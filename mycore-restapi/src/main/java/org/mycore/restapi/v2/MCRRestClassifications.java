@@ -60,7 +60,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Path("/v2/classifications")
+@Path("/classifications")
 @OpenAPIDefinition(
     tags = @Tag(name = MCRRestUtils.TAG_MYCORE_CLASSIFICATION, description = "Operations on classifications"))
 public class MCRRestClassifications {

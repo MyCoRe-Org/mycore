@@ -54,7 +54,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
  * @author Robert Stephan
  *
  */
-@Path("/v1/auth")
+@Path("/auth")
 public class MCRRestAPIAuthentication {
 
     private static final int EXPIRATION_TIME_MINUTES = 10;

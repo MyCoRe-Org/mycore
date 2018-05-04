@@ -51,7 +51,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-@Path("/v2/mycore")
+@Path("/mycore")
 public class MCRInfo {
 
     private static Date initTime = new Date();

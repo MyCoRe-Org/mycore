@@ -88,7 +88,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-@Path("/v2/objects/{" + PARAM_MCRID + "}/derivates")
+@Path("/objects/{" + PARAM_MCRID + "}/derivates")
 public class MCRRestDerivates {
     @Context
     Request request;

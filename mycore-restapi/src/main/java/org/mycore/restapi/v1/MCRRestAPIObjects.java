@@ -58,7 +58,7 @@ import org.mycore.restapi.v1.utils.MCRRestAPIUploadHelper;
  * 
  * @version $Revision: $ $Date: $
  */
-@Path("/v1/objects")
+@Path("/objects")
 public class MCRRestAPIObjects {
     public static final String STYLE_DERIVATEDETAILS = "derivatedetails";
 

@@ -56,7 +56,7 @@ import com.google.gson.stream.JsonWriter;
  * 
  * @version $Revision: $ $Date: $
  */
-@Path("/v1/messages")
+@Path("/messages")
 public class MCRRestAPIMessages {
 
     public static final String FORMAT_JSON = "json";

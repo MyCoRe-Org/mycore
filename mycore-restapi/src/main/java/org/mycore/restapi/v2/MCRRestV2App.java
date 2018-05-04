@@ -16,12 +16,13 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.restapi;
+package org.mycore.restapi.v2;
 
 import java.net.URI;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.InternalServerErrorException;
 
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +36,10 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
 import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
+import org.mycore.restapi.MCRCORSResponseFilter;
+import org.mycore.restapi.MCRRestFeature;
+import org.mycore.restapi.MCRSessionFilter;
+import org.mycore.restapi.MCRTransactionFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
@@ -50,22 +55,19 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
 
-/**
- * @author Thomas Scheffler (yagee)
- *
- */
-public class MCRRestResourceConfig extends ResourceConfig {
+@ApplicationPath("/api/v2")
+public class MCRRestV2App extends ResourceConfig {
 
-    public MCRRestResourceConfig(){
+    public MCRRestV2App() {
         super();
-        setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API");
-        LogManager.getLogger().error("========MCRRESTResourceConfig======== {}", getApplicationName());
+        setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API v2");
+        LogManager.getLogger().error("Initiialize {}", getApplicationName());
         MCRJerseyDefaultConfiguration.setupGuiceBridge(this);
         String[] restPackages = Stream
             .concat(
                 Stream.of(MCRWrappedXMLWriter.class.getPackage().getName(),
                     OpenApiResource.class.getPackage().getName()),
-                MCRConfiguration.instance().getStrings("MCR.RestAPI.Resource.Packages").stream())
+                MCRConfiguration.instance().getStrings("MCR.RestAPI.V2.Resource.Packages").stream())
             .toArray(String[]::new);
         packages(restPackages);
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true);
@@ -102,7 +104,7 @@ public class MCRRestResourceConfig extends ResourceConfig {
             .openAPI(oas)
             .resourcePackages(Stream.of(restPackages).collect(Collectors.toSet()))
             .ignoredRoutes(
-                MCRConfiguration2.getString("MCR.RestAPI.OpenAPI.IgnoredRoutes")
+                MCRConfiguration2.getString("MCR.RestAPI.V2.OpenAPI.IgnoredRoutes")
                     .map(MCRConfiguration2::splitValue)
                     .orElseGet(Stream::empty)
                     .collect(Collectors.toSet()))
@@ -116,5 +118,4 @@ public class MCRRestResourceConfig extends ResourceConfig {
             throw new InternalServerErrorException(e);
         }
     }
-
 }

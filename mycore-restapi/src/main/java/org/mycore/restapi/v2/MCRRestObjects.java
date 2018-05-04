@@ -81,7 +81,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Path("/v2/objects")
+@Path("/objects")
 @OpenAPIDefinition(tags = {
     @Tag(name = MCRRestUtils.TAG_MYCORE_OBJECT, description = "Operations on metadata objects"),
     @Tag(name = MCRRestUtils.TAG_MYCORE_DERIVATE,

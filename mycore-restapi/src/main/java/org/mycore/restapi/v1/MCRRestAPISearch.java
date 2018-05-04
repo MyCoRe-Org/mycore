@@ -50,7 +50,7 @@ import org.mycore.solr.MCRSolrConstants;
  * 
  * @version $Revision: $ $Date: $
  */
-@Path("/v1/search")
+@Path("/search")
 public class MCRRestAPISearch {
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 

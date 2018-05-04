@@ -72,7 +72,7 @@ import com.google.gson.stream.JsonWriter;
  *
  * @version $Revision: $ $Date: $
  */
-@Path("/v1/classifications")
+@Path("/classifications")
 public class MCRRestAPIClassifications {
 
     public static final String FORMAT_JSON = "json";
