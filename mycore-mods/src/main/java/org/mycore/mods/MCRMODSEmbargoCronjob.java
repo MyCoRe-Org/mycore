@@ -18,12 +18,9 @@
 
 package org.mycore.mods;
 
-import static org.mycore.datamodel.metadata.MCRObjectService.DATE_TYPE_MODIFYDATE;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
@@ -54,10 +51,6 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final int TIMER_TASK_PERIOD = 1000 * 60;// * 60 * 3;
-
-    public MCRMODSEmbargoCronjob() {
-
-    }
 
     @Override
     public String getName() {
