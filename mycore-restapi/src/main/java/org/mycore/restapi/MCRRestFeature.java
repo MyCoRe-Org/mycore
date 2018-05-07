@@ -20,17 +20,16 @@ package org.mycore.restapi;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
-import org.mycore.frontend.jersey.MCRCacheControl;
-import org.mycore.frontend.jersey.filter.MCRCacheFilter;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 
 /**
@@ -68,7 +67,12 @@ public class MCRRestFeature extends MCRJerseyDefaultFeature {
 
     @Override
     protected List<String> getPackages() {
-        return MCRConfiguration.instance().getStrings("MCR.RestAPI.Resource.Packages");
+        return Stream.concat(
+            MCRConfiguration2.getString("MCR.RestAPI.Resource.Packages").map(MCRConfiguration2::splitValue)
+                .orElse(Stream.empty()),
+            MCRConfiguration2.getString("MCR.RestAPI.V2.Resource.Packages").map(MCRConfiguration2::splitValue)
+                .orElse(Stream.empty()))
+            .collect(Collectors.toList());
     }
 
     @Override
