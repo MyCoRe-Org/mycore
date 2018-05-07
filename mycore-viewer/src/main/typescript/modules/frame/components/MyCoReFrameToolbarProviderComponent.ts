@@ -33,6 +33,10 @@ namespace mycore.viewer.components {
         public init() {
             var frameToolbarModel = new mycore.viewer.model.MyCoReFrameToolbarModel();
 
+            if(this._settings.mobile){
+                frameToolbarModel.shrink();
+            }
+
             this.trigger(new events.ProvideToolbarModelEvent(
                 this, frameToolbarModel));
         }
