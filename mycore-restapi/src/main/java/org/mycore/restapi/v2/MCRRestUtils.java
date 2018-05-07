@@ -21,6 +21,7 @@ package org.mycore.restapi.v2;
 import java.util.Date;
 import java.util.Optional;
 
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
@@ -42,6 +43,11 @@ final class MCRRestUtils {
     static Optional<Response> getCachedResponse(Request request, Date lastModified) {
         return Optional.ofNullable(request)
             .map(r -> r.evaluatePreconditions(lastModified))
+            .map(Response.ResponseBuilder::build);
+    }
+    static Optional<Response> getCachedResponse(Request request, Date lastModified, EntityTag eTag) {
+        return Optional.ofNullable(request)
+            .map(r -> r.evaluatePreconditions(lastModified, eTag))
             .map(Response.ResponseBuilder::build);
     }
 }

@@ -21,14 +21,19 @@ package org.mycore.restapi.v2;
 import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
-import java.nio.ByteBuffer;
+import java.nio.file.CopyOption;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.SecureDirectoryStream;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -37,19 +42,26 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Variant;
@@ -59,14 +71,17 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.CountingOutputStream;
+import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.logging.log4j.LogManager;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.jersey.MCRCacheControl;
+import org.mycore.restapi.annotations.MCRRequireTransaction;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -80,21 +95,27 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/[^/]+)*}")
 public class MCRRestDerivateContents {
     @Context
-    HttpRequest request;
-
-    @Context
-    HttpResponse response;
+    ContainerRequestContext request;
 
     @Context
     ServletContext context;
 
+    @Parameter(example = "mir_mods_00004711")
+    @PathParam(PARAM_MCRID)
+    MCRObjectID mcrId;
+
+    @Parameter(example = "mir_derivate_00004711")
+    @PathParam(PARAM_DERID)
+    MCRObjectID derid;
+
+    @PathParam("path")
+    @DefaultValue("")
+    String path;
+
     @HEAD
     @MCRCacheControl(sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
-    public Response getHead(
-        @Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID mcrId,
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid,
-        @PathParam("path") @DefaultValue("") String path) {
-        MCRPath mcrPath = getPath(derid, path);
+    public Response getHead() {
+        MCRPath mcrPath = getPath();
         MCRFileAttributes fileAttributes;
         try {
             fileAttributes = Files.readAttributes(mcrPath, MCRFileAttributes.class);
@@ -125,10 +146,7 @@ public class MCRRestDerivateContents {
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Operation(
         summary = "List directory contents or serves file given by {path} in derivate")
-    public Response getFileOrDirectory(
-        @Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID mcrId,
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid,
-        @PathParam("path") @DefaultValue("") String path) {
+    public Response getFileOrDirectory() {
         LogManager.getLogger().info("{}:{}", derid, path);
         MCRPath mcrPath = MCRPath.getPath(derid.toString(), path);
         MCRFileAttributes fileAttributes = null;
@@ -149,6 +167,128 @@ public class MCRRestDerivateContents {
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_TYPE, context.getMimeType(mcrPath.getFileName().toString()))
             .build();
+    }
+
+    @PUT
+    @Consumes(MediaType.WILDCARD)
+    @Operation(summary = "Creates directory or file. Parent must exists.")
+    @MCRRequireTransaction
+    public Response createFileOrDirectory(@Nullable InputStream contents) {
+        MCRPath mcrPath = MCRPath.getPath(derid.toString(), path);
+        if (mcrPath.getNameCount() > 1) {
+            MCRPath parentDirectory = mcrPath.getParent();
+            try {
+                BasicFileAttributes parentAttrs = Files.readAttributes(parentDirectory, BasicFileAttributes.class);
+                if (!parentAttrs.isDirectory()) {
+                    throw new BadRequestException();
+                }
+            } catch (IOException e) {
+                throw new NotFoundException();
+            }
+        }
+        if (isFile()) {
+            long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
+            String contentLength = request.getHeaderString(HttpHeaders.CONTENT_LENGTH);
+            if (contentLength != null && Long.parseLong(contentLength) > maxSize) {
+                throw new BadRequestException("File is to big. " + mcrPath);
+            }
+            return updateOrCreateFile(contents, mcrPath);
+        } else {
+            //is directory
+            return createDirectory(mcrPath);
+        }
+    }
+
+    @DELETE
+    @Operation(summary = "Creates directory or file. Parent must exists.")
+    @MCRRequireTransaction
+    public Response deleteFileOrDirectory() {
+        MCRPath mcrPath = getPath();
+        try {
+            if (Files.deleteIfExists(mcrPath)) {
+                return Response.ok().build();
+            }
+        } catch (DirectoryNotEmptyException e) {
+            throw new BadRequestException("Directory is not empty: " + mcrPath);
+        } catch (IOException e) {
+            throw new InternalServerErrorException(e);
+        }
+        throw new NotFoundException();
+    }
+
+    private static Response createDirectory(MCRPath mcrPath) {
+        try {
+            BasicFileAttributes directoryAttrs = Files.readAttributes(mcrPath, BasicFileAttributes.class);
+            if (!directoryAttrs.isDirectory()) {
+                throw new BadRequestException("Overwrite directory with file: " + mcrPath);
+            }
+            return Response.ok().build();
+        } catch (IOException e) {
+            //does not exist
+            LogManager.getLogger().info("Creating directory: {}", mcrPath);
+            try {
+                Files.createDirectory(mcrPath);
+            } catch (IOException e2) {
+                throw new InternalServerErrorException(e2);
+            }
+            return Response.status(Response.Status.CREATED).build();
+        }
+    }
+
+    private Response updateOrCreateFile(InputStream contents, MCRPath mcrPath) {
+        MCRFileAttributes fileAttributes;
+        try {
+            fileAttributes = Files.readAttributes(mcrPath, MCRFileAttributes.class);
+            if (!fileAttributes.isRegularFile()) {
+                throw new BadRequestException("Overwrite directory with file: " + mcrPath);
+            }
+        } catch (IOException e) {
+            //does not exist
+            LogManager.getLogger().info("Creating file: {}", mcrPath);
+            try {
+                Files.copy(contents, mcrPath);
+            } catch (IOException e2) {
+                try {
+                    Files.deleteIfExists(mcrPath);
+                } catch (IOException e3) {
+                    LogManager.getLogger().warn("Error while deleting incomplete file.", e3);
+                }
+                throw new InternalServerErrorException(e2);
+            }
+            return Response.status(Response.Status.CREATED).build();
+        }
+        //file does already exist
+        Date lastModified = new Date(fileAttributes.lastModifiedTime().toMillis());
+        EntityTag eTag = getETag(mcrPath, fileAttributes);
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified,
+            eTag);
+        if (cachedResponse.isPresent()) {
+            return cachedResponse.get();
+        }
+        LogManager.getLogger().info("Updating file: {}", mcrPath);
+        int memBuf = MCRConfiguration2.getOrThrow("MCR.FileUpload.MemoryThreshold", Integer::parseInt);
+        java.io.File uploadDirectory = MCRConfiguration2.getOrThrow("MCR.FileUpload.TempStoragePath",
+            java.io.File::new);
+        try {
+            try (DeferredFileOutputStream dfos = new DeferredFileOutputStream(memBuf, mcrPath.getOwner(),
+                mcrPath.getFileName().toString(), uploadDirectory);
+                MaxBytesOutputStream mbos = new MaxBytesOutputStream(dfos)) {
+                IOUtils.copy(contents, mbos);
+                try (InputStream bufferedInput = dfos.isInMemory() ? new ByteArrayInputStream(dfos.getData())
+                    : Files.newInputStream(dfos.getFile().toPath())) {
+                    Files.copy(bufferedInput, mcrPath, StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+        } catch (IOException e) {
+            throw new InternalServerErrorException(e);
+        }
+        return Response.ok().build();
+    }
+
+    private boolean isFile() {
+        //as per https://tools.ietf.org/html/rfc7230#section-3.3
+        MultivaluedMap<String, String> headers = request.getHeaders();
+        return headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding");
     }
 
     private Response serveDirectory(MCRPath mcrPath, MCRFileAttributes dirAttrs) {
@@ -181,8 +321,8 @@ public class MCRRestDerivateContents {
         return Response.ok(dir).build();
     }
 
-    private static MCRPath getPath(MCRObjectID derId, String path) {
-        return MCRPath.getPath(derId.toString(), path);
+    private MCRPath getPath() {
+        return MCRPath.getPath(derid.toString(), path);
     }
 
     private static EntityTag getETag(MCRPath path, MCRFileAttributes attrs) {
@@ -311,6 +451,24 @@ public class MCRRestDerivateContents {
                 })
                 .compound((de1, de2) -> de1.getName().compareTo(de2.getName()))
                 .compare(this, o);
+        }
+    }
+
+    private static class MaxBytesOutputStream extends CountingOutputStream {
+
+        private final long maxSize;
+
+        public MaxBytesOutputStream(OutputStream out) {
+            super(out);
+            maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
+        }
+
+        @Override
+        protected synchronized void beforeWrite(int n) {
+            super.beforeWrite(n);
+            if (getByteCount() > maxSize) {
+                throw new BadRequestException("Maximum upload file size exceeded: " + maxSize);
+            }
         }
     }
 
