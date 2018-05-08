@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
-import java.nio.file.CopyOption;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -91,6 +90,7 @@ import com.google.common.collect.Ordering;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/[^/]+)*}")
 public class MCRRestDerivateContents {
@@ -171,7 +171,13 @@ public class MCRRestDerivateContents {
 
     @PUT
     @Consumes(MediaType.WILDCARD)
-    @Operation(summary = "Creates directory or file. Parent must exists.")
+    @Operation(summary = "Creates directory or file. Parent must exists.",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "if directory already exists or while was updated"),
+            @ApiResponse(responseCode = "201", description = "if directory or file was created"),
+            @ApiResponse(responseCode = "400",
+                description = "if directory overwrites file or vice versa; content length is too big"),
+        })
     @MCRRequireTransaction
     public Response createFileOrDirectory(@Nullable InputStream contents) {
         MCRPath mcrPath = MCRPath.getPath(derid.toString(), path);
@@ -200,13 +206,16 @@ public class MCRRestDerivateContents {
     }
 
     @DELETE
-    @Operation(summary = "Creates directory or file. Parent must exists.")
+    @Operation(summary = "Deletes file or empty directory.",
+        responses = { @ApiResponse(responseCode = "204", description = "if deletion exists"),
+            @ApiResponse(responseCode = "400", description = "if directory is not empty"),
+        })
     @MCRRequireTransaction
     public Response deleteFileOrDirectory() {
         MCRPath mcrPath = getPath();
         try {
             if (Files.deleteIfExists(mcrPath)) {
-                return Response.ok().build();
+                return Response.noContent().build();
             }
         } catch (DirectoryNotEmptyException e) {
             throw new BadRequestException("Directory is not empty: " + mcrPath);
@@ -222,7 +231,7 @@ public class MCRRestDerivateContents {
             if (!directoryAttrs.isDirectory()) {
                 throw new BadRequestException("Overwrite directory with file: " + mcrPath);
             }
-            return Response.ok().build();
+            return Response.noContent().build();
         } catch (IOException e) {
             //does not exist
             LogManager.getLogger().info("Creating directory: {}", mcrPath);
@@ -282,7 +291,7 @@ public class MCRRestDerivateContents {
         } catch (IOException e) {
             throw new InternalServerErrorException(e);
         }
-        return Response.ok().build();
+        return Response.noContent().build();
     }
 
     private boolean isFile() {
