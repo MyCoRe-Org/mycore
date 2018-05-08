@@ -41,6 +41,7 @@ import org.mycore.restapi.MCRRestFeature;
 import org.mycore.restapi.MCRSessionFilter;
 import org.mycore.restapi.MCRTransactionFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
+import org.mycore.restapi.v1.MCRRestAPIAuthentication;
 import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
@@ -70,6 +71,7 @@ public class MCRRestV2App extends ResourceConfig {
                 MCRConfiguration.instance().getStrings("MCR.RestAPI.V2.Resource.Packages").stream())
             .toArray(String[]::new);
         packages(restPackages);
+        register(MCRRestAPIAuthentication.class); //keep 'unchanged' in v2
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true);
         register(MCRSessionFilter.class);
         register(MCRTransactionFilter.class);
