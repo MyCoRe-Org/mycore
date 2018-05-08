@@ -90,6 +90,7 @@ import com.google.common.collect.Ordering;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/[^/]+)*}")
@@ -114,7 +115,17 @@ public class MCRRestDerivateContents {
 
     @HEAD
     @MCRCacheControl(sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
-    public Response getHead() {
+    @Operation(description = "get information about mime-type(s), last modified, ETag (md5sum) and ranges support",
+        tags = MCRRestUtils.TAG_MYCORE_FILE,
+        responses = @ApiResponse(
+            description = "Use this for single file metadata queries only. Support is implemented for user agents.",
+            headers = {
+                @Header(name = "Content-Type", description = "mime type of file"),
+                @Header(name = "Content-Length", description = "size of file"),
+                @Header(name = "ETag", description = "MD5 sum of file"),
+                @Header(name = "Last-Modified", description = "last modified date of file"),
+            }))
+    public Response getFileOrDirectoryMetadata() {
         MCRPath mcrPath = getPath();
         MCRFileAttributes fileAttributes;
         try {
@@ -145,7 +156,8 @@ public class MCRRestDerivateContents {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Operation(
-        summary = "List directory contents or serves file given by {path} in derivate")
+        summary = "List directory contents or serves file given by {path} in derivate",
+        tags = MCRRestUtils.TAG_MYCORE_FILE)
     public Response getFileOrDirectory() {
         LogManager.getLogger().info("{}:{}", derid, path);
         MCRPath mcrPath = MCRPath.getPath(derid.toString(), path);
@@ -177,7 +189,8 @@ public class MCRRestDerivateContents {
             @ApiResponse(responseCode = "201", description = "if directory or file was created"),
             @ApiResponse(responseCode = "400",
                 description = "if directory overwrites file or vice versa; content length is too big"),
-        })
+        },
+        tags = MCRRestUtils.TAG_MYCORE_FILE)
     @MCRRequireTransaction
     public Response createFileOrDirectory(@Nullable InputStream contents) {
         MCRPath mcrPath = MCRPath.getPath(derid.toString(), path);
@@ -209,7 +222,8 @@ public class MCRRestDerivateContents {
     @Operation(summary = "Deletes file or empty directory.",
         responses = { @ApiResponse(responseCode = "204", description = "if deletion exists"),
             @ApiResponse(responseCode = "400", description = "if directory is not empty"),
-        })
+        },
+        tags = MCRRestUtils.TAG_MYCORE_FILE)
     @MCRRequireTransaction
     public Response deleteFileOrDirectory() {
         MCRPath mcrPath = getPath();

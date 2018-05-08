@@ -96,6 +96,10 @@ public class MCRRestDerivates {
     @Context
     UriInfo uriInfo;
 
+    @Parameter(example = "mir_mods_00004711")
+    @PathParam(PARAM_MCRID)
+    MCRObjectID mcrId;
+
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
@@ -110,18 +114,18 @@ public class MCRRestDerivates {
 
         },
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
-    public Response listDerivates(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
+    public Response listDerivates()
         throws IOException {
-        long modified = MCRXMLMetadataManager.instance().getLastModified(id);
+        long modified = MCRXMLMetadataManager.instance().getLastModified(mcrId);
         if (modified < 0) {
-            throw new NotFoundException("MCRObject " + id + " not found");
+            throw new NotFoundException("MCRObject " + mcrId + " not found");
         }
         Date lastModified = new Date(modified);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(id);
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrId);
         List<MCRMetaLinkID> derivates = obj.getStructure().getDerivates();
         GenericEntity<List<MCRMetaLinkID>> entity = new GenericEntity<List<MCRMetaLinkID>>(derivates) {
         };
@@ -135,7 +139,7 @@ public class MCRRestDerivates {
             .build();
     }
 
-    private void validateDerivateRelation(MCRObjectID mcrId, MCRObjectID derId) {
+    private static void validateDerivateRelation(MCRObjectID mcrId, MCRObjectID derId) {
         MCRObjectID objectId = MCRMetadataManager.getObjectId(derId, 1, TimeUnit.DAYS);
         if (objectId != null && !mcrId.equals(objectId)) {
             objectId = MCRMetadataManager.getObjectId(derId, 0, TimeUnit.SECONDS);
@@ -155,8 +159,7 @@ public class MCRRestDerivates {
         summary = "Returns given derivate in the given object",
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
     @Path("/{" + PARAM_DERID + "}")
-    public Response getDerivate(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID mcrId,
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid)
+    public Response getDerivate(@Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid)
         throws IOException {
         validateDerivateRelation(mcrId, derid);
         long modified = MCRXMLMetadataManager.instance().getLastModified(derid);
@@ -187,8 +190,7 @@ public class MCRRestDerivates {
         })
     @MCRRequireTransaction
     @Path("/{" + PARAM_DERID + "}")
-    public Response updateDerivate(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID mcrId,
-        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid,
+    public Response updateDerivate(@Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid,
         @Parameter(required = true,
             description = "MCRObject XML",
             examples = @ExampleObject("<mycoreobject ID=\"{mcrid}\" ..>\n...\n</mycorobject>")) InputStream xmlSource)
@@ -246,9 +248,8 @@ public class MCRRestDerivates {
             headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new derivate")),
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
     @MCRRequireTransaction
-    public Response createDefaultDerivate(
-        @Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID mcrId) {
-        return doCreateDerivate(mcrId, new DerivateMetadata());
+    public Response createDefaultDerivate() {
+        return doCreateDerivate(new DerivateMetadata());
     }
 
     @POST
@@ -262,15 +263,11 @@ public class MCRRestDerivates {
         content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA,
             schema = @Schema(implementation = DerivateMetadata.class)))
     @MCRRequireTransaction
-    public Response createDerivate(
-        @Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID mcrId,
-        @BeanParam DerivateMetadata der) {
-        return doCreateDerivate(mcrId, der);
+    public Response createDerivate(@BeanParam DerivateMetadata der) {
+        return doCreateDerivate(der);
     }
 
-    private Response doCreateDerivate(
-        @Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID mcrId,
-        @BeanParam DerivateMetadata der) {
+    private Response doCreateDerivate(@BeanParam DerivateMetadata der) {
         LogManager.getLogger().info(der);
         String projectID = mcrId.getProjectId();
         MCRObjectID derId = MCRObjectID.getNextFreeId(projectID + "_derivate");

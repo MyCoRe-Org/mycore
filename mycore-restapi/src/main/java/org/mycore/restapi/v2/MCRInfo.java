@@ -46,12 +46,17 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/mycore")
+@OpenAPIDefinition(
+    tags = @Tag(name = MCRRestUtils.TAG_MYCORE_ABOUT, description = "informations about this repository")
+)
 public class MCRInfo {
 
     private static Date initTime = new Date();
@@ -65,7 +70,8 @@ public class MCRInfo {
     @Operation(description = "get MyCoRe version information",
         responses = {
             @ApiResponse(content = @Content(schema = @Schema(implementation = GitInfo.class)))
-        })
+        },
+        tags = MCRRestUtils.TAG_MYCORE_ABOUT)
     public Response getVersion() {
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, initTime);
         return cachedResponse.orElseGet(
