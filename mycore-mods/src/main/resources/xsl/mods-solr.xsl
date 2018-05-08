@@ -189,11 +189,9 @@
       <field name="mods.embargo">
         <xsl:value-of select="." />
       </field>
-      <xsl:if test="embargo:isAfterToday(text())">
-        <field name="mods.embargo.date">
-          <xsl:value-of select="." />
-        </field>
-      </xsl:if>
+      <field name="mods.embargo.date">
+        <xsl:value-of select="." />
+      </field>
     </xsl:for-each>
     <xsl:for-each select="mods:accessCondition[@type='use and reproduction']">
       <field name="mods.rights">

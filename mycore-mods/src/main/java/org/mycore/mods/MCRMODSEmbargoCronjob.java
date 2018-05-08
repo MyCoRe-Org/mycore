@@ -98,10 +98,11 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
             final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
             final MCRMODSWrapper modsWrapper = new MCRMODSWrapper(object);
             final String embargoXPATH = "mods:accessCondition[@type='embargo']";
-            final String expiredEmbargoXpath = "mods:accessCondition[@type='expiredEmbargo']";
             final String embargoString = modsWrapper.getElement(embargoXPATH).getTextNormalize();
             modsWrapper.removeElements(embargoXPATH);
-            modsWrapper.addElement(expiredEmbargoXpath).setText(embargoString);
+            modsWrapper.addElement("mods:accessCondition")
+                .setAttribute("type", "expiredEmbargo")
+                .setText(embargoString);
             MCRMetadataManager.update(object);
         } catch (MCRAccessException e) {
             LOGGER.error("Error while releasing embargo document!", e);
