@@ -21,26 +21,38 @@
  */
 package org.mycore.restapi;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
 import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
+import org.mycore.restapi.v1.feature.MCRRESTFeature;
 
 /**
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRRESTResourceConfig extends ResourceConfig {
+public class MCRRESTResourceConfig extends MCRJerseyDefaultConfiguration {
 
-    protected String[] packages;
+    public static final String REST_API_PACKAGE = "MCR.RestAPI.Resource.Packages";
 
     public MCRRESTResourceConfig() {
         super();
-        String[] restPackages = MCRConfiguration.instance().getStrings("MCR.RestAPI.Resource.Packages").stream()
-            .toArray(String[]::new);
-        packages(restPackages);
-        register(MultiPartFeature.class);
-        register(MCRRestAPIExceptionMapper.class);
     }
 
+    @Override
+    public void configure(ResourceConfig resourceConfig) {
+        resourceConfig.register(MCRRestAPIExceptionMapper.class);
+        super.configure(resourceConfig);
+    }
+
+    @Override
+    protected void setupResources(ResourceConfig resourceConfig) {
+        resourceConfig.packages(MCRConfiguration.instance().getStrings(REST_API_PACKAGE).toArray(new String[0]));
+    }
+
+    @Override
+    protected void setupFeatures(ResourceConfig resourceConfig) {
+        super.setupFeatures(resourceConfig);
+        resourceConfig.register(MCRRESTFeature.class);
+    }
 }
