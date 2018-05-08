@@ -100,7 +100,7 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
             final String embargoXPATH = "mods:accessCondition[@type='embargo']";
             final String embargoString = modsWrapper.getElement(embargoXPATH).getTextNormalize();
             modsWrapper.removeElements(embargoXPATH);
-            modsWrapper.addElement("mods:accessCondition")
+            modsWrapper.addElement("accessCondition")
                 .setAttribute("type", "expiredEmbargo")
                 .setText(embargoString);
             MCRMetadataManager.update(object);
