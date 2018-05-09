@@ -23,8 +23,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
-
 /**
  * Used to mark REST methods that require an active JPA transaction
  * @author Thomas Scheffler (yagee)

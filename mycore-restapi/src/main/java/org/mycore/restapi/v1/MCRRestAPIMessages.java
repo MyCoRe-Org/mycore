@@ -42,7 +42,6 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.stream.JsonWriter;

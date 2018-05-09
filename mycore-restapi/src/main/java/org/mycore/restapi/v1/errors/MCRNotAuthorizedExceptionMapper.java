@@ -18,17 +18,11 @@
 
 package org.mycore.restapi.v1.errors;
 
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-
-import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
 
 /**
  * Maps response status {@link Response.Status#FORBIDDEN} to
