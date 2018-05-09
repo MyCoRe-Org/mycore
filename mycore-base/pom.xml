@@ -79,12 +79,10 @@
           <dateFormat>yyyy-MM-dd'T'HH:mm:ssXXX</dateFormat>
           <dateFormatTimeZone>UTC</dateFormatTimeZone>
           <commitIdGenerationMode>full</commitIdGenerationMode>
-          <!--
           <excludeProperties>
             <excludeProperty>.*\.email</excludeProperty>
             <excludeProperty>.*\.host</excludeProperty>
           </excludeProperties>
--->
         </configuration>
         <executions>
           <execution>

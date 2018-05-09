@@ -28,9 +28,9 @@ import java.security.SecureRandom;
 import java.util.Date;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -62,6 +62,10 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
             if (!sharedSecretFile.isFile()) {
                 secret = new byte[4096];
                 try {
+                    LogManager.getLogger().warn(
+                        "Creating shared secret file ({}) for JSON Web Token."
+                            + " This may take a while. Please wait...",
+                        sharedSecretFile);
                     SecureRandom.getInstanceStrong().nextBytes(secret);
                     Files.write(sharedSecretFile.toPath(), secret, StandardOpenOption.CREATE_NEW);
                 } catch (NoSuchAlgorithmException | IOException e) {
