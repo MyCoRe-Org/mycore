@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.container.CompletionCallback;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -42,6 +42,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.WriterInterceptor;
+import javax.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,7 +65,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-public class MCRSessionFilter implements ContainerRequestFilter, ContainerResponseFilter, CompletionCallback {
+public class MCRSessionFilter implements ContainerRequestFilter, ContainerResponseFilter, WriterInterceptor {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
@@ -111,7 +113,8 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         if (MCRSessionMgr.hasCurrentSession()) {
             throw new InternalServerErrorException("Session is already attached.");
         }
-        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+        MCRSessionMgr.unlock();
+        MCRSession currentSession = MCRSessionMgr.getCurrentSession(); //bind to this request
         currentSession.setCurrentIP(MCRFrontendUtil.getRemoteAddr(httpServletRequest));
         currentSession.beginTransaction();
         //3 cases for authentication
@@ -166,7 +169,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 userInformation = Optional.of(new MCRJWTUserInformation(jwt));
             } catch (JWTVerificationException e) {
                 LOGGER.error(e.getMessage());
-                LinkedHashMap<String, String> attrs=new LinkedHashMap<>();
+                LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
                 attrs.put("error", "invalid_token");
                 attrs.put("error_description", e.getMessage());
                 throw new NotAuthorizedException(e.getMessage(), e,
@@ -189,6 +192,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
         throws IOException {
+        LOGGER.info("Response filtered");
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
         if (responseContext.getStatus() == Response.Status.FORBIDDEN.getStatusCode() && currentSession
             .getUserInformation().getUserID().equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
@@ -198,38 +202,30 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
         }
         addJWTToResponse(requestContext, responseContext);
-
-        try {
-            if (currentSession.isTransactionActive()) {
-                if (currentSession.transactionRequiresRollback()) {
-                    currentSession.rollbackTransaction();
-                } else {
-                    currentSession.commitTransaction();
-                }
-            }
-        } finally {
-            MCRSessionMgr.releaseCurrentSession();
-            currentSession.close();
-        }
     }
 
     @Override
-    public void onComplete(Throwable throwable) {
-        LOGGER.warn("Complete");
+    public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
+        context.proceed();
         if (MCRSessionMgr.hasCurrentSession()) {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             try {
                 if (currentSession.isTransactionActive()) {
-                    LOGGER.warn("Active MCRSession and JPA-Transaction found. Clearing up");
-                    currentSession.rollbackTransaction();
+                    LOGGER.debug("Active MCRSession and JPA-Transaction found. Clearing up");
+                    if (currentSession.transactionRequiresRollback()) {
+                        currentSession.rollbackTransaction();
+                    } else {
+                        currentSession.commitTransaction();
+                    }
                 } else {
-                    LOGGER.warn("Active MCRSession found. Clearing up");
+                    LOGGER.debug("Active MCRSession found. Clearing up");
                 }
             } finally {
                 MCRSessionMgr.releaseCurrentSession();
                 currentSession.close();
+                MCRSessionMgr.lock();
+                LOGGER.info("Session closed.");
             }
-
         }
     }
 
