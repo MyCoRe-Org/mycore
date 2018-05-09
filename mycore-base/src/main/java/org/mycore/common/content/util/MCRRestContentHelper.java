@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
@@ -46,7 +48,7 @@ public abstract class MCRRestContentHelper {
 
     private static Logger LOGGER = LogManager.getLogger();
 
-    public static final RuntimeDelegate.HeaderDelegate<Date> DATE_HEADER_DELEGATE =RuntimeDelegate.getInstance()
+    public static final RuntimeDelegate.HeaderDelegate<Date> DATE_HEADER_DELEGATE = RuntimeDelegate.getInstance()
         .createHeaderDelegate(Date.class);
 
     public enum ContentDispositionType {
@@ -100,6 +102,12 @@ public abstract class MCRRestContentHelper {
         if (config.useAcceptRanges) {
             response.header("Accept-Ranges", "bytes");
             ranges = parseRange(requestHeader, lastModified, eTag, contentLength);
+            String varyHeader = Stream.of("Range", "If-Range")
+                .filter(h -> requestHeader.getHeaderString(h) != null)
+                .collect(Collectors.joining(","));
+            if (!varyHeader.isEmpty()) {
+                response.header(HttpHeaders.VARY, varyHeader);
+            }
         }
 
         String filename = Optional.of(content.getName())
