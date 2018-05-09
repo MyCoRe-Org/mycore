@@ -62,7 +62,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -77,6 +77,8 @@ import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRPathContent;
+import org.mycore.common.content.util.MCRRestContentHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
@@ -147,6 +149,7 @@ public class MCRRestDerivateContents {
         String mimeType = context.getMimeType(path);
         return Response
             .status(Response.Status.PARTIAL_CONTENT)
+            .header("Accept-Ranges", "bytes")
             .header(HttpHeaders.CONTENT_TYPE, mimeType)
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
@@ -162,7 +165,7 @@ public class MCRRestDerivateContents {
     @Operation(
         summary = "List directory contents or serves file given by {path} in derivate",
         tags = MCRRestUtils.TAG_MYCORE_FILE)
-    public Response getFileOrDirectory() {
+    public Response getFileOrDirectory(@Context UriInfo uriInfo, @Context HttpHeaders requestHeader) {
         LogManager.getLogger().info("{}:{}", derid, path);
         MCRPath mcrPath = MCRPath.getPath(derid.toString(), path);
         MCRFileAttributes fileAttributes;
@@ -174,15 +177,12 @@ public class MCRRestDerivateContents {
         if (fileAttributes.isDirectory()) {
             return serveDirectory(mcrPath, fileAttributes);
         }
-        StreamingOutput sout = out -> Files.copy(mcrPath, out);
-        Response.Status status = Response.Status.OK;
-        return Response.status(status)
-            .entity(sout)
-            .tag(getETag(fileAttributes))
-            .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
-            .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
-            .header(HttpHeaders.CONTENT_TYPE, context.getMimeType(mcrPath.getFileName().toString()))
-            .build();
+        MCRPathContent content = new MCRPathContent(mcrPath, fileAttributes);
+        try {
+            return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader);
+        } catch (IOException e) {
+            throw new InternalServerErrorException(e);
+        }
     }
 
     @PUT

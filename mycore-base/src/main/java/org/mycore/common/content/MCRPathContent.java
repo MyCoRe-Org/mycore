@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
@@ -51,10 +52,17 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
 
     private Path path;
 
+    private BasicFileAttributes attrs;
+
     private static int BUFFER_SIZE = 8192;
 
     public MCRPathContent(Path path) {
+        this(path, null);
+    }
+
+    public MCRPathContent(Path path, BasicFileAttributes attrs) {
         this.path = Objects.requireNonNull(path).toAbsolutePath().normalize();
+        this.attrs = attrs;
     }
 
     /* (non-Javadoc)
@@ -116,16 +124,19 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
 
     @Override
     public long length() throws IOException {
-        return Files.size(path);
+        return attrs != null ? attrs.size() : Files.size(path);
     }
 
     @Override
     public long lastModified() throws IOException {
-        return Files.getLastModifiedTime(path).toMillis();
+        return (attrs != null ? attrs.lastModifiedTime() : Files.getLastModifiedTime(path)).toMillis();
     }
 
     @Override
     public String getETag() throws IOException {
+        if (attrs instanceof MCRFileAttributes){
+            return ((MCRFileAttributes) attrs).md5sum();
+        }
         Object fileKey = Files.getAttribute(path, "md5");
         if (fileKey instanceof String) {
             return fileKey.toString();
