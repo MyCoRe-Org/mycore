@@ -83,12 +83,11 @@ public class MCRRestV2App extends ResourceConfig {
         register(MCRNotAuthorizedExceptionMapper.class);
         register(MCRCORSResponseFilter.class);
         register(MCRRequestScopeACLFactory.getBinder());
-        getInstances().stream()
-            .forEach(LogManager.getLogger()::info);
+        getInstances().forEach(LogManager.getLogger()::info);
         setupOAS(restPackages);
     }
 
-    protected void setupOAS(String[] restPackages) {
+    private void setupOAS(String[] restPackages) {
         OpenAPI oas = new OpenAPI();
         Info oasInfo = new Info();
         oas.setInfo(oasInfo);

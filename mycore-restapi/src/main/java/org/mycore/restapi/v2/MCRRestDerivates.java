@@ -190,7 +190,8 @@ public class MCRRestDerivates {
         })
     @MCRRequireTransaction
     @Path("/{" + PARAM_DERID + "}")
-    public Response updateDerivate(@Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid,
+    public Response updateDerivate(
+        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid,
         @Parameter(required = true,
             description = "MCRObject XML",
             examples = @ExampleObject("<mycoreobject ID=\"{mcrid}\" ..>\n...\n</mycorobject>")) InputStream xmlSource)
@@ -214,7 +215,7 @@ public class MCRRestDerivates {
             create = false;
         }
         MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null, MCRDerivate.ROOT_NAME);
-        MCRDerivate derivate = null;
+        MCRDerivate derivate;
         try {
             derivate = new MCRDerivate(inputContent.asXML());
             derivate.validate();
@@ -309,14 +310,14 @@ public class MCRRestDerivates {
         return Response.created(uriInfo.getAbsolutePathBuilder().path(derId.toString()).build()).build();
     }
 
-    public static class DerivateMetadata {
+    static class DerivateMetadata {
         private String label;
 
         private boolean displayEnabled = true;
 
         private String mainDoc;
 
-        public String getLabel() {
+        String getLabel() {
             return label;
         }
 
@@ -325,7 +326,7 @@ public class MCRRestDerivates {
             this.label = label;
         }
 
-        public boolean isDisplayEnabled() {
+        boolean isDisplayEnabled() {
             return displayEnabled;
         }
 
@@ -335,7 +336,7 @@ public class MCRRestDerivates {
             this.displayEnabled = displayEnabled;
         }
 
-        public String getMainDoc() {
+        String getMainDoc() {
             return mainDoc;
         }
 

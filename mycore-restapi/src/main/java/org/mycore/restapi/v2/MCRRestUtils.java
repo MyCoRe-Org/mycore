@@ -47,6 +47,7 @@ final class MCRRestUtils {
             .map(r -> r.evaluatePreconditions(lastModified))
             .map(Response.ResponseBuilder::build);
     }
+
     static Optional<Response> getCachedResponse(Request request, Date lastModified, EntityTag eTag) {
         return Optional.ofNullable(request)
             .map(r -> r.evaluatePreconditions(lastModified, eTag))

@@ -55,11 +55,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/mycore")
 @OpenAPIDefinition(
-    tags = @Tag(name = MCRRestUtils.TAG_MYCORE_ABOUT, description = "informations about this repository")
-)
+    tags = @Tag(name = MCRRestUtils.TAG_MYCORE_ABOUT, description = "informations about this repository"))
 public class MCRInfo {
 
-    private static Date initTime = new Date();
+    private static final Date INIT_TIME = new Date();
 
     @Context
     Request request;
@@ -73,14 +72,14 @@ public class MCRInfo {
         },
         tags = MCRRestUtils.TAG_MYCORE_ABOUT)
     public Response getVersion() {
-        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, initTime);
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, INIT_TIME);
         return cachedResponse.orElseGet(
-            () -> Response.ok(new GitInfo(MCRCoreVersion.getVersionProperties())).lastModified(initTime).build());
+            () -> Response.ok(new GitInfo(MCRCoreVersion.getVersionProperties())).lastModified(INIT_TIME).build());
     }
 
     @XmlRootElement
     @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY)
-    public static class GitInfo {
+    static class GitInfo {
         private String branch;
 
         private BuildInfo build;
@@ -99,7 +98,7 @@ public class MCRInfo {
             //JAXB;
         }
 
-        public GitInfo(Map<String, String> props) {
+        GitInfo(Map<String, String> props) {
             branch = props.get("git.branch");
             build = new BuildInfo(props);
             closestTag = new GitClosestTag(props);
@@ -173,7 +172,7 @@ public class MCRInfo {
             //JAXB
         }
 
-        public BuildInfo(Map<String, String> props) {
+        BuildInfo(Map<String, String> props) {
             time = Instant.parse(props.get("git.build.time"));
             user = new User(props.get("git.build.user.name"), props.get("git.build.user.email"));
             host = props.get("git.build.host");
@@ -216,7 +215,7 @@ public class MCRInfo {
             //JAXB
         }
 
-        public GitCommitInfo(Map<String, String> props) {
+        GitCommitInfo(Map<String, String> props) {
             id = new GitId(props);
             message = new GitCommitMessage(props.get("git.commit.message.full"), props.get("git.commit.message.short"));
             time = Instant.parse(props.get("git.commit.time"));
@@ -258,7 +257,7 @@ public class MCRInfo {
             //JAXB
         }
 
-        public GitClosestTag(Map<String, String> props) {
+        GitClosestTag(Map<String, String> props) {
             name = props.get("git.closest.tag.name");
             commitCount = Integer.parseInt(props.get("git.closest.tag.commit.count"));
         }
@@ -332,7 +331,7 @@ public class MCRInfo {
             //JAXB
         }
 
-        public GitCommitMessage(String full, String short_) {
+        GitCommitMessage(String full, String short_) {
             this.full = full;
             this.short_ = short_;
         }
@@ -358,7 +357,7 @@ public class MCRInfo {
             //JAXB
         }
 
-        public User(String name, String email) {
+        User(String name, String email) {
             this.name = name;
             this.email = email;
         }

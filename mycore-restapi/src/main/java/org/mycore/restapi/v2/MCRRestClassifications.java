@@ -20,7 +20,6 @@ package org.mycore.restapi.v2;
 
 import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_CLASSID;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +77,7 @@ public class MCRRestClassifications {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRClass.class)))),
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     @XmlElementWrapper(name = "classifications")
-    public Response listClassifications() throws IOException {
+    public Response listClassifications() {
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         Date lastModified = new Date(categoryDAO.getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
@@ -116,8 +115,7 @@ public class MCRRestClassifications {
         responses = @ApiResponse(
             content = @Content(schema = @Schema(implementation = MCRClass.class))),
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
-    public Response getClassification(@PathParam(PARAM_CLASSID) String classId)
-        throws IOException {
+    public Response getClassification(@PathParam(PARAM_CLASSID) String classId) {
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         Date lastModified = getLastModifiedDate(classId, categoryDAO);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
@@ -154,8 +152,7 @@ public class MCRRestClassifications {
         },
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     @MCRRequireTransaction
-    public Response createClassification(@PathParam(PARAM_CLASSID) String classId, MCRClass mcrClass)
-        throws IOException {
+    public Response createClassification(@PathParam(PARAM_CLASSID) String classId, MCRClass mcrClass) {
         if (!classId.equals(mcrClass.getID())) {
             throw new BadRequestException("classId mismatch: " + classId + "!=" + mcrClass.getID(),
                 Response.status(Response.Status.BAD_REQUEST)

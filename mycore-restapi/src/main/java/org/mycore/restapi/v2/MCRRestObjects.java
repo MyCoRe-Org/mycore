@@ -55,9 +55,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -103,7 +101,7 @@ public class MCRRestObjects {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRObjectIDDate.class)))),
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @XmlElementWrapper(name = "mycoreobjects")
-    @JacksonFeatures(serializationDisable = {SerializationFeature.WRITE_DATES_AS_TIMESTAMPS})
+    @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
     public Response listObjects() throws IOException {
         Date lastModified = new Date(MCRXMLMetadataManager.instance().getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
@@ -177,8 +175,7 @@ public class MCRRestObjects {
         List<MCRMetadataVersion> versions = MCRXMLMetadataManager.instance().getVersionedMetaData(id)
             .listVersions();
         return Response.ok()
-            .entity(new GenericEntity<List<MCRMetadataVersion>>(versions,
-                TypeUtils.parameterize(List.class, MCRMetadataVersion.class)))
+            .entity(new GenericEntity<>(versions, TypeUtils.parameterize(List.class, MCRMetadataVersion.class)))
             .lastModified(lastModified)
             .build();
     }
@@ -196,7 +193,8 @@ public class MCRRestObjects {
         throws IOException {
         MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id, revision);
         if (mcrContent == null) {
-            throw new NotFoundException(Response.status(Response.Status.NOT_FOUND).entity("revision_not_found").build());
+            throw new NotFoundException(
+                Response.status(Response.Status.NOT_FOUND).entity("revision_not_found").build());
         }
         long modified = mcrContent.lastModified();
         Date lastModified = new Date(modified);
@@ -245,7 +243,7 @@ public class MCRRestObjects {
             //ignore errors as PUT is idempotent
         }
         MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null, MCRObject.ROOT_NAME);
-        MCRObject updatedObject = null;
+        MCRObject updatedObject;
         try {
             updatedObject = new MCRObject(inputContent.asXML());
             updatedObject.validate();
