@@ -18,14 +18,12 @@
 package org.mycore.common.content.util;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -43,15 +41,13 @@ import com.google.common.collect.Iterables;
 
 /**
  * @author Thomas Scheffler (yagee)
- * @author Matthias Eichner
  */
 public abstract class MCRRestContentHelper {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRRestContentHelper.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
-    public static final int DEFAULT_BUFFER_SIZE = ContentUtils.DEFAULT_BUFFER_SIZE;
-
-    public static final String ATT_SERVE_CONTENT = MCRRestContentHelper.class.getName() + ".serveContent";
+    public static final RuntimeDelegate.HeaderDelegate<Date> DATE_HEADER_DELEGATE =RuntimeDelegate.getInstance()
+        .createHeaderDelegate(Date.class);
 
     public enum ContentDispositionType {
         inline, attachment;
@@ -78,16 +74,81 @@ public abstract class MCRRestContentHelper {
     public static Response serveContent(final MCRContent content, final UriInfo uriInfo,
         final HttpHeaders requestHeader, final Config config) throws IOException {
 
-        final String path = uriInfo.getPath();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Serving '{}' headers and data", path);
-        }
-
         if (content == null) {
             throw new NotFoundException();
         }
 
         // Find content type.
+        MediaType contentType = getMediaType(content);
+
+        Response.ResponseBuilder response = Response.ok();
+
+        String eTag = content.getETag();
+        response.header(HttpHeaders.ETAG, eTag);
+
+        final long contentLength = content.length();
+        if (contentLength == 0) {
+            //No Content to serve?
+            return response.status(Response.Status.NO_CONTENT).build();
+        }
+        long lastModified = content.lastModified();
+        if (lastModified >= 0) {
+            response.lastModified(new Date(lastModified));
+        }
+
+        List<Range> ranges = null;
+        if (config.useAcceptRanges) {
+            response.header("Accept-Ranges", "bytes");
+            ranges = parseRange(requestHeader, lastModified, eTag, contentLength);
+        }
+
+        String filename = Optional.of(content.getName())
+            .orElseGet(() -> Iterables.getLast(uriInfo.getPathSegments()).getPath());
+        response.header(HttpHeaders.CONTENT_DISPOSITION,
+            config.dispositionType.name() + ";filename=\"" + filename + "\"");
+
+        boolean noRangeRequest = ranges == null || ranges == ContentUtils.FULL;
+        if (noRangeRequest) {
+            LOGGER.debug("contentType='{}'", contentType);
+            LOGGER.debug("contentLength={}", contentLength);
+            response.type(contentType);
+            response.header(HttpHeaders.CONTENT_LENGTH, contentLength);
+            response.entity(
+                (StreamingOutput) out -> ContentUtils.copy(content, out, config.inputBufferSize,
+                    config.outputBufferSize));
+
+        } else if (ranges.isEmpty()) {
+            return response.status(Response.Status.NO_CONTENT).build();
+        } else {
+            // Partial content response.
+            response.status(Response.Status.PARTIAL_CONTENT);
+
+            if (ranges.size() == 1) {
+                final Range range = ranges.get(0);
+                response.header("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.length);
+                final long length = range.end - range.start + 1;
+                response.header(HttpHeaders.CONTENT_LENGTH, length);
+
+                LOGGER.debug("contentType='{}'", contentType);
+                response.type(contentType);
+
+                response.entity(
+                    (StreamingOutput) out -> ContentUtils.copy(content, out, range, config.inputBufferSize,
+                        config.outputBufferSize));
+            } else {
+                response.type("multipart/byteranges; boundary=" + ContentUtils.MIME_BOUNDARY);
+                Iterator<Range> rangeIterator = ranges.iterator();
+                String ct = contentType.toString();
+                response.entity(
+                    (StreamingOutput) out -> ContentUtils.copy(content, out, rangeIterator, ct,
+                        config.inputBufferSize,
+                        config.outputBufferSize));
+            }
+        }
+        return response.build();
+    }
+
+    private static MediaType getMediaType(MCRContent content) throws IOException {
         String mimeType = content.getMimeType();
         if (mimeType == null) {
             mimeType = MediaType.APPLICATION_OCTET_STREAM;
@@ -99,122 +160,7 @@ public abstract class MCRRestContentHelper {
             param.put(MediaType.CHARSET_PARAMETER, enc);
             contentType = new MediaType(contentType.getType(), contentType.getSubtype(), param);
         }
-
-        Response.ResponseBuilder response = Response.ok();
-
-        String eTag = content.getETag();
-        List<Range> ranges = null;
-        if (config.useAcceptRanges) {
-            response.header("Accept-Ranges", "bytes");
-        }
-
-        final long contentLength = content.length();
-        long lastModified = content.lastModified();
-        ranges = parseRange(requestHeader, lastModified, eTag, contentLength);
-
-        response.header(HttpHeaders.ETAG, eTag);
-
-        if (lastModified >= 0) {
-            response.lastModified(new Date(lastModified));
-        }
-        String dispositionType = config.dispositionType.name();
-        String filename = Optional.of(content.getName())
-            .orElseGet(() -> Iterables.getLast(uriInfo.getPathSegments()).getPath());
-        response.header(HttpHeaders.CONTENT_DISPOSITION, dispositionType + ";filename=\"" + filename + "\"");
-
-        boolean serveContent = true;
-        //No Content to serve?
-        if (contentLength == 0) {
-            serveContent = false;
-        }
-
-        if (ranges == null || ranges == ContentUtils.FULL) {
-            //No ranges
-            if (contentType != null) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("contentType='{}'", contentType);
-                }
-                response.type(contentType);
-            }
-            if (contentLength >= 0) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("contentLength={}", contentLength);
-                }
-                response.header(HttpHeaders.CONTENT_LENGTH, contentLength);
-            }
-
-            if (serveContent) {
-                response.entity(
-                    (StreamingOutput) out -> ContentUtils.copy(content, out, config.inputBufferSize,
-                        config.outputBufferSize));
-            }
-
-        } else {
-
-            if (ranges.isEmpty()) {
-                return response.status(Response.Status.NO_CONTENT).build();
-            }
-
-            // Partial content response.
-
-            response.status(Response.Status.PARTIAL_CONTENT);
-
-            if (ranges.size() == 1) {
-
-                final Range range = ranges.get(0);
-                response.header("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.length);
-                final long length = range.end - range.start + 1;
-                response.header(HttpHeaders.CONTENT_LENGTH, length);
-
-                if (contentType != null) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("contentType='{}'", contentType);
-                    }
-                    response.type(contentType);
-                }
-
-                if (serveContent) {
-                    response.entity(
-                        (StreamingOutput) out -> ContentUtils.copy(content, out, range, config.inputBufferSize,
-                            config.outputBufferSize));
-                }
-
-            } else {
-
-                response.type("multipart/byteranges; boundary=" + ContentUtils.MIME_BOUNDARY);
-
-                if (serveContent) {
-                    Iterator<Range> rangeIterator = ranges.iterator();
-                    String ct = contentType.toString();
-                    response.entity(
-                        (StreamingOutput) out -> ContentUtils.copy(content, out, rangeIterator, ct,
-                            config.inputBufferSize,
-                            config.outputBufferSize));
-                }
-            }
-        }
-        return response.build();
-    }
-
-    private static String extractFileName(String filename) {
-        int filePosition = filename.lastIndexOf('/') + 1;
-        filename = filename.substring(filePosition);
-        filePosition = filename.lastIndexOf('.');
-        if (filePosition > 0) {
-            filename = filename.substring(0, filePosition);
-        }
-        return filename;
-    }
-
-    private static String getFileName(final HttpServletRequest req, final MCRContent content) {
-        final String filename = content.getName();
-        if (filename != null) {
-            return filename;
-        }
-        if (req.getPathInfo() != null) {
-            return extractFileName(req.getPathInfo());
-        }
-        return MessageFormat.format("{0}-{1}", extractFileName(req.getServletPath()), System.currentTimeMillis());
+        return contentType;
     }
 
     /**
@@ -229,9 +175,7 @@ public abstract class MCRRestContentHelper {
         if (ifRangeHeader != null) {
             long headerValueTime = -1L;
             try {
-                RuntimeDelegate.HeaderDelegate<Date> dateHeaderDelegate = RuntimeDelegate.getInstance()
-                    .createHeaderDelegate(Date.class);
-                headerValueTime = dateHeaderDelegate.fromString(ifRangeHeader).getTime();
+                headerValueTime = DATE_HEADER_DELEGATE.fromString(ifRangeHeader).getTime();
             } catch (final IllegalArgumentException e) {
                 // Ignore
             }
@@ -249,11 +193,6 @@ public abstract class MCRRestContentHelper {
             }
 
         }
-
-        if (contentLength <= 0) {
-            return null;
-        }
-
         String rangeHeader = headers.getHeaderString("Range");
         try {
             return Range.parseRanges(rangeHeader, contentLength);
