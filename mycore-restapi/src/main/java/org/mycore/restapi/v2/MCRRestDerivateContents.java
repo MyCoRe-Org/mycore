@@ -40,7 +40,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import javax.annotation.Nullable;
 import javax.servlet.ServletContext;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
@@ -195,7 +194,7 @@ public class MCRRestDerivateContents {
                 description = "if directory overwrites file or vice versa; content length is too big"),
         },
         tags = MCRRestUtils.TAG_MYCORE_FILE)
-    public Response createFileOrDirectory(@Nullable InputStream contents) {
+    public Response createFileOrDirectory(InputStream contents) {
         MCRPath mcrPath = MCRPath.getPath(derid.toString(), path);
         if (mcrPath.getNameCount() > 1) {
             MCRPath parentDirectory = mcrPath.getParent();
@@ -499,7 +498,7 @@ public class MCRRestDerivateContents {
         }
 
         @Override
-        public int compareTo(@NotNull DirectoryEntry o) {
+        public int compareTo(DirectoryEntry o) {
             return Ordering
                 .<DirectoryEntry> from((de1, de2) -> {
                     if (de1 instanceof Directory && !(de2 instanceof Directory)) {

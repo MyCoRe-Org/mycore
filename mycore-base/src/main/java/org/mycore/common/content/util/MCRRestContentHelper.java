@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -223,8 +222,7 @@ public abstract class MCRRestContentHelper {
      * This method ensures that all ranges are in ascending order and non-overlapping, so we can use a single
      * InputStream.
      */
-    private static List<Range> parseRange(HttpHeaders headers, long lastModified, @NotNull String eTag,
-        long contentLength) {
+    private static List<Range> parseRange(HttpHeaders headers, long lastModified, String eTag, long contentLength) {
 
         // Checking if range is still valid (lastModified, ETag)
         String ifRangeHeader = headers.getHeaderString("If-Range");
