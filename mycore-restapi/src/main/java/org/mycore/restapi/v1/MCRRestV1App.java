@@ -35,6 +35,7 @@ import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
 import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
 import org.mycore.restapi.MCRCORSResponseFilter;
+import org.mycore.restapi.MCRIgnoreClientAbortInterceptor;
 import org.mycore.restapi.MCRRestFeature;
 import org.mycore.restapi.MCRSessionFilter;
 import org.mycore.restapi.MCRTransactionFilter;
@@ -75,6 +76,7 @@ public class MCRRestV1App extends ResourceConfig {
         register(MCRNotAuthorizedExceptionMapper.class);
         register(MCRCORSResponseFilter.class);
         register(MCRRequestScopeACLFactory.getBinder());
+        register(MCRIgnoreClientAbortInterceptor.class);
         getInstances().stream()
             .forEach(LogManager.getLogger()::info);
     }
