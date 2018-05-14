@@ -192,21 +192,41 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
         throws IOException {
-        LOGGER.info("Response filtered");
-        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-        if (responseContext.getStatus() == Response.Status.FORBIDDEN.getStatusCode() && currentSession
-            .getUserInformation().getUserID().equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
-            LOGGER.debug("Guest detected, change response from FORBIDDEN to UNAUTHORIZED.");
-            responseContext.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
-            responseContext.getHeaders().putSingle(HttpHeaders.WWW_AUTHENTICATE,
-                MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
+        LOGGER.debug("ResponseFilter start");
+        try {
+            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            if (responseContext.getStatus() == Response.Status.FORBIDDEN.getStatusCode() && currentSession
+                .getUserInformation().getUserID().equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
+                LOGGER.debug("Guest detected, change response from FORBIDDEN to UNAUTHORIZED.");
+                responseContext.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
+                responseContext.getHeaders().putSingle(HttpHeaders.WWW_AUTHENTICATE,
+                    MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
+            }
+            addJWTToResponse(requestContext, responseContext);
+            if (!responseContext.hasEntity()) {
+                //close here if no write interceptor is invoked later
+                closeSessionIfNeeded();
+            }
+        } finally {
+            LOGGER.debug("ResponseFilter stop");
         }
-        addJWTToResponse(requestContext, responseContext);
     }
 
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
-        context.proceed();
+        LOGGER.info("WriteInterceptor debug");
+        try {
+            context.proceed();
+        } finally {
+            try {
+                closeSessionIfNeeded();
+            } finally {
+                LOGGER.debug("WriteInterceptor debug");
+            }
+        }
+    }
+
+    private static void closeSessionIfNeeded() {
         if (MCRSessionMgr.hasCurrentSession()) {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             try {
@@ -224,7 +244,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 MCRSessionMgr.releaseCurrentSession();
                 currentSession.close();
                 MCRSessionMgr.lock();
-                LOGGER.info("Session closed.");
+                LOGGER.debug("Session closed.");
             }
         }
     }
