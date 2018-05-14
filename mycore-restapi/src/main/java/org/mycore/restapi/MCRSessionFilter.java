@@ -164,6 +164,8 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                             requestContext.setProperty(PROP_RENEW_JWT, true);
                             MCRRestAPIAuthentication.validate(token);
                             break;
+                        default:
+                            LOGGER.warn("Cannot validate JWT for '{}' audience.", audience.get());
                     }
                 }
                 userInformation = Optional.of(new MCRJWTUserInformation(jwt));

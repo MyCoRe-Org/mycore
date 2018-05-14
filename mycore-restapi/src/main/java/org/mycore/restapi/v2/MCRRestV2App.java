@@ -113,7 +113,7 @@ public class MCRRestV2App extends ResourceConfig {
                     .collect(Collectors.toSet()))
             .prettyPrint(true);
         try {
-            OpenApiContext oasContext = new JaxrsOpenApiContextBuilder()
+            new JaxrsOpenApiContextBuilder()
                 .application(getApplication())
                 .openApiConfiguration(oasConfig)
                 .buildContext(true);

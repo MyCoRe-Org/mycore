@@ -37,7 +37,7 @@ public class MCRGuiceBridgeFeature implements Feature {
     private final ServiceLocator scopedLocator;
 
     @Inject
-    private MCRGuiceBridgeFeature(ServiceLocator locator) {
+    public MCRGuiceBridgeFeature(ServiceLocator locator) {
         this.scopedLocator = locator;
     }
 

@@ -23,8 +23,6 @@ import org.mycore.common.MCRException;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /**
  * This class implements all method for special handling with the MCRMetaLink
  * part of a metadata object. The MCRMetaLinkID class present two types. At once

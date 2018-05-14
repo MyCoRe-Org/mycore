@@ -36,7 +36,6 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.http.HttpStatus;

@@ -876,13 +876,12 @@ public class MCRRestAPIObjectsHelper {
         }
 
         String matchedDerID = null;
-        if (derKey.equals("mcr")) {
-            if (MCRMetadataManager.getDerivateIds(parentObjId, 0, TimeUnit.SECONDS)
+        if (derKey.equals("mcr") &&
+            MCRMetadataManager.getDerivateIds(parentObjId, 0, TimeUnit.SECONDS)
                 .stream()
                 .map(MCRObjectID::toString)
                 .anyMatch(derIDString::equals)) {
-                matchedDerID = derIDString;
-            }
+            matchedDerID = derIDString;
         }
         if (derKey.equals("label")) {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(parentObjId);

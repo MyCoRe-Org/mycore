@@ -30,6 +30,8 @@ class Range {
 
     public long length;
 
+    public static final String RANGE_UNIT = "bytes";
+
     public boolean validate() {
         if (end >= length) {
             //set 'end' to content size
@@ -38,21 +40,20 @@ class Range {
         return start >= 0 && end >= 0 && start <= end && length > 0;
     }
 
-    public static List<Range> parseRanges(String rangeHeader, long fileLength) throws IllegalArgumentException {
+    public static List<Range> parseRanges(final String rangeHeader, long fileLength) throws IllegalArgumentException {
         if (rangeHeader == null) {
             return null;
         }
 
         // We operate on byte level only
-        String rangeUnit = "bytes";
-        if (!rangeHeader.startsWith(rangeUnit)) {
+        if (!rangeHeader.startsWith(RANGE_UNIT)) {
             throw new IllegalArgumentException();
         }
 
-        rangeHeader = rangeHeader.substring(rangeUnit.length() + 1);
+        String rangeValue = rangeHeader.substring(RANGE_UNIT.length() + 1);
 
         final ArrayList<Range> result = new ArrayList<>();
-        final StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
+        final StringTokenizer commaTokenizer = new StringTokenizer(rangeValue, ",");
 
         // Parsing the range list
         long lastByte = 0;

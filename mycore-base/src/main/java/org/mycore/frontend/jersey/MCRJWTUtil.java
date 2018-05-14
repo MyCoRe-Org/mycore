@@ -44,51 +44,11 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
-    @Override
-    public String getName() {
-        return "JSON WebToken Services";
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
-    public void startUp(ServletContext servletContext) {
-        if (servletContext != null) {
-            File sharedSecretFile = MCRConfigurationDir.getConfigFile("jwt.secret");
-            byte[] secret;
-            if (!sharedSecretFile.isFile()) {
-                secret = new byte[4096];
-                try {
-                    LogManager.getLogger().warn(
-                        "Creating shared secret file ({}) for JSON Web Token."
-                            + " This may take a while. Please wait...",
-                        sharedSecretFile);
-                    SecureRandom.getInstanceStrong().nextBytes(secret);
-                    Files.write(sharedSecretFile.toPath(), secret, StandardOpenOption.CREATE_NEW);
-                } catch (NoSuchAlgorithmException | IOException e) {
-                    throw new MCRConfigurationException(
-                        "Could not create shared secret in file: " + sharedSecretFile.getAbsolutePath(), e);
-                }
-            } else {
-                try {
-                    secret = Files.readAllBytes(sharedSecretFile.toPath());
-                } catch (IOException e) {
-                    throw new MCRConfigurationException(
-                        "Could not create shared secret in file: " + sharedSecretFile.getAbsolutePath(), e);
-                }
-            }
-            SHARED_SECRET = Algorithm.HMAC512(secret);
-        }
-    }
-
-    private static final JsonFactory JSON_FACTORY = new JsonFactory();
-
     public static final String JWT_CLAIM_ROLES = "mcr:roles";
 
     public static final String JWT_CLAIM_IP = "mcr:ip";
+
+    private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
     private static final String ROLES_PROPERTY = "MCR.Rest.JWT.Roles";
 
@@ -160,6 +120,46 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(sw.toString())
                 .build();
+        }
+    }
+
+    @Override
+    public String getName() {
+        return "JSON WebToken Services";
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
+    public void startUp(ServletContext servletContext) {
+        if (servletContext != null) {
+            File sharedSecretFile = MCRConfigurationDir.getConfigFile("jwt.secret");
+            byte[] secret;
+            if (!sharedSecretFile.isFile()) {
+                secret = new byte[4096];
+                try {
+                    LogManager.getLogger().warn(
+                        "Creating shared secret file ({}) for JSON Web Token."
+                            + " This may take a while. Please wait...",
+                        sharedSecretFile);
+                    SecureRandom.getInstanceStrong().nextBytes(secret);
+                    Files.write(sharedSecretFile.toPath(), secret, StandardOpenOption.CREATE_NEW);
+                } catch (NoSuchAlgorithmException | IOException e) {
+                    throw new MCRConfigurationException(
+                        "Could not create shared secret in file: " + sharedSecretFile.getAbsolutePath(), e);
+                }
+            } else {
+                try {
+                    secret = Files.readAllBytes(sharedSecretFile.toPath());
+                } catch (IOException e) {
+                    throw new MCRConfigurationException(
+                        "Could not create shared secret in file: " + sharedSecretFile.getAbsolutePath(), e);
+                }
+            }
+            SHARED_SECRET = Algorithm.HMAC512(secret);
         }
     }
 
