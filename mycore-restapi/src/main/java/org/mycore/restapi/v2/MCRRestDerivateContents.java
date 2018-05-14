@@ -172,15 +172,22 @@ public class MCRRestDerivateContents {
         } catch (IOException e) {
             throw new NotFoundException(e);
         }
+        Date lastModified = new Date(fileAttributes.lastModifiedTime().toMillis());
         if (fileAttributes.isDirectory()) {
-            return serveDirectory(mcrPath, fileAttributes);
+            return MCRRestUtils
+                .getCachedResponse(request.getRequest(), lastModified)
+                .orElseGet(() -> serveDirectory(mcrPath, fileAttributes));
         }
-        MCRPathContent content = new MCRPathContent(mcrPath, fileAttributes);
-        try {
-            return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader);
-        } catch (IOException e) {
-            throw new InternalServerErrorException(e);
-        }
+        return MCRRestUtils
+            .getCachedResponse(request.getRequest(), lastModified, getETag(fileAttributes))
+            .orElseGet(() -> {
+                MCRPathContent content = new MCRPathContent(mcrPath, fileAttributes);
+                try {
+                    return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader);
+                } catch (IOException e) {
+                    throw new InternalServerErrorException(e);
+                }
+            });
     }
 
     @PUT
@@ -377,7 +384,7 @@ public class MCRRestDerivateContents {
         } catch (IOException | UncheckedIOException e) {
             throw new InternalServerErrorException(e);
         }
-        return Response.ok(dir).build();
+        return Response.ok(dir).lastModified(new Date(dirAttrs.lastModifiedTime().toMillis())).build();
     }
 
     private MCRPath getPath() {
@@ -441,8 +448,6 @@ public class MCRRestDerivateContents {
 
         private String md5;
 
-        private Date modified;
-
         private long size;
 
         File() {
@@ -452,7 +457,6 @@ public class MCRRestDerivateContents {
         File(MCRPath p, MCRFileAttributes attr) {
             super(p, attr);
             this.md5 = attr.md5sum();
-            this.modified = Date.from(attr.lastModifiedTime().toInstant());
             this.size = attr.size();
         }
 
@@ -460,13 +464,6 @@ public class MCRRestDerivateContents {
         @JsonProperty(index = 3)
         public String getMd5() {
             return md5;
-        }
-
-        @XmlAttribute
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = MCRRestUtils.JSON_DATE_FORMAT)
-        @JsonProperty(index = 2)
-        public Date getModified() {
-            return modified;
         }
 
         @XmlAttribute
@@ -480,10 +477,13 @@ public class MCRRestDerivateContents {
     private abstract static class DirectoryEntry implements Comparable<DirectoryEntry> {
         private String name;
 
+        private Date modified;
+
         DirectoryEntry(MCRPath p, MCRFileAttributes attr) {
             this.name = Optional.ofNullable(p.getFileName())
                 .map(java.nio.file.Path::toString)
                 .orElse(null);
+            this.modified = Date.from(attr.lastModifiedTime().toInstant());
         }
 
         DirectoryEntry() {
@@ -494,6 +494,13 @@ public class MCRRestDerivateContents {
         @JsonInclude(content = JsonInclude.Include.NON_EMPTY)
         String getName() {
             return name;
+        }
+
+        @XmlAttribute
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = MCRRestUtils.JSON_DATE_FORMAT)
+        @JsonProperty(index = 2)
+        public Date getModified() {
+            return modified;
         }
 
         @Override
