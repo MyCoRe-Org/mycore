@@ -202,6 +202,11 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 responseContext.getHeaders().putSingle(HttpHeaders.WWW_AUTHENTICATE,
                     MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
             }
+            if (responseContext.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()
+                && "XMLHttpRequest".equals(requestContext.getHeaderString("X-Requested-With"))) {
+                LOGGER.debug("Remove {} header.", HttpHeaders.WWW_AUTHENTICATE);
+                responseContext.getHeaders().remove(HttpHeaders.WWW_AUTHENTICATE);
+            }
             addJWTToResponse(requestContext, responseContext);
             if (!responseContext.hasEntity()) {
                 //close here if no write interceptor is invoked later
