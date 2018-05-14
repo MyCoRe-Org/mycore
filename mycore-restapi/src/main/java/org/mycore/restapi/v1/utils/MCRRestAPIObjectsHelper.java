@@ -876,7 +876,7 @@ public class MCRRestAPIObjectsHelper {
         }
 
         String matchedDerID = null;
-        if (derKey.equals("mcr") &&
+        if ("mcr".equals(derKey) &&
             MCRMetadataManager.getDerivateIds(parentObjId, 0, TimeUnit.SECONDS)
                 .stream()
                 .map(MCRObjectID::toString)
