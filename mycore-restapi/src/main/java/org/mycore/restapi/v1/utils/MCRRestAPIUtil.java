@@ -72,7 +72,7 @@ public class MCRRestAPIUtil {
         if (value != null && !value.isEmpty()) {
             b.append("=\"");
             appendValue(b, value);
-            b.append("\"");
+            b.append('\"');
         }
     }
 
