@@ -21,9 +21,14 @@ package org.mycore.mods;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 
@@ -33,15 +38,15 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 /**
  * This event handler updates the embargo dates in the Database.
@@ -51,6 +56,10 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final int TIMER_TASK_PERIOD = 1000 * 60;// * 60 * 3;
+
+    private static final int RELEASE_THREAD_COUNT = 3;
+
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(RELEASE_THREAD_COUNT);
 
     @Override
     public String getName() {
@@ -72,42 +81,43 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
         final SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         final ModifiableSolrParams params = new ModifiableSolrParams();
         final LocalDate today = LocalDate.now();
+        final String todayString = today.format(DateTimeFormatter.ISO_DATE);
+
         params.set("start", 0);
         params.set("rows", Integer.MAX_VALUE - 1);
         params.set("fl", "id");
-
-        final String todayString = today.format(DateTimeFormatter.ISO_DATE);
-
         params.set("q", "mods.embargo.date:[* TO " + todayString + "]");
+
         try {
             final QueryResponse response = solrClient.query(params);
-            response.getResults().stream()
+            Set<MCRFixedUserCallable<Boolean>> releaseCallables = response.getResults().stream()
                 .map(result -> (String) result.get("id"))
                 .map(MCRObjectID::getInstance)
-                .forEach(objectReleaser);
-        } catch (SolrServerException | IOException e) {
+                .map(id -> new MCRFixedUserCallable<>(() -> {
+                    objectReleaser.accept(id);
+                    return true;
+                }, MCRSystemUserInformation.getSuperUserInstance())).collect(Collectors.toSet());
+
+            EXECUTOR_SERVICE.invokeAll(releaseCallables);
+        } catch (SolrServerException | IOException | InterruptedException e) {
             LOGGER.error("Error while searching embargo documents!", e);
         }
     }
 
     private void releaseDocument(MCRObjectID objectID) {
-        final MCRSession session = MCRSessionMgr.getCurrentSession();
         try {
             LOGGER.info("Release object {}", objectID);
-            session.setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
             final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
             final MCRMODSWrapper modsWrapper = new MCRMODSWrapper(object);
             final String embargoXPATH = "mods:accessCondition[@type='embargo']";
-            final String embargoString = modsWrapper.getElement(embargoXPATH).getTextNormalize();
-            modsWrapper.removeElements(embargoXPATH);
-            modsWrapper.addElement("accessCondition")
-                .setAttribute("type", "expiredEmbargo")
-                .setText(embargoString);
-            MCRMetadataManager.update(object);
+
+            Optional<Element> element = Optional.ofNullable(modsWrapper.getElement(embargoXPATH));
+            if (element.isPresent()) {
+                element.get().setAttribute("type", "expiredEmbargo");
+                MCRMetadataManager.update(object);
+            }
         } catch (MCRAccessException e) {
             LOGGER.error("Error while releasing embargo document!", e);
-        } finally {
-            session.close();
         }
     }
 
