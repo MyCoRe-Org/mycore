@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.restapi.v1.feature;
 
-import java.util.List;
+package org.mycore.restapi;
 
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
-import org.mycore.restapi.MCRRestConfig;
+import org.apache.logging.log4j.LogManager;
+import org.glassfish.jersey.server.ResourceConfig;
 
-public class MCRRESTFeature extends MCRJerseyDefaultFeature {
+public class MCRRestResourceConfig extends ResourceConfig {
 
-    @Override
-    protected List<String> getPackages() {
-        return MCRConfiguration.instance().getStrings(MCRRestConfig.REST_API_PACKAGE);
+    public MCRRestResourceConfig(){
+        super();
+        LogManager.getLogger().info("Loading rest-api resource config...");
+        new MCRRestConfig().configure(this);
     }
+
 }

@@ -31,11 +31,11 @@ import org.mycore.restapi.v1.feature.MCRRESTFeature;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRRESTResourceConfig extends MCRJerseyDefaultConfiguration {
+public class MCRRestConfig extends MCRJerseyDefaultConfiguration {
 
     public static final String REST_API_PACKAGE = "MCR.RestAPI.Resource.Packages";
 
-    public MCRRESTResourceConfig() {
+    public MCRRestConfig() {
         super();
     }
 
