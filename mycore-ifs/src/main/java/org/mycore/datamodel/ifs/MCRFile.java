@@ -473,7 +473,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         if (storageID.length() != 0) {
             BasicFileAttributes attrs = getBasicFileAttributes();
-            getContentStore().deleteContent(storageID);
 
             // Call event handlers to update indexed content
             MCREvent event = new MCREvent(MCREvent.PATH_TYPE, MCREvent.DELETE_EVENT);
@@ -481,13 +480,15 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
             event.put(MCREvent.PATH_KEY, toPath());
             event.put(MCREvent.FILEATTR_KEY, attrs);
             MCREventManager.instance().handleEvent(event);
-
             if (hasParent()) {
                 getParent().sizeOfChildChanged(-size);
             }
-        }
 
-        super.delete();
+            super.delete();
+            getContentStore().deleteContent(storageID);
+        } else {
+            super.delete();
+        }
 
         contentTypeID = null;
         md5 = null;
