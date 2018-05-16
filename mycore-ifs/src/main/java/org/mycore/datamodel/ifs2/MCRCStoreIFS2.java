@@ -210,7 +210,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         }
         Optional<MCRDirectory> parent;
         try {
-            parent = Optional.of(file
+            parent = Optional.ofNullable(file
                 .map(MCRFile::getParent)
                 .map(MCRDirectory.class::cast)
                 .orElseGet(() -> getParentDirectory(storageID)));
