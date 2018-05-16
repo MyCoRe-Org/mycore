@@ -35,9 +35,6 @@ public class MCRRestConfig extends MCRJerseyDefaultConfiguration {
 
     public static final String REST_API_PACKAGE = "MCR.RestAPI.Resource.Packages";
 
-    public MCRRestConfig() {
-        super();
-    }
 
     @Override
     public void configure(ResourceConfig resourceConfig) {
