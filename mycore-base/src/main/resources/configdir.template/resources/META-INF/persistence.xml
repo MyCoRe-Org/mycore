@@ -12,6 +12,7 @@
     <mapping-file>META-INF/mycore-iview2-mappings.xml</mapping-file>
     <mapping-file>META-INF/mycore-pi-mappings.xml</mapping-file>
     <mapping-file>META-INF/mycore-user2-mappings.xml</mapping-file>
+    <mapping-file>META-INF/mycore-viewer-mappings.xml</mapping-file>
     <properties>
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE" />
