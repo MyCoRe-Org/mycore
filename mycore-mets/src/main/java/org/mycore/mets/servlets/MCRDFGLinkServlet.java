@@ -104,7 +104,8 @@ public class MCRDFGLinkServlet extends MCRServlet {
             return;
         }
 
-        if (filePath == "") {
+
+        if (filePath.isEmpty()) {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
             filePath = derivate.getDerivate().getInternals().getMainDoc();
         }
@@ -146,7 +147,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
                 List<File> fileList = fileGrp.getFileList();
                 for (File file : fileList) {
                     FLocat fLocat = file.getFLocat();
-                    if (fLocat.getHref().equals(MCRXMLFunctions.encodeURIPath(fileHref)))
+                    if (fLocat.getHref().equals( MCRXMLFunctions.encodeURIPath(fileHref, true)))
                         fileID = file.getId();
                 }
             }
