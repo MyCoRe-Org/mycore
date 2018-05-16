@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Priorities;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -42,9 +41,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-import javax.ws.rs.ext.WriterInterceptor;
-import javax.ws.rs.ext.WriterInterceptorContext;
 
+import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
@@ -65,7 +63,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-public class MCRSessionFilter implements ContainerRequestFilter, ContainerResponseFilter, WriterInterceptor {
+public class MCRSessionFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
@@ -210,26 +208,24 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 responseContext.getHeaders().remove(HttpHeaders.WWW_AUTHENTICATE);
             }
             addJWTToResponse(requestContext, responseContext);
-            if (!responseContext.hasEntity()) {
-                //close here if no write interceptor is invoked later
+            if (requestContext.hasEntity()) {
+                responseContext.setEntityStream(new ProxyOutputStream(responseContext.getEntityStream()) {
+                    @Override
+                    public void close() throws IOException {
+                        LOGGER.debug("Closing EntityStream");
+                        try {
+                            super.close();
+                        } finally {
+                            closeSessionIfNeeded();
+                            LOGGER.debug("Closing EntityStream done");
+                        }
+                    }
+                });
+            } else {
                 closeSessionIfNeeded();
             }
         } finally {
             LOGGER.debug("ResponseFilter stop");
-        }
-    }
-
-    @Override
-    public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
-        LOGGER.info("WriteInterceptor debug");
-        try {
-            context.proceed();
-        } finally {
-            try {
-                closeSessionIfNeeded();
-            } finally {
-                LOGGER.debug("WriteInterceptor debug");
-            }
         }
     }
 

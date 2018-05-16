@@ -220,6 +220,7 @@ public class MCRErrorServlet extends HttpServlet {
             boolean sessionFromRequest = setCurrentSession(request);
             MCRSession session = null;
             try {
+                MCRSessionMgr.unlock();
                 session = MCRSessionMgr.getCurrentSession();
                 boolean openTransaction = session.isTransactionActive();
                 if (!openTransaction) {
@@ -240,6 +241,7 @@ public class MCRErrorServlet extends HttpServlet {
                     //new session created for transaction
                     session.close();
                 }
+                MCRSessionMgr.lock();
             }
         } else {
             if (request.getAttribute(requestAttr) != null) {
