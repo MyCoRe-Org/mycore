@@ -440,8 +440,8 @@ public class MCRDirectory extends MCRFilesystemNode {
     public void delete() throws MCRPersistenceException {
         ensureNotDeleted();
 
-        for (int i = getNumChildren(NODES, HERE) - 1; i >= 0; i--) {
-            getChild(i).delete();
+        for (MCRFilesystemNode child : getChildren()) {
+            child.delete();
         }
         BasicFileAttributes attrs = getBasicFileAttributes();
         MCRPath path = toPath();
