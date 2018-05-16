@@ -195,7 +195,7 @@ public class MCRMetsSave {
             UUID uuid = UUID.randomUUID();
 
             // check for file existance (if a derivate with mets.xml is uploaded
-            String relPath = MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath().substring(1));
+            String relPath = MCRXMLFunctions.encodeURIPath(file.getOwnerRelativePath().substring(1), true);
 
             // Check if file already exists -> if yes do nothing
             String fileExistPathString = "mets:mets/mets:fileSec/mets:fileGrp/mets:file/mets:FLocat[@xlink:href='"
@@ -672,7 +672,8 @@ public class MCRMetsSave {
                         MCRPath mcrPath = MCRPath.toMCRPath(file);
                         String path;
                         try {
-                            path = MCRXMLFunctions.encodeURIPath(mcrPath.getOwnerRelativePath().substring(1));//remove leading '/'
+                            path = MCRXMLFunctions
+                                .encodeURIPath(mcrPath.getOwnerRelativePath().substring(1), true);//remove leading '/'
                         } catch (URISyntaxException e) {
                             throw new IOException(e);
                         }
