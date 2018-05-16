@@ -41,6 +41,7 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -55,7 +56,11 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final int TIMER_TASK_PERIOD = 1000 * 60;// * 60 * 3;
+    private static final int TIMER_TASK_PERIOD = getTimerPause();// * 60 * 3;
+
+    private static int getTimerPause() {
+        return MCRConfiguration.instance().getInt("MCR.MODS.Embargo.Job.Schedule.WaitInMinutes")*1000 * 60;
+    }
 
     private static final int RELEASE_THREAD_COUNT = 3;
 

@@ -17,18 +17,22 @@
  */
 package org.mycore.mods;
 
+import java.io.IOException;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRCreatorCache;
 import org.mycore.datamodel.common.MCRISO8601Date;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -42,6 +46,30 @@ public class MCRMODSEmbargoUtils {
     public static final String POOLPRIVILEGE_EMBARGO = "embargo";
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMODSEmbargoUtils.class);
+
+    private static final String EMPTY_VALUE = "";
+
+    private static final int CAPACITY = 10000;
+
+    private static MCRCache<MCRObjectID, String> embargoCache = new MCRCache<>(CAPACITY, "MODS embargo filter cache");
+
+    public static String getCachedEmbargo(final MCRObjectID objectId) {
+        MCRCache.ModifiedHandle modifiedHandle = MCRXMLMetadataManager.instance().getLastModifiedHandle(objectId, 10,
+            TimeUnit.MINUTES);
+        String embargo = null;
+        try {
+            embargo = embargoCache.getIfUpToDate(objectId, modifiedHandle);
+        } catch (IOException e) {
+            LOGGER.warn("Could not determine last modified timestamp of object {}", objectId);
+        }
+        if (embargo != null) {
+            return embargo == EMPTY_VALUE ? null : embargo;
+        }
+        MCRMODSWrapper modsWrapper = new MCRMODSWrapper(MCRMetadataManager.retrieveMCRObject(objectId));
+        embargo = modsWrapper.getElementValue("mods:accessCondition[@type='embargo']");
+        embargoCache.put(objectId, embargo != null ? embargo : EMPTY_VALUE);
+        return embargo;
+    }
 
     /**
      * Returns the embargo or <code>null</code> if none is set or is allowed to read.
@@ -60,7 +88,12 @@ public class MCRMODSEmbargoUtils {
      * @return the embargo or <code>null</code>
      */
     public static String getEmbargo(final MCRObjectID objectId) {
-        return getEmbargo(MCRMetadataManager.retrieveMCRObject(objectId));
+        String embargo = getCachedEmbargo(objectId);
+
+        if (embargo != null && !embargo.isEmpty() && isAfterToday(embargo)) {
+            return embargo;
+        }
+        return null;
     }
 
     public static String getEmbargo(final MCRObject object) {
