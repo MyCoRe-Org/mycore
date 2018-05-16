@@ -18,14 +18,15 @@
 
 package org.mycore.pi;
 
+import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
 
 public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
 
@@ -59,4 +60,18 @@ public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
      */
     public abstract T generate(MCRBase mcrBase, String additional) throws MCRPersistentIdentifierException;
 
+    /**
+     * checks if the property exists and throws a exception if not.
+     * @param propertyName to check
+     * @throws MCRConfigurationException if property does not exist
+     */
+    protected void checkPropertyExists(final String propertyName) throws MCRConfigurationException {
+        if(!getProperties().containsKey(propertyName)){
+            throw new MCRConfigurationException("Missing property " + GENERATOR_CONFIG_PREFIX + getGeneratorID() + "." + propertyName);
+        }
+    }
+
+    public String getGeneratorID() {
+        return generatorID;
+    }
 }

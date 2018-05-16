@@ -34,6 +34,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
@@ -156,8 +157,14 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     @Override
+    @Deprecated
     public boolean checkPermission(String id, String permission, String userID) {
         return checkAccess(id, permission, userID, null);
+    }
+
+    @Override
+    public boolean checkPermission(String id, String permission, MCRUserInformation userInfo) {
+        return checkAccess(id, permission, userInfo, null);
     }
 
     @Override
@@ -169,8 +176,14 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     @Override
+    @Deprecated
     public boolean checkPermissionForUser(String permission, String userID) {
         return checkAccess(poolPrivilegeID, permission, userID, null);
+    }
+
+    @Override
+    public boolean checkPermissionForUser(String permission, MCRUserInformation userInfo) {
+        return checkAccess(poolPrivilegeID, permission, userInfo, null);
     }
 
     @Override
@@ -179,7 +192,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         String ruleStr = getNormalizedRuleString(rule);
         MCRAccessRule accessRule = new MCRAccessRule(null, "System", new Date(), ruleStr, "");
         try {
-            return accessRule.checkAccess(session.getUserInformation().getUserID(), new Date(), new MCRIPAddress(
+            return accessRule.checkAccess(session.getUserInformation(), new Date(), new MCRIPAddress(
                 session.getCurrentIP()));
         } catch (MCRException | UnknownHostException e) {
             // only return true if access is allowed, we dont know this
@@ -280,6 +293,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
      *            ip-Address
      * @return true if access is granted according to defined access rules
      */
+    @Deprecated
     public boolean checkAccess(String objID, String permission, String userID, MCRIPAddress ip) {
         Date date = new Date();
         LOGGER.debug("getAccess()");
@@ -289,6 +303,30 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
             return userID.equals(MCRSystemUserInformation.getSuperUserInstance().getUserID());
         }
         return rule.checkAccess(userID, date, ip);
+    }
+
+    /**
+     * Validator methods to validate access definition for given object and pool
+     *
+     * @param permission
+     *            poolname as string
+     * @param objID
+     *            MCRObjectID as string
+     * @param userInfo
+     *            MCRUser
+     * @param ip
+     *            ip-Address
+     * @return true if access is granted according to defined access rules
+     */
+    public boolean checkAccess(String objID, String permission, MCRUserInformation userInfo, MCRIPAddress ip) {
+        Date date = new Date();
+        LOGGER.debug("getAccess()");
+        MCRAccessRule rule = getAccessRule(objID, permission);
+        LOGGER.debug("getAccess() is done");
+        if (rule == null) {
+            return userInfo.getUserID().equals(MCRSystemUserInformation.getSuperUserInstance().getUserID());
+        }
+        return rule.checkAccess(userInfo, date, ip);
     }
 
     /**

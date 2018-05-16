@@ -299,6 +299,13 @@
     </a>
   </xsl:template>
 
+  <xsl:template match="mods:accessCondition" mode="ogl-logo">
+    <xsl:variable name="licenseVersion" select="substring-before(substring-after(@xlink:href, '#ogl_'), '.')" />
+    <a rel="license" href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/{$licenseVersion}/">
+      <img src="https://upload.wikimedia.org/wikipedia/en/4/46/UKOpenGovernmentLicence.svg" style="width: 50px;" />
+    </a>
+  </xsl:template>
+
   <xsl:template match="mods:accessCondition" mode="cc-text">
     <xsl:variable name="trimmed" select="substring-after(normalize-space(@xlink:href),'#')" />
     <xsl:variable name="licenseURI" select="concat('classification:metadata:0:children:mir_licenses:',$trimmed)" />

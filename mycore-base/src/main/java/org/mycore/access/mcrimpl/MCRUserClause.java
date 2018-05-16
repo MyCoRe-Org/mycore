@@ -18,10 +18,12 @@
 
 package org.mycore.access.mcrimpl;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
@@ -61,11 +63,15 @@ class MCRUserClause implements MCRCondition<Object> {
     }
 
     public boolean evaluate(Object o) {
+        MCRUserInformation userInformation = Optional.ofNullable(o)
+            .filter(obj -> obj instanceof MCRAccessData)
+            .map(MCRAccessData.class::cast)
+            .map(MCRAccessData::getUserInformation)
+            .orElseGet(MCRSessionMgr.getCurrentSession()::getUserInformation);
         if (userRegEx != null) {
-            return userRegEx.matcher(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()).matches()
-                ^ not;
+            return userRegEx.matcher(userInformation.getUserID()).matches() ^ not;
         }
-        return user.equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()) ^ not;
+        return user.equals(userInformation.getUserID()) ^ not;
     }
 
     @Override

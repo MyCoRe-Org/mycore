@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.mycore.pi;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -47,13 +48,12 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.MCRDOIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
@@ -69,6 +69,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     protected static final String METADATA_SERVICE_PROPERTY_KEY = "MetadataService";
 
+    protected static final String TRANSLATE_PREFIX = "component.pi.register.error.";
+
     private final String registrationServiceID;
 
     private final String type;
@@ -78,10 +80,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         this.type = identifierType;
     }
 
-    public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
-        String json = getGson().toJson(databaseEntry);
-        obj.getService().addFlag(PI_FLAG, json);
-    }
+    // generated identifier is already present in database
+    private static final int ERR_CODE_0_1 = 0x0001;
+
+    private static Logger LOGGER = LogManager.getLogger();
 
     /**
      * Removes a flag from a {@link MCRObject}
@@ -204,6 +206,26 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new MCRException(e);
         }
+    }
+
+    public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
+        String json = getGson().toJson(databaseEntry);
+        obj.getService().addFlag(PI_FLAG, json);
+    }
+
+    public static boolean hasFlag(MCRObjectID id, String additional, MCRPIRegistrationInfo mcrpi) {
+        MCRBase obj = MCRMetadataManager.retrieve(id);
+        return hasFlag(obj, additional, mcrpi);
+    }
+
+    public static boolean hasFlag(MCRBase obj, String additional, MCRPIRegistrationInfo mcrpi) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        Gson gson = getGson();
+        return flags.stream().anyMatch(_stringFlag -> {
+            MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
+            return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
+        });
     }
 
     protected void validatePermission(MCRBase obj) throws MCRAccessException {
@@ -380,9 +402,20 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return shortened;
     }
 
-    protected T getNewIdentifier(MCRBase obj, String additional) throws MCRPersistentIdentifierException {
+    protected T getNewIdentifier(MCRBase id, String additional) throws MCRPersistentIdentifierException {
         MCRPIGenerator<T> persitentIdentifierGenerator = getGenerator();
-        return persitentIdentifierGenerator.generate(obj, additional);
+        final T generated = persitentIdentifierGenerator.generate(id, additional);
+        final String generatedIdentifier = generated.asString();
+        final Optional<MCRPIRegistrationInfo> mayInfo = MCRPIManager.getInstance()
+            .getInfo(generatedIdentifier, getType());
+        if (mayInfo.isPresent()) {
+            final String presentObject = mayInfo.get().getMycoreID();
+            throw new MCRPersistentIdentifierException(
+                "The Generated identifier " + generatedIdentifier + " is already present in database in object "
+                    + presentObject, MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_0_1),
+                ERR_CODE_0_1);
+        }
+        return generated;
     }
 
     protected MCRPI getTableEntry(MCRObjectID id, String additional) {

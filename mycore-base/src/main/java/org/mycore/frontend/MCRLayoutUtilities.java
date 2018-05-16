@@ -347,7 +347,10 @@ public class MCRLayoutUtilities {
      * @param access
      *            initial value
      * @param userID a user id
+     * 
+     * @deprecated userID as string is not enough - we need to pass the complete MCRUserInformation object
      */
+    @Deprecated
     public static boolean itemAccess(String permission, Element item, boolean access, String userID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
         String objID = getWebpageACLID(item);

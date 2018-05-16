@@ -462,7 +462,7 @@ public class MCRRestAPIUploadHelper {
             response = Response
                 .created(info.getBaseUriBuilder().path("v1/objects/" + objID + "/derivates").build())
                 .type("application/xml; charset=UTF-8").header(HEADER_NAME_AUTHORIZATION,
-                    "Bearer " + MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
+                    MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
                 .build();
         }
         return response;

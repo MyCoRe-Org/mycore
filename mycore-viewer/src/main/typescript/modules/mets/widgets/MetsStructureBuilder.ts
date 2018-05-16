@@ -181,7 +181,7 @@ namespace mycore.viewer.widgets.mets {
                 if ((elem instanceof Element || "getAttribute" in elem)) {
                     if (elem.nodeName.indexOf("fptr") != -1) {
                         this.processFPTR(chapterObject, <Element>elem);
-                    } else if (elem.nodeName.indexOf("div")) {
+                    } else if (elem.nodeName.indexOf("div") != -1) {
                         chapterObject.chapter.push(this.processChapter(chapterObject, <Element>elem));
                     }
                 }

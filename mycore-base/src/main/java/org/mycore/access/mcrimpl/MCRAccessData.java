@@ -20,15 +20,26 @@ package org.mycore.access.mcrimpl;
 
 import java.util.Date;
 
+import org.mycore.common.MCRUserInformation;
+
 public class MCRAccessData {
     private String userID;
+
+    private MCRUserInformation userInformation;
 
     private Date date;
 
     private MCRIPAddress ip;
 
+    @Deprecated
     MCRAccessData(String userID, Date date, MCRIPAddress ip) {
         this.userID = userID;
+        this.date = date;
+        this.ip = ip;
+    }
+
+    MCRAccessData(MCRUserInformation userInfo, Date date, MCRIPAddress ip) {
+        this.userInformation = userInfo;
         this.date = date;
         this.ip = ip;
     }
@@ -59,4 +70,13 @@ public class MCRAccessData {
     public void setUserID(String userID) {
         this.userID = userID;
     }
+
+    public MCRUserInformation getUserInformation() {
+        return userInformation;
+    }
+
+    public void setUserInformation(MCRUserInformation userInformation) {
+        this.userInformation = userInformation;
+    }
+
 }

@@ -28,6 +28,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
@@ -166,9 +167,18 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String,
      *      java.lang.String, MCRUser)
      */
+    @Deprecated
+    @Override
     public boolean checkPermission(String id, String permission, String userID) {
         LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID {} for permission {} for user{}", id, permission,
             userID);
+        return true;
+    }
+
+    @Override
+    public boolean checkPermission(String id, String permission, MCRUserInformation userInfo) {
+        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID " + id + " for permission " + permission
+            + " for user" + userInfo == null ? "null" : userInfo.getUserID());
         return true;
     }
 
@@ -187,8 +197,19 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String, MCRUser)
      */
+    @Deprecated
+    @Override
     public boolean checkPermissionForUser(String permission, String userID) {
         LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for permission {} for user {}", permission, userID);
+        return true;
+    }
+
+    @Override
+    public boolean checkPermissionForUser(String permission, MCRUserInformation userInfo) {
+        LOGGER.debug(
+            "Execute MCRAccessBaseImpl checkPermission for permission " + permission + " for user " + userInfo == null
+                ? "null"
+                : userInfo.getUserID());
         return true;
     }
 

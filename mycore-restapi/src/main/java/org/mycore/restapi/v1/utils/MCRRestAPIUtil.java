@@ -23,16 +23,12 @@
 package org.mycore.restapi.v1.utils;
 
 import java.net.UnknownHostException;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response.Status;
 
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
-import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRIPAddress;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
@@ -73,38 +69,20 @@ public class MCRRestAPIUtil {
      */
     public static void checkRestAPIAccess(HttpServletRequest request, MCRRestAPIACLPermission permission, String path)
         throws MCRRestAPIException {
-        //save the current user and set REST API user into session, 
-        //because ACL System can only validate the current user in session.
-        MCRUserInformation oldUser = MCRSessionMgr.getCurrentSession().getUserInformation();
         try {
             String userID = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(request);
-            if (userID != null) {
-                if (MCRSystemUserInformation.getGuestInstance().getUserID().equals(userID)) {
-                    MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
-                } else {
-                    MCRSessionMgr.getCurrentSession().setUserInformation(MCRUserManager.getUser(userID));
-                }
-            }
+            MCRUserInformation userInfo = MCRUserManager.getUser(userID);
             MCRIPAddress theIP = new MCRIPAddress(MCRFrontendUtil.getRemoteAddr(request));
             String thePath = path.startsWith("/") ? path : "/" + path;
-
-            boolean hasAPIAccess = ((MCRAccessControlSystem) MCRAccessControlSystem.instance()).checkAccess("restapi:/",
-                permission.toString(), userID, theIP);
-            if (hasAPIAccess) {
-                MCRAccessRule rule = (MCRAccessRule) MCRAccessControlSystem.instance()
-                    .getAccessRule("restapi:" + thePath, permission.toString());
-                if (rule != null) {
-                    if (rule.checkAccess(userID, new Date(), theIP)) {
-                        return;
-                    }
-                } else {
-                    return;
-                }
+            String thePermission = permission.toString();
+            MCRAccessControlSystem acs = (MCRAccessControlSystem) MCRAccessControlSystem.instance();
+            boolean hasAPIAccess = acs.checkAccess("restapi:/", thePermission, userInfo, theIP);
+            if (hasAPIAccess && (!acs.hasRule("restapi:" + thePath, thePermission)
+                || acs.checkAccess("restapi:" + thePath, permission.toString(), userInfo, theIP))) {
+                return;
             }
         } catch (UnknownHostException e) {
             // ignore
-        } finally {
-            MCRSessionMgr.getCurrentSession().setUserInformation(oldUser);
         }
         throw new MCRRestAPIException(Status.FORBIDDEN,
             new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",

@@ -39,6 +39,7 @@ import javax.persistence.criteria.Root;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
@@ -315,7 +316,7 @@ public class MCRPIManager {
         return getUnregisteredIdentifiers(type, -1);
     }
 
-    public List<MCRPIRegistrationInfo> getRegistered(MCRObject object) {
+    public List<MCRPIRegistrationInfo> getRegistered(MCRBase object) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRPIRegistrationInfo> getQuery = cb.createQuery(MCRPIRegistrationInfo.class);
@@ -343,6 +344,20 @@ public class MCRPIManager {
                 .where(cb.equal(pi.get(MCRPI_.identifier), identifier)))
             .getResultList();
     }
+
+    public Optional<MCRPIRegistrationInfo> getInfo(String identifier, String type) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRPIRegistrationInfo> getQuery = cb.createQuery(MCRPIRegistrationInfo.class);
+        Root<MCRPI> pi = getQuery.from(MCRPI.class);
+        final List<MCRPIRegistrationInfo> resultList = em.createQuery(
+            getQuery
+                .select(pi)
+                .where(cb.equal(pi.get(MCRPI_.identifier), identifier),cb.equal(pi.get(MCRPI_.type), type)))
+            .getResultList();
+        return resultList.size()==0 ? Optional.empty():Optional.of(resultList.get(0));
+    }
+
 
     /**
      * Returns a parser for a specific type of persistent identifier.
