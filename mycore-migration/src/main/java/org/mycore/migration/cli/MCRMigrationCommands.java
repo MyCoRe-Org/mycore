@@ -113,7 +113,7 @@ public class MCRMigrationCommands {
             if (!service.isFlagTypeSet(MCRObjectService.FLAG_TYPE_MODIFIEDBY)) { //the chicken
                 //have to restore also modifiedby from version history.
                 LOGGER.info(objectID + ", modified by: " + modifyUser);
-                service.addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, modifyUser);
+                service.addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY, modifyUser);
             }
             obj.setImportMode(true);
             if (obj instanceof MCRDerivate) {
