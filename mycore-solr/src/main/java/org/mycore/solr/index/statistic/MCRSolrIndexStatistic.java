@@ -50,7 +50,7 @@ public class MCRSolrIndexStatistic {
     }
 
     public int addDocument(int docs) {
-        LOGGER.debug("{}: adding {} documents", name, documents);
+        LOGGER.debug("{}: adding {} documents", name, docs);
         return documents.addAndGet(docs);
     }
 
