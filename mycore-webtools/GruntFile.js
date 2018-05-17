@@ -28,8 +28,14 @@ module.exports = function (grunt) {
                 options: {
                     fast: 'never'
                 },
-                default: {
+                processing: {
                     tsconfig: './src/main/ts/processing/tsconfig.json'
+                },
+                upload_api: {
+                    tsconfig: './src/main/ts/upload/tsconfig-api.json'
+                },
+                upload_gui: {
+                    tsconfig: './src/main/ts/upload/tsconfig-gui.json'
                 }
             },
             copy: {

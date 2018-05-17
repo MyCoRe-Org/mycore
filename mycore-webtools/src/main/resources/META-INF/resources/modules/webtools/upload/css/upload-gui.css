@@ -1,0 +1,19 @@
+.mcr-upload {
+    position: fixed;
+    display: block;
+    bottom: 0px;
+    right: 0px;
+    min-height: 200px;
+    min-width: 200px;
+    height: 33%;
+    width: 33%;
+}
+
+.mcr-upload .entry {
+    border-bottom: 1px solid lavender;
+    padding-top: 10px;
+}
+
+.mcr-upload-entry-list {
+    height: 100%;
+}

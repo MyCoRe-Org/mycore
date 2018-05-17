@@ -123,7 +123,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
         if (set_maindoc == null) {
             maindoc = "";
         } else {
-            maindoc = set_maindoc;
+            maindoc = set_maindoc.startsWith("/") ? set_maindoc.substring(1) : set_maindoc;
         }
     }
 

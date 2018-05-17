@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"rootDir": "src/main/ts/upload",
+		"outDir": "../../../../target/classes/META-INF/resources/modules/webtools/upload/js",
+		"mapRoot": ".",
+		"sourceRoot": ".",
+		"target": "es5",
+		"module": "commonjs",
+		"sourceMap": true,
+		"removeComments": false,
+    "noImplicitAny": false,
+    "declaration": true
+  },
+  "files": [ "../../../../target/classes/META-INF/resources/modules/webtools/upload/js/upload-api.d.ts","upload-gui.ts" ]
+}
