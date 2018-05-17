@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -105,7 +104,6 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     @Override
     public MCRDNBURN register(MCRBase obj, String filePath, boolean updateObject)
             throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
-        Objects.nonNull(filePath);
         this.validateRegistration(obj, filePath);
 
         if (obj instanceof MCRDerivate) {
@@ -146,7 +144,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
                 .sorted()
                 .collect(Collectors.toMap(generateURN, p -> p, (m1, m2) -> m1, LinkedHashMap::new));
 
-        if (!filePath.equals("") && urnPathMap.isEmpty()) {
+        if (!"".equals(filePath) && urnPathMap.isEmpty()) {
             String errMsg =
                     MessageFormat.format("File {0} does not exist in {1}.\n", filePath, derivID.toString()) +
                             "Use absolute path of file without owner ID like /abs/path/to/file.\n";
