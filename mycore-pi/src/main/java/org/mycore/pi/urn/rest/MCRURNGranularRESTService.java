@@ -73,12 +73,11 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     private final Function<MCRDerivate, Stream<MCRPath>> derivateFileStream;
 
     public MCRURNGranularRESTService(String registrationServiceID) {
-        this(registrationServiceID,
-             MCRURNGranularRESTService::defaultDerivateFileStream);
+        this(registrationServiceID, MCRURNGranularRESTService::defaultDerivateFileStream);
     }
 
     public MCRURNGranularRESTService(String registrationServiceID,
-                                     Function<MCRDerivate, Stream<MCRPath>> derivateFileStreamFunc) {
+            Function<MCRDerivate, Stream<MCRPath>> derivateFileStreamFunc) {
         super(registrationServiceID, MCRDNBURN.TYPE);
         this.derivateFileStream = derivateFileStreamFunc;
     }
@@ -117,10 +116,10 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
     private MCRDNBURN registerURN(MCRDerivate deriv, String filePath) throws MCRPersistentIdentifierException {
         MCRObjectID derivID = deriv.getId();
 
-        Function<String, Integer> countCreatedPI = s -> MCRPIManager
-                .getInstance()
-                .getCreatedIdentifiers(derivID, getType(), getServiceID())
-                .size();
+        Function<String, Integer> countCreatedPI = s -> MCRPIManager.getInstance()
+                                                                    .getCreatedIdentifiers(derivID, getType(),
+                                                                            getServiceID())
+                                                                    .size();
 
         int seed = Optional.of(filePath)
                            .filter(p -> !"".equals(p))
@@ -128,26 +127,26 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
                            .map(count -> count + 1)
                            .orElse(1);
 
-        MCRDNBURN derivURN = Optional
-                .ofNullable(deriv.getDerivate())
-                .map(MCRObjectDerivate::getURN)
-                .flatMap(new MCRDNBURNParser()::parse)
-                .orElseGet(() -> createNewURN(deriv));
+        MCRDNBURN derivURN = Optional.ofNullable(deriv.getDerivate())
+                                     .map(MCRObjectDerivate::getURN)
+                                     .flatMap(new MCRDNBURNParser()::parse)
+                                     .orElseGet(() -> createNewURN(deriv));
 
         String setID = derivID.getNumberAsString();
         GranularURNGenerator granularURNGen = new GranularURNGenerator(seed, derivURN, setID);
         Function<MCRPath, Supplier<String>> generateURN = p -> granularURNGen.getURNSupplier();
 
-        LinkedHashMap<Supplier<String>, MCRPath> urnPathMap = derivateFileStream
-                .apply(deriv)
-                .filter(notInIgnoreList().and(matchFile(filePath)))
-                .sorted()
-                .collect(Collectors.toMap(generateURN, p -> p, (m1, m2) -> m1, LinkedHashMap::new));
+        LinkedHashMap<Supplier<String>, MCRPath> urnPathMap = derivateFileStream.apply(deriv)
+                                                                                .filter(notInIgnoreList().and(
+                                                                                        matchFile(filePath)))
+                                                                                .sorted()
+                                                                                .collect(Collectors.toMap(generateURN,
+                                                                                        p -> p, (m1, m2) -> m1,
+                                                                                        LinkedHashMap::new));
 
         if (!"".equals(filePath) && urnPathMap.isEmpty()) {
-            String errMsg =
-                    MessageFormat.format("File {0} does not exist in {1}.\n", filePath, derivID.toString()) +
-                            "Use absolute path of file without owner ID like /abs/path/to/file.\n";
+            String errMsg = MessageFormat.format("File {0} does not exist in {1}.\n", filePath, derivID.toString())
+                    + "Use absolute path of file without owner ID like /abs/path/to/file.\n";
 
             throw new MCRPersistentIdentifierException(errMsg);
         }
@@ -160,9 +159,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
             LOGGER.error("Error while updating derivate {}", derivID, e);
         }
 
-        EntityTransaction transaction = MCREntityManagerProvider
-                .getCurrentEntityManager()
-                .getTransaction();
+        EntityTransaction transaction = MCREntityManagerProvider.getCurrentEntityManager().getTransaction();
 
         if (!transaction.isActive()) {
             transaction.begin();
@@ -184,8 +181,8 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
             if (Boolean.valueOf(getProperties().getOrDefault("supportDfgViewerURN", "false"))) {
                 String suffix = "dfg";
-                persistURNStr(deriv, null, getServiceID() + "-" + suffix)
-                        .accept(() -> derivURN.withNamespaceSuffix(suffix + "-").asString(), "");
+                persistURNStr(deriv, null, getServiceID() + "-" + suffix).accept(
+                        () -> derivURN.withNamespaceSuffix(suffix + "-").asString(), "");
             }
 
             return derivURN;
@@ -208,8 +205,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
     private BiConsumer<Supplier<String>, String> persistURNStr(MCRDerivate deriv, Date registerDate, String serviceID) {
         return (urnSup, path) -> {
-            MCRPI mcrpi = new MCRPI(urnSup.get(), getType(), deriv.getId().toString(), path, serviceID,
-                                    registerDate);
+            MCRPI mcrpi = new MCRPI(urnSup.get(), getType(), deriv.getId().toString(), path, serviceID, registerDate);
             MCREntityManagerProvider.getCurrentEntityManager().persist(mcrpi);
         };
     }
@@ -226,14 +222,13 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         Supplier<? extends RuntimeException> errorInIgnorList = () -> new RuntimeException(
                 "Error in ignore filename list!");
 
-        return path -> getIgnoreFileList()
-                .stream()
-                .map(Pattern::compile)
-                .map(Pattern::asPredicate)
-                .map(Predicate::negate)
-                .reduce(Predicate::and)
-                .orElseThrow(errorInIgnorList)
-                .test(path.getOwnerRelativePath());
+        return path -> getIgnoreFileList().stream()
+                                          .map(Pattern::compile)
+                                          .map(Pattern::asPredicate)
+                                          .map(Predicate::negate)
+                                          .reduce(Predicate::and)
+                                          .orElseThrow(errorInIgnorList)
+                                          .test(path.getOwnerRelativePath());
     }
 
     private List<String> getIgnoreFileList() {
