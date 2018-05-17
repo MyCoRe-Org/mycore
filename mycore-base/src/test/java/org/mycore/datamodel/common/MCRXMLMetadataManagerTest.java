@@ -41,6 +41,7 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
@@ -113,7 +114,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         assertTrue(MyCoRe_document_00000001.id + " should exist", getStore().exists(MyCoRe_document_00000001.id));
         try {
             getStore().delete(MCR_document_00000001.id);
-        } catch (IOException e) {
+        } catch (MCRPersistenceException e) {
             //is expected as MCR_document_00000001 does not exist
         }
         assertTrue(MyCoRe_document_00000001.id + " should not have been deleted",

@@ -1459,7 +1459,7 @@ public final class MCRURIResolver implements URIResolver {
                 if (versions != null && !versions.isEmpty()) {
                     return getSource(versions);
                 } else {
-                    MCRMetadataStore metadataStore = metadataManager.getStore(id);
+                    MCRMetadataStore metadataStore = metadataManager.getStore(id, true);
                     return getSource(metadataStore.retrieve(mcrId.getNumberAsInteger()));
                 }
             } catch (Exception e) {

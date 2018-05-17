@@ -587,18 +587,14 @@ public final class MCRMetadataManager {
 
     /**
      * Tells if the object or derivate with <code>id</code> exists.
-     * 
+     *
      * @param id
      *            the object ID
      * @throws MCRPersistenceException
      *            the xml couldn't be read
      */
     public static boolean exists(final MCRObjectID id) throws MCRPersistenceException {
-        try {
-            return MCRXMLMetadataManager.instance().exists(id);
-        } catch (IOException e) {
-            throw new MCRPersistenceException("Error while checking existence of " + id, e);
-        }
+        return MCRXMLMetadataManager.instance().exists(id);
     }
 
     /**

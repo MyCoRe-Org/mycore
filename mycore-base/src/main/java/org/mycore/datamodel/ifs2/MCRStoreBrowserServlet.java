@@ -86,6 +86,7 @@ class MCRStoreBrowserRequest {
     private void getStore(String storeID) throws Exception {
         if (storeID.contains("_"))
             store = MCRXMLMetadataManager.instance().getStore(storeID);
+        // TODO: the store can never be null, instead an MCRPersistenceException is thrown
         if (store == null) {
             store = MCRStoreManager.getStore(storeID, MCRMetadataStore.class);
             if (store == null)

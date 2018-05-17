@@ -74,6 +74,7 @@ import org.mycore.backend.hibernate.tables.MCRFSNODES_;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRStreamQuery;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -799,7 +800,7 @@ public class MCRIFSCommands {
             .filter(derID -> {
                 try {
                     return !mgr.exists(derID);
-                } catch (IOException e) {
+                } catch (MCRPersistenceException e) {
                     LOGGER.error("Error while checking existence of {}", derID, e);
                     return true;
                 }

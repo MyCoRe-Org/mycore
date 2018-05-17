@@ -103,7 +103,7 @@ public class MCRObjectServlet extends MCRContentServlet {
     private MCRContent requestVersionedObject(final MCRObjectID mcrid, final HttpServletResponse resp, final long rev)
         throws IOException {
         MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
-        MCRMetadataStore metadataStore = xmlMetadataManager.getStore(mcrid);
+        MCRMetadataStore metadataStore = xmlMetadataManager.getStore(mcrid, true);
         if (metadataStore instanceof MCRVersioningMetadataStore) {
             MCRContent content = xmlMetadataManager.retrieveContent(mcrid, rev);
             if (content != null) {
