@@ -31,6 +31,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -63,6 +64,9 @@ public class MCRRestAPIAuthentication {
 
     @Context
     HttpServletRequest req;
+
+    @Context
+    Application app;
 
     /**
      * Unauthenticated requests should return a response whose header contains a HTTP 401 Unauthorized status and a
@@ -98,7 +102,7 @@ public class MCRRestAPIAuthentication {
         }
         throw new NotAuthorizedException(
             "Login failed. Please provide proper user name and password via HTTP Basic Authentication.",
-            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
+            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null, app));
     }
 
     public static Optional<String> getToken(MCRUserInformation userInformation, String remoteIp) {
@@ -132,7 +136,7 @@ public class MCRRestAPIAuthentication {
         }
         throw new NotAuthorizedException(
             "Login failed. Please provide a valid JSON Web Token for authentication.",
-            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
+            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null, app));
     }
 
     public static void validate(String token) throws JWTVerificationException {

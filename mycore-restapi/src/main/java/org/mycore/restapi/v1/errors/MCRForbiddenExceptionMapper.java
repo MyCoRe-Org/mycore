@@ -19,6 +19,8 @@
 package org.mycore.restapi.v1.errors;
 
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -33,13 +35,15 @@ import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
  * {@link javax.ws.rs.core.Response.Status#UNAUTHORIZED} if current user is guest.
  */
 public class MCRForbiddenExceptionMapper implements ExceptionMapper<ForbiddenException> {
+    @Context
+    Application app;
     public Response toResponse(ForbiddenException ex) {
         String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         if (userID.equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
             LogManager.getLogger().warn("Guest detected");
             return Response.fromResponse(ex.getResponse())
                 .status(Response.Status.UNAUTHORIZED)
-                .header(HttpHeaders.WWW_AUTHENTICATE, MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null))
+                .header(HttpHeaders.WWW_AUTHENTICATE, MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null, app))
                 .build();
         }
         return ex.getResponse();

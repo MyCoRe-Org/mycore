@@ -26,7 +26,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.mycore.common.config.MCRConfiguration2;
+import javax.ws.rs.core.Application;
+
+import org.glassfish.jersey.server.ServerProperties;
 
 /**
  * This class contains some generic utility functions for the REST API
@@ -35,12 +37,11 @@ import org.mycore.common.config.MCRConfiguration2;
  */
 public class MCRRestAPIUtil {
     public static String getWWWAuthenticateHeader(String s,
-        Map<String, String> attributes) {
-        String realm = MCRConfiguration2.getString("MCR.NameOfProject")
-            .map(p -> p + ": ")
-            .orElse("")
-            + "Rest-API V1";
+        Map<String, String> attributes, Application app) {
         LinkedHashMap<String, String> attrMap = new LinkedHashMap<>();
+        String realm = app.getProperties()
+            .getOrDefault(ServerProperties.APPLICATION_NAME, "REST API")
+            .toString();
         attrMap.put("realm", realm);
         Optional.ofNullable(attributes).ifPresent(attrMap::putAll);
         StringBuilder b = new StringBuilder();

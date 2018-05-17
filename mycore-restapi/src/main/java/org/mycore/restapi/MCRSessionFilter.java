@@ -35,6 +35,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -71,6 +72,9 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
     @Context
     HttpServletRequest httpServletRequest;
+
+    @Context
+    Application app;
 
     /**
      * If request was authenticated via JSON Web Token add a new token if <code>aud</code> was {@link MCRRestAPIAuthentication#AUDIENCE}.
@@ -173,7 +177,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 attrs.put("error", "invalid_token");
                 attrs.put("error_description", e.getMessage());
                 throw new NotAuthorizedException(e.getMessage(), e,
-                    MCRRestAPIUtil.getWWWAuthenticateHeader("Bearer", attrs));
+                    MCRRestAPIUtil.getWWWAuthenticateHeader("Bearer", attrs, app));
             }
         }
 
@@ -200,7 +204,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 LOGGER.debug("Guest detected, change response from FORBIDDEN to UNAUTHORIZED.");
                 responseContext.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
                 responseContext.getHeaders().putSingle(HttpHeaders.WWW_AUTHENTICATE,
-                    MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null));
+                    MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null, app));
             }
             if (responseContext.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()
                 && "XMLHttpRequest".equals(requestContext.getHeaderString("X-Requested-With"))) {
