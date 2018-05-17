@@ -25,27 +25,13 @@ import java.util.stream.Stream;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.InternalServerErrorException;
 
-import org.apache.logging.log4j.LogManager;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.ServerProperties;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
-import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
-import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
-import org.mycore.restapi.MCRCORSResponseFilter;
-import org.mycore.restapi.MCRIgnoreClientAbortInterceptor;
-import org.mycore.restapi.MCRRestFeature;
-import org.mycore.restapi.MCRSessionFilter;
-import org.mycore.restapi.MCRTransactionFilter;
+import org.mycore.restapi.MCRJerseyRestApp;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
-import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
-import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
-import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -57,38 +43,30 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
 
 @ApplicationPath("/api/v2")
-public class MCRRestV2App extends ResourceConfig {
+public class MCRRestV2App extends MCRJerseyRestApp {
 
     public MCRRestV2App() {
         super();
-        setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API v2");
-        LogManager.getLogger().error("Initiialize {}", getApplicationName());
-        MCRJerseyDefaultConfiguration.setupGuiceBridge(this);
-        String[] restPackages = Stream
+        register(MCRRestAPIAuthentication.class); //keep 'unchanged' in v2
+        setupOAS();
+    }
+
+    @Override
+    protected String getVersion() {
+        return "v2";
+    }
+
+    @Override
+    protected String[] getRestPackages() {
+        return Stream
             .concat(
                 Stream.of(MCRWrappedXMLWriter.class.getPackage().getName(),
                     OpenApiResource.class.getPackage().getName()),
                 MCRConfiguration.instance().getStrings("MCR.RestAPI.V2.Resource.Packages").stream())
             .toArray(String[]::new);
-        packages(restPackages);
-        register(MCRRestAPIAuthentication.class); //keep 'unchanged' in v2
-        property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true);
-        register(MCRSessionFilter.class);
-        register(MCRTransactionFilter.class);
-        register(MultiPartFeature.class);
-        register(MCRRestFeature.class);
-        register(MCRJerseyExceptionMapper.class);
-        register(MCRRestAPIExceptionMapper.class);
-        register(MCRForbiddenExceptionMapper.class);
-        register(MCRNotAuthorizedExceptionMapper.class);
-        register(MCRCORSResponseFilter.class);
-        register(MCRRequestScopeACLFactory.getBinder());
-        register(MCRIgnoreClientAbortInterceptor.class);
-        getInstances().forEach(LogManager.getLogger()::info);
-        setupOAS(restPackages);
     }
 
-    private void setupOAS(String[] restPackages) {
+    private void setupOAS() {
         OpenAPI oas = new OpenAPI();
         Info oasInfo = new Info();
         oas.setInfo(oasInfo);
@@ -104,7 +82,7 @@ public class MCRRestV2App extends ResourceConfig {
         oas.addServersItem(oasServer);
         SwaggerConfiguration oasConfig = new SwaggerConfiguration()
             .openAPI(oas)
-            .resourcePackages(Stream.of(restPackages).collect(Collectors.toSet()))
+            .resourcePackages(Stream.of(getRestPackages()).collect(Collectors.toSet()))
             .ignoredRoutes(
                 MCRConfiguration2.getString("MCR.RestAPI.V2.OpenAPI.IgnoredRoutes")
                     .map(MCRConfiguration2::splitValue)

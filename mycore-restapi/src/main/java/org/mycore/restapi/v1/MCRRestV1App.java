@@ -25,24 +25,9 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.ApplicationPath;
 
-import org.apache.logging.log4j.LogManager;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.ServerProperties;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
-import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
-import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
-import org.mycore.restapi.MCRCORSResponseFilter;
-import org.mycore.restapi.MCRIgnoreClientAbortInterceptor;
-import org.mycore.restapi.MCRRestFeature;
-import org.mycore.restapi.MCRSessionFilter;
-import org.mycore.restapi.MCRTransactionFilter;
+import org.mycore.restapi.MCRJerseyRestApp;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
-import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
-import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
-import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 
@@ -51,34 +36,24 @@ import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
  *
  */
 @ApplicationPath("/api/v1")
-public class MCRRestV1App extends ResourceConfig {
+public class MCRRestV1App extends MCRJerseyRestApp {
 
     public MCRRestV1App() {
         super();
-        setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API v1");
-        LogManager.getLogger().error("Initiialize {}", getApplicationName());
-        MCRJerseyDefaultConfiguration.setupGuiceBridge(this);
-        String[] restPackages = Stream
+    }
+
+    @Override
+    protected String getVersion() {
+        return "v1";
+    }
+
+    @Override
+    protected String[] getRestPackages() {
+        return Stream
             .concat(
                 Stream.of(MCRWrappedXMLWriter.class.getPackage().getName(),
                     OpenApiResource.class.getPackage().getName()),
                 MCRConfiguration.instance().getStrings("MCR.RestAPI.Resource.Packages").stream())
             .toArray(String[]::new);
-        packages(restPackages);
-        property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true);
-        register(MCRSessionFilter.class);
-        register(MCRTransactionFilter.class);
-        register(MultiPartFeature.class);
-        register(MCRRestFeature.class);
-        register(MCRJerseyExceptionMapper.class);
-        register(MCRRestAPIExceptionMapper.class);
-        register(MCRForbiddenExceptionMapper.class);
-        register(MCRNotAuthorizedExceptionMapper.class);
-        register(MCRCORSResponseFilter.class);
-        register(MCRRequestScopeACLFactory.getBinder());
-        register(MCRIgnoreClientAbortInterceptor.class);
-        getInstances().stream()
-            .forEach(LogManager.getLogger()::info);
     }
-
 }
