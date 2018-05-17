@@ -98,7 +98,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         handlePreFlight(requestContext, responseHeaders, authenticatedRequest);
         if (!"*".equals(responseHeaders.getFirst(ACCESS_CONTROL_ALLOW_ORIGIN))) {
             String vary = Stream
-                .concat(Stream.of(ACCESS_CONTROL_ALLOW_ORIGIN),
+                .concat(Stream.of(ORIGIN),
                     responseHeaders.getOrDefault(HttpHeaders.VARY, Collections.emptyList())
                         .stream()
                         .map(Object::toString)
