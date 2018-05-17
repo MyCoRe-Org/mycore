@@ -24,14 +24,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -53,6 +56,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
@@ -268,6 +272,65 @@ public class MCRRestObjects {
         } catch (MCRAccessException e) {
             throw new ForbiddenException(e);
         }
+    }
+
+    @DELETE
+    @Path("/{" + PARAM_MCRID + "}")
+    @Operation(summary = "Deletes MCRObject {" + PARAM_MCRID + "}",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        responses = {
+            @ApiResponse(responseCode = "204", description = "MCRObject successfully deleted"),
+            @ApiResponse(responseCode = "409",
+                description = "MCRObject could not be deleted as it is referenced.",
+                content = @Content(schema = @Schema(
+                    description = "Map<String, <Collection<String>> of source (key) to targets (value)",
+                    implementation = Map.class))),
+        })
+    @MCRRequireTransaction
+    public Response deleteObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
+        //check preconditions
+        if (!MCRMetadataManager.exists(id)) {
+            throw new NotFoundException();
+        }
+        try {
+            MCRMetadataManager.deleteMCRObject(id);
+        } catch (MCRActiveLinkException e) {
+            Map<String, Collection<String>> activeLinks = e.getActiveLinks();
+            return Response.status(Response.Status.CONFLICT).entity(activeLinks).build();
+        } catch (MCRAccessException e) {
+            throw new ForbiddenException(); //usually handled before
+        }
+        return Response.noContent().build();
+    }
+
+    @PUT
+    @Path("/{" + PARAM_MCRID + "}/try")
+    @Operation(summary = "pre-flight target to test write operation on {" + PARAM_MCRID + "}",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        responses = {
+            @ApiResponse(responseCode = "204", description = "You have write permission"),
+            @ApiResponse(responseCode = "401",
+                description = "You do not have write permission and need to authenticate first"),
+            @ApiResponse(responseCode = "403", description = "You do not have write permission"),
+        })
+    public Response testUpdateObject(@PathParam(PARAM_MCRID) MCRObjectID id)
+        throws IOException {
+        return Response.noContent().build();
+    }
+
+    @DELETE
+    @Path("/{" + PARAM_MCRID + "}/try")
+    @Operation(summary = "pre-flight target to test delete operation on {" + PARAM_MCRID + "}",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        responses = {
+            @ApiResponse(responseCode = "204", description = "You have delete permission"),
+            @ApiResponse(responseCode = "401",
+                description = "You do not have delete permission and need to authenticate first"),
+            @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
+        })
+    public Response testDeleteObject(@PathParam(PARAM_MCRID) MCRObjectID id)
+        throws IOException {
+        return Response.noContent().build();
     }
 
 }

@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
@@ -242,6 +243,27 @@ public class MCRRestDerivates {
         }
     }
 
+    @DELETE
+    @Operation(summary = "Deletes MCRDerivate {" + PARAM_DERID + "}",
+        tags = MCRRestUtils.TAG_MYCORE_DERIVATE,
+        responses = {
+            @ApiResponse(responseCode = "204", description = "MCRDerivate successfully deleted"),
+        })
+    @MCRRequireTransaction
+    @Path("/{" + PARAM_DERID + "}")
+    public Response deleteDerivate(
+        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
+        if (!MCRMetadataManager.exists(derid)) {
+            throw new NotFoundException();
+        }
+        try {
+            MCRMetadataManager.deleteMCRDerivate(derid);
+            return Response.noContent().build();
+        } catch (MCRAccessException e) {
+            throw new ForbiddenException();
+        }
+    }
+
     @POST
     @Operation(
         summary = "Adds a new derivate (with defaults for 'display-enabled', 'main-doc', 'label') in the given object",
@@ -309,6 +331,37 @@ public class MCRRestDerivates {
         }
         return Response.created(uriInfo.getAbsolutePathBuilder().path(derId.toString()).build()).build();
     }
+
+    @PUT
+    @Path("/{" + PARAM_DERID + "}/try")
+    @Operation(summary = "pre-flight target to test write operation on {" + PARAM_DERID + "}",
+        tags = MCRRestUtils.TAG_MYCORE_DERIVATE,
+        responses = {
+            @ApiResponse(responseCode = "204", description = "You have write permission"),
+            @ApiResponse(responseCode = "401",
+                description = "You do not have write permission and need to authenticate first"),
+            @ApiResponse(responseCode = "403", description = "You do not have write permission"),
+        })
+    public Response testUpdateDerivate(@PathParam(PARAM_DERID) MCRObjectID id)
+        throws IOException {
+        return Response.noContent().build();
+    }
+
+    @DELETE
+    @Path("/{" + PARAM_DERID + "}/try")
+    @Operation(summary = "pre-flight target to test delete operation on {" + PARAM_DERID + "}",
+        tags = MCRRestUtils.TAG_MYCORE_DERIVATE,
+        responses = {
+            @ApiResponse(responseCode = "204", description = "You have delete permission"),
+            @ApiResponse(responseCode = "401",
+                description = "You do not have delete permission and need to authenticate first"),
+            @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
+        })
+    public Response testDeleteDerivate(@PathParam(PARAM_DERID) MCRObjectID id)
+        throws IOException {
+        return Response.noContent().build();
+    }
+
 
     static class DerivateMetadata {
         private String label;
