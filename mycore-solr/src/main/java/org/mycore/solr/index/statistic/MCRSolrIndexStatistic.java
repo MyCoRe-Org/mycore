@@ -45,15 +45,13 @@ public class MCRSolrIndexStatistic {
     }
 
     public long addTime(long time) {
-        accumulatedTime.addAndGet(time);
         LOGGER.debug("{}: adding {} ms", name, time);
-        return accumulatedTime.get();
+        return accumulatedTime.addAndGet(time);
     }
 
     public int addDocument(int docs) {
-        documents.addAndGet(docs);
-        LOGGER.debug("{}: adding {} documents", name, documents);
-        return documents.get();
+        LOGGER.debug("{}: adding {} documents", name, docs);
+        return documents.addAndGet(docs);
     }
 
     public long getAccumulatedTime() {
