@@ -212,7 +212,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 responseContext.getHeaders().remove(HttpHeaders.WWW_AUTHENTICATE);
             }
             addJWTToResponse(requestContext, responseContext);
-            if (requestContext.hasEntity()) {
+            if (responseContext.hasEntity()) {
                 responseContext.setEntityStream(new ProxyOutputStream(responseContext.getEntityStream()) {
                     @Override
                     public void close() throws IOException {
@@ -226,6 +226,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                     }
                 });
             } else {
+                LOGGER.debug("No Entity in response, closing MCRSession");
                 closeSessionIfNeeded();
             }
         } finally {
