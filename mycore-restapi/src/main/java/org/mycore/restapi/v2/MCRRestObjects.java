@@ -308,14 +308,14 @@ public class MCRRestObjects {
     @Operation(summary = "pre-flight target to test write operation on {" + PARAM_MCRID + "}",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
-            @ApiResponse(responseCode = "204", description = "You have write permission"),
+            @ApiResponse(responseCode = "202", description = "You have write permission"),
             @ApiResponse(responseCode = "401",
                 description = "You do not have write permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have write permission"),
         })
     public Response testUpdateObject(@PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
-        return Response.noContent().build();
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 
     @DELETE
@@ -323,14 +323,14 @@ public class MCRRestObjects {
     @Operation(summary = "pre-flight target to test delete operation on {" + PARAM_MCRID + "}",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,
         responses = {
-            @ApiResponse(responseCode = "204", description = "You have delete permission"),
+            @ApiResponse(responseCode = "202", description = "You have delete permission"),
             @ApiResponse(responseCode = "401",
                 description = "You do not have delete permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
         })
     public Response testDeleteObject(@PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
-        return Response.noContent().build();
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 
 }

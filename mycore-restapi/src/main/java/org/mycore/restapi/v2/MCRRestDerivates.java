@@ -337,14 +337,14 @@ public class MCRRestDerivates {
     @Operation(summary = "pre-flight target to test write operation on {" + PARAM_DERID + "}",
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE,
         responses = {
-            @ApiResponse(responseCode = "204", description = "You have write permission"),
+            @ApiResponse(responseCode = "202", description = "You have write permission"),
             @ApiResponse(responseCode = "401",
                 description = "You do not have write permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have write permission"),
         })
     public Response testUpdateDerivate(@PathParam(PARAM_DERID) MCRObjectID id)
         throws IOException {
-        return Response.noContent().build();
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 
     @DELETE
@@ -352,14 +352,14 @@ public class MCRRestDerivates {
     @Operation(summary = "pre-flight target to test delete operation on {" + PARAM_DERID + "}",
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE,
         responses = {
-            @ApiResponse(responseCode = "204", description = "You have delete permission"),
+            @ApiResponse(responseCode = "202", description = "You have delete permission"),
             @ApiResponse(responseCode = "401",
                 description = "You do not have delete permission and need to authenticate first"),
             @ApiResponse(responseCode = "403", description = "You do not have delete permission"),
         })
     public Response testDeleteDerivate(@PathParam(PARAM_DERID) MCRObjectID id)
         throws IOException {
-        return Response.noContent().build();
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 
 
