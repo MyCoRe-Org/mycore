@@ -251,6 +251,21 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         testDelete(deleteCategory);
     }
 
+    @Test
+    public void deleteMultipleCategories() {
+        //check for MCR-1863
+        addWorldClassification();
+        List<MCRCategoryID> europeChildrenIds = category.getChildren()
+            .get(0)
+            .getChildren()
+            .stream()
+            .map(MCRCategory::getId)
+            .collect(Collectors.toList());
+        DAO.deleteCategory(europeChildrenIds.get(0));
+        DAO.deleteCategory(europeChildrenIds.get(1));
+        DAO.deleteCategory(europeChildrenIds.get(2));
+    }
+
     private void testDelete(MCRCategory deleteCategory) {
         DAO.deleteCategory(deleteCategory.getId());
         startNewTransaction();
