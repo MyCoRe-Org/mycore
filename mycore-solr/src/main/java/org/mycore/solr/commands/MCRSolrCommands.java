@@ -302,13 +302,14 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         MCRSolrSchemaReloader.processConfigFiles(coreName, coreType);
     }
 	
-	@MCRCommand(syntax = "create solr core {0}",
-            help = "The command creates a new empty core with the given name",
+
+	@MCRCommand(syntax = "create solr core {0} from template {1}", 
+            help = "The command creates a new empty core with the given name based on the named core template",
             order = 220)
-	public static final void createSolrCore(String name) throws IOException, SolrServerException {
+	public static final void createSolrCore(String coreName, String templateName) throws IOException, SolrServerException {
 	    CoreAdminRequest.Create create = new CoreAdminRequest.Create();
-	    create.setCoreName(name);
-	    create.setConfigSet("_default");
+	    create.setCoreName(coreName);
+	    create.setConfigSet(templateName);
 	    create.setIsLoadOnStartup(true);
 	    SolrClient solrClient = MCRSolrClientFactory.getSolrBaseClient();
 	    CoreAdminResponse response = create.process(solrClient);

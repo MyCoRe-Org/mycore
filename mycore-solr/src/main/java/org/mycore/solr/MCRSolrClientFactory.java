@@ -18,9 +18,9 @@
 
 package org.mycore.solr;
 
-import static org.mycore.solr.MCRSolrConstants.CORE;
-import static org.mycore.solr.MCRSolrConstants.SERVER_BASE_URL;
-import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_MAIN;
+import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_BASE_URL;
+import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
 
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -47,10 +47,10 @@ public abstract class MCRSolrClientFactory {
     static {
         try {
             CORE_MAP = Collections.synchronizedMap(new HashMap<String, MCRSolrCore>());
-            if (CORE != null) {
-                setSolrClient(SERVER_BASE_URL, CORE);
+            if (SOLR_CORE_MAIN != null) {
+                setSolrClient(SOLR_SERVER_BASE_URL, SOLR_CORE_MAIN);
             } else {
-                setSolrClient(SERVER_URL);
+                setSolrClient(SOLR_SERVER_URL);
             }
         } catch (Throwable t) {
             LOGGER.error("Exception creating solr client object", t);

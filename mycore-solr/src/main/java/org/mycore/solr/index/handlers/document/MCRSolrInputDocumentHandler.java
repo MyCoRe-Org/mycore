@@ -57,7 +57,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
     @Override
     public void index() throws IOException, SolrServerException {
         LOGGER.info("Sending {} to SOLR...", document.getFieldValue("id"));
-        UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.UPDATE_PATH);
+        UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
         updateRequest.add(document);
         updateRequest.process(getSolrClient());
     }

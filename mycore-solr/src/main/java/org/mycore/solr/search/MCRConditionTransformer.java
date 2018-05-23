@@ -18,6 +18,8 @@
 
 package org.mycore.solr.search;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -278,7 +280,7 @@ public class MCRConditionTransformer {
             if (!mapEntry.getKey().equals("metadata")) {
                 MCRCondition combinedFilterQuery = buildSubCondition(mapEntry.getValue(), and, not);
                 SolrQuery filterQuery = getSolrQuery(combinedFilterQuery, sortBy, maxHits, returnFields);
-                solrRequestQuery.addFilterQuery(MCRSolrConstants.JOIN_PATTERN + filterQuery.getQuery());
+                solrRequestQuery.addFilterQuery(MCRSolrConstants.SOLR_JOIN_PATTERN + filterQuery.getQuery());
             }
         }
         return solrRequestQuery;
@@ -348,7 +350,7 @@ public class MCRConditionTransformer {
 
     private static HashSet<String> getJoinFields() {
         if (joinFields == null) {
-            joinFields = new HashSet<>(MCRConfiguration.instance().getStrings("MCR.Module-solr.JoinQueryFields"));
+            joinFields = new HashSet<>(MCRConfiguration.instance().getStrings(SOLR_CONFIG_PREFIX + "JoinQueryFields"));
         }
         return joinFields;
     }

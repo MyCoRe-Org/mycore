@@ -105,7 +105,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
                 .format("+{0}:\"{1}\"{2}{3}", fieldName, category, objectType, restriction);
         this.solrQuery.setQuery(queryString.trim());
         if (filterCategory) {
-            solrQuery.setFilterQueries(MessageFormat.format("{0}+{1}:\"{2}\"", MCRSolrConstants.JOIN_PATTERN,
+            solrQuery.setFilterQueries(MessageFormat.format("{0}+{1}:\"{2}\"", MCRSolrConstants.SOLR_JOIN_PATTERN,
                 fieldName, category));
         }
     }

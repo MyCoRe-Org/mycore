@@ -59,7 +59,7 @@ public abstract class MCRSolrClassificationUtil {
 
     static {
         MCRSolrCore defaultCore = MCRSolrClientFactory.getDefaultSolrCore();
-        CLASSIFICATION_CORE_NAME = MCRConfiguration.instance().getString("MCR.Module-solr.Classification.Core",
+        CLASSIFICATION_CORE_NAME = MCRConfiguration.instance().getString("MCR.Solr.Classification.Core",
             defaultCore != null ? defaultCore.getName() + "_class" : "classification");
     }
 
@@ -237,7 +237,7 @@ public abstract class MCRSolrClassificationUtil {
             synchronized (CREATE_LOCK) {
                 classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_NAME);
                 if (classCore == null) {
-                    classCore = new MCRSolrCore(MCRSolrConstants.SERVER_BASE_URL, CLASSIFICATION_CORE_NAME);
+                    classCore = new MCRSolrCore(MCRSolrConstants.SOLR_SERVER_BASE_URL, CLASSIFICATION_CORE_NAME);
                     MCRSolrClientFactory.add(classCore);
                 }
             }

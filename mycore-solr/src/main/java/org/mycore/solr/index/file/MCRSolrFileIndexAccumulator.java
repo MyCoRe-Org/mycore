@@ -26,7 +26,7 @@ import org.apache.solr.common.SolrInputDocument;
 
 /**
  * This interface is used to accumulate information of a file to a solr document.
- * Add instances of this interface to the property <code>MCR.Module-solr.Indexer.File.AccumulatorList</code>
+ * Add instances of this interface to the property <code>MCR.Solr.Indexer.File.AccumulatorList</code>
  */
 public interface MCRSolrFileIndexAccumulator {
     /**

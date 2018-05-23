@@ -87,7 +87,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
         }
         UpdateResponse updateResponse;
         try {
-            UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.UPDATE_PATH);
+            UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
             updateRequest.add(documents);
             updateResponse = updateRequest.process(getSolrClient());
         } catch (Throwable e) {

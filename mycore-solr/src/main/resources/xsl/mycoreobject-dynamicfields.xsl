@@ -5,11 +5,11 @@
 
   <xsl:import href="xslImport:solr-document:mycoreobject-dynamicfields.xsl" />
 
-  <xsl:param name="MCR.Module-solr.DynamicFields" select="'true'" />
-  <xsl:param name="MCR.Module-solr.DynamicFields.excludes" select="''" />
+  <xsl:param name="MCR.Solr.DynamicFields" select="'true'" />
+  <xsl:param name="MCR.Solr.DynamicFields.excludes" select="''" />
 
   <xsl:template name="check.excludes">
-    <xsl:param name="excludes" select="concat(normalize-space($MCR.Module-solr.DynamicFields.excludes), ',')" />
+    <xsl:param name="excludes" select="concat(normalize-space($MCR.Solr.DynamicFields.excludes), ',')" />
     <xsl:variable name="exclude" select="substring-before($excludes, ',')" />
     <xsl:variable name="otherExcludes" select="substring-after($excludes, ',')" />
 
@@ -36,10 +36,10 @@
     <xsl:variable name="isExcluded">
       <xsl:call-template name="check.excludes" />
     </xsl:variable>
-    <xsl:if test="$MCR.Module-solr.DynamicFields='true' and $isExcluded = 'false'">
+    <xsl:if test="$MCR.Solr.DynamicFields='true' and $isExcluded = 'false'">
       <xsl:comment>
         Start of dynamic fields:
-        Set 'MCR.Module-solr.DynamicFields=false' to exclude these:
+        Set 'MCR.Solr.DynamicFields=false' to exclude these:
       </xsl:comment>
       <!-- dynamic field for leaf nodes -->
       <xsl:for-each select=".//*[not(*)]">

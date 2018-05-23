@@ -100,7 +100,7 @@ public class MCRRestAPISearch {
         @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
         @QueryParam("facet.mincount") String facetMinCount, @QueryParam("json.wrf") String jsonWrf)
         throws MCRRestAPIException {
-        StringBuilder url = new StringBuilder(MCRSolrConstants.SERVER_URL);
+        StringBuilder url = new StringBuilder(MCRSolrConstants.SOLR_SERVER_URL);
         url.append("/select?");
 
         try {

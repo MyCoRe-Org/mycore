@@ -18,7 +18,7 @@
 
 package org.mycore.solr.index.handlers;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
 import java.nio.file.Path;

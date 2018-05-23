@@ -18,6 +18,8 @@
 
 package org.mycore.solr.index;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -63,7 +65,7 @@ import org.mycore.util.concurrent.processing.MCRProcessableSupplier;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 /**
  * Base class for indexing with solr.
@@ -82,7 +84,7 @@ public class MCRSolrIndexer {
      * Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is
      * 100.
      */
-    static final int BULK_SIZE = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.BulkSize", 100);
+    static final int BULK_SIZE = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "Indexer.BulkSize", 100);
 
     static final MCRProcessableExecutor SOLR_EXECUTOR;
 
@@ -95,7 +97,7 @@ public class MCRSolrIndexer {
     static {
         MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
 
-        int poolSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Indexer.ThreadCount", 4);
+        int poolSize = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "Indexer.ThreadCount", 4);
         final ExecutorService threadPool = new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS,
             MCRProcessableFactory.newPriorityBlockingQueue(),
             new ThreadFactoryBuilder().setNameFormat("SOLR-Indexer-#%d").build());
@@ -293,7 +295,7 @@ public class MCRSolrIndexer {
      * @return true if nested documents are used, otherwise false
      */
     protected static boolean useNestedDocuments() {
-        return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
+        return MCRConfiguration.instance().getBoolean(SOLR_CONFIG_PREFIX + "NestedDocuments", true);
     }
 
     /**

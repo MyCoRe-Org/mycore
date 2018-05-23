@@ -18,6 +18,8 @@
 
 package org.mycore.solr.search;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -376,7 +378,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
     private boolean isSolrParameter(String parameterName) {
         boolean reservedCostumKey;
         try {
-            reservedCostumKey = MCRConfiguration.instance().getStrings("MCR.Module-solr.ReservedParameterKeys")
+            reservedCostumKey = MCRConfiguration.instance().getStrings(SOLR_CONFIG_PREFIX + "ReservedParameterKeys")
                 .contains(parameterName);
         } catch (MCRConfigurationException e) {
             reservedCostumKey = false;

@@ -18,6 +18,8 @@
 
 package org.mycore.solr;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.util.regex.Pattern;
 
 import org.mycore.common.config.MCRConfiguration;
@@ -53,7 +55,7 @@ public class MCRSolrUtils {
      * @return true if nested documents are used, otherwise false
      */
     public static boolean useNestedDocuments() {
-        return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
+        return MCRConfiguration.instance().getBoolean(SOLR_CONFIG_PREFIX + "NestedDocuments", true);
     }
 
 }

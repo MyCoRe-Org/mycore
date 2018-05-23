@@ -18,7 +18,7 @@
 
 package org.mycore.solr;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
 
@@ -53,7 +53,7 @@ public class MCRSolrCore {
 
     static {
         USE_CONCURRENT_SERVER = MCRConfiguration.instance()
-            .getBoolean(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled");
+            .getBoolean(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled");
     }
 
     /**
@@ -89,8 +89,8 @@ public class MCRSolrCore {
         this.serverURL = serverURL;
         this.name = name;
         String coreURL = serverURL + name;
-        int connectionTimeout = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "SolrClient.ConnectionTimeout");
-        int socketTimeout = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "SolrClient.SocketTimeout");
+        int connectionTimeout = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout");
+        int socketTimeout = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "SolrClient.SocketTimeout");
 
         // default server
         solrClient = new HttpSolrClient.Builder(coreURL)
@@ -100,9 +100,9 @@ public class MCRSolrCore {
         solrClient.setRequestWriter(new BinaryRequestWriter());
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
-            int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
+            int queueSize = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
             int threadCount = MCRConfiguration.instance()
-                .getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
+                .getInt(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
             concurrentClient = new ConcurrentUpdateSolrClient.Builder(coreURL)
                 .withQueueSize(queueSize)
                 .withConnectionTimeout(connectionTimeout)
