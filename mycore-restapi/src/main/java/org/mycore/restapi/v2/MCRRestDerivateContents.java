@@ -182,6 +182,7 @@ public class MCRRestDerivateContents {
             .getCachedResponse(request.getRequest(), lastModified, getETag(fileAttributes))
             .orElseGet(() -> {
                 MCRPathContent content = new MCRPathContent(mcrPath, fileAttributes);
+                content.setMimeType(context.getMimeType(mcrPath.getFileName().toString()));
                 try {
                     return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader);
                 } catch (IOException e) {
