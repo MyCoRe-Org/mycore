@@ -21,6 +21,8 @@
  */
 package org.mycore.oai;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,10 +38,14 @@ import org.jdom2.Element;
 import org.jdom2.ProcessingInstruction;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.jdom2.output.support.AbstractXMLOutputProcessor;
+import org.jdom2.output.support.FormatStack;
+import org.jdom2.util.NamespaceStack;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.dataprovider.OAIAdapter;
 import org.mycore.oai.pmh.dataprovider.OAIRequest;
 import org.mycore.oai.pmh.dataprovider.OAIResponse;
@@ -52,6 +58,7 @@ import org.mycore.oai.pmh.dataprovider.jaxb.JAXBOAIProvider;
  * @author Matthias Eichner
  */
 public class MCROAIDataProvider extends MCRServlet {
+
     private static final long serialVersionUID = 1L;
 
     protected static final Logger LOGGER = LogManager.getLogger(MCROAIDataProvider.class);
@@ -66,6 +73,8 @@ public class MCROAIDataProvider extends MCRServlet {
     static {
         mcrOAIAdapterMap = new HashMap<>();
     }
+
+    private static final OAIXMLOutputProcessor OAI_XML_OUTPUT_PROCESSOR = new OAIXMLOutputProcessor();
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -85,8 +94,7 @@ public class MCROAIDataProvider extends MCRServlet {
         Element xmlRespone = oaiResponse.toXML();
         // fire
         job.getResponse().setContentType("text/xml; charset=UTF-8");
-        XMLOutputter xout = new XMLOutputter();
-        xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8"));
+        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat(), OAI_XML_OUTPUT_PROCESSOR);
         xout.output(addXSLStyle(new Document(xmlRespone)), job.getResponse().getOutputStream());
     }
 
@@ -152,4 +160,15 @@ public class MCROAIDataProvider extends MCRServlet {
         return oaiAdapter;
     }
 
+    private static final class OAIXMLOutputProcessor extends AbstractXMLOutputProcessor {
+        @Override
+        protected void printElement(Writer out, FormatStack fstack, NamespaceStack nstack, Element element)
+            throws IOException {
+            //MCR-1866 use raw format if element is not in OAI namespace
+            if (!element.getNamespace().equals(OAIConstants.NS_OAI)) {
+                fstack.setTextMode(Format.TextMode.PRESERVE);
+            }
+            super.printElement(out, fstack, nstack, element);
+        }
+    }
 }
