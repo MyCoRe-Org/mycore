@@ -69,13 +69,19 @@ public class MCRIFSCopyTest extends MCRIFSTest {
             .submit(new MCRFixedUserCallable<>(new CopyTask("nachhaltig.jpg", derivate), systemUser));
         Future<Exception> future3 = executorService
             .submit(new MCRFixedUserCallable<>(new CopyTask("vielseitig.jpg", derivate), systemUser));
-        assertNull(future1.get(5, TimeUnit.SECONDS));
-        assertNull(future2.get(5, TimeUnit.SECONDS));
-        assertNull(future3.get(5, TimeUnit.SECONDS));
+        throwException(future1.get(5, TimeUnit.SECONDS));
+        throwException(future2.get(5, TimeUnit.SECONDS));
+        throwException(future3.get(5, TimeUnit.SECONDS));
         assertEquals("the derivate should contain three files", 3,
             Files.list(MCRPath.getPath(derivate.getId().toString(), "/")).count());
 
         executorService.awaitTermination(1, TimeUnit.SECONDS);
+    }
+
+    private void throwException(Exception e) throws Exception {
+        if (e != null){
+            throw e;
+        }
     }
 
     public void create() throws Exception {
