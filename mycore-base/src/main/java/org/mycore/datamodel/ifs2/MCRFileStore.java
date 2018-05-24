@@ -24,6 +24,10 @@ import java.util.Iterator;
 import org.apache.commons.vfs2.FileObject;
 import org.mycore.common.MCRException;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 /**
  * Stores file collections containing files and directories.
  * 
@@ -35,6 +39,23 @@ import org.mycore.common.MCRException;
  * @author Frank Lützenkirchen
  */
 public class MCRFileStore extends MCRStore {
+
+    private final MCRFileStore thisInstance;
+
+    //MCR-1868: prevents parallel threads to read and write mcrmeta.xml concurrently on instantiation
+    LoadingCache<Integer, MCRFileCollection> collectionLoadingCache = CacheBuilder.newBuilder()
+        .weakValues()
+        .build(new CacheLoader<Integer, MCRFileCollection>() {
+            @Override
+            public MCRFileCollection load(Integer key) throws Exception {
+                return new MCRFileCollection(thisInstance, key);
+            }
+        });
+
+    public MCRFileStore() {
+        super();
+        thisInstance = this;
+    }
 
     /**
      * Creates and stores a new, empty file collection using the next free ID in
@@ -62,7 +83,7 @@ public class MCRFileStore extends MCRStore {
             String msg = "FileCollection with ID " + id + " already exists";
             throw new MCRException(msg);
         }
-        return new MCRFileCollection(this, id);
+        return collectionLoadingCache.getUnchecked(id);
     }
 
     /**
@@ -78,7 +99,7 @@ public class MCRFileStore extends MCRStore {
         if (!fo.exists()) {
             return null;
         } else {
-            return new MCRFileCollection(this, id);
+            return collectionLoadingCache.getUnchecked(id);
         }
     }
 
