@@ -30,9 +30,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -93,9 +93,8 @@ public class MCRTransferPackage {
      * Builds the transfer package.
      * 
      * @throws MCRUsageException is thrown if some of the referenced objects or derivates couldn't be retrieved
-     * @throws MCRAccessException if the Users doesn't have the rights to create this transfer package
      */
-    public void build() throws MCRUsageException, MCRAccessException {
+    public void build() throws MCRUsageException {
         LinkedHashMap<MCRObjectID, MCRObject> objectMap = new LinkedHashMap<>();
         Set<MCRCategoryID> categories = new HashSet<>();
         resolveChildrenAndLinks(source, objectMap, categories);
@@ -220,6 +219,10 @@ public class MCRTransferPackage {
         // classifications
         for (String classId : this.classifications) {
             Document classification = MCRClassificationUtils.asDocument(classId);
+            if(classification == null) {
+                LogManager.getLogger().warn("Unable to get classification " + classId);
+                continue;
+            }
             String path = CLASS_PATH + classId + ".xml";
             content.put(path, new MCRJDOMContent(classification));
         }

@@ -52,7 +52,7 @@ public class MCRTransferPackageCommands {
     private static final Logger LOGGER = LogManager.getLogger(MCRTransferPackageCommands.class);
 
     @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.",
-        syntax = "create transfer package for objects matching {0}")
+                syntax = "create transfer package for objects matching {0}")
     public static void create(String query) throws Exception {
         List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrClientFactory.getSolrClient(), query);
         for (String objectId : ids) {
@@ -64,7 +64,7 @@ public class MCRTransferPackageCommands {
     }
 
     @MCRCommand(help = "Imports all transfer packages located in the directory {0}.",
-        syntax = "import transfer packages from directory {0}")
+                syntax = "import transfer packages from directory {0}")
     public static List<String> importTransferPackagesFromDirectory(String directory) throws Exception {
         Path dir = Paths.get(directory);
         if (!(Files.exists(dir) || Files.isDirectory(dir))) {
@@ -72,7 +72,7 @@ public class MCRTransferPackageCommands {
         }
         List<String> importStatements = new LinkedList<>();
         try (Stream<Path> stream = Files.find(dir, 0,
-            (path, attr) -> String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
+                (path, attr) -> String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
             stream.map(Path::toAbsolutePath).map(Path::toString).forEach(path -> {
                 String subCommand = MessageFormat.format("import transfer package from tar {0}", path);
                 importStatements.add(subCommand);
@@ -81,9 +81,11 @@ public class MCRTransferPackageCommands {
         return importStatements;
     }
 
-    @MCRCommand(help = "Imports a transfer package located at {0}. Where {0} is the absolute path to the tar file.",
-        syntax = "import transfer package from tar {0}")
-    public static List<String> importTransferPackageFromTar(String pathToTar) throws Exception {
+    @MCRCommand(help = "Imports a transfer package located at {0}. Where {0} is the absolute path to the tar file. "
+            + "The parameter {1} is optional and can be omitted. You can specify a mycore id where the first object of "
+            + "import.xml should be attached.",
+                syntax = "import transfer package from tar {0} to {1}")
+    public static List<String> importTransferPackageFromTar(String pathToTar, String mycoreTargetId) throws Exception {
         Path tar = Paths.get(pathToTar);
         if (!Files.exists(tar)) {
             throw new FileNotFoundException(tar.toAbsolutePath() + " does not exist.");
@@ -92,7 +94,7 @@ public class MCRTransferPackageCommands {
 
         List<String> commands = new ArrayList<>();
         commands.add("_import transfer package untar " + pathToTar);
-        commands.add("_import transfer package from directory " + targetDirectory);
+        commands.add("_import transfer package from directory " + targetDirectory + " to " + mycoreTargetId);
         commands.add("_import transfer package clean up " + targetDirectory);
         return commands;
     }
@@ -105,25 +107,32 @@ public class MCRTransferPackageCommands {
         MCRUtils.untar(tar, targetDirectory);
     }
 
-    @MCRCommand(syntax = "_import transfer package from directory {0}")
-    public static List<String> fromDirectory(String targetDirectoryPath) throws Exception {
-        LOGGER.info("Import transfer package from {}...", targetDirectoryPath);
-        Path targetDirectory = Paths.get(targetDirectoryPath);
+    @MCRCommand(syntax = "_import transfer package from directory {0} to {1}")
+    public static List<String> fromDirectory(String sourceDirectory, String mycoreTargetId) throws Exception {
+        LOGGER.info("Import transfer package from {}...", sourceDirectory);
+        Path sourcePath = Paths.get(sourceDirectory);
         List<String> commands = new ArrayList<>();
 
         // load classifications
-        List<Path> classificationPaths = MCRTransferPackageUtil.getClassifications(targetDirectory);
+        List<Path> classificationPaths = MCRTransferPackageUtil.getClassifications(sourcePath);
         for (Path pathToClassification : classificationPaths) {
-            commands.add(
-                "_import transfer package classification from " + pathToClassification.toAbsolutePath());
+            commands.add("_import transfer package classification from " + pathToClassification.toAbsolutePath());
         }
 
         // import objects
-        List<String> mcrObjects = MCRTransferPackageUtil.getMCRObjects(targetDirectory);
+        List<String> mcrObjects = MCRTransferPackageUtil.getMCRObjects(sourcePath);
         MCRMarkManager markManager = MCRMarkManager.instance();
+
+        if (mycoreTargetId != null && mcrObjects.size() >= 1) {
+            String rootId = mcrObjects.get(0);
+            markManager.mark(MCRObjectID.getInstance(rootId), Operation.IMPORT);
+            commands.add(
+                    "_import transfer package object " + rootId + " from " + sourceDirectory + " to " + mycoreTargetId);
+            mcrObjects = mcrObjects.subList(1, mcrObjects.size());
+        }
         for (String id : mcrObjects) {
             markManager.mark(MCRObjectID.getInstance(id), Operation.IMPORT);
-            commands.add("_import transfer package object " + id + " from " + targetDirectoryPath);
+            commands.add("_import transfer package object " + id + " from " + sourceDirectory + " to {2}");
         }
         return commands;
     }
@@ -133,13 +142,14 @@ public class MCRTransferPackageCommands {
         MCRClassificationUtils.fromPath(Paths.get(pathToClassification));
     }
 
-    @MCRCommand(syntax = "_import transfer package object {0} from {1}")
-    public static List<String> importObject(String objectId, String targetDirectoryPath) throws Exception {
+    @MCRCommand(syntax = "_import transfer package object {0} from {1} to {2}")
+    public static List<String> importObject(String objectId, String targetDirectoryPath, String parentId)
+            throws Exception {
         Path targetDirectory = Paths.get(targetDirectoryPath);
-        List<String> derivates = MCRTransferPackageUtil.importObjectCLI(targetDirectory, objectId);
+        List<String> derivates = MCRTransferPackageUtil.importObjectCLI(targetDirectory, objectId, parentId);
         return derivates.stream()
-            .map(derId -> "_import transfer package derivate " + derId + " from " + targetDirectoryPath)
-            .collect(Collectors.toList());
+                        .map(derId -> "_import transfer package derivate " + derId + " from " + targetDirectoryPath)
+                        .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "_import transfer package derivate {0} from {1}")
