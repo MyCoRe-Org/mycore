@@ -80,7 +80,7 @@ public class MCRDirectory extends MCRStoredNode {
 
     @SuppressWarnings("unchecked")
     private Element getChildData(String name) {
-        for (Element child : data.getChildren()) {
+        for (Element child : readData(Element::getChildren)) {
             if (name.equals(child.getAttributeValue("name"))) {
                 return child;
             }
@@ -88,7 +88,7 @@ public class MCRDirectory extends MCRStoredNode {
 
         Element childData = new Element("node");
         childData.setAttribute("name", name);
-        data.addContent(childData);
+        writeData(e -> e.addContent(childData));
         return childData;
     }
 
@@ -119,17 +119,19 @@ public class MCRDirectory extends MCRStoredNode {
     @Override
     @SuppressWarnings("unchecked")
     void repairMetadata() throws IOException {
-        data.setName("dir");
-        data.setAttribute("name", getName());
+        writeData(e -> {
+            e.setName("dir");
+            e.setAttribute("name", getName());
 
-        for (Element childEntry : data.getChildren()) {
-            childEntry.setName("node");
-        }
+            for (Element childEntry : e.getChildren()) {
+                childEntry.setName("node");
+            }
+        });
 
         for (MCRNode child : getChildren()) {
             ((MCRStoredNode) child).repairMetadata();
         }
 
-        data.removeChildren("node");
+        writeData(e -> e.removeChildren("node"));
     }
 }

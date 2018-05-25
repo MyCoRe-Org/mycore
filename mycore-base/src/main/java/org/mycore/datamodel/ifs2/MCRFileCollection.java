@@ -19,17 +19,22 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.Selectors;
 import org.apache.commons.vfs2.VFS;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRVFSContent;
+import org.mycore.util.concurrent.MCRReadWriteGuard;
 import org.xml.sax.SAXException;
 
 /**
@@ -59,11 +64,18 @@ public class MCRFileCollection extends MCRDirectory {
     private int id;
 
     /**
+     * Guard for additional data
+     *
+     * MCR-1869
+     */
+    private MCRReadWriteGuard dataGuard;
+
+    /**
      * Creates a new file collection in the given store, or retrieves an
      * existing one.
-     * 
+     *
      * @see MCRFileStore
-     * 
+     *
      * @param store
      *            the store this file collection is stored in
      * @param id
@@ -73,25 +85,43 @@ public class MCRFileCollection extends MCRDirectory {
         super(null, store.getSlot(id), new Element("collection"));
         this.store = store;
         this.id = id;
+        this.dataGuard = new MCRReadWriteGuard();
         if (fo.exists()) {
             readAdditionalData();
         } else {
             fo.createFolder();
-            new Document(data);
+            writeData(Document::new);
             saveAdditionalData();
         }
+    }
+
+    MCRReadWriteGuard getDataGuard() {
+        return dataGuard;
     }
 
     private void readAdditionalData() throws IOException {
         FileObject src = VFS.getManager().resolveFile(fo, dataFile);
         if (!src.exists()) {
             LOGGER.warn("Metadata file is missing, repairing metadata...");
-            data = new Element("collection");
-            new Document(data);
+            writeData(e -> {
+                e.detach();
+                e.setName("collection");
+                e.removeContent();
+                new Document(e);
+            });
             repairMetadata();
         }
         try {
-            data = new MCRVFSContent(src).asXML().getRootElement();
+            Element parsed = new MCRVFSContent(src).asXML().getRootElement();
+            writeData(e -> {
+                e.detach();
+                e.setName("collection");
+                e.removeContent();
+                List<Content> parsedContent = new ArrayList<>(parsed.getContent());
+                parsedContent.forEach(Content::detach);
+                e.addContent(parsedContent);
+                new Document(e);
+            });
         } catch (JDOMException | SAXException e) {
             throw new IOException(e);
         }
@@ -99,14 +129,25 @@ public class MCRFileCollection extends MCRDirectory {
 
     protected void saveAdditionalData() throws IOException {
         FileObject target = VFS.getManager().resolveFile(fo, dataFile);
-        new MCRJDOMContent(data.getDocument()).sendTo(target);
+        try {
+            readData(e -> {
+                try {
+                    new MCRJDOMContent(e.getDocument()).sendTo(target);
+                    return null;
+                } catch (IOException e1) {
+                    throw new UncheckedIOException(e1);
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
     /**
      * Deletes this file collection with all its data and children
      */
     public void delete() throws IOException {
-        data.removeContent();
+        writeData(Element::removeContent);
         fo.delete(Selectors.SELECT_ALL);
     }
 
@@ -174,8 +215,10 @@ public class MCRFileCollection extends MCRDirectory {
     @Override
     public void repairMetadata() throws IOException {
         super.repairMetadata();
-        data.setName("collection");
-        data.removeAttribute("name");
+        writeData(e -> {
+            e.setName("collection");
+            e.removeAttribute("name");
+        });
         saveAdditionalData();
     }
 
@@ -184,6 +227,7 @@ public class MCRFileCollection extends MCRDirectory {
      * collection
      */
     Document getMetadata() {
-        return data.getDocument();
+        return new Document(readData(Element::clone));
     }
+
 }
