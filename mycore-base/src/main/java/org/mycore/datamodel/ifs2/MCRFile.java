@@ -71,7 +71,7 @@ public class MCRFile extends MCRStoredNode {
     protected MCRFile(MCRDirectory parent, String name) throws IOException {
         super(parent, name, "file");
         fo.createFile();
-        data.setAttribute("md5", MCRFile.MD5_OF_EMPTY_FILE);
+        writeData(e -> e.setAttribute("md5", MCRFile.MD5_OF_EMPTY_FILE));
         getRoot().saveAdditionalData();
     }
 
@@ -90,7 +90,7 @@ public class MCRFile extends MCRStoredNode {
      * @return the md5 checksum of the file's content.
      */
     public String getMD5() {
-        return data.getAttributeValue("md5");
+        return readData(e -> e.getAttributeValue("md5"));
     }
 
     /**
@@ -117,7 +117,7 @@ public class MCRFile extends MCRStoredNode {
         MCRContentInputStream cis = source.getContentInputStream();
         source.sendTo(fo);
         String md5 = cis.getMD5String();
-        data.setAttribute("md5", md5);
+        writeData(e -> e.setAttribute("md5", md5));
         getRoot().saveAdditionalData();
         return md5;
     }
@@ -127,17 +127,20 @@ public class MCRFile extends MCRStoredNode {
      */
     @Override
     void repairMetadata() throws IOException {
-        data.setName("file");
-        data.setAttribute("name", getName());
-        data.removeChildren("file");
-        data.removeChildren("directory");
         MCRContentInputStream cis = getContent().getContentInputStream();
         IOUtils.copy(cis, DEV_NULL);
         cis.close();
-        String md5 = cis.getMD5String();
-        if (!md5.equals(data.getAttributeValue("md5"))) {
-            LOGGER.warn("Fixed MD5 of {} to {}", getPath(), md5);
-            data.setAttribute("md5", md5);
-        }
+        String path = getPath();
+        writeData(e -> {
+            e.setName("file");
+            e.setAttribute("name", getName());
+            e.removeChildren("file");
+            e.removeChildren("directory");
+            String md5 = cis.getMD5String();
+            if (!md5.equals(e.getAttributeValue("md5"))) {
+                LOGGER.warn("Fixed MD5 of {} to {}", path, md5);
+                e.setAttribute("md5", md5);
+            }
+        });
     }
 }

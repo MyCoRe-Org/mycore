@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.Selectors;
@@ -51,7 +53,7 @@ public abstract class MCRStoredNode extends MCRNode {
     /**
      * Any additional data of this node that is not stored in the file object
      */
-    protected Element data;
+    private Element additionalData;
 
     /**
      * Returns a stored node instance that already exists
@@ -66,12 +68,12 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     protected MCRStoredNode(MCRDirectory parent, FileObject fo, Element data) throws IOException {
         super(parent, fo);
-        this.data = data;
+        this.additionalData = data;
     }
 
     /**
      * Creates a new stored node
-     * 
+     *
      * @param parent
      *            the parent directory
      * @param name
@@ -81,9 +83,9 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     protected MCRStoredNode(MCRDirectory parent, String name, String type) throws IOException {
         super(parent, VFS.getManager().resolveFile(parent.fo, name));
-        data = new Element(type);
-        data.setAttribute(NAME_ATT, name);
-        parent.data.addContent(data);
+        additionalData = new Element(type);
+        additionalData.setAttribute(NAME_ATT, name);
+        parent.writeData(e -> e.addContent(additionalData));
     }
 
     /**
@@ -104,7 +106,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * Deletes this node with all its data and children
      */
     public void delete() throws IOException {
-        data.detach();
+        writeData(Element::detach);
         fo.delete(Selectors.SELECT_ALL);
         getRoot().saveAdditionalData();
     }
@@ -120,7 +122,7 @@ public abstract class MCRStoredNode extends MCRNode {
         fo.moveTo(fNew);
         fo = fNew;
         fo.getContent().setLastModifiedTime(System.currentTimeMillis());
-        data.setAttribute(NAME_ATT, name);
+        writeData(e -> e.setAttribute(NAME_ATT, name));
         getRoot().saveAdditionalData();
     }
 
@@ -143,19 +145,20 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the label in this language
      */
     public void setLabel(String lang, String label) throws IOException {
-
-        data.getChildren(LABEL_ELEMENT)
-            .stream()
-            .filter(child -> lang.equals(
-                child.getAttributeValue(LANG_ATT,
-                    Namespace.XML_NAMESPACE)))
-            .findAny()
-            .orElseGet(() -> {
-                Element newLabel = new Element(LABEL_ELEMENT).setAttribute(LANG_ATT, lang, Namespace.XML_NAMESPACE);
-                data.addContent(newLabel);
-                return newLabel;
-            })
-            .setText(label);
+        writeData(e -> {
+            e.getChildren(LABEL_ELEMENT)
+                .stream()
+                .filter(child -> lang.equals(
+                    child.getAttributeValue(LANG_ATT,
+                        Namespace.XML_NAMESPACE)))
+                .findAny()
+                .orElseGet(() -> {
+                    Element newLabel = new Element(LABEL_ELEMENT).setAttribute(LANG_ATT, lang, Namespace.XML_NAMESPACE);
+                    e.addContent(newLabel);
+                    return newLabel;
+                })
+                .setText(label);
+        });
         getRoot().saveAdditionalData();
     }
 
@@ -163,7 +166,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * Removes all labels set
      */
     public void clearLabels() throws IOException {
-        data.removeChildren(LABEL_ELEMENT);
+        writeData(e -> e.removeChildren(LABEL_ELEMENT));
         getRoot().saveAdditionalData();
     }
 
@@ -173,7 +176,7 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     public Map<String, String> getLabels() {
         Map<String, String> labels = new TreeMap<>();
-        for (Element label : data.getChildren(LABEL_ELEMENT)) {
+        for (Element label : readData(e -> e.getChildren(LABEL_ELEMENT))) {
             labels.put(label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE), label.getText());
         }
         return labels;
@@ -187,13 +190,13 @@ public abstract class MCRStoredNode extends MCRNode {
      * @return the label, or null if there is no label for that language
      */
     public String getLabel(String lang) {
-        return data.getChildren(LABEL_ELEMENT)
+        return readData(e -> e.getChildren(LABEL_ELEMENT)
             .stream()
             .filter(label -> lang.equals(
                 label.getAttributeValue(LANG_ATT, Namespace.XML_NAMESPACE)))
             .findAny()
             .map(Element::getText)
-            .orElse(null);
+            .orElse(null));
     }
 
     /**
@@ -216,11 +219,20 @@ public abstract class MCRStoredNode extends MCRNode {
             return label;
         }
 
-        return data.getChildText(LABEL_ELEMENT);
+        return readData(e -> e.getChildText(LABEL_ELEMENT));
     }
 
     /**
      * Repairs additional metadata of this node
      */
     abstract void repairMetadata() throws IOException;
+
+    protected <T> T readData(Function<Element, T> readOperation) {
+        return getRoot().getDataGuard().read(() -> readOperation.apply(additionalData));
+    }
+
+    protected <T> void writeData(Consumer<Element> writeOperation) {
+        getRoot().getDataGuard().write(() -> writeOperation.accept(additionalData));
+    }
+
 }
