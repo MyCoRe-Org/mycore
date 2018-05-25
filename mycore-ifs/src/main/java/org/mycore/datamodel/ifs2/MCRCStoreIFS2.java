@@ -167,8 +167,14 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         MCRFileStore store = getStore(base);
 
         MCRFileCollection slot = store.retrieve(slotID);
-        if (slot == null)
-            slot = store.create(slotID);
+        if (slot == null) {
+            synchronized (store) {
+                slot = store.retrieve(slotID);
+                if (slot == null) {
+                    slot = store.create(slotID);
+                }
+            }
+        }
 
         String path = fr.getAbsolutePath();
         MCRDirectory dir = slot;

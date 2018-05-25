@@ -42,6 +42,7 @@ import javax.xml.transform.Source;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
@@ -231,7 +232,9 @@ public abstract class MCRContent {
      *            the file to write the content to
      */
     public void sendTo(FileObject target) throws IOException {
-        sendTo(target.getContent().getOutputStream(), true);
+        try (FileContent content = target.getContent(); OutputStream outputStream = content.getOutputStream()) {
+            sendTo(outputStream, false);
+        }
     }
 
     /**
