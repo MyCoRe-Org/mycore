@@ -18,7 +18,7 @@
 
 package org.mycore.solr;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_MAIN;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_DEFAULT;
 import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_BASE_URL;
 import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
 
@@ -35,6 +35,7 @@ import org.apache.solr.client.solrj.SolrClient;
  * @author shermann
  * @author Thomas Scheffler (yagee)
  * @author Matthias Eichner
+ * @author Jens Kupferschmidt
  */
 public abstract class MCRSolrClientFactory {
 
@@ -44,11 +45,15 @@ public abstract class MCRSolrClientFactory {
 
     private static Map<String, MCRSolrCore> CORE_MAP;
 
+    /**
+     * Load the cores defined by the properties MCR.Solr.ServerURL (included core name) or
+     * MCR.Solr.ServerURL (without core name) and MCR.Solr.Core.Main .
+     */
     static {
         try {
             CORE_MAP = Collections.synchronizedMap(new HashMap<String, MCRSolrCore>());
-            if (SOLR_CORE_MAIN != null) {
-                setSolrClient(SOLR_SERVER_BASE_URL, SOLR_CORE_MAIN);
+            if (SOLR_CORE_DEFAULT != null) {
+                setSolrClient(SOLR_SERVER_BASE_URL, SOLR_CORE_DEFAULT);
             } else {
                 setSolrClient(SOLR_SERVER_URL);
             }
@@ -60,10 +65,20 @@ public abstract class MCRSolrClientFactory {
         }
     }
 
+    /**
+     * Add a SOLR core instance to the list
+     * 
+     * @param core the MCRSolrCore instance 
+     */
     public static void add(MCRSolrCore core) {
         CORE_MAP.put(core.getName(), core);
     }
 
+    /**
+     * Remove a SOLR core instance from the list
+     * 
+     * @param coreName the name of the MCRSolrCore instance 
+     */
     public static MCRSolrCore remove(String coreName) {
         return CORE_MAP.remove(coreName);
     }

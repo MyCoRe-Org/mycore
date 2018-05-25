@@ -1,10 +1,10 @@
-[{
-		"add-field": {
-			"name": "mods.title_subtitle",
-			"type": "text_de",
-			"multiValued": true,
-			"stored": false
-		}
-	}
-	
+[
+  {
+    "add-field": {
+      "name": "mods.title_subtitle",
+      "type": "text_general",
+      "multiValued": true,
+      "stored": false
+    }
+  }
 ]

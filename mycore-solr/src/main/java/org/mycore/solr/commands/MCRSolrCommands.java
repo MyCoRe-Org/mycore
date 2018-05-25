@@ -238,7 +238,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 			    help = "The command reloads the schema in solr using the solr schema api",
 			    order = 200)
 	public static final void reloadSolrSchema(String coreName, String coreType) {
-		MCRSolrSchemaReloader.clearSchema();
+		MCRSolrSchemaReloader.clearSchema(coreName);
 		MCRSolrSchemaReloader.processSchemaFiles(coreName, coreType);
 	}
 
@@ -291,17 +291,25 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
 
-
-    //reload solr config for core {coreName} with type {coreType}
-    //reload solr config for core mir with type default-core
-    @MCRCommand(syntax = "reload solr config for core {0} with type {1}", 
+    /**
+     * This command reload the managed-schema.xml and solrconfig.xml files. It remove all
+     * schema definitions outside the default definitions in the MyCoRe core template. Then
+     * it add / update / delete the user schema definition. Then it add / update /delete
+     * the solrconfig.xml definition. 
+     * @see https://github.com/MyCoRe-Org/solr-core-templates/tree/master/mycore_default_core/conf
+     * 
+     * @param coreName the name of the core that should be reloaded
+     * @param coreType the core type of the core that should be reloaded; the MyCoRe default application 
+     * core type is <b>default-core</b>
+     */
+    @MCRCommand(syntax = "reload solr configuration for core {0} with type {1}", 
                 help = "The command reloads the schema in solr using the solr schema api",
                 order = 210)
-    public static final void reloadSolrConfig(String coreName, String coreType) {
-        MCRSolrSchemaReloader.clearSchema();
+    public static final void reloadSolrConfiguration(String coreName, String coreType) {
+        MCRSolrSchemaReloader.clearSchema(coreName);
+        MCRSolrSchemaReloader.processSchemaFiles(coreName, coreType);
         MCRSolrSchemaReloader.processConfigFiles(coreName, coreType);
     }
-	
 
 	@MCRCommand(syntax = "create solr core {0} from template {1}", 
             help = "The command creates a new empty core with the given name based on the named core template",
@@ -315,4 +323,5 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 	    CoreAdminResponse response = create.process(solrClient);
 	    LogManager.getLogger().info("Core Create Response: {}", response);
 	}
+
 }
