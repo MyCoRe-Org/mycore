@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
@@ -65,6 +64,13 @@ import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
 public class MCRUploadResource {
 
     private static final String FILE_PROCESSOR_PROPERTY = "MCR.MCRUploadHandlerIFS.FileProcessors";
+
+    private static final List<MCRPostUploadFileProcessor> FILE_PROCESSORS = initProcessorList();
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    @Context
+    ContainerRequestContext request;
 
     private static List<MCRPostUploadFileProcessor> initProcessorList() {
         List<String> fileProcessorList = MCRConfiguration.instance().getStrings(FILE_PROCESSOR_PROPERTY,
@@ -102,13 +108,28 @@ public class MCRUploadResource {
         }).collect(Collectors.toList());
     }
 
-    private static final List<MCRPostUploadFileProcessor> FILE_PROCESSORS = initProcessorList();
+    private static void setDefaultMainFile(MCRDerivate derivate) {
+        MCRPath path = MCRPath.getPath(derivate.getId().toString(), "/");
+        try {
+            MCRFileCollectingFileVisitor<java.nio.file.Path> visitor = new MCRFileCollectingFileVisitor<>();
+            Files.walkFileTree(path, visitor);
 
-
-    @Context
-    ContainerRequestContext request;
-
-    private static final Logger LOGGER = LogManager.getLogger();
+            visitor.getPaths().stream()
+                .map(MCRPath.class::cast)
+                .filter(p -> !p.getOwnerRelativePath().endsWith(".xml"))
+                .findFirst()
+                .ifPresent(file -> {
+                    derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
+                    try {
+                        MCRMetadataManager.update(derivate);
+                    } catch (MCRPersistenceException | MCRAccessException e) {
+                        LOGGER.error("Could not set main file!", e);
+                    }
+                });
+        } catch (IOException e) {
+            LOGGER.error("Could not set main file!", e);
+        }
+    }
 
     @PUT
     @Path("commit")
@@ -144,7 +165,7 @@ public class MCRUploadResource {
         }
 
         try {
-            Files.walkFileTree(root,copier );
+            Files.walkFileTree(root, copier);
         } catch (IOException e) {
             throw new MCRUploadException("mcr.upload.import.failed", e);
         }
@@ -152,31 +173,8 @@ public class MCRUploadResource {
         MCRDerivate theDerivate = MCRMetadataManager.retrieveMCRDerivate(objOrDerivateID);
 
         String mainDoc = theDerivate.getDerivate().getInternals().getMainDoc();
-        if(mainDoc==null || mainDoc.isEmpty()){
+        if (mainDoc == null || mainDoc.isEmpty()) {
             setDefaultMainFile(theDerivate);
-        }
-    }
-
-    private static void setDefaultMainFile(MCRDerivate derivate) {
-        MCRPath path = MCRPath.getPath(derivate.getId().toString(), "/");
-        try {
-            MCRFileCollectingFileVisitor<java.nio.file.Path> visitor = new MCRFileCollectingFileVisitor<>();
-            Files.walkFileTree(path, visitor);
-
-            visitor.getPaths().stream()
-                .map(MCRPath.class::cast)
-                .filter(p -> !p.getOwnerRelativePath().endsWith(".xml"))
-                .findFirst()
-                .ifPresent(file -> {
-                    derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
-                    try {
-                        MCRMetadataManager.update(derivate);
-                    } catch (MCRPersistenceException | MCRAccessException e) {
-                        LOGGER.error("Could not set main file!", e);
-                    }
-                });
-        } catch (IOException e) {
-            LOGGER.error("Could not set main file!", e);
         }
     }
 
@@ -236,7 +234,8 @@ public class MCRUploadResource {
         throws IOException {
 
         MCRObjectID oid = MCRObjectID.getInstance(objectID);
-        if (!MCRMetadataManager.exists(oid) || !MCRAccessManager.checkPermission(oid, MCRAccessManager.PERMISSION_WRITE)) {
+        if (!MCRMetadataManager.exists(oid) || !MCRAccessManager
+            .checkPermission(oid, MCRAccessManager.PERMISSION_WRITE)) {
             throw new ForbiddenException("No write access to " + oid.toString());
         }
 
@@ -246,11 +245,9 @@ public class MCRUploadResource {
         if (filePath.getNameCount() > 1) {
             java.nio.file.Path parentDirectory = filePath.getParent();
             if (!Files.exists(parentDirectory)) {
-              Files.createDirectories(parentDirectory);
+                Files.createDirectories(parentDirectory);
             }
         }
-
-
 
         long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
         String contentLength = request.getHeaderString(HttpHeaders.CONTENT_LENGTH);
@@ -264,16 +261,16 @@ public class MCRUploadResource {
                     return procesor.isProcessable(path);
                 }).collect(Collectors.toList());
 
-            if(processors.size()==0){
+            if (processors.size() == 0) {
                 Files.copy(contents, filePath, StandardCopyOption.REPLACE_EXISTING);
             } else {
-                 java.nio.file.Path input = Files.createTempFile("processing", ".temp");
-                Files.copy(contents, input,StandardCopyOption.REPLACE_EXISTING);
+                java.nio.file.Path input = Files.createTempFile("processing", ".temp");
+                Files.copy(contents, input, StandardCopyOption.REPLACE_EXISTING);
 
                 for (MCRPostUploadFileProcessor processor : processors) {
                     final java.nio.file.Path tempFile2 = Files.createTempFile("processing", ".temp");
                     final java.nio.file.Path result = processor.processFile(path, input, () -> tempFile2);
-                    if(result!=null){
+                    if (result != null) {
                         Files.deleteIfExists(input);
                         input = result;
                     }
