@@ -46,7 +46,6 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -80,18 +79,17 @@ public abstract class MCRTransferPackageUtil {
      *                path to the *.tar archive
      * @throws IOException
      *                some file system stuff went wrong
-     * @throws MCRActiveLinkException
-     *                if object is created (no real update), see {@link MCRMetadataManager#create(MCRObject)}
-     * @throws MCRAccessException 
+     * @throws MCRAccessException
      *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
      * @throws JDOMException
      *                some jdom parsing went wrong
-     * @throws URISyntaxException 
-     * @throws SAXParseException 
-     * @throws MCRException 
+     * @throws URISyntaxException
+     *                unable to transform the xml
+     * @throws SAXParseException
+     *                xml parsing went wrong
      */
-    public static void importTar(Path pathToTar) throws IOException, MCRActiveLinkException, MCRAccessException,
-        JDOMException, MCRException, SAXParseException, URISyntaxException {
+    public static void importTar(Path pathToTar) throws IOException, MCRAccessException,
+        JDOMException, SAXParseException, URISyntaxException {
         if (!Files.exists(pathToTar)) {
             throw new FileNotFoundException(pathToTar.toAbsolutePath() + " does not exist.");
         }
@@ -126,16 +124,15 @@ public abstract class MCRTransferPackageUtil {
      *                some jdom parsing went wrong
      * @throws IOException
      *                something went wrong while reading from the file system
-     * @throws MCRActiveLinkException
-     *                if object is created (no real update), see {@link MCRMetadataManager#create(MCRObject)}
-     * @throws MCRAccessException 
+     * @throws MCRAccessException
      *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
-     * @throws URISyntaxException 
-     * @throws SAXParseException 
-     * @throws MCRException 
+     * @throws URISyntaxException
+     *                unable to transform the xml
+     * @throws SAXParseException
+     *                xml parsing went wrong
      */
     public static void importFromDirectory(Path targetDirectory) throws JDOMException, IOException,
-        MCRActiveLinkException, MCRAccessException, MCRException, SAXParseException, URISyntaxException {
+        MCRAccessException, SAXParseException, URISyntaxException {
         // import classifications
         for (Path pathToClassification : getClassifications(targetDirectory)) {
             MCRClassificationUtils.fromPath(pathToClassification);
@@ -144,7 +141,7 @@ public abstract class MCRTransferPackageUtil {
         // import objects & derivates
         List<String> objectImportList = getMCRObjects(targetDirectory);
         for (String id : objectImportList) {
-            importObject(targetDirectory, id);
+            importObject(targetDirectory, id, null);
         }
     }
 
@@ -162,7 +159,7 @@ public abstract class MCRTransferPackageUtil {
         Path classPath = targetDirectory.resolve(MCRTransferPackage.CLASS_PATH);
         if (Files.exists(classPath)) {
             try (Stream<Path> stream = Files.find(classPath, 2,
-                (path, attr) -> path.toString().endsWith(".xml") && !Files.isRegularFile(path))) {
+                (path, attr) -> path.toString().endsWith(".xml") && Files.isRegularFile(path))) {
                 stream.forEach(classificationPaths::add);
             }
         }
@@ -176,19 +173,19 @@ public abstract class MCRTransferPackageUtil {
      *                the directory where the *.tar was unpacked
      * @param objectId
      *                object id to import
+     * @param parentId
+     *                The new parent. Should be null if the original parent remains the same.
      * @throws JDOMException
      *                coulnd't parse the import order xml
      * @throws IOException
      *                when an I/O error prevents a document from being fully parsed
-     * @throws MCRActiveLinkException
-     *                if object is created (no real update), see {@link MCRMetadataManager#create(MCRObject)}
-     * @throws MCRAccessException 
+     * @throws MCRAccessException
      *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
      */
-    public static void importObject(Path targetDirectory, String objectId)
-        throws JDOMException, IOException, MCRActiveLinkException, MCRAccessException {
+    public static void importObject(Path targetDirectory, String objectId, String parentId)
+        throws JDOMException, IOException, MCRAccessException {
         // import object
-        List<String> derivates = importObjectCLI(targetDirectory, objectId);
+        List<String> derivates = importObjectCLI(targetDirectory, objectId, parentId);
         // process the saved derivates
         for (String derivateId : derivates) {
             importDerivate(targetDirectory, derivateId);
@@ -196,24 +193,24 @@ public abstract class MCRTransferPackageUtil {
     }
 
     /**
-     * Same as {@link #importObject(Path, String)} but returns a list of derivates which
+     * Same as {@link #importObject(Path, String, String)} but returns a list of derivates which
      * should be imported afterwards.
      * 
      * @param targetDirectory
      *                the directory where the *.tar was unpacked
      * @param objectId
      *                object id to import
+     * @param parentId
+     *                The new parent. Should be null if the original parent remains the same.
      * @throws JDOMException
      *                coulnd't parse the import order xml
      * @throws IOException
      *                when an I/O error prevents a document from being fully parsed
-     * @throws MCRActiveLinkException
-     *                if object is created (no real update), see {@link MCRMetadataManager#create(MCRObject)}
-     * @throws MCRAccessException 
+     * @throws MCRAccessException
      *                if write permission is missing or see {@link MCRMetadataManager#create(MCRObject)}
      */
-    public static List<String> importObjectCLI(Path targetDirectory, String objectId)
-        throws JDOMException, IOException, MCRActiveLinkException, MCRAccessException {
+    public static List<String> importObjectCLI(Path targetDirectory, String objectId, String parentId)
+        throws JDOMException, IOException, MCRAccessException {
         SAXBuilder sax = new SAXBuilder();
         Path targetXML = targetDirectory.resolve(CONTENT_DIRECTORY).resolve(objectId + ".xml");
         if (LOGGER.isDebugEnabled()) {
@@ -221,6 +218,9 @@ public abstract class MCRTransferPackageUtil {
         }
         Document objXML = sax.build(targetXML.toFile());
         MCRObject mcr = new MCRObject(objXML);
+        if(parentId != null) {
+            mcr.getStructure().setParent(parentId);
+        }
         mcr.setImportMode(true);
 
         List<String> derivates = new LinkedList<>();
@@ -265,14 +265,15 @@ public abstract class MCRTransferPackageUtil {
             MCRMetadataManager.update(der);
         }
         try (Stream<Path> stream = Files.find(derivateDirectory, 5,
-            (path, attr) -> !path.toString().endsWith(".md5") && Files.isRegularFile(path))) {
+                (path, attr) -> !path.toString().endsWith(".md5") && Files.isRegularFile(path) && !path.equals(
+                        derivatePath))) {
             stream.forEach(path -> {
                 String targetPath = derivateDirectory.relativize(path).toString();
                 try (InputStream in = Files.newInputStream(path)) {
                     Files.copy(in, MCRPath.getPath(derivateId, targetPath), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ioExc) {
-                    throw new MCRException(
-                        "Unable to add file " + path.toAbsolutePath() + " to derivate " + derivateId, ioExc);
+                    throw new MCRException("Unable to add file " + path.toAbsolutePath() + " to derivate " + derivateId,
+                            ioExc);
                 }
             });
         }
@@ -285,8 +286,8 @@ public abstract class MCRTransferPackageUtil {
      * @return list of object which lies within the directory
      */
     public static List<String> getMCRObjects(Path targetDirectory) throws JDOMException, IOException {
-        Path order = targetDirectory.resolve(MCRTransferPackage.IMPORT_CONFIG_FILENAME);
-        Document xml = new SAXBuilder().build(order.toFile());
+        Path importXMLPath = targetDirectory.resolve(MCRTransferPackage.IMPORT_CONFIG_FILENAME);
+        Document xml = new SAXBuilder().build(importXMLPath.toFile());
         Element config = xml.getRootElement();
         XPathExpression<Text> exp = MCRConstants.XPATH_FACTORY.compile("order/object/text()", Filters.text());
         return exp.evaluate(config).stream().map(Text::getText).collect(Collectors.toList());

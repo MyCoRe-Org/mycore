@@ -220,8 +220,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
 
         for (FileRef ref : this.files) {
             String use = MCRMetsModelHelper.getUseForHref(ref.path.getOwnerRelativePath()).orElse("UNKNOWN");
-            FileGrp fileGrp = fileGrps.stream().filter(grp -> grp.getUse().equals(use)).findFirst()
-                                      .orElse(null);
+            FileGrp fileGrp = fileGrps.stream().filter(grp -> grp.getUse().equals(use)).findFirst().orElse(null);
             if (fileGrp == null) {
                 LOGGER.warn("Unable to add file '" + ref.toId() + "' because cannot find corresponding group "
                         + " with @USE='" + use + "'. Ignore file and continue.");
@@ -359,8 +358,12 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
                 for (Fptr fptr : oldDiv.getFptrList()) {
                     copyFptr(oldAltoGroup, newAltoGroup, fptr).ifPresent(newFptr -> newDiv.getFptrList().add(newFptr));
                 }
+                updateStructLinkMapUsingALTO(newDiv);
+            } else {
+                LOGGER.warn("Unable to find logical div @ID='" + id + "'"
+                        + " of previous mets.xml in this generated mets.xml. Be aware that the content of the 'old' "
+                        + "logical div cannot be copied and therefore cannot be preserved!");
             }
-            updateStructLinkMapUsingALTO(newDiv);
         });
     }
 
@@ -411,7 +414,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
      *
      * @param logicalDiv the logical div to handle
      */
-    protected void updateStructLinkMapUsingALTO(LogicalDiv logicalDiv) {
+    protected void updateStructLinkMapUsingALTO(final LogicalDiv logicalDiv) {
         logicalDiv.getFptrList()
                   .stream()
                   .flatMap(fptr -> fptr.getSeqList().stream())
@@ -529,7 +532,8 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         PhysicalDiv mainDiv = this.physicalStructMap.getDivContainer();
         return mainDiv.getChildren()
                       .stream()
-                      .filter(subDiv -> Objects.nonNull(subDiv.getFptr(fileId))).findAny()
+                      .filter(subDiv -> Objects.nonNull(subDiv.getFptr(fileId)))
+                      .findAny()
                       .orElse(null);
     }
 
@@ -548,7 +552,8 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
                             .filter(metaInterface -> metaInterface instanceof MCRMetaDerivateLink)
                             .map(MCRMetaDerivateLink.class::cast)
                             .filter(link -> this.mcrDer.getId().equals(MCRObjectID.getInstance(link.getOwner())))
-                            .map(MCRMetaDerivateLink::getRawPath).findFirst();
+                            .map(MCRMetaDerivateLink::getRawPath)
+                            .findFirst();
     }
 
     /**

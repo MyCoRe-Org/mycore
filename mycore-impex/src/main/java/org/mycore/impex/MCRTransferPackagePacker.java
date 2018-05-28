@@ -33,7 +33,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
@@ -45,7 +44,7 @@ import org.mycore.services.packaging.MCRPacker;
 
 /**
  * Using the {@link MCRPacker} API to build a {@link MCRTransferPackage}.
- * 
+ *
  * @author Matthias Eichner
  * @author Silvio Hermann
  */
@@ -57,8 +56,8 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     static {
         String alternative = MCRConfiguration.instance().getString("MCR.datadir") + File.separator + "transferPackages";
-        String directoryPath = MCRConfiguration.instance().getString("MCR.TransferPackage.Save.to.Directory",
-            alternative);
+        String directoryPath = MCRConfiguration.instance()
+                                               .getString("MCR.TransferPackage.Save.to.Directory", alternative);
         SAVE_DIRECTORY_PATH = Paths.get(directoryPath);
     }
 
@@ -67,17 +66,16 @@ public class MCRTransferPackagePacker extends MCRPacker {
      * @see org.mycore.services.packaging.MCRPacker#checkSetup()
      */
     @Override
-    public void checkSetup() throws MCRUsageException, MCRAccessException {
+    public void checkSetup() throws MCRUsageException {
         build();
     }
 
     /**
      * Builds the transfer package and returns it.
-     * 
+     *
      * @return the transfer package
-     * @throws MCRAccessException
      */
-    private MCRTransferPackage build() throws MCRAccessException {
+    private MCRTransferPackage build() {
         MCRObject source = getSource();
         MCRTransferPackage transferPackage = new MCRTransferPackage(source);
         transferPackage.build();
@@ -86,7 +84,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     /**
      * Returns the source object.
-     * 
+     *
      * @return mycore object which should be packed
      * @throws MCRUsageException something went wrong
      */
@@ -95,14 +93,14 @@ public class MCRTransferPackagePacker extends MCRPacker {
         MCRObjectID mcrId = MCRObjectID.getInstance(sourceId);
         if (!MCRMetadataManager.exists(mcrId)) {
             throw new MCRUsageException(
-                "Requested object '" + sourceId + "' does not exist. Thus a transfer package cannot be created.");
+                    "Requested object '" + sourceId + "' does not exist. Thus a transfer package cannot be created.");
         }
         return MCRMetadataManager.retrieveMCRObject(mcrId);
     }
 
     /**
      * Returns the id of the mycore object which should be packed.
-     * 
+     *
      * @return mycore object id as string
      */
     private String getSourceId() {
@@ -142,7 +140,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     /**
      * Returns the path to the tar archive where the transfer package will be stored.
-     * 
+     *
      * @return path to the *.tar location
      */
     public Path getTarPath(MCRTransferPackage transferPackage) {
@@ -151,7 +149,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     /**
      * Builds a *.tar archive at the path for the given transfer package.
-     * 
+     *
      * @param pathToTar where to store the *.tar
      * @param transferPackage the package to zip
      * @throws IOException something went wrong while packing
@@ -173,11 +171,11 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     /**
      * Writes a file to a *.tar archive.
-     * 
+     *
      * @param tarOutStream the stream of the *.tar.
      * @param fileName the file name to write
      * @param data of the file
-     * 
+     *
      * @throws IOException some writing to the stream went wrong
      */
     private void writeFile(TarArchiveOutputStream tarOutStream, String fileName, byte[] data) throws IOException {
@@ -190,11 +188,11 @@ public class MCRTransferPackagePacker extends MCRPacker {
 
     /**
      * Writes a checksum file to a *.tar archive.
-     * 
+     *
      * @param tarOutStream the stream of the *.tar.
      * @param fileName the file name to write
      * @param data of the file
-     * 
+     *
      * @throws IOException some writing to the stream went wrong
      */
     private void writeMD5(TarArchiveOutputStream tarOutStream, String fileName, byte[] data) throws IOException {
