@@ -21,6 +21,10 @@ package org.mycore.datamodel.ifs2;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
@@ -223,7 +227,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             file.get().delete();
         }
         if (parent.isPresent()) {
-            deleteEmptyParents(parent.get());
+            deleteEmptyParents(parent.get(), toDerivateID(storageID));
         }
     }
 
@@ -239,12 +243,29 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         }
     }
 
-    private void deleteEmptyParents(MCRDirectory dir) throws IOException {
-        if ((dir == null) || dir.hasChildren())
+    private void deleteEmptyParents(MCRDirectory dir, MCRObjectID derId) throws IOException {
+        if (dir == null) {
             return;
+        }
+        if (dir.hasChildren()) {
+            //check metadatastore
+            String owner = derId.toString();
+            MCRPath path = MCRPath.getPath(owner, dir.getPath());
+            LOGGER.debug("Checking {}", path);
+            if (Files.isDirectory(path)) {
+                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path);) {
+                    Iterator<Path> pathIterator = ds.iterator();
+                    if (pathIterator.hasNext()) {
+                        //has children
+                        LOGGER.debug("Child: {}", pathIterator.next());
+                        return;
+                    }
+                }
+            }
+        }
         MCRDirectory parent = (MCRDirectory) (dir.getParent());
         dir.delete();
-        deleteEmptyParents(parent);
+        deleteEmptyParents(parent, derId);
     }
 
     @Override

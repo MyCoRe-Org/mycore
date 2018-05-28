@@ -103,7 +103,7 @@ public class MCRRestAPISearch {
         @QueryParam("start") String start, @QueryParam("rows") String rows, @QueryParam("fq") String fq,
         @QueryParam("fl") String fl, @QueryParam("facet") String facet, @QueryParam("facet.sort") String facetSort,
         @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
-        @QueryParam("json.wrf") String jsonWrf)
+        @QueryParam("facet.mincount") String facetMinCount, @QueryParam("json.wrf") String jsonWrf)
         throws MCRRestAPIException {
         MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/search");
         StringBuilder url = new StringBuilder(MCRSolrConstants.SERVER_URL);
@@ -142,6 +142,9 @@ public class MCRRestAPISearch {
             }
             if (facetLimit != null) {
                 url.append("&facet.limit=").append(facetLimit);
+            }
+            if (facetMinCount != null) {
+                url.append("&facet.mincount=").append(facetMinCount);
             }
             if (jsonWrf != null) {
                 url.append("&json.wrf=").append(jsonWrf);

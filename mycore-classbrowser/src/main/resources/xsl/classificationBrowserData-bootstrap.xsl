@@ -47,7 +47,7 @@
           <xsl:apply-templates select="@numLinks" mode="formatCount">
             <xsl:with-param name="maxCount" select="$maxLinks" />
           </xsl:apply-templates>
-          <a onclick="return startSearch('{$ServletsBaseURL}SolrSelectProxy?','{@query}','{../@webpage}','{../@parameters}');" href="{$ServletsBaseURL}SolrSelectProxy?{@query}&amp;mask={../@webpage}&amp;{../@parameters}">
+          <a onclick="return startSearch('{$ServletsBaseURL}solr/select?','{@query}','{../@webpage}','{../@parameters}');" href="{$ServletsBaseURL}solr/select?{@query}&amp;mask={../@webpage}&amp;{../@parameters}">
             <xsl:value-of select="label" />
           </a>
           <xsl:if test="uri">

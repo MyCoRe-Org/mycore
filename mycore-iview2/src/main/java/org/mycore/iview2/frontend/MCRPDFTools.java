@@ -73,15 +73,18 @@ class MCRPDFTools implements AutoCloseable {
                 centered ? thumbnailSize : newHeight, imageType);
             LOGGER.info("target image dimensions: {}x{}", bicubic.getWidth(), bicubic.getHeight());
             final Graphics2D bg = bicubic.createGraphics();
-            bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
-            int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
-            if (x != 0 && y != 0) {
-                LOGGER.warn("Writing at position {},{}", x, y);
+            try {
+                bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
+                int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
+                if (x != 0 && y != 0) {
+                    LOGGER.warn("Writing at position {},{}", x, y);
+                }
+                bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
+                    (int) Math.ceil(height), null);
+            } finally {
+                bg.dispose();
             }
-            bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
-                (int) Math.ceil(height), null);
-            bg.dispose();
             return bicubic;
         }
     }

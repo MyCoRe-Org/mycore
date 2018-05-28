@@ -2,9 +2,9 @@
 <!DOCTYPE MyCoReWebPage>
 <MyCoReWebPage>
     <section xml:lang="all" title="Classification Editor">
-        <classificationEditor />
+        <classificationEditor showId="true" />
     </section>
     <meta>
-        <log date="2011-06-01" time="11:24" labelPath="Classification Editor" lastEditor="Administrator" />
+        <log date="2018-05-17" time="12:15" labelPath="Classification Editor" lastEditor="Administrator" />
     </meta>
 </MyCoReWebPage>

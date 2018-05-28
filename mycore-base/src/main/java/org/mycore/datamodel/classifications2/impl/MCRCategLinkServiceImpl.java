@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -374,31 +375,16 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     @Override
     public Collection<String> getTypes() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<String> query = cb.createQuery(String.class);
-        Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
-        return em
-            .createQuery(
-                query
-                    .distinct(true)
-                    .select(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type)))
-            .setHint(QueryHints.READ_ONLY, "true")
-            .getResultList();
+        TypedQuery<String> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "types", String.class);
+        return q.getResultList();
     }
 
     @Override
     public Collection<MCRCategoryLink> getLinks(String type) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MCRCategoryLink> query = cb.createQuery(MCRCategoryLink.class);
-        Root<MCRCategoryLinkImpl> li = query.from(LINK_CLASS);
-        return em
-            .createQuery(
-                query
-                    .where(
-                        cb.equal(li.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.type), type)))
-            .setHint(QueryHints.READ_ONLY, "true")
-            .getResultList();
+        TypedQuery<MCRCategoryLink> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "links", MCRCategoryLink.class);
+        q.setParameter("type", type);
+        return q.getResultList();
     }
 
 }

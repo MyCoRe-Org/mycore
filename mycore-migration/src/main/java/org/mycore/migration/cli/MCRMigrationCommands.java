@@ -23,19 +23,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.TreeSet;
-import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -82,8 +77,6 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.iview2.services.MCRTileJob;
 import org.mycore.pi.backend.MCRPI;
-import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.pi.urn.MCRDNBURNParser;
 import org.xml.sax.SAXException;
 
 /**
@@ -139,7 +132,7 @@ public class MCRMigrationCommands {
             if (!service.isFlagTypeSet(MCRObjectService.FLAG_TYPE_MODIFIEDBY)) { //the chicken
                 //have to restore also modifiedby from version history.
                 LOGGER.info("{}, modified by: {}", objectID, modifyUser);
-                service.addFlag(MCRObjectService.FLAG_TYPE_CREATEDBY, modifyUser);
+                service.addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY, modifyUser);
             }
             obj.setImportMode(true);
             if (obj instanceof MCRDerivate) {

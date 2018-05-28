@@ -138,6 +138,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         LOGGER.debug("Will get: {}", id);
         MCRCategoryImpl category = getByNaturalID(entityManager, id);
+        entityManager.refresh(category); //for MCR-1863
         if (category == null) {
             throw new MCRPersistenceException("Category " + id + " was not found. Delete aborted.");
         }
@@ -712,14 +713,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         entityManager.setFlushMode(FlushModeType.COMMIT);
         try {
             T result = task.apply(entityManager);
-            entityManager.setFlushMode(fm);
             if (flushAtEnd) {
                 entityManager.flush();
             }
             return result;
         } catch (RuntimeException e) {
-            entityManager.setFlushMode(fm);
             throw e;
+        } finally {
+            entityManager.setFlushMode(fm);
         }
     }
 
