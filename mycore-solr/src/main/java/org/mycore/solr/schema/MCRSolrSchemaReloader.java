@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -91,10 +92,22 @@ public class MCRSolrSchemaReloader {
         try {
             SolrClient solrClient = MCRSolrClientFactory.get(coreName).getClient();
             
+            SchemaRequest.CopyFields copyFieldsReq = new SchemaRequest.CopyFields();
+            for (Map<String, Object> copyField : copyFieldsReq.process(solrClient).getCopyFields()) {
+                String fieldSrc = copyField.get("source").toString();
+                List<String> fieldDest = new ArrayList<String>();
+                fieldDest.add(copyField.get("dest").toString());
+                LOGGER.debug("remove SOLR CopyField " + fieldSrc + " --> " + fieldDest.get(0));
+                SchemaRequest.DeleteCopyField delCopyField = new SchemaRequest.DeleteCopyField(fieldSrc, fieldDest);
+                delCopyField.process(solrClient);
+            }
+            LOGGER.debug("CopyFields cleaned in core " + coreName);
+
             SchemaRequest.Fields fieldsReq = new SchemaRequest.Fields();
             for (Map<String, Object> field : fieldsReq.process(solrClient).getFields()) {
                 String fieldName = field.get("name").toString();
                 if (!SOLR_DEFAULT_FIELDS.contains(fieldName)) {
+                    LOGGER.debug("remove SOLR Field " + fieldName);
                     SchemaRequest.DeleteField delField = new SchemaRequest.DeleteField(fieldName);
                     delField.process(solrClient);
                 }
@@ -105,25 +118,18 @@ public class MCRSolrSchemaReloader {
             for (Map<String, Object> field : dynFieldsReq.process(solrClient).getDynamicFields()) {
                 String fieldName = field.get("name").toString();
                 if (!SOLR_DEFAULT_DYNAMIC_FIELDS.contains(fieldName)) {
+                    LOGGER.debug("remove SOLR DynamicField " + fieldName);
                     SchemaRequest.DeleteDynamicField delField = new SchemaRequest.DeleteDynamicField(fieldName);
                     delField.process(solrClient);
                 }
             }
             LOGGER.debug("DynamicFields cleaned in core " + coreName);
 
-            SchemaRequest.CopyFields copyFieldsReq = new SchemaRequest.CopyFields();
-            for (Map<String, Object> copyField : copyFieldsReq.process(solrClient).getCopyFields()) {
-                String fieldSrc = copyField.get("source").toString();
-                List<String> fieldDest = (List<String>) copyField.get("dest");
-                SchemaRequest.DeleteCopyField delCopyField = new SchemaRequest.DeleteCopyField(fieldSrc, fieldDest);
-                delCopyField.process(solrClient);
-            }
-            LOGGER.debug("CopyFields cleaned in core " + coreName);
-
             SchemaRequest.FieldTypes fieldTypesReq = new SchemaRequest.FieldTypes();
             for (FieldTypeRepresentation fieldType : fieldTypesReq.process(solrClient).getFieldTypes()) {
                 String fieldTypeName = fieldType.getAttributes().get("name").toString();
                 if (!SOLR_DEFAULT_FIELDTYPES.contains(fieldTypeName)) {
+                    LOGGER.debug("remove SOLR FieldType " + fieldTypeName);
                     SchemaRequest.DeleteFieldType delField = new SchemaRequest.DeleteFieldType(fieldTypeName);
                     delField.process(solrClient);
                 }
