@@ -31,10 +31,10 @@ module.exports = function (grunt) {
                 processing: {
                     tsconfig: './src/main/ts/processing/tsconfig.json'
                 },
-                upload_api: {
+                uploadApi: {
                     tsconfig: './src/main/ts/upload/tsconfig-api.json'
                 },
-                upload_gui: {
+                uploadGui: {
                     tsconfig: './src/main/ts/upload/tsconfig-gui.json'
                 }
             },

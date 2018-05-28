@@ -48,7 +48,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -101,8 +100,6 @@ public class MCRFile extends MCRFilesystemNode {
 
     /** Is true if this file is a new MCRFile and not retrieved from store * */
     private boolean isNew;
-
-        private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Creates a new and empty root MCRFile with the given filename, belonging to the given ownerID. The file is assumed to be a standalone "root file" that has
@@ -280,7 +277,6 @@ public class MCRFile extends MCRFilesystemNode {
         try {
             localFile = getLocalFile();
         } catch (IOException e) {
-            LOGGER.error(e);
             throw new NoSuchFileException(toPath().toString(), null, e.getMessage());
         }
         FileChannel fileChannel = FileChannel.open(localFile.toPath(), options);
