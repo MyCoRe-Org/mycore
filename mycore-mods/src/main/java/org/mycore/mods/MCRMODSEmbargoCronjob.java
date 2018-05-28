@@ -58,13 +58,13 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
 
     private static final int TIMER_TASK_PERIOD = getTimerPause();// * 60 * 3;
 
-    private static int getTimerPause() {
-        return MCRConfiguration.instance().getInt("MCR.MODS.Embargo.Job.Schedule.WaitInMinutes")*1000 * 60;
-    }
-
     private static final int RELEASE_THREAD_COUNT = 3;
 
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(RELEASE_THREAD_COUNT);
+
+    private static int getTimerPause() {
+        return MCRConfiguration.instance().getInt("MCR.MODS.Embargo.Job.Schedule.WaitInMinutes") * 1000 * 60;
+    }
 
     @Override
     public String getName() {
