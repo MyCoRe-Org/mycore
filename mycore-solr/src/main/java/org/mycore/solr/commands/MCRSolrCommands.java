@@ -201,7 +201,6 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     public static List<String> synchronizeAndRepairSolrIndex() throws Exception {
         List<String> result = new ArrayList<>();
         Collection<String> objectTypes = MCRXMLMetadataManager.instance().getObjectTypes();
-        objectTypes.remove("derivate");
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         for (String objectType : objectTypes) {
 
