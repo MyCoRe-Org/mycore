@@ -448,7 +448,7 @@
               <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
               <smtpPort implementation="java.lang.Integer">25</smtpPort>
               <toAddresses>
-                <toAddress implementation="java.lang.String">mycore-user@lists.sourceforge.net</toAddress>
+                <toAddress implementation="java.lang.String">user@mycore.de</toAddress>
               </toAddresses>
               <mailSender>
                 <name>${changes.mailSender.name}</name>
@@ -469,9 +469,7 @@
           <plugin>
             <artifactId>maven-changelog-plugin</artifactId>
             <configuration>
-              <!-- simple regex until http://jira.codehaus.org/browse/MCHANGELOG-125 is fixed -->
-              <issueIDRegexPattern>\d{3,}</issueIDRegexPattern>
-              <issueLinkUrl>http://sourceforge.net/p/mycore/bugs/%ISSUE%</issueLinkUrl>
+              <issueLinkUrl>https://mycore.atlassian.net/browse/%ISSUE%</issueLinkUrl>
               <type>date</type>
               <dates>
                 <date implementation="java.lang.String">${changelog.since}</date>
