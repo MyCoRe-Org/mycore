@@ -33,9 +33,9 @@
     <tag>HEAD</tag>
   </scm>
   <properties>
-    <changelog.since>2017-06-20</changelog.since>
+    <changelog.since>2018-05-30</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2018.05</changes.version>
+    <changes.version>2018.06.0</changes.version>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
     <forbiddenapis.version>1.7</forbiddenapis.version>
     <frontend.maven.plugin.version>1.4</frontend.maven.plugin.version>
