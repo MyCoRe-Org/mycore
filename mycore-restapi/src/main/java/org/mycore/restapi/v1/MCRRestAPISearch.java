@@ -54,8 +54,6 @@ import org.mycore.solr.MCRSolrConstants;
 public class MCRRestAPISearch {
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
 
-    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
-
     public static final String FORMAT_JSON = "json";
 
     public static final String FORMAT_XML = "xml";

@@ -26,7 +26,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
 import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
-import org.mycore.restapi.v1.MCRRestAPIAuthentication;
 import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;

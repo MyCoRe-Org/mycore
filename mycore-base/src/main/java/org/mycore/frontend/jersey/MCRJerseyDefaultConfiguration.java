@@ -19,19 +19,11 @@
 package org.mycore.frontend.jersey;
 
 import org.apache.logging.log4j.LogManager;
-import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.spi.AbstractContainerLifecycleListener;
-import org.glassfish.jersey.server.spi.Container;
-import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
-import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.inject.MCRInjectorConfig;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
 import org.mycore.frontend.jersey.feature.MCRGuiceBridgeFeature;
-
-import com.google.inject.Injector;
 
 /**
  * Default jersey configuration for mycore.

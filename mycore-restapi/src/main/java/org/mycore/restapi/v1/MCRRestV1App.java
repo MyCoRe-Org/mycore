@@ -38,10 +38,6 @@ import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 @ApplicationPath("/api/v1")
 public class MCRRestV1App extends MCRJerseyRestApp {
 
-    public MCRRestV1App() {
-        super();
-    }
-
     @Override
     protected String getVersion() {
         return "v1";

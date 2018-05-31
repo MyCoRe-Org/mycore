@@ -66,10 +66,6 @@ import org.mycore.restapi.v1.errors.MCRRestAPIException;
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
 
-    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
-
-    public static final String FORMAT_XML = "xml";
-
     private static java.nio.file.Path UPLOAD_DIR = Paths
         .get(MCRConfiguration.instance().getString("MCR.RestAPI.v1.Upload.Directory"));
     static {
