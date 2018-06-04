@@ -87,7 +87,8 @@
       </field>
     </xsl:for-each>
     <xsl:for-each
-      select=".//mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
+      select="mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher |
+              mods:relatedItem[@type='host']/mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
       <field name="mods.publisher">
         <xsl:call-template name="printModsName" />
       </field>
