@@ -59,7 +59,7 @@ namespace mycore.viewer.components {
         private correctToToolbarSize() {
             const toolbar = this._container.parent().find(".navbar.navbar-default");
             const heightOfToolbar = toolbar.outerHeight(false);
-            toolbar.siblings().css({"top": heightOfToolbar + "px"})
+            toolbar.siblings().css({"top": heightOfToolbar + "px"});
         }
 
         private static SIDEBAR_DIRECTION = mycore.viewer.widgets.layout.IviewBorderLayout.DIRECTION_WEST;
