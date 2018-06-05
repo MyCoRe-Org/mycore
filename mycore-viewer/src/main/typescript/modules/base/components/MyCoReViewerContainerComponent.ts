@@ -50,7 +50,16 @@ namespace mycore.viewer.components {
 
                 this._informationBar = this._layout.getContainer(MyCoReViewerContainerComponent.INFORMATION_BAR_DIRECTION);
                 this._layout.getContainer(widgets.layout.IviewBorderLayout.DIRECTION_EAST).addClass("panel panel-default sidebar");
+                this._container.bind("iviewResize", () => {
+                    this.correctToToolbarSize();
+                });
             }
+        }
+
+        private correctToToolbarSize() {
+            const toolbar = this._container.parent().find(".navbar.navbar-default");
+            const heightOfToolbar = toolbar.outerHeight(false);
+            toolbar.siblings().css({"top": heightOfToolbar + "px"})
         }
 
         private static SIDEBAR_DIRECTION = mycore.viewer.widgets.layout.IviewBorderLayout.DIRECTION_WEST;
@@ -123,6 +132,8 @@ namespace mycore.viewer.components {
                     }
                     this._layout.updateSizes();
                 }
+
+                this.correctToToolbarSize();
             }
 
             if (e.type == mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent.TYPE) {
