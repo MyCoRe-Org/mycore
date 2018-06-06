@@ -44,7 +44,7 @@ namespace mycore.upload {
         private uploadHandler: string | null;
         private object: string | null;
 
-        constructor(element: HTMLElement) {
+        constructor(element: HTMLElement, manualToggle: HTMLElement) {
             this.target = element.getAttribute("data-upload-target");
             this.object = element.getAttribute("data-upload-object");
             this.uploadHandler = element.getAttribute("data-upload-handler");
@@ -72,7 +72,24 @@ namespace mycore.upload {
                         this.traverse(file, uploadID, this.object);
                     }
                 }
-            })
+            });
+
+            if (manualToggle != null) {
+                manualToggle.addEventListener("click", () => {
+                    const fileInput = document.createElement("input");
+                    const uploadID = (Math.random() * 10000).toString(10);
+
+                    fileInput.setAttribute("type", "file");
+                    fileInput.addEventListener('change', () => {
+                        for (let i = 0; i < fileInput.files.length; i++) {
+                            let file = fileInput.files.item(i);
+                            const fileTransfer = new FileTransfer(file, this.target, uploadID, this.object, [], this.uploadHandler);
+                            FileTransferQueue.getQueue().add(fileTransfer);
+                        }
+                    });
+                    fileInput.click();
+                });
+            }
         }
 
         private traverse(fileEntry: WebKitFileEntry, uploadID: string, object: string, parentTransfers: FileTransfer[] = []) {
@@ -387,7 +404,7 @@ namespace mycore.upload {
 
     export class FileTransfer {
 
-        constructor(private _entry: WebKitFileEntry,
+        constructor(private _entry: WebKitFileEntry | File,
                     private _target: string,
                     private _uploadID: string,
                     private _targetObject: string,
@@ -397,7 +414,7 @@ namespace mycore.upload {
         }
 
         get fileName():string {
-          return this._entry.fullPath;
+            return (this._entry instanceof File) ? this._entry.name : this._entry.fullPath;
         }
 
         get uploadHandler(): string {
@@ -408,7 +425,7 @@ namespace mycore.upload {
             return this._uploadID;
         }
 
-        get entry(): WebKitFileEntry {
+        get entry(): WebKitFileEntry | File {
             return this._entry;
         }
 
@@ -471,31 +488,42 @@ namespace mycore.upload {
 
             this._started = true;
 
-            if(this._entry.isDirectory){
-                if (!this.aborted) {
-                    this.send();
-                }
+            if (this._entry instanceof File) {
+                this.send(this._entry);
             } else {
-                this._entry.file((f) => {
-                    if (this.aborted) {
-                        return;
+                if (this._entry.isDirectory) {
+                    if (!this.aborted) {
+                        this.send();
                     }
-                    const file: File = <any>f;
-                    this.send(file);
-                }, () => {
-                    this._error = true;
-                    if (this.errorHandler) {
-                        this.errorHandler();
-                    }
-                });
+                } else {
+                    this._entry.file((f) => {
+                        if (this.aborted) {
+                            return;
+                        }
+                        const file: File = <any>f;
+                        this.send(file);
+                    }, () => {
+                        this._error = true;
+                        if (this.errorHandler) {
+                            this.errorHandler();
+                        }
+                    });
+                }
             }
+
 
         }
 
         private request: XMLHttpRequest;
 
         public send(file?: File): void {
-            let uploadPath = this.entry.fullPath[ 0 ] == '/' ? this.entry.fullPath.substr(1) : this.entry.fullPath;
+            let uploadPath;
+            if (this._entry instanceof File) {
+                uploadPath = this.entry.name;
+            } else {
+                uploadPath = this._entry.fullPath[0] == '/' ? this._entry.fullPath.substr(1) : this._entry.fullPath;
+
+            }
 
             this.request = new XMLHttpRequest();
 
@@ -551,7 +579,8 @@ namespace mycore.upload {
     export function enable(element: HTMLElement) {
         (<HTMLElement[]>Array.prototype.slice.call(element.querySelectorAll("[data-upload-target]")))
             .forEach(element => {
-                new UploadTarget(element);
+                const fileBoxToggle = element.querySelector(".mcr-upload-show");
+                new UploadTarget(element, <HTMLElement>fileBoxToggle);
             })
     }
 
