@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi;
+package org.mycore.datamodel.niofs.utils;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

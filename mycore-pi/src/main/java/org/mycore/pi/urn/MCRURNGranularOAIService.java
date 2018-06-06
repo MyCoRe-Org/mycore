@@ -40,7 +40,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.pi.MCRFileCollectingFileVisitor;
+import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIService;
 import org.mycore.pi.backend.MCRPI;
