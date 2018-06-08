@@ -80,7 +80,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
         solrQuery.set("rows", 0);
         QueryResponse queryResponse;
         try {
-            queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
+            queryResponse = MCRSolrClientFactory.getSolrDefaultClient().query(solrQuery);
         } catch (SolrServerException | IOException e) {
             LOGGER.warn("Could not query SOLR.", e);
             return -1;

@@ -18,8 +18,7 @@
 
 package org.mycore.solr;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_DEFAULT;
-import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_BASE_URL;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_MAIN;
 import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
 
 import java.text.MessageFormat;
@@ -52,11 +51,7 @@ public abstract class MCRSolrClientFactory {
     static {
         try {
             CORE_MAP = Collections.synchronizedMap(new HashMap<String, MCRSolrCore>());
-            if (SOLR_CORE_DEFAULT != null) {
-                setSolrClient(SOLR_SERVER_BASE_URL, SOLR_CORE_DEFAULT);
-            } else {
-                setSolrClient(SOLR_SERVER_URL);
-            }
+            setSolrDefaultClient(SOLR_SERVER_URL, SOLR_CORE_MAIN);
         } catch (Throwable t) {
             LOGGER.error("Exception creating solr client object", t);
         } finally {
@@ -102,20 +97,21 @@ public abstract class MCRSolrClientFactory {
     /**
      * Returns the solr client of the default core.
      */
-    public static SolrClient getSolrClient() {
+    public static SolrClient getSolrDefaultClient() {
         return getDefaultSolrCore().getClient();
     }
 
     /**
      * Returns the concurrent solr client of the default core.
      */
-    public static SolrClient getConcurrentSolrClient() {
+    public static SolrClient getConcurrentSolrDefaultClient() {
         return getDefaultSolrCore().getConcurrentClient();
     }
 
     /**
      * Sets the new solr url including the core.
      */
+    /**
     public static void setSolrClient(String serverURL) {
         removeDefaultCore();
         MCRSolrCore defaultCore = new MCRSolrCore(serverURL);
@@ -124,17 +120,28 @@ public abstract class MCRSolrClientFactory {
         add(baseCore);
         DEFAULT_CORE_NAME = defaultCore.getName();
     }
+    **/
 
     /**
-     * Sets the new solr url.
+     * Sets the new solr server url and core name as default client.
+     * 
+     * @param serverURL base solr url
+     * @param core core of the server
+     */
+    public static void setSolrDefaultClient(String serverURL, String core) {
+        removeDefaultCore();
+        add(new MCRSolrCore(serverURL, core));
+        DEFAULT_CORE_NAME = core;
+    }
+
+    /**
+     * Sets the new solr server url and core name.
      * 
      * @param serverURL base solr url
      * @param core core of the server
      */
     public static void setSolrClient(String serverURL, String core) {
-        removeDefaultCore();
         add(new MCRSolrCore(serverURL, core));
-        DEFAULT_CORE_NAME = core;
     }
 
     private static void removeDefaultCore() {

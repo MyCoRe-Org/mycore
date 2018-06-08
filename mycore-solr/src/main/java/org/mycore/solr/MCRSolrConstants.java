@@ -28,11 +28,9 @@ public class MCRSolrConstants {
 
     public static final String SOLR_CONFIG_PREFIX = "MCR.Solr.";
 
-    public static final String SOLR_SERVER_BASE_URL;
-
     public static final String SOLR_SERVER_URL;
 
-    public static final String SOLR_CORE_DEFAULT = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "Core.Default", null);
+    public static final String SOLR_CORE_MAIN = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "Core.main", null);
 
     public static final String SOLR_QUERY_XML_PROTOCOL_VERSION = MCRConfiguration.instance().getString(
         SOLR_CONFIG_PREFIX + "XMLProtocolVersion");
@@ -49,11 +47,6 @@ public class MCRSolrConstants {
         String serverURL = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "ServerURL");
         if (!serverURL.endsWith("/")) {
             serverURL = serverURL += "/";
-        }
-        SOLR_SERVER_BASE_URL = serverURL;
-        serverURL = SOLR_CORE_DEFAULT != null ? SOLR_SERVER_BASE_URL + SOLR_CORE_DEFAULT : SOLR_SERVER_BASE_URL;
-        if (serverURL.endsWith("/")) {
-            serverURL = serverURL.substring(0, serverURL.length() - 1);
         }
         SOLR_SERVER_URL = serverURL;
     }

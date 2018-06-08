@@ -18,7 +18,7 @@
 
 package org.mycore.solr.schema;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_BASE_URL;
+import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -141,6 +141,17 @@ public class MCRSolrSchemaReloader {
         }
     }
 
+    public static void clearConfig(String coreName) {
+
+        LOGGER.info("Clear SOLR schema in core " + coreName);
+       // try {
+            SolrClient solrClient = MCRSolrClientFactory.get(coreName).getClient();
+            
+       // } catch (IOException | SolrServerException e) {
+       //     LOGGER.error(e);
+        //}
+    }
+           
     /**
      * This method modified the SOLR schema definition based on all solr/{coreType}/solr-schema.json 
      * in the MyCoRe-Maven modules resource path.
@@ -184,7 +195,7 @@ public class MCRSolrSchemaReloader {
                         
                         LOGGER.debug(e.toString());
 
-                        HttpPost post = new HttpPost(SOLR_SERVER_BASE_URL + coreName + "/" + configType);
+                        HttpPost post = new HttpPost(SOLR_SERVER_URL + coreName + "/" + configType);
                         post.setHeader("Content-type", "application/json");
                         post.setEntity(new StringEntity(e.toString()));
 

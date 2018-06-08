@@ -204,7 +204,7 @@ public class MCRSolrIndexer {
         if (!MCRSolrUtils.useNestedDocuments()) {
             return null;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
         return solrClient.deleteByQuery("-({!join from=id to=_root_}_root_:*) +_root_:*", 0);
     }
 
@@ -218,7 +218,7 @@ public class MCRSolrIndexer {
         if (solrIDs == null || solrIDs.length == 0) {
             return null;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
@@ -263,7 +263,7 @@ public class MCRSolrIndexer {
         if (id == null) {
             return null;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
@@ -330,7 +330,7 @@ public class MCRSolrIndexer {
      *            list of mycore object identifiers
      */
     public static void rebuildMetadataIndex(List<String> list) {
-        rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrClient());
+        rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrDefaultClient());
     }
 
     /**
@@ -387,7 +387,7 @@ public class MCRSolrIndexer {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex() {
-        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(),
+        rebuildContentIndex(MCRSolrClientFactory.getSolrDefaultClient(),
             MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
     }
 
@@ -403,7 +403,7 @@ public class MCRSolrIndexer {
      *            list of mycore object id's
      */
     public static void rebuildContentIndex(List<String> list) {
-        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(), list);
+        rebuildContentIndex(MCRSolrClientFactory.getSolrDefaultClient(), list);
     }
 
     /**
@@ -417,7 +417,7 @@ public class MCRSolrIndexer {
      *            higher priority means earlier execution
      */
     public static void rebuildContentIndex(List<String> list, int priority) {
-        rebuildContentIndex(MCRSolrClientFactory.getSolrClient(), list, priority);
+        rebuildContentIndex(MCRSolrClientFactory.getSolrDefaultClient(), list, priority);
     }
 
     /**
@@ -518,7 +518,7 @@ public class MCRSolrIndexer {
      */
     public static void dropIndex() throws Exception {
         LOGGER.info("Dropping solr index...");
-        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
         solrClient.deleteByQuery("*:*", BATCH_AUTO_COMMIT_WITHIN_MS);
         LOGGER.info("Dropping solr index...done");
     }
@@ -531,7 +531,7 @@ public class MCRSolrIndexer {
 
         LOGGER.info("Dropping solr index for type {}...", type);
         String deleteQuery = MessageFormat.format("objectType:{0} _root_:*_{1}_*", type, type);
-        MCRSolrClientFactory.getSolrClient().deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
+        MCRSolrClientFactory.getSolrDefaultClient().deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
         LOGGER.info("Dropping solr index for type {}...done", type);
     }
 
@@ -572,7 +572,7 @@ public class MCRSolrIndexer {
         LOGGER.info("there are {} mycore objects", storeList.size());
         // get ids from solr
         LOGGER.info("fetching solr...");
-        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
         List<String> solrList = MCRSolrSearchUtils.listIDs(solrClient, "objectType:" + objectType);
         LOGGER.info("there are {} solr objects", solrList.size());
 

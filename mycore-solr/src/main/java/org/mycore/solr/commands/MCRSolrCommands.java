@@ -18,6 +18,8 @@
 
 package org.mycore.solr.commands;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +29,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
+import org.apache.solr.client.solrj.request.CoreAdminRequest;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -139,11 +145,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "set solr server {0}",
-        help = "Sets a new SOLR server, {0} specifies the URL of the SOLR Server",
+        syntax = "set default solr server {0} for core {1}",
+        help = "Sets a new SOLR server, {0} specifies the URL of the SOLR Server and {1} the core name",
         order = 130)
-    public static void setSolrServer(String solrClientURL) {
-        MCRSolrClientFactory.setSolrClient(solrClientURL);
+    public static void setSolrServer(String solrClientURL, String solrCore) {
+        MCRSolrClientFactory.setSolrDefaultClient(solrClientURL, solrCore);
     }
 
     @MCRCommand(
@@ -223,11 +229,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "selects mcr objects with a solr query",
         order = 180)
     public static void selectObjectsWithSolrQuery(String query) throws Exception {
-        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
         List<String> ids = MCRSolrSearchUtils.listIDs(solrClient, query);
         MCRObjectCommands.setSelectedObjectIDs(ids);
     }
-    
+
     //reload solr schema for core {coreName} with type {coreType}
     //reload solr schema for core mir with type default-core
 	@MCRCommand(syntax = "reload solr schema for core {0} with type {1}", 
@@ -237,6 +243,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 		MCRSolrSchemaReloader.clearSchema(coreName);
 		MCRSolrSchemaReloader.processSchemaFiles(coreName, coreType);
 	}
+
 
     /**
      * This command tries to identify MyCoRe Objects missing in SOLR and reindexes them using the
@@ -256,7 +263,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     public static List<String> synchronizeAndRepairSolrIndex() throws Exception {
         List<String> result = new ArrayList<>();
         Collection<String> objectTypes = MCRXMLMetadataManager.instance().getObjectTypes();
-        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
         for (String objectType : objectTypes) {
 
             LOGGER.info("synchronize SOLR index for object type: " + objectType);
@@ -292,25 +299,31 @@ public class MCRSolrCommands extends MCRAbstractCommands {
      * schema definitions outside the default definitions in the MyCoRe core template. Then
      * it add / update / delete the user schema definition. Then it add / update /delete
      * the solrconfig.xml definition. 
-     * @see https://github.com/MyCoRe-Org/solr-core-templates/tree/master/mycore_default_core/conf
+     * @see https://github.com/MyCoRe-Org/mycore_solr_configset_main
      * 
-     * @param coreName the name of the core that should be reloaded
      * @param coreType the core type of the core that should be reloaded; the MyCoRe default application 
-     * core type is <b>default-core</b>
+     * core type is <b>main</b>
      */
-    @MCRCommand(syntax = "reload solr configuration for core {0} with type {1}", 
-                help = "The command reloads the schema in solr using the solr schema api",
-                order = 210)
-    public static final void reloadSolrConfiguration(String coreName, String coreType) {
+    @MCRCommand(syntax = "reload solr configuration for type {0}",
+        help = "The command reloads the schema and the configuration in solr by using the solr schema api for core type {0}",
+        order = 210)
+    public static final void reloadSolrConfiguration(String coreType) {
+        final String coreName = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "Core." + coreType, null);
+        if (coreName == null) {
+            LOGGER.error("Wrong core type " + coreType);
+            return;
+        }
         MCRSolrSchemaReloader.clearSchema(coreName);
         MCRSolrSchemaReloader.processSchemaFiles(coreName, coreType);
+        MCRSolrSchemaReloader.clearConfig(coreName);
         MCRSolrSchemaReloader.processConfigFiles(coreName, coreType);
     }
 
 	@MCRCommand(syntax = "create solr core {0} from template {1}", 
             help = "The command creates a new empty core with the given name based on the named core template",
             order = 220)
-	public static final void createSolrCore(String coreName, String templateName) throws IOException, SolrServerException {
+	public static final void createSolrCore(String coreName, String templateName) throws IOException,
+        SolrServerException {
 	    CoreAdminRequest.Create create = new CoreAdminRequest.Create();
 	    create.setCoreName(coreName);
 	    create.setConfigSet(templateName);
@@ -319,5 +332,6 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 	    CoreAdminResponse response = create.process(solrClient);
 	    LogManager.getLogger().info("Core Create Response: {}", response);
 	}
+
 
 }

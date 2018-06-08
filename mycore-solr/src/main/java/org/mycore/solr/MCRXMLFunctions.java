@@ -44,7 +44,7 @@ public class MCRXMLFunctions {
         SolrQuery solrQuery = new SolrQuery(q);
         solrQuery.set("rows", 0);
         QueryResponse queryResponse;
-        queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
+        queryResponse = MCRSolrClientFactory.getSolrDefaultClient().query(solrQuery);
         return queryResponse.getResults().getNumFound();
     }
 
@@ -61,7 +61,7 @@ public class MCRXMLFunctions {
         SolrQuery solrQuery = new SolrQuery(q);
         solrQuery.set("rows", 1);
         QueryResponse queryResponse;
-        queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
+        queryResponse = MCRSolrClientFactory.getSolrDefaultClient().query(solrQuery);
 
         if (queryResponse.getResults().getNumFound() == 0) {
             return null;

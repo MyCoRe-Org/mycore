@@ -830,7 +830,7 @@ public class MCRRestAPIObjectsHelper {
 
             return MCRMetadataManager.retrieveMCRObject(mcrID);
         } else {
-            SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+            SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
             SolrQuery query = new SolrQuery();
             query.setQuery(key + ":" + idString);
             try {
