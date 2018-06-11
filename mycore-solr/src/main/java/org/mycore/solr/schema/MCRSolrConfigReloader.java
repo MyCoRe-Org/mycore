@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -152,7 +153,7 @@ public class MCRSolrConfigReloader {
                 //get first and only? property of the command object
                 Entry<String, JsonElement> entry = command.getAsJsonObject().entrySet().iterator().next();
                 String currentConfigObjectName = entry.getKey().substring(entry.getKey().indexOf("-") + 1)
-                    .toLowerCase();
+                    .toLowerCase(Locale.ROOT);
 
                 if (isKnownSolrConfigCommmand(entry.getKey())) {
                     if (entry.getKey().startsWith("add-")
@@ -244,7 +245,7 @@ public class MCRSolrConfigReloader {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             response = httpClient.execute(get);
             JsonParser jsonParser = new JsonParser();
-            JsonElement jeResponse = jsonParser.parse(new InputStreamReader(response.getEntity().getContent()));
+            JsonElement jeResponse = jsonParser.parse(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
             return jeResponse.getAsJsonObject().get("config").getAsJsonObject();
         } catch (IOException e) {
             throw new MCRException("Could not read Solr configuration", e);
@@ -258,7 +259,7 @@ public class MCRSolrConfigReloader {
      */
 
     private static boolean isKnownSolrConfigCommmand(String cmd) {
-        String cfgObjName = cmd.substring(cmd.indexOf("-") + 1).toLowerCase();
+        String cfgObjName = cmd.substring(cmd.indexOf("-") + 1).toLowerCase(Locale.ROOT);
         return ((cmd.startsWith("add-") || cmd.startsWith("update-") || cmd.startsWith("delete-"))
             && (SOLR_CONFIG_OBJECT_NAMES.keySet().contains(cfgObjName)))
             || SOLR_CONFIG_PROPERTY_COMMANDS.contains(cmd);
