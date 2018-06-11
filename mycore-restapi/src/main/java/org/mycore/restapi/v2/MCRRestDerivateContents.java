@@ -215,7 +215,7 @@ public class MCRRestDerivateContents {
             }
         }
         if (isFile()) {
-            long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
+            long maxSize = getUploadMaxSize();
             String contentLength = request.getHeaderString(HttpHeaders.CONTENT_LENGTH);
             if (contentLength != null && Long.parseLong(contentLength) > maxSize) {
                 throw new BadRequestException("File is to big. " + mcrPath);
@@ -290,24 +290,7 @@ public class MCRRestDerivateContents {
             }
         } catch (IOException e) {
             //does not exist
-            LogManager.getLogger().info("Creating file: {}", mcrPath);
-            try {
-                OutputStream out = Files.newOutputStream(mcrPath, StandardOpenOption.CREATE_NEW);
-                try {
-                    IOUtils.copy(contents, out, BUFFER_SIZE);
-                } finally {
-                    //close writes data to database
-                    doWithinTransaction(out::close);
-                }
-            } catch (IOException e2) {
-                try {
-                    doWithinTransaction(() -> Files.deleteIfExists(mcrPath));
-                } catch (IOException e3) {
-                    LogManager.getLogger().warn("Error while deleting incomplete file.", e3);
-                }
-                throw new InternalServerErrorException(e2);
-            }
-            return Response.status(Response.Status.CREATED).build();
+            return createFile(contents, mcrPath);
         }
         //file does already exist
         Date lastModified = new Date(fileAttributes.lastModifiedTime().toMillis());
@@ -317,10 +300,13 @@ public class MCRRestDerivateContents {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
+        return updateFile(contents, mcrPath);
+    }
+
+    private static Response updateFile(InputStream contents, MCRPath mcrPath) {
         LogManager.getLogger().info("Updating file: {}", mcrPath);
-        int memBuf = MCRConfiguration2.getOrThrow("MCR.FileUpload.MemoryThreshold", Integer::parseInt);
-        java.io.File uploadDirectory = MCRConfiguration2.getOrThrow("MCR.FileUpload.TempStoragePath",
-            java.io.File::new);
+        int memBuf = getUploadMemThreshold();
+        java.io.File uploadDirectory = getUploadTempStorage();
         try (DeferredFileOutputStream dfos = new DeferredFileOutputStream(memBuf, mcrPath.getOwner(),
             mcrPath.getFileName().toString(), uploadDirectory);
             MaxBytesOutputStream mbos = new MaxBytesOutputStream(dfos)) {
@@ -336,7 +322,7 @@ public class MCRRestDerivateContents {
                         try {
                             Files.copy(tempFile.toPath(), out);
                         } finally {
-                            LogManager.getLogger().info("Deleting file {} of size {}.", tempFile.getAbsolutePath(),
+                            LogManager.getLogger().debug("Deleting file {} of size {}.", tempFile.getAbsolutePath(),
                                 tempFile.length());
                             tempFile.delete();
                         }
@@ -350,6 +336,27 @@ public class MCRRestDerivateContents {
             throw new InternalServerErrorException(e);
         }
         return Response.noContent().build();
+    }
+
+    private static Response createFile(InputStream contents, MCRPath mcrPath) {
+        LogManager.getLogger().info("Creating file: {}", mcrPath);
+        try {
+            OutputStream out = Files.newOutputStream(mcrPath, StandardOpenOption.CREATE_NEW);
+            try {
+                IOUtils.copy(contents, out, BUFFER_SIZE);
+            } finally {
+                //close writes data to database
+                doWithinTransaction(out::close);
+            }
+        } catch (IOException e2) {
+            try {
+                doWithinTransaction(() -> Files.deleteIfExists(mcrPath));
+            } catch (IOException e3) {
+                LogManager.getLogger().warn("Error while deleting incomplete file.", e3);
+            }
+            throw new InternalServerErrorException(e2);
+        }
+        return Response.status(Response.Status.CREATED).build();
     }
 
     private boolean isFile() {
@@ -527,7 +534,7 @@ public class MCRRestDerivateContents {
 
         MaxBytesOutputStream(OutputStream out) {
             super(out);
-            maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
+            maxSize = getUploadMaxSize();
         }
 
         @Override
@@ -537,6 +544,18 @@ public class MCRRestDerivateContents {
                 throw new BadRequestException("Maximum upload file size exceeded: " + maxSize);
             }
         }
+    }
+
+    private static long getUploadMaxSize() {
+        return MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
+    }
+
+    private static java.io.File getUploadTempStorage() {
+        return MCRConfiguration2.getOrThrow("MCR.FileUpload.TempStoragePath", java.io.File::new);
+    }
+
+    private static int getUploadMemThreshold() {
+        return MCRConfiguration2.getOrThrow("MCR.FileUpload.MemoryThreshold", Integer::parseInt);
     }
 
     @FunctionalInterface

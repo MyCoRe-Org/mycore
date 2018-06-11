@@ -147,8 +147,8 @@ public class MCRRestClassifications {
             @ApiResponse(responseCode = "400",
                 content = { @Content(mediaType = MediaType.TEXT_PLAIN) },
                 description = "'MCRCategoryID mismatch'"),
-            @ApiResponse(responseCode = "201", description = "MCRObject successfully created"),
-            @ApiResponse(responseCode = "204", description = "MCRObject successfully updated"),
+            @ApiResponse(responseCode = "201", description = "Classification successfully created"),
+            @ApiResponse(responseCode = "204", description = "Classification successfully updated"),
         },
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     @MCRRequireTransaction
@@ -161,7 +161,7 @@ public class MCRRestClassifications {
         }
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         Response.Status status;
-        if (categoryDAO.exist(MCRCategoryID.rootID(classId))) {
+        if (!categoryDAO.exist(MCRCategoryID.rootID(classId))) {
             categoryDAO.addCategory(null, mcrClass.toCategory());
             status = Response.Status.CREATED;
         } else {
