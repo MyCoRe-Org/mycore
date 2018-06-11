@@ -21,11 +21,9 @@ package org.mycore.solr.schema;
 import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +49,7 @@ import com.google.gson.JsonParser;
 
 /**
  * This class provides methods to reload a SOLR schema using the SOLR schema API
- * @see https://lucene.apache.org/solr/guide/7_3/schema-api.html
+ * see https://lucene.apache.org/solr/guide/7_3/schema-api.html
  *
  * @author Robert Stephan
  * @author jens Kupferschmidt

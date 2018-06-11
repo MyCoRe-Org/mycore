@@ -50,7 +50,7 @@ import com.google.gson.JsonParser;
 
 /**
  * This class provides methods to reload a SOLR config using the SOLR config API
- * @see https://lucene.apache.org/solr/guide/7_3/config-api.html
+ * see https://lucene.apache.org/solr/guide/7_3/config-api.html
  * 
  * @author Robert Stephan
  * @author Jens Kupferschmidt
