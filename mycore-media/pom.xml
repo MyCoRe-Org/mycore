@@ -43,6 +43,14 @@
     </dependency>
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
+      <artifactId>fontbox</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>jbig2-imageio</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
       <artifactId>pdfbox</artifactId>
     </dependency>
     <dependency>

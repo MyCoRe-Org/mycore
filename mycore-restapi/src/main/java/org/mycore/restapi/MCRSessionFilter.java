@@ -207,7 +207,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                     MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null, app));
             }
             if (responseContext.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()
-                && "XMLHttpRequest".equals(requestContext.getHeaderString("X-Requested-With"))) {
+                && doNotWWWAuthenticate(requestContext)) {
                 LOGGER.debug("Remove {} header.", HttpHeaders.WWW_AUTHENTICATE);
                 responseContext.getHeaders().remove(HttpHeaders.WWW_AUTHENTICATE);
             }
@@ -232,6 +232,20 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         } finally {
             LOGGER.debug("ResponseFilter stop");
         }
+    }
+
+    private static boolean doNotWWWAuthenticate(ContainerRequestContext requestContext) {
+        if ("XMLHttpRequest".equals(requestContext.getHeaderString("X-Requested-With"))) {
+            return true;
+        }
+        if (requestContext.getAcceptableMediaTypes()
+            .stream()
+            .findFirst()
+            .filter(m -> "image".equals(m.getType()))
+            .isPresent()) {
+            return true;
+        }
+        return false;
     }
 
     private static void closeSessionIfNeeded() {
