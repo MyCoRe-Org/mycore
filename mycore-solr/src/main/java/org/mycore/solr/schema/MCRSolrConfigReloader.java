@@ -21,11 +21,9 @@ package org.mycore.solr.schema;
 import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,26 +115,24 @@ public class MCRSolrConfigReloader {
 
         LOGGER.info("Load config definitions for core type " + coreType + " in core " + coreName);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            Enumeration<? extends InputStream> files = MCRConfigurationInputStream.getConfigFileInputStreams(
-                "solr/" + coreType + "/" + SOLR_CONFIG_UPDATE_FILE_NAME, null);
-            while (files.hasMoreElements()) {
-                try (InputStream is = files.nextElement()) {
-                    String content = new String(ByteStreams.toByteArray(is), StandardCharsets.UTF_8);
-
-                    JsonParser parser = new JsonParser();
-                    JsonElement json = parser.parse(content);
-                    if (!json.isJsonArray()) {
-                        JsonElement e = json;
-                        json = new JsonArray();
-                        json.getAsJsonArray().add(e);
-                    }
-
-                    JsonObject currentSolrConfig = retrieveCurrentSolrConfig(coreName);
-
-                    for (JsonElement command : json.getAsJsonArray()) {
-                        processConfigCommand(coreName, command, currentSolrConfig);
-                    }
+            List<byte[]> configFileContents = MCRConfigurationInputStream.getConfigFileContents(
+                "solr/" + coreType + "/" + SOLR_CONFIG_UPDATE_FILE_NAME);
+            for (byte[] configFileData : configFileContents) {
+                String content = new String(configFileData, StandardCharsets.UTF_8);
+                JsonParser parser = new JsonParser();
+                JsonElement json = parser.parse(content);
+                if (!json.isJsonArray()) {
+                    JsonElement e = json;
+                    json = new JsonArray();
+                    json.getAsJsonArray().add(e);
                 }
+
+                JsonObject currentSolrConfig = retrieveCurrentSolrConfig(coreName);
+
+                for (JsonElement command : json.getAsJsonArray()) {
+                    processConfigCommand(coreName, command, currentSolrConfig);
+                }
+
             }
 
         } catch (IOException e) {
@@ -159,29 +155,27 @@ public class MCRSolrConfigReloader {
                     .toLowerCase();
 
                 if (isKnownSolrConfigCommmand(entry.getKey())) {
-                    if (entry.getKey().startsWith("add-")) {
-                        if (CHECKED_CONFIG_OBJECTS.contains(currentConfigObjectName)) {
-                            String key = currentConfigObjectName.equals("listener") ? "event" : "name";
-                            String name = entry.getValue().getAsJsonObject().get(key).getAsString();
-                            JsonElement jeSolrConfigObj = currentSolrConfig
-                                .get(SOLR_CONFIG_OBJECT_NAMES.get(currentConfigObjectName));
-                            if (jeSolrConfigObj == null || jeSolrConfigObj.getAsJsonObject().get(name) == null) {
-                                //the config object does exist in current Solr config 
-                                //--> convert command: add-* to update-*
-                                command.getAsJsonObject().add(entry.getKey().replace("add-", "update-"),
-                                    entry.getValue());
-                                command.getAsJsonObject().remove(entry.getKey());
-                                LOGGER.debug(
-                                    "The object to be updated does not exist in Solr -> switch mode from add-* to update-*\n"
-                                        + command.toString());
-                            }
+                    if (entry.getKey().startsWith("add-")
+                        && CHECKED_CONFIG_OBJECTS.contains(currentConfigObjectName)) {
+                        String key = "listener".equals(currentConfigObjectName) ? "event" : "name";
+                        String name = entry.getValue().getAsJsonObject().get(key).getAsString();
+                        JsonElement jeSolrConfigObj = currentSolrConfig
+                            .get(SOLR_CONFIG_OBJECT_NAMES.get(currentConfigObjectName));
+                        if (jeSolrConfigObj == null || jeSolrConfigObj.getAsJsonObject().get(name) == null) {
+                            //the config object does exist in current Solr config 
+                            //--> convert command: add-* to update-*
+                            command.getAsJsonObject().add(entry.getKey().replace("add-", "update-"),
+                                entry.getValue());
+                            command.getAsJsonObject().remove(entry.getKey());
+                            LOGGER.debug(
+                                "The object to be updated does not exist in Solr -> switch mode from add-* to update-*\n"
+                                    + command.toString());
                         }
-
                     }
 
                     if (entry.getKey().startsWith("update-")
-                        && (CHECKED_CONFIG_OBJECTS.contains(currentConfigObjectName))) {
-                        String key = currentConfigObjectName.equals("listener") ? "event" : "name";
+                        && CHECKED_CONFIG_OBJECTS.contains(currentConfigObjectName)) {
+                        String key = "listener".equals(currentConfigObjectName) ? "event" : "name";
                         String name = entry.getValue().getAsJsonObject().get(key).getAsString();
                         JsonElement jeSolrConfigObj = currentSolrConfig
                             .get(SOLR_CONFIG_OBJECT_NAMES.get(currentConfigObjectName));
@@ -228,16 +222,15 @@ public class MCRSolrConfigReloader {
                     }
 
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     LOGGER.error(
                         "Could not execute the following Solr config update command\n" + command.toString(), e);
                 }
 
             } catch (IOException e) {
-                // Use Logger
-                e.printStackTrace();
+                LOGGER.error(e);
             }
         }
+
     }
 
     /**
@@ -254,8 +247,6 @@ public class MCRSolrConfigReloader {
             JsonElement jeResponse = jsonParser.parse(new InputStreamReader(response.getEntity().getContent()));
             return jeResponse.getAsJsonObject().get("config").getAsJsonObject();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            LOGGER.error(e);
             throw new MCRException("Could not read Solr configuration", e);
         }
     }

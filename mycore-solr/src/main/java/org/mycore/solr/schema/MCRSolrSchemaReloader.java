@@ -141,44 +141,39 @@ public class MCRSolrSchemaReloader {
     public static void processSchemaFiles(String coreName, String coreType) {
         LOGGER.info("Load schema definitions for core type " + coreType + " in core " + coreName);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            Enumeration<? extends InputStream> files = MCRConfigurationInputStream.getConfigFileInputStreams(
-                "solr/" + coreType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME, null);
-            while (files.hasMoreElements()) {
-                try (InputStream is = files.nextElement()) {
-                    String content = new String(ByteStreams.toByteArray(is), StandardCharsets.UTF_8);
+            List<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
+                "solr/" + coreType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME);
+            for (byte[] schemaFileData : schemaFileContents) {
+                String content = new String(schemaFileData, StandardCharsets.UTF_8);
+                JsonParser parser = new JsonParser();
+                JsonElement json = parser.parse(content);
+                if (!json.isJsonArray()) {
+                    JsonElement e = json;
+                    json = new JsonArray();
+                    json.getAsJsonArray().add(e);
+                }
 
-                    JsonParser parser = new JsonParser();
-                    JsonElement json = parser.parse(content);
-                    if (!json.isJsonArray()) {
-                        JsonElement e = json;
-                        json = new JsonArray();
-                        json.getAsJsonArray().add(e);
-                    }
+                for (JsonElement e : json.getAsJsonArray()) {
+                    LOGGER.debug(e.toString());
 
-                    for (JsonElement e : json.getAsJsonArray()) {
+                    HttpPost post = new HttpPost(SOLR_SERVER_URL + coreName + "/schema");
+                    post.setHeader("Content-type", "application/json");
+                    post.setEntity(new StringEntity(e.toString()));
 
-                        LOGGER.debug(e.toString());
+                    CloseableHttpResponse response = httpClient.execute(post);
+                    if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                        String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
+                            StandardCharsets.UTF_8);
+                        LOGGER.info("SOLR schema update successful \n" + respContent);
+                    } else {
 
-                        HttpPost post = new HttpPost(SOLR_SERVER_URL + coreName + "/schema");
-                        post.setHeader("Content-type", "application/json");
-                        post.setEntity(new StringEntity(e.toString()));
-
-                        CloseableHttpResponse response = httpClient.execute(post);
-                        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                            String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
-                                StandardCharsets.UTF_8);
-                            LOGGER.info("SOLR schema update successful \n" + respContent);
-                        } else {
-
-                            String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
-                                StandardCharsets.UTF_8);
-                            LOGGER.error("SOLR schema update error: " + response.getStatusLine().getStatusCode() + " "
-                                + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
-                        }
+                        String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
+                            StandardCharsets.UTF_8);
+                        LOGGER.error("SOLR schema update error: " + response.getStatusLine().getStatusCode() + " "
+                            + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
                     }
                 }
             }
-
         } catch (IOException e) {
             LOGGER.error(e);
         }
