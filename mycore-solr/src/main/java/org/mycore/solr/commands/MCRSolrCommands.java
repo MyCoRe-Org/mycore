@@ -47,6 +47,7 @@ import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
 import org.mycore.solr.index.MCRSolrIndexer;
+import org.mycore.solr.schema.MCRSolrConfigReloader;
 import org.mycore.solr.schema.MCRSolrSchemaReloader;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
@@ -315,8 +316,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         }
         MCRSolrSchemaReloader.clearSchema(coreName);
         MCRSolrSchemaReloader.processSchemaFiles(coreName, coreType);
-        MCRSolrSchemaReloader.clearConfig(coreName);
-        MCRSolrSchemaReloader.processConfigFiles(coreName, coreType);
+        MCRSolrConfigReloader.clearConfig(coreName);
+        MCRSolrConfigReloader.processConfigFiles(coreName, coreType);
     }
 
 	@MCRCommand(syntax = "create solr core {0} from template {1}", 

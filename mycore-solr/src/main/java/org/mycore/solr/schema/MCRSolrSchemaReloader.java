@@ -20,16 +20,12 @@ package org.mycore.solr.schema;
 
 import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,10 +41,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
-import org.mycore.common.config.MCRComponent;
-import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.MCRConfigurationInputStream;
-import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.solr.MCRSolrClientFactory;
 
 import com.google.common.io.ByteStreams;
@@ -58,7 +51,6 @@ import com.google.gson.JsonParser;
 
 /**
  * This class provides methods to reload a SOLR schema using the SOLR schema API
- * @see https://lucene.apache.org/solr/guide/7_3/config-api.html
  * @see https://lucene.apache.org/solr/guide/7_3/schema-api.html
  *
  * @author Robert Stephan
@@ -67,9 +59,7 @@ import com.google.gson.JsonParser;
 public class MCRSolrSchemaReloader {
     private static Logger LOGGER = LogManager.getLogger(MCRSolrSchemaReloader.class);
 
-    private static String SOLR_SCHEMA_UPDATE_FILES = "solr-schema.json";
-
-    private static String SOLR_CONFIG_UPDATE_FILES = "solr-config.json";
+    private static String SOLR_SCHEMA_UPDATE_FILE_NAME = "solr-schema.json";
 
     private static List<String> SOLR_DEFAULT_FIELDS = Arrays.asList("id", "_version_", "_root_", "_text_");
 
@@ -91,7 +81,7 @@ public class MCRSolrSchemaReloader {
         LOGGER.info("Clear SOLR schema in core " + coreName);
         try {
             SolrClient solrClient = MCRSolrClientFactory.get(coreName).getClient();
-            
+
             SchemaRequest.CopyFields copyFieldsReq = new SchemaRequest.CopyFields();
             for (Map<String, Object> copyField : copyFieldsReq.process(solrClient).getCopyFields()) {
                 String fieldSrc = copyField.get("source").toString();
@@ -141,17 +131,6 @@ public class MCRSolrSchemaReloader {
         }
     }
 
-    public static void clearConfig(String coreName) {
-
-        LOGGER.info("Clear SOLR schema in core " + coreName);
-       // try {
-            SolrClient solrClient = MCRSolrClientFactory.get(coreName).getClient();
-            
-       // } catch (IOException | SolrServerException e) {
-       //     LOGGER.error(e);
-        //}
-    }
-           
     /**
      * This method modified the SOLR schema definition based on all solr/{coreType}/solr-schema.json 
      * in the MyCoRe-Maven modules resource path.
@@ -160,25 +139,10 @@ public class MCRSolrSchemaReloader {
      * @param coreType the type string of the core, use <b>default-core</b> for the MyCoRe default application core
      */
     public static void processSchemaFiles(String coreName, String coreType) {
-        processJsonFiles(coreName, coreType, "schema", SOLR_SCHEMA_UPDATE_FILES);
-    }
-    
-    /**
-     * This method modified the SOLR config definition based on all solr/{coreType}/solr-config.json 
-     * in the MyCoRe-Maven modules resource path.
-     * 
-     * @param coreName the name of the SOLR core
-     * @param coreType the type string of the core, use <b>default-core</b> for the MyCoRe default application core
-     */
-    public static void processConfigFiles(String coreName, String coreType) {
-        processJsonFiles(coreName, coreType, "config", SOLR_CONFIG_UPDATE_FILES);
-    }
-
-    private static void processJsonFiles(String coreName, String coreType, String configType, String configFileName) {
-        LOGGER.info("Load " + configType + " definitions for core type " + coreType + " in core " + coreName);
+        LOGGER.info("Load schema definitions for core type " + coreType + " in core " + coreName);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            Enumeration<? extends InputStream> files = getInputStreams(
-                "solr/" + coreType + "/" + configFileName, null);
+            Enumeration<? extends InputStream> files = MCRConfigurationInputStream.getConfigFileInputStreams(
+                "solr/" + coreType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME, null);
             while (files.hasMoreElements()) {
                 try (InputStream is = files.nextElement()) {
                     String content = new String(ByteStreams.toByteArray(is), StandardCharsets.UTF_8);
@@ -192,10 +156,10 @@ public class MCRSolrSchemaReloader {
                     }
 
                     for (JsonElement e : json.getAsJsonArray()) {
-                        
+
                         LOGGER.debug(e.toString());
 
-                        HttpPost post = new HttpPost(SOLR_SERVER_URL + coreName + "/" + configType);
+                        HttpPost post = new HttpPost(SOLR_SERVER_URL + coreName + "/schema");
                         post.setHeader("Content-type", "application/json");
                         post.setEntity(new StringEntity(e.toString()));
 
@@ -203,12 +167,12 @@ public class MCRSolrSchemaReloader {
                         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                             String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
                                 StandardCharsets.UTF_8);
-                            LOGGER.info("SOLR " + configType + " update successful \n" + respContent);
+                            LOGGER.info("SOLR schema update successful \n" + respContent);
                         } else {
 
                             String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
                                 StandardCharsets.UTF_8);
-                            LOGGER.error("SOLR " + configType + " update error: " + response.getStatusLine().getStatusCode() + " "
+                            LOGGER.error("SOLR schema update error: " + response.getStatusLine().getStatusCode() + " "
                                 + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
                         }
                     }
@@ -219,27 +183,4 @@ public class MCRSolrSchemaReloader {
             LOGGER.error(e);
         }
     }
-
-    /**
-     * @see MCRConfigurationInputStream for implementation details
-     */
-    private static Enumeration<? extends InputStream> getInputStreams(String filename, InputStream initStream)
-        throws IOException {
-        LinkedList<InputStream> cList = new LinkedList<>();
-        if (initStream != null) {
-            cList.add(initStream);
-        }
-        for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
-            InputStream is = component.getConfigFileStream(filename);
-            if (is != null) {
-                cList.add(is);
-            }
-        }
-        File localProperties = MCRConfigurationDir.getConfigFile(filename);
-        if (localProperties != null && localProperties.canRead()) {
-            cList.add(new FileInputStream(localProperties));
-        }
-        return Collections.enumeration(cList);
-    }
-
 }

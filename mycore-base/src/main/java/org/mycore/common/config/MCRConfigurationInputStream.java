@@ -74,7 +74,7 @@ public class MCRConfigurationInputStream extends InputStream {
     private MCRConfigurationInputStream(String filename, InputStream initStream) throws IOException {
         super();
         this.empty = true;
-        this.e = getInputStreams(filename, initStream);
+        this.e = getPropertyInputStreams(filename, initStream);
         if (e.hasMoreElements()) {
             nextStream();
         }
@@ -105,7 +105,7 @@ public class MCRConfigurationInputStream extends InputStream {
         return empty;
     }
 
-    private Enumeration<? extends InputStream> getInputStreams(String filename, InputStream initStream)
+    private Enumeration<? extends InputStream> getPropertyInputStreams(String filename, InputStream initStream)
         throws IOException {
         LinkedList<InputStream> cList = new LinkedList<>();
         if (initStream != null) {
@@ -163,6 +163,31 @@ public class MCRConfigurationInputStream extends InputStream {
             }
         }
         return input == null ? null : input.getInputStream();
+    }
+    
+    /**
+     * return an enumeration of input streams of configuration files
+     * found in MyCoRe components and modules, respecting the proper loading order 
+     * 
+     * @author Robert Stephan
+     */
+    public static Enumeration<? extends InputStream> getConfigFileInputStreams(String filename, InputStream initStream)
+        throws IOException {
+        LinkedList<InputStream> cList = new LinkedList<>();
+        if (initStream != null) {
+            cList.add(initStream);
+        }
+        for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
+            InputStream is = component.getConfigFileStream(filename);
+            if (is != null) {
+                cList.add(is);
+            }
+        }
+        File localConfigFile = MCRConfigurationDir.getConfigFile(filename);
+        if (localConfigFile != null && localConfigFile.canRead()) {
+            cList.add(new FileInputStream(localConfigFile));
+        }
+        return Collections.enumeration(cList);
     }
 
     /**
