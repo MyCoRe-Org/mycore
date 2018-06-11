@@ -299,8 +299,9 @@ public class MCRSolrCommands extends MCRAbstractCommands {
      * This command reload the managed-schema.xml and solrconfig.xml files. It remove all
      * schema definitions outside the default definitions in the MyCoRe core template. Then
      * it add / update / delete the user schema definition. Then it add / update /delete
-     * the solrconfig.xml definition. 
-     * @see https://github.com/MyCoRe-Org/mycore_solr_configset_main
+     * the solrconfig.xml definition.
+     *  
+     * see https://github.com/MyCoRe-Org/mycore_solr_configset_main
      * 
      * @param coreType the core type of the core that should be reloaded; the MyCoRe default application 
      * core type is <b>main</b>
