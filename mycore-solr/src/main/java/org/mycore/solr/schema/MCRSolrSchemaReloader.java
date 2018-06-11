@@ -164,7 +164,7 @@ public class MCRSolrSchemaReloader {
                     if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                         String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
                             StandardCharsets.UTF_8);
-                        LOGGER.info("SOLR schema update successful \n" + respContent);
+                        LOGGER.debug("SOLR schema update successful \n" + respContent);
                     } else {
 
                         String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
