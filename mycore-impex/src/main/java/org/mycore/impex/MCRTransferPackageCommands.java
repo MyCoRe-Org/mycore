@@ -55,7 +55,7 @@ public class MCRTransferPackageCommands {
     @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.",
                 syntax = "create transfer package for objects matching {0}")
     public static void create(String query) throws Exception {
-        List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrClientFactory.getSolrDefaultClient(), query);
+        List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrClientFactory.getSolrMainClient(), query);
         for (String objectId : ids) {
             Map<String, String> parameters = new HashMap<>();
             parameters.put("packer", "TransferPackage");

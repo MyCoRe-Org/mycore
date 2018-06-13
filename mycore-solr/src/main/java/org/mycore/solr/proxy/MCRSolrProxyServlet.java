@@ -22,7 +22,6 @@ package org.mycore.solr.proxy;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_PATH;
 import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
-import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,6 +66,7 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.services.http.MCRIdleConnectionMonitorThread;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.xml.sax.SAXException;
 
 public class MCRSolrProxyServlet extends MCRServlet {
@@ -264,8 +264,9 @@ public class MCRSolrProxyServlet extends MCRServlet {
      *            Parameters to use with the Request
      * @return a method to make the request
      */
-    private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params, String core) {
-        String serverURL =  core != null && !"".equals(core) ? SOLR_SERVER_URL + core : SOLR_SERVER_URL;
+    private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params, String coreID) {
+        String serverURL = MCRSolrClientFactory.getURL(coreID);
+
         return new HttpGet(MessageFormat.format("{0}{1}{2}", serverURL, queryHandlerPath, params.toQueryString()));
     }
 
@@ -287,14 +288,9 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
 
-        LOGGER.info("Initializing SOLR connection to \"{}\"", SOLR_SERVER_URL);
-
         this.updateQueryHandlerMap();
 
-        solrHost = MCRHttpUtils.getHttpHost(SOLR_SERVER_URL);
-        if (solrHost == null) {
-            throw new ServletException("URI does not specify a valid host name: " + SOLR_SERVER_URL);
-        }
+
         httpClientConnectionManager = MCRHttpUtils.getConnectionManager(MAX_CONNECTIONS);
         httpClient = MCRHttpUtils.getHttpClient(httpClientConnectionManager, MAX_CONNECTIONS);
 

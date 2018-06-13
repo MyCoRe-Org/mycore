@@ -49,7 +49,7 @@ public class MCRSolrMCRContentIndexHandler extends MCRSolrAbstractIndexHandler {
     private SolrInputDocument document;
 
     public MCRSolrMCRContentIndexHandler(MCRObjectID id, MCRContent content) {
-        this(id, content, MCRSolrClientFactory.getSolrDefaultClient());
+        this(id, content, MCRSolrClientFactory.getSolrMainClient());
     }
 
     public MCRSolrMCRContentIndexHandler(MCRObjectID id, MCRContent content, SolrClient solrClient) {

@@ -66,7 +66,7 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
         if (!filterEmptySets()) {
             return false;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
         ModifiableSolrParams p = new ModifiableSolrParams();
         String value = set.getSpec();
         p.set(CommonParams.Q, MCROAIUtils.getDefaultSetQuery(value, getConfigPrefix()));

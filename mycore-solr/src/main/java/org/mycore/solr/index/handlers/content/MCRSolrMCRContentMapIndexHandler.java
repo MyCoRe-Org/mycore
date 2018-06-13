@@ -55,7 +55,7 @@ public class MCRSolrMCRContentMapIndexHandler extends MCRSolrAbstractIndexHandle
     private Map<MCRObjectID, MCRContent> contentMap;
 
     public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap) {
-        this(contentMap, MCRSolrClientFactory.getSolrDefaultClient());
+        this(contentMap, MCRSolrClientFactory.getSolrMainClient());
     }
 
     public MCRSolrMCRContentMapIndexHandler(Map<MCRObjectID, MCRContent> contentMap, SolrClient solrClient) {

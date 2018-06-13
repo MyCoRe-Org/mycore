@@ -18,17 +18,18 @@
 
 package org.mycore.solr;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_MAIN;
-import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
+import static org.mycore.solr.MCRSolrConstants.DEFAULT_SOLR_SERVER_URL;
 
-import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * @author shermann
@@ -36,28 +37,66 @@ import org.apache.solr.client.solrj.SolrClient;
  * @author Matthias Eichner
  * @author Jens Kupferschmidt
  */
-public abstract class MCRSolrClientFactory {
+public final class MCRSolrClientFactory {
+
+    private MCRSolrClientFactory(){
+    }
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrClientFactory.class);
 
-    private static String DEFAULT_CORE_NAME;
+    public static final String MAIN_CORE_TYPE = "Main";
 
     private static Map<String, MCRSolrCore> CORE_MAP;
 
-    /**
-     * Load the cores defined by the properties MCR.Solr.ServerURL (included core name) or
-     * MCR.Solr.ServerURL (without core name) and MCR.Solr.Core.Main .
-     */
+
     static {
         try {
-            CORE_MAP = Collections.synchronizedMap(new HashMap<String, MCRSolrCore>());
-            setSolrDefaultClient(SOLR_SERVER_URL, SOLR_CORE_MAIN);
+            CORE_MAP = Collections.synchronizedMap(loadCoresFromProperties());
         } catch (Throwable t) {
             LOGGER.error("Exception creating solr client object", t);
-        } finally {
-            LOGGER.info(MessageFormat.format("Using server at address \"{0}\"", getDefaultSolrCore().getClient()
-                .getBaseURL()));
         }
+    }
+
+    /**
+     * MCR.Solr.Core.Main.Name=cmo
+     * MCR.Solr.Core.Classfication.Name=cmo-classification
+     * @return a map of all cores defined in the properties.
+     */
+    private static Map<String, MCRSolrCore> loadCoresFromProperties(){
+        return MCRConfiguration2
+            .getPropertiesMap()
+            .keySet()
+            .stream()
+            .filter(p->p.startsWith(MCRSolrConstants.SOLR_CORE_PREFIX))
+            .map(cp-> cp.substring(MCRSolrConstants.SOLR_CORE_PREFIX.length()))
+            .map(cp -> {
+                int indexOfDot = cp.indexOf(".");
+                return indexOfDot != -1 ? cp.substring(0, indexOfDot) : cp;
+            })
+            .distinct()
+            .collect(Collectors.toMap(coreType -> coreType, MCRSolrClientFactory::initializeSolrCore));
+    }
+
+    private static MCRSolrCore initializeSolrCore(String coreType) {
+        final String coreNameKey =
+            MCRSolrConstants.SOLR_CORE_PREFIX + coreType + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
+        final String coreServerKey =
+            MCRSolrConstants.SOLR_CORE_PREFIX + coreType + MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
+
+        String coreName = MCRConfiguration2.getString(coreNameKey)
+            .orElseThrow(() -> new MCRConfigurationException("Missing property " + coreNameKey));
+
+        String coreServer = MCRConfiguration2.getString(coreServerKey)
+            .orElseGet(() -> MCRConfiguration2.getString(DEFAULT_SOLR_SERVER_URL).orElseThrow(
+                () -> new MCRConfigurationException("Missing property " + DEFAULT_SOLR_SERVER_URL)));
+
+        return new MCRSolrCore(coreServer, coreName);
+    }
+
+    public static MCRSolrCore addCore(String server, String coreName, String coreType){
+        final MCRSolrCore core = new MCRSolrCore(server, coreName);
+        CORE_MAP.put(coreType, core);
+        return core;
     }
 
     /**
@@ -65,96 +104,43 @@ public abstract class MCRSolrClientFactory {
      * 
      * @param core the MCRSolrCore instance 
      */
-    public static void add(MCRSolrCore core) {
-        CORE_MAP.put(core.getName(), core);
+    public static void add(String coreType, MCRSolrCore core) {
+        CORE_MAP.put(coreType, core);
     }
 
     /**
      * Remove a SOLR core instance from the list
-     * 
-     * @param coreName the name of the MCRSolrCore instance 
+     *
+     * @param coreType the name of the MCRSolrCore instance
      */
-    public static MCRSolrCore remove(String coreName) {
-        return CORE_MAP.remove(coreName);
-    }
-
-    public static MCRSolrCore get(String coreName) {
-        return CORE_MAP.get(coreName);
-    }
-
-    public static MCRSolrCore getDefaultSolrCore() {
-        return DEFAULT_CORE_NAME != null ? CORE_MAP.get(DEFAULT_CORE_NAME) : null;
+    public static Optional<MCRSolrCore> remove(String coreType) {
+        return Optional.ofNullable(CORE_MAP.remove(coreType));
     }
 
     /**
-     * Returns a SolrClient from the SOLR base URL.
-     * This does not reference a specific SOLR core.
+     * @param coreType the id of the core
+     * @return a core with a specific id
      */
-    public static SolrClient getSolrBaseClient() {
-        return CORE_MAP.get("").getClient();
+    public static Optional<MCRSolrCore> get(String coreType) {
+        return Optional.ofNullable(CORE_MAP.get(coreType));
+    }
+
+    public static MCRSolrCore getMainSolrCore() {
+        return get(MAIN_CORE_TYPE).orElseThrow(() -> new MCRConfigurationException("The core Main is not configured!"));
     }
 
     /**
      * Returns the solr client of the default core.
      */
-    public static SolrClient getSolrDefaultClient() {
-        return getDefaultSolrCore().getClient();
+    public static SolrClient getSolrMainClient() {
+        return getMainSolrCore().getClient();
     }
 
     /**
      * Returns the concurrent solr client of the default core.
      */
-    public static SolrClient getConcurrentSolrDefaultClient() {
-        return getDefaultSolrCore().getConcurrentClient();
+    public static SolrClient getConcurrentSolrMainClient() {
+        return getMainSolrCore().getConcurrentClient();
     }
 
-    /**
-     * Sets the new solr url including the core.
-     */
-    /**
-    public static void setSolrClient(String serverURL) {
-        removeDefaultCore();
-        MCRSolrCore defaultCore = new MCRSolrCore(serverURL);
-        add(defaultCore);
-        MCRSolrCore baseCore = new MCRSolrCore(defaultCore.serverURL, "");
-        add(baseCore);
-        DEFAULT_CORE_NAME = defaultCore.getName();
-    }
-    **/
-
-    /**
-     * Sets the new solr server url and core name as default client.
-     * 
-     * @param serverURL base solr url
-     * @param core core of the server
-     */
-    public static void setSolrDefaultClient(String serverURL, String core) {
-        removeDefaultCore();
-        add(new MCRSolrCore(serverURL, core));
-        DEFAULT_CORE_NAME = core;
-    }
-
-    /**
-     * Sets the new solr server url and core name.
-     * 
-     * @param serverURL base solr url
-     * @param core core of the server
-     */
-    public static void setSolrClient(String serverURL, String core) {
-        add(new MCRSolrCore(serverURL, core));
-    }
-
-    private static void removeDefaultCore() {
-        MCRSolrCore defaultCore = getDefaultSolrCore();
-        if (defaultCore != null) {
-            defaultCore.shutdown();
-            CORE_MAP.remove(defaultCore.getName());
-            DEFAULT_CORE_NAME = null;
-        }
-        MCRSolrCore baseCore = CORE_MAP.get("");
-        if (baseCore != null) {
-            baseCore.shutdown();
-            CORE_MAP.remove(baseCore.getName());
-        }
-    }
 }

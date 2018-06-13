@@ -23,6 +23,7 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 import java.util.regex.Pattern;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -58,4 +59,9 @@ public class MCRSolrUtils {
         return MCRConfiguration.instance().getBoolean(SOLR_CONFIG_PREFIX + "NestedDocuments", true);
     }
 
+    public static MCRConfigurationException getCoreConfigMissingException(String coreType) {
+        return new MCRConfigurationException(
+            "Missing property: " + MCRSolrConstants.SOLR_CORE_PREFIX + coreType
+                + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX);
+    }
 }

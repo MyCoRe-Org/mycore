@@ -18,8 +18,6 @@
 
 package org.mycore.solr.schema;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_SERVER_URL;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -41,6 +39,8 @@ import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
 import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrUtils;
 
 import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;
@@ -71,14 +71,15 @@ public class MCRSolrSchemaReloader {
      * Remove all fields, dynamicFields, copyFields and fieldTypes in the SOLR schema for the given core. The fields,
      * dynamicFields, and types in the lists SOLR_DEFAULT_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS
      * are excluded from remove.
-     * 
-     * @param coreName the name of the core
+     *
+     * @param coreType the name of the core
      */
-    public static void clearSchema(String coreName) {
+    public static void clearSchema(String coreType) {
 
-        LOGGER.info("Clear SOLR schema in core " + coreName);
+        LOGGER.info("Clear SOLR schema for core type " + coreType);
         try {
-            SolrClient solrClient = MCRSolrClientFactory.get(coreName).getClient();
+            SolrClient solrClient = MCRSolrClientFactory.get(coreType).orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType))
+                .getClient();
 
             SchemaRequest.CopyFields copyFieldsReq = new SchemaRequest.CopyFields();
             for (Map<String, Object> copyField : copyFieldsReq.process(solrClient).getCopyFields()) {
@@ -89,7 +90,7 @@ public class MCRSolrSchemaReloader {
                 SchemaRequest.DeleteCopyField delCopyField = new SchemaRequest.DeleteCopyField(fieldSrc, fieldDest);
                 delCopyField.process(solrClient);
             }
-            LOGGER.debug("CopyFields cleaned in core " + coreName);
+            LOGGER.debug("CopyFields cleaned for core type " + coreType);
 
             SchemaRequest.Fields fieldsReq = new SchemaRequest.Fields();
             for (Map<String, Object> field : fieldsReq.process(solrClient).getFields()) {
@@ -100,7 +101,7 @@ public class MCRSolrSchemaReloader {
                     delField.process(solrClient);
                 }
             }
-            LOGGER.debug("Fields cleaned in core " + coreName);
+            LOGGER.debug("Fields cleaned for core type " + coreType);
 
             SchemaRequest.DynamicFields dynFieldsReq = new SchemaRequest.DynamicFields();
             for (Map<String, Object> field : dynFieldsReq.process(solrClient).getDynamicFields()) {
@@ -111,7 +112,7 @@ public class MCRSolrSchemaReloader {
                     delField.process(solrClient);
                 }
             }
-            LOGGER.debug("DynamicFields cleaned in core " + coreName);
+            LOGGER.debug("DynamicFields cleaned for core type  " + coreType);
 
             SchemaRequest.FieldTypes fieldTypesReq = new SchemaRequest.FieldTypes();
             for (FieldTypeRepresentation fieldType : fieldTypesReq.process(solrClient).getFieldTypes()) {
@@ -122,7 +123,7 @@ public class MCRSolrSchemaReloader {
                     delField.process(solrClient);
                 }
             }
-            LOGGER.debug("FieldTypes cleaned in core " + coreName);
+            LOGGER.debug("FieldTypes cleaned for core type  " + coreType);
 
         } catch (IOException | SolrServerException e) {
             LOGGER.error(e);
@@ -133,11 +134,12 @@ public class MCRSolrSchemaReloader {
      * This method modified the SOLR schema definition based on all solr/{coreType}/solr-schema.json 
      * in the MyCoRe-Maven modules resource path.
      * 
-     * @param coreName the name of the SOLR core
      * @param coreType the type string of the core, use <b>default-core</b> for the MyCoRe default application core
      */
-    public static void processSchemaFiles(String coreName, String coreType) {
-        LOGGER.info("Load schema definitions for core type " + coreType + " in core " + coreName);
+    public static void processSchemaFiles(String coreType) {
+        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreType).orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType));
+
+        LOGGER.info("Load schema definitions for core type " + coreType + " in core " + solrCore.getName());
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             List<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
                 "solr/" + coreType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME);
@@ -154,7 +156,7 @@ public class MCRSolrSchemaReloader {
                 for (JsonElement e : json.getAsJsonArray()) {
                     LOGGER.debug(e.toString());
 
-                    HttpPost post = new HttpPost(SOLR_SERVER_URL + coreName + "/schema");
+                    HttpPost post = new HttpPost(solrCore.getV1CoreURL() + "/schema");
                     post.setHeader("Content-type", "application/json");
                     post.setEntity(new StringEntity(e.toString()));
 

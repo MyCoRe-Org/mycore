@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +31,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -39,8 +39,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrUtils;
 
 import com.google.common.collect.Lists;
 
@@ -55,12 +55,10 @@ public abstract class MCRSolrClassificationUtil {
 
     private static final Object CREATE_LOCK = new Object();
 
-    public static final String CLASSIFICATION_CORE_NAME;
+    private static final String CLASSIFICATION_CORE_TYPE = "Classification";
 
     static {
-        MCRSolrCore defaultCore = MCRSolrClientFactory.getDefaultSolrCore();
-        CLASSIFICATION_CORE_NAME = MCRConfiguration.instance().getString("MCR.Solr.Classification.Core",
-            defaultCore != null ? defaultCore.getName() + "_class" : "classification");
+        MCRSolrCore defaultCore = MCRSolrClientFactory.getMainSolrCore();
     }
 
     /**
@@ -232,17 +230,8 @@ public abstract class MCRSolrClassificationUtil {
      * Returns the solr classification core.
      */
     public static MCRSolrCore getCore() {
-        MCRSolrCore classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_NAME);
-        if (classCore == null) {
-            synchronized (CREATE_LOCK) {
-                classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_NAME);
-                if (classCore == null) {
-                    classCore = new MCRSolrCore(MCRSolrConstants.SOLR_SERVER_URL, CLASSIFICATION_CORE_NAME);
-                    MCRSolrClientFactory.add(classCore);
-                }
-            }
-        }
-        return classCore;
+        Optional<MCRSolrCore> classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_TYPE);
+        return classCore.orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(CLASSIFICATION_CORE_TYPE));
     }
 
     /**

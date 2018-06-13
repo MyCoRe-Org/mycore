@@ -50,7 +50,7 @@ public class MCRSolrInputDocumentsHandler extends MCRSolrAbstractIndexHandler {
     private static Logger LOGGER = LogManager.getLogger(MCRSolrInputDocumentsHandler.class);
 
     public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents) {
-        this(documents, MCRSolrClientFactory.getSolrDefaultClient());
+        this(documents, MCRSolrClientFactory.getSolrMainClient());
     }
 
     public MCRSolrInputDocumentsHandler(Collection<SolrInputDocument> documents, SolrClient solrClient) {

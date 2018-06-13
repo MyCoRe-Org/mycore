@@ -58,10 +58,12 @@ public class MCRSolrCore {
 
     /**
      * Creates a new solr server core instance. The last part of this url should be the core.
-     * 
+     *
      * @param serverURL
      *            whole url e.g. http://localhost:8296/docportal
+     * @deprecated use {@link #MCRSolrCore(String, String)} instead
      */
+    @Deprecated
     public MCRSolrCore(String serverURL) {
         if (serverURL.endsWith("/")) {
             serverURL = serverURL.substring(0, serverURL.length() - 1);
@@ -88,7 +90,7 @@ public class MCRSolrCore {
         }
         this.serverURL = serverURL;
         this.name = name;
-        String coreURL = serverURL + name;
+        String coreURL = getV1CoreURL();
         int connectionTimeout = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout");
         int socketTimeout = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "SolrClient.SocketTimeout");
 
@@ -130,6 +132,10 @@ public class MCRSolrCore {
         });
     }
 
+    public String getV1CoreURL() {
+        return this.serverURL + "solr/" + this.name;
+    }
+
     public synchronized void shutdown() {
         try {
             shutdownGracefully(solrClient);
@@ -159,6 +165,10 @@ public class MCRSolrCore {
      */
     public String getName() {
         return name;
+    }
+
+    public String getServerURL() {
+        return serverURL;
     }
 
     /**

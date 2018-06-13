@@ -60,7 +60,7 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
             idsInSet = Collections.emptySet();
             return;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
         QueryResponse response;
         try {
             response = solrClient.query(getQuery());

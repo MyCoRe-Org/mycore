@@ -28,27 +28,29 @@ public class MCRSolrConstants {
 
     public static final String SOLR_CONFIG_PREFIX = "MCR.Solr.";
 
-    public static final String SOLR_SERVER_URL;
+    // public static final String SOLR_SERVER_URL;
 
-    public static final String SOLR_CORE_MAIN = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "Core.main", null);
+    public static final String DEFAULT_SOLR_SERVER_URL = MCRConfiguration.instance().getString(
+        SOLR_CONFIG_PREFIX + "DefaultServer");
+
+    public static final String SOLR_CORE_PREFIX = SOLR_CONFIG_PREFIX + "Core.";
+
+    public static final String SOLR_CORE_NAME_SUFFIX = ".Name";
+
+    public static final String SOLR_CORE_SERVER_SUFFIX = ".Server";
 
     public static final String SOLR_QUERY_XML_PROTOCOL_VERSION = MCRConfiguration.instance().getString(
         SOLR_CONFIG_PREFIX + "XMLProtocolVersion");
 
-    public static final String SOLR_QUERY_PATH = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "SelectPath");
+    public static final String SOLR_QUERY_PATH = MCRConfiguration.instance()
+        .getString(SOLR_CONFIG_PREFIX + "SelectPath");
 
-    public static final String SOLR_EXTRACT_PATH = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "ExtractPath");
+    public static final String SOLR_EXTRACT_PATH = MCRConfiguration.instance()
+        .getString(SOLR_CONFIG_PREFIX + "ExtractPath");
 
-    public static final String SOLR_UPDATE_PATH = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "UpdatePath");
+    public static final String SOLR_UPDATE_PATH = MCRConfiguration.instance()
+        .getString(SOLR_CONFIG_PREFIX + "UpdatePath");
 
     public static final String SOLR_JOIN_PATTERN = "{!join from=returnId to=id}";
-
-    static {
-        String serverURL = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "ServerURL");
-        if (!serverURL.endsWith("/")) {
-            serverURL = serverURL += "/";
-        }
-        SOLR_SERVER_URL = serverURL;
-    }
 
 }

@@ -65,8 +65,6 @@ import org.mycore.util.concurrent.processing.MCRProcessableSupplier;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
-
 /**
  * Base class for indexing with solr.
  *
@@ -204,7 +202,7 @@ public class MCRSolrIndexer {
         if (!MCRSolrUtils.useNestedDocuments()) {
             return null;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
         return solrClient.deleteByQuery("-({!join from=id to=_root_}_root_:*) +_root_:*", 0);
     }
 
@@ -218,7 +216,7 @@ public class MCRSolrIndexer {
         if (solrIDs == null || solrIDs.length == 0) {
             return null;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
@@ -263,7 +261,7 @@ public class MCRSolrIndexer {
         if (id == null) {
             return null;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
@@ -330,7 +328,7 @@ public class MCRSolrIndexer {
      *            list of mycore object identifiers
      */
     public static void rebuildMetadataIndex(List<String> list) {
-        rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrDefaultClient());
+        rebuildMetadataIndex(list, MCRSolrClientFactory.getConcurrentSolrMainClient());
     }
 
     /**
@@ -387,7 +385,7 @@ public class MCRSolrIndexer {
      * Rebuilds solr's content index.
      */
     public static void rebuildContentIndex() {
-        rebuildContentIndex(MCRSolrClientFactory.getSolrDefaultClient(),
+        rebuildContentIndex(MCRSolrClientFactory.getSolrMainClient(),
             MCRXMLMetadataManager.instance().listIDsOfType("derivate"));
     }
 
@@ -403,7 +401,7 @@ public class MCRSolrIndexer {
      *            list of mycore object id's
      */
     public static void rebuildContentIndex(List<String> list) {
-        rebuildContentIndex(MCRSolrClientFactory.getSolrDefaultClient(), list);
+        rebuildContentIndex(MCRSolrClientFactory.getSolrMainClient(), list);
     }
 
     /**
@@ -417,7 +415,7 @@ public class MCRSolrIndexer {
      *            higher priority means earlier execution
      */
     public static void rebuildContentIndex(List<String> list, int priority) {
-        rebuildContentIndex(MCRSolrClientFactory.getSolrDefaultClient(), list, priority);
+        rebuildContentIndex(MCRSolrClientFactory.getSolrMainClient(), list, priority);
     }
 
     /**
@@ -518,7 +516,7 @@ public class MCRSolrIndexer {
      */
     public static void dropIndex() throws Exception {
         LOGGER.info("Dropping solr index...");
-        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
         solrClient.deleteByQuery("*:*", BATCH_AUTO_COMMIT_WITHIN_MS);
         LOGGER.info("Dropping solr index...done");
     }
@@ -531,7 +529,7 @@ public class MCRSolrIndexer {
 
         LOGGER.info("Dropping solr index for type {}...", type);
         String deleteQuery = MessageFormat.format("objectType:{0} _root_:*_{1}_*", type, type);
-        MCRSolrClientFactory.getSolrDefaultClient().deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
+        MCRSolrClientFactory.getSolrMainClient().deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
         LOGGER.info("Dropping solr index for type {}...done", type);
     }
 
@@ -572,7 +570,7 @@ public class MCRSolrIndexer {
         LOGGER.info("there are {} mycore objects", storeList.size());
         // get ids from solr
         LOGGER.info("fetching solr...");
-        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
         List<String> solrList = MCRSolrSearchUtils.listIDs(solrClient, "objectType:" + objectType);
         LOGGER.info("there are {} solr objects", solrList.size());
 

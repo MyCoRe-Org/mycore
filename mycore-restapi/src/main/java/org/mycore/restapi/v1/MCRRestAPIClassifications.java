@@ -486,7 +486,7 @@ public class MCRRestAPIClassifications {
     }
 
     private void filterNonEmpty(String classId, Element e) {
-        SolrClient solrClient = MCRSolrClientFactory.getSolrDefaultClient();
+        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
         for (int i = 0; i < e.getChildren("category").size(); i++) {
             Element cat = e.getChildren("category").get(i);
 

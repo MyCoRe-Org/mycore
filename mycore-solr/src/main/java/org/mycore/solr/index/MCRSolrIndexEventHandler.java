@@ -184,7 +184,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             try {
                 MCRSolrIndexer.submitIndexHandler(MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
-                    MCRSolrClientFactory.getSolrDefaultClient()), MCRSolrIndexer.HIGH_PRIORITY);
+                    MCRSolrClientFactory.getSolrMainClient()), MCRSolrIndexer.HIGH_PRIORITY);
             } catch (Exception ex) {
                 LOGGER.error("Error creating transfer thread for file {}", path, ex);
             }
