@@ -86,25 +86,6 @@ public class MCRSolrConfigReloader {
     private static List<String> CHECKED_CONFIG_OBJECTS = Arrays.asList("requesthandler", "searchcomponent",
         "queryresponsewriter", "updateprocessor", "listener");
 
-    public static void clearConfig(String coreName) {
-        LOGGER.info("Clear SOLR configuration of core " + coreName);
-        /* Check if it is possible or necessary to delete the comlete Solr base configuriation.
-         * 
-        try {
-            SolrClient solrClient = MCRSolrClientFactory.get(coreName).getClient();
-            
-            ConfigSetAdminRequest.List listConfigReq = new ConfigSetAdminRequest.List();
-            List<String> data = listConfigReq.process(solrClient).getConfigSets();
-            for(String s: data) {
-                LOGGER.info("ConfigSet "+ s);
-            }
-        } catch (IOException | SolrServerException e) {
-            LOGGER.error(e);
-        }
-        
-        */
-    }
-
     /**
      * This method modified the SOLR config definition based on all solr/{coreType}/solr-config.json 
      * in the MyCoRe-Maven modules resource path.

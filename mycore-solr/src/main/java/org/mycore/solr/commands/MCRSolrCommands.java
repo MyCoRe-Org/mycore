@@ -317,7 +317,6 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         }
         MCRSolrSchemaReloader.clearSchema(coreName);
         MCRSolrSchemaReloader.processSchemaFiles(coreName, coreType);
-        MCRSolrConfigReloader.clearConfig(coreName);
         MCRSolrConfigReloader.processConfigFiles(coreName, coreType);
     }
 
