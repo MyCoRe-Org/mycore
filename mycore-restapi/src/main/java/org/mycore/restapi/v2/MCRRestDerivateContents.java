@@ -385,7 +385,7 @@ public class MCRRestDerivateContents {
                 .entrySet()
                 .stream()
                 .map(e -> e.getValue().isDirectory() ? new Directory(e.getKey(), e.getValue())
-                    : new File(e.getKey(), e.getValue()))
+                    : new File(e.getKey(), e.getValue(), context.getMimeType(e.getKey().getFileName().toString())))
                 .sorted() //directories first, than sort for filename
                 .collect(Collectors.toList());
             dir.setEntries(entries);
@@ -454,6 +454,8 @@ public class MCRRestDerivateContents {
 
     private static class File extends DirectoryEntry {
 
+        private String mimeType;
+
         private String md5;
 
         private long size;
@@ -462,10 +464,11 @@ public class MCRRestDerivateContents {
             super();
         }
 
-        File(MCRPath p, MCRFileAttributes attr) {
+        File(MCRPath p, MCRFileAttributes attr, String mimeType) {
             super(p, attr);
             this.md5 = attr.md5sum();
             this.size = attr.size();
+            this.mimeType = mimeType;
         }
 
         @XmlAttribute
@@ -478,6 +481,12 @@ public class MCRRestDerivateContents {
         @JsonProperty(index = 1)
         public long getSize() {
             return size;
+        }
+
+        @XmlAttribute
+        @JsonProperty(index = 4)
+        public String getMimeType() {
+            return mimeType;
         }
     }
 
