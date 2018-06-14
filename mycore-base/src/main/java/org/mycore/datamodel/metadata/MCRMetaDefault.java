@@ -29,7 +29,12 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.language.MCRLanguageFactory;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.JsonObject;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * This class implements any methods for handling the basic data for all
@@ -39,6 +44,9 @@ import com.google.gson.JsonObject;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.PUBLIC_ONLY,
+    setterVisibility = JsonAutoDetect.Visibility.NONE)
 public abstract class MCRMetaDefault implements MCRMetaInterface {
     // public data
     public static final int DEFAULT_LANG_LENGTH = 12;
@@ -205,6 +213,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * 
      * @return the subtag
      */
+    @Schema(hidden = true)
+    @JsonIgnore
     public final String getSubTag() {
         return subtag;
     }
@@ -322,6 +332,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * 
      * @return a boolean value
      */
+    @JsonIgnore
     public boolean isValid() {
         try {
             validate();

@@ -26,13 +26,14 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.frontend.jersey.filter.MCRCacheFilter;
 import org.mycore.frontend.jersey.filter.MCRDBTransactionFilter;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 import org.mycore.frontend.jersey.filter.MCRSessionLockFilter;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 
 /**
- * Default feature for mycore. Does register a transaction, session and
+ * Default feature for mycore. Does register a cache, transaction, session and
  * access filter.
  * 
  * @author Matthias Eichner
@@ -46,6 +47,7 @@ public class MCRJerseyDefaultFeature extends MCRJerseyBaseFeature {
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         Class<?> resourceClass = resourceInfo.getResourceClass();
         Method resourceMethod = resourceInfo.getResourceMethod();
+        context.register(MCRCacheFilter.class);
         if (isStaticContent(resourceClass, resourceMethod)) {
             // class or method is annotated with MCRStaticContent
             //   -> do only register session lock filter

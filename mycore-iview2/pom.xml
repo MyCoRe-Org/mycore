@@ -22,11 +22,6 @@
       <artifactId>guice</artifactId>
     </dependency>
     <dependency>
-      <!-- needed for some PDF documents -->
-      <groupId>com.levigo.jbig2</groupId>
-      <artifactId>levigo-jbig2-imageio</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -53,6 +48,11 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <!-- needed for some PDF documents -->
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>jbig2-imageio</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.pdfbox</groupId>

@@ -46,6 +46,8 @@ public class MCRStartupHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static boolean isWebApp;
+
     public interface AutoExecutable {
         /**
          * returns a name to display on start-up.
@@ -67,6 +69,7 @@ public class MCRStartupHandler {
         //setup configuration
         MCRConfigurationDirSetup dirSetup = new MCRConfigurationDirSetup();
         dirSetup.startUp(servletContext);
+        isWebApp = servletContext != null;
         LOGGER.info("I have these components for you: {}", MCRRuntimeComponentDetector.getAllComponents());
         LOGGER.info("I have these mycore components for you: {}", MCRRuntimeComponentDetector.getMyCoReComponents());
         LOGGER.info("I have these app modules for you: {}", MCRRuntimeComponentDetector.getApplicationModules());
@@ -81,6 +84,10 @@ public class MCRStartupHandler {
             .forEachOrdered(autoExecutable -> startExecutable(servletContext, autoExecutable));
         //initialize MCRURIResolver
         MCRURIResolver.init(servletContext);
+    }
+
+    public static boolean isWebApp() {
+        return isWebApp;
     }
 
     private static void startExecutable(ServletContext servletContext, AutoExecutable autoExecutable) {

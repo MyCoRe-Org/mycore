@@ -18,65 +18,57 @@
 
 package org.mycore.restapi.v1;
 
-import java.nio.charset.StandardCharsets;
-import java.security.interfaces.RSAPublicKey;
-import java.util.Base64;
-import java.util.Collections;
+import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.restapi.v1.errors.MCRRestAPIError;
-import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
-import org.mycore.user2.MCRUserManager;
+import org.mycore.frontend.jersey.MCRCacheControl;
+import org.mycore.frontend.jersey.MCRJWTUtil;
+import org.mycore.frontend.jersey.MCRJerseyUtil;
+import org.mycore.frontend.jersey.access.MCRRequireLogin;
+import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
+import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
 
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jwt.SignedJWT;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 
 /**
  * Rest Controller that handles authentication.
- * 
+ *
+ * @author Thomas Scheffler
  * @author Robert Stephan
  *
  */
-@Path("/v1/auth")
+@Path("/auth")
 public class MCRRestAPIAuthentication {
-    private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIAuthentication.class);
 
-    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
+    private static final int EXPIRATION_TIME_MINUTES = 10;
 
-    private static final String HEADER_PREFIX_BEARER = "Bearer ";
+    public static final String AUDIENCE = "mcr:rest-auth";
 
-    /**
-     * @return the server public key as Java Web Token
-     */
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response initAuthorization() {
-        SignedJWT jwt = MCRJSONWebTokenUtil.createEmptyJWTwithPublicKey("http:/localhost:8080");
-        String msg = "{" + "\n    \"access_token\": \"" + jwt + "\"," + "\n}";
+    @Context
+    HttpServletRequest req;
 
-        return Response.ok(msg).type("application/json; charset=UTF-8")
-            .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
-    }
+    @Context
+    Application app;
 
     /**
-     * Validation: https://jwt.io/ Public Key: http://localhost:8080/api/v1/auth/public_key.txt
-     *
      * Unauthenticated requests should return a response whose header contains a HTTP 401 Unauthorized status and a
      * WWW-Authenticate field.
      * 
@@ -89,92 +81,68 @@ public class MCRRestAPIAuthentication {
      * the response, which is unusual but not strictly forbidden.
      * 
      * @param authorization - content HTTP Header Authorization
+     * @throws IOException if JWT cannot be written
      * @return response message as JSON
      */
-    @POST
-    @Produces({ MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @GET
+    @Produces({ MCRJerseyUtil.APPLICATION_JSON_UTF8 })
     @Path("/login")
-    public Response authorize(@DefaultValue("") @HeaderParam("Authorization") String authorization) {
-        String username = null;
-        String password = null;
-        JWK clientPubKey = null;
-        String userPwd = null;
+    @MCRCacheControl(noTransform = true,
+        noStore = true,
+        private_ = @MCRCacheControl.FieldArgument(active = true),
+        noCache = @MCRCacheControl.FieldArgument(active = true))
+    public Response authorize(@DefaultValue("") @HeaderParam("Authorization") String authorization) throws IOException {
         if (authorization.startsWith("Basic ")) {
-            byte[] encodedAuth = authorization.substring(6).trim().getBytes(StandardCharsets.ISO_8859_1);
-            userPwd = new String(Base64.getDecoder().decode(encodedAuth), StandardCharsets.ISO_8859_1);
-
-        }
-        if (authorization.startsWith(HEADER_PREFIX_BEARER)) {
-            userPwd = MCRJSONWebTokenUtil.retrieveUsernamePasswordFromLoginToken(authorization.substring(7).trim());
-            clientPubKey = MCRJSONWebTokenUtil.retrievePublicKeyFromLoginToken(authorization.substring(7).trim());
-        }
-
-        if (userPwd != null && userPwd.contains(":")) {
-            int splitPos = userPwd.indexOf(":");
-            username = userPwd.substring(0, splitPos);
-            password = userPwd.substring(splitPos + 1);
-        }
-        //validate username and password
-        if (username != null && password != null && MCRUserManager.checkPassword(username, password) != null) {
-            SignedJWT jwt = MCRJSONWebTokenUtil.createJWT(username, Collections.singletonList("restapi"),
-                MCRFrontendUtil.getBaseURL(), clientPubKey);
-            if (jwt != null) {
-                String msg = "{" + "\n    \"login_successful\":true," + "\n    \"access_token\": \"" + jwt.serialize()
-                    + "\","
-                    + "\n    \"token_type\": \"Bearer\"" + "\n}";
-
-                return Response.ok(msg).type("application/json; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, HEADER_PREFIX_BEARER + jwt.serialize()).build();
+            //login handled by MCRSessionFilter
+            Optional<String> jwt = getToken(MCRSessionMgr.getCurrentSession().getUserInformation(),
+                MCRFrontendUtil.getRemoteAddr(req));
+            if (jwt.isPresent()) {
+                return MCRJWTUtil.getJWTLoginSuccessResponse(jwt.get());
             }
         }
+        throw new NotAuthorizedException(
+            "Login failed. Please provide proper user name and password via HTTP Basic Authentication.",
+            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null, app));
+    }
 
-        String msg = "{" + "\n    \"login_successful\":false," + "\n    \"error\": \"login_failed\""
-            + "\n    \"error_description\": "
-            + "\"Login failed. Please provider proper user name and password via HTTP Basic Authentication.\"" + "\n}";
-
-        return Response.status(Status.FORBIDDEN).header("WWW-Authenticate", "Basic realm=\"MyCoRe REST API\"")
-            .entity(msg).type("application/json; charset=UTF-8").build();
+    public static Optional<String> getToken(MCRUserInformation userInformation, String remoteIp) {
+        ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
+        return Optional.ofNullable(userInformation)
+            .map(MCRJWTUtil::getJWTBuilder)
+            .map(b -> {
+                return b.withAudience(AUDIENCE)
+                    .withClaim(MCRJWTUtil.JWT_CLAIM_IP, remoteIp)
+                    .withExpiresAt(Date.from(currentTime.plusMinutes(EXPIRATION_TIME_MINUTES).toInstant()))
+                    .withNotBefore(Date.from(currentTime.minusMinutes(EXPIRATION_TIME_MINUTES).toInstant()))
+                    .sign(MCRJWTUtil.getJWTAlgorithm());
+            });
     }
 
     @GET
-    @Path("/public_key.jwk")
-    public Response sendPublicKey() {
-        JWK jwk = new RSAKey.Builder((RSAPublicKey) MCRJSONWebTokenUtil.RSA_KEYS.getPublic()).build();
-        return Response.ok(jwk.toJSONString()).type("application/json; charset=UTF-8").build();
-    }
-
-    @GET
-    @Path("/api/v1/auth/public_key.txt")
-    public Response sendPublicKeyasText() {
-        String txt = "-----BEGIN PUBLIC KEY-----\n"
-            + Base64.getEncoder().encodeToString(MCRJSONWebTokenUtil.RSA_KEYS.getPublic().getEncoded())
-            + "\n-----END PUBLIC KEY-----";
-        return Response.ok(txt).type("text/plain; charset=UTF-8").build();
-    }
-
-    @POST
     @Path("/renew")
-    public Response renew(@DefaultValue("") String data, @Context HttpServletRequest request)
-        throws MCRRestAPIException {
-        try {
-            String authHeader = MCRJSONWebTokenUtil
-                .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
-            if (authHeader != null) {
-                String msg = "{" + "\n    \"executed\":true," + "\n    \"access_token\": \"" + authHeader.replace(
-                    HEADER_PREFIX_BEARER, "") + "\"," + "\n    \"token_type\": \"Bearer\"," + "\n    \"data\": \""
-                    + data + "\"," + "\n}";
-
-                return Response.ok(msg).type("application/json; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+    @MCRRestrictedAccess(MCRRequireLogin.class)
+    @MCRCacheControl(noTransform = true,
+        noStore = true,
+        private_ = @MCRCacheControl.FieldArgument(active = true),
+        noCache = @MCRCacheControl.FieldArgument(active = true))
+    public Response renew(@DefaultValue("") @HeaderParam("Authorization") String authorization) throws IOException {
+        if (authorization.startsWith("Bearer ")) {
+            //login handled by MCRSessionFilter
+            Optional<String> jwt = getToken(MCRSessionMgr.getCurrentSession().getUserInformation(),
+                MCRFrontendUtil.getRemoteAddr(req));
+            if (jwt.isPresent()) {
+                return MCRJWTUtil.getJWTRenewSuccessResponse(jwt.get());
             }
-        } catch (MCRRestAPIException rae) {
-            throw rae;
-        } catch (Exception e) {
-            LOGGER.error(e);
-            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
-                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Session cannot be renewed!", e.getMessage()));
         }
-        throw new MCRRestAPIException(Status.FORBIDDEN, new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_AUTHENCATION,
-            "Permission denied", "Please provide a valid JWT Token for the session."));
+        throw new NotAuthorizedException(
+            "Login failed. Please provide a valid JSON Web Token for authentication.",
+            MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null, app));
+    }
+
+    public static void validate(String token) throws JWTVerificationException {
+        JWT.require(MCRJWTUtil.getJWTAlgorithm())
+            .withAudience(AUDIENCE)
+            .acceptLeeway(0)
+            .build().verify(token);
     }
 }

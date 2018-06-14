@@ -17,7 +17,6 @@
  */
 package org.mycore.restapi.v1.utils;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.BufferedInputStream;
@@ -29,8 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.security.Signature;
-import java.util.Base64;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
@@ -51,9 +48,6 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
@@ -66,21 +60,11 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRObjectCommands;
-import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.user2.MCRUserManager;
-
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jwt.SignedJWT;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
-
-    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
-
-    public static final String FORMAT_XML = "xml";
 
     private static java.nio.file.Path UPLOAD_DIR = Paths
         .get(MCRConfiguration.instance().getString("MCR.RestAPI.v1.Upload.Directory"));
@@ -110,9 +94,8 @@ public class MCRRestAPIUploadHelper {
     public static Response uploadObject(UriInfo info, HttpServletRequest request, InputStream uploadedInputStream,
         FormDataContentDisposition fileDetails) throws MCRRestAPIException {
 
-        SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
         java.nio.file.Path fXML = null;
-        try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
+        try {
             SAXBuilder sb = new SAXBuilder();
             Document docOut = sb.build(uploadedInputStream);
 
@@ -130,18 +113,11 @@ public class MCRRestAPIUploadHelper {
                 xmlOut.output(docOut, bw);
             }
 
-            MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-            MCRUserInformation currentUser = mcrSession.getUserInformation();
-            MCRUserInformation apiUser = MCRUserManager
-                .getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT));
-            mcrSession.setUserInformation(apiUser);
             MCRObjectCommands.updateFromFile(fXML.toString(), false); // handles "create" as well
-            mcrSession.setUserInformation(currentUser);
 
             return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID).build())
                 .type("application/xml; charset=UTF-8")
-                .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
-
+                .build();
         } catch (Exception e) {
             LOGGER.error("Unable to Upload file: {}", String.valueOf(fXML), e);
             throw new MCRRestAPIException(Status.BAD_REQUEST, new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
@@ -171,17 +147,10 @@ public class MCRRestAPIUploadHelper {
         boolean overwriteOnExistingLabel) throws MCRRestAPIException {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
-        SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
         //  File fXML = null;
         MCRObjectID mcrObjIDObj = MCRObjectID.getInstance(mcrObjID);
 
-        try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
-            MCRSession session = MCRServlet.getSession(request);
-            MCRUserInformation currentUser = session.getUserInformation();
-            MCRUserInformation apiUser = MCRUserManager
-                .getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT));
-            session.setUserInformation(apiUser);
-
+        try {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjIDObj);
             MCRObjectID derID = null;
             if (overwriteOnExistingLabel) {
@@ -210,8 +179,7 @@ public class MCRRestAPIUploadHelper {
             response = Response
                 .created(info.getBaseUriBuilder().path("v1/objects/" + mcrObjID + "/derivates/" + derID).build())
                 .type("application/xml; charset=UTF-8")
-                .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT)).build();
-            session.setUserInformation(currentUser);
+                .build();
         } catch (Exception e) {
             LOGGER.error("Exeption while uploading derivate", e);
         }
@@ -239,7 +207,6 @@ public class MCRRestAPIUploadHelper {
         String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5, Long formParamSize)
         throws MCRRestAPIException {
 
-        SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
         SortedMap<String, String> parameter = new TreeMap<>();
         parameter.put("mcrObjectID", pathParamMcrObjID);
         parameter.put("mcrDerivateID", pathParamMcrDerID);
@@ -249,108 +216,86 @@ public class MCRRestAPIUploadHelper {
         parameter.put("md5", formParamMD5);
         parameter.put("size", Long.toString(formParamSize));
 
-        String base64Signature = request.getHeader("X-MyCoRe-RestAPI-Signature");
-        if (base64Signature == null) {
-            throw new MCRRestAPIException(Status.UNAUTHORIZED,
-                new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_AUTHENCATION,
-                    "The submitted data could not be validated.",
-                    "Please provide a signature as HTTP header 'X-MyCoRe-RestAPI-Signature'."));
+        MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
+        MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
+
+        if (!MCRAccessManager.checkPermission(derID.toString(), PERMISSION_WRITE)) {
+            throw new MCRRestAPIException(Status.FORBIDDEN,
+                new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "Could not add file to derivate",
+                    "You do not have the permission to write to " + derID));
         }
-        if (verifyPropertiesWithSignature(parameter, base64Signature,
-            MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT))) {
-            try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
-                //MCRSession session = MCRServlet.getSession(request);
-                MCRSession session = MCRSessionMgr.getCurrentSession();
-                MCRUserInformation currentUser = session.getUserInformation();
+        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
-                MCRUserInformation apiUser = MCRUserManager
-                    .getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT));
-                session.setUserInformation(apiUser);
-                MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
-                MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
+        java.nio.file.Path derDir = null;
 
-                MCRAccessManager.invalidPermissionCache(derID.toString(), PERMISSION_WRITE);
-                if (MCRAccessManager.checkPermission(derID.toString(), PERMISSION_WRITE)) {
+        String path = null;
+        if (!der.getOwnerID().equals(objID)) {
+            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Derivate object mismatch",
+                    "Derivate " + derID + " belongs to a different object: " + objID));
+        }
+        try {
+            derDir = UPLOAD_DIR.resolve(derID.toString());
+            if (Files.exists(derDir)) {
+                Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
+            }
+            path = formParamPath.replace("\\", "/").replace("../", "");
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
 
-                    MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
+            MCRDirectory difs = MCRDirectory.getRootDirectory(derID.toString());
+            if (difs == null) {
+                difs = new MCRDirectory(derID.toString());
+            }
 
-                    java.nio.file.Path derDir = null;
+            der.getDerivate().getInternals().setIFSID(difs.getID());
+            der.getDerivate().getInternals().setSourcePath(derDir.toString());
 
-                    String path = null;
-                    if (der.getOwnerID().equals(objID)) {
-                        try {
-                            derDir = UPLOAD_DIR.resolve(derID.toString());
-                            if (Files.exists(derDir)) {
-                                Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
-                            }
-                            path = formParamPath.replace("\\", "/").replace("../", "");
-                            while (path.startsWith("/")) {
-                                path = path.substring(1);
-                            }
-
-                            MCRDirectory difs = MCRDirectory.getRootDirectory(derID.toString());
-                            if (difs == null) {
-                                difs = new MCRDirectory(derID.toString());
-                            }
-
-                            der.getDerivate().getInternals().setIFSID(difs.getID());
-                            der.getDerivate().getInternals().setSourcePath(derDir.toString());
-
-                            if (formParamUnzip) {
-                                String maindoc = null;
-                                try (ZipInputStream zis = new ZipInputStream(
-                                    new BufferedInputStream(uploadedInputStream))) {
-                                    ZipEntry entry;
-                                    while ((entry = zis.getNextEntry()) != null) {
-                                        LOGGER.debug("Unzipping: {}", entry.getName());
-                                        java.nio.file.Path target = derDir.resolve(entry.getName());
-                                        Files.createDirectories(target.getParent());
-                                        Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
-                                        if (maindoc == null && !entry.isDirectory()) {
-                                            maindoc = entry.getName();
-                                        }
-                                    }
-                                } catch (IOException e) {
-                                    LOGGER.error(e);
-                                }
-
-                                MCRFileImportExport.importFiles(derDir.toFile(), difs);
-
-                                if (formParamMaindoc) {
-                                    der.getDerivate().getInternals().setMainDoc(maindoc);
-                                }
-                            } else {
-                                java.nio.file.Path saveFile = derDir.resolve(path);
-                                Files.createDirectories(saveFile.getParent());
-                                Files.copy(uploadedInputStream, saveFile, StandardCopyOption.REPLACE_EXISTING);
-                                //delete old file
-                                MCRFileImportExport.importFiles(derDir.toFile(), difs);
-                                if (formParamMaindoc) {
-                                    der.getDerivate().getInternals().setMainDoc(path);
-                                }
-                            }
-
-                            MCRMetadataManager.update(der);
-                            Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
-                        } catch (IOException | MCRPersistenceException | MCRAccessException e) {
-                            LOGGER.error(e);
-                            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
-                                MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
+            if (formParamUnzip) {
+                String maindoc = null;
+                try (ZipInputStream zis = new ZipInputStream(
+                    new BufferedInputStream(uploadedInputStream))) {
+                    ZipEntry entry;
+                    while ((entry = zis.getNextEntry()) != null) {
+                        LOGGER.debug("Unzipping: {}", entry.getName());
+                        java.nio.file.Path target = derDir.resolve(entry.getName());
+                        Files.createDirectories(target.getParent());
+                        Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
+                        if (maindoc == null && !entry.isDirectory()) {
+                            maindoc = entry.getName();
                         }
                     }
-                    session.setUserInformation(currentUser);
-                    return Response
-                        .created(info.getBaseUriBuilder()
-                            .path("v1/objects/" + objID + "/derivates/" + derID + "/contents")
-                            .build())
-                        .type("application/xml; charset=UTF-8")
-                        .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
-                        .build();
+                } catch (IOException e) {
+                    LOGGER.error(e);
+                }
+
+                MCRFileImportExport.importFiles(derDir.toFile(), difs);
+
+                if (formParamMaindoc) {
+                    der.getDerivate().getInternals().setMainDoc(maindoc);
+                }
+            } else {
+                java.nio.file.Path saveFile = derDir.resolve(path);
+                Files.createDirectories(saveFile.getParent());
+                Files.copy(uploadedInputStream, saveFile, StandardCopyOption.REPLACE_EXISTING);
+                //delete old file
+                MCRFileImportExport.importFiles(derDir.toFile(), difs);
+                if (formParamMaindoc) {
+                    der.getDerivate().getInternals().setMainDoc(path);
                 }
             }
+
+            MCRMetadataManager.update(der);
+            Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
+        } catch (IOException | MCRPersistenceException | MCRAccessException e) {
+            LOGGER.error(e);
+            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
+                MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
         }
-        throw new MCRRestAPIException(Status.FORBIDDEN, new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_DATA,
-            "File upload failed.", "The submitted data could not be validated."));
+        return Response
+            .created(info.getBaseUriBuilder().path("v1/objects/" + objID + "/derivates/" + derID + "/contents").build())
+            .type("application/xml; charset=UTF-8").build();
     }
 
     /**
@@ -365,57 +310,33 @@ public class MCRRestAPIUploadHelper {
     public static Response deleteAllFiles(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) throws MCRRestAPIException {
 
-        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-
-        SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
         SortedMap<String, String> parameter = new TreeMap<>();
         parameter.put("mcrObjectID", pathParamMcrObjID);
         parameter.put("mcrDerivateID", pathParamMcrDerID);
 
-        String base64Signature = request.getHeader("X-MyCoRe-RestAPI-Signature");
-        if (base64Signature == null) {
-            //ToDo error handling
-        }
-        if (verifyPropertiesWithSignature(parameter, base64Signature,
-            MCRJSONWebTokenUtil.retrievePublicKeyFromAuthenticationToken(signedJWT))) {
-            try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
-                //MCRSession session = MCRServlet.getSession(request);
-                MCRSession session = MCRSessionMgr.getCurrentSession();
-                MCRUserInformation currentUser = session.getUserInformation();
-                MCRUserInformation apiUser = MCRUserManager
-                    .getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT));
-                session.setUserInformation(apiUser);
-                MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
-                MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
+        MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
+        MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
-                //MCRAccessManager.checkPermission uses CACHE, which seems to be dirty from other calls
-                MCRAccessManager.invalidPermissionCache(derID.toString(), PERMISSION_WRITE);
-                if (MCRAccessManager.checkPermission(derID.toString(), PERMISSION_WRITE)) {
-                    MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
+        //MCRAccessManager.checkPermission uses CACHE, which seems to be dirty from other calls
+        MCRAccessManager.invalidPermissionCache(derID.toString(), PERMISSION_WRITE);
+        if (MCRAccessManager.checkPermission(derID.toString(), PERMISSION_WRITE)) {
+            MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derID);
 
-                    final MCRPath rootPath = MCRPath.getPath(der.getId().toString(), "/");
-                    try {
-                        Files.walkFileTree(rootPath, MCRRecursiveDeleter.instance());
-                        Files.createDirectory(rootPath);
-                    } catch (IOException e) {
-                        LOGGER.error(e);
-                    }
-                }
-
-                session.setUserInformation(currentUser);
-                response = Response
-                    .created(info.getBaseUriBuilder()
-                        .path("v1/objects/" + objID + "/derivates/" + derID + "/contents")
-                        .build())
-                    .type("application/xml; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
-                    .build();
+            final MCRPath rootPath = MCRPath.getPath(der.getId().toString(), "/");
+            try {
+                Files.walkFileTree(rootPath, MCRRecursiveDeleter.instance());
+                Files.createDirectory(rootPath);
+            } catch (IOException e) {
+                LOGGER.error(e);
             }
-        } else {
-            throw new MCRRestAPIException(Status.FORBIDDEN, new MCRRestAPIError(MCRRestAPIError.CODE_INVALID_DATA,
-                "Delete failed.", "The submitted data could not be validated."));
         }
-        return response;
+
+        return Response
+            .created(info.getBaseUriBuilder()
+                .path("v1/objects/" + objID + "/derivates/" + derID + "/contents")
+                .build())
+            .type("application/xml; charset=UTF-8")
+            .build();
     }
 
     /**
@@ -430,42 +351,19 @@ public class MCRRestAPIUploadHelper {
     public static Response deleteDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) throws MCRRestAPIException {
 
-        Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
-
-        SignedJWT signedJWT = MCRJSONWebTokenUtil.retrieveAuthenticationToken(request);
-
-        String base64Signature = request.getHeader("X-MyCoRe-RestAPI-Signature");
-        if (base64Signature == null) {
-            //ToDo error handling
-        }
-        try (MCRJPATransactionWrapper mtw = new MCRJPATransactionWrapper()) {
-            //MCRSession session = MCRServlet.getSession(request);
-            MCRSession session = MCRSessionMgr.getCurrentSession();
-            MCRUserInformation currentUser = session.getUserInformation();
-            session.setUserInformation(
-                MCRUserManager.getUser(MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(signedJWT)));
             MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
             MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
-            //MCRAccessManager.checkPermission() uses CACHE, which seems to be dirty from other calls????
-            MCRAccessManager.invalidPermissionCache(derID.toString(), PERMISSION_DELETE);
-            if (MCRAccessManager.checkPermission(derID.toString(), PERMISSION_DELETE)) {
-                try {
-                    MCRMetadataManager.deleteMCRDerivate(derID);
-                } catch (MCRPersistenceException pe) {
-                    //dir does not exist - do nothing
-                } catch (MCRAccessException e) {
-                    LOGGER.error(e);
-                }
-            }
-            session.setUserInformation(currentUser);
-            response = Response
+        try {
+            MCRMetadataManager.deleteMCRDerivate(derID);
+            return Response
                 .created(info.getBaseUriBuilder().path("v1/objects/" + objID + "/derivates").build())
-                .type("application/xml; charset=UTF-8").header(HEADER_NAME_AUTHORIZATION,
-                    MCRJSONWebTokenUtil.createJWTAuthorizationHeader(signedJWT))
+                .type("application/xml; charset=UTF-8")
                 .build();
+        } catch (MCRAccessException e) {
+            throw new MCRRestAPIException(Status.FORBIDDEN,
+                new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "Could not delete derivate", e.getMessage()));
         }
-        return response;
     }
 
     /**
@@ -489,27 +387,4 @@ public class MCRRestAPIUploadHelper {
         return result;
     }
 
-    /**
-     * verifies a set of Properties against a signature and and a public key
-     * @param data - the data a sorted Map of Strings
-     * @param base64Signature - the signature
-     * @param jwk -the public key
-     * @return true, if the properties match the signature
-     */
-    public static boolean verifyPropertiesWithSignature(SortedMap<String, String> data, String base64Signature,
-        JWK jwk) {
-        try {
-            String message = generateMessagesFromProperties(data);
-
-            Signature signature = Signature.getInstance("SHA1withRSA");
-            signature.initVerify(((RSAKey) jwk).toRSAPublicKey());
-            signature.update(message.getBytes(StandardCharsets.ISO_8859_1));
-
-            return signature.verify(Base64.getDecoder().decode(base64Signature));
-
-        } catch (Exception e) {
-            LOGGER.error(e);
-        }
-        return false;
-    }
 }

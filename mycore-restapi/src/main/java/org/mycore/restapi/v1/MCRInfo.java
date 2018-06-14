@@ -28,7 +28,7 @@ import javax.ws.rs.core.MediaType;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.frontend.jersey.MCRStaticContent;
 
-@Path("/v1/mycore")
+@Path("/mycore")
 @MCRStaticContent
 public class MCRInfo {
 

@@ -20,8 +20,9 @@ package org.mycore.restapi.v1;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -41,6 +42,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -54,11 +56,10 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
+import org.mycore.frontend.jersey.MCRCacheControl;
+import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
-import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
-import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 
@@ -71,12 +72,8 @@ import com.google.gson.stream.JsonWriter;
  *
  * @version $Revision: $ $Date: $
  */
-@Path("/v1/classifications")
+@Path("/classifications")
 public class MCRRestAPIClassifications {
-
-    private static Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
-
-    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
 
     public static final String FORMAT_JSON = "json";
 
@@ -84,188 +81,12 @@ public class MCRRestAPIClassifications {
 
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
-    /**
-     * lists all available classifications as XML or JSON
-     * 
-     * @param info - the URIInfo object
-     * @param request - the HTTPServletRequest object
-     * @param format - the output format ('xml' or 'json)
-     * @return a Jersey Response Object
-     * @throws MCRRestAPIException
-     */
-    @GET
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response listClassifications(@Context UriInfo info, @Context HttpServletRequest request,
-        @QueryParam("format") @DefaultValue("json") String format) throws MCRRestAPIException {
-        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/classifications");
+    private static Logger LOGGER = LogManager.getLogger(MCRRestAPIClassifications.class);
 
-        String authHeader = MCRJSONWebTokenUtil
-            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
-        if (FORMAT_XML.equals(format)) {
-            StringWriter sw = new StringWriter();
+    @Context
+    ContainerRequest request;
 
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            Document docOut = new Document();
-            Element eRoot = new Element("mycoreclassifications");
-            docOut.setRootElement(eRoot);
-
-            for (MCRCategory cat : DAO.getRootCategories()) {
-                eRoot.addContent(new Element("mycoreclass").setAttribute("ID", cat.getId().getRootID()).setAttribute(
-                    "href", info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString()));
-            }
-            try {
-                xout.output(docOut, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
-            } catch (IOException e) {
-                //ToDo
-            }
-        }
-
-        if (FORMAT_JSON.equals(format)) {
-            StringWriter sw = new StringWriter();
-            try {
-                JsonWriter writer = new JsonWriter(sw);
-                writer.setIndent("    ");
-                writer.beginObject();
-                writer.name("mycoreclass");
-                writer.beginArray();
-                for (MCRCategory cat : DAO.getRootCategories()) {
-                    writer.beginObject();
-                    writer.name("ID").value(cat.getId().getRootID());
-                    writer.name("href")
-                        .value(info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString());
-                    writer.endObject();
-                }
-                writer.endArray();
-                writer.endObject();
-
-                writer.close();
-
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
-            } catch (IOException e) {
-                //toDo
-            }
-        }
-        return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    /**
-     *  returns a single classification object
-     *
-     * @param classID - the classfication id
-     * @param format
-     *   Possible values are: json | xml (required)
-     * @param filter
-     * 	 a ';'-separated list of ':'-separated key-value pairs, possible keys are:
-     *      - lang - the language of the returned labels, if ommited all labels in all languages will be returned
-     *      - root - an id for a category which will be used as root
-     *      - nonempty - hide empty categories
-     * @param style
-     * 	a ';'-separated list of values, possible keys are:
-     *   	- 'checkboxtree' - create a json syntax which can be used as input for a dojo checkboxtree;
-     *      - 'checked'   - (together with 'checkboxtree') all checkboxed will be checked
-     *      - 'jstree' - create a json syntax which can be used as input for a jsTree
-     *      - 'opened' - (together with 'jstree') - all nodes will be opened
-     *      - 'disabled' - (together with 'jstree') - all nodes will be disabled
-     *      - 'selected' - (together with 'jstree') - all nodes will be selected
-     * @param request - the HTTPServletRequestObject
-     * @param callback - used in JSONP to wrap json result into a Javascript function named by callback parameter
-     * @return a Jersey Response object
-     * @throws MCRRestAPIException
-     */
-    @GET
-    //@Path("/id/{value}{format:(\\.[^/]+?)?}")  -> working, but returns empty string instead of default value
-    @Path("/{classID}")
-    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    public Response showObject(@Context HttpServletRequest request, @PathParam("classID") String classID,
-        @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") @DefaultValue("") String filter,
-        @QueryParam("style") @DefaultValue("") String style, @QueryParam("callback") @DefaultValue("") String callback)
-        throws MCRRestAPIException {
-        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/classifications");
-        String rootCateg = null;
-        String lang = null;
-        boolean filterNonEmpty = false;
-        boolean filterNoChildren = false;
-
-        for (String f : filter.split(";")) {
-            if (f.startsWith("root:")) {
-                rootCateg = f.substring(5);
-            }
-            if (f.startsWith("lang:")) {
-                lang = f.substring(5);
-            }
-            if (f.startsWith("nonempty")) {
-                filterNonEmpty = true;
-            }
-            if (f.startsWith("nochildren")) {
-                filterNoChildren = true;
-            }
-        }
-
-        if (format == null || classID == null) {
-            return Response.serverError().status(Status.BAD_REQUEST).build();
-            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, 
-            //        "Please specify parameters format and classid.");
-        }
-        try {
-            MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
-            if (cl == null) {
-                throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
-                    new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
-                        "There is no classification with the given ID."));
-            }
-            Document docClass = MCRCategoryTransformer.getMetaDataDocument(cl, false);
-            Element eRoot = docClass.getRootElement();
-            if (rootCateg != null) {
-                XPathExpression<Element> xpe = XPathFactory.instance().compile("//category[@ID='" + rootCateg + "']",
-                    Filters.element());
-                Element e = xpe.evaluateFirst(docClass);
-                if (e != null) {
-                    eRoot = e;
-                } else {
-                    throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
-                        new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Category not found.",
-                            "The classfication does not contain a category with the given ID."));
-                }
-            }
-            if (filterNonEmpty) {
-                Element eFilter = eRoot;
-                if (eFilter.getName().equals("mycoreclass")) {
-                    eFilter = eFilter.getChild("categories");
-                }
-                filterNonEmpty(docClass.getRootElement().getAttributeValue("ID"), eFilter);
-            }
-            if (filterNoChildren) {
-                eRoot.removeChildren("category");
-            }
-
-            String authHeader = MCRJSONWebTokenUtil
-                .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
-            if (FORMAT_JSON.equals(format)) {
-                String json = writeJSON(eRoot, lang, style);
-                //eventually: allow Cross Site Requests: .header("Access-Control-Allow-Origin", "*")
-                if (callback.length() > 0) {
-                    return Response.ok(callback + "(" + json + ")").type("application/javascript; charset=UTF-8")
-                        .build();
-                } else {
-                    return Response.ok(json).type("application/json; charset=UTF-8")
-                        .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
-                }
-            }
-
-            if (FORMAT_XML.equals(format)) {
-                String xml = writeXML(eRoot, lang);
-                return Response.ok(xml).type("application/xml; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
-            }
-        } catch (Exception e) {
-            LogManager.getLogger(this.getClass()).error("Error outputting classification", e);
-            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error outputting classification");
-        }
-        return null;
-    }
+    private Date lastModified = new Date(DAO.getLastModified());
 
     /**
      * Output xml
@@ -287,69 +108,6 @@ public class MCRRestAPIClassifications {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         Document docOut = new Document(eRoot.detach());
         xout.output(docOut, sw);
-        return sw.toString();
-    }
-
-    /**
-     * Output JSON
-     * @param eRoot - the category element
-     * @param lang - the language to be filtered for or null if all languages should be displayed
-     * @param style - the style
-     * @return a string representation of a JSON object
-     * @throws IOException
-     */
-    private String writeJSON(Element eRoot, String lang, String style) throws IOException {
-        StringWriter sw = new StringWriter();
-        JsonWriter writer = new JsonWriter(sw);
-        writer.setIndent("  ");
-        if (style.contains("checkboxtree")) {
-            if (lang == null) {
-                lang = "de";
-            }
-            writer.beginObject();
-            writer.name("identifier").value(eRoot.getAttributeValue("ID"));
-            for (Element eLabel : eRoot.getChildren("label")) {
-                if (lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writer.name("label").value(eLabel.getAttributeValue("text"));
-                }
-            }
-            writer.name("items");
-
-            writeChildrenAsJSONCBTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("checked"));
-            writer.endObject();
-        } else if (style.contains("jstree")) {
-            if (lang == null) {
-                lang = "de";
-            }
-            writeChildrenAsJSONJSTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("opened"),
-                style.contains("disabled"), style.contains("selected"));
-        } else {
-            writer.beginObject(); // {
-            writer.name("ID").value(eRoot.getAttributeValue("ID"));
-            writer.name("label");
-            writer.beginArray();
-            for (Element eLabel : eRoot.getChildren("label")) {
-                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
-                    writer.beginObject();
-                    writer.name("lang").value(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE));
-                    writer.name("text").value(eLabel.getAttributeValue("text"));
-                    if (eLabel.getAttributeValue("description") != null) {
-                        writer.name("description").value(eLabel.getAttributeValue("description"));
-                    }
-                    writer.endObject();
-                }
-            }
-            writer.endArray();
-
-            if (eRoot.equals(eRoot.getDocument().getRootElement())) {
-                writeChildrenAsJSON(eRoot.getChild("categories"), writer, lang);
-            } else {
-                writeChildrenAsJSON(eRoot, writer, lang);
-            }
-
-            writer.endObject();
-        }
-        writer.close();
         return sw.toString();
     }
 
@@ -468,6 +226,265 @@ public class MCRRestAPIClassifications {
         writer.endArray();
     }
 
+    /**
+     * lists all available classifications as XML or JSON
+     *
+     * @param info - the URIInfo object
+     * @param format - the output format ('xml' or 'json)
+     * @return a Jersey Response Object
+     */
+    @GET
+    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
+    public Response listClassifications(@Context UriInfo info,
+        @QueryParam("format") @DefaultValue("json") String format) {
+
+        Response.ResponseBuilder builder = request.evaluatePreconditions(lastModified);
+        if (builder != null) {
+            return builder.build();
+        }
+
+        if (FORMAT_XML.equals(format)) {
+            StringWriter sw = new StringWriter();
+
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            Document docOut = new Document();
+            Element eRoot = new Element("mycoreclassifications");
+            docOut.setRootElement(eRoot);
+
+            for (MCRCategory cat : DAO.getRootCategories()) {
+                eRoot.addContent(new Element("mycoreclass").setAttribute("ID", cat.getId().getRootID()).setAttribute(
+                    "href", info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString()));
+            }
+            try {
+                xout.output(docOut, sw);
+                return Response.ok(sw.toString())
+                    .lastModified(lastModified)
+                    .type("application/xml; charset=UTF-8")
+                    .build();
+            } catch (IOException e) {
+                //ToDo
+            }
+        }
+
+        if (FORMAT_JSON.equals(format)) {
+            StringWriter sw = new StringWriter();
+            try {
+                JsonWriter writer = new JsonWriter(sw);
+                writer.setIndent("    ");
+                writer.beginObject();
+                writer.name("mycoreclass");
+                writer.beginArray();
+                for (MCRCategory cat : DAO.getRootCategories()) {
+                    writer.beginObject();
+                    writer.name("ID").value(cat.getId().getRootID());
+                    writer.name("href")
+                        .value(info.getAbsolutePathBuilder().path(cat.getId().getRootID()).build().toString());
+                    writer.endObject();
+                }
+                writer.endArray();
+                writer.endObject();
+
+                writer.close();
+
+                return Response.ok(sw.toString())
+                    .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+                    .lastModified(lastModified)
+                    .build();
+            } catch (IOException e) {
+                //toDo
+            }
+        }
+        return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    /**
+     *  returns a single classification object
+     *
+     * @param classID - the classfication id
+     * @param format
+     *   Possible values are: json | xml (required)
+     * @param filter
+     * 	 a ';'-separated list of ':'-separated key-value pairs, possible keys are:
+     *      - lang - the language of the returned labels, if ommited all labels in all languages will be returned
+     *      - root - an id for a category which will be used as root
+     *      - nonempty - hide empty categories
+     * @param style
+     * 	a ';'-separated list of values, possible keys are:
+     *   	- 'checkboxtree' - create a json syntax which can be used as input for a dojo checkboxtree;
+     *      - 'checked'   - (together with 'checkboxtree') all checkboxed will be checked
+     *      - 'jstree' - create a json syntax which can be used as input for a jsTree
+     *      - 'opened' - (together with 'jstree') - all nodes will be opened
+     *      - 'disabled' - (together with 'jstree') - all nodes will be disabled
+     *      - 'selected' - (together with 'jstree') - all nodes will be selected
+     * @param callback - used in JSONP to wrap json result into a Javascript function named by callback parameter
+     * @return a Jersey Response object
+     */
+    @GET
+    //@Path("/id/{value}{format:(\\.[^/]+?)?}")  -> working, but returns empty string instead of default value
+    @Path("/{classID}")
+    @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
+    public Response showObject(@PathParam("classID") String classID,
+        @QueryParam("format") @DefaultValue("xml") String format, @QueryParam("filter") @DefaultValue("") String filter,
+        @QueryParam("style") @DefaultValue("") String style,
+        @QueryParam("callback") @DefaultValue("") String callback) {
+
+        Response.ResponseBuilder builder = request.evaluatePreconditions(lastModified);
+        if (builder != null) {
+            return builder.build();
+        }
+
+        String rootCateg = null;
+        String lang = null;
+        boolean filterNonEmpty = false;
+        boolean filterNoChildren = false;
+
+        for (String f : filter.split(";")) {
+            if (f.startsWith("root:")) {
+                rootCateg = f.substring(5);
+            }
+            if (f.startsWith("lang:")) {
+                lang = f.substring(5);
+            }
+            if (f.startsWith("nonempty")) {
+                filterNonEmpty = true;
+            }
+            if (f.startsWith("nochildren")) {
+                filterNoChildren = true;
+            }
+        }
+
+        if (format == null || classID == null) {
+            return Response.serverError().status(Status.BAD_REQUEST).build();
+            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND,
+            //        "Please specify parameters format and classid.");
+        }
+        try {
+            MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
+            if (cl == null) {
+                throw new MCRRestAPIException(Status.NOT_FOUND,
+                    new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
+                        "There is no classification with the given ID."));
+            }
+            Document docClass = MCRCategoryTransformer.getMetaDataDocument(cl, false);
+            Element eRoot = docClass.getRootElement();
+            if (rootCateg != null) {
+                XPathExpression<Element> xpe = XPathFactory.instance().compile("//category[@ID='" + rootCateg + "']",
+                    Filters.element());
+                Element e = xpe.evaluateFirst(docClass);
+                if (e != null) {
+                    eRoot = e;
+                } else {
+                    throw new MCRRestAPIException(Status.NOT_FOUND,
+                        new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Category not found.",
+                            "The classfication does not contain a category with the given ID."));
+                }
+            }
+            if (filterNonEmpty) {
+                Element eFilter = eRoot;
+                if (eFilter.getName().equals("mycoreclass")) {
+                    eFilter = eFilter.getChild("categories");
+                }
+                filterNonEmpty(docClass.getRootElement().getAttributeValue("ID"), eFilter);
+            }
+            if (filterNoChildren) {
+                eRoot.removeChildren("category");
+            }
+
+            if (FORMAT_JSON.equals(format)) {
+                String json = writeJSON(eRoot, lang, style);
+                //eventually: allow Cross Site Requests: .header("Access-Control-Allow-Origin", "*")
+                if (callback.length() > 0) {
+                    return Response.ok(callback + "(" + json + ")")
+                        .lastModified(lastModified)
+                        .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+                        .build();
+                } else {
+                    return Response.ok(json).type("application/json; charset=UTF-8")
+                        .build();
+                }
+            }
+
+            if (FORMAT_XML.equals(format)) {
+                String xml = writeXML(eRoot, lang);
+                return Response.ok(xml)
+                    .lastModified(lastModified)
+                    .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+                    .build();
+            }
+        } catch (Exception e) {
+            LogManager.getLogger(this.getClass()).error("Error outputting classification", e);
+            //TODO response.sendError(HttpServletResponse.SC_NOT_FOUND, "Error outputting classification");
+        }
+        return null;
+    }
+
+    /**
+     * Output JSON
+     * @param eRoot - the category element
+     * @param lang - the language to be filtered for or null if all languages should be displayed
+     * @param style - the style
+     * @return a string representation of a JSON object
+     * @throws IOException
+     */
+    private String writeJSON(Element eRoot, String lang, String style) throws IOException {
+        StringWriter sw = new StringWriter();
+        JsonWriter writer = new JsonWriter(sw);
+        writer.setIndent("  ");
+        if (style.contains("checkboxtree")) {
+            if (lang == null) {
+                lang = "de";
+            }
+            writer.beginObject();
+            writer.name("identifier").value(eRoot.getAttributeValue("ID"));
+            for (Element eLabel : eRoot.getChildren("label")) {
+                if (lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                    writer.name("label").value(eLabel.getAttributeValue("text"));
+                }
+            }
+            writer.name("items");
+
+            writeChildrenAsJSONCBTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("checked"));
+            writer.endObject();
+        } else if (style.contains("jstree")) {
+            if (lang == null) {
+                lang = "de";
+            }
+            writeChildrenAsJSONJSTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("opened"),
+                style.contains("disabled"), style.contains("selected"));
+        } else {
+            writer.beginObject(); // {
+            writer.name("ID").value(eRoot.getAttributeValue("ID"));
+            writer.name("label");
+            writer.beginArray();
+            for (Element eLabel : eRoot.getChildren("label")) {
+                if (lang == null || lang.equals(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
+                    writer.beginObject();
+                    writer.name("lang").value(eLabel.getAttributeValue("lang", Namespace.XML_NAMESPACE));
+                    writer.name("text").value(eLabel.getAttributeValue("text"));
+                    if (eLabel.getAttributeValue("description") != null) {
+                        writer.name("description").value(eLabel.getAttributeValue("description"));
+                    }
+                    writer.endObject();
+                }
+            }
+            writer.endArray();
+
+            if (eRoot.equals(eRoot.getDocument().getRootElement())) {
+                writeChildrenAsJSON(eRoot.getChild("categories"), writer, lang);
+            } else {
+                writeChildrenAsJSON(eRoot, writer, lang);
+            }
+
+            writer.endObject();
+        }
+        writer.close();
+        return sw.toString();
+    }
+
     private void filterNonEmpty(String classId, Element e) {
         SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
         for (int i = 0; i < e.getChildren("category").size(); i++) {
@@ -492,4 +509,5 @@ public class MCRRestAPIClassifications {
             filterNonEmpty(classId, e.getChildren("category").get(i));
         }
     }
+
 }

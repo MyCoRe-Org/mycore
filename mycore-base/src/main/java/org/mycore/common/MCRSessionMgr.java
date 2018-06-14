@@ -157,6 +157,10 @@ public class MCRSessionMgr {
         isSessionCreationLocked.set(false);
     }
 
+    public static boolean isLocked() {
+        return isSessionCreationLocked.get();
+    }
+
     /**
      * Returns the MCRSession for the given sessionID.
      */

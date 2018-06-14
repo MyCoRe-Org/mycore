@@ -40,6 +40,11 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * This class holds all informations and methods to handle the MyCoRe Object ID.
  * The MyCoRe Object ID is a special ID to identify each metadata object with
@@ -51,6 +56,9 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
+@JsonClassDescription("MyCoRe ObjectID in form {project}_{type}_{int32}, "
+    + "where project is a namespace and type defines the datamodel")
+@JsonFormat(shape = JsonFormat.Shape.STRING)
 public final class MCRObjectID implements Comparable<MCRObjectID> {
     /**
      * public constant value for the MCRObjectID length
@@ -224,6 +232,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * @return an MCRObjectID class instance
      * @exception MCRException if the given identifier is not valid
      */
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static MCRObjectID getInstance(String id) {
         return MCRObjectIDPool.getMCRObjectID(Objects.requireNonNull(id, "'id' must not be null."));
     }
@@ -395,6 +404,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      *         {@link #getNumberAsInteger()}
      */
     @Override
+    @JsonValue
     public String toString() {
         return combinedId;
     }

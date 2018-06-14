@@ -14,6 +14,16 @@
   </listener>
 
   <filter>
+    <filter-name>guiceFilter</filter-name>
+    <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>guiceFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
     <filter-name>UriResolverDebugFilter</filter-name>
     <filter-class>org.mycore.common.xml.MCRURIResolverFilter</filter-class>
   </filter>

@@ -17,22 +17,11 @@
  */
 package org.mycore.common.content.util;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.EOFException;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
@@ -43,13 +32,9 @@ import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRSeekableChannelContent;
-import org.mycore.common.content.MCRVFSContent;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -59,41 +44,18 @@ public abstract class MCRServletContentHelper {
 
     private static Logger LOGGER = LogManager.getLogger(MCRServletContentHelper.class);
 
-    private static final ArrayList<Range> FULL = new ArrayList<>();
-
-    private static final String MIME_BOUNDARY = "MYCORE_MIME_BOUNDARY";
+    public static final int DEFAULT_BUFFER_SIZE = ContentUtils.DEFAULT_BUFFER_SIZE;
 
     public static final String ATT_SERVE_CONTENT = MCRServletContentHelper.class.getName() + ".serveContent";
-
-    public static final int DEFAULT_BUFFER_SIZE = 65536;
-
-    public static final int MIN_BUFFER_SIZE = 512;
 
     public static class Config {
 
         public boolean useAcceptRanges = true;
 
-        public int inputBufferSize = DEFAULT_BUFFER_SIZE;
+        public int inputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
 
-        public int outputBufferSize = DEFAULT_BUFFER_SIZE;
+        public int outputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
 
-    }
-
-    protected static class Range {
-
-        public long start;
-
-        public long end;
-
-        public long length;
-
-        public boolean validate() {
-            if (end >= length) {
-                //set 'end' to content size
-                end = length - 1;
-            }
-            return start >= 0 && end >= 0 && start <= end && length > 0;
-        }
     }
 
     public static Config buildConfig(ServletConfig servletConfig) {
@@ -111,11 +73,11 @@ public abstract class MCRServletContentHelper {
             config.useAcceptRanges = Boolean.parseBoolean(servletConfig.getInitParameter("useAcceptRanges"));
         }
 
-        if (config.inputBufferSize < MIN_BUFFER_SIZE) {
-            config.inputBufferSize = MIN_BUFFER_SIZE;
+        if (config.inputBufferSize < ContentUtils.MIN_BUFFER_SIZE) {
+            config.inputBufferSize = ContentUtils.MIN_BUFFER_SIZE;
         }
-        if (config.outputBufferSize < MIN_BUFFER_SIZE) {
-            config.outputBufferSize = MIN_BUFFER_SIZE;
+        if (config.outputBufferSize < ContentUtils.MIN_BUFFER_SIZE) {
+            config.outputBufferSize = ContentUtils.MIN_BUFFER_SIZE;
         }
         return config;
     }
@@ -183,7 +145,7 @@ public abstract class MCRServletContentHelper {
         }
 
         String eTag = null;
-        ArrayList<Range> ranges = null;
+        List<Range> ranges = null;
         if (!isError) {
             eTag = content.getETag();
             if (config.useAcceptRanges) {
@@ -227,11 +189,11 @@ public abstract class MCRServletContentHelper {
                 if (request.getHeader("Range") != null) {
                     LOGGER.warn("Response is wrapped by ServletResponseWrapper, no 'Range' requests supported.");
                 }
-                ranges = FULL;
+                ranges = ContentUtils.FULL;
             }
 
             if (isError || (ranges == null || ranges.isEmpty()) && request.getHeader("Range") == null
-                || ranges == FULL) {
+                || ranges == ContentUtils.FULL) {
                 //No ranges
                 if (contentType != null) {
                     if (LOGGER.isDebugEnabled()) {
@@ -247,7 +209,7 @@ public abstract class MCRServletContentHelper {
                 }
 
                 if (serveContent) {
-                    copy(content, out, config.inputBufferSize, config.outputBufferSize);
+                    ContentUtils.copy(content, out, config.inputBufferSize, config.outputBufferSize);
                 }
 
             } else {
@@ -275,15 +237,15 @@ public abstract class MCRServletContentHelper {
                     }
 
                     if (serveContent) {
-                        copy(content, out, range, config.inputBufferSize, config.outputBufferSize);
+                        ContentUtils.copy(content, out, range, config.inputBufferSize, config.outputBufferSize);
                     }
 
                 } else {
 
-                    response.setContentType("multipart/byteranges; boundary=" + MIME_BOUNDARY);
+                    response.setContentType("multipart/byteranges; boundary=" + ContentUtils.MIME_BOUNDARY);
 
                     if (serveContent) {
-                        copy(content, out, ranges.iterator(), contentType, config.inputBufferSize,
+                        ContentUtils.copy(content, out, ranges.iterator(), contentType, config.inputBufferSize,
                             config.outputBufferSize);
                     }
                 }
@@ -422,252 +384,9 @@ public abstract class MCRServletContentHelper {
         return true;
     }
 
-    private static long copyChannel(final ReadableByteChannel src, final WritableByteChannel dest, final int bufferSize)
-        throws IOException {
-        if (src instanceof FileChannel) {
-            return copyFileChannel((FileChannel) src, dest, bufferSize);
-        }
-        long bytes = 0;
-        final ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize);
-        while (src.read(buffer) != -1) {
-            // prepare the buffer to be drained
-            buffer.flip();
-
-            // write to the channel, may block
-            bytes += dest.write(buffer);
-            // If partial transfer, shift remainder down
-            // If buffer is empty, same as doing clear()
-            buffer.compact();
-        }
-        // EOF will leave buffer in fill state
-        buffer.flip();
-        // make sure the buffer is fully drained.
-        while (buffer.hasRemaining()) {
-            bytes += dest.write(buffer);
-        }
-        return bytes;
-    }
-
-    private static long copyFileChannel(final FileChannel src, final WritableByteChannel dest, final int bufferSize)
-        throws IOException {
-        long bytes = 0L;
-        long time = -System.currentTimeMillis();
-        long size = src.size();
-        while (bytes < size) {
-            long bytesToTransfer = Math.min(bufferSize, size - bytes);
-            long bytesTransfered = src.transferTo(bytes, bytesToTransfer, dest);
-
-            bytes += bytesTransfered;
-
-            if (LOGGER.isDebugEnabled()) {
-                long percentage = Math.round(bytes / ((double) size) * 100.0);
-                LOGGER.debug("overall bytes transfered: {} progress {}%", bytes, percentage);
-            }
-
-        }
-
-        if (LOGGER.isDebugEnabled()) {
-            time += System.currentTimeMillis();
-            double kBps = (bytes / 1024.0) / (time / 1000.0);
-            LOGGER.debug("Transfered: {} bytes in: {} s -> {} kbytes/s", bytes, time / 1000.0, kBps);
-        }
-        return bytes;
-    }
-
-    /**
-     * Consumes the content and writes it to the ServletOutputStream.
-     */
-    private static void copy(final MCRContent content, final ServletOutputStream out, final int inputBufferSize,
-        final int outputBufferSize) throws IOException {
-        final long bytesCopied;
-        long length = content.length();
-        if (content instanceof MCRSeekableChannelContent) {
-            try (SeekableByteChannel byteChannel = ((MCRSeekableChannelContent) content).getSeekableByteChannel();
-                WritableByteChannel nout = Channels.newChannel(out)) {
-                endCurrentTransaction();
-                bytesCopied = copyChannel(byteChannel, nout, outputBufferSize);
-            }
-        } else {
-            try (InputStream contentIS = content.getInputStream();
-                final InputStream in = isInputStreamBuffered(contentIS, content) ? contentIS
-                    : new BufferedInputStream(
-                        contentIS, inputBufferSize)) {
-                endCurrentTransaction();
-                // Copy the inputBufferSize stream to the outputBufferSize stream
-                bytesCopied = IOUtils.copyLarge(in, out, new byte[outputBufferSize]);
-            }
-        }
-        if (length >= 0 && length != bytesCopied) {
-            throw new EOFException("Bytes to send: " + length + " actual: " + bytesCopied);
-        }
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Wrote {} bytes.", bytesCopied);
-        }
-    }
-
-    /**
-     * Consumes the content and writes it to the ServletOutputStream.
-     *
-     * @param content      The MCRContent resource to serve
-     * @param out       The outputBufferSize stream to write to
-     * @param ranges        Enumeration of the ranges in ascending non overlapping order the client wanted to retrieve
-     * @param contentType   Content type of the resource
-     */
-    private static void copy(final MCRContent content, final ServletOutputStream out, final Iterator<Range> ranges,
-        final String contentType, final int inputBufferSize, final int outputBufferSize) throws IOException {
-
-        IOException exception = null;
-
-        long lastByte = 0;
-        try (final InputStream resourceInputStream = content.getInputStream();
-            final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
-                : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
-            endCurrentTransaction();
-            while (exception == null && ranges.hasNext()) {
-
-                final Range currentRange = ranges.next();
-
-                // Writing MIME header.
-                out.println();
-                out.println("--" + MIME_BOUNDARY);
-                if (contentType != null) {
-                    out.println("Content-Type: " + contentType);
-                }
-                out.println("Content-Range: bytes " + currentRange.start + "-" + currentRange.end + "/"
-                    + currentRange.length);
-                out.println();
-
-                // Printing content
-                exception = copyRange(in, out, lastByte, currentRange.start, currentRange.end, outputBufferSize);
-                lastByte = currentRange.end;
-            }
-        }
-        out.println();
-        out.print("--" + MIME_BOUNDARY + "--");
-
-        // Rethrow any exception that has occurred
-        if (exception != null) {
-            throw exception;
-        }
-
-    }
-
-    /**
-     * Consumes the content and writes it to the ServletOutputStream.
-     *
-     * @param content  The source resource
-     * @param out   The outputBufferSize stream to write to
-     * @param range     Range the client wanted to retrieve
-     */
-    private static void copy(final MCRContent content, final ServletOutputStream out, final Range range,
-        // TODO: beautify this
-        final int inputBufferSize, final int outputBufferSize) throws IOException {
-        if (content.isReusable()) {
-            try (ReadableByteChannel readableByteChannel = content.getReadableByteChannel()) {
-                if (readableByteChannel instanceof SeekableByteChannel) {
-                    endCurrentTransaction();
-                    SeekableByteChannel seekableByteChannel = (SeekableByteChannel) readableByteChannel;
-                    seekableByteChannel.position(range.start);
-                    long bytesToCopy = range.end - range.start + 1;
-                    while (bytesToCopy > 0) {
-                        ByteBuffer byteBuffer;
-                        if (bytesToCopy > (long) MCRServletContentHelper.DEFAULT_BUFFER_SIZE) {
-                            byteBuffer = ByteBuffer.allocate(MCRServletContentHelper.DEFAULT_BUFFER_SIZE);
-                        } else {
-                            byteBuffer = ByteBuffer.allocate((int) bytesToCopy);
-                        }
-
-                        int bytesRead = seekableByteChannel.read(byteBuffer);
-                        bytesToCopy -= bytesRead;
-                        out.write(byteBuffer.array());
-                    }
-                    return;
-                }
-            }
-        }
-
-        try (final InputStream resourceInputStream = content.getInputStream();
-            final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
-                : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
-            endCurrentTransaction();
-            final IOException exception = copyRange(in, out, 0, range.start, range.end, outputBufferSize);
-            if (exception != null) {
-                throw exception;
-            }
-        }
-    }
-
-    /**
-     * Copy the content with the specified range of bytes from InputStream to OutputStream.
-     *
-     * @param in The input
-     * @param out The output
-     * @param inPosition Current position of the input
-     * @param start Start position to be copied
-     * @param end End position to be copied
-     * @return Exception which occurred during processing or if less than <code>end - start + 1</code> bytes were read/written.
-     */
-    private static IOException copyRange(final InputStream in, final ServletOutputStream out, final long inPosition,
-        final long start, final long end, final int outputBufferSize) {
-
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Serving bytes:{}-{}", start, end);
-        }
-
-        final long bytesToRead = end - start + 1;
-        final long skip = start - inPosition;
-        try {
-            final long copied = copyLarge(in, out, skip, bytesToRead, new byte[outputBufferSize]);
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("Served bytes:{}", copied);
-            }
-            if (copied != bytesToRead) {
-                return new EOFException("Bytes to send: " + bytesToRead + " actual: " + copied);
-            }
-        } catch (final IOException e) {
-            return e;
-        }
-        return null;
-    }
-
     public static long copyLarge(InputStream input, OutputStream output, long inputOffset, long length, byte[] buffer)
         throws IOException {
-        if (inputOffset > 0L) {
-            long bytesToSkip = inputOffset;
-            while (bytesToSkip > 0) {
-                bytesToSkip -= input.skip(bytesToSkip);
-            }
-        }
-
-        if (length == 0L) {
-            return 0L;
-        } else {
-            int bufferLength = buffer.length;
-            int bytesToRead = bufferLength;
-            if (length > 0L && length < (long) bufferLength) {
-                bytesToRead = (int) length;
-            }
-
-            long totalRead = 0L;
-
-            int read;
-            while (bytesToRead > 0 && -1 != (read = input.read(buffer, 0, bytesToRead))) {
-                output.write(buffer, 0, read);
-                totalRead += (long) read;
-                if (length > 0L) {
-                    bytesToRead = (int) Math.min(length - totalRead, (long) bufferLength);
-                }
-            }
-
-            return totalRead;
-        }
-    }
-
-    /**
-     * Called before sending data to end hibernate transaction.
-     */
-    private static void endCurrentTransaction() {
-        MCRSessionMgr.getCurrentSession().commitTransaction();
+        return ContentUtils.copyLarge(input, output, inputOffset, length, buffer);
     }
 
     private static String extractFileName(String filename) {
@@ -699,21 +418,11 @@ public abstract class MCRServletContentHelper {
     }
 
     /**
-     * Returns if the content InputStream is already buffered.
-     * @param contentIS output of {@link MCRContent#getInputStream()}
-     * @param content MCRContent instance associated with contentIS
-     */
-    private static boolean isInputStreamBuffered(final InputStream contentIS, final MCRContent content) {
-        return contentIS instanceof BufferedInputStream || contentIS instanceof ByteArrayInputStream
-            || contentIS instanceof FilterInputStream && content instanceof MCRVFSContent;
-    }
-
-    /**
      * Parses and validates the range header.
      * This method ensures that all ranges are in ascending order and non-overlapping, so we can use a single
      * InputStream.
      */
-    private static ArrayList<Range> parseRange(final HttpServletRequest request, final HttpServletResponse response,
+    private static List<Range> parseRange(final HttpServletRequest request, final HttpServletResponse response,
         final MCRContent content) throws IOException {
 
         // Checking if range is still valid (lastModified)
@@ -733,12 +442,12 @@ public abstract class MCRServletContentHelper {
             if (headerValueTime == -1L) {
                 // If the content changed, the complete content is served.
                 if (!eTag.equals(headerValue.trim())) {
-                    return FULL;
+                    return ContentUtils.FULL;
                 }
             } else {
                 //add one second buffer to check if the content was modified.
                 if (lastModified > headerValueTime + 1000) {
-                    return FULL;
+                    return ContentUtils.FULL;
                 }
             }
 
@@ -750,79 +459,13 @@ public abstract class MCRServletContentHelper {
         }
 
         String rangeHeader = request.getHeader("Range");
-        if (rangeHeader == null) {
-            return null;
-        }
-
-        // We operate on byte level only
-        String rangeUnit = "bytes";
-        if (!rangeHeader.startsWith(rangeUnit)) {
+        try {
+            return Range.parseRanges(rangeHeader, fileLength);
+        } catch (IllegalArgumentException e) {
             response.addHeader("Content-Range", "bytes */" + fileLength);
             response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
             return null;
         }
-
-        rangeHeader = rangeHeader.substring(rangeUnit.length() + 1);
-
-        final ArrayList<Range> result = new ArrayList<>();
-        final StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
-
-        // Parsing the range list
-        long lastByte = 0;
-        while (commaTokenizer.hasMoreTokens()) {
-            final String rangeDefinition = commaTokenizer.nextToken().trim();
-
-            final Range currentRange = new Range();
-            currentRange.length = fileLength;
-
-            final int dashPos = rangeDefinition.indexOf('-');
-
-            if (dashPos == -1) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
-            }
-
-            if (dashPos == 0) {
-
-                try {
-                    //offset is negative
-                    final long offset = Long.parseLong(rangeDefinition);
-                    currentRange.start = fileLength + offset;
-                    currentRange.end = fileLength - 1;
-                } catch (final NumberFormatException e) {
-                    response.addHeader("Content-Range", "bytes */" + fileLength);
-                    response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
-                }
-
-            } else {
-
-                try {
-                    currentRange.start = Long.parseLong(rangeDefinition.substring(0, dashPos));
-                    if (dashPos < rangeDefinition.length() - 1) {
-                        currentRange.end = Long.parseLong(rangeDefinition.substring(dashPos + 1,
-                            rangeDefinition.length()));
-                    } else {
-                        currentRange.end = fileLength - 1;
-                    }
-                } catch (final NumberFormatException e) {
-                    response.addHeader("Content-Range", "bytes */" + fileLength);
-                    response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
-                }
-
-            }
-
-            if (!currentRange.validate() || lastByte > currentRange.start) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
-            }
-            lastByte = currentRange.end;
-            result.add(currentRange);
-        }
-        return result;
     }
 
     private static void setContentLengthLong(final HttpServletResponse response, final long length) {

@@ -15,18 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.restapi.v1.feature;
 
-import java.util.List;
+package org.mycore.restapi.annotations;
 
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
-import org.mycore.restapi.MCRRestConfig;
+import java.lang.annotation.Annotation;
 
-public class MCRRESTFeature extends MCRJerseyDefaultFeature {
+public @interface MCRParam {
+    public String name();
 
-    @Override
-    protected List<String> getPackages() {
-        return MCRConfiguration.instance().getStrings(MCRRestConfig.REST_API_PACKAGE);
+    public String value();
+
+    public static class Factory {
+        public static MCRParam get(String name, String value) {
+            return new MCRParam() {
+                @Override
+                public String name() {
+                    return name;
+                }
+
+                @Override
+                public String value() {
+                    return value;
+                }
+
+                @Override
+                public Class<? extends Annotation> annotationType() {
+                    return MCRParam.class;
+                }
+            };
+        }
     }
+
 }

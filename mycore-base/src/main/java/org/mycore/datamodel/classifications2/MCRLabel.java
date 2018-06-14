@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * This class represents a label of a MCRCategory.
  * 
@@ -40,6 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     name = "label")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Embeddable
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class MCRLabel implements Cloneable, Serializable {
 
     private static final long serialVersionUID = -843799854929361194L;

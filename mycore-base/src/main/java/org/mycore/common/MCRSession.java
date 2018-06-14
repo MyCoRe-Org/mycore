@@ -440,9 +440,7 @@ public class MCRSession implements Cloneable {
     public void commitTransaction() {
         if (isTransactionActive()) {
             transaction.get().commit();
-            beginTransaction();
             MCREntityManagerProvider.getCurrentEntityManager().clear();
-            transaction.get().commit();
             transaction.remove();
         }
         submitOnCommitTasks();

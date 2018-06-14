@@ -41,9 +41,6 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.restapi.v1.utils.MCRJSONWebTokenUtil;
-import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
-import org.mycore.restapi.v1.utils.MCRRestAPIUtil.MCRRestAPIACLPermission;
 import org.mycore.solr.MCRSolrConstants;
 
 /**
@@ -53,11 +50,9 @@ import org.mycore.solr.MCRSolrConstants;
  * 
  * @version $Revision: $ $Date: $
  */
-@Path("/v1/search")
+@Path("/search")
 public class MCRRestAPISearch {
     private static Logger LOGGER = LogManager.getLogger(MCRRestAPISearch.class);
-
-    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
 
     public static final String FORMAT_JSON = "json";
 
@@ -105,7 +100,6 @@ public class MCRRestAPISearch {
         @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
         @QueryParam("facet.mincount") String facetMinCount, @QueryParam("json.wrf") String jsonWrf)
         throws MCRRestAPIException {
-        MCRRestAPIUtil.checkRestAPIAccess(request, MCRRestAPIACLPermission.READ, "/v1/search");
         StringBuilder url = new StringBuilder(MCRSolrConstants.SERVER_URL);
         url.append("/select?");
 
@@ -153,27 +147,28 @@ public class MCRRestAPISearch {
             LOGGER.error(e);
         }
 
-        String authHeader = MCRJSONWebTokenUtil
-            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         try (InputStream is = new URL(url.toString()).openStream()) {
             try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8.name())) {
                 String text = scanner.useDelimiter("\\A").next();
 
+                String contentType;
                 switch (wt) {
                     case FORMAT_XML:
-                        return Response.ok(text).type("application/xml; charset=UTF-8")
-                            .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
-                    //break;
+                        contentType = "application/xml; charset=UTF-8";
+                        break;
                     case FORMAT_JSON:
-                        return Response.ok(text).type("application/json; charset=UTF-8")
-                            .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
-                    //break;
+                        contentType = "application/json; charset=UTF-8";
+                        break;
                     case FORMAT_CSV:
-                        return Response.ok(text).type("text/comma-separated-values; charset=UTF-8")
-                            .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                        contentType = "text/comma-separated-values; charset=UTF-8";
+                        break;
                     default:
-                        return Response.ok(text).type("text").header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                        contentType = "text";
                 }
+                return Response.ok(text)
+                    .type(contentType)
+                    .build();
+
             }
         } catch (IOException e) {
             LOGGER.error(e);

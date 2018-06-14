@@ -2,22 +2,7 @@
 <web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0"
   metadata-complete="true">
-  <servlet>
-    <servlet-name>MyCoRe REST API</servlet-name>
-    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-    <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
-      <param-value>org.mycore.restapi.MCRRestResourceConfig</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MyCoRe REST API</servlet-name>
-    <url-pattern>/api/*</url-pattern>
-  </servlet-mapping>
-  <filter-mapping>
-    <filter-name>MCRUserAgentFilter</filter-name>
-    <servlet-name>MyCoRe REST API</servlet-name>
-    <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
+
+  <!-- Rest-API is handled by jersey-servlet-container -->
+
 </web-fragment>

@@ -18,15 +18,17 @@
 
 package org.mycore.restapi;
 
-import org.apache.logging.log4j.LogManager;
-import org.glassfish.jersey.server.ResourceConfig;
+import java.io.IOException;
 
-public class MCRRestResourceConfig extends ResourceConfig {
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 
-    public MCRRestResourceConfig(){
-        super();
-        LogManager.getLogger().info("Loading rest-api resource config...");
-        new MCRRestConfig().configure(this);
+@Priority(Priorities.USER - 500)
+public class MCREnableTransactionFilter implements ContainerRequestFilter {
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        requestContext.setProperty(MCRTransactionFilter.PROP_REQUIRE_TRANSACTION, true);
     }
-
 }

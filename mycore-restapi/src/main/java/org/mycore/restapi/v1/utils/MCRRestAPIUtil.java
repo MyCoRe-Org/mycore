@@ -22,70 +22,59 @@
  */
 package org.mycore.restapi.v1.utils;
 
-import java.net.UnknownHostException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Application;
 
-import org.mycore.access.mcrimpl.MCRAccessControlSystem;
-import org.mycore.access.mcrimpl.MCRIPAddress;
-import org.mycore.common.MCRUserInformation;
-import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.restapi.v1.errors.MCRRestAPIError;
-import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.user2.MCRUserManager;
+import org.glassfish.jersey.server.ServerProperties;
 
 /**
  * This class contains some generic utility functions for the REST API
  * 
- * @author Robert Stephan
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRRestAPIUtil {
+    public static String getWWWAuthenticateHeader(String s,
+        Map<String, String> attributes, Application app) {
+        LinkedHashMap<String, String> attrMap = new LinkedHashMap<>();
+        String realm = app.getProperties()
+            .getOrDefault(ServerProperties.APPLICATION_NAME, "REST API")
+            .toString();
+        attrMap.put("realm", realm);
+        Optional.ofNullable(attributes).ifPresent(attrMap::putAll);
+        StringBuilder b = new StringBuilder();
+        attrMap.entrySet().stream()
+            .forEach(e -> appendFieldValue(b, e.getKey(), e.getValue()));
+        b.insert(0, " ");
+        return Optional.ofNullable(s).orElse("Basic") + b.toString();
+    }
 
-    /**
-     * The REST API access permissions (read, write)
-     */
-    public enum MCRRestAPIACLPermission {
-        READ {
-            public String toString() {
-                return "read";
-            }
-        },
+    private static void appendField(StringBuilder b, String field) {
+        if (b.length() > 0) {
+            b.append(", ");
+        }
+        b.append(field);
+    }
 
-        WRITE {
-            public String toString() {
-                return "write";
+    private static void appendValue(StringBuilder b, String value) {
+        for (char c : value.toCharArray()) {
+            if ((c < 0x20) || (c == 0x22) || (c == 0x5c) || (c > 0x7e)) {
+                b.append(' ');
+            } else {
+                b.append(c);
             }
         }
     }
 
-    /**
-     * checks if the given REST API operation is allowed
-     * @param request - the HTTP request
-     * @param permission "read" or "write"
-     * @param path - the REST API path, e.g. /v1/messages
-     * 
-     * @throws MCRRestAPIException if access is restricted
-     */
-    public static void checkRestAPIAccess(HttpServletRequest request, MCRRestAPIACLPermission permission, String path)
-        throws MCRRestAPIException {
-        try {
-            String userID = MCRJSONWebTokenUtil.retrieveUsernameFromAuthenticationToken(request);
-            MCRUserInformation userInfo = MCRUserManager.getUser(userID);
-            MCRIPAddress theIP = new MCRIPAddress(MCRFrontendUtil.getRemoteAddr(request));
-            String thePath = path.startsWith("/") ? path : "/" + path;
-            String thePermission = permission.toString();
-            MCRAccessControlSystem acs = (MCRAccessControlSystem) MCRAccessControlSystem.instance();
-            boolean hasAPIAccess = acs.checkAccess("restapi:/", thePermission, userInfo, theIP);
-            if (hasAPIAccess && (!acs.hasRule("restapi:" + thePath, thePermission)
-                || acs.checkAccess("restapi:" + thePath, permission.toString(), userInfo, theIP))) {
-                return;
-            }
-        } catch (UnknownHostException e) {
-            // ignore
+    private static void appendFieldValue(StringBuilder b, String field, String value) {
+        appendField(b, field);
+        if (value != null && !value.isEmpty()) {
+            b.append("=\"");
+            appendValue(b, value);
+            b.append('\"');
         }
-        throw new MCRRestAPIException(Status.FORBIDDEN,
-            new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
-                "Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
     }
+
 }

@@ -20,8 +20,11 @@ package org.mycore.datamodel.common;
 
 import java.util.Date;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public interface MCRObjectIDDate {
 
+    @Schema(description = "MCRObjectID as String in form {project}_{type}_{int32}", example = "mir_mods_00004711")
     String getId();
 
     Date getLastModified();

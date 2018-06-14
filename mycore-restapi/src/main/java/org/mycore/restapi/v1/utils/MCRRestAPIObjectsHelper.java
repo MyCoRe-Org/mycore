@@ -37,9 +37,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -105,7 +105,6 @@ import com.google.gson.stream.JsonWriter;
  * @version $Revision: $ $Date: $
  */
 public class MCRRestAPIObjectsHelper {
-    private static final String HEADER_NAME_AUTHORIZATION = "Authorization";
 
     private static final String GENERAL_ERROR_MSG = "A problem occured while fetching the data.";
 
@@ -113,8 +112,8 @@ public class MCRRestAPIObjectsHelper {
 
     private static SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
-    public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info,
-        HttpServletRequest request) throws MCRRestAPIException {
+    public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info)
+        throws MCRRestAPIException {
 
         MCRObject mcrObj = retrieveMCRObject(pathParamId);
         Document doc = mcrObj.createXML();
@@ -173,31 +172,32 @@ public class MCRRestAPIObjectsHelper {
                 MCRRestAPIError.CODE_INTERNAL_ERROR, "Unable to retrieve/transform MyCoRe object", e.getMessage()));
         }
 
-        String authHeader = MCRJSONWebTokenUtil
-            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
-        return Response.ok(sw.toString()).type("application/xml").header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+        return Response.ok(sw.toString())
+            .type("application/xml")
+            .build();
     }
 
     public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID, UriInfo info,
-        HttpServletRequest request) throws MCRRestAPIException {
+        boolean withDetails) throws MCRRestAPIException {
 
-        MCRObject mcrObj = retrieveMCRObject(pathParamMcrID);
+        MCRObjectID mcrObj = MCRObjectID.getInstance(pathParamMcrID);
         MCRDerivate derObj = retrieveMCRDerivate(mcrObj, pathParamDerID);
 
         try {
             Document doc = derObj.createXML();
-            Document docContent = listDerivateContentAsXML(derObj, "/", -1, info);
-            if (docContent != null && docContent.hasRootElement()) {
-                doc.getRootElement().addContent(docContent.getRootElement().detach());
+            if (withDetails) {
+                Document docContent = listDerivateContentAsXML(derObj, "/", -1, info);
+                if (docContent != null && docContent.hasRootElement()) {
+                    doc.getRootElement().addContent(docContent.getRootElement().detach());
+                }
             }
 
             StringWriter sw = new StringWriter();
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(doc, sw);
             
-            String authHeader = MCRJSONWebTokenUtil
-                .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
-            return Response.ok(sw.toString()).type("application/xml").header(HEADER_NAME_AUTHORIZATION, authHeader)
+            return Response.ok(sw.toString())
+                .type("application/xml")
                 .build();
         } catch (IOException e) {
             throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -296,18 +296,18 @@ public class MCRRestAPIObjectsHelper {
     /**
      * returns a list of objects
      * @param info - the injected Jersey URIInfo object
-     * 
+     *
      * @param format - the output format ('xml'|'json')
      * @param filter - a filter criteria
      * @param sort - the sort criteria
-     * 
+     *
      * @return a Jersey response object
      * @throws MCRRestAPIException    
      * 
-     * @see org.mycore.restapi.v1.MCRRestAPIObjects#listObjects(UriInfo, HttpServletRequest, String, String, String)
+     * @see MCRRestAPIObjects#listObjects(UriInfo, String, String, String)
      * 
      */
-    public static Response listObjects(UriInfo info, HttpServletRequest request, String format, String filter,
+    public static Response listObjects(UriInfo info, String format, String filter,
         String sort) throws MCRRestAPIException {
         List<MCRRestAPIError> errors = new ArrayList<>();
         //analyze sort
@@ -440,8 +440,6 @@ public class MCRRestAPIObjectsHelper {
             objIdDates.sort(new MCRRestAPISortObjectComparator(sortObj));
         }
 
-        String authHeader = MCRJSONWebTokenUtil
-            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         //output as XML
         if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
             Element eMcrobjects = new Element("mycoreobjects");
@@ -459,8 +457,9 @@ public class MCRRestAPIObjectsHelper {
                 StringWriter sw = new StringWriter();
                 XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
                 xout.output(docOut, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                return Response.ok(sw.toString())
+                    .type("application/xml; charset=UTF-8")
+                    .build();
             } catch (IOException e) {
                 throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                     new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
@@ -488,8 +487,9 @@ public class MCRRestAPIObjectsHelper {
                 writer.endObject();
 
                 writer.close();
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                return Response.ok(sw.toString())
+                    .type("application/json; charset=UTF-8")
+                    .build();
             } catch (IOException e) {
                 throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                     new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
@@ -506,14 +506,14 @@ public class MCRRestAPIObjectsHelper {
      * @param mcrObjID - the MyCoRe Object ID
      * @param format - the output format ('xml'|'json')
      * @param sort - the sort criteria
-     * 
+     *
      * @return a Jersey response object
      * @throws MCRRestAPIException    
      * 
      * 
-     * @see org.mycore.restapi.v1.MCRRestAPIObjects#listDerivates(UriInfo, HttpServletRequest, String, String, String)
+     * @see MCRRestAPIObjects#listDerivates(UriInfo, String, String, String)
      */
-    public static Response listDerivates(UriInfo info, HttpServletRequest request, String mcrObjID, String format,
+    public static Response listDerivates(UriInfo info, String mcrObjID, String format,
         String sort) throws MCRRestAPIException {
         List<MCRRestAPIError> errors = new ArrayList<>();
 
@@ -564,8 +564,6 @@ public class MCRRestAPIObjectsHelper {
                 }
             }).sorted(new MCRRestAPISortObjectComparator(sortObj)::compare).collect(Collectors.toList());
 
-        String authHeader = MCRJSONWebTokenUtil
-            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(request));
         //output as XML
         if (MCRRestAPIObjects.FORMAT_XML.equals(format)) {
             Element eDerObjects = new Element("derobjects");
@@ -589,8 +587,9 @@ public class MCRRestAPIObjectsHelper {
                 StringWriter sw = new StringWriter();
                 XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
                 xout.output(docOut, sw);
-                return Response.ok(sw.toString()).type("application/xml; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                return Response.ok(sw.toString())
+                    .type("application/xml; charset=UTF-8")
+                    .build();
             } catch (IOException e) {
                 throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                     new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
@@ -625,8 +624,9 @@ public class MCRRestAPIObjectsHelper {
 
                 writer.close();
 
-                return Response.ok(sw.toString()).type("application/json; charset=UTF-8")
-                    .header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                return Response.ok(sw.toString())
+                    .type("application/json; charset=UTF-8")
+                    .build();
             } catch (IOException e) {
                 throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                     new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG, e.getMessage()));
@@ -650,7 +650,7 @@ public class MCRRestAPIObjectsHelper {
      * @return a Jersey Response object
      * @throws MCRRestAPIException
      */
-    public static Response listContents(UriInfo info, HttpServletRequest httpRequest, Request request, String mcrObjID,
+    public static Response listContents(UriInfo info, Request request, String mcrObjID,
         String mcrDerID, String format, String path, int depth) throws MCRRestAPIException {
 
         if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
@@ -658,18 +658,16 @@ public class MCRRestAPIObjectsHelper {
                 new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The syntax of format parameter is wrong.",
                     "Allowed values for format are 'json' or 'xml'."));
         }
-        MCRObject mcrObj = retrieveMCRObject(mcrObjID);
+        MCRObjectID mcrObj = MCRObjectID.getInstance(mcrObjID);
         MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
 
-        String authHeader = MCRJSONWebTokenUtil
-            .createJWTAuthorizationHeader(MCRJSONWebTokenUtil.retrieveAuthenticationToken(httpRequest));
         try {
             MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
             BasicFileAttributes readAttributes = Files.readAttributes(root, BasicFileAttributes.class);
             Date lastModified = new Date(readAttributes.lastModifiedTime().toMillis());
             ResponseBuilder responseBuilder = request.evaluatePreconditions(lastModified);
             if (responseBuilder != null) {
-                return responseBuilder.header(HEADER_NAME_AUTHORIZATION, authHeader).build();
+                return responseBuilder.build();
             }
             switch (format) {
                 case MCRRestAPIObjects.FORMAT_XML:
@@ -677,7 +675,7 @@ public class MCRRestAPIObjectsHelper {
                     try (StringWriter sw = new StringWriter()) {
                         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
                         xout.output(docOut, sw);
-                        return response(sw.toString(), "application/xml", lastModified, authHeader);
+                        return response(sw.toString(), "application/xml", lastModified);
                     } catch (IOException e) {
                         throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
                             new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, GENERAL_ERROR_MSG,
@@ -686,7 +684,7 @@ public class MCRRestAPIObjectsHelper {
                 case MCRRestAPIObjects.FORMAT_JSON:
                     if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
                         String result = listDerivateContentAsJson(derObj, path, depth, info);
-                        return response(result, "application/json", lastModified, authHeader);
+                        return response(result, "application/json", lastModified);
                     }
                 default:
                     throw new MCRRestAPIException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -712,13 +710,13 @@ public class MCRRestAPIObjectsHelper {
      */
     public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID) throws IOException {
         try {
-            MCRObject mcrObj = retrieveMCRObject(mcrObjID);
+            MCRObjectID mcrObj = MCRObjectID.getInstance(mcrObjID);
             MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
             String maindoc = derObj.getDerivate().getInternals().getMainDoc();
 
             String baseURL = MCRJerseyUtil.getBaseURL(info)
                 + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
-            baseURL = baseURL.replace("${mcrid}", mcrObj.getId().toString()).replace("${derid}",
+            baseURL = baseURL.replace("${mcrid}", mcrObj.toString()).replace("${derid}",
                 derObj.getId().toString());
 
             return baseURL + maindoc;
@@ -727,14 +725,14 @@ public class MCRRestAPIObjectsHelper {
         }
     }
 
-    private static Response response(String response, String type, Date lastModified, String authHeader) {
+    private static Response response(String response, String type, Date lastModified) {
         byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
         String mimeType = type + "; charset=UTF-8";
         CacheControl cacheControl = new CacheControl();
         cacheControl.setNoTransform(false);
         cacheControl.setMaxAge(0);
         return Response.ok(responseBytes, mimeType).lastModified(lastModified)
-            .header("Content-Length", responseBytes.length).header(HEADER_NAME_AUTHORIZATION, authHeader)
+            .header("Content-Length", responseBytes.length)
             .cacheControl(cacheControl).build();
     }
 
@@ -862,7 +860,8 @@ public class MCRRestAPIObjectsHelper {
         }
     }
 
-    private static MCRDerivate retrieveMCRDerivate(MCRObject mcrObj, String derIDString) throws MCRRestAPIException {
+    private static MCRDerivate retrieveMCRDerivate(MCRObjectID parentObjId, String derIDString)
+        throws MCRRestAPIException {
 
         String derKey = "mcr"; // the default value for the key
         if (derIDString.contains(":")) {
@@ -877,14 +876,16 @@ public class MCRRestAPIObjectsHelper {
         }
 
         String matchedDerID = null;
-        for (MCRMetaLinkID check : mcrObj.getStructure().getDerivates()) {
-            if (derKey.equals("mcr")) {
-                if (check.getXLinkHref().equals(derIDString)) {
-                    matchedDerID = check.getXLinkHref();
-                    break;
-                }
-            }
-            if (derKey.equals("label")) {
+        if ("mcr".equals(derKey) &&
+            MCRMetadataManager.getDerivateIds(parentObjId, 0, TimeUnit.SECONDS)
+                .stream()
+                .map(MCRObjectID::toString)
+                .anyMatch(derIDString::equals)) {
+            matchedDerID = derIDString;
+        }
+        if (derKey.equals("label")) {
+            MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(parentObjId);
+            for (MCRMetaLinkID check : mcrObj.getStructure().getDerivates()) {
                 if (derIDString.equals(check.getXLinkLabel()) || derIDString.equals(check.getXLinkTitle())) {
                     matchedDerID = check.getXLinkHref();
                     break;
@@ -895,7 +896,7 @@ public class MCRRestAPIObjectsHelper {
         if (matchedDerID == null) {
             throw new MCRRestAPIException(Response.Status.NOT_FOUND,
                 new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Derivate " + derIDString + " not found.",
-                    "The MyCoRe Object with id '" + mcrObj.getId()
+                    "The MyCoRe Object with id '" + parentObjId
                         + "' does not contain a derivate with id '" + derIDString + "'."));
         }
 

@@ -20,6 +20,13 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.stream.Stream;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
@@ -36,31 +43,55 @@ import org.tmatesoft.svn.core.io.SVNRepository;
  * 
  * @author Frank Lützenkirchen
  */
+@XmlRootElement(name = "revision")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class MCRMetadataVersion {
+
+    private static enum Type {
+        created(MCRMetadataVersion.CREATED), modified(MCRMetadataVersion.UPDATED), deleted(MCRMetadataVersion.DELETED);
+
+        private final char charValue;
+
+        Type(char a) {
+            this.charValue = a;
+        }
+
+        public static Type fromValue(char a) {
+            return Stream.of(values()).filter(t -> t.charValue == a)
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
+        }
+    }
+
     /**
      * The metadata document this version belongs to
      */
+    @XmlTransient
     private MCRVersionedMetadata vm;
 
     /**
      * The revision number of this version
      */
+    @XmlAttribute(name = "r")
     private long revision;
 
     /**
      * The user that created this version
      */
+    @XmlAttribute
     private String user;
 
     /**
      * The date this version was created
      */
+    @XmlAttribute
     private Date date;
 
     /**
      * Was this version result of a create, update or delete?
      */
-    private char type;
+    @XmlAttribute()
+    private Type type;
 
     /**
      * A version that was created in store
@@ -77,6 +108,10 @@ public class MCRMetadataVersion {
      */
     public static final char DELETED = 'D';
 
+    private MCRMetadataVersion() {
+        //required for JAXB serialization
+    }
+
     /**
      * Creates a new metadata version info object
      * 
@@ -92,7 +127,7 @@ public class MCRMetadataVersion {
         revision = logEntry.getRevision();
         user = logEntry.getAuthor();
         date = logEntry.getDate();
-        this.type = type;
+        this.type = Type.fromValue(type);
     }
 
     /**
@@ -112,7 +147,7 @@ public class MCRMetadataVersion {
      * @see #DELETED
      */
     public char getType() {
-        return type;
+        return type.charValue;
     }
 
     /**
@@ -150,7 +185,7 @@ public class MCRMetadataVersion {
      *             if this is a deleted version, which can not be retrieved
      */
     public MCRContent retrieve() throws IOException {
-        if (type == DELETED) {
+        if (type == Type.deleted) {
             String msg = "You can not retrieve a deleted version, retrieve a previous version instead";
             throw new MCRUsageException(msg);
         }

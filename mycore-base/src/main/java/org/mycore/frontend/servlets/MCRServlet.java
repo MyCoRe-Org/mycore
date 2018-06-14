@@ -199,6 +199,7 @@ public class MCRServlet extends HttpServlet {
             .flatMap(MCRSessionResolver::resolveSession)
             .orElse(null);
 
+        MCRSessionMgr.unlock();
         if (fromHttpSession != null && fromHttpSession.getID() != null) {
             // Take session from HttpSession with servlets
             session = fromHttpSession;
@@ -334,6 +335,7 @@ public class MCRServlet extends HttpServlet {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 MCRSessionMgr.releaseCurrentSession();
+                MCRSessionMgr.lock();
             }
         }
     }

@@ -17,9 +17,10 @@
  */
 package org.mycore.restapi.v1.errors;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+
+import org.mycore.frontend.jersey.MCRJerseyUtil;
 
 /**
  * maps a REST API exception to a proper response with message as JSON output
@@ -32,6 +33,6 @@ import javax.ws.rs.ext.ExceptionMapper;
 public class MCRRestAPIExceptionMapper implements ExceptionMapper<MCRRestAPIException> {
     public Response toResponse(MCRRestAPIException ex) {
         return Response.status(ex.getStatus()).entity(MCRRestAPIError.convertErrorListToJSONString(ex.getErrors()))
-            .type(MediaType.APPLICATION_JSON_TYPE).build();
+            .type(MCRJerseyUtil.APPLICATION_JSON_UTF8).build();
     }
 }
