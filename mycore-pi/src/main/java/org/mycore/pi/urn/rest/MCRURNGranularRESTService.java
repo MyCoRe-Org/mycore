@@ -21,6 +21,7 @@ package org.mycore.pi.urn.rest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -108,17 +109,15 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, filePath);
 
-        Supplier<? extends RuntimeException> objIsNotMCRDerivate = () -> new RuntimeException(
-            "Object " + obj.getId() + " is not a MCRDerivate!");
-
-        return Optional.of(obj)
-            .filter(MCRDerivate.class::isInstance)
-            .map(MCRDerivate.class::cast)
-            .map(deriv -> registerURN(deriv, filePath))
-            .orElseThrow(objIsNotMCRDerivate);
+        if (obj instanceof MCRDerivate) {
+            MCRDerivate derivate = (MCRDerivate) obj;
+            return registerURN(derivate, filePath);
+        } else {
+            throw new MCRPersistentIdentifierException("Object " + obj.getId() + " is not a MCRDerivate!");
+        }
     }
 
-    private MCRDNBURN registerURN(MCRDerivate deriv, String filePath) {
+    private MCRDNBURN registerURN(MCRDerivate deriv, String filePath) throws MCRPersistentIdentifierException {
         MCRObjectID derivID = deriv.getId();
 
         Function<String, Integer> countCreatedPI = s -> MCRPIManager
@@ -142,12 +141,20 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         GranularURNGenerator granularURNGen = new GranularURNGenerator(seed, derivURN, setID);
         Function<MCRPath, Supplier<String>> generateURN = p -> granularURNGen.getURNSupplier();
 
-        derivateFileStream.apply(deriv)
+        LinkedHashMap<Supplier<String>, MCRPath> urnPathMap = derivateFileStream.apply(deriv)
             .filter(notInIgnoreList().and(matchFile(filePath)))
             .sorted()
             .collect(Collectors.toMap(generateURN, p -> p, (m1, m2) -> m1,
-                LinkedHashMap::new))
-            .forEach(createFileMetadata(deriv).andThen(persistURN(deriv)));
+                LinkedHashMap::new));
+
+        if (!"".equals(filePath) && urnPathMap.isEmpty()) {
+            String errMsg = MessageFormat.format("File {0} does not exist in {1}.\n", filePath, derivID.toString())
+                + "Use absolute path of file without owner ID like /abs/path/to/file.\n";
+
+            throw new MCRPersistentIdentifierException(errMsg);
+        }
+
+        urnPathMap.forEach(createFileMetadata(deriv).andThen(persistURN(deriv)));
 
         try {
             MCRMetadataManager.update(deriv);
