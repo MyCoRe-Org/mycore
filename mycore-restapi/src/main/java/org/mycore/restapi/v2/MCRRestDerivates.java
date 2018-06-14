@@ -53,6 +53,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
@@ -91,6 +92,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates")
 public class MCRRestDerivates {
+
+    public static final Logger LOGGER = LogManager.getLogger();
+
     @Context
     Request request;
 
@@ -233,6 +237,10 @@ public class MCRRestDerivates {
         try {
             if (create) {
                 MCRMetadataManager.create(derivate);
+                MCRPath rootDir = MCRPath.getPath(derid.toString(), "/");
+                if (Files.notExists(rootDir)) {
+                    rootDir.getFileSystem().createRoot(derid.toString());
+                }
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 MCRMetadataManager.update(derivate);
@@ -291,7 +299,7 @@ public class MCRRestDerivates {
     }
 
     private Response doCreateDerivate(@BeanParam DerivateMetadata der) {
-        LogManager.getLogger().info(der);
+        LOGGER.debug(der);
         String projectID = mcrId.getProjectId();
         MCRObjectID derId = MCRObjectID.getNextFreeId(projectID + "_derivate");
         MCRDerivate derivate = new MCRDerivate();
@@ -315,7 +323,7 @@ public class MCRRestDerivates {
         ifs.setMainDoc(der.getMainDoc());
         derivate.getDerivate().setInternals(ifs);
 
-        LogManager.getLogger().debug("Creating new derivate with ID {}", derId);
+        LOGGER.debug("Creating new derivate with ID {}", derId);
         try {
             MCRMetadataManager.create(derivate);
         } catch (MCRAccessException e) {

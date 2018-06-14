@@ -28,7 +28,6 @@ import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 
@@ -54,11 +53,11 @@ public class MCRRestFeature extends MCRJerseyDefaultFeature {
     }
 
     /**
-     * Checks if the class/method is annotated by {@link MCRStaticContent}.
+     * Checks if the class/method is annotated by {@link MCRRequireTransaction}.
      *
      * @param resourceClass the class to check
      * @param resourceMethod the method to check
-     * @return true if one of both is annotated as static
+     * @return true if one ore both is annotated and requires transaction
      */
     protected boolean requiresTransaction(Class<?> resourceClass, Method resourceMethod) {
         return resourceClass.getAnnotation(MCRRequireTransaction.class) != null

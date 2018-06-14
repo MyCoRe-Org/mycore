@@ -109,7 +109,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         LOGGER.info("Filter start.");
         boolean isSecure = requestContext.getSecurityContext().isSecure();
         if (MCRSessionMgr.hasCurrentSession()) {
@@ -194,8 +194,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-        throws IOException {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         LOGGER.debug("ResponseFilter start");
         try {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
@@ -234,18 +233,14 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         }
     }
 
+    //returns true for Ajax-Requests or requests for embedded images
     private static boolean doNotWWWAuthenticate(ContainerRequestContext requestContext) {
-        if ("XMLHttpRequest".equals(requestContext.getHeaderString("X-Requested-With"))) {
-            return true;
-        }
-        if (requestContext.getAcceptableMediaTypes()
-            .stream()
-            .findFirst()
-            .filter(m -> "image".equals(m.getType()))
-            .isPresent()) {
-            return true;
-        }
-        return false;
+        return "XMLHttpRequest".equals(requestContext.getHeaderString("X-Requested-With")) ||
+            requestContext.getAcceptableMediaTypes()
+                .stream()
+                .findFirst()
+                .filter(m -> "image".equals(m.getType()))
+                .isPresent();
     }
 
     private static void closeSessionIfNeeded() {
