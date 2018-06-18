@@ -72,7 +72,7 @@ public class MCRWorksPublisher {
         Document workXML = buildWorkXMLFrom(objectID);
         Entity<InputStream> input = buildRequestEntity(workXML);
 
-        LOGGER.info("post (create){} at {}", objectID, target.getUri());
+        LOGGER.info("post (create) {} at {}", objectID, target.getUri());
         Response response = builder.post(input);
         expect(response, Response.Status.CREATED);
 

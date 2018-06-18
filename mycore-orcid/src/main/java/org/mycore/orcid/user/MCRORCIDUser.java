@@ -48,7 +48,7 @@ public class MCRORCIDUser {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRORCIDUser.class);
 
-    private static final String ATTR_ID_PREFIX = "id_";
+    public static final String ATTR_ID_PREFIX = "id_";
 
     private static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + "orcid";
 
@@ -60,6 +60,10 @@ public class MCRORCIDUser {
 
     public MCRORCIDUser(MCRUser user) {
         this.user = user;
+    }
+
+    public MCRUser getUser() {
+        return user;
     }
 
     /** Called from MCROAuthServlet to store the user's ORCID iD and token after successful OAuth authorization */
@@ -148,7 +152,7 @@ public class MCRORCIDUser {
         return identifierKeys;
     }
 
-    private Set<String> getNameIdentifierKeys(MCRMODSWrapper wrapper) {
+    public static Set<String> getNameIdentifierKeys(MCRMODSWrapper wrapper) {
         Set<String> identifierKeys = new HashSet<String>();
 
         List<Element> nameIdentifiers = wrapper.getElements("mods:name/mods:nameIdentifier");
@@ -160,7 +164,7 @@ public class MCRORCIDUser {
         return identifierKeys;
     }
 
-    private String buildNameIdentifierKey(String type, String id) {
+    private static String buildNameIdentifierKey(String type, String id) {
         return type + ":" + id;
     }
 }
