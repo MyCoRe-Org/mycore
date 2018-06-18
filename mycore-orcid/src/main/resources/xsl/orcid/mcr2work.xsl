@@ -173,7 +173,7 @@
   <xsl:template name="external-id-relationship">
     <common:external-id-relationship>
       <xsl:choose>
-        <xsl:when test="ancestor::mods:relatedItem[@type='host'']">part-of</xsl:when>
+        <xsl:when test="ancestor::mods:relatedItem[@type='host']">part-of</xsl:when>
         <xsl:otherwise>self</xsl:otherwise>
       </xsl:choose>
     </common:external-id-relationship>
