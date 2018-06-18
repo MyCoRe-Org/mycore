@@ -19,9 +19,12 @@
 package org.mycore.orcid.works;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.orcid.MCRORCIDException;
@@ -90,6 +93,14 @@ public class MCRWork {
 
     void setMODS(Element mods) {
         this.mods = mods;
+    }
+
+    /**
+     * Returns all mods:identifier elements of this work.
+     */
+    public List<Element> getIdentifiers() {
+        List<Element> identifiers = getMODS().getChildren("identifier", MCRConstants.MODS_NAMESPACE);
+        return Collections.unmodifiableList(identifiers);
     }
 
     /**

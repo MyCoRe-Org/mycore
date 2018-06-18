@@ -14,4 +14,13 @@
     <url-pattern>/orcid</url-pattern>
   </servlet-mapping>
 
+  <servlet id="WorkSyncServlet">
+    <servlet-name>WorkSyncServlet</servlet-name>
+    <servlet-class>org.mycore.orcid.works.MCRWorkSyncServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WorkSyncServlet</servlet-name>
+    <url-pattern>/servlets/WorkSyncServlet</url-pattern>
+  </servlet-mapping>
+
 </web-fragment>

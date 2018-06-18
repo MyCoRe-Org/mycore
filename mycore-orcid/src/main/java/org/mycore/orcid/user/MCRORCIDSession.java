@@ -38,6 +38,11 @@ public class MCRORCIDSession {
         return user.hasORCIDProfile() ? user.getORCIDProfile().getWorksSection().getWorks().size() : 0;
     }
 
+    public static String getPublicationStatus(String objectID)
+        throws JDOMException, IOException, SAXException {
+        return getORCIDUser().getPublicationStatus(objectID).toString();
+    }
+
     public static boolean weAreTrustedParty() {
         return getORCIDUser().weAreTrustedParty();
     }
