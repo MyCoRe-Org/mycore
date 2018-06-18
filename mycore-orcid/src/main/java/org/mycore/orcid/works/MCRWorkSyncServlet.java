@@ -7,7 +7,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.orcid.MCRORCIDProfile;
-import org.mycore.orcid.user.MCRORCIDPublicationStatus;
 import org.mycore.orcid.user.MCRORCIDSession;
 import org.mycore.orcid.user.MCRORCIDUser;
 
@@ -64,6 +63,7 @@ public class MCRWorkSyncServlet extends MCRServlet {
                 case IN_MY_ORCID_PROFILE:
                     works.findWork(oid).get().update();
                     break;
+                default:
             }
         }
         job.getResponse().setStatus(HttpServletResponse.SC_OK);
