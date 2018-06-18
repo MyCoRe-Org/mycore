@@ -50,6 +50,10 @@
       <artifactId>mycore-mods</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-user2</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
       <scope>runtime</scope>
