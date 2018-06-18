@@ -31,6 +31,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -189,11 +190,12 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "create solr objecttype {0} at {1}",
+        syntax = "create solr objecttype {0} for core type {1}",
         help = "indexes all objects of an object type (e.g. document) on specific solr server core",
         order = 125)
-    public static void createObjectType(String type, String url) throws Exception {
-        MCRSolrCore core = new MCRSolrCore(url);
+    public static void createObjectType(String type, String coreType) throws Exception {
+        MCRSolrCore core = MCRSolrClientFactory.get(coreType)
+            .orElseThrow(() -> new MCRConfigurationException("The core " + coreType + " is not configured!"));
         SolrClient concurrentSolrClient = core.getConcurrentClient();
         MCRSolrIndexer.rebuildMetadataIndex(MCRXMLMetadataManager.instance().listIDsOfType(type), concurrentSolrClient);
         concurrentSolrClient.optimize();

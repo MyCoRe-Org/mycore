@@ -41,6 +41,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
+import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 
 /**
@@ -100,7 +101,7 @@ public class MCRRestAPISearch {
         @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
         @QueryParam("facet.mincount") String facetMinCount, @QueryParam("json.wrf") String jsonWrf)
         throws MCRRestAPIException {
-        StringBuilder url = new StringBuilder(MCRSolrConstants.SOLR_SERVER_URL);
+        StringBuilder url = new StringBuilder(MCRSolrClientFactory.getMainSolrCore().getV1CoreURL());
         url.append("/select?");
 
         try {
