@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -72,6 +74,12 @@ public class MCROAuthServlet extends MCRServlet {
         } else if ((code == null) || code.trim().isEmpty()) {
             redirectToGetAuthorization(job);
         } else {
+            String state = job.getRequest().getParameter("state");
+            if (!MCROAuthClient.buildStateParam().equals(state)) {
+                String msg = "Invalid state, possibly cross-site request forgery?";
+                job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, msg);
+            }
+
             MCRTokenResponse token = exchangeCodeForAccessToken(code);
 
             MCRORCIDUser orcidUser = MCRORCIDSession.getORCIDUser();

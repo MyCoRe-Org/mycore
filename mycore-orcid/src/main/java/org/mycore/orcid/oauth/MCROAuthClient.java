@@ -20,12 +20,17 @@ package org.mycore.orcid.oauth;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.content.MCRByteContent;
+import org.mycore.common.content.streams.MCRMD5InputStream;
+import org.mycore.user2.MCRUserManager;
 
 /**
  * Utility class working as a client for the OAuth2 API of orcid.org.
@@ -91,6 +96,20 @@ public class MCROAuthClient {
         builder.addParameter("response_type", "code");
         builder.addParameter("redirect_uri", redirectURL);
         builder.addParameter("scope", scopes.trim().replace(" ", "%20"));
+        builder.addParameter("state", buildStateParam());
         return builder.build().toURL().toExternalForm();
+    }
+
+    /**
+     * Builds a state parameter to be used with OAuth to defend against cross-site request forgery.
+     * Comparing state ensures the user is still the same that initiated the authorization process.
+     */
+    static String buildStateParam() {
+        String userID = MCRUserManager.getCurrentUser().getUserID();
+        byte[] bytes = userID.getBytes();
+        MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
+        md5Digest.update(bytes);
+        byte[] digest = md5Digest.digest();
+        return MCRMD5InputStream.getMD5String(digest);
     }
 }
