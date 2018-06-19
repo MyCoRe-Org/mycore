@@ -166,7 +166,7 @@ public class MCRMETSServlet extends MCRServlet {
         return Boolean.valueOf(useExistingMetsParam);
     }
 
-    protected static String getOwnerID(String pathInfo) {
+    public static String getOwnerID(String pathInfo) {
         StringBuilder ownerID = new StringBuilder(pathInfo.length());
         boolean running = true;
         for (int i = (pathInfo.charAt(0) == '/') ? 1 : 0; (i < pathInfo.length() && running); i++) {
@@ -192,6 +192,7 @@ public class MCRMETSServlet extends MCRServlet {
     @Override
     protected long getLastModified(HttpServletRequest request) {
         String ownerID = getOwnerID(request.getPathInfo());
+        MCRSessionMgr.unlock();
         MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRPath metsPath = MCRPath.getPath(ownerID, "/mets.xml");
         try {
@@ -210,6 +211,7 @@ public class MCRMETSServlet extends MCRServlet {
             session.commitTransaction();
             MCRSessionMgr.releaseCurrentSession();
             session.close(); // just created session for db transaction
+            MCRSessionMgr.lock();
         }
     }
 
