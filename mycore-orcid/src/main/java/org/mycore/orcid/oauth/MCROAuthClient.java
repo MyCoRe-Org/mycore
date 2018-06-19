@@ -20,16 +20,16 @@ package org.mycore.orcid.oauth;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.streams.MCRMD5InputStream;
+import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
@@ -85,7 +85,12 @@ public class MCROAuthClient {
 
     /**
      * Builds the URL where to redirect the user's browser to initiate a three-way authorization
-     * and request permission to access the given scopes
+     * and request permission to access the given scopes. If
+     *
+     * MCR.ORCID.PreFillRegistrationForm=true
+     *
+     * submits the current user's E-Mail address, first and last name to the ORCID registration form
+     * to simplify registration. May be disabled for more data privacy.
      *
      * @param redirectURL The URL to redirect back to after the user has granted permission
      * @param scopes the scope(s) to request permission for, if multiple separate by blanks
@@ -97,7 +102,56 @@ public class MCROAuthClient {
         builder.addParameter("redirect_uri", redirectURL);
         builder.addParameter("scope", scopes.trim().replace(" ", "%20"));
         builder.addParameter("state", buildStateParam());
+        builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+
+        if (MCRConfiguration.instance().getBoolean("MCR.ORCID.PreFillRegistrationForm")) {
+            preFillRegistrationForm(builder);
+        }
+
         return builder.build().toURL().toExternalForm();
+    }
+
+    /**
+     * If
+     *
+     * MCR.ORCID.PreFillRegistrationForm=true
+     *
+     * submits the current user's E-Mail address, first and last name to the ORCID registration form
+     * to simplify registration. May be disabled for more data privacy.
+     *
+     * See https://members.orcid.org/api/resources/customize
+     */
+    private void preFillRegistrationForm(URIBuilder builder) {
+        MCRUser user = MCRUserManager.getCurrentUser();
+        String eMail = user.getEMailAddress();
+        if (eMail != null) {
+            builder.addParameter("email", eMail);
+        }
+
+        String name = user.getRealName();
+        String firstName = null;
+        String lastName = name;
+
+        if (name.contains(",")) {
+            String[] nameParts = name.split(",");
+            if (nameParts.length == 2) {
+                firstName = nameParts[1].trim();
+                lastName = nameParts[0].trim();
+            }
+        } else if (name.contains(" ")) {
+            String[] nameParts = name.split(" ");
+            if (nameParts.length == 2) {
+                firstName = nameParts[0].trim();
+                lastName = nameParts[1].trim();
+            }
+        }
+
+        if (firstName != null) {
+            builder.addParameter("given_names", firstName);
+        }
+        if (lastName != null) {
+            builder.addParameter("family_names", lastName);
+        }
     }
 
     /**
