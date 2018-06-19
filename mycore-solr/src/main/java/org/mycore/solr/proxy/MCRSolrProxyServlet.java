@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -67,6 +68,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.services.http.MCRIdleConnectionMonitorThread;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrConstants;
 import org.xml.sax.SAXException;
 
 public class MCRSolrProxyServlet extends MCRServlet {
@@ -98,7 +100,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     private MCRIdleConnectionMonitorThread idleConnectionMonitorThread;
 
-    protected HttpHost solrHost;
 
     private Set<String> queryHandlerWhitelist;
 
@@ -202,10 +203,10 @@ public class MCRSolrProxyServlet extends MCRServlet {
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
-            request.getParameter(QUERY_CORE_PARAMETER));
+            Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
         try {
             LOGGER.info("Sending Request: {}", solrHttpMethod.getURI());
-            HttpResponse response = httpClient.execute(solrHost, solrHttpMethod);
+            HttpResponse response = httpClient.execute(solrHttpMethod);
             int statusCode = response.getStatusLine().getStatusCode();
 
             // set status code

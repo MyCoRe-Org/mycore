@@ -78,8 +78,8 @@ public class MCRSolrSchemaReloader {
 
         LOGGER.info("Clear SOLR schema for core type " + coreType);
         try {
-            SolrClient solrClient = MCRSolrClientFactory.get(coreType).orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType))
-                .getClient();
+            SolrClient solrClient = MCRSolrClientFactory.get(coreType).map(MCRSolrCore::getClient)
+                .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType));
 
             SchemaRequest.CopyFields copyFieldsReq = new SchemaRequest.CopyFields();
             for (Map<String, Object> copyField : copyFieldsReq.process(solrClient).getCopyFields()) {

@@ -18,8 +18,6 @@
 
 package org.mycore.solr;
 
-import static org.mycore.solr.MCRSolrConstants.DEFAULT_SOLR_SERVER_URL;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -43,8 +41,6 @@ public final class MCRSolrClientFactory {
     }
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrClientFactory.class);
-
-    public static final String MAIN_CORE_TYPE = "Main";
 
     private static Map<String, MCRSolrCore> CORE_MAP;
 
@@ -87,8 +83,7 @@ public final class MCRSolrClientFactory {
             .orElseThrow(() -> new MCRConfigurationException("Missing property " + coreNameKey));
 
         String coreServer = MCRConfiguration2.getString(coreServerKey)
-            .orElseGet(() -> MCRConfiguration2.getString(DEFAULT_SOLR_SERVER_URL).orElseThrow(
-                () -> new MCRConfigurationException("Missing property " + DEFAULT_SOLR_SERVER_URL)));
+            .orElse(MCRSolrConstants.DEFAULT_SOLR_SERVER_URL);
 
         return new MCRSolrCore(coreServer, coreName);
     }
@@ -126,7 +121,7 @@ public final class MCRSolrClientFactory {
     }
 
     public static MCRSolrCore getMainSolrCore() {
-        return get(MAIN_CORE_TYPE).orElseThrow(() -> new MCRConfigurationException("The core Main is not configured!"));
+        return get(MCRSolrConstants.MAIN_CORE_TYPE).orElseThrow(() -> new MCRConfigurationException("The core Main is not configured!"));
     }
 
     /**
