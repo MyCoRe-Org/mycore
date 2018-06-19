@@ -88,7 +88,7 @@
     .expander {
       cursor: pointer;
       font-size: 10px;
-      top: -4px;
+      top: 3px;
       width: 10px;
       height: 10px;
       display: inline-block;
@@ -100,7 +100,7 @@
 
     ol {
       border: none;
-      border-radius: 0px;
+      border-radius: 0;
       padding-left: 15px;
     }
 
@@ -116,14 +116,14 @@
 
     li.list-group-item {
       border: none;
-      border-radius: 0px;
-      margin-bottom: 0px;
-      display: inline-block;
-      width: 100%;
+      margin: 3px;
+      display: flex;
+      border-radius: 0;
 
       span.childLabel {
         color: gray;
-        float: right;
+        text-align: right;
+        min-width: 7rem;
       }
     }
 
@@ -133,8 +133,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      display: inline-block;
-      width: ~"calc(100% - 72px)";
+      flex-grow: 1;
     }
 
     li[data-selected=true] {
