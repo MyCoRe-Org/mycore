@@ -226,15 +226,6 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         MCRObjectCommands.setSelectedObjectIDs(MCRSolrSearchUtils.listIDs(client, query));
     }
 
-    @MCRCommand(syntax = "reload solr schema for core type {0} ",
-			    help = "The command reloads the schema in solr using the solr schema api",
-			    order = 200)
-    public static final void reloadSolrSchema(String coreType) {
-        MCRSolrSchemaReloader.clearSchema(coreType);
-        MCRSolrSchemaReloader.processSchemaFiles(coreType);
-	}
-
-
     /**
      * This command tries to identify MyCoRe Objects missing in SOLR and reindexes them using the
      * repair metadata search command.
@@ -285,17 +276,17 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This command reload the managed-schema.xml and solrconfig.xml files. It remove all
-     * schema definitions outside the default definitions in the MyCoRe core template. Then
-     * it add / update / delete the user schema definition. Then it add / update /delete
-     * the solrconfig.xml definition.
+     * This command recreates the managed-schema.xml and solrconfig.xml files. First it removes all
+     * schema definitions, except for some MyCoRe default types and fields. Second it parses the available
+     * MyCoRe modules and components and adds / updates / deletes the schema definition. 
+     * Finally it does the same for the solrconfig.xml definition.
      *
      * see https://github.com/MyCoRe-Org/mycore_solr_configset_main
      *
      * @param coreType the core type of the core that should be reloaded; the MyCoRe default application 
      * core type is <b>main</b>
      */
-    @MCRCommand(syntax = "reload solr configuration for type {0}",
+    @MCRCommand(syntax = "reload solr configuration for core of type {0}",
         help = "The command reloads the schema and the configuration in solr by using the solr schema api for core type {0}",
         order = 210)
     public static void reloadSolrConfiguration(String coreType) {
@@ -304,21 +295,29 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         MCRSolrConfigReloader.processConfigFiles(coreType);
     }
 
-    @MCRCommand(syntax = "create solr core {0} from template {1} and type {2}",
+    /**
+     * The command uses the SOLR Admin API to create a new core.
+     * 
+     * @param coreType the core type of the core that should be reloaded; the MyCoRe default application 
+     * core type is <b>main</b>
+     * @param coreName the name of the core; the part following the SOLR server url
+     * @param templateName the name of the configuration set, which should be used as base
+     * @throws IOException
+     * @throws SolrServerException
+     */
+    @MCRCommand(syntax = "create solr core of type {0} with name {1} from template {2}",
             help = "The command creates a new empty core with the given name based on the named core template",
             order = 220)
-    public static final void createSolrCore(String coreName, String templateName, String type) throws IOException,
+    public static final void createSolrCore(String coreType, String coreName, String templateName) throws IOException,
         SolrServerException {
 	    CoreAdminRequest.Create create = new CoreAdminRequest.Create();
 	    create.setCoreName(coreName);
 	    create.setConfigSet(templateName);
 	    create.setIsLoadOnStartup(true);
 
-        SolrClient solrClient = MCRSolrClientFactory.addCore(MCRSolrConstants.DEFAULT_SOLR_SERVER_URL, coreName, type)
+        SolrClient solrClient = MCRSolrClientFactory.addCore(MCRSolrConstants.DEFAULT_SOLR_SERVER_URL, coreName, coreType)
             .getClient();
 	    CoreAdminResponse response = create.process(solrClient);
 	    LogManager.getLogger().info("Core Create Response: {}", response);
 	}
-
-
 }
