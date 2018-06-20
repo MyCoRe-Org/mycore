@@ -20,6 +20,7 @@ package org.mycore.orcid.oauth;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 import javax.ws.rs.client.Client;
@@ -160,7 +161,7 @@ public class MCROAuthClient {
      */
     static String buildStateParam() {
         String userID = MCRUserManager.getCurrentUser().getUserID();
-        byte[] bytes = userID.getBytes();
+        byte[] bytes = userID.getBytes(StandardCharsets.UTF_8);
         MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
         md5Digest.update(bytes);
         byte[] digest = md5Digest.digest();
