@@ -37,13 +37,9 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public final class MCRSolrClientFactory {
 
-    private MCRSolrClientFactory(){
-    }
-
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrClientFactory.class);
 
     private static Map<String, MCRSolrCore> CORE_MAP;
-
 
     static {
         try {
@@ -53,18 +49,21 @@ public final class MCRSolrClientFactory {
         }
     }
 
+    private MCRSolrClientFactory() {
+    }
+
     /**
      * MCR.Solr.Core.Main.Name=cmo
      * MCR.Solr.Core.Classfication.Name=cmo-classification
      * @return a map of all cores defined in the properties.
      */
-    private static Map<String, MCRSolrCore> loadCoresFromProperties(){
+    private static Map<String, MCRSolrCore> loadCoresFromProperties() {
         return MCRConfiguration2
             .getPropertiesMap()
             .keySet()
             .stream()
-            .filter(p->p.startsWith(MCRSolrConstants.SOLR_CORE_PREFIX))
-            .map(cp-> cp.substring(MCRSolrConstants.SOLR_CORE_PREFIX.length()))
+            .filter(p -> p.startsWith(MCRSolrConstants.SOLR_CORE_PREFIX))
+            .map(cp -> cp.substring(MCRSolrConstants.SOLR_CORE_PREFIX.length()))
             .map(cp -> {
                 int indexOfDot = cp.indexOf(".");
                 return indexOfDot != -1 ? cp.substring(0, indexOfDot) : cp;
@@ -88,7 +87,7 @@ public final class MCRSolrClientFactory {
         return new MCRSolrCore(coreServer, coreName);
     }
 
-    public static MCRSolrCore addCore(String server, String coreName, String coreType){
+    public static MCRSolrCore addCore(String server, String coreName, String coreType) {
         final MCRSolrCore core = new MCRSolrCore(server, coreName);
         CORE_MAP.put(coreType, core);
         return core;
@@ -96,7 +95,7 @@ public final class MCRSolrClientFactory {
 
     /**
      * Add a SOLR core instance to the list
-     * 
+     *
      * @param core the MCRSolrCore instance 
      */
     public static void add(String coreType, MCRSolrCore core) {
@@ -121,7 +120,8 @@ public final class MCRSolrClientFactory {
     }
 
     public static MCRSolrCore getMainSolrCore() {
-        return get(MCRSolrConstants.MAIN_CORE_TYPE).orElseThrow(() -> new MCRConfigurationException("The core Main is not configured!"));
+        return get(MCRSolrConstants.MAIN_CORE_TYPE)
+            .orElseThrow(() -> new MCRConfigurationException("The core Main is not configured!"));
     }
 
     /**

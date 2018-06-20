@@ -20,6 +20,7 @@ package org.mycore.solr.schema;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -135,52 +136,48 @@ public class MCRSolrConfigReloader {
         if (command.isJsonObject()) {
             try {
                 //get first and only? property of the command object
-                Entry<String, JsonElement> entry = command.getAsJsonObject().entrySet().iterator().next();
-                String currentConfigObjectName = entry.getKey().substring(entry.getKey().indexOf("-") + 1)
-                    .toLowerCase(Locale.ROOT);
+                final JsonObject commandJsonObject = command.getAsJsonObject();
+                Entry<String, JsonElement> commandObject = commandJsonObject.entrySet().iterator().next();
+                final String configCommand = commandObject.getKey();
+                final String currentConfigObjectName = configCommand.split("-", 2)[0].toLowerCase(Locale.ROOT);
+                final String namingKey = "listener".equals(currentConfigObjectName) ? "event" : "name";
 
-                if (isKnownSolrConfigCommmand(entry.getKey())) {
-                    if (entry.getKey().startsWith("add-")
+                if (isKnownSolrConfigCommmand(configCommand)) {
+                    if (configCommand.startsWith("add-")
                         && CHECKED_CONFIG_OBJECTS.contains(currentConfigObjectName)) {
-                        String key = "listener".equals(currentConfigObjectName) ? "event" : "name";
-                        String name = entry.getValue().getAsJsonObject().get(key).getAsString();
-                        JsonElement jeSolrConfigObj = currentSolrConfig
+                        String name = commandObject.getValue().getAsJsonObject().get(namingKey).getAsString();
+                        JsonElement solrObjectConfig = currentSolrConfig
                             .get(SOLR_CONFIG_OBJECT_NAMES.get(currentConfigObjectName));
-                        if (jeSolrConfigObj != null && jeSolrConfigObj.getAsJsonObject().get(name) != null) {
+                        if (solrObjectConfig != null && solrObjectConfig.getAsJsonObject().get(name) != null) {
                             //the config object does exist in current Solr config 
                             //--> convert command: add-* to update-*
-                            command.getAsJsonObject().add(entry.getKey().replace("add-", "update-"),
-                                entry.getValue());
-                            command.getAsJsonObject().remove(entry.getKey());
-                            LOGGER.debug(
-                                "The object to be added does exist in Solr -> switch mode from add-* to update-*\n"
-                                    + command.toString());
-                        }
-                    }
+                            final String newCommandName = configCommand.replace("add-", "update-");
 
-                    if (entry.getKey().startsWith("update-")
+                            commandJsonObject.add(newCommandName, commandObject.getValue());
+                            commandJsonObject.remove(configCommand);
+                            LOGGER.debug("The object to be added does exist in Solr -> switch from add- to update-\n{}",
+                                command.toString());
+                        }
+                    } else if (configCommand.startsWith("update-")
                         && CHECKED_CONFIG_OBJECTS.contains(currentConfigObjectName)) {
-                        String key = "listener".equals(currentConfigObjectName) ? "event" : "name";
-                        String name = entry.getValue().getAsJsonObject().get(key).getAsString();
-                        JsonElement jeSolrConfigObj = currentSolrConfig
+                        String name = commandObject.getValue().getAsJsonObject().get(namingKey).getAsString();
+                        JsonElement solrObjectConfig = currentSolrConfig
                             .get(SOLR_CONFIG_OBJECT_NAMES.get(currentConfigObjectName));
-                        if (jeSolrConfigObj == null || jeSolrConfigObj.getAsJsonObject().get(name) == null) {
+                        if (solrObjectConfig == null || solrObjectConfig.getAsJsonObject().get(name) == null) {
                             //if the config object does not exist in current Solr config 
                             //--> convert command: update-* to add-*
-                            command.getAsJsonObject().add(entry.getKey().replace("update-", "add-"),
-                                entry.getValue());
-                            command.getAsJsonObject().remove(entry.getKey());
+                            final String newCommandName = configCommand.replace("update-", "add-");
+                            commandJsonObject.add(newCommandName, commandObject.getValue());
+                            commandJsonObject.remove(configCommand);
                             LOGGER.debug(
-                                "The object to be updated does not exist in Solr -> switch mode from update-* to add-*\n"
+                                "The object to be updated does not exist in Solr -> switch from update- to add-\n"
                                     + command.toString());
                         }
-                    }
-
-                    if (entry.getKey().startsWith("delete-")) {
-                        String name = entry.getValue().getAsString();
-                        JsonElement jeSolrConfigObj = currentSolrConfig
+                    } else if (configCommand.startsWith("delete-")) {
+                        String name = commandObject.getValue().getAsString();
+                        JsonElement solrObjectConfig = currentSolrConfig
                             .get(SOLR_CONFIG_OBJECT_NAMES.get(currentConfigObjectName));
-                        if (jeSolrConfigObj == null || jeSolrConfigObj.getAsJsonObject().get(name) == null) {
+                        if (solrObjectConfig == null || solrObjectConfig.getAsJsonObject().get(name) == null) {
                             //if the config object does not exist in current Solr config
                             //--> ignore command.
                             LOGGER.debug(
@@ -190,35 +187,42 @@ public class MCRSolrConfigReloader {
                         }
                     }
                 }
-
-                String coreURL = MCRSolrClientFactory.get(coreType)
-                    .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType)).getV1CoreURL();
-                HttpPost post = new HttpPost(coreURL
-                    + "/config");
-                post.setHeader("Content-type", "application/json");
-                post.setEntity(new StringEntity(command.toString()));
-                HttpResponse response;
-                try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                    response = httpClient.execute(post);
-                    String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
-                        StandardCharsets.UTF_8);
-                    if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                        LOGGER.debug("SOLR config update command was successful \n" + respContent);
-                    } else {
-                        LOGGER.error("SOLR config update error: " + response.getStatusLine().getStatusCode() + " "
-                            + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
-                    }
-
-                } catch (IOException e) {
-                    LOGGER.error(
-                        "Could not execute the following Solr config update command\n" + command.toString(), e);
-                }
-
+                executeSolrCommand(coreType, command.getAsString());
             } catch (IOException e) {
                 LOGGER.error(e);
             }
         }
 
+    }
+
+    /**
+     * Sends a command to solr
+     * @param coreType to which the command will be send
+     * @param command the command as string
+     * @throws UnsupportedEncodingException if command encoding is not supported
+     */
+    private static void executeSolrCommand(String coreType, String command) throws UnsupportedEncodingException {
+        String coreURL = MCRSolrClientFactory.get(coreType)
+            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType)).getV1CoreURL();
+        HttpPost post = new HttpPost(coreURL + "/config");
+        post.setHeader("Content-type", "application/json");
+        post.setEntity(new StringEntity(command));
+        HttpResponse response;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            response = httpClient.execute(post);
+            String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
+                StandardCharsets.UTF_8);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                LOGGER.debug("SOLR config update command was successful \n" + respContent);
+            } else {
+                LOGGER.error("SOLR config update error: " + response.getStatusLine().getStatusCode() + " "
+                    + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
+            }
+
+        } catch (IOException e) {
+            LOGGER.error(
+                "Could not execute the following Solr config update command\n" + command, e);
+        }
     }
 
     /**
@@ -254,6 +258,5 @@ public class MCRSolrConfigReloader {
             && (SOLR_CONFIG_OBJECT_NAMES.keySet().contains(cfgObjName)))
             || SOLR_CONFIG_PROPERTY_COMMANDS.contains(cmd);
     }
-
 
 }

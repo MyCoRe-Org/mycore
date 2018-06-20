@@ -19,10 +19,6 @@
 package org.mycore.solr.proxy;
 
 
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_PATH;
-import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,7 +41,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -70,6 +65,10 @@ import org.mycore.services.http.MCRIdleConnectionMonitorThread;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 import org.xml.sax.SAXException;
+
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_PATH;
+import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
 
 public class MCRSolrProxyServlet extends MCRServlet {
 

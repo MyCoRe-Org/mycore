@@ -46,7 +46,7 @@ import com.google.common.collect.Lists;
 
 /**
  * Some solr classification utility stuff.
- * 
+ *
  * @author Matthias Eichner
  */
 public abstract class MCRSolrClassificationUtil {
@@ -55,11 +55,7 @@ public abstract class MCRSolrClassificationUtil {
 
     private static final Object CREATE_LOCK = new Object();
 
-    private static final String CLASSIFICATION_CORE_TYPE = "Classification";
-
-    static {
-        MCRSolrCore defaultCore = MCRSolrClientFactory.getMainSolrCore();
-    }
+    private static final String CLASSIFICATION_CORE_TYPE = "classification";
 
     /**
      * Reindex the whole classification system.
@@ -92,7 +88,7 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Bulk index. The collection is split into parts of one thousand.
-     * 
+     *
      * @param solrDocumentList the list to index
      */
     public static void bulkIndex(List<SolrInputDocument> solrDocumentList) {
@@ -124,7 +120,7 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Returns a list of all descendants. The list is unordered.
-     * 
+     *
      * @return list of descendants.
      */
     public static List<MCRCategory> getDescendants(MCRCategory category) {
@@ -142,7 +138,7 @@ public abstract class MCRSolrClassificationUtil {
      * Returns a list of all ancestors. The list is ordered. The first element is
      * always the root node and the last element is always the parent. If the
      * element has no ancestor an empty list is returned.
-     * 
+     *
      * @return list of ancestors
      */
     public static LinkedList<MCRCategory> getAncestors(MCRCategory category) {
@@ -180,7 +176,7 @@ public abstract class MCRSolrClassificationUtil {
     /**
      * Reindex a bunch of {@link MCRCategory}. Be aware that this method does not fail
      * if a reindex of a single category causes an exception (its just logged).
-     * 
+     *
      * @param categories the categories to reindex
      */
     public static void reindex(MCRCategory... categories) {
@@ -205,7 +201,7 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Returns a collection of category id instances.
-     * 
+     *
      * @param categoryIds list of category ids as string
      */
     public static Collection<MCRCategoryID> fromString(Collection<String> categoryIds) {
@@ -236,7 +232,7 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Encodes the mycore category id to a solr usable one.
-     * 
+     *
      * @param classId the id to encode
      */
     public static String encodeCategoryId(MCRCategoryID classId) {
