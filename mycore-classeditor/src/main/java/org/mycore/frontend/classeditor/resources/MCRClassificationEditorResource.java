@@ -68,7 +68,7 @@ import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.frontend.classeditor.access.MCRClassificationWritePermission;
 import org.mycore.frontend.classeditor.access.MCRNewClassificationPermission;
 import org.mycore.frontend.classeditor.json.MCRJSONCategory;
-import org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName;
+import org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.solr.MCRSolrClientFactory;
@@ -346,8 +346,8 @@ public class MCRClassificationEditorResource {
         boolean hasParent = false;
 
         if (parentID != null && !parentID.toString().contains("_placeboid_") && position != null) {
-            categ.add(MCRJSONCategoryPropName.PARENTID, parentID);
-            categ.add(MCRJSONCategoryPropName.POSITION, position);
+            categ.add(MCRJSONCategoryHelper.PROP_PARENTID, parentID);
+            categ.add(MCRJSONCategoryHelper.PROP_POSITION, position);
             hasParent = true;
         }
 

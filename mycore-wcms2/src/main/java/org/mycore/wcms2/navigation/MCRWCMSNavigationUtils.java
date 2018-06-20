@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
 
 import com.google.gson.JsonObject;
 
-public class MCRWCMSNavigationManager {
+public class MCRWCMSNavigationUtils {
 
     private static MCRWCMSNavigationProvider NAVIGATION_PROVIDER;
 

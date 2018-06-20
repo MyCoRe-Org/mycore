@@ -18,8 +18,8 @@
 
 package org.mycore.frontend.classeditor;
 
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.CATEGID;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.ROOTID;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_CATEGID;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_ROOTID;
 
 import java.lang.reflect.Type;
 
@@ -38,8 +38,8 @@ public class MCRCategoryIDTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryID> 
     public MCRCategoryID deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
         JsonObject idJsonObj = json.getAsJsonObject();
-        JsonElement rootIDObj = idJsonObj.get(ROOTID);
-        JsonElement categIDObj = idJsonObj.get(CATEGID);
+        JsonElement rootIDObj = idJsonObj.get(PROP_ROOTID);
+        JsonElement categIDObj = idJsonObj.get(PROP_CATEGID);
 
         String rootID = rootIDObj.getAsString();
         String categID = categIDObj == null ? "" : categIDObj.getAsString();
@@ -52,9 +52,9 @@ public class MCRCategoryIDTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryID> 
         String categID = id.getID();
 
         JsonObject idJsonObj = new JsonObject();
-        idJsonObj.addProperty(ROOTID, rootID);
+        idJsonObj.addProperty(PROP_ROOTID, rootID);
         if (categID != null && !"".equals(categID)) {
-            idJsonObj.addProperty(CATEGID, categID);
+            idJsonObj.addProperty(PROP_CATEGID, categID);
         }
 
         return idJsonObj;

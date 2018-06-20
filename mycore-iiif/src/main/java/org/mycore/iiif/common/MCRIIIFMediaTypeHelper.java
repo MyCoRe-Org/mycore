@@ -23,7 +23,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * @author Thomas Scheffler (yagee)
  */
-public class MCRIIIFMediaType {
+public class MCRIIIFMediaTypeHelper {
 
     public static final String APPLICATION_LD_JSON = "application/ld+json";
 

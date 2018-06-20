@@ -49,7 +49,7 @@
   <rule ref="rulesets/java/empty.xml/EmptyInitializer" />
   <rule ref="rulesets/java/empty.xml/EmptyStatementBlock" />
   <rule ref="rulesets/java/empty.xml/EmptyStatementNotInLoop" />
-  <rule ref="rulesets/java/empty.xml/EmptyStaticInitializer" />
+  <rule ref="rulesets/java/empty.xml/EmptyInitializer" />
   <rule ref="rulesets/java/empty.xml/EmptySwitchStatements" />
   <rule ref="rulesets/java/empty.xml/EmptySynchronizedBlock" />
   <rule ref="rulesets/java/empty.xml/EmptyTryBlock" />

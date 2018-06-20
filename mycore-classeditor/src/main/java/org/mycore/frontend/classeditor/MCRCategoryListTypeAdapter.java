@@ -18,11 +18,11 @@
 
 package org.mycore.frontend.classeditor;
 
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.HASCHILDREN;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.HASLINK;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.ID;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.LABELS;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.URISTR;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_HAS_CHILDREN;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_HAS_LINK;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_ID;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_LABELS;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_URISTR;
 
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -77,15 +77,15 @@ public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryLi
 
     private JsonElement createCategRefJSONObj(MCRCategory categ, Boolean hasLink) {
         JsonObject categRefJsonObject = new JsonObject();
-        categRefJsonObject.add(ID, serializationContext.serialize(categ.getId()));
+        categRefJsonObject.add(PROP_ID, serializationContext.serialize(categ.getId()));
         Set<MCRLabel> labels = categ.getLabels();
-        categRefJsonObject.add(LABELS, serializationContext.serialize(new MCRLabelSetWrapper(labels)));
+        categRefJsonObject.add(PROP_LABELS, serializationContext.serialize(new MCRLabelSetWrapper(labels)));
         URI uri = categ.getURI();
         if (uri != null) {
-            categRefJsonObject.addProperty(URISTR, uri.toString());
+            categRefJsonObject.addProperty(PROP_URISTR, uri.toString());
         }
-        categRefJsonObject.addProperty(HASCHILDREN, categ.hasChildren());
-        categRefJsonObject.addProperty(HASLINK, hasLink);
+        categRefJsonObject.addProperty(PROP_HAS_CHILDREN, categ.hasChildren());
+        categRefJsonObject.addProperty(PROP_HAS_LINK, hasLink);
         return categRefJsonObject;
     }
 

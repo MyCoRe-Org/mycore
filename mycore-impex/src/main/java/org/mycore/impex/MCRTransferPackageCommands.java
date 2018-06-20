@@ -47,6 +47,7 @@ import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.search.MCRSolrSearchUtils;
 
 @MCRCommandGroup(name = "Transfer Package Commands")
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class MCRTransferPackageCommands {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTransferPackageCommands.class);
