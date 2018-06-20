@@ -18,13 +18,13 @@
 
 package org.mycore.frontend.classeditor;
 
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.CHILDREN;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.HASLINK;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.ID;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.LABELS;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.PARENTID;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.POSITION;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.URISTR;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_CHILDREN;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_HAS_LINK;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_ID;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_LABELS;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_PARENTID;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_POSITION;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_URISTR;
 
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -59,30 +59,30 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
         JsonObject categJsonObject = json.getAsJsonObject();
         MCRJSONCategory deserializedCateg = new MCRJSONCategory();
 
-        JsonElement idJsonElement = categJsonObject.get(ID);
+        JsonElement idJsonElement = categJsonObject.get(PROP_ID);
         if (idJsonElement != null) {
             MCRCategoryID id = context.deserialize(idJsonElement, MCRCategoryID.class);
             deserializedCateg.setId(id);
         }
 
-        JsonElement parentIdJsonElement = categJsonObject.get(PARENTID);
+        JsonElement parentIdJsonElement = categJsonObject.get(PROP_PARENTID);
         if (parentIdJsonElement != null) {
             MCRCategoryID parentId = context.deserialize(parentIdJsonElement, MCRCategoryID.class);
             deserializedCateg.setParentID(parentId);
         }
 
-        JsonElement positionJsonElem = categJsonObject.get(POSITION);
+        JsonElement positionJsonElem = categJsonObject.get(PROP_POSITION);
         if (positionJsonElem != null) {
             deserializedCateg.setPositionInParent(positionJsonElem.getAsInt());
         }
 
-        JsonElement labelSetWrapperElem = categJsonObject.get(LABELS);
+        JsonElement labelSetWrapperElem = categJsonObject.get(PROP_LABELS);
         if (labelSetWrapperElem != null) {
             MCRLabelSetWrapper labelSetWrapper = context.deserialize(labelSetWrapperElem, MCRLabelSetWrapper.class);
             deserializedCateg.setLabels(labelSetWrapper.getSet());
         }
 
-        JsonElement uriJsonElement = categJsonObject.get(URISTR);
+        JsonElement uriJsonElement = categJsonObject.get(PROP_URISTR);
         if (uriJsonElement != null) {
             String uriStr = uriJsonElement.getAsString();
             deserializedCateg.setURI(URI.create(uriStr));
@@ -96,23 +96,23 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
         JsonObject rubricJsonObject = new JsonObject();
         MCRCategoryID id = category.getId();
         if (id != null) {
-            rubricJsonObject.add(ID, contextSerialization.serialize(id));
+            rubricJsonObject.add(PROP_ID, contextSerialization.serialize(id));
         }
 
         Set<MCRLabel> labels = category.getLabels();
-        rubricJsonObject.add(LABELS, contextSerialization.serialize(new MCRLabelSetWrapper(labels)));
+        rubricJsonObject.add(PROP_LABELS, contextSerialization.serialize(new MCRLabelSetWrapper(labels)));
         URI uri = category.getURI();
         if (uri != null) {
-            rubricJsonObject.addProperty(URISTR, uri.toString());
+            rubricJsonObject.addProperty(PROP_URISTR, uri.toString());
         }
 
         if (category.hasChildren()) {
             List<MCRCategory> children = category.getChildren();
             Map<MCRCategoryID, Boolean> linkMap = getLinkService().hasLinks(category);
             if (linkMap.values().contains(true)) {
-                rubricJsonObject.addProperty(HASLINK, true);
+                rubricJsonObject.addProperty(PROP_HAS_LINK, true);
             }
-            rubricJsonObject.add(CHILDREN,
+            rubricJsonObject.add(PROP_CHILDREN,
                 contextSerialization.serialize(new MCRCategoryListWrapper(children, linkMap)));
         }
 

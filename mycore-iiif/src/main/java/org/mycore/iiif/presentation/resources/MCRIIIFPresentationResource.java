@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
-import org.mycore.iiif.common.MCRIIIFMediaType;
+import org.mycore.iiif.common.MCRIIIFMediaTypeHelper;
 import org.mycore.iiif.presentation.MCRIIIFPresentationManifestQuickAccess;
 import org.mycore.iiif.presentation.impl.MCRIIIFPresentationImpl;
 import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
@@ -55,14 +55,14 @@ public class MCRIIIFPresentationResource {
     private static final String IDENTIFIER_PARAM = "identifier";
 
     @GET
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("collection/{" + NAME_PARAM + "}")
     public Response getCollection(@PathParam(IMPL_PARAM) String impl, @PathParam(NAME_PARAM) String name) {
         return null;
     }
 
     @GET
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/manifest")
     public Response getManifest(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier)
         throws CloneNotSupportedException {
@@ -94,7 +94,7 @@ public class MCRIIIFPresentationResource {
         return builder
             .header("Link",
                 "<http://iiif.io/api/presentation/2/context.json>\n;rel=\"http://www.w3.org/ns/json-ld#context\";type=\""
-                    + MCRIIIFMediaType.APPLICATION_LD_JSON + "\"")
+                    + MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON + "\"")
             .header("Access-Control-Allow-Origin", "*");
     }
 
@@ -105,7 +105,7 @@ public class MCRIIIFPresentationResource {
     }
 
     @GET
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/sequence/{" + NAME_PARAM + "}")
     public Response getSequence(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {
@@ -115,7 +115,7 @@ public class MCRIIIFPresentationResource {
     }
 
     @GET
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/canvas/{" + NAME_PARAM + "}")
     public Response getCanvas(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {
@@ -125,7 +125,7 @@ public class MCRIIIFPresentationResource {
     }
 
     @GET
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/annotation/{" + NAME_PARAM + "}")
     public Response getAnnotation(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {
@@ -135,7 +135,7 @@ public class MCRIIIFPresentationResource {
     }
 
     @GET
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/list/{" + NAME_PARAM + "}")
     public Response getAnnotationList(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier, @PathParam(NAME_PARAM) String name) {
@@ -143,7 +143,7 @@ public class MCRIIIFPresentationResource {
     }
 
     @GET
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/range/{" + NAME_PARAM + "}")
     public Response getRange(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {
@@ -155,7 +155,7 @@ public class MCRIIIFPresentationResource {
     // layers and resources are not supported currently
 
     @GET
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/layer/{" + NAME_PARAM + "}")
     public Response getLayer(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {

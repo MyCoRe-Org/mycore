@@ -41,7 +41,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
-import org.mycore.iiif.common.MCRIIIFMediaType;
+import org.mycore.iiif.common.MCRIIIFMediaTypeHelper;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
 import org.mycore.iiif.image.impl.MCRIIIFImageProvidingException;
@@ -71,7 +71,7 @@ public class MCRIIIFImageResource {
     public static final String IDENTIFIER_PARAM = "identifier";
 
     @GET
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/info.json")
     public Response getInfo(@PathParam(IMPL_PARAM) String implString, @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
@@ -161,7 +161,7 @@ public class MCRIIIFImageResource {
 
     @GET
     @Path("profile.json")
-    @Produces(MCRIIIFMediaType.APPLICATION_LD_JSON)
+    @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     public Response getDereferencedProfile(@PathParam(IMPL_PARAM) String implStr) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         MCRIIIFImageProfile profile = getProfile(getImpl(implStr));

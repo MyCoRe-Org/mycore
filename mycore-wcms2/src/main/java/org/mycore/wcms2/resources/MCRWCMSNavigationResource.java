@@ -46,7 +46,7 @@ import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.wcms2.access.MCRWCMSPermission;
 import org.mycore.wcms2.datamodel.MCRNavigation;
 import org.mycore.wcms2.navigation.MCRWCMSContentManager;
-import org.mycore.wcms2.navigation.MCRWCMSNavigationManager;
+import org.mycore.wcms2.navigation.MCRWCMSNavigationUtils;
 import org.mycore.wcms2.navigation.MCRWCMSNavigationProvider;
 
 import com.google.gson.JsonArray;
@@ -68,7 +68,7 @@ public class MCRWCMSNavigationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String get() {
         try {
-            JsonObject json = MCRWCMSNavigationManager.getNavigationAsJSON();
+            JsonObject json = MCRWCMSNavigationUtils.getNavigationAsJSON();
             return json.toString();
         } catch (Exception exc) {
             throw new WebApplicationException(exc, Status.INTERNAL_SERVER_ERROR);
@@ -94,9 +94,9 @@ public class MCRWCMSNavigationResource {
         }
         JsonObject saveObject = jsonStreamParser.next().getAsJsonObject();
         // get navigation
-        MCRNavigation newNavigation = MCRWCMSNavigationManager.fromJSON(saveObject);
+        MCRNavigation newNavigation = MCRWCMSNavigationUtils.fromJSON(saveObject);
         // save navigation
-        MCRWCMSNavigationManager.save(newNavigation);
+        MCRWCMSNavigationUtils.save(newNavigation);
         // save content
         JsonArray items = saveObject.get(MCRWCMSNavigationProvider.JSON_ITEMS).getAsJsonArray();
         getContentManager().save(items);
@@ -111,7 +111,7 @@ public class MCRWCMSNavigationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getTemplates(@Context ServletContext servletContext) throws Exception {
         // templates of navigation.xml
-        Document xml = MCRWCMSNavigationManager.getNavigationAsXML();
+        Document xml = MCRWCMSNavigationUtils.getNavigationAsXML();
         List<Element> elementList = TEMPLATE_PATH.evaluate(xml);
         HashSet<String> entries = elementList.stream()
             .map(e -> e.getAttributeValue("template"))
@@ -146,10 +146,10 @@ public class MCRWCMSNavigationResource {
         getContentManager().move(from, to);
 
         // update navigation
-        MCRNavigation navigation = MCRWCMSNavigationManager.getNavigation();
-        boolean hrefUpdated = MCRWCMSNavigationManager.updateHref(navigation, from, to);
+        MCRNavigation navigation = MCRWCMSNavigationUtils.getNavigation();
+        boolean hrefUpdated = MCRWCMSNavigationUtils.updateHref(navigation, from, to);
         if (hrefUpdated) {
-            MCRWCMSNavigationManager.save(navigation);
+            MCRWCMSNavigationUtils.save(navigation);
         }
     }
 

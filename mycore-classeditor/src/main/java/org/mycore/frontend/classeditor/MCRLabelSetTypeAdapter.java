@@ -18,9 +18,9 @@
 
 package org.mycore.frontend.classeditor;
 
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.DESCRIPTION;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.LANG;
-import static org.mycore.frontend.classeditor.json.MCRJSONCategoryPropName.TEXT;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_DESCRIPTION;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_LANG;
+import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_TEXT;
 
 import java.lang.reflect.Type;
 import java.util.HashSet;
@@ -59,11 +59,11 @@ public class MCRLabelSetTypeAdapter extends MCRJSONTypeAdapter<MCRLabelSetWrappe
 
     private JsonObject labelToJsonObj(MCRLabel label) {
         JsonObject labelJsonObj = new JsonObject();
-        labelJsonObj.addProperty(LANG, label.getLang());
-        labelJsonObj.addProperty(TEXT, label.getText());
+        labelJsonObj.addProperty(PROP_LANG, label.getLang());
+        labelJsonObj.addProperty(PROP_TEXT, label.getText());
         String description = label.getDescription();
         if (description != null && !"".equals(description)) {
-            labelJsonObj.addProperty(DESCRIPTION, description);
+            labelJsonObj.addProperty(PROP_DESCRIPTION, description);
         }
         return labelJsonObj;
     }
@@ -85,9 +85,9 @@ public class MCRLabelSetTypeAdapter extends MCRJSONTypeAdapter<MCRLabelSetWrappe
     }
 
     private MCRLabel jsonLabelToMCRLabel(JsonObject labelJsonObject) {
-        String lang = labelJsonObject.get(LANG).getAsString();
-        String text = labelJsonObject.get(TEXT).getAsString();
-        JsonElement jsonElement = labelJsonObject.get(DESCRIPTION);
+        String lang = labelJsonObject.get(PROP_LANG).getAsString();
+        String text = labelJsonObject.get(PROP_TEXT).getAsString();
+        JsonElement jsonElement = labelJsonObject.get(PROP_DESCRIPTION);
         String description = null;
         if (jsonElement != null) {
             description = jsonElement.getAsString();
