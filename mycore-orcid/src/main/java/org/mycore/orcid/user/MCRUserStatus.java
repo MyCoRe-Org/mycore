@@ -18,9 +18,29 @@
 
 package org.mycore.orcid.user;
 
-public enum MCRORCIDPublicationStatus {
-    NO_ORCID_USER, // the user is not connected to an ORCID profile, we don't know his ORCID iD
-    NOT_MINE, // the user has an ORCID profile, but this publication is not from him (his name identifiers do not occur)
-    IN_MY_ORCID_PROFILE, // this publication is in the user's ORCID works section
-    NOT_IN_MY_ORCID_PROFILE; // this is a publication of the user, but is not in the user's ORCID works section
+public class MCRUserStatus {
+
+    private boolean isORCIDUser;
+
+    private String orcid;
+
+    private boolean weAreTrustedParty;
+
+    MCRUserStatus(MCRORCIDUser user) {
+        this.orcid = user.getORCID();
+        this.isORCIDUser = orcid != null;
+        this.weAreTrustedParty = user.getAccessToken() != null;
+    }
+
+    public boolean isORCIDUser() {
+        return isORCIDUser;
+    }
+
+    public String getORCID() {
+        return orcid;
+    }
+
+    public boolean weAreTrustedParty() {
+        return weAreTrustedParty;
+    }
 }

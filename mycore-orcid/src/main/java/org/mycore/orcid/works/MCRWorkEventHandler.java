@@ -10,8 +10,8 @@ import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.orcid.user.MCRORCIDPublicationStatus;
 import org.mycore.orcid.user.MCRORCIDUser;
+import org.mycore.orcid.user.MCRPublicationStatus;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -53,26 +53,25 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
 
         users.stream()
             .map(user -> new MCRORCIDUser(user))
-            .filter(user -> user.hasORCIDProfile())
-            .filter(user -> user.weAreTrustedParty())
+            .filter(user -> user.getStatus().isORCIDUser())
+            .filter(user -> user.getStatus().weAreTrustedParty())
             .forEach(user -> publishToORCID(oid, user));
     }
 
     private void publishToORCID(MCRObjectID oid, MCRORCIDUser user) {
         try {
-            MCRWorksSection works = user.getORCIDProfile().getWorksSection();
-            MCRORCIDPublicationStatus status = user.getPublicationStatus(oid.toString());
+            MCRWorksSection works = user.getProfile().getWorksSection();
+            MCRPublicationStatus status = user.getPublicationStatus(oid);
 
-            if (status == MCRORCIDPublicationStatus.IN_MY_ORCID_PROFILE) {
+            if (status.isInORCIDProfile()) {
                 works.findWork(oid).get().update();
-            }
-            if (status == MCRORCIDPublicationStatus.NOT_IN_MY_ORCID_PROFILE) {
+            } else {
                 works.addWorkFrom(oid);
             }
 
         } catch (Exception ex) {
             LOGGER.warn("Could not publish {} in ORCID profile {} of user {}", oid,
-                user.getORCIDProfile().getORCID(), user.getUser().getUserName(), ex);
+                user.getORCID(), user.getUser().getUserName(), ex);
         }
     }
 

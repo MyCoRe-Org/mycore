@@ -27,7 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRUsageException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -66,6 +65,10 @@ public class MCRORCIDUser {
         return user;
     }
 
+    public MCRUserStatus getStatus() {
+        return new MCRUserStatus(this);
+    }
+
     /** Called from MCROAuthServlet to store the user's ORCID iD and token after successful OAuth authorization */
     public void store(MCRTokenResponse token) {
         user.getAttributes().put(ATTR_ORCID_ID, token.getORCID());
@@ -73,57 +76,32 @@ public class MCRORCIDUser {
         MCRUserManager.updateUser(user);
     }
 
-    public boolean hasORCIDProfile() {
-        return user.getUserAttribute(ATTR_ORCID_ID) != null;
+    public String getORCID() {
+        return user.getUserAttribute(ATTR_ORCID_ID);
     }
 
-    /**
-     * Returns true, if there is an access token stored for this user.
-     */
-    public boolean weAreTrustedParty() {
-        return user.getUserAttribute(ATTR_ORCID_TOKEN) != null;
+    public String getAccessToken() {
+        return user.getUserAttribute(ATTR_ORCID_TOKEN);
     }
 
-    public MCRORCIDProfile getORCIDProfile() {
-        if (!hasORCIDProfile()) {
-            return null;
-        }
+    public MCRORCIDProfile getProfile() {
+        if ((profile == null) && (getORCID() != null)) {
+            String orcid = getORCID();
+            String token = getAccessToken();
 
-        if (profile == null) {
-            String orcid = user.getUserAttribute(ATTR_ORCID_ID);
             profile = new MCRORCIDProfile(orcid);
-            if (weAreTrustedParty()) {
-                String token = user.getUserAttribute(ATTR_ORCID_TOKEN);
+            if (token != null) {
                 profile.setAccessToken(token);
             }
         }
         return profile;
     }
 
-    public MCRORCIDPublicationStatus getPublicationStatus(String objectID)
-        throws JDOMException, IOException, SAXException {
-        if (!hasORCIDProfile()) {
-            return MCRORCIDPublicationStatus.NO_ORCID_USER;
-        }
-
-        MCRObjectID oid = MCRObjectID.getInstance(objectID);
-        if (!MCRMetadataManager.exists(oid)) {
-            throw new MCRUsageException("No  publication stored with ID " + oid);
-        }
-
-        if (!isMyPublication(oid)) {
-            return MCRORCIDPublicationStatus.NOT_MINE;
-        }
-
-        MCRORCIDProfile profile = getORCIDProfile();
-        if (profile.getWorksSection().containsWork(oid)) {
-            return MCRORCIDPublicationStatus.IN_MY_ORCID_PROFILE;
-        }
-
-        return MCRORCIDPublicationStatus.NOT_IN_MY_ORCID_PROFILE;
+    public MCRPublicationStatus getPublicationStatus(MCRObjectID oid) throws JDOMException, IOException, SAXException {
+        return new MCRPublicationStatus(this, oid);
     }
 
-    private boolean isMyPublication(MCRObjectID oid) {
+    public boolean isMyPublication(MCRObjectID oid) {
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(oid);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(obj);
 
@@ -167,4 +145,5 @@ public class MCRORCIDUser {
     private static String buildNameIdentifierKey(String type, String id) {
         return type + ":" + id;
     }
+
 }
