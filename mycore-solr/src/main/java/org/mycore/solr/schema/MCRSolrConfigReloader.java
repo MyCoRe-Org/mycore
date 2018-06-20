@@ -187,7 +187,7 @@ public class MCRSolrConfigReloader {
                         }
                     }
                 }
-                executeSolrCommand(coreType, command.getAsString());
+                executeSolrCommand(coreType, command.toString());
             } catch (IOException e) {
                 LOGGER.error(e);
             }
