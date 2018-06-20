@@ -139,7 +139,9 @@ public class MCRSolrConfigReloader {
                 final JsonObject commandJsonObject = command.getAsJsonObject();
                 Entry<String, JsonElement> commandObject = commandJsonObject.entrySet().iterator().next();
                 final String configCommand = commandObject.getKey();
-                final String currentConfigObjectName = configCommand.split("-", 2)[0].toLowerCase(Locale.ROOT);
+                final String currentConfigObjectName = configCommand.contains("-") ?
+                    configCommand.split("-", 2)[1].toLowerCase(Locale.ROOT) :
+                    configCommand;
                 final String namingKey = "listener".equals(currentConfigObjectName) ? "event" : "name";
 
                 if (isKnownSolrConfigCommmand(configCommand)) {
