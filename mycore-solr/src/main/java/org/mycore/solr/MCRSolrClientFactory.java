@@ -127,14 +127,14 @@ public final class MCRSolrClientFactory {
     /**
      * Returns the solr client of the default core.
      */
-    public static SolrClient getSolrMainClient() {
+    public static SolrClient getMainSolrClient() {
         return getMainSolrCore().getClient();
     }
 
     /**
      * Returns the concurrent solr client of the default core.
      */
-    public static SolrClient getConcurrentSolrMainClient() {
+    public static SolrClient getMainConcurrentSolrClient() {
         return getMainSolrCore().getConcurrentClient();
     }
 

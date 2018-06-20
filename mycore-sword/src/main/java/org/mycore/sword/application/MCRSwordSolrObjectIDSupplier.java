@@ -52,7 +52,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
             // only need the numFound
             queryCopy.setStart(0);
             queryCopy.setRows(0);
-            final QueryResponse queryResponse = MCRSolrClientFactory.getSolrMainClient().query(queryCopy);
+            final QueryResponse queryResponse = MCRSolrClientFactory.getMainSolrClient().query(queryCopy);
 
             return queryResponse.getResults().getNumFound();
         } catch (SolrServerException | IOException e) {
@@ -68,7 +68,7 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
         queryCopy.setStart(from);
         queryCopy.setRows(count);
         try {
-            final QueryResponse queryResponse = MCRSolrClientFactory.getSolrMainClient().query(queryCopy);
+            final QueryResponse queryResponse = MCRSolrClientFactory.getMainSolrClient().query(queryCopy);
             return queryResponse.getResults().stream()
                 .map(r -> (String) r.getFieldValue("id"))
                 .map(MCRObjectID::getInstance)

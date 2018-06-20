@@ -109,7 +109,7 @@ public class MCRAltoHighlightResource {
         p.set("hl.fragsize", 70);
         p.set("hl.maxAnalyzedChars", Integer.MAX_VALUE - 1);
         try {
-            QueryResponse solrResponse = MCRSolrClientFactory.getSolrMainClient().query(p);
+            QueryResponse solrResponse = MCRSolrClientFactory.getMainSolrClient().query(p);
             JsonArray response = buildQueryResponse(solrResponse.getHighlighting());
             return Response.ok().entity(new Gson().toJson(response)).build();
         } catch (Exception exc) {

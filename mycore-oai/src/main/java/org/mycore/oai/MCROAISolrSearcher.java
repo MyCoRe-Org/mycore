@@ -83,7 +83,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         query.set(CommonParams.Q, "id:" + MCRSolrUtils.escapeSearchValue(mcrId));
         query.setRows(1);
         // do the query
-        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
+        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         try {
             QueryResponse response = solrClient.query(query);
             SolrDocumentList results = response.getResults();
@@ -149,7 +149,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         query.set(CommonParams.SORT, "id asc");
 
         // do the query
-        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
+        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         QueryResponse response = solrClient.query(query);
         Collection<MCROAISetResolver<String, SolrDocument>> setResolver = getSetResolver(response.getResults());
         return new MCROAISolrResult(response, d -> toHeader(d, setResolver));
@@ -244,7 +244,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         params.add(CommonParams.FQ, fieldName + ":[* TO *]");
         params.add(CommonParams.FL, fieldName);
         params.add(CommonParams.ROWS, "1");
-        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
+        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         try {
             QueryResponse response = solrClient.query(params);
             SolrDocumentList list = response.getResults();

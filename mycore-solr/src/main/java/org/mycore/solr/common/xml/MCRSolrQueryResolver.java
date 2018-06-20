@@ -39,7 +39,7 @@ public class MCRSolrQueryResolver implements URIResolver {
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         String urlQuery = href.substring(href.indexOf(":") + 1);
-        SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
+        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         MCRSolrURL solrURL = new MCRSolrURL((HttpSolrClient) solrClient, urlQuery);
         try {
             MCRURLContent result = new MCRURLContent(solrURL.getUrl());

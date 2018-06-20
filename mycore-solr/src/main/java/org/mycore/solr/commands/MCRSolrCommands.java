@@ -222,7 +222,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         help = "selects mcr objects with a solr query",
         order = 180)
     public static void selectObjectsWithSolrQuery(String query) throws Exception {
-        SolrClient client = MCRSolrClientFactory.getSolrMainClient();
+        SolrClient client = MCRSolrClientFactory.getMainSolrClient();
         MCRObjectCommands.setSelectedObjectIDs(MCRSolrSearchUtils.listIDs(client, query));
     }
 
@@ -254,7 +254,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         List<String> result = new ArrayList<>();
         Collection<String> objectTypes = MCRXMLMetadataManager.instance().getObjectTypes();
 
-        final SolrClient solrClient = MCRSolrClientFactory.getSolrMainClient();
+        final SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
             for (String objectType : objectTypes) {
                 LOGGER.info("synchronize SOLR index for object type: " + objectType);
                 // get ids from store
