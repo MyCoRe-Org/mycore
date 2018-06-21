@@ -15,7 +15,7 @@ cache:
 env:
   global:
     - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
-    - GECKODRIVER_VERSION="0.19.0"
+    - GECKODRIVER_VERSION="0.20.1"
     - CHROMEDRIVER_VERSION=$(curl http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
     - FIREFOX_BIN=$(which firefox)
     - SELENIUM_BROWSER=firefox
@@ -39,6 +39,7 @@ before_script:
   - |
    echo "BUILD START: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 script:
+  - export $(dbus-launch)
   - mkdir ${HOME}/tmp
   - export TMPDIR="${HOME}/tmp"
   - mvn -B -Plocal-testing,!standard-with-extra-repos clean install && mvn -P!standard-with-extra-repos -B javadoc:javadoc && mvn -P!standard-with-extra-repos com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DfailOnMissingReportFile=false
