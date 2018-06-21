@@ -4,11 +4,10 @@ dist: trusty
 group: beta
 install: true
 addons:
-  firefox: "60.0.2"
+  firefox: "60.0esr"
   apt:
     packages:
     - google-chrome-stable
-    - dbus-x11
 cache:
   directories:
     - $HOME/.m2/repository
