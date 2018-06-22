@@ -78,9 +78,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
                     }
 
                     return new MessageFormat(format, Locale.ROOT).format(new String[] { SOLR_CORE_PREFIX, coreID,
-                        SOLR_CORE_NAME_SUFFIX, core.getName(), core.getServerURL(), SOLR_CORE_SERVER_SUFFIX });
-                }
-            ).collect(Collectors.joining("\n")));
+                        SOLR_CORE_NAME_SUFFIX, core.getName(), core.getServerURL(), SOLR_CORE_SERVER_SUFFIX, });
+                }).collect(Collectors.joining("\n")));
     }
 
     @MCRCommand(syntax = "create solr core with name {0} on server {1} using configset {2}", order = 20)
@@ -91,18 +90,18 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         create.setConfigSet(configSet);
         create.setIsLoadOnStartup(true);
 
-        try(HttpSolrClient solrClient = new HttpSolrClient.Builder(server+"/solr").build()){
+        try (HttpSolrClient solrClient = new HttpSolrClient.Builder(server + "/solr").build()) {
             CoreAdminResponse response = create.process(solrClient);
-            LOGGER.info("Core Create Response: {}", response);    
+            LOGGER.info("Core Create Response: {}", response);
         }
     }
-    
+
     @MCRCommand(syntax = "create solr core with name {0} using configset {1}", order = 30)
     public static void createSolrCore(String coreName, String configSet)
         throws IOException, SolrServerException {
         createSolrCore(coreName, DEFAULT_SOLR_SERVER_URL, configSet);
     }
-    
+
     @MCRCommand(syntax = "register solr core with name {0} on server {1} as core {2}", order = 40)
     public static void registerSolrCore(String coreName, String server, String coreID) {
         MCRSolrClientFactory.addCore(server, coreName, coreID);
@@ -157,8 +156,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "rebuild solr metadata index for all objects of type {0} in core {1}",
-        order = 130
-    )
+        order = 130)
     public static void rebuildMetadataIndexType(String type, String coreID) throws Exception {
         MCRSolrCore core = getCore(coreID);
         MCRSolrIndexer.rebuildMetadataIndex(type, core.getClient());
@@ -166,8 +164,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "rebuild solr metadata index for object {0} in core {1}",
-        order = 120
-    )
+        order = 120)
     public static void rebuildMetadataIndexObject(String object, String coreID) throws Exception {
         MCRSolrCore core = getCore(coreID);
         MCRSolrIndexer.rebuildMetadataIndex(Stream.of(object).collect(Collectors.toList()), core.getClient());
@@ -194,7 +191,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "rebuild solr content index for object {0} in core {1}",
-        help = "rebuilds solr's content index for the derivate of objects with the id {0} and the core with the coreID {1}",
+        help = "rebuilds solr's content index for the derivate of objects with the id {0} "
+            + "and the core with the coreID {1}",
         order = 160)
     public static void rebuildContentIndexObject(String objectID, String coreID) {
         MCRSolrCore core = getCore(coreID);
@@ -267,11 +265,10 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "optimize solr index in core {0}\n",
-        help =
-            "The optimize operation is like a hard commit except that it forces all of the index segments "
+        help = "The optimize operation is like a hard commit except that it forces all of the index segments "
             + "to be merged into a single segment first. "
-                + "Depending on the use cases, this operation should be performed infrequently (like nightly), "
-                + "if at all, since it is very expensive and involves reading and re-writing the entire index",
+            + "Depending on the use cases, this operation should be performed infrequently (like nightly), "
+            + "if at all, since it is very expensive and involves reading and re-writing the entire index",
         order = 410)
     public static void optimize(String coreID) {
         MCRSolrCore core = getCore(coreID);

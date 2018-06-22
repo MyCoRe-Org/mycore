@@ -41,7 +41,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
 
 import com.google.common.io.ByteStreams;
@@ -70,11 +69,6 @@ public class MCRSolrConfigReloader {
 
     private static String SOLR_CONFIG_UPDATE_FILE_NAME = "solr-config.json";
 
-    //at the moment we check the existence of the following config object (having a 'name' property)
-    //-> be careful when you try to modify other config objects
-    private static List<String> CHECKED_CONFIG_OBJECTS = Arrays.asList("requesthandler", "searchcomponent",
-        "queryresponsewriter", "updateprocessor", "listener");
-
     static {
         SOLR_CONFIG_OBJECT_NAMES.put("requesthandler", "requestHandler"); //checked -> id in subfield "name"
         SOLR_CONFIG_OBJECT_NAMES.put("searchcomponent", "searchComponent"); //checked  -> id in subfield "name"
@@ -97,9 +91,6 @@ public class MCRSolrConfigReloader {
      * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processConfigFiles(String configType, String coreID) {
-        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
-
         LOGGER.info("Load config definitions for core " + coreID + " using configuration " + configType);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             List<byte[]> configFileContents = MCRConfigurationInputStream.getConfigFileContents(
@@ -114,12 +105,9 @@ public class MCRSolrConfigReloader {
                     json.getAsJsonArray().add(e);
                 }
 
-                JsonObject currentSolrConfig = retrieveCurrentSolrConfig(configType);
-
                 for (JsonElement command : json.getAsJsonArray()) {
-                    processConfigCommand(coreID, command, currentSolrConfig);
+                    processConfigCommand(coreID, command);
                 }
-
             }
 
         } catch (IOException e) {
@@ -133,7 +121,7 @@ public class MCRSolrConfigReloader {
      * @param command - the command in JSON syntax
      * @param currentSolrConfig - the current Solr configuration as JSONObject
      */
-    private static void processConfigCommand(String coreID, JsonElement command, JsonObject currentSolrConfig) {
+    private static void processConfigCommand(String coreID, JsonElement command) {
         if (command.isJsonObject()) {
             try {
                 //get first and only? property of the command object
@@ -143,7 +131,6 @@ public class MCRSolrConfigReloader {
                 final String currentConfigObjectName = configCommand.contains("-") ?
                     configCommand.split("-", 2)[1].toLowerCase(Locale.ROOT) :
                     configCommand;
-                final String namingKey = "listener".equals(currentConfigObjectName) ? "event" : "name";
 
                 if (isKnownSolrConfigCommmand(configCommand)) {
                     executeSolrCommand(coreID, command.toString());
