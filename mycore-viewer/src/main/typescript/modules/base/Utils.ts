@@ -1034,35 +1034,75 @@ class ViewerParameterMap extends MyCoReMap<string, string> {
 
 }
 
-function singleSelectShim(xml:Document, xpath:string, nsMap:MyCoReMap<string, string>):Node {
+function singleSelectShim(xml: Document, xpath: string, nsMap: MyCoReMap<string, string>): Node {
 
-    if ("evaluate" in document) {
+    if ('evaluate' in document) {
         /**
          * Every Browser Solution
          */
-        var nsResolver = (nsPrefix:string) => {
+        const nsResolver = (nsPrefix: string) => {
             return nsMap.get(nsPrefix);
         };
-
         return (<any>xml).evaluate(xpath, xml.documentElement, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     } else {
         /**
          * MS IE Solution
          */
-        var documentAsMSXML = new ActiveXObject("Msxml2.DOMDocument.6.0");
+        const documentAsMSXML = new ActiveXObject('Msxml2.DOMDocument.6.0');
         documentAsMSXML.async = false;
         documentAsMSXML.load(xml);
 
-        var nsCollector = "";
-        nsMap.keys.forEach((key:string) => {
-            var part = "xmlns:" + key + "='" + nsMap.get(key) + "' ";
+        let nsCollector = '';
+        nsMap.keys.forEach((key: string) => {
+            const part = 'xmlns:' + key + '="' + nsMap.get(key) + '" ';
             nsCollector = nsCollector + part;
         });
-        documentAsMSXML.setProperty("SelectionNamespaces", nsCollector);
-        documentAsMSXML.setProperty("SelectionLanguage", "XPath");
+        documentAsMSXML.setProperty('SelectionNamespaces', nsCollector);
+        documentAsMSXML.setProperty('SelectionLanguage', 'XPath');
         return documentAsMSXML.documentElement.selectSingleNode(xpath);
     }
-};
+}
+
+function getNodesShim(xml: Document, xpathExpression: string, contextNode: any,
+                      nsMap: MyCoReMap<string, string>, resultType: any, result: any): Node[] {
+    if ('evaluate' in document) {
+        /**
+         * Every Browser Solution
+         */
+        const nsResolver = (nsPrefix: string) => {
+            return nsMap.get(nsPrefix);
+        };
+        const resultList = (<any>xml).evaluate(xpathExpression, contextNode, nsResolver, resultType, result);
+        const nodeArray: Node[] = [];
+        let next;
+        while ((next = resultList.iterateNext()) != null) {
+            nodeArray.push(next);
+        }
+        return nodeArray;
+    } else {
+        /**
+         * MS IE Solution
+         */
+        const documentAsMSXML = new ActiveXObject('Msxml2.DOMDocument.6.0');
+        documentAsMSXML.async = false;
+        documentAsMSXML.load(xml);
+
+        let nsCollector = '';
+        nsMap.keys.forEach((key: string) => {
+            const part = 'xmlns:' + key + '="' + nsMap.get(key) + '" ';
+            nsCollector = nsCollector + part;
+        });
+        documentAsMSXML.setProperty('SelectionNamespaces', nsCollector);
+        documentAsMSXML.setProperty('SelectionLanguage', 'XPath');
+        const resultList = documentAsMSXML.documentElement.selectNodes(xpathExpression);
+        const nodeArray: Node[] = [];
+        for (let i = 0; i < resultList.length; i++) {
+            nodeArray.push(resultList.nextNode());
+        }
+        return nodeArray;
+    }
+
+}
 
 class XMLUtil {
 
