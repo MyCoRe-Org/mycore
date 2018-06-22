@@ -98,7 +98,8 @@ public abstract class MCRSolrClassificationUtil {
         for (List<SolrInputDocument> part : partitionList) {
             try {
                 client.add(part, 500);
-                LOGGER.info("Added {}/{} documents", added += part.size(), docNum);
+                added += part.size();
+                LOGGER.info("Added {}/{} documents", added, docNum);
             } catch (SolrServerException | IOException e) {
                 LOGGER.error("Unable to add classification documents.", e);
             }

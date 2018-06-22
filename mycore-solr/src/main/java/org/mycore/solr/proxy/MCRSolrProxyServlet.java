@@ -18,7 +18,6 @@
 
 package org.mycore.solr.proxy;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -98,7 +97,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private CloseableHttpClient httpClient;
 
     private MCRIdleConnectionMonitorThread idleConnectionMonitorThread;
-
 
     private Set<String> queryHandlerWhitelist;
 
@@ -250,7 +248,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     private void updateQueryHandlerMap() {
-        List<String> whitelistPropertyList = MCRConfiguration.instance().getStrings(SOLR_CONFIG_PREFIX + "Proxy.WhiteList",
+        List<String> whitelistPropertyList = MCRConfiguration.instance().getStrings(
+            SOLR_CONFIG_PREFIX + "Proxy.WhiteList",
             Collections.singletonList("/select"));
         this.queryHandlerWhitelist = new HashSet<>(whitelistPropertyList);
     }
@@ -289,7 +288,6 @@ public class MCRSolrProxyServlet extends MCRServlet {
         super.init();
 
         this.updateQueryHandlerMap();
-
 
         httpClientConnectionManager = MCRHttpUtils.getConnectionManager(MAX_CONNECTIONS);
         httpClient = MCRHttpUtils.getHttpClient(httpClientConnectionManager, MAX_CONNECTIONS);

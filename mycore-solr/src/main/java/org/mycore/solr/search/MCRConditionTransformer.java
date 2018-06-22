@@ -58,7 +58,7 @@ public class MCRConditionTransformer {
      * If a condition references fields from multiple indexes, this constant is
      * returned
      */
-    protected static final String mixed = "--mixed--";
+    protected static final String MIXED = "--mixed--";
 
     private static HashSet<String> joinFields = null;
 
@@ -191,8 +191,9 @@ public class MCRConditionTransformer {
     }
 
     public static StringBuilder getTermQuery(String field, String value) {
-        if (value.length() == 0)
+        if (value.length() == 0) {
             return null;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append('+');
         sb.append(field);
@@ -340,7 +341,7 @@ public class MCRConditionTransformer {
         // mixed indexes here!
         return children.stream()
             .map(MCRConditionTransformer::getIndex)
-            .reduce((l, r) -> l.equals(r) ? l : mixed)
+            .reduce((l, r) -> l.equals(r) ? l : MIXED)
             .get();
     }
 

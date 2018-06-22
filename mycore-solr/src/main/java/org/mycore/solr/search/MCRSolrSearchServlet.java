@@ -94,7 +94,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             "debug", "explainOther", "defType", "timeAllowed", "omitHeader", "sortOrder", "sortBy", "wt", "qf", "q.alt",
             "mm", "pf",
             "ps", "qs", "tie", "bq", "bf", "lang", "facet", "facet.field", "facet.sort", "facet.method",
-            PHRASE_QUERY_PARAM };
+            PHRASE_QUERY_PARAM, };
 
         RESERVED_PARAMETER_KEYS = Collections.unmodifiableList(Arrays.asList(parameter));
     }

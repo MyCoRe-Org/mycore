@@ -129,8 +129,9 @@ public abstract class MCRSolrSearchUtils {
 
         @Override
         public boolean tryAdvance(Consumer<? super SolrDocument> action) {
-            if (action == null)
+            if (action == null) {
                 throw new NullPointerException();
+            }
             long i = start, size = estimateSize();
             if (size > 0) {
                 if (response == null) {
@@ -149,8 +150,9 @@ public abstract class MCRSolrSearchUtils {
 
         @Override
         public void forEachRemaining(Consumer<? super SolrDocument> action) {
-            if (action == null)
+            if (action == null) {
                 throw new NullPointerException();
+            }
             ModifiableSolrParams p = new ModifiableSolrParams(params);
             p.set("rows", (int) rows);
             long start = this.start, size = estimateSize(), fetched = 0;

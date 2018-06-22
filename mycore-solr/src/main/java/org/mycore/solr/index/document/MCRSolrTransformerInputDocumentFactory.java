@@ -56,7 +56,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
     private static boolean isJAXBTransformer;
 
     /* (non-Javadoc)
-     * @see org.mycore.solr.index.document.MCRSolrInputDocumentFactory#getDocument(org.mycore.datamodel.metadata.MCRObjectID, org.mycore.common.content.MCRContent)
+     * @see org.mycore.solr.index.document.MCRSolrInputDocumentFactory
+     *          #getDocument(org.mycore.datamodel.metadata.MCRObjectID, org.mycore.common.content.MCRContent)
      */
     @Override
     public SolrInputDocument getDocument(MCRObjectID id, MCRContent content) throws SAXException, IOException {

@@ -260,8 +260,8 @@ public class MCRQLSearchUtils {
             for (String name : sortFields) {
                 String sOrder = getReqParameter(req, name, "ascending");
                 boolean order = "ascending".equals(sOrder) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING;
-                name = name.substring(0, name.indexOf(".sortField"));
-                sortBy.add(new MCRSortBy(name, order));
+                String fieldName = name.substring(0, name.indexOf(".sortField"));
+                sortBy.add(new MCRSortBy(fieldName, order));
             }
             query.setSortBy(sortBy);
         }

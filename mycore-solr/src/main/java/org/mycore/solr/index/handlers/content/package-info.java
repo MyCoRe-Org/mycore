@@ -18,6 +18,7 @@
 
 /**
  * @author Thomas Scheffler (yagee)
- * Classes that perform lazy conversion of {@link org.mycore.common.content.MCRContent} to {@link org.apache.solr.common.SolrInputDocument}
+ * Classes that perform lazy conversion of {@link org.mycore.common.content.MCRContent} 
+ * to {@link org.apache.solr.common.SolrInputDocument}
  */
 package org.mycore.solr.index.handlers.content;
