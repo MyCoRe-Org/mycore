@@ -47,12 +47,12 @@
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-client</artifactId>
-      <scope>runtime</scope>
+      <artifactId>jersey-common</artifactId>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-common</artifactId>
+      <artifactId>jersey-client</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
