@@ -292,14 +292,4 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         MCRSolrIndexer.synchronizeMetadataIndex(core.getClient());
     }
 
-    // above new commands
-
-    @MCRCommand(
-        syntax = "drop solr classification index",
-        help = "Deletes an existing classification index from solr",
-        order = 95)
-    public static void dropClassificationIndex() {
-        MCRSolrClassificationUtil.dropIndex();
-    }
-
 }
