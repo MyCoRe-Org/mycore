@@ -88,9 +88,5 @@ A message like this should appear: `INFO: 2 objects selected`
 
 Then you can use the following command to apply the migration command to all found objects:
 ```
-execute for selected xslt {x} with file {path to mycoreobject-migrate-language.xsl}
+execute for selected xslt {x} with file resource:xsl/mycoreobject-migrate-language.xsl
 ```
-
-You need to replace `{path to mycoreobject-migrate-language.xsl}` with your path to the `mycoreobject-migrate-language.xsl`
-
-You can find the file in `mycore-migration/src/main/resources/xsl/mycoreobject-migrate-language.xsl`
