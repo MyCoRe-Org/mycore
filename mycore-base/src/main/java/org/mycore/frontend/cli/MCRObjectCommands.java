@@ -21,7 +21,6 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -44,6 +43,7 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -66,6 +66,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -88,7 +89,6 @@ import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.tools.MCRTopologicalSort;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
@@ -842,7 +842,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "xslt {0} with file {1}",
-        help = "transforms a mycore object {0} with the given file or URL {1}",
+        help = "transforms a mycore object {0} with the given file or URI {1}",
         order = 280)
     public static void xslt(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException,
         URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException,
@@ -865,7 +865,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
             syntax = "force xslt {0} with file {1}",
-            help = "transforms a mycore object {0} with the given file or URL {1}. Overwrites anyway if original "
+        help = "transforms a mycore object {0} with the given file or URI {1}. Overwrites anyway if original "
                     + "root name and result root name are different.",
             order = 285)
     public static void forceXSLT(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException,
@@ -874,22 +874,19 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         xslt(objectId, xslFilePath, true);
     }
 
-    private static void xslt(String objectId, String xslFilePath, boolean force)
-        throws IOException, JDOMException, SAXException,
-        URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException,
-        ParserConfigurationException {
+    private static void xslt(String objectId, String xslFilePath, boolean force) throws IOException, JDOMException,
+        SAXException, TransformerException, MCRPersistenceException, MCRAccessException, ParserConfigurationException {
         File xslFile = new File(xslFilePath);
-        URL xslURL;
-        if (!xslFile.exists()) {
-            try {
-                xslURL = new URL(xslFilePath);
-            } catch (MalformedURLException e) {
-                LOGGER.error("XSL parameter is not a file or URL: {}", xslFilePath);
-                return;
-            }
+        Source xslSource;
+        if (xslFile.exists()) {
+            xslSource = new StreamSource(xslFile);
         } else {
-            xslURL = xslFile.toURI().toURL();
+            xslSource = MCRURIResolver.instance().resolve(xslFilePath, null);
+            if (xslSource == null) {
+                xslSource = new StreamSource(xslFilePath);
+            }
         }
+        MCRSourceContent style = new MCRSourceContent(xslSource);
         MCRObjectID mcrId = MCRObjectID.getInstance(objectId);
         Document document = MCRXMLMetadataManager.instance().retrieveXML(mcrId);
         // do XSL transform
@@ -898,7 +895,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         transformerFactory.setURIResolver(MCRURIResolver.instance());
         XMLReader xmlReader = MCRXMLParserFactory.getNonValidatingParser().getXMLReader();
         xmlReader.setEntityResolver(MCREntityResolver.instance());
-        SAXSource styleSource = new SAXSource(xmlReader, new InputSource(xslURL.toURI().toString()));
+        SAXSource styleSource = new SAXSource(xmlReader, style.getInputSource());
         Transformer transformer = transformerFactory.newTransformer(styleSource);
         for (Entry<String, String> property : MCRConfiguration.instance().getPropertiesMap().entrySet()) {
             transformer.setParameter(property.getKey(), property.getValue());

@@ -6,7 +6,7 @@
     <mods:title>Test-Titel</mods:title>
   </mods:titleInfo>
   <mods:language>
-    <mods:languageTerm authority="rfc4646" type="code">de</mods:languageTerm>
+    <mods:languageTerm authority="rfc5646" type="code">de</mods:languageTerm>
   </mods:language>
   <mods:classification authority="sdnb" displayLabel="sdnb">000</mods:classification>
   <mods:accessCondition type="use and reproduction" xlink:type="simple">cc_by-nc</mods:accessCondition>

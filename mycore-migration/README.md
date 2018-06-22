@@ -75,3 +75,18 @@ execute for selected migrate tei entries in mets file of derivate {x}
 If you don't do that you will receive this message in the viewer console:
 ```Unknown File Group : TRANSCRIPTION```
 
+## mycore-mods
+
+
+To migrate old mods-files we have a Stylesheet.
+You need to select all mods-files first:
+```
+select objects with solr query objectType:mods
+```
+
+A message like this should appear: `INFO: 2 objects selected`
+
+Then you can use the following command to apply the migration command to all found objects:
+```
+execute for selected xslt {x} with file resource:xsl/mycoreobject-migrate-language.xsl
+```

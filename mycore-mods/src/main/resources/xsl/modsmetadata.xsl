@@ -778,7 +778,7 @@
         <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.language'), ':')" />
       </td>
       <td class="metavalue">
-        <xsl:for-each select="mods:languageTerm[@authority='rfc4646']">
+        <xsl:for-each select="mods:languageTerm[@authority='rfc5646']">
           <xsl:if test="position()!=1">
             <xsl:choose>
               <xsl:when test="string-length($sep)&gt;0">
