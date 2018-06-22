@@ -121,20 +121,10 @@ namespace mycore.viewer.widgets.mets {
         }
 
         public getGroups() {
-            let fileGroupPath = "//mets:fileSec//mets:fileGrp";
-            var nsResolver = (nsPrefix: string) => {
-                return MetsStructureBuilder.NS_MAP.get(nsPrefix);
-            };
-            let fileSectionResult = (<any>this.metsDocument).evaluate(fileGroupPath, this.metsDocument.documentElement,
-                nsResolver, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
-
-            let nodeArray: Array<Node> = [];
-            let next;
-            while ((next = fileSectionResult.iterateNext()) != null) {
-                nodeArray.push(next);
-            }
-
-            return nodeArray;
+            const fileGroupPath: string = '//mets:fileSec//mets:fileGrp';
+            return getNodesShim(this.metsDocument, fileGroupPath,
+                this.metsDocument.documentElement, MetsStructureBuilder.NS_MAP,
+                /* XPathResult.UNORDERED_NODE_ITERATOR_TYPE */ 4, null);
         }
 
         /**
