@@ -60,7 +60,7 @@ public abstract class MCRSolrClassificationUtil {
     /**
      * Reindex the whole classification system.
      */
-    public static void rebuildIndex() {
+    public static void rebuildIndex(SolrClient client) {
         LOGGER.info("rebuild classification index...");
         // categories
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
@@ -71,14 +71,14 @@ public abstract class MCRSolrClassificationUtil {
             List<MCRCategory> categoryList = getDescendants(rootCategory);
             categoryList.add(rootCategory);
             List<SolrInputDocument> solrDocumentList = toSolrDocument(categoryList);
-            bulkIndex(solrDocumentList);
+            bulkIndex(client, solrDocumentList);
         }
         // links
         MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
         Collection<String> linkTypes = linkService.getTypes();
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '{}' links...", linkType);
-            bulkIndex(linkService.getLinks(linkType).stream()
+            bulkIndex(client, linkService.getLinks(linkType).stream()
                 .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
                     link.getObjectReference()))
                 .map(MCRSolrCategoryLink::toSolrDocument)
@@ -91,14 +91,13 @@ public abstract class MCRSolrClassificationUtil {
      *
      * @param solrDocumentList the list to index
      */
-    public static void bulkIndex(List<SolrInputDocument> solrDocumentList) {
-        SolrClient solrClient = getCore().getConcurrentClient();
+    public static void bulkIndex(SolrClient client, List<SolrInputDocument> solrDocumentList) {
         List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 1000);
         int docNum = solrDocumentList.size();
         int added = 0;
         for (List<SolrInputDocument> part : partitionList) {
             try {
-                solrClient.add(part, 500);
+                client.add(part, 500);
                 LOGGER.info("Added {}/{} documents", added += part.size(), docNum);
             } catch (SolrServerException | IOException e) {
                 LOGGER.error("Unable to add classification documents.", e);

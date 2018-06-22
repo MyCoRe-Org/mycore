@@ -59,9 +59,9 @@ public class MCRSolrUtils {
         return MCRConfiguration.instance().getBoolean(SOLR_CONFIG_PREFIX + "NestedDocuments", true);
     }
 
-    public static MCRConfigurationException getCoreConfigMissingException(String coreType) {
+    public static MCRConfigurationException getCoreConfigMissingException(String coreID) {
         return new MCRConfigurationException(
-            "Missing property: " + MCRSolrConstants.SOLR_CORE_PREFIX + coreType
+            "Missing property: " + MCRSolrConstants.SOLR_CORE_PREFIX + coreID
                 + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX);
     }
 }

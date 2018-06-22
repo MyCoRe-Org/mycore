@@ -18,7 +18,9 @@
 
 package org.mycore.solr.schema;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,59 +76,79 @@ public class MCRSolrSchemaReloader {
      *
      * @param coreType the name of the core
      */
-    public static void clearSchema(String coreType) {
+    public static void clearSchema(String coreID, String coreType) {
 
-        LOGGER.info("Clear SOLR schema for core type " + coreType);
+        LOGGER.info("Clear SOLR schema for core type " + coreType + " and in core " + coreID);
         try {
-            SolrClient solrClient = MCRSolrClientFactory.get(coreType).map(MCRSolrCore::getClient)
-                .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType));
+            SolrClient solrClient = MCRSolrClientFactory.get(coreID).map(MCRSolrCore::getClient)
+                .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
 
-            SchemaRequest.CopyFields copyFieldsReq = new SchemaRequest.CopyFields();
-            for (Map<String, Object> copyField : copyFieldsReq.process(solrClient).getCopyFields()) {
-                String fieldSrc = copyField.get("source").toString();
-                List<String> fieldDest = new ArrayList<String>();
-                fieldDest.add(copyField.get("dest").toString());
-                LOGGER.debug("remove SOLR CopyField " + fieldSrc + " --> " + fieldDest.get(0));
-                SchemaRequest.DeleteCopyField delCopyField = new SchemaRequest.DeleteCopyField(fieldSrc, fieldDest);
-                delCopyField.process(solrClient);
-            }
+            deleteCopyFields(solrClient);
             LOGGER.debug("CopyFields cleaned for core type " + coreType);
 
-            SchemaRequest.Fields fieldsReq = new SchemaRequest.Fields();
-            for (Map<String, Object> field : fieldsReq.process(solrClient).getFields()) {
-                String fieldName = field.get("name").toString();
-                if (!SOLR_DEFAULT_FIELDS.contains(fieldName)) {
-                    LOGGER.debug("remove SOLR Field " + fieldName);
-                    SchemaRequest.DeleteField delField = new SchemaRequest.DeleteField(fieldName);
-                    delField.process(solrClient);
-                }
-            }
+            deleteFields(solrClient);
             LOGGER.debug("Fields cleaned for core type " + coreType);
 
-            SchemaRequest.DynamicFields dynFieldsReq = new SchemaRequest.DynamicFields();
-            for (Map<String, Object> field : dynFieldsReq.process(solrClient).getDynamicFields()) {
-                String fieldName = field.get("name").toString();
-                if (!SOLR_DEFAULT_DYNAMIC_FIELDS.contains(fieldName)) {
-                    LOGGER.debug("remove SOLR DynamicField " + fieldName);
-                    SchemaRequest.DeleteDynamicField delField = new SchemaRequest.DeleteDynamicField(fieldName);
-                    delField.process(solrClient);
-                }
-            }
+            deleteDynamicFields(solrClient);
             LOGGER.debug("DynamicFields cleaned for core type  " + coreType);
 
-            SchemaRequest.FieldTypes fieldTypesReq = new SchemaRequest.FieldTypes();
-            for (FieldTypeRepresentation fieldType : fieldTypesReq.process(solrClient).getFieldTypes()) {
-                String fieldTypeName = fieldType.getAttributes().get("name").toString();
-                if (!SOLR_DEFAULT_FIELDTYPES.contains(fieldTypeName)) {
-                    LOGGER.debug("remove SOLR FieldType " + fieldTypeName);
-                    SchemaRequest.DeleteFieldType delField = new SchemaRequest.DeleteFieldType(fieldTypeName);
-                    delField.process(solrClient);
-                }
-            }
+            deleteFieldTypes(solrClient);
             LOGGER.debug("FieldTypes cleaned for core type  " + coreType);
 
         } catch (IOException | SolrServerException e) {
             LOGGER.error(e);
+        }
+    }
+
+    private static void deleteFieldTypes(SolrClient solrClient)
+        throws SolrServerException, IOException {
+        SchemaRequest.FieldTypes fieldTypesReq = new SchemaRequest.FieldTypes();
+        for (FieldTypeRepresentation fieldType : fieldTypesReq.process(solrClient).getFieldTypes()) {
+            String fieldTypeName = fieldType.getAttributes().get("name").toString();
+            if (!SOLR_DEFAULT_FIELDTYPES.contains(fieldTypeName)) {
+                LOGGER.debug("remove SOLR FieldType " + fieldTypeName);
+                SchemaRequest.DeleteFieldType delField = new SchemaRequest.DeleteFieldType(fieldTypeName);
+                delField.process(solrClient);
+            }
+        }
+    }
+
+    private static void deleteDynamicFields(SolrClient solrClient)
+        throws SolrServerException, IOException {
+        SchemaRequest.DynamicFields dynFieldsReq = new SchemaRequest.DynamicFields();
+        for (Map<String, Object> field : dynFieldsReq.process(solrClient).getDynamicFields()) {
+            String fieldName = field.get("name").toString();
+            if (!SOLR_DEFAULT_DYNAMIC_FIELDS.contains(fieldName)) {
+                LOGGER.debug("remove SOLR DynamicField " + fieldName);
+                SchemaRequest.DeleteDynamicField delField = new SchemaRequest.DeleteDynamicField(fieldName);
+                delField.process(solrClient);
+            }
+        }
+    }
+
+    private static void deleteFields(SolrClient solrClient)
+        throws SolrServerException, IOException {
+        SchemaRequest.Fields fieldsReq = new SchemaRequest.Fields();
+        for (Map<String, Object> field : fieldsReq.process(solrClient).getFields()) {
+            String fieldName = field.get("name").toString();
+            if (!SOLR_DEFAULT_FIELDS.contains(fieldName)) {
+                LOGGER.debug("remove SOLR Field " + fieldName);
+                SchemaRequest.DeleteField delField = new SchemaRequest.DeleteField(fieldName);
+                delField.process(solrClient);
+            }
+        }
+    }
+
+    private static void deleteCopyFields(SolrClient solrClient)
+        throws SolrServerException, IOException {
+        SchemaRequest.CopyFields copyFieldsReq = new SchemaRequest.CopyFields();
+        for (Map<String, Object> copyField : copyFieldsReq.process(solrClient).getCopyFields()) {
+            String fieldSrc = copyField.get("source").toString();
+            List<String> fieldDest = new ArrayList<String>();
+            fieldDest.add(copyField.get("dest").toString());
+            LOGGER.debug("remove SOLR CopyField " + fieldSrc + " --> " + fieldDest.get(0));
+            SchemaRequest.DeleteCopyField delCopyField = new SchemaRequest.DeleteCopyField(fieldSrc, fieldDest);
+            delCopyField.process(solrClient);
         }
     }
 
@@ -136,41 +158,43 @@ public class MCRSolrSchemaReloader {
      * 
      * @param coreType the type string of the core, use <b>default-core</b> for the MyCoRe default application core
      */
-    public static void processSchemaFiles(String coreType) {
-        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreType).orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType));
+    public static void processSchemaFiles(String coreID, String coreType) {
+        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID).orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
 
-        LOGGER.info("Load schema definitions for core type " + coreType + " in core " + solrCore.getName());
+        LOGGER.info("Load schema definitions for core type " + coreType + " in core " + coreID);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             List<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
                 "solr/" + coreType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME);
+            JsonParser parser = new JsonParser();
             for (byte[] schemaFileData : schemaFileContents) {
-                String content = new String(schemaFileData, StandardCharsets.UTF_8);
-                JsonParser parser = new JsonParser();
-                JsonElement json = parser.parse(content);
+                InputStreamReader schemaReader = new InputStreamReader(new ByteArrayInputStream(schemaFileData),
+                    StandardCharsets.UTF_8);
+                JsonElement json = parser.parse(schemaReader);
                 if (!json.isJsonArray()) {
                     JsonElement e = json;
                     json = new JsonArray();
                     json.getAsJsonArray().add(e);
                 }
-
                 for (JsonElement e : json.getAsJsonArray()) {
-                    LOGGER.debug(e.toString());
+                    LOGGER.debug(e);
 
                     HttpPost post = new HttpPost(solrCore.getV1CoreURL() + "/schema");
                     post.setHeader("Content-type", "application/json");
                     post.setEntity(new StringEntity(e.toString()));
 
-                    CloseableHttpResponse response = httpClient.execute(post);
-                    if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                        String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
-                            StandardCharsets.UTF_8);
-                        LOGGER.debug("SOLR schema update successful \n" + respContent);
-                    } else {
+                    try (CloseableHttpResponse response = httpClient.execute(post)) {
+                        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                            String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
+                                StandardCharsets.UTF_8);
+                            LOGGER.debug("SOLR schema update successful \n{}", respContent);
+                        } else {
 
-                        String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
-                            StandardCharsets.UTF_8);
-                        LOGGER.error("SOLR schema update error: " + response.getStatusLine().getStatusCode() + " "
-                            + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
+                            String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
+                                StandardCharsets.UTF_8);
+                            LOGGER
+                                .error("SOLR schema update error: {} {}\n{}", response.getStatusLine().getStatusCode(),
+                                    response.getStatusLine().getReasonPhrase(), respContent);
+                        }
                     }
                 }
             }

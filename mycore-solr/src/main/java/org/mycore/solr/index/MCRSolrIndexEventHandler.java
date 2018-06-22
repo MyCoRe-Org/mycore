@@ -124,7 +124,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
         MCRSessionMgr.getCurrentSession()
             .onCommit(() -> MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
-                MCRSolrIndexer.HIGH_PRIORITY));
+                MCRSolrClientFactory.getMainSolrClient(), MCRSolrIndexer.HIGH_PRIORITY));
     }
 
     @Override
@@ -162,7 +162,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     }
 
     protected synchronized void solrDelete(MCRObjectID id) {
-        MCRSessionMgr.getCurrentSession().onCommit(() -> MCRSolrIndexer.deleteById(id.toString()));
+        MCRSessionMgr.getCurrentSession()
+            .onCommit(() -> MCRSolrIndexer.deleteById(MCRSolrClientFactory.getMainSolrClient(), id.toString()));
     }
 
     protected synchronized void deleteDerivate(MCRDerivate derivate) {
@@ -196,7 +197,8 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             return;
         }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
-            UpdateResponse updateResponse = MCRSolrIndexer.deleteById(file.toUri().toString());
+            UpdateResponse updateResponse = MCRSolrIndexer
+                .deleteById(MCRSolrClientFactory.getMainSolrClient(), file.toUri().toString());
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Deleted file {}. Response:{}", file, updateResponse);
             }

@@ -69,14 +69,14 @@ public final class MCRSolrClientFactory {
                 return indexOfDot != -1 ? cp.substring(0, indexOfDot) : cp;
             })
             .distinct()
-            .collect(Collectors.toMap(coreType -> coreType, MCRSolrClientFactory::initializeSolrCore));
+            .collect(Collectors.toMap(coreID -> coreID, MCRSolrClientFactory::initializeSolrCore));
     }
 
-    private static MCRSolrCore initializeSolrCore(String coreType) {
+    private static MCRSolrCore initializeSolrCore(String coreID) {
         final String coreNameKey =
-            MCRSolrConstants.SOLR_CORE_PREFIX + coreType + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
+            MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
         final String coreServerKey =
-            MCRSolrConstants.SOLR_CORE_PREFIX + coreType + MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
+            MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
 
         String coreName = MCRConfiguration2.getString(coreNameKey)
             .orElseThrow(() -> new MCRConfigurationException("Missing property " + coreNameKey));
@@ -87,9 +87,9 @@ public final class MCRSolrClientFactory {
         return new MCRSolrCore(coreServer, coreName);
     }
 
-    public static MCRSolrCore addCore(String server, String coreName, String coreType) {
+    public static MCRSolrCore addCore(String server, String coreName, String coreID) {
         final MCRSolrCore core = new MCRSolrCore(server, coreName);
-        CORE_MAP.put(coreType, core);
+        CORE_MAP.put(coreID, core);
         return core;
     }
 
@@ -98,25 +98,25 @@ public final class MCRSolrClientFactory {
      *
      * @param core the MCRSolrCore instance 
      */
-    public static void add(String coreType, MCRSolrCore core) {
-        CORE_MAP.put(coreType, core);
+    public static void add(String coreID, MCRSolrCore core) {
+        CORE_MAP.put(coreID, core);
     }
 
     /**
      * Remove a SOLR core instance from the list
      *
-     * @param coreType the name of the MCRSolrCore instance
+     * @param coreID the name of the MCRSolrCore instance
      */
-    public static Optional<MCRSolrCore> remove(String coreType) {
-        return Optional.ofNullable(CORE_MAP.remove(coreType));
+    public static Optional<MCRSolrCore> remove(String coreID) {
+        return Optional.ofNullable(CORE_MAP.remove(coreID));
     }
 
     /**
-     * @param coreType the id of the core
+     * @param coreID the id of the core
      * @return a core with a specific id
      */
-    public static Optional<MCRSolrCore> get(String coreType) {
-        return Optional.ofNullable(CORE_MAP.get(coreType));
+    public static Optional<MCRSolrCore> get(String coreID) {
+        return Optional.ofNullable(CORE_MAP.get(coreID));
     }
 
     public static MCRSolrCore getMainSolrCore() {
@@ -136,6 +136,13 @@ public final class MCRSolrClientFactory {
      */
     public static SolrClient getMainConcurrentSolrClient() {
         return getMainSolrCore().getConcurrentClient();
+    }
+
+    /**
+     * @return the read only core map wich contains the coreId and the core
+     */
+    public static Map<String, MCRSolrCore> getCoreMap(){
+        return Collections.unmodifiableMap(CORE_MAP);
     }
 
 }

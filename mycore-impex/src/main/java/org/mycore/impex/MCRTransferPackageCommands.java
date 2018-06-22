@@ -169,7 +169,7 @@ public class MCRTransferPackageCommands {
             markManager.remove(MCRObjectID.getInstance(id));
         }
         // index all objects
-        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects);
+        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects, MCRSolrClientFactory.getMainSolrClient());
 
         // deleting expanded directory
         LOGGER.info("Deleting expanded tar in {}...", targetDirectoryPath);
