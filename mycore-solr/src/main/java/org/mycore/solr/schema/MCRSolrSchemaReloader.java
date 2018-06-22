@@ -75,7 +75,8 @@ public class MCRSolrSchemaReloader {
      * dynamicFields, and types in the lists SOLR_DEFAULT_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS, 
      * SOLR_DEFAULT_DYNAMIC_FIELDS are excluded from remove.
      *
-     * @param coreType the name of the core
+     * @param configType the name of the configuration directory containg the Solr core configuration
+     * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void clearSchema(String configType, String coreID) {
 
@@ -157,7 +158,8 @@ public class MCRSolrSchemaReloader {
      * This method modified the SOLR schema definition based on all solr/{coreType}/solr-schema.json 
      * in the MyCoRe-Maven modules resource path.
      * 
-     * @param coreType the type string of the core, use <b>default-core</b> for the MyCoRe default application core
+     * @param configType the name of the configuration directory containg the Solr core configuration
+     * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processSchemaFiles(String configType, String coreID) {
         MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID).orElseThrow(() 

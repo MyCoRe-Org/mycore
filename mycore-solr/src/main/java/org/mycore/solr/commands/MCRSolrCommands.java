@@ -83,7 +83,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
             ).collect(Collectors.joining("\n")));
     }
 
-    @MCRCommand(syntax = "create solr core with name {0} at server {1} using configset {2}", order = 20)
+    @MCRCommand(syntax = "create solr core with name {0} on server {1} using configset {2}", order = 20)
     public static void createSolrCore(String coreName, String server, String configSet)
         throws IOException, SolrServerException {
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
@@ -194,7 +194,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "rebuild solr content index for object {0} in core {1}",
-        help = "rebuilds solr's content index for the derivate with the id {0} and the core with the coreID {1}",
+        help = "rebuilds solr's content index for the derivate of objects with the id {0} and the core with the coreID {1}",
         order = 160)
     public static void rebuildContentIndexObject(String objectID, String coreID) {
         MCRSolrCore core = getCore(coreID);
@@ -203,7 +203,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "rebuild solr content index for selected in core {0}",
-        help = "rebuilds solr's content index for selected derivates in the core with the coreID {0}",
+        help = "rebuilds solr's content index for derivates of selected objects in the core with the coreID {0}",
         order = 170)
     public static void rebuildContentIndexForSelected(String coreID) {
         MCRSolrCore core = getCore(coreID);
@@ -284,18 +284,18 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-        syntax = "restricted synchronize metadata index for objecttype {0}",
-        help = "synchronizes the mycore store and solr server",
-        order = 160)
-    public static void synchronizeMetadataIndex(String coreID, String objectType) throws Exception {
+        syntax = "synchronize solr metadata index for all objects of type {0} in core {1}",
+        help = "synchronizes the mycore store and solr server for objects of the given type in the given core",
+        order = 420)
+    public static void synchronizeMetadataIndex(String objectType, String coreID) throws Exception {
         MCRSolrCore core = getCore(coreID);
         MCRSolrIndexer.synchronizeMetadataIndex(core.getClient(), objectType);
     }
 
     @MCRCommand(
         syntax = "synchronize solr metadata index in core {0}",
-        help = "synchronizes the database and solr server",
-        order = 150)
+        help = "synchronizes the mycore store and solr server in the given core",
+        order = 430)
     public static void synchronizeMetadataIndex(String coreID) throws Exception {
         MCRSolrCore core = getCore(coreID);
         MCRSolrIndexer.synchronizeMetadataIndex(core.getClient());

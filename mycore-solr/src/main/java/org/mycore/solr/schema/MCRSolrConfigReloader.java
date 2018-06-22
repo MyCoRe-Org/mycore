@@ -93,7 +93,8 @@ public class MCRSolrConfigReloader {
      * This method modified the SOLR config definition based on all solr/{coreType}/solr-config.json 
      * in the MyCoRe-Maven modules resource path.
      *
-     * @param coreType the type string of the core, use <b>default-core</b> for the MyCoRe default application core
+     * @param configType the name of the configuration directory containg the Solr core configuration
+     * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processConfigFiles(String configType, String coreID) {
         MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID)
