@@ -18,8 +18,16 @@
 
 package org.mycore.solr.commands;
 
+import static org.mycore.solr.MCRSolrConstants.DEFAULT_SOLR_SERVER_URL;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
+
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,7 +42,6 @@ import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.classification.MCRSolrClassificationUtil;
@@ -47,6 +54,7 @@ import org.mycore.solr.search.MCRSolrSearchUtils;
  * Class provides useful solr related commands.
  *
  * @author shermann
+ * @author Sebastian Hofmann
  */
 @MCRCommandGroup(
     name = "SOLR Commands")
@@ -54,27 +62,25 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     private static Logger LOGGER = LogManager.getLogger();
 
-    @MCRCommand(syntax = "list solr configuration", order = 10)
+    @MCRCommand(syntax = "show solr configuration", order = 10)
     public static void listConfig() {
         LOGGER.info("List core configuration: {}{}{}{}", System.lineSeparator(),
-            MCRSolrConstants.SOLR_CONFIG_PREFIX + "ServerURL=" + MCRSolrConstants.DEFAULT_SOLR_SERVER_URL,
+            SOLR_CONFIG_PREFIX + "ServerURL=" + DEFAULT_SOLR_SERVER_URL,
             System.lineSeparator(),
             MCRSolrClientFactory.getCoreMap().entrySet().stream().map(
                 (entry) -> {
                     String coreID = entry.getKey();
                     MCRSolrCore core = entry.getValue();
-                    String coreNameProp = System.lineSeparator() + MCRSolrConstants.SOLR_CORE_PREFIX + coreID
-                        + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX + "=" + core.getName();
-                    if (MCRSolrConstants.DEFAULT_SOLR_SERVER_URL.equals(core.getServerURL())) {
-                        return coreNameProp;
-                    } else {
-                        String coreServerProp =
-                            MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX + "="
-                                + core.getServerURL();
-                        return coreNameProp + System.lineSeparator() + coreServerProp;
+
+                    String format = "{0}{1}{2}={3}";
+                    if (!DEFAULT_SOLR_SERVER_URL.equals(core.getServerURL())) {
+                        format += "\n{0}{1}{5}={4}";
                     }
+
+                    return new MessageFormat(format, Locale.ROOT).format(new String[] { SOLR_CORE_PREFIX, coreID,
+                        SOLR_CORE_NAME_SUFFIX, core.getName(), core.getServerURL(), SOLR_CORE_SERVER_SUFFIX });
                 }
-            ).collect(Collectors.joining(System.lineSeparator())));
+            ).collect(Collectors.joining("\n")));
     }
 
     @MCRCommand(syntax = "create solr core with name {0} at server {1} using configset {2}", order = 20)
@@ -94,7 +100,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "create solr core with name {0} using configset {1}", order = 30)
     public static void createSolrCore(String coreName, String configSet)
         throws IOException, SolrServerException {
-        createSolrCore(coreName, MCRSolrConstants.DEFAULT_SOLR_SERVER_URL, configSet);
+        createSolrCore(coreName, DEFAULT_SOLR_SERVER_URL, configSet);
     }
     
     @MCRCommand(syntax = "register solr core with name {0} on server {1} as core {2}", order = 40)
@@ -104,7 +110,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "register solr core with name {0} as core {1}", order = 50)
     public static void registerSolrCore(String coreName, String coreID) {
-        MCRSolrClientFactory.addCore(MCRSolrConstants.DEFAULT_SOLR_SERVER_URL, coreName, coreID);
+        MCRSolrClientFactory.addCore(DEFAULT_SOLR_SERVER_URL, coreName, coreID);
     }
 
     @MCRCommand(syntax = "switch solr core {0} with core {1}", order = 60)
@@ -124,8 +130,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
      *
      * see https://github.com/MyCoRe-Org/mycore_solr_configset_main
      *
-     * @param coreType the core type of the core that should be reloaded; the MyCoRe default application
-     * core type is <b>main</b>
+     * @param coreID the core type of the core that should be reloaded; the MyCoRe default application
+     * coreID is <b>main</b>
      */
     @MCRCommand(syntax = "reload solr configuration {0} in core {1}",
         help = "The command reloads the schema and the configuration in solr "
