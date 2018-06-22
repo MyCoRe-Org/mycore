@@ -83,6 +83,26 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         assertEquals(0, MCRUserManager.getUsers("junit", "test failed").count());
     }
 
+    //MCR-1885
+    @Test
+    public final void testGetUserPropertiesAfterGetUsers() {
+        MCRUser user = new MCRUser("john");
+        user.setRealName("John Doe");
+        user.getAttributes().put("id_orcid", "1234-5678-1234-0000");
+        user.getAttributes().put("id_scopus", "87654321");
+        assertEquals(2, user.getAttributes().size());
+
+        MCRUserManager.createUser(user);
+        assertEquals(2, user.getAttributes().size());
+
+        startNewTransaction();
+        MCRUser user2 = MCRUserManager.getUsers("id_orcid","1234-5678-1234-0000").findFirst().get();
+        assertEquals("john", user2.getUserName() );
+
+        MCRUser user3 = MCRUserManager.getUser( user2.getUserName(), user2.getRealmID() );
+        assertEquals(2, user3.getAttributes().size());
+    }
+
     /**
      * Test method for {@link org.mycore.user2.MCRUserManager#exists(java.lang.String, org.mycore.user2.MCRRealm)}.
      */

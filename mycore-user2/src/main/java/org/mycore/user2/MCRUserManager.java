@@ -132,7 +132,8 @@ public class MCRUserManager {
         propertyQuery.setParameter("value", attrValue);
         return propertyQuery.getResultList()
             .stream()
-            .filter(u -> u.getAttributes().get(attrName).equals(attrValue));
+            .filter(u -> u.getAttributes().get(attrName).equals(attrValue))
+            .peek(em::refresh); //fixes MCR-1885
     }
 
     private static MCRUser setRoles(MCRUser mcrUser) {
