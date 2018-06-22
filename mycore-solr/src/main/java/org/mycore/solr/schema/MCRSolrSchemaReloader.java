@@ -39,6 +39,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.client.solrj.response.schema.FieldTypeRepresentation;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrCore;
@@ -71,29 +72,29 @@ public class MCRSolrSchemaReloader {
 
     /**
      * Remove all fields, dynamicFields, copyFields and fieldTypes in the SOLR schema for the given core. The fields,
-     * dynamicFields, and types in the lists SOLR_DEFAULT_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS
-     * are excluded from remove.
+     * dynamicFields, and types in the lists SOLR_DEFAULT_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS, 
+     * SOLR_DEFAULT_DYNAMIC_FIELDS are excluded from remove.
      *
      * @param coreType the name of the core
      */
-    public static void clearSchema(String coreID, String coreType) {
+    public static void clearSchema(String configType, String coreID) {
 
-        LOGGER.info("Clear SOLR schema for core type " + coreType + " and in core " + coreID);
+        LOGGER.info("Clear SOLR schema for core " + coreID + " using configuration " + configType);
         try {
             SolrClient solrClient = MCRSolrClientFactory.get(coreID).map(MCRSolrCore::getClient)
-                .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
+                .orElseThrow(() ->  new MCRConfigurationException("The core "+ coreID +" is not configured!"));
 
             deleteCopyFields(solrClient);
-            LOGGER.debug("CopyFields cleaned for core type " + coreType);
+            LOGGER.debug("CopyFields cleaned for core " + coreID + " for configuration " + configType);
 
             deleteFields(solrClient);
-            LOGGER.debug("Fields cleaned for core type " + coreType);
+            LOGGER.debug("Fields cleaned for core " + coreID + " for configuration " + configType);
 
             deleteDynamicFields(solrClient);
-            LOGGER.debug("DynamicFields cleaned for core type  " + coreType);
+            LOGGER.debug("DynamicFields cleaned for core " + coreID + " for configuration " + configType); 
 
             deleteFieldTypes(solrClient);
-            LOGGER.debug("FieldTypes cleaned for core type  " + coreType);
+            LOGGER.debug("FieldTypes cleaned for core " + coreID + " for configuration " + configType);
 
         } catch (IOException | SolrServerException e) {
             LOGGER.error(e);
@@ -158,13 +159,14 @@ public class MCRSolrSchemaReloader {
      * 
      * @param coreType the type string of the core, use <b>default-core</b> for the MyCoRe default application core
      */
-    public static void processSchemaFiles(String coreID, String coreType) {
-        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID).orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
+    public static void processSchemaFiles(String configType, String coreID) {
+        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID).orElseThrow(() 
+            -> MCRSolrUtils.getCoreConfigMissingException(coreID));
 
-        LOGGER.info("Load schema definitions for core type " + coreType + " in core " + coreID);
+        LOGGER.info("Load schema definitions for core " + coreID + " using configuration " + configType);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             List<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
-                "solr/" + coreType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME);
+                "solr/" + configType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME);
             JsonParser parser = new JsonParser();
             for (byte[] schemaFileData : schemaFileContents) {
                 InputStreamReader schemaReader = new InputStreamReader(new ByteArrayInputStream(schemaFileData),

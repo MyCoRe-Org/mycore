@@ -57,7 +57,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "list solr configuration", order = 10)
     public static void listConfig() {
         LOGGER.info("List core configuration: {}{}{}{}", System.lineSeparator(),
-            MCRSolrConstants.SOLR_CONFIG_PREFIX + ".ServerURL=" + MCRSolrConstants.DEFAULT_SOLR_SERVER_URL,
+            MCRSolrConstants.SOLR_CONFIG_PREFIX + "ServerURL=" + MCRSolrConstants.DEFAULT_SOLR_SERVER_URL,
             System.lineSeparator(),
             MCRSolrClientFactory.getCoreMap().entrySet().stream().map(
                 (entry) -> {
@@ -77,36 +77,37 @@ public class MCRSolrCommands extends MCRAbstractCommands {
             ).collect(Collectors.joining(System.lineSeparator())));
     }
 
-    @MCRCommand(syntax = "create solr core with name {0} with configset {1}", order = 20)
-    public static void createSolrCoRe(String coreName, String configSet)
-        throws IOException, SolrServerException {
-        createSolrCoRe(coreName, MCRSolrConstants.DEFAULT_SOLR_SERVER_URL, configSet);
-    }
-
-    @MCRCommand(syntax = "create solr core with name {0} at {1} with configset {2}", order = 30)
-    public static void createSolrCoRe(String coreName, String server, String configSet)
+    @MCRCommand(syntax = "create solr core with name {0} at server {1} using configset {2}", order = 20)
+    public static void createSolrCore(String coreName, String server, String configSet)
         throws IOException, SolrServerException {
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
         create.setCoreName(coreName);
         create.setConfigSet(configSet);
         create.setIsLoadOnStartup(true);
 
-        final MCRSolrCore core = new MCRSolrCore(server, coreName);
-        CoreAdminResponse response = create.process(core.getClient());
-        LOGGER.info("Core Create Response: {}", response);
+        try(HttpSolrClient solrClient = new HttpSolrClient.Builder(server+"/solr").build()){
+            CoreAdminResponse response = create.process(solrClient);
+            LOGGER.info("Core Create Response: {}", response);    
+        }
     }
-
-    @MCRCommand(syntax = "register core {0} as {1}", order = 40)
-    public static void registerSolrCore(String coreName, String coreID) {
-        MCRSolrClientFactory.addCore(MCRSolrConstants.DEFAULT_SOLR_SERVER_URL, coreName, coreID);
+    
+    @MCRCommand(syntax = "create solr core with name {0} using configset {1}", order = 30)
+    public static void createSolrCore(String coreName, String configSet)
+        throws IOException, SolrServerException {
+        createSolrCore(coreName, MCRSolrConstants.DEFAULT_SOLR_SERVER_URL, configSet);
     }
-
-    @MCRCommand(syntax = "register core {0} from {1} as {2}", order = 50)
+    
+    @MCRCommand(syntax = "register solr core with name {0} on server {1} as core {2}", order = 40)
     public static void registerSolrCore(String coreName, String server, String coreID) {
         MCRSolrClientFactory.addCore(server, coreName, coreID);
     }
 
-    @MCRCommand(syntax = "switch solr core {0} with {1}", order = 60)
+    @MCRCommand(syntax = "register solr core with name {0} as core {1}", order = 50)
+    public static void registerSolrCore(String coreName, String coreID) {
+        MCRSolrClientFactory.addCore(MCRSolrConstants.DEFAULT_SOLR_SERVER_URL, coreName, coreID);
+    }
+
+    @MCRCommand(syntax = "switch solr core {0} with core {1}", order = 60)
     public static void switchSolrCore(String coreID1, String coreID2) {
         MCRSolrCore core1 = getCore(coreID1);
         MCRSolrCore core2 = getCore(coreID2);
@@ -126,13 +127,14 @@ public class MCRSolrCommands extends MCRAbstractCommands {
      * @param coreType the core type of the core that should be reloaded; the MyCoRe default application
      * core type is <b>main</b>
      */
-    @MCRCommand(syntax = "reload solr configuration for core {0} with type {1}",
-        help = "The command reloads the schema and the configuration in solr by using the solr schema api for core type {0}",
+    @MCRCommand(syntax = "reload solr configuration {0} in core {1}",
+        help = "The command reloads the schema and the configuration in solr "
+            + "by using the solr schema api for core type {0}",
         order = 70)
-    public static void reloadSolrConfiguration(String coreID, String coreType) {
-        MCRSolrSchemaReloader.clearSchema(coreID, coreType);
-        MCRSolrSchemaReloader.processSchemaFiles(coreID, coreType);
-        MCRSolrConfigReloader.processConfigFiles(coreID, coreType);
+    public static void reloadSolrConfiguration(String configType, String coreID) {
+        MCRSolrSchemaReloader.clearSchema(configType, coreID);
+        MCRSolrSchemaReloader.processSchemaFiles(configType, coreID);
+        MCRSolrConfigReloader.processConfigFiles(configType, coreID);
     }
 
     @MCRCommand(
@@ -260,7 +262,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "optimize solr index in core {0}\n",
         help =
-            "An optimize is like a hard commit except that it forces all of the index segments to be merged into a single segment first. "
+            "The optimize operation is like a hard commit except that it forces all of the index segments "
+            + "to be merged into a single segment first. "
                 + "Depending on the use cases, this operation should be performed infrequently (like nightly), "
                 + "if at all, since it is very expensive and involves reading and re-writing the entire index",
         order = 410)

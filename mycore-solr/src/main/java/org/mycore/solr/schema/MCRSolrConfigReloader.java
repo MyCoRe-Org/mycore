@@ -95,14 +95,14 @@ public class MCRSolrConfigReloader {
      *
      * @param coreType the type string of the core, use <b>default-core</b> for the MyCoRe default application core
      */
-    public static void processConfigFiles(String coreID, String coreType) {
+    public static void processConfigFiles(String configType, String coreID) {
         MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID)
             .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
 
-        LOGGER.info("Load config definitions for core type " + coreType + " in core " + coreID);
+        LOGGER.info("Load config definitions for core " + coreID + " using configuration " + configType);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             List<byte[]> configFileContents = MCRConfigurationInputStream.getConfigFileContents(
-                "solr/" + coreType + "/" + SOLR_CONFIG_UPDATE_FILE_NAME);
+                "solr/" + configType + "/" + SOLR_CONFIG_UPDATE_FILE_NAME);
             for (byte[] configFileData : configFileContents) {
                 String content = new String(configFileData, StandardCharsets.UTF_8);
                 JsonParser parser = new JsonParser();
@@ -113,7 +113,7 @@ public class MCRSolrConfigReloader {
                     json.getAsJsonArray().add(e);
                 }
 
-                JsonObject currentSolrConfig = retrieveCurrentSolrConfig(coreType);
+                JsonObject currentSolrConfig = retrieveCurrentSolrConfig(configType);
 
                 for (JsonElement command : json.getAsJsonArray()) {
                     processConfigCommand(coreID, command, currentSolrConfig);

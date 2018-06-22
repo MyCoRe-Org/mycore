@@ -121,7 +121,7 @@ public final class MCRSolrClientFactory {
 
     public static MCRSolrCore getMainSolrCore() {
         return get(MCRSolrConstants.MAIN_CORE_TYPE)
-            .orElseThrow(() -> new MCRConfigurationException("The core Main is not configured!"));
+            .orElseThrow(() -> new MCRConfigurationException("The core main is not configured!"));
     }
 
     /**
