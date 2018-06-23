@@ -128,10 +128,6 @@ public class MCRSolrConfigReloader {
                 final JsonObject commandJsonObject = command.getAsJsonObject();
                 Entry<String, JsonElement> commandObject = commandJsonObject.entrySet().iterator().next();
                 final String configCommand = commandObject.getKey();
-                final String currentConfigObjectName = configCommand.contains("-") ?
-                    configCommand.split("-", 2)[1].toLowerCase(Locale.ROOT) :
-                    configCommand;
-
                 if (isKnownSolrConfigCommmand(configCommand)) {
                     executeSolrCommand(coreID, command.toString());
                 }
@@ -172,26 +168,26 @@ public class MCRSolrConfigReloader {
         }
     }
 
-    /**
-     * retrieves the current solr configuration for the given core
-     * @param coreType - the name of the solr core
-     * @return the config as JSON object
-     */
-    private static JsonObject retrieveCurrentSolrConfig(String coreType) {
-        String coreURL = MCRSolrClientFactory.get(coreType)
-            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType)).getV1CoreURL();
-        HttpGet get = new HttpGet(coreURL + "/config");
-        HttpResponse response;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            response = httpClient.execute(get);
-            JsonParser jsonParser = new JsonParser();
-            JsonElement jeResponse = jsonParser
-                .parse(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
-            return jeResponse.getAsJsonObject().get("config").getAsJsonObject();
-        } catch (IOException e) {
-            throw new MCRException("Could not read Solr configuration", e);
-        }
-    }
+//    /**
+//     * retrieves the current solr configuration for the given core
+//     * @param coreType - the name of the solr core
+//     * @return the config as JSON object
+//     */
+//    private static JsonObject retrieveCurrentSolrConfig(String coreID) {
+//        String coreURL = MCRSolrClientFactory.get(coreType)
+//            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType)).getV1CoreURL();
+//        HttpGet get = new HttpGet(coreURL + "/config");
+//        HttpResponse response;
+//        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+//            response = httpClient.execute(get);
+//            JsonParser jsonParser = new JsonParser();
+//            JsonElement jeResponse = jsonParser
+//                .parse(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
+//            return jeResponse.getAsJsonObject().get("config").getAsJsonObject();
+//        } catch (IOException e) {
+//            throw new MCRException("Could not read Solr configuration", e);
+//        }
+//    }
 
     /**
      *
