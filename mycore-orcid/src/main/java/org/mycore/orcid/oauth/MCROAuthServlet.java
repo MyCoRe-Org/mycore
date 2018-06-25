@@ -82,9 +82,9 @@ public class MCROAuthServlet extends MCRServlet {
 
             MCRTokenResponse token = exchangeCodeForAccessToken(code);
 
-            MCRORCIDUser orcidUser = MCRORCIDSession.getORCIDUser();
+            MCRORCIDUser orcidUser = MCRORCIDSession.getCurrentUser();
             orcidUser.store(token);
-            orcidUser.getORCIDProfile().getWorksSection();
+            orcidUser.getProfile().getWorksSection();
 
             job.getResponse().sendRedirect(USER_PROFILE_URL);
         }
