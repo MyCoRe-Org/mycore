@@ -26,6 +26,8 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -33,10 +35,12 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CoreAdminResponse;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
@@ -325,6 +329,54 @@ public class MCRSolrCommands extends MCRAbstractCommands {
     public static void synchronizeMetadataIndex(String coreID) throws Exception {
         MCRSolrCore core = getCore(coreID);
         MCRSolrIndexer.synchronizeMetadataIndex(core.getClient());
+    }
+
+    /**
+     * This command tries to identify MyCoRe Objects missing in SOLR and reindexes them
+     * using the repair metadata search command
+     * The same functionality is provided by MyCoRe's synchronize command, 
+     * which is more performant since it only repairs the metadata index.
+     * but has a bug when executed on SOLR 4 (and 7?).
+     * 
+     * @version MyCoRe 2017.06 LTS, 2018.06 LTS (should be removed in later versions)
+     * @author Robert Stephan
+     * @return a list of repair commands
+     * @throws Exception
+     */
+    @MCRCommand(syntax = "synchronized repair metadata search",
+        help = "synchronizes the metadata store and solr index (for SOLR 4)",
+        order = 440)
+    public static List<String> synchronizeAndRepairSolrIndex() throws Exception {
+        List<String> result = new ArrayList<>();
+        Collection<String> objectTypes = MCRXMLMetadataManager.instance().getObjectTypes();
+        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
+        for (String objectType : objectTypes) {
+
+            LOGGER.info("synchronize SOLR index for object type: " + objectType);
+            // get ids from store
+            List<String> storeList = MCRXMLMetadataManager.instance().listIDsOfType(objectType);
+            LOGGER.info("there are " + storeList.size() + " mycore objects");
+            List<String> solrList = MCRSolrSearchUtils.listIDs(solrClient, "objectType:" + objectType);
+            LOGGER.info("there are " + solrList.size() + " solr objects");
+
+            // documents to remove
+            for (String id : solrList) {
+                if (!storeList.contains(id)) {
+                    result.add("delete from solr index object " + id + " in core main");
+                }
+            }
+            LOGGER.info("remove " + result.size() + " zombie objects from solr");
+
+            // documents to add
+            storeList.removeAll(solrList);
+            if (!storeList.isEmpty()) {
+                LOGGER.info("reindex " + storeList.size() + " mycore objects");
+                for (String id : storeList) {
+                    result.add("repair metadata search of ID " + id);
+                }
+            }
+        }
+        return result;
     }
 
 }
