@@ -104,7 +104,11 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
             + "    AND cattree.left BETWEEN cat.left AND cat.right",
         hints = { @QueryHint(name = QueryHints.READ_ONLY, value = "true") }),
     @NamedQuery(name = "MCRCategoryLink.linkedClassifications",
-        query = "SELECT distinct node.id.rootID from MCRCategoryImpl as node, MCRCategoryLinkImpl as link where node.internalID=link.category")
+        query = "SELECT distinct node.id.rootID from MCRCategoryImpl as node, MCRCategoryLinkImpl as link where node.internalID=link.category"),
+    @NamedQuery(name = "MCRCategoryLink.types",
+        query = "SELECT DISTINCT(objectReference.type) FROM MCRCategoryLinkImpl"),
+    @NamedQuery(name = "MCRCategoryLink.links",
+        query = "FROM MCRCategoryLinkImpl WHERE objectReference.type=:type")
 })
 class MCRCategoryLinkImpl implements MCRCategoryLink {
 
