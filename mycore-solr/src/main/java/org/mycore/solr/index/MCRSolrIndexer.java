@@ -203,8 +203,9 @@ public class MCRSolrIndexer {
             return null;
         }
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
-        return solrClient.deleteByQuery("-({!join from=id to=_root_}_root_:*) +_root_:*", 0);
+        return solrClient.deleteByQuery("-({!join from=id to=_root_ score=none}_root_:*) +_root_:*", 0);
     }
+    
 
     /**
      * Deletes a list of documents by unique ID. Also removes any nested document of that ID.
