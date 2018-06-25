@@ -1,6 +1,8 @@
 package org.mycore.pi;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,11 +24,6 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.MCRPIParser;
-import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
@@ -36,7 +32,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * Set a generic pattern. You can also just use one of them $Count
  *
- * MCR.PI.Generator.myGenerator.GeneralPattern=gbv:$CurrentDate-$ObjectType-$Count
+ * MCR.PI.Generator.myGenerator.GeneralPattern=gbv:$CurrentDate-$ObjectType-$ObjectNumber-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=gbv:$ObjectDate-$ObjectType-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=gbv:$ObjectDate-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=gbv:$ObjectType-$Count
@@ -69,6 +65,10 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
     static final String PLACE_HOLDER_OBJECT_TYPE = "$ObjectType";
 
     static final String PLACE_HOLDER_COUNT = "$Count";
+
+    static final String PLACE_HOLDER_OBJECT_NUMBER = "$ObjectNumber";
+
+    static final String PLACE_HOLDER_CHECKSUM = "$SUM";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -129,7 +129,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
     }
 
     private void validateProperties() {
-        if (countPrecision == -1 && "urn".equals(getType())) {
+        if (countPrecision == -1 && "dnbUrn".equals(getType())) {
             throw new MCRConfigurationException(
                 PROPERTY_KEY_COUNT_PRECISION + "=-1 and " + PROPERTY_KEY_TYPE + "=urn is not supported!");
         }
@@ -142,54 +142,78 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         String resultingPI = getGeneralPattern();
 
         if (resultingPI.contains(PLACE_HOLDER_CURRENT_DATE)) {
-            resultingPI = resultingPI.replaceAll(PLACE_HOLDER_CURRENT_DATE, getDateFormat().format(new Date()));
+            resultingPI = resultingPI.replace(PLACE_HOLDER_CURRENT_DATE, getDateFormat().format(new Date()));
         }
 
         if (resultingPI.contains(PLACE_HOLDER_OBJECT_DATE)) {
             final Date objectCreateDate = mcrBase.getService().getDate(MCRObjectService.DATE_TYPE_CREATEDATE);
-            resultingPI = resultingPI.replaceAll(PLACE_HOLDER_OBJECT_DATE, getDateFormat().format(objectCreateDate));
+            resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_DATE, getDateFormat().format(objectCreateDate));
         }
 
         if (resultingPI.contains(PLACE_HOLDER_OBJECT_TYPE)) {
             final String mappedObjectType = getMappedType(mcrBase.getId());
-            resultingPI = resultingPI.replaceAll(PLACE_HOLDER_OBJECT_TYPE, mappedObjectType);
+            resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_TYPE, mappedObjectType);
+        }
+
+        if (resultingPI.contains(PLACE_HOLDER_OBJECT_NUMBER)) {
+            resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_NUMBER, mcrBase.getId().getNumberAsString());
         }
 
         final MCRPIParser<MCRPersistentIdentifier> parser = MCRPIManager.getInstance()
             .getParserForType(getType());
 
-        final String result;
+        String result;
 
         if (resultingPI.contains(PLACE_HOLDER_COUNT)) {
             final int countPrecision = getCountPrecision();
             String regexpStr;
 
             if (countPrecision == -1) {
-                regexpStr = "[0-9]+";
+                regexpStr = "([0-9]+)";
             } else {
-                regexpStr = IntStream.range(0, countPrecision).mapToObj((i) -> "[0-9]").collect(Collectors.joining(""));
+                regexpStr =
+                    "(" + IntStream.range(0, countPrecision).mapToObj((i) -> "[0-9]").collect(Collectors.joining(""))
+                        + ")";
             }
 
-            String counterPattern = resultingPI.replaceAll(PLACE_HOLDER_COUNT, regexpStr);
+            String counterPattern = resultingPI.replace(PLACE_HOLDER_COUNT, regexpStr);
+            if (getType().equals("dnbUrn")) {
+                counterPattern = counterPattern + "[0-9]";
+            }
+
+            LOGGER.info("Counter pattern is {}", counterPattern);
+
             final int count = getCount(counterPattern);
-            result = resultingPI.replaceAll(PLACE_HOLDER_COUNT, String.valueOf(count));
+            LOGGER.info("Count is {}", count);
+            final String pattern = IntStream.range(0, Math.abs(countPrecision)).mapToObj((i) -> "0")
+                .collect(Collectors.joining(""));
+            final String countAsString =
+                countPrecision != -1 ? new DecimalFormat(pattern).format(count) : String.valueOf(count);
+            result = resultingPI.replace(PLACE_HOLDER_COUNT, countAsString);
         } else {
             result = resultingPI;
         }
-        return parser.parse(resultingPI)
-            .orElseThrow(() -> new MCRPersistentIdentifierException("Could not parse " + result));
+
+        if (getType().equals("dnbUrn")) {
+            result = result + "C"; // will be replaced by the URN-Parser
+        }
+
+        String finalResult = result;
+        return parser.parse(finalResult)
+            .orElseThrow(() -> new MCRPersistentIdentifierException("Could not parse " + finalResult));
 
     }
 
     private String getMappedType(MCRObjectID id) {
         String mapping = getObjectTypeMapping();
-
-        Map<String, String> typeMap = Stream.of(mapping.split(","))
-            .collect(Collectors
-                .toMap((mappingPart) -> mappingPart.split(":")[0], (mappingPart) -> mappingPart.split(":")[1]));
-
         String typeID = id.getTypeId();
-        return typeMap.getOrDefault(typeID, typeID);
+
+        return Optional.ofNullable(mapping)
+            .map(mappingStr -> mappingStr.split(","))
+            .map(Arrays::asList)
+            .filter(o -> o.get(0).equals(typeID))
+            .map(o -> o.get(1))
+            .orElse(typeID);
     }
 
     protected AtomicInteger readCountFromDatabase(String countPattern) {
