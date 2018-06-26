@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -53,14 +54,21 @@ public abstract class MCRSolrClassificationUtil {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrClassificationUtil.class);
 
-    private static final Object CREATE_LOCK = new Object();
-
     private static final String CLASSIFICATION_CORE_TYPE = "classification";
 
     /**
-     * Reindex the whole classification system.
+     * Reindex the whole classification system with the default classification solr core.
      */
-    public static void rebuildIndex(SolrClient client) {
+    public static void rebuildIndex() {
+        rebuildIndex(getCore().getClient());
+    }
+
+    /**
+     * Reindex the whole classification system.
+     *
+     * @param client the target solr client
+     */
+    public static void rebuildIndex(final SolrClient client) {
         LOGGER.info("rebuild classification index...");
         // categories
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
@@ -78,32 +86,35 @@ public abstract class MCRSolrClassificationUtil {
         Collection<String> linkTypes = linkService.getTypes();
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '{}' links...", linkType);
-            bulkIndex(client, linkService.getLinks(linkType).stream()
-                .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
-                    link.getObjectReference()))
-                .map(MCRSolrCategoryLink::toSolrDocument)
-                .collect(Collectors.toList()));
+            bulkIndex(client, linkService.getLinks(linkType)
+                                         .stream()
+                                         .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
+                                                 link.getObjectReference()))
+                                         .map(MCRSolrCategoryLink::toSolrDocument)
+                                         .collect(Collectors.toList()));
         }
     }
 
     /**
-     * Bulk index. The collection is split into parts of one thousand.
+     * Async bulk index. The collection is split into parts of one thousand.
      *
      * @param solrDocumentList the list to index
      */
-    public static void bulkIndex(SolrClient client, List<SolrInputDocument> solrDocumentList) {
-        List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 1000);
-        int docNum = solrDocumentList.size();
-        int added = 0;
-        for (List<SolrInputDocument> part : partitionList) {
-            try {
-                client.add(part, 500);
-                added += part.size();
-                LOGGER.info("Added {}/{} documents", added, docNum);
-            } catch (SolrServerException | IOException e) {
-                LOGGER.error("Unable to add classification documents.", e);
+    public static void bulkIndex(final SolrClient client, List<SolrInputDocument> solrDocumentList) {
+        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 1000);
+            int docNum = solrDocumentList.size();
+            int added = 0;
+            for (List<SolrInputDocument> part : partitionList) {
+                try {
+                    client.add(part, 500);
+                    added += part.size();
+                    LOGGER.info("Added {}/{} documents", added, docNum);
+                } catch (SolrServerException | IOException e) {
+                    LOGGER.error("Unable to add classification documents.", e);
+                }
             }
-        }
+        });
     }
 
     /**
@@ -156,21 +167,20 @@ public abstract class MCRSolrClassificationUtil {
      */
     public static List<SolrInputDocument> toSolrDocument(Collection<MCRCategory> categoryList) {
         return categoryList.stream()
-            .map(MCRSolrCategory::new)
-            .map(MCRSolrCategory::toSolrDocument)
-            .collect(Collectors.toList());
+                           .map(MCRSolrCategory::new)
+                           .map(MCRSolrCategory::toSolrDocument)
+                           .collect(Collectors.toList());
     }
 
     /**
      * Creates a new list of {@link SolrInputDocument} based on the given categories and the link.
      */
     public static List<SolrInputDocument> toSolrDocument(MCRCategLinkReference linkReference,
-        Collection<MCRCategoryID> categories) {
+            Collection<MCRCategoryID> categories) {
         return categories.stream()
-            .map(categoryId -> new MCRSolrCategoryLink(categoryId,
-                linkReference))
-            .map(MCRSolrCategoryLink::toSolrDocument)
-            .collect(Collectors.toList());
+                         .map(categoryId -> new MCRSolrCategoryLink(categoryId, linkReference))
+                         .map(MCRSolrCategoryLink::toSolrDocument)
+                         .collect(Collectors.toList());
     }
 
     /**
@@ -236,7 +246,7 @@ public abstract class MCRSolrClassificationUtil {
      * @param classId the id to encode
      */
     public static String encodeCategoryId(MCRCategoryID classId) {
-        return classId.toString().replaceAll("\\:", "\\\\:");
+        return classId.toString().replaceAll(":", "\\\\:");
     }
 
 }
