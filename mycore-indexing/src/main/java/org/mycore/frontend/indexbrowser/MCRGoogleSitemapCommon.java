@@ -175,7 +175,7 @@ public final class MCRGoogleSitemapCommon {
         query.setParam("fl", "id,modified");
 
         try {
-            response = MCRSolrClientFactory.getSolrClient().query(query);
+            response = MCRSolrClientFactory.getMainSolrClient().query(query);
             objidlist = response.getResults().stream().map((document) -> {
                 String id = (String) document.getFieldValue("id");
                 Date modified = (Date) document.getFieldValue("modified");

@@ -26,11 +26,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
@@ -74,7 +77,7 @@ public class MCRConfigurationInputStream extends InputStream {
     private MCRConfigurationInputStream(String filename, InputStream initStream) throws IOException {
         super();
         this.empty = true;
-        this.e = getInputStreams(filename, initStream);
+        this.e = getPropertyInputStreams(filename, initStream);
         if (e.hasMoreElements()) {
             nextStream();
         }
@@ -105,7 +108,7 @@ public class MCRConfigurationInputStream extends InputStream {
         return empty;
     }
 
-    private Enumeration<? extends InputStream> getInputStreams(String filename, InputStream initStream)
+    private Enumeration<? extends InputStream> getPropertyInputStreams(String filename, InputStream initStream)
         throws IOException {
         LinkedList<InputStream> cList = new LinkedList<>();
         if (initStream != null) {
@@ -163,6 +166,31 @@ public class MCRConfigurationInputStream extends InputStream {
             }
         }
         return input == null ? null : input.getInputStream();
+    }
+
+    /**
+     * return an enumeration of input streams of configuration files
+     * found in MyCoRe components and modules, respecting the proper loading order 
+     * 
+     * @author Robert Stephan
+     */
+    public static List<byte[]> getConfigFileContents(String filename)
+        throws IOException {
+        ArrayList<byte[]> cList = new ArrayList<>();
+        for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
+            try (InputStream is = component.getConfigFileStream(filename)) {
+                if (is != null) {
+                    cList.add(IOUtils.toByteArray(is));
+                }
+            }
+            File localConfigFile = MCRConfigurationDir.getConfigFile(filename);
+            if (localConfigFile != null && localConfigFile.canRead()) {
+                try (FileInputStream fis = new FileInputStream(localConfigFile)) {
+                    cList.add(IOUtils.toByteArray(fis));
+                }
+            }
+        }
+        return cList;
     }
 
     /**
@@ -225,5 +253,4 @@ public class MCRConfigurationInputStream extends InputStream {
             nextStream();
         } while (in != null);
     }
-
 }

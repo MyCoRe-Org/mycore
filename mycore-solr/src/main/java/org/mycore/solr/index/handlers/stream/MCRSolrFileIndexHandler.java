@@ -18,7 +18,7 @@
 
 package org.mycore.solr.index.handlers.stream;
 
-import static org.mycore.solr.MCRSolrConstants.EXTRACT_PATH;
+import static org.mycore.solr.MCRSolrConstants.SOLR_EXTRACT_PATH;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -65,7 +65,7 @@ public class MCRSolrFileIndexHandler extends MCRSolrAbstractStreamIndexHandler {
             LOGGER.debug("Solr: indexing file \"{}\"", file);
         }
         /* create the update request object */
-        ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(EXTRACT_PATH);
+        ContentStreamUpdateRequest updateRequest = new ContentStreamUpdateRequest(SOLR_EXTRACT_PATH);
         updateRequest.addContentStream(getStream());
 
         /* set the additional parameters */

@@ -47,10 +47,11 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private static final QName _Add_QNAME = new QName("", "add");
+    private static final QName ADD_QNAME = new QName("", "add");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.mycore.solr.index.document.jaxb
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes 
+     * for package: org.mycore.solr.index.document.jaxb
      * 
      */
     public ObjectFactory() {
@@ -86,7 +87,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "add")
     public JAXBElement<MCRSolrInputDocumentList> createAdd(MCRSolrInputDocumentList value) {
-        return new JAXBElement<>(_Add_QNAME, MCRSolrInputDocumentList.class, null, value);
+        return new JAXBElement<>(ADD_QNAME, MCRSolrInputDocumentList.class, null, value);
     }
 
 }

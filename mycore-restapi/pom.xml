@@ -10,7 +10,7 @@
   <artifactId>mycore-restapi</artifactId>
   <name>MyCoRe REST API</name>
   <properties>
-    <manifest.priority>82</manifest.priority>
+    <manifest.priority>65</manifest.priority>
   </properties>
   <dependencies>
     <dependency>

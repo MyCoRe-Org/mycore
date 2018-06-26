@@ -18,7 +18,7 @@
 
 package org.mycore.solr.index.file;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -43,12 +43,12 @@ import org.mycore.solr.index.handlers.stream.MCRSolrFilesIndexHandler;
  */
 public class MCRSolrPathDocumentFactory {
 
-    private static final String ACCUMULATOR_LIST_PROPERTY_NAME = CONFIG_PREFIX + "Indexer.File.AccumulatorList";
+    private static final String ACCUMULATOR_LIST_PROPERTY_NAME = SOLR_CONFIG_PREFIX + "Indexer.File.AccumulatorList";
 
     private static Logger LOGGER = LogManager.getLogger(MCRSolrPathDocumentFactory.class);
 
     private static MCRSolrPathDocumentFactory instance = MCRConfiguration.instance()
-        .getInstanceOf(CONFIG_PREFIX + "SolrInputDocument.Path.Factory", (String) null);
+        .getInstanceOf(SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory", (String) null);
 
     private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
 

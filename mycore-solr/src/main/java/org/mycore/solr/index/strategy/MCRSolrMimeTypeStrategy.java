@@ -18,7 +18,7 @@
 
 package org.mycore.solr.index.strategy;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -29,7 +29,7 @@ import org.mycore.common.xml.MCRXMLFunctions;
 
 /**
  * Strategy that depends on a files mime type. By default images are
- * ignored. You can use the MCR.Module-solr.MimeTypeStrategy.Pattern property to
+ * ignored. You can use the MCR.Solr.MimeTypeStrategy.Pattern property to
  * set an application specific pattern. Be aware that this is the ignore
  * pattern, the {@link #check(Path, BasicFileAttributes)} method will return false if it
  * matches.
@@ -42,7 +42,7 @@ public class MCRSolrMimeTypeStrategy implements MCRSolrFileStrategy {
     private static final Pattern IGNORE_PATTERN;
 
     static {
-        String acceptPattern = MCRConfiguration.instance().getString(CONFIG_PREFIX + "MimeTypeStrategy.Pattern");
+        String acceptPattern = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "MimeTypeStrategy.Pattern");
         IGNORE_PATTERN = Pattern.compile(acceptPattern);
     }
 

@@ -80,7 +80,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
         solrQuery.set("rows", 0);
         QueryResponse queryResponse;
         try {
-            queryResponse = MCRSolrClientFactory.getSolrClient().query(solrQuery);
+            queryResponse = MCRSolrClientFactory.getMainSolrClient().query(solrQuery);
         } catch (SolrServerException | IOException e) {
             LOGGER.warn("Could not query SOLR.", e);
             return -1;
@@ -105,7 +105,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
                 .format("+{0}:\"{1}\"{2}{3}", fieldName, category, objectType, restriction);
         this.solrQuery.setQuery(queryString.trim());
         if (filterCategory) {
-            solrQuery.setFilterQueries(MessageFormat.format("{0}+{1}:\"{2}\"", MCRSolrConstants.JOIN_PATTERN,
+            solrQuery.setFilterQueries(MessageFormat.format("{0}+{1}:\"{2}\"", MCRSolrConstants.SOLR_JOIN_PATTERN,
                 fieldName, category));
         }
     }

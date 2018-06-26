@@ -1,0 +1,316 @@
+[
+  {
+    "add-field-type": {
+      "name": "long",
+      "class": "solr.TrieLongField",
+      "positionIncrementGap": "0",
+      "precisionStep": "0"
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "payloads",
+      "class": "solr.TextField",
+      "indexed": true,
+      "stored": false,
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.WhitespaceTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.DelimitedPayloadTokenFilterFactory",
+            "encoder": "float"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "text_wc",
+      "class": "solr.TextField",
+      "stored": false,
+      "multiValued": true,
+      "indexAnalyzer": {
+        "tokenizer": {
+          "class": "solr.WhitespaceTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.DelimitedPayloadTokenFilterFactory",
+            "encoder": "identity",
+            "delimiter": "|"
+          },
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "stopwords.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          },
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "[^\\p{L}\\p{Nd}]",
+            "replacement": ""
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "tokenizer": {
+          "class": "solr.WhitespaceTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "stopwords.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          },
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "[^\\p{L}\\p{Nd}]",
+            "replacement": ""
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field": {
+      "name": "allMeta",
+      "type": "text_general",
+      "multiValued": true,
+      "stored": false
+    }
+  },
+  {
+    "add-field": {
+      "name": "category",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "category.top",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "content",
+      "type": "text_general",
+      "stored": false
+    }
+  },
+  {
+    "add-field": {
+      "name": "created",
+      "type": "pdate"
+    }
+  },
+  {
+    "add-field": {
+      "name": "createdby",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "derCount",
+      "type": "pint"
+    }
+  },
+  {
+    "add-field": {
+      "name": "derivateDisplay",
+      "type": "boolean"
+    }
+  },
+  {
+    "add-field": {
+      "name": "derivateID",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "derivateLink",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "derivateURN",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "derivates",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "fileCategory",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "fileName",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "filePath",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "fileURN",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "iviewFile",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "link",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "maindoc",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "modified",
+      "type": "pdate"
+    }
+  },
+  {
+    "add-field": {
+      "name": "modifiedby",
+      "type": "string",
+      "multiValued": true,
+      "stored": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "objectKind",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "objectProject",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "objectType",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "parent",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "parentLinkText",
+      "type": "string",
+      "indexed": false
+    }
+  },
+  {
+    "add-field": {
+      "name": "payload",
+      "type": "payloads"
+    }
+  },
+  {
+    "add-field": {
+      "name": "returnId",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "search_result_link_text",
+      "type": "text_general",
+      "indexed": false
+    }
+  },
+  {
+    "add-field": {
+      "name": "stream_content_type",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "stream_name",
+      "type": "string",
+      "indexed": true,
+      "stored": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "stream_size",
+      "type": "long",
+      "indexed": true,
+      "stored": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "stream_source_info",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "text_wc",
+      "type": "text_wc"
+    }
+  },
+  {
+    "add-field": {
+      "name": "urn",
+      "type": "string",
+      "multiValued": true
+    }
+  }
+]

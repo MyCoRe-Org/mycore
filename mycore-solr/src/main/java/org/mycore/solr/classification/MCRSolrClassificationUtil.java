@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +31,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -39,14 +39,14 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.solr.MCRSolrClientFactory;
-import org.mycore.solr.MCRSolrConstants;
 import org.mycore.solr.MCRSolrCore;
+import org.mycore.solr.MCRSolrUtils;
 
 import com.google.common.collect.Lists;
 
 /**
  * Some solr classification utility stuff.
- * 
+ *
  * @author Matthias Eichner
  */
 public abstract class MCRSolrClassificationUtil {
@@ -55,18 +55,12 @@ public abstract class MCRSolrClassificationUtil {
 
     private static final Object CREATE_LOCK = new Object();
 
-    public static final String CLASSIFICATION_CORE_NAME;
-
-    static {
-        MCRSolrCore defaultCore = MCRSolrClientFactory.getDefaultSolrCore();
-        CLASSIFICATION_CORE_NAME = MCRConfiguration.instance().getString("MCR.Module-solr.Classification.Core",
-            defaultCore != null ? defaultCore.getName() + "_class" : "classification");
-    }
+    private static final String CLASSIFICATION_CORE_TYPE = "classification";
 
     /**
      * Reindex the whole classification system.
      */
-    public static void rebuildIndex() {
+    public static void rebuildIndex(SolrClient client) {
         LOGGER.info("rebuild classification index...");
         // categories
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
@@ -77,14 +71,14 @@ public abstract class MCRSolrClassificationUtil {
             List<MCRCategory> categoryList = getDescendants(rootCategory);
             categoryList.add(rootCategory);
             List<SolrInputDocument> solrDocumentList = toSolrDocument(categoryList);
-            bulkIndex(solrDocumentList);
+            bulkIndex(client, solrDocumentList);
         }
         // links
         MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
         Collection<String> linkTypes = linkService.getTypes();
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '{}' links...", linkType);
-            bulkIndex(linkService.getLinks(linkType).stream()
+            bulkIndex(client, linkService.getLinks(linkType).stream()
                 .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
                     link.getObjectReference()))
                 .map(MCRSolrCategoryLink::toSolrDocument)
@@ -94,18 +88,18 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Bulk index. The collection is split into parts of one thousand.
-     * 
+     *
      * @param solrDocumentList the list to index
      */
-    public static void bulkIndex(List<SolrInputDocument> solrDocumentList) {
-        SolrClient solrClient = getCore().getConcurrentClient();
+    public static void bulkIndex(SolrClient client, List<SolrInputDocument> solrDocumentList) {
         List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 1000);
         int docNum = solrDocumentList.size();
         int added = 0;
         for (List<SolrInputDocument> part : partitionList) {
             try {
-                solrClient.add(part, 500);
-                LOGGER.info("Added {}/{} documents", added += part.size(), docNum);
+                client.add(part, 500);
+                added += part.size();
+                LOGGER.info("Added {}/{} documents", added, docNum);
             } catch (SolrServerException | IOException e) {
                 LOGGER.error("Unable to add classification documents.", e);
             }
@@ -126,7 +120,7 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Returns a list of all descendants. The list is unordered.
-     * 
+     *
      * @return list of descendants.
      */
     public static List<MCRCategory> getDescendants(MCRCategory category) {
@@ -144,7 +138,7 @@ public abstract class MCRSolrClassificationUtil {
      * Returns a list of all ancestors. The list is ordered. The first element is
      * always the root node and the last element is always the parent. If the
      * element has no ancestor an empty list is returned.
-     * 
+     *
      * @return list of ancestors
      */
     public static LinkedList<MCRCategory> getAncestors(MCRCategory category) {
@@ -182,7 +176,7 @@ public abstract class MCRSolrClassificationUtil {
     /**
      * Reindex a bunch of {@link MCRCategory}. Be aware that this method does not fail
      * if a reindex of a single category causes an exception (its just logged).
-     * 
+     *
      * @param categories the categories to reindex
      */
     public static void reindex(MCRCategory... categories) {
@@ -207,7 +201,7 @@ public abstract class MCRSolrClassificationUtil {
 
     /**
      * Returns a collection of category id instances.
-     * 
+     *
      * @param categoryIds list of category ids as string
      */
     public static Collection<MCRCategoryID> fromString(Collection<String> categoryIds) {
@@ -232,22 +226,13 @@ public abstract class MCRSolrClassificationUtil {
      * Returns the solr classification core.
      */
     public static MCRSolrCore getCore() {
-        MCRSolrCore classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_NAME);
-        if (classCore == null) {
-            synchronized (CREATE_LOCK) {
-                classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_NAME);
-                if (classCore == null) {
-                    classCore = new MCRSolrCore(MCRSolrConstants.SERVER_BASE_URL, CLASSIFICATION_CORE_NAME);
-                    MCRSolrClientFactory.add(classCore);
-                }
-            }
-        }
-        return classCore;
+        Optional<MCRSolrCore> classCore = MCRSolrClientFactory.get(CLASSIFICATION_CORE_TYPE);
+        return classCore.orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(CLASSIFICATION_CORE_TYPE));
     }
 
     /**
      * Encodes the mycore category id to a solr usable one.
-     * 
+     *
      * @param classId the id to encode
      */
     public static String encodeCategoryId(MCRCategoryID classId) {

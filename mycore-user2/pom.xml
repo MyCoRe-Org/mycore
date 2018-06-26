@@ -10,7 +10,7 @@
   <artifactId>mycore-user2</artifactId>
   <name>MyCoRe New User System</name>
   <properties>
-    <manifest.priority>58</manifest.priority>
+    <manifest.priority>15</manifest.priority>
   </properties>
   <dependencies>
     <dependency>

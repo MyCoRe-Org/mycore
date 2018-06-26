@@ -55,7 +55,7 @@ public class MCRTransferPackageCommands {
     @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.",
                 syntax = "create transfer package for objects matching {0}")
     public static void create(String query) throws Exception {
-        List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrClientFactory.getSolrClient(), query);
+        List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrClientFactory.getMainSolrClient(), query);
         for (String objectId : ids) {
             Map<String, String> parameters = new HashMap<>();
             parameters.put("packer", "TransferPackage");
@@ -169,7 +169,7 @@ public class MCRTransferPackageCommands {
             markManager.remove(MCRObjectID.getInstance(id));
         }
         // index all objects
-        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects);
+        MCRSolrIndexer.rebuildMetadataIndex(mcrObjects, MCRSolrClientFactory.getMainSolrClient());
 
         // deleting expanded directory
         LOGGER.info("Deleting expanded tar in {}...", targetDirectoryPath);

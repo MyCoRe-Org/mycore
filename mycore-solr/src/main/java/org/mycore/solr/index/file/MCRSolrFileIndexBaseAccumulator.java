@@ -54,7 +54,7 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
 
     private static final MCRCategoryDAO CATEGORY_DAO = MCRCategoryDAOFactory.getInstance();
 
-    private static final MCRCache<String, String> derivateModified = new MCRCache<>(10000,
+    private static final MCRCache<String, String> DERIVATE_MODIFIED_CACHE = new MCRCache<>(10000,
         "derivateID ISODateString cache");
 
     @Override
@@ -112,13 +112,13 @@ public class MCRSolrFileIndexBaseAccumulator implements MCRSolrFileIndexAccumula
     private static String getDerivateModified(final String derivateID) throws IOException {
         MCRObjectID derID = MCRObjectID.getInstance(derivateID);
         MCRCache.ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(derID, 30, TimeUnit.SECONDS);
-        String modified = derivateModified.getIfUpToDate(derivateID, modifiedHandle);
+        String modified = DERIVATE_MODIFIED_CACHE.getIfUpToDate(derivateID, modifiedHandle);
         if (modified == null) {
             Date date = new Date(modifiedHandle.getLastModified());
             MCRISO8601Date date2 = new MCRISO8601Date();
             date2.setDate(date);
             modified = date2.getISOString();
-            derivateModified.put(derivateID, modified);
+            DERIVATE_MODIFIED_CACHE.put(derivateID, modified);
         }
         return modified;
     }

@@ -39,7 +39,7 @@ public abstract class MCRSolrAbstractIndexHandler implements MCRSolrIndexHandler
     }
 
     public MCRSolrAbstractIndexHandler(SolrClient solrClient) {
-        this.solrClient = solrClient != null ? solrClient : MCRSolrClientFactory.getSolrClient();
+        this.solrClient = solrClient != null ? solrClient : MCRSolrClientFactory.getMainSolrClient();
         this.commitWithin = -1;
     }
 

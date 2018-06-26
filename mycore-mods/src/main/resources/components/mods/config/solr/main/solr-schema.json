@@ -1,0 +1,233 @@
+[
+  {
+    "add-field-type": {
+      "name": "mods.namesType",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "analyzer": {
+        "charFilters": [
+          {
+            "class": "solr.MappingCharFilterFactory",
+            "mapping": "mycore_default_mapping.txt"
+          }
+        ],
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          },
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "mods.text_de",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "format": "snowball",
+            "words": "lang/stopwords_de.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.GermanNormalizationFilterFactory"
+          },
+          {
+            "class": "solr.GermanLightStemFilterFactory"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "mods.collatedGERMAN",
+      "class": "solr.TextField",
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.KeywordTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "format": "snowball",
+            "words": "lang/stopwords_de.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.GermanNormalizationFilterFactory"
+          },
+          {
+            "class": "solr.GermanLightStemFilterFactory"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.abstract",
+      "type": "mods.text_de",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.author",
+      "type": "mods.namesType",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.dateIssued",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.dateIssued.host",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.embargo",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.genre",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.identifier",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.identifier.host",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.mainAuthor",
+      "type": "mods.collatedGERMAN",
+      "indexed": true,
+      "stored": false
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.name",
+      "type": "mods.namesType",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.name.top",
+      "type": "mods.namesType",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.nameIdentifier",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.nameIdentifier.top",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.place",
+      "type": "mods.text_de",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.publisher",
+      "type": "mods.text_de",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title",
+      "type": "text_general",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.host",
+      "type": "text_general",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.main",
+      "type": "mods.collatedGERMAN"
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.title.subtitle",
+      "type": "mods.text_de"
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.type",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.yearIssued",
+      "type": "pint"
+    }
+  },
+  {
+    "add-dynamic-field": {
+      "name": "mods.note.*",
+      "type": "string",
+      "multiValued": true
+    }
+  }
+]

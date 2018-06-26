@@ -18,7 +18,7 @@
 
 package org.mycore.solr.index.document;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -56,7 +56,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
     private static boolean isJAXBTransformer;
 
     /* (non-Javadoc)
-     * @see org.mycore.solr.index.document.MCRSolrInputDocumentFactory#getDocument(org.mycore.datamodel.metadata.MCRObjectID, org.mycore.common.content.MCRContent)
+     * @see org.mycore.solr.index.document.MCRSolrInputDocumentFactory
+     *          #getDocument(org.mycore.datamodel.metadata.MCRObjectID, org.mycore.common.content.MCRContent)
      */
     @Override
     public SolrInputDocument getDocument(MCRObjectID id, MCRContent content) throws SAXException, IOException {
@@ -80,7 +81,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
     }
 
     private static MCRContentTransformer getTransformer() {
-        String property = CONFIG_PREFIX + "SolrInputDocument.Transformer";
+        String property = SOLR_CONFIG_PREFIX + "SolrInputDocument.Transformer";
         String transformerId = MCRConfiguration.instance().getString(property);
         MCRContentTransformer contentTransformer = MCRContentTransformerFactory.getTransformer(transformerId);
         isJAXBTransformer = contentTransformer instanceof MCRXSL2JAXBTransformer;

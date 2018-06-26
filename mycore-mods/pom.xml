@@ -10,7 +10,7 @@
   <artifactId>mycore-mods</artifactId>
   <name>MyCoRe MODS</name>
   <properties>
-    <manifest.priority>54</manifest.priority>
+    <manifest.priority>50</manifest.priority>
   </properties>
   <build>
     <plugins>

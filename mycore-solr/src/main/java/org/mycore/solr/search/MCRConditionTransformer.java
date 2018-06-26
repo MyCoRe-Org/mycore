@@ -18,6 +18,8 @@
 
 package org.mycore.solr.search;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,7 +58,7 @@ public class MCRConditionTransformer {
      * If a condition references fields from multiple indexes, this constant is
      * returned
      */
-    protected static final String mixed = "--mixed--";
+    protected static final String MIXED = "--mixed--";
 
     private static HashSet<String> joinFields = null;
 
@@ -189,8 +191,9 @@ public class MCRConditionTransformer {
     }
 
     public static StringBuilder getTermQuery(String field, String value) {
-        if (value.length() == 0)
+        if (value.length() == 0) {
             return null;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append('+');
         sb.append(field);
@@ -278,7 +281,7 @@ public class MCRConditionTransformer {
             if (!mapEntry.getKey().equals("metadata")) {
                 MCRCondition combinedFilterQuery = buildSubCondition(mapEntry.getValue(), and, not);
                 SolrQuery filterQuery = getSolrQuery(combinedFilterQuery, sortBy, maxHits, returnFields);
-                solrRequestQuery.addFilterQuery(MCRSolrConstants.JOIN_PATTERN + filterQuery.getQuery());
+                solrRequestQuery.addFilterQuery(MCRSolrConstants.SOLR_JOIN_PATTERN + filterQuery.getQuery());
             }
         }
         return solrRequestQuery;
@@ -338,7 +341,7 @@ public class MCRConditionTransformer {
         // mixed indexes here!
         return children.stream()
             .map(MCRConditionTransformer::getIndex)
-            .reduce((l, r) -> l.equals(r) ? l : mixed)
+            .reduce((l, r) -> l.equals(r) ? l : MIXED)
             .get();
     }
 
@@ -348,7 +351,7 @@ public class MCRConditionTransformer {
 
     private static HashSet<String> getJoinFields() {
         if (joinFields == null) {
-            joinFields = new HashSet<>(MCRConfiguration.instance().getStrings("MCR.Module-solr.JoinQueryFields"));
+            joinFields = new HashSet<>(MCRConfiguration.instance().getStrings(SOLR_CONFIG_PREFIX + "JoinQueryFields"));
         }
         return joinFields;
     }

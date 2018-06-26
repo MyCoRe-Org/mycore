@@ -18,9 +18,12 @@
 
 package org.mycore.solr;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+
 import java.util.regex.Pattern;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -53,7 +56,12 @@ public class MCRSolrUtils {
      * @return true if nested documents are used, otherwise false
      */
     public static boolean useNestedDocuments() {
-        return MCRConfiguration.instance().getBoolean("MCR.Module-solr.NestedDocuments", true);
+        return MCRConfiguration.instance().getBoolean(SOLR_CONFIG_PREFIX + "NestedDocuments", true);
     }
 
+    public static MCRConfigurationException getCoreConfigMissingException(String coreID) {
+        return new MCRConfigurationException(
+            "Missing property: " + MCRSolrConstants.SOLR_CORE_PREFIX + coreID
+                + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX);
+    }
 }

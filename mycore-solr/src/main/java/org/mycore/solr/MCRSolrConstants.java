@@ -26,36 +26,32 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRSolrConstants {
 
-    public static final String CONFIG_PREFIX = "MCR.Module-solr.";
+    public static final String SOLR_CONFIG_PREFIX = "MCR.Solr.";
 
-    public static final String SERVER_BASE_URL;
+    // public static final String SOLR_SERVER_URL;
 
-    public static final String SERVER_URL;
+    public static final String DEFAULT_SOLR_SERVER_URL = MCRConfiguration.instance().getString(
+        SOLR_CONFIG_PREFIX + "ServerURL");
 
-    public static final String CORE = MCRConfiguration.instance().getString(CONFIG_PREFIX + "Core", null);
+    public static final String SOLR_CORE_PREFIX = SOLR_CONFIG_PREFIX + "Core.";
 
-    public static final String QUERY_XML_PROTOCOL_VERSION = MCRConfiguration.instance().getString(
-        CONFIG_PREFIX + "XMLProtocolVersion");
+    public static final String SOLR_CORE_NAME_SUFFIX = ".Name";
 
-    public static final String QUERY_PATH = MCRConfiguration.instance().getString(CONFIG_PREFIX + "SelectPath");
+    public static final String SOLR_CORE_SERVER_SUFFIX = ".ServerURL";
 
-    public static final String EXTRACT_PATH = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExtractPath");
+    public static final String SOLR_QUERY_XML_PROTOCOL_VERSION = MCRConfiguration.instance().getString(
+        SOLR_CONFIG_PREFIX + "XMLProtocolVersion");
 
-    public static final String UPDATE_PATH = MCRConfiguration.instance().getString(CONFIG_PREFIX + "UpdatePath");
+    public static final String SOLR_QUERY_PATH = MCRConfiguration.instance()
+        .getString(SOLR_CONFIG_PREFIX + "SelectPath");
 
-    public static final String JOIN_PATTERN = "{!join from=returnId to=id}";
+    public static final String SOLR_EXTRACT_PATH = MCRConfiguration.instance()
+        .getString(SOLR_CONFIG_PREFIX + "ExtractPath");
 
-    static {
-        String serverURL = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ServerURL");
-        if (!serverURL.endsWith("/")) {
-            serverURL = serverURL += "/";
-        }
-        SERVER_BASE_URL = serverURL;
-        serverURL = CORE != null ? SERVER_BASE_URL + CORE : SERVER_BASE_URL;
-        if (serverURL.endsWith("/")) {
-            serverURL = serverURL.substring(0, serverURL.length() - 1);
-        }
-        SERVER_URL = serverURL;
-    }
+    public static final String SOLR_UPDATE_PATH = MCRConfiguration.instance()
+        .getString(SOLR_CONFIG_PREFIX + "UpdatePath");
 
+    public static final String SOLR_JOIN_PATTERN = "{!join from=returnId to=id}";
+
+    public static final String MAIN_CORE_TYPE = "main";
 }

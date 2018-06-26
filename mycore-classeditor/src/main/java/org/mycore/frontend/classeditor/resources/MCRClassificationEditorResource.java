@@ -289,12 +289,12 @@ public class MCRClassificationEditorResource {
     public Response retrieveLinkedObjects(@PathParam("id") String id, @QueryParam("start") Integer start,
         @QueryParam("rows") Integer rows) throws SolrServerException, IOException {
         // do solr query
-        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.set("start", start != null ? start : 0);
         params.set("rows", rows != null ? rows : 50);
         params.set("fl", "id");
-        String configQuery = MCRConfiguration.instance().getString("MCR.Module-solr.linkQuery", "category.top:{0}");
+        String configQuery = MCRConfiguration.instance().getString("MCR.Solr.linkQuery", "category.top:{0}");
         String query = MessageFormat.format(configQuery, id.replaceAll(":", "\\\\:"));
         params.set("q", query);
         QueryResponse solrResponse = solrClient.query(params);

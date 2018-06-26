@@ -10,7 +10,7 @@
   <artifactId>mycore-oai</artifactId>
   <name>MyCoRe OAI-PMH 2.0 Data Provider</name>
   <properties>
-    <manifest.priority>81</manifest.priority>
+    <manifest.priority>60</manifest.priority>
   </properties>
   <dependencies>
     <dependency>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
   xmlns:mcrsolr="http://www.mycore.de/components/solr" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions">
-  <xsl:param name="MCR.Module-solr.ServerURL" />
+  <xsl:param name="MCR.Solr.ServerURL" />
   <xsl:variable name="mcrsolr:label-width" select="3" />
   <xsl:variable name="mcrsolr:input-width" select="12 - $mcrsolr:label-width" />
 
@@ -194,7 +194,7 @@
   <xsl:template match="mcrsolr:fieldsHelp">
     <div class="table-responsive">
       <table class="table table-striped table-hover table-condensed">
-        <xsl:variable name="url" select="concat($MCR.Module-solr.ServerURL, '/admin/luke')" />
+        <xsl:variable name="url" select="concat($MCR.Solr.ServerURL, '/admin/luke')" />
         <xsl:variable name="availableFields" select="document($url)" />
         <tr>
           <th>field</th>

@@ -41,13 +41,13 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.solr.MCRSolrConstants;
+import org.mycore.solr.MCRSolrClientFactory;
 
 /**
  * Rest API methods that cover SOLR searches.
- *  
+ *
  * @author Robert Stephan
- * 
+ *
  * @version $Revision: $ $Date: $
  */
 @Path("/search")
@@ -62,10 +62,10 @@ public class MCRRestAPISearch {
 
     /**
      * see http://wiki.apache.org/solr/CommonQueryParameters for syntax of parameters
-     * 
+     *
      * @param info - the injected Jersey URIInfo object
      * @param request - the injected HTTPServletRequest object
-     * 
+     *
      * @param query
      *      the Query in SOLR Query syntax
      * @param sort
@@ -86,9 +86,9 @@ public class MCRRestAPISearch {
      *      the list of facetFields to be returned - syntax as defined by SOLR
      * @param jsonWrf
      *      the name of the JSONP callback function - syntax as defined by SOLR 
-     *      
+     *
      * @return a Jersey Response Object
-     * @throws MCRRestAPIException    
+     * @throws MCRRestAPIException
      */
     @GET
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8", MediaType.APPLICATION_JSON + ";charset=UTF-8",
@@ -100,7 +100,7 @@ public class MCRRestAPISearch {
         @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
         @QueryParam("facet.mincount") String facetMinCount, @QueryParam("json.wrf") String jsonWrf)
         throws MCRRestAPIException {
-        StringBuilder url = new StringBuilder(MCRSolrConstants.SERVER_URL);
+        StringBuilder url = new StringBuilder(MCRSolrClientFactory.getMainSolrCore().getV1CoreURL());
         url.append("/select?");
 
         try {

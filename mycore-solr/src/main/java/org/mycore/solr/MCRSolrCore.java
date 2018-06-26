@@ -18,7 +18,7 @@
 
 package org.mycore.solr;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.io.IOException;
 
@@ -53,15 +53,17 @@ public class MCRSolrCore {
 
     static {
         USE_CONCURRENT_SERVER = MCRConfiguration.instance()
-            .getBoolean(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled");
+            .getBoolean(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled");
     }
 
     /**
      * Creates a new solr server core instance. The last part of this url should be the core.
-     * 
+     *
      * @param serverURL
      *            whole url e.g. http://localhost:8296/docportal
+     * @deprecated use {@link #MCRSolrCore(String, String)} instead
      */
+    @Deprecated
     public MCRSolrCore(String serverURL) {
         if (serverURL.endsWith("/")) {
             serverURL = serverURL.substring(0, serverURL.length() - 1);
@@ -88,9 +90,9 @@ public class MCRSolrCore {
         }
         this.serverURL = serverURL;
         this.name = name;
-        String coreURL = serverURL + name;
-        int connectionTimeout = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "SolrClient.ConnectionTimeout");
-        int socketTimeout = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "SolrClient.SocketTimeout");
+        String coreURL = getV1CoreURL();
+        int connectionTimeout = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout");
+        int socketTimeout = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "SolrClient.SocketTimeout");
 
         // default server
         solrClient = new HttpSolrClient.Builder(coreURL)
@@ -100,9 +102,10 @@ public class MCRSolrCore {
         solrClient.setRequestWriter(new BinaryRequestWriter());
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
-            int queueSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
+            int queueSize = MCRConfiguration.instance()
+                .getInt(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
             int threadCount = MCRConfiguration.instance()
-                .getInt(CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
+                .getInt(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
             concurrentClient = new ConcurrentUpdateSolrClient.Builder(coreURL)
                 .withQueueSize(queueSize)
                 .withConnectionTimeout(connectionTimeout)
@@ -128,6 +131,10 @@ public class MCRSolrCore {
                 shutdown();
             }
         });
+    }
+
+    public String getV1CoreURL() {
+        return this.serverURL + "solr/" + this.name;
     }
 
     public synchronized void shutdown() {
@@ -159,6 +166,10 @@ public class MCRSolrCore {
      */
     public String getName() {
         return name;
+    }
+
+    public String getServerURL() {
+        return serverURL;
     }
 
     /**

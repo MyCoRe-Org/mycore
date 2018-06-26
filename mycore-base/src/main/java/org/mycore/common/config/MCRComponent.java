@@ -20,6 +20,7 @@ package org.mycore.common.config;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Map;
@@ -137,6 +138,18 @@ public class MCRComponent implements Comparable<MCRComponent> {
         return resourceStream;
     }
 
+    public URL getConfigURL(String filename) {
+        String resourceBase = getResourceBase();
+        if (resourceBase == null) {
+            return null;
+        }
+        String resourceName = resourceBase + filename;
+        URL resourceURL = this.getClass().getClassLoader().getResource(resourceName);
+        if (resourceURL != null) {
+            LOGGER.info("Reading config resource: {}", resourceName);
+        }
+        return resourceURL;
+    }
     /**
      * Returns resource base path to this components config resources.
      */

@@ -18,8 +18,8 @@
 
 package org.mycore.solr.search;
 
-import static org.mycore.solr.MCRSolrConstants.QUERY_PATH;
-import static org.mycore.solr.MCRSolrConstants.QUERY_XML_PROTOCOL_VERSION;
+import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_PATH;
+import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +41,8 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 public class MCRSolrURL {
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrURL.class);
 
-    public static final String FIXED_URL_PART = MessageFormat.format("{0}?version={1}", QUERY_PATH,
-        QUERY_XML_PROTOCOL_VERSION);
+    public static final String FIXED_URL_PART = MessageFormat.format("{0}?version={1}", SOLR_QUERY_PATH,
+        SOLR_QUERY_XML_PROTOCOL_VERSION);
 
     private HttpSolrClient solrClient;
 

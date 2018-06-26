@@ -46,9 +46,11 @@ public class MCRSolrCategLinkService extends MCRCategLinkServiceImpl {
     public void setLinks(MCRCategLinkReference objectReference, Collection<MCRCategoryID> categories) {
         super.setLinks(objectReference, categories);
         // solr
+        SolrClient solrClient = MCRSolrClassificationUtil.getCore().getClient();
+
         List<SolrInputDocument> solrDocumentList = MCRSolrClassificationUtil
             .toSolrDocument(objectReference, categories);
-        MCRSolrClassificationUtil.bulkIndex(solrDocumentList);
+        MCRSolrClassificationUtil.bulkIndex(solrClient, solrDocumentList);
     }
 
     @Override

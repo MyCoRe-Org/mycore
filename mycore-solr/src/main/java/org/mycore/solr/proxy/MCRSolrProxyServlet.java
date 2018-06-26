@@ -18,12 +18,6 @@
 
 package org.mycore.solr.proxy;
 
-import static org.mycore.solr.MCRSolrConstants.CONFIG_PREFIX;
-import static org.mycore.solr.MCRSolrConstants.QUERY_PATH;
-import static org.mycore.solr.MCRSolrConstants.QUERY_XML_PROTOCOL_VERSION;
-import static org.mycore.solr.MCRSolrConstants.SERVER_URL;
-import static org.mycore.solr.MCRSolrConstants.SERVER_BASE_URL;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,6 +29,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -45,7 +40,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -67,7 +61,13 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.services.http.MCRIdleConnectionMonitorThread;
+import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrConstants;
 import org.xml.sax.SAXException;
+
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_PATH;
+import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
 
 public class MCRSolrProxyServlet extends MCRServlet {
 
@@ -92,13 +92,11 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public static final String QUERY_CORE_PARAMETER = "core";
 
     private static int MAX_CONNECTIONS = MCRConfiguration.instance()
-        .getInt(CONFIG_PREFIX + "SelectProxy.MaxConnections");
+        .getInt(SOLR_CONFIG_PREFIX + "SelectProxy.MaxConnections");
 
     private CloseableHttpClient httpClient;
 
     private MCRIdleConnectionMonitorThread idleConnectionMonitorThread;
-
-    protected HttpHost solrHost;
 
     private Set<String> queryHandlerWhitelist;
 
@@ -144,7 +142,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static void redirectToQueryHandler(HttpServletRequest request, HttpServletResponse resp)
         throws IOException {
         ModifiableSolrParams solrQueryParameter = getSolrQueryParameter(request);
-        String queryHandlerPath = solrQueryParameter.get(QUERY_HANDLER_PAR_NAME, QUERY_PATH);
+        String queryHandlerPath = solrQueryParameter.get(QUERY_HANDLER_PAR_NAME, SOLR_QUERY_PATH);
         solrQueryParameter.remove(QUERY_HANDLER_PAR_NAME);
         Map<String, String[]> parameters = toMultiMap(solrQueryParameter);
         doRedirectToQueryHandler(resp, queryHandlerPath, parameters);
@@ -202,10 +200,10 @@ public class MCRSolrProxyServlet extends MCRServlet {
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
-            request.getParameter(QUERY_CORE_PARAMETER));
+            Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
         try {
             LOGGER.info("Sending Request: {}", solrHttpMethod.getURI());
-            HttpResponse response = httpClient.execute(solrHost, solrHttpMethod);
+            HttpResponse response = httpClient.execute(solrHttpMethod);
             int statusCode = response.getStatusLine().getStatusCode();
 
             // set status code
@@ -250,7 +248,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     private void updateQueryHandlerMap() {
-        List<String> whitelistPropertyList = MCRConfiguration.instance().getStrings("MCR.Module-solr.Proxy.WhiteList",
+        List<String> whitelistPropertyList = MCRConfiguration.instance().getStrings(
+            SOLR_CONFIG_PREFIX + "Proxy.WhiteList",
             Collections.singletonList("/select"));
         this.queryHandlerWhitelist = new HashSet<>(whitelistPropertyList);
     }
@@ -264,8 +263,9 @@ public class MCRSolrProxyServlet extends MCRServlet {
      *            Parameters to use with the Request
      * @return a method to make the request
      */
-    private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params, String core) {
-        String serverURL =  core != null && !"".equals(core) ? SERVER_BASE_URL + core : SERVER_URL;
+    private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params, String type) {
+        String serverURL = MCRSolrClientFactory.get(type).get().getV1CoreURL();
+
         return new HttpGet(MessageFormat.format("{0}{1}{2}", serverURL, queryHandlerPath, params.toQueryString()));
     }
 
@@ -287,14 +287,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
 
-        LOGGER.info("Initializing SOLR connection to \"{}\"", SERVER_URL);
-
         this.updateQueryHandlerMap();
 
-        solrHost = MCRHttpUtils.getHttpHost(SERVER_URL);
-        if (solrHost == null) {
-            throw new ServletException("URI does not specify a valid host name: " + SERVER_URL);
-        }
         httpClientConnectionManager = MCRHttpUtils.getConnectionManager(MAX_CONNECTIONS);
         httpClient = MCRHttpUtils.getHttpClient(httpClientConnectionManager, MAX_CONNECTIONS);
 
@@ -320,7 +314,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
         LinkedHashMap<String, String[]> copy = new LinkedHashMap<>(parameters);
         ModifiableSolrParams solrParams = new ModifiableSolrParams(copy);
         if (!parameters.containsKey("version") && !parameters.containsKey("wt")) {
-            solrParams.set("version", QUERY_XML_PROTOCOL_VERSION);
+            solrParams.set("version", SOLR_QUERY_XML_PROTOCOL_VERSION);
         }
         return solrParams;
     }

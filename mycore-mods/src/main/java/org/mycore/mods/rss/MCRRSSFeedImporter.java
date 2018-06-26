@@ -205,7 +205,7 @@ public class MCRRSSFeedImporter {
     }
 
     private boolean isAlreadyStored(String publicationID) {
-        SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         SolrQuery query = new SolrQuery();
         query.setQuery(field2queryID + ":" + MCRSolrUtils.escapeSearchValue(publicationID));
         query.setRows(0);

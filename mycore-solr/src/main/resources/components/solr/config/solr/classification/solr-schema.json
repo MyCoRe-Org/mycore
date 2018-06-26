@@ -1,0 +1,164 @@
+[
+  {
+    "add-field-type": {
+      "name": "text",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "indexAnalyzer": {
+        "tokenizer": {
+          "class": "solr.ICUTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "stopwords.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.ICUFoldingFilterFactory"
+          },
+          {
+            "class": "solr.RemoveDuplicatesTokenFilterFactory"
+          },
+          {
+            "class": "solr.LengthFilterFactory",
+            "min": "2",
+            "max": "30"
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "tokenizer": {
+          "class": "solr.ICUTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "stopwords.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.ICUFoldingFilterFactory"
+          },
+          {
+            "class": "solr.RemoveDuplicatesTokenFilterFactory"
+          },
+          {
+            "class": "solr.LengthFilterFactory",
+            "min": "2",
+            "max": "30"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field": {
+      "name": "allMeta",
+      "type": "text",
+      "multiValued": true,
+      "stored": false
+    }
+  },
+  {
+    "add-field": {
+      "name": "ancestors",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "category",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "children",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "classification",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "id",
+      "type": "string",
+      "required": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "index",
+      "type": "long"
+    }
+  },
+  {
+    "add-field": {
+      "name": "linkType",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "node",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "object",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "parent",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "type",
+      "type": "string",
+      "required": true
+    }
+  },
+  {
+    "add-dynamicField": {
+      "name": "label.*",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-dynamicField": {
+      "name": "*",
+      "type": "ignored"
+    }
+  },
+  {
+    "add-copyField": {
+      "source": "category",
+      "dest": "allMeta"
+    }
+  },
+  {
+    "add-copyField": {
+      "source": "classification",
+      "dest": "allMeta"
+    }
+  },
+  {
+    "add-copyField": {
+      "source": "label.*",
+      "dest": "allMeta"
+    }
+  }
+]
