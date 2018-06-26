@@ -1,6 +1,7 @@
 package org.mycore.orcid.works;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -81,9 +82,10 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
             String name = MCRORCIDUser.ATTR_ID_PREFIX + key.split(":")[0];
             String value = key.split(":")[1];
 
-            // Workaround, because MCRUserManager.getUsers(name,value) returns users with incomplete attributes
-            MCRUserManager.listUsers(null, null, null).stream()
-                .filter(u -> value.equals(u.getUserAttribute(name))).forEach(u -> users.add(u));
+            Optional<MCRUser> user = MCRUserManager.getUsers(name, value).findFirst();
+            if (user.isPresent()) {
+                users.add(user.get());
+            }
         }
         return users;
     }
