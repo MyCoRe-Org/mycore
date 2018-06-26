@@ -99,6 +99,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 public class MCRRestDerivateContents {
     private static final int BUFFER_SIZE = 8192;
 
+    public static final String IGNORE_MESSAGE_BODY_HEADER = "X-MCR-Ignore-Message-Body";
+
     @Context
     ContainerRequestContext request;
 
@@ -361,8 +363,11 @@ public class MCRRestDerivateContents {
 
     private boolean isFile() {
         //as per https://tools.ietf.org/html/rfc7230#section-3.3
+        //IGNORE_MESSAGE_BODY_HEADER is used as User Agents may send 'Content-Length: 0'
+        //even if no message body was send
         MultivaluedMap<String, String> headers = request.getHeaders();
-        return headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding");
+        return !headers.containsKey(IGNORE_MESSAGE_BODY_HEADER) && headers.containsKey(HttpHeaders.CONTENT_LENGTH)
+            || headers.containsKey("Transfer-Encoding");
     }
 
     private Response serveDirectory(MCRPath mcrPath, MCRFileAttributes dirAttrs) {
