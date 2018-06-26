@@ -86,12 +86,24 @@
         <xsl:value-of select="." />
       </field>
     </xsl:for-each>
-    <xsl:for-each
-      select=".//mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
-      <field name="mods.publisher">
-        <xsl:call-template name="printModsName" />
-      </field>
-    </xsl:for-each>
+    <!-- publisher is either specified in current metadata or inherited from parent or grandparent-->
+    <xsl:choose>
+      <xsl:when test="mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
+        <xsl:apply-templates select="mods:originInfo[@eventType='publication' or (not(@eventType) and not (../mods:originInfo[@eventType='publication']))]" mode="print_publisher_field" />
+      </xsl:when>
+      <xsl:when test="mods:relatedItem[@type='host']/mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
+        <xsl:apply-templates select="mods:relatedItem[@type='host']/mods:originInfo[@eventType='publication' or (not(@eventType) and not (../mods:originInfo[@eventType='publication']))]/mods:publisher" mode="print_publisher_field" />
+      </xsl:when>
+      <xsl:when test="//mods:relatedItem[@type='host']/mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
+        <xsl:apply-templates select="//mods:relatedItem[@type='host']/mods:originInfo[@eventType='publication' or (not(@eventType) and not (../mods:originInfo[@eventType='publication']))]/mods:publisher" mode="print_publisher_field" />
+      </xsl:when>
+      <xsl:when test="mods:relatedItem[@type='series']/mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
+        <xsl:apply-templates select="mods:relatedItem[@type='series']/mods:originInfo[@eventType='publication' or (not(@eventType) and not (../mods:originInfo[@eventType='publication']))]/mods:publisher" mode="print_publisher_field" />
+      </xsl:when>
+      <xsl:when test="//mods:relatedItem[@type='series']/mods:originInfo[not(@eventType) or @eventType='publication']/mods:publisher">
+        <xsl:apply-templates select="//mods:relatedItem[@type='series']/mods:originInfo[@eventType='publication' or (not(@eventType) and not (../mods:originInfo[@eventType='publication']))]/mods:publisher" mode="print_publisher_field" />
+      </xsl:when>
+    </xsl:choose>
     <xsl:for-each select="mods:genre[@type='intern']">
       <field name="mods.genre">
         <xsl:value-of select="substring-after(@valueURI,'#')" />
@@ -244,6 +256,12 @@
     </doc>
   </xsl:template>
 
+
+  <xsl:template match="mods:publisher" mode="print_publisher_field">
+    <field name="mods.publisher">
+      <xsl:call-template name="printModsName" />
+    </field>
+  </xsl:template>
 
   <xsl:template name="printModsName">
     <xsl:choose>
