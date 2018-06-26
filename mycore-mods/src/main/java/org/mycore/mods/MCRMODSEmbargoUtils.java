@@ -22,18 +22,19 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRCreatorCache;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -44,13 +45,31 @@ public class MCRMODSEmbargoUtils {
 
     public static final String POOLPRIVILEGE_EMBARGO = "embargo";
 
-    private static final int CAPACITY = 10000;
-
     private static final Logger LOGGER = LogManager.getLogger(MCRMODSEmbargoUtils.class);
 
     private static final String EMPTY_VALUE = "";
 
+    private static final int CAPACITY = 10000;
+
     private static MCRCache<MCRObjectID, String> embargoCache = new MCRCache<>(CAPACITY, "MODS embargo filter cache");
+
+    public static String getCachedEmbargo(final MCRObjectID objectId) {
+        MCRCache.ModifiedHandle modifiedHandle = MCRXMLMetadataManager.instance().getLastModifiedHandle(objectId, 10,
+            TimeUnit.MINUTES);
+        String embargo = null;
+        try {
+            embargo = embargoCache.getIfUpToDate(objectId, modifiedHandle);
+        } catch (IOException e) {
+            LOGGER.warn("Could not determine last modified timestamp of object {}", objectId);
+        }
+        if (embargo != null) {
+            return embargo == EMPTY_VALUE ? null : embargo;
+        }
+        MCRMODSWrapper modsWrapper = new MCRMODSWrapper(MCRMetadataManager.retrieveMCRObject(objectId));
+        embargo = modsWrapper.getElementValue("mods:accessCondition[@type='embargo']");
+        embargoCache.put(objectId, embargo != null ? embargo : EMPTY_VALUE);
+        return embargo;
+    }
 
     /**
      * Returns the embargo or <code>null</code> if none is set or is allowed to read.
@@ -69,7 +88,6 @@ public class MCRMODSEmbargoUtils {
      * @return the embargo or <code>null</code>
      */
     public static String getEmbargo(final MCRObjectID objectId) {
-
         String embargo = getCachedEmbargo(objectId);
 
         if (embargo != null && !embargo.isEmpty() && isAfterToday(embargo)) {
@@ -78,31 +96,39 @@ public class MCRMODSEmbargoUtils {
         return null;
     }
 
-    public static String getCachedEmbargo(final MCRObjectID objectId) {
-        ModifiedHandle modifiedHandle = MCRXMLMetadataManager.instance().getLastModifiedHandle(objectId, 10,
-            TimeUnit.MINUTES);
-        String embargo = null;
-        try {
-            embargo = embargoCache.getIfUpToDate(objectId, modifiedHandle);
-        } catch (IOException e) {
-            LOGGER.warn("Could not determine last modified timestamp of object {}", objectId);
+    public static String getEmbargo(final MCRObject object) {
+        final MCRMODSWrapper modsWrapper = new MCRMODSWrapper(object);
+        final String embargo = modsWrapper.getElementValue("mods:accessCondition[@type='embargo']");
+
+        if (embargo != null && !embargo.isEmpty() && isAfterToday(embargo)) {
+            return embargo;
         }
-        if (embargo != null) {
-            return embargo == EMPTY_VALUE ? null : embargo;
-        }
-        MCRMODSWrapper modsWrapper = new MCRMODSWrapper(MCRMetadataManager.retrieveMCRObject(objectId));
-        embargo = modsWrapper.getElementValue("mods:accessCondition[@type='embargo']");
-        embargoCache.put(objectId, embargo != null ? embargo : EMPTY_VALUE);
-        return embargo;
+        return null;
     }
 
-    private static boolean isAfterToday(final String embargoDate) {
-        try {
-            final MCRISO8601Date isoED = new MCRISO8601Date(embargoDate);
-            final LocalDate now = Instant.now().atZone(ZoneId.systemDefault()).toLocalDate();
-            final LocalDate ed = LocalDate.from(isoED.getDt());
+    public static Optional<LocalDate> getEmbargoDate(final String objectID) {
+        return parseEmbargo(getEmbargo(objectID));
+    }
 
-            return ed.isAfter(now);
+    public static Optional<LocalDate> getEmbargoDate(final MCRObjectID object) {
+        return parseEmbargo(getEmbargo(object));
+    }
+
+    public static Optional<LocalDate> getEmbargoDate(final MCRObject object) {
+        return parseEmbargo(getEmbargo(object));
+    }
+
+    private static Optional<LocalDate> parseEmbargo(final String embargoDate) {
+        final MCRISO8601Date isoED = new MCRISO8601Date(embargoDate);
+        return Optional.ofNullable(LocalDate.from(isoED.getDt()));
+    }
+
+    public static boolean isAfterToday(final String embargoDate) {
+        try {
+            final Optional<LocalDate> ed = parseEmbargo(embargoDate);
+            final LocalDate now = Instant.now().atZone(ZoneId.systemDefault()).toLocalDate();
+            final boolean bool = ed.map(ded -> ded.isAfter(now)).orElseGet(() -> false);
+            return bool;
         } catch (DateTimeException ex) {
             return embargoDate.compareTo(MCRISO8601Date.now().getISOString()) > 0;
         }
