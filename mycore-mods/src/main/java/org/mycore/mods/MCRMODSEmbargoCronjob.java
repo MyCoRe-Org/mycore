@@ -83,7 +83,7 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
     }
 
     private void searchDocumentsToRelease(Consumer<MCRObjectID> objectReleaser) {
-        final SolrClient solrClient = MCRSolrClientFactory.getSolrClient();
+        final SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         final ModifiableSolrParams params = new ModifiableSolrParams();
         final LocalDate today = LocalDate.now();
         final String todayString = today.format(DateTimeFormatter.ISO_DATE);
