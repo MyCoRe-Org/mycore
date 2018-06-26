@@ -1,8 +1,8 @@
 package org.mycore.orcid.works;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,10 +82,7 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
             String name = MCRORCIDUser.ATTR_ID_PREFIX + key.split(":")[0];
             String value = key.split(":")[1];
 
-            Optional<MCRUser> user = MCRUserManager.getUsers(name, value).findFirst();
-            if (user.isPresent()) {
-                users.add(user.get());
-            }
+            users.addAll(MCRUserManager.getUsers(name, value).collect(Collectors.toSet()));
         }
         return users;
     }
