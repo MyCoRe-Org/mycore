@@ -326,7 +326,7 @@ public class MCRMetsSave {
 
     private static List<String> getFileGroups(Document mets) {
         final XPathExpression<Attribute> xpath = XPathFactory.instance()
-            .compile("mets:mets/mets:fileSec/mets:fileGrp@USE", Filters.attribute(), null,
+            .compile("mets:mets/mets:fileSec/mets:fileGrp/@USE", Filters.attribute(), null,
                 MCRConstants.METS_NAMESPACE);
         return xpath.evaluate(mets).stream().map(Attribute::getValue).collect(Collectors.toList());
 
