@@ -2,6 +2,7 @@ package org.mycore.orcid.works;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,9 +82,7 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
             String name = MCRORCIDUser.ATTR_ID_PREFIX + key.split(":")[0];
             String value = key.split(":")[1];
 
-            // Workaround, because MCRUserManager.getUsers(name,value) returns users with incomplete attributes
-            MCRUserManager.listUsers(null, null, null).stream()
-                .filter(u -> value.equals(u.getUserAttribute(name))).forEach(u -> users.add(u));
+            users.addAll(MCRUserManager.getUsers(name, value).collect(Collectors.toSet()));
         }
         return users;
     }
