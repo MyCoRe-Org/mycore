@@ -138,7 +138,18 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 String[] upSplit = userPwd.split(":");
                 String username = upSplit[0];
                 String password = upSplit[1];
-                userInformation = Optional.ofNullable(MCRUserManager.checkPassword(username, password));
+                userInformation = Optional.ofNullable(MCRUserManager.checkPassword(username, password))
+                    .map(MCRUserInformation.class::cast)
+                    .map(Optional::of)
+                    .orElseThrow(() -> {
+                        LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
+                        attrs.put("error", "invalid_login");
+                        attrs.put("error_description", "Wrong login or password.");
+                        return new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED)
+                            .header(HttpHeaders.WWW_AUTHENTICATE,
+                                MCRRestAPIUtil.getWWWAuthenticateHeader(null, attrs, app))
+                            .build());
+                    });
             }
         }
         //3. JWT
