@@ -161,8 +161,9 @@ public class MCRMETSServlet extends MCRServlet {
 
     private boolean useExistingMets(HttpServletRequest request) {
         String useExistingMetsParam = request.getParameter("useExistingMets");
-        if (useExistingMetsParam == null)
+        if (useExistingMetsParam == null) {
             return true;
+        }
         return Boolean.valueOf(useExistingMetsParam);
     }
 

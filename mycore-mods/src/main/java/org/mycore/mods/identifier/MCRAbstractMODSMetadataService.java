@@ -60,7 +60,7 @@ public class MCRAbstractMODSMetadataService
         MCRObject object = checkObject(base);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
         wrapper.setElement("identifier", "type", getIdentifierType(), identifier.asString())
-                .orElseThrow(() -> new MCRException("Could not insert " + getIdentifierType() + " into mods document!"));
+               .orElseThrow(() -> new MCRException("Could not insert " + getIdentifierType() + " into mods document!"));
     }
 
     private MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {

@@ -62,7 +62,6 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRMarkManager;
-import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
@@ -244,7 +243,7 @@ public class MCRMetsSave {
             String fileGrpUSE = getFileGroupUse(file);
 
             String fileId = MessageFormat.format("{0}_{1}", fileGrpUSE.toLowerCase(Locale.ROOT), getFileBase(relPath));
-            org.mycore.mets.model.files.File fileAsMetsFile = new org.mycore.mets.model.files.File(fileId, contentType);
+            File fileAsMetsFile = new File(fileId, contentType);
 
             FLocat fLocat = new FLocat(LOCTYPE.URL, relPath);
             fileAsMetsFile.setFLocat(fLocat);
@@ -316,7 +315,8 @@ public class MCRMetsSave {
         String physicalFileExistsXpathString = String
             .format(
                 Locale.ROOT,
-                "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']/mets:div[mets:fptr/@FILEID='%s']",
+                "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']" +
+                        "/mets:div[mets:fptr/@FILEID='%s']",
                 matchId);
         xpath = XPathFactory.instance().compile(physicalFileExistsXpathString, Filters.element(), null,
             MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
@@ -429,14 +429,14 @@ public class MCRMetsSave {
         String matchId = null;
 
         // iterate over all files
-        path = getCleanPath(path);
+        String cleanPath = getCleanPath(path);
 
         for (Element fileLoc : fileLocList) {
             Attribute hrefAttribute = fileLoc.getAttribute("href", MCRConstants.XLINK_NAMESPACE);
             String hrefAttributeValue = hrefAttribute.getValue();
             String hrefPath = getCleanPath(removeExtension(hrefAttributeValue));
 
-            if (hrefPath.equals(removeExtension(path))) {
+            if (hrefPath.equals(removeExtension(cleanPath))) {
                 matchId = ((Element) fileLoc.getParent()).getAttributeValue("ID");
                 break;
             }
@@ -445,20 +445,21 @@ public class MCRMetsSave {
     }
 
     private static String getCleanPath(String path) {
-        if (path.startsWith(ALTO_FOLDER_PREFIX)) {
-            path = path.substring(ALTO_FOLDER_PREFIX.length());
-        } else if (path.startsWith(TEI_FOLDER_PREFIX)) {
-            path = path.substring(TEI_FOLDER_PREFIX.length());
+        String cleanPath = path;
+        if (cleanPath.startsWith(ALTO_FOLDER_PREFIX)) {
+            cleanPath = cleanPath.substring(ALTO_FOLDER_PREFIX.length());
+        } else if (cleanPath.startsWith(TEI_FOLDER_PREFIX)) {
+            cleanPath = cleanPath.substring(TEI_FOLDER_PREFIX.length());
 
-            if (path.startsWith(TRANSLATION_FOLDER_PREFIX)) {
+            if (cleanPath.startsWith(TRANSLATION_FOLDER_PREFIX)) {
                 // e.g. tei/TRANSLATION_FOLDER_PREFIXDE/folder/file.tif -> folder/file.tif
-                path = path.substring(TRANSLATION_FOLDER_PREFIX.length());
-                path = path.substring(path.indexOf("/") + 1);
-            } else if (path.startsWith(TRANSCRIPTION_FOLDER_PREFIX)) {
-                path = path.substring(TRANSCRIPTION_FOLDER_PREFIX.length() + 1);
+                cleanPath = cleanPath.substring(TRANSLATION_FOLDER_PREFIX.length());
+                cleanPath = cleanPath.substring(cleanPath.indexOf("/") + 1);
+            } else if (cleanPath.startsWith(TRANSCRIPTION_FOLDER_PREFIX)) {
+                cleanPath = cleanPath.substring(TRANSCRIPTION_FOLDER_PREFIX.length() + 1);
             }
         }
-        return path;
+        return cleanPath;
     }
 
     private static String removeExtension(String fileName) {
@@ -579,7 +580,7 @@ public class MCRMetsSave {
 
             for (FileGrp fileGrp : fileGroups) {
                 if (fileGrp.contains(href)) {
-                    org.mycore.mets.model.files.File fileToRemove = fileGrp.getFileByHref(href);
+                    File fileToRemove = fileGrp.getFileByHref(href);
                     fileGrp.removeFile(fileToRemove);
 
                     ArrayList<PhysicalSubDiv> physicalSubDivsToRemove = new ArrayList<>();
@@ -696,7 +697,7 @@ public class MCRMetsSave {
     }
 
     /**
-     * @return true if all files in the {@link MCRDirectory} appears in the fileGroup
+     * @return true if all files in the {@link org.mycore.datamodel.ifs2.MCRDirectory} appears in the fileGroup
      */
     public static boolean isComplete(final FileGrp fileGroup, MCRPath rootDir) {
         final AtomicBoolean complete = new AtomicBoolean(true);
@@ -715,7 +716,8 @@ public class MCRMetsSave {
                             throw new IOException(e);
                         }
                         if (!fileGroup.contains(path)) {
-                            LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!", path, mcrPath.getOwner()));
+                            LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!",
+                                    path, mcrPath.getOwner()));
                             complete.set(false);
                             return FileVisitResult.TERMINATE;
                         }

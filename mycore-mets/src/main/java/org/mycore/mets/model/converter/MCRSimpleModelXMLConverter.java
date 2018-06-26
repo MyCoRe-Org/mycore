@@ -171,7 +171,6 @@ public class MCRSimpleModelXMLConverter {
 
         sectionIdMap.put(metsSection, id);
         parent.add(logicalSubDiv);
-        int count = 1;
         for (MCRMetsSection section : metsSection.getMetsSectionList()) {
             buildLogicalSubDiv(section, logicalSubDiv, sectionIdMap, idToNewIDMap);
         }

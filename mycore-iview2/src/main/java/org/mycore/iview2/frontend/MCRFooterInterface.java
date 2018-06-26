@@ -21,7 +21,8 @@ package org.mycore.iview2.frontend;
 import java.awt.image.BufferedImage;
 
 /**
- * The MCRFooterInterface adds the possibility to write a different implementations and combine them for example with the {@link MCRTileCombineServlet}.  
+ * The MCRFooterInterface adds the possibility to write a different implementations and combine them for example with
+ * the {@link MCRTileCombineServlet}.
  * @author Thomas Scheffler (yagee)
  *
  */

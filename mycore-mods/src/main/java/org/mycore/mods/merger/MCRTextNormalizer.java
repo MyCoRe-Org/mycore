@@ -31,14 +31,19 @@ import java.util.Locale;
 public class MCRTextNormalizer {
 
     public static String normalizeText(String text) {
-        text = text.toLowerCase(Locale.getDefault());
-        text = new MCRHyphenNormalizer().normalize(text).replace("-", " ");
-        text = Normalizer.normalize(text, Form.NFD).replaceAll("\\p{M}", ""); //canonical decomposition, remove accents
-        text = text.replace("ue", "u").replace("oe", "o").replace("ae", "a").replace("ß", "s").replace("ss", "s");
-        text = text.replaceAll("[^a-z0-9]\\s]", ""); //remove all non-alphabetic characters
-        // text = text.replaceAll("\\b.{1,3}\\b", " ").trim(); // remove all words with fewer than four characters
-        text = text.replaceAll("\\p{Punct}", " ").trim(); // remove all punctuation
-        text = text.replaceAll("\\s+", " "); // normalize whitespace
-        return text;
+        String normalizedText = text.toLowerCase(Locale.getDefault());
+        normalizedText = new MCRHyphenNormalizer().normalize(normalizedText).replace("-", " ");
+        //canonical decomposition, remove accents
+        normalizedText = Normalizer.normalize(normalizedText, Form.NFD).replaceAll("\\p{M}", "");
+        normalizedText = normalizedText.replace("ue", "u")
+                                        .replace("oe", "o").replace("ae", "a")
+                                        .replace("ß", "s").replace("ss", "s");
+        //remove all non-alphabetic characters
+        normalizedText = normalizedText.replaceAll("[^a-z0-9]\\s]", "");
+        // remove all words with fewer than four characters
+        // normalizedText = normalizedText.replaceAll("\\b.{1,3}\\b", " ").trim();
+        normalizedText = normalizedText.replaceAll("\\p{Punct}", " ").trim(); // remove all punctuation
+        normalizedText = normalizedText.replaceAll("\\s+", " "); // normalize whitespace
+        return normalizedText;
     }
 }

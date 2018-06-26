@@ -180,13 +180,14 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         if (!Boolean.valueOf(req.getParameter("countlinks"))) {
             return;
         }
-        if (objectType != null && objectType.trim().length() == 0) {
-            objectType = null;
+        String objType = objectType;
+        if (objType != null && objType.trim().length() == 0) {
+            objType = null;
         }
 
         String classifID = category.getId().getRootID();
         Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category,
-            objectType, true);
+                objType, true);
         for (Iterator<Element> it = data.iterator(); it.hasNext();) {
             Element child = it.next();
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));

@@ -34,9 +34,10 @@ public class MCRHyphenNormalizer {
      * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.
      **/
     public String normalize(String input) {
+        String normalizedInput = input;
         for (char hypenVariant : HYPHEN_VARIANTS) {
-            input = input.replace(hypenVariant, HYPHEN_NORM);
+            normalizedInput = normalizedInput.replace(hypenVariant, HYPHEN_NORM);
         }
-        return input;
+        return normalizedInput;
     }
 }

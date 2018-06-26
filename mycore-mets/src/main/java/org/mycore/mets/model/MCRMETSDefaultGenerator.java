@@ -149,7 +149,9 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
     private void structureMets(MCRPath dir, Set<MCRPath> ignoreNodes, FileSec fileSec, PhysicalDiv physicalDiv,
         LogicalDiv logicalDiv, StructLink structLink, int logOrder) throws IOException {
-        SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>(), directories = new TreeMap<>();
+        int lOrder = logOrder;
+        SortedMap<MCRPath, BasicFileAttributes> files = new TreeMap<>();
+        SortedMap<MCRPath, BasicFileAttributes> directories = new TreeMap<>();
 
         fillFileMap(ignoreNodes, files, directories, dir);
 
@@ -159,11 +161,11 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         for (Map.Entry<MCRPath, BasicFileAttributes> directory : directories.entrySet()) {
             String dirName = directory.getKey().getFileName().toString();
             if (isInExcludedRootFolder(directory.getKey())) {
-                structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, logOrder);
+                structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, lOrder);
             } else {
-                LogicalDiv section = new LogicalDiv("log_" + Integer.toString(++logOrder), "section", dirName);
+                LogicalDiv section = new LogicalDiv("log_" + Integer.toString(++lOrder), "section", dirName);
                 logicalDiv.add(section);
-                structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, section, structLink, logOrder);
+                structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, section, structLink, lOrder);
             }
         }
     }
@@ -270,8 +272,9 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
     private boolean isInExcludedRootFolder(MCRPath directory) {
         for (String excludedRoot : EXCLUDED_ROOT_FOLDERS) {
             String path = directory.toString().substring(directory.toString().indexOf(":/") + 2);
-            if (path.startsWith(excludedRoot))
+            if (path.startsWith(excludedRoot)) {
                 return true;
+            }
         }
         return false;
     }

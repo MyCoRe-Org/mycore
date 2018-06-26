@@ -75,7 +75,8 @@ public class MCRUpdateMetsOnDerivateChangeEventHandler extends MCREventHandlerBa
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleFileDeleted(org.mycore.common.events.MCREvent, org.mycore.datamodel.ifs.MCRFile)
+     * @see org.mycore.common.events.MCREventHandlerBase
+     * #handleFileDeleted(org.mycore.common.events.MCREvent, org.mycore.datamodel.ifs.MCRFile)
      */
     @Override
     protected void handlePathDeleted(MCREvent evt, Path file, BasicFileAttributes attrs) {

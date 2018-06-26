@@ -55,6 +55,16 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
     private static final Logger LOGGER = LogManager.getLogger(MCRMODSClassificationSupport.class);
 
     /**
+     * The authority URI
+     */
+    private String authorityURI;
+
+    /**
+     * The value URI
+     */
+    private String valueURI;
+
+    /**
      * Inspects the attributes in the given MODS XML element and returns the AuthorityInfo given there.
      */
     public static MCRAuthorityWithURI getAuthorityInfo(Element element) {
@@ -74,12 +84,13 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
 
     /**
      * Builds the authority info from the given values, does some checks on the values.
-     * 
+     *
      * @return the authority info, or null if the values are illegal or unsupported.
      */
     private static MCRAuthorityWithURI getAuthorityInfo(String authorityURI, String valueURI) {
-        if (authorityURI == null || authorityURI.isEmpty())
+        if (authorityURI == null || authorityURI.isEmpty()) {
             return null;
+        }
 
         if (valueURI == null || valueURI.length() == 0) {
             LOGGER.warn("Did find attribute authorityURI='{}', but no valueURI", authorityURI);
@@ -111,17 +122,7 @@ class MCRAuthorityWithURI extends MCRAuthorityInfo {
         return getLabel(category, LABEL_LANG_URI, defaultURI);
     }
 
-    /**
-     * The authority URI
-     */
-    private String authorityURI;
-
-    /**
-     * The value URI
-     */
-    private String valueURI;
-
-    public MCRAuthorityWithURI(String authorityURI, String valueURI) {
+    MCRAuthorityWithURI(String authorityURI, String valueURI) {
         this.authorityURI = authorityURI;
         this.valueURI = valueURI;
     }

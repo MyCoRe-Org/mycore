@@ -97,7 +97,7 @@ public class MCRStalledJobResetter implements Runnable {
         try {
             executorTransaction.commit();
         } catch (HibernateException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
             if (executorTransaction != null) {
                 executorTransaction.rollback();
                 reset = false;//No changes are applied, so no notification is needed as well

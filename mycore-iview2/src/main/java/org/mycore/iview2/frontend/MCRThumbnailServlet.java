@@ -174,10 +174,12 @@ public class MCRThumbnailServlet extends MCRServlet {
     }
 
     private static ThumnailInfo getThumbnailInfo(String pathInfo) {
-        if (pathInfo.startsWith("/"))
-            pathInfo = pathInfo.substring(1);
-        final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
-        String imagePath = pathInfo.substring(derivate.length());
+        String pInfo = pathInfo;
+        if (pInfo.startsWith("/")) {
+            pInfo = pInfo.substring(1);
+        }
+        final String derivate = pInfo.substring(0, pInfo.indexOf('/'));
+        String imagePath = pInfo.substring(derivate.length());
         LOGGER.debug("derivate: {}, image: {}", derivate, imagePath);
         return new ThumnailInfo(derivate, imagePath);
     }
@@ -232,7 +234,7 @@ public class MCRThumbnailServlet extends MCRServlet {
     private static class ThumnailInfo {
         String derivate, imagePath;
 
-        public ThumnailInfo(final String derivate, final String imagePath) {
+        ThumnailInfo(final String derivate, final String imagePath) {
             this.derivate = derivate;
             this.imagePath = imagePath;
         }

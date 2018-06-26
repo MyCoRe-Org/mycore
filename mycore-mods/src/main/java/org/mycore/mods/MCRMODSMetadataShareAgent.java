@@ -48,7 +48,8 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
     private static final String HOST_SECTION_XPATH = "mods:relatedItem[@type='host']";
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent
+     * #inheritableMetadataChanged(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     public boolean shareableMetadataChanged(MCRObject oldVersion, MCRObject newVersion) {
@@ -63,7 +64,8 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent
+     * #inheritMetadata(org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     public void distributeMetadata(MCRObject holder) throws MCRPersistenceException, MCRAccessException {
@@ -116,7 +118,8 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent#inheritMetadata(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.datamodel.metadata.share.MCRMetadataShareAgent
+     * #inheritMetadata(org.mycore.datamodel.metadata.MCRObject, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     public void receiveMetadata(MCRObject child) {

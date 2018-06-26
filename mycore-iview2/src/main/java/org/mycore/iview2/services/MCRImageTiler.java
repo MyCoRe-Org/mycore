@@ -59,7 +59,7 @@ public class MCRImageTiler implements Runnable, Closeable {
 
     private static Logger LOGGER = LogManager.getLogger(MCRImageTiler.class);
 
-    private static final MCRTilingQueue tq = MCRTilingQueue.getInstance();
+    private static final MCRTilingQueue TQ = MCRTilingQueue.getInstance();
 
     private MCRProcessableExecutor tilingServe;
 
@@ -165,9 +165,9 @@ public class MCRImageTiler implements Runnable, Closeable {
                             MCRTileJob job = null;
                             try (Session session = MCRHIBConnection.instance().getSession()) {
                                 transaction = session.beginTransaction();
-                                job = tq.poll();
+                                job = TQ.poll();
                                 imageTilerCollection.setProperty("queue",
-                                    tq.stream().map(MCRTileJob::getPath).collect(Collectors.toList()));
+                                    TQ.stream().map(MCRTileJob::getPath).collect(Collectors.toList()));
                                 transaction.commit();
                             } catch (HibernateException e) {
                                 LOGGER.error("Error while getting next tiling job.", e);
@@ -184,12 +184,12 @@ public class MCRImageTiler implements Runnable, Closeable {
                                 tilingServe.submit(getTilingAction(job));
                             } else {
                                 try {
-                                    synchronized (tq) {
+                                    synchronized (TQ) {
                                         if (running) {
                                             LOGGER.debug("No Picture in TilingQueue going to sleep");
                                             //fixes a race conditioned deadlock situation
                                             //do not wait longer than 60 sec. for a new MCRTileJob
-                                            tq.wait(60000);
+                                            TQ.wait(60000);
                                         }
                                     }
                                 } catch (InterruptedException e) {
@@ -200,7 +200,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                             runLock.unlock();
                         }
                     } // while(tilingServe.getActiveCount() < tilingServe.getCorePoolSize())
-                    if (activeThreads.get() < tilingThreadCount)
+                    if (activeThreads.get() < tilingThreadCount) {
                         try {
                             LOGGER.info("Waiting for a tiling job to finish");
                             Thread.sleep(1000);
@@ -209,6 +209,7 @@ public class MCRImageTiler implements Runnable, Closeable {
                                 LOGGER.error("Image Tiling thread was interrupted.", e);
                             }
                         }
+                    }
                 } catch (Throwable e) {
                     LOGGER.error("Keep running while catching exceptions.", e);
                 }
@@ -236,9 +237,9 @@ public class MCRImageTiler implements Runnable, Closeable {
         //signal master thread to stop now
         running = false;
         //Wake up, Neo!
-        synchronized (tq) {
+        synchronized (TQ) {
             LOGGER.debug("Wake up tiling queue");
-            tq.notifyAll();
+            TQ.notifyAll();
         }
         runLock.lock();
         try {

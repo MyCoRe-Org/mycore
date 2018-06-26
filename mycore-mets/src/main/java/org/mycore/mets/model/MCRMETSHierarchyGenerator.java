@@ -97,15 +97,15 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
 
     private List<FileRef> files;
 
-    public MCRMETSHierarchyGenerator() {
-        this.files = new ArrayList<>();
-    }
-
     /**
      * Hashmap to store logical and physical ids. An entry is added
      * for each derivate link.
      */
     private Map<String, List<String>> structLinkMap;
+
+    public MCRMETSHierarchyGenerator() {
+        this.files = new ArrayList<>();
+    }
 
     @Override
     public synchronized Mets generate() throws MCRException {
@@ -584,7 +584,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
 
         private String contentType;
 
-        public FileRef(MCRPath path, String contentType) {
+        FileRef(MCRPath path, String contentType) {
             this.path = path;
             this.contentType = contentType;
         }

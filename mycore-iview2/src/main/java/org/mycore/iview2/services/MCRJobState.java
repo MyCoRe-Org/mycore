@@ -54,6 +54,8 @@ public enum MCRJobState {
         .of(MCRJobState.FINISHED).collect(
             Collectors.toSet()));
 
+    private char status;
+
     public static Set<MCRJobState> notCompleteStates() {
         return NOT_COMPLETE_STATES;
     }
@@ -61,8 +63,6 @@ public enum MCRJobState {
     public static Set<MCRJobState> completeStates() {
         return COMPLETE_STATES;
     }
-
-    private char status;
 
     MCRJobState(char status) {
         this.status = status;

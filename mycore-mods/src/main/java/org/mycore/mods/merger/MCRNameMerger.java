@@ -104,24 +104,25 @@ public class MCRNameMerger extends MCRMerger {
 
     private void addGivenNames(String nameFragment) {
         for (String token : nameFragment.split("\\s")) {
-            token = normalize(token.trim());
-            if (token.length() > 1) {
-                givenNames.add(token);
+            String normalizedToken = normalize(token.trim());
+            if (normalizedToken.length() > 1) {
+                givenNames.add(normalizedToken);
             }
         }
     }
 
     private void addInitials(String nameFragment) {
         for (String token : nameFragment.split("\\s")) {
-            token = normalize(token.trim());
-            initials.add(token.substring(0, 1));
+            String normalizedToken = normalize(token.trim());
+            initials.add(normalizedToken.substring(0, 1));
         }
     }
 
     private String normalize(String nameFragment) {
         String text = nameFragment.toLowerCase(Locale.getDefault());
         text = new MCRHyphenNormalizer().normalize(text).replace("-", " ");
-        text = Normalizer.normalize(text, Form.NFD).replaceAll("\\p{M}", ""); // canonical decomposition, then remove accents
+        // canonical decomposition, then remove accents
+        text = Normalizer.normalize(text, Form.NFD).replaceAll("\\p{M}", "");
         text = text.replace("ue", "u").replace("oe", "o").replace("ae", "a").replace("ß", "s").replace("ss", "s");
         text = text.replaceAll("[^a-z0-9]\\s]", ""); //remove all non-alphabetic characters
         text = text.replaceAll("\\p{Punct}", " ").trim(); // remove all punctuation
@@ -159,17 +160,17 @@ public class MCRNameMerger extends MCRMerger {
     public String toString() {
         StringBuilder sb = new StringBuilder(familyName);
 
-        sb.append("|");
+        sb.append('|');
         for (String givenName : givenNames) {
-            sb.append(givenName).append(",");
+            sb.append(givenName).append(',');
         }
         if (!givenNames.isEmpty()) {
             sb.setLength(sb.length() - 1);
         }
 
-        sb.append("|");
+        sb.append('|');
         for (String initial : initials) {
-            sb.append(initial).append(",");
+            sb.append(initial).append(',');
         }
         if (!initials.isEmpty()) {
             sb.setLength(sb.length() - 1);

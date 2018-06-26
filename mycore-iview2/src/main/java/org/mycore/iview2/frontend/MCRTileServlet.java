@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.imagetiler.MCRImage;
-import org.mycore.imagetiler.MCRTiledPictureProps;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 /**
@@ -96,7 +95,8 @@ public class MCRTileServlet extends HttpServlet {
     }
 
     /**
-     * Returns at which time the specified tile (see {@link #doGet(HttpServletRequest, HttpServletResponse)} was last modified.
+     * Returns at which time the specified tile (see {@link #doGet(HttpServletRequest, HttpServletResponse)}
+     * was last modified.
      */
     @Override
     protected long getLastModified(final HttpServletRequest req) {
@@ -122,7 +122,8 @@ public class MCRTileServlet extends HttpServlet {
      * returns a {@link TileInfo} for this <code>pathInfo</code>.
      * The format of <code>pathInfo</code> is
      * <code>/{derivateID}/{absoluteImagePath}/{tileCoordinate}</code>
-     * where <code>tileCoordinate</code> is either {@value MCRTiledPictureProps#IMAGEINFO_XML} or <code>{z}/{y}/{x}</code> as zoomLevel and x-y-coordinates.
+     * where <code>tileCoordinate</code> is either {@value org.mycore.imagetiler.MCRTiledPictureProps#IMAGEINFO_XML}
+     * or <code>{z}/{y}/{x}</code> as zoomLevel and x-y-coordinates.
      * @param pathInfo of the described format
      * @return a {@link TileInfo} instance for <code>pathInfo</code>
      */
@@ -164,7 +165,7 @@ public class MCRTileServlet extends HttpServlet {
     static class TileInfo {
         String derivate, imagePath, tile;
 
-        public TileInfo(final String derivate, final String imagePath, final String tile) {
+        TileInfo(final String derivate, final String imagePath, final String tile) {
             this.derivate = derivate;
             this.imagePath = imagePath;
             this.tile = tile;

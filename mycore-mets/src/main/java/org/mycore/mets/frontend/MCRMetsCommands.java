@@ -143,8 +143,8 @@ public class MCRMetsCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "add mets files for project id {0}", order = 30)
     public static void addMetsFileForProjectID(String projectID) {
         MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
-        List<String> dervate_list = manager.listIDsForBase(projectID + "_derivate");
-        for (String derivateID : dervate_list) {
+        List<String> dervateList = manager.listIDsForBase(projectID + "_derivate");
+        for (String derivateID : dervateList) {
             addMetsFileForDerivate(derivateID);
         }
     }

@@ -211,7 +211,8 @@ public class MetsResource {
      * A simple helper to detect if a user has a specific permission for a derivate.
      *
      * @param derivateIdObject the id Object of the derivate
-     * @param permission       the permission to check {@link MCRAccessManager#PERMISSION_DELETE} | {@link MCRAccessManager#PERMISSION_READ} | {@link MCRAccessManager#PERMISSION_WRITE}
+     * @param permission       the permission to check {@link MCRAccessManager#PERMISSION_DELETE}
+     *                         | {@link MCRAccessManager#PERMISSION_READ} | {@link MCRAccessManager#PERMISSION_WRITE}
      * @throws WebApplicationException if the user doesnt have the permission
      */
     private void checkDerivateAccess(MCRObjectID derivateIdObject, String permission) {

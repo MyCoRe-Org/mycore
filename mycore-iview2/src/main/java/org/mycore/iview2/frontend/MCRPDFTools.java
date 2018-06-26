@@ -18,7 +18,6 @@
 
 package org.mycore.iview2.frontend;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -42,13 +41,11 @@ class MCRPDFTools implements AutoCloseable {
 
     static final int PDF_DEFAULT_DPI = 72; //from private org.apache.pdfbox.pdmodel.PDPage.DEFAULT_USER_SPACE_UNIT_DPI
 
-    private static final Color TRANSPARENT_WHITE = new Color(255, 255, 255, 0);
-
     private static Logger LOGGER = LogManager.getLogger(MCRPDFTools.class);
 
     private MCRPNGTools pngTools;
 
-    public MCRPDFTools() {
+    MCRPDFTools() {
         this.pngTools = new MCRPNGTools();
     }
 

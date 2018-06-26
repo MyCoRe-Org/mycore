@@ -51,7 +51,8 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
     private MCRPDFTools pdfTools;
 
     /* (non-Javadoc)
-     * @see org.mycore.frontend.servlets.MCRContentServlet#getContent(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see org.mycore.frontend.servlets.MCRContentServlet#getContent(javax.servlet.http.HttpServletRequest,
+      * javax.servlet.http.HttpServletResponse)
      */
     @Override
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -106,11 +107,12 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
     }
 
     private static ThumnailInfo getThumbnailInfo(String pathInfo) {
-        if (pathInfo.startsWith("/")) {
-            pathInfo = pathInfo.substring(1);
+        String pInfo = pathInfo;
+        if (pInfo.startsWith("/")) {
+            pInfo = pInfo.substring(1);
         }
-        final String derivate = pathInfo.substring(0, pathInfo.indexOf('/'));
-        String imagePath = pathInfo.substring(derivate.length());
+        final String derivate = pInfo.substring(0, pInfo.indexOf('/'));
+        String imagePath = pInfo.substring(derivate.length());
         LOGGER.debug("derivate: {}, image: {}", derivate, imagePath);
         return new ThumnailInfo(derivate, imagePath);
     }
@@ -118,7 +120,7 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
     private static class ThumnailInfo {
         String derivate, filePath;
 
-        public ThumnailInfo(final String derivate, final String imagePath) {
+        ThumnailInfo(final String derivate, final String imagePath) {
             this.derivate = derivate;
             this.filePath = imagePath;
         }

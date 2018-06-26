@@ -44,17 +44,17 @@ import org.mycore.common.MCRConstants;
  **/
 public class MCRMODSPagesHelper {
 
-    private static final HyphenNormalizer hyphenNormalizer = new HyphenNormalizer();
+    private static final HyphenNormalizer HYPHEN_NORMALIZER = new HyphenNormalizer();
 
-    private static final EndPageCompleter endPageNormalizer = new EndPageCompleter();
+    private static final EndPageCompleter END_PAGE_COMPLETER = new EndPageCompleter();
 
-    private static final ExtentPagesBuilder extentBuilder = new ExtentPagesBuilder();
+    private static final ExtentPagesBuilder EXTENT_PAGES_BUILDER = new ExtentPagesBuilder();
 
     public static Element buildExtentPages(String input) {
-        input = input.trim();
-        input = hyphenNormalizer.normalize(input);
-        Element extent = extentBuilder.buildExtent(input);
-        endPageNormalizer.completeEndPage(extent);
+        String normalizedInput = input.trim();
+        normalizedInput = HYPHEN_NORMALIZER.normalize(normalizedInput);
+        Element extent = EXTENT_PAGES_BUILDER.buildExtent(normalizedInput);
+        END_PAGE_COMPLETER.completeEndPage(extent);
         return extent;
     }
 
@@ -76,13 +76,15 @@ class HyphenNormalizer {
 
     private static final char HYPHEN_NORM = '-';
 
-    private char[] HYPHEN_VARIANTS = { '\u002D', '\u2010', '\u2011', '\u2012', '\u2013', '\u2015', '\u2212', '\u2E3B',
-        '\uFE58', '\uFE63' };
+    private char[] hyphenVariants = { '\u002D', '\u2010', '\u2011', '\u2012', '\u2013', '\u2015', '\u2212', '\u2E3B',
+        '\uFE58', '\uFE63', };
 
     String normalize(String input) {
-        for (char hypenVariant : HYPHEN_VARIANTS)
-            input = input.replace(hypenVariant, HYPHEN_NORM);
-        return input;
+        String normalizedInput = input;
+        for (char hypenVariant : hyphenVariants) {
+            normalizedInput = normalizedInput.replace(hypenVariant, HYPHEN_NORM);
+        }
+        return normalizedInput;
     }
 }
 

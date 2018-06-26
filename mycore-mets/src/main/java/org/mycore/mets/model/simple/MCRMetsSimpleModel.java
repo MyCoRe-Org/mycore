@@ -27,6 +27,12 @@ import java.util.List;
  */
 public class MCRMetsSimpleModel {
 
+    private MCRMetsSection rootSection;
+
+    private List<MCRMetsPage> metsPageList;
+
+    public List<MCRMetsLink> sectionPageLinkList;
+
     /**
      * Creates a new empty MCRMetsSimpleModel.
      */
@@ -34,12 +40,6 @@ public class MCRMetsSimpleModel {
         metsPageList = new ArrayList<>();
         sectionPageLinkList = new ArrayList<>();
     }
-
-    private MCRMetsSection rootSection;
-
-    private List<MCRMetsPage> metsPageList;
-
-    public List<MCRMetsLink> sectionPageLinkList;
 
     public MCRMetsSection getRootSection() {
         return rootSection;

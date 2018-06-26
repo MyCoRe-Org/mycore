@@ -44,7 +44,8 @@ import org.mycore.mods.MCRMODSWrapper;
 
 /**
  * Maps classifications in Mods-Documents.
- * <p>You can define a label <b><code>x-mapping</code></b> in a classification with space seperated categoryIds to which the classification will be mapped.</p>
+ * <p>You can define a label <b><code>x-mapping</code></b> in a classification with space seperated categoryIds
+ * to which the classification will be mapped.</p>
  * <code>
  * &lt;category ID=&quot;article&quot; counter=&quot;1&quot;&gt;<br>
  * &nbsp;&lt;label xml:lang=&quot;en&quot; text=&quot;Article / Chapter&quot; /&gt;<br>

@@ -43,30 +43,33 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
     private static final Logger LOGGER = LogManager.getLogger(MCRExtractRelatedItemsEventHandler.class);
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.common.events.MCREventHandlerBase
+     * #handleObjectCreated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     protected void handleObjectCreated(final MCREvent evt, final MCRObject obj) {
-        extractRelatedItems(evt, obj);
+        extractRelatedItems(obj);
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectUpdated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.common.events.MCREventHandlerBase
+     * #handleObjectUpdated(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     protected void handleObjectUpdated(final MCREvent evt, final MCRObject obj) {
-        extractRelatedItems(evt, obj);
+        extractRelatedItems(obj);
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCREventHandlerBase#handleObjectRepaired(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
+     * @see org.mycore.common.events.MCREventHandlerBase
+     * #handleObjectRepaired(org.mycore.common.events.MCREvent, org.mycore.datamodel.metadata.MCRObject)
      */
     @Override
     protected void handleObjectRepaired(final MCREvent evt, final MCRObject obj) {
-        extractRelatedItems(evt, obj);
+        extractRelatedItems(obj);
     }
 
-    private void extractRelatedItems(final MCREvent evt, final MCRObject object) {
+    private void extractRelatedItems(final MCRObject object) {
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }

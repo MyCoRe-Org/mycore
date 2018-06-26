@@ -35,7 +35,7 @@ class MCRIdentifierType {
 
     private XPathExpression<Element> xPath;
 
-    public MCRIdentifierType(String typeID, String xPath) {
+    MCRIdentifierType(String typeID, String xPath) {
         this.typeID = typeID;
         this.xPath = XPathFactory.instance().compile(xPath, Filters.element(), null,
             MCRConstants.getStandardNamespaces());

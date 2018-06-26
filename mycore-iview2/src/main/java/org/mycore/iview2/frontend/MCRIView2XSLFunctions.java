@@ -47,18 +47,18 @@ public class MCRIView2XSLFunctions {
 
     private static final String METS_NAMESPACE_URI = "http://www.loc.gov/METS/";
 
-    private static final MCRIView2XSLFunctionsAdapter adapter = MCRIView2XSLFunctionsAdapter.getInstance();
+    private static final MCRIView2XSLFunctionsAdapter ADAPTER = MCRIView2XSLFunctionsAdapter.getInstance();
 
     public static boolean hasMETSFile(String derivateID) {
-        return adapter.hasMETSFile(derivateID);
+        return ADAPTER.hasMETSFile(derivateID);
     }
 
     public static String getSupportedMainFile(String derivateID) {
-        return adapter.getSupportedMainFile(derivateID);
+        return ADAPTER.getSupportedMainFile(derivateID);
     }
 
     public static String getOptions(String derivateID, String extensions) {
-        return adapter.getOptions(derivateID, extensions);
+        return ADAPTER.getOptions(derivateID, extensions);
     }
 
     /**
@@ -78,8 +78,9 @@ public class MCRIView2XSLFunctions {
 
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
         List<MCRMetaLinkID> derivates = obj.getStructure().getDerivates();
-        if (derivates.size() > 0)
-            return derivates.get(0) + "/" + adapter.getSupportedMainFile(derivates.get(0).toString());
+        if (derivates.size() > 0) {
+            return derivates.get(0) + "/" + ADAPTER.getSupportedMainFile(derivates.get(0).toString());
+        }
         return null;
     }
 
@@ -88,12 +89,15 @@ public class MCRIView2XSLFunctions {
         int index = imagePath.hashCode() % baseURLs.length;
         StringBuilder baseURL = new StringBuilder(baseURLs[index]);
         baseURL.append('/').append(derivate);
-        if (imagePath.charAt(0) != '/')
+        if (imagePath.charAt(0) != '/') {
             baseURL.append('/');
+        }
         int dotPos = imagePath.lastIndexOf('.');
-        if (dotPos > 0)
-            imagePath = imagePath.substring(0, dotPos);
-        baseURL.append(imagePath).append(".iview2/0/0/0.jpg");
+        String imgPath = imagePath;
+        if (dotPos > 0) {
+            imgPath = imagePath.substring(0, dotPos);
+        }
+        baseURL.append(imgPath).append(".iview2/0/0/0.jpg");
         return baseURL.toString();
     }
 
@@ -137,18 +141,18 @@ public class MCRIView2XSLFunctions {
         return Integer.parseInt(orderValue);
     }
 
-    private static Node getElementById(Node base, String ID) {
+    private static Node getElementById(Node base, String id) {
         NamedNodeMap attributes = base.getAttributes();
         if (IntStream.range(0, attributes.getLength())
             .mapToObj(i -> (Attr) attributes.item(i))
-            .anyMatch(attr -> attr.getLocalName().equalsIgnoreCase("id") && attr.getNodeValue().equals(ID))) {
+            .anyMatch(attr -> attr.getLocalName().equalsIgnoreCase("id") && attr.getNodeValue().equals(id))) {
             return base;
         }
         NodeList childNodes = base.getChildNodes();
         return IntStream.range(0, childNodes.getLength())
             .mapToObj(childNodes::item)
             .filter(child -> child.getNodeType() == Node.ELEMENT_NODE)
-            .map(child -> getElementById(child, ID))
+            .map(child -> getElementById(child, id))
             .filter(Objects::nonNull)
             .findFirst()
             .orElse(null);

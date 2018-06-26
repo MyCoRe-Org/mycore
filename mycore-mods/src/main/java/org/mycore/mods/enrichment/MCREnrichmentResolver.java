@@ -48,17 +48,17 @@ public class MCREnrichmentResolver implements URIResolver {
 
     private static final Logger LOGGER = LogManager.getLogger(MCREnrichmentResolver.class);
 
-    private static final XPathExpression<Element> xPath2RelatedItems = XPathFactory.instance().compile(
+    private static final XPathExpression<Element> X_PATH_2_RELATED_ITEMS = XPathFactory.instance().compile(
         "mods:relatedItem[@type='host' or @type='series']", Filters.element(), null,
         MCRConstants.getStandardNamespaces());
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        href = href.substring(href.indexOf(":") + 1);
-        String configID = href.substring(0, href.indexOf(':'));
+        String subHref = href.substring(href.indexOf(":") + 1);
+        String configID = subHref.substring(0, subHref.indexOf(':'));
 
-        href = href.substring(href.indexOf(":") + 1);
-        Element mods = MCRURIResolver.instance().resolve(href);
+        subHref = subHref.substring(subHref.indexOf(":") + 1);
+        Element mods = MCRURIResolver.instance().resolve(subHref);
 
         enrichPublication(mods, configID);
 
@@ -67,7 +67,7 @@ public class MCREnrichmentResolver implements URIResolver {
 
     public void enrichPublication(Element mods, String configID) {
         enrichPublicationLevel(mods, configID);
-        List<Element> relatedItems = xPath2RelatedItems.evaluate(mods);
+        List<Element> relatedItems = X_PATH_2_RELATED_ITEMS.evaluate(mods);
         for (Element relatedItem : relatedItems) {
             enrichPublicationLevel(relatedItem, configID);
         }
@@ -84,12 +84,12 @@ public class MCREnrichmentResolver implements URIResolver {
 
         for (StringTokenizer st = new StringTokenizer(dsConfig, " ()", true); st.hasMoreTokens();) {
             String token = st.nextToken();
-            if (token.equals(" ")) {
+            if (" ".equals(token)) {
                 continue;
-            } else if (token.equals("(")) {
+            } else if ("(".equals(token)) {
                 withinGroup = true;
                 dataSourceCompleted = false;
-            } else if (token.equals(")")) {
+            } else if (")".equals(token)) {
                 withinGroup = false;
                 dataSourceCompleted = false;
             } else if (withinGroup && dataSourceCompleted) {

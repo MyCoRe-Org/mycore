@@ -24,6 +24,18 @@ import java.util.List;
 
 public class MCRMetsSection {
 
+    private List<MCRMetsSection> metsSectionList;
+
+    private String id;
+
+    private String type;
+
+    private String label;
+
+    private List<MCRMetsAltoLink> altoLinks;
+
+    private transient MCRMetsSection parent;
+
     public MCRMetsSection() {
         this.metsSectionList = new ArrayList<>();
         this.altoLinks = new ArrayList<>();
@@ -36,18 +48,6 @@ public class MCRMetsSection {
         this.label = label;
         this.parent = parent;
     }
-
-    private List<MCRMetsSection> metsSectionList;
-
-    private String id;
-
-    private String type;
-
-    private String label;
-
-    private List<MCRMetsAltoLink> altoLinks;
-
-    private transient MCRMetsSection parent;
 
     public void setId(String id) {
         this.id = id;

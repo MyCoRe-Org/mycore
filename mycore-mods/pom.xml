@@ -10,6 +10,7 @@
   <artifactId>mycore-mods</artifactId>
   <name>MyCoRe MODS</name>
   <properties>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>50</manifest.priority>
   </properties>
   <build>

@@ -61,7 +61,8 @@ public class MCRAccessCondition extends MCRAuthorityInfo {
             return categoryByURI.iterator().next().getId();
         }
         //maybe href is in form {authorityURI}#{categId}
-        String categId, authorityURI = null;
+        String categId;
+        String authorityURI = null;
         try {
             authorityURI = href.substring(0, href.lastIndexOf("#"));
             categId = href.substring(authorityURI.length() + 1);
