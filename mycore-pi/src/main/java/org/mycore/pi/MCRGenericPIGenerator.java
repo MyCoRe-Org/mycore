@@ -31,12 +31,12 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * MCR.PI.Generator.myGenerator=org.mycore.pi.urn.MCRGenericPIGenerator
  *
- * Set a generic pattern. You can also just use one of them $Count
+ * Set a generic pattern.
  *
- * MCR.PI.Generator.myGenerator.GeneralPattern=gbv:$CurrentDate-$ObjectType-$ObjectNumber-$Count
- * MCR.PI.Generator.myGenerator.GeneralPattern=gbv:$ObjectDate-$ObjectType-$Count
- * MCR.PI.Generator.myGenerator.GeneralPattern=gbv:$ObjectDate-$Count
- * MCR.PI.Generator.myGenerator.GeneralPattern=gbv:$ObjectType-$Count
+ * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$ObjectType-$ObjectNumber-$Count-
+ * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$ObjectType-$Count
+ * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$Count
+ * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectType-$Count
  *
  * Set a optional DateFormat, if not set the ddMMyyyy is just used as value. (SimpleDateFormat)
  *
@@ -52,7 +52,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * Set the Type of the generated pi.
  *
- * MCR.PI.Generator.myGenerator.Type=urn
+ * MCR.PI.Generator.myGenerator.Type=dnbURN
  *
  *
  * @author Sebastian Hofmann
@@ -68,8 +68,6 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
     static final String PLACE_HOLDER_COUNT = "$Count";
 
     static final String PLACE_HOLDER_OBJECT_NUMBER = "$ObjectNumber";
-
-    static final String PLACE_HOLDER_CHECKSUM = "$SUM";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -165,6 +163,20 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
         String result;
 
+        result = applyCount(resultingPI);
+
+        if (getType().equals("dnbUrn")) {
+            result = result + "C"; // will be replaced by the URN-Parser
+        }
+
+        String finalResult = result;
+        return parser.parse(finalResult)
+            .orElseThrow(() -> new MCRPersistentIdentifierException("Could not parse " + finalResult));
+
+    }
+
+    private String applyCount(String resultingPI) {
+        String result;
         if (resultingPI.contains(PLACE_HOLDER_COUNT)) {
             final int countPrecision = getCountPrecision();
             String regexpStr;
@@ -195,15 +207,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         } else {
             result = resultingPI;
         }
-
-        if (getType().equals("dnbUrn")) {
-            result = result + "C"; // will be replaced by the URN-Parser
-        }
-
-        String finalResult = result;
-        return parser.parse(finalResult)
-            .orElseThrow(() -> new MCRPersistentIdentifierException("Could not parse " + finalResult));
-
+        return result;
     }
 
     private String getMappedType(MCRObjectID id) {

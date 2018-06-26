@@ -1,25 +1,25 @@
 package org.mycore.pi;
 
+import static org.junit.Assert.assertEquals;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.Test;
 import org.mycore.common.MCRStoreTestCase;
-import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import static org.junit.Assert.*;
 
 public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
 
     @Test
     public void testGenerate() throws MCRPersistentIdentifierException {
         final MCRGenericPIGenerator generator = new MCRGenericPIGenerator("test1",
-            "urn:nbn:de:gbv:$CurrentDate-$ObjectType-$ObjectNumber-$Count-", new SimpleDateFormat("yyyy"), null, 3, "dnbUrn");
+            "urn:nbn:de:gbv:$CurrentDate-$ObjectType-$ObjectNumber-$Count-", new SimpleDateFormat("yyyy", Locale.ROOT), null, 3,
+            "dnbUrn");
 
         MCRObjectID testID = MCRObjectID.getInstance("my_test_00000001");
         MCRObject mcrObject = new MCRObject();
@@ -27,17 +27,17 @@ public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
 
         final MCRPersistentIdentifier generate = generator.generate(mcrObject, "");
         final MCRPersistentIdentifier generate2 = generator.generate(mcrObject, "");
-        assertEquals("urn:nbn:de:gbv:"+ Calendar.getInstance().get(Calendar.YEAR)+"-test-00000001-000-9", generate.asString());
-        assertEquals("urn:nbn:de:gbv:"+ Calendar.getInstance().get(Calendar.YEAR)+"-test-00000001-001-5", generate2.asString());
+        assertEquals("urn:nbn:de:gbv:" + Calendar.getInstance().get(Calendar.YEAR) + "-test-00000001-000-9",
+            generate.asString());
+        assertEquals("urn:nbn:de:gbv:" + Calendar.getInstance().get(Calendar.YEAR) + "-test-00000001-001-5",
+            generate2.asString());
     }
-
 
     @Override
     protected Map<String, String> getTestProperties() {
         final Map<String, String> testProperties = super.getTestProperties();
 
         testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-
 
         return testProperties;
     }
