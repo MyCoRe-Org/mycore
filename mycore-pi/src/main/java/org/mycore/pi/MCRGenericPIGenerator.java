@@ -1,6 +1,7 @@
 package org.mycore.pi;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -103,7 +104,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
         setDateFormat(Optional.ofNullable(properties.get(PROPERTY_KEY_DATE_FORMAT))
             .map(format -> new SimpleDateFormat(format, Locale.ROOT))
-            .orElse(new SimpleDateFormat("ddMMyyyy")));
+            .orElse(new SimpleDateFormat("ddMMyyyy", Locale.ROOT)));
 
         setObjectTypeMapping(properties.get(PROPERTY_KEY_OBJECT_TYPE_MAPPING));
 
@@ -187,8 +188,9 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             LOGGER.info("Count is {}", count);
             final String pattern = IntStream.range(0, Math.abs(countPrecision)).mapToObj((i) -> "0")
                 .collect(Collectors.joining(""));
+            DecimalFormat decimalFormat = new DecimalFormat(pattern, DecimalFormatSymbols.getInstance(Locale.ROOT));
             final String countAsString =
-                countPrecision != -1 ? new DecimalFormat(pattern).format(count) : String.valueOf(count);
+                countPrecision != -1 ? decimalFormat.format(count) : String.valueOf(count);
             result = resultingPI.replace(PLACE_HOLDER_COUNT, countAsString);
         } else {
             result = resultingPI;
