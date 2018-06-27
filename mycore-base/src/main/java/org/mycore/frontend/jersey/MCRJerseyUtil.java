@@ -201,7 +201,7 @@ public abstract class MCRJerseyUtil {
 
     private static String removeAppPath(String baseURL, String path) {
         if (baseURL.endsWith("/" + path + "/")) {
-            baseURL = baseURL.substring(0, baseURL.indexOf(path));
+            return baseURL.substring(0, baseURL.indexOf(path));
         }
         return baseURL;
     }
