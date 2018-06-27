@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriInfo;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -55,10 +56,10 @@ public class MCRJSONFileVisitor extends SimpleFileVisitor<Path> {
 
     private String derId;
 
-    public MCRJSONFileVisitor(JsonWriter jw, MCRObjectID objId, MCRObjectID derId, UriInfo info) {
+    public MCRJSONFileVisitor(JsonWriter jw, MCRObjectID objId, MCRObjectID derId, UriInfo info, Application app) {
         super();
         this.jw = jw;
-        this.baseURL = MCRJerseyUtil.getBaseURL(info);
+        this.baseURL = MCRJerseyUtil.getBaseURL(info, app);
         this.objId = objId.toString();
         this.derId = derId.toString();
     }
