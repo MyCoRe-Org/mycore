@@ -700,6 +700,7 @@ public class MCRXMLMetadataManager {
         try {
             store = getStore(base, true);
         } catch (MCRPersistenceException e) {
+            LOGGER.warn("Store for '{}' does not exist.", base);
             return Collections.emptyList();
         }
 
