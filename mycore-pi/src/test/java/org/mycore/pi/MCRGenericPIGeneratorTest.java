@@ -18,7 +18,7 @@ public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
     @Test
     public void testGenerate() throws MCRPersistentIdentifierException {
         final MCRGenericPIGenerator generator = new MCRGenericPIGenerator("test1",
-            "urn:nbn:de:gbv:$CurrentDate-$ObjectType-$ObjectNumber-$Count-", new SimpleDateFormat("yyyy", Locale.ROOT), null, 3,
+            "urn:nbn:de:gbv:$CurrentDate-$ObjectType-$ObjectProject-$ObjectNumber-$Count-", new SimpleDateFormat("yyyy", Locale.ROOT), null, null, 3,
             "dnbUrn");
 
         MCRObjectID testID = MCRObjectID.getInstance("my_test_00000001");
@@ -27,9 +27,9 @@ public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
 
         final MCRPersistentIdentifier generate = generator.generate(mcrObject, "");
         final MCRPersistentIdentifier generate2 = generator.generate(mcrObject, "");
-        assertEquals("urn:nbn:de:gbv:" + Calendar.getInstance().get(Calendar.YEAR) + "-test-00000001-000-9",
+        assertEquals("urn:nbn:de:gbv:" + Calendar.getInstance().get(Calendar.YEAR) + "-test-my-00000001-000-5",
             generate.asString());
-        assertEquals("urn:nbn:de:gbv:" + Calendar.getInstance().get(Calendar.YEAR) + "-test-00000001-001-5",
+        assertEquals("urn:nbn:de:gbv:" + Calendar.getInstance().get(Calendar.YEAR) + "-test-my-00000001-001-2",
             generate2.asString());
     }
 

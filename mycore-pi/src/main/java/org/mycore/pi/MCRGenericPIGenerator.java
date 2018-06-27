@@ -33,7 +33,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * Set a generic pattern.
  *
- * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$ObjectType-$ObjectNumber-$Count-
+ * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$ObjectType-$objectProject-$ObjectNumber-$Count-
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$ObjectType-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectType-$Count
@@ -45,6 +45,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * Set a optional ObjectType mapping, if not set the ObjectType is just used as value
  *
  * MCR.PI.Generator.myGenerator.TypeMapping=document:doc,disshab:diss,Thesis:Thesis,bundle:doc,mods:test
+ *
+ * You can also map the projectid
  *
  * Set a optional Count precision, if not set or set to -1 the pure number is used (1,2,.., 999). Count always relativ to type and date.
  *
@@ -65,6 +67,8 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
     static final String PLACE_HOLDER_OBJECT_TYPE = "$ObjectType";
 
+    static final String PLACE_HOLDER_OBJECT_PROJECT = "$ObjectProject";
+
     static final String PLACE_HOLDER_COUNT = "$Count";
 
     static final String PLACE_HOLDER_OBJECT_NUMBER = "$ObjectNumber";
@@ -77,6 +81,8 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
     private static final String PROPERTY_KEY_OBJECT_TYPE_MAPPING = "ObjectTypeMapping";
 
+    private static final String PROPERTY_KEY_OBJECT_PROJECT_MAPPING = "ObjectProjectMapping";
+
     private static final String PROPERTY_KEY_COUNT_PRECISION = "CountPrecision";
 
     private static final String PROPERTY_KEY_TYPE = "Type";
@@ -88,6 +94,8 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
     private SimpleDateFormat dateFormat;
 
     private String objectTypeMapping;
+
+    private String objectProjectMapping;
 
     private int countPrecision;
 
@@ -105,6 +113,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             .orElse(new SimpleDateFormat("ddMMyyyy", Locale.ROOT)));
 
         setObjectTypeMapping(properties.get(PROPERTY_KEY_OBJECT_TYPE_MAPPING));
+        setObjectProjectMapping(properties.get(PROPERTY_KEY_OBJECT_PROJECT_MAPPING));
 
         setCountPrecision(Optional.ofNullable(properties.get(PROPERTY_KEY_COUNT_PRECISION))
             .map(Integer::parseInt)
@@ -116,9 +125,10 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
     // for testing purposes
     MCRGenericPIGenerator(String id, String generalPattern, SimpleDateFormat dateFormat,
-        String objectTypeMapping,
+        String objectTypeMapping, String objectProjectMapping,
         int countPrecision, String type) {
         super(id);
+        setObjectProjectMapping(objectProjectMapping);
         setGeneralPattern(generalPattern);
         setDateFormat(dateFormat);
         setObjectTypeMapping(objectTypeMapping);
@@ -153,6 +163,12 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             final String mappedObjectType = getMappedType(mcrBase.getId());
             resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_TYPE, mappedObjectType);
         }
+
+        if (resultingPI.contains(PLACE_HOLDER_OBJECT_PROJECT)) {
+            final String mappedObjectProject = getMappedProject(mcrBase.getId());
+            resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_PROJECT, mappedObjectProject);
+        }
+
 
         if (resultingPI.contains(PLACE_HOLDER_OBJECT_NUMBER)) {
             resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_NUMBER, mcrBase.getId().getNumberAsString());
@@ -220,6 +236,18 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             .filter(o -> o.get(0).equals(typeID))
             .map(o -> o.get(1))
             .orElse(typeID);
+    }
+
+    private String getMappedProject(MCRObjectID id) {
+        String mapping = getObjectProjectMapping();
+        String projectID = id.getProjectId();
+
+        return Optional.ofNullable(mapping)
+            .map(mappingStr -> mappingStr.split(","))
+            .map(Arrays::asList)
+            .filter(o -> o.get(0).equals(projectID))
+            .map(o -> o.get(1))
+            .orElse(projectID);
     }
 
     protected AtomicInteger readCountFromDatabase(String countPattern) {
@@ -302,5 +330,13 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             .computeIfAbsent(pattern, this::readCountFromDatabase);
 
         return count.getAndIncrement();
+    }
+
+    public String getObjectProjectMapping() {
+        return objectProjectMapping;
+    }
+
+    public void setObjectProjectMapping(String objectProjectMapping) {
+        this.objectProjectMapping = objectProjectMapping;
     }
 }

@@ -52,7 +52,8 @@ Supported parts:
 
 - **$CurrentDate**    - replaced with the current date honoring the **DateFormat** property
 - **$ObjectDate**     - replaced with the creation date of the object honoring the **DateFormat** property
-- **$ObjectType**     - replaced with the type of the object. Can be mapped with **TypeMapping** property
+- **$ObjectType**     - replaced with the type of the object. Can be mapped with **ObjectTypeMapping** property
+- **$ObjectProject**   - replaced with the project id of the object. Can be mapped with **ObjectProjectMapping** property
 - **$ObjectNumber**   - replaced with the number of the object id.
 - **$Count**          - replaced with the count of the existing pi with the same parts listed above, honoring  the **CountPrecision** property
 
@@ -62,12 +63,19 @@ MCR.PI.Generator.myGenerator.DateFormat=yyyy
 ```
 The SimpleDateFormat which will be used to express $CurrentDate or $ObjectDate
 
-**TypeMapping**
+**ObjectTypeMapping**
 ```
 MCR.PI.Generator.myGenerator.TypeMapping=document:doc,disshab:diss,Thesis:Thesis,bundle:doc,mods:test
 ```
 A comma separated list of key value pairs to map a object type to a specific string. The key ist the object type and the value the resulting string.
 If none match the type is used as the string.
+
+**ObjectProjectMapping**
+```
+MCR.PI.Generator.myGenerator.ObjectProjectMapping=openagrar:oa,zimport:oa
+```
+A comma separated list of key value pairs to map a project id to a specific string. The key ist the project id of the object and the value the resulting string.
+If none match the project id is used as the string.
 
 **CountPrecision**
 ```
