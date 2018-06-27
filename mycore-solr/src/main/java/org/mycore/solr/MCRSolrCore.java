@@ -86,7 +86,7 @@ public class MCRSolrCore {
 
     protected void setup(String serverURL, String name) {
         if (!serverURL.endsWith("/")) {
-            serverURL += serverURL + "/";
+            serverURL += "/";
         }
         this.serverURL = serverURL;
         this.name = name;
