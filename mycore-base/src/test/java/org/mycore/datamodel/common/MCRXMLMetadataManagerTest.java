@@ -190,6 +190,13 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
             getStore().listIDs().contains(MyCoRe_document_00000001.id.toString()));
     }
 
+    @Test
+    public void listIDs() {
+        assertTrue(getStore().listIDsForBase("foo_bar").isEmpty());
+        assertTrue(getStore().listIDsOfType("bar").isEmpty());
+        assertTrue(getStore().listIDs().isEmpty());
+    }
+
     private static class XMLInfo {
         public XMLInfo(String id, byte[] blob, Date lastModified) {
             this.id = MCRObjectID.getInstance(id);
