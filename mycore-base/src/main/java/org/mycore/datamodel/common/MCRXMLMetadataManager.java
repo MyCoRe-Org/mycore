@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -695,7 +696,14 @@ public class MCRXMLMetadataManager {
      * @param base the MCRObjectID base, e.g. DocPortal_document
      */
     public List<String> listIDsForBase(String base) {
-        MCRMetadataStore store = getStore(base, true);
+        MCRMetadataStore store;
+        try {
+            store = getStore(base, true);
+        } catch (MCRPersistenceException e) {
+            LOGGER.warn("Store for '{}' does not exist.", base);
+            return Collections.emptyList();
+        }
+
         List<String> list = new ArrayList<>();
         Iterator<Integer> it = store.listIDs(MCRStore.ASCENDING);
         String[] idParts = MCRObjectID.getIDParts(base);
