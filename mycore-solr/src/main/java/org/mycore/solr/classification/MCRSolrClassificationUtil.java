@@ -87,11 +87,11 @@ public abstract class MCRSolrClassificationUtil {
         for (String linkType : linkTypes) {
             LOGGER.info("rebuild '{}' links...", linkType);
             bulkIndex(client, linkService.getLinks(linkType)
-                                         .stream()
-                                         .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
-                                                 link.getObjectReference()))
-                                         .map(MCRSolrCategoryLink::toSolrDocument)
-                                         .collect(Collectors.toList()));
+                .stream()
+                .map(link -> new MCRSolrCategoryLink(link.getCategory().getId(),
+                    link.getObjectReference()))
+                .map(MCRSolrCategoryLink::toSolrDocument)
+                .collect(Collectors.toList()));
         }
     }
 
@@ -167,20 +167,20 @@ public abstract class MCRSolrClassificationUtil {
      */
     public static List<SolrInputDocument> toSolrDocument(Collection<MCRCategory> categoryList) {
         return categoryList.stream()
-                           .map(MCRSolrCategory::new)
-                           .map(MCRSolrCategory::toSolrDocument)
-                           .collect(Collectors.toList());
+            .map(MCRSolrCategory::new)
+            .map(MCRSolrCategory::toSolrDocument)
+            .collect(Collectors.toList());
     }
 
     /**
      * Creates a new list of {@link SolrInputDocument} based on the given categories and the link.
      */
     public static List<SolrInputDocument> toSolrDocument(MCRCategLinkReference linkReference,
-            Collection<MCRCategoryID> categories) {
+        Collection<MCRCategoryID> categories) {
         return categories.stream()
-                         .map(categoryId -> new MCRSolrCategoryLink(categoryId, linkReference))
-                         .map(MCRSolrCategoryLink::toSolrDocument)
-                         .collect(Collectors.toList());
+            .map(categoryId -> new MCRSolrCategoryLink(categoryId, linkReference))
+            .map(MCRSolrCategoryLink::toSolrDocument)
+            .collect(Collectors.toList());
     }
 
     /**
