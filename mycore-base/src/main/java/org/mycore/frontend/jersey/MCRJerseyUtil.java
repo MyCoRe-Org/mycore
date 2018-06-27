@@ -19,14 +19,18 @@
 package org.mycore.frontend.jersey;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.glassfish.jersey.server.ResourceConfig;
 import org.jdom2.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -176,14 +180,28 @@ public abstract class MCRJerseyUtil {
      *
      * @return base URL of the mycore system as string
      */
-    public static String getBaseURL(UriInfo info) {
+    public static String getBaseURL(UriInfo info, Application app) {
         String baseURL = info.getBaseUri().toString();
         List<String> applicationPaths = MCRConfiguration.instance()
             .getStrings("MCR.Jersey.Resource.ApplicationPaths");
         for (String path : applicationPaths) {
-            if (baseURL.endsWith("/" + path + "/")) {
-                return baseURL.substring(0, baseURL.indexOf(path));
-            }
+            baseURL = removeAppPath(baseURL, path);
+        }
+        Optional<String> appPath = Optional.ofNullable(app)
+            .map(a -> a instanceof ResourceConfig ? ((ResourceConfig) a).getApplication() : a)
+            .map(Application::getClass)
+            .map(c -> c.getAnnotation(ApplicationPath.class))
+            .map(ApplicationPath::value)
+            .map(s -> s.startsWith("/") ? s.substring(1) : s);
+        if (appPath.isPresent()) {
+            baseURL = removeAppPath(baseURL, appPath.get());
+        }
+        return baseURL;
+    }
+
+    private static String removeAppPath(String baseURL, String path) {
+        if (baseURL.endsWith("/" + path + "/")) {
+            return baseURL.substring(0, baseURL.indexOf(path));
         }
         return baseURL;
     }

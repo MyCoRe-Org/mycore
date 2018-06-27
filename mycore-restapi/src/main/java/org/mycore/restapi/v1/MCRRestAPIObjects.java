@@ -36,6 +36,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
@@ -69,6 +70,9 @@ public class MCRRestAPIObjects {
     public static final String SORT_ASC = "asc";
 
     public static final String SORT_DESC = "desc";
+
+    @Context
+    Application app;
 
     /** returns a list of mcrObjects 
      *
@@ -152,7 +156,7 @@ public class MCRRestAPIObjects {
     public Response returnMCRObject(@Context UriInfo info,
         @PathParam(PARAM_MCRID) String id, @QueryParam("style") String style)
         throws MCRRestAPIException {
-        return MCRRestAPIObjectsHelper.showMCRObject(id, style, info);
+        return MCRRestAPIObjectsHelper.showMCRObject(id, style, info, app);
     }
 
     /**
@@ -179,7 +183,7 @@ public class MCRRestAPIObjects {
         @PathParam(PARAM_DERID) String derid,
         @QueryParam("style") String style)
         throws MCRRestAPIException {
-        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, "derivatedetails".equals(style));
+        return MCRRestAPIObjectsHelper.showMCRDerivate(mcrid, derid, info, app, "derivatedetails".equals(style));
     }
 
     /** returns a list of derivates for a given MyCoRe Object 
@@ -212,7 +216,7 @@ public class MCRRestAPIObjects {
         @PathParam(PARAM_DERID) String derid,
         @PathParam("path") @DefaultValue("/") String path, @QueryParam("format") @DefaultValue("xml") String format,
         @QueryParam("depth") @DefaultValue("-1") int depth) throws MCRRestAPIException {
-        return MCRRestAPIObjectsHelper.listContents(info, request, mcrid, derid, format, path, depth);
+        return MCRRestAPIObjectsHelper.listContents(info, app, request, mcrid, derid, format, path, depth);
     }
 
     /**
@@ -236,7 +240,7 @@ public class MCRRestAPIObjects {
         @PathParam(PARAM_DERID) String mcrDerID)
         throws MCRRestAPIException {
         try {
-            String url = MCRRestAPIObjectsHelper.retrieveMaindocURL(info, mcrObjID, mcrDerID);
+            String url = MCRRestAPIObjectsHelper.retrieveMaindocURL(info, mcrObjID, mcrDerID, app);
             if (url != null) {
                 return Response.seeOther(new URI(url)).build();
             }

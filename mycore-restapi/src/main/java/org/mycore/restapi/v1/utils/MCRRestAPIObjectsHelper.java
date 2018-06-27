@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -112,7 +113,7 @@ public class MCRRestAPIObjectsHelper {
 
     private static SimpleDateFormat SDF_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
-    public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info)
+    public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info, Application app)
         throws MCRRestAPIException {
 
         MCRObject mcrObj = retrieveMCRObject(pathParamId);
@@ -140,7 +141,7 @@ public class MCRRestAPIObjectsHelper {
 
                         eDer = eDer.getChild("mycorederivate").getChild("derivate");
                         Document docContents = listDerivateContentAsXML(
-                            MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID)), "/", -1, info);
+                            MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID)), "/", -1, info, app);
                         if (docContents.hasRootElement()) {
                             eDer.addContent(docContents.getRootElement().detach());
                         }
@@ -177,7 +178,7 @@ public class MCRRestAPIObjectsHelper {
             .build();
     }
 
-    public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID, UriInfo info,
+    public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID, UriInfo info, Application app,
         boolean withDetails) throws MCRRestAPIException {
 
         MCRObjectID mcrObj = MCRObjectID.getInstance(pathParamMcrID);
@@ -186,7 +187,7 @@ public class MCRRestAPIObjectsHelper {
         try {
             Document doc = derObj.createXML();
             if (withDetails) {
-                Document docContent = listDerivateContentAsXML(derObj, "/", -1, info);
+                Document docContent = listDerivateContentAsXML(derObj, "/", -1, info, app);
                 if (docContent != null && docContent.hasRootElement()) {
                     doc.getRootElement().addContent(docContent.getRootElement().detach());
                 }
@@ -208,7 +209,8 @@ public class MCRRestAPIObjectsHelper {
         //       "Please contact a developer!").createHttpResponse();
     }
 
-    private static String listDerivateContentAsJson(MCRDerivate derObj, String path, int depth, UriInfo info)
+    private static String listDerivateContentAsJson(MCRDerivate derObj, String path, int depth, UriInfo info,
+        Application app)
         throws IOException {
         StringWriter sw = new StringWriter();
         MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
@@ -219,13 +221,14 @@ public class MCRRestAPIObjectsHelper {
         if (root != null) {
             JsonWriter writer = new JsonWriter(sw);
             Files.walkFileTree(root, EnumSet.noneOf(FileVisitOption.class), depth,
-                new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId(), info));
+                new MCRJSONFileVisitor(writer, derObj.getOwnerID(), derObj.getId(), info, app));
             writer.close();
         }
         return sw.toString();
     }
 
-    private static Document listDerivateContentAsXML(MCRDerivate derObj, String path, int depth, UriInfo info)
+    private static Document listDerivateContentAsXML(MCRDerivate derObj, String path, int depth, UriInfo info,
+        Application app)
         throws IOException {
         Document doc = new Document();
 
@@ -250,7 +253,7 @@ public class MCRRestAPIObjectsHelper {
             }
 
             //add href Attributes
-            String baseURL = MCRJerseyUtil.getBaseURL(info)
+            String baseURL = MCRJerseyUtil.getBaseURL(info, app)
                 + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
             baseURL = baseURL.replace("${mcrid}", derObj.getOwnerID().toString()).replace("${derid}",
                 derObj.getId().toString());
@@ -650,7 +653,7 @@ public class MCRRestAPIObjectsHelper {
      * @return a Jersey Response object
      * @throws MCRRestAPIException
      */
-    public static Response listContents(UriInfo info, Request request, String mcrObjID,
+    public static Response listContents(UriInfo info, Application app, Request request, String mcrObjID,
         String mcrDerID, String format, String path, int depth) throws MCRRestAPIException {
 
         if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
@@ -671,7 +674,7 @@ public class MCRRestAPIObjectsHelper {
             }
             switch (format) {
                 case MCRRestAPIObjects.FORMAT_XML:
-                    Document docOut = listDerivateContentAsXML(derObj, path, depth, info);
+                    Document docOut = listDerivateContentAsXML(derObj, path, depth, info, app);
                     try (StringWriter sw = new StringWriter()) {
                         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
                         xout.output(docOut, sw);
@@ -683,7 +686,7 @@ public class MCRRestAPIObjectsHelper {
                     }
                 case MCRRestAPIObjects.FORMAT_JSON:
                     if (MCRRestAPIObjects.FORMAT_JSON.equals(format)) {
-                        String result = listDerivateContentAsJson(derObj, path, depth, info);
+                        String result = listDerivateContentAsJson(derObj, path, depth, info, app);
                         return response(result, "application/json", lastModified);
                     }
                 default:
@@ -708,13 +711,14 @@ public class MCRRestAPIObjectsHelper {
      * @return the Resolving URL for the main document of the derivate
      * @throws IOException
      */
-    public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID) throws IOException {
+    public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID, Application app)
+        throws IOException {
         try {
             MCRObjectID mcrObj = MCRObjectID.getInstance(mcrObjID);
             MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
             String maindoc = derObj.getDerivate().getInternals().getMainDoc();
 
-            String baseURL = MCRJerseyUtil.getBaseURL(info)
+            String baseURL = MCRJerseyUtil.getBaseURL(info, app)
                 + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
             baseURL = baseURL.replace("${mcrid}", mcrObj.toString()).replace("${derid}",
                 derObj.getId().toString());
