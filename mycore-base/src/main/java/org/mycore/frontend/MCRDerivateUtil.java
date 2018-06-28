@@ -21,7 +21,7 @@ public class MCRDerivateUtil {
         throws IOException {
         MCRPath derivateRoot = MCRPath.getPath(derivate, "/");
         Pattern patternObj = Pattern.compile(pattern);
-        Map<String, String> resultMap = new HashMap<String, String>();
+        Map<String, String> resultMap = new HashMap<>();
         Files.walkFileTree(derivateRoot, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
@@ -32,12 +32,10 @@ public class MCRDerivateUtil {
                     String newFilename;
                     try {
                         newFilename = matcher.replaceAll(newName);
-                    }
-                    catch (IndexOutOfBoundsException e) {
+                    } catch (IndexOutOfBoundsException e) {
                         LOGGER.info("The file " + file + " can't be renamed to " + newName + ". To many groups!");
                         return FileVisitResult.CONTINUE;
-                    }
-                    catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException e) {
                         LOGGER.info("The new name '" + newName + "' contains illegal characters!");
                         return FileVisitResult.CONTINUE;
                     }
@@ -51,24 +49,21 @@ public class MCRDerivateUtil {
         return resultMap;
     }
 
-    public static String testRenameFile(String filename, String pattern, String newName)
-        throws IOException {
+    public static String testRenameFile(String filename, String pattern, String newName) {
         String newFilename = "";
         try {
             Pattern patternObj = Pattern.compile(pattern);
             Matcher matcher = patternObj.matcher(filename);
             newFilename = matcher.replaceAll(newName);
             LOGGER.info("The file " + filename + " will be renamed to " + newFilename);
-        }
-        catch (PatternSyntaxException e) {
+        } catch (PatternSyntaxException e) {
             LOGGER.info("The pattern '" + pattern + "' contains errors!");
-        }
-        catch (IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             LOGGER.info("The file " + filename + " can't be renamed to " + newName + ". To many groups!");
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             LOGGER.info("The new name '" + newName + "' contains illegal characters!");
         }
         return newFilename;
     }
+
 }
