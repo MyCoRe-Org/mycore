@@ -89,6 +89,25 @@ public class MCRSolrCommands extends MCRAbstractCommands {
                 }).collect(Collectors.joining("\n")));
     }
 
+    /*
+     * The create core commands cannot be used, because the CoreAdmin API
+     * connects the created core with the configset. That means, if multiple cores
+     * are created from one config set, configuration changes in one core will be applied to all other derived cores.
+     * 
+     * There are different option, which can be looked at later:
+     * a) The issue in https://issues.apache.org/jira/browse/SOLR-7742 describes a feature
+     * to lock a configset from beeing overriden, but this cannot be found elsewhere in the Solr documentation:
+     * create a configsetprops.json file at set the immutable = true as JSON name list. 
+     * 
+     * b) There is also a Solr Configset API, which would allow to copy / create the configset for each new core 
+     *    (only in Solr cloud mode)
+     *    
+     * Currently we recommend to create Cores directly in Solr:
+     * > bin/solr create -d mycore_solr_configset_main -c {core_name}
+     * This command copies the configuration into the new core 
+     * 
+     * @author Robert Stephan
+     *  
     @MCRCommand(
         syntax = "create solr core with name {0} on server {1} using configset {2}",
         help = "creates a new Solr core",
@@ -114,6 +133,7 @@ public class MCRSolrCommands extends MCRAbstractCommands {
         throws IOException, SolrServerException {
         createSolrCore(coreName, DEFAULT_SOLR_SERVER_URL, configSet);
     }
+    */
 
     @MCRCommand(
         syntax = "register solr core with name {0} on server {1} as core {2}",
