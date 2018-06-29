@@ -24,7 +24,6 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_PREFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,10 +35,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.request.CoreAdminRequest;
-import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
@@ -66,6 +62,11 @@ public class MCRSolrCommands extends MCRAbstractCommands {
 
     private static Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * This command displays the MyCoRe properties,
+     * which have to be set, to reload the current Solr / Solr Core configuration
+     * on the next start of the MyCoRe application.
+     */
     @MCRCommand(
         syntax = "show solr configuration",
         help = "displays MyCoRe properties for the current Solr configuration",
@@ -88,52 +89,6 @@ public class MCRSolrCommands extends MCRAbstractCommands {
                         SOLR_CORE_NAME_SUFFIX, core.getName(), core.getServerURL(), SOLR_CORE_SERVER_SUFFIX, });
                 }).collect(Collectors.joining("\n")));
     }
-
-    /*
-     * The create core commands cannot be used, because the CoreAdmin API
-     * connects the created core with the configset. That means, if multiple cores
-     * are created from one config set, configuration changes in one core will be applied to all other derived cores.
-     * 
-     * There are different option, which can be looked at later:
-     * a) The issue in https://issues.apache.org/jira/browse/SOLR-7742 describes a feature
-     * to lock a configset from beeing overriden, but this cannot be found elsewhere in the Solr documentation:
-     * create a configsetprops.json file at set the immutable = true as JSON name list. 
-     * 
-     * b) There is also a Solr Configset API, which would allow to copy / create the configset for each new core 
-     *    (only in Solr cloud mode)
-     *    
-     * Currently we recommend to create Cores directly in Solr:
-     * > bin/solr create -d mycore_solr_configset_main -c {core_name}
-     * This command copies the configuration into the new core 
-     * 
-     * @author Robert Stephan
-     *  
-    @MCRCommand(
-        syntax = "create solr core with name {0} on server {1} using configset {2}",
-        help = "creates a new Solr core",
-        order = 20)
-    public static void createSolrCore(String coreName, String server, String configSet)
-        throws IOException, SolrServerException {
-        CoreAdminRequest.Create create = new CoreAdminRequest.Create();
-        create.setCoreName(coreName);
-        create.setConfigSet(configSet);
-        create.setIsLoadOnStartup(true);
-
-        try (HttpSolrClient solrClient = new HttpSolrClient.Builder(server + "/solr").build()) {
-            CoreAdminResponse response = create.process(solrClient);
-            LOGGER.info("Core Create Response: {}", response);
-        }
-    }
-
-    @MCRCommand(
-        syntax = "create solr core with name {0} using configset {1}",
-        help = "creates a new Solr core on the configured default Solr server",
-        order = 30)
-    public static void createSolrCore(String coreName, String configSet)
-        throws IOException, SolrServerException {
-        createSolrCore(coreName, DEFAULT_SOLR_SERVER_URL, configSet);
-    }
-    */
 
     @MCRCommand(
         syntax = "register solr core with name {0} on server {1} as core {2}",
