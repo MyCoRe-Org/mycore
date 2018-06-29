@@ -1,52 +1,125 @@
 [
   {
     "add-field-type": {
-      "name": "text",
+      "name": "ignored",
+      "class": "solr.StrField",
+      "indexed": false,
+      "stored": false,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "strings",
+      "class": "solr.StrField",
+      "sortMissingLast": true,
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "boolean",
+      "class": "solr.BoolField",
+      "sortMissingLast": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "booleans",
+      "class": "solr.BoolField",
+      "sortMissingLast": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pint",
+      "class": "solr.IntPointField",
+      "docValues": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pints",
+      "class": "solr.IntPointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "plongs",
+      "class": "solr.LongPointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pfloat",
+      "class": "solr.FloatPointField",
+      "docValues": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pfloats",
+      "class": "solr.FloatPointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pdouble",
+      "class": "solr.DoublePointField",
+      "docValues": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pdoubles",
+      "class": "solr.DoublePointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pdate",
+      "class": "solr.DatePointField",
+      "docValues": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pdates",
+      "class": "solr.DatePointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "binary",
+      "class": "solr.BinaryField"
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "payloads",
       "class": "solr.TextField",
-      "positionIncrementGap": "100",
-      "indexAnalyzer": {
+      "indexed": true,
+      "stored": false,
+      "analyzer": {
         "tokenizer": {
-          "class": "solr.ICUTokenizerFactory"
+          "class": "solr.WhitespaceTokenizerFactory"
         },
         "filters": [
           {
-            "class": "solr.StopFilterFactory",
-            "words": "stopwords.txt",
-            "ignoreCase": "true"
-          },
-          {
-            "class": "solr.ICUFoldingFilterFactory"
-          },
-          {
-            "class": "solr.RemoveDuplicatesTokenFilterFactory"
-          },
-          {
-            "class": "solr.LengthFilterFactory",
-            "min": "2",
-            "max": "30"
-          }
-        ]
-      },
-      "queryAnalyzer": {
-        "tokenizer": {
-          "class": "solr.ICUTokenizerFactory"
-        },
-        "filters": [
-          {
-            "class": "solr.StopFilterFactory",
-            "words": "stopwords.txt",
-            "ignoreCase": "true"
-          },
-          {
-            "class": "solr.ICUFoldingFilterFactory"
-          },
-          {
-            "class": "solr.RemoveDuplicatesTokenFilterFactory"
-          },
-          {
-            "class": "solr.LengthFilterFactory",
-            "min": "2",
-            "max": "30"
+            "class": "solr.DelimitedPayloadTokenFilterFactory",
+            "encoder": "float"
           }
         ]
       }
@@ -55,7 +128,7 @@
   {
     "add-field": {
       "name": "allMeta",
-      "type": "text",
+      "type": "text_general",
       "multiValued": true,
       "stored": false
     }
@@ -84,19 +157,6 @@
     "add-field": {
       "name": "classification",
       "type": "string"
-    }
-  },
-  {
-    "add-field": {
-      "name": "id",
-      "type": "string",
-      "required": true
-    }
-  },
-  {
-    "add-field": {
-      "name": "index",
-      "type": "long"
     }
   },
   {
@@ -131,32 +191,32 @@
     }
   },
   {
-    "add-dynamicField": {
+    "add-dynamic-field": {
       "name": "label.*",
       "type": "string",
       "multiValued": true
     }
   },
   {
-    "add-dynamicField": {
+    "add-dynamic-field": {
       "name": "*",
       "type": "ignored"
     }
   },
   {
-    "add-copyField": {
+    "add-copy-field": {
       "source": "category",
       "dest": "allMeta"
     }
   },
   {
-    "add-copyField": {
+    "add-copy-field": {
       "source": "classification",
       "dest": "allMeta"
     }
   },
   {
-    "add-copyField": {
+    "add-copy-field": {
       "source": "label.*",
       "dest": "allMeta"
     }

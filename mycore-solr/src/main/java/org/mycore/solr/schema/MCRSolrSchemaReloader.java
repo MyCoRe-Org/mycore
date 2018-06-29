@@ -64,11 +64,8 @@ public class MCRSolrSchemaReloader {
 
     private static List<String> SOLR_DEFAULT_FIELDS = Arrays.asList("id", "_version_", "_root_", "_text_");
 
-    private static List<String> SOLR_DEFAULT_DYNAMIC_FIELDS = Arrays.asList("*", "ignored_*");
-
-    private static List<String> SOLR_DEFAULT_FIELDTYPES = Arrays.asList("ignored", "string", "strings", "boolean",
-        "booleans", "pint", "plong", "pfloat", "pdouble", "pints", "plongs", "pfloats", "pdoubles", "pdate", "pdates",
-        "string", "binary", "text_general");
+    private static List<String> SOLR_DEFAULT_FIELDTYPES = Arrays.asList(
+        "plong", "string", "text_general");
 
     /**
      * Remove all fields, dynamicFields, copyFields and fieldTypes in the SOLR schema for the given core. The fields,
@@ -83,7 +80,7 @@ public class MCRSolrSchemaReloader {
         LOGGER.info("Clear SOLR schema for core " + coreID + " using configuration " + configType);
         try {
             SolrClient solrClient = MCRSolrClientFactory.get(coreID).map(MCRSolrCore::getClient)
-                .orElseThrow(() ->  new MCRConfigurationException("The core "+ coreID +" is not configured!"));
+                .orElseThrow(() -> new MCRConfigurationException("The core " + coreID + " is not configured!"));
 
             deleteCopyFields(solrClient);
             LOGGER.debug("CopyFields cleaned for core " + coreID + " for configuration " + configType);
@@ -92,7 +89,7 @@ public class MCRSolrSchemaReloader {
             LOGGER.debug("Fields cleaned for core " + coreID + " for configuration " + configType);
 
             deleteDynamicFields(solrClient);
-            LOGGER.debug("DynamicFields cleaned for core " + coreID + " for configuration " + configType); 
+            LOGGER.debug("DynamicFields cleaned for core " + coreID + " for configuration " + configType);
 
             deleteFieldTypes(solrClient);
             LOGGER.debug("FieldTypes cleaned for core " + coreID + " for configuration " + configType);
@@ -120,11 +117,10 @@ public class MCRSolrSchemaReloader {
         SchemaRequest.DynamicFields dynFieldsReq = new SchemaRequest.DynamicFields();
         for (Map<String, Object> field : dynFieldsReq.process(solrClient).getDynamicFields()) {
             String fieldName = field.get("name").toString();
-            if (!SOLR_DEFAULT_DYNAMIC_FIELDS.contains(fieldName)) {
                 LOGGER.debug("remove SOLR DynamicField " + fieldName);
                 SchemaRequest.DeleteDynamicField delField = new SchemaRequest.DeleteDynamicField(fieldName);
                 delField.process(solrClient);
-            }
+
         }
     }
 
@@ -157,12 +153,12 @@ public class MCRSolrSchemaReloader {
     /**
      * This method modified the SOLR schema definition based on all solr/{coreType}/solr-schema.json 
      * in the MyCoRe-Maven modules resource path.
-     * 
+     *
      * @param configType the name of the configuration directory containg the Solr core configuration
      * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processSchemaFiles(String configType, String coreID) {
-        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID).orElseThrow(() 
+        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID).orElseThrow(()
             -> MCRSolrUtils.getCoreConfigMissingException(coreID));
 
         LOGGER.info("Load schema definitions for core " + coreID + " using configuration " + configType);

@@ -1,10 +1,109 @@
 [
   {
     "add-field-type": {
-      "name": "long",
-      "class": "solr.TrieLongField",
-      "positionIncrementGap": "0",
-      "precisionStep": "0"
+      "name": "ignored",
+      "class": "solr.StrField",
+      "indexed": false,
+      "stored": false,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "strings",
+      "class": "solr.StrField",
+      "sortMissingLast": true,
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "boolean",
+      "class": "solr.BoolField",
+      "sortMissingLast": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "booleans",
+      "class": "solr.BoolField",
+      "sortMissingLast": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pint",
+      "class": "solr.IntPointField",
+      "docValues": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pints",
+      "class": "solr.IntPointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "plongs",
+      "class": "solr.LongPointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pfloat",
+      "class": "solr.FloatPointField",
+      "docValues": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pfloats",
+      "class": "solr.FloatPointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pdouble",
+      "class": "solr.DoublePointField",
+      "docValues": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pdoubles",
+      "class": "solr.DoublePointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pdate",
+      "class": "solr.DatePointField",
+      "docValues": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "pdates",
+      "class": "solr.DatePointField",
+      "docValues": true,
+      "multiValued": true
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "binary",
+      "class": "solr.BinaryField"
     }
   },
   {
@@ -21,6 +120,98 @@
           {
             "class": "solr.DelimitedPayloadTokenFilterFactory",
             "encoder": "float"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "text_en",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "indexAnalyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "lang/stopwords_en.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.EnglishPossessiveFilterFactory"
+          },
+          {
+            "class": "solr.KeywordMarkerFilterFactory",
+            "protected": "protwords.txt"
+          },
+          {
+            "class": "solr.PorterStemFilterFactory"
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.SynonymGraphFilterFactory",
+            "expand": "true",
+            "ignoreCase": "true",
+            "synonyms": "synonyms.txt"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "words": "lang/stopwords_en.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.EnglishPossessiveFilterFactory"
+          },
+          {
+            "class": "solr.KeywordMarkerFilterFactory",
+            "protected": "protwords.txt"
+          },
+          {
+            "class": "solr.PorterStemFilterFactory"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "text_de",
+      "class": "solr.TextField",
+      "positionIncrementGap": "100",
+      "analyzer": {
+        "tokenizer": {
+          "class": "solr.StandardTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "format": "snowball",
+            "words": "lang/stopwords_de.txt",
+            "ignoreCase": "true"
+          },
+          {
+            "class": "solr.GermanNormalizationFilterFactory"
+          },
+          {
+            "class": "solr.GermanLightStemFilterFactory"
           }
         ]
       }
@@ -289,7 +480,7 @@
   {
     "add-field": {
       "name": "stream_size",
-      "type": "long",
+      "type": "plong",
       "indexed": true,
       "stored": true
     }
@@ -311,6 +502,18 @@
       "name": "urn",
       "type": "string",
       "multiValued": true
+    }
+  },
+  {
+    "add-dynamic-field": {
+      "name": "ignored_*",
+      "type": "ignored"
+    }
+  },
+  {
+    "add-dynamic-field": {
+      "name": "*",
+      "type": "ignored"
     }
   }
 ]
