@@ -37,7 +37,7 @@ import javax.ws.rs.ext.Provider;
 public class MCRNoFormDataPutFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        if (requestContext.getMethod().equals(HttpMethod.PUT)
+        if (requestContext.getMethod().equals(HttpMethod.PUT) && requestContext.getMediaType() != null
             && requestContext.getMediaType().isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
             throw new BadRequestException("Cannot PUT form data on this resource.");
         }
