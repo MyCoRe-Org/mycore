@@ -208,6 +208,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         LOGGER.debug("ResponseFilter start");
         try {
+            MCRSessionMgr.unlock();
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             if (responseContext.getStatus() == Response.Status.FORBIDDEN.getStatusCode() && currentSession
                 .getUserInformation().getUserID().equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {
