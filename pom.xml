@@ -7,7 +7,7 @@
     <version>37</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2018.06.0</version>
+  <version>2018.06.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -30,12 +30,12 @@
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>v2018.06.0</tag>
+    <tag>2018.06.0.x</tag>
   </scm>
   <properties>
-    <changelog.since>2018-05-30</changelog.since>
+    <changelog.since>2018-07-02</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2018.06.0</changes.version>
+    <changes.version>2018.06.0.1</changes.version>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
     <forbiddenapis.version>1.7</forbiddenapis.version>
     <frontend.maven.plugin.version>1.4</frontend.maven.plugin.version>
