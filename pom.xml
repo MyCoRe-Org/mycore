@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>37-SNAPSHOT</version>
+    <version>38-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <version>2018.08-SNAPSHOT</version>
@@ -33,7 +33,7 @@
     <tag>HEAD</tag>
   </scm>
   <properties>
-    <changelog.since>2018-05-30</changelog.since>
+    <changelog.since>2018-07-02</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2018.08</changes.version>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
@@ -1588,7 +1588,7 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>selenium-utils</artifactId>
-        <version>0.9-SNAPSHOT</version>
+        <version>0.9</version>
         <scope>test</scope>
         <exclusions>
           <exclusion>
