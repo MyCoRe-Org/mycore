@@ -17,9 +17,12 @@ public class MCRPrioritySupplier<T> implements Supplier<T>, MCRPrioritizable {
 
     private int priority;
 
+    private long created;
+
     public MCRPrioritySupplier(Supplier<T> delegate, int priority) {
         this.delegate = delegate;
         this.priority = priority;
+        this.created = System.nanoTime();
     }
 
     @Override
@@ -32,4 +35,8 @@ public class MCRPrioritySupplier<T> implements Supplier<T>, MCRPrioritizable {
         return this.priority;
     }
 
+    @Override
+    public long getCreated() {
+        return created;
+    }
 }
