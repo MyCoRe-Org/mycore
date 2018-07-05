@@ -21,7 +21,7 @@ public interface MCRPrioritizable extends Comparable<MCRPrioritizable> {
     @Override
     default int compareTo(MCRPrioritizable o) {
         return ComparatorUtils.chainedComparator(
-            Comparator.comparingInt(MCRPrioritizable::getPriority),
+            Comparator.comparingInt(MCRPrioritizable::getPriority).reversed(),
             Comparator.comparingLong(MCRPrioritizable::getCreated))
             .compare(this,o);
     }
