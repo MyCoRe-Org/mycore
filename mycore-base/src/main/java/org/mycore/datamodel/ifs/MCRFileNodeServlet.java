@@ -80,6 +80,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
         }
         String ownerID = getOwnerID(request);
         if (ownerID != null && ownerID.length() > 0) {
+            //make sure, that numberpart of ownerID has correct length 
             ownerID = MCRObjectID.getInstance(ownerID).toString();
         }
         if (!MCRAccessManager.checkPermissionForReadingDerivate(ownerID)) {
