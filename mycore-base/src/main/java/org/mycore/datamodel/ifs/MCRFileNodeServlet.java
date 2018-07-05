@@ -41,6 +41,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRPathContent;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.servlets.MCRContentServlet;
@@ -78,6 +79,10 @@ public class MCRFileNodeServlet extends MCRContentServlet {
             return null;
         }
         String ownerID = getOwnerID(request);
+        if (ownerID != null && ownerID.length() > 0) {
+            //make sure, that numberpart of ownerID has correct length 
+            ownerID = MCRObjectID.getInstance(ownerID).toString();
+        }
         if (!MCRAccessManager.checkPermissionForReadingDerivate(ownerID)) {
             LOGGER.info("AccessForbidden to " + request.getPathInfo());
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
