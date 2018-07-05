@@ -63,7 +63,7 @@ public class MCRViewerConfiguration {
 
     static {
         DEBUG_MODE = Boolean.parseBoolean(MCRConfiguration.instance().getString("MCR.Viewer.DeveloperMode", "false"));
-        REQUEST_PATH_PATTERN = Pattern.compile(".*/(\\w+_derivate_\\d+)(/.*)?");
+        REQUEST_PATH_PATTERN = Pattern.compile("/(\\w+_derivate_\\d+)(/.*)?");
     }
 
     public MCRViewerConfiguration() {
