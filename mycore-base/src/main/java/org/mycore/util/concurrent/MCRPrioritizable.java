@@ -2,8 +2,6 @@ package org.mycore.util.concurrent;
 
 import java.util.Comparator;
 
-import org.apache.commons.collections.ComparatorUtils;
-
 /**
  * Objects can implement this interface if they are capable of being prioritized.
  *
@@ -20,10 +18,10 @@ public interface MCRPrioritizable extends Comparable<MCRPrioritizable> {
 
     @Override
     default int compareTo(MCRPrioritizable o) {
-        return ComparatorUtils.chainedComparator(
-            Comparator.comparingInt(MCRPrioritizable::getPriority).reversed(),
-            Comparator.comparingLong(MCRPrioritizable::getCreated))
-            .compare(this,o);
+        return Comparator.comparingInt(MCRPrioritizable::getPriority)
+            .reversed()
+            .thenComparingLong(MCRPrioritizable::getCreated)
+            .compare(this, o);
     }
 
 }
