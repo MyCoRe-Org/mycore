@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRSessionMgr;
 
 /**
@@ -122,7 +123,8 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
     }
 
     /**
-     * Sets the new status.
+     * Sets the new status. If the status is equal "processing" the startTime is set, if the status is equal
+     * "successful", "failed" or "canceled" the endTime is set. This will call the fireStatusChanged method.
      * 
      * @param status the new status
      */
@@ -133,7 +135,7 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
             this.startTime = Instant.now();
         }
         if (status.equals(MCRProcessableStatus.successful) || status.equals(MCRProcessableStatus.failed) ||
-                status.equals(MCRProcessableStatus.canceled)) {
+            status.equals(MCRProcessableStatus.canceled)) {
             this.endTime = Instant.now();
         }
         fireStatusChanged(oldStatus);
@@ -176,7 +178,14 @@ public class MCRAbstractProcessable extends MCRAbstractProgressable implements M
 
     protected void fireStatusChanged(MCRProcessableStatus oldStatus) {
         synchronized (this.statusListener) {
-            this.statusListener.forEach(listener -> listener.onStatusChange(this, oldStatus, getStatus()));
+            this.statusListener.forEach(listener -> {
+                try {
+                    listener.onStatusChange(this, oldStatus, getStatus());
+                } catch (Exception exc) {
+                    LogManager.getLogger().error("Unable to execute onStatusChange() on listener '{}' for '{}'",
+                        listener.getClass().getName(), getName(), exc);
+                }
+            });
         }
     }
 
