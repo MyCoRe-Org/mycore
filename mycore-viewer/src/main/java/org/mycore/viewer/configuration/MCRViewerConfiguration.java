@@ -192,31 +192,39 @@ public class MCRViewerConfiguration {
     }
 
     /**
-     * Shorthand MCRViewerConfiguration#addLocalScript(String, true)
+     * Shorthand MCRViewerConfiguration#addLocalScript(String, true, false)
      */
     public void addLocalScript(final String file) {
-        this.addLocalScript(file, true);
+        this.addLocalScript(file, true, false);
+    }
+
+    /**
+     * Shorthand MCRViewerConfiguration#addLocalScript(file, hasMinified, false)
+     */
+    public void addLocalScript(final String file, boolean hasMinified) {
+        this.addLocalScript(file, hasMinified, false);
     }
 
     /**
      * Adds a local (based in modules/iview2/js/) javascript file which should be included
-     * by the image viewer. This method takes care of the debug mode. You should always
-     * call this method with the base file version. E.g. addLocalScript("iview-client-mobile.js");.
-     * When debug mode is activated, this method injects a ".min" by default.
-     * So the included file will look like "iview-client-mobile.min.js".
-     * 
-     * @param file to include
-     * @param hasMinified only uses the minified version if true
+     * by the image viewer. You should always call this method with the base file version.
+     * E.g. addLocalScript("iview-client-mobile.js");.
+     *
+     * <p>This method uses the minified (adds a .min) version only if hasMinified is true and debugMode is false.</p>.
+     *
+     * @param file the local javascript file to include
+     * @param hasMinified is a minified version available
+     * @param debugMode if the debug mode is active or not
      */
-    public void addLocalScript(final String file, final boolean hasMinified) {
+    public void addLocalScript(final String file, final boolean hasMinified, final boolean debugMode) {
         String baseURL = MCRFrontendUtil.getBaseURL();
         StringBuilder scriptURL = new StringBuilder(baseURL);
         scriptURL.append("modules/iview2/js/");
-        if (isDebugMode() || !hasMinified) {
-            scriptURL.append(file);
-        } else {
-            scriptURL.append(file.substring(0, file.lastIndexOf(".")));
+        if (hasMinified && !debugMode) {
+            scriptURL.append(file, 0, file.lastIndexOf("."));
             scriptURL.append(".min.js");
+        } else {
+            scriptURL.append(file);
         }
         addScript(scriptURL.toString());
     }

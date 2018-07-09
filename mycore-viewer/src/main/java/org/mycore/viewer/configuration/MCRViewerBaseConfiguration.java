@@ -82,22 +82,22 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
 
         // script & css
         boolean developerMode = isDebugParameterSet(request);
-        addLocalScript("iview-client-base.js", developerMode);
+        addLocalScript("iview-client-base.js", true, developerMode);
         final boolean framed = this.isFramed(request);
 
         if (mobile && !framed && !"js".equals(request.getParameter("XSL.Style"))) {
-            addLocalScript("iview-client-mobile.js", developerMode);
+            addLocalScript("iview-client-mobile.js", true, developerMode);
             addLocalCSS("mobile.css");
         } else {
             if (framed) {
-                addLocalScript("iview-client-frame.js", developerMode);
+                addLocalScript("iview-client-frame.js", true, developerMode);
             } else if (this.getEmbeddedParameter(request) != null) {
-                addLocalScript("iview-client-frame.js", !developerMode);
+                addLocalScript("iview-client-frame.js", true, developerMode);
                 setProperty("embedded", "true");
                 setProperty("permalink.updateHistory", false);
                 setProperty("chapter.showOnStart", false);
             } else {
-                addLocalScript("iview-client-desktop.js", !developerMode);
+                addLocalScript("iview-client-desktop.js", true, developerMode);
             }
 
             addLocalCSS("default.css");
@@ -120,7 +120,7 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
 
     protected boolean isFramed(HttpServletRequest req) {
         String frameParameter = req.getParameter("frame");
-        return frameParameter != null && Boolean.parseBoolean(frameParameter);
+        return Boolean.parseBoolean(frameParameter);
     }
 
     public abstract String getDocType(HttpServletRequest request);
