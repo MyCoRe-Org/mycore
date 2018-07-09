@@ -31,8 +31,8 @@ public class MCRViewerLogoConfiguration extends MCRViewerConfiguration {
         String logoURL = MCRConfiguration.instance().getString("MCR.Viewer.logo.URL", null);
         if (logoURL != null) {
             String framedParameter = request.getParameter("frame");
-            if (framedParameter == null || !Boolean.parseBoolean(framedParameter)) {
-                this.addLocalScript("iview-client-logo.js", !isDebugParameterSet(request));
+            if (!Boolean.parseBoolean(framedParameter)) {
+                this.addLocalScript("iview-client-logo.js", true, isDebugParameterSet(request));
                 this.setProperty("logoURL", MCRFrontendUtil.getBaseURL() + logoURL);
 
                 String logoCssProperty = MCRConfiguration.instance().getString("MCR.Viewer.logo.css", null);

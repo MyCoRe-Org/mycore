@@ -45,8 +45,7 @@ public class MCRViewerMetadataConfiguration extends MCRViewerConfiguration {
         final MCRObjectID objectID = MCRMetadataManager.getObjectId(derivateID, EXPIRE_METADATA_CACHE_TIME,
             TimeUnit.SECONDS);
         if (objectID == null) {
-            String errorMessage = MCRTranslation.translate("component.viewer.MCRIViewClientServlet.object.not.found",
-                objectID);
+            String errorMessage = MCRTranslation.translate("component.viewer.MCRIViewClientServlet.object.not.found");
             // TODO: we should not throw an webapplication exc. here -> instead throw something líke ConfigException
             throw new WebApplicationException(Response.status(Status.NOT_FOUND).entity(errorMessage).build());
         }
@@ -63,7 +62,7 @@ public class MCRViewerMetadataConfiguration extends MCRViewerConfiguration {
         }
 
         // script
-        addLocalScript("iview-client-metadata.js", !isDebugParameterSet(request));
+        addLocalScript("iview-client-metadata.js", true, isDebugParameterSet(request));
 
         return this;
     }
