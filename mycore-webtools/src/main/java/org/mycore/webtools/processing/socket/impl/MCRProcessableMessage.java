@@ -76,8 +76,8 @@ class MCRProcessableMessage extends MCRWebSocketMessage {
                 this.took = processable.took().toMillis();
             }
         }
-        if (processable.isFailed()) {
-            Throwable error = processable.getError();
+        Throwable error = processable.getError();
+        if (processable.isFailed() && error != null) {
             this.errorMessage = error.getMessage();
             this.stackTrace = MCRUtils.getStackTraceAsString(error);
         }

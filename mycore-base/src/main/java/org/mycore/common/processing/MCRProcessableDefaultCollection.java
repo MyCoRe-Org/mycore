@@ -123,38 +123,41 @@ public class MCRProcessableDefaultCollection implements MCRProcessableCollection
     }
 
     protected void fireAdded(MCRProcessable processable) {
-        synchronized (this.listenerList) {
-            this.listenerList.forEach(listener -> {
-                try {
-                    listener.onAdd(this, processable);
-                } catch (Exception exc) {
-                    LOGGER.error("Unable to inform collection listener due internal error", exc);
-                }
-            });
-        }
+        List<MCRProcessableCollectionListener> listeners = listenersSnapshot();
+        listeners.forEach(listener -> {
+            try {
+                listener.onAdd(this, processable);
+            } catch (Exception exc) {
+                LOGGER.error("Unable to inform collection listener due internal error", exc);
+            }
+        });
     }
 
     protected void fireRemoved(MCRProcessable processable) {
-        synchronized (this.listenerList) {
-            this.listenerList.forEach(listener -> {
-                try {
-                    listener.onRemove(this, processable);
-                } catch (Exception exc) {
-                    LOGGER.error("Unable to inform collection listener due internal error", exc);
-                }
-            });
-        }
+        List<MCRProcessableCollectionListener> listeners = listenersSnapshot();
+        listeners.forEach(listener -> {
+            try {
+                listener.onRemove(this, processable);
+            } catch (Exception exc) {
+                LOGGER.error("Unable to inform collection listener due internal error", exc);
+            }
+        });
     }
 
     protected void firePropertyChanged(String propertyName, Object oldValue, Object newValue) {
+        List<MCRProcessableCollectionListener> listeners = listenersSnapshot();
+        listeners.forEach(listener -> {
+            try {
+                listener.onPropertyChange(this, propertyName, oldValue, newValue);
+            } catch (Exception exc) {
+                LOGGER.error("Unable to inform collection listener due internal error", exc);
+            }
+        });
+    }
+
+    private List<MCRProcessableCollectionListener> listenersSnapshot() {
         synchronized (this.listenerList) {
-            this.listenerList.forEach(listener -> {
-                try {
-                    listener.onPropertyChange(this, propertyName, oldValue, newValue);
-                } catch (Exception exc) {
-                    LOGGER.error("Unable to inform collection listener due internal error", exc);
-                }
-            });
+            return new ArrayList<>(this.listenerList);
         }
     }
 

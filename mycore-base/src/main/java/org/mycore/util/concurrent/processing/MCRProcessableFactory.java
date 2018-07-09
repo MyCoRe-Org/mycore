@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.apache.logging.log4j.LogManager;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.processing.MCRListenableProgressable;
 import org.mycore.common.processing.MCRProcessable;
@@ -146,7 +147,12 @@ public abstract class MCRProcessableFactory {
                     }
                 }
                 this.collection.add(processable);
-                supplier.getFuture().whenComplete((result, throwable) -> this.collection.remove(supplier));
+                supplier.getFuture().whenComplete((result, throwable) -> {
+                    this.collection.remove(supplier);
+                    if (throwable != null) {
+                        LogManager.getLogger().error("Error while processing '{}'", supplier.getName(), throwable);
+                    }
+                });
             }
             return supplier;
         }
