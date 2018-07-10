@@ -28,28 +28,29 @@ namespace mycore.viewer.components {
     import AltoElement = mycore.viewer.widgets.alto.AltoElement;
 
     export class MyCoReHighlightAltoComponent extends ViewerComponent {
-        private pageLayout:widgets.canvas.PageLayout = null;
-        private highlightLayer:widgets.canvas.HighlightAltoChapterCanvasPageLayer = new widgets.canvas.HighlightAltoChapterCanvasPageLayer();
-        private _model:widgets.mets.MetsStructureModel;
-        private _altoChapterContainer:AltoChapterContainer = null;
+        private pageLayout: widgets.canvas.PageLayout = null;
+        private highlightLayer: widgets.canvas.HighlightAltoChapterCanvasPageLayer =
+            new widgets.canvas.HighlightAltoChapterCanvasPageLayer();
+        private _model: widgets.mets.MetsStructureModel;
+        private _altoChapterContainer: AltoChapterContainer = null;
 
-        private selectedChapter:string = null;
-        private highlightedChapter:string = null;
+        private selectedChapter: string = null;
+        private highlightedChapter: string = null;
 
-        constructor(private _settings:MetsSettings, private container:JQuery) {
+        constructor(private _settings: MetsSettings, private container: JQuery) {
             super();
         }
 
-        public init():any {
-            if (this._settings.doctype == 'mets') {
+        public init(): any {
+            if (this._settings.doctype === 'mets') {
                 this.trigger(new WaitForEvent(this, events.PageLayoutChangedEvent.TYPE));
                 this.trigger(new WaitForEvent(this, events.RequestPageEvent.TYPE));
                 this.trigger(new events.AddCanvasPageLayerEvent(this, 0, this.highlightLayer));
             }
         }
 
-        public get handlesEvents():string[] {
-            if (this._settings.doctype == 'mets') {
+        public get handlesEvents(): string[] {
+            if (this._settings.doctype === 'mets') {
                 return [events.ChapterChangedEvent.TYPE,
                     events.PageLayoutChangedEvent.TYPE,
                     events.RequestPageEvent.TYPE,
@@ -61,23 +62,23 @@ namespace mycore.viewer.components {
             }
         }
 
-        public get isEnabled():boolean {
+        public get isEnabled(): boolean {
             return this._model != null && this._model._textContentPresent;
         }
 
-        public getPageLayout():widgets.canvas.PageLayout {
+        public getPageLayout(): widgets.canvas.PageLayout {
             return this.pageLayout;
         }
 
-        public getPageController():widgets.canvas.PageController {
+        public getPageController(): widgets.canvas.PageController {
             return this.pageLayout.getPageController();
         }
 
-        public getAltoChapterContainer():AltoChapterContainer {
+        public getAltoChapterContainer(): AltoChapterContainer {
             return this._altoChapterContainer;
         }
 
-        public setChapter(chapterId:string, triggerChapterChangeEvent:boolean = false, forceChange:boolean = false) {
+        public setChapter(chapterId: string, triggerChapterChangeEvent: boolean = false, forceChange: boolean = false) {
             if (!forceChange && this.selectedChapter === chapterId) {
                 return;
             }
@@ -89,15 +90,15 @@ namespace mycore.viewer.components {
             this.handleDarkenPageAnimation();
             this.trigger(new events.RedrawEvent(this));
             if (triggerChapterChangeEvent) {
-                let chapter:model.StructureChapter = this._altoChapterContainer.getChapter(chapterId);
+                const chapter: model.StructureChapter = this._altoChapterContainer.getChapter(chapterId);
                 this.trigger(new events.ChapterChangedEvent(this, chapter));
             }
         }
 
-        public setHighlightChapter(chapterId:string) {
+        public setHighlightChapter(chapterId: string) {
             if (this._altoChapterContainer === null ||
-                 !this._altoChapterContainer.hasLoadedPages() ||
-                 this.highlightedChapter === chapterId) {
+                !this._altoChapterContainer.hasLoadedPages() ||
+                this.highlightedChapter === chapterId) {
                 return;
             }
             this.highlightLayer.highlightedChapter = chapterId != null ? this._altoChapterContainer.chapters.get(chapterId) : null;
@@ -109,16 +110,16 @@ namespace mycore.viewer.components {
         }
 
         public handleDarkenPageAnimation() {
-            let selected:boolean = this.selectedChapter != null;
-            let highlighted:boolean = this.highlightedChapter != null;
-            let oldValue:number = 0;
+            const selected: boolean = this.selectedChapter != null;
+            const highlighted: boolean = this.highlightedChapter != null;
+            let oldValue: number = 0;
             if (this.highlightLayer.fadeAnimation != null) {
                 oldValue = this.highlightLayer.fadeAnimation.value;
                 this.getPageController().removeAnimation(this.highlightLayer.fadeAnimation);
             }
             // fade out
             if (!selected && !highlighted) {
-                if (oldValue == 0) {
+                if (oldValue === 0) {
                     return;
                 }
                 this.highlightLayer.fadeAnimation = new widgets.canvas.InterpolationAnimation(1000, oldValue, 0);
@@ -126,14 +127,14 @@ namespace mycore.viewer.components {
                 return;
             }
             // fade in
-            let alpha:number = selected ? 0.4 : 0.15;
+            const alpha: number = selected ? 0.4 : 0.15;
             this.highlightLayer.fadeAnimation = new widgets.canvas.InterpolationAnimation(1000, oldValue, alpha);
             this.getPageController().addAnimation(this.highlightLayer.fadeAnimation);
         }
 
-        public handle(e:mycore.viewer.widgets.events.ViewerEvent) {
-            if (e.type == events.MetsLoadedEvent.TYPE) {
-                let mle = <events.MetsLoadedEvent> e;
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent) {
+            if (e.type === events.MetsLoadedEvent.TYPE) {
+                const mle = <events.MetsLoadedEvent> e;
                 this._model = <widgets.mets.MetsStructureModel>mle.mets.model;
                 if (!this.isEnabled) {
                     return;
@@ -144,25 +145,27 @@ namespace mycore.viewer.components {
                 }
                 this.trigger(new events.RequestDesktopInputEvent(this, new HighlightAltoInputListener(this)));
             }
-            if (e.type == events.RequestPageEvent.TYPE) {
-                let rpe = <events.RequestPageEvent> e;
+            if (e.type === events.RequestPageEvent.TYPE) {
+                const rpe = <events.RequestPageEvent> e;
                 this.trigger(new RequestAltoModelEvent(this, rpe._pageId, (page, altoHref, altoModel) => {
                     this._altoChapterContainer.addPage(rpe._pageId, altoHref, altoModel);
+                    if (this.selectedChapter != null) {
+                        this.setChapter(this.selectedChapter, false, true);
+                    }
                 }));
             }
-            if (e.type == events.ChapterChangedEvent.TYPE) {
-                let cce = <events.ChapterChangedEvent>e;
+            if (e.type === events.ChapterChangedEvent.TYPE) {
+                const cce = <events.ChapterChangedEvent>e;
                 if (cce == null || cce.chapter == null) {
                     return;
                 }
                 this.setChapter(cce.chapter.id);
             }
-            if (e.type == events.PageLayoutChangedEvent.TYPE) {
-                this.pageLayout = ( <events.PageLayoutChangedEvent>e ).pageLayout;
+            if (e.type === events.PageLayoutChangedEvent.TYPE) {
+                this.pageLayout = (<events.PageLayoutChangedEvent>e).pageLayout;
             }
-
-            if (e.type == events.TextEditEvent.TYPE) {
-                let tee = <events.TextEditEvent>e;
+            if (e.type === events.TextEditEvent.TYPE) {
+                const tee = <events.TextEditEvent>e;
                 this.highlightLayer.setEnabled(!tee.edit);
             }
         }
@@ -171,50 +174,50 @@ namespace mycore.viewer.components {
 
     class HighlightAltoInputListener extends widgets.canvas.DesktopInputAdapter {
 
-        constructor(protected component:MyCoReHighlightAltoComponent) {
+        constructor(protected component: MyCoReHighlightAltoComponent) {
             super();
         }
 
-        public mouseClick(position:Position2D) {
-            let chapterId:string = this.getChapterId(position);
+        public mouseClick(position: Position2D) {
+            const chapterId: string = this.getChapterId(position);
             this.component.setChapter(chapterId, true);
         }
 
-        public mouseMove(position:Position2D) {
-            let chapterId:string = this.getChapterId(position);
+        public mouseMove(position: Position2D) {
+            const chapterId: string = this.getChapterId(position);
             this.component.setHighlightChapter(chapterId);
         }
 
-        private getChapterId(position:Position2D):string {
-            let pageLayout = this.component.getPageLayout();
+        private getChapterId(position: Position2D): string {
+            const pageLayout = this.component.getPageLayout();
             if (pageLayout == null) {
                 return null;
             }
 
-            let pageHitInfo:widgets.canvas.PageHitInfo = pageLayout.getPageHitInfo(position);
+            const pageHitInfo: widgets.canvas.PageHitInfo = pageLayout.getPageHitInfo(position);
 
             if (pageHitInfo.id == null) {
                 return null;
             }
-            let altoChapterContainer:AltoChapterContainer = this.component.getAltoChapterContainer();
+            const altoChapterContainer: AltoChapterContainer = this.component.getAltoChapterContainer();
             if (altoChapterContainer === null) {
                 return null;
             }
-            let chapters:MyCoReMap<string, AltoChapter> = altoChapterContainer.chapters;
-            let pageChapterMap:MyCoReMap<string, Array<string>> = altoChapterContainer.pageChapterMap;
+            const chapters: MyCoReMap<string, AltoChapter> = altoChapterContainer.chapters;
+            const pageChapterMap: MyCoReMap<string, string[]> = altoChapterContainer.pageChapterMap;
 
-            let chapterIdsOnPage:Array<string> = pageChapterMap.get(pageHitInfo.id);
+            const chapterIdsOnPage: string[] = pageChapterMap.get(pageHitInfo.id);
             if (chapterIdsOnPage == null || chapterIdsOnPage.length <= 0) {
                 return null;
             }
-            for (let chapterId of chapterIdsOnPage) {
-                let altoChapter:AltoChapter = chapters.get(chapterId);
-                let rectsOfChapter:Array<Rect> = altoChapter.boundingBoxMap.get(pageHitInfo.id);
+            for (const chapterId of chapterIdsOnPage) {
+                const altoChapter: AltoChapter = chapters.get(chapterId);
+                const rectsOfChapter: Rect[] = altoChapter.boundingBoxMap.get(pageHitInfo.id);
                 if (rectsOfChapter == null) {
                     continue;
                 }
-                for (let rectOfChapter of rectsOfChapter) {
-                    let rect:Rect = rectOfChapter.scale(pageHitInfo.pageAreaInformation.scale);
+                for (const rectOfChapter of rectsOfChapter) {
+                    const rect: Rect = rectOfChapter.scale(pageHitInfo.pageAreaInformation.scale);
                     if (rect.intersects(pageHitInfo.hit)) {
                         return chapterId;
                     }
@@ -227,16 +230,16 @@ namespace mycore.viewer.components {
 
     export class AltoChapterContainer {
 
-        public chapters:MyCoReMap<string, AltoChapter> = new MyCoReMap<string, AltoChapter>();
-        public pageChapterMap:MyCoReMap<string, Array<string>> = new MyCoReMap<string, Array<string>>();
+        public chapters: MyCoReMap<string, AltoChapter> = new MyCoReMap<string, AltoChapter>();
+        public pageChapterMap: MyCoReMap<string, string[]> = new MyCoReMap<string, string[]>();
 
-        private _loadedPages:any = {};
+        private _loadedPages: any = {};
 
-        constructor(private _model:widgets.mets.MetsStructureModel) {
+        constructor(private _model: widgets.mets.MetsStructureModel) {
             this._model.smLinkMap.forEach((chapterId, linkedImages) => {
                 this.chapters.set(chapterId, new AltoChapter(chapterId));
-                for(let imageHref of linkedImages) {
-                    if(!this.pageChapterMap.has(imageHref)) {
+                for (const imageHref of linkedImages) {
+                    if (!this.pageChapterMap.has(imageHref)) {
                         this.pageChapterMap.set(imageHref, []);
                     }
                     this.pageChapterMap.get(imageHref).push(chapterId);
@@ -248,26 +251,26 @@ namespace mycore.viewer.components {
             return Object.keys(this._loadedPages).length > 0;
         }
 
-        getAreaListOfChapter(chapter:model.StructureChapter):Array<MetsArea> {
-            let blocklist = chapter.additional.get("blocklist");
-            if(blocklist == null) {
+        getAreaListOfChapter(chapter: model.StructureChapter): MetsArea[] {
+            const blocklist = chapter.additional.get('blocklist');
+            if (blocklist == null) {
                 return [];
             }
-            return blocklist.map((block:{ fileId:string, fromId:string, toId:string }) => {
+            return blocklist.map((block: { fileId: string, fromId: string, toId: string }) => {
                 return new MetsArea(block.fileId, block.fromId, block.toId);
             });
         }
 
-        getChapter(chapterId:string):model.StructureChapter {
+        getChapter(chapterId: string): model.StructureChapter {
             return this.findChapter(this._model.rootChapter, chapterId);
         }
 
-        findChapter(from:model.StructureChapter, chapterId:string):model.StructureChapter {
+        findChapter(from: model.StructureChapter, chapterId: string): model.StructureChapter {
             if (from.id == chapterId) {
                 return from;
             }
-            for (let childChapter of from.chapter) {
-                let foundChapter = this.findChapter(childChapter, chapterId);
+            for (const childChapter of from.chapter) {
+                const foundChapter = this.findChapter(childChapter, chapterId);
                 if (foundChapter != null) {
                     return foundChapter;
                 }
@@ -275,8 +278,8 @@ namespace mycore.viewer.components {
             return null;
         }
 
-        getBlocklistOfChapterAndAltoHref(chapterId:string, altoHref:string):Array<MetsArea> {
-            let chapter:model.StructureChapter = this.getChapter(chapterId);
+        getBlocklistOfChapterAndAltoHref(chapterId: string, altoHref: string): MetsArea[] {
+            const chapter: model.StructureChapter = this.getChapter(chapterId);
             if (chapter == null) {
                 return [];
             }
@@ -285,9 +288,9 @@ namespace mycore.viewer.components {
             });
         }
 
-        getAllBlocklistChapters(from:model.StructureChapter):Array<model.StructureChapter> {
-            let chapters:Array<model.StructureChapter> = [];
-            if (from.additional.get("blocklist") != null) {
+        getAllBlocklistChapters(from: model.StructureChapter): model.StructureChapter[] {
+            let chapters: model.StructureChapter[] = [];
+            if (from.additional.get('blocklist') != null) {
                 chapters.push(from);
             }
             from.chapter.forEach(childChapter => {
@@ -296,12 +299,12 @@ namespace mycore.viewer.components {
             return chapters;
         }
 
-        addPage(pageId:string, altoHref:string, alto:widgets.alto.AltoFile) {
+        addPage(pageId: string, altoHref: string, alto: widgets.alto.AltoFile) {
             if (this._loadedPages[pageId] != null) {
                 return;
             }
             this._loadedPages[pageId] = true;
-            this.pageChapterMap.hasThen(pageId, (chapterIds:Array<string>) => {
+            this.pageChapterMap.hasThen(pageId, (chapterIds: string[]) => {
                 // calculate areas for each chapter
                 chapterIds.map(chapterId => this.chapters.get(chapterId)).forEach((chapter) => {
                     chapter.addPage(pageId, alto, this.getBlocklistOfChapterAndAltoHref(chapter.chapterId, altoHref));
@@ -309,7 +312,7 @@ namespace mycore.viewer.components {
                 // fix stuff, needs to be done after all chapters are added
                 chapterIds.map(chapterId => this.chapters.get(chapterId)).forEach((chapter, i, chapters) => {
                     // maximize
-                    let maximizedRect = chapter.maximize(pageId);
+                    const maximizedRect = chapter.maximize(pageId);
                     if (maximizedRect == null) {
                         return;
                     }
@@ -317,18 +320,18 @@ namespace mycore.viewer.components {
 
                     // intersect with other chapters
                     for (let j = 0; j < chapters.length; j++) {
-                        if (i == j) {
+                        if (i === j) {
                             continue;
                         }
                         // try to remove bounding box
-                        let otherBoundingBox = chapters[j].maximize(pageId);
+                        const otherBoundingBox = chapters[j].maximize(pageId);
                         chapter.fixBoundingBox(pageId, otherBoundingBox);
                         // fix area intersections of chapters on the same page
                         chapter.fixIntersections(pageId, chapters[j]);
                     }
 
                     // cut start and end
-                    let altoRects = chapter.altoRectMap.get(pageId);
+                    const altoRects = chapter.altoRectMap.get(pageId);
                     chapter.cutVerticalBoundingBox(pageId, altoRects[0].getY());
                     chapter.cutVerticalBoundingBox(pageId,
                         altoRects[altoRects.length - 1].getY() + altoRects[altoRects.length - 1].getHeight());
@@ -351,7 +354,7 @@ namespace mycore.viewer.components {
          * key: image (e.g. ThULB_129489832_1941_Perthes_0034.tif)
          * value: array of MetsArea's which are assigned to this chapter on the specific page (image)
          */
-        public metsAreas:MyCoReMap<string, Array<MetsArea>>;
+        public metsAreas: MyCoReMap<string, MetsArea[]>;
 
         /**
          * Map of rectangles's for a given page. Those rectangles's are calculated using the original mets:area's when
@@ -365,7 +368,7 @@ namespace mycore.viewer.components {
          * key: image (e.g. ThULB_129489832_1941_Perthes_0034.tif)
          * value: array of rectangles where each rectangle is the bounding box of a ALTO paragraph (+ small padding)
          */
-        public altoRectMap:MyCoReMap<string, Array<Rect>>;
+        public altoRectMap: MyCoReMap<string, Rect[]>;
 
         /**
          * Map of rectangles's for a given page. Those rectangles define the bounding box of an AltoChapter for one
@@ -375,39 +378,39 @@ namespace mycore.viewer.components {
          * key: image (e.g. ThULB_129489832_1941_Perthes_0034.tif)
          * value: array of rectangles
          */
-        public boundingBoxMap:MyCoReMap<string, Array<Rect>>;
+        public boundingBoxMap: MyCoReMap<string, Rect[]>;
 
-        constructor(public chapterId:string) {
-            this.boundingBoxMap = new MyCoReMap<string, Array<Rect>>();
-            this.altoRectMap = new MyCoReMap<string, Array<Rect>>();
-            this.metsAreas = new MyCoReMap<string, Array<MetsArea>>();
+        constructor(public chapterId: string) {
+            this.boundingBoxMap = new MyCoReMap<string, Rect[]>();
+            this.altoRectMap = new MyCoReMap<string, Rect[]>();
+            this.metsAreas = new MyCoReMap<string, MetsArea[]>();
         }
 
-        public addPage(pageId:string, altoFile:widgets.alto.AltoFile, metsAreas:Array<MetsArea>) {
-            let altoBlocks:Array<widgets.alto.AltoElement> = this.getAltoBlocks(altoFile, metsAreas);
-            let areaRects = this.getAreaRects(altoFile, altoBlocks);
+        public addPage(pageId: string, altoFile: widgets.alto.AltoFile, metsAreas: MetsArea[]) {
+            const altoBlocks: widgets.alto.AltoElement[] = this.getAltoBlocks(altoFile, metsAreas);
+            const areaRects = this.getAreaRects(altoFile, altoBlocks);
             this.altoRectMap.set(pageId, areaRects);
             this.boundingBoxMap.set(pageId, areaRects);
             this.metsAreas.set(pageId, metsAreas);
         }
 
-        public maximize(pageId:string):Rect {
-            let boundingBox = this.boundingBoxMap.get(pageId);
-            if(boundingBox == null || boundingBox.length == 0) {
+        public maximize(pageId: string): Rect {
+            const boundingBox = this.boundingBoxMap.get(pageId);
+            if (boundingBox == null || boundingBox.length == 0) {
                 return null;
             }
             return boundingBox.reduce((a, b) => {
-               return a.maximizeRect(b);
+                return a.maximizeRect(b);
             });
         }
 
-        public fixBoundingBox(pageId:string, rect:Rect) {
-            if(rect == null) {
+        public fixBoundingBox(pageId: string, rect: Rect) {
+            if (rect == null) {
                 return;
             }
             let thisBoundingBox = this.boundingBoxMap.get(pageId);
-            for (let thisBBRect of thisBoundingBox) {
-                if(!thisBBRect.intersectsArea(rect) || this.intersectsText(pageId, rect)) {
+            for (const thisBBRect of thisBoundingBox) {
+                if (!thisBBRect.intersectsArea(rect) || this.intersectsText(pageId, rect)) {
                     continue;
                 }
                 thisBoundingBox = thisBoundingBox.filter(rect => rect !== thisBBRect);
@@ -423,10 +426,10 @@ namespace mycore.viewer.components {
          * @param pageId id of the page
          * @param rect the rect
          */
-        public intersectsText(pageId:string, rect:Rect):boolean {
-            let rects = this.altoRectMap.get(pageId);
-            for(let altoRect of rects) {
-                if(altoRect.intersectsArea(rect)) {
+        public intersectsText(pageId: string, rect: Rect): boolean {
+            const rects = this.altoRectMap.get(pageId);
+            for (const altoRect of rects) {
+                if (altoRect.intersectsArea(rect)) {
                     return true;
                 }
             }
@@ -439,11 +442,11 @@ namespace mycore.viewer.components {
          * @param pageId the page to fix
          * @param other the other chapter area
          */
-        public fixIntersections(pageId:string, other:AltoChapter) {
+        public fixIntersections(pageId: string, other: AltoChapter) {
             let thisAreas = this.boundingBoxMap.get(pageId);
-            let otherAreas = other.boundingBoxMap.get(pageId);
-            for (let thisArea of thisAreas) {
-                for (let otherArea of otherAreas) {
+            const otherAreas = other.boundingBoxMap.get(pageId);
+            for (const thisArea of thisAreas) {
+                for (const otherArea of otherAreas) {
                     if (!thisArea.intersectsArea(otherArea)) {
                         continue;
                     }
@@ -464,14 +467,15 @@ namespace mycore.viewer.components {
          */
         public cutVerticalBoundingBox(pageId: string, y: number) {
             let thisAreas = this.boundingBoxMap.get(pageId);
-            for (let thisArea of thisAreas) {
+            for (const thisArea of thisAreas) {
                 if (!thisArea.intersectsVertical(y)) {
                     continue;
                 }
                 thisAreas = thisAreas.filter(rect => rect !== thisArea);
-                let cutY = y - thisArea.getY();
+                const cutY = y - thisArea.getY();
                 thisAreas.push(Rect.fromXYWH(thisArea.getX(), thisArea.getY(), thisArea.getWidth(), cutY));
-                thisAreas.push(Rect.fromXYWH(thisArea.getX(), thisArea.getY() + cutY + 1, thisArea.getWidth(), thisArea.getHeight() - (cutY + 1)));
+                thisAreas.push(Rect.fromXYWH(thisArea.getX(), thisArea.getY() + cutY + 1, thisArea.getWidth(),
+                    thisArea.getHeight() - (cutY + 1)));
                 this.boundingBoxMap.set(pageId, thisAreas);
             }
         }
@@ -482,17 +486,17 @@ namespace mycore.viewer.components {
          * @param pageId the page to fix
          * @param alto the alto file
          */
-        public fixEmptyAreas(pageId:string, alto:widgets.alto.AltoFile) {
+        public fixEmptyAreas(pageId: string, alto: widgets.alto.AltoFile) {
             let thisAreas = this.boundingBoxMap.get(pageId);
-            let thisMetsAreas = this.metsAreas.get(pageId);
-            let textBlockIds = alto.allElements.map(block => block.getId());
-            let textAreas:Array<Rect> = alto.allElements
+            const thisMetsAreas = this.metsAreas.get(pageId);
+            const textBlockIds = alto.allElements.map(block => block.getId());
+            const textAreas: Rect[] = alto.allElements
                 .filter(block => {
                     return thisMetsAreas.some(metsArea => metsArea.contains(textBlockIds, block.getId()));
                 })
                 .map(block => block.asRect());
             thisAreas = thisAreas.filter(area => {
-                for (let textArea of textAreas) {
+                for (const textArea of textAreas) {
                     if (area.intersectsArea(textArea)) {
                         return true;
                     }
@@ -502,15 +506,15 @@ namespace mycore.viewer.components {
             this.boundingBoxMap.set(pageId, thisAreas);
         }
 
-        private getAltoBlocks(altoFile:widgets.alto.AltoFile,
-                              metsAreas:Array<MetsArea>):Array<widgets.alto.AltoElement> {
-            let allBlocks = altoFile.allElements;
-            let ids = allBlocks.map(block => block.getId());
-            let blocks:Array<widgets.alto.AltoElement> = [];
+        private getAltoBlocks(altoFile: widgets.alto.AltoFile,
+                              metsAreas: MetsArea[]): widgets.alto.AltoElement[] {
+            const allBlocks = altoFile.allElements;
+            const ids = allBlocks.map(block => block.getId());
+            const blocks: widgets.alto.AltoElement[] = [];
             metsAreas.map(metsArea => [ids.indexOf(metsArea.begin), ids.indexOf(metsArea.end)])
                 .forEach(([fromIndex, toIndex]) => {
                         for (let i = fromIndex; i <= toIndex; i++) {
-                            let blockToHighlight = allBlocks[i];
+                            const blockToHighlight = allBlocks[i];
                             if (blockToHighlight == null) {
                                 continue;
                             }
@@ -521,8 +525,8 @@ namespace mycore.viewer.components {
             return blocks;
         }
 
-        private getAreaRects(altoFile: widgets.alto.AltoFile, blocks: Array<widgets.alto.AltoElement>): Array<Rect> {
-            let padding: number = Math.ceil(altoFile.pageHeight * 0.004);
+        private getAreaRects(altoFile: widgets.alto.AltoFile, blocks: widgets.alto.AltoElement[]): Rect[] {
+            const padding: number = Math.ceil(altoFile.pageHeight * 0.004);
             return blocks.map(block => {
                 return Rect
                     .fromXYWH(block.getBlockHPos(), block.getBlockVPos(), block.getWidth(), block.getHeight())
@@ -534,11 +538,11 @@ namespace mycore.viewer.components {
 
     export class MetsArea {
 
-        constructor(public altoRef:string, public begin:string, public end:string) {
+        constructor(public altoRef: string, public begin: string, public end: string) {
         }
 
-        public contains(blockIds:Array<string>, paragraph:string):boolean {
-            let index = blockIds.indexOf(paragraph);
+        public contains(blockIds: string[], paragraph: string): boolean {
+            const index = blockIds.indexOf(paragraph);
             return index >= blockIds.indexOf(this.begin) && index <= blockIds.indexOf(this.end);
         }
 
