@@ -94,6 +94,8 @@ public class MCRViewerConfiguration {
 
     /**
      * Returns the properties of this configuration.
+     *
+     * @return map of all properties set in this configuration
      */
     public Map<String, Object> getProperties() {
         return properties;
@@ -101,6 +103,8 @@ public class MCRViewerConfiguration {
 
     /**
      * Returns a multimap containing all resources (javascript and css url's).
+     *
+     * @return map of resources
      */
     public Multimap<ResourceType, String> getResources() {
         return resources;
@@ -117,17 +121,19 @@ public class MCRViewerConfiguration {
     }
 
     /**
-     * return true if iview2.debug=true
-     */
-    protected boolean isDebugParameterSet(HttpServletRequest request) {
-        return Boolean.TRUE.toString().toLowerCase(Locale.ROOT).equals(request.getParameter("iview2.debug"));
-    }
-
-    /**
      * Returns true if the debug/developer mode is active.
+     * 
+     * <ul>
+     *   <li>URL parameter iview2.debug = true</li>
+     *   <li>MCR.Viewer.DeveloperMode property = true</li>
+     * </ul>
+     *
+     * @param request the request to check the iview2.debug parameter
+     * @return true if the debug mode is active, otherwise false
      */
-    public static boolean isDebugMode() {
-        return DEBUG_MODE;
+    public static boolean isDebugMode(HttpServletRequest request) {
+        return DEBUG_MODE ||
+            Boolean.TRUE.toString().toLowerCase(Locale.ROOT).equals(request.getParameter("iview2.debug"));
     }
 
     /**
@@ -193,6 +199,8 @@ public class MCRViewerConfiguration {
 
     /**
      * Shorthand MCRViewerConfiguration#addLocalScript(String, true, false)
+     *
+     * @param file the local javascript file to include
      */
     public void addLocalScript(final String file) {
         this.addLocalScript(file, true, false);
@@ -200,6 +208,9 @@ public class MCRViewerConfiguration {
 
     /**
      * Shorthand MCRViewerConfiguration#addLocalScript(file, hasMinified, false)
+     *
+     * @param file the local javascript file to include
+     * @param hasMinified is a minified version available
      */
     public void addLocalScript(final String file, boolean hasMinified) {
         this.addLocalScript(file, hasMinified, false);
@@ -231,6 +242,8 @@ public class MCRViewerConfiguration {
 
     /**
      * Adds a new css file which should be included by the image viewer.
+     *
+     * @param url the url to add e.g. baseURL + "modules/iview2/css/my.css"
      */
     public void addCSS(final String url) {
         this.resources.put(ResourceType.css, url);
@@ -269,7 +282,7 @@ public class MCRViewerConfiguration {
     /**
      * Returns the configuration in json format.
      * 
-     * @return json
+     * @return json the configuration as json string
      */
     public String toJSON() {
         final Gson gson = new GsonBuilder().registerTypeAdapter(Multimap.class, new MultimapSerializer()).create();
@@ -278,6 +291,8 @@ public class MCRViewerConfiguration {
 
     /**
      * Returns the configuration in xml content format.
+     *
+     * @return the configuration as xml content
      */
     public MCRXMLContent toXML() throws JAXBException {
         MCRIViewClientXMLConfiguration xmlConfig = new MCRIViewClientXMLConfiguration(resources, properties);
@@ -394,4 +409,5 @@ public class MCRViewerConfiguration {
         }
 
     }
+
 }
