@@ -59,7 +59,7 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
             .getString("MCR.Viewer.PDFCreatorRestrictionFormatString", null));
 
         // script
-        final boolean debugParameterSet = isDebugParameterSet(request);
+        final boolean debugParameterSet = isDebugMode(request);
         addLocalScript("iview-client-mets.js", true, debugParameterSet);
 
         final MCRPath teiDirectoryPath = MCRPath.getPath(derivate, "/tei");

@@ -81,7 +81,7 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         }
 
         // script & css
-        boolean developerMode = isDebugParameterSet(request);
+        boolean developerMode = isDebugMode(request);
         addLocalScript("iview-client-base.js", true, developerMode);
         final boolean framed = this.isFramed(request);
 
