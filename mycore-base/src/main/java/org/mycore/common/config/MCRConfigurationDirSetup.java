@@ -27,6 +27,7 @@ import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -110,7 +111,8 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             //no configuration dir exists
             return;
         }
-        ClassLoader classLoader = MCRConfigurationDir.class.getClassLoader();
+        ClassLoader classLoader = Optional.ofNullable(Thread.currentThread().getContextClassLoader())
+            .orElseGet(MCRConfigurationDir.class::getClassLoader);
         if (!(classLoader instanceof URLClassLoader)) {
             System.err.println(classLoader.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
             return;

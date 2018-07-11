@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -85,6 +87,10 @@ public class MCRCommandLineInterface {
      * reads a file containing a list of commands to be processed
      */
     public static void main(String[] args) {
+        if (!(MCRCommandLineInterface.class.getClassLoader() instanceof URLClassLoader)) {
+            System.out.println("Current ClassLoader is not extendable at runtime. Using workaround.");
+            Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[0]));
+        }
         MCRStartupHandler.startUp(null/*no servlet context here*/);
         //BUG: try to track down https://bamboo.mycore.de/browse/DP-TEST-234
         if (MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", null) == null) {
