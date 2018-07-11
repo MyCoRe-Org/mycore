@@ -18,9 +18,17 @@
 
 package org.mycore.common.xml;
 
+import static org.jdom2.JDOMConstants.SAX_FEATURE_NAMESPACES;
+import static org.jdom2.JDOMConstants.SAX_FEATURE_NAMESPACE_PREFIXES;
+import static org.jdom2.JDOMConstants.SAX_FEATURE_VALIDATION;
+
+import org.apache.xerces.parsers.SAXParser;
+import org.jdom2.JDOMException;
 import org.jdom2.input.sax.XMLReaderJDOMFactory;
 import org.jdom2.input.sax.XMLReaderSAX2Factory;
 import org.mycore.common.config.MCRConfiguration;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * Returns validating or non-validating XML parsers.
@@ -32,11 +40,9 @@ public class MCRXMLParserFactory {
     private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.XMLParser.ValidateSchema",
         true);
 
-    private static final String XMLREADER_CLASS_NAME = "org.apache.xerces.parsers.SAXParser";
+    private static XMLReaderJDOMFactory nonValidatingFactory = new MCRXMLReaderSAX2Factory(false);
 
-    private static XMLReaderJDOMFactory nonValidatingFactory = new XMLReaderSAX2Factory(false, XMLREADER_CLASS_NAME);
-
-    private static XMLReaderJDOMFactory validatingFactory = new XMLReaderSAX2Factory(true, XMLREADER_CLASS_NAME);
+    private static XMLReaderJDOMFactory validatingFactory = new MCRXMLReaderSAX2Factory(true);
 
     private static ThreadLocal<MCRXMLParserImpl> nonValidating = ThreadLocal.withInitial(
         () -> new MCRXMLParserImpl(nonValidatingFactory));
@@ -89,6 +95,29 @@ public class MCRXMLParserFactory {
             return validate ? validatingSilent.get() : nonValidatingSilent.get();
         } else {
             return validate ? validating.get() : nonValidating.get();
+        }
+    }
+
+    /*
+     * required in Java 10 as ClassLoader used in super does not find the driver
+     */
+    private static class MCRXMLReaderSAX2Factory extends XMLReaderSAX2Factory {
+
+        public MCRXMLReaderSAX2Factory(boolean validate) {
+            super(validate);
+        }
+
+        @Override
+        public XMLReader createXMLReader() throws JDOMException {
+            try {
+                XMLReader reader = new SAXParser();
+                reader.setFeature(SAX_FEATURE_VALIDATION, isValidating());
+                reader.setFeature(SAX_FEATURE_NAMESPACES, true);
+                reader.setFeature(SAX_FEATURE_NAMESPACE_PREFIXES, true);
+                return reader;
+            } catch (SAXException e) {
+                throw new JDOMException("Unable to create SAX2 XMLReader.", e);
+            }
         }
     }
 }

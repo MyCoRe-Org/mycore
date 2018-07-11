@@ -207,6 +207,14 @@
       <artifactId>jsch</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
     </dependency>
@@ -228,7 +236,7 @@
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>
-      <artifactId>javax.activation-api</artifactId>
+      <artifactId>activation</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.annotation</groupId>
@@ -379,8 +387,8 @@
       <artifactId>svnkit</artifactId>
     </dependency>
     <dependency>
-      <groupId>se.jiderhamn</groupId>
-      <artifactId>classloader-leak-prevention</artifactId>
+      <groupId>se.jiderhamn.classloader-leak-prevention</groupId>
+      <artifactId>classloader-leak-prevention-core</artifactId>
     </dependency>
     <dependency>
       <groupId>xalan</groupId>
