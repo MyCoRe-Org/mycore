@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableStatus;
 import org.mycore.common.processing.MCRProcessableTask;
@@ -96,14 +97,14 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
             R result = getTask().call();
             this.setStatus(MCRProcessableStatus.successful);
             return result;
-        } catch (InterruptedException iExc) {
+        } catch (InterruptedException exc) {
+            this.error = exc;
             this.setStatus(MCRProcessableStatus.canceled);
-            throw new RuntimeException(this.error = iExc);
+            throw new MCRException(this.error);
         } catch (Exception exc) {
+            this.error = exc;
             this.setStatus(MCRProcessableStatus.failed);
-            throw new RuntimeException(this.error = exc);
-        } finally {
-            this.endTime = Instant.now();
+            throw new MCRException(this.error);
         }
     }
 

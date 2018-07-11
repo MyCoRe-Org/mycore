@@ -319,6 +319,12 @@
   },
   {
     "add-field": {
+      "name": "state",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
       "name": "derCount",
       "type": "pint"
     }

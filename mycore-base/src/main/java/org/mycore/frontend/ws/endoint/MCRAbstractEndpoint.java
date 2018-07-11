@@ -18,10 +18,13 @@
 
 package org.mycore.frontend.ws.endoint;
 
+import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.websocket.Session;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
@@ -58,8 +61,8 @@ public abstract class MCRAbstractEndpoint {
      * @param runnable the runnable
      */
     protected void sessionized(Session session, Runnable runnable) {
-        activate(session);
         try {
+            activate(session);
             runnable.run();
         } finally {
             passivate(session);
@@ -73,9 +76,21 @@ public abstract class MCRAbstractEndpoint {
      * @param session the websocket session
      */
     protected void activate(Session session) {
-        MCRSession mcrSession = ((MCRSessionResolver) session.getUserProperties().get(MCRServlet.ATTR_MYCORE_SESSION))
-            .resolveSession().get();
-        MCRSessionMgr.setCurrentSession(mcrSession);
+        MCRSessionMgr.unlock();
+        String mcrSessionKey = MCRServlet.ATTR_MYCORE_SESSION;
+        Optional<MCRSession> optionalSession = ((MCRSessionResolver) session.getUserProperties()
+            .get(mcrSessionKey))
+                .resolveSession();
+        if (optionalSession.isPresent()) {
+            MCRSession mcrSession = optionalSession.get();
+            MCRSessionMgr.setCurrentSession(mcrSession);
+        } else {
+            throw new MCRException(
+                String.format(Locale.ROOT,
+                    "Unable to retrieve the mycore session of websocket %s. The mycore session should be bound to the"
+                        + " property key %s.",
+                    session.getId(), mcrSessionKey));
+        }
     }
 
     /**
@@ -85,6 +100,7 @@ public abstract class MCRAbstractEndpoint {
      */
     protected void passivate(Session session) {
         MCRSessionMgr.releaseCurrentSession();
+        MCRSessionMgr.lock();
     }
 
 }

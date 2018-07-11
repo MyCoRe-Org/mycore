@@ -41,13 +41,13 @@ public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
 
     private static Logger LOGGER = LogManager.getLogger();
 
-    private List<MCRProcessableCollection> collections;
+    private final List<MCRProcessableCollection> collections;
 
     private final List<MCRProcessableRegistryListener> listenerList;
 
     public MCRCentralProcessableRegistry() {
         this.collections = Collections.synchronizedList(new ArrayList<>());
-        this.listenerList = new ArrayList<>();
+        this.listenerList = Collections.synchronizedList(new ArrayList<>());
     }
 
     /**
@@ -56,11 +56,13 @@ public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
      * @param collection the collection to register
      */
     public void register(MCRProcessableCollection collection) {
-        if (this.collections.contains(collection)) {
-            LOGGER.warn("Don't add same collection twice!");
-            return;
+        synchronized (this.collections) {
+            if (this.collections.contains(collection)) {
+                LOGGER.warn("Don't add same collection twice!");
+                return;
+            }
+            this.collections.add(collection);
         }
-        this.collections.add(collection);
         fireAdded(collection);
     }
 
@@ -80,7 +82,11 @@ public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
      * @return stream of the registry content.
      */
     public Stream<MCRProcessableCollection> stream() {
-        return this.collections.stream();
+        List<MCRProcessableCollection> snapshot;
+        synchronized (this.collections) {
+            snapshot = new ArrayList<>(this.collections);
+        }
+        return snapshot.stream();
     }
 
     @Override
@@ -94,26 +100,30 @@ public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
     }
 
     protected void fireAdded(MCRProcessableCollection collection) {
-        synchronized (this.listenerList) {
-            this.listenerList.forEach(listener -> {
-                try {
-                    listener.onAdd(this, collection);
-                } catch (Exception exc) {
-                    LOGGER.error("Unable to inform registry listener due internal error", exc);
-                }
-            });
-        }
+        List<MCRProcessableRegistryListener> listeners = listenersSnapshot();
+        listeners.forEach(listener -> {
+            try {
+                listener.onAdd(this, collection);
+            } catch (Exception exc) {
+                LOGGER.error("Unable to inform registry listener due internal error", exc);
+            }
+        });
     }
 
     protected void fireRemoved(MCRProcessableCollection collection) {
+        List<MCRProcessableRegistryListener> listeners = listenersSnapshot();
+        listeners.forEach(listener -> {
+            try {
+                listener.onRemove(this, collection);
+            } catch (Exception exc) {
+                LOGGER.error("Unable to inform registry listener due internal error", exc);
+            }
+        });
+    }
+
+    private List<MCRProcessableRegistryListener> listenersSnapshot() {
         synchronized (this.listenerList) {
-            this.listenerList.forEach(listener -> {
-                try {
-                    listener.onRemove(this, collection);
-                } catch (Exception exc) {
-                    LOGGER.error("Unable to inform registry listener due internal error", exc);
-                }
-            });
+            return new ArrayList<>(this.listenerList);
         }
     }
 
