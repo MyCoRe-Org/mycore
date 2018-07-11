@@ -233,7 +233,7 @@ namespace mycore.viewer.components {
         public chapters: MyCoReMap<string, AltoChapter> = new MyCoReMap<string, AltoChapter>();
         public pageChapterMap: MyCoReMap<string, string[]> = new MyCoReMap<string, string[]>();
 
-        private _loadedPages: any = {};
+        private loadedPages: any = {};
 
         constructor(private _model: widgets.mets.MetsStructureModel) {
             this._model.smLinkMap.forEach((chapterId, linkedImages) => {
@@ -248,7 +248,7 @@ namespace mycore.viewer.components {
         }
 
         hasLoadedPages(): boolean {
-            return Object.keys(this._loadedPages).length > 0;
+            return Object.keys(this.loadedPages).length > 0;
         }
 
         getAreaListOfChapter(chapter: model.StructureChapter): MetsArea[] {
@@ -266,7 +266,7 @@ namespace mycore.viewer.components {
         }
 
         findChapter(from: model.StructureChapter, chapterId: string): model.StructureChapter {
-            if (from.id == chapterId) {
+            if (from.id === chapterId) {
                 return from;
             }
             for (const childChapter of from.chapter) {
@@ -300,10 +300,10 @@ namespace mycore.viewer.components {
         }
 
         addPage(pageId: string, altoHref: string, alto: widgets.alto.AltoFile) {
-            if (this._loadedPages[pageId] != null) {
+            if (this.loadedPages[pageId] != null) {
                 return;
             }
-            this._loadedPages[pageId] = true;
+            this.loadedPages[pageId] = true;
             this.pageChapterMap.hasThen(pageId, (chapterIds: string[]) => {
                 // calculate areas for each chapter
                 chapterIds.map(chapterId => this.chapters.get(chapterId)).forEach((chapter) => {
@@ -396,7 +396,7 @@ namespace mycore.viewer.components {
 
         public maximize(pageId: string): Rect {
             const boundingBox = this.boundingBoxMap.get(pageId);
-            if (boundingBox == null || boundingBox.length == 0) {
+            if (boundingBox == null || boundingBox.length === 0) {
                 return null;
             }
             return boundingBox.reduce((a, b) => {
@@ -408,15 +408,19 @@ namespace mycore.viewer.components {
             if (rect == null) {
                 return;
             }
+            if (this.intersectsText(pageId, rect)) {
+                return;
+            }
             let thisBoundingBox = this.boundingBoxMap.get(pageId);
             for (const thisBBRect of thisBoundingBox) {
-                if (!thisBBRect.intersectsArea(rect) || this.intersectsText(pageId, rect)) {
+                if (!thisBBRect.intersectsArea(rect)) {
                     continue;
                 }
-                thisBoundingBox = thisBoundingBox.filter(rect => rect !== thisBBRect);
-                thisBBRect.difference(rect).forEach(rect => thisBoundingBox.push(rect));
+                thisBoundingBox = thisBoundingBox.filter(r => r !== thisBBRect);
+                thisBBRect.difference(rect).forEach(r => thisBoundingBox.push(r));
                 this.boundingBoxMap.set(pageId, thisBoundingBox);
                 this.fixBoundingBox(pageId, rect);
+                return;
             }
         }
 
@@ -462,8 +466,8 @@ namespace mycore.viewer.components {
         /**
          * Cuts the bounding box on y.
          *
-         * @param {string} pageId page to cut
-         * @param {number} y the vertical position to cut
+         * @param pageId page to cut
+         * @param y the vertical position to cut
          */
         public cutVerticalBoundingBox(pageId: string, y: number) {
             let thisAreas = this.boundingBoxMap.get(pageId);
