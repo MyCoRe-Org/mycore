@@ -98,12 +98,10 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                     newName = prefixString + nameTry++ + suffixString;
                 } while (Files.exists(target = parent.resolve(newName)));
             }
-            if(restartTransaction){
-                if(MCRSessionMgr.hasCurrentSession()){
-                    final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-                    currentSession.commitTransaction();
-                    currentSession.beginTransaction();
-                }
+            if (restartTransaction && MCRSessionMgr.hasCurrentSession()) {
+                final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+                currentSession.commitTransaction();
+                currentSession.beginTransaction();
             }
             Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {
