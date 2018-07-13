@@ -159,7 +159,7 @@ public class MCRUploadResource {
 
         final MCRTreeCopier copier;
         try {
-            copier = new MCRTreeCopier(root, targetDerivateRoot);
+            copier = new MCRTreeCopier(root, targetDerivateRoot, false, true);
         } catch (NoSuchFileException e) {
             throw new MCRException(e);
         }
@@ -176,6 +176,8 @@ public class MCRUploadResource {
         if (mainDoc == null || mainDoc.isEmpty()) {
             setDefaultMainFile(theDerivate);
         }
+
+        MCRFileUploadBucket.releaseBucket(uploadID);
     }
 
     private MCRObjectID getNewCreateDerivateID(MCRObjectID objId) {

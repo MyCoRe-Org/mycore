@@ -32,6 +32,8 @@ import java.nio.file.attribute.FileTime;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 
 /**
  * Simple {@link FileVisitor} that recursive copies a directory
@@ -47,17 +49,24 @@ public class MCRTreeCopier implements FileVisitor<Path> {
 
     private final boolean renameExisting;
 
+    private final boolean restartTransaction;
+
     public MCRTreeCopier(Path source, Path target) throws NoSuchFileException {
-        this(source, target, false);
+        this(source, target, false, false);
     }
 
     public MCRTreeCopier(Path source, Path target, boolean renameOnExisting) throws NoSuchFileException {
+        this(source,target,renameOnExisting, false);
+    }
+
+    public MCRTreeCopier(Path source, Path target, boolean renameOnExisting, boolean restartTransaction) throws NoSuchFileException {
         this.renameExisting = renameOnExisting;
         if (Files.notExists(target)) {
             throw new NoSuchFileException(target.toString(), null, "Target directory does not exist.");
         }
         this.source = source;
         this.target = target;
+        this.restartTransaction = restartTransaction;
     }
 
     @Override
@@ -88,6 +97,13 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 do {
                     newName = prefixString + nameTry++ + suffixString;
                 } while (Files.exists(target = parent.resolve(newName)));
+            }
+            if(restartTransaction){
+                if(MCRSessionMgr.hasCurrentSession()){
+                    final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+                    currentSession.commitTransaction();
+                    currentSession.beginTransaction();
+                }
             }
             Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {

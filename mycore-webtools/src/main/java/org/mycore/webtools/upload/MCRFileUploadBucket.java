@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.events.MCRSessionEvent;
+import org.mycore.common.events.MCRSessionListener;
+import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 
 /**
@@ -34,17 +37,17 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
  * MCR.Upload.UploadHandlerNotSupported = Upload Handler werden aktuell nicht unterstützt!
  *
  */
-public class MCRFileUploadBucket {
+public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandler.Closeable {
 
     private static final ConcurrentHashMap<String, MCRFileUploadBucket> bucketMap = new ConcurrentHashMap<>();
-
-    private static final ConcurrentHashMap<String, List<MCRFileUploadBucket>> sessionIDBucketMap = new ConcurrentHashMap<>();
 
     private String bucketID;
 
     private String objectID;
 
     private Path root;
+
+    private String sessionID;
 
     /**
      *
@@ -54,12 +57,16 @@ public class MCRFileUploadBucket {
     private MCRFileUploadBucket(String bucketID, String objectID) {
         this.bucketID = bucketID;
         this.objectID = objectID;
+        sessionID = MCRSessionMgr.getCurrentSessionID();
 
         try {
             root = Files.createTempDirectory("mycore_" + bucketID);
         } catch (IOException e) {
             throw new MCRUploadException("MCR.Upload.TempDirectory.Create.Failed", e);
         }
+
+        MCRSessionMgr.addSessionListener(this);
+        MCRShutdownHandler.getInstance().addCloseable(this);
     }
 
     public static MCRFileUploadBucket getBucket(String bucketID) {
@@ -69,10 +76,6 @@ public class MCRFileUploadBucket {
     public synchronized static MCRFileUploadBucket getOrCreateBucket(String bucketID, String objectID) {
         final MCRFileUploadBucket mcrFileUploadBucket = bucketMap
             .computeIfAbsent(bucketID, (id) -> new MCRFileUploadBucket(bucketID, objectID));
-        final List<MCRFileUploadBucket> list = sessionIDBucketMap
-            .computeIfAbsent(bucketID, (id) -> new ArrayList<>());
-        list.add(mcrFileUploadBucket);
-
         return mcrFileUploadBucket;
     }
 
@@ -90,13 +93,6 @@ public class MCRFileUploadBucket {
         }
     }
 
-    public static void cleanBuckets() {
-        sessionIDBucketMap.forEach((sessionID, buckets) -> {
-            if (MCRSessionMgr.getSession(sessionID) == null) {
-                buckets.stream().map(MCRFileUploadBucket::getBucketID).forEach(MCRFileUploadBucket::releaseBucket);
-            }
-        });
-    }
 
     public String getBucketID() {
         return bucketID;
@@ -108,5 +104,20 @@ public class MCRFileUploadBucket {
 
     public Path getRoot() {
         return root;
+    }
+
+    @Override
+    public void sessionEvent(MCRSessionEvent event) {
+        if (event.getType().equals(MCRSessionEvent.Type.destroyed)) {
+            final String sessionID = event.getSession().getID();
+            if(sessionID.equals(this.sessionID)){
+                close();
+            }
+        }
+    }
+
+    @Override
+    public void close() {
+        releaseBucket(this.bucketID);
     }
 }
