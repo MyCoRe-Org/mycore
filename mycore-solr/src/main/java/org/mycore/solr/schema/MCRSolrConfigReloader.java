@@ -103,6 +103,7 @@ public class MCRSolrConfigReloader {
                 }
 
                 for (JsonElement command : json.getAsJsonArray()) {
+                    LOGGER.debug(command);
                     processConfigCommand(coreID, command);
                 }
             }
@@ -147,21 +148,22 @@ public class MCRSolrConfigReloader {
         HttpPost post = new HttpPost(coreURL + "/config");
         post.setHeader("Content-type", "application/json");
         post.setEntity(new StringEntity(command));
+        String commandprefix = command.indexOf('-') != -1 ? command.substring(2,command.indexOf('-')) : "unknown command";
         HttpResponse response;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             response = httpClient.execute(post);
             String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
                 StandardCharsets.UTF_8);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                LOGGER.debug("SOLR config update command was successful \n" + respContent);
+                LOGGER.debug("SOLR config " + commandprefix + " command was successful \n" + respContent);
             } else {
-                LOGGER.error("SOLR config update error: " + response.getStatusLine().getStatusCode() + " "
+                LOGGER.error("SOLR config " + commandprefix + " error: " + response.getStatusLine().getStatusCode() + " "
                     + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
             }
 
         } catch (IOException e) {
             LOGGER.error(
-                "Could not execute the following Solr config update command\n" + command, e);
+                "Could not execute the following Solr config " + commandprefix + " command\n" + command, e);
         }
     }
 
