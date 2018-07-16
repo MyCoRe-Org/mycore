@@ -18,6 +18,7 @@
 
 package org.mycore.solr.index.cs;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,13 +39,13 @@ import org.apache.solr.common.util.ContentStreamBase;
  * @author shermann
  * @author Matthias Eichner
  * */
-public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase {
+public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase implements AutoCloseable {
 
     static final Logger LOGGER = LogManager.getLogger(MCRSolrAbstractContentStream.class);
 
     protected boolean setup;
 
-    protected InputStream inputStream;
+    private CheckableInputStream inputStream;
 
     protected InputStreamReader streamReader;
 
@@ -68,7 +69,7 @@ public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase 
     }
 
     public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
+        this.inputStream = new CheckableInputStream(inputStream);
     }
 
     /**
@@ -131,8 +132,36 @@ public abstract class MCRSolrAbstractContentStream<T> extends ContentStreamBase 
         return super.getSize();
     }
 
+    @Override
+    public void close() throws IOException {
+        if (inputStream == null || inputStream.isClosed()) {
+            return;
+        }
+        LOGGER.info("MCR-1911: SOLR leaks resources. Closing open InputStream of {}.", source);
+        inputStream.close();
+    }
+
     public T getSource() {
         return source;
+    }
+
+    private static class CheckableInputStream extends FilterInputStream {
+        boolean closed;
+
+        protected CheckableInputStream(InputStream in) {
+            super(in);
+            closed = false;
+        }
+
+        @Override
+        public void close() throws IOException {
+            closed = true;
+            super.close();
+        }
+
+        public boolean isClosed() {
+            return closed;
+        }
     }
 
 }
