@@ -21,7 +21,6 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.text.MessageFormat;
@@ -35,6 +34,7 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -197,6 +197,37 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
+     * Runs though all mycore objects which are linked with the given object and removes its link. This includes
+     * parent/child relations and all {@link MCRMetaLinkID} in the metadata section.
+     *
+     * @param ID
+     *            the ID of the MCRObject that should be deleted
+     * @throws MCRPersistenceException  if a persistence problem is occurred
+     */
+    @MCRCommand(
+        syntax = "clear links of object {0}",
+        help = "removes all links of this object, including parent/child relations and all MetaLinkID's in the metadata section",
+        order = 45)
+    public static void clearLinks(String ID)
+        throws MCRPersistenceException {
+        final MCRObjectID mcrId = MCRObjectID.getInstance(ID);
+        AtomicInteger counter = new AtomicInteger(0);
+        MCRLinkTableManager.instance().getSourceOf(mcrId).stream().filter(MCRObjectID::isValid)
+            .map(MCRObjectID::getInstance).map(MCRMetadataManager::retrieveMCRObject).forEach(linkedObject -> {
+                LOGGER.info("removing link '{}' of '{}'.", mcrId, linkedObject.getId());
+                if (MCRObjectUtils.removeLink(linkedObject, mcrId)) {
+                    try {
+                        MCRMetadataManager.update(linkedObject);
+                        counter.incrementAndGet();
+                    } catch (Exception exc) {
+                        LOGGER.error(String.format(Locale.ROOT, "Unable to update object '%s'", linkedObject), exc);
+                    }
+                }
+            });
+        LOGGER.info("{} link(s) removed of {}.", counter.get(), mcrId);
+    }
+
+    /**
      * Delete MCRObject's form ID to ID from the datastore.
      *
      * @param IDfrom
@@ -239,7 +270,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "load all objects in topological order from directory {0}",
         help = "Loads all MCRObjects form the directory {0} to the system respecting the order of parents and children.",
         order = 75)
-    public static List<String> loadTopologicalFromDirectory(String directory) throws MCRActiveLinkException {
+    public static List<String> loadTopologicalFromDirectory(String directory) {
         return processFromDirectory(true, directory, false);
     }
 
@@ -253,7 +284,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "update all objects in topological order from directory {0}",
         help = "Updates all MCRObjects from the directory {0} in the system respecting the order of parents and children.",
         order = 95)
-    public static List<String> updateTopologicalFromDirectory(String directory) throws MCRActiveLinkException {
+    public static List<String> updateTopologicalFromDirectory(String directory) {
         return processFromDirectory(true, directory, true);
     }
 
@@ -267,7 +298,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "load all objects from directory {0}",
         help = "Loads all MCRObjects from the directory {0} to the system.",
         order = 70)
-    public static List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
+    public static List<String> loadFromDirectory(String directory) {
         return processFromDirectory(false, directory, false);
     }
 
@@ -281,7 +312,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "update all objects from directory {0}",
         help = "Updates all MCRObjects from the directory {0} in the system.",
         order = 90)
-    public static List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {
+    public static List<String> updateFromDirectory(String directory) {
         return processFromDirectory(false, directory, true);
     }
 
@@ -342,7 +373,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "load object from file {0}",
         help = "Adds a MCRObject from the file {0} to the system.",
         order = 60)
-    public static boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException,
+    public static boolean loadFromFile(String file) throws MCRException, SAXParseException,
         IOException, MCRAccessException {
         return loadFromFile(file, true);
     }
@@ -356,7 +387,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
-    public static boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
+    public static boolean loadFromFile(String file, boolean importMode) throws MCRException,
         SAXParseException, IOException, MCRAccessException {
         return processFromFile(new File(file), false, importMode);
     }
@@ -372,7 +403,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "update object from file {0}",
         help = "Updates a MCRObject from the file {0} in the system.",
         order = 80)
-    public static boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException,
+    public static boolean updateFromFile(String file) throws MCRException, SAXParseException,
         IOException, MCRAccessException {
         return updateFromFile(file, true);
     }
@@ -386,7 +417,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, servdates are taken from xml file
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
-    public static boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException,
+    public static boolean updateFromFile(String file, boolean importMode) throws MCRException,
         SAXParseException, IOException, MCRAccessException {
         return processFromFile(new File(file), true, importMode);
     }
@@ -836,7 +867,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            object to transform
      * @param xslFilePath
      *            path to xsl file
-     * @throws URISyntaxException if xslFilePath is not a valid file or URL
      * @throws MCRPersistenceException see {@link MCRMetadataManager#update(MCRObject)}
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
@@ -845,7 +875,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "transforms a mycore object {0} with the given file or URI {1}",
         order = 280)
     public static void xslt(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException,
-        URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException,
+        TransformerException, MCRPersistenceException, MCRAccessException,
         ParserConfigurationException {
         xslt(objectId, xslFilePath, false);
     }
@@ -859,17 +889,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            object to transform
      * @param xslFilePath
      *            path to xsl file
-     * @throws URISyntaxException if xslFilePath is not a valid file or URL
      * @throws MCRPersistenceException see {@link MCRMetadataManager#update(MCRObject)}
      * @throws MCRAccessException see {@link MCRMetadataManager#update(MCRObject)}
      */
     @MCRCommand(
-            syntax = "force xslt {0} with file {1}",
+        syntax = "force xslt {0} with file {1}",
         help = "transforms a mycore object {0} with the given file or URI {1}. Overwrites anyway if original "
-                    + "root name and result root name are different.",
-            order = 285)
+            + "root name and result root name are different.",
+        order = 285)
     public static void forceXSLT(String objectId, String xslFilePath) throws IOException, JDOMException, SAXException,
-        URISyntaxException, TransformerException, MCRPersistenceException, MCRAccessException,
+        TransformerException, MCRPersistenceException, MCRAccessException,
         ParserConfigurationException {
         xslt(objectId, xslFilePath, true);
     }
@@ -917,12 +946,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (MCRXMLHelper.deepEqual(document, resultDocument)) {
             return;
         }
-        if(resultName.equals(MCRObject.ROOT_NAME)) {
-            MCRMetadataManager.update(new MCRObject(resultDocument));
-        } else if(resultName.equals(MCRDerivate.ROOT_NAME)) {
-            MCRMetadataManager.update(new MCRDerivate(resultDocument));
-        } else {
-            LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
+        switch (resultName) {
+            case MCRObject.ROOT_NAME:
+                MCRMetadataManager.update(new MCRObject(resultDocument));
+                break;
+            case MCRDerivate.ROOT_NAME:
+                MCRMetadataManager.update(new MCRDerivate(resultDocument));
+                break;
+            default:
+                LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
+                break;
         }
     }
 
@@ -940,7 +973,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "replaces a parent of an object (first parameter) to the given new one (second parameter)",
         order = 300)
     public static void replaceParent(String sourceId, String newParentId) throws MCRPersistenceException,
-        MCRActiveLinkException, MCRAccessException {
+        MCRAccessException {
         // child
         MCRObject sourceMCRObject = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(sourceId));
         // old parent
@@ -996,7 +1029,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "check derivate entries in objects for base {0}",
         help = "check in all objects with MCR base ID {0} for existing linked derivates",
         order = 400)
-    public static void checkDerivatesInObjects(String base_id) throws IOException {
+    public static void checkDerivatesInObjects(String base_id) {
         if (base_id == null || base_id.length() == 0) {
             LOGGER.error("Base ID missed for check derivate entries in objects for base {0}");
             return;
@@ -1025,13 +1058,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "execute for selected {0}",
         help = "Calls the given command multiple times for all selected objects." +
-                " The replacement is defined by an {x}.E.g. 'execute for selected set" +
-                " parent of {x} to myapp_container_00000001'",
+            " The replacement is defined by an {x}.E.g. 'execute for selected set" +
+            " parent of {x} to myapp_container_00000001'",
         order = 450)
-    public static List<String> executeForSelected(String command) throws Exception {
+    public static List<String> executeForSelected(String command) {
         if (!command.contains("{x}")) {
             LOGGER.info("No replacement defined. Use the {x} variable in order to execute your command with all "
-                    + "selected objects.");
+                + "selected objects.");
             return Collections.emptyList();
         }
         return getSelectedObjectIDs().stream()
@@ -1083,7 +1116,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 180)
     public static void repairMetadataSearchForID(String id) {
         LOGGER.info("Start the repair for the ID {}", id);
-        if(!MCRObjectID.isValid(id)) {
+        if (!MCRObjectID.isValid(id)) {
             LOGGER.error("The String {} is not a MCRObjectID.", id);
             return;
         }
@@ -1100,20 +1133,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static void repairMCRLinkHrefTable() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         MCRStreamQuery<String> fromQuery = MCRStreamQuery
-                .getInstance(em, "SELECT DISTINCT m.key.mcrfrom FROM MCRLINKHREF m", String.class);
+            .getInstance(em, "SELECT DISTINCT m.key.mcrfrom FROM MCRLINKHREF m", String.class);
         MCRStreamQuery<String> toQuery = MCRStreamQuery
-                .getInstance(em, "SELECT DISTINCT m.key.mcrto FROM MCRLINKHREF m", String.class);
+            .getInstance(em, "SELECT DISTINCT m.key.mcrto FROM MCRLINKHREF m", String.class);
         String query = "DELETE FROM MCRLINKHREF m WHERE m.key.mcrfrom IN (:invalidIds) or m.key.mcrto IN (:invalidIds)";
         // open streams
         try (Stream<String> fromStream = fromQuery.getResultStream()) {
             try (Stream<String> toStream = toQuery.getResultStream()) {
                 List<String> invalidIds = Stream.concat(fromStream, toStream)
-                                                .distinct()
-                                                .filter(MCRObjectID::isValid)
-                                                .map(MCRObjectID::getInstance)
-                                                .filter(MCRStreamUtils.not(MCRMetadataManager::exists))
-                                                .map(MCRObjectID::toString)
-                                                .collect(Collectors.toList());
+                    .distinct()
+                    .filter(MCRObjectID::isValid)
+                    .map(MCRObjectID::getInstance)
+                    .filter(MCRStreamUtils.not(MCRMetadataManager::exists))
+                    .map(MCRObjectID::toString)
+                    .collect(Collectors.toList());
                 // delete
                 em.createQuery(query).setParameter("invalidIds", invalidIds).executeUpdate();
             }
@@ -1121,10 +1154,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-            syntax = "rebuild mcrlinkhref table for object {0}",
-            help = "Rebuilds (remove/create) all entries of the link href table for the given object id.",
-            order = 188
-    )
+        syntax = "rebuild mcrlinkhref table for object {0}",
+        help = "Rebuilds (remove/create) all entries of the link href table for the given object id.",
+        order = 188)
     public static void rebuildMCRLinkHrefTableForObject(String objectId) {
         MCRLinkTableManager.instance().update(MCRObjectID.getInstance(objectId));
     }
