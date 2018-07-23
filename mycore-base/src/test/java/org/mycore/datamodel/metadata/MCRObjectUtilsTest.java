@@ -19,13 +19,19 @@
 package org.mycore.datamodel.metadata;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
@@ -51,33 +57,14 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
     public void setUp() throws Exception {
         super.setUp();
         MCREventManager.instance().clear().addEventHandler("MCRObject", new MCRXMLMetadataEventHandler());
-        root = new MCRObject();
-        root.setId(MCRObjectID.getInstance("test_document_00000001"));
-        root.setSchema("noSchema");
-        l11 = new MCRObject();
-        l11.setId(MCRObjectID.getInstance("test_document_00000002"));
-        l11.setSchema("noSchema");
-        l11.getStructure().setParent(root.getId());
-        l12 = new MCRObject();
-        l12.setId(MCRObjectID.getInstance("test_document_00000003"));
-        l12.setSchema("noSchema");
-        l12.getStructure().setParent(root.getId());
-        l13 = new MCRObject();
-        l13.setId(MCRObjectID.getInstance("test_document_00000004"));
-        l13.setSchema("noSchema");
-        l13.getStructure().setParent(root.getId());
-        l21 = new MCRObject();
-        l21.setId(MCRObjectID.getInstance("test_document_00000005"));
-        l21.setSchema("noSchema");
-        l21.getStructure().setParent(l11.getId());
-        l22 = new MCRObject();
-        l22.setId(MCRObjectID.getInstance("test_document_00000006"));
-        l22.setSchema("noSchema");
-        l22.getStructure().setParent(l11.getId());
-        l31 = new MCRObject();
-        l31.setId(MCRObjectID.getInstance("test_document_00000007"));
-        l31.setSchema("noSchema");
-        l31.getStructure().setParent(l21.getId());
+        root = createObject("test_document_00000001", null);
+        l11 = createObject("test_document_00000002", root.getId());
+        l12 = createObject("test_document_00000003", root.getId());
+        l13 = createObject("test_document_00000004", root.getId());
+        l21 = createObject("test_document_00000005", l11.getId());
+        l22 = createObject("test_document_00000006", l11.getId());
+        l31 = createObject("test_document_00000007", l21.getId());
+
         MCRMetadataManager.create(root);
         MCRMetadataManager.create(l11);
         MCRMetadataManager.create(l12);
@@ -87,8 +74,18 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
         MCRMetadataManager.create(l31);
     }
 
+    private MCRObject createObject(String id, MCRObjectID parent) {
+        MCRObject object = new MCRObject();
+        object.setId(MCRObjectID.getInstance(id));
+        object.setSchema("noSchema");
+        if (parent != null) {
+            object.getStructure().setParent(parent);
+        }
+        return object;
+    }
+
     @Test
-    public void getAncestors() throws Exception {
+    public void getAncestors() {
         MCRObject doc = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance("test_document_00000007"));
         List<MCRObject> ancestors = MCRObjectUtils.getAncestors(doc);
         assertEquals(3, ancestors.size());
@@ -98,7 +95,7 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void getAncestorsAndSelf() throws Exception {
+    public void getAncestorsAndSelf() {
         MCRObject doc = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance("test_document_00000007"));
         List<MCRObject> ancestors = MCRObjectUtils.getAncestorsAndSelf(doc);
         assertEquals(4, ancestors.size());
@@ -109,13 +106,15 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void getRoot() throws Exception {
+    public void getRoot() {
         MCRObject doc = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance("test_document_00000006"));
-        assertEquals(root.getId(), MCRObjectUtils.getRoot(doc).getId());
+        MCRObject root = MCRObjectUtils.getRoot(doc);
+        assertNotNull(root);
+        assertEquals(this.root.getId(), root.getId());
     }
 
     @Test
-    public void getDescendants() throws Exception {
+    public void getDescendants() {
         MCRObject doc = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance("test_document_00000001"));
         List<MCRObject> descendants = MCRObjectUtils.getDescendants(doc);
         assertEquals(6, descendants.size());
@@ -130,10 +129,37 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
     }
 
     @Test
-    public void getDescendantsAndSelf() throws Exception {
+    public void getDescendantsAndSelf() {
         MCRObject doc = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance("test_document_00000001"));
         List<MCRObject> descendants = MCRObjectUtils.getDescendantsAndSelf(doc);
         assertEquals(7, descendants.size());
+    }
+
+    @Test
+    public void removeLink() throws MCRAccessException {
+        // remove parent link
+        assertTrue(MCRObjectUtils.removeLink(l22, l11.getId()));
+        MCRMetadataManager.update(l22);
+        l11 = MCRMetadataManager.retrieveMCRObject(l11.getId());
+        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
+        assertNull(l22.getParent());
+        assertFalse(l11.getStructure().containsChild(l22.getId()));
+
+        // add metadata links to test
+        MCRMetaLinkID l11Link = new MCRMetaLinkID("link", l11.getId(), "l11", "l11");
+        MCRMetaLinkID l31Link = new MCRMetaLinkID("link", l31.getId(), "l31", "l31");
+        List<MCRMetaLinkID> linkList = Arrays.asList(l11Link, l31Link);
+        MCRMetaElement link = new MCRMetaElement(MCRMetaLinkID.class, "links", false, false, linkList);
+        l22.getMetadata().setMetadataElement(link);
+        MCRMetadataManager.update(l22);
+        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
+        assertEquals(2, l22.getMetadata().stream("links").count());
+
+        // remove metadata link
+        assertTrue(MCRObjectUtils.removeLink(l22, l31.getId()));
+        assertEquals(1, l22.getMetadata().stream("links").count());
+        assertTrue(MCRObjectUtils.removeLink(l22, l11.getId()));
+        assertEquals(0, l22.getMetadata().stream("links").count());
     }
 
     @Override

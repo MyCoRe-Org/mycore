@@ -21,6 +21,7 @@ package org.mycore.datamodel.metadata;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -155,12 +156,12 @@ public abstract class MCRObjectUtils {
     public static List<MCRObjectID> getDerivates(MCRObjectID mcrObjectID) {
         MCRLinkTableManager linkTableManager = MCRLinkTableManager.instance();
         Stream<String> derivateStream = linkTableManager
-                .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE).stream();
+            .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE).stream();
         Stream<String> derivateLinkStream = linkTableManager
-                .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK).stream()
-                .map(link -> link.substring(0, link.indexOf("/")));
+            .getDestinationOf(mcrObjectID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK).stream()
+            .map(link -> link.substring(0, link.indexOf("/")));
         return Stream.concat(derivateStream, derivateLinkStream).distinct().map(MCRObjectID::getInstance)
-                     .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
     /**
@@ -180,6 +181,41 @@ public abstract class MCRObjectUtils {
                     + object.getId() + " but does not exist.");
             }
         }).map(MCRMetadataManager::retrieveMCRObject).collect(Collectors.toList());
+    }
+
+    /**
+     * <p>Removes the linkToRemove in the metadata and the structure part of the source object. Be aware that this can
+     * lead to a zombie source object without a parent! Use this method with care!</p>
+     *
+     * <p>This method does not take care of storing the source object.</p>
+     *
+     * @param source the source object where the links should be removed from
+     * @param linkToRemove the link id to remove
+     * @return true if a link was removed (the source object changed)
+     */
+    public static boolean removeLink(MCRObject source, MCRObjectID linkToRemove) {
+        final AtomicBoolean updated = new AtomicBoolean(false);
+        // remove parent
+        if (source.getParent() != null && source.getParent().equals(linkToRemove)) {
+            source.getStructure().removeParent();
+            updated.set(true);
+        }
+        // remove children
+        if (source.getStructure().removeChild(linkToRemove)) {
+            updated.set(true);
+        }
+        // remove metadata parts
+        source.getMetadata().stream().filter(metaElement -> metaElement.getClazz().equals(MCRMetaLinkID.class))
+            .forEach(metaElement -> {
+                List<MCRMetaLinkID> linksToRemove = metaElement.stream().map(MCRMetaLinkID.class::cast)
+                    .filter(metaLinkID -> metaLinkID.getXLinkHrefID().equals(linkToRemove))
+                    .collect(Collectors.toList());
+                if(linksToRemove.size() > 0) {
+                    updated.set(true);
+                    linksToRemove.forEach(metaElement::removeMetaObject);
+                }
+            });
+        return updated.get();
     }
 
     /**

@@ -144,6 +144,13 @@ public class MCRObjectStructure {
     }
 
     /**
+     * Removes the parent reference. Use this method with care!
+     */
+    public final void removeParent() {
+        parent = null;
+    }
+
+    /**
      * The method appends a child ID to the child link list if and only if it is
      * not already contained in the list, preventing from doubly-linked objects.
      * If the link could be added a "true" will be returned, otherwise "false".
@@ -177,6 +184,15 @@ public class MCRObjectStructure {
             LOGGER.debug("Remove child ID {}", href);
         }
         return removeMetaLink(getChildren().iterator(), href);
+    }
+
+    /**
+     * Checks if the child is in the children vector.
+     *
+     * @param childId child to check
+     */
+    public final boolean containsChild(MCRObjectID childId) {
+        return getChildren().stream().map(MCRMetaLinkID::getXLinkHrefID).anyMatch(childId::equals);
     }
 
     /**
