@@ -63,6 +63,9 @@ public class MCRBooleanClauseParser<T> {
 
         if (condition.getName().equalsIgnoreCase("boolean")) {
             String operator = condition.getAttributeValue("operator");
+            if (operator == null) {
+                throw new MCRParseException("Syntax error: attribute operator not found");
+            }
 
             if (operator.equalsIgnoreCase("not")) {
                 Element child = condition.getChildren().get(0);
@@ -208,15 +211,20 @@ public class MCRBooleanClauseParser<T> {
             return new MCRFalseCondition<>();
         }
 
-        throw new MCRParseException("syntax error: " + s); // extendClauses(s,
+        throw new MCRParseException("Syntax error: " + s); // extendClauses(s,
         // l));
     }
 
     //---------------------------------------------
 
-    protected MCRCondition<T> parseSimpleCondition(Element e) throws MCRParseException {
+    protected MCRCondition<T> parseSimpleCondition(Element element) throws MCRParseException {
         // <boolean operator="true|false" />
-        String name = e.getAttributeValue("operator").toLowerCase(Locale.ROOT);
+        String name;
+        try {
+            name = element.getAttributeValue("operator").toLowerCase(Locale.ROOT);
+        } catch (Exception e) {
+            throw new MCRParseException("Syntax error: attribute operator not found");
+        }
 
         if (name.equals("true")) {
             return new MCRTrueCondition<>();
@@ -226,82 +234,11 @@ public class MCRBooleanClauseParser<T> {
             return new MCRFalseCondition<>();
         }
 
-        throw new MCRParseException("syntax error: <" + name + ">");
+        throw new MCRParseException("Syntax error: <" + name + ">");
     }
 
     protected MCRCondition<T> defaultRule() {
         return new MCRTrueCondition<>();
     }
 
-    public static void main(String[] args) {
-        MCRBooleanClauseParser<Object> p = new MCRBooleanClauseParser<>();
-
-        System.out.println("-------------");
-        System.out.println("Positive test cases");
-        System.out.println("1--");
-        System.out.println(p.parse("true or false or true"));
-        System.out.println("2--");
-        System.out.println(p.parse("(true) or (false) or (true)"));
-        System.out.println("3--");
-        System.out.println(p.parse("true and false and true"));
-        System.out.println("4--");
-        System.out.println(p.parse("true or false and true"));
-        System.out.println("5--");
-        System.out.println(p.parse("true or true or (true or true)"));
-        System.out.println("6--");
-        System.out.println(p.parse("((true))"));
-        System.out.println("7--");
-        System.out.println(p.parse("(true ) or  ( ((false) or (true)))"));
-
-        System.out.println("-------------");
-        System.out.println("Negative test cases");
-        System.out.println("1==");
-        try {
-            System.out.println(p.parse("(true or false or true"));
-        } catch (MCRParseException e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println("2==");
-        try {
-            System.out.println(p.parse("(true) or false) or (true)"));
-        } catch (MCRParseException e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println("3==");
-        try {
-            System.out.println(p.parse("true and (false and true"));
-        } catch (MCRParseException e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println("4==");
-        try {
-            System.out.println(p.parse("((((true or false))))) and true)"));
-        } catch (MCRParseException e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println("5==");
-        try {
-            System.out.println(p.parse("true or true or (true or true))))"));
-        } catch (MCRParseException e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println("6==");
-        try {
-            System.out.println(p.parse("((true)"));
-        } catch (MCRParseException e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println("7==");
-        try {
-            System.out.println(p.parse("(true ) or  ( ((false) or (true))"));
-        } catch (MCRParseException e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println("8==");
-        try {
-            System.out.println(p.parse("(true ) or  ((((((((( ((false) or (true))"));
-        } catch (MCRParseException e) {
-            System.out.println(e.getMessage());
-        }
-    }
 }
