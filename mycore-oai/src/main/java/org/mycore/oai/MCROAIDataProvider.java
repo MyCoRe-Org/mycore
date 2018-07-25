@@ -49,7 +49,7 @@ import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.dataprovider.OAIAdapter;
 import org.mycore.oai.pmh.dataprovider.OAIRequest;
 import org.mycore.oai.pmh.dataprovider.OAIResponse;
-import org.mycore.oai.pmh.dataprovider.OAIXMLProvider;
+import org.mycore.oai.pmh.dataprovider.OAIProvider;
 import org.mycore.oai.pmh.dataprovider.jaxb.JAXBOAIProvider;
 
 /**
@@ -66,15 +66,15 @@ public class MCROAIDataProvider extends MCRServlet {
     /**
      * Map of all MyCoRe oai adapter.
      */
-    private static Map<String, MCROAIAdapter> mcrOAIAdapterMap;
-
-    private String myBaseURL;
-
-    static {
-        mcrOAIAdapterMap = new HashMap<>();
-    }
+    private static Map<String, MCROAIAdapter> ADAPTER_MAP;
 
     private static final OAIXMLOutputProcessor OAI_XML_OUTPUT_PROCESSOR = new OAIXMLOutputProcessor();
+
+    static {
+        ADAPTER_MAP = new HashMap<>();
+    }
+
+    private String myBaseURL;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -87,7 +87,7 @@ public class MCROAIDataProvider extends MCRServlet {
         // create new oai request
         OAIRequest oaiRequest = new OAIRequest(fixParameterMap(request.getParameterMap()));
         // create new oai provider
-        OAIXMLProvider oaiProvider = new JAXBOAIProvider(getOAIAdapter());
+        OAIProvider oaiProvider = new JAXBOAIProvider(getOAIAdapter());
         // handle request
         OAIResponse oaiResponse = oaiProvider.handleRequest(oaiRequest);
         // build response
@@ -120,8 +120,9 @@ public class MCROAIDataProvider extends MCRServlet {
         StringBuilder log = new StringBuilder(this.getServletName());
         for (Object o : req.getParameterMap().keySet()) {
             String name = (String) o;
-            for (String value : req.getParameterValues(name))
+            for (String value : req.getParameterValues(name)) {
                 log.append(" ").append(name).append("=").append(value);
+            }
         }
         LOGGER.info(log.toString());
     }
@@ -143,17 +144,17 @@ public class MCROAIDataProvider extends MCRServlet {
 
     private OAIAdapter getOAIAdapter() {
         String oaiAdapterKey = getServletName();
-        MCROAIAdapter oaiAdapter = mcrOAIAdapterMap.get(oaiAdapterKey);
+        MCROAIAdapter oaiAdapter = ADAPTER_MAP.get(oaiAdapterKey);
         if (oaiAdapter == null) {
             synchronized (this) {
                 // double check because of synchronize block
-                oaiAdapter = mcrOAIAdapterMap.get(oaiAdapterKey);
+                oaiAdapter = ADAPTER_MAP.get(oaiAdapterKey);
                 if (oaiAdapter == null) {
                     MCRConfiguration config = MCRConfiguration.instance();
                     String adapter = MCROAIAdapter.PREFIX + oaiAdapterKey + ".Adapter";
                     oaiAdapter = config.getInstanceOf(adapter, MCROAIAdapter.class.getName());
                     oaiAdapter.init(this.myBaseURL, oaiAdapterKey);
-                    mcrOAIAdapterMap.put(oaiAdapterKey, oaiAdapter);
+                    ADAPTER_MAP.put(oaiAdapterKey, oaiAdapter);
                 }
             }
         }
@@ -171,4 +172,5 @@ public class MCROAIDataProvider extends MCRServlet {
             super.printElement(out, fstack, nstack, element);
         }
     }
+
 }
