@@ -1296,12 +1296,12 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh</artifactId>
-        <version>0.9</version>
+        <version>1.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh-dataprovider</artifactId>
-        <version>0.9</version>
+        <version>1.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.iview2</groupId>
