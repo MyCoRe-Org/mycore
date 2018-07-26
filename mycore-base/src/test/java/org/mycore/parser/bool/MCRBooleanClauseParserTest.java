@@ -72,6 +72,7 @@ public class MCRBooleanClauseParserTest {
         System.out.println("Boolean claus test 5 --> " + c05.toString());
         assertEquals("Returned value is not", c05.toString(), p.parse("true").toString());
         assertEquals("Returned value is not", c05.toString(), p.parse("(true)").toString());
+        assertEquals("Returned value is not", c05.toString(), p.parse("(true )").toString());
         
         try {
             p.parse("(true").toString();
