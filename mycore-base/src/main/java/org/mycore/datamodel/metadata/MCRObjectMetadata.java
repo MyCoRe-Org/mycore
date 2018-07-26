@@ -49,7 +49,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     private static final Logger LOGGER = LogManager.getLogger();
 
     // common data
-    private boolean herited_xml = true;
+    private boolean herited_xml;
 
     // metadata list
     private final ArrayList<MCRMetaElement> meta_list;
@@ -193,6 +193,16 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     }
 
     /**
+     * Removes the given element.
+     *
+     * @param element the meta element to remove
+     * @return true if the element was removed
+     */
+    public final boolean removeMetadataElement(MCRMetaElement element) {
+        return meta_list.remove(element);
+    }
+
+    /**
      * This method remove the MCRMetaElement selected by tag from the list.
      * 
      * @return true if set was successful, otherwise false
@@ -200,7 +210,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
     public final MCRMetaElement removeMetadataElement(String tag) {
         MCRMetaElement old = getMetadataElement(tag);
         if (old != null) {
-            meta_list.remove(old);
+            removeMetadataElement(old);
             return old;
         }
         return null;

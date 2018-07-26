@@ -208,22 +208,18 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "clear links of object {0}",
         help = "removes all links of this object, including parent/child relations and all MetaLinkID's in the metadata section",
         order = 45)
-    public static void clearLinks(String ID)
-        throws MCRPersistenceException {
+    public static void clearLinks(String ID) throws MCRPersistenceException {
         final MCRObjectID mcrId = MCRObjectID.getInstance(ID);
         AtomicInteger counter = new AtomicInteger(0);
-        MCRLinkTableManager.instance().getSourceOf(mcrId).stream().filter(MCRObjectID::isValid)
-            .map(MCRObjectID::getInstance).map(MCRMetadataManager::retrieveMCRObject).forEach(linkedObject -> {
+        MCRObjectUtils.removeLinks(mcrId).forEach(linkedObject -> {
+            try {
                 LOGGER.info("removing link '{}' of '{}'.", mcrId, linkedObject.getId());
-                if (MCRObjectUtils.removeLink(linkedObject, mcrId)) {
-                    try {
-                        MCRMetadataManager.update(linkedObject);
-                        counter.incrementAndGet();
-                    } catch (Exception exc) {
-                        LOGGER.error(String.format(Locale.ROOT, "Unable to update object '%s'", linkedObject), exc);
-                    }
-                }
-            });
+                MCRMetadataManager.update(linkedObject);
+                counter.incrementAndGet();
+            } catch (Exception exc) {
+                LOGGER.error(String.format(Locale.ROOT, "Unable to update object '%s'", linkedObject), exc);
+            }
+        });
         LOGGER.info("{} link(s) removed of {}.", counter.get(), mcrId);
     }
 
