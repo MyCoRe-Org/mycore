@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +35,7 @@ import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.common.MCRLinkTableEventHandler;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 
 public class MCRObjectUtilsTest extends MCRStoreTestCase {
@@ -56,7 +58,9 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCREventManager.instance().clear().addEventHandler("MCRObject", new MCRXMLMetadataEventHandler());
+        MCREventManager.instance().clear();
+        MCREventManager.instance().addEventHandler("MCRObject", new MCRXMLMetadataEventHandler());
+        MCREventManager.instance().addEventHandler("MCRObject", new MCRLinkTableEventHandler());
         root = createObject("test_document_00000001", null);
         l11 = createObject("test_document_00000002", root.getId());
         l12 = createObject("test_document_00000003", root.getId());
@@ -146,13 +150,7 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
         assertFalse(l11.getStructure().containsChild(l22.getId()));
 
         // add metadata links to test
-        MCRMetaLinkID l11Link = new MCRMetaLinkID("link", l11.getId(), "l11", "l11");
-        MCRMetaLinkID l31Link = new MCRMetaLinkID("link", l31.getId(), "l31", "l31");
-        List<MCRMetaLinkID> linkList = Arrays.asList(l11Link, l31Link);
-        MCRMetaElement link = new MCRMetaElement(MCRMetaLinkID.class, "links", false, false, linkList);
-        l22.getMetadata().setMetadataElement(link);
-        MCRMetadataManager.update(l22);
-        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
+        addLinksToL22();
         assertEquals(2, l22.getMetadata().stream("links").count());
 
         // remove metadata link
@@ -160,6 +158,43 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
         assertEquals(1, l22.getMetadata().stream("links").count());
         assertTrue(MCRObjectUtils.removeLink(l22, l11.getId()));
         assertEquals(0, l22.getMetadata().stream("links").count());
+
+        // check if links element is completely removed
+        MCRMetadataManager.update(l22);
+        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
+        assertNull(l22.getMetadata().getMetadataElement("links"));
+    }
+
+    @Test
+    public void removeLinks() throws MCRAccessException {
+        // add metadata links to test
+        addLinksToL22();
+        assertEquals(2, l22.getMetadata().stream("links").count());
+
+        // remove l11
+        for (MCRObject linkedObject : MCRObjectUtils.removeLinks(l11.getId()).collect(Collectors.toList())) {
+            MCRMetadataManager.update(linkedObject);
+        }
+        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
+        assertEquals(1, l22.getMetadata().stream("links").count());
+
+        // remove l31
+        for (MCRObject linkedObject : MCRObjectUtils.removeLinks(l31.getId()).collect(Collectors.toList())) {
+            MCRMetadataManager.update(linkedObject);
+        }
+        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
+        assertEquals(0, l22.getMetadata().stream("links").count());
+
+    }
+
+    private void addLinksToL22() throws MCRAccessException {
+        MCRMetaLinkID l11Link = new MCRMetaLinkID("link", l11.getId(), "l11", "l11");
+        MCRMetaLinkID l31Link = new MCRMetaLinkID("link", l31.getId(), "l31", "l31");
+        List<MCRMetaLinkID> linkList = Arrays.asList(l11Link, l31Link);
+        MCRMetaElement link = new MCRMetaElement(MCRMetaLinkID.class, "links", false, false, linkList);
+        l22.getMetadata().setMetadataElement(link);
+        MCRMetadataManager.update(l22);
+        l22 = MCRMetadataManager.retrieveMCRObject(l22.getId());
     }
 
     @Override

@@ -184,8 +184,23 @@ public abstract class MCRObjectUtils {
     }
 
     /**
-     * <p>Removes the linkToRemove in the metadata and the structure part of the source object. Be aware that this can
-     * lead to a zombie source object without a parent! Use this method with care!</p>
+     * <p>Removes all links of the source object. This includes parent links, children links and metadata links. A list
+     * of all updated objects is returned.</p>
+     * <p>Be aware that this method does not take care of storing the returned objects.</p>
+     *
+     * @param sourceId id of the object
+     * @return a stream of updated objects where a link of the source was removed
+     */
+    public static Stream<MCRObject> removeLinks(MCRObjectID sourceId) {
+        return MCRLinkTableManager.instance().getSourceOf(sourceId).stream().filter(MCRObjectID::isValid)
+            .map(MCRObjectID::getInstance).map(MCRMetadataManager::retrieveMCRObject)
+            .flatMap(linkedObject -> MCRObjectUtils.removeLink(linkedObject, sourceId) ? Stream.of(linkedObject)
+                : Stream.empty());
+    }
+
+    /**
+     * <p>Removes the <b>linkToRemove</b> in the metadata and the structure part of the <b>source</b> object. Be aware
+     * that this can lead to a zombie source object without a parent! Use this method with care!</p>
      *
      * <p>This method does not take care of storing the source object.</p>
      *
@@ -205,16 +220,19 @@ public abstract class MCRObjectUtils {
             updated.set(true);
         }
         // remove metadata parts
-        source.getMetadata().stream().filter(metaElement -> metaElement.getClazz().equals(MCRMetaLinkID.class))
-            .forEach(metaElement -> {
+        List<MCRMetaElement> emptyElements = source.getMetadata().stream()
+            .filter(metaElement -> metaElement.getClazz().equals(MCRMetaLinkID.class))
+            .flatMap(metaElement -> {
                 List<MCRMetaLinkID> linksToRemove = metaElement.stream().map(MCRMetaLinkID.class::cast)
                     .filter(metaLinkID -> metaLinkID.getXLinkHrefID().equals(linkToRemove))
                     .collect(Collectors.toList());
-                if(linksToRemove.size() > 0) {
+                if (linksToRemove.size() > 0) {
                     updated.set(true);
                     linksToRemove.forEach(metaElement::removeMetaObject);
                 }
-            });
+                return metaElement.size() == 0 ? Stream.of(metaElement) : Stream.empty();
+            }).collect(Collectors.toList());
+        emptyElements.forEach(source.getMetadata()::removeMetadataElement);
         return updated.get();
     }
 
