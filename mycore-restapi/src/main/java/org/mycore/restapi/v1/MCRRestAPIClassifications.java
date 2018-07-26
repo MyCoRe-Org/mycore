@@ -412,7 +412,7 @@ public class MCRRestAPIClassifications {
                 String xml = writeXML(eRoot, lang);
                 return Response.ok(xml)
                     .lastModified(lastModified)
-                    .type(MCRJerseyUtil.APPLICATION_JSON_UTF8)
+                    .type(MCRJerseyUtil.APPLICATION_XML_UTF8)
                     .build();
             }
         } catch (Exception e) {
