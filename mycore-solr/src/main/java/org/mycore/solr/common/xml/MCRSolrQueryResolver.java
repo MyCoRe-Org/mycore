@@ -19,6 +19,7 @@
 package org.mycore.solr.common.xml;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -31,16 +32,26 @@ import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.search.MCRSolrURL;
 
 /**
- * 
+ * <p>solr:{optional core}:query</p>
+ * <p>solr:main:q=%2BobjectType%3Ajpjournal</p>
+ *
  * @author Matthias Eichner
  */
 public class MCRSolrQueryResolver implements URIResolver {
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        String urlQuery = href.substring(href.indexOf(":") + 1);
-        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
-        MCRSolrURL solrURL = new MCRSolrURL((HttpSolrClient) solrClient, urlQuery);
+        AtomicReference<String> urlQuery = new AtomicReference<>(href.substring(href.indexOf(":") + 1));
+        AtomicReference<SolrClient> solrClient = new AtomicReference<>(MCRSolrClientFactory.getMainSolrClient());
+        int clientIndex = urlQuery.get().indexOf(":");
+        if (clientIndex != -1) {
+            String coreID = urlQuery.get().substring(0, clientIndex);
+            MCRSolrClientFactory.get(coreID).ifPresent(core -> {
+                solrClient.set(core.getClient());
+                urlQuery.set(urlQuery.get().substring(clientIndex + 1));
+            });
+        }
+        MCRSolrURL solrURL = new MCRSolrURL((HttpSolrClient) solrClient.get(), urlQuery.get());
         try {
             MCRURLContent result = new MCRURLContent(solrURL.getUrl());
             return result.getSource();
@@ -48,4 +59,5 @@ public class MCRSolrQueryResolver implements URIResolver {
             throw new TransformerException("Unable to get input stream from solr: " + solrURL.getUrl(), e);
         }
     }
+
 }
