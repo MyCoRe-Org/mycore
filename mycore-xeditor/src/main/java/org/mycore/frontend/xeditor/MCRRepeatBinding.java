@@ -49,8 +49,9 @@ public class MCRRepeatBinding extends MCRBinding {
         JDOMException {
         this(xPath, parent, method);
 
-        while (getBoundNodes().size() < minRepeats)
+        while (getBoundNodes().size() < minRepeats) {
             insert(getBoundNodes().size());
+        }
 
         this.maxRepeats = maxRepeats < 1 ? Integer.MAX_VALUE : maxRepeats;
         this.maxRepeats = Math.max(this.maxRepeats, getBoundNodes().size());
@@ -111,7 +112,8 @@ public class MCRRepeatBinding extends MCRBinding {
             parentElement.addContent(targetPos, newElement);
             boundNodes.add(pos, newElement);
             track(MCRAddedElement.added(newElement));
-        } else
+        } else {
             cloneBoundElement(pos - 1);
+        }
     }
 }

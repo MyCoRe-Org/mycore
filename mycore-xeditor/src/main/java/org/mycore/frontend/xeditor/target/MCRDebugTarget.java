@@ -54,8 +54,9 @@ public class MCRDebugTarget implements MCREditorTarget {
         MCRChangeTracker tracker = session.getChangeTracker().clone();
 
         List<Step> steps = new ArrayList<>();
-        for (String label; (label = tracker.undoLastBreakpoint(result)) != null;)
+        for (String label; (label = tracker.undoLastBreakpoint(result)) != null;) {
             steps.add(0, new Step(label, result.clone()));
+        }
 
         result = session.getEditedXML().clone();
         result = MCRChangeTracker.removeChangeTracking(result);
@@ -67,8 +68,9 @@ public class MCRDebugTarget implements MCREditorTarget {
         steps.add(new Step("After postprocessing", result));
 
         for (int i = 0; i < steps.size(); i++) {
-            if (i == steps.size() - 3)
+            if (i == steps.size() - 3) {
                 outputParameters(parameters, out);
+            }
 
             steps.get(i).output(out);
         }
@@ -84,9 +86,11 @@ public class MCRDebugTarget implements MCREditorTarget {
         List<String> names = new ArrayList<>(values.keySet());
         Collections.sort(names);
 
-        for (String name : names)
-            for (String value : values.get(name))
+        for (String name : names) {
+            for (String value : values.get(name)) {
                 out.println(name + " = " + value);
+            }
+        }
 
         out.println("</pre></p>");
     }
@@ -97,7 +101,7 @@ public class MCRDebugTarget implements MCREditorTarget {
 
         private Document xml;
 
-        public Step(String label, Document xml) {
+        Step(String label, Document xml) {
             this.label = label;
             this.xml = xml;
         }

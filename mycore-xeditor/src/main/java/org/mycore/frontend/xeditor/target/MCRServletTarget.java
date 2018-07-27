@@ -44,8 +44,9 @@ public class MCRServletTarget implements MCREditorTarget {
             result = session.getPostProcessor().process(result);
 
             RequestDispatcher dispatcher = context.getNamedDispatcher(servletNameOrPath);
-            if (dispatcher == null)
+            if (dispatcher == null) {
                 dispatcher = context.getRequestDispatcher(servletNameOrPath);
+            }
 
             job.getRequest().setAttribute("MCRXEditorSubmission", result);
 

@@ -81,7 +81,8 @@ public class MCREditorSession {
     }
 
     public MCREditorSession(Map<String, String[]> requestParameters, MCRParameterCollector collector) {
-        this.requestParameters.putAll(requestParameters); // make a copy, the original may be re-used by servlet container
+        // make a copy, the original may be re-used by servlet container
+        this.requestParameters.putAll(requestParameters);
         this.variables = new HashMap<>(collector.getParameterMap());
         removeIllegalVariables();
     }
@@ -142,8 +143,9 @@ public class MCREditorSession {
     }
 
     public void setCancelURL(String cancelURL) {
-        if (this.cancelURL != null)
+        if (this.cancelURL != null) {
             return;
+        }
 
         cancelURL = replaceParameters(cancelURL);
         if (!cancelURL.contains("{")) {
@@ -178,18 +180,21 @@ public class MCREditorSession {
         for (Namespace ns : element.getAdditionalNamespaces()) {
             MCRConstants.registerNamespace(ns);
         }
-        for (Element child : element.getChildren())
+        for (Element child : element.getChildren()) {
             addNamespacesFrom(child);
+        }
     }
 
     public void setEditedXML(String uri) throws JDOMException, IOException, SAXException, TransformerException {
-        if ((editedXML != null) || (uri = replaceParameters(uri)).contains("{"))
+        String uriRe = replaceParameters(uri);
+        if ((editedXML != null) || uriRe.contains("{")) {
             return;
+        }
 
-        LOGGER.info("Reading edited XML from {}", uri);
-        Document xml = MCRSourceContent.getInstance(uri).asXML();
+        LOGGER.info("Reading edited XML from {}", uriRe);
+        Document xml = MCRSourceContent.getInstance(uriRe).asXML();
         setEditedXML(xml);
-        setBreakpoint("Reading XML from " + uri);
+        setBreakpoint("Reading XML from " + uriRe);
     }
 
     public MCRBinding getRootBinding() throws JDOMException {
@@ -199,8 +204,9 @@ public class MCREditorSession {
     }
 
     public void setBreakpoint(String msg) {
-        if (editedXML != null)
+        if (editedXML != null) {
             tracker.track(MCRBreakpoint.setBreakpoint(editedXML.getRootElement(), msg));
+        }
     }
 
     public MCRChangeTracker getChangeTracker() {

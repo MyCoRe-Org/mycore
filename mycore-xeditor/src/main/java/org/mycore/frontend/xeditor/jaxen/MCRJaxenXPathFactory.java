@@ -72,8 +72,9 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
 
     private void addExtensionFunctions(XPath xPath) {
         XPathFunctionContext xfc = (XPathFunctionContext) (xPath.getFunctionContext());
-        for (ExtensionFunction function : functions)
+        for (ExtensionFunction function : functions) {
             function.register(xfc);
+        }
         xPath.setFunctionContext(xfc);
     }
 
@@ -93,7 +94,7 @@ public class MCRJaxenXPathFactory extends JaxenXPathFactory {
 
         Function function;
 
-        public ExtensionFunction(String prefix, String localName, Function function) {
+        ExtensionFunction(String prefix, String localName, Function function) {
             this.prefix = prefix;
             this.localName = localName;
             this.function = function;

@@ -33,9 +33,10 @@ class MCRFunctionTranslate implements org.jaxen.Function {
     @Override
     public Object call(Context context, List args) throws FunctionCallException {
         String i18nkey = (String) (args.get(0));
-        if (args.size() == 1)
+        if (args.size() == 1) {
             return MCRTranslation.translate(i18nkey);
-        else
+        } else {
             return MCRTranslation.translate(i18nkey, args.subList(1, args.size()));
+        }
     }
 }

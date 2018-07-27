@@ -65,13 +65,15 @@ public class MCRXEditorServlet extends MCRServlet {
         for (Enumeration<String> parameters = job.getRequest().getParameterNames(); parameters.hasMoreElements();) {
             String name = parameters.nextElement();
             if (name.startsWith(TARGET_PATTERN)) {
-                if (name.endsWith(".x") || name.endsWith(".y")) // input type="image"
+                if (name.endsWith(".x") || name.endsWith(".y")) {// input type="image"
                     name = name.substring(0, name.length() - 2);
+                }
 
                 targetID = name.split("[_\\:]")[3].toLowerCase(Locale.ROOT);
                 parameter = name.substring(TARGET_PATTERN.length() + targetID.length());
-                if (!parameter.isEmpty())
+                if (!parameter.isEmpty()) {
                     parameter = parameter.substring(1);
+                }
 
                 break;
             }
