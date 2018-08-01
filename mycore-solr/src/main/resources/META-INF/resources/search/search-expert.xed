@@ -121,6 +121,19 @@ form .optional.expanded .fieldset{
                 </h3>
               </div>
               <div class="panel-body">
+                <xed:bind xpath="param[@name='core']" default="main">
+                  <div class="form-group">
+                    <label class="col-md-{$label-width} control-label" for="core">
+                      core
+                    </label>
+                    <div class="col-md-{$input-width}">
+                      <select title="SOLR core (alias)." class="form-control" id="core">
+                        <option>main</option>
+                        <option>classification</option>
+                      </select>
+                    </div>
+                  </div>
+                </xed:bind>
                 <mcrsolr:textfield name="qt" title="Request handler in solrconfig.xml." default="/select" />
 
                 <fieldset class="common">

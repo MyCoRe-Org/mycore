@@ -2,6 +2,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
   xmlns:mcrsolr="http://www.mycore.de/components/solr" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions">
   <xsl:param name="MCR.Solr.ServerURL" />
+  <xsl:param name="MCR.Solr.Core.main.Name" />
+  <xsl:param name="MCR.Solr.Core.classification.Name" />
   <xsl:variable name="mcrsolr:label-width" select="3" />
   <xsl:variable name="mcrsolr:input-width" select="12 - $mcrsolr:label-width" />
 
@@ -192,10 +194,23 @@
   </xsl:template>
 
   <xsl:template match="mcrsolr:fieldsHelp">
+    <xsl:apply-templates select="." mode="with-core">
+      <xsl:with-param name="core" select="$MCR.Solr.Core.main.Name" />
+      <xsl:with-param name="type" select="'main'" />
+    </xsl:apply-templates>
+    <xsl:apply-templates select="." mode="with-core">
+      <xsl:with-param name="core" select="$MCR.Solr.Core.classification.Name" />
+      <xsl:with-param name="type" select="'classification'" />
+    </xsl:apply-templates>
+  </xsl:template>
+  <xsl:template match="mcrsolr:fieldsHelp" mode="with-core">
+    <xsl:param name="core" />
+    <xsl:param name="type" />
     <div class="table-responsive">
       <table class="table table-striped table-hover table-condensed">
-        <xsl:variable name="url" select="concat($MCR.Solr.ServerURL, '/admin/luke')" />
+        <xsl:variable name="url" select="concat($MCR.Solr.ServerURL, 'solr/', $core, '/admin/luke?wt=xml')" />
         <xsl:variable name="availableFields" select="document($url)" />
+        <caption><xsl:value-of select="concat('Fields of core ',$type,'(',$core,')')" /></caption>
         <tr>
           <th>field</th>
           <th>type</th>
