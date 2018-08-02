@@ -67,6 +67,9 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
             exposedHeaders.add(HttpHeaders.AUTHORIZATION);
         }
+        if (responseHeaders.getFirst(HttpHeaders.LOCATION) != null){
+            exposedHeaders.add(HttpHeaders.LOCATION);
+        }
         if (!exposedHeaders.isEmpty()) {
             responseHeaders.putSingle(ACCESS_CONTROL_EXPOSE_HEADERS,
                 exposedHeaders.stream().collect(Collectors.joining(",")));
