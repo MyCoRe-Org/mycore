@@ -19,6 +19,8 @@
 package org.mycore.solr.search;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
@@ -26,13 +28,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
+import org.jdom2.Document;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.parsers.bool.MCRSetCondition;
+import org.mycore.services.fieldquery.MCRQuery;
 
 /**
  * Some solr search utils.
@@ -40,6 +52,8 @@ import org.apache.solr.common.params.SolrParams;
  * @author Matthias Eichner
  */
 public abstract class MCRSolrSearchUtils {
+    
+    private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
     /**
      * Returns the first document.
@@ -197,6 +211,38 @@ public abstract class MCRSolrSearchUtils {
         public int characteristics() {
             return Spliterator.SIZED | Spliterator.SUBSIZED | Spliterator.ORDERED;
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
+        int rows = query.getNumPerPage();
+        List <String> returnFields = query.getReturnFields();
+        MCRCondition condition = query.getCondition();
+        HashMap<String, List<MCRCondition>> table;
+
+        if (condition instanceof MCRSetCondition) {
+            table = MCRConditionTransformer.groupConditionsByIndex((MCRSetCondition) condition);
+        } else {
+            // if there is only one condition its no set condition. we don't need to group
+            LOGGER.warn("Condition is not SetCondition.");
+            table = new HashMap<>();
+
+            ArrayList<MCRCondition> conditionList = new ArrayList<>();
+            conditionList.add(condition);
+
+            table.put("metadata", conditionList);
+
+        }
+
+        boolean booleanAnd = !(condition instanceof MCROrCondition<?>);
+        SolrQuery mergedSolrQuery = MCRConditionTransformer.buildMergedSolrQuery(query.getSortBy(), false, booleanAnd,
+            table, rows, returnFields);
+        String mask = input.getRootElement().getAttributeValue("mask");
+        if (mask != null) {
+            mergedSolrQuery.setParam("mask", mask);
+            mergedSolrQuery.setParam("_session", request.getParameter("_session"));
+        }
+        return mergedSolrQuery;
     }
 
 }

@@ -21,7 +21,6 @@ package org.mycore.solr.search;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.filter.ElementFilter;
@@ -51,38 +49,6 @@ public class MCRQLSearchUtils {
 
     private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList("search", "query", "maxResults",
         "numPerPage", "page", "mask", "mode", "redirect"));
-
-    @SuppressWarnings("rawtypes")
-    public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
-        int rows = Integer.parseInt(input.getRootElement().getAttributeValue("numPerPage", "10"));
-        List <String> returnFields = query.getReturnFields();
-        MCRCondition condition = query.getCondition();
-        HashMap<String, List<MCRCondition>> table;
-
-        if (condition instanceof MCRSetCondition) {
-            table = MCRConditionTransformer.groupConditionsByIndex((MCRSetCondition) condition);
-        } else {
-            // if there is only one condition its no set condition. we don't need to group
-            LOGGER.warn("Condition is not SetCondition.");
-            table = new HashMap<>();
-
-            ArrayList<MCRCondition> conditionList = new ArrayList<>();
-            conditionList.add(condition);
-
-            table.put("metadata", conditionList);
-
-        }
-
-        boolean booleanAnd = !(condition instanceof MCROrCondition<?>);
-        SolrQuery mergedSolrQuery = MCRConditionTransformer.buildMergedSolrQuery(query.getSortBy(), false, booleanAnd,
-            table, rows, returnFields);
-        String mask = input.getRootElement().getAttributeValue("mask");
-        if (mask != null) {
-            mergedSolrQuery.setParam("mask", mask);
-            mergedSolrQuery.setParam("_session", request.getParameter("_session"));
-        }
-        return mergedSolrQuery;
-    }
 
     /**
      * Build MCRQuery from editor XML input
