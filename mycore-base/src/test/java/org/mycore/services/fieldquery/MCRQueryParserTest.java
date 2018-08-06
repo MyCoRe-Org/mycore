@@ -50,7 +50,8 @@ public class MCRQueryParserTest extends MCRTestCase {
     @Test
     public final void testQuery() {
         
-        String sampleQueryML = "title contains \"Amt\"";
+        String sampleQueryML = "(((title contains \"test\") OR (releaseDate < \"2000\")) AND (not (content contains \"Gericht Amt\"))) AND (content contains \"Finanzen\")";
+        //String sampleQueryML = "((title) contains \"Amt\")";
         
         /*
          * not sure what's expected here
@@ -61,9 +62,12 @@ public class MCRQueryParserTest extends MCRTestCase {
         MCRQuery queryElement = new MCRQuery(queryElementParsed);
         */
 
+        System.out.println("############################################################################");
         // String
         MCRCondition<Void> queryStringParsed = queryParser.parse(sampleQueryML);
+        System.out.println(queryStringParsed.toString());
         MCRQuery queryString = new MCRQuery(queryStringParsed);
+        System.out.println("############################################################################");
         //assertEquals("test to fail", "successfully run!");
     }
     

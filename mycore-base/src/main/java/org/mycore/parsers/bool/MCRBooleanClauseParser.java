@@ -103,9 +103,15 @@ public class MCRBooleanClauseParser<T> {
     }
 
     public MCRCondition<T> parse(String s) throws MCRParseException {
+        System.out.println("before replacing escape sequences:");
+        System.out.println(s);
         s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
+        System.out.println("after replacing escape sequences:");
+        System.out.println(s);
 
         if (s.trim().length() == 0 || s.equals("()")) {
+
+            System.out.println("\napplying default rule…\n\n");
             return defaultRule();
         }
 
@@ -122,22 +128,46 @@ public class MCRBooleanClauseParser<T> {
             s = "(true)";
         }
 
+
+        System.out.println("iterating over brackets:\n");
+        int i = 0;
+        Pattern startsWithBracket = Pattern.compile("^\\s*\\(");
+        Pattern endsWithBracket = Pattern.compile("\\)\\s*$");
         while (true) { // replace all bracket expressions with $n
             /* remove outer brackets () */
+            System.out.println("Iteration " + i);
+
+            System.out.println("\nbefore replacing brackets:");
+            System.out.println(s);
+            // s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')'
             while (s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')'
                 && s.substring(1, s.length() - 1).indexOf('(') < 0 && s.substring(1, s.length() - 1).indexOf(')') < 0) {
-                s = s.substring(1, s.length() - 1).trim();
+                s = s.trim().substring(1, s.length() - 1).trim();
             }
+            System.out.println("after replacing brackets:");
+            System.out.println(s);
 
+            System.out.println("\nbracket pattern:");
+            System.out.println(bracket.toString());
             Matcher m = bracket.matcher(s); // find bracket pairs
             if (m.find()) {
+                System.out.println("\nbracket pattern found");
                 String clause = m.group(); // replace bracket pair with token
+                
+                System.out.println("before replacing brackets with tokens:");
+                System.out.println(s);
                 s = s.substring(0, m.start()) + "@<" + l.size() + ">@" + s.substring(m.end());
+                System.out.println("after replacing brackets with tokens:");
+                System.out.println(s);
+                
                 l.add(extendClauses(clause, l));
             } else {
                 break;
             }
+            i+=1;
         }
+        System.out.println("\ndone iterating over brackets:");
+        System.out.println(s);
 
         // after replacing bracket pairs check for unmatched parenthis
         if ((s.indexOf('(') >= 0) ^ (s.indexOf(')') >= 0)) { // missing opening or closing bracket?
@@ -153,11 +183,19 @@ public class MCRBooleanClauseParser<T> {
             if (last >= l1) {
                 throw new MCRParseException("subclause of OR missing while parsing \"" + s + "\"");
             }
+            System.out.println("\n###### OR found:");
+            System.out.println(s.substring(last, l1));
+            System.out.println(extendClauses(s.substring(last, l1), l));
+            System.out.println("replacing OR:");
             MCRCondition<T> c = parse(extendClauses(s.substring(last, l1), l), l);
             last = m.end();
             orclause.addChild(c);
         }
         if (last != 0) {
+            System.out.println("\n###### OR found:");
+            System.out.println(s.substring(last));
+            System.out.println(extendClauses(s.substring(last), l));
+            System.out.println("replacing OR:");
             MCRCondition<T> c = parse(extendClauses(s.substring(last), l), l);
             orclause.addChild(c);
             return orclause;
@@ -172,11 +210,19 @@ public class MCRBooleanClauseParser<T> {
             if (last >= l1) {
                 throw new MCRParseException("subclause of AND missing while parsing \"" + s + "\"");
             }
+            System.out.println("\n###### AND found:");
+            System.out.println(s.substring(last, l1));
+            System.out.println(extendClauses(s.substring(last, l1), l));
+            System.out.println("replacing AND:");
             MCRCondition<T> c = parse(extendClauses(s.substring(last, l1), l), l);
             last = m.end();
             andclause.addChild(c);
         }
         if (last != 0) {
+            System.out.println("\n###### AND found:");
+            System.out.println(s.substring(last));
+            System.out.println(extendClauses(s.substring(last), l));
+            System.out.println("replacing AND:");
             MCRCondition<T> c = parse(extendClauses(s.substring(last), l), l);
             andclause.addChild(c);
             return andclause;
@@ -186,13 +232,33 @@ public class MCRBooleanClauseParser<T> {
         s = s.trim();
 
         if (s.toLowerCase(Locale.ROOT).startsWith("not ")) {
+            System.out.println("\n###### NOT found:");
+            System.out.println(s.substring(last));
+            System.out.println(extendClauses(s.substring(last), l));
+            System.out.println("replacing NOT:");
             MCRCondition<T> inverse = parse(extendClauses(s.substring(4), l), l);
 
             return new MCRNotCondition<>(inverse);
         }
-
+        
+        System.out.println("\nafter replacing logical operators:");
+        System.out.println(s);
         s = extendClauses(s, l); // expands tokens with previously analysed expressions
+        System.out.println("\nafter expanding tokens:");
+        System.out.println(s);
+        System.out.println("" + s.indexOf('(') + " " + s.indexOf(')'));
         if ((s.indexOf('(') >= 0) && (s.indexOf(')') >= 0)) { // recusion ONLY if parenthis (can) match
+            System.out.println("\n###### brackets found, recursing:");
+            System.out.println(s);
+
+            System.out.println("\n###################################");
+            System.out.println("ABORT HERE???");
+            System.out.println("###################################");
+            /*try {
+                return parseSimpleCondition(s);
+            } catch (MCRParseException e) {
+                throw e;
+            }*/
             return parse(s, l);
         } else {
             return parseSimpleCondition(s);
