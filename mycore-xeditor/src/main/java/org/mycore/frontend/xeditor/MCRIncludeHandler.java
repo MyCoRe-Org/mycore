@@ -77,14 +77,14 @@ public class MCRIncludeHandler {
      */
     public void preloadFromURIs(String uris, String sStatic)
         throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
-        for (String uri : uris.split("\\s+")) {
+        for (String uri : uris.split(",")) {
             preloadFromURI(uri, sStatic);
         }
     }
 
     private void preloadFromURI(String uri, String sStatic)
         throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
-        if (uri.isEmpty()) {
+        if (uri.trim().isEmpty()) {
             return;
         }
 
@@ -92,7 +92,7 @@ public class MCRIncludeHandler {
 
         Element xml;
         try {
-            xml = resolve(uri, sStatic);
+            xml = resolve(uri.trim(), sStatic);
         } catch (Exception ex) {
             LOGGER.warn("Exception preloading " + uri, ex);
             return;
