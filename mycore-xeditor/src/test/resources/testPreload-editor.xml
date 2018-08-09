@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<div xmlns:xed="http://www.mycore.de/xeditor">
+
+  <xed:template id="field.title">
+    <xed:bind xpath="title">
+      <label for="title">Titel:</label>
+      <input id="title" />
+    </xed:bind>
+  </xed:template>
+  
+  <xed:template id="field.author">
+    <xed:bind xpath="author">
+      <label for="author">Autor:</label>
+      <input id="author" />
+    </xed:bind>
+  </xed:template>
+
+  <xed:template id="field.place">
+    <xed:bind xpath="place">
+      <label for="place">Ort:</label>
+      <input id="place" />
+    </xed:bind>
+  </xed:template>
+
+  <xed:template id="field.publisher">
+    <xed:bind xpath="publisher">
+      <label for="publisher">Verlag:</label>
+      <input id="publisher" />
+    </xed:bind>
+  </xed:template>
+
+  <xed:template id="panel.origin">
+    <xed:bind xpath="origin">
+      <xed:include ref="field.place" />
+      <xed:include ref="field.publisher" />
+    </xed:bind>
+  </xed:template>
+
+  <xed:form>
+    <xed:preload uri="resource:testPreload-editor.xml" />
+    <xed:preload uri="resource:testPreload-includes.xml" />
+
+    <xed:bind xpath="/document">
+      <xed:include ref="field.title" />
+      <xed:include ref="field.author" />
+      <xed:include ref="panel.origin" />
+    </xed:bind>    
+
+  </xed:form>
+
+</div>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<div xmlns:xed="http://www.mycore.de/xeditor">
+  <form action="http://localhost:8291/servlets/XEditor" method="post">
+
+    <label for="title">Titel:</label>
+    <input name="/document/title" value="" id="title" />
+
+    <label for="author.first">Vorname:</label>
+    <input name="/document/author/first" value="" id="author.first" />
+    
+    <label for="author.last">Nachname:</label>
+    <input name="/document/author/Last" value="" id="author.last" />
+
+    <label for="publisher">Verlag:</label>
+    <input name="/document/origin/publisher" value="" id="publisher" />
+
+    <label for="edition">Auflage:</label>
+    <input name="/document/origin/edition" value="" id="edition" />
+
+    <label for="year">Erscheinungsjahr:</label>
+    <input name="/document/origin/year" value="" id="year" />
+
+    <div style="visibility:hidden">
+      <input value="1-0" name="_xed_session" type="hidden" />
+    </div>
+
+  </form>
+</div>
