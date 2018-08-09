@@ -103,15 +103,12 @@ public class MCRBooleanClauseParser<T> {
     }
 
     public MCRCondition<T> parse(String s) throws MCRParseException {
-        System.out.println("before replacing escape sequences:");
-        System.out.println(s);
+System.out.println("================================================================================");
+System.out.println("before replacing escape sequences:::" + s + ":::");
         s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
-        System.out.println("after replacing escape sequences:");
-        System.out.println(s);
+System.out.println("after replacing escape sequences:::" + s + ":::");
 
         if (s.trim().length() == 0 || s.equals("()")) {
-
-            System.out.println("\napplying default rule…\n\n");
             return defaultRule();
         }
 
@@ -119,9 +116,17 @@ public class MCRBooleanClauseParser<T> {
     }
 
     private MCRCondition<T> parse(String s, List<String> l) throws MCRParseException {
+System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+System.out.println("s :::" + s + ":::");
         if (l == null) {
             l = new ArrayList<>();
+System.out.println("new list");
         }
+else {
+    for (String st : l) {
+        System.out.println("l[] :::" + st + ":::");
+     }
+ }
 
         s = s.trim();
         if (s.equals("()")) {
@@ -129,8 +134,8 @@ public class MCRBooleanClauseParser<T> {
         }
 
 
-        System.out.println("iterating over brackets:\n");
-        int i = 0;
+System.out.println("iterating over brackets:\n");
+int i = 0;
         Pattern startsWithBracket = Pattern.compile("^\\s*\\(");
         Pattern endsWithBracket = Pattern.compile("\\)\\s*$");
         while (true) { // replace all bracket expressions with $n

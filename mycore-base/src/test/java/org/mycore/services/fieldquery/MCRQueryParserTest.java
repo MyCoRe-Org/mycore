@@ -48,10 +48,11 @@ public class MCRQueryParserTest extends MCRTestCase {
      */
         
     @Test
-    public final void testQuery() {
+    public final void testQueryAsString() {
         
-        String sampleQueryML = "(((title contains \"test\") OR (releaseDate < \"2000\")) AND (not (content contains \"Gericht Amt\"))) AND (content contains \"Finanzen\")";
+        //String sampleQueryML = "(((title contains \"test\") OR (releaseDate < \"2000\")) AND (not (content contains \"Gericht Amt\"))) AND (content contains \"Finanzen\")";
         //String sampleQueryML = "((title) contains \"Amt\")";
+        String sampleQueryML = "((title) contains \"Amt (Test)\")";
         
         /*
          * not sure what's expected here

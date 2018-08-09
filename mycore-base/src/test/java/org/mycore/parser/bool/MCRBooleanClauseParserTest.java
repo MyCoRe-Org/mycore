@@ -19,13 +19,10 @@
 package org.mycore.parser.bool;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
