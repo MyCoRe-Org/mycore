@@ -55,9 +55,8 @@ public class MCRConfigurationInputStream extends InputStream {
 
     private static final String MYCORE_PROPERTIES = "mycore.properties";
 
-    private static final byte[] lbr = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1); // latin1
-                                                                                                                  // for
-                                                                                                                  // properties
+    // latin1 for properties
+    private static final byte[] lbr = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1);
 
     InputStream in;
 
