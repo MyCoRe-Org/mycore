@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.StreamSupport;
 
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -39,12 +40,11 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.output.DOMOutputter;
+import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.google.common.collect.Streams;
 
 /**
  * Handles xed:include, xed:preload and xed:modify|xed:extend to include XEditor components by URI and ID.
@@ -163,9 +163,9 @@ public class MCRIncludeHandler {
     }
 
     private Optional<Element> findDescendant(Element container, String id) {
-        return Streams.stream(container.getDescendants(new ElementFilter()).iterator())
-            .filter(e -> hasOrIncludesID(e, id))
-            .findFirst();
+        IteratorIterable<Element> descendants = container.getDescendants(new ElementFilter());
+        return StreamSupport.stream(descendants.spliterator(), false)
+            .filter(e -> hasOrIncludesID(e, id)).findFirst();
     }
 
     private boolean hasOrIncludesID(Element e, String id) {
