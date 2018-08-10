@@ -186,10 +186,11 @@ public class MCRConfigurationInputStream extends InputStream {
             }
         }
         // load config file from classpath
-        InputStream configStream = getConfigFileStream(filename);
-        if (configStream != null) {
-            LogManager.getLogger().debug("Loaded config file from classpath: " + filename);
-            cList.add(IOUtils.toByteArray(configStream));
+        try (InputStream configStream = getConfigFileStream(filename)) {
+            if (configStream != null) {
+                LogManager.getLogger().debug("Loaded config file from classpath: " + filename);
+                cList.add(IOUtils.toByteArray(configStream));
+            }
         }
         
         //load config file from app config dir
