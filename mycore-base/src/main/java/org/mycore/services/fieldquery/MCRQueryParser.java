@@ -147,7 +147,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
         Matcher m = pattern.matcher(s);
 
         if (!m.find()) {
-            throw new MCRParseException("Not a valid condition: " + s);
+            return super.parseSimpleCondition(s);
         }
 
         String field = m.group(1);
