@@ -35,7 +35,7 @@ public class MCRQuery {
     private static final Logger LOGGER = LogManager.getLogger(MCRQuery.class);
     
     /** The query condition */
-    private MCRCondition cond;
+    private MCRCondition<Void> cond;
 
     /** The maximum number of results, default is 0 = unlimited */
     private int maxResults = 0;
@@ -87,7 +87,7 @@ public class MCRQuery {
      * 
      * @return the query condition
      */
-    public MCRCondition getCondition() {
+    public MCRCondition<Void> getCondition() {
         return cond;
     }
 
