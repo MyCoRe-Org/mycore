@@ -65,7 +65,7 @@ public class MCRBooleanClauseParser<T> {
 
     /**
      * Parse a complex or simple condition in XML format and put it in an condition object.
-     * for samples see {@link org.mycore.services.fieldquery.MCRQueryParserTest#testQueryAsXML()}
+     * for samples see {@link org.mycore.services.fieldquery.MCRQueryParserTest#testQueryAsXML() MCRQueryParserTest#testQueryAsXML()}
      * @param condition a MyCoRe condition object in XML format
      * @return a MyCoRe condition object in the MCRCondition format
      */
@@ -117,7 +117,7 @@ public class MCRBooleanClauseParser<T> {
 
     /**
      * Parse a complex or simple condition in String format and put it in an condition object.
-     * for samples see {@link org.mycore.services.fieldquery.MCRQueryParserTest#testQueryAsString()}
+     * for samples see {@link org.mycore.services.fieldquery.MCRQueryParserTest#testQueryAsString() MCRQueryParserTest#testQueryAsString()}
      * @param s a MyCoRe condition object in String format
      * @return a MyCoRe condition object in the MCRCondition format
      */
