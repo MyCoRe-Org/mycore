@@ -316,7 +316,7 @@ public class MCRQuery {
         String max = xml.getAttributeValue("maxResults", "");
         query.setMaxResults(max);
         String num = xml.getAttributeValue("numPerPage", "");
-        query.setMaxResults(num);
+        query.setNumPerPage(num);
 
         List<MCRSortBy> sortBy = null;
         Element sortByElem = xml.getChild("sortBy");
