@@ -65,9 +65,9 @@ public class MCRBooleanClauseParser<T> {
 
     /**
      * Parse a complex or simple condition in XML format and put it in an condition object.
-     * @param conditiona MyCoRe condition object in XML format
+     * for samples see {@link org.mycore.services.fieldquery.MCRQueryParserTest#testQueryAsXML()}
+     * @param condition a MyCoRe condition object in XML format
      * @return a MyCoRe condition object in the MCRCondition format
-     * @see for samples see {@link org.mycore.services.fieldquery.MCRQueryParserTest#testQueryAsXML()}
      */
     public MCRCondition<T> parse(Element condition) {
         if (condition == null) {
@@ -115,6 +115,12 @@ public class MCRBooleanClauseParser<T> {
         return parseSimpleCondition(condition);
     }
 
+    /**
+     * Parse a complex or simple condition in String format and put it in an condition object.
+     * for samples see {@link org.mycore.services.fieldquery.MCRQueryParserTest#testQueryAsString()}
+     * @param s a MyCoRe condition object in String format
+     * @return a MyCoRe condition object in the MCRCondition format
+     */
     public MCRCondition<T> parse(String s) throws MCRParseException {
         s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
 
