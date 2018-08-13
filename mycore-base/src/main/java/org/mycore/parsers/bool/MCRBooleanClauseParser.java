@@ -47,25 +47,26 @@ public class MCRBooleanClauseParser<T> {
 
     private static String closing_bracket = "##########";
 
-    private static String extendClauses(String s, List<String> l) {
+    private static String extendClauses(final String s, final List<String> l) {
+        String sintern = s;
         while (true) {
-            Matcher m = bracket_marker.matcher(s);
+            Matcher m = bracket_marker.matcher(sintern);
 
             if (m.find()) {
                 String c = m.group();
                 String clause = (String) l.get(Integer.parseInt(m.group(1)));
-                s = s.replaceAll(c, clause);
+                sintern = sintern.replaceAll(c, clause);
             } else {
                 break;
             }
         }
 
-        return s;
+        return sintern;
     }
 
     /**
      * Parse a complex or simple condition in XML format and put it in an condition object.
-     * for samples see {@link org.mycore.services.fieldquery.MCRQueryParserTest#testQueryAsXML() MCRQueryParserTest#testQueryAsXML()}
+     * 
      * @param condition a MyCoRe condition object in XML format
      * @return a MyCoRe condition object in the MCRCondition format
      */
@@ -117,7 +118,7 @@ public class MCRBooleanClauseParser<T> {
 
     /**
      * Parse a complex or simple condition in String format and put it in an condition object.
-     * for samples see {@link org.mycore.services.fieldquery.MCRQueryParserTest#testQueryAsString() MCRQueryParserTest#testQueryAsString()}
+     * 
      * @param s a MyCoRe condition object in String format
      * @return a MyCoRe condition object in the MCRCondition format
      */

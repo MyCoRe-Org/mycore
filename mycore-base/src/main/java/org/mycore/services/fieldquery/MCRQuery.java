@@ -109,9 +109,10 @@ public class MCRQuery {
      */
     public void setMaxResults(int maxResults) {
         if (maxResults < 0) {
-            maxResults = 0;
+            this.maxResults = 0;
+        } else {
+            this.maxResults = maxResults;
         }
-        this.maxResults = maxResults;
         doc = null;
     }
 
@@ -124,13 +125,13 @@ public class MCRQuery {
      */
     public void setMaxResults(String maxResultsString) {
         if (maxResultsString == null || maxResultsString.length() == 0) {
-            maxResults = 0;
+            this.maxResults = 0;
         }
         try {
             this.maxResults = Integer.parseInt(maxResultsString);
         } catch (NumberFormatException e) {
             LOGGER.warn("The Results maxstring " + maxResultsString + " contains not an integer, 0 as default is set");
-            maxResults = 0;
+            this.maxResults = 0;
         }
         doc = null;
     }
@@ -152,9 +153,10 @@ public class MCRQuery {
      */
     public void setNumPerPage(int numPerPage) {
         if (numPerPage < 0) {
-            numPerPage = 10;
+            this.numPerPage = 10;
+        } else {
+            this.numPerPage = numPerPage;
         }
-        this.numPerPage = numPerPage;
         doc = null;
     }
 
@@ -166,13 +168,13 @@ public class MCRQuery {
      */
     public void setNumPerPage(String numPerPageString) {
         if (numPerPageString == null || numPerPageString.length() == 0) {
-            numPerPage = 10;
+            this.numPerPage = 10;
         }
         try {
             this.numPerPage = Integer.parseInt(numPerPageString);
         } catch (NumberFormatException e) {
             LOGGER.warn("The numPerPage string " + numPerPageString + " contains not an integer, 10 as default is set");
-            numPerPage = 10;
+            this.numPerPage = 10;
         }
         doc = null;
     }

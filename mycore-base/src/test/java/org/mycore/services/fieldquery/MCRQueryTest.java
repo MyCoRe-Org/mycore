@@ -31,12 +31,13 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
 
-public class MCRQueryTest extends MCRTestCase  {
+public class MCRQueryTest extends MCRTestCase {
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
     }
+
     @Test
     public final void testQueryAsXML() {
         Document doc = new Document();
@@ -80,22 +81,22 @@ public class MCRQueryTest extends MCRTestCase  {
         try {
             XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
             xmlOutputter.output(doc, System.out);
-            System.out.println();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
+        System.out.println();
 
+        MCRQuery mcrquery = MCRQuery.parseXML(doc);
+        Document mcrquerydoc = mcrquery.buildXML();
         try {
-            MCRQuery mcrquery = MCRQuery.parseXML(doc);
-            Document mcrquerydoc = mcrquery.buildXML();
             XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
             xmlOutputter.output(mcrquerydoc, System.out);
-            System.out.println();
-            assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(doc, mcrquerydoc));
-            } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
-        
+        System.out.println();
+        assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(doc, mcrquerydoc));
+
     }
-    
+
 }
