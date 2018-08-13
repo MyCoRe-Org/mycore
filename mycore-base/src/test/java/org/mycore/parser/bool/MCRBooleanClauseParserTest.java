@@ -63,7 +63,6 @@ public class MCRBooleanClauseParserTest {
             new MCRFalseCondition(), new MCRTrueCondition()));
         System.out.println("Boolean claus test 4 --> " + c04.toString());
         assertEquals("Returned value is not", c04.toString(), p.parse("true or false and true").toString());
-        //assertTrue(MCRXMLHelper.deepEqual(new Document(c03.toXML()), new Document(p.parse("true or false and true").toXML())));
         
         MCRCondition c05 = new MCRTrueCondition();
         System.out.println("Boolean claus test 5 --> " + c05.toString());
