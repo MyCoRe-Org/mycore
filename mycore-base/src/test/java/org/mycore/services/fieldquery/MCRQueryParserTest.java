@@ -38,7 +38,7 @@ public class MCRQueryParserTest extends MCRTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.services.fieldquery.MCRQueryParser#parse(org.jdom2.Element)}
+     * {@link org.mycore.services.fieldquery.MCRQueryParser#parse(org.jdom2.Element) MCRQueryParser.parse} for XML
      */
 
     @Test
@@ -79,7 +79,7 @@ public class MCRQueryParserTest extends MCRTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.services.fieldquery.MCRQueryParser#parse(java.lang.String)}
+     * {@link org.mycore.services.fieldquery.MCRQueryParser#parse(java.lang.String) MCRQueryParser.parse} for String
      */
 
     @Test
