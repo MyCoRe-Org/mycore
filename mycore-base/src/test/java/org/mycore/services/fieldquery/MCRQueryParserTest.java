@@ -79,7 +79,7 @@ public class MCRQueryParserTest extends MCRTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.services.fieldquery.MCRQueryParser#parse(java.lang.String)} and
+     * {@link org.mycore.services.fieldquery.MCRQueryParser#parse(java.lang.String)}
      */
 
     @Test
