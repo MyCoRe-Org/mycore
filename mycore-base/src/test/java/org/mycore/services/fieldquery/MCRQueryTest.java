@@ -18,23 +18,38 @@
 
 package org.mycore.services.fieldquery;
 
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.junit.Before;
 import org.junit.Test;
+import org.mycore.common.MCRTestCase;
+import org.mycore.common.xml.MCRXMLHelper;
 
-public class MCRQueryTest {
+public class MCRQueryTest extends MCRTestCase  {
 
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
     @Test
     public final void testQueryAsXML() {
         Document doc = new Document();
         Element query = new Element("query");
-        query.setAttribute("maxResults", "0");
-        query.setAttribute("numPerPage", "10");
+        query.setAttribute("maxResults", "50");
+        query.setAttribute("numPerPage", "25");
         doc.addContent(query);
+        Element sortby = new Element("sortBy");
+        query.addContent(sortby);
+        Element sortfield = new Element("field");
+        sortfield.setAttribute("name", "dict01_sort");
+        sortfield.setAttribute("order", "ascending");
+        sortby.addContent(sortfield);
         Element return_fields = new Element("returnFields");
         return_fields.setText("id,returnId,objectType");
         query.addContent(return_fields);
@@ -46,28 +61,41 @@ public class MCRQueryTest {
         conditions.addContent(bool);
         Element condition01 = new Element("condition");
         condition01.setAttribute("field", "objectType");
-        condition01.setAttribute("opertor", "=");
+        condition01.setAttribute("operator", "=");
         condition01.setAttribute("value", "viaf");
         bool.addContent(condition01);
         Element condition02 = new Element("condition");
         condition02.setAttribute("field", "title");
-        condition02.setAttribute("opertor", "contains");
+        condition02.setAttribute("operator", "contains");
         condition02.setAttribute("value", "Amt");
         bool.addContent(condition02);
-        Element sortby = new Element("sortBy");
-        query.addContent(sortby);
-        Element sortfield = new Element("field");
-        sortfield.setAttribute("name", "dict01_sort");
-        sortfield.setAttribute("order", "ascending");
-        sortby.addContent(sortfield);
+        Element not = new Element("boolean");
+        not.setAttribute("operator", "not");
+        bool.addContent(not);
+        Element condition03 = new Element("condition");
+        condition03.setAttribute("field", "title");
+        condition03.setAttribute("operator", "contains");
+        condition03.setAttribute("value", "Ehre");
+        not.addContent(condition03);
         try {
             XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
             xmlOutputter.output(doc, System.out);
+            System.out.println();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //MCRQuery mcrquery = MCRQuery.parseXML(doc);
+        try {
+            MCRQuery mcrquery = MCRQuery.parseXML(doc);
+            Document mcrquerydoc = mcrquery.buildXML();
+            XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+            xmlOutputter.output(mcrquerydoc, System.out);
+            System.out.println();
+            assertTrue("Elements should be equal", MCRXMLHelper.deepEqual(doc, mcrquerydoc));
+            } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
     }
     
 }
