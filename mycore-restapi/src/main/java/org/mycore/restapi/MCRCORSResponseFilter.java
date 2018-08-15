@@ -21,6 +21,7 @@ package org.mycore.restapi;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,11 +30,14 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 
 public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
@@ -55,21 +59,27 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
     private static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
 
+    @Context
+    ResourceInfo resourceInfo;
+
     private static void handlePreFlight(ContainerRequestContext requestContext,
-        MultivaluedMap<String, Object> responseHeaders,
+        MultivaluedMap<String, Object> responseHeaders, ResourceInfo resourceInfo,
         boolean authenticatedRequest) {
         if (!requestContext.getMethod().equals(HttpMethod.OPTIONS)) {
             return;
         }
         //allow all methods
         responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_METHODS, responseHeaders.getFirst(HttpHeaders.ALLOW));
-        ArrayList<String> exposedHeaders = new ArrayList<>(); //todo: to be extended
+        ArrayList<String> exposedHeaders = new ArrayList<>();
         if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
             exposedHeaders.add(HttpHeaders.AUTHORIZATION);
         }
-        if (responseHeaders.getFirst(HttpHeaders.LOCATION) != null){
-            exposedHeaders.add(HttpHeaders.LOCATION);
-        }
+        Optional.ofNullable(resourceInfo.getResourceMethod()
+            .getAnnotation(MCRAccessControlExposeHeaders.class))
+            .map(a -> a.value())
+            .map(Stream::of)
+            .orElse(Stream.empty())
+            .forEach(exposedHeaders::add);
         if (!exposedHeaders.isEmpty()) {
             responseHeaders.putSingle(ACCESS_CONTROL_EXPOSE_HEADERS,
                 exposedHeaders.stream().collect(Collectors.joining(",")));
@@ -98,7 +108,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         }
         responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_ORIGIN, authenticatedRequest ? origin : "*");
         //todo: Access-Control-Expose-Headers
-        handlePreFlight(requestContext, responseHeaders, authenticatedRequest);
+        handlePreFlight(requestContext, responseHeaders, resourceInfo, authenticatedRequest);
         if (!"*".equals(responseHeaders.getFirst(ACCESS_CONTROL_ALLOW_ORIGIN))) {
             String vary = Stream
                 .concat(Stream.of(ORIGIN),
