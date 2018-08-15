@@ -62,28 +62,13 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
     @Context
     ResourceInfo resourceInfo;
 
-    private static void handlePreFlight(ContainerRequestContext requestContext,
-        MultivaluedMap<String, Object> responseHeaders, ResourceInfo resourceInfo,
-        boolean authenticatedRequest) {
+    private static boolean handlePreFlight(ContainerRequestContext requestContext,
+        MultivaluedMap<String, Object> responseHeaders) {
         if (!requestContext.getMethod().equals(HttpMethod.OPTIONS)) {
-            return;
+            return false;
         }
         //allow all methods
         responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_METHODS, responseHeaders.getFirst(HttpHeaders.ALLOW));
-        ArrayList<String> exposedHeaders = new ArrayList<>();
-        if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
-            exposedHeaders.add(HttpHeaders.AUTHORIZATION);
-        }
-        Optional.ofNullable(resourceInfo.getResourceMethod()
-            .getAnnotation(MCRAccessControlExposeHeaders.class))
-            .map(a -> a.value())
-            .map(Stream::of)
-            .orElse(Stream.empty())
-            .forEach(exposedHeaders::add);
-        if (!exposedHeaders.isEmpty()) {
-            responseHeaders.putSingle(ACCESS_CONTROL_EXPOSE_HEADERS,
-                exposedHeaders.stream().collect(Collectors.joining(",")));
-        }
         String requestHeaders = requestContext.getHeaderString(ACCESS_CONTROL_REQUEST_HEADERS);
         if (requestHeaders != null) {
             //todo: may be restricted?
@@ -91,6 +76,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         }
         long cacheSeconds = TimeUnit.DAYS.toSeconds(1);
         responseHeaders.putSingle(ACCESS_CONTROL_MAX_AGE, cacheSeconds);
+        return true;
     }
 
     @Override
@@ -107,8 +93,23 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
             responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
         }
         responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_ORIGIN, authenticatedRequest ? origin : "*");
-        //todo: Access-Control-Expose-Headers
-        handlePreFlight(requestContext, responseHeaders, resourceInfo, authenticatedRequest);
+        if (!handlePreFlight(requestContext, responseHeaders)) {
+            //not a CORS preflight request
+            ArrayList<String> exposedHeaders = new ArrayList<>();
+            if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
+                exposedHeaders.add(HttpHeaders.AUTHORIZATION);
+            }
+            Optional.ofNullable(resourceInfo.getResourceMethod()
+                .getAnnotation(MCRAccessControlExposeHeaders.class))
+                .map(a -> a.value())
+                .map(Stream::of)
+                .orElse(Stream.empty())
+                .forEach(exposedHeaders::add);
+            if (!exposedHeaders.isEmpty()) {
+                responseHeaders.putSingle(ACCESS_CONTROL_EXPOSE_HEADERS,
+                    exposedHeaders.stream().collect(Collectors.joining(",")));
+            }
+        }
         if (!"*".equals(responseHeaders.getFirst(ACCESS_CONTROL_ALLOW_ORIGIN))) {
             String vary = Stream
                 .concat(Stream.of(ORIGIN),
