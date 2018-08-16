@@ -101,7 +101,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
             }
             Optional.ofNullable(resourceInfo.getResourceMethod()
                 .getAnnotation(MCRAccessControlExposeHeaders.class))
-                .map(a -> a.value())
+                .map(MCRAccessControlExposeHeaders::value)
                 .map(Stream::of)
                 .orElse(Stream.empty())
                 .forEach(exposedHeaders::add);

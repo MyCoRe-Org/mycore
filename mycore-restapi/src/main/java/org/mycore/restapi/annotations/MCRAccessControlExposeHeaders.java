@@ -18,10 +18,17 @@
 
 package org.mycore.restapi.annotations;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * Used by {@link org.mycore.restapi.MCRCORSResponseFilter} to return values for
  * {@code Access-Control-Expose-Headers} HTTP response header.
  */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface MCRAccessControlExposeHeaders {
 
     /**
