@@ -42,9 +42,12 @@ public class MCRBooleanClauseParser<T> {
     private static Pattern or = Pattern.compile("[)\\s]+[oO][rR][\\s(]+");
 
     private static Pattern bracket_marker = Pattern.compile("@<([0-9]*)>@");
-    
-    private static String opening_bracket = "%%%%%%%%%%";
 
+    /**
+     * This both strings are for temporary bracket substitution in case of brackets 
+     * in a text string in a condition like 'title contains "foo (and bar)".
+     */
+    private static String opening_bracket = "%%%%%%%%%%";
     private static String closing_bracket = "##########";
 
     private static String extendClauses(final String s, final List<String> l) {
@@ -85,7 +88,7 @@ public class MCRBooleanClauseParser<T> {
                 Element child = condition.getChildren().get(0);
                 return new MCRNotCondition<>(parse(child));
             } else if (operator.equalsIgnoreCase("and") || operator.equalsIgnoreCase("or")) {
-                List <Element> children = condition.getChildren();
+                List<Element> children = condition.getChildren();
                 MCRCondition<T> cond;
 
                 if (operator.equalsIgnoreCase("and")) {
@@ -144,7 +147,7 @@ public class MCRBooleanClauseParser<T> {
             s = "(true)";
         }
 
-        while (true) { 
+        while (true) {
             // replace all bracket expressions with $n
             while (s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')'
                 && s.substring(1, s.length() - 1).indexOf('(') < 0 && s.substring(1, s.length() - 1).indexOf(')') < 0) {
@@ -175,7 +178,7 @@ public class MCRBooleanClauseParser<T> {
         if ((s.indexOf('(') >= 0) ^ (s.indexOf(')') >= 0)) { // missing opening or closing bracket?
             throw new MCRParseException("Syntax error: missing bracket in \"" + s + "\"");
         }
-        
+
         /* handle OR */
         Matcher m = or.matcher(s);
         int last = 0;
