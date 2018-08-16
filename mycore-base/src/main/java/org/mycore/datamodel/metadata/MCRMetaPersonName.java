@@ -26,12 +26,10 @@ import org.mycore.common.MCRException;
 /**
  * This class implements all methods for handling a name with the
  * MCRMetaPersonName datamodel. The MCRMetaPersonName class represents a natural
- * or juristic person specified by a list of names parts.
+ * or legal person specified by a list of names parts.
  * 
  * @author J. Vogler
  * @author J. Kupferschmidt
- * @version $Revision$ $Date: 2013-01-23 14:55:57 +0100 (Mi, 23. Jan
- *          2013) $
  */
 public final class MCRMetaPersonName extends MCRMetaDefault {
     // MetaPerson data
@@ -418,7 +416,18 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      */
     @Override
     public final MCRMetaPersonName clone() {
-        return new MCRMetaPersonName(subtag, inherited);
+        MCRMetaPersonName temp = new MCRMetaPersonName(subtag, inherited);
+        temp.setFirstName(firstname);
+        temp.setCallName(callname);
+        temp.setSurName(surname);
+        temp.setFullName(fullname);
+        temp.setAcademic(academic);
+        temp.setPeerage(peerage);
+        temp.setNumeration(numeration);
+        temp.setTitle(title);
+        temp.setPrefix(prefix);
+        temp.setAffix(affix);
+        return temp;
     }
 
     /**
