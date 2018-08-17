@@ -148,7 +148,7 @@ public class MCRShutdownHandler {
         if (leakPreventor != null) {
             ClassLoaderLeakPreventor myLeakPreventor = leakPreventor;
             leakPreventor = null;
-            myLeakPreventor.contextDestroyed(null);
+            myLeakPreventor.runCleanUps();
         }
     }
 

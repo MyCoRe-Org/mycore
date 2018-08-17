@@ -88,13 +88,19 @@
     <xsl:value-of select="transformer:initializePostprocessor($transformer,.)" />
   </xsl:template>
 
+  <!-- ========== <xed:preload uri="" static="true|false" /> ========== -->
+  
+  <xsl:template match="xed:preload" mode="xeditor">
+    <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
+    <xsl:value-of select="includer:preloadFromURIs($includer,$uri,@static)" />
+  </xsl:template>
+  
   <!-- ========== <xed:include uri="" ref="" static="true|false" /> ========== -->
 
   <xsl:template match="xed:include[@uri and @ref]" mode="xeditor">
     <xsl:variable name="uri" select="transformer:replaceParameters($transformer,@uri)" />
     <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
-    <xsl:apply-templates select="includer:resolve($includer,$uri,@static)/descendant::*[@id=$ref]"
-                         mode="included" />
+    <xsl:apply-templates select="includer:resolve($includer,$uri,@static)/descendant::*[@id=$ref]" mode="included" />
   </xsl:template>
 
   <xsl:template match="xed:include[@uri and not(@ref)]" mode="xeditor">
@@ -104,7 +110,15 @@
 
   <xsl:template match="xed:include[@ref and not(@uri)]" mode="xeditor">
     <xsl:variable name="ref" select="transformer:replaceParameters($transformer,@ref)" />
-    <xsl:apply-templates select="/*/descendant-or-self::*[@id=$ref]" mode="included" />
+    <xsl:variable name="resolved" select="includer:resolve($includer,$ref)" />
+    <xsl:choose>
+      <xsl:when test="count($resolved) &gt; 0">
+        <xsl:apply-templates select="$resolved" mode="included" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="/*/descendant-or-self::*[@id=$ref]" mode="included" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="*|text()" mode="included">

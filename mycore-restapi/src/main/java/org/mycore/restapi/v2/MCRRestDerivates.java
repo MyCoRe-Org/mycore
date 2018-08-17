@@ -70,6 +70,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.jersey.MCRCacheControl;
+import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
@@ -279,6 +280,7 @@ public class MCRRestDerivates {
             headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new derivate")),
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
     @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
     public Response createDefaultDerivate() {
         return doCreateDerivate(new DerivateMetadata());
     }
@@ -294,6 +296,7 @@ public class MCRRestDerivates {
         content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA,
             schema = @Schema(implementation = DerivateMetadata.class)))
     @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
     public Response createDerivate(@BeanParam DerivateMetadata der) {
         return doCreateDerivate(der);
     }

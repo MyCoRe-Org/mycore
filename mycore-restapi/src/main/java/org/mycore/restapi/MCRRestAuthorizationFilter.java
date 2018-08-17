@@ -165,24 +165,24 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     }
 
     /**
-     * The REST API access permissions (read, write)
+     * The REST API access permissions (read, write, delete)
      */
     public enum MCRRestAPIACLPermission {
         READ {
             public String toString() {
-                return "read";
+                return MCRAccessManager.PERMISSION_READ;
             }
         },
 
         WRITE {
             public String toString() {
-                return "write";
+                return MCRAccessManager.PERMISSION_WRITE;
             }
         },
 
         DELETE {
             public String toString() {
-                return "delete";
+                return MCRAccessManager.PERMISSION_DELETE;
             }
         }
     }

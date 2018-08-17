@@ -55,7 +55,7 @@ import com.google.gson.JsonParser;
  * see https://lucene.apache.org/solr/guide/7_3/schema-api.html
  *
  * @author Robert Stephan
- * @author jens Kupferschmidt
+ * @author Jens Kupferschmidt
  */
 public class MCRSolrSchemaReloader {
     private static Logger LOGGER = LogManager.getLogger(MCRSolrSchemaReloader.class);
@@ -177,22 +177,24 @@ public class MCRSolrSchemaReloader {
                 }
                 for (JsonElement e : json.getAsJsonArray()) {
                     LOGGER.debug(e);
+                    String command = e.toString();
 
                     HttpPost post = new HttpPost(solrCore.getV1CoreURL() + "/schema");
                     post.setHeader("Content-type", "application/json");
-                    post.setEntity(new StringEntity(e.toString()));
+                    post.setEntity(new StringEntity(command));
+                    String commandprefix = command.indexOf('-') != -1 ? command.substring(2,command.indexOf('-')) : "unknown command";
 
                     try (CloseableHttpResponse response = httpClient.execute(post)) {
                         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                             String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
                                 StandardCharsets.UTF_8);
-                            LOGGER.debug("SOLR schema update successful \n{}", respContent);
+                            LOGGER.debug("SOLR schema " + commandprefix + " successful \n{}", respContent);
                         } else {
 
                             String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
                                 StandardCharsets.UTF_8);
                             LOGGER
-                                .error("SOLR schema update error: {} {}\n{}", response.getStatusLine().getStatusCode(),
+                                .error("SOLR schema " + commandprefix + " error: {} {}\n{}", response.getStatusLine().getStatusCode(),
                                     response.getStatusLine().getReasonPhrase(), respContent);
                         }
                     }

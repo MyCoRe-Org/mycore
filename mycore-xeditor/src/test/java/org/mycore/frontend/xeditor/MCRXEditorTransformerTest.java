@@ -82,8 +82,9 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
 
         String msg = "Transformed output is different to " + expectedOutputFile;
         boolean isEqual = MCRXMLHelper.deepEqual(expected, transformed.asXML());
-        if (!isEqual)
+        if (!isEqual) {
             System.out.println(transformed.asString());
+        }
         assertTrue(msg, isEqual);
     }
 
@@ -99,6 +100,12 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
     public void testIncludes() throws IOException, URISyntaxException, TransformerException, JDOMException,
         SAXException, JaxenException {
         testTransformation("testIncludes-editor.xml", null, "testIncludes-transformed.xml");
+    }
+
+    @Test
+    public void testPreload() throws IOException, URISyntaxException, TransformerException, JDOMException,
+        SAXException, JaxenException {
+        testTransformation("testPreload-editor.xml", null, "testPreload-transformed.xml");
     }
 
     @Test

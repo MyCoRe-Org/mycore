@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xed:template xmlns:xed="http://www.mycore.de/xeditor">
+
+  <xed:template id="field.author">
+    <xed:bind xpath="author">
+      <xed:bind xpath="first">
+        <label for="author.first">Vorname:</label>
+        <input id="author.first" />
+      </xed:bind>
+      <xed:bind xpath="Last">
+        <label for="author.last">Nachname:</label>
+        <input id="author.last" />
+      </xed:bind>
+    </xed:bind>
+  </xed:template>
+
+  <xed:template id="field.year">
+    <xed:bind xpath="year">
+      <label for="year">Erscheinungsjahr:</label>
+      <input id="year" />
+    </xed:bind>
+  </xed:template>
+
+  <xed:template id="field.edition">
+    <xed:bind xpath="edition">
+      <label for="edition">Auflage:</label>
+      <input id="edition" />
+    </xed:bind>
+  </xed:template>
+
+  <xed:modify ref="panel.origin">
+    <xed:remove ref="field.place" />
+    <xed:include ref="field.year" after="field.publisher" />
+    <xed:include ref="field.edition" before="field.year" />
+  </xed:modify>
+
+</xed:template>

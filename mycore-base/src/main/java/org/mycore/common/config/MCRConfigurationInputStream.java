@@ -55,7 +55,8 @@ public class MCRConfigurationInputStream extends InputStream {
 
     private static final String MYCORE_PROPERTIES = "mycore.properties";
 
-    private static final byte[] lbr = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1); //latin1 for properties
+    // latin1 for properties
+    private static final byte[] lbr = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1);
 
     InputStream in;
 
@@ -94,9 +95,9 @@ public class MCRConfigurationInputStream extends InputStream {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         InputStream initStream = null;
         if (configurationDirectory != null) {
-            LogManager.getLogger()
-                .info("Current configuration directory: {}", configurationDirectory.getAbsolutePath());
-            //set MCR.basedir, is normally overwritten later
+            LogManager.getLogger().info("Current configuration directory: {}",
+                    configurationDirectory.getAbsolutePath());
+            // set MCR.basedir, is normally overwritten later
             if (configurationDirectory.isDirectory()) {
                 initStream = getBaseDirInputStream(configurationDirectory);
             }
@@ -125,11 +126,12 @@ public class MCRConfigurationInputStream extends InputStream {
                 //workaround if last property is not terminated with line break
                 cList.add(new ByteArrayInputStream(lbr));
             } else {
-                cList.add(new ByteArrayInputStream(("# Unable to find " + filename + " in "
-                    + component.getResourceBase() + "\n").getBytes(StandardCharsets.ISO_8859_1)));
+                cList.add(new ByteArrayInputStream(
+                        ("# Unable to find " + filename + " in " + component.getResourceBase() + "\n")
+                                .getBytes(StandardCharsets.ISO_8859_1)));
             }
         }
-        InputStream propertyStream = getPropertyStream(filename);
+        InputStream propertyStream = getConfigFileStream(filename);
         if (propertyStream != null) {
             empty = false;
             cList.add(propertyStream);
@@ -154,11 +156,11 @@ public class MCRConfigurationInputStream extends InputStream {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    private static InputStream getPropertyStream(String filename) throws IOException {
-        File mycoreProperties = new File(filename);
+    private static InputStream getConfigFileStream(String filename) throws IOException {
+        File cfgFile = new File(filename);
         MCRContent input = null;
-        if (mycoreProperties.canRead()) {
-            input = new MCRFileContent(mycoreProperties);
+        if (cfgFile.canRead()) {
+            input = new MCRFileContent(cfgFile);
         } else {
             URL url = MCRConfigurationInputStream.class.getClassLoader().getResource(filename);
             if (url != null) {
@@ -174,8 +176,7 @@ public class MCRConfigurationInputStream extends InputStream {
      * 
      * @author Robert Stephan
      */
-    public static List<byte[]> getConfigFileContents(String filename)
-        throws IOException {
+    public static List<byte[]> getConfigFileContents(String filename) throws IOException {
         ArrayList<byte[]> cList = new ArrayList<>();
         for (MCRComponent component : MCRRuntimeComponentDetector.getAllComponents()) {
             try (InputStream is = component.getConfigFileStream(filename)) {
@@ -183,11 +184,21 @@ public class MCRConfigurationInputStream extends InputStream {
                     cList.add(IOUtils.toByteArray(is));
                 }
             }
-            File localConfigFile = MCRConfigurationDir.getConfigFile(filename);
-            if (localConfigFile != null && localConfigFile.canRead()) {
-                try (FileInputStream fis = new FileInputStream(localConfigFile)) {
-                    cList.add(IOUtils.toByteArray(fis));
-                }
+        }
+        // load config file from classpath
+        try (InputStream configStream = getConfigFileStream(filename)) {
+            if (configStream != null) {
+                LogManager.getLogger().debug("Loaded config file from classpath: " + filename);
+                cList.add(IOUtils.toByteArray(configStream));
+            }
+        }
+        
+        //load config file from app config dir
+        File localConfigFile = MCRConfigurationDir.getConfigFile(filename);
+        if (localConfigFile != null && localConfigFile.canRead()) {
+            LogManager.getLogger().debug("Loaded config file from config dir: " + filename);
+            try (FileInputStream fis = new FileInputStream(localConfigFile)) {
+                cList.add(IOUtils.toByteArray(fis));
             }
         }
         return cList;
