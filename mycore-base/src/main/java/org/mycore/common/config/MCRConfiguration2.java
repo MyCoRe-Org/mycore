@@ -45,7 +45,7 @@ import com.google.inject.ConfigurationException;
 public class MCRConfiguration2 {
 
     private static ConcurrentHashMap<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
-    static Hashtable<SingletonKey, Object> instanceHolder = new Hashtable<>();
+    static ConcurrentHashMap<SingletonKey, Object> instanceHolder = new ConcurrentHashMap<>();
 
     public static Map<String, String> getPropertiesMap() {
         return MCRConfiguration.instance().getPropertiesMap();

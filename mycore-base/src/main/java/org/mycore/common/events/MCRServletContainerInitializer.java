@@ -28,13 +28,13 @@ import java.util.Set;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
+import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventorFactory;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -46,8 +46,10 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
      */
     @Override
     public void onStartup(final Set<Class<?>> c, final ServletContext ctx) throws ServletException {
-        ClassLoaderLeakPreventor leakPreventor = new MCRClassLoaderLeakPreventor();
-        leakPreventor.contextInitialized(new ServletContextEvent(ctx));
+        final ClassLoaderLeakPreventorFactory leakPreventorFactory = new ClassLoaderLeakPreventorFactory();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoaderLeakPreventor leakPreventor = leakPreventorFactory.newLeakPreventor(classLoader);
+        leakPreventor.runPreClassLoaderInitiators();
         MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
         shutdownHandler.isWebAppRunning = true;
         shutdownHandler.leakPreventor = leakPreventor;
