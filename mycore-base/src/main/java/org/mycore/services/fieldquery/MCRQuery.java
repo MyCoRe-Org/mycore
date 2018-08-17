@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.parsers.bool.MCRCondition;
@@ -30,11 +32,16 @@ import org.mycore.parsers.bool.MCRCondition;
 /** Represents a query with its condition and optional parameters */
 public class MCRQuery {
 
+    private static final Logger LOGGER = LogManager.getLogger(MCRQuery.class);
+    
     /** The query condition */
-    private MCRCondition cond;
+    private MCRCondition<Void> cond;
 
     /** The maximum number of results, default is 0 = unlimited */
     private int maxResults = 0;
+
+    /** The number of results per page, default is 10 */
+    private int numPerPage = 10;
 
     /** A list of MCRSortBy criteria, may be empty */
     private List<MCRSortBy> sortBy = new ArrayList<>();
@@ -80,7 +87,7 @@ public class MCRQuery {
      * 
      * @return the query condition
      */
-    public MCRCondition getCondition() {
+    public MCRCondition<Void> getCondition() {
         return cond;
     }
 
@@ -102,13 +109,77 @@ public class MCRQuery {
      */
     public void setMaxResults(int maxResults) {
         if (maxResults < 0) {
-            maxResults = 0;
+            this.maxResults = 0;
+        } else {
+            this.maxResults = maxResults;
         }
-        this.maxResults = maxResults;
         doc = null;
     }
 
     /**
+     * Sets the maximum number of results the query should return. Default is 0
+     * which means "return all results".
+     * 
+     * @param maxResultsString
+     *            the maximum number of results as String
+     */
+    public void setMaxResults(String maxResultsString) {
+        if (maxResultsString == null || maxResultsString.length() == 0) {
+            this.maxResults = 0;
+        }
+        try {
+            this.maxResults = Integer.parseInt(maxResultsString);
+        } catch (NumberFormatException e) {
+            LOGGER.warn("The Results maxstring " + maxResultsString + " contains not an integer, 0 as default is set");
+            this.maxResults = 0;
+        }
+        doc = null;
+    }
+
+    /**
+     * Returns the number of results per page that the query should return
+     * 
+     * @return the number of results per page
+     */
+    public int getNumPerPage() {
+        return numPerPage;
+    }
+
+    /**
+     * Sets the number of results per page that the query should return. Default is 10.
+     * 
+     * @param numPerPage
+     *            the number of results per page
+     */
+    public void setNumPerPage(int numPerPage) {
+        if (numPerPage < 0) {
+            this.numPerPage = 10;
+        } else {
+            this.numPerPage = numPerPage;
+        }
+        doc = null;
+    }
+
+    /**
+     * Sets the number of results per page that the query should return. Default is 10.
+     * 
+     * @param numPerPageString
+     *            the number of results per page as String
+     */
+    public void setNumPerPage(String numPerPageString) {
+        if (numPerPageString == null || numPerPageString.length() == 0) {
+            this.numPerPage = 10;
+        }
+        try {
+            this.numPerPage = Integer.parseInt(numPerPageString);
+        } catch (NumberFormatException e) {
+            LOGGER.warn("The numPerPage string " + numPerPageString + " contains not an integer, 10 as default is set");
+            this.numPerPage = 10;
+        }
+        doc = null;
+    }
+
+   /**
      * Returns the list of MCRSortBy criteria for sorting query results
      * 
      * @return a list of MCRSortBy objects, may be empty
@@ -197,6 +268,7 @@ public class MCRQuery {
         if (doc == null) {
             Element query = new Element("query");
             query.setAttribute("maxResults", String.valueOf(maxResults));
+            query.setAttribute("numPerPage", String.valueOf(numPerPage));
 
             if (sortBy != null && sortBy.size() > 0) {
                 Element sortByElem = new Element("sortBy");
@@ -244,9 +316,9 @@ public class MCRQuery {
         }
 
         String max = xml.getAttributeValue("maxResults", "");
-        if (max.length() > 0) {
-            query.setMaxResults(Integer.parseInt(max));
-        }
+        query.setMaxResults(max);
+        String num = xml.getAttributeValue("numPerPage", "");
+        query.setNumPerPage(num);
 
         List<MCRSortBy> sortBy = null;
         Element sortByElem = xml.getChild("sortBy");
