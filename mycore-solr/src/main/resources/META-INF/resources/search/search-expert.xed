@@ -121,6 +121,7 @@ form .optional.expanded .fieldset{
                 </h3>
               </div>
               <div class="panel-body">
+                <mcrsolr:textfield name="core" title="SOLR core (alias, e.g. 'main' or 'classification')." default="main" />
                 <mcrsolr:textfield name="qt" title="Request handler in solrconfig.xml." default="/select" />
 
                 <fieldset class="common">

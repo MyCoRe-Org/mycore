@@ -2,6 +2,10 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor"
   xmlns:mcrsolr="http://www.mycore.de/components/solr" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions">
   <xsl:param name="MCR.Solr.ServerURL" />
+  <xsl:param name="MCR.Solr.Core.main.Name" />
+  <xsl:param name="MCR.Solr.Core.main.ServerURL" />
+  <xsl:param name="MCR.Solr.Core.classification.Name" />
+  <xsl:param name="MCR.Solr.Core.classification.ServerURL" />
   <xsl:variable name="mcrsolr:label-width" select="3" />
   <xsl:variable name="mcrsolr:input-width" select="12 - $mcrsolr:label-width" />
 
@@ -190,12 +194,45 @@
   <xsl:template match="mcrsolr:label">
   <!-- Labels are used in head of fieldset only -->
   </xsl:template>
-
   <xsl:template match="mcrsolr:fieldsHelp">
+    <xsl:apply-templates select="." mode="with-core">
+      <xsl:with-param name="core" select="$MCR.Solr.Core.main.Name" />
+      <xsl:with-param name="type" select="'main'" />
+      <xsl:with-param name="solrUrl">
+        <xsl:choose>
+          <xsl:when test="$MCR.Solr.Core.main.ServerURL">
+            <xsl:value-of select="$MCR.Solr.Core.main.ServerURL" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$MCR.Solr.ServerURL" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:with-param>
+    </xsl:apply-templates>
+    <xsl:apply-templates select="." mode="with-core">
+      <xsl:with-param name="core" select="$MCR.Solr.Core.classification.Name" />
+      <xsl:with-param name="type" select="'classification'" />
+      <xsl:with-param name="solrUrl">
+        <xsl:choose>
+          <xsl:when test="$MCR.Solr.Core.classification.ServerURL">
+            <xsl:value-of select="$MCR.Solr.Core.classification.ServerURL" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$MCR.Solr.ServerURL" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:with-param>
+    </xsl:apply-templates>
+  </xsl:template>
+  <xsl:template match="mcrsolr:fieldsHelp" mode="with-core">
+    <xsl:param name="core" />
+    <xsl:param name="type" />
+    <xsl:param name="solrUrl" />
     <div class="table-responsive">
       <table class="table table-striped table-hover table-condensed">
-        <xsl:variable name="url" select="concat($MCR.Solr.ServerURL, '/admin/luke')" />
+        <xsl:variable name="url" select="concat($solrUrl, 'solr/', $core, '/admin/luke?wt=xml')" />
         <xsl:variable name="availableFields" select="document($url)" />
+        <caption><xsl:value-of select="concat('Fields of core ',$type,'(',$core,')')" /></caption>
         <tr>
           <th>field</th>
           <th>type</th>
