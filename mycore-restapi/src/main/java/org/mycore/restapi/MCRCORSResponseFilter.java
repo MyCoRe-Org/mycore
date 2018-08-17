@@ -21,6 +21,7 @@ package org.mycore.restapi;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,11 +30,14 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 
 public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
@@ -55,25 +59,16 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
     private static final String ACCESS_CONTROL_MAX_AGE = "Access-Control-Max-Age";
 
-    private static void handlePreFlight(ContainerRequestContext requestContext,
-        MultivaluedMap<String, Object> responseHeaders,
-        boolean authenticatedRequest) {
+    @Context
+    ResourceInfo resourceInfo;
+
+    private static boolean handlePreFlight(ContainerRequestContext requestContext,
+        MultivaluedMap<String, Object> responseHeaders) {
         if (!requestContext.getMethod().equals(HttpMethod.OPTIONS)) {
-            return;
+            return false;
         }
         //allow all methods
         responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_METHODS, responseHeaders.getFirst(HttpHeaders.ALLOW));
-        ArrayList<String> exposedHeaders = new ArrayList<>(); //todo: to be extended
-        if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
-            exposedHeaders.add(HttpHeaders.AUTHORIZATION);
-        }
-        if (responseHeaders.getFirst(HttpHeaders.LOCATION) != null){
-            exposedHeaders.add(HttpHeaders.LOCATION);
-        }
-        if (!exposedHeaders.isEmpty()) {
-            responseHeaders.putSingle(ACCESS_CONTROL_EXPOSE_HEADERS,
-                exposedHeaders.stream().collect(Collectors.joining(",")));
-        }
         String requestHeaders = requestContext.getHeaderString(ACCESS_CONTROL_REQUEST_HEADERS);
         if (requestHeaders != null) {
             //todo: may be restricted?
@@ -81,6 +76,7 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
         }
         long cacheSeconds = TimeUnit.DAYS.toSeconds(1);
         responseHeaders.putSingle(ACCESS_CONTROL_MAX_AGE, cacheSeconds);
+        return true;
     }
 
     @Override
@@ -97,8 +93,23 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
             responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
         }
         responseHeaders.putSingle(ACCESS_CONTROL_ALLOW_ORIGIN, authenticatedRequest ? origin : "*");
-        //todo: Access-Control-Expose-Headers
-        handlePreFlight(requestContext, responseHeaders, authenticatedRequest);
+        if (!handlePreFlight(requestContext, responseHeaders)) {
+            //not a CORS preflight request
+            ArrayList<String> exposedHeaders = new ArrayList<>();
+            if (authenticatedRequest && responseHeaders.getFirst(HttpHeaders.AUTHORIZATION) != null) {
+                exposedHeaders.add(HttpHeaders.AUTHORIZATION);
+            }
+            Optional.ofNullable(resourceInfo.getResourceMethod()
+                .getAnnotation(MCRAccessControlExposeHeaders.class))
+                .map(MCRAccessControlExposeHeaders::value)
+                .map(Stream::of)
+                .orElse(Stream.empty())
+                .forEach(exposedHeaders::add);
+            if (!exposedHeaders.isEmpty()) {
+                responseHeaders.putSingle(ACCESS_CONTROL_EXPOSE_HEADERS,
+                    exposedHeaders.stream().collect(Collectors.joining(",")));
+            }
+        }
         if (!"*".equals(responseHeaders.getFirst(ACCESS_CONTROL_ALLOW_ORIGIN))) {
             String vary = Stream
                 .concat(Stream.of(ORIGIN),

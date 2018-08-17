@@ -38,6 +38,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -46,6 +47,7 @@ import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
+import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
@@ -274,6 +276,7 @@ public class MCRRestAPIObjects {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
     public Response uploadObject(@Context UriInfo info, @Context HttpServletRequest request,
         @FormDataParam("file") InputStream uploadedInputStream,
         @FormDataParam("file") FormDataContentDisposition fileDetails) throws MCRRestAPIException {
@@ -301,6 +304,7 @@ public class MCRRestAPIObjects {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
     public Response uploadDerivate(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam(PARAM_MCRID) String mcrObjID, @FormDataParam("label") String label,
         @FormDataParam("overwriteOnExistingLabel") @DefaultValue("false") boolean overwrite)
@@ -331,6 +335,7 @@ public class MCRRestAPIObjects {
     @Produces({ MediaType.TEXT_XML + ";charset=UTF-8" })
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
     public Response uploadFile(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam(PARAM_MCRID) String mcrObjID,
         @PathParam(PARAM_DERID) String mcrDerID,
