@@ -46,7 +46,7 @@ import org.mycore.common.log4j2.MCRSessionThreadContext;
 
 /**
  * Called by {@link MCRStartupHandler} on start up to setup {@link MCRConfiguration}.
- * 
+ *
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
  */
@@ -111,15 +111,19 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             //no configuration dir exists
             return;
         }
-        ClassLoader classLoader = Optional.ofNullable(Thread.currentThread().getContextClassLoader())
-            .orElseGet(MCRConfigurationDir.class::getClassLoader);
-        if (!(classLoader instanceof URLClassLoader)) {
-            System.err.println(classLoader.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
+        Optional<URLClassLoader> classLoaderOptional = Stream
+            .of(MCRConfigurationDirSetup.class.getClassLoader(), Thread.currentThread().getContextClassLoader())
+            .filter(URLClassLoader.class::isInstance)
+            .map(URLClassLoader.class::cast)
+            .findFirst();
+        if (!classLoaderOptional.isPresent()) {
+            System.err.println(classLoaderOptional.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
             return;
         }
         File libDir = MCRConfigurationDir.getConfigFile("lib");
-        Set<URL> currentCPElements = Stream.of(((URLClassLoader) classLoader).getURLs()).collect(Collectors.toSet());
-        Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
+        URLClassLoader urlClassLoader = classLoaderOptional.get();
+        Set<URL> currentCPElements = Stream.of(urlClassLoader.getURLs()).collect(Collectors.toSet());
+        Class<? extends ClassLoader> classLoaderClass = urlClassLoader.getClass();
         try {
             Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             addUrlMethod.setAccessible(true);
@@ -138,7 +142,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                 .forEach(u -> {
                     System.out.println("Adding to CLASSPATH: " + u);
                     try {
-                        addUrlMethod.invoke(classLoader, u);
+                        addUrlMethod.invoke(urlClassLoader, u);
                     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                         LOGGER.error("Could not add {} to current classloader.", u, e);
                     }
