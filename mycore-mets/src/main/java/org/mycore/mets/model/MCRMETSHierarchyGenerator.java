@@ -22,18 +22,18 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
@@ -44,6 +44,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectUtils;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.mets.misc.DefaultStructLinkGenerator;
 import org.mycore.mets.model.files.FLocat;
 import org.mycore.mets.model.files.File;
 import org.mycore.mets.model.files.FileGrp;
@@ -51,6 +52,7 @@ import org.mycore.mets.model.files.FileSec;
 import org.mycore.mets.model.header.MetsHdr;
 import org.mycore.mets.model.sections.AmdSec;
 import org.mycore.mets.model.sections.DmdSec;
+import org.mycore.mets.model.struct.AbstractDiv;
 import org.mycore.mets.model.struct.Area;
 import org.mycore.mets.model.struct.Fptr;
 import org.mycore.mets.model.struct.LOCTYPE;
@@ -60,7 +62,6 @@ import org.mycore.mets.model.struct.PhysicalDiv;
 import org.mycore.mets.model.struct.PhysicalStructMap;
 import org.mycore.mets.model.struct.PhysicalSubDiv;
 import org.mycore.mets.model.struct.Seq;
-import org.mycore.mets.model.struct.SmLink;
 import org.mycore.mets.model.struct.StructLink;
 import org.mycore.mets.tools.MCRMetsSave;
 
@@ -75,7 +76,7 @@ import org.mycore.mets.tools.MCRMetsSave;
  */
 public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRMETSHierarchyGenerator.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     protected MCRDerivate mcrDer;
 
@@ -95,13 +96,12 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
 
     protected StructLink structLink;
 
-    private List<FileRef> files;
+    protected List<FileRef> files;
 
     /**
-     * Hashmap to store logical and physical ids. An entry is added
-     * for each derivate link.
+     * Hashmap to store logical and physical ids.
      */
-    private Map<String, List<String>> structLinkMap;
+    protected Map<LogicalDiv, List<PhysicalSubDiv>> structLinkMap;
 
     public MCRMETSHierarchyGenerator() {
         this.files = new ArrayList<>();
@@ -214,33 +214,35 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
 
         for (MCRPath file : filePaths) {
             String contentType = MCRContentTypes.probeContentType(file);
-            FileRef ref = new FileRef(file, contentType);
+            FileRef ref = buildFileRef(file, contentType);
             this.files.add(ref);
         }
 
         for (FileRef ref : this.files) {
-            String use = MCRMetsModelHelper.getUseForHref(ref.path.getOwnerRelativePath()).orElse("UNKNOWN");
+            String use = MCRMetsModelHelper.getUseForHref(ref.getPath().getOwnerRelativePath()).orElse("UNKNOWN");
             FileGrp fileGrp = fileGrps.stream().filter(grp -> grp.getUse().equals(use)).findFirst().orElse(null);
             if (fileGrp == null) {
-                LOGGER.warn("Unable to add file '" + ref.toId() + "' because cannot find corresponding group "
-                        + " with @USE='" + use + "'. Ignore file and continue.");
+                LOGGER.warn(
+                    "Unable to add file '{}' because cannot find corresponding group  with @USE='{}'. "
+                        + "Ignore file and continue.",
+                    ref.toFileId(), use);
                 continue;
             }
-            addFile(ref.toId(), fileGrp, ref.getPath(), ref.getContentType());
+            addFile(ref, fileGrp);
         }
 
         return fileSec;
     }
 
-    private void addFile(String id, FileGrp fileGroup, MCRPath path, String mimeType) {
-        File imageFile = new File(id, mimeType);
+    protected void addFile(FileRef fileRef, FileGrp fileGroup) {
+        File imageFile = new File(fileRef.toFileId(fileGroup), fileRef.getContentType());
         try {
-            final String href = MCRXMLFunctions.encodeURIPath(path.getOwnerRelativePath().substring(1), true);
+            final String href = fileRef.toFileHref(fileGroup);
             FLocat fLocat = new FLocat(LOCTYPE.URL, href);
             imageFile.setFLocat(fLocat);
             fileGroup.addFile(imageFile);
-        } catch (URISyntaxException uriSyntaxException) {
-            LOGGER.error("invalid href", uriSyntaxException);
+        } catch (Exception exc) {
+            LOGGER.error("invalid href for " + fileRef.getPath().toString(), exc);
         }
     }
 
@@ -259,10 +261,10 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
             PhysicalSubDiv page = physicalDiv.get(physId);
             if (page == null) {
                 page = new PhysicalSubDiv(physId, PhysicalSubDiv.TYPE_PAGE);
-                getOrderLabel(ref.toId()).ifPresent(page::setOrderLabel);
+                getOrderLabel(ref.toFileId()).ifPresent(page::setOrderLabel);
                 physicalDiv.add(page);
             }
-            page.add(new Fptr(ref.toId()));
+            page.add(new Fptr(ref.toFileId()));
         }
         return pstr;
     }
@@ -302,17 +304,15 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         String amdId = this.amdSection.getId();
         String dmdId = this.dmdSection.getId();
         LogicalDiv logicalDiv = new LogicalDiv(objId.toString(), getType(this.rootObj), getLabel(this.rootObj), amdId,
-                dmdId);
+            dmdId);
         lstr.setDivContainer(logicalDiv);
         // run through all children
         newLogicalStructMap(this.rootObj, logicalDiv);
-        // remove not linked logical divs
-        logicalDiv.getChildren().removeIf(child -> !validateLogicalStruct(child));
         return lstr;
     }
 
     /**
-     * Creates the logical structure recursive. 
+     * Creates the logical structure recursive.
      *
      * @param parentObject mycore object
      * @param parentLogicalDiv parent div
@@ -327,7 +327,8 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
             // add to parent
             parentLogicalDiv.add(logicalChildDiv);
             // check if a derivate link exists and get the linked file
-            updateStructLinkMapUsingDerivateLinks(logicalChildDiv, childObject);
+            FileGrp masterGroup = this.fileSection.getFileGroup(FileGrp.USE_MASTER);
+            updateStructLinkMapUsingDerivateLinks(logicalChildDiv, childObject, masterGroup);
             // do recursive call for children
             newLogicalStructMap(childObject, logicalChildDiv);
         });
@@ -360,9 +361,11 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
                 }
                 updateStructLinkMapUsingALTO(newDiv);
             } else {
-                LOGGER.warn("Unable to find logical div @ID='" + id + "'"
-                        + " of previous mets.xml in this generated mets.xml. Be aware that the content of the 'old' "
-                        + "logical div cannot be copied and therefore cannot be preserved!");
+                LOGGER.warn(
+                    "Unable to find logical div @ID='{}' of previous mets.xml in this generated mets.xml. "
+                        + "Be aware that the content of the 'old' logical div cannot be copied and therefore cannot "
+                        + "be preserved!",
+                    id);
             }
         });
     }
@@ -399,11 +402,18 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
      *
      * @param logicalDiv the logical div to handle
      * @param mcrObject the mycore object linked in the logical div (mets:div/@ID == mycore object id)
+     * @param group the group to search the corresponding File ID. this is usally the MASTER group
      */
-    protected void updateStructLinkMapUsingDerivateLinks(LogicalDiv logicalDiv, MCRObject mcrObject) {
-        // by derivate link
+    protected void updateStructLinkMapUsingDerivateLinks(LogicalDiv logicalDiv, MCRObject mcrObject, FileGrp group) {
+        // get the derivate link
         Optional<String> linkedFileOptional = getLinkedFile(mcrObject);
-        linkedFileOptional.flatMap(this::getFileId).ifPresent(fileId -> {
+        // resolve the derivate link using the FileRef API
+        Optional<String> resolvedFileHref = linkedFileOptional.map(linkedFile -> {
+            FileRef tempRef = buildFileRef(MCRPath.toMCRPath(getDerivatePath().resolve(linkedFile)), null);
+            return tempRef.toFileHref(group);
+        });
+        // add to struct link map
+        resolvedFileHref.flatMap(linkedFile -> this.getFileId(linkedFile, group)).ifPresent(fileId -> {
             PhysicalSubDiv physicalDiv = getPhysicalDiv(fileId);
             addToStructLinkMap(logicalDiv, physicalDiv);
         });
@@ -416,16 +426,16 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
      */
     protected void updateStructLinkMapUsingALTO(final LogicalDiv logicalDiv) {
         logicalDiv.getFptrList()
-                  .stream()
-                  .flatMap(fptr -> fptr.getSeqList().stream())
-                  .flatMap(seq -> seq.getAreaList().stream())
-                  .map(Area::getFileId)
-                  .map(this::getPhysicalDiv)
-                  .forEach(physicalDiv -> addToStructLinkMap(logicalDiv, physicalDiv));
+            .stream()
+            .flatMap(fptr -> fptr.getSeqList().stream())
+            .flatMap(seq -> seq.getAreaList().stream())
+            .map(Area::getFileId)
+            .map(this::getPhysicalDiv)
+            .forEach(physicalDiv -> addToStructLinkMap(logicalDiv, physicalDiv));
     }
 
     /**
-     * Adds the logical div to the physical div. Required to build the mets:structLink section.
+     * Adds the physical div to the logical div. Required to build the mets:structLink section.
      *
      * @param from logical div
      * @param to physical div
@@ -434,9 +444,16 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         if (from == null || to == null) {
             return;
         }
-        List<String> logChildDivIDs = this.structLinkMap.getOrDefault(to.getId(), new ArrayList<>());
-        logChildDivIDs.add(from.getId());
-        this.structLinkMap.put(to.getId(), logChildDivIDs);
+        List<PhysicalSubDiv> physicalSubDivs = this.structLinkMap.getOrDefault(from, new ArrayList<>());
+        physicalSubDivs.add(to);
+        physicalSubDivs = physicalSubDivs.stream().filter(MCRStreamUtils.distinctByKey(AbstractDiv::getId))
+            .sorted((div1, div2) -> {
+                if (div1.getOrder() != null && div2.getOrder() != null) {
+                    return div1.getOrder().compareTo(div2.getOrder());
+                }
+                return div1.getId().compareTo(div2.getId());
+            }).collect(Collectors.toList());
+        this.structLinkMap.put(from, physicalSubDivs);
     }
 
     /**
@@ -449,72 +466,29 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
     }
 
     /**
-     * Its important to remove not linked logical divs without children to
-     * get a valid logical structure.
-     *
-     * @param logicalDiv the logical div to check
-     * @return true if the logical struct is valid otherwise false
-     */
-    private boolean validateLogicalStruct(LogicalDiv logicalDiv) {
-        // has link
-        String logicalDivId = logicalDiv.getId();
-        for (List<String> logivalDivIDs : structLinkMap.values()) {
-            if (logivalDivIDs.contains(logicalDivId)) {
-                return true;
-            }
-        }
-        // has children with link
-        Iterator<LogicalDiv> it = logicalDiv.getChildren().iterator();
-        while (it.hasNext()) {
-            LogicalDiv child = it.next();
-            if (validateLogicalStruct(child)) {
-                return true;
-            }
-            // nothing -> delete it
-            it.remove();
-        }
-        return false;
-    }
-
-    /**
      * Creates the mets:structLink part of the mets.xml
      *
      * @return a newly generated StructLink.
      */
     protected StructLink createStructLink() {
-        StructLink structLink = new StructLink();
-        String currentLogicalDivId = logicalStructMap.getDivContainer().getId();
-        PhysicalDiv physicalDiv = this.physicalStructMap.getDivContainer();
-        List<PhysicalSubDiv> subDivList = physicalDiv.getChildren();
-        for (PhysicalSubDiv physLink : subDivList) {
-            if (structLinkMap.containsKey(physLink.getId())) {
-                ArrayList<String> logicalIdList = new ArrayList<>(structLinkMap.get(physLink.getId()));
-                Collections.sort(logicalIdList);
-                for (String logicalId : logicalIdList) {
-                    currentLogicalDivId = logicalId;
-                    structLink.addSmLink(new SmLink(currentLogicalDivId, physLink.getId()));
-                }
-            } else {
-                structLink.addSmLink(new SmLink(currentLogicalDivId, physLink.getId()));
-            }
-        }
-        return structLink;
+        DefaultStructLinkGenerator structLinkGenerator = new DefaultStructLinkGenerator(this.structLinkMap);
+        structLinkGenerator.setFailEasy(false);
+        return structLinkGenerator.generate(this.physicalStructMap, this.logicalStructMap);
     }
 
     /**
-     * Runs through all USE="MASTER" files and tries to find the corresponding
-     * mets:file @ID.
+     * Runs through all files in the given FileGrp and tries to find the corresponding mets:file @ID.
      *
+     * @param group the file group
      * @param uriEncodedLinkedFile the file to find
      * @return the fileSec @ID
      */
-    private Optional<String> getFileId(String uriEncodedLinkedFile) {
-        FileGrp masterGroup = this.fileSection.getFileGroup(FileGrp.USE_MASTER);
-        return masterGroup.getFileList().stream().filter(file -> {
+    private Optional<String> getFileId(String uriEncodedLinkedFile, FileGrp group) {
+        return group.getFileList().stream().filter(file -> {
             String href = file.getFLocat().getHref();
             boolean equals = href.equals(uriEncodedLinkedFile);
-            boolean equalsWithoutSlash =
-                    uriEncodedLinkedFile.startsWith("/") && href.equals(uriEncodedLinkedFile.substring(1));
+            boolean equalsWithoutSlash = uriEncodedLinkedFile.startsWith("/")
+                && href.equals(uriEncodedLinkedFile.substring(1));
             return equals || equalsWithoutSlash;
         }).map(File::getId).findFirst();
     }
@@ -531,10 +505,10 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         }
         PhysicalDiv mainDiv = this.physicalStructMap.getDivContainer();
         return mainDiv.getChildren()
-                      .stream()
-                      .filter(subDiv -> Objects.nonNull(subDiv.getFptr(fileId)))
-                      .findAny()
-                      .orElse(null);
+            .stream()
+            .filter(subDiv -> Objects.nonNull(subDiv.getFptr(fileId)))
+            .findAny()
+            .orElse(null);
     }
 
     /**
@@ -549,11 +523,11 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
             return Optional.empty();
         }
         return StreamSupport.stream(me.spliterator(), false)
-                            .filter(metaInterface -> metaInterface instanceof MCRMetaDerivateLink)
-                            .map(MCRMetaDerivateLink.class::cast)
-                            .filter(link -> this.mcrDer.getId().equals(MCRObjectID.getInstance(link.getOwner())))
-                            .map(MCRMetaDerivateLink::getRawPath)
-                            .findFirst();
+            .filter(metaInterface -> metaInterface instanceof MCRMetaDerivateLink)
+            .map(MCRMetaDerivateLink.class::cast)
+            .filter(link -> this.mcrDer.getId().equals(MCRObjectID.getInstance(link.getOwner())))
+            .map(MCRMetaDerivateLink::getRawPath)
+            .findFirst();
     }
 
     /**
@@ -578,31 +552,68 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
      */
     protected abstract String getDerivateLinkName();
 
-    class FileRef {
+    protected FileRef buildFileRef(MCRPath path, String contentType) {
+        return new FileRefImpl(path, contentType);
+    }
+
+    protected interface FileRef {
+
+        MCRPath getPath();
+
+        String getContentType();
+
+        default String toFileId() {
+            return this.toFileId(null);
+        }
+
+        String toFileId(FileGrp fileGroup);
+
+        String toFileHref(FileGrp fileGroup);
+
+        String toPhysId();
+
+    }
+
+    protected static class FileRefImpl implements FileRef {
 
         private MCRPath path;
 
         private String contentType;
 
-        FileRef(MCRPath path, String contentType) {
+        FileRefImpl(MCRPath path, String contentType) {
             this.path = path;
             this.contentType = contentType;
         }
 
-        public String toId() {
-            return MCRMetsSave.getFileId(path);
-        }
-
-        public String toPhysId() {
-            return PhysicalSubDiv.ID_PREFIX + MCRMetsSave.getFileBase(path);
-        }
-
+        @Override
         public MCRPath getPath() {
-            return path;
+            return this.path;
         }
 
+        @Override
         public String getContentType() {
-            return contentType;
+            return this.contentType;
+        }
+
+        @Override
+        public String toFileId(FileGrp fileGroup) {
+            return MCRMetsSave.getFileId(this.path);
+        }
+
+        @Override
+        public String toFileHref(FileGrp fileGroup) {
+            String path = getPath().getOwnerRelativePath().substring(1);
+            try {
+                return MCRXMLFunctions.encodeURIPath(path,
+                    true);
+            } catch (URISyntaxException exc) {
+                throw new MCRException("Unable to encode " + path, exc);
+            }
+        }
+
+        @Override
+        public String toPhysId() {
+            return PhysicalSubDiv.ID_PREFIX + MCRMetsSave.getFileBase(this.path);
         }
 
     }
