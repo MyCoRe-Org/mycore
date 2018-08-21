@@ -85,7 +85,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
                 pi.getType(),
                 pi.getService()));
 
-        Gson gson = new Gson();
+        Gson gson = MCRPIService.getGson();
         obj.getService().getFlags(MCRPIService.PI_FLAG).stream()
             .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
             .filter(entry -> !MCRPIManager.getInstance().exist(entry))

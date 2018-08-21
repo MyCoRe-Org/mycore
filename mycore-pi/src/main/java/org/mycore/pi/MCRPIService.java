@@ -110,7 +110,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         return null;
     }
 
-    private static Gson getGson() {
+    static Gson getGson() {
         return new GsonBuilder().registerTypeAdapter(Date.class, new MCRGsonUTCDateAdapter())
             .setExclusionStrategies(new ExclusionStrategy() {
                 @Override
