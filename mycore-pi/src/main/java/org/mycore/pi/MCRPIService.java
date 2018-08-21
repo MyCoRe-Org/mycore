@@ -296,7 +296,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *                                          {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
-    public T register(MCRBase obj, String additional, boolean updateObject)
+    public synchronized T register(MCRBase obj, String additional, boolean updateObject)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         this.validateRegistration(obj, additional);
         final T identifier = getNewIdentifier(obj, additional);
