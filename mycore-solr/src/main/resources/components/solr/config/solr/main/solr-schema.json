@@ -302,6 +302,7 @@
     "add-field": {
       "name": "content",
       "type": "text_general",
+      "multiValued": false,
       "stored": false
     }
   },
@@ -415,7 +416,7 @@
     "add-field": {
       "name": "modifiedby",
       "type": "string",
-      "multiValued": true,
+      "multiValued": false,
       "stored": true
     }
   },
@@ -466,6 +467,7 @@
     "add-field": {
       "name": "search_result_link_text",
       "type": "text_general",
+      "multiValued": false,
       "indexed": false
     }
   },
@@ -508,6 +510,18 @@
       "name": "urn",
       "type": "string",
       "multiValued": true
+    }
+  },
+  {
+    "add-field": {
+      "name": "worldReadable",
+      "type": "boolean"
+    }
+  },
+  {
+    "add-field": {
+      "name": "worldReadableComplete",
+      "type": "boolean"
     }
   },
   {
