@@ -135,7 +135,7 @@ If you don't do that you will receive this message in the viewer console:
 To migrate old mods-files we have a Stylesheet.
 You need to select all mods-files first:
 ```
-select objects with solr query objectType:mods
+select objects with solr query +objectType:mods +category.top:rfc4646\:* in core main
 ```
 
 A message like this should appear: `INFO: 2 objects selected`
