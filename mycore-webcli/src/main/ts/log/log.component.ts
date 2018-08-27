@@ -55,6 +55,7 @@ export class WebCliLogComponent {
                         document.getElementsByClassName('web-cli-log')[0].appendChild(nodeEx);
                       }
                     }
+                    this.scrollLog();
                   });
               }
 
@@ -62,9 +63,9 @@ export class WebCliLogComponent {
     document.getElementsByClassName('web-cli-log')[0].innerHTML = "";
   }
 
-  ngAfterViewChecked() {
-    this.scrollLog()
-  }
+  // ngAfterViewChecked() {
+  //   this.scrollLog()
+  // }
 
   scrollLog() {
     if (this.settings.autoscroll) {

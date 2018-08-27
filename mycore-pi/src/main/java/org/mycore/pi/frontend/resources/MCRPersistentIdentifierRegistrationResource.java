@@ -20,6 +20,7 @@ package org.mycore.pi.frontend.resources;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.DefaultValue;
@@ -130,7 +131,7 @@ public class MCRPersistentIdentifierRegistrationResource {
         MCRBase object = MCRMetadataManager.retrieve(mycoreIDObject);
         try {
             identifier = registrationService.register(object, additional, true);
-        } catch (MCRPersistentIdentifierException | MCRActiveLinkException e) {
+        } catch (MCRPersistentIdentifierException | MCRActiveLinkException | ExecutionException | InterruptedException e) {
             LOGGER.error(e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(buildErrorJSON("Error while register new identifier!", e)).build();
@@ -139,6 +140,7 @@ public class MCRPersistentIdentifierRegistrationResource {
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(buildErrorJSON("Error while register new identifier!", e)).build();
         }
+
 
         return Response.status(Response.Status.CREATED).entity(buildIdentifierObject(identifier)).build();
     }

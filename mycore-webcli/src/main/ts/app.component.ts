@@ -54,7 +54,7 @@ export class AppComponent {
           this.currentQueueLength = queueLength;
           if (queueLength < 1) {
             (<HTMLElement>document.getElementsByClassName('logTab')[0]).click();
-            this.webCliLogComponent.scrollLog();
+            // this.webCliLogComponent.scrollLog();
           }
       });
     this._communicationService.commandHistory.subscribe(

@@ -77,7 +77,8 @@ import org.mycore.common.MCRCoreVersion;
 })
 @Table(
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "identifier", "type" })
+        @UniqueConstraint(columnNames = { "identifier", "type" }),
+        @UniqueConstraint(columnNames = { "mycoreid", "service", "additional"})
     },
     indexes = {
         @Index(name = "Identifier", columnList = "identifier"),

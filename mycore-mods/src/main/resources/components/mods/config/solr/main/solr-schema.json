@@ -105,7 +105,9 @@
   {
     "add-field": {
       "name": "mods.dateIssued.host",
-      "type": "string"
+      "type": "string",
+      "stored": true,
+      "multiValued": false
     }
   },
   {

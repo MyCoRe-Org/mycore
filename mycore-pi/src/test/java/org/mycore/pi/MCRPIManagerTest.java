@@ -21,6 +21,7 @@ package org.mycore.pi;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 import org.junit.After;
@@ -95,7 +96,8 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
 
     @Test
     public void testRegistrationService()
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        InterruptedException {
         MockMetadataManager mockMetadataManager = new MockMetadataManager();
 
         MCRPIService<MCRMockIdentifier> registrationService = MCRPIServiceManager
