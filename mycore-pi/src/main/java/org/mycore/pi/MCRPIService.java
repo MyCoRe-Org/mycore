@@ -17,8 +17,6 @@
  */
 package org.mycore.pi;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -26,6 +24,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -36,6 +38,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -49,11 +52,15 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.MCRDOIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.i18n.MCRTranslation;
+import org.mycore.util.concurrent.MCRFixedUserCallable;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
@@ -74,6 +81,14 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     private final String registrationServiceID;
 
     private final String type;
+
+    private static final ExecutorService REGISTER_POOL;
+
+    static {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("MCRPIRegister-#%d")
+            .build();
+        REGISTER_POOL = Executors.newFixedThreadPool(1, threadFactory);
+    }
 
     public MCRPIService(String registrationServiceID, String identifierType) {
         this.registrationServiceID = registrationServiceID;
@@ -263,7 +278,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * shorthand for {@link #register(MCRBase, String, boolean)} with update = true
      */
     public T register(MCRBase obj, String additional)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        InterruptedException {
         return register(obj, additional, true);
     }
 
@@ -279,7 +295,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *                                          {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
-    public T register(MCRBase obj) throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
+    public T register(MCRBase obj)
+        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        InterruptedException {
         return this.register(obj, null);
     }
 
@@ -296,26 +314,34 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *                                          {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
-    public T register(MCRBase obj, String additional, boolean updateObject)
-        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
-        this.validateRegistration(obj, additional);
-        final T identifier = getNewIdentifier(obj, additional);
-        this.registerIdentifier(obj, additional, identifier);
-        this.getMetadataService().insertIdentifier(identifier, obj, additional);
+    public synchronized T register(MCRBase obj, String additional, boolean updateObject)
+        throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
+        InterruptedException {
 
-        MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier);
+        // There are many querys that require the current database state.
+        // So we start a new transaction within the synchronized block
+        final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<T>(() -> {
+            this.validateRegistration(obj, additional);
+            final T identifier = getNewIdentifier(obj, additional);
+            this.registerIdentifier(obj, additional, identifier);
+            this.getMetadataService().insertIdentifier(identifier, obj, additional);
 
-        addFlagToObject(obj, databaseEntry);
+            MCRPI databaseEntry = insertIdentifierToDatabase(obj, additional, identifier);
 
-        if (updateObject) {
-            if (obj instanceof MCRObject) {
-                MCRMetadataManager.update((MCRObject) obj);
-            } else if (obj instanceof MCRDerivate) {
-                MCRMetadataManager.update((MCRDerivate) obj);
+            addFlagToObject(obj, databaseEntry);
+
+            if (updateObject) {
+                if (obj instanceof MCRObject) {
+                    MCRMetadataManager.update((MCRObject) obj);
+                } else if (obj instanceof MCRDerivate) {
+                    MCRMetadataManager.update((MCRDerivate) obj);
+                }
             }
-        }
 
-        return identifier;
+            return identifier;
+        }, MCRSessionMgr.getCurrentSession().getUserInformation());
+
+        return REGISTER_POOL.submit(createPICallable).get();
     }
 
     protected Date provideRegisterDate(MCRBase obj, String additional) {
