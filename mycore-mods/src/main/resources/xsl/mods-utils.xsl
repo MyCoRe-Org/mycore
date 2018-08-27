@@ -295,14 +295,14 @@
 
   <xsl:template match="mods:accessCondition" mode="oa-logo">
     <a rel="license" href="https://open-access.net/">
-      <img src="http://open-access.net/fileadmin/logos/OpenAccess_Logo.JPG" style="width: 25%;" />
+      <img src="//open-access.net/fileadmin/logos/OpenAccess_Logo.JPG" style="width: 25%;" />
     </a>
   </xsl:template>
 
   <xsl:template match="mods:accessCondition" mode="ogl-logo">
     <xsl:variable name="licenseVersion" select="substring-before(substring-after(@xlink:href, '#ogl_'), '.')" />
     <a rel="license" href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/{$licenseVersion}/">
-      <img src="https://upload.wikimedia.org/wikipedia/en/4/46/UKOpenGovernmentLicence.svg" style="width: 50px;" />
+      <img src="//upload.wikimedia.org/wikipedia/en/4/46/UKOpenGovernmentLicence.svg" style="width: 50px;" />
     </a>
   </xsl:template>
 
