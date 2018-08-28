@@ -319,7 +319,7 @@
                 <xsl:apply-templates select="$derivate/mycorederivate/derivate/internals" />
                 <xsl:if test="$derivateWithURN">
                   <xsl:variable name="derivateURN" select="$derivate/mycorederivate/derivate/fileset/@urn" />
-                  <a href="{concat('http://nbn-resolving.de/urn/resolver.pl?urn=',$derivateURN)}">
+                  <a href="{concat('https://nbn-resolving.org/urn/resolver.pl?urn=',$derivateURN)}">
                     <xsl:value-of select="$derivateURN" />
                   </a>
                 </xsl:if>
