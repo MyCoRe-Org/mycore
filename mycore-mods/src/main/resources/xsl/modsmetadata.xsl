@@ -733,7 +733,7 @@
             </a>
           </xsl:when>
           <xsl:when test="@type='urn' and not(contains($link,'http'))">
-            <a href="http://nbn-resolving.de/{$link}">
+            <a href="https://nbn-resolving.org/{$link}">
               <xsl:value-of select="$link" />
             </a>
           </xsl:when>
