@@ -417,6 +417,14 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         setCalendar(element.getChildTextTrim("calendar"));
         setVonDate(element.getChildTextTrim("von"), calendar);
         setBisDate(element.getChildTextTrim("bis"), calendar);
+        /** 
+         * If dates higher than 1582 and calendar is Julian the calendar must switch to 
+         * Gregorian cause the date transforming is implicit in the calendar methods. In
+         * other cases before 1582 both calendar are equal.
+         * */
+        if (calendar.equals(MCRCalendar.TAG_JULIAN)) {
+            calendar = MCRCalendar.TAG_GREGORIAN;
+        }
     }
 
     /**
