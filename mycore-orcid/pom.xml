@@ -62,6 +62,10 @@
       <artifactId>mycore-user2</artifactId>
     </dependency>
     <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
       <scope>runtime</scope>
