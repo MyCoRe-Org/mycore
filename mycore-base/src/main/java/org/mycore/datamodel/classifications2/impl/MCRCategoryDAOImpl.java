@@ -34,6 +34,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.FlushModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
@@ -138,7 +139,12 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         LOGGER.debug("Will get: {}", id);
         MCRCategoryImpl category = getByNaturalID(entityManager, id);
-        entityManager.refresh(category); //for MCR-1863
+        try {
+            entityManager.refresh(category); //for MCR-1863
+        } catch (EntityNotFoundException e){
+            //required since hibernate 5.3 if category is deleted within same transaction.
+            //junit: testLicenses()
+        }
         if (category == null) {
             throw new MCRPersistenceException("Category " + id + " was not found. Delete aborted.");
         }
