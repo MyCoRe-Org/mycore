@@ -19,6 +19,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,7 +82,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
      * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The type element was set to
+     * is null or empty an exception was thrown. The type element was set to
      * the value of <em>set_type</em>, if it is null, an empty string was set
      * to the type element.<br>
      * The text element is set to an empty string. The calendar is set to 'Gregorian Calendar'. The von value 
@@ -511,9 +512,31 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             LOGGER.debug("Von (JulianDay)    = {}", ivon);
             LOGGER.debug("Bis (String)       = {}", getBisToString());
             LOGGER.debug("Bis (JulianDay)    = {}", ibis);
-            LOGGER.debug("Stop");
             LOGGER.debug("");
         }
+    }
+
+    /**
+     * This method compares this instance with a MCRMetaHistoryDate object
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MCRMetaHistoryDate other = (MCRMetaHistoryDate) obj;
+        boolean field_test = Objects.equals(this.calendar, other.calendar) && Objects.equals(this.ivon, other.ivon);
+        boolean text_test = equalText(other.getTexts());
+        return field_test && text_test;
+    }
+
+    private boolean equalText(ArrayList<MCRMetaHistoryDateText> objtexts) {
+        boolean testflag = true;
+        int size = texts.size() < objtexts.size() ? texts.size() : objtexts.size();
+        for (int i = 0 ; i < size; i++) {
+            testflag &= texts.get(i).equals(objtexts.get(i));  
+        }
+        return testflag;
     }
 
     /**
@@ -592,5 +615,14 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             return !(lang.length() == 0 || datetext.length() == 0);
         }
 
+        /**
+         * This method check the equivalence of lang and text between this object and a given MCRMetaHistoryDateText object.
+         * 
+         * @param obj a MCRMetaHistoryDateText instance
+         * @return true if both parts are equal
+         */
+        public boolean equals(MCRMetaHistoryDateText obj) {
+            return lang.equals(obj.getLang()) && datetext.equals(obj.getText());
+        }
     }
 }
