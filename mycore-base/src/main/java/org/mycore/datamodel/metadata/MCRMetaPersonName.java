@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -32,7 +34,7 @@ import org.mycore.common.MCRException;
  * @author J. Kupferschmidt
  */
 public final class MCRMetaPersonName extends MCRMetaDefault {
-    // MetaPerson data
+
     private String firstname;
 
     private String callname;
@@ -417,6 +419,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
     @Override
     public final MCRMetaPersonName clone() {
         MCRMetaPersonName temp = new MCRMetaPersonName(subtag, inherited);
+        temp.setType(type);
         temp.setFirstName(firstname);
         temp.setCallName(callname);
         temp.setSurName(surname);
@@ -450,4 +453,20 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
             LOGGER.debug("");
         }
     }
+    
+    /**
+     * This method compares this instance with a MCRMetaPersonName object
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MCRMetaPersonName other = (MCRMetaPersonName) obj;
+        return Objects.equals(this.firstname, other.firstname) && Objects.equals(this.callname, other.callname) &&
+            Objects.equals(this.surname, other.surname) && Objects.equals(this.fullname, other.fullname) &&
+            Objects.equals(this.academic, other.academic) && Objects.equals(this.peerage, other.peerage) &&
+            Objects.equals(this.numeration, other.numeration) && Objects.equals(this.title, other.title) &&
+            Objects.equals(this.prefix, other.prefix) && Objects.equals(this.affix, other.affix);
+    }    
 }
