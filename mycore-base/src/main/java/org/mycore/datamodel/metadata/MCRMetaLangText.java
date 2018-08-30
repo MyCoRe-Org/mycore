@@ -248,11 +248,17 @@ public class MCRMetaLangText extends MCRMetaDefault {
     }
 
     /**
-     * This method make a clone of this class.
+     * clone of this instance
+     * 
+     * you will get a (deep) clone of this element
+     * 
+     * @see java.lang.Object#clone()
      */
     @Override
     public MCRMetaLangText clone() {
-        return new MCRMetaLangText(subtag, lang, type, inherited, form, text);
+        MCRMetaLangText out = new MCRMetaLangText();
+        out.setFromDOM(createXML().clone());
+        return out;
     }
 
     /**
@@ -268,6 +274,12 @@ public class MCRMetaLangText extends MCRMetaDefault {
         }
     }
 
+    /**
+     * Check the equivalence between this instance and the given object.
+     * 
+     * @param obj the MCRMetaLangText object
+     * @return true if its equal
+     */
     @Override
     public boolean equals(Object obj) {
         if (!super.equals(obj)) {

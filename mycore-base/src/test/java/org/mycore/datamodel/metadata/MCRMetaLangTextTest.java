@@ -39,12 +39,12 @@ public class MCRMetaLangTextTest extends MCRTestCase {
     public void checkCreateParseEqualsClone() {
         MCRMetaLangText langtext = new MCRMetaLangText("subtag", "de", "my_type", 0, "plain", "mein text");
 
-        Element person_xml = langtext.createXML();
-        MCRMetaLangText person_read = new MCRMetaLangText();
-        person_read.setFromDOM(person_xml);
-        assertEquals("read objects from XML should be equal", langtext, person_read);
+        Element langtext_xml = langtext.createXML();
+        MCRMetaLangText langtext_read = new MCRMetaLangText();
+        langtext_read.setFromDOM(langtext_xml);
+        assertEquals("read objects from XML should be equal", langtext, langtext_read);
 
-        MCRMetaLangText person_clone = person_read.clone();
-        assertEquals("cloned object should be equal with original", person_read, person_clone);
+        MCRMetaLangText langtext_clone = langtext_read.clone();
+        assertEquals("cloned object should be equal with original", langtext_read, langtext_clone);
     }
 }
