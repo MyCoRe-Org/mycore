@@ -483,17 +483,16 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * This method make a clone of this class.
+     * clone of this instance
+     * 
+     * you will get a (deep) clone of this element
+     * 
+     * @see java.lang.Object#clone()
      */
     @Override
     public MCRMetaHistoryDate clone() {
-        MCRMetaHistoryDate out = new MCRMetaHistoryDate(subtag, type, inherited);
-        for (MCRMetaHistoryDateText h : texts) {
-            out.setText(h.getText(), h.getLang());
-        }
-        out.setVonDate(von);
-        out.setBisDate(bis);
-        out.setCalendar(calendar);
+        MCRMetaHistoryDate out = new MCRMetaHistoryDate();
+        out.setFromDOM(createXML().clone());
         return out;
     }
 
