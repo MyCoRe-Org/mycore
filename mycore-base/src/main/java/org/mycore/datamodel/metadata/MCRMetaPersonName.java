@@ -414,23 +414,17 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
     }
 
     /**
-     * This method make a clone of this class.
+     * clone of this instance
+     * 
+     * you will get a (deep) clone of this element
+     * 
+     * @see java.lang.Object#clone()
      */
     @Override
     public final MCRMetaPersonName clone() {
-        MCRMetaPersonName temp = new MCRMetaPersonName(subtag, inherited);
-        temp.setType(type);
-        temp.setFirstName(firstname);
-        temp.setCallName(callname);
-        temp.setSurName(surname);
-        temp.setFullName(fullname);
-        temp.setAcademic(academic);
-        temp.setPeerage(peerage);
-        temp.setNumeration(numeration);
-        temp.setTitle(title);
-        temp.setPrefix(prefix);
-        temp.setAffix(affix);
-        return temp;
+        MCRMetaPersonName out = new MCRMetaPersonName();
+        out.setFromDOM(createXML().clone());
+        return out;
     }
 
     /**
