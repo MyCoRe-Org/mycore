@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -31,7 +33,6 @@ import com.google.gson.JsonObject;
  * specified by a list of names.
  * 
  * @author J. Vogler
- * @version $Revision$ $Date$
  */
 public final class MCRMetaAddress extends MCRMetaDefault {
     // MetaAddress data
@@ -63,7 +64,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
      * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The type element was set to
+     * is null or empty an exception was thrown. The type element was set to
      * the value of <em>set_type</em>, if it is null, an empty string was set
      * to the type element. The country, state, zipCode, city, street and
      * number element was set to the value of <em>set_...</em>, if they are null,
@@ -86,21 +87,26 @@ public final class MCRMetaAddress extends MCRMetaDefault {
         final String set_state, final String set_zipcode, final String set_city, final String set_street,
         final String set_number) throws MCRException {
         super(set_subtag, default_lang, set_type, set_inherted);
-        country = set_country;
-        state = set_state;
-        zipCode = set_zipcode;
-        city = set_city;
-        street = set_street;
-        number = set_number;
+        setCountry(set_country);
+        setState(set_state);
+        setZipCode(set_zipcode);
+        setCity(set_city);
+        setStreet(set_street);
+        setNumber(set_number);
     }
 
     /**
-     * This method make a clone of this class.
+     * clone of this instance
+     * 
+     * you will get a (deep) clone of this element
+     * 
+     * @see java.lang.Object#clone()
      */
     @Override
     public MCRMetaAddress clone() {
-        return new MCRMetaAddress(subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipCode, city, street,
-            number);
+        MCRMetaAddress out = new MCRMetaAddress();
+        out.setFromDOM(createXML().clone());
+        return out;
     }
 
     /**
@@ -191,6 +197,23 @@ public final class MCRMetaAddress extends MCRMetaDefault {
             LOGGER.debug("Number             = {}", number);
             LOGGER.debug(" ");
         }
+    }
+
+    /**
+     * Check the equivalence between this instance and the given object.
+     * 
+     * @param obj the MCRMetaAddress object
+     * @return true if its equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final MCRMetaAddress other = (MCRMetaAddress) obj;
+        return Objects.equals(this.country, other.country) && Objects.equals(this.state, other.state)
+            && Objects.equals(this.zipCode, other.zipCode) && Objects.equals(this.city, other.city)
+            && Objects.equals(this.street, other.street) && Objects.equals(this.number, other.number);
     }
 
     /**
