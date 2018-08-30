@@ -39,7 +39,6 @@ import com.google.gson.JsonObject;
  * &lt;/tag&gt; <br>
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public class MCRMetaLink extends MCRMetaDefault {
     // MetaLink data
@@ -440,19 +439,16 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * This method make a clone of this class.
+     * clone of this instance
+     * 
+     * you will get a (deep) clone of this element
+     * 
+     * @see java.lang.Object#clone()
      */
     @Override
     public final MCRMetaLink clone() {
-        MCRMetaLink out = new MCRMetaLink(subtag, inherited);
-        out.linktype = linktype;
-        out.title = title;
-        out.type = type;
-        out.href = href;
-        out.role = role;
-        out.to = to;
-        out.from = from;
-
+        MCRMetaLink out = new MCRMetaLink();
+        out.setFromDOM(createXML().clone());
         return out;
     }
 

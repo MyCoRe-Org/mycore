@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.mycore.common.MCRException;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
@@ -231,6 +233,43 @@ public final class MCRMetaLinkID extends MCRMetaLink {
                 throw new MCRException("The xlink:to is not a MCRObjectID.");
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        MCRMetaLinkID other = (MCRMetaLinkID) obj;
+        if (!Objects.equals(from, other.from)) {
+            return false;
+        } else if (!Objects.equals(href, other.href)) {
+            return false;
+        } else if (!Objects.equals(label, other.label)) {
+            return false;
+        } else if (!Objects.equals(linktype, other.linktype)) {
+            return false;
+        } else if (!Objects.equals(role, other.role)) {
+            return false;
+        } else if (!Objects.equals(title, other.title)) {
+            return false;
+        } else if (!Objects.equals(to, other.to)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * clone of this instance
+     * 
+     * you will get a (deep) clone of this element
+     * 
+     * @see java.lang.Object#clone()
+     */
+    public MCRMetaLinkID cloneLinkID() {
+        MCRMetaLinkID out = new MCRMetaLinkID();
+        out.setFromDOM(createXML().clone());
+        return out;
     }
 
     @Override
