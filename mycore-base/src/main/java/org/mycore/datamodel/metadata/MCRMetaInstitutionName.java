@@ -226,11 +226,17 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
     }
 
     /**
-     * This method make a clone of this class.
+     * clone of this instance
+     * 
+     * you will get a (deep) clone of this element
+     * 
+     * @see java.lang.Object#clone()
      */
     @Override
-    public final MCRMetaInstitutionName clone() {
-        return new MCRMetaInstitutionName(subtag, lang, type, inherited, fullname, nickname, property);
+    public MCRMetaInstitutionName clone() {
+        MCRMetaInstitutionName out = new MCRMetaInstitutionName();
+        out.setFromDOM(createXML().clone());
+        return out;
     }
 
     @Override
