@@ -36,7 +36,7 @@ import com.google.gson.JsonObject;
  * @version $Revision$ $Date$
  */
 public class MCRMetaLangText extends MCRMetaDefault {
-    // MetaLangText data
+
     protected String text;
 
     protected String form;
@@ -45,7 +45,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The language element was set to <b>en </b>. All other elemnts was set to
+     * The language element was set to <b>en </b>. All other elements was set to
      * an empty string. The <em>form</em> Attribute is set to 'plain'.
      */
     public MCRMetaLangText() {
@@ -59,7 +59,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
      * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The type element was set to
+     * is null or empty an exception was thrown. The type element was set to
      * the value of <em>set_type</em>, if it is null, an empty string was set
      * to the type element. The text element was set to the value of
      * <em>set_text</em>, if it is null, an empty string was set
@@ -90,13 +90,13 @@ public class MCRMetaLangText extends MCRMetaDefault {
     }
 
     /**
-     * This method set the languge, type and text.
+     * This method set the language, type and text.
      * 
      * @param set_lang
      *            the new language string, if this is null or empty, nothing is
      *            to do
      * @param set_type
-     *            the optional type syting
+     *            the optional type string
      * @param set_text
      *            the new text string
      */
