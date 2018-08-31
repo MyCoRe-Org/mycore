@@ -236,7 +236,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (!super.equals(obj)) {
             return false;
         }
@@ -266,14 +266,14 @@ public final class MCRMetaLinkID extends MCRMetaLink {
      * 
      * @see java.lang.Object#clone()
      */
-    public MCRMetaLinkID cloneLinkID() {
+    public final MCRMetaLinkID clone() {
         MCRMetaLinkID out = new MCRMetaLinkID();
         out.setFromDOM(createXML().clone());
         return out;
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return getXLinkHref();
     }
 }

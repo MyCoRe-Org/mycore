@@ -59,8 +59,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * This is the constructor. <br>
-     * The language element was set to <b>en </b>. All other elemnts was set to an empty value.
+     * initializes with empty values.
      */
     public MCRMetaLink() {
         super();
@@ -446,7 +445,7 @@ public class MCRMetaLink extends MCRMetaDefault {
      * @see java.lang.Object#clone()
      */
     @Override
-    public final MCRMetaLink clone() {
+    public MCRMetaLink clone() {
         MCRMetaLink out = new MCRMetaLink();
         out.setFromDOM(createXML().clone());
         return out;

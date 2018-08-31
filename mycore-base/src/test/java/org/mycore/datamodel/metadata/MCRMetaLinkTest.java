@@ -84,7 +84,7 @@ public class MCRMetaLinkTest extends MCRTestCase {
         link1_read.setFromDOM(link1_xml);
         assertEquals("read objects from XML should be equal", link1, link1_read);
 
-        MCRMetaLinkID link1_clone = link1_read.cloneLinkID();
+        MCRMetaLinkID link1_clone = link1_read.clone();
         assertEquals("cloned object should be equal with original", link1_read, link1_clone);
 
         MCRMetaLinkID link2 = new MCRMetaLinkID("subtag", 0);
@@ -100,7 +100,7 @@ public class MCRMetaLinkTest extends MCRTestCase {
         link3_read.setFromDOM(link3_xml);
         assertEquals("read objects from XML should be equal", link3, link3_read);
 
-        MCRMetaLinkID link3_clone = link3_read.cloneLinkID();
+        MCRMetaLinkID link3_clone = link3_read.clone();
         assertEquals("cloned object should be equal with original", link3_read, link3_clone);
 
         MCRMetaLinkID link4 = new MCRMetaLinkID("subtag", 0);
