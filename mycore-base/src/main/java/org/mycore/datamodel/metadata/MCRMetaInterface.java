@@ -148,7 +148,9 @@ public interface MCRMetaInterface extends Cloneable {
     /**
      * This method make a clone of this class.
      */
-    MCRMetaInterface clone();
+    default MCRMetaInterface clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("The clone method is no supported for this class.");
+    }
 
     /**
      * This method put debug data to the logger (for the debug mode).
