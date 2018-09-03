@@ -168,4 +168,12 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         }
     }
 
+    @Override
+    public MCRMetaDerivateLink clone() {
+        MCRMetaDerivateLink clone = (MCRMetaDerivateLink) super.clone();
+
+        clone.map = new HashMap<>(this.map);
+
+        return clone;
+    }
 }

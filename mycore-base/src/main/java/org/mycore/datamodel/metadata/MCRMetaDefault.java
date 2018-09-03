@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,8 +35,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.JsonObject;
-
-import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * This class implements any methods for handling the basic data for all
@@ -406,5 +406,20 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     }
 
     @Override
-    public abstract MCRMetaInterface clone();
+    public MCRMetaDefault clone() {
+        try {
+            MCRMetaDefault clone = (MCRMetaDefault) super.clone();
+
+            clone.subtag = this.subtag;
+            clone.lang = this.lang;
+            clone.type = this.type;
+            clone.datapart = this.datapart;
+            clone.inherited = this.inherited;
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            //this is impossible!
+            return null;
+        }
+    }
 }

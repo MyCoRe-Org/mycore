@@ -20,6 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -162,9 +163,11 @@ public class MCRMetaXML extends MCRMetaDefault {
      */
     @Override
     public MCRMetaXML clone() {
-        MCRMetaXML out = new MCRMetaXML();
-        out.setFromDOM(createXML());
-        return out;
+        MCRMetaXML clone = (MCRMetaXML) super.clone();
+
+        clone.content = this.content.stream().map(Content::clone).collect(Collectors.toList());
+
+        return clone;
     }
 
     /**

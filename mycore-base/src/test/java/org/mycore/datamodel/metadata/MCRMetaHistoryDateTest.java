@@ -18,12 +18,13 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-import org.junit.Ignore;
+import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.xml.MCRXMLHelper;
 
 import com.ibm.icu.util.GregorianCalendar;
 
@@ -35,73 +36,60 @@ import com.ibm.icu.util.GregorianCalendar;
  *
  */
 public class MCRMetaHistoryDateTest extends MCRTestCase {
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setFromDOM(Element)'
+    
+    /**
+     * check set date methods
      */
     @Test
-    @Ignore("not implemented")
-    public void testSetFromDOM() {
-
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.createXML()'
-     */
-    @Test
-    @Ignore("not implemented")
-    public void testCreateXML() {
-
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setVonDate(GregorianCalendar)'
-     */
-    @Test
-    public void setVonDateGregorianCalendar() {
+    public void checkSetDateMethods() {
         MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
-        hd.setVonDate(new GregorianCalendar(1964, 1, 24));
-        assertEquals("Von value is not 1964-02-24 AD", "1964-02-24 AD", hd.getVonToString());
+        hd.setVonDate(new GregorianCalendar(1964, 1, 23));
+        assertEquals("Von value is not 1964-02-23 AD", "1964-02-23 AD", hd.getVonToString());
+
+        hd = new MCRMetaHistoryDate();
+        hd.setVonDate("23.02.1964", MCRCalendar.TAG_GREGORIAN);
+        assertEquals("Von value is not 1964-02-23 AD", "1964-02-23 AD", hd.getVonToString());
+
+        hd = new MCRMetaHistoryDate();
+        hd.setBisDate(new GregorianCalendar(1964, 1, 23));
+        assertEquals("Bis value is not 1964-02-23 AD", "1964-02-23 AD", hd.getBisToString());
+
+        hd = new MCRMetaHistoryDate();
+        hd.setBisDate("23.02.1964", MCRCalendar.TAG_GREGORIAN);
+        assertEquals("Bis value is not 1964-02-23 AD", "1964-02-23 AD", hd.getBisToString());
     }
 
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setVonDate(String)'
+    /**
+     * check createXML, setFromDom, equals and clone
      */
     @Test
-    public void setVonDateString() {
-        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
-        hd.setVonDate("24.02.1964", MCRCalendar.TAG_GREGORIAN);
-        assertEquals("Von value is not 1964-02-24 AD", "1964-02-24 AD", hd.getVonToString());
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setBisDate(GregorianCalendar)'
-     */
-    @Test
-    public void setBisDateGregorianCalendar() {
-        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
-        hd.setBisDate(new GregorianCalendar(1964, 1, 24));
-        assertEquals("Bis value is not 1964-02-24 AD", "1964-02-24 AD", hd.getBisToString());
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setBisDate(String)'
-     */
-    @Test
-    public void setBisDateString() {
-        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
-        hd.setBisDate("24.02.1964", MCRCalendar.TAG_GREGORIAN);
-        assertEquals("Bis value is not 1964-02-24 AD", "1964-02-24 AD", hd.getBisToString());
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.debug()'
-     */
-    @Test
-    public void debug() {
-        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
-        hd.setVonDate("05.10.1582", MCRCalendar.TAG_GREGORIAN);
-        hd.setBisDate("15.10.1582", MCRCalendar.TAG_GREGORIAN);
-        hd.debug();
-    }
+    public void checkCreateParseEqualsClone() {
+        
+        MCRMetaHistoryDate julian_date = new MCRMetaHistoryDate("subtag","type",0);
+        julian_date.setCalendar(MCRCalendar.TAG_JULIAN);
+        julian_date.setVonDate("22.02.1964", julian_date.getCalendar());
+        julian_date.setBisDate("22.02.1964", julian_date.getCalendar());
+        julian_date.addText("mein Tag", "de");
+        julian_date.setCalendar(MCRCalendar.TAG_GREGORIAN);
+        
+        MCRMetaHistoryDate gregorian_date = new MCRMetaHistoryDate("subtag","type",0);
+        gregorian_date.setCalendar(MCRCalendar.TAG_GREGORIAN);
+        gregorian_date.setVonDate("06.03.1964", gregorian_date.getCalendar());
+        gregorian_date.setBisDate("06.03.1964", gregorian_date.getCalendar());
+        gregorian_date.addText("mein Tag", "de");
+        
+        Element julian_date_xml = julian_date.createXML();
+        Element gregorian_date_xml = gregorian_date.createXML();
+        assertTrue("XML elements should be equal", MCRXMLHelper.deepEqual(julian_date_xml, gregorian_date_xml));
+        
+        MCRMetaHistoryDate julian_date_read = new MCRMetaHistoryDate();
+        julian_date_read.setFromDOM(julian_date_xml);
+        MCRMetaHistoryDate gregorian_date_read = new MCRMetaHistoryDate();
+        gregorian_date_read.setFromDOM(gregorian_date_xml);
+        assertEquals("read objects from XML should be equal", julian_date_read, gregorian_date_read);
+        
+        MCRMetaHistoryDate gregorian_date_clone = gregorian_date_read.clone();
+        assertEquals("cloned object should be equal with original", gregorian_date_read, gregorian_date_clone);
+   }
+    
 }

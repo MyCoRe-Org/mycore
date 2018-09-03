@@ -37,10 +37,9 @@ import com.google.gson.JsonObject;
  * &lt;/tag&gt; <br>
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
  */
 public final class MCRMetaBoolean extends MCRMetaDefault {
-    // MCRMetaBoolean data
+
     private boolean value;
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -59,17 +58,19 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
      * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The type element was set to
+     * is null or empty an exception was thrown. The type element was set to
      * the value of <em>set_type</em>, if it is null, an empty string was set
      * to the type element. The boolean string <em>set_value</em>
      * was set to a boolean element, if it is null, false was set.
      * @param set_subtag       the name of the subtag
+     * @param default_lang     the language
      * @param set_type         the optional type string
      * @param set_inherted     a value &gt;= 0
      * @param set_value        the boolean value (true or false) as string
      *
      * @exception MCRException if the set_subtag value is null or empty
      */
+    @Deprecated
     public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, String set_value)
         throws MCRException {
         this(set_subtag, set_type, set_inherted, false);
@@ -80,7 +81,28 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
      * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The type element was set to
+     * is null or empty an exception was thrown. The type element was set to
+     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * to the type element. The boolean string <em>set_value</em>
+     * was set to a boolean element, if it is null, false was set.
+     * @param set_subtag       the name of the subtag
+     * @param set_type         the optional type string
+     * @param set_inherted     a value &gt;= 0
+     * @param set_value        the boolean value (true or false) as string
+     *
+     * @exception MCRException if the set_subtag value is null or empty
+     */
+    public MCRMetaBoolean(String set_subtag, String set_type, int set_inherted, String set_value)
+        throws MCRException {
+        super(set_subtag, null, set_type, set_inherted);
+        setValue(set_value);
+    }
+
+    /**
+     * This is the constructor. <br>
+     * The language element was set to <b>en </b>. The subtag element was set to
+     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * is null or empty an exception was thrown. The type element was set to
      * the value of <em>set_type</em>, if it is null, an empty string was set
      * to the type element. The boolean string <em>set_value</em>
      * was set to a boolean element, if it is null, false was set.
@@ -92,8 +114,8 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
      */
     public MCRMetaBoolean(String set_subtag, String set_type, int set_inherted, boolean set_value) throws MCRException {
         super(set_subtag, null, set_type, set_inherted);
-        value = set_value;
-    }
+        setValue(set_value);
+   }
 
     /**
      * This method set value. It set false if the string is corrupt.
@@ -180,11 +202,19 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
     }
 
     /**
-     * This method make a clone of this class.
+     * clone of this instance
+     * 
+     * you will get a (deep) clone of this element
+     * 
+     * @see java.lang.Object#clone()
      */
     @Override
     public MCRMetaBoolean clone() {
-        return new MCRMetaBoolean(subtag, type, inherited, value);
+        MCRMetaBoolean clone = (MCRMetaBoolean) super.clone();
+
+        clone.value = this.value;
+
+        return clone;
     }
 
     /**

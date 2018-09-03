@@ -222,11 +222,13 @@ public final class MCRMetaIFS extends MCRMetaDefault {
 
     @Override
     public final MCRMetaIFS clone() {
-        MCRMetaIFS ifs = new MCRMetaIFS(getSubTag(), getSourcePath());
-        ifs.setMainDoc(getMainDoc());
-        ifs.setIFSID(getIFSID());
-        ifs.setType(getType());
-        return ifs;
+        MCRMetaIFS clone = (MCRMetaIFS) super.clone();
+
+        clone.maindoc = this.maindoc;
+        clone.ifsid = this.ifsid;
+        clone.sourcepath = this.sourcepath;
+
+        return clone;
     }
 
     @Override

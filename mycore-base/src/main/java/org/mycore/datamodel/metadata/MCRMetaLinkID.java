@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.Objects;
+
 import org.mycore.common.MCRException;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
@@ -234,7 +236,34 @@ public final class MCRMetaLinkID extends MCRMetaLink {
     }
 
     @Override
-    public String toString() {
+    public final boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        MCRMetaLinkID other = (MCRMetaLinkID) obj;
+        if (!Objects.equals(from, other.from)) {
+            return false;
+        } else if (!Objects.equals(href, other.href)) {
+            return false;
+        } else if (!Objects.equals(label, other.label)) {
+            return false;
+        } else if (!Objects.equals(linktype, other.linktype)) {
+            return false;
+        } else if (!Objects.equals(role, other.role)) {
+            return false;
+        } else if (!Objects.equals(title, other.title)) {
+            return false;
+        } else {
+            return Objects.equals(to, other.to);
+        }
+    }
+
+    @Override public MCRMetaLinkID clone() {
+        return (MCRMetaLinkID) super.clone();
+    }
+
+    @Override
+    public final String toString() {
         return getXLinkHref();
     }
 }
