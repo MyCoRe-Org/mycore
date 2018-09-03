@@ -422,9 +422,20 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      */
     @Override
     public final MCRMetaPersonName clone() {
-        MCRMetaPersonName out = new MCRMetaPersonName();
-        out.setFromDOM(createXML().clone());
-        return out;
+        MCRMetaPersonName clone = (MCRMetaPersonName) super.clone();
+
+        clone.firstname = this.firstname;
+        clone.callname = this.callname;
+        clone.surname = this.surname;
+        clone.fullname = this.fullname;
+        clone.academic = this.academic;
+        clone.peerage = this.peerage;
+        clone.numeration = this.numeration;
+        clone.title = this.title;
+        clone.prefix = this.prefix;
+        clone.affix = this.affix;
+
+        return clone;
     }
 
     /**

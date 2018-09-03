@@ -253,23 +253,13 @@ public final class MCRMetaLinkID extends MCRMetaLink {
             return false;
         } else if (!Objects.equals(title, other.title)) {
             return false;
-        } else if (!Objects.equals(to, other.to)) {
-            return false;
+        } else {
+            return Objects.equals(to, other.to);
         }
-        return true;
     }
 
-    /**
-     * clone of this instance
-     * 
-     * you will get a (deep) clone of this element
-     * 
-     * @see java.lang.Object#clone()
-     */
-    public final MCRMetaLinkID clone() {
-        MCRMetaLinkID out = new MCRMetaLinkID();
-        out.setFromDOM(createXML().clone());
-        return out;
+    @Override public MCRMetaLinkID clone() {
+        return (MCRMetaLinkID) super.clone();
     }
 
     @Override

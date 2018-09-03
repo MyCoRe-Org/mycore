@@ -192,7 +192,12 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      */
     @Override
     public MCRMetaAccessRule clone() {
-        return new MCRMetaAccessRule(subtag, type, inherited, permission, condition);
+        MCRMetaAccessRule clone = (MCRMetaAccessRule) super.clone();
+
+        clone.permission = this.permission;
+        clone.condition = this.condition.clone();
+
+        return clone;
     }
 
     /**

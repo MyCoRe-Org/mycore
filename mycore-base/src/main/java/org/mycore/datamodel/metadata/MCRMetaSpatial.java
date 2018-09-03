@@ -25,10 +25,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * Stores spatial information for geographic references. The latitude longitude values are stored in an array list,
@@ -155,10 +156,13 @@ public class MCRMetaSpatial extends MCRMetaDefault {
      * 
      * @see java.lang.Object#clone()
      */
-    public final MCRMetaSpatial clone() {
-        MCRMetaSpatial out = new MCRMetaSpatial();
-        out.setFromDOM(createXML().clone());
-        return out;
+    @Override
+    public MCRMetaSpatial clone() {
+        MCRMetaSpatial clone = (MCRMetaSpatial) super.clone();
+
+        clone.data = new ArrayList<>(this.data); // Big Integer is immutable
+
+        return clone;
     }
 
 }

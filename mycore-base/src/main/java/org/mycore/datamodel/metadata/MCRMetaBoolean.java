@@ -210,9 +210,11 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
      */
     @Override
     public MCRMetaBoolean clone() {
-        MCRMetaBoolean out = new MCRMetaBoolean();
-        out.setFromDOM(createXML().clone());
-        return out;
+        MCRMetaBoolean clone = (MCRMetaBoolean) super.clone();
+
+        clone.value = this.value;
+
+        return clone;
     }
 
     /**

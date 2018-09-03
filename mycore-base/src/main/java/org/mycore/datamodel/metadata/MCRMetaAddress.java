@@ -104,9 +104,16 @@ public final class MCRMetaAddress extends MCRMetaDefault {
      */
     @Override
     public MCRMetaAddress clone() {
-        MCRMetaAddress out = new MCRMetaAddress();
-        out.setFromDOM(createXML().clone());
-        return out;
+        MCRMetaAddress clone = (MCRMetaAddress) super.clone();
+
+        clone.country = this.country;
+        clone.state = this.state;
+        clone.zipCode = this.zipCode;
+        clone.city = this.city;
+        clone.street = this.street;
+        clone.number = this.number;
+
+        return clone;
     }
 
     /**

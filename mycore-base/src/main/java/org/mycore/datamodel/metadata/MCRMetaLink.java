@@ -446,9 +446,17 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     @Override
     public MCRMetaLink clone() {
-        MCRMetaLink out = new MCRMetaLink();
-        out.setFromDOM(createXML().clone());
-        return out;
+        MCRMetaLink clone = (MCRMetaLink) super.clone();
+
+        clone.href=this.href;
+        clone.label = this.label;
+        clone.title = this.title;
+        clone.linktype = this.linktype;
+        clone.role = this.role;
+        clone.from = this.from;
+        clone.to = this.to;
+
+        return clone;
     }
 
     /**

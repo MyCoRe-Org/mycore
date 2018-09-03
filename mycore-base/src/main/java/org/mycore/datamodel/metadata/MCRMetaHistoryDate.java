@@ -20,6 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -491,9 +492,17 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     @Override
     public MCRMetaHistoryDate clone() {
-        MCRMetaHistoryDate out = new MCRMetaHistoryDate();
-        out.setFromDOM(createXML().clone());
-        return out;
+        MCRMetaHistoryDate clone = (MCRMetaHistoryDate) super.clone();
+
+        clone.texts = this.texts.stream().map(MCRMetaHistoryDateText::clone)
+            .collect(Collectors.toCollection(ArrayList::new));
+        clone.bis = (Calendar) this.bis.clone();
+        clone.von = (Calendar) this.von.clone();
+        clone.ibis = this.ibis;
+        clone.ivon = this.ivon;
+        clone.calendar = this.calendar;
+
+        return clone;
     }
 
     /**
@@ -543,7 +552,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * language notation is in the ISO format.
      * 
      */
-    protected class MCRMetaHistoryDateText {
+    protected static class MCRMetaHistoryDateText implements Cloneable {
         private String datetext;
 
         private String lang;
@@ -622,6 +631,21 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          */
         public boolean equals(MCRMetaHistoryDateText obj) {
             return lang.equals(obj.getLang()) && datetext.equals(obj.getText());
+        }
+
+        @Override
+        protected MCRMetaHistoryDateText clone() {
+            MCRMetaHistoryDateText clone = null;
+            try {
+                clone = (MCRMetaHistoryDateText) super.clone();
+            } catch (Exception e) {
+                // this can not happen!
+            }
+
+            clone.datetext = this.datetext;
+            clone.lang = this.lang;
+
+            return clone;
         }
     }
 }

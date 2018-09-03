@@ -226,9 +226,11 @@ public class MCRMetaClassification extends MCRMetaDefault {
      */
     @Override
     public MCRMetaClassification clone() {
-        MCRMetaClassification out = new MCRMetaClassification();
-        out.setFromDOM(createXML().clone());
-        return out;
+        MCRMetaClassification clone = (MCRMetaClassification) super.clone();
+
+        clone.category = this.category; // immutable so shallow copy ok
+
+        return clone;
     }
 
     /**

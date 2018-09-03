@@ -256,9 +256,12 @@ public class MCRMetaLangText extends MCRMetaDefault {
      */
     @Override
     public MCRMetaLangText clone() {
-        MCRMetaLangText out = new MCRMetaLangText();
-        out.setFromDOM(createXML().clone());
-        return out;
+        MCRMetaLangText clone = (MCRMetaLangText) super.clone();
+
+        clone.form = this.form;
+        clone.text = this.text;
+
+        return clone;
     }
 
     /**

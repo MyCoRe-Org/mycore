@@ -323,9 +323,13 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      */
     @Override
     public final MCRMetaNumber clone() {
-        MCRMetaNumber out = new MCRMetaNumber();
-        out.setFromDOM(createXML().clone());
-        return out;
+        MCRMetaNumber clone = (MCRMetaNumber) super.clone();
+
+        clone.dimension =this.dimension;
+        clone.measurement = this.measurement;
+        clone.number = this.number;
+
+        return clone;
     }
 
     /**
