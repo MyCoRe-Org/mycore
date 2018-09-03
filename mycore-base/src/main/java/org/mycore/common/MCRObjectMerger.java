@@ -81,15 +81,11 @@ public class MCRObjectMerger {
                         }
                     }
                     if (!equal) {
-                        try {
-                            metaElementTarget.addMetaObject(metaInterfaceSource.clone());
-                            if (validate && !validate(this.target)) {
-                                metaElementTarget.removeMetaObject(metaInterfaceSource);
-                            } else {
-                                merged = true;
-                            }
-                        } catch (CloneNotSupportedException e) {
-                            e.printStackTrace();
+                        metaElementTarget.addMetaObject(metaInterfaceSource.clone());
+                        if (validate && !validate(this.target)) {
+                            metaElementTarget.removeMetaObject(metaInterfaceSource);
+                        } else {
+                            merged = true;
                         }
                     }
                 }

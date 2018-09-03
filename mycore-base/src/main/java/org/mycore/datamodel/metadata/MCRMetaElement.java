@@ -457,12 +457,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         out.setNotInherit(notinherit);
 
         for (int i = 0; i < size(); i++) {
-            try {
-                MCRMetaInterface mif = (list.get(i)).clone();
-                out.addMetaObject(mif);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+            MCRMetaInterface mif = (list.get(i)).clone();
+            out.addMetaObject(mif);
         }
 
         return out;
