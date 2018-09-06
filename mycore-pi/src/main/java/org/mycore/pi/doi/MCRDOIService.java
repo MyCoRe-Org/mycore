@@ -203,7 +203,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         try {
             getDataciteClient().getDOIList();
         } catch (MCRPersistentIdentifierException e) {
-            throw new MCRConfigurationException("Error while checking Datacite credentials!", e);
+            LOGGER.error("Error while checking Datacite credentials!", e);
         }
 
         if (MCRContentTransformerFactory.getTransformer(this.transformer) == null) {
