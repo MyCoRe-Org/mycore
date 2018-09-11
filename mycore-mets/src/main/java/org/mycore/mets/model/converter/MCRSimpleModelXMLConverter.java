@@ -101,7 +101,7 @@ public class MCRSimpleModelXMLConverter {
             }
             String contentIds = page.getContentIds();
             if (contentIds != null) {
-                physicalSubDiv.setContentids(contentIds);
+                physicalSubDiv.setContentIds(contentIds);
             }
 
             structMap.getDivContainer().add(physicalSubDiv);

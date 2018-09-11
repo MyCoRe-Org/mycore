@@ -152,8 +152,8 @@ public class MCRMetsMods2IIIFConverter {
         sequence.canvases = children.stream().map(physicalSubDiv -> {
             String order = physicalSubDiv.asElement().getAttributeValue("ORDER");
             String orderLabel = physicalSubDiv.getOrderLabel();
-            String contentids = physicalSubDiv.getContentids();
-            String label = Stream.of(order, orderLabel, contentids)
+            String contentIds = physicalSubDiv.getContentIds();
+            String label = Stream.of(order, orderLabel, contentIds)
                 .filter(o -> o != null && !o.isEmpty())
                 .collect(Collectors.joining(" - "));
 
@@ -208,7 +208,7 @@ public class MCRMetsMods2IIIFConverter {
         this.logicalIdIdentifiersMap.get(divContainer.getId()).stream().map(refId -> refId)
             .forEach(canvasRef -> range.canvases.add(canvasRef));
 
-        divContainer.getChildren().stream()
+        divContainer.getChildren()
             .forEach(div -> {
                 processDivContainer(complete, div);
                 range.ranges.add(div.getId());

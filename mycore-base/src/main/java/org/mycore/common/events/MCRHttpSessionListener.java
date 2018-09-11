@@ -27,7 +27,7 @@ import org.mycore.frontend.servlets.MCRServlet;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import java.util.Enumeration;
+import java.util.Optional;
 
 /**
  * Handles different HttpSession events.
@@ -38,7 +38,8 @@ import java.util.Enumeration;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRHttpSessionListener implements HttpSessionListener {
-    Logger LOGGER = LogManager.getLogger();
+
+    private final static Logger LOGGER = LogManager.getLogger();
 
     /*
      * (non-Javadoc)
@@ -46,7 +47,7 @@ public class MCRHttpSessionListener implements HttpSessionListener {
      * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
      */
     public void sessionCreated(HttpSessionEvent hse) {
-        LOGGER.debug(() -> "HttpSession " + hse.getSession().getId() + " is beeing created by: " + hse.getSource());
+        LOGGER.debug(() -> "HttpSession " + hse.getSession().getId() + " is being created by: " + hse.getSource());
     }
 
     /*
@@ -57,19 +58,13 @@ public class MCRHttpSessionListener implements HttpSessionListener {
     public void sessionDestroyed(HttpSessionEvent hse) {
         // clear MCRSessions
         HttpSession httpSession = hse.getSession();
-        LOGGER.debug(() -> "HttpSession " + httpSession.getId() + " is beeing destroyed by " + hse.getSource()
-                + ", clearing up.");
+        LOGGER.debug(() -> "HttpSession " + httpSession.getId() + " is being destroyed by " + hse.getSource()
+            + ", clearing up.");
         LOGGER.debug("Removing any MCRSessions from HttpSession");
-        for (Enumeration<String> e = httpSession.getAttributeNames(); e.hasMoreElements(); ) {
-            String key = e.nextElement();
-            if (key.equals(MCRServlet.ATTR_MYCORE_SESSION)) {
-                ((MCRSessionResolver) httpSession.getAttribute(key))
-                        .resolveSession()
-                        .ifPresent(MCRSession::close);
-                // remove reference in httpSession
-                httpSession.removeAttribute(key);
-            }
-        }
+        Optional.ofNullable(httpSession.getAttribute(MCRServlet.ATTR_MYCORE_SESSION))
+            .map(MCRSessionResolver.class::cast).flatMap(MCRSessionResolver::resolveSession)
+            .ifPresent(MCRSession::close);
+        httpSession.removeAttribute(MCRServlet.ATTR_MYCORE_SESSION);
         LOGGER.debug("Clearing up done");
     }
 

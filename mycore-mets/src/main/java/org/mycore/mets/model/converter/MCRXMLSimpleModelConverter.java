@@ -51,9 +51,8 @@ public class MCRXMLSimpleModelConverter {
      *
      * @param metsDocument the Document which should be converted
      * @return the converted MetsSimpleModel
-     * @throws Exception if new Mets(metsDocument) throws exception
      */
-    public static MCRMetsSimpleModel fromXML(Document metsDocument) throws Exception {
+    public static MCRMetsSimpleModel fromXML(Document metsDocument) {
         Mets mets = new Mets(metsDocument);
 
         MCRMetsSimpleModel msm = new MCRMetsSimpleModel();
@@ -131,7 +130,7 @@ public class MCRXMLSimpleModelConverter {
                 MCRMetsPage metsPage = new MCRMetsPage();
                 metsPage.setId(physicalSubDiv.getId());
                 metsPage.setOrderLabel(physicalSubDiv.getOrderLabel());
-                metsPage.setContentIds(physicalSubDiv.getContentids());
+                metsPage.setContentIds(physicalSubDiv.getContentIds());
 
                 // Add all MetsFile to the MetsPage
                 List<MCRMetsFile> fileList = metsPage.getFileList();
@@ -172,9 +171,8 @@ public class MCRXMLSimpleModelConverter {
     private static void addFilesFromGroup(Map<String, MCRMetsFile> idPageMap, FileGrp fileGroup) {
         String fileGroupUse = fileGroup.getUse();
         fileGroup.getFileList().forEach(file -> {
-            String use =  fileGroupUse;
             idPageMap.put(file.getId(), new MCRMetsFile(file.getId(),
-                file.getFLocat().getHref(), file.getMimeType(), use));
+                file.getFLocat().getHref(), file.getMimeType(), fileGroupUse));
         });
     }
 

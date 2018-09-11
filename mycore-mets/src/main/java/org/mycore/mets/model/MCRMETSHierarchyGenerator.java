@@ -556,7 +556,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
         return new FileRefImpl(path, contentType);
     }
 
-    protected interface FileRef {
+    public interface FileRef {
 
         MCRPath getPath();
 
@@ -574,7 +574,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
 
     }
 
-    protected static class FileRefImpl implements FileRef {
+    public static class FileRefImpl implements FileRef {
 
         private MCRPath path;
 
