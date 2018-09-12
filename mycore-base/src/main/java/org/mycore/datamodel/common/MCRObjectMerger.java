@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common;
+package org.mycore.datamodel.common;
 
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
