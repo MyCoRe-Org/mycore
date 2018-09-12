@@ -556,7 +556,7 @@ public class MCRMetsSave {
             // check if there is a URN for the file
             String file = "/" + URLDecoder.decode(idFileMap.get(idMets), "UTF-8");
             if (fileUrnMap.containsKey(file)) {
-                divChild.setContentids(fileUrnMap.get(file));
+                divChild.setContentIds(fileUrnMap.get(file));
             }
         }
     }
@@ -904,7 +904,7 @@ public class MCRMetsSave {
     public static List<String> listFileUse(List<MCRPath> paths) {
         Set<String> fileUseSet = new HashSet<>();
         for (MCRPath path : paths) {
-            final Optional<String> use = MCRMetsModelHelper.getUseForHref(path.getOwnerRelativePath().toString());
+            final Optional<String> use = MCRMetsModelHelper.getUseForHref(path.getOwnerRelativePath());
             use.ifPresent(fileUseSet::add);
         }
         return new ArrayList<>(fileUseSet);
