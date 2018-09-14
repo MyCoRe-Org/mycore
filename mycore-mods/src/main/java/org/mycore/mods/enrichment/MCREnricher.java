@@ -146,9 +146,9 @@ class MCREnricher {
             String token = st.nextToken(delimiters).trim();
             if (token.isEmpty()) {
                 continue;
-            } else if (token.equals("(")) {
+            } else if ("(".equals(token)) {
                 withinGroup = true;
-            } else if (token.equals(")")) {
+            } else if (")".equals(token)) {
                 withinGroup = false;
             } else {
                 MCRDataSourceCall call = id2call.get(token);
