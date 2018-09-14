@@ -19,6 +19,7 @@
 package org.mycore.mods.enrichment;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jdom2.Element;
 import org.jdom2.filter.Filters;
@@ -27,26 +28,46 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 
 /**
+ * Represents a type of publication identifier, like DOI or ISBN.
+ * Each type has a corresponding XPath expression
+ * used to locate or build identifiers of this type within MODS.
+ *
+ * If the corresponding XPath representation is
+ * mods:identifier[@type='TYPE'], no explicit configuration is needed.
+ *
+ * Otherwise, the XPath must be configured, e.g.
+ * MCR.MODS.EnrichmentResolver.IdentifierType.shelfmark=mods:location/mods:shelfLocator
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRIdentifierType {
 
     private String typeID;
 
-    private XPathExpression<Element> xPath;
+    private String xPath;
+
+    private XPathExpression<Element> xPathExpr;
 
     MCRIdentifierType(String typeID, String xPath) {
         this.typeID = typeID;
-        this.xPath = XPathFactory.instance().compile(xPath, Filters.element(), null,
+        this.xPath = xPath;
+        this.xPathExpr = XPathFactory.instance().compile(xPath, Filters.element(), null,
             MCRConstants.getStandardNamespaces());
     }
 
-    public String getTypeID() {
+    String getTypeID() {
         return typeID;
     }
 
-    public List<Element> findIdentifiers(Element mods) {
-        return xPath.evaluate(mods);
+    String getXPath() {
+        return xPath;
+    }
+
+    /** Returns all identifiers of this type found in the given MODS element. */
+    List<MCRIdentifier> getIdentifiers(Element mods) {
+        return xPathExpr.evaluate(mods).stream()
+            .map(e -> new MCRIdentifier(this, e.getTextTrim()))
+            .collect(Collectors.toList());
     }
 
     @Override

@@ -19,11 +19,21 @@
 package org.mycore.mods.enrichment;
 
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
+ * Builds identifiers types as configured in mycore.properties.
+ *
+ * If the corresponding XPath representation is
+ * mods:identifier[@type='TYPE'], no explicit configuration is needed.
+ *
+ * Otherwise, the XPath must be configured, e.g.
+ * MCR.MODS.EnrichmentResolver.IdentifierType.shelfmark=mods:location/mods:shelfLocator
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRIdentifierTypeFactory {
@@ -32,9 +42,9 @@ class MCRIdentifierTypeFactory {
 
     private static MCRIdentifierTypeFactory INSTANCE = new MCRIdentifierTypeFactory();
 
-    private MCRCache<String, MCRIdentifierType> id2type = new MCRCache<>(30, "identifier types");
+    private Map<String, MCRIdentifierType> id2type = new HashMap<String, MCRIdentifierType>();
 
-    public static MCRIdentifierTypeFactory instance() {
+    static MCRIdentifierTypeFactory instance() {
         return INSTANCE;
     }
 
@@ -48,12 +58,18 @@ class MCRIdentifierTypeFactory {
         return new MCRIdentifierType(typeID, xPath);
     }
 
-    public MCRIdentifierType getType(String typeID) {
+    /** Returns the identifier type with the given ID, e.g. DOI or ISBN */
+    MCRIdentifierType getType(String typeID) {
         MCRIdentifierType type = id2type.get(typeID);
         if (type == null) {
             type = buildIdentifierType(typeID);
             id2type.put(typeID, type);
         }
         return type;
+    }
+
+    /** Returns all identifier types used or configured so far */
+    Collection<MCRIdentifierType> getTypes() {
+        return id2type.values();
     }
 }
