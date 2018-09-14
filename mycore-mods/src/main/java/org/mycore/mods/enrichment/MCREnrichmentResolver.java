@@ -35,7 +35,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * enrich:[ConfigID]:[URIReturningExistingMODS]
  *
  * To start with just an identifier, use the "buildxml" resolver, e.g.
- * enrich:import:buildxml:_rootName_=mods:mods&mods:identifier=10.123/456&mods:identifier/@type=doi
+ * enrich:import:buildxml:_rootName_=mods:mods&amp;mods:identifier=10.123/456&amp;mods:identifier/@type=doi
  * This first builds an empty MODS document with just a DOI identifier,
  * then enriches it using the "import" configuration of MCREnricher.
  *
