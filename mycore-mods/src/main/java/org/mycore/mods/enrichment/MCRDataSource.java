@@ -22,24 +22,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A data source is able to return publication data in MODS format
+ * for a given publication identifier. A data source may support more than
+ * one identifier, e.g. DOI and PubMed ID for PubMed as a data source:
+ *
+ * MCR.MODS.EnrichmentResolver.DataSource.PubMed.IdentifierTypes=doi pubmed
+ *
+ * For each supported identifier type, the data source has a resolver that
+ * returns MODS data for that identifier type.
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRDataSource {
 
     private String sourceID;
 
-    private List<MCRIdentifierResolver> resolvers = new ArrayList<>();
+    private List<MCRIdentifierResolver> resolvers = new ArrayList<MCRIdentifierResolver>();
 
     MCRDataSource(String sourceID) {
         this.sourceID = sourceID;
     }
 
-    public void addResolver(MCRIdentifierResolver resolver) {
+    void addResolver(MCRIdentifierResolver resolver) {
         resolvers.add(resolver);
     }
 
-    public List<MCRIdentifierResolver> getResolvers() {
+    /** Returns all resolvers to get publication data for a given identifier */
+    List<MCRIdentifierResolver> getResolvers() {
         return resolvers;
+    }
+
+    String getID() {
+        return sourceID;
     }
 
     public String toString() {

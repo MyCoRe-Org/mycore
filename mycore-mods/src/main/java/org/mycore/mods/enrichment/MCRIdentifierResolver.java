@@ -27,6 +27,20 @@ import org.jdom2.Element;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
+ * Returns publication data in MODS format for a given identifier.
+ * Each resolver belongs to a certain data source, e.g. the data source
+ * "PubMed" may have two resolves to get publication data by DOI or PubMed artice ID.
+ *
+ * The resolver will use an URI to get the publication data.
+ * MCR.MODS.EnrichmentResolver.DataSource.[SourceID].[TypeID].URI=[URI]
+ *
+ * This is typically a HTTP URL followed by a XSL stylesheet to transform the
+ * source format to MODS, e.g.
+ * MCR.MODS.EnrichmentResolver.DataSource.DataCite.doi.URI=xslStyle:datacite2mods:https://data.datacite.org/application/vnd.datacite.datacite+xml/{0}
+ *
+ * Within the URI, the pattern {0} will be replaced by the given identifier value,
+ * optionally the pattern {1} will be replaced by the value uri-encoded as http request parameter
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRIdentifierResolver {
@@ -42,17 +56,23 @@ class MCRIdentifierResolver {
         this.uriPattern = uriPattern;
     }
 
-    public MCRIdentifierType getType() {
+    MCRIdentifierType getType() {
         return idType;
     }
 
-    public Element resolve(String identifier) {
+    /**
+     * Tries to resolve publication data for the given identifier.
+     *
+     * @param identifier the identifier's value, e.g. a DOI or ISBN
+     * @return the publication data in MODS format, or null if the data source did not return data for this identifier
+     */
+    Element resolve(String identifier) {
         Element resolved = null;
         try {
             String uri = MessageFormat.format(uriPattern, identifier, URLEncoder.encode(identifier, "UTF-8"));
             resolved = MCRURIResolver.instance().resolve(uri);
         } catch (Exception ex) {
-            LOGGER.warn("Exception resolving {}: {} {}", identifier, ex.getClass().getName(), ex.getMessage());
+            LOGGER.info("Exception resolving {}: {} {}", identifier, ex.getClass().getName(), ex.getMessage());
         }
 
         // Normalize various error/not found cases:

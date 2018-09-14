@@ -22,6 +22,18 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration;
 
 /**
+ * Builds and caches all data sources as configured in mycore.properties.
+ *
+ * For each data source, the types of identifiers must be configured:
+ * MCR.MODS.EnrichmentResolver.DataSource.[ID].IdentifierTypes=[TYPE] [TYPE] [TYPE]
+ * e.g.
+ * MCR.MODS.EnrichmentResolver.DataSource.PubMed.IdentifierTypes=doi pubmed
+ *
+ * Per data source, for each identifier there must be a pattern configured that
+ * defines the URI to get the data for this type of identifier
+ *
+ * @see MCRIdentifierResolver
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRDataSourceFactory {
@@ -30,7 +42,7 @@ class MCRDataSourceFactory {
 
     private MCRCache<String, MCRDataSource> dataSources = new MCRCache<>(30, "data sources");
 
-    public static MCRDataSourceFactory instance() {
+    static MCRDataSourceFactory instance() {
         return INSTANCE;
     }
 
@@ -54,7 +66,7 @@ class MCRDataSourceFactory {
         return dataSource;
     }
 
-    public MCRDataSource getDataSource(String sourceID) {
+    MCRDataSource getDataSource(String sourceID) {
         MCRDataSource dataSource = dataSources.get(sourceID);
         if (dataSource == null) {
             dataSource = buildDataSource(sourceID);
