@@ -18,133 +18,48 @@
 
 package org.mycore.mods.enrichment;
 
-import java.util.List;
-import java.util.StringTokenizer;
-
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXPathBuilder;
-import org.mycore.mods.MCRMODSSorter;
-import org.mycore.mods.merger.MCRMergeTool;
 
 /**
+ * Retrieves a publication as MODS XML from a given URI and
+ * enriches publication data using external data sources.
+ *
+ * There may be different configurations for the enrichment process.
+ * Syntax:
+ * enrich:[ConfigID]:[URIReturningExistingMODS]
+ *
+ * To start with just an identifier, use the "buildxml" resolver, e.g.
+ * enrich:import:buildxml:_rootName_=mods:mods&amp;mods:identifier=10.123/456&amp;mods:identifier/@type=doi
+ * This first builds an empty MODS document with just a DOI identifier,
+ * then enriches it using the "import" configuration of MCREnricher.
+ *
+ * For further details,
+ * @see MCREnricher
+ *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCREnrichmentResolver implements URIResolver {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCREnrichmentResolver.class);
-
-    private static final XPathExpression<Element> X_PATH_2_RELATED_ITEMS = XPathFactory.instance().compile(
-        "mods:relatedItem[@type='host' or @type='series']", Filters.element(), null,
-        MCRConstants.getStandardNamespaces());
-
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        String subHref = href.substring(href.indexOf(":") + 1);
-        String configID = subHref.substring(0, subHref.indexOf(':'));
+        href = href.substring(href.indexOf(":") + 1);
+        String configID = href.substring(0, href.indexOf(':'));
 
-        subHref = subHref.substring(subHref.indexOf(":") + 1);
-        Element mods = MCRURIResolver.instance().resolve(subHref);
+        href = href.substring(href.indexOf(":") + 1);
+        Element mods = MCRURIResolver.instance().resolve(href);
 
         enrichPublication(mods, configID);
-
         return new JDOMSource(mods);
     }
 
     public void enrichPublication(Element mods, String configID) {
-        enrichPublicationLevel(mods, configID);
-        List<Element> relatedItems = X_PATH_2_RELATED_ITEMS.evaluate(mods);
-        for (Element relatedItem : relatedItems) {
-            enrichPublicationLevel(relatedItem, configID);
-        }
-
-        debug(mods, "complete publication");
-    }
-
-    private void enrichPublicationLevel(Element mods, String configID) {
-        LOGGER.debug("resolving via config {} : {}", configID, MCRXPathBuilder.buildXPath(mods));
-
-        boolean withinGroup = false;
-        boolean dataSourceCompleted = false;
-        String dsConfig = MCRConfiguration.instance().getString("MCR.MODS.EnrichmentResolver.DataSources." + configID);
-
-        for (StringTokenizer st = new StringTokenizer(dsConfig, " ()", true); st.hasMoreTokens();) {
-            String token = st.nextToken();
-            if (" ".equals(token)) {
-                continue;
-            } else if ("(".equals(token)) {
-                withinGroup = true;
-                dataSourceCompleted = false;
-            } else if (")".equals(token)) {
-                withinGroup = false;
-                dataSourceCompleted = false;
-            } else if (withinGroup && dataSourceCompleted) {
-                LOGGER.debug("Skipping data source {}", token);
-                continue;
-            } else {
-                MCRDataSource dataSource = MCRDataSourceFactory.instance().getDataSource(token);
-
-                dataSourceLoop: for (MCRIdentifierResolver resolver : dataSource.getResolvers()) {
-                    MCRIdentifierType idType = resolver.getType();
-                    List<Element> identifiersFound = idType.findIdentifiers(mods);
-                    for (Element identifierElement : identifiersFound) {
-                        String identifier = identifierElement.getTextTrim();
-
-                        LOGGER.debug("resolving {} {} from {}...", idType, identifier, dataSource);
-                        Element resolved = resolver.resolve(identifier);
-
-                        if (resolved == null) {
-                            LOGGER.debug("no data returned from {}", dataSource);
-                        } else {
-                            mergeResolvedIntoExistingData(mods, resolved);
-                            dataSourceCompleted = true;
-                            break dataSourceLoop;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private void mergeResolvedIntoExistingData(Element mods, Element resolved) {
-        LOGGER.debug("resolved publication data, merging into existing data...");
-        debug(resolved, "resolved publication");
-
-        if (mods.getName().equals("relatedItem")) {
-            // resolved is always mods:mods, transform to mods:relatedItem to be mergeable
-            resolved.setName("relatedItem");
-            resolved.setAttribute(mods.getAttribute("type").clone());
-        }
-
-        MCRMergeTool.merge(mods, resolved);
-        MCRMODSSorter.sort(mods);
-        debug(mods, "merged publication");
-    }
-
-    private void debug(Element mods, String headline) {
-        if (LOGGER.isDebugEnabled()) {
-            mods.removeChildren("extension", MCRConstants.MODS_NAMESPACE);
-            try {
-                LOGGER.debug("\n-------------------- {}: --------------------\n", headline);
-                XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-                LOGGER.debug(xout.outputString(mods));
-                LOGGER.debug("\n");
-            } catch (Exception ignored) {
-            }
-        }
+        MCREnricher enricher = new MCREnricher(configID);
+        enricher.enrich(mods);
     }
 }

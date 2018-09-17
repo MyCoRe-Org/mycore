@@ -230,9 +230,13 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      */
     @Override
     public MCRMetaISO8601Date clone() {
-        MCRMetaISO8601Date out = new MCRMetaISO8601Date();
-        out.setFromDOM(createXML().clone());
-        return out;
+        MCRMetaISO8601Date clone = (MCRMetaISO8601Date) super.clone();
+
+        clone.changed = this.changed;
+        clone.export = this.export.clone();
+        clone.isoDate = this.isoDate; // this is ok because iso Date is immutable
+
+        return clone;
     }
 
     /**

@@ -314,9 +314,22 @@ public final class MCRMetaNumber extends MCRMetaDefault {
         return elm;
     }
 
+    /**
+     * clone of this instance
+     * 
+     * you will get a (deep) clone of this element
+     * 
+     * @see java.lang.Object#clone()
+     */
     @Override
     public final MCRMetaNumber clone() {
-        return new MCRMetaNumber(subtag, inherited, dimension, measurement, number);
+        MCRMetaNumber clone = (MCRMetaNumber) super.clone();
+
+        clone.dimension =this.dimension;
+        clone.measurement = this.measurement;
+        clone.number = this.number;
+
+        return clone;
     }
 
     /**

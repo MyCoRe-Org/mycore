@@ -19,6 +19,7 @@
 package org.mycore.common.events;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
@@ -189,7 +190,10 @@ public class MCRShutdownHandler {
 
         @Override
         default int compareTo(Closeable other) {
-            return Integer.compare(other.getPriority(), getPriority());
+            //MCR-1941: never return 0 if !this.equals(other)
+            return Comparator.comparingInt(Closeable::getPriority)
+                .thenComparingLong(Closeable::hashCode)
+                .compare(other, this);
         }
     }
 
