@@ -219,7 +219,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
             URL localSchemaURL = MCRDOIService.class.getClassLoader().getResource(schemaPath);
 
             if (localSchemaURL == null) {
-                throw new MCRConfigurationException(DEFAULT_DATACITE_SCHEMA_PATH + " was not found!");
+                throw new MCRConfigurationException(schemaPath + " was not found!");
             }
             return schemaFactory.newSchema(localSchemaURL);
         } catch (SAXException e) {
