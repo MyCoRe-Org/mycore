@@ -159,7 +159,9 @@ public class MCRImportCCPublications extends MCREventHandlerBase {
 
     private MCRPath createRootDir(MCRObjectID derivateID) throws FileSystemException {
         MCRPath rootDir = MCRPath.getPath(derivateID.toString(), "/");
-        rootDir.getFileSystem().createRoot(derivateID.toString());
+        if (Files.notExists(rootDir)) {
+            rootDir.getFileSystem().createRoot(derivateID.toString());
+        }
         return rootDir;
     }
 
