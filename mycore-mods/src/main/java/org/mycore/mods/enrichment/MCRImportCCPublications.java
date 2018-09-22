@@ -25,11 +25,14 @@ import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
@@ -55,6 +58,8 @@ import org.mycore.mods.MCRMODSWrapper;
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRImportCCPublications extends MCREventHandlerBase {
+
+    private static final String CFG_ADD_DEFAULT_RULE = "MCR.Access.AddDerivateDefaultRule";
 
     private static final String PATTERN_CC_LICENSE = "#cc";
 
@@ -120,8 +125,8 @@ public class MCRImportCCPublications extends MCREventHandlerBase {
             derivate.getDerivate().setInternals(ifs);
 
             MCRMetadataManager.create(derivate);
-
             importPDF(rootDir, fileName, url);
+            setDefaultPermissions(derivateID);
         } catch (MCRPersistenceException | MCRAccessException | IOException ex) {
             LOGGER.warn(ex);
         }
@@ -167,6 +172,17 @@ public class MCRImportCCPublications extends MCREventHandlerBase {
 
         Files.copy(in, file, StandardCopyOption.REPLACE_EXISTING);
         in.close();
+    }
+
+    private void setDefaultPermissions(MCRObjectID derivateID) {
+        if (MCRConfiguration.instance().getBoolean(CFG_ADD_DEFAULT_RULE, true)) {
+            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+            for (String permission : configuredPermissions) {
+                MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
+                    "default derivate rule");
+            }
+        }
     }
 
     private URL getURLofPDF(Element mods) {
