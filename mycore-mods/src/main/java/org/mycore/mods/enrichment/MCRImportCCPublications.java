@@ -183,8 +183,8 @@ public class MCRImportCCPublications extends MCREventHandlerBase {
 
     private void setDefaultPermissions(MCRObjectID derivateID) {
         if (MCRConfiguration.instance().getBoolean(CFG_ADD_DEFAULT_RULE, true)) {
-            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+            MCRAccessInterface ai = MCRAccessManager.getAccessImpl();
+            Collection<String> configuredPermissions = ai.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
                     "default derivate rule");
