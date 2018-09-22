@@ -118,14 +118,18 @@ public class MCRImportCCPublications extends MCREventHandlerBase {
         String fileName = getFileName(url);
 
         MCRMetaIFS ifs = buildMetaIFS(fileName);
+        derivate.getDerivate().setInternals(ifs);
 
         try {
+            MCRMetadataManager.create(derivate);
+
             MCRPath rootDir = createRootDir(derivateID);
             setIFSID(ifs, rootDir);
-            derivate.getDerivate().setInternals(ifs);
-
-            MCRMetadataManager.create(derivate);
             importPDF(rootDir, fileName, url);
+
+            ifs.setMainDoc(fileName);
+            MCRMetadataManager.updateMCRDerivateXML(derivate);
+
             setDefaultPermissions(derivateID);
         } catch (MCRPersistenceException | MCRAccessException | IOException ex) {
             LOGGER.warn(ex);
@@ -136,7 +140,6 @@ public class MCRImportCCPublications extends MCREventHandlerBase {
         MCRMetaIFS ifs = new MCRMetaIFS();
         ifs.setSubTag(SUBTAG_INTERNAL);
         ifs.setSourcePath(null);
-        ifs.setMainDoc(fileName);
         return ifs;
     }
 
