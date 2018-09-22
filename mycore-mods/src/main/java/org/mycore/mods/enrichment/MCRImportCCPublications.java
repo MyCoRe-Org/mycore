@@ -105,6 +105,8 @@ public class MCRImportCCPublications extends MCREventHandlerBase {
             return;
         }
 
+        LOGGER.info("Detected MODS publication with CC license and link to PDF, will import {}", url.toExternalForm());
+
         MCRObjectID objectID = obj.getId();
         MCRObjectID derivateID = MCRObjectID.getNextFreeId(objectID.getProjectId() + '_' + TYPE_DERIVATE);
 
