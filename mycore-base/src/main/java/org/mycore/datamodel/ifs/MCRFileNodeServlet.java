@@ -78,7 +78,8 @@ public class MCRFileNodeServlet extends MCRContentServlet {
             //make sure, that numberpart of ownerID has correct length 
             ownerID = MCRObjectID.getInstance(ownerID).toString();
         }
-        if (!MCRAccessManager.checkPermissionForReadingDerivate(ownerID)) {
+        if (!MCRAccessManager.checkDerivateContentPermission(MCRObjectID.getInstance(ownerID),
+            MCRAccessManager.PERMISSION_READ)) {
             LOGGER.info("AccessForbidden to {}", request.getPathInfo());
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return null;

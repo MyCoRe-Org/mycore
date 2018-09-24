@@ -209,6 +209,30 @@ public class MCRAccessManager {
     }
 
     /**
+     * checks if the current user has the permission to perform an action on the derivate metadata.
+     * @param derId the MCRObjectID of the derivate
+     * @param permission the access permission for the rule
+     * @return true, if the access is allowed
+     */
+    public static boolean checkDerivateMetadataPermission(MCRObjectID derId, String permission) {
+        MCRObjectID objectId = MCRMetadataManager.getObjectId(derId, 10, TimeUnit.MINUTES);
+        if (objectId != null) {
+            return checkPermission(objectId, permission);
+        }
+        return checkPermission(derId.toString(), permission);
+    }
+
+    /**
+     * checks if the current user has the permission to perform an action on the derivate content.
+     * @param derId the MCRObjectID of the derivate
+     * @param permission the access permission for the rule
+     * @return true, if the access is allowed
+     */
+    public static boolean checkDerivateContentPermission(MCRObjectID derId, String permission) {
+        return checkPermission(derId.toString(), permission);
+    }
+
+    /**
      * determines whether the current user has the permission to perform a certain action.
      *
      * @param id
@@ -275,7 +299,11 @@ public class MCRAccessManager {
      * @param derID
      *            String ID of a MyCoRe-Derivate
      * @return true if the access is allowed otherwise it return false
+     * @deprecated use {@link #checkDerivateContentPermission(MCRObjectID, String)} or
+     *  {@link #checkDerivateMetadataPermission(MCRObjectID, String)} instead with Strategy
+     *  that also checks for the object.
      */
+    @Deprecated
     public static boolean checkPermissionForReadingDerivate(String derID) {
         // derID must be a derivate ID
         boolean accessAllowed = false;

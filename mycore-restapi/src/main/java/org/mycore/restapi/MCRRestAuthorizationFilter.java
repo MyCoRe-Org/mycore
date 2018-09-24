@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Priority;
-import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.Priorities;
@@ -54,6 +53,8 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     public static final String PARAM_MCRID = "mcrid";
 
     public static final String PARAM_DERID = "derid";
+
+    public static final String PARAM_DER_PATH = "path";
 
     @Context
     ResourceInfo resourceInfo;
@@ -92,12 +93,15 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     }
 
     private void checkBaseAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
-        String objectId, String derId)
+        String objectId, String derId, String path)
         throws MCRRestAPIException {
+        LogManager.getLogger().debug("Permission: {}, Object: {}, Derivate: {}, Path: {}", permission, objectId, derId,
+            path);
         Optional<String> checkable = Optional.ofNullable(derId)
+            .filter(d -> path != null) //only check for derId if path is given
             .map(Optional::of)
             .orElseGet(() -> Optional.ofNullable(objectId));
-        checkable.ifPresent(id -> LogManager.getLogger().warn("Checking " + permission + " access on " + id));
+        checkable.ifPresent(id -> LogManager.getLogger().info("Checking " + permission + " access on " + id));
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         boolean allowed = checkable
             .map(id -> aclProvider.checkPermission(id, permission.toString()))
@@ -147,7 +151,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                     checkRestAPIAccess(requestContext, permission, path);
                     MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
                     checkBaseAccess(requestContext, permission, pathParameters.getFirst(PARAM_MCRID),
-                        pathParameters.getFirst(PARAM_DERID));
+                        pathParameters.getFirst(PARAM_DERID), pathParameters.getFirst(PARAM_DER_PATH));
                 } catch (MCRRestAPIException e) {
                     LogManager.getLogger().warn("API Access denied!");
                     requestContext.abortWith(new MCRRestAPIExceptionMapper().toResponse(e));

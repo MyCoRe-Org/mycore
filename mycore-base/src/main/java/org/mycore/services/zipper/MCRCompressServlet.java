@@ -116,7 +116,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
             return;
         }
         boolean readPermission = id.getTypeId().equals("derivate") ? MCRAccessManager
-            .checkPermissionForReadingDerivate(id.toString()) : MCRAccessManager.checkPermission(id, PERMISSION_READ);
+            .checkDerivateContentPermission(id, PERMISSION_READ) : MCRAccessManager.checkPermission(id, PERMISSION_READ);
         if (!readPermission) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, "You may not read " + id);
             return;
@@ -175,10 +175,11 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
         for (Element el : li) {
             if (el.getAttributeValue("inherited").equals("0")) {
                 String ownerID = el.getAttributeValue("href", XLINK_NAMESPACE);
+                MCRObjectID derId = MCRObjectID.getInstance(ownerID);
                 // here the access check is tested only against the derivate
-                if (MCRAccessManager.checkPermission(ownerID, PERMISSION_READ)
+                if (MCRAccessManager.checkDerivateContentPermission(derId, PERMISSION_READ)
                     && MCRXMLFunctions.isDisplayedEnabledDerivate(ownerID)) {
-                    sendDerivate(MCRObjectID.getInstance(ownerID), null, container);
+                    sendDerivate(derId, null, container);
                 }
             }
         }

@@ -20,6 +20,7 @@ package org.mycore.restapi.v2;
 
 import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
+import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DER_PATH;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,7 +96,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-@Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{path:(/[^/]+)*}")
+@Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{" + PARAM_DER_PATH + ":(/[^/]+)*}")
 public class MCRRestDerivateContents {
     private static final int BUFFER_SIZE = 8192;
 
@@ -113,7 +114,7 @@ public class MCRRestDerivateContents {
     @PathParam(PARAM_DERID)
     MCRObjectID derid;
 
-    @PathParam("path")
+    @PathParam(PARAM_DER_PATH)
     @DefaultValue("")
     String path;
 
