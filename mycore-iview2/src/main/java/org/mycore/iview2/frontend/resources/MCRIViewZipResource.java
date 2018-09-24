@@ -45,6 +45,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
@@ -64,7 +65,8 @@ public class MCRIViewZipResource {
     @Produces("application/zip")
     @Path("{derivateID}")
     public Response zip(@PathParam("derivateID") String derivateID, @QueryParam("zoom") Integer zoom) throws Exception {
-        if (!MCRAccessManager.checkPermissionForReadingDerivate(derivateID)) {
+        if (!MCRAccessManager.checkDerivateContentPermission(MCRObjectID.getInstance(derivateID),
+            MCRAccessManager.PERMISSION_READ)) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
         MCRPath derivateRoot = MCRPath.getPath(derivateID, "/");

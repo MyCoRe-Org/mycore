@@ -369,7 +369,7 @@ public final class MCRMetadataManager {
      */
     public static void delete(final MCRDerivate mcrDerivate) throws MCRPersistenceException, MCRAccessException {
         MCRObjectID id = mcrDerivate.getId();
-        if (!MCRAccessManager.checkPermission(id, PERMISSION_DELETE)) {
+        if (!MCRAccessManager.checkDerivateContentPermission(id, PERMISSION_DELETE)) {
             throw MCRAccessException.missingPermission("Delete derivate", id.toString(), PERMISSION_DELETE);
         }
         // mark for deletion
@@ -748,7 +748,7 @@ public final class MCRMetadataManager {
             MCRMetadataManager.create(mcrDerivate);
             return;
         }
-        if (!MCRAccessManager.checkPermission(id, PERMISSION_WRITE)) {
+        if (!MCRAccessManager.checkDerivateMetadataPermission(id, PERMISSION_WRITE)) {
             throw MCRAccessException.missingPermission("Update derivate", id.toString(), PERMISSION_WRITE);
         }
         File fileSourceDirectory = null;

@@ -111,7 +111,7 @@ public abstract class MCRJerseyUtil {
     }
 
     /**
-     * Checks if the current user has the read permission on the given derivate. Throws an unauthorized exception
+     * Checks if the current user has the read permission on the given derivate content. Throws an unauthorized exception
      * otherwise.
      * 
      * @param id
@@ -119,7 +119,7 @@ public abstract class MCRJerseyUtil {
      * @see MCRAccessManager#checkPermissionForReadingDerivate(String)
      */
     public static void checkDerivateReadPermission(MCRObjectID id) {
-        if (!MCRAccessManager.checkPermissionForReadingDerivate(id.toString())) {
+        if (!MCRAccessManager.checkDerivateContentPermission(id, MCRAccessManager.PERMISSION_READ)) {
             throw new WebApplicationException(Response.status(Status.UNAUTHORIZED).build());
         }
     }
