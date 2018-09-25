@@ -327,7 +327,7 @@
 
     <xsl:choose>
       <xsl:when test="$linkTo = $loginURL">
-        <span itemprop="name">
+        <span>
           <xsl:value-of select="$displayText" />
         </span>
         &#160;
@@ -336,8 +336,8 @@
         </a>
       </xsl:when>
       <xsl:otherwise>
-        <a href="{$linkTo}" itemprop="url">
-          <span itemprop="name">
+        <a href="{$linkTo}">
+          <span>
             <xsl:value-of select="$displayText" />
           </span>
         </a>

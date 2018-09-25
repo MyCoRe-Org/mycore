@@ -152,7 +152,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <article class="result clearfix" itemscope="" itemtype="http://schema.org/Book">
+    <article class="result clearfix">
       <header class="top-head">
         <h3>
           <xsl:apply-templates select="." mode="linkTo" />
@@ -162,7 +162,7 @@
         <xsl:variable name="dateModified" select="date[@name='modified']" />
         <p>
           Zuletzt bearbeitet am :
-          <time itemprop="dateModified" datetime="{$dateModified}">
+          <time datetime="{$dateModified}">
             <xsl:call-template name="formatISODate">
               <xsl:with-param select="$dateModified" name="date" />
               <xsl:with-param select="i18n:translate('metaData.date')" name="format" />
