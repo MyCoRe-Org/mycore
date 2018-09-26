@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>37</version>
+    <version>38-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <version>2018.06.0.1-SNAPSHOT</version>
