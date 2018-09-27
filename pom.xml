@@ -33,6 +33,7 @@
     <tag>HEAD</tag>
   </scm>
   <properties>
+    <argLine />
     <changelog.since>2018-07-02</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2018.08</changes.version>
@@ -190,7 +191,7 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <argLine>${env.MAVEN_OPTS}</argLine>
+            <argLine>${env.MAVEN_OPTS} @{argLine}</argLine>
           </configuration>
         </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
@@ -1500,6 +1501,13 @@
         <scope>import</scope>
       </dependency>
       <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.3.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>1.4.197</version>
@@ -1574,8 +1582,7 @@
       <dependency>
         <groupId>org.jmockit</groupId>
         <artifactId>jmockit</artifactId>
-        <!-- version 1.38, 1.39 acts like princess about classpath order -->
-        <version>1.37</version>
+        <version>1.42</version>
         <scope>test</scope>
       </dependency>
       <dependency>
