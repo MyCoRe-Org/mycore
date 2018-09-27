@@ -124,7 +124,7 @@ public class MCRTestCase {
     protected URL getResourceAsURL(String fileName) {
         String fileLocation = buildFileLocation(fileName);
         System.out.println("File location: " + fileLocation);
-        return Class.class.getResource(fileLocation);
+        return getClass().getResource(fileLocation);
     }
 
     private String buildFileLocation(String fileName) {
