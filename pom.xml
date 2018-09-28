@@ -4,10 +4,10 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>38</version>
+    <version>38-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2018.06.0.2-SNAPSHOT</version>
+  <version>2018.06.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
