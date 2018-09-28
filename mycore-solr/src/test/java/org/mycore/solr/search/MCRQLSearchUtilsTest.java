@@ -18,6 +18,8 @@
 
 package org.mycore.solr.search;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static org.junit.Assert.assertEquals;
 
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +37,7 @@ import org.mycore.services.fieldquery.MCRQueryParser;
 public class MCRQLSearchUtilsTest extends MCRTestCase {
     /**
      * Test method for
-     * {@link org.mycore.solr.search.MCRQLSearchUtils#getSolrQuery(org.mycore.services.fieldquery.MCRQuery, org.jdom2.Document, javax.servlet.http.HttpServletRequest)}
+     * {@link MCRSolrSearchUtils#getSolrQuery(MCRQuery, Document, HttpServletRequest)}
      * .
      */
     @Test
