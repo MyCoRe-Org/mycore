@@ -540,12 +540,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         }
     }
 
-    @MCRCommand(syntax = "filter classification {0} with mappings",
-        help = "Deletes all Categories of classification {0} which can not be mapped from all other classifications!",
-        order = 160)
-    public static void filterClassificationWithMapping(String id) {
-        new MCRClassificationMappingFilter(id).filter();
-    }
 
     private static int checkLeftRightAndLevel(MCRCategoryImpl category, int leftStart, int levelStart,
         List<String> log) {
