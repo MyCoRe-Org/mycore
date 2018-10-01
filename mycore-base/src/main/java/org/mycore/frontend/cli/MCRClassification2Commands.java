@@ -55,7 +55,6 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRClassificationMappingFilter;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
