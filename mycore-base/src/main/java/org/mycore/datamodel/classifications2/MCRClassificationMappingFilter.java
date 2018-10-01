@@ -92,7 +92,6 @@ public class MCRClassificationMappingFilter {
             for (String mappingTarget : mappingTargets) {
                 final String[] kv = mappingTarget.split(":");
                 String clazz = kv[0];
-                String categ = kv[1];
                 if (classificationID.equals(clazz)) {
                     LOGGER.info("Found mapping from {} to {}", category.getId(), mappingTarget );
                     toFromMapping.put(mappingTarget, category.getId().toString());
