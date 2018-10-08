@@ -41,6 +41,8 @@
 
   -->
 
+  <xsl:include href="xslInclude:schemaorg" />
+
   <xsl:template match="/">
     <xsl:element name="script">
       <xsl:attribute name="type">application/ld+json</xsl:attribute>
@@ -241,9 +243,15 @@
       </fn:string>
     </xsl:if>
 
+    <xsl:apply-templates select="*" mode="extension" />
+
     <!-- child files -->
     <xsl:call-template name="addFiles"/>
 
+  </xsl:template>
+
+  <xsl:template match="*" mode="extension">
+    <!-- nothing -->
   </xsl:template>
 
   <xsl:template name="modsScholarlyArticle">
