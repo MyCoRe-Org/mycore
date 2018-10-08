@@ -26,7 +26,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Priority;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -39,6 +41,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 
+@Priority(Priorities.AUTHENTICATION-1)
 public class MCRCORSResponseFilter implements ContainerResponseFilter {
 
     private static final Logger LOGGER = LogManager.getLogger();
