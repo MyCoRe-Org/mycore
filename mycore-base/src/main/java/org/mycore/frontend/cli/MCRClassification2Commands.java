@@ -539,7 +539,6 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         }
     }
 
-
     private static int checkLeftRightAndLevel(MCRCategoryImpl category, int leftStart, int levelStart,
         List<String> log) {
         int curValue = leftStart;
