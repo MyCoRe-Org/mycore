@@ -57,14 +57,22 @@
   </xsl:template>
 
   <xsl:template match="mods:mods">
+    <!-- do nothing -->
+  </xsl:template>
+
+  <xsl:template match="mods:mods[mods:classification/@authorityURI='http://schema.org/']">
+    <xsl:variable name="type" select="tokenize(mods:classification[@authorityURI='http://schema.org/']/@valueURI, '/')[last()]" />
     <fn:map>
-      <xsl:call-template name="modsCreativeWork"/>
+      <xsl:call-template name="modsCreativeWork">
+        <xsl:with-param name="context" select="'http://schema.org/'" />
+        <xsl:with-param name="type" select="$type" />
+      </xsl:call-template>
     </fn:map>
   </xsl:template>
 
   <xsl:template match="mods:mods[mods:classification/@valueURI='http://schema.org/Article']">
     <fn:map>
-      <xsl:call-template name="modsArticle"/>
+      <xsl:call-template name="modsArticle" />
     </fn:map>
   </xsl:template>
 
