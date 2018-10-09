@@ -28,12 +28,6 @@ import org.mycore.common.MCRSystemUserInformation;
 
 public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
 
-    public static final ACLBinder BINDER = new ACLBinder();
-
-    public static Binder getBinder() {
-        return BINDER;
-    }
-
     @Override
     public void dispose(MCRRequestScopeACL mcrRequestScopeACL) {
         LogManager.getLogger().debug("Disposed...");
@@ -94,15 +88,4 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
         }
     }
 
-    private static class ACLBinder extends AbstractBinder {
-        @Override
-        protected void configure() {
-            bindFactory(MCRRequestScopeACLFactory.class)
-                .proxy(true)
-                .proxyForSameScope(false)
-                .to(MCRRequestScopeACL.class)
-                .in(RequestScoped.class);
-        }
-
-    }
 }
