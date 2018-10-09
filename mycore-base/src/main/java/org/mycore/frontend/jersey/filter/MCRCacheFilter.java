@@ -40,6 +40,7 @@ import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
+import org.glassfish.jersey.process.internal.RequestScope;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 
@@ -49,9 +50,6 @@ public class MCRCacheFilter implements ContainerResponseFilter {
 
     @Context
     private ResourceInfo resourceInfo;
-
-    @Inject
-    private MCRRequestScopeACL aclProvider;
 
     private CacheControl getCacheConrol(MCRCacheControl cacheControlAnnotation) {
         CacheControl cc = new CacheControl();
@@ -117,6 +115,7 @@ public class MCRCacheFilter implements ContainerResponseFilter {
             cc = getCacheConrol(resourceInfo.getResourceMethod().getAnnotation(MCRCacheControl.class));
         }
 
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         if (aclProvider.isPrivate()) {
             cc.setPrivate(true);
             cc.getPrivateFields().clear();
