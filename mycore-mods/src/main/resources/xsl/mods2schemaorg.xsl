@@ -507,7 +507,7 @@
     <fn:string key="encodingFormat">
       <xsl:value-of select="contentType/text()" />
     </fn:string>
-    <fn:string key="contentURL">
+    <fn:string key="contentUrl">
       <xsl:value-of
         select="concat($WebApplicationBaseURL,
           'servlets/MCRFileNodeServlet/',
