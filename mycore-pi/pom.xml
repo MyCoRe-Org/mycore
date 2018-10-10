@@ -8,6 +8,32 @@
   </parent>
   <artifactId>mycore-pi</artifactId>
   <name>MyCoRe Persistent Identifier</name>
+  <properties>
+    <argLine>-Djdk.attach.allowAttachSelf</argLine>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>getClasspathFilenames</id>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.0</version>
+        <configuration>
+          <argLine>${env.MAVEN_OPTS} @{argLine} -javaagent:${org.jmockit:jmockit:jar}</argLine>
+          <useSystemClassLoader>true</useSystemClassLoader>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>com.google.code.gson</groupId>
