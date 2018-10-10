@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -40,7 +39,6 @@ import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
-import org.glassfish.jersey.process.internal.RequestScope;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 
