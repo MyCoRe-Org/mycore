@@ -55,7 +55,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRClassificationMappingFilter;
+import org.mycore.datamodel.classifications2.MCRUnmappedCategoryRemover;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
@@ -540,11 +540,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         }
     }
 
-    @MCRCommand(syntax = "filter classification {0} with mappings",
+    @MCRCommand(syntax = "remove unmapped categories from classification {0}",
         help = "Deletes all Categories of classification {0} which can not be mapped from all other classifications!",
         order = 160)
     public static void filterClassificationWithMapping(String id) {
-        new MCRClassificationMappingFilter(id).filter();
+        new MCRUnmappedCategoryRemover(id).filter();
     }
 
     private static int checkLeftRightAndLevel(MCRCategoryImpl category, int leftStart, int levelStart,
