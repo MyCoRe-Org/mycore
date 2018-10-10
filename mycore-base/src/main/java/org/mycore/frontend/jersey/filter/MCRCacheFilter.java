@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -49,9 +48,6 @@ public class MCRCacheFilter implements ContainerResponseFilter {
 
     @Context
     private ResourceInfo resourceInfo;
-
-    @Inject
-    private MCRRequestScopeACL aclProvider;
 
     private CacheControl getCacheConrol(MCRCacheControl cacheControlAnnotation) {
         CacheControl cc = new CacheControl();
@@ -117,6 +113,7 @@ public class MCRCacheFilter implements ContainerResponseFilter {
             cc = getCacheConrol(resourceInfo.getResourceMethod().getAnnotation(MCRCacheControl.class));
         }
 
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         if (aclProvider.isPrivate()) {
             cc.setPrivate(true);
             cc.getPrivateFields().clear();

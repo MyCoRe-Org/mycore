@@ -18,6 +18,11 @@
 
 package org.mycore.frontend.jersey.access;
 
+import java.util.Objects;
+import java.util.function.Supplier;
+
+import javax.ws.rs.container.ContainerRequestContext;
+
 public interface MCRRequestScopeACL {
 
     public boolean checkPermission(String privilege);
@@ -25,5 +30,17 @@ public interface MCRRequestScopeACL {
     public boolean checkPermission(String id, String permission);
 
     public boolean isPrivate();
+
+    public static MCRRequestScopeACL getInstance(ContainerRequestContext requestContext) {
+        Object property = requestContext.getProperty(MCRRequestScopeACLFilter.ACL_INSTANT_KEY);
+        Objects.requireNonNull(property, "Please register " + MCRRequestScopeACLFilter.class);
+        if (property instanceof Supplier) {
+            @SuppressWarnings("unchecked")
+            MCRRequestScopeACL requestScopeACL = ((Supplier<MCRRequestScopeACL>) property).get();
+            requestContext.setProperty(MCRRequestScopeACLFilter.ACL_INSTANT_KEY, requestScopeACL);
+            property = requestScopeACL;
+        }
+        return (MCRRequestScopeACL) property;
+    }
 
 }

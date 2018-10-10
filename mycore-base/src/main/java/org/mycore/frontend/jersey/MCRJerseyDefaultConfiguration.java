@@ -23,6 +23,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
+import org.mycore.frontend.jersey.access.MCRRequestScopeACLFilter;
 import org.mycore.frontend.jersey.feature.MCRGuiceBridgeFeature;
 
 /**
@@ -39,7 +40,7 @@ public class MCRJerseyDefaultConfiguration implements MCRJerseyConfiguration {
 
     @Override
     public void configure(ResourceConfig resourceConfig) {
-        resourceConfig.register(MCRRequestScopeACLFactory.getBinder());
+        resourceConfig.register(MCRRequestScopeACLFilter.class);
         // setup resources
         setupResources(resourceConfig);
 

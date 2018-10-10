@@ -58,9 +58,6 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     @Context
     ResourceInfo resourceInfo;
 
-    @Inject
-    private MCRRequestScopeACL aclProvider;
-
     /**
      * checks if the given REST API operation is allowed
      * @param permission "read" or "write"
@@ -68,8 +65,10 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
      *
      * @throws MCRRestAPIException if access is restricted
      */
-    private void checkRestAPIAccess(MCRRestAPIACLPermission permission, String path)
+    private void checkRestAPIAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
+        String path)
         throws MCRRestAPIException {
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         LogManager.getLogger().warn(path + ": Checking API access: " + permission);
         String thePath = path.startsWith("/") ? path : "/" + path;
 
@@ -92,12 +91,14 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 "Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
     }
 
-    private void checkBaseAccess(MCRRestAPIACLPermission permission, String objectId, String derId)
+    private void checkBaseAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
+        String objectId, String derId)
         throws MCRRestAPIException {
         Optional<String> checkable = Optional.ofNullable(derId)
             .map(Optional::of)
             .orElseGet(() -> Optional.ofNullable(objectId));
         checkable.ifPresent(id -> LogManager.getLogger().warn("Checking " + permission + " access on " + id));
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         boolean allowed = checkable
             .map(id -> aclProvider.checkPermission(id, permission.toString()))
             .orElse(true);
@@ -109,7 +110,8 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 "Check access right '" + permission + "' on '" + checkable.orElse(null) + "'!"));
     }
 
-    private void checkDetailLevel(String... detail) throws MCRRestAPIException {
+    private void checkDetailLevel(ContainerRequestContext requestContext, String... detail) throws MCRRestAPIException {
+        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         List<String> missedPermissions = Stream.of(detail)
             .map(d -> "rest-detail-" + d)
             .filter(d -> MCRAccessManager.hasRule(MCRAccessControlSystem.poolPrivilegeID, d))
@@ -142,9 +144,9 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .map(Path::value)
             .ifPresent(path -> {
                 try {
-                    checkRestAPIAccess(permission, path);
+                    checkRestAPIAccess(requestContext, permission, path);
                     MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
-                    checkBaseAccess(permission, pathParameters.getFirst(PARAM_MCRID),
+                    checkBaseAccess(requestContext, permission, pathParameters.getFirst(PARAM_MCRID),
                         pathParameters.getFirst(PARAM_DERID));
                 } catch (MCRRestAPIException e) {
                     LogManager.getLogger().warn("API Access denied!");
@@ -152,7 +154,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 }
             });
         try {
-            checkDetailLevel(
+            checkDetailLevel(requestContext,
                 requestContext.getAcceptableMediaTypes()
                     .stream()
                     .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
