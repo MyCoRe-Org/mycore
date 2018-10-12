@@ -39,6 +39,8 @@ final class MCRRestUtils {
 
     public static final String TAG_MYCORE_ABOUT = "mcr_about";
 
+    public static final String TAG_MYCORE_EVENTS = "mcr_events";
+
     private MCRRestUtils() {
     }
 
