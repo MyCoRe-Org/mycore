@@ -36,6 +36,7 @@ import javax.ws.rs.sse.SseBroadcaster;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -72,6 +73,14 @@ class MCREventHandler {
         return b64.encodeToString(bytes);
     }
 
+    private static void addUserInfo(JsonObject jEvent) {
+        if (!MCRSessionMgr.hasCurrentSession()) {
+            return;
+        }
+        String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
+        jEvent.addProperty("user", userID);
+    }
+
     public static class MCRObjectHandler implements org.mycore.common.events.MCREventHandler {
         private final SseBroadcaster sseBroadcaster;
 
@@ -94,6 +103,7 @@ class MCREventHandler {
             MCRObject obj = (MCRObject) evt.get(MCREvent.OBJECT_KEY);
             JsonObject jEvent = new JsonObject();
             JsonObject newData = getData(obj);
+            addUserInfo(jEvent);
             jEvent.add("current", newData);
             MCRObject oldObj = (MCRObject) evt.get(MCREvent.OBJECT_OLD_KEY);
             if (oldObj != null) {
@@ -154,6 +164,7 @@ class MCREventHandler {
             }
             MCRDerivate der = (MCRDerivate) evt.get(MCREvent.DERIVATE_KEY);
             JsonObject jEvent = new JsonObject();
+            addUserInfo(jEvent);
             JsonObject newData = getData(der);
             jEvent.add("current", newData);
             MCRDerivate oldDer = (MCRDerivate) evt.get(MCREvent.DERIVATE_OLD_KEY);
@@ -247,6 +258,7 @@ class MCREventHandler {
                 return;
             }
             JsonObject file = new JsonObject();
+            addUserInfo(file);
             String derId = ((MCRPath) path).getOwner();
             String fPath = ((MCRPath) path).getOwnerRelativePath();
             String objId = MCRMetadataManager.getObjectId(MCRObjectID.getInstance(derId), 1, TimeUnit.MINUTES)
