@@ -597,6 +597,10 @@ p.intro {
       <xsl:apply-templates select="*" />
     </table>
   </div>
+  <h3>XML-Source</h3>
+  <div class="xmlSource">
+    <xsl:apply-templates select="." mode='xmlMarkup' />
+  </div>
 </xsl:template>
 
 <xsl:template match="dc:title" xmlns:dc="http://purl.org/dc/elements/1.1/">
