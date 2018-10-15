@@ -182,7 +182,6 @@ class MCREventHandler {
         }
 
         private JsonObject getData(MCRDerivate der) {
-            JsonParser parser = new JsonParser();
             JsonObject event = new JsonObject();
             event.addProperty("id", der.getId().toString());
             event.addProperty("uri",
