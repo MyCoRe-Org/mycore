@@ -29,6 +29,7 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.restapi.MCRDropSessionFilter;
 import org.mycore.restapi.MCRJerseyRestApp;
 import org.mycore.restapi.MCRNoFormDataPutFilter;
 import org.mycore.restapi.MCRRemoveMsgBodyFilter;
@@ -52,6 +53,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         register(MCRRestAPIAuthentication.class); //keep 'unchanged' in v2
         register(MCRRemoveMsgBodyFilter.class);
         register(MCRNoFormDataPutFilter.class);
+        register(MCRDropSessionFilter.class);
         setupOAS();
     }
 

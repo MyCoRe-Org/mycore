@@ -16,6 +16,7 @@
   <filter>
     <filter-name>guiceFilter</filter-name>
     <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
 
   <filter-mapping>
@@ -31,6 +32,7 @@
   <filter>
     <filter-name>WebAppBaseFilter</filter-name>
     <filter-class>org.mycore.frontend.filter.MCRWebAppBaseFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
 
   <filter>
@@ -46,11 +48,13 @@
   <filter>
     <filter-name>RequestDebugFilter</filter-name>
     <filter-class>org.mycore.frontend.filter.MCRRequestDebugFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
 
   <filter>
     <filter-name>RequestAuthenticationFilter</filter-name>
     <filter-class>org.mycore.frontend.filter.MCRRequestAuthenticationFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
 
   <servlet id="CreateObjectServlet">
