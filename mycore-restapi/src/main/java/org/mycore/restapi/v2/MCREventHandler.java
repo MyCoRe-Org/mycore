@@ -268,6 +268,7 @@ class MCREventHandler {
             file.addProperty("derivate", derId);
             file.addProperty("object", objId);
             file.addProperty("size", attrs.size());
+            file.addProperty("modified", attrs.lastModifiedTime().toInstant().toString());
             file.addProperty("md5", ((MCRFileAttributes) attrs).md5sum());
             file.addProperty("mimeType", context.getMimeType(path.getFileName().toString()));
             OutboundSseEvent event = sse.newEventBuilder()
