@@ -564,6 +564,19 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     @Test
+    public void replaceCategoryWithAdoption() throws URISyntaxException, MCRException, SAXParseException, IOException {
+        MCRCategory gc1 = loadClassificationResource("/grandchild.xml");
+        MCRCategory gc2 = loadClassificationResource("/grandchild2.xml");
+        DAO.addCategory(null, gc1);
+        startNewTransaction();
+        DAO.replaceCategory(gc2);
+        startNewTransaction();
+        MCRCategoryImpl rootNode = (MCRCategoryImpl) DAO.getRootCategory(gc2.getId(), -1);
+        assertEquals("Category count does not match.", countNodes(gc2), countNodes(rootNode));
+        checkLeftRightLevelValue(rootNode, 0, 0);
+    }
+
+    @Test
     public void replaceSameCategory() throws Exception {
         loadWorldClassification2();
         addWorldClassification();

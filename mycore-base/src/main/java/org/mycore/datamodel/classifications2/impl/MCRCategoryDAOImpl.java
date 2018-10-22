@@ -497,13 +497,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (category.hasChildren()) {
             int parentPos = category.getPositionInParent();
             MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
-            parent.children.addAll(parentPos, category.children
-                .stream()
-                .map(MCRCategoryImpl.class::cast)
-                .collect(Collectors.toList()) //temporary list so we do not modify 'children' directly
-                .stream()
-                .peek(MCRCategoryImpl::detachFromParent)
-                .collect(Collectors.toList()));
+            @SuppressWarnings("unchecked")
+            ArrayList<MCRCategoryImpl> copy = (ArrayList<MCRCategoryImpl>) new ArrayList(category.children);
+            copy.forEach(MCRCategoryImpl::detachFromParent);
+            parent.children.addAll(parentPos, copy);
+            copy.forEach(c -> c.parent = parent); //fixes MCR-1963
         }
         category.detachFromParent();
         MCREntityManagerProvider.getCurrentEntityManager().remove(category);
