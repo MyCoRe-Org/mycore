@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="grandchildtest">
+  <label xml:lang="en" text="grandchild adoption test" />
+  <categories>
+    <category ID="grandparent">
+      <label xml:lang="en" text="grandparent" />
+      <category ID="newparent">
+        <label xml:lang="en" text="new parent" />
+        <category ID="child">
+          <label xml:lang="en" text="children" />
+        </category>
+      </category>
+    </category>
+  </categories>
+</mycoreclass>
