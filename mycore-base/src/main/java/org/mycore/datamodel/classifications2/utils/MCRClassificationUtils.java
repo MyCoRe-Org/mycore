@@ -74,7 +74,7 @@ public class MCRClassificationUtils {
         if (classification == null) {
             return null;
         }
-        return MCRCategoryTransformer.getMetaDataDocument(classification, true);
+        return MCRCategoryTransformer.getMetaDataDocument(classification, false);
     }
 
     /**
