@@ -23,8 +23,11 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
 import java.util.Base64;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -39,6 +42,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -124,11 +128,12 @@ class MCREventHandler {
             JsonObject event = new JsonObject();
             event.addProperty("id", obj.getId().toString());
             event.addProperty("uri", uriResolver.apply(getPathURI("objects/" + obj.getId())).toString());
-            event.addProperty("state", obj.getService().getState().getID());
-            event.addProperty("createdBy", obj.getService().getFlags("createdby").get(0));
-            event.addProperty("created", obj.getService().getDate("createdate").toInstant().toString());
-            event.addProperty("modifiedBy", obj.getService().getFlags("modifiedby").get(0));
-            event.addProperty("modified", obj.getService().getDate("modifydate").toInstant().toString());
+            Optional.ofNullable(obj.getService().getState())
+                .ifPresent(s -> event.addProperty("state", s.getID()));
+            copyFlagToProperty(obj, event, "createdby", "createdBy");
+            copyServiceDateToProperty(obj, event, "createdate", "created");
+            copyFlagToProperty(obj, event, "modifiedby", "modifiedBy");
+            copyServiceDateToProperty(obj, event, "modifydate", "modified");
             JsonArray pi = new JsonArray();
             obj.getService().getFlags("MyCoRe-PI").stream()
                 .map(parser::parse)
@@ -141,6 +146,24 @@ class MCREventHandler {
         public void undoHandleEvent(MCREvent evt) throws MCRException {
             //do nothing
         }
+    }
+
+    private static void copyServiceDateToProperty(MCRBase obj, JsonObject jsonObj, String dateType,
+        String propertyName) {
+        Optional.ofNullable(obj.getService().getDate(dateType))
+            .map(Date::toInstant)
+            .map(Instant::toString)
+            .ifPresent(d -> jsonObj.addProperty(propertyName, d));
+    }
+
+    private static void copyFlagToProperty(MCRBase obj, JsonObject json, String flagName, String propertyName) {
+        obj.getService()
+            .getFlags(flagName)
+            .stream()
+            .findFirst()
+            .ifPresent(c -> {
+                json.addProperty(propertyName, c);
+            });
     }
 
     public static class MCRDerivateHandler implements org.mycore.common.events.MCREventHandler {
@@ -188,10 +211,10 @@ class MCREventHandler {
                 uriResolver.apply(getPathURI("objects/" + der.getOwnerID())).toString() + "/derivates/" + der.getId());
             event.addProperty("object", der.getOwnerID().toString());
             event.addProperty("objectUri", uriResolver.apply(getPathURI("objects/" + der.getOwnerID())).toString());
-            event.addProperty("createdBy", der.getService().getFlags("createdby").get(0));
-            event.addProperty("created", der.getService().getDate("createdate").toInstant().toString());
-            event.addProperty("modifiedBy", der.getService().getFlags("modifiedby").get(0));
-            event.addProperty("modified", der.getService().getDate("modifydate").toInstant().toString());
+            copyFlagToProperty(der, event, "createdby", "createdBy");
+            copyServiceDateToProperty(der, event, "createdate", "created");
+            copyFlagToProperty(der, event, "modifiedby", "modifiedBy");
+            copyServiceDateToProperty(der, event, "modifydate", "modified");
             return event;
         }
 
@@ -268,6 +291,7 @@ class MCREventHandler {
             file.addProperty("derivate", derId);
             file.addProperty("object", objId);
             file.addProperty("size", attrs.size());
+            file.addProperty("modified", attrs.lastModifiedTime().toInstant().toString());
             file.addProperty("md5", ((MCRFileAttributes) attrs).md5sum());
             file.addProperty("mimeType", context.getMimeType(path.getFileName().toString()));
             OutboundSseEvent event = sse.newEventBuilder()
