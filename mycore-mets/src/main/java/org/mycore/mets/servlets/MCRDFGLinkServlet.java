@@ -124,10 +124,10 @@ public class MCRDFGLinkServlet extends MCRServlet {
                     "Image \"{0}\" not found in the MCRDerivate. Please contact an administrator.", filePath));
                 return;
             case -2:
-                dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL;
+                dfgURL = "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL;
                 break;
             default:
-                dfgURL = "http://dfg-viewer.de/show/?set[mets]=" + encodedMetsURL + "&set[image]=" + imageNumber;
+                dfgURL = "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL + "&set[image]=" + imageNumber;
                 break;
         }
 
