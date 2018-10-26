@@ -22,8 +22,10 @@ import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_CLASSID;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.BadRequestException;
@@ -34,10 +36,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
@@ -47,9 +49,11 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.model.MCRClass;
+import org.mycore.datamodel.classifications2.model.MCRClassCategory;
 import org.mycore.datamodel.classifications2.model.MCRClassURL;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+import org.mycore.restapi.converter.MCRDetailLevel;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,8 +68,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     tags = @Tag(name = MCRRestUtils.TAG_MYCORE_CLASSIFICATION, description = "Operations on classifications"))
 public class MCRRestClassifications {
 
+    private static final String PARAM_CATEGID = "categid";
+
     @Context
-    Request request;
+    ContainerRequestContext request;
 
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
@@ -80,7 +86,7 @@ public class MCRRestClassifications {
     public Response listClassifications() {
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         Date lastModified = new Date(categoryDAO.getLastModified());
-        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
@@ -116,18 +122,60 @@ public class MCRRestClassifications {
             content = @Content(schema = @Schema(implementation = MCRClass.class))),
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId) {
+        return getClassification(classId, dao -> dao.getCategory(MCRCategoryID.rootID(classId), -1));
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
+    @Path("/{" + PARAM_CLASSID + "}/{" + PARAM_CATEGID + "}")
+    @Operation(summary = "Returns Classification with the given " + PARAM_CLASSID + " and " + PARAM_CATEGID + ".",
+        responses = @ApiResponse(content = {
+            @Content(schema = @Schema(implementation = MCRClass.class)),
+            @Content(schema = @Schema(implementation = MCRClassCategory.class))
+        },
+            description = "If media type parameter " + MCRDetailLevel.MEDIA_TYPE_PARAMETER
+                + " is 'summary' an MCRClassCategory is returned. In other cases MCRClass with different detail level."),
+        tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
+
+    public Response getClassification(@PathParam(PARAM_CLASSID) String classId,
+        @PathParam(PARAM_CATEGID) String categId) {
+
+        MCRDetailLevel detailLevel = request.getAcceptableMediaTypes()
+            .stream()
+            .flatMap(m -> m.getParameters().entrySet().stream()
+                .filter(e -> MCRDetailLevel.MEDIA_TYPE_PARAMETER.equals(e.getKey())))
+            .map(Map.Entry::getValue)
+            .findFirst()
+            .map(MCRDetailLevel::valueOf).orElse(MCRDetailLevel.normal);
+
+        MCRCategoryID categoryID = new MCRCategoryID(classId, categId);
+        switch (detailLevel) {
+            case detailed:
+                return getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
+            case summary:
+                return getClassification(classId, dao -> dao.getCategory(categoryID, 0));
+            case normal: //default case
+            default:
+                return getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
+        }
+    }
+
+    private Response getClassification(String classId, Function<MCRCategoryDAO, MCRCategory> categorySupplier) {
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         Date lastModified = getLastModifiedDate(classId, categoryDAO);
-        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        MCRCategory classification = categoryDAO.getCategory(MCRCategoryID.rootID(classId), -1);
+        MCRCategory classification = categorySupplier.apply(categoryDAO);
         if (classification == null) {
             throw new NotFoundException();
         }
         return Response.ok()
-            .entity(MCRClass.getClassification(classification))
+            .entity(classification.isClassification() ? MCRClass.getClassification(classification)
+                : MCRClassCategory.getInstance(classification))
             .lastModified(lastModified)
             .build();
     }
@@ -165,7 +213,7 @@ public class MCRRestClassifications {
             categoryDAO.addCategory(null, mcrClass.toCategory());
             status = Response.Status.CREATED;
         } else {
-            Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request,
+            Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(),
                 getLastModifiedDate(classId, categoryDAO));
             if (cachedResponse.isPresent()) {
                 return cachedResponse.get();
