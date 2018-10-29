@@ -920,6 +920,7 @@
             <artifactId>geronimo-activation_1.1_spec</artifactId>
           </exclusion>
         </exclusions>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.avalon.framework</groupId>
