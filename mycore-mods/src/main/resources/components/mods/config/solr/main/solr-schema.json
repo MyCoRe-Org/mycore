@@ -83,6 +83,12 @@
     }
   },
   {
+    "add-field-type": {
+      "name": "mods.date_range",
+      "class": "solr.DateRangeField"
+    }
+  },
+  {
     "add-field": {
       "name": "mods.abstract",
       "type": "mods.text_de",
@@ -223,6 +229,13 @@
     "add-field": {
       "name": "mods.yearIssued",
       "type": "pint"
+    }
+  },
+  {
+    "add-field": {
+      "name": "mods.embargo.date",
+      "type": "mods.date_range",
+      "multiValued": true
     }
   },
   {
