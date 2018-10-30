@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:xlink="http://www.w3.org/1999/xlink"
-  exclude-result-prefixes="i18n mcrxml xalan xlink"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+                xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions"
+                xmlns:mods="http://www.loc.gov/mods/v3"
+                xmlns:xalan="http://xml.apache.org/xalan"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:piUtil="xalan://org.mycore.pi.frontend.MCRIdentifierXSLUtils"
+                exclude-result-prefixes="i18n mcrxml xalan xlink piUtil"
 >
 
   <xsl:param name="CurrentUser" />
@@ -523,6 +528,24 @@
           <xsl:value-of select="$name" />
         </namePart>
       </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template mode="preferredPI" match="mods:mods">
+    <xsl:param name="type" />
+    <xsl:param name="prefix" select="''"/>
+    <xsl:param name="preferManaged" select="false()" />
+    <xsl:variable name="candidate"
+                  select="mods:identifier[@type=$type and starts-with(text(), $prefix)]" />
+    <xsl:variable name="preferred"
+                  select="$candidate[$preferManaged=piUtil:isManagedPI(text(), /mycoreobject/@ID)]" />
+    <xsl:choose>
+      <xsl:when test="$preferred">
+        <xsl:value-of select="$preferred[1]" />
+      </xsl:when>
+      <xsl:when test="$candidate">
+        <xsl:value-of select="$candidate[1]" />
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 
