@@ -40,13 +40,16 @@ import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -64,8 +67,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import com.ibm.icu.util.Calendar;
-import com.ibm.icu.util.GregorianCalendar;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -106,6 +107,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.ibm.icu.util.Calendar;
+import com.ibm.icu.util.GregorianCalendar;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -1031,4 +1035,48 @@ public class MCRXMLFunctions {
         return name.replaceAll("[^\\w\\-\\.]*", "");
     }
 
+    /**
+     * This only works with text nodes
+     * @param nodes
+     * @return
+     */
+    public static NodeList distinctValues(NodeList nodes) {
+        SortedSet<Node> set = new TreeSet<>(new Comparator<Node>() {
+            @Override public int compare(Node node, Node t1) {
+
+                String nodeValue = node.getNodeValue();
+                String nodeValue1 = t1.getNodeValue();
+
+                if (nodeValue != null && nodeValue1 != null) {
+                    return nodeValue.equals(nodeValue1) ? 0 : -1;
+                } else if (nodeValue1 == null && nodeValue == null) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        for (int i = 0; i < nodes.getLength(); i++) {
+            set.add(nodes.item(i));
+        }
+
+        return new SetNodeList(set);
+    }
+
+    private static class SetNodeList implements NodeList {
+
+        private final Object[] objects;
+
+        SetNodeList(Set<Node> set) {
+            objects = set.toArray();
+        }
+
+        @Override public Node item(int index) {
+            return (Node) objects[index];
+        }
+
+        @Override public int getLength() {
+            return objects.length;
+        }
+    }
 }
