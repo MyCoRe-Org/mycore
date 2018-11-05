@@ -372,9 +372,9 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <a itemprop="creator" href="{$query}">
-      <span itemscope="itemscope" itemtype="http://schema.org/Person">
-        <span itemprop="name">
+    <a href="{$query}">
+      <span>
+        <span>
           <xsl:apply-templates select="." mode="nameString" />
         </span>
         <xsl:if test="count($nameIdentifier) &gt; 0">
