@@ -54,23 +54,28 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public class MCROAuthServlet extends MCRServlet {
 
-    private final static Logger LOGGER = LogManager.getLogger(MCROAuthServlet.class);
+    private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER = LogManager.getLogger(MCROAuthServlet.class);
 
     private String scopes = MCRConfiguration.instance().getString("MCR.ORCID.OAuth.Scopes");
 
-    private final static String USER_PROFILE_URL = MCRFrontendUtil.getBaseURL() + "servlets/MCRUserServlet?action=show";
+    private String userProfileURL;
 
     private String redirectURL;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
-        this.redirectURL = MCRFrontendUtil.getBaseURL() + job.getRequest().getServletPath().substring(1);
+        String baseURL = MCRFrontendUtil.getBaseURL();
+
+        this.redirectURL = baseURL + job.getRequest().getServletPath().substring(1);
+        this.userProfileURL = baseURL + "servlets/MCRUserServlet?action=show&XSL.Style=orcid-oauth";
 
         String code = job.getRequest().getParameter("code");
         String error = job.getRequest().getParameter("error");
 
         if ((error != null) && !error.trim().isEmpty()) {
-            job.getResponse().sendRedirect(USER_PROFILE_URL + "&XSL.error=" + error);
+            job.getResponse().sendRedirect(userProfileURL + "&XSL.error=" + error);
         } else if ((code == null) || code.trim().isEmpty()) {
             redirectToGetAuthorization(job);
         } else {
@@ -86,7 +91,7 @@ public class MCROAuthServlet extends MCRServlet {
             orcidUser.store(token);
             orcidUser.getProfile().getWorksSection();
 
-            job.getResponse().sendRedirect(USER_PROFILE_URL);
+            job.getResponse().sendRedirect(userProfileURL);
         }
     }
 
