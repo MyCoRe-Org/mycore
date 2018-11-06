@@ -936,7 +936,7 @@
         <xsl:value-of
           select="concat('H. ',mods:part/mods:detail[@type='issue']/mods:number)" />
       </xsl:if>
-      <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number and string-length($dateIssued) &gt; 0">
+      <xsl:if test="mods:part/mods:detail[@type='issue']/mods:number or mods:part/mods:detail[@type='volume']/mods:number and string-length($dateIssued) &gt; 0">
         <xsl:text> </xsl:text>
       </xsl:if>
       <xsl:if test="string-length($dateIssued) &gt; 0">
