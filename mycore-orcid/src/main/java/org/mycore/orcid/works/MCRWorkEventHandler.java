@@ -1,6 +1,7 @@
 package org.mycore.orcid.works;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -64,8 +65,9 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
             MCRWorksSection works = user.getProfile().getWorksSection();
             MCRPublicationStatus status = user.getPublicationStatus(oid);
 
-            if (status.isInORCIDProfile()) {
-                works.findWork(oid).get().update();
+            Optional<MCRWork> work = works.findWork(oid);
+            if (work.isPresent()) {
+                work.get().update();
             } else {
                 works.addWorkFrom(oid);
             }
