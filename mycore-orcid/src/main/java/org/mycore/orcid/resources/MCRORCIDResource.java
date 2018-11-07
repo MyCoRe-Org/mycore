@@ -21,6 +21,7 @@ package org.mycore.orcid.resources;
 import java.io.IOException;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -28,6 +29,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -44,6 +47,8 @@ import com.google.gson.Gson;
 
 @Path("orcid")
 public class MCRORCIDResource {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Returns the ORCID status of the current user as JSON, e.g.
@@ -115,19 +120,25 @@ public class MCRORCIDResource {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
-        MCRORCIDProfile profile = user.getProfile();
-        MCRWorksSection works = profile.getWorksSection();
-        MCRPublicationStatus status = user.getPublicationStatus(oid);
+        try {
+            MCRORCIDProfile profile = user.getProfile();
+            MCRWorksSection works = profile.getWorksSection();
+            MCRPublicationStatus status = user.getPublicationStatus(oid);
 
-        if (!status.isUsersPublication()) {
-            throw new WebApplicationException(Status.FORBIDDEN);
-        } else if (!status.isInORCIDProfile()) {
-            works.addWorkFrom(oid);
-        } else if (status.isInORCIDProfile()) {
-            works.findWork(oid).get().update();
+            if (!status.isUsersPublication()) {
+                throw new WebApplicationException(Status.FORBIDDEN);
+            } else if (!status.isInORCIDProfile()) {
+                works.addWorkFrom(oid);
+            } else if (status.isInORCIDProfile()) {
+                works.findWork(oid).get().update();
+            }
+
+            return publicationStatus(oid, user);
+        } catch (Exception ex) {
+            LOGGER.warn("Exception publishing " + oid + " to ORCID", ex);
+            String msg = ex.getClass().getName() + " " + ex.getMessage();
+            throw new InternalServerErrorException(msg);
         }
-
-        return publicationStatus(oid, user);
     }
 
     private MCRObjectID checkID(String objectID) {
