@@ -228,14 +228,14 @@
         <xsl:when test=".='asg'">assignee</xsl:when>
         <xsl:when test=".='edt'">editor</xsl:when>
         <xsl:when test=".='trl'">chair-or-translator</xsl:when>
-        <xsl:otherwise></xsl:otherwise>
+        <xsl:otherwise>aut</xsl:otherwise>
       </xsl:choose>
     </work:contributor-role>
   </xsl:template>
   
   <xsl:template match="mods:language">
     <common:language-code>
-      <xsl:value-of select="mods:languageTerm[@authority='rfc5646'][@type='code']" />
+      <xsl:value-of select="mods:languageTerm[@type='code']" />
     </common:language-code>
   </xsl:template>
   
