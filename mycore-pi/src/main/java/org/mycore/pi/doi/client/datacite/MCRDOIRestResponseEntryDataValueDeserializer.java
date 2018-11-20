@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.doi.rest;
+package org.mycore.pi.doi.client.datacite;
 
 import java.lang.reflect.Type;
 
@@ -26,9 +26,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-public class MCRDOIRestResponseEntryDataValueDeserializer implements JsonDeserializer<MCRDOIRestResponseEntryData> {
+public class MCRDOIRestResponseEntryDataValueDeserializer implements JsonDeserializer<MCRDataciteRestResponseEntryData> {
     @Override
-    public MCRDOIRestResponseEntryData deserialize(JsonElement jsonElement, Type type,
+    public MCRDataciteRestResponseEntryData deserialize(JsonElement jsonElement, Type type,
         JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject dataObject = jsonElement.getAsJsonObject();
 
@@ -37,18 +37,18 @@ public class MCRDOIRestResponseEntryDataValueDeserializer implements JsonDeseria
 
         switch (format) {
             case "string":
-                return new MCRDOIRestResponseEntryData(format,
-                    new MCRDOIRestResponseEntryDataStringValue(value.getAsJsonPrimitive().getAsString()));
+                return new MCRDataciteRestResponseEntryData(format,
+                    new MCRDataciteRestResponseEntryDataStringValue(value.getAsJsonPrimitive().getAsString()));
             case "base64":
-                return new MCRDOIRestResponseEntryData(format,
-                    new MCRDOIRestResponseEntryDataBase64Value(value.getAsJsonPrimitive().getAsString()));
+                return new MCRDataciteRestResponseEntryData(format,
+                    new MCRDataciteRestResponseEntryDataBase64Value(value.getAsJsonPrimitive().getAsString()));
             case "hex":
             case "admin":
             case "vlist":
             case "site":
             default:
                 // currently not supported
-                return new MCRDOIRestResponseEntryData(format, new MCRDOIRestResponseEntryDataValue());
+                return new MCRDataciteRestResponseEntryData(format, new MCRDataciteRestResponseEntryDataValue());
         }
     }
 }

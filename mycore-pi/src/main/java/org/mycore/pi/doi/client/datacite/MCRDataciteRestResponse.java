@@ -16,16 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.doi.rest;
+package org.mycore.pi.doi.client.datacite;
 
 import java.util.List;
 
-public class MCRDOIRestResponse {
+public class MCRDataciteRestResponse {
     int responseCode;
 
     String handle;
 
-    List<MCRDOIRestResponseEntry> values;
+    List<MCRDataciteRestResponseEntry> values;
 
     /**
      * 1 : Success. (HTTP 200 OK)
@@ -43,7 +43,7 @@ public class MCRDOIRestResponse {
         return handle;
     }
 
-    public List<MCRDOIRestResponseEntry> getValues() {
+    public List<MCRDataciteRestResponseEntry> getValues() {
         return values;
     }
 }

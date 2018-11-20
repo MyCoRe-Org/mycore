@@ -21,7 +21,6 @@ package org.mycore.pi.doi;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,12 +30,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
-import javax.persistence.NoResultException;
-import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,15 +44,12 @@ import org.jdom2.transform.JDOMSource;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -68,9 +60,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIGenerator;
-import org.mycore.pi.MCRPIJobService;
-import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.doi.client.datacite.MCRDataciteClient;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
@@ -105,7 +95,7 @@ import org.xml.sax.SAXException;
  * <dd>The user which will be used to run the registration/update job</dd>
  * </dl>
  */
-public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
+public class MCRDOIService extends MCRDOIBaseService {
 
     private static final String KERNEL_3_NAMESPACE_URI = "http://datacite.org/schema/kernel-3";
 
@@ -114,8 +104,6 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     private static final String TEST_SERVER = "UseTestServer";
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final String TYPE = "doi";
 
     /**
      * A media URL is longer then 255 chars
@@ -135,39 +123,26 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
 
     private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
 
-    private static final String CONTEXT_OBJ = "obj";
-
-    private static final String CONTEXT_DOI = "doi";
-
-    private String username;
-
-    private String password;
-
-    private String transformer;
-
     private String host;
 
     private String registerURL;
 
     private String registerURLContext;
 
-    private String schemaPath;
-
     private Namespace nameSpace;
 
     private boolean useTestServer;
 
     public MCRDOIService(String serviceID) {
-        super(serviceID, MCRDigitalObjectIdentifier.TYPE);
+        super(serviceID);
 
+    }
+
+    private void init() {
         Map<String, String> properties = getProperties();
-        username = properties.get("Username");
-        password = properties.get("Password");
         useTestServer = Boolean
             .valueOf(properties.getOrDefault(TEST_SERVER, properties.getOrDefault(TEST_PREFIX, "false")));
-        transformer = properties.get("Transformer");
         registerURL = properties.get("RegisterBaseURL");
-        schemaPath = properties.getOrDefault("Schema", DEFAULT_DATACITE_SCHEMA_PATH);
         nameSpace = Namespace.getNamespace("datacite", properties.getOrDefault("Namespace", KERNEL_3_NAMESPACE_URI));
 
         if (!registerURL.endsWith("/")) {
@@ -178,7 +153,12 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         host = "mds." + (usesTestServer() ? "test." : "") + "datacite.org";
     }
 
-    private void insertDOI(Document datacite, MCRDigitalObjectIdentifier doi)
+    @Override
+    protected String getDefaultSchemaPath() {
+        return DEFAULT_DATACITE_SCHEMA_PATH;
+    }
+
+    private void insertDOI(Document datacite, String doi)
         throws MCRPersistentIdentifierException {
         XPathExpression<Element> compile = XPathFactory.instance().compile(
             "//datacite:identifier[@identifierType='DOI']",
@@ -190,47 +170,27 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         } else if (doiList.size() == 1) {
             Element doiElement = doiList.stream().findAny().get();
             LOGGER.warn("Found existing DOI({}) in Document will be replaced with {}", doiElement.getTextTrim(),
-                doi.asString());
-            doiElement.setText(doi.asString());
+                doi);
+            doiElement.setText(doi);
         } else {
             // must be 0
             Element doiElement = new Element("identifier", nameSpace);
             datacite.getRootElement().addContent(doiElement);
             doiElement.setAttribute("identifierType", "DOI");
-            doiElement.setText(doi.asString());
+            doiElement.setText(doi);
         }
     }
 
     @Override
     protected void checkConfiguration() throws MCRConfigurationException {
         super.checkConfiguration();
-
-        loadDataciteSchema();
+        this.initCommonProperties();
+        init();
 
         try {
             getDataciteClient().getDOIList();
         } catch (MCRPersistentIdentifierException e) {
             LOGGER.error("Error while checking Datacite credentials!", e);
-        }
-
-        if (MCRContentTransformerFactory.getTransformer(this.transformer) == null) {
-            throw new MCRConfigurationException("Transformer " + this.transformer + " can not be resolved!");
-        }
-    }
-
-    private Schema loadDataciteSchema() {
-        try {
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
-
-            URL localSchemaURL = MCRClassTools.getClassLoader().getResource(schemaPath);
-
-            if (localSchemaURL == null) {
-                throw new MCRConfigurationException(schemaPath + " was not found!");
-            }
-            return schemaFactory.newSchema(localSchemaURL);
-        } catch (SAXException e) {
-            throw new MCRConfigurationException("Error while loading datacite schema!", e);
         }
     }
 
@@ -265,17 +225,6 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     }
 
     @Override
-    protected Date provideRegisterDate(MCRBase obj, String additional) {
-        return null;
-    }
-
-    @Override
-    protected MCRDigitalObjectIdentifier getNewIdentifier(MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
-        return  super.getNewIdentifier(obj, additional);
-    }
-
-    @Override
     public void registerIdentifier(MCRBase obj, String additional, MCRDigitalObjectIdentifier newDOI)
         throws MCRPersistentIdentifierException {
         if (!additional.equals("")) {
@@ -284,28 +233,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         }
 
         // just to check if valid
-        transformToDatacite(newDOI, obj);
-    }
-
-    @Override
-    public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, MCRDigitalObjectIdentifier identifier) {
-        Date registrationStarted = null;
-        if (getRegistrationCondition(obj.getId().getTypeId()).test(obj)) {
-            registrationStarted = new Date();
-            startRegisterJob(obj, identifier);
-        }
-
-        MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
-            this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
-        MCRHIBConnection.instance().getSession().save(databaseEntry);
-        return databaseEntry;
-    }
-
-    private void startRegisterJob(MCRBase obj, MCRDigitalObjectIdentifier newDOI) {
-        HashMap<String, String> contextParameters = new HashMap<>();
-        contextParameters.put(CONTEXT_DOI, newDOI.asString());
-        contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
-        this.addRegisterJob(contextParameters);
+        transform(obj, newDOI.asString());
     }
 
     public URI getRegisteredURI(MCRBase obj) throws URISyntaxException {
@@ -339,20 +267,21 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     }
 
     public MCRDataciteClient getDataciteClient() {
-        return new MCRDataciteClient(host, username, password);
+        return new MCRDataciteClient(host, getUsername(), getPassword());
     }
 
-    protected Document transformToDatacite(MCRDigitalObjectIdentifier doi, MCRBase mcrBase)
+    @Override
+    protected Document transform(MCRBase mcrBase, String doi)
         throws MCRPersistentIdentifierException {
         MCRObjectID id = mcrBase.getId();
         MCRBaseContent content = new MCRBaseContent(mcrBase);
 
         try {
-            MCRContent transform = MCRContentTransformerFactory.getTransformer(this.transformer).transform(content);
+            MCRContent transform = getTransformer().transform(content);
             Document dataciteDocument = transform.asXML();
             insertDOI(dataciteDocument, doi);
 
-            Schema dataciteSchema = loadDataciteSchema();
+            Schema dataciteSchema = getSchema();
 
             try {
                 dataciteSchema.newValidator().validate(new JDOMSource(dataciteDocument));
@@ -365,7 +294,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
             return dataciteDocument;
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRPersistentIdentifierException(
-                "Could not transform the content of " + id + " with the transformer " + transformer, e);
+                "Could not transform the content of " + id + " with the transformer " + getTransformerID(), e);
         }
     }
 
@@ -387,24 +316,6 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
                 throw new MCRPersistentIdentifierException("Object should not be deleted! (It has a registered DOI)");
             }
         }
-        // just delete
-    }
-
-    @Override
-    public void update(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
-        throws MCRPersistentIdentifierException {
-        if (isRegistered(obj.getId(), additional)) {
-            HashMap<String, String> contextParameters = new HashMap<>();
-            contextParameters.put(CONTEXT_DOI, doi.asString());
-            contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
-            this.addUpdateJob(contextParameters);
-        } else if (!hasRegistrationStarted(obj.getId(), additional)) {
-            Predicate<MCRBase> registrationCondition = getRegistrationCondition(obj.getId().getTypeId());
-            if (registrationCondition.test(obj)) {
-                this.updateStartRegistrationDate(obj.getId(), "", new Date());
-                startRegisterJob(obj, doi);
-            }
-        }
     }
 
     @Override
@@ -423,7 +334,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         MCRDigitalObjectIdentifier doi = getDOIFromJob(parameters);
         String idString = parameters.get(CONTEXT_OBJ);
 
-        if(!checkJobValid(idString, PiJobAction.UPDATE)){
+        if (!checkJobValid(idString, PiJobAction.UPDATE)) {
             return;
         }
 
@@ -431,7 +342,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         this.validateJobUserRights(objectID);
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
 
-        Document newDataciteMetadata = transformToDatacite(doi, object);
+        Document newDataciteMetadata = transform(object, doi.asString());
         MCRDataciteClient dataciteClient = getDataciteClient();
 
         try {
@@ -466,7 +377,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         MCRDigitalObjectIdentifier doi = getDOIFromJob(parameters);
         String idString = parameters.get(CONTEXT_OBJ);
 
-        if(!checkJobValid(idString, PiJobAction.REGISTER)){
+        if (!checkJobValid(idString, PiJobAction.REGISTER)) {
             return;
         }
 
@@ -475,7 +386,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
 
         MCRObject mcrBase = MCRMetadataManager.retrieveMCRObject(objectID);
-        Document dataciteDocument = transformToDatacite(doi, mcrBase);
+        Document dataciteDocument = transform(mcrBase, doi.asString());
 
         MCRDataciteClient dataciteClient = getDataciteClient();
         dataciteClient.storeMetadata(dataciteDocument);
@@ -488,7 +399,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
             throw new MCRException("Base-URL seems to be invalid!", e);
         }
 
-        List<Map.Entry<String, URI>> entryList = getMediaList((MCRObject) object);
+        List<Map.Entry<String, URI>> entryList = getMediaList(object);
         dataciteClient.setMediaList(doi, entryList);
         this.updateRegistrationDate(objectID, "", new Date());
     }
@@ -499,7 +410,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
      *
      * @param parameters the job parameters
      * @return the parsed DOI
-     * @throws MCRPersistentIdentifierException
+     * @throws MCRPersistentIdentifierException if the DOI can not be parsed
      */
     private MCRDigitalObjectIdentifier getDOIFromJob(Map<String, String> parameters)
         throws MCRPersistentIdentifierException {
@@ -514,19 +425,6 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         String pattern = "{0} DOI: {1} for object: {2}";
         return Optional.of(String.format(Locale.ROOT, pattern, getAction(contextParameters).toString(),
             contextParameters.get(CONTEXT_DOI), contextParameters.get(CONTEXT_OBJ)));
-    }
-
-    protected boolean checkJobValid(String mycoreID, PiJobAction action){
-        final MCRObjectID objectID = MCRObjectID.getInstance(mycoreID);
-        final boolean exists = MCRMetadataManager.exists(objectID);
-
-        try {
-            MCRPIManager.getInstance().get(getServiceID(), mycoreID, "");
-        } catch (NoResultException r){
-            return false;
-        }
-
-        return exists;
     }
 
 }

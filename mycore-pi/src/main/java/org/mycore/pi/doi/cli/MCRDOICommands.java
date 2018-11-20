@@ -18,7 +18,9 @@
 
 package org.mycore.pi.doi.cli;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,13 +29,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.xml.XMLConstants;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRBaseContent;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -44,10 +62,12 @@ import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.MCRDOIParser;
 import org.mycore.pi.doi.MCRDOIService;
-import org.mycore.pi.doi.MCRDataciteClient;
+import org.mycore.pi.doi.client.datacite.MCRDataciteClient;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
+import org.mycore.pi.doi.crossref.MCRCrossrefUtil;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.xml.sax.SAXException;
 
 @MCRCommandGroup(name = "DOI Commands")
 public class MCRDOICommands {
@@ -55,6 +75,8 @@ public class MCRDOICommands {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String REPAIR_MEDIALIST_OF_0_AND_SERVICE_1 = "repair medialist of {0} and service {1}";
+
+    public static final String CROSSREF_SCHEMA_PATH = "xsd/crossref/4.4.1/crossref4.4.1.xsd";
 
     @MCRCommand(syntax = "repair incomplete registered doi {0} with registration service {1}",
         help = "Use this method if a DOI is registered, but not inserted in the Database. {0} is the DOI and "
@@ -236,4 +258,59 @@ public class MCRDOICommands {
             LOGGER.error("Error occurred for DOI: {}", doi, e);
         }
     }
+
+    @MCRCommand(syntax = "validate document {0} with transformer {1} against crossref schema")
+    public static void validateCrossrefDocument(String mycoreIDString, String transformer)
+        throws MCRPersistentIdentifierException {
+        final MCRObjectID mycoreID = MCRObjectID.getInstance(mycoreIDString);
+
+        if (!MCRMetadataManager.exists(mycoreID)) {
+            LOGGER.error("Document with id {} does not exist", mycoreIDString);
+            return;
+        }
+
+        final MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(mycoreID);
+        final MCRContentTransformer contentTransformer = MCRContentTransformerFactory.getTransformer(transformer);
+        final MCRContent transform;
+        final Document document;
+
+        try {
+            transform = contentTransformer.transform(new MCRBaseContent(mcrObject));
+            document = transform.asXML();
+        } catch (IOException | JDOMException | SAXException e) {
+            LOGGER.error("Error while transforming document {} with transformer {}", e, mycoreIDString, transformer);
+            return;
+        }
+
+        final Element root = document.getRootElement();
+        MCRCrossrefUtil.insertBatchInformation(root.getChild("head",MCRConstants.CROSSREF_NAMESPACE), UUID.randomUUID().toString(), String.valueOf(new Date().getTime()),
+            "Test-Depositor", "email@mycore.de", "Test-Registrant");
+
+        MCRCrossrefUtil.replaceDOIData(root, "DOI for "::concat, "http://baseURL.de/");
+
+        final String documentAsString = new XMLOutputter(Format.getPrettyFormat()).outputString(document);
+        LOGGER.info("Crossref document is: {}", documentAsString);
+
+        final Schema schema;
+        try {
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            URL localSchemaURL = MCRDOIService.class.getClassLoader().getResource(CROSSREF_SCHEMA_PATH);
+            if (localSchemaURL == null) {
+                LOGGER.error(CROSSREF_SCHEMA_PATH + " was not found!");
+                return;
+            }
+            schema = schemaFactory.newSchema(localSchemaURL);
+        } catch (SAXException e) {
+            LOGGER.error("Error while loading crossref schema!", e);
+            return;
+        }
+
+        try {
+            schema.newValidator().validate(new JDOMSource(document));
+            LOGGER.info("Check Complete!");
+        } catch (SAXException|IOException e) {
+            LOGGER.error("Error while checking schema!", e);
+        }
+    }
+
 }

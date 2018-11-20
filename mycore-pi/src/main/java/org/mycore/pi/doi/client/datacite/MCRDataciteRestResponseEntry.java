@@ -16,14 +16,14 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.doi.rest;
+package org.mycore.pi.doi.client.datacite;
 
-public class MCRDOIRestResponseEntry {
+public class MCRDataciteRestResponseEntry {
     int index;
 
     String type;
 
-    MCRDOIRestResponseEntryData data;
+    MCRDataciteRestResponseEntryData data;
 
     int ttl;
 
@@ -37,7 +37,7 @@ public class MCRDOIRestResponseEntry {
         return type;
     }
 
-    public MCRDOIRestResponseEntryData getData() {
+    public MCRDataciteRestResponseEntryData getData() {
         return data;
     }
 

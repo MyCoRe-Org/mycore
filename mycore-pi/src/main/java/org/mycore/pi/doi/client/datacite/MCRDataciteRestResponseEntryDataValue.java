@@ -16,23 +16,8 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.doi.rest;
+package org.mycore.pi.doi.client.datacite;
 
-public class MCRDOIRestResponseEntryData {
-    String format;
+public class MCRDataciteRestResponseEntryDataValue {
 
-    MCRDOIRestResponseEntryDataValue value;
-
-    public MCRDOIRestResponseEntryData(String format, MCRDOIRestResponseEntryDataValue value) {
-        this.format = format;
-        this.value = value;
-    }
-
-    public MCRDOIRestResponseEntryDataValue getValue() {
-        return value;
-    }
-
-    public String getFormat() {
-        return format;
-    }
 }

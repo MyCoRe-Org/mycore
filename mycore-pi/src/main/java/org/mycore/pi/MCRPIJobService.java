@@ -250,6 +250,10 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
             session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
             session.setUserInformation(user);
             LOGGER.info("Continue as User {}", jobUser);
+        } else {
+            savedUserInformation = session.getUserInformation();
+            session.setUserInformation(MCRSystemUserInformation.getGuestInstance());
+            session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
         }
 
         boolean transactionActive = !session.isTransactionActive();
