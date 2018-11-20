@@ -16,17 +16,19 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.doi.rest;
+package org.mycore.pi.doi.client.datacite;
 
-public class MCRDOIRestResponseEntryDataStringValue extends MCRDOIRestResponseEntryDataValue {
-    private String value;
+import java.util.Base64;
 
-    public MCRDOIRestResponseEntryDataStringValue(String value) {
-        this.value = value;
+public class MCRDataciteRestResponseEntryDataBase64Value extends MCRDataciteRestResponseEntryDataValue {
+
+    private final byte[] decodedValue;
+
+    public MCRDataciteRestResponseEntryDataBase64Value(String base64value) {
+        decodedValue = Base64.getDecoder().decode(base64value);
     }
 
-    public String getValue() {
-        return value;
+    public byte[] getDecodedValue() {
+        return decodedValue;
     }
-
 }

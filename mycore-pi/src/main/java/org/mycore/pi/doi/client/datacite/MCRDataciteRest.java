@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.doi.rest;
+package org.mycore.pi.doi.client.datacite;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class MCRDOIRest {
+public class MCRDataciteRest {
 
     private static final String URL_TEMPLATE = "http://doi.org/api/handles/{doi}";
 
@@ -44,7 +44,7 @@ public class MCRDOIRest {
         return HttpClientBuilder.create().build();
     }
 
-    public static MCRDOIRestResponse get(MCRDigitalObjectIdentifier doi) throws MCRIdentifierUnresolvableException {
+    public static MCRDataciteRestResponse get(MCRDigitalObjectIdentifier doi) throws MCRIdentifierUnresolvableException {
 
         HttpGet get = new HttpGet(URL_TEMPLATE.replaceAll("\\{doi\\}", doi.asString()));
         try (CloseableHttpClient httpClient = getHttpClient()) {
@@ -54,9 +54,9 @@ public class MCRDOIRest {
             try (BufferedReader buffer = new BufferedReader(
                 new InputStreamReader(entity.getContent(), Charset.forName("UTF-8")))) {
                 String json = buffer.lines().collect(Collectors.joining("\n"));
-                Gson gson = new GsonBuilder().registerTypeAdapter(MCRDOIRestResponseEntryData.class,
+                Gson gson = new GsonBuilder().registerTypeAdapter(MCRDataciteRestResponseEntryData.class,
                     new MCRDOIRestResponseEntryDataValueDeserializer()).create();
-                return gson.fromJson(json, MCRDOIRestResponse.class);
+                return gson.fromJson(json, MCRDataciteRestResponse.class);
             }
 
         } catch (IOException e) {
@@ -67,7 +67,7 @@ public class MCRDOIRest {
     }
 
     public static void main(String[] args) throws MCRIdentifierUnresolvableException {
-        MCRDOIRestResponse mcrdoiRestResponse = get(new MCRDOIParser().parse("10.1000/1").get());
+        MCRDataciteRestResponse mcrdoiRestResponse = get(new MCRDOIParser().parse("10.1000/1").get());
     }
 
 }

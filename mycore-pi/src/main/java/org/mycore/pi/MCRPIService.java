@@ -17,13 +17,12 @@
  */
 package org.mycore.pi;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,6 +62,8 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
@@ -477,5 +478,21 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         } catch (Exception e) {
             throw new MCRException("Could not update flags of object " + id, e);
         }
+    }
+
+    /**
+     * Validates a property of this service
+     * @param propertyName the property to check
+     * @return the property
+     * @throws MCRConfigurationException if property is not set or empty
+     */
+    protected String requireNotEmptyProperty(String propertyName) throws MCRConfigurationException{
+        final Map<String, String> properties = getProperties();
+        if (!properties.containsKey(propertyName) && properties.get(propertyName).length() > 0) {
+            throw new MCRConfigurationException(String
+                .format(Locale.ROOT,"The property %s%s.%s is empty or not set!", REGISTRATION_CONFIG_PREFIX, registrationServiceID,
+                    propertyName));
+        }
+        return properties.get(propertyName);
     }
 }

@@ -37,4 +37,18 @@
   <system systemId="http://schema.datacite.org/meta/kernel-3/include/datacite-descriptionType-v3.xsd"
           uri="xsd/datacite/v3/datacite-descriptionType-v3.xsd" />
 
+  <system systemId="http://data.crossref.org/schemas/crossref4.4.1.xsd" uri="xsd/crossref/4.4.1/crossref4.4.1.xsd" />
+  <system systemId="http://data.crossref.org/schemas/common4.4.1.xsd" uri="xsd/crossref/4.4.1/common4.4.1.xsd" />
+  <system systemId="http://data.crossref.org/schemas/common4.3.5.xsd" uri="xsd/crossref/4.3.5/common4.3.5.xsd" />
+  <system systemId="http://data.crossref.org/schemas/JATS-journalpublishing1.xsd" uri="xsd/crossref/4.4.1/JATS-journalpublishing1.xsd" />
+  <system systemId="http://data.crossref.org/schemas/relations.xsd" uri="xsd/crossref/4.4.1/relations.xsd" />
+  <system systemId="http://data.crossref.org/schemas/fundref.xsd" uri="xsd/crossref/4.4.1/fundref.xsd" />
+  <system systemId="http://data.crossref.org/schemas/AccessIndicators.xsd" uri="xsd/crossref/4.4.1/AccessIndicators.xsd" />
+  <system systemId="http://data.crossref.org/schemas/clinicaltrials.xsd" uri="xsd/crossref/4.4.1/clinicaltrials.xsd" />
+  <system systemId="http://www.w3.org/Math/XMLSchema/mathml3/mathml3.xsd" uri="xsd/crossref/4.4.1/mathml3.xsd" />
+  <system systemId="http://www.w3.org/Math/XMLSchema/mathml3/mathml3-common.xsd" uri="xsd/crossref/4.4.1/mathml3-common.xsd" />
+  <system systemId="http://www.w3.org/Math/XMLSchema/mathml3/mathml3-content.xsd" uri="xsd/crossref/4.4.1/mathml3-content.xsd" />
+  <system systemId="http://www.w3.org/Math/XMLSchema/mathml3/mathml3-presentation.xsd" uri="xsd/crossref/4.4.1/mathml3-presentation.xsd" />
+  <system systemId="http://www.w3.org/Math/XMLSchema/mathml3/mathml3-strict-content.xsd" uri="xsd/crossref/4.4.1/mathml3-strict-content.xsd" />
+
 </catalog>

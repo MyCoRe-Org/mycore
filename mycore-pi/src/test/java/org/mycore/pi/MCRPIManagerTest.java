@@ -74,6 +74,8 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
                 .getInstance()
                 .getRegistrationService(MOCK_SERVICE);
 
+        ((MCRMockIdentifierService)registrationService).reset();
+
         MCRObject mcrObject = buildMockObject();
         mockMetadataManager.put(mcrObject.getId(), mcrObject);
         registrationService.register(mcrObject, null);
@@ -105,6 +107,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
             .getRegistrationService(MOCK_SERVICE);
 
         MCRMockIdentifierService casted = (MCRMockIdentifierService) registrationService;
+        casted.reset();
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
         Assert.assertFalse("Register should not have been called!", casted.isRegisterCalled());

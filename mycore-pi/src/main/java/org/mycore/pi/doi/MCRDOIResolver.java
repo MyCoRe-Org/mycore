@@ -21,10 +21,10 @@ package org.mycore.pi.doi;
 import java.util.stream.Stream;
 
 import org.mycore.pi.MCRPIResolver;
-import org.mycore.pi.doi.rest.MCRDOIRest;
-import org.mycore.pi.doi.rest.MCRDOIRestResponse;
-import org.mycore.pi.doi.rest.MCRDOIRestResponseEntry;
-import org.mycore.pi.doi.rest.MCRDOIRestResponseEntryDataStringValue;
+import org.mycore.pi.doi.client.datacite.MCRDataciteRest;
+import org.mycore.pi.doi.client.datacite.MCRDataciteRestResponse;
+import org.mycore.pi.doi.client.datacite.MCRDataciteRestResponseEntry;
+import org.mycore.pi.doi.client.datacite.MCRDataciteRestResponseEntryDataStringValue;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 
 public class MCRDOIResolver extends MCRPIResolver<MCRDigitalObjectIdentifier> {
@@ -34,15 +34,15 @@ public class MCRDOIResolver extends MCRPIResolver<MCRDigitalObjectIdentifier> {
 
     @Override
     public Stream<String> resolve(MCRDigitalObjectIdentifier identifier) throws MCRIdentifierUnresolvableException {
-        MCRDOIRestResponse restResponse = MCRDOIRest.get(identifier);
+        MCRDataciteRestResponse restResponse = MCRDataciteRest.get(identifier);
 
         if (restResponse.getResponseCode() == 1) {
             return restResponse.getValues()
                 .stream()
                 .filter(responseEntry -> responseEntry.getType().equals("URL"))
-                .map(MCRDOIRestResponseEntry::getData)
+                .map(MCRDataciteRestResponseEntry::getData)
                 .filter(responseEntryData -> responseEntryData.getFormat().equals("string"))
-                .map(responseEntryData -> ((MCRDOIRestResponseEntryDataStringValue) responseEntryData
+                .map(responseEntryData -> ((MCRDataciteRestResponseEntryDataStringValue) responseEntryData
                     .getValue()).getValue());
         }
 

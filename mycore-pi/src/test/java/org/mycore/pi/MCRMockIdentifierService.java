@@ -63,4 +63,8 @@ public class MCRMockIdentifierService extends MCRPIService<MCRMockIdentifier> {
     public boolean isUpdatedCalled() {
         return updatedCalled;
     }
+
+    protected void reset() {
+        this.registerCalled = this.deleteCalled = this.updatedCalled = false;
+    }
 }

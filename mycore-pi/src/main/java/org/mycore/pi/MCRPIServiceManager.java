@@ -21,6 +21,8 @@ package org.mycore.pi;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRException;
@@ -34,6 +36,8 @@ public class MCRPIServiceManager {
     public static MCRPIServiceManager getInstance() {
         return InstanceHolder.instance;
     }
+
+    private Map<String, MCRPIService> serviceCache = new ConcurrentHashMap<>();
 
     public List<String> getServiceIDList() {
         return MCRConfiguration.instance()
@@ -53,20 +57,23 @@ public class MCRPIServiceManager {
     }
 
     public <T extends MCRPersistentIdentifier> MCRPIService<T> getRegistrationService(
-        String registrationServiceID) {
-        String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
-        Class<? extends MCRPIService<T>> piClass = MCRConfiguration.instance().getClass(propertyName);
+        String id) {
 
-        try {
-            Constructor<? extends MCRPIService<T>> constructor = piClass.getConstructor(String.class);
+        final MCRPIService mcrpiService = serviceCache.computeIfAbsent(id, (registrationServiceID) -> {
+            String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
+            Class<? extends MCRPIService<T>> piClass = MCRConfiguration.instance().getClass(propertyName);
 
-            return constructor.newInstance(registrationServiceID);
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException("The property : " + propertyName
-                + " points to existing class, but without string constructor(serviceid)!", e);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new MCRException("Cant initialize class the class defined in: " + propertyName, e);
-        }
+            try {
+                Constructor<? extends MCRPIService<T>> constructor = piClass.getConstructor(String.class);
+                return constructor.newInstance(registrationServiceID);
+            } catch (NoSuchMethodException e) {
+                throw new MCRConfigurationException("The property : " + propertyName
+                    + " points to existing class, but without string constructor(serviceid)!", e);
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                throw new MCRException("Cant initialize class the class defined in: " + propertyName, e);
+            }
+        });
+        return (MCRPIService<T>) mcrpiService;
     }
 
     private static class InstanceHolder {
