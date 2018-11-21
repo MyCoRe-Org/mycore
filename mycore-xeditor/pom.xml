@@ -10,7 +10,9 @@
   <artifactId>mycore-xeditor</artifactId>
   <name>MyCoRe XEditor</name>
   <properties>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>20</manifest.priority>
+    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>

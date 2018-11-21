@@ -25,7 +25,7 @@ import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.servlets.MCRServletJob;
 
-public class MCRTargetUtility {
+public class MCRTargetUtils {
     static Map<String, String[]> getSubmittedValues(MCRServletJob job, String baseXPath)
         throws JDOMException, JaxenException {
         Map<String, String[]> valuesToSet = new HashMap<>();

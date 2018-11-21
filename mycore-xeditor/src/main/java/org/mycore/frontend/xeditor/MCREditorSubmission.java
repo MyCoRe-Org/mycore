@@ -62,7 +62,7 @@ public class MCREditorSubmission {
         StringBuilder sb = new StringBuilder();
         for (String xPath : xPaths2CheckResubmission) {
             String path = xPath.substring(xPath.indexOf("/", 1) + 1);
-            sb.append(path).append(" ");
+            sb.append(path).append(' ');
         }
         return sb.toString().trim();
     }

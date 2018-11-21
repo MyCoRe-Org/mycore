@@ -82,7 +82,7 @@ public class MCRXEditorTransformer {
     }
 
     public static MCRXEditorTransformer getTransformer(String key) {
-        return MCRXEditorTransformerStore.getAndRemoveTransformer(key);
+        return MCRXEditorTransformerStoreUtils.getAndRemoveTransformer(key);
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
@@ -91,7 +91,7 @@ public class MCRXEditorTransformer {
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer) {
-            String key = MCRXEditorTransformerStore.storeTransformer(this);
+            String key = MCRXEditorTransformerStoreUtils.storeTransformer(this);
             transformationParameters.setParameter("XEditorTransformerKey", key);
             MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource,
                 transformationParameters);
@@ -281,7 +281,7 @@ public class MCRXEditorTransformer {
     }
 
     public String getSwapParameter(String action) throws JaxenException {
-        boolean direction = action.equals("down") ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
+        boolean direction = "down".equals(action) ? MCRSwapTarget.MOVE_DOWN : MCRSwapTarget.MOVE_UP;
         return MCRSwapTarget.getSwapParameter(getCurrentRepeat(), direction);
     }
 

@@ -54,7 +54,8 @@ public class MCRDebugTarget implements MCREditorTarget {
         MCRChangeTracker tracker = session.getChangeTracker().clone();
 
         List<Step> steps = new ArrayList<>();
-        for (String label; (label = tracker.undoLastBreakpoint(result)) != null;) {
+        for (String label = tracker.undoLastBreakpoint(result); label != null;
+             label = tracker.undoLastBreakpoint(result)) {
             steps.add(0, new Step(label, result.clone()));
         }
 
@@ -101,12 +102,12 @@ public class MCRDebugTarget implements MCREditorTarget {
 
         private Document xml;
 
+        private Format format = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
+
         Step(String label, Document xml) {
             this.label = label;
             this.xml = xml;
         }
-
-        private Format format = Format.getPrettyFormat().setLineSeparator("\n").setOmitDeclaration(true);
 
         public void output(PrintWriter out) throws IOException {
             out.println("<h3>" + label + ":</h3>");

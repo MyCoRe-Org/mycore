@@ -147,10 +147,10 @@ public class MCREditorSession {
             return;
         }
 
-        cancelURL = replaceParameters(cancelURL);
-        if (!cancelURL.contains("{")) {
-            LOGGER.debug("{} set cancel URL to {}", id, cancelURL);
-            this.cancelURL = cancelURL;
+        String cURL = replaceParameters(cancelURL);
+        if (!cURL.contains("{")) {
+            LOGGER.debug("{} set cancel URL to {}", id, cURL);
+            this.cancelURL = cURL;
         }
     }
 

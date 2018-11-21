@@ -44,7 +44,7 @@ public class MCRXEditorServlet extends MCRServlet {
         String xEditorStepID = job.getRequest().getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
 
         String sessionID = xEditorStepID.split("-")[0];
-        MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
+        MCREditorSession session = MCREditorSessionStoreUtils.getSessionStore().getSession(sessionID);
 
         if (session == null) {
             String msg = getErrorI18N("xeditor.error", "noSession", sessionID);

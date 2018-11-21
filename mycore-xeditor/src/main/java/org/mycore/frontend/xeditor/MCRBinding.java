@@ -67,6 +67,8 @@ public class MCRBinding {
 
     protected MCRChangeTracker tracker;
 
+    private Map<String, Object> staticVariables = null;
+
     public MCRBinding(Document document) throws JDOMException {
         this.boundNodes.add(document);
     }
@@ -106,8 +108,8 @@ public class MCRBinding {
 
         for (Object boundNode : boundNodes) {
             if (!(boundNode instanceof Element || boundNode instanceof Attribute || boundNode instanceof Document)) {
-                throw new RuntimeException(
-                    "XPath MUST only bind either element, attribute or document nodes: " + xPath);
+                throw new TypeNotPresentException(
+                    "XPath MUST only bind either element, attribute or document nodes: " + xPath, null);
             }
         }
 
@@ -246,8 +248,6 @@ public class MCRBinding {
     public List<MCRBinding> getChildren() {
         return children;
     }
-
-    private Map<String, Object> staticVariables = null;
 
     private Map<String, Object> getVariables() {
         if (staticVariables != null) {
