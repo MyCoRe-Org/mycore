@@ -28,7 +28,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
@@ -85,8 +84,7 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
     }
 
     private void searchDocumentsToRelease(Consumer<MCRObjectID> objectReleaser) {
-        final Predicate<String> stringEmpty = String::isEmpty;
-        if(MCRConfiguration2.getString("MCR.Solr.ServerURL").filter(stringEmpty.negate()).isPresent()){
+        if(MCRConfiguration2.getString("MCR.Solr.ServerURL").isPresent()){
             final SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
             final ModifiableSolrParams params = new ModifiableSolrParams();
             final LocalDate today = LocalDate.now();
