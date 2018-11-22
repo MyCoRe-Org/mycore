@@ -44,8 +44,9 @@ public class MCRLayoutServiceTarget implements MCREditorTarget {
             result = session.getXMLCleaner().clean(result);
             result = session.getPostProcessor().process(result);
 
-            if ((style != null) && (!style.isEmpty()))
+            if ((style != null) && (!style.isEmpty())) {
                 job.getRequest().setAttribute("XSL.Style", style);
+            }
 
             MCRContent editedXML = new MCRJDOMContent(result);
             MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), editedXML);

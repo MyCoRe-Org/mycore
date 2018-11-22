@@ -44,7 +44,7 @@ public class MCRXEditorServlet extends MCRServlet {
         String xEditorStepID = job.getRequest().getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM);
 
         String sessionID = xEditorStepID.split("-")[0];
-        MCREditorSession session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
+        MCREditorSession session = MCREditorSessionStoreUtils.getSessionStore().getSession(sessionID);
 
         if (session == null) {
             String msg = getErrorI18N("xeditor.error", "noSession", sessionID);
@@ -65,13 +65,15 @@ public class MCRXEditorServlet extends MCRServlet {
         for (Enumeration<String> parameters = job.getRequest().getParameterNames(); parameters.hasMoreElements();) {
             String name = parameters.nextElement();
             if (name.startsWith(TARGET_PATTERN)) {
-                if (name.endsWith(".x") || name.endsWith(".y")) // input type="image"
+                if (name.endsWith(".x") || name.endsWith(".y")) {// input type="image"
                     name = name.substring(0, name.length() - 2);
+                }
 
                 targetID = name.split("[_\\:]")[3].toLowerCase(Locale.ROOT);
                 parameter = name.substring(TARGET_PATTERN.length() + targetID.length());
-                if (!parameter.isEmpty())
+                if (!parameter.isEmpty()) {
                     parameter = parameter.substring(1);
+                }
 
                 break;
             }

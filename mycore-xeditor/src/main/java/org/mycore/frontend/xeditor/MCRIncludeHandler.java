@@ -76,7 +76,8 @@ public class MCRIncludeHandler {
      * Preloads editor components from one or more URIs.
      *
      * @param uris a list of URIs to preload, separated by whitespace
-     * @param sStatic if true, use static cache on application level, otherwise reload at each XEditor form transformation
+     * @param sStatic if true, use static cache on application level,
+     *               otherwise reload at each XEditor form transformation
      */
     public void preloadFromURIs(String uris, String sStatic)
         throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
@@ -174,10 +175,8 @@ public class MCRIncludeHandler {
     private boolean hasOrIncludesID(Element e, String id) {
         if (id.equals(e.getAttributeValue(ATTR_ID))) {
             return true;
-        } else if ("include".equals(e.getName()) && id.equals(e.getAttributeValue(ATTR_REF))) {
-            return true;
         } else {
-            return false;
+            return "include".equals(e.getName()) && id.equals(e.getAttributeValue(ATTR_REF));
         }
     }
 

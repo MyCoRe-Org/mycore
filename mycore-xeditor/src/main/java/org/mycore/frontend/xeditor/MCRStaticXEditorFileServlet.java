@@ -82,7 +82,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
         MCREditorSession session = null;
 
         if (sessionID != null) {
-            session = MCREditorSessionStoreFactory.getSessionStore().getSession(sessionID);
+            session = MCREditorSessionStoreUtils.getSessionStore().getSession(sessionID);
             if (session == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Editor session timed out.");
                 return null;
@@ -90,7 +90,7 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
         } else {
             session = new MCREditorSession(request.getParameterMap(), pc);
             session.setPageURL(pageURL);
-            MCREditorSessionStoreFactory.getSessionStore().storeSession(session);
+            MCREditorSessionStoreUtils.getSessionStore().storeSession(session);
         }
 
         return new MCRXEditorTransformer(session, pc).transform(content);

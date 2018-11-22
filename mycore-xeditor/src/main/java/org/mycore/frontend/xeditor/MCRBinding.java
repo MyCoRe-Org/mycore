@@ -67,6 +67,8 @@ public class MCRBinding {
 
     protected MCRChangeTracker tracker;
 
+    private Map<String, Object> staticVariables = null;
+
     public MCRBinding(Document document) throws JDOMException {
         this.boundNodes.add(document);
     }
@@ -104,10 +106,12 @@ public class MCRBinding {
 
         boundNodes.addAll(xPathExpr.evaluate(parent.getBoundNodes()));
 
-        for (Object boundNode : boundNodes)
-            if (!(boundNode instanceof Element || boundNode instanceof Attribute || boundNode instanceof Document))
-                throw new RuntimeException(
-                    "XPath MUST only bind either element, attribute or document nodes: " + xPath);
+        for (Object boundNode : boundNodes) {
+            if (!(boundNode instanceof Element || boundNode instanceof Attribute || boundNode instanceof Document)) {
+                throw new TypeNotPresentException(
+                    "XPath MUST only bind either element, attribute or document nodes: " + xPath, null);
+            }
+        }
 
         LOGGER.debug("Bind to {} selected {} node(s)", xPath, boundNodes.size());
 
@@ -140,10 +144,11 @@ public class MCRBinding {
 
     public void removeBoundNode(int index) {
         Object node = boundNodes.remove(index);
-        if (node instanceof Element)
+        if (node instanceof Element) {
             track(MCRRemoveElement.remove((Element) node));
-        else
+        } else {
             track(MCRRemoveAttribute.remove((Attribute) node));
+        }
     }
 
     public Element cloneBoundElement(int index) {
@@ -194,10 +199,11 @@ public class MCRBinding {
     }
 
     public static String getValue(Object node) {
-        if (node instanceof Element)
+        if (node instanceof Element) {
             return ((Element) node).getTextTrim();
-        else
+        } else {
             return ((Attribute) node).getValue();
+        }
     }
 
     public boolean hasValue(String value) {
@@ -209,13 +215,15 @@ public class MCRBinding {
     }
 
     public void setDefault(String value) {
-        if (getValue().isEmpty())
+        if (getValue().isEmpty()) {
             setValue(getBoundNode(), value);
+        }
     }
 
     public void setValues(String value) {
-        for (int i = 0; i < boundNodes.size(); i++)
+        for (int i = 0; i < boundNodes.size(); i++) {
             setValue(i, value);
+        }
     }
 
     public void setValue(int index, String value) {
@@ -241,8 +249,6 @@ public class MCRBinding {
         return children;
     }
 
-    private Map<String, Object> staticVariables = null;
-
     private Map<String, Object> getVariables() {
         if (staticVariables != null) {
             return staticVariables;
@@ -264,8 +270,9 @@ public class MCRBinding {
         for (MCRBinding ancestor : getAncestorsAndSelf()) {
             for (MCRBinding child : ancestor.getChildren()) {
                 String childName = child.getName();
-                if (childName != null)
+                if (childName != null) {
                     variables.put(childName, child.getBoundNodes());
+                }
             }
         }
         return variables;
@@ -280,9 +287,10 @@ public class MCRBinding {
     }
 
     public void track(MCRChangeData change) {
-        if (tracker != null)
+        if (tracker != null) {
             tracker.track(change);
-        else if (parent != null)
+        } else if (parent != null) {
             parent.track(change);
+        }
     }
 }

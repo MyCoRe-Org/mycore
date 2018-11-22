@@ -46,9 +46,9 @@ import org.xml.sax.SAXException;
  */
 public class MCRBuildFilterXSLTarget implements MCREditorTarget {
 
-    private static final String transformerID = "BuildFilterXSL";
+    private static final String TRANSFORMER_ID = "BuildFilterXSL";
 
-    private MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerID);
+    private MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(TRANSFORMER_ID);
 
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session,

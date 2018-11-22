@@ -43,6 +43,8 @@ public class MCRChangeData {
 
     protected ProcessingInstruction pi;
 
+    private static final XMLOutputter RAW_OUTPUTTER = new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
+
     public MCRChangeData(String type, String text, int pos, Element context) {
         this.type = type;
         this.text = text;
@@ -100,8 +102,6 @@ public class MCRChangeData {
         return text2attribute(text);
     }
 
-    private static final XMLOutputter RAW_OUTPUTTER = new XMLOutputter(Format.getRawFormat().setEncoding("UTF-8"));
-
     private static String element2text(Element element) {
         return RAW_OUTPUTTER.outputString(element);
     }
@@ -121,7 +121,7 @@ public class MCRChangeData {
     }
 
     public Attribute text2attribute(String text) {
-        text = "<x " + text + " />";
-        return text2element(text).getAttributes().get(0).detach();
+        String xtext = "<x " + text + " />";
+        return text2element(xtext).getAttributes().get(0).detach();
     }
 }

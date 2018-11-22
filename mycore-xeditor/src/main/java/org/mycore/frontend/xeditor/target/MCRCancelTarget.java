@@ -46,11 +46,11 @@ public class MCRCancelTarget implements MCREditorTarget {
         ServletException {
         String cancelURL = session.getCancelURL();
 
-        if (cancelURL == null)
+        if (cancelURL == null) {
             cancelURL = MCRFrontendUtil.getBaseURL();
-        else if (cancelURL.startsWith("/"))
+        } else if (cancelURL.startsWith("/")) {
             cancelURL = MCRFrontendUtil.getBaseURL() + cancelURL.substring(1);
-        else if (!(cancelURL.startsWith("http:") || cancelURL.startsWith("https:"))) {
+        } else if (!(cancelURL.startsWith("http:") || cancelURL.startsWith("https:"))) {
             String pageURL = session.getPageURL();
             cancelURL = pageURL.substring(0, pageURL.lastIndexOf('/') + 1) + cancelURL;
         }

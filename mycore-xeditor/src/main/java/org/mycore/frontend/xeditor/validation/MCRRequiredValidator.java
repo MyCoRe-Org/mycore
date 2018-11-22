@@ -18,6 +18,7 @@
 
 package org.mycore.frontend.xeditor.validation;
 
+import org.mycore.common.MCRException;
 import org.mycore.frontend.xeditor.MCRBinding;
 
 /**
@@ -41,7 +42,7 @@ public class MCRRequiredValidator extends MCRValidator {
     public boolean validateBinding(MCRValidationResults results, MCRBinding binding) {
         if (binding.getBoundNodes().size() == 0) {
             String msg = "Condition for " + this.xPath + " can not be validated, no such XML source node";
-            throw new RuntimeException(msg);
+            throw new MCRException(msg);
         }
 
         String absPath = binding.getAbsoluteXPath();

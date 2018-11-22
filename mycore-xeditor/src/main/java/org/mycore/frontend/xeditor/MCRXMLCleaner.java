@@ -63,17 +63,20 @@ public class MCRXMLCleaner {
 
     public Document clean(Document xml) {
         Document clone = xml.clone();
-        do
+        do {
             mapNodesToRules(clone);
+        }
         while (clean(clone.getRootElement()));
         return clone;
     }
 
     private void mapNodesToRules(Document xml) {
         nodes2rules.clear();
-        for (MCRCleaningRule rule : rules)
-            for (Object object : rule.getNodesToInspect(xml))
+        for (MCRCleaningRule rule : rules) {
+            for (Object object : rule.getNodesToInspect(xml)) {
                 nodes2rules.put(object, rule);
+            }
+        }
     }
 
     private boolean clean(Element element) {
@@ -81,8 +84,9 @@ public class MCRXMLCleaner {
 
         for (Iterator<Element> children = element.getChildren().iterator(); children.hasNext();) {
             Element child = children.next();
-            if (clean(child))
+            if (clean(child)) {
                 changed = true;
+            }
             if (!isRelevant(child)) {
                 changed = true;
                 children.remove();
@@ -114,7 +118,7 @@ class MCRCleaningRule {
 
     private XPathExpression<Object> xPathRelevancyTest;
 
-    public MCRCleaningRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
+    MCRCleaningRule(String xPathExprNodesToInspect, String xPathExprRelevancyTest) {
         this.xPathExprNodesToInspect = xPathExprNodesToInspect;
         this.xPathNodesToInspect = XPathFactory.instance().compile(xPathExprNodesToInspect, Filters.fpassthrough(),
             null,
@@ -129,20 +133,22 @@ class MCRCleaningRule {
 
     public boolean isRelevant(Object node) {
         Object found = xPathRelevancyTest.evaluateFirst(node);
-        if (found == null)
+        if (found == null) {
             return false;
-        else if (found instanceof Boolean)
+        } else if (found instanceof Boolean) {
             return (Boolean) found;
-        else
+        } else {
             return true; // something matching found
+        }
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRCleaningRule)
+        if (obj instanceof MCRCleaningRule) {
             return xPathExprNodesToInspect.equals(((MCRCleaningRule) obj).xPathExprNodesToInspect);
-        else
+        } else {
             return false;
+        }
     }
 
     @Override

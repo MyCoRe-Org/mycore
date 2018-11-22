@@ -42,8 +42,9 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
     }
 
     public Document process(Document xml) throws IOException, JDOMException, SAXException {
-        if (stylesheet == null)
+        if (stylesheet == null) {
             return xml.clone();
+        }
 
         MCRContent source = new MCRJDOMContent(xml);
         MCRContent transformed = MCRXSL2XMLTransformer.getInstance("xsl/" + stylesheet).transform(source);

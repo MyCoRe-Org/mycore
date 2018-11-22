@@ -45,6 +45,7 @@ public abstract class MCRValidator {
 
     /** If validator uses properties to configure its behavior, override this */
     public void configure() {
+        // empty
     }
 
     public Node getRuleElement() {

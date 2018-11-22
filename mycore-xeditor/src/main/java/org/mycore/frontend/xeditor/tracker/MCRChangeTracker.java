@@ -50,15 +50,17 @@ public class MCRChangeTracker implements Cloneable {
     }
 
     public void undoChanges(Document doc, int stepNumber) {
-        while (counter > stepNumber)
+        while (counter > stepNumber) {
             undoLastChange(doc);
+        }
     }
 
     public String undoLastBreakpoint(Document doc) {
         while (counter > 0) {
             MCRChangeData change = undoLastChange(doc);
-            if ("breakpoint".equals(change.getType()))
+            if ("breakpoint".equals(change.getType())) {
                 return change.getText();
+            }
         }
         return null;
     }
@@ -79,8 +81,9 @@ public class MCRChangeTracker implements Cloneable {
         for (ProcessingInstruction instruction : doc.getDescendants(Filters.processinginstruction())) {
             String target = instruction.getTarget();
 
-            if (target.startsWith(typePrefix))
+            if (target.startsWith(typePrefix)) {
                 return new MCRChangeData(instruction, typePrefix);
+            }
         }
         throw new MCRException("Lost processing instruction for undo, not found: " + typePrefix);
     }
@@ -94,8 +97,9 @@ public class MCRChangeTracker implements Cloneable {
     public static void removeChangeTracking(Element element) {
         for (Iterator<ProcessingInstruction> iter = element.getDescendants(Filters.processinginstruction())
             .iterator(); iter.hasNext();) {
-            if (iter.next().getTarget().startsWith(PREFIX))
+            if (iter.next().getTarget().startsWith(PREFIX)) {
                 iter.remove();
+            }
         }
     }
 

@@ -33,7 +33,7 @@ public class MCRAjaxSubselectTarget implements MCREditorTarget {
         throws Exception {
         int pos = parameter.lastIndexOf(":");
         String xPath = parameter.substring(0, pos);
-        Map<String, String[]> submittedValues = MCRTargetUtility.getSubmittedValues(job, xPath);
+        Map<String, String[]> submittedValues = MCRTargetUtils.getSubmittedValues(job, xPath);
         session.getSubmission().setSubmittedValues(submittedValues);
 
         job.getResponse().setStatus(HttpServletResponse.SC_OK);

@@ -18,25 +18,23 @@
 
 package org.mycore.frontend.xeditor;
 
-import org.mycore.common.MCRCache;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 /**
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRXEditorTransformerStore {
+public class MCREditorSessionStoreUtils {
 
-    private static MCRCache<String, MCRXEditorTransformer> cache = new MCRCache<>(100, "XEditorTransformers");
+    private static final String XEDITORS_CACHE_KEY = "XEditorsCache";
 
-    public static String storeTransformer(MCRXEditorTransformer transformer) {
-        String key = MCRSessionMgr.getCurrentSession().getID() + "-" + String.valueOf(System.nanoTime());
-        cache.put(key, transformer);
-        return key;
-    }
-
-    public static MCRXEditorTransformer getAndRemoveTransformer(String key) {
-        MCRXEditorTransformer transformer = cache.get(key);
-        cache.remove(key);
-        return transformer;
+    public static MCREditorSessionStore getSessionStore() {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        MCREditorSessionStore store = (MCREditorSessionStore) (session.get(XEDITORS_CACHE_KEY));
+        if (store == null) {
+            store = new MCREditorSessionStore();
+            session.put(XEDITORS_CACHE_KEY, store);
+        }
+        return store;
     }
 }

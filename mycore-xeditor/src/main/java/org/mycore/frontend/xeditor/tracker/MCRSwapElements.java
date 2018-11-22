@@ -36,8 +36,9 @@ public class MCRSwapElements implements MCRChange {
     }
 
     public static MCRChangeData swap(Element parent, int posA, Content a, int posB, Content b) {
-        if (posA > posB)
+        if (posA > posB) {
             return swap(parent, posB, b, posA, a);
+        }
 
         b.detach(); // x a x x x  
         parent.addContent(posA, b); // x b a x x x 
