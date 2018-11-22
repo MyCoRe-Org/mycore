@@ -81,18 +81,13 @@ public class MCRXEditorTransformer {
         this.buildFilterXSL = "true".equals(transformationParameters.getParameter("buildFilterXSL", "false"));
     }
 
-    public static MCRXEditorTransformer getTransformer(String key) {
-        return MCRXEditorTransformerStoreUtils.getAndRemoveTransformer(key);
-    }
-
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
         editorSession.getValidator().clearRules();
         editorSession.getSubmission().clear();
 
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("xeditor");
         if (transformer instanceof MCRParameterizedTransformer) {
-            String key = MCRXEditorTransformerStoreUtils.storeTransformer(this);
-            transformationParameters.setParameter("XEditorTransformerKey", key);
+            transformationParameters.setParameter("transformer", this);
             MCRContent result = ((MCRParameterizedTransformer) transformer).transform(editorSource,
                 transformationParameters);
             if (result instanceof MCRWrappedContent
