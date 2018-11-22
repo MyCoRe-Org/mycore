@@ -11,13 +11,12 @@
   <xsl:include href="copynodes.xsl" />
   <xsl:include href="xslInclude:xeditor" />
 
-  <xsl:param name="XEditorTransformerKey" />
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
   <xsl:param name="HttpSession" />
+  <xsl:param name="transformer" />
 
-  <xsl:variable name="transformer" select="transformer:getTransformer($XEditorTransformerKey)" />
   <xsl:variable name="includer" select="includer:new()" />
 
   <!-- ========== <xed:form /> output-only ========== -->
