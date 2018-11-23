@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -1038,29 +1039,22 @@ public class MCRXMLFunctions {
     /**
      * This only works with text nodes
      * @param nodes
-     * @return
+     * @return the order of nodes maybe changes
      */
     public static NodeList distinctValues(NodeList nodes) {
-        SortedSet<Node> set = new TreeSet<>(new Comparator<Node>() {
-            @Override public int compare(Node node, Node t1) {
-
+        SortedSet<Node> distinctNodeSet = new TreeSet<>(new Comparator<Node>() {
+            @Override
+            public int compare(Node node, Node t1) {
                 String nodeValue = node.getNodeValue();
                 String nodeValue1 = t1.getNodeValue();
-
-                if (nodeValue != null && nodeValue1 != null) {
-                    return nodeValue.equals(nodeValue1) ? 0 : -1;
-                } else if (nodeValue1 == null && nodeValue == null) {
-                    return 0;
-                } else {
-                    return -1;
-                }
+                return Objects.equals(nodeValue1, nodeValue) ? 0 : -1;
             }
         });
         for (int i = 0; i < nodes.getLength(); i++) {
-            set.add(nodes.item(i));
+            distinctNodeSet.add(nodes.item(i));
         }
 
-        return new SetNodeList(set);
+        return new SetNodeList(distinctNodeSet);
     }
 
     private static class SetNodeList implements NodeList {
