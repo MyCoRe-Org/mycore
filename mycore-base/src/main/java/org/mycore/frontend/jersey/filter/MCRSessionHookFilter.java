@@ -31,6 +31,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 
+import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
@@ -47,11 +48,15 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
     @Context
     private HttpServletResponse httpResponse;
 
+    private final static String ATTR = MCRSessionHookFilter.class.getName() + ".session";
+
     private static final Logger LOGGER = LogManager.getLogger(MCRSessionHookFilter.class);
 
     @Override
-    public void filter(ContainerRequestContext request) throws IOException {
+    public void filter(ContainerRequestContext request) {
+        MCRSessionMgr.unlock();
         MCRSession session = MCRServlet.getSession(httpRequest);
+        request.setProperty(ATTR, session);
         MCRSessionMgr.setCurrentSession(session);
         LOGGER.info(MessageFormat.format("{0} ip={1} mcr={2} user={3}", request.getUriInfo().getPath(),
             MCRFrontendUtil.getRemoteAddr(httpRequest), session.getID(), session.getUserInformation().getUserID()));
@@ -59,8 +64,52 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
     }
 
     @Override
-    public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
-        MCRSessionMgr.releaseCurrentSession();
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
+        MCRSessionMgr.unlock();
+        MCRSession requestSession = (MCRSession) requestContext.getProperty(ATTR);
+        if (responseContext.hasEntity()) {
+            responseContext.setEntityStream(new ProxyOutputStream(responseContext.getEntityStream()) {
+                @Override
+                public void close() throws IOException {
+                    LOGGER.debug("Closing EntityStream");
+                    try {
+                        super.close();
+                    } finally {
+                        releaseSessionIfNeeded(requestSession);
+                        LOGGER.debug("Closing EntityStream done");
+                    }
+                }
+            });
+        } else {
+            LOGGER.debug("No Entity in response, closing MCRSession");
+            releaseSessionIfNeeded(requestSession);
+        }
+    }
+
+    private static void releaseSessionIfNeeded(MCRSession requestSession) {
+        if (MCRSessionMgr.hasCurrentSession()) {
+            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            try {
+                if (currentSession.isTransactionActive()) {
+                    LOGGER.debug("Active MCRSession and JPA-Transaction found. Clearing up");
+                    if (currentSession.transactionRequiresRollback()) {
+                        currentSession.rollbackTransaction();
+                    } else {
+                        currentSession.commitTransaction();
+                    }
+                } else {
+                    LOGGER.debug("Active MCRSession found. Clearing up");
+                }
+            } finally {
+                MCRSessionMgr.releaseCurrentSession();
+                if (!currentSession.equals(requestSession)) {
+                    LOGGER.warn("Found orphaned MCRSession. Closing {} ", currentSession);
+                    currentSession.close(); //is not bound to HttpSession
+                }
+                MCRSessionMgr.lock();
+                LOGGER.debug("Session released.");
+            }
+        }
     }
 
 }

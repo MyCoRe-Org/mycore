@@ -42,6 +42,7 @@ import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -83,29 +84,31 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
     }
 
     private void searchDocumentsToRelease(Consumer<MCRObjectID> objectReleaser) {
-        final SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
-        final ModifiableSolrParams params = new ModifiableSolrParams();
-        final LocalDate today = LocalDate.now();
-        final String todayString = today.format(DateTimeFormatter.ISO_DATE);
+        if(MCRConfiguration2.getString("MCR.Solr.ServerURL").isPresent()){
+            final SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
+            final ModifiableSolrParams params = new ModifiableSolrParams();
+            final LocalDate today = LocalDate.now();
+            final String todayString = today.format(DateTimeFormatter.ISO_DATE);
 
-        params.set("start", 0);
-        params.set("rows", Integer.MAX_VALUE - 1);
-        params.set("fl", "id");
-        params.set("q", "mods.embargo.date:[* TO " + todayString + "]");
+            params.set("start", 0);
+            params.set("rows", Integer.MAX_VALUE - 1);
+            params.set("fl", "id");
+            params.set("q", "mods.embargo.date:[* TO " + todayString + "]");
 
-        try {
-            final QueryResponse response = solrClient.query(params);
-            Set<MCRFixedUserCallable<Boolean>> releaseCallables = response.getResults().stream()
-                .map(result -> (String) result.get("id"))
-                .map(MCRObjectID::getInstance)
-                .map(id -> new MCRFixedUserCallable<>(() -> {
-                    objectReleaser.accept(id);
-                    return true;
-                }, MCRSystemUserInformation.getSuperUserInstance())).collect(Collectors.toSet());
+            try {
+                final QueryResponse response = solrClient.query(params);
+                Set<MCRFixedUserCallable<Boolean>> releaseCallables = response.getResults().stream()
+                    .map(result -> (String) result.get("id"))
+                    .map(MCRObjectID::getInstance)
+                    .map(id -> new MCRFixedUserCallable<>(() -> {
+                        objectReleaser.accept(id);
+                        return true;
+                    }, MCRSystemUserInformation.getSuperUserInstance())).collect(Collectors.toSet());
 
-            EXECUTOR_SERVICE.invokeAll(releaseCallables);
-        } catch (SolrServerException | IOException | InterruptedException e) {
-            LOGGER.error("Error while searching embargo documents!", e);
+                EXECUTOR_SERVICE.invokeAll(releaseCallables);
+            } catch (SolrServerException | IOException | InterruptedException e) {
+                LOGGER.error("Error while searching embargo documents!", e);
+            }
         }
     }
 

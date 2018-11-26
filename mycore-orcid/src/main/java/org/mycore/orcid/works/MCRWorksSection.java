@@ -21,16 +21,20 @@ package org.mycore.orcid.works;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid.MCRORCIDException;
 import org.mycore.orcid.MCRORCIDProfile;
 import org.xml.sax.SAXException;
@@ -142,9 +146,42 @@ public class MCRWorksSection {
         return work;
     }
 
-    /** Returns the work originating from the given local object, if any */
+    /**
+     * Returns the work originating from the given local object, if any.
+     * This is done by comparing the ID and all mods:identifier elements given in the MyCoRe MODS object
+     * with the identifiers given in the ORCID work.
+     */
     public Optional<MCRWork> findWork(MCRObjectID oid) {
-        return works.stream().filter(work -> oid.equals(work.getObjectID())).findFirst();
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(oid);
+        return findWork(obj);
+    }
+
+    public Optional<MCRWork> findWork(MCRObject obj) {
+        MCRMODSWrapper wrapper = new MCRMODSWrapper(obj);
+        List<Element> objectIdentifiers = wrapper.getElements("mods:identifier");
+        Set<String> objectKeys = buildIdentifierKeys(objectIdentifiers);
+        return works.stream().filter(work -> matches(work, obj.getId(), objectKeys)).findFirst();
+    }
+
+    private boolean matches(MCRWork work, MCRObjectID oid, Set<String> objectIdentifiers) {
+        if (oid.equals(work.getObjectID())) {
+            return true;
+        }
+        Set<String> workIdentifiers = buildIdentifierKeys(work.getIdentifiers());
+        workIdentifiers.retainAll(objectIdentifiers);
+        return !workIdentifiers.isEmpty();
+    }
+
+    private Set<String> buildIdentifierKeys(List<Element> modsIdentifiers) {
+        Set<String> objectKeys = new HashSet<String>();
+        for (Element modsIdentifier : modsIdentifiers) {
+            objectKeys.add(buildIdentifierKey(modsIdentifier));
+        }
+        return objectKeys;
+    }
+
+    private String buildIdentifierKey(Element modsIdentifier) {
+        return modsIdentifier.getAttributeValue("type") + ":" + modsIdentifier.getTextTrim();
     }
 
     /** Returns true, if there is a work in the ORCID profile that's origin is the given MyCoRe object */
