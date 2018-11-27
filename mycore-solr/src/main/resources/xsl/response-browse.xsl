@@ -28,7 +28,7 @@
         <td class="resultPages">
           <xsl:copy-of select="$ResultPages" />
         </td>
-        <td>
+        <td class="resultBack">
           <xsl:variable name="params">
             <xsl:for-each select="lst[@name='responseHeader']/lst[@name='params']/str">
               <xsl:choose>
