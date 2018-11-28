@@ -302,13 +302,16 @@ public class MCRServlet extends HttpServlet {
             Exception thinkException = processThinkPhase(job);
             // first phase completed, start rendering phase
             processRenderingPhase(job, thinkException);
-        } catch (Throwable ex) {
+        } catch (Error error) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 session.rollbackTransaction();
             }
-            if (ex instanceof Error) {
-                throw (Error) ex; //do not handle errors
+            throw error;
+        } catch (Exception ex) {
+            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+                // current Servlet not called via RequestDispatcher
+                session.rollbackTransaction();
             }
             if (isBrokenPipe(ex)) {
                 LOGGER.info("Ignore broken pipe.");
