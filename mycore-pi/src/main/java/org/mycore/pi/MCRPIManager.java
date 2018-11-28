@@ -34,6 +34,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -237,19 +238,20 @@ public class MCRPIManager {
     public void delete(String objectID, String additional, String type, String service) {
         Objects.requireNonNull(objectID, "objectId may not be null");
         Objects.requireNonNull(type, "type may not be null");
-        Objects.requireNonNull(additional, "additional may not be null");
         Objects.requireNonNull(service, "service may not be null");
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRPI> getQuery = cb.createQuery(MCRPI.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
+        Predicate additionalPredicate = additional == null ?
+            cb.isNull(pi.get(MCRPI_.additional)) : cb.equal(pi.get(MCRPI_.additional), additional);
         em.remove(
             em.createQuery(
                 getQuery
                     .where(
                         cb.equal(pi.get(MCRPI_.mycoreID), objectID),
                         cb.equal(pi.get(MCRPI_.type), type),
-                        cb.equal(pi.get(MCRPI_.additional), additional),
+                        additionalPredicate,
                         cb.equal(pi.get(MCRPI_.service), service)))
                 .getSingleResult());
     }
