@@ -118,6 +118,13 @@
   },
   {
     "add-field": {
+      "name": "mods.subject",
+      "type": "text_general",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
       "name": "mods.embargo",
       "type": "string"
     }
