@@ -114,6 +114,11 @@
         <xsl:value-of select="text()" />
       </field>
     </xsl:for-each>
+    <xsl:for-each select="mods:subject/mods:topic">
+      <field name="mods.subject">
+        <xsl:value-of select="." />
+      </field>
+    </xsl:for-each>
     <xsl:for-each select="mods:abstract">
       <field name="mods.abstract">
         <xsl:value-of select="text()" />
