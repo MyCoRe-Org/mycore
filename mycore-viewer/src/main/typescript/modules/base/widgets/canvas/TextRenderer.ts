@@ -135,10 +135,28 @@ namespace mycore.viewer.widgets.canvas {
                     pageHtml.appendChild(contentPart);
                 }
             });
+            textContent.links.forEach((link)=>{
+                var cacheKey = link.rect.toString() + link.url;
+                if (!this._elementCache.has(cacheKey)) {
+                    const linkElement = document.createElement("a");
+                    linkElement.setAttribute("href", link.url);
+                    linkElement.style.left = link.rect.getX() + "px";
+                    linkElement.style.top = link.rect.getY() + "px";
+                    linkElement.style.width = link.rect.getWidth() + "px";
+                    linkElement.style.height = link.rect.getHeight() + "px";
+                    linkElement.style.display = "block";
+                    linkElement.style.position = "fixed";
+                    linkElement.style.zIndex = "8";
+                    linkElement.setAttribute("target", "_blank");
+                    this._elementCache.set(cacheKey, linkElement);
+                    pageHtml.appendChild(linkElement);
+                }
+            });
+
             var pageElement = <HTMLElement>this._pageElementCache.get(page).children[0];
             pageElement.appendChild(pageHtml);
             if (pageElement.style.display == "none") {
-                pageElement.style.display == "block";
+                pageElement.style.display = "block";
             }
         }
 
