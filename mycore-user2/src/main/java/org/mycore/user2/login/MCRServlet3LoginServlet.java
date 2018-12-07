@@ -74,16 +74,9 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
             MCRSession session = MCRSessionMgr.getCurrentSession();
             req.login(uid, pwd);
             session.setUserInformation(new Servlet3ContainerUserInformation(session, realm));
-            if (needsToBeAuthenticatedOnEveryRequest(job)){
-                req.getSession().setAttribute(MCRRequestAuthenticationFilter.SESSION_KEY, Boolean.TRUE);
-            }
+            req.getSession().setAttribute(MCRRequestAuthenticationFilter.SESSION_KEY, Boolean.TRUE);
             LOGGER.info("Logged in: {}", session.getUserInformation().getUserID());
         }
-    }
-
-    private static boolean needsToBeAuthenticatedOnEveryRequest(MCRServletJob job){
-        //hack for tomcat, jetty will fail if we authenticate on every request
-        return job.getRequest().getClass().getPackage().getName().contains(".catalina.");
     }
 
     @Override
