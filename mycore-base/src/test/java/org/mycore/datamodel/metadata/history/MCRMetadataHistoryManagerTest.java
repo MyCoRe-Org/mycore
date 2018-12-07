@@ -19,6 +19,7 @@
 package org.mycore.datamodel.metadata.history;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.time.Instant;
 import java.util.Map;
@@ -49,28 +50,30 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        testObject = MCRObjectID.getInstance("mir_mods_00000355");
-        create(testObject, HISTORY_START);
-        delete(testObject, Instant.parse("2017-06-19T10:34:27.915Z"));
-        create(testObject, Instant.parse("2017-06-19T10:52:59.711Z"));
-        lastDelete = Instant.parse("2017-06-19T10:52:59.718Z");
-        delete(testObject, lastDelete);
-        startNewTransaction();
+    }
+
+    @Test
+    public void testGetEmptyHistoryStart(){
+        //MCR-1979
+        assertFalse("No earliest timestamp should be present", MCRMetadataHistoryManager.getHistoryStart().isPresent());
     }
 
     @Test
     public void testGetHighestStoredID() {
+        addTestData();
         assertEquals(testObject,
             MCRMetadataHistoryManager.getHighestStoredID(testObject.getProjectId(), testObject.getTypeId()).get());
     }
 
     @Test
     public void testGetHistoryStart() {
+        addTestData();
         assertEquals(HISTORY_START, MCRMetadataHistoryManager.getHistoryStart().get());
     }
 
     @Test
     public void testGetDeletedItems() {
+        addTestData();
         Map<MCRObjectID, Instant> deletedItems = MCRMetadataHistoryManager.getDeletedItems(Instant.ofEpochMilli(0),
             Optional.empty());
         assertEquals("Expected a single deletion event.", 1, deletedItems.size());
@@ -78,7 +81,18 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
 
     @Test
     public void testGetLastDeletedDate() {
+        addTestData();
         assertEquals(lastDelete, MCRMetadataHistoryManager.getLastDeletedDate(testObject).get());
+    }
+
+    private void addTestData() {
+        testObject = MCRObjectID.getInstance("mir_mods_00000355");
+        create(testObject, HISTORY_START);
+        delete(testObject, Instant.parse("2017-06-19T10:34:27.915Z"));
+        create(testObject, Instant.parse("2017-06-19T10:52:59.711Z"));
+        lastDelete = Instant.parse("2017-06-19T10:52:59.718Z");
+        delete(testObject, lastDelete);
+        startNewTransaction();
     }
 
     private void create(MCRObjectID id, Instant time) {
