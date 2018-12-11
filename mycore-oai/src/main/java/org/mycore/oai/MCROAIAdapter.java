@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -240,7 +241,19 @@ public class MCROAIAdapter implements OAIAdapter {
         if (!getObjectManager().exists(identifier)) {
             throw new IdDoesNotExistException(identifier);
         }
-        return getMetadataFormats();
+        Header header = getSearchManager().getHeader(identifier).get();
+        if (header.isDeleted()) {
+            throw new NoMetadataFormatsException(identifier);
+        }
+        List<MetadataFormat> metadataFormats = getMetadataFormats()
+            .stream()
+            .filter(format -> objectManager.getRecord(header, format) != null)
+            .collect(Collectors.toList());
+        if (metadataFormats.isEmpty()) {
+            throw new NoMetadataFormatsException(identifier);
+        }
+        return metadataFormats;
+
     }
 
     /*
@@ -267,6 +280,10 @@ public class MCROAIAdapter implements OAIAdapter {
                     return deletedRecord;
                 }
             }
+        } else {
+            throw new CannotDisseminateFormatException()
+                .setId(identifier)
+                .setMetadataPrefix(format.getPrefix());
         }
         throw new IdDoesNotExistException(identifier);
     }
@@ -280,7 +297,7 @@ public class MCROAIAdapter implements OAIAdapter {
         //Update set for response header
         getSetManager().getDirectList();
         OAIDataList<Record> recordList = getSearchManager().searchRecord(resumptionToken);
-        if (recordList.isEmpty()) {
+        if (recordList.isEmpty() && getHeaders(resumptionToken).isEmpty()) {
             throw new BadResumptionTokenException(resumptionToken);
         }
         return recordList;
@@ -292,7 +309,7 @@ public class MCROAIAdapter implements OAIAdapter {
         //Update set for response header
         getSetManager().getDirectList();
         OAIDataList<Record> recordList = getSearchManager().searchRecord(format, toMCRSet(set), from, until);
-        if (recordList.isEmpty()) {
+        if (recordList.isEmpty() && getHeaders(format, set, from, until).isEmpty()) {
             throw new NoRecordsMatchException();
         }
         return recordList;

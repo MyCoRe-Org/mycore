@@ -1,0 +1,157 @@
+[
+  {
+    "add-field-type": {
+      "name": "alto_continuous_text",
+      "class": "solr.TextField",
+      "indexed": true,
+      "stored": true,
+      "indexAnalyzer": {
+        "type": "index",
+        "tokenizer": {
+          "class": "solr.WhitespaceTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "ignoreCase": "true",
+            "words": "stopwords.txt"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          },
+          {
+            "class": "solr.ICUNormalizer2FilterFactory"
+          },
+          {
+            "class": "solr.ApostropheFilterFactory"
+          },
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "[^\\p{L}\\p{Nd}]",
+            "replacement": ""
+          },
+          {
+            "class": "solr.SnowballPorterFilterFactory",
+            "language": "German2"
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "type": "query",
+        "tokenizer": {
+          "class": "solr.WhitespaceTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "ignoreCase": "true",
+            "words": "stopwords.txt"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          },
+          {
+            "class": "solr.ICUNormalizer2FilterFactory"
+          },
+          {
+            "class": "solr.SnowballPorterFilterFactory",
+            "language": "German2"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field-type": {
+      "name": "alto_word_coordinates",
+      "class": "solr.TextField",
+      "indexed": true,
+      "multiValued": true,
+      "stored": true,
+      "indexAnalyzer": {
+        "type": "index",
+        "tokenizer": {
+          "class": "solr.WhitespaceTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.DelimitedPayloadTokenFilterFactory",
+            "delimiter": "|",
+            "encoder": "identity"
+          },
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "ignoreCase": "true",
+            "words": "stopwords.txt"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          },
+          {
+            "class": "solr.ICUNormalizer2FilterFactory"
+          },
+          {
+            "class": "solr.ApostropheFilterFactory"
+          },
+          {
+            "class": "solr.PatternReplaceCharFilterFactory",
+            "pattern": "[^\\p{L}\\p{Nd}]",
+            "replacement": ""
+          },
+          {
+            "class": "solr.SnowballPorterFilterFactory",
+            "language": "German2"
+          }
+        ]
+      },
+      "queryAnalyzer": {
+        "type": "query",
+        "tokenizer": {
+          "class": "solr.WhitespaceTokenizerFactory"
+        },
+        "filters": [
+          {
+            "class": "solr.LowerCaseFilterFactory"
+          },
+          {
+            "class": "solr.StopFilterFactory",
+            "ignoreCase": "true",
+            "words": "stopwords.txt"
+          },
+          {
+            "class": "solr.ASCIIFoldingFilterFactory"
+          },
+          {
+            "class": "solr.ICUNormalizer2FilterFactory"
+          },
+          {
+            "class": "solr.SnowballPorterFilterFactory",
+            "language": "German2"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "add-field": {
+      "name": "alto_content",
+      "type": "alto_continuous_text"
+    }
+  },
+  {
+    "add-field": {
+      "name": "alto_words",
+      "type": "alto_word_coordinates",
+      "multiValued": true
+    }
+  }
+]

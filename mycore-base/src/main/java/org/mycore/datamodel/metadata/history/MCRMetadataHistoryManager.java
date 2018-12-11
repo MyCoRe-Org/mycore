@@ -54,11 +54,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     public static Optional<Instant> getHistoryStart() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         TypedQuery<Instant> query = em.createNamedQuery("MCRMetaHistory.getFirstDate", Instant.class);
-        try {
-            return Optional.of(query.getSingleResult());
-        } catch (NoResultException e) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(query.getSingleResult());
     }
 
     public static Map<MCRObjectID, Instant> getDeletedItems(Instant from, Optional<Instant> until) {
