@@ -21,11 +21,11 @@
 namespace mycore.viewer.model {
     export interface TextContentModel {
         content : Array<TextElement>;
-        links: Array<Link>;
+        links: Link[];
     }
 
     export interface Link {
-        url:string;
+        url: string;
         rect: Rect;
     }
 

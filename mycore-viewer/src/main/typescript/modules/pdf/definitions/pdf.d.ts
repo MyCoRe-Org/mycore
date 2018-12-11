@@ -168,8 +168,6 @@ interface PDFAnnotationData {
     hasAppearance: boolean;
 }
 
-
-
 interface PDFRenderTextLayer {
     beginLayout(): void;
     endLayout(): void;
