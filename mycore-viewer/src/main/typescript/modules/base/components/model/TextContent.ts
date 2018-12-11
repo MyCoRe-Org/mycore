@@ -21,6 +21,12 @@
 namespace mycore.viewer.model {
     export interface TextContentModel {
         content : Array<TextElement>;
+        links: Link[];
+    }
+
+    export interface Link {
+        url: string;
+        rect: Rect;
     }
 
     export interface TextElement {

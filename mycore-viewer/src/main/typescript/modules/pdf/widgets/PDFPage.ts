@@ -52,9 +52,32 @@ namespace mycore.viewer.widgets.canvas {
         public resolveTextContent(callback:(content:model.TextContentModel)=>void):void {
             if (this._textData == null) {
                 var textContent:model.TextContentModel = {
-                    content : []
+                    content : [],
+                    links : []
                 };
+                this._textData = textContent;
+                let contentReady = false, linksReady = false;
+                let completeCall = () => (contentReady && linksReady) ? callback(textContent) : null;
+
+                this._pdfPage.getAnnotations().then((anotations) => {
+                    linksReady = true;
+                    if (anotations.length > 0) {
+                        for (var annotation of anotations) {
+                            if ((<any>annotation).annotationType == 2 && (<any>annotation).subtype == 'Link') {
+                                textContent.links.push({
+                                    rect : new Rect(
+                                        new Position2D(annotation.rect[ 0 ] * PDFPage.CSS_UNITS, this.size.height - (annotation.rect[ 1 ] * PDFPage.CSS_UNITS) - ((annotation.rect[ 3 ] - annotation.rect[ 1 ]) * PDFPage.CSS_UNITS)),
+                                        new Size2D((annotation.rect[ 2 ] - annotation.rect[ 0 ]) * PDFPage.CSS_UNITS, (annotation.rect[ 3 ] - annotation.rect[ 1 ]) * PDFPage.CSS_UNITS))
+                                    , url : (<any>annotation).url
+                                });
+                            }
+                        }
+                    }
+                    completeCall();
+                });
+
                 this._pdfPage.getTextContent().then((textData:PDFPageTextData)=> {
+                    contentReady = true;
                     textData.items.forEach((e)=> {
 
                         var vp = (<any>this._pdfPage.getViewport(1));
@@ -81,12 +104,15 @@ namespace mycore.viewer.widgets.canvas {
                         var textElement = new PDFTextElement(angle, new Size2D(e.width, e.height).scale(PDFPage.CSS_UNITS).roundDown(), fontHeight, e.str, new Position2D(x, y), style.fontFamily, this.id);
                         textContent.content.push(textElement);
                     });
-                    this._textData = textContent;
-                    callback(textContent);
+
+                    completeCall();
                 }, (reason:string) => {
+                    contentReady = true;
                     console.error("PDF Page Text Content rejected");
                     console.error("Reason: " + reason);
+                    completeCall();
                 });
+
             } else {
                 callback(this._textData);
             }

@@ -168,17 +168,6 @@ interface PDFAnnotationData {
     hasAppearance: boolean;
 }
 
-interface PDFAnnotations {
-    getData(): PDFAnnotationData;
-    hasHtml(): boolean; // always false
-    getHtmlElement(commonOjbs): HTMLElement; // throw new NotImplementedException()
-    getEmptyContainer(tagName:string, rect:number[]): HTMLElement; // deprecated
-    isViewable(): boolean;
-    loadResources(keys): PDFPromise<any>;
-    getOperatorList(evaluator): PDFPromise<any>;
-    // ... todo
-}
-
 interface PDFRenderTextLayer {
     beginLayout(): void;
     endLayout(): void;
@@ -241,7 +230,7 @@ interface PDFPageProxy {
     /**
      * A promise that is resolved with an array of the annotation objects.
      **/
-    getAnnotations(): PDFPromise<PDFAnnotations>;
+    getAnnotations(): PDFPromise<PDFAnnotationData[]>;
 
     /**
      * Begins the process of rendering a page to the desired context.
