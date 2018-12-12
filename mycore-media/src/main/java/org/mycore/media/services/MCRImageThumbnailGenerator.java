@@ -26,7 +26,7 @@ public class MCRImageThumbnailGenerator implements MCRThumbnailGenerator {
 
     @Override
     public Optional<BufferedImage> getThumbnail(MCRPath path, int size) throws IOException {
-        Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), path.getOwner(), path.getFileName()
+        Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), path.getOwner(), path.getOwnerRelativePath()
             .toString());
         MCRTiledPictureProps iviewFileProps = getIviewFileProps(iviewFile);
         final double width = iviewFileProps.getWidth();
