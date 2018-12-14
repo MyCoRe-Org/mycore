@@ -30,6 +30,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.events.MCREvent;
+import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRCreatorCache;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -52,6 +55,15 @@ public class MCRMODSEmbargoUtils {
     private static final int CAPACITY = 10000;
 
     private static MCRCache<MCRObjectID, String> embargoCache = new MCRCache<>(CAPACITY, "MODS embargo filter cache");
+
+    static {
+        MCREventManager.instance().addEventHandler(MCREvent.OBJECT_TYPE, new MCREventHandlerBase() {
+            @Override
+            protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+                embargoCache.remove(obj.getId());
+            }
+        });
+    }
 
     public static String getCachedEmbargo(final MCRObjectID objectId) {
         MCRCache.ModifiedHandle modifiedHandle = MCRXMLMetadataManager.instance().getLastModifiedHandle(objectId, 10,
