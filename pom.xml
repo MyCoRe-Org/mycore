@@ -7,7 +7,7 @@
     <version>38</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2018.06.0.2-SNAPSHOT</version>
+  <version>2018.06.0.2</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -30,7 +30,7 @@
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>2018.06.0.x</tag>
+    <tag>v2018.06.0.2</tag>
   </scm>
   <properties>
     <changelog.since>2018-07-02</changelog.since>
@@ -1305,7 +1305,7 @@
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>1.13-SNAPSHOT</version>
+        <version>1.13</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
