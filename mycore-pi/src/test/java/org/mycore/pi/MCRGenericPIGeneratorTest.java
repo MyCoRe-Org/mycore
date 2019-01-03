@@ -1,6 +1,7 @@
 package org.mycore.pi;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -15,6 +16,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
 
+    public static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
+
     @Test
     public void testGenerate() throws MCRPersistentIdentifierException {
         final MCRGenericPIGenerator generator = new MCRGenericPIGenerator("test1",
@@ -25,12 +28,10 @@ public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
         MCRObject mcrObject = new MCRObject();
         mcrObject.setId(testID);
 
-        final MCRPersistentIdentifier generate = generator.generate(mcrObject, "");
-        final MCRPersistentIdentifier generate2 = generator.generate(mcrObject, "");
-        assertEquals("urn:nbn:de:gbv:" + Calendar.getInstance().get(Calendar.YEAR) + "-test-my-00000001-000-5",
-            generate.asString());
-        assertEquals("urn:nbn:de:gbv:" + Calendar.getInstance().get(Calendar.YEAR) + "-test-my-00000001-001-2",
-            generate2.asString());
+        final String pi1 = generator.generate(mcrObject, "").asString();
+        final String pi2 = generator.generate(mcrObject, "").asString();
+        assertEquals("urn:nbn:de:gbv:" + CURRENT_YEAR + "-test-my-00000001-000-", pi1.substring(0, pi1.length() - 1));
+        assertEquals("urn:nbn:de:gbv:" + CURRENT_YEAR + "-test-my-00000001-001-", pi2.substring(0, pi2.length() - 1));
     }
 
     @Override
