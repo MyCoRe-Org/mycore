@@ -1,7 +1,7 @@
 language: java
-sudo: false
-dist: trusty
-group: beta
+dist: xenial
+jdk:
+    - openjdk11
 install: true
 addons:
   firefox: "56.0"
