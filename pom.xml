@@ -49,6 +49,7 @@
     <httpcore.version>4.4.10</httpcore.version>
     <jackson.version>2.9.7</jackson.version>
     <java.target.version>11</java.target.version>
+    <jaxb.version>2.3.1</jaxb.version>
     <jersey.version>2.27</jersey.version>
     <jetty.version>9.4.14.v20181114</jetty.version>
     <log4j.version>2.11.1</log4j.version>
@@ -263,6 +264,11 @@
         <artifactId>maven-processor-plugin</artifactId>
         <version>3.3.3</version>
         <dependencies>
+          <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb.version}</version>
+          </dependency>
           <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-jpamodelgen</artifactId>
@@ -873,7 +879,7 @@
       <dependency>
         <groupId>javax.xml.bind</groupId>
         <artifactId>jaxb-api</artifactId>
-        <version>2.3.0</version>
+        <version>${jaxb.version}</version>
       </dependency>
       <dependency>
         <groupId>jaxen</groupId>
