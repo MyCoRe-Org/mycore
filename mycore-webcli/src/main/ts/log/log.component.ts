@@ -26,7 +26,7 @@ import {CommunicationService} from '../service/communication.service';
   selector: '[web-cli-log]',
   templateUrl: 'app/log/log.html'
 })
-export class WebCliLogComponent implements AfterViewInit, OnInit{
+export class WebCliLogComponent implements AfterViewInit, OnInit {
   timeout: number;
   settings: Settings;
   webCLILogElement: HTMLElement;
@@ -57,7 +57,7 @@ export class WebCliLogComponent implements AfterViewInit, OnInit{
           }
           for (let removeNodes = this.webCLILogElement.childNodes.length - this.settings.historySize;
                removeNodes > 0;
-               removeNodes--){
+               removeNodes--) {
             (<HTMLElement>this.webCLILogElement.childNodes[0]).remove();
           }
         }
@@ -70,7 +70,7 @@ export class WebCliLogComponent implements AfterViewInit, OnInit{
   }
 
   public clearLog() {
-    this.webCLILogElement.innerHTML = "";
+    this.webCLILogElement.innerHTML = '';
   }
 
   scrollLog() {
