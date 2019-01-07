@@ -147,13 +147,13 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
             Session mySession = new DelegatedSession(session) {
                 @Override
                 public void close() throws IOException {
-                    LOGGER.info("Close session.", new RuntimeException("debug"));
+                    LOGGER.debug("Close session.", new RuntimeException("debug"));
                     super.close();
                 }
 
                 @Override
                 public void close(CloseReason closeReason) throws IOException {
-                    LOGGER.info("Close session: " + closeReason, new RuntimeException("debug"));
+                    LOGGER.debug(() -> "Close session: " + closeReason, new RuntimeException("debug"));
                     super.close(closeReason);
                 }
             };
