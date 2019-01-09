@@ -18,8 +18,10 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.util.List;
 import java.util.Objects;
 
+import org.jdom2.Content;
 import org.mycore.common.MCRException;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
@@ -44,7 +46,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @version $Revision$ $Date$
  */
 @JsonClassDescription("Links to other objects or derivates")
-public final class MCRMetaLinkID extends MCRMetaLink {
+public class MCRMetaLinkID extends MCRMetaLink {
     /**
      * initializes with empty values.
      */
@@ -208,7 +210,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
      *                and to are not a MCRObjectID
      */
     @Override
-    public final void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
 
         if (linktype.equals("locator")) {

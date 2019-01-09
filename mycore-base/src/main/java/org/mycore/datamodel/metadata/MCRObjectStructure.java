@@ -63,7 +63,7 @@ public class MCRObjectStructure {
 
     private final ArrayList<MCRMetaLinkID> children;
 
-    private final ArrayList<MCRMetaLinkID> derivates;
+    private final ArrayList<MCRMetaDerivateLinkID> derivates;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -208,7 +208,7 @@ public class MCRObjectStructure {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Remove derivate ID {}", href);
         }
-        return removeMetaLink(getDerivates().iterator(), href);
+        return removeMetaLink(getDerivates().stream().map(MCRMetaLinkID.class::cast).iterator(), href);
     }
 
     /**
@@ -243,7 +243,7 @@ public class MCRObjectStructure {
      * @param add_derivate
      *            the link to be added as MCRMetaLinkID
      */
-    public final boolean addDerivate(MCRMetaLinkID add_derivate) {
+    public final boolean addDerivate(MCRMetaDerivateLinkID add_derivate) {
         MCRObjectID href = add_derivate.getXLinkHrefID();
         if (containsDerivate(href)) {
             return false;
@@ -262,7 +262,7 @@ public class MCRObjectStructure {
      * @param derivateLink the link to add or update
      * @return true when the structure is changed
      */
-    public final boolean addOrUpdateDerivate(MCRMetaLinkID derivateLink) {
+    public final boolean addOrUpdateDerivate(MCRMetaDerivateLinkID derivateLink) {
         if (derivateLink == null) {
             return false;
         }
@@ -289,7 +289,7 @@ public class MCRObjectStructure {
     /**
      * Returns the derivate link by id or null.
      */
-    public final MCRMetaLinkID getDerivateLink(MCRObjectID derivateId) {
+    public final MCRMetaDerivateLinkID getDerivateLink(MCRObjectID derivateId) {
         return getDerivates().stream()
             .filter(derivate -> derivate.getXLinkHrefID().equals(derivateId))
             .findAny()
@@ -299,7 +299,7 @@ public class MCRObjectStructure {
     /** 
      * @return a list with all related derivate ids encapsulated within a {@link MCRMetaLinkID}
      * */
-    public List<MCRMetaLinkID> getDerivates() {
+    public List<MCRMetaDerivateLinkID> getDerivates() {
         return this.derivates;
     }
 
@@ -341,7 +341,7 @@ public class MCRObjectStructure {
             List<Element> derobjectList = subElement.getChildren();
 
             for (Element derElement : derobjectList) {
-                MCRMetaLinkID der = new MCRMetaLinkID();
+                MCRMetaDerivateLinkID der = new MCRMetaDerivateLinkID();
                 der.setFromDOM(derElement);
                 addDerivate(der);
             }
