@@ -8,6 +8,7 @@ import org.jdom2.Element;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -21,6 +22,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * Mirrors derivate metadata to the mycore object.
  */
 public class MCRMirrorDerivateMetadataEventHandler extends MCREventHandlerBase {
+
+    private static final String DEFAULT_LABEL_PROPERTY = "MCR.Metadata.Derivate.DefaultLabel";
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
@@ -48,7 +51,10 @@ public class MCRMirrorDerivateMetadataEventHandler extends MCREventHandlerBase {
 
             derivateLink.setMainDoc(mainDoc);
 
-            if (XMLChar.isValidNCName(label)) {
+            if (label == null || label.isEmpty() || !XMLChar.isValidNCName(label)) {
+                String defaultLabel = getDefaultLabel(ownerID);
+                derivateLink.setXLinkLabel(defaultLabel);
+            } else {
                 derivateLink.setXLinkLabel(label);
             }
 
@@ -70,5 +76,12 @@ public class MCRMirrorDerivateMetadataEventHandler extends MCREventHandlerBase {
                 throw new MCRException("Eventhandler has no access to modify the MyCoRe-Object!", e);
             }
         }
+    }
+
+    private String getDefaultLabel(MCRObjectID ownerID) {
+        return MCRConfiguration2.getString(DEFAULT_LABEL_PROPERTY + "." + ownerID.getBase())
+            .orElseGet(() -> MCRConfiguration2.getString(DEFAULT_LABEL_PROPERTY + "." + ownerID.getProjectId())
+                .orElseGet(() -> MCRConfiguration2.getString(DEFAULT_LABEL_PROPERTY + "." + ownerID.getTypeId())
+                    .orElseGet(() -> MCRConfiguration2.getStringOrThrow(DEFAULT_LABEL_PROPERTY))));
     }
 }

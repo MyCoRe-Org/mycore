@@ -9,6 +9,10 @@ import org.mycore.common.MCRException;
 
 public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
 
+    private String mainDoc;
+
+    private List<Content> contentList;
+
     public MCRMetaDerivateLinkID() {
     }
 
@@ -30,10 +34,6 @@ public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
         this.contentList = contentList;
     }
 
-    private String mainDoc;
-
-    private List<Content> contentList;
-
     @Override
     public void setFromDOM(Element element) {
         super.setFromDOM(element);
@@ -45,30 +45,30 @@ public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
     @Override public Element createXML() throws MCRException {
         final Element xml = super.createXML();
 
-        if(contentList!=null){
+        if (contentList != null) {
             contentList.stream().map(Content::clone).forEach(xml::addContent);
         }
 
-        if(this.mainDoc != null){
+        if (this.mainDoc != null) {
             xml.setAttribute("mainDoc", this.mainDoc);
         }
 
         return xml;
     }
 
-    public void setMainDoc(String mainDoc) {
-        this.mainDoc = mainDoc;
-    }
-
     public String getMainDoc() {
         return mainDoc;
     }
 
-    public void setContentList(List<Content> contentList) {
-        this.contentList = contentList;
+    public void setMainDoc(String mainDoc) {
+        this.mainDoc = mainDoc;
     }
 
     public List<Content> getContentList() {
         return contentList;
+    }
+
+    public void setContentList(List<Content> contentList) {
+        this.contentList = contentList;
     }
 }

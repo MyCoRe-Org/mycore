@@ -383,7 +383,7 @@ public class MCRObjectStructure {
 
         if (derivates.size() > 0) {
             Element elmm = new Element("derobjects");
-            elmm.setAttribute("class", "MCRMetaLinkID");
+            elmm.setAttribute("class", "MCRMetaDerivateLinkID");
             for (MCRMetaLinkID derivate : getDerivates()) {
                 elmm.addContent(derivate.createXML());
             }
