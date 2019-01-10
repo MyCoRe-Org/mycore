@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {Log} from './log';
 import {Settings} from '../settings/settings';
 import {RESTService} from '../service/rest.service';
@@ -26,51 +26,56 @@ import {CommunicationService} from '../service/communication.service';
   selector: '[web-cli-log]',
   templateUrl: 'app/log/log.html'
 })
-export class WebCliLogComponent {
+export class WebCliLogComponent implements AfterViewInit, OnInit {
   timeout: number;
   settings: Settings;
+  webCLILogElement: HTMLElement;
 
   constructor(private _restService: RESTService,
-              private _comunicationService: CommunicationService){
-                this.settings = new Settings(500, 10, true, false);
-                this._comunicationService.settings.subscribe(
-                  settings =>{
-                    this.settings = settings;
-                  }
-                );
-                this._restService.currentLog.subscribe(
-                  log => {
-                    if (log != undefined) {
-                      if (document.getElementsByClassName('web-cli-log')[0].childNodes.length + 1 > this.settings.historySize) {
-                        document.getElementsByClassName('web-cli-log')[0].removeChild(document.getElementsByClassName('web-cli-log')[0].childNodes[0]);
-                      }
-                      var node = document.createElement("pre");
-                      var text = document.createTextNode(log.logLevel + ": " + log.message);
-                      node.appendChild(text);
-                      document.getElementsByClassName('web-cli-log')[0].appendChild(node);
-                      if(log.exception != undefined) {
-                        var nodeEx = document.createElement("pre");
-                        var textEx = document.createTextNode(log.exception);
-                        nodeEx.appendChild(textEx);
-                        document.getElementsByClassName('web-cli-log')[0].appendChild(nodeEx);
-                      }
-                    }
-                    this.scrollLog();
-                  });
-              }
-
-  public clearLog() {
-    document.getElementsByClassName('web-cli-log')[0].innerHTML = "";
+              private _comunicationService: CommunicationService) {
+    this.settings = new Settings(500, 10, true, false);
   }
 
-  // ngAfterViewChecked() {
-  //   this.scrollLog()
-  // }
+  ngOnInit() {
+    this._comunicationService.settings.subscribe(
+      settings =>{
+        this.settings = settings;
+      }
+    );
+    this._restService.currentLog.subscribe(
+      log => {
+        if (log != undefined) {
+          var node = document.createElement("pre");
+          var text = document.createTextNode(log.logLevel + ": " + log.message);
+          node.appendChild(text);
+          this.webCLILogElement.appendChild(node);
+          if(log.exception != undefined) {
+            var nodeEx = document.createElement("pre");
+            var textEx = document.createTextNode(log.exception);
+            nodeEx.appendChild(textEx);
+            this.webCLILogElement.appendChild(nodeEx);
+          }
+          for (let removeNodes = this.webCLILogElement.childNodes.length - this.settings.historySize;
+               removeNodes > 0;
+               removeNodes--) {
+            (<HTMLElement>this.webCLILogElement.childNodes[0]).remove();
+          }
+        }
+        this.scrollLog();
+      });
+  }
+
+  ngAfterViewInit() {
+    this.webCLILogElement = <HTMLElement> document.getElementsByClassName('web-cli-log')[0];
+  }
+
+  public clearLog() {
+    this.webCLILogElement.innerHTML = '';
+  }
 
   scrollLog() {
     if (this.settings.autoscroll) {
-        var elem = document.getElementsByClassName('web-cli-log');
-        elem[0].scrollTop = elem[0].scrollHeight;
+        this.webCLILogElement.scrollTop = this.webCLILogElement.scrollHeight;
     }
   }
 }

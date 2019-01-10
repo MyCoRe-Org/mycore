@@ -209,7 +209,7 @@ public abstract class MCRAudioVideoExtender {
 
     /**
      * Returns the duration of this asset, formatted as a String for output. For
-     * example, <tt>getDurationFormatted( "Std.", "Min.", "Sek." )</tt> will
+     * example, <code>getDurationFormatted( "Std.", "Min.", "Sek." )</code> will
      * return the String "1 Std. 15 Min." for an asset that is one hour and 15
      * minutes long. If duration is less than one hour, only minutes and seconds
      * go into the output string, otherwise hours and minutes are used.

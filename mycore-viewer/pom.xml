@@ -97,6 +97,7 @@
         <artifactId>jetty-maven-plugin</artifactId>
         <version>${jetty.version}</version>
         <configuration>
+          <supportedPackagings>jar</supportedPackagings>
           <webAppSourceDirectory>${basedir}/target/</webAppSourceDirectory>
           <scanIntervalSeconds>10</scanIntervalSeconds>
           <stopKey>foo</stopKey>

@@ -133,30 +133,25 @@ export class RESTService {
         return;
       }
       var message = JSON.parse(event.data);
-      if (message.type == "getKnownCommands"){
-        this._currentCommandList.next(<Commands[]> JSON.parse(message.return).commands);
-      }
-      if (message.type == "log"){
-        if(message.return != "") {
-          this._currentLog.next(<Log> JSON.parse(message.return));
-        }
-      }
-      if (message.type == "commandQueue"){
-        if(message.return != "") {
-          this._currentQueue.next(<String[]> JSON.parse(message.return));
-        }
-        else {
-          this._currentQueue.next(new Array<String>());
-        }
-        this._currentQueueLength.next(message.size);
-      }
-      if (message.type == "currentCommand"){
+      switch (message.type) {
+        case "log":
+          this._currentLog.next(<Log> message.return);
+          break;
+        case "commandQueue":
+          this._currentQueue.next(<String[]> message.return);
+          this._currentQueueLength.next(message.size);
+          break;
+        case "currentCommand":
           this._currentCommand.next(message.return);
-      }
-      if (message.type == "continueIfOneFails"){
+          break;
+        case "getKnownCommands":
+          this._currentCommandList.next(<Commands[]> message.return.commands);
+          break;
+        case "continueIfOneFails":
           if(message.value != undefined) {
             this._continueIfOneFails.next(message.value);
           }
+          break;
       }
     }
   }

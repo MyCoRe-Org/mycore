@@ -20,14 +20,22 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Flow;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.SubmissionPublisher;
+import java.util.concurrent.locks.ReentrantLock;
 
+import javax.servlet.http.HttpSession;
+import javax.websocket.CloseReason;
 import javax.websocket.Session;
 
 import org.apache.logging.log4j.Level;
@@ -50,14 +58,14 @@ import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.frontend.ws.common.MCRWebsocketDefaultConfigurator;
 import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
 import org.mycore.util.concurrent.processing.MCRProcessableSupplier;
 import org.mycore.webcli.cli.MCRWebCLICommandManager;
-import org.mycore.webcli.observable.CommandListObserver;
-import org.mycore.webcli.observable.LogEventDequeObserver;
-import org.mycore.webcli.observable.ObservableCommandList;
-import org.mycore.webcli.observable.ObservableLogEventDeque;
+import org.mycore.webcli.flow.MCRCommandListProcessor;
+import org.mycore.webcli.flow.MCRJSONSubscriber;
+import org.mycore.webcli.flow.MCRLogEventProcessor;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -72,6 +80,8 @@ import com.google.gson.JsonPrimitive;
  * @since 2.0
  */
 public class MCRWebCLIContainer {
+    private final ReentrantLock lock;
+
     MCRProcessableSupplier<Boolean> curFuture;
 
     private static Map<String, List<MCRCommand>> knownCommands;
@@ -100,7 +110,12 @@ public class MCRWebCLIContainer {
      *            the current Session(Websocket) of the user using the gui.
      */
     public MCRWebCLIContainer(Session session) {
-        processCallable = new ProcessCallable(MCRSessionMgr.getCurrentSession(), session);
+        lock = new ReentrantLock();
+        processCallable = new ProcessCallable(MCRSessionMgr.getCurrentSession(), session, lock);
+    }
+
+    public ReentrantLock getWebsocketLock() {
+        return lock;
     }
 
     /**
@@ -170,12 +185,16 @@ public class MCRWebCLIContainer {
         this.processCallable.changeWebSocketSession(webSocketSession);
     }
 
+    public void webSocketClosed() {
+        this.processCallable.webSocketClosed();
+    }
+
     public void stopLogging() {
-        this.processCallable.stopLogging();
+        this.processCallable.stopLogging(true);
     }
 
     public void startLogging() {
-        this.processCallable.startLogging();
+        this.processCallable.startLogging(true);
     }
 
     public void setContinueIfOneFails(boolean con) {
@@ -192,9 +211,9 @@ public class MCRWebCLIContainer {
 
     private static class ProcessCallable implements Callable<Boolean> {
 
-        ObservableLogEventDeque logs;
+        private final ReentrantLock lock;
 
-        ObservableCommandList commands;
+        List<String> commands;
 
         Session webSocketSession;
 
@@ -202,37 +221,59 @@ public class MCRWebCLIContainer {
 
         Log4JGrabber logGrabber;
 
-        CommandListObserver commandListObserver;
-
-        LogEventDequeObserver logEventQueueObserver;
-
         String currentCommand;
 
         boolean continueIfOneFails;
 
-        ProcessCallable(MCRSession session, Session webSocketSession) {
-            this.commands = new ObservableCommandList();
+        boolean stopLogs;
+
+        private MCRLogEventProcessor logEventProcessor;
+
+        private final SubmissionPublisher<List<String>> cmdListPublisher;
+
+        private MCRCommandListProcessor cmdListProcessor;
+
+        ProcessCallable(MCRSession session, Session webSocketSession, ReentrantLock lock) {
+            this.commands = new ArrayList<>();
             this.session = session;
+            this.lock = lock;
+            this.stopLogs = false;
             this.webSocketSession = webSocketSession;
-            this.logs = new ObservableLogEventDeque();
             this.logGrabber = new Log4JGrabber(MCRWebCLIContainer.class.getSimpleName() + session.getID(), null,
                 PatternLayout.createDefaultLayout());
             this.logGrabber.start();
-
-            this.commandListObserver = new CommandListObserver(commands, webSocketSession);
-            commands.addObserver(commandListObserver);
-            this.logEventQueueObserver = new LogEventDequeObserver(logs, webSocketSession);
-            logs.addObserver(logEventQueueObserver);
+            startLogging(true);
+            cmdListPublisher = new SubmissionPublisher<>(ForkJoinPool.commonPool(), 1);
             this.currentCommand = "";
             this.continueIfOneFails = false;
+            startSendingCommandQueue();
         }
 
-        public void stopLogging() {
-            this.logEventQueueObserver.stopSendMessages();
+        public void stopLogging(boolean remember) {
+            if (remember) {
+                this.stopLogs = true;
+            }
+            this.logEventProcessor.close();
         }
 
-        public void startLogging() {
-            this.logEventQueueObserver.startSendMessages();
+        public void startLogging(boolean remember) {
+            if (remember) {
+                this.stopLogs = false;
+            }
+            if (this.stopLogs) {
+                return;
+            }
+            if (logEventProcessor != null) {
+                logEventProcessor.close();
+            }
+            MCRLogEventProcessor logEventProcessor = new MCRLogEventProcessor();
+            MCRJSONSubscriber log2web = new MCRJSONSubscriber(webSocketSession, lock);
+            logEventProcessor.subscribe(log2web);
+            this.logEventProcessor = logEventProcessor;
+            logGrabber.subscribe(logEventProcessor);
+            if (logGrabber.isStopped()){
+                logGrabber.start();
+            }
         }
 
         public void setContinueIfOneFails(boolean con) {
@@ -246,15 +287,19 @@ public class MCRWebCLIContainer {
                 jObject.addProperty("type", "continueIfOneFails");
                 jObject.addProperty("value", con);
                 try {
+                    lock.lock();
                     webSocketSession.getBasicRemote().sendText(jObject.toString());
                 } catch (IOException e) {
                     LOGGER.error("Cannot send message to client.", e);
+                } finally {
+                    lock.unlock();
                 }
             }
         }
 
         public void clearCommandList() {
             this.commands.clear();
+            cmdListPublisher.submit(commands);
             setCurrentCommand("");
         }
 
@@ -319,6 +364,7 @@ public class MCRWebCLIContainer {
                     if (commandsReturned.size() > 0) {
                         LOGGER.info("Queueing {} commands to process", commandsReturned.size());
                         commands.addAll(0, commandsReturned);
+                        cmdListPublisher.submit(commands);
                     }
 
                     break;
@@ -347,7 +393,7 @@ public class MCRWebCLIContainer {
                 if (lastCommand != null) {
                     pw.println(lastCommand);
                 }
-                for (String command : commands.getCopyAsArrayList()) {
+                for (String command : commands.toArray(String[]::new)) {
                     pw.println(command);
                 }
                 if (failedQueue != null && !failedQueue.isEmpty()) {
@@ -359,8 +405,7 @@ public class MCRWebCLIContainer {
             } catch (IOException ex) {
                 LOGGER.error("Cannot write to {}", file.getAbsolutePath(), ex);
             }
-            setCurrentCommand("");
-            commands.clear();
+            clearCommandList();
         }
 
         protected boolean processCommands() throws IOException {
@@ -368,14 +413,19 @@ public class MCRWebCLIContainer {
             final AbstractConfiguration logConf = (AbstractConfiguration) logCtx.getConfiguration();
             LinkedList<String> failedQueue = new LinkedList<>();
             logGrabber.grabCurrentThread();
-            logGrabber.setLogEventList(logs);
             // start grabbing logs of this thread
             logConf.getRootLogger().addAppender(logGrabber, logConf.getRootLogger().getLevel(), null);
             // register session to MCRSessionMgr
             MCRSessionMgr.setCurrentSession(session);
+            Optional<HttpSession> httpSession = Optional
+                .ofNullable((HttpSession) webSocketSession.getUserProperties()
+                    .get(MCRWebsocketDefaultConfigurator.HTTP_SESSION));
+            int sessionTime = httpSession.map(HttpSession::getMaxInactiveInterval).orElse(-1);
+            httpSession.ifPresent(s -> s.setMaxInactiveInterval(-1));
             try {
                 while (!commands.isEmpty()) {
                     String command = commands.remove(0);
+                    cmdListPublisher.submit(commands);
                     if (!processCommand(command)) {
                         if (!continueIfOneFails) {
                             return false;
@@ -392,17 +442,35 @@ public class MCRWebCLIContainer {
                 }
             } finally {
                 // stop grabbing logs of this thread
+                logGrabber.stop();
                 logConf.removeAppender(logGrabber.getName());
-                // release session
-                MCRSessionMgr.releaseCurrentSession();
+                try {
+                    if (webSocketSession.isOpen()) {
+                        LogManager.getLogger().info("Close session {}", webSocketSession::getId);
+                        webSocketSession.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Done"));
+                    }
+                } finally {
+                    httpSession.ifPresent(s -> s.setMaxInactiveInterval(sessionTime));
+                    // release session
+                    MCRSessionMgr.releaseCurrentSession();
+                }
             }
         }
 
+        public void startSendingCommandQueue() {
+            MCRCommandListProcessor commandListProcessor = new MCRCommandListProcessor();
+            commandListProcessor.subscribe(new MCRJSONSubscriber(this.webSocketSession, lock));
+            cmdListPublisher.subscribe(commandListProcessor);
+            this.cmdListProcessor = commandListProcessor;
+            cmdListPublisher.submit(commands);
+        }
+
         public void changeWebSocketSession(Session webSocketSession) {
+            webSocketClosed();
             this.webSocketSession = webSocketSession;
-            this.logEventQueueObserver.changeSession(webSocketSession);
-            this.commandListObserver.changeSession(webSocketSession);
+            startLogging(false);
             sendCurrentCommand();
+            startSendingCommandQueue();
         }
 
         private void setCurrentCommand(String command) {
@@ -416,28 +484,36 @@ public class MCRWebCLIContainer {
             jObject.addProperty("return", currentCommand);
             if (webSocketSession.isOpen()) {
                 try {
+                    lock.lock();
                     webSocketSession.getBasicRemote().sendText(jObject.toString());
                 } catch (IOException ex) {
                     LOGGER.error("Cannot send message to client.", ex);
+                } finally {
+                    lock.unlock();
                 }
             }
         }
 
         @Override
         public String toString() {
-            if (this.commands.isEmpty()) {
-                return "no active command";
-            }
-            return this.commands.getCopyAsArrayList().get(0);
+            return this.commands.stream().findFirst().orElse("no active command");
         }
 
+        public void webSocketClosed() {
+            stopLogging(false);
+            cmdListProcessor.close();
+        }
     }
 
-    private static class Log4JGrabber extends AbstractAppender {
+    private static class Log4JGrabber extends AbstractAppender implements Flow.Publisher<LogEvent> {
+
+        private SubmissionPublisher<LogEvent> publisher;
 
         public String webCLIThread;
 
-        public ObservableLogEventDeque logEvents;
+        private static int MAX_BUFFER = 10000;
+
+        private List<Flow.Subscriber<? super LogEvent>> subscribers;
 
         protected Log4JGrabber(String name, Filter filter, Layout<? extends Serializable> layout) {
             super(name, filter, layout);
@@ -446,29 +522,37 @@ public class MCRWebCLIContainer {
         @Override
         public void start() {
             super.start();
+            if (this.publisher != null && !this.publisher.isClosed()) {
+                stop();
+            }
+            this.publisher = new SubmissionPublisher<LogEvent>(ForkJoinPool.commonPool(), MAX_BUFFER);
+            if (subscribers != null) {
+                subscribers.stream().forEach(publisher::subscribe);
+            }
             grabCurrentThread();
         }
 
         @Override
         public void stop() {
+            this.subscribers = publisher.getSubscribers();
             super.stop();
-            logEvents.clear();
+            this.publisher.close();
         }
 
         public void grabCurrentThread() {
             this.webCLIThread = Thread.currentThread().getName();
         }
 
-        public void setLogEventList(ObservableLogEventDeque logs) {
-            logEvents = logs;
-        }
-
         @Override
         public void append(LogEvent event) {
             if (webCLIThread.equals(event.getThreadName())) {
-                logEvents.add(event);
+                publisher.submit(event);
             }
         }
 
+        @Override
+        public void subscribe(Flow.Subscriber<? super LogEvent> subscriber) {
+            publisher.subscribe(subscriber);
+        }
     }
 }

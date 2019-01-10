@@ -20,12 +20,22 @@ package org.mycore.webcli.resources;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.security.Principal;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.websocket.CloseReason;
+import javax.websocket.Extension;
+import javax.websocket.MessageHandler;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
+import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.logging.log4j.LogManager;
@@ -83,16 +93,20 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
     }
 
     private void handleMessage(Session session, JsonObject request) {
+        LOGGER.info("WebSocket Request: {}", request::toString);
         String type = request.get("type").getAsString();
         if ("run".equals(type)) {
             String command = request.get("command").getAsString();
             cliCont.addCommand(command);
         } else if ("getKnownCommands".equals(type)) {
-            request.addProperty("return", MCRWebCLIContainer.getKnownCommands().toString());
+            request.add("return", MCRWebCLIContainer.getKnownCommands());
             try {
+                cliCont.getWebsocketLock().lock();
                 session.getBasicRemote().sendText(request.toString());
             } catch (IOException ex) {
                 LOGGER.error("Cannot send message to client.", ex);
+            } finally {
+                cliCont.getWebsocketLock().unlock();
             }
         } else if ("stopLog".equals(type)) {
             cliCont.stopLogging();
@@ -108,7 +122,10 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
 
     @OnClose
     public void close(Session session) {
-        cliCont.stopLogging();
+        LOGGER.info("Closing socket {}", session.getId());
+        if (cliCont != null) {
+            cliCont.webSocketClosed();
+        }
     }
 
     @OnError
@@ -121,22 +138,188 @@ public class MCRWebCLIResourceSockets extends MCRAbstractEndpoint {
     }
 
     private MCRWebCLIContainer getCurrentSessionContainer(boolean create, Session session) {
-        Object sessionValue;
+        MCRWebCLIContainer sessionValue;
         synchronized (MCRSessionMgr.getCurrentSession()) {
-            sessionValue = MCRSessionMgr.getCurrentSession().get(SESSION_KEY);
-            if (sessionValue == null) {
-                if (!create) {
-                    return null;
+            sessionValue = (MCRWebCLIContainer) MCRSessionMgr.getCurrentSession().get(SESSION_KEY);
+            if (sessionValue == null && !create) {
+                return null;
+            }
+            Session mySession = new DelegatedSession(session) {
+                @Override
+                public void close() throws IOException {
+                    LOGGER.debug("Close session.", new RuntimeException("debug"));
+                    super.close();
                 }
+
+                @Override
+                public void close(CloseReason closeReason) throws IOException {
+                    LOGGER.debug(() -> "Close session: " + closeReason, new RuntimeException("debug"));
+                    super.close(closeReason);
+                }
+            };
+            if (sessionValue == null) {
                 // create object
-                sessionValue = new MCRWebCLIContainer(session);
+                sessionValue = new MCRWebCLIContainer(mySession);
                 MCRSessionMgr.getCurrentSession().put(SESSION_KEY, sessionValue);
             } else {
-                ((MCRWebCLIContainer) sessionValue).changeWebSocketSession(session);
-                ((MCRWebCLIContainer) sessionValue).startLogging();
+                sessionValue.changeWebSocketSession(mySession);
+                sessionValue.startLogging();
             }
         }
-        return (MCRWebCLIContainer) sessionValue;
+        return sessionValue;
+    }
+
+    private static class DelegatedSession implements Session {
+        private Session delegate;
+
+        DelegatedSession(Session delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public WebSocketContainer getContainer() {
+            return delegate.getContainer();
+        }
+
+        @Override
+        public void addMessageHandler(MessageHandler handler) throws IllegalStateException {
+            delegate.addMessageHandler(handler);
+        }
+
+        @Override
+        public <T> void addMessageHandler(Class<T> clazz, MessageHandler.Whole<T> handler) {
+            delegate.addMessageHandler(clazz, handler);
+        }
+
+        @Override
+        public <T> void addMessageHandler(Class<T> clazz, MessageHandler.Partial<T> handler) {
+            delegate.addMessageHandler(clazz, handler);
+        }
+
+        @Override
+        public Set<MessageHandler> getMessageHandlers() {
+            return delegate.getMessageHandlers();
+        }
+
+        @Override
+        public void removeMessageHandler(MessageHandler handler) {
+            delegate.removeMessageHandler(handler);
+        }
+
+        @Override
+        public String getProtocolVersion() {
+            return delegate.getProtocolVersion();
+        }
+
+        @Override
+        public String getNegotiatedSubprotocol() {
+            return delegate.getNegotiatedSubprotocol();
+        }
+
+        @Override
+        public List<Extension> getNegotiatedExtensions() {
+            return delegate.getNegotiatedExtensions();
+        }
+
+        @Override
+        public boolean isSecure() {
+            return delegate.isSecure();
+        }
+
+        @Override
+        public boolean isOpen() {
+            return delegate.isOpen();
+        }
+
+        @Override
+        public long getMaxIdleTimeout() {
+            return delegate.getMaxIdleTimeout();
+        }
+
+        @Override
+        public void setMaxIdleTimeout(long milliseconds) {
+            delegate.setMaxIdleTimeout(milliseconds);
+        }
+
+        @Override
+        public void setMaxBinaryMessageBufferSize(int length) {
+            delegate.setMaxBinaryMessageBufferSize(length);
+        }
+
+        @Override
+        public int getMaxBinaryMessageBufferSize() {
+            return delegate.getMaxBinaryMessageBufferSize();
+        }
+
+        @Override
+        public void setMaxTextMessageBufferSize(int length) {
+            delegate.setMaxTextMessageBufferSize(length);
+        }
+
+        @Override
+        public int getMaxTextMessageBufferSize() {
+            return delegate.getMaxTextMessageBufferSize();
+        }
+
+        @Override
+        public RemoteEndpoint.Async getAsyncRemote() {
+            return delegate.getAsyncRemote();
+        }
+
+        @Override
+        public RemoteEndpoint.Basic getBasicRemote() {
+            return delegate.getBasicRemote();
+        }
+
+        @Override
+        public String getId() {
+            return delegate.getId();
+        }
+
+        @Override
+        public void close() throws IOException {
+            delegate.close();
+        }
+
+        @Override
+        public void close(CloseReason closeReason) throws IOException {
+            delegate.close(closeReason);
+        }
+
+        @Override
+        public URI getRequestURI() {
+            return delegate.getRequestURI();
+        }
+
+        @Override
+        public Map<String, List<String>> getRequestParameterMap() {
+            return delegate.getRequestParameterMap();
+        }
+
+        @Override
+        public String getQueryString() {
+            return delegate.getQueryString();
+        }
+
+        @Override
+        public Map<String, String> getPathParameters() {
+            return delegate.getPathParameters();
+        }
+
+        @Override
+        public Map<String, Object> getUserProperties() {
+            return delegate.getUserProperties();
+        }
+
+        @Override
+        public Principal getUserPrincipal() {
+            return delegate.getUserPrincipal();
+        }
+
+        @Override
+        public Set<Session> getOpenSessions() {
+            return delegate.getOpenSessions();
+        }
     }
 
 }

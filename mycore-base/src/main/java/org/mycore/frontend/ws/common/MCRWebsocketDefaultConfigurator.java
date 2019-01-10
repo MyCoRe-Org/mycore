@@ -34,6 +34,8 @@ import org.mycore.frontend.servlets.MCRServlet;
  */
 public class MCRWebsocketDefaultConfigurator extends ServerEndpointConfig.Configurator {
 
+    public static final String HTTP_SESSION = "http.session";
+
     @Override
     public <T> T getEndpointInstance(Class<T> endpointClass) throws InstantiationException {
         return MCRInjectorConfig.injector().getInstance(endpointClass);
@@ -44,6 +46,7 @@ public class MCRWebsocketDefaultConfigurator extends ServerEndpointConfig.Config
         HttpSession httpSession = (HttpSession) request.getHttpSession();
         config.getUserProperties().put(MCRServlet.ATTR_MYCORE_SESSION,
             httpSession.getAttribute(MCRServlet.ATTR_MYCORE_SESSION));
+        config.getUserProperties().put(HTTP_SESSION, httpSession);
     }
 
 }

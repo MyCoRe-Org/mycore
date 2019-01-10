@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF">
+  <properties>
+    <property name="filename">target/test.log</property>
+  </properties>
+  <appenders>
+    <File name="File" fileName="${filename}">
+      <PatternLayout pattern="%C{1}.%M %m %ex%n"/>
+    </File>
+  </appenders>
+  <loggers>
+    <root level="info">
+      <appender-ref ref="File"/>
+    </root>
+    <logger name="org.hibernate" level="error" />
+  </loggers>
+</configuration>
