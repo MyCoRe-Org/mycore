@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +35,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.mods.MCRMODSSorter;
+import org.mycore.util.concurrent.MCRTransactionableCallable;
 
 /**
  * Enriches a given MODS publication
@@ -123,7 +125,10 @@ class MCREnricher {
     }
 
     private void resolveExternalData() {
-        Collection<MCRDataSourceCall> calls = id2call.values();
+        Collection<MCRTransactionableCallable<Boolean>> calls = id2call.values()
+            .stream()
+            .map(MCRTransactionableCallable::new)
+            .collect(Collectors.toList());
         ExecutorService executor = Executors.newFixedThreadPool(calls.size());
         try {
             while (idPool.hasNewIdentifiers()) {
