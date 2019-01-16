@@ -78,6 +78,7 @@ import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
@@ -749,7 +750,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     /**
-     * Delivers a jdom Element created by any local class that implements MCRResolver (deprecated) or URIResolver
+     * Delivers a jdom Element created by any local class that implements URIResolver
      * interface. the class name of the file in the format localclass:org.mycore.ClassName?mode=getAll
      */
     private static class MCRLocalClassResolver implements URIResolver {
@@ -757,16 +758,15 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String classname = href.substring(href.indexOf(":") + 1, href.indexOf("?"));
-            Class<?> cl = null;
+            Class<? extends URIResolver> cl = null;
             LogManager.getLogger(this.getClass()).debug("Loading Class: {}", classname);
-            Object o;
+            URIResolver resolver;
             try {
-                cl = Class.forName(classname);
-                o = cl.getDeclaredConstructor().newInstance();
+                cl = MCRClassTools.forName(classname);
+                resolver = cl.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new TransformerException(e);
             }
-            URIResolver resolver = (URIResolver) o;
             return resolver.resolve(href, base);
         }
 

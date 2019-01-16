@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
 
 import com.google.common.collect.Sets;
 
@@ -73,8 +74,7 @@ public class MCRRuntimeComponentDetector {
     private static SortedSet<MCRComponent> getConfiguredComponents() {
         try {
             String underTesting = System.getProperty("MCRRuntimeComponentDetector.underTesting");
-            Enumeration<URL> resources = MCRRuntimeComponentDetector.class.getClassLoader().getResources(
-                "META-INF/MANIFEST.MF");
+            Enumeration<URL> resources = MCRClassTools.getClassLoader().getResources("META-INF/MANIFEST.MF");
             if (!resources.hasMoreElements() && underTesting == null) {
                 LOGGER.warn("Did not find any Manifests.");
                 return Collections.emptySortedSet();
@@ -118,7 +118,7 @@ public class MCRRuntimeComponentDetector {
                 return null;
             }
 
-            try (InputStream pi = MCRRuntimeComponentDetector.class.getClassLoader().getResourceAsStream(
+            try (InputStream pi = MCRClassTools.getClassLoader().getResourceAsStream(
                 pomPropertiesPath)) {
                 if (pi == null) {
                     LOGGER.warn("Manifest entry {} set to \"{}\", but resource could not be loaded.", ATT_POM,

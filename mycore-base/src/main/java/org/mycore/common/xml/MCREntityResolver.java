@@ -44,6 +44,7 @@ import org.apache.xerces.xni.XNIException;
 import org.apache.xerces.xni.parser.XMLEntityResolver;
 import org.apache.xerces.xni.parser.XMLInputSource;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -79,7 +80,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     private MCREntityResolver() {
         Enumeration<URL> systemResources;
         try {
-            systemResources = this.getClass().getClassLoader().getResources("catalog.xml");
+            systemResources = MCRClassTools.getClassLoader().getResources("catalog.xml");
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }

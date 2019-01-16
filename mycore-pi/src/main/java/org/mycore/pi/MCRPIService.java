@@ -38,6 +38,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
 import org.mycore.common.MCRSessionMgr;
@@ -208,9 +209,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         String className = MCRConfiguration.instance().getString(generatorPropertyKey);
 
         try {
-            @SuppressWarnings("unchecked")
-            Class<MCRPIGenerator<T>> classObject = (Class<MCRPIGenerator<T>>) Class.forName(className);
-            Constructor<MCRPIGenerator<T>> constructor = classObject.getConstructor(String.class);
+            Class<? extends MCRPIGenerator<T>> classObject = MCRClassTools.forName(className);
+            Constructor<? extends MCRPIGenerator<T>> constructor = classObject.getConstructor(String.class);
             return constructor.newInstance(generatorName);
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException(

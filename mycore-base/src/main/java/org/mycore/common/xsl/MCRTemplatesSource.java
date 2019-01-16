@@ -27,6 +27,7 @@ import javax.xml.transform.sax.SAXSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -81,7 +82,7 @@ public class MCRTemplatesSource {
 
     public URL getURL() {
         try {
-            return MCRXMLResource.instance().getURL(resource, MCRXSLTransformerFactory.class.getClassLoader());
+            return MCRXMLResource.instance().getURL(resource, MCRClassTools.getClassLoader());
         } catch (IOException e) {
             LOGGER.warn("Could not determine URL of resource {}", resource, e);
             return null;
@@ -91,7 +92,7 @@ public class MCRTemplatesSource {
     /** Returns the timestamp the XSL file was last modified on the filesystem. */
     public long getLastModified() {
         try {
-            return MCRXMLResource.instance().getLastModified(resource, MCRXSLTransformerFactory.class.getClassLoader());
+            return MCRXMLResource.instance().getLastModified(resource, MCRClassTools.getClassLoader());
         } catch (IOException e) {
             LOGGER.warn("Could not determine last modified date of resource {}", resource);
             return -1;
@@ -99,7 +100,7 @@ public class MCRTemplatesSource {
     }
 
     public MCRCache.ModifiedHandle getModifiedHandle(long checkPeriod) {
-        return MCRXMLResource.instance().getModifiedHandle(resource, MCRXSLTransformerFactory.class.getClassLoader(),
+        return MCRXMLResource.instance().getModifiedHandle(resource, MCRClassTools.getClassLoader(),
             checkPeriod);
     }
 }

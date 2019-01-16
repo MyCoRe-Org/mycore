@@ -39,6 +39,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.apache.logging.log4j.web.Log4jServletContainerInitializer;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
@@ -112,7 +113,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             return;
         }
         Optional<URLClassLoader> classLoaderOptional = Stream
-            .of(MCRConfigurationDirSetup.class.getClassLoader(), Thread.currentThread().getContextClassLoader())
+            .of(MCRClassTools.getClassLoader(), Thread.currentThread().getContextClassLoader())
             .filter(URLClassLoader.class::isInstance)
             .map(URLClassLoader.class::cast)
             .findFirst();

@@ -76,6 +76,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRCalendar;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
@@ -363,7 +364,7 @@ public class MCRXMLFunctions {
 
     public static boolean classAvailable(String className) {
         try {
-            Class.forName(className);
+            MCRClassTools.forName(className);
             LOGGER.debug("found class: {}", className);
             return true;
         } catch (ClassNotFoundException e) {
