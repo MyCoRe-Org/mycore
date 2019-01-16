@@ -66,7 +66,7 @@ public class MCRClassTools {
     }
 
     /**
-     * @eeturn a ClassLoader that should be used to load resources
+     * @return a ClassLoader that should be used to load resources
      */
     public static ClassLoader getClassLoader() {
         return Optional.of(Thread.currentThread().getContextClassLoader())
