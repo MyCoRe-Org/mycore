@@ -430,10 +430,18 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
             throw new MCRPersistentIdentifierException("Error while updating URL!", e);
         }
 
-        Document oldDataciteMetadata = dataciteClient.resolveMetadata(doi);
-        if (!MCRXMLHelper.deepEqual(newDataciteMetadata, oldDataciteMetadata)) {
+        Document oldDataciteMetadata = null;
+        try {
+            oldDataciteMetadata = dataciteClient.resolveMetadata(doi);
+        } catch (JDOMException e) {
+            LOGGER.info("Old metadata is invalid.. replace it with new metadata!");
+        }
+        if (oldDataciteMetadata == null || !MCRXMLHelper.deepEqual(newDataciteMetadata, oldDataciteMetadata)) {
             LOGGER.info("Sending new Metadata of {} to Datacite!", idString);
-            dataciteClient.deleteMetadata(doi);
+            if (oldDataciteMetadata != null) {
+                dataciteClient.deleteMetadata(doi);
+            }
+
             dataciteClient.storeMetadata(newDataciteMetadata);
         }
     }
