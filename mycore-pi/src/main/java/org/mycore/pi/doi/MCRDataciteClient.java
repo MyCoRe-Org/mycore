@@ -65,6 +65,7 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.pi.exceptions.MCRDatacenterAuthenticationException;
 import org.mycore.pi.exceptions.MCRDatacenterException;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
@@ -333,7 +334,7 @@ public class MCRDataciteClient {
         }
     }
 
-    private URI getRequestURI(String path) throws MCRPersistentIdentifierException {
+    private URI getRequestURI(String path) {
         try {
             URIBuilder builder = new URIBuilder()
                 .setScheme(HTTPS_SCHEME)
@@ -345,11 +346,20 @@ public class MCRDataciteClient {
             }
             return builder.build();
         } catch (URISyntaxException e) {
-            throw new MCRDatacenterException("Invalid URI Exception!", e);
+            throw new MCRConfigurationException("Invalid URI Exception!", e);
         }
     }
 
-    public Document resolveMetadata(final MCRDigitalObjectIdentifier doiParam) throws MCRPersistentIdentifierException {
+    /**
+     *
+     * @param doiParam the doi
+     * @return the resolved metadata of the doi
+     * @throws MCRDatacenterAuthenticationException if the authentication is wrong
+     * @throws MCRIdentifierUnresolvableException if the doi is not valid or can not be resolved
+     * @throws JDOMException if the metadata is empty or not a valid xml document
+     * @throws MCRDatacenterException if there is something wrong with the communication with the datacenter
+     */
+    public Document resolveMetadata(final MCRDigitalObjectIdentifier doiParam) throws MCRDatacenterAuthenticationException, MCRIdentifierUnresolvableException, JDOMException, MCRDatacenterException {
         MCRDigitalObjectIdentifier doi = isTestPrefix() ? doiParam.toTestPrefix() : doiParam;
         URI requestURI = getRequestURI("/metadata/" + doi.asString());
         HttpGet get = new HttpGet(requestURI);
@@ -375,7 +385,7 @@ public class MCRDataciteClient {
                 default:
                     throw new MCRDatacenterException("Unknown return status: " + getStatusString(response));
             }
-        } catch (IOException | JDOMException e) {
+        } catch (IOException e) {
             throw new MCRDatacenterException("Error while resolving metadata!", e);
         }
     }
