@@ -29,6 +29,7 @@ import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -328,7 +329,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                         + getServiceID() + "." + MCRDOIService.REGISTRATION_CONDITION_PROVIDER
                         + ")";
                 try {
-                    return Class.forName(clazz)
+                    return MCRClassTools.forName(clazz)
                         .getConstructor()
                         .newInstance();
                 } catch (ClassNotFoundException e) {

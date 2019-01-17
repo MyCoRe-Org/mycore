@@ -49,6 +49,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -216,7 +217,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
 
-            URL localSchemaURL = MCRDOIService.class.getClassLoader().getResource(schemaPath);
+            URL localSchemaURL = MCRClassTools.getClassLoader().getResource(schemaPath);
 
             if (localSchemaURL == null) {
                 throw new MCRConfigurationException(schemaPath + " was not found!");

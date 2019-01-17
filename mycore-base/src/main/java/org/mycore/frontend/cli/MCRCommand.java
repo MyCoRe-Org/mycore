@@ -33,6 +33,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -225,7 +226,7 @@ public class MCRCommand {
      */
     public List<String> invoke(String input) throws IllegalAccessException, InvocationTargetException,
         ClassNotFoundException, NoSuchMethodException {
-        return invoke(input, MCRCommand.class.getClassLoader());
+        return invoke(input, MCRClassTools.getClassLoader());
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

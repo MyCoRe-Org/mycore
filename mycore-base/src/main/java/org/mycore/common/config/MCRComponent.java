@@ -28,6 +28,7 @@ import java.util.jar.Manifest;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.status.StatusLogger;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 
 /**
@@ -131,7 +132,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             return null;
         }
         String resourceName = resourceBase + filename;
-        InputStream resourceStream = this.getClass().getClassLoader().getResourceAsStream(resourceName);
+        InputStream resourceStream = MCRClassTools.getClassLoader().getResourceAsStream(resourceName);
         if (resourceStream != null) {
             LOGGER.info("Reading config resource: {}", resourceName);
         }
@@ -144,7 +145,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
             return null;
         }
         String resourceName = resourceBase + filename;
-        URL resourceURL = this.getClass().getClassLoader().getResource(resourceName);
+        URL resourceURL = MCRClassTools.getClassLoader().getResource(resourceName);
         if (resourceURL != null) {
             LOGGER.info("Reading config resource: {}", resourceName);
         }

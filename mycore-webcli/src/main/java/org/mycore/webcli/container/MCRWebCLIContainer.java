@@ -41,6 +41,7 @@ import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
@@ -313,7 +314,7 @@ public class MCRWebCLIContainer {
             throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
             List<String> commandsReturned = null;
             for (MCRCommand currentCommand : commandList) {
-                commandsReturned = currentCommand.invoke(command, this.getClass().getClassLoader());
+                commandsReturned = currentCommand.invoke(command, MCRClassTools.getClassLoader());
                 if (commandsReturned != null) { // Command was executed
                     // Add commands to queue
                     if (commandsReturned.size() > 0) {

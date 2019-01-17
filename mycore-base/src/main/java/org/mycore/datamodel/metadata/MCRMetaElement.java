@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
@@ -306,7 +307,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
                 throw new MCRException("Missing required class attribute in element " + element.getName());
             }
             fullname = META_PACKAGE_NAME + classname;
-            forName = (Class<? extends MCRMetaInterface>) Class.forName(fullname);
+            forName = MCRClassTools.forName(fullname);
             setClass(forName);
         } catch (ClassNotFoundException e) {
             throw new MCRException(e);

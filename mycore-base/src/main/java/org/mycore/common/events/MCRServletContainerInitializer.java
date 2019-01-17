@@ -32,6 +32,7 @@ import javax.servlet.ServletException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
 
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventorFactory;
@@ -58,7 +59,7 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         final Logger LOGGER = LogManager.getLogger();
         if (LOGGER.isDebugEnabled()) {
             try {
-                Enumeration<URL> resources = this.getClass().getClassLoader().getResources("META-INF/web-fragment.xml");
+                Enumeration<URL> resources = MCRClassTools.getClassLoader().getResources("META-INF/web-fragment.xml");
                 while (resources.hasMoreElements()) {
                     LOGGER.debug("Found: {}", resources.nextElement());
                 }

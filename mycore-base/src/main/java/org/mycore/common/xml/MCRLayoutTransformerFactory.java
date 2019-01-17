@@ -29,6 +29,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -135,7 +136,7 @@ public class MCRLayoutTransformerFactory {
 
         String styleName = buildStylesheetName(id);
         try {
-            if (MCRXMLResource.instance().exists(styleName, MCRLayoutTransformerFactory.class.getClassLoader())) {
+            if (MCRXMLResource.instance().exists(styleName, MCRClassTools.getClassLoader())) {
                 return styleName;
             }
         } catch (Exception e) {
