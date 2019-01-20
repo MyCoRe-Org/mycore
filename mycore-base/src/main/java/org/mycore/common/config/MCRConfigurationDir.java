@@ -31,6 +31,7 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.common.MCRClassTools;
 
 /**
  * This helper class determines in which directory to look for addition configuration files.
@@ -217,8 +218,7 @@ public class MCRConfigurationDir {
                     .warn("Exception while returning URL for file: {}", resolvedFile, e);
             }
         }
-        return getClassPathResource(relativePath, classLoader == null ? MCRConfigurationDir.class.getClassLoader()
-            : classLoader);
+        return getClassPathResource(relativePath, classLoader == null ? MCRClassTools.getClassLoader() : classLoader);
     }
 
     private static URL getClassPathResource(String relativePath, ClassLoader classLoader) {

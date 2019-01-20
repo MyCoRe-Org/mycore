@@ -47,6 +47,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRClassTools;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.imagetiler.MCRImage;
@@ -99,7 +100,8 @@ public class MCRTileCombineServlet extends MCRServlet {
         String footerClassName = getInitParameter(MCRFooterInterface.class.getName());
         if (footerClassName != null) {
             try {
-                footerImpl = (MCRFooterInterface) Class.forName(footerClassName).getDeclaredConstructor().newInstance();
+                footerImpl = (MCRFooterInterface) MCRClassTools.forName(footerClassName).getDeclaredConstructor()
+                    .newInstance();
             } catch (Exception e) {
                 throw new ServletException("Could not initialize MCRFooterInterface", e);
             }

@@ -30,6 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -175,8 +176,7 @@ public abstract class MCRMETSGeneratorFactory {
                 MCRMETSDefaultGenerator.class.getName());
             try {
                 if (METS_GENERATOR_CLASS == null || !cn.equals(METS_GENERATOR_CLASS.getName())) {
-                    Class<?> classToCheck = Class.forName(cn);
-                    METS_GENERATOR_CLASS = classToCheck.asSubclass(MCRMETSGenerator.class);
+                    METS_GENERATOR_CLASS = MCRClassTools.forName(cn);
                 }
                 return METS_GENERATOR_CLASS.getDeclaredConstructor().newInstance();
             } catch (Exception cause) {

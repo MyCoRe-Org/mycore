@@ -30,6 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
@@ -64,7 +65,7 @@ public class MCRXMLResource {
     }
 
     public URL getURL(String name) throws IOException {
-        return getURL(name, MCRXMLResource.class.getClassLoader());
+        return getURL(name, MCRClassTools.getClassLoader());
     }
 
     public URL getURL(String name, ClassLoader classLoader) throws IOException {
@@ -87,7 +88,7 @@ public class MCRXMLResource {
      * @see MCRXMLResource#getResource(String, ClassLoader)
      */
     public MCRContent getResource(String name) throws IOException, JDOMException {
-        return getResource(name, this.getClass().getClassLoader());
+        return getResource(name, MCRClassTools.getClassLoader());
     }
 
     /**
@@ -98,7 +99,7 @@ public class MCRXMLResource {
      * @see MCRXMLResource#getRawResource(String, ClassLoader)
      */
     public byte[] getRawResource(String name) throws IOException {
-        return getRawResource(name, this.getClass().getClassLoader());
+        return getRawResource(name, MCRClassTools.getClassLoader());
     }
 
     /**

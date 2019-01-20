@@ -45,6 +45,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
@@ -189,7 +190,7 @@ public class MCREditorOutValidator {
     public static Class<? extends MCRMetaInterface> getClass(String mcrclass) throws ClassNotFoundException {
         Class<? extends MCRMetaInterface> clazz = CLASS_MAP.get(mcrclass);
         if (clazz == null) {
-            clazz = (Class<? extends MCRMetaInterface>) Class.forName("org.mycore.datamodel.metadata." + mcrclass);
+            clazz = MCRClassTools.forName("org.mycore.datamodel.metadata." + mcrclass);
             CLASS_MAP.put(mcrclass, clazz);
         }
         return clazz;

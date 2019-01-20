@@ -21,6 +21,8 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import javax.persistence.PersistenceException;
 
+import org.mycore.common.MCRClassTools;
+
 /**
  * @author Ren\u00E9 Adler (eagle)
  */
@@ -36,7 +38,7 @@ public class MCRJobActionConverter implements AttributeConverter<Object, String>
     @Override
     public Object convertToEntityAttribute(String actionClassString) {
         try {
-            return Class.forName(actionClassString);
+            return MCRClassTools.forName(actionClassString);
         } catch (ClassNotFoundException e) {
             throw new PersistenceException("MCRJobAction class \"" + actionClassString + "\" not found!", e);
         }

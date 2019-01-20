@@ -24,6 +24,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.config.MCRConfigurationException;
@@ -107,7 +108,7 @@ public class MCRStartupHandler {
 
     private static AutoExecutable getAutoExecutable(String className) {
         try {
-            return (AutoExecutable) Class.forName(className).getDeclaredConstructor().newInstance();
+            return (AutoExecutable) MCRClassTools.forName(className).getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new MCRConfigurationException("Could not initialize 'MCR.Startup.Class': " + className, e);
         }

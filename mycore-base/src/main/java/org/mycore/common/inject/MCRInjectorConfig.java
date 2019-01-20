@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -81,8 +82,7 @@ public class MCRInjectorConfig {
     private static Module instantiateModule(String classname) {
         LogManager.getLogger().debug("Loading Guice Module: {}", classname);
         try {
-            @SuppressWarnings("unchecked")
-            Class<? extends Module> forName = (Class<? extends Module>) Class.forName(classname);
+            Class<? extends Module> forName = MCRClassTools.forName(classname);
             return forName.getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new MCRConfigurationException("Could not instantiate Guice Module " + classname, e);

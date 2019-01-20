@@ -48,6 +48,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -234,8 +235,7 @@ public class MCRIView2Tools {
     public static FileSystem getFileSystem(Path iviewFile) throws IOException {
         URI uri = URI.create("jar:" + iviewFile.toUri());
         try {
-            return FileSystems.newFileSystem(uri, Collections.emptyMap(),
-                MCRIView2Tools.class.getClassLoader());
+            return FileSystems.newFileSystem(uri, Collections.emptyMap(), MCRClassTools.getClassLoader());
         } catch (FileSystemAlreadyExistsException exc) {
             // block until file system is closed
             try {

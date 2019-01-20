@@ -22,6 +22,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Optional;
 
 public class MCRClassTools {
     public static Object loadClassFromURL(String classPath, String className)
@@ -41,4 +42,35 @@ public class MCRClassTools {
 
         return null;
     }
+
+    /**
+     * Loads a class via default ClassLoader or <code>Thread.currentThread().getContextClassLoader()</code>.
+     * @param classname Name of class
+     * @param <T> Type of Class
+     * @return the initialized class
+     * @throws ClassNotFoundException if both ClassLoader cannot load the Class
+     */
+    public static <T> Class<? extends T> forName(String classname) throws ClassNotFoundException {
+        @SuppressWarnings("unchecked")
+        Class<? extends T> forName;
+        try {
+            forName = (Class<? extends T>) Class.forName(classname);
+        } catch (ClassNotFoundException cnfe) {
+            if (Thread.currentThread().getContextClassLoader() == null) {
+                throw cnfe;
+            }
+            forName = (Class<? extends T>) Class.forName(classname, true,
+                Thread.currentThread().getContextClassLoader());
+        }
+        return forName;
+    }
+
+    /**
+     * @return a ClassLoader that should be used to load resources
+     */
+    public static ClassLoader getClassLoader() {
+        return Optional.of(Thread.currentThread().getContextClassLoader())
+            .orElseGet(MCRClassTools.class::getClassLoader);
+    }
+
 }

@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -90,7 +91,7 @@ public class MCRCommandManager {
                 }
                 LOGGER.debug("Will load commands from the {} class {}", type, className);
                 try {
-                    Class<?> cliClass = Class.forName(className);
+                    Class<?> cliClass = MCRClassTools.forName(className);
                     if (cliClass.isAnnotationPresent(MCRCommandGroup.class)) {
                         addAnnotatedCLIClass(cliClass);
                     } else {
@@ -133,7 +134,7 @@ public class MCRCommandManager {
 
     private Object buildInstanceOfClass(String className) {
         try {
-            return Class.forName(className).getDeclaredConstructor().newInstance();
+            return MCRClassTools.forName(className).getDeclaredConstructor().newInstance();
         } catch (Exception ex) {
             String msg = "Could not instantiate class " + className;
             throw new MCRConfigurationException(msg, ex);

@@ -43,6 +43,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -71,7 +72,7 @@ public class MetsResource {
         checkDerivateExists(derivateIdObject);
         checkDerivateAccess(derivateIdObject, MCRAccessManager.PERMISSION_WRITE);
 
-        InputStream resourceAsStream = MetsResource.class.getClassLoader().getResourceAsStream("mets-editor.html");
+        InputStream resourceAsStream = MCRClassTools.getClassLoader().getResourceAsStream("mets-editor.html");
         try {
             StringWriter writer = new StringWriter();
             IOUtils.copy(resourceAsStream, writer, Charset.forName("UTF-8"));

@@ -19,7 +19,6 @@
 package org.mycore.common.config;
 
 import java.lang.reflect.Modifier;
-import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +30,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.function.MCRTriConsumer;
 import org.mycore.common.inject.MCRInjectorConfig;
 
@@ -303,9 +303,7 @@ public class MCRConfiguration2 {
 
     private static <T> Class<? extends T> getClassObject(String classname) {
         try {
-            @SuppressWarnings("unchecked")
-            Class<? extends T> forName = (Class<? extends T>) Class.forName(classname.trim());
-            return forName;
+            return MCRClassTools.forName(classname.trim());
         } catch (ClassNotFoundException ex) {
             throw new MCRConfigurationException("Could not load class.", ex);
         }

@@ -38,6 +38,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.Parent;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
@@ -130,7 +131,8 @@ public class MCRXEditorTransformer {
 
     public void setPostProcessor(String clazz) {
         try {
-            MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) Class.forName(clazz).getDeclaredConstructor()
+            MCRXEditorPostProcessor instance = ((MCRXEditorPostProcessor) MCRClassTools.forName(clazz)
+                .getDeclaredConstructor()
                 .newInstance());
             editorSession.setPostProcessor(instance);
         } catch (ReflectiveOperationException e) {

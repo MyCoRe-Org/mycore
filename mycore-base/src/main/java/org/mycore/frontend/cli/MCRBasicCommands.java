@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -198,7 +199,7 @@ public class MCRBasicCommands {
     }
 
     private static void createSampleConfigFile(String path) throws IOException {
-        ClassLoader classLoader = MCRBasicCommands.class.getClassLoader();
+        ClassLoader classLoader = MCRClassTools.getClassLoader();
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         File targetFile = new File(configurationDirectory, path);
         if (targetFile.exists()) {
