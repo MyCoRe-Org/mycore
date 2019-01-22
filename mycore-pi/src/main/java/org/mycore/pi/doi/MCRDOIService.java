@@ -514,7 +514,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         final boolean exists = MCRMetadataManager.exists(objectID);
 
         try {
-            MCRPIManager.getInstance().get(getServiceID(), mycoreID, null);
+            MCRPIManager.getInstance().get(getServiceID(), mycoreID, "");
         } catch (NoResultException r){
             return false;
         }
