@@ -91,8 +91,9 @@ import org.xml.sax.SAXException;
  * <dt>RegisterBaseURL</dt>
  * <dd>The BaseURL (everything before /receive/mcr_object_0000000) which will be send to Datacite.</dd>
  * <dt>UseTestPrefix</dt>
- * <dd>If true the prefix of the created {@link MCRDigitalObjectIdentifier} will be replaced with the Datacite test
- * prefix</dd>
+ * <dd>Deprecated use UseTestServer instead.</dd>
+ * <dt>UseTestServer</dt>
+ * <dd>Use the test server of Datacite instead of the production server! (Default is UseTestPrefix or false) </dd>
  * <dt>RegistrationConditionProvider</dt>
  * <dd>Used to detect if the registration should happen. DOI will be created but the real registration will if the
  * Condition is true. The Parameter is optional and the default condition is always true.</dd>
@@ -109,6 +110,8 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     private static final String KERNEL_3_NAMESPACE_URI = "http://datacite.org/schema/kernel-3";
 
     private static final String TEST_PREFIX = "UseTestPrefix";
+
+    private static final String TEST_SERVER = "UseTestServer";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -152,7 +155,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
 
     private Namespace nameSpace;
 
-    private boolean useTestPrefix;
+    private boolean useTestServer;
 
     public MCRDOIService(String serviceID) {
         super(serviceID, MCRDigitalObjectIdentifier.TYPE);
@@ -160,7 +163,8 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         Map<String, String> properties = getProperties();
         username = properties.get("Username");
         password = properties.get("Password");
-        useTestPrefix = properties.containsKey(TEST_PREFIX) && Boolean.valueOf(properties.get(TEST_PREFIX));
+        useTestServer = Boolean
+            .valueOf(properties.getOrDefault(TEST_SERVER, properties.getOrDefault(TEST_PREFIX, "false")));
         transformer = properties.get("Transformer");
         registerURL = properties.get("RegisterBaseURL");
         schemaPath = properties.getOrDefault("Schema", DEFAULT_DATACITE_SCHEMA_PATH);
@@ -171,7 +175,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         }
 
         registerURLContext = properties.getOrDefault("RegisterURLContext", DEFAULT_CONTEXT_PATH);
-        host = "mds.datacite.org";
+        host = "mds." + (usesTestServer() ? "test." : "") + "datacite.org";
     }
 
     private void insertDOI(Document datacite, MCRDigitalObjectIdentifier doi)
@@ -230,8 +234,13 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         }
     }
 
+    @Deprecated
     public boolean usesTestPrefix() {
-        return useTestPrefix;
+        return usesTestServer();
+    }
+
+    public boolean usesTestServer() {
+        return useTestServer;
     }
 
     public String getRegisterURL() {
@@ -263,8 +272,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     @Override
     protected MCRDigitalObjectIdentifier getNewIdentifier(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        MCRDigitalObjectIdentifier newIdentifier = super.getNewIdentifier(obj, additional);
-        return (useTestPrefix) ? newIdentifier.toTestPrefix() : newIdentifier;
+        return  super.getNewIdentifier(obj, additional);
     }
 
     @Override
@@ -331,7 +339,7 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     }
 
     public MCRDataciteClient getDataciteClient() {
-        return new MCRDataciteClient(host, username, password, false, this.useTestPrefix);
+        return new MCRDataciteClient(host, username, password);
     }
 
     protected Document transformToDatacite(MCRDigitalObjectIdentifier doi, MCRBase mcrBase)
