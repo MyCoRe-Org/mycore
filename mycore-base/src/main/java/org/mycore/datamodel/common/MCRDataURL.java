@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,6 +44,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -80,6 +83,23 @@ public class MCRDataURL implements Serializable {
     private final byte[] data;
 
     /**
+     * Build a "data" URL for given {@link Document}, encoding, mime-type and charset.
+     * Should encoding be <code>null</code>, it is detect from mime-type.
+     *
+     * @param document the document
+     * @param encoding the {@link MCRDataURLEncoding}
+     * @param mimeType the mime-type
+     * @param charset the charset
+     * @return a string with "data" URL
+     * @throws TransformerException
+     * @throws MalformedURLException
+     */
+    public static String build(final Document document, final String encoding, final String mimeType,
+        final String charset) throws TransformerException, MalformedURLException {
+        return build(document.getChildNodes(), encoding, mimeType, charset);
+    }
+
+    /**
      * Build a "data" URL for given {@link NodeList}, encoding, mime-type and charset.
      * Should encoding be <code>null</code>, it is detect from mime-type.
      *
@@ -93,53 +113,53 @@ public class MCRDataURL implements Serializable {
      */
     public static String build(final NodeList nodeList, final String encoding, final String mimeType,
         final String charset) throws TransformerException, MalformedURLException {
-        if (nodeList.item(0).getNodeName().equals("#document")) {
-            final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            final Transformer transformer = transformerFactory.newTransformer();
+        Node node = Optional.ofNullable(nodeList.item(0)).filter(n -> n.getNodeName().equals("#document"))
+            .orElseGet(() -> Optional.of(nodeList).filter(nl -> nl.getLength() == 1).map(nl -> nl.item(0))
+                .orElseThrow(() -> new IllegalArgumentException("Nodelist must have an single root element.")));
 
-            MCRDataURLEncoding enc = encoding != null ? MCRDataURLEncoding.fromValue(encoding) : null;
-            String method = "xml";
+        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        final Transformer transformer = transformerFactory.newTransformer();
 
-            final Matcher mtm = PATTERN_MIMETYPE.matcher(mimeType);
-            if (mtm.matches()) {
-                if (enc == null) {
-                    if ("text".equals(mtm.group(1))) {
-                        enc = MCRDataURLEncoding.URL;
-                    } else {
-                        enc = MCRDataURLEncoding.BASE64;
-                    }
-                }
+        MCRDataURLEncoding enc = encoding != null ? MCRDataURLEncoding.fromValue(encoding) : null;
+        String method = "xml";
 
-                if ("plain".equals(mtm.group(2))) {
-                    method = "text";
-                } else if ("html".equals(mtm.group(2))) {
-                    method = "html";
-                } else if ("xml|xhtml+xml".equals(mtm.group(2))) {
-                    method = "xml";
+        final Matcher mtm = PATTERN_MIMETYPE.matcher(mimeType);
+        if (mtm.matches()) {
+            if (enc == null) {
+                if ("text".equals(mtm.group(1))) {
+                    enc = MCRDataURLEncoding.URL;
                 } else {
-                    method = null;
+                    enc = MCRDataURLEncoding.BASE64;
                 }
             }
 
-            if (method != null) {
-                transformer.setOutputProperty(OutputKeys.METHOD, method);
+            if ("plain".equals(mtm.group(2))) {
+                method = "text";
+            } else if ("html".equals(mtm.group(2))) {
+                method = "html";
+            } else if ("xml|xhtml+xml".contains(mtm.group(2))) {
+                method = "xml";
+            } else {
+                method = null;
             }
-
-            transformer.setOutputProperty(OutputKeys.INDENT, "no");
-            transformer.setOutputProperty(OutputKeys.MEDIA_TYPE, mimeType);
-            transformer.setOutputProperty(OutputKeys.ENCODING, charset);
-
-            DOMSource source = new DOMSource(nodeList.item(0).getFirstChild());
-            ByteArrayOutputStream bao = new ByteArrayOutputStream();
-            StreamResult result = new StreamResult(bao);
-            transformer.transform(source, result);
-
-            final MCRDataURL dataURL = new MCRDataURL(bao.toByteArray(), enc, mimeType, charset);
-
-            return dataURL.toString();
         }
 
-        return null;
+        if (method != null) {
+            transformer.setOutputProperty(OutputKeys.METHOD, method);
+        }
+
+        transformer.setOutputProperty(OutputKeys.INDENT, "no");
+        transformer.setOutputProperty(OutputKeys.MEDIA_TYPE, mimeType);
+        transformer.setOutputProperty(OutputKeys.ENCODING, charset);
+
+        DOMSource source = new DOMSource(node);
+        ByteArrayOutputStream bao = new ByteArrayOutputStream();
+        StreamResult result = new StreamResult(bao);
+        transformer.transform(source, result);
+
+        final MCRDataURL dataURL = new MCRDataURL(bao.toByteArray(), enc, mimeType, charset);
+
+        return dataURL.toString();
     }
 
     /**
@@ -175,6 +195,20 @@ public class MCRDataURL implements Serializable {
     }
 
     /**
+     * Build a "data" URL for given {@link Document}, mime-type and <code>UTF-8</code> as charset.
+     *
+     * @param document the document
+     * @param mimeType the mime-type
+     * @return a string with "data" URL
+     * @throws TransformerException
+     * @throws MalformedURLException
+     */
+    public static String build(final Document document, final String mimeType)
+        throws TransformerException, MalformedURLException {
+        return build(document, null, mimeType, "UTF-8");
+    }
+
+    /**
      * Build a "data" URL for given {@link NodeList}, mime-type and <code>UTF-8</code> as charset.
      *
      * @param nodeList the node list
@@ -200,6 +234,19 @@ public class MCRDataURL implements Serializable {
     public static String build(final String str, final String mimeType)
         throws TransformerException, MalformedURLException {
         return build(str, null, mimeType, "UTF-8");
+    }
+
+    /**
+     * Build a "data" URL for given {@link Document} with mime-type based encoding,
+     * <code>text/xml</code> as mime-type and <code>UTF-8</code> as charset.
+     *
+     * @param document the document
+     * @return a string with "data" URL
+     * @throws TransformerException
+     * @throws MalformedURLException
+     */
+    public static String build(final Document document) throws TransformerException, MalformedURLException {
+        return build(document, null, "text/xml", "UTF-8");
     }
 
     /**
