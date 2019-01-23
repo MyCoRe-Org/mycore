@@ -23,11 +23,21 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.nio.charset.IllegalCharsetNameException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -51,6 +61,10 @@ public class MCRDataURLTest extends MCRTestCase {
         "data:base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC",
         "", "http://wikipedia.org", "base64",
         "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEUAAAD///+l2Z/dAAAAM0lEQVR4nGP4/5/h/1+G/58ZDrAz3D/McH8yw83NDDeNGe4Ug9C9zwz3gVLMDA/A6P9/AFGGFyjOXZtQAAAAAElFTkSuQmCC" };
+
+    private static final String TEST_XML = "<testxml>Blah</testxml>";
+
+    private static final String TEST_EXCEPTION_XML = "<xml><testxml>Blah</testxml><testxml>Blub</testxml></xml>";
 
     @Test
     public void testParseValid() {
@@ -100,4 +114,31 @@ public class MCRDataURLTest extends MCRTestCase {
             }
         }
     }
+
+    @Test
+    public void testComposeFromDocument()
+        throws ParserConfigurationException, SAXException, IOException, TransformerException {
+        DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+        InputSource is = new InputSource();
+        is.setCharacterStream(new StringReader(TEST_XML));
+        Document doc = db.parse(is);
+
+        String du = MCRDataURL.build(doc, MCRDataURLEncoding.BASE64.value(), "application/xml", "utf-8");
+        assertNotNull(du);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testException() throws ParserConfigurationException, SAXException, IOException, TransformerException {
+        DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+        InputSource is = new InputSource();
+        is.setCharacterStream(new StringReader(TEST_EXCEPTION_XML));
+        Document doc = db.parse(is);
+
+        MCRDataURL.build(doc.getChildNodes().item(0).getChildNodes(), MCRDataURLEncoding.BASE64.value(),
+            "TEXT/xml",
+            "utf-8");
+    }
+
 }
