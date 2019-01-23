@@ -135,9 +135,7 @@ public class MCRClassMapper {
                 authInfo = new MCRAuthorityWithURI(authorityURI, valueURI);
             } else if (modsElement.getAttributeValue("authority") != null) {
                 //authority
-                String authority = modsElement.getAttributeValue("authority");
-                String code = modsElement.getTextTrim();
-                authInfo = new MCRAuthorityAndCode(authority, code);
+                authInfo = MCRAuthorityAndCode.getAuthorityInfo(modsElement);
             } else if (modsElement.getName().equals(ACCESS_CONDITION)) {
                 //accessDefinition
                 String href = modsElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE, "");
@@ -147,6 +145,9 @@ public class MCRClassMapper {
                 String code = modsElement.getTextTrim();
                 authInfo = new MCRTypeOfResource(code);
             } else {
+                return null;
+            }
+            if (authInfo == null) {
                 return null;
             }
             return authInfo.getCategoryID();
@@ -164,9 +165,7 @@ public class MCRClassMapper {
                 authInfo = new MCRAuthorityWithURI(authorityURI, valueURI);
             } else if (!modsElement.getAttribute("authority").isEmpty()) {
                 //authority
-                String authority = modsElement.getAttribute("authority");
-                String code = modsElement.getTextContent().trim();
-                authInfo = new MCRAuthorityAndCode(authority, code);
+                authInfo = MCRAuthorityAndCode.getAuthorityInfo(modsElement);
             } else if (modsElement.getLocalName().equals(ACCESS_CONDITION)) {
                 //accessDefinition
                 String href = modsElement.getAttributeNS(MCRConstants.XLINK_NAMESPACE.getURI(), "href");
@@ -176,6 +175,9 @@ public class MCRClassMapper {
                 String code = modsElement.getTextContent().trim();
                 authInfo = new MCRTypeOfResource(code);
             } else {
+                return null;
+            }
+            if (authInfo == null) {
                 return null;
             }
             return authInfo.getCategoryID();
