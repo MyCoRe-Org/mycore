@@ -73,40 +73,4 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
         return null;
     }
 
-    @Override
-    public boolean isRegistered(MCRObjectID id, String additional) {
-        boolean registered = super.isRegistered(id, additional);
-        if (registered)
-            return true;
-
-        if (!isCreated(id, additional)) {
-            return false;
-        }
-
-        // URN is created. Now we need to check if it is resolvable
-        MCRPI mcrpi = getTableEntry(id, additional);
-        MCRDNBURN dnburn = new MCRDNBURNParser()
-            .parse(mcrpi.getIdentifier())
-            .orElseThrow(() -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
-
-        try {
-            // Find register date in dnb rest
-            Date dnbRegisteredDate = MCRURNUtils.getDNBRegisterDate(dnburn);
-
-            if (dnbRegisteredDate == null) {
-                return false;
-            }
-
-            mcrpi.setRegistered(dnbRegisteredDate);
-            updateFlag(id, additional, mcrpi);
-            return true;
-        } catch (ParseException e) {
-            LOGGER.error("Could not parse Date from PIDEF ! URN wont be marked as registered because of this! ", e);
-            return false;
-        } catch (MCRIdentifierUnresolvableException e) {
-            return false;
-        }
-
-    }
-
 }

@@ -27,6 +27,10 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRSystemUserInformation implements MCRUserInformation {
 
+    private static MCRSystemUserInformation janitorInstance = new MCRSystemUserInformation(
+        new UserIdResolver("MCRJANITOR", null)
+        , true);
+
     private static MCRSystemUserInformation systemInstance = new MCRSystemUserInformation(new UserIdResolver("SYSTEM",
         null), false);
 
@@ -85,6 +89,13 @@ public class MCRSystemUserInformation implements MCRUserInformation {
      */
     public static MCRSystemUserInformation getSuperUserInstance() {
         return superUserInstance;
+    }
+
+    /**
+     * @return the janitor Instance
+     */
+    public static MCRSystemUserInformation getJanitorInstance() {
+        return janitorInstance;
     }
 
     private static class UserIdResolver {
