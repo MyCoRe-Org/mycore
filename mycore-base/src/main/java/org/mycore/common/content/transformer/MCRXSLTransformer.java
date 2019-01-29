@@ -48,6 +48,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.transformer.TransformerImpl;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -120,7 +121,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
     public synchronized void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
         TransformerFactory transformerFactory = Optional.ofNullable(factoryClass)
-            .map(c -> TransformerFactory.newInstance(c, null)).orElseGet(TransformerFactory::newInstance);
+            .map(c -> TransformerFactory.newInstance(c, MCRClassTools.getClassLoader()))
+            .orElseGet(TransformerFactory::newInstance);
         LOGGER.info("Transformerfactory: {}", transformerFactory.getClass().getName());
         transformerFactory.setURIResolver(URI_RESOLVER);
         transformerFactory.setErrorListener(MCRErrorListener.getInstance());

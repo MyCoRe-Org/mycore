@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
+import javax.persistence.NoResultException;
 import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -68,6 +69,7 @@ import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.MCRPIJobService;
+import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.i18n.MCRTranslation;
@@ -413,6 +415,10 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         MCRDigitalObjectIdentifier doi = getDOIFromJob(parameters);
         String idString = parameters.get(CONTEXT_OBJ);
 
+        if(!checkJobValid(idString, PiJobAction.UPDATE)){
+            return;
+        }
+
         MCRObjectID objectID = MCRObjectID.getInstance(idString);
         this.validateJobUserRights(objectID);
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
@@ -431,10 +437,18 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
             throw new MCRPersistentIdentifierException("Error while updating URL!", e);
         }
 
-        Document oldDataciteMetadata = dataciteClient.resolveMetadata(doi);
-        if (!MCRXMLHelper.deepEqual(newDataciteMetadata, oldDataciteMetadata)) {
+        Document oldDataciteMetadata = null;
+        try {
+            oldDataciteMetadata = dataciteClient.resolveMetadata(doi);
+        } catch (JDOMException e) {
+            LOGGER.info("Old metadata is invalid.. replace it with new metadata!");
+        }
+        if (oldDataciteMetadata == null || !MCRXMLHelper.deepEqual(newDataciteMetadata, oldDataciteMetadata)) {
             LOGGER.info("Sending new Metadata of {} to Datacite!", idString);
-            dataciteClient.deleteMetadata(doi);
+            if (oldDataciteMetadata != null) {
+                dataciteClient.deleteMetadata(doi);
+            }
+
             dataciteClient.storeMetadata(newDataciteMetadata);
         }
     }
@@ -443,6 +457,10 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     public void registerJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         MCRDigitalObjectIdentifier doi = getDOIFromJob(parameters);
         String idString = parameters.get(CONTEXT_OBJ);
+
+        if(!checkJobValid(idString, PiJobAction.REGISTER)){
+            return;
+        }
 
         MCRObjectID objectID = MCRObjectID.getInstance(idString);
         this.validateJobUserRights(objectID);
@@ -489,6 +507,19 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
         return Optional.of(MessageFormat
             .format(pattern, getAction(contextParameters).toString(), contextParameters.get(CONTEXT_DOI),
                 contextParameters.get(CONTEXT_OBJ)));
+    }
+
+    protected boolean checkJobValid(String mycoreID, PiJobAction action){
+        final MCRObjectID objectID = MCRObjectID.getInstance(mycoreID);
+        final boolean exists = MCRMetadataManager.exists(objectID);
+
+        try {
+            MCRPIManager.getInstance().get(getServiceID(), mycoreID, "");
+        } catch (NoResultException r){
+            return false;
+        }
+
+        return exists;
     }
 
 }
