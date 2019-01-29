@@ -25,6 +25,12 @@ import java.net.URLClassLoader;
 import java.util.Optional;
 
 public class MCRClassTools {
+    private static volatile ClassLoader extendedClassLoader;
+
+    static {
+        updateClassLoader(); //first init
+    }
+
     public static Object loadClassFromURL(String classPath, String className)
         throws MalformedURLException, ReflectiveOperationException {
         return loadClassFromURL(new File(classPath), className);
@@ -56,11 +62,7 @@ public class MCRClassTools {
         try {
             forName = (Class<? extends T>) Class.forName(classname);
         } catch (ClassNotFoundException cnfe) {
-            if (Thread.currentThread().getContextClassLoader() == null) {
-                throw cnfe;
-            }
-            forName = (Class<? extends T>) Class.forName(classname, true,
-                Thread.currentThread().getContextClassLoader());
+            forName = (Class<? extends T>) Class.forName(classname, true, extendedClassLoader);
         }
         return forName;
     }
@@ -69,7 +71,11 @@ public class MCRClassTools {
      * @return a ClassLoader that should be used to load resources
      */
     public static ClassLoader getClassLoader() {
-        return Optional.of(Thread.currentThread().getContextClassLoader())
+        return extendedClassLoader;
+    }
+
+    public static void updateClassLoader() {
+        extendedClassLoader = Optional.ofNullable(Thread.currentThread().getContextClassLoader())
             .orElseGet(MCRClassTools.class::getClassLoader);
     }
 

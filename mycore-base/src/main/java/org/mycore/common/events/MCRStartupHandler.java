@@ -71,6 +71,10 @@ public class MCRStartupHandler {
         MCRConfigurationDirSetup dirSetup = new MCRConfigurationDirSetup();
         dirSetup.startUp(servletContext);
         isWebApp = servletContext != null;
+        //initialize ClassLoader here, so it can be used later reliably.
+        MCRClassTools.updateClassLoader();
+        ClassLoader resourceClassLoader = MCRClassTools.getClassLoader();
+        LOGGER.info("The following ClassLoader is used: {}", resourceClassLoader);
         LOGGER.info("I have these components for you: {}", MCRRuntimeComponentDetector.getAllComponents());
         LOGGER.info("I have these mycore components for you: {}", MCRRuntimeComponentDetector.getMyCoReComponents());
         LOGGER.info("I have these app modules for you: {}", MCRRuntimeComponentDetector.getApplicationModules());
