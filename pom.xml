@@ -39,18 +39,18 @@
     <changes.version>2019.02</changes.version>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
     <forbiddenapis.version>1.7</forbiddenapis.version>
-    <frontend.maven.plugin.version>1.4</frontend.maven.plugin.version>
+    <frontend.maven.plugin.version>1.6</frontend.maven.plugin.version>
     <grizzly.version>2.3.35</grizzly.version>
-    <guice.version>4.2.0</guice.version>
+    <guice.version>4.2.2</guice.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
-    <hibernate.version>5.3.6.Final</hibernate.version>
-    <hk2.version>2.5.0-b62</hk2.version>
-    <httpcomponents.version>4.5.6</httpcomponents.version>
-    <httpcore.version>4.4.10</httpcore.version>
-    <jackson.version>2.9.7</jackson.version>
+    <hibernate.version>5.4.1.Final</hibernate.version>
+    <hk2.version>2.5.0</hk2.version>
+    <httpcomponents.version>4.5.7</httpcomponents.version>
+    <httpcore.version>4.4.11</httpcore.version>
+    <jackson.version>2.9.8</jackson.version>
     <java.target.version>11</java.target.version>
     <jaxb.version>2.3.1</jaxb.version>
-    <jersey.version>2.27</jersey.version>
+    <jersey.version>2.28</jersey.version>
     <jetty.version>9.4.14.v20181114</jetty.version>
     <log4j.version>2.11.1</log4j.version>
     <!-- lowest is 99, highest is 0 -->
@@ -59,12 +59,12 @@
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <node.version>v6.9.1</node.version>
     <pmd.failOnViolation>false</pmd.failOnViolation>
-    <selenium.version>3.14.0</selenium.version>
+    <selenium.version>3.141.59</selenium.version>
     <site.suffix />
-    <swagger.version>2.0.5</swagger.version>
+    <swagger.version>2.0.6</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
-    <yarn.version>v0.24.6</yarn.version>
+    <yarn.version>v1.13.0</yarn.version>
   </properties>
   <build>
     <pluginManagement>
@@ -178,13 +178,13 @@
               </group>
             </groups>
             <links>
-              <link>http://docs.oracle.com/javase/8/docs/api/</link>
+              <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
               <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
               <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-              <link>http://lucene.apache.org/solr/7_3_0/solr-solrj/</link>
+              <link>http://lucene.apache.org/solr/7_6_0/solr-solrj/</link>
             </links>
           </configuration>
         </plugin>
@@ -610,13 +610,13 @@
                 </group>
               </groups>
               <links>
-                <link>http://docs.oracle.com/javase/8/docs/api/</link>
+                <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
                 <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
                 <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-                <link>http://lucene.apache.org/solr/7_3_0/solr-solrj/</link>
+                <link>http://lucene.apache.org/solr/7_6_0/solr-solrj/</link>
               </links>
             </configuration>
             <reportSets>
@@ -714,7 +714,7 @@
       <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
-        <version>3.4.0</version>
+        <version>3.6.0</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -749,7 +749,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>26.0-jre</version>
+        <version>27.0.1-jre</version>
       </dependency>
       <dependency>
         <groupId>com.google.inject</groupId>
@@ -769,12 +769,12 @@
       <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
-        <version>62.1</version>
+        <version>63.1</version>
       </dependency>
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
-        <version>1.11.0</version>
+        <version>1.12.0</version>
       </dependency>
       <dependency>
         <groupId>com.sun.activation</groupId>
@@ -940,7 +940,7 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.8</version>
+        <version>3.8.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -970,12 +970,12 @@
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>2.0.12</version>
+        <version>2.0.13</version>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>7.4.0</version>
+        <version>7.6.0</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
@@ -1024,7 +1024,7 @@
       <dependency>
         <groupId>org.bibsonomy</groupId>
         <artifactId>bibsonomy-bibtex-parser</artifactId>
-        <version>3.8.15</version>
+        <version>3.8.18</version>
         <exclusions>
           <exclusion>
             <groupId>jtidy</groupId>
@@ -1406,19 +1406,19 @@
         <!-- required for commons-vfs -->
         <groupId>com.jcraft</groupId>
         <artifactId>jsch</artifactId>
-        <version>0.1.54</version>
+        <version>0.1.55</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>4.5.2</version>
+        <version>5.2.0</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
@@ -1437,7 +1437,7 @@
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>fontbox</artifactId>
-        <version>2.0.12</version>
+        <version>2.0.13</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1512,7 +1512,7 @@
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.22.0-GA</version>
+        <version>3.24.1-GA</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1586,7 +1586,7 @@
       <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-core</artifactId>
-        <version>1.3</version>
+        <version>2.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1604,7 +1604,7 @@
       <dependency>
         <groupId>org.jmockit</groupId>
         <artifactId>jmockit</artifactId>
-        <version>1.43</version>
+        <version>1.45</version>
         <scope>test</scope>
       </dependency>
       <dependency>
