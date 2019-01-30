@@ -45,7 +45,7 @@ public class ImageOverviewController extends SideBarController {
      * @param orderLabel
      */
     public void clickImageByOrder(String orderLabel) {
-        clickElementByXpath(MessageFormat.format("//div[@class=\"caption\" and contains(text(),\"{0}\")]", orderLabel));
+        clickElementByXpath(org.mycore.common.MCRUtils.format("//div[@class=\"caption\" and contains(text(),\"{0}\")]", orderLabel));
     }
 
     /**

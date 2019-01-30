@@ -18,7 +18,6 @@
 
 package org.mycore.iview2.services;
 
-import java.text.MessageFormat;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -238,7 +237,7 @@ public class MCRTileJob implements Cloneable {
      */
     @Override
     public String toString() {
-        return MessageFormat.format("MCRTileJob [derivate:{0}, path:{1}, added:{2}]", getDerivate(), getPath(),
+        return org.mycore.common.MCRUtils.format("MCRTileJob [derivate:{0}, path:{1}, added:{2}]", getDerivate(), getPath(),
             getAdded());
     }
 

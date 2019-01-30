@@ -20,7 +20,6 @@ package org.mycore.mods.rss;
 
 import java.io.IOException;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -219,7 +218,7 @@ public class MCRRSSFeedImporter {
     }
 
     private Element retrieveAndConvertPublication(String externalID) {
-        String uri = MessageFormat.format(importURI, externalID);
+        String uri = org.mycore.common.MCRUtils.format(importURI, externalID);
         return MCRURIResolver.instance().resolve(uri);
     }
 

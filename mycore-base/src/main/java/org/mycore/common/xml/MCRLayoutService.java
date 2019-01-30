@@ -20,7 +20,6 @@ package org.mycore.common.xml;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.MessageFormat;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -134,7 +133,7 @@ public class MCRLayoutService {
         String transformerId = parameter.getParameter("Transformer", null);
         if (transformerId == null) {
             String style = parameter.getParameter("Style", "default");
-            transformerId = MessageFormat.format("{0}-{1}", docType, style);
+            transformerId = org.mycore.common.MCRUtils.format("{0}-{1}", docType, style);
         }
         return MCRLayoutTransformerFactory.getTransformer(transformerId);
     }
@@ -151,7 +150,7 @@ public class MCRLayoutService {
         if (req.getPathInfo() != null) {
             return extractFileName(req.getPathInfo());
         }
-        return MessageFormat.format("{0}-{1}", extractFileName(req.getServletPath()), System.currentTimeMillis());
+        return org.mycore.common.MCRUtils.format("{0}-{1}", extractFileName(req.getServletPath()), System.currentTimeMillis());
     }
 
     private String extractFileName(String filename) {

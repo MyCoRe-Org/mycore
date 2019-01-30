@@ -21,7 +21,6 @@
  */
 package org.mycore.iview.tests.controller;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -66,7 +65,7 @@ public class WebDriverController {
         WebElement element = getDriver().findElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
+            LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
                 selector.toString()));
         }
 
@@ -85,7 +84,7 @@ public class WebDriverController {
         WebElement element = getDriver().findElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
+            LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
                 selector.toString()));
         }
 
@@ -120,14 +119,14 @@ public class WebDriverController {
         List<WebElement> element = getDriver().findElements(selector);
         for (WebElement webElement : element) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", webElement.toString(),
+                LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", webElement.toString(),
                     selector.toString()));
             }
             if (webElement.getAttribute(attribute) != null) {
                 return webElement.getAttribute(attribute).contains(assertion);
             }
         }
-        LOGGER.error(MessageFormat.format("Element {0} or Attribute '{1}' not fot found!", xPath, attribute));
+        LOGGER.error(org.mycore.common.MCRUtils.format("Element {0} or Attribute '{1}' not fot found!", xPath, attribute));
         return false;
     }
 
@@ -139,16 +138,16 @@ public class WebDriverController {
      * @return true if an element is found
      */
     public boolean assertElementByAttributePresent(String attribute, String value) {
-        By selector = By.xpath(MessageFormat.format("//*[contains(@{0},\"{1}\")]", attribute, value));
+        By selector = By.xpath(org.mycore.common.MCRUtils.format("//*[contains(@{0},\"{1}\")]", attribute, value));
         List<WebElement> elements = getDriver().findElements(selector);
         if (elements.isEmpty()) {
-            LOGGER.error(MessageFormat.format("No element with attribute '{0}' and value '{1}' found!", attribute,
+            LOGGER.error(org.mycore.common.MCRUtils.format("No element with attribute '{0}' and value '{1}' found!", attribute,
                 value));
             return false;
         }
         for (WebElement webElement : elements) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", webElement.toString(),
+                LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", webElement.toString(),
                     selector.toString()));
             }
         }

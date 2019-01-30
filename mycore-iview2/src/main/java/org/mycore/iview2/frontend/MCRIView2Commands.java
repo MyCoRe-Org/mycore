@@ -28,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -110,7 +109,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
-            cmds.add(MessageFormat.format(batchCommandSyntax, id));
+            cmds.add(org.mycore.common.MCRUtils.format(batchCommandSyntax, id));
         }
         return cmds;
     }
@@ -142,7 +141,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             if (id.startsWith(project)) {
-                cmds.add(MessageFormat.format(batchCommandSyntax, id));
+                cmds.add(org.mycore.common.MCRUtils.format(batchCommandSyntax, id));
             }
         }
         return cmds;
@@ -198,7 +197,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
         List<MCRPath> supportedFiles = getSupportedFiles(derivateRoot);
         return supportedFiles.stream()
-            .map(image -> MessageFormat.format(batchCommandSyntax, derivateID,
+            .map(image -> org.mycore.common.MCRUtils.format(batchCommandSyntax, derivateID,
                 image.getOwnerRelativePath()))
             .collect(Collectors.toList());
     }
@@ -278,7 +277,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 BufferedImage thumbnail = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, imageReader, 0);
                 int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
                 int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
-                LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", props.getWidth(),
+                LOGGER.debug(org.mycore.common.MCRUtils.format("Image size:{0}x{1}, tiles:{2}x{3}", props.getWidth(),
                     props.getHeight(), maxX, maxY));
                 try {
                     @SuppressWarnings("unused")
@@ -386,7 +385,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
         ArrayList<String> cmds = new ArrayList<>(derivateIds.size());
         for (MCRObjectID derId : derivateIds) {
-            cmds.add(MessageFormat.format(batchCommandSyntax, derId));
+            cmds.add(org.mycore.common.MCRUtils.format(batchCommandSyntax, derId));
         }
         return cmds;
     }

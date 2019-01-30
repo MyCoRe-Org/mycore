@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -144,7 +143,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     public void transform(MCRContent input, OutputStream out) throws TransformerException, IOException {
         try {
             final FOUserAgent userAgent = fopFactory.newFOUserAgent();
-            userAgent.setProducer(MessageFormat.format("MyCoRe {0} ({1})", MCRCoreVersion.getCompleteVersion(),
+            userAgent.setProducer(org.mycore.common.MCRUtils.format("MyCoRe {0} ({1})", MCRCoreVersion.getCompleteVersion(),
                 userAgent.getProducer()));
 
             final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, out);

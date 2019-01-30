@@ -19,7 +19,6 @@
 package org.mycore.mods.enrichment;
 
 import java.net.URLEncoder;
-import java.text.MessageFormat;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,7 +68,8 @@ class MCRIdentifierResolver {
     Element resolve(String identifier) {
         Element resolved = null;
         try {
-            String uri = MessageFormat.format(uriPattern, identifier, URLEncoder.encode(identifier, "UTF-8"));
+            String uri = org.mycore.common.MCRUtils.format(uriPattern, identifier,
+                URLEncoder.encode(identifier, "UTF-8"));
             resolved = MCRURIResolver.instance().resolve(uri);
         } catch (Exception ex) {
             LOGGER.info("Exception resolving {}: {} {}", identifier, ex.getClass().getName(), ex.getMessage());

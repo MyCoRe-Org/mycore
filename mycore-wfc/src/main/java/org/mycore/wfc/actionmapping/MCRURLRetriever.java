@@ -90,7 +90,7 @@ public final class MCRURLRetriever {
             if (act.getAction().equals(action)) {
                 if (LOGGER.isDebugEnabled()) {
                     String mcrId = categoryReference == null ? null : categoryReference.getObjectID();
-                    LOGGER.debug(MessageFormat.format("Collection: {0}, Action: {1}, Object: {2}",
+                    LOGGER.debug(org.mycore.common.MCRUtils.format("Collection: {0}, Action: {1}, Object: {2}",
                         collection.getName(), action, mcrId));
                 }
                 String url = act.getURL(new MCRWorkflowData(categoryReference));

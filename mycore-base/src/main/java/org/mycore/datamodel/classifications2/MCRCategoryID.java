@@ -174,7 +174,7 @@ public class MCRCategoryID implements Serializable {
                 throw new MCRException("category ID '" + id + "' is invalid and does not match: " + validID);
             }
             if (id.length() > CATEG_ID_LENGTH) {
-                throw new MCRException(MessageFormat.format("category ID ''{0}'' is more than {1} characters long: {2}",
+                throw new MCRException(org.mycore.common.MCRUtils.format("category ID ''{0}'' is more than {1} characters long: {2}",
                     id, CATEG_ID_LENGTH, id.length()));
             }
         }
@@ -195,7 +195,7 @@ public class MCRCategoryID implements Serializable {
     private void setRootID(String rootID) {
         if (!validID.matcher(rootID).matches()) {
             throw new MCRException(
-                MessageFormat.format("classification ID ''{0}'' is invalid and does not match: {1}", rootID, validID));
+                org.mycore.common.MCRUtils.format("classification ID ''{0}'' is invalid and does not match: {1}", rootID, validID));
         }
         if (rootID.length() > ROOT_ID_LENGTH) {
             throw new MCRException(MessageFormat.format(

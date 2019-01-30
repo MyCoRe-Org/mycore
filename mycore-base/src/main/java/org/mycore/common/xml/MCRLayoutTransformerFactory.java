@@ -18,7 +18,6 @@
 
 package org.mycore.common.xml;
 
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -128,7 +127,7 @@ public class MCRLayoutTransformerFactory {
      * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
      */
     private static String buildStylesheetName(String id) {
-        return MessageFormat.format("xsl/{0}.xsl", id.replaceAll("-default$", ""));
+        return org.mycore.common.MCRUtils.format("xsl/{0}.xsl", id.replaceAll("-default$", ""));
     }
 
     private static String getResourceName(String id) {

@@ -42,7 +42,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -412,7 +411,7 @@ public class MCRSwordUtil {
             } else {
                 if (required) {
                     throw new IllegalArgumentException(
-                        MessageFormat.format("{0} does not match the pattern {1}", uriPathAsString, iriPattern));
+                        org.mycore.common.MCRUtils.format("{0} does not match the pattern {1}", uriPathAsString, iriPattern));
                 } else {
                     return null;
                 }
@@ -427,7 +426,7 @@ public class MCRSwordUtil {
                 if (matcher.matches()) {
                     return matcher.group(1);
                 } else {
-                    throw new IllegalArgumentException(MessageFormat.format("{0} does not match the pattern {1}",
+                    throw new IllegalArgumentException(org.mycore.common.MCRUtils.format("{0} does not match the pattern {1}",
                         uriPathAsString, COLLECTION_IRI_PATTERN));
                 }
             }
@@ -482,12 +481,12 @@ public class MCRSwordUtil {
         private static Logger LOGGER = LogManager.getLogger(BuildLinkUtil.class);
 
         public static String getEditHref(String collection, String id) {
-            return MessageFormat.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(),
+            return org.mycore.common.MCRUtils.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(),
                 MCRSwordConstants.SWORD2_EDIT_IRI, collection, id);
         }
 
         public static String getEditMediaHrefOfDerivate(String collection, String id) {
-            return MessageFormat.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(),
+            return org.mycore.common.MCRUtils.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(),
                 MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, collection, id);
         }
 
@@ -529,7 +528,7 @@ public class MCRSwordUtil {
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                         throws IOException {
                         String relativePath = derivateRootPath.relativize(file).toString();
-                        final String URI = MessageFormat.format("{0}{1}{2}/{3}/{4}", MCRFrontendUtil.getBaseURL(),
+                        final String URI = org.mycore.common.MCRUtils.format("{0}{1}{2}/{3}/{4}", MCRFrontendUtil.getBaseURL(),
                             MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, collection, derivateId,
                             encodeURLPart(relativePath));
                         iris.add(new IRI(URI));

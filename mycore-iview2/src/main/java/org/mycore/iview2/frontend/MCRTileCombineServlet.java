@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
@@ -172,7 +171,7 @@ public class MCRTileCombineServlet extends MCRServlet {
                     if (!imagePath.startsWith("/")) {
                         imagePath = "/" + imagePath;
                     }
-                    String redirectURL = response.encodeRedirectURL(MessageFormat.format("{0}{1}/{2}/{3}{4}",
+                    String redirectURL = response.encodeRedirectURL(org.mycore.common.MCRUtils.format("{0}{1}/{2}/{3}{4}",
                         request.getContextPath(), request.getServletPath(), zoomAlias, derivate, imagePath));
                     response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
                     response.setHeader("Location", redirectURL);

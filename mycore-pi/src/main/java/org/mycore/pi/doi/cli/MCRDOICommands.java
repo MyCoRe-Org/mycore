@@ -19,7 +19,6 @@
 package org.mycore.pi.doi.cli;
 
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -164,7 +163,7 @@ public class MCRDOICommands {
                     return !isTestDOI || registrationService.usesTestPrefix();
                 })
                 .map(MCRDigitalObjectIdentifier::asString)
-                .map(doiStr -> MessageFormat.format(REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, doiStr, serviceID))
+                .map(doiStr -> org.mycore.common.MCRUtils.format(REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, doiStr, serviceID))
                 .collect(Collectors.toList());
         } catch (MCRPersistentIdentifierException e) {
             LOGGER.error("Error while receiving DOI list from Registration-Service!", e);

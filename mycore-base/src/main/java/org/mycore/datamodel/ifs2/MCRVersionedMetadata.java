@@ -20,7 +20,6 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -279,7 +278,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 revision = getLastPresentRevision();
                 if (revision < 0) {
                     LOGGER.warn(
-                        MessageFormat.format("Metadata object {0} in store {1} has no last revision!", getID(),
+                        org.mycore.common.MCRUtils.format("Metadata object {0} in store {1} has no last revision!", getID(),
                             getStore().getID()));
                     return null;
                 }
@@ -296,7 +295,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                     return new MCRMetadataVersion(this, logEntry, type);
                 }
             }
-            LOGGER.warn(MessageFormat.format("Metadata object {0} in store {1} has no revision ''{2}''!", getID(),
+            LOGGER.warn(org.mycore.common.MCRUtils.format("Metadata object {0} in store {1} has no revision ''{2}''!", getID(),
                 getStore().getID(),
                 getRevision()));
             return null;

@@ -21,7 +21,6 @@ package org.mycore.pi.urn.rest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -148,7 +147,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
                 LinkedHashMap::new));
 
         if (!"".equals(filePath) && urnPathMap.isEmpty()) {
-            String errMsg = MessageFormat.format("File {0} does not exist in {1}.\n", filePath, derivID.toString())
+            String errMsg = org.mycore.common.MCRUtils.format("File {0} does not exist in {1}.\n", filePath, derivID.toString())
                 + "Use absolute path of file without owner ID like /abs/path/to/file.\n";
 
             throw new MCRPersistentIdentifierException(errMsg);

@@ -115,7 +115,8 @@ public final class MCRMODSClassificationSupport {
             throw new MCRException(e);
         }
 
-        return MessageFormat.format("classification:metadata:0:children:{0}:{1}", category.getRootID(), id);
+        return org.mycore.common.MCRUtils.format("classification:metadata:0:children:{0}:{1}", category.getRootID(),
+            id);
     }
 
     public static String getClassCategParentLink(final NodeList sources) {

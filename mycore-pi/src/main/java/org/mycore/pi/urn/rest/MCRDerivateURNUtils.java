@@ -102,7 +102,7 @@ public class MCRDerivateURNUtils {
      * @throws IOException
      */
     private static String getViewerURL(MCRPath file) {
-        return MessageFormat.format("{0}rsc/viewer/{1}/{2}", MCRFrontendUtil.getBaseURL(), file.getOwner(),
+        return org.mycore.common.MCRUtils.format("{0}rsc/viewer/{1}/{2}", MCRFrontendUtil.getBaseURL(), file.getOwner(),
             file.getFileName().toString());
     }
 

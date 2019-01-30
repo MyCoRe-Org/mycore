@@ -21,7 +21,6 @@
  */
 package org.mycore.iview.tests.controller;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -52,14 +51,14 @@ public class StructureOverviewController extends SideBarController {
      * @param orderLabel
      */
     public void selectImageByOrder(String orderLabel) {
-        String xpath = MessageFormat.format("//li/a[../span[@class=\"childLabel\" and contains(text(),\"{0}\")]"
+        String xpath = org.mycore.common.MCRUtils.format("//li/a[../span[@class=\"childLabel\" and contains(text(),\"{0}\")]"
             + "]|//li/a[contains(text(),\"{0}\")]",
             orderLabel);
         clickElementByXpath(xpath);
     }
 
     public boolean isImageSelected(String orderLabel) {
-        String xPath = MessageFormat.format("//li[./span[@class=\"childLabel\" and contains(text(),\"{0}\")]|"
+        String xPath = org.mycore.common.MCRUtils.format("//li[./span[@class=\"childLabel\" and contains(text(),\"{0}\")]|"
             + "./a[contains(text(),\"{0}\")]]",
             orderLabel);
         return assertAttributeByXpath(xPath, "data-selected", true);
@@ -75,7 +74,7 @@ public class StructureOverviewController extends SideBarController {
         List<WebElement> element = this.getDriver().findElements(selector);
         for (WebElement webElement : element) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
+                LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
                     selector.toString()));
             }
             String text = webElement.getText();

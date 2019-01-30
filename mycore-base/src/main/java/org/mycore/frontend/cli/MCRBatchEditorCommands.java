@@ -19,7 +19,6 @@
 package org.mycore.frontend.cli;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,7 +39,6 @@ import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
@@ -167,13 +165,13 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     private static void add(Element base, String field, String value) throws JaxenException {
         String path = MCRConfiguration.instance().getString(CFG_PREFIX + field + CFG_SUFFIX_ADD);
-        path = MessageFormat.format(path, value);
+        path = org.mycore.common.MCRUtils.format(path, value);
         new MCRNodeBuilder().buildNode(path, null, base);
     }
 
     private static List<Element> find(Element base, String field, String value) {
         String path = MCRConfiguration.instance().getString(CFG_PREFIX + field + CFG_SUFFIX_REMOVE);
-        path = MessageFormat.format(path, value);
+        path = org.mycore.common.MCRUtils.format(path, value);
         XPathExpression<Element> fPath = XPathFactory.instance().compile(path, FE, null, NS);
         List<Element> selected = fPath.evaluate(base);
         return selected;

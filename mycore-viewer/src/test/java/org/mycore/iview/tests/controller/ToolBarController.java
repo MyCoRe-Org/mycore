@@ -18,7 +18,6 @@
 
 package org.mycore.iview.tests.controller;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -66,11 +65,11 @@ public class ToolBarController extends WebDriverController {
      * @param id
      */
     public void pressButton(String id) {
-        By selector = By.cssSelector(MessageFormat.format(BUTTON_SELECTOR_PATTERN, id));
+        By selector = By.cssSelector(org.mycore.common.MCRUtils.format(BUTTON_SELECTOR_PATTERN, id));
         WebElement element = this.getDriver().findElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
+            LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
                 selector.toString()));
         }
 
@@ -85,12 +84,12 @@ public class ToolBarController extends WebDriverController {
     public void clickElementById(String id) {
         int trys = 10;
 
-        By selector = By.cssSelector(MessageFormat.format(ELEMENT_SELECTOR_PATTERN, id));
+        By selector = By.cssSelector(org.mycore.common.MCRUtils.format(ELEMENT_SELECTOR_PATTERN, id));
 
         WebElement element = getNotStaleElement(trys, selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
+            LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
                 selector.toString()));
         }
 

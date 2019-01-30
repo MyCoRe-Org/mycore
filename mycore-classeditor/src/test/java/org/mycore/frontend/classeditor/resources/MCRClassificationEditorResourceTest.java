@@ -21,7 +21,6 @@ package org.mycore.frontend.classeditor.resources;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -147,7 +146,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
             String categoryJsonStr = target("/classifications/" + path).request().get(String.class);
             MCRJSONCategory retrievedCateg = MCRJSONManager.instance().createGson().fromJson(categoryJsonStr,
                 MCRJSONCategory.class);
-            String errorMsg = MessageFormat.format("We want to retrieve the category {0} but it was {1}", id,
+            String errorMsg = org.mycore.common.MCRUtils.format("We want to retrieve the category {0} but it was {1}", id,
                 retrievedCateg.getId());
             assertTrue(errorMsg, id.equals(retrievedCateg.getId()));
         }

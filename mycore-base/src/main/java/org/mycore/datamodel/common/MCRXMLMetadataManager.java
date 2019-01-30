@@ -327,7 +327,7 @@ public class MCRXMLMetadataManager {
                         setupStore(project, type, prefix, readOnly);
                     } catch (ReflectiveOperationException e) {
                         throw new MCRPersistenceException(
-                                MessageFormat.format("Could not instantiate store for project {0} and object type {1}.",
+                                org.mycore.common.MCRUtils.format("Could not instantiate store for project {0} and object type {1}.",
                                         project, type), e);
                     }
                 }
@@ -336,7 +336,7 @@ public class MCRXMLMetadataManager {
         MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
             throw new MCRPersistenceException(
-                    MessageFormat.format("Metadata store for project {0} and object type {1} is unconfigured.", project,
+                    org.mycore.common.MCRUtils.format("Metadata store for project {0} and object type {1} is unconfigured.", project,
                             type));
         }
         return store;
@@ -356,7 +356,7 @@ public class MCRXMLMetadataManager {
             String property = configPrefix + "SVNRepositoryURL";
             String svnURL = config.getString(property, null);
             if (svnURL == null) {
-                String relativeURI = MessageFormat.format("{0}/{1}/", project, objectType);
+                String relativeURI = org.mycore.common.MCRUtils.format("{0}/{1}/", project, objectType);
                 URI repURI = svnBase.resolve(relativeURI);
                 LOGGER.info("Resolved {} to {} for {}", relativeURI, repURI.toASCIIString(), property);
                 config.set(property, repURI.toASCIIString());

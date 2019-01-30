@@ -92,7 +92,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
         if (!Files.isDirectory(rootPath)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                MessageFormat.format("Derivate {0} does not exist.", derivateID));
+                org.mycore.common.MCRUtils.format("Derivate {0} does not exist.", derivateID));
             return;
         }
         request.setAttribute("XSL.derivateID", derivateID);

@@ -23,8 +23,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.text.MessageFormat;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.datamodel.ifs2.MCRStore;
@@ -83,7 +81,7 @@ public class MCRStoreCenterTest {
     }
 
     private String getPropName(String storeID, String propType) {
-        return MessageFormat.format("MCR.IFS2.Store.{0}.{1}", storeID, propType);
+        return org.mycore.common.MCRUtils.format("MCR.IFS2.Store.{0}.{1}", storeID, propType);
     }
 
     public static class FakeStore extends MCRStore {

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -128,7 +127,7 @@ public class MCRTestCase {
     }
 
     private String buildFileLocation(String fileName) {
-        return MessageFormat.format("/{0}/{1}", this.getClass().getSimpleName(), fileName);
+        return org.mycore.common.MCRUtils.format("/{0}/{1}", this.getClass().getSimpleName(), fileName);
     }
 
 }

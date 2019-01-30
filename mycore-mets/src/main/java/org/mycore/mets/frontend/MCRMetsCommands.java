@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -98,7 +97,9 @@ public class MCRMetsCommands extends MCRAbstractCommands {
             try (InputStream metsInputStream = Files.newInputStream(metsFile)) {
                 metsDocument = saxBuilder.build(metsInputStream);
             } catch (IOException | JDOMException e) {
-                LOGGER.error(MessageFormat.format("Cannot fix METS of {0}. Can not parse mets.xml!", selectedObjectID),
+                LOGGER.error(
+                    org.mycore.common.MCRUtils.format("Cannot fix METS of {0}. Can not parse mets.xml!",
+                        selectedObjectID),
                     e);
                 return;
             }
@@ -108,7 +109,8 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                 mcrMetsSimpleModel = MCRXMLSimpleModelConverter.fromXML(metsDocument);
             } catch (Exception e) {
                 LOGGER.error(
-                    MessageFormat.format("Cannot fix METS of {0}. Can not convert to SimpleModel!", selectedObjectID),
+                    org.mycore.common.MCRUtils.format("Cannot fix METS of {0}. Can not convert to SimpleModel!",
+                        selectedObjectID),
                     e);
                 return;
             }
@@ -119,7 +121,8 @@ public class MCRMetsCommands extends MCRAbstractCommands {
                 xmlOutputter.output(newMets, os);
             } catch (IOException e) {
                 LOGGER.error(
-                    MessageFormat.format("Cannot fix METS of {0}. Can not write mets to derivate.", selectedObjectID));
+                    org.mycore.common.MCRUtils.format("Cannot fix METS of {0}. Can not write mets to derivate.",
+                        selectedObjectID));
             }
         }
     }

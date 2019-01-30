@@ -18,7 +18,6 @@
 
 package org.mycore.mods.enrichment;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +52,7 @@ class MCRIdentifierTypeFactory {
 
     private MCRIdentifierType buildIdentifierType(String typeID) {
         MCRConfiguration config = MCRConfiguration.instance();
-        String defaultXPath = MessageFormat.format(DEFAULT_XPATH, typeID);
+        String defaultXPath = org.mycore.common.MCRUtils.format(DEFAULT_XPATH, typeID);
         String xPath = config.getString("MCR.MODS.EnrichmentResolver.IdentifierType." + typeID, defaultXPath);
         return new MCRIdentifierType(typeID, xPath);
     }

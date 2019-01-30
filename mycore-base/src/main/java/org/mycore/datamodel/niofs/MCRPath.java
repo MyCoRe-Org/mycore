@@ -36,7 +36,6 @@ import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,7 +69,7 @@ public abstract class MCRPath implements Path {
             stringValue = this.path;
         } else {
             if (!path.isEmpty() && path.charAt(0) != SEPARATOR) {
-                final String msg = MessageFormat.format("If root is given, path has to start with ''{0}'': {1}",
+                final String msg = org.mycore.common.MCRUtils.format("If root is given, path has to start with ''{0}'': {1}",
                     SEPARATOR_STRING, path);
                 throw new IllegalArgumentException(msg);
             }

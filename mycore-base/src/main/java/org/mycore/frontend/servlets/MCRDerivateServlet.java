@@ -23,7 +23,6 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -88,7 +87,7 @@ public class MCRDerivateServlet extends MCRServlet {
             default:
                 job.getResponse()
                     .sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        MessageFormat.format("The task \"{0}\" is not supported.", task));
+                        org.mycore.common.MCRUtils.format("The task \"{0}\" is not supported.", task));
                 break;
         }
         return !job.getResponse().isCommitted();
@@ -106,7 +105,7 @@ public class MCRDerivateServlet extends MCRServlet {
             der.getDerivate().getInternals().setMainDoc(file);
             MCRMetadataManager.updateMCRDerivateXML(der);
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, MessageFormat.format("User has not the \""
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, org.mycore.common.MCRUtils.format("User has not the \""
                 + PERMISSION_WRITE + "\" permission on object {0}.", derivateId));
         }
     }
@@ -125,7 +124,7 @@ public class MCRDerivateServlet extends MCRServlet {
                 Files.walkFileTree(pathToFile, MCRRecursiveDeleter.instance());
             }
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, MessageFormat.format("User has not the \""
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, org.mycore.common.MCRUtils.format("User has not the \""
                 + PERMISSION_DELETE + "\" permission on object {0}.", derivateId));
         }
     }

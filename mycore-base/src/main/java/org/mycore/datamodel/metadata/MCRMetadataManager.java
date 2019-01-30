@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -380,10 +379,10 @@ public final class MCRMetadataManager {
         try {
             metaId = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
             if (MCRMetadataManager.removeDerivateFromObject(metaId, id)) {
-                LOGGER.info(MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} is deleted.", metaId, id));
+                LOGGER.info(org.mycore.common.MCRUtils.format("Link in MCRObject {0} to MCRDerivate {1} is deleted.", metaId, id));
             } else {
                 LOGGER.warn(
-                    MessageFormat.format("Link in MCRObject {0} to MCRDerivate {1} could not be deleted.", metaId, id));
+                    org.mycore.common.MCRUtils.format("Link in MCRObject {0} to MCRDerivate {1} could not be deleted.", metaId, id));
             }
         } catch (final Exception e) {
             LOGGER.warn("Can't delete link for MCRDerivate {} from MCRObject {}. Error ignored.", id, metaId);

@@ -27,7 +27,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -132,7 +131,7 @@ public class MCRThumbnailServlet extends MCRServlet {
             if (fileAttributes == null) {
                 job.getResponse().sendError(
                     HttpServletResponse.SC_NOT_FOUND,
-                    MessageFormat.format("Could not find iview2 file for {0}{1}", thumbnailInfo.derivate,
+                    org.mycore.common.MCRUtils.format("Could not find iview2 file for {0}{1}", thumbnailInfo.derivate,
                         thumbnailInfo.imagePath));
                 return;
             }

@@ -350,19 +350,19 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private SolrParameterGroup getParameterType(String parameterName) {
         if (isTypeParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
+            LOGGER.debug(org.mycore.common.MCRUtils.format("Parameter {0} is a {1}", parameterName,
                 SolrParameterGroup.TypeParameter.toString()));
             return SolrParameterGroup.TypeParameter;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
+            LOGGER.debug(org.mycore.common.MCRUtils.format("Parameter {0} is a {1}", parameterName,
                 SolrParameterGroup.SolrParameter.toString()));
             return SolrParameterGroup.SolrParameter;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
+            LOGGER.debug(org.mycore.common.MCRUtils.format("Parameter {0} is a {1}", parameterName,
                 SolrParameterGroup.SolrParameter.toString()));
             return SolrParameterGroup.SortParameter;
         } else {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
+            LOGGER.debug(org.mycore.common.MCRUtils.format("Parameter {0} is a {1}", parameterName,
                 SolrParameterGroup.QueryParameter.toString()));
             return SolrParameterGroup.QueryParameter;
         }

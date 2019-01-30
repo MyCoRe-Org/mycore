@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -239,10 +238,11 @@ public class MCRMetsSave {
 
             // add to file section
             String contentType = MCRContentTypes.probeContentType(file);
-            LOGGER.warn(MessageFormat.format("Content Type is : {0}", contentType));
+            LOGGER.warn(org.mycore.common.MCRUtils.format("Content Type is : {0}", contentType));
             String fileGrpUSE = getFileGroupUse(file);
 
-            String fileId = MessageFormat.format("{0}_{1}", fileGrpUSE.toLowerCase(Locale.ROOT), getFileBase(relPath));
+            String fileId = org.mycore.common.MCRUtils.format("{0}_{1}", fileGrpUSE.toLowerCase(Locale.ROOT),
+                getFileBase(relPath));
             File fileAsMetsFile = new File(fileId, contentType);
 
             FLocat fLocat = new FLocat(LOCTYPE.URL, relPath);
@@ -519,10 +519,11 @@ public class MCRMetsSave {
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
             LOGGER.info(
-                MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivateID));
+                org.mycore.common.MCRUtils.format("Derivate with id \"{0}\" has no mets file. Nothing to do",
+                    derivateID));
             return;
         }
-        LOGGER.info(MessageFormat.format("Update {0} URNS in Mets.xml", fileUrnMap.size()));
+        LOGGER.info(org.mycore.common.MCRUtils.format("Update {0} URNS in Mets.xml", fileUrnMap.size()));
         Mets metsObject = new Mets(mets);
         updateURNsInMetsDocument(metsObject, fileUrnMap);
         saveMets(metsObject.asDocument(), derivateID);
@@ -716,7 +717,7 @@ public class MCRMetsSave {
                             throw new IOException(e);
                         }
                         if (!fileGroup.contains(path)) {
-                            LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!",
+                            LOGGER.warn(org.mycore.common.MCRUtils.format("{0} does not appear in {1}!",
                                     path, mcrPath.getOwner()));
                             complete.set(false);
                             return FileVisitResult.TERMINATE;

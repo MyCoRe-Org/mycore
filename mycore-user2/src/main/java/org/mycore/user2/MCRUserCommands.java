@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -152,7 +151,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new MCRException("Can't create the superuser.", e);
         }
 
-        LOGGER.info(MessageFormat.format("The user {0} with password {1} is installed.", suser, spasswd));
+        LOGGER.info(org.mycore.common.MCRUtils.format("The user {0} with password {1} is installed.", suser, spasswd));
         return Collections.singletonList("change to user " + suser + " with " + spasswd);
     }
 
@@ -388,7 +387,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         Arrays.sort(listFiles);
         ArrayList<String> cmds = new ArrayList<>(listFiles.length);
         for (File file : listFiles) {
-            cmds.add(MessageFormat.format("{0} {1}", cmd, file.getAbsolutePath()));
+            cmds.add(org.mycore.common.MCRUtils.format("{0} {1}", cmd, file.getAbsolutePath()));
         }
         return cmds;
     }

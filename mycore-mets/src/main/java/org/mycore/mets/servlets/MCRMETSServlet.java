@@ -80,7 +80,7 @@ public class MCRMETSServlet extends MCRServlet {
 
         if (!Files.isDirectory(rootPath)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                MessageFormat.format("Derivate {0} does not exist.", derivate));
+                org.mycore.common.MCRUtils.format("Derivate {0} does not exist.", derivate));
             return;
         }
         request.setAttribute("XSL.derivateID", derivate);
