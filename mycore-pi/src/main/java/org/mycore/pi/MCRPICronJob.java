@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -14,6 +15,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -73,44 +75,52 @@ public class MCRPICronJob implements Runnable, MCRStartupHandler.AutoExecutable 
 
     public void run() {
         LOGGER.info("Running " + getName() + "..");
-
         if (tasks.stream().allMatch(Future::isDone)) {
             tasks.clear();
             final List<MCRPI> urns = MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE, -1);
-            urns.stream().map(mcrpi ->
-                new MCRFixedUserCallable<Void>(() -> {
-                    LOGGER.info("check {} is registered.", mcrpi.getIdentifier());
-                    MCRDNBURN dnburn = new MCRDNBURNParser()
-                        .parse(mcrpi.getIdentifier())
-                        .orElseThrow(
-                            () -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
-
-                    try {
-                        // Find register date in dnb rest
-                        Date dnbRegisteredDate = MCRURNUtils.getDNBRegisterDate(dnburn);
-
-                        if (dnbRegisteredDate == null) {
-                            return null;
-                        }
-
-                        mcrpi.setRegistered(dnbRegisteredDate);
-                        MCRPIServiceManager.getInstance().getRegistrationService(mcrpi.getService()).updateFlag(
-                            MCRObjectID.getInstance(mcrpi.getMycoreID()), mcrpi.getAdditional(), mcrpi);
-                    } catch (ParseException e) {
-                        LOGGER.error(
-                            "Could not parse Date from PIDEF ! URN wont be marked as registered because of this! ",
-                            e);
-                    } catch (MCRIdentifierUnresolvableException e) {
-                        LOGGER
-                            .error(
-                                "Could not update Date from PIDEF ! URN wont be marked as registered because of this! ",
-                                e);
-                    }
-                    return null;
-                }, MCRSystemUserInformation.getJanitorInstance()))
-                .map(CHECK_URN_EXECUTOR_SERVICE::submit)
+            urns.stream().map(mcrpi -> {
+                MCREntityManagerProvider.getCurrentEntityManager().detach(mcrpi);
+                return getCheckPICallable(mcrpi);
+            }).map(CHECK_URN_EXECUTOR_SERVICE::submit)
                 .forEach(tasks::add);
+
+            tasks.forEach(voidFuture -> {
+                try {
+                    voidFuture.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    LOGGER.error("Error in PICronjob!", e);
+                }
+            });
         }
+    }
+
+    private MCRFixedUserCallable<Void> getCheckPICallable(MCRPI mcrpi) {
+        return new MCRFixedUserCallable<Void>(() -> {
+            LOGGER.info("check {} is registered.", mcrpi.getIdentifier());
+            MCRDNBURN dnburn = new MCRDNBURNParser()
+                .parse(mcrpi.getIdentifier())
+                .orElseThrow(() -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
+
+            try {
+                // Find register date in dnb rest
+                Date dnbRegisteredDate = MCRURNUtils.getDNBRegisterDate(dnburn);
+
+                if (dnbRegisteredDate == null) {
+                    return null;
+                }
+
+                mcrpi.setRegistered(dnbRegisteredDate);
+                MCRPIServiceManager.getInstance().getRegistrationService(mcrpi.getService())
+                    .updateFlag(MCRObjectID.getInstance(mcrpi.getMycoreID()), mcrpi.getAdditional(), mcrpi);
+                MCREntityManagerProvider.getCurrentEntityManager().merge(mcrpi);
+            } catch (ParseException e) {
+                LOGGER.error("Could not parse Date from PIDEF ! URN wont be marked as registered because of this! ", e);
+            } catch (MCRIdentifierUnresolvableException e) {
+                LOGGER
+                    .error("Could not update Date from PIDEF ! URN wont be marked as registered because of this! ", e);
+            }
+            return null;
+        }, MCRSystemUserInformation.getJanitorInstance());
     }
 
     @Override
@@ -126,6 +136,7 @@ public class MCRPICronJob implements Runnable, MCRStartupHandler.AutoExecutable 
     @Override
     public void startUp(ServletContext servletContext) {
         addShutdownHandler(cronExcutorService);
-        cronExcutorService.scheduleWithFixedDelay(this, CRON_INITIAL_DELAY_MINUTES, CRON_PERIOD_MINUTES, TimeUnit.MINUTES);
+        cronExcutorService
+            .scheduleWithFixedDelay(this, CRON_INITIAL_DELAY_MINUTES, CRON_PERIOD_MINUTES, TimeUnit.MINUTES);
     }
 }
