@@ -21,6 +21,7 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -72,8 +73,8 @@ public class MCRErrorServlet extends HttpServlet {
         String requestURI = (String) req.getAttribute("javax.servlet.error.request_uri");
         String servletName = (String) req.getAttribute("javax.servlet.error.servletName");
         if (LOGGER.isDebugEnabled()) {
-            String msg = org.mycore.common.MCRUtils.format("Handling error {0} for request ''{1}'' message: {2}", statusCode,
-                requestURI, message);
+            String msg = new MessageFormat("Handling error {0} for request ''{1}'' message: {2}", Locale.ROOT)
+                .format(new Object[] { statusCode, requestURI, message });
             LOGGER.debug(msg, exception);
             LOGGER.debug("Has current session: {}", MCRSessionMgr.hasCurrentSession());
         }

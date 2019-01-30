@@ -23,12 +23,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -151,7 +153,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new MCRException("Can't create the superuser.", e);
         }
 
-        LOGGER.info(org.mycore.common.MCRUtils.format("The user {0} with password {1} is installed.", suser, spasswd));
+        LOGGER.info(new MessageFormat("The user {0} with password {1} is installed.", Locale.ROOT)
+            .format(new Object[] { suser, spasswd }));
         return Collections.singletonList("change to user " + suser + " with " + spasswd);
     }
 
@@ -387,7 +390,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         Arrays.sort(listFiles);
         ArrayList<String> cmds = new ArrayList<>(listFiles.length);
         for (File file : listFiles) {
-            cmds.add(org.mycore.common.MCRUtils.format("{0} {1}", cmd, file.getAbsolutePath()));
+            cmds.add(new MessageFormat("{0} {1}", Locale.ROOT).format(new Object[] { cmd, file.getAbsolutePath() }));
         }
         return cmds;
     }

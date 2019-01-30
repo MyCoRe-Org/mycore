@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -350,20 +351,20 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private SolrParameterGroup getParameterType(String parameterName) {
         if (isTypeParameter(parameterName)) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.TypeParameter.toString()));
+            LOGGER.debug(new MessageFormat("Parameter {0} is a {1}", Locale.ROOT)
+                .format(new Object[] { parameterName, SolrParameterGroup.TypeParameter.toString() }));
             return SolrParameterGroup.TypeParameter;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.SolrParameter.toString()));
+            LOGGER.debug(new MessageFormat("Parameter {0} is a {1}", Locale.ROOT)
+                .format(new Object[] { parameterName, SolrParameterGroup.SolrParameter.toString() }));
             return SolrParameterGroup.SolrParameter;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.SolrParameter.toString()));
+            LOGGER.debug(new MessageFormat("Parameter {0} is a {1}", Locale.ROOT)
+                .format(new Object[] { parameterName, SolrParameterGroup.SolrParameter.toString() }));
             return SolrParameterGroup.SortParameter;
         } else {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.QueryParameter.toString()));
+            LOGGER.debug(new MessageFormat("Parameter {0} is a {1}", Locale.ROOT)
+                .format(new Object[] { parameterName, SolrParameterGroup.QueryParameter.toString() }));
             return SolrParameterGroup.QueryParameter;
         }
     }

@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -620,7 +621,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         List<String> cmds = new ArrayList<>(objectIds.size());
         for (String id : objectIds) {
-            String command = org.mycore.common.MCRUtils.format(EXPORT_OBJECT_TO_DIRECTORY_COMMAND, id, dir.getAbsolutePath(), style);
+            String command = new MessageFormat(EXPORT_OBJECT_TO_DIRECTORY_COMMAND, Locale.ROOT)
+                .format(new Object[] { id, dir.getAbsolutePath(), style });
             cmds.add(command);
         }
         return cmds;

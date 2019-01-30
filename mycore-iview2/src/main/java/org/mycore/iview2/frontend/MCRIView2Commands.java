@@ -199,8 +199,9 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
         List<MCRPath> supportedFiles = getSupportedFiles(derivateRoot);
         return supportedFiles.stream()
-            .map(image -> org.mycore.common.MCRUtils.format(batchCommandSyntax, derivateID,
-                image.getOwnerRelativePath()))
+            .map(
+                image -> new MessageFormat(batchCommandSyntax, Locale.ROOT).format(
+                    new Object[] { derivateID, image.getOwnerRelativePath() }))
             .collect(Collectors.toList());
     }
 
@@ -279,8 +280,8 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 BufferedImage thumbnail = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, imageReader, 0);
                 int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
                 int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
-                LOGGER.debug(org.mycore.common.MCRUtils.format("Image size:{0}x{1}, tiles:{2}x{3}", props.getWidth(),
-                    props.getHeight(), maxX, maxY));
+                LOGGER.debug(new MessageFormat("Image size:{0}x{1}, tiles:{2}x{3}", Locale.ROOT)
+                    .format(new Object[] { props.getWidth(), props.getHeight(), maxX, maxY }));
                 try {
                     @SuppressWarnings("unused")
                     BufferedImage sampleTile = MCRIView2Tools.readTile(iviewFileRoot, imageReader,

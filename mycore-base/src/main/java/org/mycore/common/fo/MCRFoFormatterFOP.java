@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -143,8 +145,8 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     public void transform(MCRContent input, OutputStream out) throws TransformerException, IOException {
         try {
             final FOUserAgent userAgent = fopFactory.newFOUserAgent();
-            userAgent.setProducer(org.mycore.common.MCRUtils.format("MyCoRe {0} ({1})", MCRCoreVersion.getCompleteVersion(),
-                userAgent.getProducer()));
+            userAgent.setProducer(new MessageFormat("MyCoRe {0} ({1})", Locale.ROOT)
+                .format(new Object[] { MCRCoreVersion.getCompleteVersion(), userAgent.getProducer() }));
 
             final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, userAgent, out);
             final Source src = input.getSource();

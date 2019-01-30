@@ -19,6 +19,8 @@
 package org.mycore.frontend.jersey.filter;
 
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Locale;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
@@ -57,8 +59,9 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
         MCRSession session = MCRServlet.getSession(httpRequest);
         request.setProperty(ATTR, session);
         MCRSessionMgr.setCurrentSession(session);
-        LOGGER.info(org.mycore.common.MCRUtils.format("{0} ip={1} mcr={2} user={3}", request.getUriInfo().getPath(),
-            MCRFrontendUtil.getRemoteAddr(httpRequest), session.getID(), session.getUserInformation().getUserID()));
+        LOGGER.info(new MessageFormat("{0} ip={1} mcr={2} user={3}", Locale.ROOT).format(
+            new Object[] { request.getUriInfo().getPath(), MCRFrontendUtil.getRemoteAddr(httpRequest), session.getID(),
+                session.getUserInformation().getUserID() }));
         MCRFrontendUtil.configureSession(session, httpRequest, httpResponse);
     }
 

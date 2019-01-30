@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -384,7 +385,8 @@ public class MCRXMLFunctions {
             return false;
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("resource: {0} found at {1}", resourceName, resource.toString()));
+            LOGGER.debug(new MessageFormat("resource: {0} found at {1}", Locale.ROOT)
+                .format(new Object[] { resourceName, resource.toString() }));
         }
         return true;
     }

@@ -20,6 +20,7 @@ package org.mycore.common.content.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -406,7 +407,8 @@ public abstract class MCRServletContentHelper {
         if (req.getPathInfo() != null) {
             return extractFileName(req.getPathInfo());
         }
-        return org.mycore.common.MCRUtils.format("{0}-{1}", extractFileName(req.getServletPath()), System.currentTimeMillis());
+        return new MessageFormat("{0}-{1}", Locale.ROOT).format(
+            new Object[] { extractFileName(req.getServletPath()), System.currentTimeMillis() });
     }
 
     /**

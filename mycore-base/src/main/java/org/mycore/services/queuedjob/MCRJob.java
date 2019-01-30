@@ -18,8 +18,10 @@
 
 package org.mycore.services.queuedjob;
 
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.CollectionTable;
@@ -261,8 +263,8 @@ public class MCRJob implements Cloneable {
      */
     @Override
     public String toString() {
-        return org.mycore.common.MCRUtils.format("MCRJob [id:{0}, action:{1}, status:{2}, added:{3}, parameters:{4}]", getId(),
-            getAction().getName(), getStatus(), getAdded(), getParameters());
+        return new MessageFormat("MCRJob [id:{0}, action:{1}, status:{2}, added:{3}, parameters:{4}]", Locale.ROOT).format(
+            new Object[] { getId(), getAction().getName(), getStatus(), getAdded(), getParameters() });
     }
 
 }

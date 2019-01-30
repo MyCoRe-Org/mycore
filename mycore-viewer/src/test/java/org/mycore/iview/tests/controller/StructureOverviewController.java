@@ -74,8 +74,8 @@ public class StructureOverviewController extends SideBarController {
         List<WebElement> element = this.getDriver().findElements(selector);
         for (WebElement webElement : element) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                    selector.toString()));
+                LOGGER.debug(new MessageFormat("Found ''{0}'' with selector :''{1}''", Locale.ROOT)
+                    .format(new Object[] { element.toString(), selector.toString() }));
             }
             String text = webElement.getText();
             if ("undefined".equalsIgnoreCase(text)) {

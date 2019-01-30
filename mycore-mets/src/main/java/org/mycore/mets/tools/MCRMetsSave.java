@@ -242,8 +242,8 @@ public class MCRMetsSave {
             LOGGER.warn(new MessageFormat("Content Type is : {0}", Locale.ROOT).format(contentType));
             String fileGrpUSE = getFileGroupUse(file);
 
-            String fileId = org.mycore.common.MCRUtils.format("{0}_{1}", fileGrpUSE.toLowerCase(Locale.ROOT),
-                getFileBase(relPath));
+            String fileId = new MessageFormat("{0}_{1}", Locale.ROOT)
+                .format(new Object[] { fileGrpUSE.toLowerCase(Locale.ROOT), getFileBase(relPath) });
             File fileAsMetsFile = new File(fileId, contentType);
 
             FLocat fLocat = new FLocat(LOCTYPE.URL, relPath);
@@ -718,8 +718,8 @@ public class MCRMetsSave {
                             throw new IOException(e);
                         }
                         if (!fileGroup.contains(path)) {
-                            LOGGER.warn(org.mycore.common.MCRUtils.format("{0} does not appear in {1}!",
-                                    path, mcrPath.getOwner()));
+                            LOGGER.warn(new MessageFormat("{0} does not appear in {1}!", Locale.ROOT)
+                                .format(new Object[] { path, mcrPath.getOwner() }));
                             complete.set(false);
                             return FileVisitResult.TERMINATE;
                         }

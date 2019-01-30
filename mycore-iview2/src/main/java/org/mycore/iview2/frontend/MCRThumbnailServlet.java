@@ -27,7 +27,9 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -131,8 +133,8 @@ public class MCRThumbnailServlet extends MCRServlet {
             if (fileAttributes == null) {
                 job.getResponse().sendError(
                     HttpServletResponse.SC_NOT_FOUND,
-                    org.mycore.common.MCRUtils.format("Could not find iview2 file for {0}{1}", thumbnailInfo.derivate,
-                        thumbnailInfo.imagePath));
+                    new MessageFormat("Could not find iview2 file for {0}{1}", Locale.ROOT)
+                        .format(new Object[] { thumbnailInfo.derivate, thumbnailInfo.imagePath }));
                 return;
             }
             String centerThumb = job.getRequest().getParameter("centerThumb");

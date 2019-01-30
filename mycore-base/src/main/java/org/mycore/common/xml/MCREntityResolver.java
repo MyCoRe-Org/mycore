@@ -32,6 +32,7 @@ import java.nio.file.Paths;
 import java.nio.file.spi.FileSystemProvider;
 import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Vector;
 
@@ -102,7 +103,8 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     @Override
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Resolving: \npublicId: {0}\nsystemId: {1}", publicId, systemId));
+            LOGGER.debug(new MessageFormat("Resolving: \npublicId: {0}\nsystemId: {1}", Locale.ROOT)
+                .format(new Object[] { publicId, systemId }));
         }
         InputSource entity = catalogResolver.resolveEntity(publicId, systemId);
         if (entity != null) {
@@ -117,7 +119,8 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     @Override
     public InputSource getExternalSubset(String name, String baseURI) throws SAXException, IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("External Subset: \nname: {0}\nbaseURI: {1}", name, baseURI));
+            LOGGER.debug(new MessageFormat("External Subset: \nname: {0}\nbaseURI: {1}", Locale.ROOT)
+                .format(new Object[] { name, baseURI }));
         }
         InputSource externalSubset = catalogResolver.getExternalSubset(name, baseURI);
         if (externalSubset != null) {
@@ -133,8 +136,9 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
         throws SAXException, IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}",
-                name, publicId, baseURI, systemId));
+            LOGGER.debug(
+                new MessageFormat("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}", Locale.ROOT)
+                    .format(new Object[] { name, publicId, baseURI, systemId }));
         }
         InputSource entity = catalogResolver.resolveEntity(name, publicId, baseURI, systemId);
         if (entity != null) {

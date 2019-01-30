@@ -516,7 +516,4 @@ public class MCRUtils {
         return sw.toString();
     }
 
-    public static String format(String pattern, Object... parameter){
-        return new MessageFormat(pattern, Locale.ROOT).format(parameter);
-    }
 }

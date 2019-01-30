@@ -19,6 +19,7 @@
 package org.mycore.datamodel.common;
 
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.time.DateTimeException;
 import java.time.Instant;
@@ -136,8 +137,9 @@ public class MCRISO8601Date {
         }
         df = df.withZone(zone);
         if (LOGGER.isDebugEnabled()) {
-            String msg = org.mycore.common.MCRUtils.format("DateTime ''{0}'', using time zone ''{1}'', formatted: {2}", dt, zone,
-                dt != null ? df.format(dt) : null);
+            Object[] parameter = new Object[] { dt, zone, dt != null ? df.format(dt) : null };
+            String msg = new MessageFormat("DateTime ''{0}'', using time zone ''{1}'', formatted: {2}", Locale.ROOT)
+                .format(parameter);
             LOGGER.debug(msg);
         }
         String formatted = null;

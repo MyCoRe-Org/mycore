@@ -301,7 +301,8 @@ public class MCRIFSCommands {
                     if (bw != null) {
                         bw.close();
                     }
-                    File outputFile = new File(targetDir, org.mycore.common.MCRUtils.format("{0}-{1}.md5", nameOfProject, storeID));
+                    File outputFile = new File(targetDir,
+                        new MessageFormat("{0}-{1}.md5", Locale.ROOT).format(new Object[] { nameOfProject, storeID }));
                     LOGGER.info("Writing to file: {}", outputFile.getAbsolutePath());
                     bw = Files.newBufferedWriter(outputFile.toPath(), Charset.defaultCharset(),
                         StandardOpenOption.CREATE);
@@ -315,7 +316,7 @@ public class MCRIFSCommands {
                 String path = currentStoreBaseDir != null ? currentStore.getLocalFile(storageID).getAbsolutePath()
                     : storageID;
                 //current store initialized
-                String line = org.mycore.common.MCRUtils.format("{0}  {1}\n", md5, path);
+                String line = new MessageFormat("{0}  {1}\n", Locale.ROOT).format(new Object[] { md5, path });
                 bw.write(line);
             }
         } finally {
@@ -389,8 +390,8 @@ public class MCRIFSCommands {
                             outputStream.close();
                         }
                     }
-                    File outputFile = new File(targetDir, org.mycore.common.MCRUtils.format("{0}-{1}-{2}.xml", nameOfProject,
-                        storeID, rootName));
+                    File outputFile = new File(targetDir, new MessageFormat("{0}-{1}-{2}.xml", Locale.ROOT)
+                        .format(new Object[] { nameOfProject, storeID, rootName }));
                     streamResult = new StreamResult(new FileOutputStream(outputFile));
                     th = tf.newTransformerHandler();
                     Transformer serializer = th.getTransformer();
@@ -484,8 +485,8 @@ public class MCRIFSCommands {
             boolean endOfList = false;
             String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
             String storeID = currentStore.getID();
-            File outputFile = new File(targetDir, org.mycore.common.MCRUtils.format("{0}-{1}-{2}.xml", nameOfProject, storeID,
-                rootName));
+            File outputFile = new File(targetDir, new MessageFormat("{0}-{1}-{2}.xml", Locale.ROOT)
+                .format(new Object[] { nameOfProject, storeID, rootName }));
             StreamResult streamResult;
             try {
                 streamResult = new StreamResult(new FileOutputStream(outputFile));
@@ -548,8 +549,8 @@ public class MCRIFSCommands {
             LOGGER.warn("IFS Node {} does not exist.", nodeID);
             return;
         }
-        LOGGER.info(org.mycore.common.MCRUtils.format("Deleting IFS Node {0}: {1}{2}", nodeID, node.getOwnerID(),
-            node.getAbsolutePath()));
+        LOGGER.info(new MessageFormat("Deleting IFS Node {0}: {1}{2}", Locale.ROOT)
+            .format(new Object[] { nodeID, node.getOwnerID(), node.getAbsolutePath() }));
         node.delete();
     }
 
@@ -590,8 +591,8 @@ public class MCRIFSCommands {
                 .format(MCRFILESYSTEMNODE_SIZE_FIELD_NAME);
             throw new MCRException(message, e);
         } catch (IllegalAccessException e) {
-            String message = org.mycore.common.MCRUtils.format("Could not acces filed {0} in {1}!",
-                MCRFILESYSTEMNODE_SIZE_FIELD_NAME, directory.toString());
+            String message = new MessageFormat("Could not acces filed {0} in {1}!", Locale.ROOT)
+                .format(new Object[] { MCRFILESYSTEMNODE_SIZE_FIELD_NAME, directory.toString() });
             throw new MCRException(message, e);
         }
 
@@ -614,7 +615,8 @@ public class MCRIFSCommands {
         }
 
         LOGGER.info(
-            org.mycore.common.MCRUtils.format("Changed size of directory {0} to {1} Bytes", directory.getName(), directorySize));
+            new MessageFormat("Changed size of directory {0} to {1} Bytes", Locale.ROOT)
+                .format(new Object[] { directory.getName(), directorySize }));
         return directorySize;
     }
 

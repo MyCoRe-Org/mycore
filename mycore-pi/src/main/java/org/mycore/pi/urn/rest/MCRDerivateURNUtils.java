@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -102,8 +103,8 @@ public class MCRDerivateURNUtils {
      * @throws IOException
      */
     private static String getViewerURL(MCRPath file) {
-        return org.mycore.common.MCRUtils.format("{0}rsc/viewer/{1}/{2}", MCRFrontendUtil.getBaseURL(), file.getOwner(),
-            file.getFileName().toString());
+        return new MessageFormat("{0}rsc/viewer/{1}/{2}", Locale.ROOT).format(
+            new Object[] { MCRFrontendUtil.getBaseURL(), file.getOwner(), file.getFileName().toString() });
     }
 
     public static URL getDFGViewerURL(MCRPIRegistrationInfo urn) {

@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -327,8 +328,8 @@ public class MCRXMLMetadataManager {
                         setupStore(project, type, prefix, readOnly);
                     } catch (ReflectiveOperationException e) {
                         throw new MCRPersistenceException(
-                                org.mycore.common.MCRUtils.format("Could not instantiate store for project {0} and object type {1}.",
-                                        project, type), e);
+                            new MessageFormat("Could not instantiate store for project {0} and object type {1}.",
+                                Locale.ROOT).format(new Object[] { project, type }), e);
                     }
                 }
             }
@@ -336,8 +337,8 @@ public class MCRXMLMetadataManager {
         MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
         if (store == null) {
             throw new MCRPersistenceException(
-                    org.mycore.common.MCRUtils.format("Metadata store for project {0} and object type {1} is unconfigured.", project,
-                            type));
+                new MessageFormat("Metadata store for project {0} and object type {1} is unconfigured.", Locale.ROOT)
+                    .format(new Object[] { project, type }));
         }
         return store;
     }
@@ -356,7 +357,8 @@ public class MCRXMLMetadataManager {
             String property = configPrefix + "SVNRepositoryURL";
             String svnURL = config.getString(property, null);
             if (svnURL == null) {
-                String relativeURI = org.mycore.common.MCRUtils.format("{0}/{1}/", project, objectType);
+                String relativeURI = new MessageFormat("{0}/{1}/", Locale.ROOT)
+                    .format(new Object[] { project, objectType });
                 URI repURI = svnBase.resolve(relativeURI);
                 LOGGER.info("Resolved {} to {} for {}", relativeURI, repURI.toASCIIString(), property);
                 config.set(property, repURI.toASCIIString());

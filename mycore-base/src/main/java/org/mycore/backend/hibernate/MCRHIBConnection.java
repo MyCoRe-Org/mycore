@@ -73,8 +73,8 @@ public class MCRHIBConnection {
                 .format(Integer.toHexString(session.hashCode())));
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Returning session: {0} open: {1}",
-                Integer.toHexString(session.hashCode()), session.isOpen()));
+            LOGGER.debug(new MessageFormat("Returning session: {0} open: {1}", Locale.ROOT)
+                .format(new Object[] { Integer.toHexString(session.hashCode()), session.isOpen() }));
         }
         return session;
     }

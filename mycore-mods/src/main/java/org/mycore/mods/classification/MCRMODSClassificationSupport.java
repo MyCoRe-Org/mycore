@@ -20,6 +20,7 @@ package org.mycore.mods.classification;
 
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
+import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 
@@ -115,8 +116,8 @@ public final class MCRMODSClassificationSupport {
             throw new MCRException(e);
         }
 
-        return org.mycore.common.MCRUtils.format("classification:metadata:0:children:{0}:{1}", category.getRootID(),
-            id);
+        return new MessageFormat("classification:metadata:0:children:{0}:{1}", Locale.ROOT).format(
+            new Object[] { category.getRootID(), id });
     }
 
     public static String getClassCategParentLink(final NodeList sources) {

@@ -21,7 +21,9 @@
  */
 package org.mycore.iview.tests.controller;
 
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,8 +67,8 @@ public class WebDriverController {
         WebElement element = getDriver().findElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                selector.toString()));
+            LOGGER.debug(new MessageFormat("Found ''{0}'' with selector :''{1}''", Locale.ROOT)
+                .format(new Object[] { element.toString(), selector.toString() }));
         }
 
         element.click();
@@ -84,8 +86,8 @@ public class WebDriverController {
         WebElement element = getDriver().findElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                selector.toString()));
+            LOGGER.debug(new MessageFormat("Found ''{0}'' with selector :''{1}''", Locale.ROOT)
+                .format(new Object[] { element.toString(), selector.toString() }));
         }
 
         Actions builder = new Actions(getDriver());
@@ -119,14 +121,15 @@ public class WebDriverController {
         List<WebElement> element = getDriver().findElements(selector);
         for (WebElement webElement : element) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", webElement.toString(),
-                    selector.toString()));
+                LOGGER.debug(new MessageFormat("Found ''{0}'' with selector :''{1}''", Locale.ROOT)
+                    .format(new Object[] { webElement.toString(), selector.toString() }));
             }
             if (webElement.getAttribute(attribute) != null) {
                 return webElement.getAttribute(attribute).contains(assertion);
             }
         }
-        LOGGER.error(org.mycore.common.MCRUtils.format("Element {0} or Attribute '{1}' not fot found!", xPath, attribute));
+        LOGGER.error(new MessageFormat("Element {0} or Attribute '{1}' not fot found!", Locale.ROOT)
+            .format(new Object[] { xPath, attribute }));
         return false;
     }
 
@@ -138,17 +141,18 @@ public class WebDriverController {
      * @return true if an element is found
      */
     public boolean assertElementByAttributePresent(String attribute, String value) {
-        By selector = By.xpath(org.mycore.common.MCRUtils.format("//*[contains(@{0},\"{1}\")]", attribute, value));
+        By selector = By.xpath(
+            new MessageFormat("//*[contains(@{0},\"{1}\")]", Locale.ROOT).format(new Object[] { attribute, value }));
         List<WebElement> elements = getDriver().findElements(selector);
         if (elements.isEmpty()) {
-            LOGGER.error(org.mycore.common.MCRUtils.format("No element with attribute '{0}' and value '{1}' found!", attribute,
-                value));
+            LOGGER.error(new MessageFormat("No element with attribute '{0}' and value '{1}' found!", Locale.ROOT)
+                .format(new Object[] { attribute, value }));
             return false;
         }
         for (WebElement webElement : elements) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", webElement.toString(),
-                    selector.toString()));
+                LOGGER.debug(new MessageFormat("Found ''{0}'' with selector :''{1}''", Locale.ROOT)
+                    .format(new Object[] { webElement.toString(), selector.toString() }));
             }
         }
         return true;

@@ -30,6 +30,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -159,7 +160,8 @@ public class MCRServlet extends HttpServlet {
             String id = spe.getSystemId() != null ? spe.getSystemId() : spe.getPublicId();
             int line = spe.getLineNumber();
             int column = spe.getColumnNumber();
-            String msg = org.mycore.common.MCRUtils.format("Error on {0}:{1} while parsing {2}", line, column, id);
+            String msg = new MessageFormat("Error on {0}:{1} while parsing {2}", Locale.ROOT)
+                .format(new Object[] { line, column, id });
             throw new IOException(msg, e);
         }
         throw new IOException(e);
@@ -542,7 +544,8 @@ public class MCRServlet extends HttpServlet {
      *            any arguments that should be passed to {@link MCRTranslation#translate(String, Object...)}
      */
     protected String getErrorI18N(String prefix, String subIdentifier, Object... args) {
-        String key = org.mycore.common.MCRUtils.format("{0}.{1}.{2}", prefix, getClass().getSimpleName(), subIdentifier);
+        String key = new MessageFormat("{0}.{1}.{2}", Locale.ROOT)
+            .format(new Object[] { prefix, getClass().getSimpleName(), subIdentifier });
         return MCRTranslation.translate(key, args);
     }
 

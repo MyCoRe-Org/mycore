@@ -21,6 +21,8 @@ package org.mycore.iview.tests.base;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -136,7 +138,7 @@ public class ImageOverviewIT extends ViewerTestBase {
     }
 
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
-        String message = org.mycore.common.MCRUtils.format(messagePattern, lessValue, moreValue);
+        String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
         Assert.assertTrue(message, lessValue < moreValue);
     }

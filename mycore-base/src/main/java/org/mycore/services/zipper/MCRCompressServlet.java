@@ -30,8 +30,10 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -221,9 +223,10 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
 
     private String getFileName(MCRObjectID id, String path) {
         if (path == null || path.equals("")) {
-            return org.mycore.common.MCRUtils.format("{0}.{1}", id, getFileExtension());
+            return new MessageFormat("{0}.{1}", Locale.ROOT).format(new Object[] { id, getFileExtension() });
         } else {
-            return org.mycore.common.MCRUtils.format("{0}-{1}.{2}", id, path.replaceAll("/", "-"), getFileExtension());
+            return new MessageFormat("{0}-{1}.{2}", Locale.ROOT).format(
+                new Object[] { id, path.replaceAll("/", "-"), getFileExtension() });
         }
     }
 

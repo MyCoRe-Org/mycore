@@ -18,6 +18,9 @@
 
 package org.mycore.common;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+
 /**
  * @author shermann
  *
@@ -67,7 +70,8 @@ public class MCRGeoUtilities {
         int minutes = (int) ((inDecimalDegree - degree) * 60);
         double seconds = ((inDecimalDegree - degree) * 60 - minutes) * 60;
 
-        return org.mycore.common.MCRUtils.format("{0}° {1}'' {2}", degree, minutes, Math.round(seconds * 100d) / 100d);
+        return new MessageFormat("{0}° {1}'' {2}", Locale.ROOT).format(
+            new Object[] { degree, minutes, Math.round(seconds * 100d) / 100d });
     }
 
     /**
@@ -90,8 +94,9 @@ public class MCRGeoUtilities {
             seconds = Double.valueOf(strings[3]);
         }
 
-        return org.mycore.common.MCRUtils.format("{0}° {1}'' {2} {3}", Integer.valueOf(strings[1]), Integer.valueOf(strings[2]),
-            Math.round(seconds * 100d) / 100d, strings[0]);
+        return new MessageFormat("{0}° {1}'' {2} {3}", Locale.ROOT).format(
+            new Object[] { Integer.valueOf(strings[1]), Integer.valueOf(strings[2]), Math.round(seconds * 100d) / 100d,
+                strings[0] });
     }
 
     /**

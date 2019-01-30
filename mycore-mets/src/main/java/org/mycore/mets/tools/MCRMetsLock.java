@@ -52,7 +52,8 @@ public class MCRMetsLock {
             String lastAccessID = MCRMetsLock.metsAccessSessionTable.get(derivateId);
             MCRSession lastSession = MCRSessionMgr.getSession(lastAccessID);
             LOGGER
-                .debug(org.mycore.common.MCRUtils.format("{0} is locked : {1}", derivateIdString, lastSession != null));
+                .debug(new MessageFormat("{0} is locked : {1}", Locale.ROOT)
+                    .format(new Object[] { derivateIdString, lastSession != null }));
             return lastSession != null;
         } else {
             LOGGER.debug(new MessageFormat("{0} is not locked", Locale.ROOT).format(derivateIdString));

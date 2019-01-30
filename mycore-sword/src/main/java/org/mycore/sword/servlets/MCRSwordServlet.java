@@ -18,6 +18,9 @@
 
 package org.mycore.sword.servlets;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,8 +45,9 @@ public class MCRSwordServlet extends HttpServlet {
         }
         MCRSession session = MCRServlet.getSession(req);
         MCRSessionMgr.setCurrentSession(session);
-        LOGGER.info(org.mycore.common.MCRUtils.format("{0} ip={1} mcr={2} user={3}", req.getPathInfo(),
-            MCRFrontendUtil.getRemoteAddr(req), session.getID(), session.getUserInformation().getUserID()));
+        LOGGER.info(new MessageFormat("{0} ip={1} mcr={2} user={3}", Locale.ROOT).format(
+            new Object[] { req.getPathInfo(), MCRFrontendUtil.getRemoteAddr(req), session.getID(),
+                session.getUserInformation().getUserID() }));
         MCRFrontendUtil.configureSession(session, req, resp);
         MCRSessionMgr.getCurrentSession().beginTransaction();
     }

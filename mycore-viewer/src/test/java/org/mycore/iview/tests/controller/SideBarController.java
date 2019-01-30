@@ -69,8 +69,8 @@ public class SideBarController extends WebDriverController {
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                selector.toString()));
+            LOGGER.debug(new MessageFormat("Found ''{0}'' with selector :''{1}''", Locale.ROOT)
+                .format(new Object[] { element.toString(), selector.toString() }));
         }
 
         return element.getSize().getWidth();

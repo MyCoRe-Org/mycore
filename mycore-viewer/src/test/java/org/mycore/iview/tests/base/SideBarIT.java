@@ -18,6 +18,9 @@
 
 package org.mycore.iview.tests.base;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -116,7 +119,7 @@ public class SideBarIT extends ViewerTestBase {
     }
 
     private void assertLess(int moreValue, int lessValue, String messagePattern) {
-        String message = org.mycore.common.MCRUtils.format(messagePattern, lessValue, moreValue);
+        String message = new MessageFormat(messagePattern, Locale.ROOT).format(new Object[] { lessValue, moreValue });
         LOGGER.debug(message);
         Assert.assertTrue(message, lessValue < moreValue);
     }

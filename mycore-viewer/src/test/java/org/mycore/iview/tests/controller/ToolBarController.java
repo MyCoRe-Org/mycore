@@ -71,8 +71,8 @@ public class ToolBarController extends WebDriverController {
         WebElement element = this.getDriver().findElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                selector.toString()));
+            LOGGER.debug(new MessageFormat("Found ''{0}'' with selector :''{1}''", Locale.ROOT)
+                .format(new Object[] { element.toString(), selector.toString() }));
         }
 
         element.click();
@@ -91,8 +91,8 @@ public class ToolBarController extends WebDriverController {
         WebElement element = getNotStaleElement(trys, selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(org.mycore.common.MCRUtils.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                selector.toString()));
+            LOGGER.debug(new MessageFormat("Found ''{0}'' with selector :''{1}''", Locale.ROOT)
+                .format(new Object[] { element.toString(), selector.toString() }));
         }
 
         List<WebElement> webElements = getDriver().findElements(selector);

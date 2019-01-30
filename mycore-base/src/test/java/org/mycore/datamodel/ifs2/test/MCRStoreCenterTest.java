@@ -18,6 +18,9 @@
 
 package org.mycore.datamodel.ifs2.test;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -81,7 +84,7 @@ public class MCRStoreCenterTest {
     }
 
     private String getPropName(String storeID, String propType) {
-        return org.mycore.common.MCRUtils.format("MCR.IFS2.Store.{0}.{1}", storeID, propType);
+        return new MessageFormat("MCR.IFS2.Store.{0}.{1}", Locale.ROOT).format(new Object[] { storeID, propType });
     }
 
     public static class FakeStore extends MCRStore {
