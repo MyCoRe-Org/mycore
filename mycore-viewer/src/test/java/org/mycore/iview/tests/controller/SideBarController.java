@@ -18,7 +18,9 @@
 
 package org.mycore.iview.tests.controller;
 
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 
 import org.apache.logging.log4j.LogManager;
@@ -61,7 +63,8 @@ public class SideBarController extends WebDriverController {
         By selector = By.xpath("//div[contains(@class,\"sidebar\")]");
         WebElement element = getDriver().findElement(selector);
         if (element == null) {
-            LOGGER.error(org.mycore.common.MCRUtils.format("No element with xpath: '{0}' found!", selector.toString()));
+            LOGGER.error(
+                new MessageFormat("No element with xpath: '{0}' found!", Locale.ROOT).format(selector.toString()));
             throw new NoSuchElementException();
         }
 

@@ -22,6 +22,7 @@
 package org.mycore.iview.tests.controller;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 
 import org.openqa.selenium.WebDriver;
 
@@ -45,7 +46,8 @@ public class ImageOverviewController extends SideBarController {
      * @param orderLabel
      */
     public void clickImageByOrder(String orderLabel) {
-        clickElementByXpath(org.mycore.common.MCRUtils.format("//div[@class=\"caption\" and contains(text(),\"{0}\")]", orderLabel));
+        clickElementByXpath(
+            new MessageFormat("//div[@class=\"caption\" and contains(text(),\"{0}\")]", Locale.ROOT).format(orderLabel));
     }
 
     /**

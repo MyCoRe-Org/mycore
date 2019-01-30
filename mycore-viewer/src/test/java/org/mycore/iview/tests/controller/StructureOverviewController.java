@@ -21,7 +21,9 @@
  */
 package org.mycore.iview.tests.controller;
 
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,16 +53,14 @@ public class StructureOverviewController extends SideBarController {
      * @param orderLabel
      */
     public void selectImageByOrder(String orderLabel) {
-        String xpath = org.mycore.common.MCRUtils.format("//li/a[../span[@class=\"childLabel\" and contains(text(),\"{0}\")]"
-            + "]|//li/a[contains(text(),\"{0}\")]",
-            orderLabel);
+        String xpath = new MessageFormat("//li/a[../span[@class=\"childLabel\" and contains(text(),\"{0}\")]"
+            + "]|//li/a[contains(text(),\"{0}\")]", Locale.ROOT).format(orderLabel);
         clickElementByXpath(xpath);
     }
 
     public boolean isImageSelected(String orderLabel) {
-        String xPath = org.mycore.common.MCRUtils.format("//li[./span[@class=\"childLabel\" and contains(text(),\"{0}\")]|"
-            + "./a[contains(text(),\"{0}\")]]",
-            orderLabel);
+        String xPath = new MessageFormat("//li[./span[@class=\"childLabel\" and contains(text(),\"{0}\")]|"
+            + "./a[contains(text(),\"{0}\")]]", Locale.ROOT).format(orderLabel);
         return assertAttributeByXpath(xPath, "data-selected", true);
     }
 

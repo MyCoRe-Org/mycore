@@ -24,6 +24,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -70,7 +71,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     public static List<String> loadFromDirectory(String directory, String projectID) {
         File dir = new File(directory);
         if (!dir.isDirectory()) {
-            throw new MCRException(org.mycore.common.MCRUtils.format("File {0} is not a directory.", directory));
+            throw new MCRException(new MessageFormat("File {0} is not a directory.", Locale.ROOT).format(directory));
         }
         String[] list = dir.list();
         if (list.length == 0) {
@@ -93,7 +94,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
             throw new MCRException(
-                org.mycore.common.MCRUtils.format("File {0} is not a file.", modsFile.getAbsolutePath()));
+                new MessageFormat("File {0} is not a file.", Locale.ROOT).format(modsFile.getAbsolutePath()));
         }
         SAXBuilder s = new SAXBuilder(XMLReaders.NONVALIDATING, null, null);
         Document modsDoc = s.build(modsFile);
@@ -102,7 +103,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         Element modsRoot = modsDoc.getRootElement();
         if (!modsRoot.getNamespace().equals(MCRConstants.MODS_NAMESPACE)) {
             throw new MCRException(
-                org.mycore.common.MCRUtils.format("File {0} is not a MODS document.", modsFile.getAbsolutePath()));
+                new MessageFormat("File {0} is not a MODS document.", Locale.ROOT).format(modsFile.getAbsolutePath()));
         }
         if (modsRoot.getName().equals("modsCollection")) {
             List<Element> modsElements = modsRoot.getChildren("mods", MCRConstants.MODS_NAMESPACE);
@@ -123,13 +124,13 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
             throw new MCRException(
-                org.mycore.common.MCRUtils.format("File {0} is not a file.", modsFile.getAbsolutePath()));
+                new MessageFormat("File {0} is not a file.", Locale.ROOT).format(modsFile.getAbsolutePath()));
         }
 
         File fileDir = new File(fileDirName);
         if (!fileDir.isDirectory()) {
             throw new MCRException(
-                org.mycore.common.MCRUtils.format("Directory {0} is not a directory.", fileDir.getAbsolutePath()));
+                new MessageFormat("Directory {0} is not a directory.", Locale.ROOT).format(fileDir.getAbsolutePath()));
         }
 
         SAXBuilder s = new SAXBuilder(XMLReaders.NONVALIDATING, null, null);
@@ -139,13 +140,12 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         Element modsRoot = modsDoc.getRootElement();
         if (!modsRoot.getNamespace().equals(MCRConstants.MODS_NAMESPACE)) {
             throw new MCRException(
-                org.mycore.common.MCRUtils.format("File {0} is not a MODS document.", modsFile.getAbsolutePath()));
+                new MessageFormat("File {0} is not a MODS document.", Locale.ROOT).format(modsFile.getAbsolutePath()));
         }
         if (modsRoot.getName().equals("modsCollection")) {
             throw new MCRException(
-                org.mycore.common.MCRUtils.format(
-                    "File {0} contains a mods collection witch not supported by this command.",
-                    modsFile.getAbsolutePath()));
+                new MessageFormat("File {0} contains a mods collection witch not supported by this command.",
+                    Locale.ROOT).format(modsFile.getAbsolutePath()));
         } else {
             createDerivate(saveAsMyCoReObject(projectID, modsRoot), fileDir);
         }

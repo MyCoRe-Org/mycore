@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -80,7 +81,7 @@ public class MCRMETSServlet extends MCRServlet {
 
         if (!Files.isDirectory(rootPath)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                org.mycore.common.MCRUtils.format("Derivate {0} does not exist.", derivate));
+                new MessageFormat("Derivate {0} does not exist.", Locale.ROOT).format(derivate));
             return;
         }
         request.setAttribute("XSL.derivateID", derivate);

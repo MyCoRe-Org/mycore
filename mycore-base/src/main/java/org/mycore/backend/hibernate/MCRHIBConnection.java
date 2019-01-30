@@ -18,6 +18,9 @@
 
 package org.mycore.backend.hibernate;
 
+import java.text.MessageFormat;
+import java.util.Locale;
+
 import javax.persistence.EntityManager;
 
 import org.apache.logging.log4j.LogManager;
@@ -66,8 +69,8 @@ public class MCRHIBConnection {
         EntityManager currentEntityManager = MCREntityManagerProvider.getCurrentEntityManager();
         Session session = currentEntityManager.unwrap(Session.class);
         if (!session.isOpen()) {
-            LOGGER.warn(org.mycore.common.MCRUtils.format("Hibernate session {0} is closed.",
-                Integer.toHexString(session.hashCode())));
+            LOGGER.warn(new MessageFormat("Hibernate session {0} is closed.", Locale.ROOT)
+                .format(Integer.toHexString(session.hashCode())));
         }
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(org.mycore.common.MCRUtils.format("Returning session: {0} open: {1}",

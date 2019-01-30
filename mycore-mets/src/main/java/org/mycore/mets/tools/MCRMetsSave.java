@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -238,7 +239,7 @@ public class MCRMetsSave {
 
             // add to file section
             String contentType = MCRContentTypes.probeContentType(file);
-            LOGGER.warn(org.mycore.common.MCRUtils.format("Content Type is : {0}", contentType));
+            LOGGER.warn(new MessageFormat("Content Type is : {0}", Locale.ROOT).format(contentType));
             String fileGrpUSE = getFileGroupUse(file);
 
             String fileId = org.mycore.common.MCRUtils.format("{0}_{1}", fileGrpUSE.toLowerCase(Locale.ROOT),
@@ -519,11 +520,11 @@ public class MCRMetsSave {
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
             LOGGER.info(
-                org.mycore.common.MCRUtils.format("Derivate with id \"{0}\" has no mets file. Nothing to do",
-                    derivateID));
+                new MessageFormat("Derivate with id \"{0}\" has no mets file. Nothing to do", Locale.ROOT)
+                    .format(derivateID));
             return;
         }
-        LOGGER.info(org.mycore.common.MCRUtils.format("Update {0} URNS in Mets.xml", fileUrnMap.size()));
+        LOGGER.info(new MessageFormat("Update {0} URNS in Mets.xml", Locale.ROOT).format(fileUrnMap.size()));
         Mets metsObject = new Mets(mets);
         updateURNsInMetsDocument(metsObject, fileUrnMap);
         saveMets(metsObject.asDocument(), derivateID);

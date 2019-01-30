@@ -18,7 +18,9 @@
 
 package org.mycore.iview.tests.controller;
 
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,7 +67,7 @@ public class ToolBarController extends WebDriverController {
      * @param id
      */
     public void pressButton(String id) {
-        By selector = By.cssSelector(org.mycore.common.MCRUtils.format(BUTTON_SELECTOR_PATTERN, id));
+        By selector = By.cssSelector(new MessageFormat(BUTTON_SELECTOR_PATTERN, Locale.ROOT).format(id));
         WebElement element = this.getDriver().findElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
@@ -84,7 +86,7 @@ public class ToolBarController extends WebDriverController {
     public void clickElementById(String id) {
         int trys = 10;
 
-        By selector = By.cssSelector(org.mycore.common.MCRUtils.format(ELEMENT_SELECTOR_PATTERN, id));
+        By selector = By.cssSelector(new MessageFormat(ELEMENT_SELECTOR_PATTERN, Locale.ROOT).format(id));
 
         WebElement element = getNotStaleElement(trys, selector);
 

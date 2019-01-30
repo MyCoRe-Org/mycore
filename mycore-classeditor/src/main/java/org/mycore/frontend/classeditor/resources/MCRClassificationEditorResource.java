@@ -23,11 +23,13 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -294,7 +296,7 @@ public class MCRClassificationEditorResource {
         params.set("rows", rows != null ? rows : 50);
         params.set("fl", "id");
         String configQuery = MCRConfiguration.instance().getString("MCR.Solr.linkQuery", "category.top:{0}");
-        String query = org.mycore.common.MCRUtils.format(configQuery, id.replaceAll(":", "\\\\:"));
+        String query = new MessageFormat(configQuery, Locale.ROOT).format(id.replaceAll(":", "\\\\:"));
         params.set("q", query);
         QueryResponse solrResponse = solrClient.query(params);
         SolrDocumentList solrResults = solrResponse.getResults();

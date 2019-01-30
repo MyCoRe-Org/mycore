@@ -28,9 +28,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -109,7 +111,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
-            cmds.add(org.mycore.common.MCRUtils.format(batchCommandSyntax, id));
+            cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(id));
         }
         return cmds;
     }
@@ -141,7 +143,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             if (id.startsWith(project)) {
-                cmds.add(org.mycore.common.MCRUtils.format(batchCommandSyntax, id));
+                cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(id));
             }
         }
         return cmds;
@@ -385,7 +387,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
         ArrayList<String> cmds = new ArrayList<>(derivateIds.size());
         for (MCRObjectID derId : derivateIds) {
-            cmds.add(org.mycore.common.MCRUtils.format(batchCommandSyntax, derId));
+            cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(derId));
         }
         return cmds;
     }

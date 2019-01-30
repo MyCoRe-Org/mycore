@@ -18,8 +18,10 @@
 
 package org.mycore.mods.enrichment;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.mycore.common.config.MCRConfiguration;
@@ -52,7 +54,7 @@ class MCRIdentifierTypeFactory {
 
     private MCRIdentifierType buildIdentifierType(String typeID) {
         MCRConfiguration config = MCRConfiguration.instance();
-        String defaultXPath = org.mycore.common.MCRUtils.format(DEFAULT_XPATH, typeID);
+        String defaultXPath = new MessageFormat(DEFAULT_XPATH, Locale.ROOT).format(typeID);
         String xPath = config.getString("MCR.MODS.EnrichmentResolver.IdentifierType." + typeID, defaultXPath);
         return new MCRIdentifierType(typeID, xPath);
     }

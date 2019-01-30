@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -557,7 +558,8 @@ public class MCRIFSCommands {
         MCRDirectory mcrDirectory = (MCRDirectory) MCRFilesystemNode.getRootNode(id);
 
         if (mcrDirectory == null) {
-            throw new IllegalArgumentException(org.mycore.common.MCRUtils.format("Could not get root node for {0}", id));
+            throw new IllegalArgumentException(
+                new MessageFormat("Could not get root node for {0}", Locale.ROOT).format(id));
         }
 
         fixDirectorySize(mcrDirectory);
@@ -584,8 +586,8 @@ public class MCRIFSCommands {
             privateLongField.set(directory, directorySize);
 
         } catch (NoSuchFieldException e) {
-            String message = org.mycore.common.MCRUtils.format("There is no field named {0} in MCRFileSystemNode!",
-                MCRFILESYSTEMNODE_SIZE_FIELD_NAME);
+            String message = new MessageFormat("There is no field named {0} in MCRFileSystemNode!", Locale.ROOT)
+                .format(MCRFILESYSTEMNODE_SIZE_FIELD_NAME);
             throw new MCRException(message, e);
         } catch (IllegalAccessException e) {
             String message = org.mycore.common.MCRUtils.format("Could not acces filed {0} in {1}!",
@@ -604,10 +606,11 @@ public class MCRIFSCommands {
             touchMethod.invoke(directory, LastModifiedFileTime, false);
         } catch (NoSuchMethodException e) {
             throw new MCRException(
-                org.mycore.common.MCRUtils.format("There is no {0}-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
+                new MessageFormat("There is no {0}-method..", Locale.ROOT).format(MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new MCRException(
-                org.mycore.common.MCRUtils.format("Error while calling {0}-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
+                new MessageFormat("Error while calling {0}-method..", Locale.ROOT)
+                    .format(MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
         }
 
         LOGGER.info(

@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -92,7 +93,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
         if (!Files.isDirectory(rootPath)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                org.mycore.common.MCRUtils.format("Derivate {0} does not exist.", derivateID));
+                new MessageFormat("Derivate {0} does not exist.", Locale.ROOT).format(derivateID));
             return;
         }
         request.setAttribute("XSL.derivateID", derivateID);
