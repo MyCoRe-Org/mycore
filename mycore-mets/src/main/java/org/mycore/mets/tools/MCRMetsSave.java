@@ -239,7 +239,7 @@ public class MCRMetsSave {
 
             // add to file section
             String contentType = MCRContentTypes.probeContentType(file);
-            LOGGER.warn("Content Type is : {}"contentType);
+            LOGGER.warn("Content Type is : {}", contentType);
             String fileGrpUSE = getFileGroupUse(file);
 
             String fileId = new MessageFormat("{0}_{1}", Locale.ROOT)
