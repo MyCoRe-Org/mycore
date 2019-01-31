@@ -18,8 +18,6 @@
 
 package org.mycore.sword.manager;
 
-import java.text.MessageFormat;
-import java.util.Locale;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletResponse;

@@ -44,7 +44,6 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
@@ -515,5 +514,4 @@ public class MCRUtils {
         t.printStackTrace(new PrintWriter(sw)); // closing string writer has no effect
         return sw.toString();
     }
-
 }

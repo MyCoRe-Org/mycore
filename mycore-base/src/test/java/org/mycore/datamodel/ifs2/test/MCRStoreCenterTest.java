@@ -18,13 +18,13 @@
 
 package org.mycore.datamodel.ifs2.test;
 
-import java.text.MessageFormat;
-import java.util.Locale;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.text.MessageFormat;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
