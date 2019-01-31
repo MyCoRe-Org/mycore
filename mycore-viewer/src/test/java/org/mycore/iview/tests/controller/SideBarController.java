@@ -66,7 +66,7 @@ public class SideBarController extends WebDriverController {
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString()));
+            LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
         }
 
         return element.getSize().getWidth();
