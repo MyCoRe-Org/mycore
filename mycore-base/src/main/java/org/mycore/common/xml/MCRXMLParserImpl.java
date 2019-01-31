@@ -21,8 +21,6 @@ package org.mycore.common.xml;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
-import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -173,10 +171,10 @@ public class MCRXMLParserImpl implements MCRXMLParser {
             baseURI = normalize(baseURI);
             int pos = baseURI.lastIndexOf('/');
             String prefix = baseURI.substring(0, pos + 1);
-            LOGGER.debug(new MessageFormat("prefix of baseURI ''{0}'' is: {1}", Locale.ROOT)
-                .format(new Object[] { baseURI, prefix }));
-            LOGGER.debug(new MessageFormat("systemId: {0} prefixed? {1}", Locale.ROOT)
-                .format(new Object[] { systemId, systemId.startsWith(prefix) }));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("prefix of baseURI ''{}'' is: {}", baseURI, prefix);
+                LOGGER.debug("systemId: {0} prefixed? {1}", systemId, systemId.startsWith(prefix));
+            }
             if (prefix.length() > 0 && systemId.startsWith(prefix)) {
                 systemId = systemId.substring(prefix.length());
                 LOGGER.debug("new systemId: {}", systemId);

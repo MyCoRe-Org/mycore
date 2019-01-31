@@ -153,8 +153,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new MCRException("Can't create the superuser.", e);
         }
 
-        LOGGER.info(new MessageFormat("The user {0} with password {1} is installed.", Locale.ROOT)
-            .format(new Object[] { suser, spasswd }));
+        LOGGER.info("The user {} with password {} is installed.", suser, spasswd);
         return Collections.singletonList("change to user " + suser + " with " + spasswd);
     }
 

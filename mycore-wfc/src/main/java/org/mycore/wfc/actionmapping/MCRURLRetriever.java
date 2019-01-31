@@ -18,10 +18,8 @@
 
 package org.mycore.wfc.actionmapping;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -90,8 +88,7 @@ public final class MCRURLRetriever {
             if (act.getAction().equals(action)) {
                 if (LOGGER.isDebugEnabled()) {
                     String mcrId = categoryReference == null ? null : categoryReference.getObjectID();
-                    LOGGER.debug(new MessageFormat("Collection: {0}, Action: {1}, Object: {2}", Locale.ROOT)
-                        .format(new Object[] { collection.getName(), action, mcrId }));
+                    LOGGER.debug("Collection: {}, Action: {}, Object: {}", collection.getName(), action, mcrId);
                 }
                 String url = act.getURL(new MCRWorkflowData(categoryReference));
                 if (absolute && url != null && url.startsWith("/")) {

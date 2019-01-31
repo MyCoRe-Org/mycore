@@ -549,8 +549,7 @@ public class MCRIFSCommands {
             LOGGER.warn("IFS Node {} does not exist.", nodeID);
             return;
         }
-        LOGGER.info(new MessageFormat("Deleting IFS Node {0}: {1}{2}", Locale.ROOT)
-            .format(new Object[] { nodeID, node.getOwnerID(), node.getAbsolutePath() }));
+        LOGGER.info("Deleting IFS Node {}: {}{}", nodeID, node.getOwnerID(), node.getAbsolutePath());
         node.delete();
     }
 
@@ -614,9 +613,7 @@ public class MCRIFSCommands {
                     .format(MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
         }
 
-        LOGGER.info(
-            new MessageFormat("Changed size of directory {0} to {1} Bytes", Locale.ROOT)
-                .format(new Object[] { directory.getName(), directorySize }));
+        LOGGER.info("Changed size of directory {} to {} Bytes", directory.getName(), directorySize);
         return directorySize;
     }
 

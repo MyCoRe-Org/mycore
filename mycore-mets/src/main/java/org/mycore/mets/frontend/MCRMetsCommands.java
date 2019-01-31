@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.logging.log4j.LogManager;
@@ -90,8 +88,11 @@ public class MCRMetsCommands extends MCRAbstractCommands {
         help = "This Command can be used to fix invalid mets files that was found in any validate selected mets runs.",
         order = 15)
     public static void fixInvalidMets() {
-        String selectedObjectID;
-        while ((selectedObjectID = invalidMetsQueue.poll()) != null) {
+        while (true) {
+            String selectedObjectID = invalidMetsQueue.poll();
+            if (selectedObjectID == null) {
+                break;
+            }
             LOGGER.info("Try to fix METS of {}", selectedObjectID);
             MCRPath metsFile = MCRPath.getPath(selectedObjectID, "/mets.xml");
             SAXBuilder saxBuilder = new SAXBuilder();
@@ -99,10 +100,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
             try (InputStream metsInputStream = Files.newInputStream(metsFile)) {
                 metsDocument = saxBuilder.build(metsInputStream);
             } catch (IOException | JDOMException e) {
-                LOGGER.error(
-                    new MessageFormat("Cannot fix METS of {0}. Can not parse mets.xml!", Locale.ROOT)
-                        .format(selectedObjectID),
-                    e);
+                LOGGER.error(() -> "Cannot fix METS of " + selectedObjectID + ". Can not parse mets.xml!", e);
                 return;
             }
 
@@ -110,10 +108,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
             try {
                 mcrMetsSimpleModel = MCRXMLSimpleModelConverter.fromXML(metsDocument);
             } catch (Exception e) {
-                LOGGER.error(
-                    new MessageFormat("Cannot fix METS of {0}. Can not convert to SimpleModel!", Locale.ROOT)
-                        .format(selectedObjectID),
-                    e);
+                LOGGER.error(() -> "Cannot fix METS of " + selectedObjectID + ". Can not convert to SimpleModel!", e);
                 return;
             }
 
@@ -122,9 +117,7 @@ public class MCRMetsCommands extends MCRAbstractCommands {
             try (OutputStream os = Files.newOutputStream(metsFile)) {
                 xmlOutputter.output(newMets, os);
             } catch (IOException e) {
-                LOGGER.error(
-                    new MessageFormat("Cannot fix METS of {0}. Can not write mets to derivate.", Locale.ROOT)
-                        .format(selectedObjectID));
+                LOGGER.error(() -> "Cannot fix METS of " + selectedObjectID + ". Can not write mets to derivate.", e);
             }
         }
     }

@@ -56,7 +56,7 @@ public class MCRSwordCollectionManager implements CollectionListManager, Collect
         String collection = MCRSwordUtil.ParseLinkUtil.CollectionIRI.getCollectionNameFromCollectionIRI(collectionIRI);
         String path = collectionIRI.getPath();
 
-        LOGGER.info(new MessageFormat("List Collection: {0}", Locale.ROOT).format(collection));
+        LOGGER.info("List Collection: {}", collection);
 
         Feed feed = new Abdera().newFeed();
         if (MCRSword.getCollectionNames().contains(collection)) {

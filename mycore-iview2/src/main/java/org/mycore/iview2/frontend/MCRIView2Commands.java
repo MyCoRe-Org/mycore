@@ -280,8 +280,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 BufferedImage thumbnail = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, imageReader, 0);
                 int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
                 int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
-                LOGGER.debug(new MessageFormat("Image size:{0}x{1}, tiles:{2}x{3}", Locale.ROOT)
-                    .format(new Object[] { props.getWidth(), props.getHeight(), maxX, maxY }));
+                LOGGER.debug("Image size:{}x{}, tiles:{}x{}", props.getWidth(), props.getHeight(), maxX, maxY);
                 try {
                     @SuppressWarnings("unused")
                     BufferedImage sampleTile = MCRIView2Tools.readTile(iviewFileRoot, imageReader,

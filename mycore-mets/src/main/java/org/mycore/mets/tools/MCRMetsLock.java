@@ -18,7 +18,6 @@
 
 package org.mycore.mets.tools;
 
-import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.Locale;
 
@@ -51,12 +50,10 @@ public class MCRMetsLock {
         if (MCRMetsLock.metsAccessSessionTable.containsKey(derivateId)) {
             String lastAccessID = MCRMetsLock.metsAccessSessionTable.get(derivateId);
             MCRSession lastSession = MCRSessionMgr.getSession(lastAccessID);
-            LOGGER
-                .debug(new MessageFormat("{0} is locked : {1}", Locale.ROOT)
-                    .format(new Object[] { derivateIdString, lastSession != null }));
+            LOGGER.debug("{} is locked : {}", derivateIdString, lastSession != null);
             return lastSession != null;
         } else {
-            LOGGER.debug(new MessageFormat("{0} is not locked", Locale.ROOT).format(derivateIdString));
+            LOGGER.debug("{} is not locked", derivateIdString);
             return false;
         }
     }
@@ -70,12 +67,10 @@ public class MCRMetsLock {
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
         if (isLocked(derivateIdString)
             && MCRMetsLock.metsAccessSessionTable.get(derivateId) != MCRSessionMgr.getCurrentSessionID()) {
-            LOGGER.info(
-                new MessageFormat("Could not lock {0}, because its already locked.", Locale.ROOT)
-                    .format(derivateIdString));
+            LOGGER.info("Could not lock {}, because its already locked.", derivateIdString);
             return false;
         } else {
-            LOGGER.info(new MessageFormat("{0} is now locked", Locale.ROOT).format(derivateIdString));
+            LOGGER.info("{} is now locked", derivateIdString);
             MCRMetsLock.metsAccessSessionTable.put(derivateId, MCRSessionMgr.getCurrentSessionID());
             return true;
         }

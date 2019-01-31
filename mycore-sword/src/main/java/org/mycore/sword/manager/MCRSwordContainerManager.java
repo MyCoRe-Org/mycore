@@ -18,8 +18,6 @@
 
 package org.mycore.sword.manager;
 
-import java.text.MessageFormat;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -72,8 +70,7 @@ public class MCRSwordContainerManager implements ContainerManager {
         String objectIdString = MCRSwordUtil.ParseLinkUtil.EditIRI.getObjectFromEditIRI(iri);
         final MCRSwordCollectionProvider collectionProvider = MCRSword.getCollection(collection);
 
-        LOGGER.info(new MessageFormat("REQUEST: Get entry {0} from {1} !", Locale.ROOT)
-            .format(new Object[] { objectIdString, collection }));
+        LOGGER.info("REQUEST: Get entry {} from {}!", objectIdString, collection);
 
         collectionProvider.getAuthHandler().authentication(authCredentials);
 
@@ -110,8 +107,7 @@ public class MCRSwordContainerManager implements ContainerManager {
         String objectIdString = MCRSwordUtil.ParseLinkUtil.EditIRI.getObjectFromEditIRI(iri);
         final MCRSwordCollectionProvider collectionProvider = MCRSword.getCollection(collection);
 
-        LOGGER.info(new MessageFormat("REQUEST: Replace metadata of {0} from {1} !", Locale.ROOT)
-            .format(new Object[] { objectIdString, collection }));
+        LOGGER.info("REQUEST: Replace metadata of {} from {}!", objectIdString, collection);
         collectionProvider.getAuthHandler().authentication(authCredentials);
         MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
 
@@ -134,8 +130,7 @@ public class MCRSwordContainerManager implements ContainerManager {
         String objectIdString = MCRSwordUtil.ParseLinkUtil.EditIRI.getObjectFromEditIRI(iri);
         final MCRSwordCollectionProvider collectionProvider = MCRSword.getCollection(collection);
 
-        LOGGER.info(new MessageFormat("REQUEST: Replace metadata and resource of {0} from {1} !", Locale.ROOT)
-            .format(new Object[] { objectIdString, collection }));
+        LOGGER.info("REQUEST: Replace metadata and resource of {} from {}!", objectIdString, collection);
         collectionProvider.getAuthHandler().authentication(authCredentials);
 
         MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
@@ -157,8 +152,7 @@ public class MCRSwordContainerManager implements ContainerManager {
         String objectIdString = MCRSwordUtil.ParseLinkUtil.EditIRI.getObjectFromEditIRI(iri);
         final MCRSwordCollectionProvider collectionProvider = MCRSword.getCollection(collection);
 
-        LOGGER.info(new MessageFormat("REQUEST: add resources {0} from {1} !", Locale.ROOT)
-            .format(new Object[] { objectIdString, collection }));
+        LOGGER.info("REQUEST: add resources {} from {}!", objectIdString, collection);
 
         collectionProvider.getAuthHandler().authentication(authCredentials);
         MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
@@ -180,8 +174,7 @@ public class MCRSwordContainerManager implements ContainerManager {
         String objectIdString = MCRSwordUtil.ParseLinkUtil.EditIRI.getObjectFromEditIRI(iri);
         final MCRSwordCollectionProvider collectionProvider = MCRSword.getCollection(collection);
 
-        LOGGER.info(new MessageFormat("REQUEST: Delete {0} from {1}", Locale.ROOT)
-            .format(new Object[] { objectIdString, collection }));
+        LOGGER.info("REQUEST: Delete {} from {}", objectIdString, collection);
 
         collectionProvider.getAuthHandler().authentication(authCredentials);
 
