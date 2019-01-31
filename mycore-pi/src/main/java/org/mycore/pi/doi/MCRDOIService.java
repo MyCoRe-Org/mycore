@@ -22,12 +22,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -504,9 +504,8 @@ public class MCRDOIService extends MCRPIJobService<MCRDigitalObjectIdentifier> {
     @Override
     protected Optional<String> getJobInformation(Map<String, String> contextParameters) {
         String pattern = "{0} DOI: {1} for object: {2}";
-        return Optional.of(MessageFormat
-            .format(pattern, getAction(contextParameters).toString(), contextParameters.get(CONTEXT_DOI),
-                contextParameters.get(CONTEXT_OBJ)));
+        return Optional.of(String.format(Locale.ROOT, pattern, getAction(contextParameters).toString(),
+            contextParameters.get(CONTEXT_DOI), contextParameters.get(CONTEXT_OBJ)));
     }
 
     protected boolean checkJobValid(String mycoreID, PiJobAction action){

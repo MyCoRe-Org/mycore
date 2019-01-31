@@ -91,16 +91,14 @@ public class MCRMetsLock {
         if (isLocked(derivateIdString)) {
             String sessionId = MCRMetsLock.metsAccessSessionTable.get(MCRObjectID.getInstance(derivateIdString));
             if (MCRSessionMgr.getCurrentSessionID().equals(sessionId)) {
-                LOGGER.info(new MessageFormat("{0} is not locked anymore", Locale.ROOT).format(derivateIdString));
+                LOGGER.info("{} is not locked anymore", derivateIdString);
                 MCRMetsLock.metsAccessSessionTable.remove(derivateId);
             } else {
-                LOGGER.error(new MessageFormat("could not unlock {0} because session id is different", Locale.ROOT)
-                    .format(derivateIdString));
-                String message = MessageFormat.format(
-                    "Could not unlock {0}, because the session wich locked it was : ''{1}'' "
-                        + "and current sesssion is ''{2}''",
-                    derivateIdString, sessionId,
-                    MCRSessionMgr.getCurrentSessionID());
+                LOGGER.error("could not unlock {} because session id is different", derivateIdString);
+                String message = String.format(Locale.ENGLISH,
+                    "Could not unlock %s, because the session wich locked it was : ''%s'' "
+                        + "and current sesssion is ''%s''",
+                    derivateIdString, sessionId, MCRSessionMgr.getCurrentSessionID());
                 throw new MCRException(message);
             }
         }

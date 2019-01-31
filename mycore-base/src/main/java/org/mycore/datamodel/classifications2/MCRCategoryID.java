@@ -201,8 +201,8 @@ public class MCRCategoryID implements Serializable {
                     .format(new Object[] { rootID, validID }));
         }
         if (rootID.length() > ROOT_ID_LENGTH) {
-            throw new MCRException(MessageFormat.format(
-                "classification ID ''{0}'' is more than {1} chracters long: {2}", rootID, ROOT_ID_LENGTH,
+            throw new MCRException(String.format(Locale.ENGLISH,
+                "classification ID ''%s'' is more than %d chracters long: %d", rootID, ROOT_ID_LENGTH,
                 rootID.length()));
         }
         this.rootID = rootID.intern();

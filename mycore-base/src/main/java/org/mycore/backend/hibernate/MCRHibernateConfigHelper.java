@@ -21,7 +21,7 @@ package org.mycore.backend.hibernate;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -69,9 +69,8 @@ public class MCRHibernateConfigHelper {
             session.doWork(connection -> {
                 String updateStmt = Stream.of("ClassLeftUnique", "ClassRightUnique")
                     .flatMap(idx -> Stream.of("drop constraint if exists " + idx,
-                        MessageFormat.format(
-                            "add constraint {0} unique ({1}) deferrable initially deferred",
-                            idx, getUniqueColumns(MCRCategoryImpl.class, idx))))
+                        String.format(Locale.ROOT, "add constraint %s unique (%s) deferrable initially deferred", idx,
+                            getUniqueColumns(MCRCategoryImpl.class, idx))))
                     .collect(Collectors.joining(", ", getAlterTableString(connection) + qualifiedTableName + " ", ""));
                 try (Statement stmt = connection.createStatement()) {
                     LogManager.getLogger().info("Fixing PostgreSQL Schema for {}:\n{}", qualifiedTableName, updateStmt);

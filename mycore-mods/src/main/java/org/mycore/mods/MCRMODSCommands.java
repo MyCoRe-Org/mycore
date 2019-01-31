@@ -80,8 +80,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         }
         return Arrays.stream(list)
             .filter(file -> file.endsWith(".xml"))
-            .map(file -> MessageFormat.format(
-                "load mods document from file {0} for project {1}",
+            .map(file -> String.format(Locale.ENGLISH,
+                "load mods document from file %s for project %s",
                 new File(dir, file).getAbsolutePath(), projectID))
             .collect(Collectors.toList());
     }

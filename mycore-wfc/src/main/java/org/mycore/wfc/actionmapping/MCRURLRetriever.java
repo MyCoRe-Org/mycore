@@ -78,8 +78,7 @@ public final class MCRURLRetriever {
             : null;
         MCRCollection collection = getCollectionWithAction(collectionName, action, defaultCollection);
         if (collection == null) {
-            LOGGER.warn(MessageFormat
-                .format("Could not find action ''{0}'' in collection: {1}", action, collectionName));
+            LOGGER.warn("Could not find action ''{}'' in collection: {}", action, collectionName);
             return null;
         }
         return getURL(action, collection, reference, absolute);

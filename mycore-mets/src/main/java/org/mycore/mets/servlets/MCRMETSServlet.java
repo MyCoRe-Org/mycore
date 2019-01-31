@@ -93,8 +93,8 @@ public class MCRMETSServlet extends MCRServlet {
                 linkList.add(ownerID.toString());
             } else {
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    MessageFormat.format(
-                        "Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivate));
+                    String.format(Locale.ENGLISH,
+                        "Derivate %s is not linked with a MCRObject. Please contact an administrator.", derivate));
                 return;
             }
         }

@@ -20,6 +20,7 @@ package org.mycore.mods;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Set;
@@ -87,7 +88,7 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
         if(MCRConfiguration2.getString("MCR.Solr.ServerURL").isPresent()){
             final SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
             final ModifiableSolrParams params = new ModifiableSolrParams();
-            final LocalDate today = LocalDate.now();
+            final LocalDate today = LocalDate.now(ZoneOffset.UTC);
             final String todayString = today.format(DateTimeFormatter.ISO_DATE);
 
             params.set("start", 0);

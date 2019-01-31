@@ -113,6 +113,7 @@ import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
+import org.mycore.services.http.MCRHttpUtils;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -491,13 +492,10 @@ public final class MCRURIResolver implements URIResolver {
                 .setConnectTimeout(REQUEST_TIMEOUT)
                 .setSocketTimeout(REQUEST_TIMEOUT)
                 .build();
-            String userAgent = MessageFormat
-                .format("MyCoRe/{0} ({1}; java {2})", MCRCoreVersion.getCompleteVersion(), MCRConfiguration.instance()
-                    .getString("MCR.NameOfProject", "undefined"), System.getProperty("java.version"));
             this.restClient = CachingHttpClients.custom()
                 .setCacheConfig(cacheConfig)
                 .setDefaultRequestConfig(requestConfig)
-                .setUserAgent(userAgent)
+                .setUserAgent(MCRHttpUtils.getHttpUserAgent())
                 .build();
             MCRShutdownHandler.getInstance().addCloseable(this::close);
             this.logger = LogManager.getLogger();

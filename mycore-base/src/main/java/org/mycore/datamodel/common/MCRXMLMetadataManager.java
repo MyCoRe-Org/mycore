@@ -386,9 +386,9 @@ public class MCRXMLMetadataManager {
             return;
         }
         if (readOnly) {
-            throw new MCRPersistenceException(MessageFormat.format(
-                    "Path does not exists ''{0}'' to set up store for project ''{1}'' and objectType ''{2}'' "
-                            + "and config prefix ''{3}''. We are not willing to create it for an read only operation.",
+            throw new MCRPersistenceException(String.format(Locale.ENGLISH,
+                "Path does not exists ''%s'' to set up store for project ''%s'' and objectType ''%s'' "
+                    + "and config prefix ''%s''. We are not willing to create it for an read only operation.",
                     path.toAbsolutePath(), project, objectType, configPrefix));
         }
         try {
@@ -396,9 +396,10 @@ public class MCRXMLMetadataManager {
                 throw new FileNotFoundException(path.toAbsolutePath() + " does not exists.");
             }
         } catch (Exception e) {
-            throw new MCRPersistenceException(MessageFormat.format(
-                    "Couldn'e create directory ''{0}'' to set up store for project ''{1}'' and objectType ''{2}'' and config prefix ''{3}''",
-                    path.toAbsolutePath(), project, objectType, configPrefix));
+            throw new MCRPersistenceException(String.format(Locale.ENGLISH,
+                "Couldn'e create directory ''%s'' to set up store for project ''%s'' and objectType ''%s'' "
+                    + "and config prefix ''%s''",
+                path.toAbsolutePath(), project, objectType, configPrefix));
         }
     }
 

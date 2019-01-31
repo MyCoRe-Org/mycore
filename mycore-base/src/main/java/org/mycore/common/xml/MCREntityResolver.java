@@ -215,11 +215,8 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
 
     @Override
     public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format(
-                "Resolving resource: \ntype: {0}\nnamespaceURI: {1}\npublicId: {2}\nsystemId: {3}\nbaseURI: {4}", type,
-                namespaceURI, publicId, systemId, baseURI));
-        }
+        LOGGER.debug("Resolving resource: \ntype: {}\nnamespaceURI: {}\npublicId: {}\nsystemId: {}\nbaseURI: {}",
+            type, namespaceURI, publicId, systemId, baseURI);
         return catalogResolver.resolveResource(type, namespaceURI, publicId, systemId, baseURI);
     }
 

@@ -139,8 +139,7 @@ public final class MCRMODSClassificationSupport {
             throw new MCRException(e);
         }
 
-        return MessageFormat
-            .format("classification:metadata:0:parents:{0}:{1}", category.getRootID(), id);
+        return String.format(Locale.ROOT, "classification:metadata:0:parents:{0}:{1}", category.getRootID(), id);
     }
 
     static String getText(final Element element) {
