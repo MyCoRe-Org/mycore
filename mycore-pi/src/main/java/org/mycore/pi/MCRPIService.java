@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -462,7 +463,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         Gson gson = getGson();
         String stringFlag = flags.stream().filter(_stringFlag -> {
             MCRPI flag = gson.fromJson(_stringFlag, MCRPI.class);
-            return flag.getAdditional().equals(additional) && flag.getIdentifier().equals(mcrpi.getIdentifier());
+            return Objects.equals(flag.getAdditional(), additional) && Objects
+                .equals(flag.getIdentifier(), mcrpi.getIdentifier());
         }).findAny().orElseThrow(() -> new MCRException(new MCRPersistentIdentifierException(
             "Could find flag to update (" + id + "," + additional + "," + mcrpi.getIdentifier() + ")")));
 
