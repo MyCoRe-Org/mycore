@@ -21,7 +21,6 @@
  */
 package org.mycore.iview.tests.controller;
 
-import java.text.MessageFormat;
 import java.util.Locale;
 
 import org.openqa.selenium.WebDriver;
@@ -47,7 +46,7 @@ public class ImageOverviewController extends SideBarController {
      */
     public void clickImageByOrder(String orderLabel) {
         clickElementByXpath(
-            new MessageFormat("//div[@class=\"caption\" and contains(text(),\"{0}\")]", Locale.ROOT).format(orderLabel));
+            String.format(Locale.ROOT, "//div[@class=\"caption\" and contains(text(),\"%s\")]", orderLabel));
     }
 
     /**
@@ -57,8 +56,8 @@ public class ImageOverviewController extends SideBarController {
      * @return true if the div of the Image has the class "selected"
      */
     public boolean isImageSelected(String orderLabel) {
-        String xPath = MessageFormat
-            .format("//div[./div[@class=\"caption\" and contains(text(),\"{0}\")]]", orderLabel);
+        String xPath = String.format(Locale.ROOT, "//div[./div[@class=\"caption\" and contains(text(),\"%s\")]]",
+            orderLabel);
         return assertAttributeByXpath(xPath, "class", "selected");
     }
 }

@@ -25,7 +25,6 @@ package org.mycore.mets.servlets;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Locale;
 
@@ -81,7 +80,7 @@ public class MCRMETSServlet extends MCRServlet {
 
         if (!Files.isDirectory(rootPath)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                new MessageFormat("Derivate {0} does not exist.", Locale.ROOT).format(derivate));
+                String.format(Locale.ENGLISH, "Derivate %s does not exist.", derivate));
             return;
         }
         request.setAttribute("XSL.derivateID", derivate);

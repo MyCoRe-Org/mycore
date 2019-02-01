@@ -296,7 +296,7 @@ public class MCRClassificationEditorResource {
         params.set("rows", rows != null ? rows : 50);
         params.set("fl", "id");
         String configQuery = MCRConfiguration.instance().getString("MCR.Solr.linkQuery", "category.top:{0}");
-        String query = new MessageFormat(configQuery, Locale.ROOT).format(id.replaceAll(":", "\\\\:"));
+        String query = new MessageFormat(configQuery, Locale.ROOT).format(new String[] { id.replaceAll(":", "\\\\:") });
         params.set("q", query);
         QueryResponse solrResponse = solrClient.query(params);
         SolrDocumentList solrResults = solrResponse.getResults();

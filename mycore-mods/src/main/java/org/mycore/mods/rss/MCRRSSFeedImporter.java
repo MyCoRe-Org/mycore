@@ -220,7 +220,7 @@ public class MCRRSSFeedImporter {
     }
 
     private Element retrieveAndConvertPublication(String externalID) {
-        String uri = new MessageFormat(importURI, Locale.ROOT).format(externalID);
+        String uri = new MessageFormat(importURI, Locale.ROOT).format(new String[] { externalID });
         return MCRURIResolver.instance().resolve(uri);
     }
 

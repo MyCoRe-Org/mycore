@@ -67,7 +67,8 @@ public class ToolBarController extends WebDriverController {
      * @param id
      */
     public void pressButton(String id) {
-        By selector = By.cssSelector(new MessageFormat(BUTTON_SELECTOR_PATTERN, Locale.ROOT).format(id));
+        By selector = By
+            .cssSelector(new MessageFormat(BUTTON_SELECTOR_PATTERN, Locale.ROOT).format(new String[] { id }));
         WebElement element = this.getDriver().findElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
@@ -85,7 +86,8 @@ public class ToolBarController extends WebDriverController {
     public void clickElementById(String id) {
         int trys = 10;
 
-        By selector = By.cssSelector(new MessageFormat(ELEMENT_SELECTOR_PATTERN, Locale.ROOT).format(id));
+        By selector = By
+            .cssSelector(new MessageFormat(ELEMENT_SELECTOR_PATTERN, Locale.ROOT).format(new String[] { id }));
 
         WebElement element = getNotStaleElement(trys, selector);
 

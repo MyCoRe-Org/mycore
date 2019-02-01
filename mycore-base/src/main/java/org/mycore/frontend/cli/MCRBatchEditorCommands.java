@@ -167,13 +167,13 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     private static void add(Element base, String field, String value) throws JaxenException {
         String path = MCRConfiguration.instance().getString(CFG_PREFIX + field + CFG_SUFFIX_ADD);
-        path = new MessageFormat(path, Locale.ROOT).format(value);
+        path = new MessageFormat(path, Locale.ROOT).format(new String[] { value });
         new MCRNodeBuilder().buildNode(path, null, base);
     }
 
     private static List<Element> find(Element base, String field, String value) {
         String path = MCRConfiguration.instance().getString(CFG_PREFIX + field + CFG_SUFFIX_REMOVE);
-        path = new MessageFormat(path, Locale.ROOT).format(value);
+        path = new MessageFormat(path, Locale.ROOT).format(new String[] { value });
         XPathExpression<Element> fPath = XPathFactory.instance().compile(path, FE, null, NS);
         List<Element> selected = fPath.evaluate(base);
         return selected;

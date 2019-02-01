@@ -558,8 +558,7 @@ public class MCRIFSCommands {
         MCRDirectory mcrDirectory = (MCRDirectory) MCRFilesystemNode.getRootNode(id);
 
         if (mcrDirectory == null) {
-            throw new IllegalArgumentException(
-                new MessageFormat("Could not get root node for {0}", Locale.ROOT).format(id));
+            throw new IllegalArgumentException(String.format(Locale.ENGLISH, "Could not get root node for %s.", id));
         }
 
         fixDirectorySize(mcrDirectory);
@@ -586,8 +585,8 @@ public class MCRIFSCommands {
             privateLongField.set(directory, directorySize);
 
         } catch (NoSuchFieldException e) {
-            String message = new MessageFormat("There is no field named {0} in MCRFileSystemNode!", Locale.ROOT)
-                .format(MCRFILESYSTEMNODE_SIZE_FIELD_NAME);
+            String message = String.format(Locale.ENGLISH, "There is no field named %s in MCRFileSystemNode!",
+                MCRFILESYSTEMNODE_SIZE_FIELD_NAME);
             throw new MCRException(message, e);
         } catch (IllegalAccessException e) {
             String message = new MessageFormat("Could not acces filed {0} in {1}!", Locale.ROOT)
@@ -606,11 +605,10 @@ public class MCRIFSCommands {
             touchMethod.invoke(directory, LastModifiedFileTime, false);
         } catch (NoSuchMethodException e) {
             throw new MCRException(
-                new MessageFormat("There is no {0}-method..", Locale.ROOT).format(MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
+                String.format(Locale.ENGLISH, "There is no %s-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new MCRException(
-                new MessageFormat("Error while calling {0}-method..", Locale.ROOT)
-                    .format(MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
+                String.format(Locale.ENGLISH, "Error while calling %s-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
         }
 
         LOGGER.info("Changed size of directory {} to {} Bytes", directory.getName(), directorySize);

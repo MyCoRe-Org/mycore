@@ -111,7 +111,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
-            cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(id));
+            cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(new String[] { id }));
         }
         return cmds;
     }
@@ -143,7 +143,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             if (id.startsWith(project)) {
-                cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(id));
+                cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(new String[] { id }));
             }
         }
         return cmds;
@@ -387,7 +387,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
         ArrayList<String> cmds = new ArrayList<>(derivateIds.size());
         for (MCRObjectID derId : derivateIds) {
-            cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(derId));
+            cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(new String[] { derId.toString() }));
         }
         return cmds;
     }
