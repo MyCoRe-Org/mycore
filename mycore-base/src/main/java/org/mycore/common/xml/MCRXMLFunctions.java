@@ -119,22 +119,6 @@ import com.ibm.icu.util.GregorianCalendar;
  * @author Ren\u00E9 Adler (eagle)
  */
 public class MCRXMLFunctions {
-    private static MCRConfiguration CONFIG = MCRConfiguration.instance();
-
-    private static final String HOST_PREFIX = "MCR.remoteaccess_";
-
-    private static final String QUERY_SUFFIX = "_query_servlet";
-
-    private static final String IFS_SUFFIX = "_ifs_servlet";
-
-    private static final String HOST_SUFFIX = "_host";
-
-    private static final String PORT_SUFFIX = "_port";
-
-    private static final String PROTOCOLL_SUFFIX = "_protocol";
-
-    private static final String DEFAULT_PORT = "80";
-
     private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)\\>";
 
     private static final String TAG_END = "\\</\\w+\\>";
@@ -192,39 +176,6 @@ public class MCRXMLFunctions {
      */
     public static String normalizeUnicode(String arg0) {
         return Normalizer.normalize(arg0, Normalizer.Form.NFC);
-    }
-
-    /**
-     * returns the QueryServlet-Link of the given hostAlias
-     *
-     * @param hostAlias
-     *            remote alias
-     * @return QueryServlet-Link
-     */
-    public static String getQueryServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(HOST_PREFIX + hostAlias + QUERY_SUFFIX)).toString();
-    }
-
-    /**
-     * returns the FileNodeServlet-Link of the given hostAlias
-     *
-     * @param hostAlias
-     *            remote alias
-     * @return FileNodeServlet-Link
-     */
-    public static String getIFSServlet(String hostAlias) {
-        return getBaseLink(hostAlias).append(CONFIG.getString(HOST_PREFIX + hostAlias + IFS_SUFFIX)).toString();
-    }
-
-    public static StringBuffer getBaseLink(String hostAlias) {
-        StringBuffer returns = new StringBuffer();
-        returns.append(CONFIG.getString(HOST_PREFIX + hostAlias + PROTOCOLL_SUFFIX, "http")).append("://")
-            .append(CONFIG.getString(HOST_PREFIX + hostAlias + HOST_SUFFIX));
-        String port = CONFIG.getString(HOST_PREFIX + hostAlias + PORT_SUFFIX, DEFAULT_PORT);
-        if (!port.equals(DEFAULT_PORT)) {
-            returns.append(":").append(port);
-        }
-        return returns;
     }
 
     public static String formatISODate(String isoDate, String simpleFormat, String iso639Language)
