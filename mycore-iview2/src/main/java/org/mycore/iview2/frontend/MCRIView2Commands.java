@@ -32,6 +32,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -110,7 +111,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
-            cmds.add(MessageFormat.format(batchCommandSyntax, id));
+            cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(new String[] { id }));
         }
         return cmds;
     }
@@ -142,7 +143,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
             if (id.startsWith(project)) {
-                cmds.add(MessageFormat.format(batchCommandSyntax, id));
+                cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(new String[] { id }));
             }
         }
         return cmds;
@@ -198,8 +199,9 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
         List<MCRPath> supportedFiles = getSupportedFiles(derivateRoot);
         return supportedFiles.stream()
-            .map(image -> MessageFormat.format(batchCommandSyntax, derivateID,
-                image.getOwnerRelativePath()))
+            .map(
+                image -> new MessageFormat(batchCommandSyntax, Locale.ROOT).format(
+                    new Object[] { derivateID, image.getOwnerRelativePath() }))
             .collect(Collectors.toList());
     }
 
@@ -278,8 +280,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 BufferedImage thumbnail = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, imageReader, 0);
                 int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
                 int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
-                LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", props.getWidth(),
-                    props.getHeight(), maxX, maxY));
+                LOGGER.debug("Image size:{}x{}, tiles:{}x{}", props.getWidth(), props.getHeight(), maxX, maxY);
                 try {
                     @SuppressWarnings("unused")
                     BufferedImage sampleTile = MCRIView2Tools.readTile(iviewFileRoot, imageReader,
@@ -386,7 +387,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         }
         ArrayList<String> cmds = new ArrayList<>(derivateIds.size());
         for (MCRObjectID derId : derivateIds) {
-            cmds.add(MessageFormat.format(batchCommandSyntax, derId));
+            cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(new String[] { derId.toString() }));
         }
         return cmds;
     }

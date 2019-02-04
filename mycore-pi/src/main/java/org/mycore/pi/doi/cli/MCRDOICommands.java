@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -164,7 +165,8 @@ public class MCRDOICommands {
                     return !isTestDOI || registrationService.usesTestPrefix();
                 })
                 .map(MCRDigitalObjectIdentifier::asString)
-                .map(doiStr -> MessageFormat.format(REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, doiStr, serviceID))
+                .map(doiStr -> new MessageFormat(REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, Locale.ROOT).format(
+                    new Object[] { doiStr, serviceID }))
                 .collect(Collectors.toList());
         } catch (MCRPersistentIdentifierException e) {
             LOGGER.error("Error while receiving DOI list from Registration-Service!", e);

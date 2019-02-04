@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -83,7 +84,7 @@ public class MCRStoreCenterTest {
     }
 
     private String getPropName(String storeID, String propType) {
-        return MessageFormat.format("MCR.IFS2.Store.{0}.{1}", storeID, propType);
+        return new MessageFormat("MCR.IFS2.Store.{0}.{1}", Locale.ROOT).format(new Object[] { storeID, propType });
     }
 
     public static class FakeStore extends MCRStore {

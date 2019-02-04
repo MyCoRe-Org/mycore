@@ -18,6 +18,10 @@
 
 package org.mycore.solr.proxy;
 
+import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
+import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_PATH;
+import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -64,10 +69,6 @@ import org.mycore.services.http.MCRIdleConnectionMonitorThread;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 import org.xml.sax.SAXException;
-
-import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
-import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_PATH;
-import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
 
 public class MCRSolrProxyServlet extends MCRServlet {
 
@@ -190,8 +191,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static void doRedirectToQueryHandler(HttpServletResponse resp, String queryHandlerPath,
         Map<String, String[]> parameters)
         throws IOException {
-        String requestURL = MessageFormat.format("{0}solr{1}{2}", getServletBaseURL(), queryHandlerPath,
-            toSolrParams(parameters).toQueryString());
+        String requestURL = new MessageFormat("{0}solr{1}{2}", Locale.ROOT)
+            .format(new Object[] { getServletBaseURL(), queryHandlerPath, toSolrParams(parameters).toQueryString() });
         LOGGER.info("Redirect to: {}", requestURL);
         resp.sendRedirect(resp.encodeRedirectURL(requestURL));
     }
@@ -266,7 +267,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static HttpGet getSolrHttpMethod(String queryHandlerPath, ModifiableSolrParams params, String type) {
         String serverURL = MCRSolrClientFactory.get(type).get().getV1CoreURL();
 
-        return new HttpGet(MessageFormat.format("{0}{1}{2}", serverURL, queryHandlerPath, params.toQueryString()));
+        return new HttpGet(new MessageFormat("{0}{1}{2}", Locale.ROOT)
+            .format(new Object[] { serverURL, queryHandlerPath, params.toQueryString() }));
     }
 
     private static ModifiableSolrParams getSolrQueryParameter(HttpServletRequest request) {

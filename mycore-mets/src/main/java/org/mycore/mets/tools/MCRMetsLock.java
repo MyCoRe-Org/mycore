@@ -18,8 +18,8 @@
 
 package org.mycore.mets.tools;
 
-import java.text.MessageFormat;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,10 +50,10 @@ public class MCRMetsLock {
         if (MCRMetsLock.metsAccessSessionTable.containsKey(derivateId)) {
             String lastAccessID = MCRMetsLock.metsAccessSessionTable.get(derivateId);
             MCRSession lastSession = MCRSessionMgr.getSession(lastAccessID);
-            LOGGER.debug(MessageFormat.format("{0} is locked : {1}", derivateIdString, lastSession != null));
+            LOGGER.debug("{} is locked : {}", derivateIdString, lastSession != null);
             return lastSession != null;
         } else {
-            LOGGER.debug(MessageFormat.format("{0} is not locked", derivateIdString));
+            LOGGER.debug("{} is not locked", derivateIdString);
             return false;
         }
     }
@@ -67,10 +67,10 @@ public class MCRMetsLock {
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdString);
         if (isLocked(derivateIdString)
             && MCRMetsLock.metsAccessSessionTable.get(derivateId) != MCRSessionMgr.getCurrentSessionID()) {
-            LOGGER.info(MessageFormat.format("Could not lock {0}, because its already locked.", derivateIdString));
+            LOGGER.info("Could not lock {}, because its already locked.", derivateIdString);
             return false;
         } else {
-            LOGGER.info(MessageFormat.format("{0} is now locked", derivateIdString));
+            LOGGER.info("{} is now locked", derivateIdString);
             MCRMetsLock.metsAccessSessionTable.put(derivateId, MCRSessionMgr.getCurrentSessionID());
             return true;
         }
@@ -86,16 +86,14 @@ public class MCRMetsLock {
         if (isLocked(derivateIdString)) {
             String sessionId = MCRMetsLock.metsAccessSessionTable.get(MCRObjectID.getInstance(derivateIdString));
             if (MCRSessionMgr.getCurrentSessionID().equals(sessionId)) {
-                LOGGER.info(MessageFormat.format("{0} is not locked anymore", derivateIdString));
+                LOGGER.info("{} is not locked anymore", derivateIdString);
                 MCRMetsLock.metsAccessSessionTable.remove(derivateId);
             } else {
-                LOGGER.error(MessageFormat.format("could not unlock {0} because session id is different",
-                    derivateIdString));
-                String message = MessageFormat.format(
-                    "Could not unlock {0}, because the session wich locked it was : ''{1}'' "
-                        + "and current sesssion is ''{2}''",
-                    derivateIdString, sessionId,
-                    MCRSessionMgr.getCurrentSessionID());
+                LOGGER.error("could not unlock {} because session id is different", derivateIdString);
+                String message = String.format(Locale.ENGLISH,
+                    "Could not unlock %s, because the session wich locked it was : ''%s'' "
+                        + "and current sesssion is ''%s''",
+                    derivateIdString, sessionId, MCRSessionMgr.getCurrentSessionID());
                 throw new MCRException(message);
             }
         }

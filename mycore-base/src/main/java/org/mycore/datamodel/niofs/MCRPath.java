@@ -40,6 +40,7 @@ import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -70,8 +71,8 @@ public abstract class MCRPath implements Path {
             stringValue = this.path;
         } else {
             if (!path.isEmpty() && path.charAt(0) != SEPARATOR) {
-                final String msg = MessageFormat.format("If root is given, path has to start with ''{0}'': {1}",
-                    SEPARATOR_STRING, path);
+                final String msg = new MessageFormat("If root is given, path has to start with ''{0}'': {1}",
+                    Locale.ROOT).format(new Object[] { SEPARATOR_STRING, path });
                 throw new IllegalArgumentException(msg);
             }
             stringValue = this.root + ":" + (this.path.isEmpty() ? SEPARATOR_STRING : this.path);

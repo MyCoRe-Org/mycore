@@ -20,10 +20,10 @@ package org.mycore.mods;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -70,7 +70,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     public static List<String> loadFromDirectory(String directory, String projectID) {
         File dir = new File(directory);
         if (!dir.isDirectory()) {
-            throw new MCRException(MessageFormat.format("File {0} is not a directory.", directory));
+            throw new MCRException(String.format(Locale.ENGLISH, "File %s is not a directory.", directory));
         }
         String[] list = dir.list();
         if (list.length == 0) {
@@ -79,8 +79,8 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         }
         return Arrays.stream(list)
             .filter(file -> file.endsWith(".xml"))
-            .map(file -> MessageFormat.format(
-                "load mods document from file {0} for project {1}",
+            .map(file -> String.format(Locale.ENGLISH,
+                "load mods document from file %s for project %s",
                 new File(dir, file).getAbsolutePath(), projectID))
             .collect(Collectors.toList());
     }
@@ -92,7 +92,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
-            throw new MCRException(MessageFormat.format("File {0} is not a file.", modsFile.getAbsolutePath()));
+            throw new MCRException(String.format(Locale.ENGLISH, "File %s is not a file.", modsFile.getAbsolutePath()));
         }
         SAXBuilder s = new SAXBuilder(XMLReaders.NONVALIDATING, null, null);
         Document modsDoc = s.build(modsFile);
@@ -101,7 +101,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         Element modsRoot = modsDoc.getRootElement();
         if (!modsRoot.getNamespace().equals(MCRConstants.MODS_NAMESPACE)) {
             throw new MCRException(
-                MessageFormat.format("File {0} is not a MODS document.", modsFile.getAbsolutePath()));
+                String.format(Locale.ENGLISH, "File %s is not a MODS document.", modsFile.getAbsolutePath()));
         }
         if (modsRoot.getName().equals("modsCollection")) {
             List<Element> modsElements = modsRoot.getChildren("mods", MCRConstants.MODS_NAMESPACE);
@@ -121,13 +121,13 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         MCRActiveLinkException, SAXException, MCRPersistenceException, MCRAccessException {
         File modsFile = new File(modsFileName);
         if (!modsFile.isFile()) {
-            throw new MCRException(MessageFormat.format("File {0} is not a file.", modsFile.getAbsolutePath()));
+            throw new MCRException(String.format(Locale.ENGLISH, "File %s is not a file.", modsFile.getAbsolutePath()));
         }
 
         File fileDir = new File(fileDirName);
         if (!fileDir.isDirectory()) {
             throw new MCRException(
-                MessageFormat.format("Directory {0} is not a directory.", fileDir.getAbsolutePath()));
+                String.format(Locale.ENGLISH, "Directory %s is not a directory.", fileDir.getAbsolutePath()));
         }
 
         SAXBuilder s = new SAXBuilder(XMLReaders.NONVALIDATING, null, null);
@@ -137,12 +137,11 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         Element modsRoot = modsDoc.getRootElement();
         if (!modsRoot.getNamespace().equals(MCRConstants.MODS_NAMESPACE)) {
             throw new MCRException(
-                MessageFormat.format("File {0} is not a MODS document.", modsFile.getAbsolutePath()));
+                String.format(Locale.ENGLISH, "File %s is not a MODS document.", modsFile.getAbsolutePath()));
         }
         if (modsRoot.getName().equals("modsCollection")) {
-            throw new MCRException(
-                MessageFormat.format("File {0} contains a mods collection witch not supported by this command.",
-                    modsFile.getAbsolutePath()));
+            throw new MCRException(String.format(Locale.ENGLISH,
+                "File %s contains a mods collection witch not supported by this command.", modsFile.getAbsolutePath()));
         } else {
             createDerivate(saveAsMyCoReObject(projectID, modsRoot), fileDir);
         }

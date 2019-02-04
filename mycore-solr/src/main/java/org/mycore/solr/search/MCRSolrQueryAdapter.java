@@ -21,6 +21,7 @@ package org.mycore.solr.search;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -100,13 +101,14 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
 
     private void configureSolrQuery() {
         this.solrQuery.clear();
-        String queryString = filterCategory ? MessageFormat.format("{0}{1}", objectType, restriction)
-            : MessageFormat
-                .format("+{0}:\"{1}\"{2}{3}", fieldName, category, objectType, restriction);
+        String queryString = filterCategory ?
+            new MessageFormat("{0}{1}", Locale.ROOT).format(new Object[] { objectType, restriction })
+            : new MessageFormat("+{0}:\"{1}\"{2}{3}", Locale.ROOT)
+                .format(new Object[] { fieldName, category, objectType, restriction });
         this.solrQuery.setQuery(queryString.trim());
         if (filterCategory) {
-            solrQuery.setFilterQueries(MessageFormat.format("{0}+{1}:\"{2}\"", MCRSolrConstants.SOLR_JOIN_PATTERN,
-                fieldName, category));
+            solrQuery.setFilterQueries(new MessageFormat("{0}+{1}:\"{2}\"", Locale.ROOT)
+                .format(new Object[] { MCRSolrConstants.SOLR_JOIN_PATTERN, fieldName, category }));
         }
     }
 

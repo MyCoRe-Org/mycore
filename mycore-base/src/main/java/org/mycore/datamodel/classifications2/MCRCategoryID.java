@@ -20,6 +20,7 @@ package org.mycore.datamodel.classifications2;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
@@ -174,8 +175,9 @@ public class MCRCategoryID implements Serializable {
                 throw new MCRException("category ID '" + id + "' is invalid and does not match: " + validID);
             }
             if (id.length() > CATEG_ID_LENGTH) {
-                throw new MCRException(MessageFormat.format("category ID ''{0}'' is more than {1} characters long: {2}",
-                    id, CATEG_ID_LENGTH, id.length()));
+                throw new MCRException(
+                    new MessageFormat("category ID ''{0}'' is more than {1} characters long: {2}", Locale.ROOT)
+                        .format(new Object[] { id, CATEG_ID_LENGTH, id.length() }));
             }
         }
         ID = id;
@@ -195,11 +197,12 @@ public class MCRCategoryID implements Serializable {
     private void setRootID(String rootID) {
         if (!validID.matcher(rootID).matches()) {
             throw new MCRException(
-                MessageFormat.format("classification ID ''{0}'' is invalid and does not match: {1}", rootID, validID));
+                new MessageFormat("classification ID ''{0}'' is invalid and does not match: {1}", Locale.ROOT)
+                    .format(new Object[] { rootID, validID }));
         }
         if (rootID.length() > ROOT_ID_LENGTH) {
-            throw new MCRException(MessageFormat.format(
-                "classification ID ''{0}'' is more than {1} chracters long: {2}", rootID, ROOT_ID_LENGTH,
+            throw new MCRException(String.format(Locale.ENGLISH,
+                "classification ID ''%s'' is more than %d chracters long: %d", rootID, ROOT_ID_LENGTH,
                 rootID.length()));
         }
         this.rootID = rootID.intern();

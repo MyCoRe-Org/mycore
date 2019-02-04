@@ -19,8 +19,8 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -72,9 +72,7 @@ public class MCRErrorServlet extends HttpServlet {
         String requestURI = (String) req.getAttribute("javax.servlet.error.request_uri");
         String servletName = (String) req.getAttribute("javax.servlet.error.servletName");
         if (LOGGER.isDebugEnabled()) {
-            String msg = MessageFormat.format("Handling error {0} for request ''{1}'' message: {2}", statusCode,
-                requestURI, message);
-            LOGGER.debug(msg, exception);
+            LOGGER.debug("Handling error {} for request ''{}'' message: {}", statusCode, requestURI, message);
             LOGGER.debug("Has current session: {}", MCRSessionMgr.hasCurrentSession());
         }
         if (acceptWebPage(req)) {
@@ -197,8 +195,8 @@ public class MCRErrorServlet extends HttpServlet {
         Throwable ex, Integer statusCode, Class<? extends Throwable> exceptionType, String requestURI,
         String servletName) throws IOException, TransformerException, SAXException {
         boolean exceptionThrown = ex != null;
-        LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN, MessageFormat.format(
-            "{0}: Error {1} occured. The following message was given: {2}", requestURI, statusCode, msg), ex);
+        LOGGER.log(exceptionThrown ? Level.ERROR : Level.WARN, String.format(Locale.ENGLISH,
+            "%s: Error %d occured. The following message was given: %s", requestURI, statusCode, msg), ex);
 
         String style = MCRFrontendUtil
             .getProperty(request, "XSL.Style")

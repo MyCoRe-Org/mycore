@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -132,19 +133,20 @@ public class MCRSolrIndexer {
 
             @Override
             public void close() {
-                String documentStats = MessageFormat.format("Solr documents: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.DOCUMENTS.getDocuments(),
-                    MCRSolrIndexStatisticCollector.DOCUMENTS.reset());
-                String metadataStats = MessageFormat.format("XML documents: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.XML.getDocuments(), MCRSolrIndexStatisticCollector.XML.reset());
-                String fileStats = MessageFormat.format("File transfers: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.FILE_TRANSFER.getDocuments(),
-                    MCRSolrIndexStatisticCollector.FILE_TRANSFER.reset());
-                String operationsStats = MessageFormat.format("Other index operations: {0}, each: {1} ms.",
-                    MCRSolrIndexStatisticCollector.OPERATIONS.getDocuments(),
-                    MCRSolrIndexStatisticCollector.OPERATIONS.reset());
-                String msg = MessageFormat.format("\nFinal statistics:\n{0}\n{1}\n{2}\n{3}", documentStats,
-                    metadataStats, fileStats, operationsStats);
+                String documentStats = new MessageFormat("Solr documents: {0}, each: {1} ms.", Locale.ROOT).format(
+                    new Object[] { MCRSolrIndexStatisticCollector.DOCUMENTS.getDocuments(),
+                        MCRSolrIndexStatisticCollector.DOCUMENTS.reset() });
+                String metadataStats = new MessageFormat("XML documents: {0}, each: {1} ms.", Locale.ROOT).format(
+                    new Object[] { MCRSolrIndexStatisticCollector.XML.getDocuments(),
+                        MCRSolrIndexStatisticCollector.XML.reset() });
+                String fileStats = new MessageFormat("File transfers: {0}, each: {1} ms.", Locale.ROOT).format(
+                    new Object[] { MCRSolrIndexStatisticCollector.FILE_TRANSFER.getDocuments(),
+                        MCRSolrIndexStatisticCollector.FILE_TRANSFER.reset() });
+                String operationsStats = new MessageFormat("Other index operations: {0}, each: {1} ms.", Locale.ROOT)
+                    .format(new Object[] { MCRSolrIndexStatisticCollector.OPERATIONS.getDocuments(),
+                        MCRSolrIndexStatisticCollector.OPERATIONS.reset() });
+                String msg = new MessageFormat("\nFinal statistics:\n{0}\n{1}\n{2}\n{3}", Locale.ROOT)
+                    .format(new Object[] { documentStats, metadataStats, fileStats, operationsStats });
                 LOGGER.info(msg);
             }
 
@@ -474,7 +476,8 @@ public class MCRSolrIndexer {
         }
 
         LOGGER.info("Dropping solr index for type {}...", type);
-        String deleteQuery = MessageFormat.format("objectType:{0} _root_:*_{1}_*", type, type);
+        String deleteQuery = new MessageFormat("objectType:{0} _root_:*_{1}_*", Locale.ROOT)
+            .format(new Object[] { type, type });
         client.deleteByQuery(deleteQuery, BATCH_AUTO_COMMIT_WITHIN_MS);
         LOGGER.info("Dropping solr index for type {}...done", type);
     }

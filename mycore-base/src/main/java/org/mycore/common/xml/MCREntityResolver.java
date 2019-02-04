@@ -30,7 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.spi.FileSystemProvider;
-import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Objects;
 import java.util.Vector;
@@ -101,9 +100,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
      */
     @Override
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Resolving: \npublicId: {0}\nsystemId: {1}", publicId, systemId));
-        }
+        LOGGER.debug("Resolving: \npublicId: {}\nsystemId: {}", publicId, systemId);
         InputSource entity = catalogResolver.resolveEntity(publicId, systemId);
         if (entity != null) {
             return resolvedEntity(entity);
@@ -116,9 +113,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
      */
     @Override
     public InputSource getExternalSubset(String name, String baseURI) throws SAXException, IOException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("External Subset: \nname: {0}\nbaseURI: {1}", name, baseURI));
-        }
+        LOGGER.debug("External Subset: \nname: {}\nbaseURI: {}", name, baseURI);
         InputSource externalSubset = catalogResolver.getExternalSubset(name, baseURI);
         if (externalSubset != null) {
             return resolvedEntity(externalSubset);
@@ -132,10 +127,8 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     @Override
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
         throws SAXException, IOException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Resolving: \nname: {0}\npublicId: {1}\nbaseURI: {2}\nsystemId: {3}",
-                name, publicId, baseURI, systemId));
-        }
+        LOGGER.debug("Resolving: \nname: {}\npublicId: {}\nbaseURI: {}\nsystemId: {}", name, publicId, baseURI,
+            systemId);
         InputSource entity = catalogResolver.resolveEntity(name, publicId, baseURI, systemId);
         if (entity != null) {
             return resolvedEntity(entity);
@@ -211,11 +204,8 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
 
     @Override
     public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format(
-                "Resolving resource: \ntype: {0}\nnamespaceURI: {1}\npublicId: {2}\nsystemId: {3}\nbaseURI: {4}", type,
-                namespaceURI, publicId, systemId, baseURI));
-        }
+        LOGGER.debug("Resolving resource: \ntype: {}\nnamespaceURI: {}\npublicId: {}\nsystemId: {}\nbaseURI: {}",
+            type, namespaceURI, publicId, systemId, baseURI);
         return catalogResolver.resolveResource(type, namespaceURI, publicId, systemId, baseURI);
     }
 

@@ -239,10 +239,11 @@ public class MCRMetsSave {
 
             // add to file section
             String contentType = MCRContentTypes.probeContentType(file);
-            LOGGER.warn(MessageFormat.format("Content Type is : {0}", contentType));
+            LOGGER.warn("Content Type is : {}", contentType);
             String fileGrpUSE = getFileGroupUse(file);
 
-            String fileId = MessageFormat.format("{0}_{1}", fileGrpUSE.toLowerCase(Locale.ROOT), getFileBase(relPath));
+            String fileId = new MessageFormat("{0}_{1}", Locale.ROOT)
+                .format(new Object[] { fileGrpUSE.toLowerCase(Locale.ROOT), getFileBase(relPath) });
             File fileAsMetsFile = new File(fileId, contentType);
 
             FLocat fLocat = new FLocat(LOCTYPE.URL, relPath);
@@ -518,11 +519,10 @@ public class MCRMetsSave {
         throws JDOMException, SAXException, IOException {
         Document mets = getCurrentMets(derivateID.toString());
         if (mets == null) {
-            LOGGER.info(
-                MessageFormat.format("Derivate with id \"{0}\" has no mets file. Nothing to do", derivateID));
+            LOGGER.info("Derivate with id \"{}\" has no mets file. Nothing to do", derivateID);
             return;
         }
-        LOGGER.info(MessageFormat.format("Update {0} URNS in Mets.xml", fileUrnMap.size()));
+        LOGGER.info("Update {} URNS in mets.xml", fileUrnMap.size());
         Mets metsObject = new Mets(mets);
         updateURNsInMetsDocument(metsObject, fileUrnMap);
         saveMets(metsObject.asDocument(), derivateID);
@@ -716,8 +716,7 @@ public class MCRMetsSave {
                             throw new IOException(e);
                         }
                         if (!fileGroup.contains(path)) {
-                            LOGGER.warn(MessageFormat.format("{0} does not appear in {1}!",
-                                    path, mcrPath.getOwner()));
+                            LOGGER.warn("{} does not appear in {}!", path, mcrPath.getOwner());
                             complete.set(false);
                             return FileVisitResult.TERMINATE;
                         }

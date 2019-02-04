@@ -34,6 +34,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
@@ -120,10 +121,9 @@ public class MCRISO8601Date {
      * @return null if date is not set yet
      */
     public String format(final String format, final Locale locale, String timeZone) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern(format);
-        if (locale != null) {
-            df = df.withLocale(locale);
-        }
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(format,
+            Optional.ofNullable(locale)
+                .orElseGet(Locale::getDefault));
         ZoneId zone = null;
         if (timeZone != null) {
             try {
@@ -137,8 +137,9 @@ public class MCRISO8601Date {
         }
         df = df.withZone(zone);
         if (LOGGER.isDebugEnabled()) {
-            String msg = MessageFormat.format("DateTime ''{0}'', using time zone ''{1}'', formatted: {2}", dt, zone,
-                dt != null ? df.format(dt) : null);
+            Object[] parameter = new Object[] { dt, zone, dt != null ? df.format(dt) : null };
+            String msg = new MessageFormat("DateTime ''{0}'', using time zone ''{1}'', formatted: {2}", Locale.ROOT)
+                .format(parameter);
             LOGGER.debug(msg);
         }
         String formatted = null;

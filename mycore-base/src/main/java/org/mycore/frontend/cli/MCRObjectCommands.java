@@ -621,7 +621,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         List<String> cmds = new ArrayList<>(objectIds.size());
         for (String id : objectIds) {
-            String command = MessageFormat.format(EXPORT_OBJECT_TO_DIRECTORY_COMMAND, id, dir.getAbsolutePath(), style);
+            String command = new MessageFormat(EXPORT_OBJECT_TO_DIRECTORY_COMMAND, Locale.ROOT)
+                .format(new Object[] { id, dir.getAbsolutePath(), style });
             cmds.add(command);
         }
         return cmds;

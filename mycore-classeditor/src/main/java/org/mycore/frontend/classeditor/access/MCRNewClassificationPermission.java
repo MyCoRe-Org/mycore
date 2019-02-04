@@ -18,8 +18,6 @@
 
 package org.mycore.frontend.classeditor.access;
 
-import java.text.MessageFormat;
-
 import javax.ws.rs.container.ContainerRequestContext;
 
 import org.apache.logging.log4j.LogManager;
@@ -42,8 +40,8 @@ public class MCRNewClassificationPermission implements MCRResourceAccessChecker 
      */
     @Override
     public boolean isPermitted(ContainerRequestContext request) {
-        LOGGER.info(MessageFormat.format("{0} has permission {1}?", request.getUriInfo().getPath(),
-            MCRClassificationUtils.CREATE_CLASS_PERMISSION));
+        LOGGER.info("{} has permission {}?", request.getUriInfo().getPath(),
+            MCRClassificationUtils.CREATE_CLASS_PERMISSION);
         return MCRAccessManager.checkPermission(MCRClassificationUtils.CREATE_CLASS_PERMISSION);
     }
 

@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.client.Entity;
@@ -147,8 +148,8 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
             String categoryJsonStr = target("/classifications/" + path).request().get(String.class);
             MCRJSONCategory retrievedCateg = MCRJSONManager.instance().createGson().fromJson(categoryJsonStr,
                 MCRJSONCategory.class);
-            String errorMsg = MessageFormat.format("We want to retrieve the category {0} but it was {1}", id,
-                retrievedCateg.getId());
+            String errorMsg = new MessageFormat("We want to retrieve the category {0} but it was {1}", Locale.ROOT)
+                .format(new Object[] { id, retrievedCateg.getId() });
             assertTrue(errorMsg, id.equals(retrievedCateg.getId()));
         }
     }

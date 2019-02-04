@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -102,8 +103,8 @@ public class MCRDerivateURNUtils {
      * @throws IOException
      */
     private static String getViewerURL(MCRPath file) {
-        return MessageFormat.format("{0}rsc/viewer/{1}/{2}", MCRFrontendUtil.getBaseURL(), file.getOwner(),
-            file.getFileName().toString());
+        return new MessageFormat("{0}rsc/viewer/{1}/{2}", Locale.ROOT).format(
+            new Object[] { MCRFrontendUtil.getBaseURL(), file.getOwner(), file.getFileName().toString() });
     }
 
     public static URL getDFGViewerURL(MCRPIRegistrationInfo urn) {
@@ -122,9 +123,8 @@ public class MCRDerivateURNUtils {
             String id = URLEncoder.encode(derivateId.toString(), "UTF-8");
             if (mainDoc != null && mainDoc.length() > 0) {
                 String mainDocEnc = URLEncoder.encode(mainDoc, "UTF-8");
-                spec = MessageFormat
-                    .format(baseURL + "servlets/MCRDFGLinkServlet?deriv={0}&file={1}",
-                        id, mainDocEnc);
+                spec = String.format(Locale.ROOT, "%sservlets/MCRDFGLinkServlet?deriv=%s&file=%s", baseURL, id,
+                    mainDocEnc);
             } else {
                 spec = baseURL + "servlets/MCRDFGLinkServlet?deriv="
                     + id;

@@ -20,7 +20,7 @@ package org.mycore.services.http;
 
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
+import java.util.Locale;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
@@ -45,14 +45,17 @@ public class MCRHttpUtils {
         SocketConfig socketConfig = SocketConfig.custom().setTcpNoDelay(true).setSoKeepAlive(true)
             .setSoReuseAddress(true).build();
 
-        String userAgent = MessageFormat
-            .format("MyCoRe/{0} ({1}; java {2})", MCRCoreVersion.getCompleteVersion(), MCRConfiguration.instance()
-                .getString("MCR.NameOfProject", "undefined"), System.getProperty("java.version"));
         //setup http client
         return HttpClients.custom().setConnectionManager(connectionManager)
-            .setUserAgent(userAgent).setRetryHandler(new MCRRetryHandler(maxConnections))
+            .setUserAgent(getHttpUserAgent()).setRetryHandler(new MCRRetryHandler(maxConnections))
             .setDefaultRequestConfig(requestConfig).setDefaultConnectionConfig(connectionConfig)
             .setDefaultSocketConfig(socketConfig).build();
+    }
+
+    public static String getHttpUserAgent() {
+        return String.format(Locale.ROOT, "MyCoRe/%s (%s; java %s)", MCRCoreVersion.getCompleteVersion(),
+                MCRConfiguration.instance().getString("MCR.NameOfProject", "undefined"),
+                System.getProperty("java.version"));
     }
 
     public static PoolingHttpClientConnectionManager getConnectionManager(int maxConnections) {

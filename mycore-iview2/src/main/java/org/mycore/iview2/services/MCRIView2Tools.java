@@ -210,8 +210,7 @@ public class MCRIView2Tools {
         double zoomFactor = Math.pow(2, (imageProps.getZoomlevel() - zoomLevel));
         int maxX = (int) Math.ceil((imageProps.getWidth() / zoomFactor) / MCRImage.getTileSize());
         int maxY = (int) Math.ceil((imageProps.getHeight() / zoomFactor) / MCRImage.getTileSize());
-        LOGGER.debug(MessageFormat.format("Image size:{0}x{1}, tiles:{2}x{3}", imageProps.getWidth(),
-            imageProps.getHeight(), maxX, maxY));
+        LOGGER.debug("Image size:{}x{}, tiles:{}x{}", imageProps.getWidth(), imageProps.getHeight(), maxX, maxY);
         int imageType = getImageType(iviewFileRoot, reader, zoomLevel, 0, 0);
         int xDim = ((maxX - 1) * MCRImage.getTileSize()
             + readTile(iviewFileRoot, reader, zoomLevel, maxX - 1, 0).getWidth());
@@ -262,7 +261,7 @@ public class MCRIView2Tools {
 
     public static BufferedImage readTile(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
-        String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
+        String tileName = new MessageFormat("{0}/{1}/{2}.jpg", Locale.ROOT).format(new Object[] { zoomLevel, y, x });
         Path tile = iviewFileRoot.resolve(tileName);
         if (Files.exists(tile)) {
             try (SeekableByteChannel fileChannel = Files.newByteChannel(tile)) {
@@ -283,7 +282,7 @@ public class MCRIView2Tools {
 
     public static int getImageType(Path iviewFileRoot, ImageReader imageReader, int zoomLevel, int x, int y)
         throws IOException {
-        String tileName = MessageFormat.format("{0}/{1}/{2}.jpg", zoomLevel, y, x);
+        String tileName = new MessageFormat("{0}/{1}/{2}.jpg", Locale.ROOT).format(new Object[] { zoomLevel, y, x });
         Path tile = iviewFileRoot.resolve(tileName);
         if (Files.exists(tile)) {
             try (SeekableByteChannel fileChannel = Files.newByteChannel(tile)) {

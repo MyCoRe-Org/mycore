@@ -25,9 +25,9 @@ package org.mycore.mets.servlets;
 
 import java.net.URLEncoder;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -92,14 +92,14 @@ public class MCRDFGLinkServlet extends MCRServlet {
 
         if (!Files.isDirectory(rootPath)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                MessageFormat.format("Derivate {0} does not exist.", derivateID));
+                String.format(Locale.ENGLISH, "Derivate %s does not exist.", derivateID));
             return;
         }
         request.setAttribute("XSL.derivateID", derivateID);
         Collection<String> linkList = MCRLinkTableManager.instance().getSourceOf(derivateID);
         if (linkList.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, MessageFormat.format(
-                "Derivate {0} is not linked with a MCRObject. Please contact an administrator.", derivateID));
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, String.format(Locale.ENGLISH,
+                "Derivate %s is not linked with a MCRObject. Please contact an administrator.", derivateID));
             return;
         }
 
@@ -120,8 +120,8 @@ public class MCRDFGLinkServlet extends MCRServlet {
         String dfgURL = "";
         switch (imageNumber) {
             case -1:
-                response.sendError(HttpServletResponse.SC_CONFLICT, MessageFormat.format(
-                    "Image \"{0}\" not found in the MCRDerivate. Please contact an administrator.", filePath));
+                response.sendError(HttpServletResponse.SC_CONFLICT, String.format(Locale.ENGLISH,
+                    "Image \"%s\" not found in the MCRDerivate. Please contact an administrator.", filePath));
                 return;
             case -2:
                 dfgURL = "https://dfg-viewer.de/show/?tx_dlf[id]=" + encodedMetsURL;

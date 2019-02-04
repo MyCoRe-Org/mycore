@@ -18,7 +18,6 @@
 
 package org.mycore.wfc.actionmapping;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +76,7 @@ public final class MCRURLRetriever {
             : null;
         MCRCollection collection = getCollectionWithAction(collectionName, action, defaultCollection);
         if (collection == null) {
-            LOGGER.warn(MessageFormat
-                .format("Could not find action ''{0}'' in collection: {1}", action, collectionName));
+            LOGGER.warn("Could not find action ''{}'' in collection: {}", action, collectionName);
             return null;
         }
         return getURL(action, collection, reference, absolute);
@@ -90,8 +88,7 @@ public final class MCRURLRetriever {
             if (act.getAction().equals(action)) {
                 if (LOGGER.isDebugEnabled()) {
                     String mcrId = categoryReference == null ? null : categoryReference.getObjectID();
-                    LOGGER.debug(MessageFormat.format("Collection: {0}, Action: {1}, Object: {2}",
-                        collection.getName(), action, mcrId));
+                    LOGGER.debug("Collection: {}, Action: {}, Object: {}", collection.getName(), action, mcrId);
                 }
                 String url = act.getURL(new MCRWorkflowData(categoryReference));
                 if (absolute && url != null && url.startsWith("/")) {

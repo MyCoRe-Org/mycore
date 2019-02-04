@@ -49,6 +49,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -412,7 +413,8 @@ public class MCRSwordUtil {
             } else {
                 if (required) {
                     throw new IllegalArgumentException(
-                        MessageFormat.format("{0} does not match the pattern {1}", uriPathAsString, iriPattern));
+                        new MessageFormat("{0} does not match the pattern {1}", Locale.ROOT)
+                            .format(new Object[] { uriPathAsString, iriPattern }));
                 } else {
                     return null;
                 }
@@ -427,8 +429,9 @@ public class MCRSwordUtil {
                 if (matcher.matches()) {
                     return matcher.group(1);
                 } else {
-                    throw new IllegalArgumentException(MessageFormat.format("{0} does not match the pattern {1}",
-                        uriPathAsString, COLLECTION_IRI_PATTERN));
+                    throw new IllegalArgumentException(
+                        new MessageFormat("{0} does not match the pattern {1}", Locale.ROOT)
+                            .format(new Object[] { uriPathAsString, COLLECTION_IRI_PATTERN }));
                 }
             }
 
@@ -482,13 +485,13 @@ public class MCRSwordUtil {
         private static Logger LOGGER = LogManager.getLogger(BuildLinkUtil.class);
 
         public static String getEditHref(String collection, String id) {
-            return MessageFormat.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(),
-                MCRSwordConstants.SWORD2_EDIT_IRI, collection, id);
+            return new MessageFormat("{0}{1}{2}/{3}", Locale.ROOT).format(
+                new Object[] { MCRFrontendUtil.getBaseURL(), MCRSwordConstants.SWORD2_EDIT_IRI, collection, id });
         }
 
         public static String getEditMediaHrefOfDerivate(String collection, String id) {
-            return MessageFormat.format("{0}{1}{2}/{3}", MCRFrontendUtil.getBaseURL(),
-                MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, collection, id);
+            return new MessageFormat("{0}{1}{2}/{3}", Locale.ROOT).format(
+                new Object[] { MCRFrontendUtil.getBaseURL(), MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, collection, id });
         }
 
         /**
@@ -529,9 +532,9 @@ public class MCRSwordUtil {
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                         throws IOException {
                         String relativePath = derivateRootPath.relativize(file).toString();
-                        final String URI = MessageFormat.format("{0}{1}{2}/{3}/{4}", MCRFrontendUtil.getBaseURL(),
-                            MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI, collection, derivateId,
-                            encodeURLPart(relativePath));
+                        final String URI = new MessageFormat("{0}{1}{2}/{3}/{4}", Locale.ROOT).format(
+                            new Object[] { MCRFrontendUtil.getBaseURL(), MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI,
+                                collection, derivateId, encodeURLPart(relativePath) });
                         iris.add(new IRI(URI));
                         return FileVisitResult.CONTINUE;
                     }

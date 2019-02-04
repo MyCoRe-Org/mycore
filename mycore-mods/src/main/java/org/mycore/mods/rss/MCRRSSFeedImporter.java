@@ -24,6 +24,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -219,7 +220,7 @@ public class MCRRSSFeedImporter {
     }
 
     private Element retrieveAndConvertPublication(String externalID) {
-        String uri = MessageFormat.format(importURI, externalID);
+        String uri = new MessageFormat(importURI, Locale.ROOT).format(new String[] { externalID });
         return MCRURIResolver.instance().resolve(uri);
     }
 

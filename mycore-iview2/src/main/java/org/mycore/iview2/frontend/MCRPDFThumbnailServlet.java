@@ -21,8 +21,8 @@ package org.mycore.iview2.frontend;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -61,8 +61,8 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
             MCRPath pdfFile = MCRPath.getPath(thumbnailInfo.derivate, thumbnailInfo.filePath);
             LOGGER.info("PDF file: {}", pdfFile);
             if (Files.notExists(pdfFile)) {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, MessageFormat.format(
-                    "Could not find pdf file for {0}{1}", thumbnailInfo.derivate, thumbnailInfo.filePath));
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, String.format(Locale.ENGLISH,
+                    "Could not find pdf file for %s%s", thumbnailInfo.derivate, thumbnailInfo.filePath));
                 return null;
             }
             String centerThumb = req.getParameter("centerThumb");

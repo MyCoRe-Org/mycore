@@ -19,7 +19,6 @@
 package org.mycore.solr.index.handlers;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,8 +38,8 @@ public class MCRSolrOptimizeIndexHandler extends MCRSolrAbstractIndexHandler {
     public void index() throws IOException, SolrServerException {
         LOGGER.info("Sending optimize request to solr");
         UpdateResponse response = getSolrClient().optimize();
-        LOGGER.info(MessageFormat.format("Optimize was {0}({1}ms)",
-            (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"), response.getElapsedTime()));
+        LOGGER.info("Optimize was {}({}ms)", (response.getStatus() == 0 ? "successful." : "UNSUCCESSFUL!"),
+            response.getElapsedTime());
     }
 
     @Override

@@ -18,7 +18,6 @@
 
 package org.mycore.iview.tests.controller;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -62,13 +61,12 @@ public class SideBarController extends WebDriverController {
         By selector = By.xpath("//div[contains(@class,\"sidebar\")]");
         WebElement element = getDriver().findElement(selector);
         if (element == null) {
-            LOGGER.error(MessageFormat.format("No element with xpath: '{0}' found!", selector.toString()));
+            LOGGER.error("No element with xpath: '{}' found!", selector.toString());
             throw new NoSuchElementException();
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                selector.toString()));
+            LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
         }
 
         return element.getSize().getWidth();

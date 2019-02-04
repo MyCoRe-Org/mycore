@@ -148,7 +148,8 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
                 LinkedHashMap::new));
 
         if (!"".equals(filePath) && urnPathMap.isEmpty()) {
-            String errMsg = MessageFormat.format("File {0} does not exist in {1}.\n", filePath, derivID.toString())
+            String errMsg = new MessageFormat("File {0} does not exist in {1}.\n", Locale.ROOT)
+                .format(new Object[] { filePath, derivID.toString() })
                 + "Use absolute path of file without owner ID like /abs/path/to/file.\n";
 
             throw new MCRPersistentIdentifierException(errMsg);

@@ -22,11 +22,11 @@ import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -75,7 +75,7 @@ public class MCRTransferPackageCommands {
         try (Stream<Path> stream = Files.find(dir, 0,
                 (path, attr) -> String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
             stream.map(Path::toAbsolutePath).map(Path::toString).forEach(path -> {
-                String subCommand = MessageFormat.format("import transfer package from tar {0}", path);
+                String subCommand = String.format(Locale.ROOT, "import transfer package from tar %s", path);
                 importStatements.add(subCommand);
             });
         }

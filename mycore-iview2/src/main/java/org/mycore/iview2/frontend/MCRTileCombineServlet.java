@@ -172,8 +172,9 @@ public class MCRTileCombineServlet extends MCRServlet {
                     if (!imagePath.startsWith("/")) {
                         imagePath = "/" + imagePath;
                     }
-                    String redirectURL = response.encodeRedirectURL(MessageFormat.format("{0}{1}/{2}/{3}{4}",
-                        request.getContextPath(), request.getServletPath(), zoomAlias, derivate, imagePath));
+                    String redirectURL = response.encodeRedirectURL(new MessageFormat("{0}{1}/{2}/{3}{4}", Locale.ROOT)
+                        .format(new Object[] { request.getContextPath(), request.getServletPath(), zoomAlias, derivate,
+                            imagePath }));
                     response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
                     response.setHeader("Location", redirectURL);
                     response.flushBuffer();

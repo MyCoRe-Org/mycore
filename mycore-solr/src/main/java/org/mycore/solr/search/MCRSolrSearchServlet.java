@@ -20,7 +20,6 @@ package org.mycore.solr.search;
 
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -218,8 +217,7 @@ public class MCRSolrSearchServlet extends MCRServlet {
             sortBuilder.append(" ");
             if (order == null) {
                 order = "asc";
-                LOGGER.warn(MessageFormat.format(
-                    "No sort order found for field with number ''{0}'' use default value : ''{1}''", position, order));
+                LOGGER.warn("No sort order found for field with number ''{}'' use default value : ''{}''", position, order);
             }
             sortBuilder.append(order);
         }
@@ -350,20 +348,16 @@ public class MCRSolrSearchServlet extends MCRServlet {
      */
     private SolrParameterGroup getParameterType(String parameterName) {
         if (isTypeParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.TypeParameter.toString()));
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.TypeParameter.toString());
             return SolrParameterGroup.TypeParameter;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.SolrParameter.toString()));
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter.toString());
             return SolrParameterGroup.SolrParameter;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.SolrParameter.toString()));
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter.toString());
             return SolrParameterGroup.SortParameter;
         } else {
-            LOGGER.debug(MessageFormat.format("Parameter {0} is a {1}", parameterName,
-                SolrParameterGroup.QueryParameter.toString()));
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.QueryParameter.toString());
             return SolrParameterGroup.QueryParameter;
         }
     }

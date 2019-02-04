@@ -20,6 +20,7 @@ package org.mycore.iview.tests.controller;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,12 +67,12 @@ public class ToolBarController extends WebDriverController {
      * @param id
      */
     public void pressButton(String id) {
-        By selector = By.cssSelector(MessageFormat.format(BUTTON_SELECTOR_PATTERN, id));
+        By selector = By
+            .cssSelector(new MessageFormat(BUTTON_SELECTOR_PATTERN, Locale.ROOT).format(new String[] { id }));
         WebElement element = this.getDriver().findElement(selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                selector.toString()));
+            LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
         }
 
         element.click();
@@ -85,13 +86,13 @@ public class ToolBarController extends WebDriverController {
     public void clickElementById(String id) {
         int trys = 10;
 
-        By selector = By.cssSelector(MessageFormat.format(ELEMENT_SELECTOR_PATTERN, id));
+        By selector = By
+            .cssSelector(new MessageFormat(ELEMENT_SELECTOR_PATTERN, Locale.ROOT).format(new String[] { id }));
 
         WebElement element = getNotStaleElement(trys, selector);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Found ''{0}'' with selector :''{1}''", element.toString(),
-                selector.toString()));
+            LOGGER.debug("Found ''{}'' with selector :''{}''", element.toString(), selector.toString());
         }
 
         List<WebElement> webElements = getDriver().findElements(selector);

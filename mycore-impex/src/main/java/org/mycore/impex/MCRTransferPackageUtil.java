@@ -25,7 +25,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -214,7 +213,7 @@ public abstract class MCRTransferPackageUtil {
         SAXBuilder sax = new SAXBuilder();
         Path targetXML = targetDirectory.resolve(CONTENT_DIRECTORY).resolve(objectId + ".xml");
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(MessageFormat.format("Importing {0}", targetXML.toAbsolutePath().toString()));
+            LOGGER.debug("Importing {}", targetXML.toAbsolutePath().toString());
         }
         Document objXML = sax.build(targetXML.toFile());
         MCRObject mcr = new MCRObject(objXML);
@@ -253,7 +252,7 @@ public abstract class MCRTransferPackageUtil {
         Path derivateDirectory = targetDirectory.resolve(CONTENT_DIRECTORY).resolve(derivateId);
         Path derivatePath = derivateDirectory.resolve(derivateId + ".xml");
 
-        LOGGER.info(MessageFormat.format("Importing {0}", derivatePath.toAbsolutePath().toString()));
+        LOGGER.info("Importing {}", derivatePath.toAbsolutePath().toString());
         MCRDerivate der = new MCRDerivate(sax.build(derivatePath.toFile()));
         MCRMetadataManager.update(der);
 

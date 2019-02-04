@@ -18,8 +18,6 @@
 
 package org.mycore.sword.servlets;
 
-import java.text.MessageFormat;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,8 +42,8 @@ public class MCRSwordServlet extends HttpServlet {
         }
         MCRSession session = MCRServlet.getSession(req);
         MCRSessionMgr.setCurrentSession(session);
-        LOGGER.info(MessageFormat.format("{0} ip={1} mcr={2} user={3}", req.getPathInfo(),
-            MCRFrontendUtil.getRemoteAddr(req), session.getID(), session.getUserInformation().getUserID()));
+        LOGGER.info("{} ip={} mcr={} user={}", req.getPathInfo(), MCRFrontendUtil.getRemoteAddr(req), session.getID(),
+            session.getUserInformation().getUserID());
         MCRFrontendUtil.configureSession(session, req, resp);
         MCRSessionMgr.getCurrentSession().beginTransaction();
     }

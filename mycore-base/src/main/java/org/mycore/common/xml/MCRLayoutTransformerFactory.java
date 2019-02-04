@@ -18,10 +18,10 @@
 
 package org.mycore.common.xml;
 
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -128,7 +128,7 @@ public class MCRLayoutTransformerFactory {
      * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
      */
     private static String buildStylesheetName(String id) {
-        return MessageFormat.format("xsl/{0}.xsl", id.replaceAll("-default$", ""));
+        return String.format(Locale.ROOT, "xsl/%s.xsl", id.replaceAll("-default$", ""));
     }
 
     private static String getResourceName(String id) {

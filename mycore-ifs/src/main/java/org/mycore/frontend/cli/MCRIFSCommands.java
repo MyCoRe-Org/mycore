@@ -301,7 +301,8 @@ public class MCRIFSCommands {
                     if (bw != null) {
                         bw.close();
                     }
-                    File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}.md5", nameOfProject, storeID));
+                    File outputFile = new File(targetDir,
+                        new MessageFormat("{0}-{1}.md5", Locale.ROOT).format(new Object[] { nameOfProject, storeID }));
                     LOGGER.info("Writing to file: {}", outputFile.getAbsolutePath());
                     bw = Files.newBufferedWriter(outputFile.toPath(), Charset.defaultCharset(),
                         StandardOpenOption.CREATE);
@@ -315,7 +316,7 @@ public class MCRIFSCommands {
                 String path = currentStoreBaseDir != null ? currentStore.getLocalFile(storageID).getAbsolutePath()
                     : storageID;
                 //current store initialized
-                String line = MessageFormat.format("{0}  {1}\n", md5, path);
+                String line = new MessageFormat("{0}  {1}\n", Locale.ROOT).format(new Object[] { md5, path });
                 bw.write(line);
             }
         } finally {
@@ -389,8 +390,8 @@ public class MCRIFSCommands {
                             outputStream.close();
                         }
                     }
-                    File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject,
-                        storeID, rootName));
+                    File outputFile = new File(targetDir, new MessageFormat("{0}-{1}-{2}.xml", Locale.ROOT)
+                        .format(new Object[] { nameOfProject, storeID, rootName }));
                     streamResult = new StreamResult(new FileOutputStream(outputFile));
                     th = tf.newTransformerHandler();
                     Transformer serializer = th.getTransformer();
@@ -484,8 +485,8 @@ public class MCRIFSCommands {
             boolean endOfList = false;
             String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
             String storeID = currentStore.getID();
-            File outputFile = new File(targetDir, MessageFormat.format("{0}-{1}-{2}.xml", nameOfProject, storeID,
-                rootName));
+            File outputFile = new File(targetDir, new MessageFormat("{0}-{1}-{2}.xml", Locale.ROOT)
+                .format(new Object[] { nameOfProject, storeID, rootName }));
             StreamResult streamResult;
             try {
                 streamResult = new StreamResult(new FileOutputStream(outputFile));
@@ -548,8 +549,7 @@ public class MCRIFSCommands {
             LOGGER.warn("IFS Node {} does not exist.", nodeID);
             return;
         }
-        LOGGER.info(MessageFormat.format("Deleting IFS Node {0}: {1}{2}", nodeID, node.getOwnerID(),
-            node.getAbsolutePath()));
+        LOGGER.info("Deleting IFS Node {}: {}{}", nodeID, node.getOwnerID(), node.getAbsolutePath());
         node.delete();
     }
 
@@ -558,7 +558,7 @@ public class MCRIFSCommands {
         MCRDirectory mcrDirectory = (MCRDirectory) MCRFilesystemNode.getRootNode(id);
 
         if (mcrDirectory == null) {
-            throw new IllegalArgumentException(MessageFormat.format("Could not get root node for {0}", id));
+            throw new IllegalArgumentException(String.format(Locale.ENGLISH, "Could not get root node for %s.", id));
         }
 
         fixDirectorySize(mcrDirectory);
@@ -585,12 +585,12 @@ public class MCRIFSCommands {
             privateLongField.set(directory, directorySize);
 
         } catch (NoSuchFieldException e) {
-            String message = MessageFormat.format("There is no field named {0} in MCRFileSystemNode!",
+            String message = String.format(Locale.ENGLISH, "There is no field named %s in MCRFileSystemNode!",
                 MCRFILESYSTEMNODE_SIZE_FIELD_NAME);
             throw new MCRException(message, e);
         } catch (IllegalAccessException e) {
-            String message = MessageFormat.format("Could not acces filed {0} in {1}!",
-                MCRFILESYSTEMNODE_SIZE_FIELD_NAME, directory.toString());
+            String message = new MessageFormat("Could not acces filed {0} in {1}!", Locale.ROOT)
+                .format(new Object[] { MCRFILESYSTEMNODE_SIZE_FIELD_NAME, directory.toString() });
             throw new MCRException(message, e);
         }
 
@@ -605,14 +605,13 @@ public class MCRIFSCommands {
             touchMethod.invoke(directory, LastModifiedFileTime, false);
         } catch (NoSuchMethodException e) {
             throw new MCRException(
-                MessageFormat.format("There is no {0}-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
+                String.format(Locale.ENGLISH, "There is no %s-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new MCRException(
-                MessageFormat.format("Error while calling {0}-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
+                String.format(Locale.ENGLISH, "Error while calling %s-method..", MCRFILESYSTEMNODE_TOUCH_METHOD_NAME));
         }
 
-        LOGGER.info(
-            MessageFormat.format("Changed size of directory {0} to {1} Bytes", directory.getName(), directorySize));
+        LOGGER.info("Changed size of directory {} to {} Bytes", directory.getName(), directorySize);
         return directorySize;
     }
 

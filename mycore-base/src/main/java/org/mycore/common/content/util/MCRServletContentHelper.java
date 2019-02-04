@@ -407,7 +407,8 @@ public abstract class MCRServletContentHelper {
         if (req.getPathInfo() != null) {
             return extractFileName(req.getPathInfo());
         }
-        return MessageFormat.format("{0}-{1}", extractFileName(req.getServletPath()), System.currentTimeMillis());
+        return new MessageFormat("{0}-{1}", Locale.ROOT).format(
+            new Object[] { extractFileName(req.getServletPath()), System.currentTimeMillis() });
     }
 
     /**
