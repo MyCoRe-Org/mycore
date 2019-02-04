@@ -47,6 +47,7 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
+import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRClassTools;
@@ -241,7 +242,7 @@ public class MCRWebCLIContainer {
             this.stopLogs = false;
             this.webSocketSession = webSocketSession;
             this.logGrabber = new Log4JGrabber(MCRWebCLIContainer.class.getSimpleName() + session.getID(), null,
-                PatternLayout.createDefaultLayout());
+                PatternLayout.createDefaultLayout(), true, Property.EMPTY_ARRAY);
             this.logGrabber.start();
             startLogging(true);
             cmdListPublisher = new SubmissionPublisher<>(ForkJoinPool.commonPool(), 1);
@@ -516,8 +517,9 @@ public class MCRWebCLIContainer {
 
         private List<Flow.Subscriber<? super LogEvent>> subscribers;
 
-        protected Log4JGrabber(String name, Filter filter, Layout<? extends Serializable> layout) {
-            super(name, filter, layout);
+        protected Log4JGrabber(String name, Filter filter, Layout<? extends Serializable> layout,
+            final boolean ignoreExceptions, final Property[] properties) {
+            super(name, filter, layout, ignoreExceptions, properties);
         }
 
         @Override
