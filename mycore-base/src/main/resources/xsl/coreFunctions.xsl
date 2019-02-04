@@ -276,21 +276,11 @@
 
         classid: classification id
         categid: category id
-        host: host to query
     -->
   <xsl:template name="ClassCategLink">
     <xsl:param name="classid" />
     <xsl:param name="categid" />
-    <xsl:param name="host" select="'local'" />
-    <xsl:choose>
-      <xsl:when test="$host != 'local' and string-length($host) &gt; 0">
-        <xsl:value-of
-          select="concat('mcrws:operation=MCRDoRetrieveClassification&amp;level=0&amp;type=children&amp;classid=',$classid,'&amp;categid=',$categid,'&amp;format=metadata','&amp;host=',$host)" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="concat('classification:metadata:0:children:',$classid,':',$categid)" />
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:value-of select="concat('classification:metadata:0:children:',$classid,':',$categid)" />
   </xsl:template>
 
     <!--
@@ -299,20 +289,10 @@
         param:
 
         classid: classification id
-        host: host to query
     -->
   <xsl:template name="ClassLink">
     <xsl:param name="classid" />
-    <xsl:param name="host" select="'local'" />
-    <xsl:choose>
-      <xsl:when test="$host != 'local'">
-        <xsl:value-of
-          select="concat('mcrws:operation=MCRDoRetrieveClassification&amp;level=-1&amp;type=children&amp;classid=',$classid,'&amp;format=metadata','&amp;host=',$host)" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="concat('classification:metadata:-1:children:',$classid)" />
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:value-of select="concat('classification:metadata:-1:children:',$classid)" />
   </xsl:template>
     <!--
         Template: PageGen

@@ -370,14 +370,7 @@
         </div>
         <div class="c15r">
           <xsl:if test="./structure/derobjects">
-            <xsl:variable name="objectBaseURL">
-              <xsl:if test="$objectHost != 'local'">
-                <xsl:value-of select="document('webapp:hosts.xml')/mcr:hosts/mcr:host[@alias=$objectHost]/mcr:url[@type='object']/@href" />
-              </xsl:if>
-              <xsl:if test="$objectHost = 'local'">
-                <xsl:value-of select="concat($WebApplicationBaseURL,'receive/')" />
-              </xsl:if>
-            </xsl:variable>
+            <xsl:variable name="objectBaseURL" select="concat($WebApplicationBaseURL,'receive/')" />
             <xsl:variable name="staticURL">
               <xsl:value-of select="concat($objectBaseURL,@ID)" />
             </xsl:variable>
@@ -1246,14 +1239,7 @@
           </div>
           <div class="c15r">
             <xsl:if test="./structure/derobjects">
-              <xsl:variable name="objectBaseURL">
-                <xsl:if test="$objectHost != 'local'">
-                  <xsl:value-of select="document('webapp:hosts.xml')/mcr:hosts/mcr:host[@alias=$objectHost]/mcr:url[@type='object']/@href" />
-                </xsl:if>
-                <xsl:if test="$objectHost = 'local'">
-                  <xsl:value-of select="concat($WebApplicationBaseURL,'receive/')" />
-                </xsl:if>
-              </xsl:variable>
+              <xsl:variable name="objectBaseURL" select="concat($WebApplicationBaseURL,'receive/')" />
               <xsl:variable name="staticURL">
                 <xsl:value-of select="concat($objectBaseURL,@ID)" />
               </xsl:variable>

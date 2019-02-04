@@ -9,8 +9,7 @@
   <xsl:param name="HttpSession" />
   <xsl:param name="JSessionID" />
   <xsl:param name="CurrentUser" />
-  <!-- TODO: remove $objectHost, printMetaDate, derivateLink and maybe others -->
-  <xsl:param name="objectHost" select="'local'" />
+  <!-- TODO: remove printMetaDate, derivateLink and maybe others -->
   <xsl:include href="coreFunctions.xsl" />
   <xsl:include href="xslInclude:components" />
   <!-- website write protected ? -->
@@ -101,69 +100,44 @@
     <xsl:param name="mcrobj" />
     <xsl:choose>
       <xsl:when test="$mcrobj">
+        <xsl:variable name="obj_id" select="$mcrobj/@ID" />
         <xsl:choose>
-          <xsl:when test="$objectHost != 'local' and string-length($objectHost) &gt; 0">
-            <!-- REMOTE REQUEST -->
-            <xsl:variable name="mcrobj"
-              select="document(concat('mcrws:operation=MCRDoRetrieveObject&amp;host=',$objectHost,'&amp;ID=',$obj_id))/mycoreobject" />
-            <a href="{$WebApplicationBaseURL}receive/{$obj_id}{$HttpSession}?host={@host}">
+          <xsl:when test="acl:checkPermission($obj_id,'read')">
+            <a href="{$WebApplicationBaseURL}receive/{$obj_id}{$HttpSession}">
+              <xsl:attribute name="title"><xsl:apply-templates select="$mcrobj" mode="fulltitle" /></xsl:attribute>
               <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
             </a>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:variable name="obj_id" select="$mcrobj/@ID" />
-            <xsl:choose>
-              <xsl:when test="acl:checkPermission($obj_id,'read')">
-                <a href="{$WebApplicationBaseURL}receive/{$obj_id}{$HttpSession}">
-                  <xsl:attribute name="title"><xsl:apply-templates select="$mcrobj" mode="fulltitle" /></xsl:attribute>
-                  <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
-                </a>
-              </xsl:when>
-              <xsl:otherwise>
-                <!-- Build Login URL for LoginServlet -->
-                <xsl:variable xmlns:encoder="xalan://java.net.URLEncoder" name="LoginURL"
-                  select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
-                <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
-                &#160;
-                <a href="{$LoginURL}">
-                  <img src="{concat($WebApplicationBaseURL,'images/paper_lock.gif')}" />
-                </a>
-              </xsl:otherwise>
-            </xsl:choose>
+            <!-- Build Login URL for LoginServlet -->
+            <xsl:variable xmlns:encoder="xalan://java.net.URLEncoder" name="LoginURL"
+              select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
+            <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
+            &#160;
+            <a href="{$LoginURL}">
+              <img src="{concat($WebApplicationBaseURL,'images/paper_lock.gif')}" />
+            </a>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:when test="string-length($obj_id)&gt;0">
         <!-- handle old way which may cause a double parsing of mcrobject: -->
+        <xsl:variable name="mcrobj" select="document(concat('mcrobject:',$obj_id))/mycoreobject" />
         <xsl:choose>
-          <xsl:when test="$objectHost != 'local' and string-length($objectHost) &gt; 0">
-            <!-- REMOTE REQUEST -->
-            <xsl:variable name="mcrobj"
-              select="document(concat('mcrws:operation=MCRDoRetrieveObject&amp;host=',$objectHost,'&amp;ID=',$obj_id))/mycoreobject" />
-            <a href="{$WebApplicationBaseURL}receive/{$obj_id}{$HttpSession}?host={@host}">
+          <xsl:when test="acl:checkPermission($obj_id,'read')">
+            <a href="{$WebApplicationBaseURL}receive/{$obj_id}{$HttpSession}">
               <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
             </a>
           </xsl:when>
           <xsl:otherwise>
-            <!-- LOCAL REQUEST -->
-            <xsl:variable name="mcrobj" select="document(concat('mcrobject:',$obj_id))/mycoreobject" />
-            <xsl:choose>
-              <xsl:when test="acl:checkPermission($obj_id,'read')">
-                <a href="{$WebApplicationBaseURL}receive/{$obj_id}{$HttpSession}">
-                  <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
-                </a>
-              </xsl:when>
-              <xsl:otherwise>
-                <!-- Build Login URL for LoginServlet -->
-                <xsl:variable xmlns:encoder="xalan://java.net.URLEncoder" name="LoginURL"
-                  select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
-                <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
-                &#160;
-                <a href="{$LoginURL}">
-                  <img src="{concat($WebApplicationBaseURL,'images/paper_lock.gif')}" />
-                </a>
-              </xsl:otherwise>
-            </xsl:choose>
+            <!-- Build Login URL for LoginServlet -->
+            <xsl:variable xmlns:encoder="xalan://java.net.URLEncoder" name="LoginURL"
+              select="concat( $ServletsBaseURL, 'MCRLoginServlet',$HttpSession,'?url=', encoder:encode( string( $RequestURL ) ) )" />
+            <xsl:apply-templates select="$mcrobj" mode="resulttitle" />
+            &#160;
+            <a href="{$LoginURL}">
+              <img src="{concat($WebApplicationBaseURL,'images/paper_lock.gif')}" />
+            </a>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -172,7 +146,6 @@
 
   <xsl:template name="printClass">
     <xsl:param name="nodes" />
-    <xsl:param name="host" select="$objectHost" />
     <xsl:param name="next" select="''" />
     <xsl:for-each select="$nodes">
       <xsl:if test="position() != 1">
@@ -182,7 +155,6 @@
         <xsl:call-template name="ClassCategLink">
           <xsl:with-param name="classid" select="@classid" />
           <xsl:with-param name="categid" select="@categid" />
-          <xsl:with-param name="host" select="$host" />
         </xsl:call-template>
       </xsl:variable>
       <xsl:for-each select="document($classlink)/mycoreclass/categories/category">
@@ -222,7 +194,6 @@
 
   <xsl:template name="printClassInfo">
     <xsl:param name="nodes" />
-    <xsl:param name="host" />
     <xsl:param name="next" />
     <xsl:for-each select="$nodes">
       <xsl:if test="position() != 1">
@@ -232,7 +203,6 @@
         <xsl:call-template name="ClassCategLink">
           <xsl:with-param name="classid" select="@classid" />
           <xsl:with-param name="categid" select="@categid" />
-          <xsl:with-param name="host" select="$host" />
         </xsl:call-template>
       </xsl:variable>
       <xsl:for-each select="document($classlink)/mycoreclass/categories/category">
@@ -358,12 +328,10 @@
               <xsl:when test="../@class='MCRMetaClassification'">
                 <xsl:call-template name="printClass">
                   <xsl:with-param name="nodes" select="." />
-                  <xsl:with-param name="host" select="$objectHost" />
                   <xsl:with-param name="next" select="'&lt;br /&gt;'" />
                 </xsl:call-template>
                 <xsl:call-template name="printClassInfo">
                   <xsl:with-param name="nodes" select="." />
-                  <xsl:with-param name="host" select="$objectHost" />
                   <xsl:with-param name="next" select="'&lt;br /&gt;'" />
                 </xsl:call-template>
               </xsl:when>
@@ -415,7 +383,6 @@
                 <xsl:if test="not(@xml:lang) or @xml:lang=$selectPresentLang">
                   <xsl:call-template name="printI18N">
                     <xsl:with-param name="nodes" select="." />
-                    <xsl:with-param name="host" select="$objectHost" />
                     <xsl:with-param name="next" select="'&lt;br /&gt;'" />
                   </xsl:call-template>
                 </xsl:if>
@@ -436,45 +403,40 @@
   <xsl:template name="derivateLink">
     <xsl:param name="staticURL" />
 
-    <xsl:if test="$objectHost != 'local'">
-      <a href="{$staticURL}">nur auf original Server</a>
-    </xsl:if>
-    <xsl:if test="$objectHost = 'local'">
-      <xsl:for-each select="derivateLink">
-        <xsl:variable select="substring-before(@xlink:href, '/')" name="deriv" />
-        <xsl:variable name="derivateWithURN" select="mcrurn:hasURNDefined(@xlink:href)" />
-        <xsl:choose>
-          <xsl:when test="acl:checkPermissionForReadingDerivate($deriv)">
-            <xsl:variable name="firstSupportedFile" select="concat('/', substring-after(@xlink:href, '/'))" />
-            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-              <tr>
-                <xsl:if test="annotation">
-                  <xsl:value-of select="annotation" />
-                  <br />
-                </xsl:if>
-              </tr>
-              <tr>
-                <td valign="top" align="left">
-                  <!-- MCR-IView ..start -->
-                  <xsl:call-template name="derivateLinkView">
-                    <xsl:with-param name="derivateID" select="$deriv" />
-                    <xsl:with-param name="file" select="$firstSupportedFile" />
-                  </xsl:call-template>
-                  <!-- MCR - IView ..end -->
-                </td>
-              </tr>
-            </table>
-          </xsl:when>
-          <xsl:otherwise>
-            <p>
-              <!-- Zugriff auf 'Abbildung' gesperrt -->
-              <xsl:variable select="substring-before(substring-after(/@ID,'_'),'_')" name="type" />
-              <xsl:value-of select="i18n:translate('metaData.derivateLocked',i18n:translate(concat('metaData.',$type,'.[derivates]')))" />
-            </p>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:for-each>
-    </xsl:if>
+    <xsl:for-each select="derivateLink">
+      <xsl:variable select="substring-before(@xlink:href, '/')" name="deriv" />
+      <xsl:variable name="derivateWithURN" select="mcrurn:hasURNDefined(@xlink:href)" />
+      <xsl:choose>
+        <xsl:when test="acl:checkPermissionForReadingDerivate($deriv)">
+          <xsl:variable name="firstSupportedFile" select="concat('/', substring-after(@xlink:href, '/'))" />
+          <table cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr>
+              <xsl:if test="annotation">
+                <xsl:value-of select="annotation" />
+                <br />
+              </xsl:if>
+            </tr>
+            <tr>
+              <td valign="top" align="left">
+                <!-- MCR-IView ..start -->
+                <xsl:call-template name="derivateLinkView">
+                  <xsl:with-param name="derivateID" select="$deriv" />
+                  <xsl:with-param name="file" select="$firstSupportedFile" />
+                </xsl:call-template>
+                <!-- MCR - IView ..end -->
+              </td>
+            </tr>
+          </table>
+        </xsl:when>
+        <xsl:otherwise>
+          <p>
+            <!-- Zugriff auf 'Abbildung' gesperrt -->
+            <xsl:variable select="substring-before(substring-after(/@ID,'_'),'_')" name="type" />
+            <xsl:value-of select="i18n:translate('metaData.derivateLocked',i18n:translate(concat('metaData.',$type,'.[derivates]')))" />
+          </p>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>

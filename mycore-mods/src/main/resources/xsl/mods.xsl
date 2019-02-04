@@ -3,7 +3,6 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcr="http://www.mycore.org/"
   xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:encoder="xalan://java.net.URLEncoder"
   xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcrurn="xalan://org.mycore.urn.MCRXMLFunctions" exclude-result-prefixes="xalan xlink mcr i18n acl mods mcrxsl mcrurn encoder" version="1.0">
-  <xsl:param select="'local'" name="objectHost" />
   <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:include href="mods-utils.xsl" />
   <xsl:include href="mods2html.xsl" />
@@ -99,12 +98,7 @@
   <!--Template for metadata view: see mycoreobject.xsl -->
   <xsl:template priority="1" mode="present" match="/mycoreobject[contains(@ID,'_mods_')]">
     <xsl:variable name="objectBaseURL">
-      <xsl:if test="$objectHost != 'local'">
-        <xsl:value-of select="document('webapp:hosts.xml')/mcr:hosts/mcr:host[@alias=$objectHost]/mcr:url[@type='object']/@href" />
-      </xsl:if>
-      <xsl:if test="$objectHost = 'local'">
-        <xsl:value-of select="concat($WebApplicationBaseURL,'receive/')" />
-      </xsl:if>
+      <xsl:value-of select="concat($WebApplicationBaseURL,'receive/')" />
     </xsl:variable>
     <xsl:variable name="staticURL">
       <xsl:value-of select="concat($objectBaseURL,@ID)" />
@@ -304,82 +298,77 @@
           <xsl:value-of select="concat(i18n:translate('component.mods.metaData.[derivates]'), ':')" />
         </td>
         <td class="metavalue">
-          <xsl:if test="$objectHost != 'local'">
-            <a href="{$staticURL}">nur auf original Server</a>
-          </xsl:if>
-          <xsl:if test="$objectHost = 'local'">
-            <xsl:for-each select="./structure/derobjects/derobject">
-              <xsl:variable select="@xlink:href" name="deriv" />
+          <xsl:for-each select="./structure/derobjects/derobject">
+            <xsl:variable select="@xlink:href" name="deriv" />
 
-              <div class="derivateBox">
-                <xsl:variable select="concat('mcrobject:',$deriv)" name="derivlink" />
-                <xsl:variable select="document($derivlink)" name="derivate" />
-                <xsl:variable name="derivateWithURN" select="mcrurn:hasURNDefined($deriv)" />
+            <div class="derivateBox">
+              <xsl:variable select="concat('mcrobject:',$deriv)" name="derivlink" />
+              <xsl:variable select="document($derivlink)" name="derivate" />
+              <xsl:variable name="derivateWithURN" select="mcrurn:hasURNDefined($deriv)" />
 
-                <xsl:apply-templates select="$derivate/mycorederivate/derivate/internals" />
-                <xsl:if test="$derivateWithURN">
-                  <xsl:variable name="derivateURN" select="$derivate/mycorederivate/derivate/fileset/@urn" />
-                  <a href="{concat('https://nbn-resolving.org/urn/resolver.pl?urn=',$derivateURN)}">
-                    <xsl:value-of select="$derivateURN" />
-                  </a>
-                </xsl:if>
-                <xsl:apply-templates select="$derivate/mycorederivate/derivate/externals" />
+              <xsl:apply-templates select="$derivate/mycorederivate/derivate/internals" />
+              <xsl:if test="$derivateWithURN">
+                <xsl:variable name="derivateURN" select="$derivate/mycorederivate/derivate/fileset/@urn" />
+                <a href="{concat('https://nbn-resolving.org/urn/resolver.pl?urn=',$derivateURN)}">
+                  <xsl:value-of select="$derivateURN" />
+                </a>
+              </xsl:if>
+              <xsl:apply-templates select="$derivate/mycorederivate/derivate/externals" />
 
-                <!-- MCR-IView ..start -->
-                <xsl:call-template name="derivateView">
-                  <xsl:with-param name="derivateID" select="$deriv" />
-                </xsl:call-template>
-                <!-- MCR - IView ..end -->
+              <!-- MCR-IView ..start -->
+              <xsl:call-template name="derivateView">
+                <xsl:with-param name="derivateID" select="$deriv" />
+              </xsl:call-template>
+              <!-- MCR - IView ..end -->
 
-                <xsl:if test="acl:checkPermission(./@xlink:href,'writedb')">
-                  <div class="derivate_options">
-                    <!-- TODO: refacture! -->
-                    <img class="button_options" src="{$WebApplicationBaseURL}images/icon_arrow_circled_red_down.png"
-                         alt="show derivate options" title="{i18n:translate('component.mods.metaData.options')}" />
-                    <div class="options">
-                      <ul>
-                        <xsl:if test="$derivateWithURN=false()">
-                          <li>
-                            <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
-                              <xsl:value-of select="i18n:translate('component.mods.derivate.addFile')" />
-                            </a>
-                          </li>
-                        </xsl:if>
+              <xsl:if test="acl:checkPermission(./@xlink:href,'writedb')">
+                <div class="derivate_options">
+                  <!-- TODO: refacture! -->
+                  <img class="button_options" src="{$WebApplicationBaseURL}images/icon_arrow_circled_red_down.png"
+                       alt="show derivate options" title="{i18n:translate('component.mods.metaData.options')}" />
+                  <div class="options">
+                    <ul>
+                      <xsl:if test="$derivateWithURN=false()">
                         <li>
-                          <xsl:if test="not($derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID))">
-                            <xsl:attribute name="class">last</xsl:attribute>
-                          </xsl:if>
-                          <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?id={@xlink:href}{$suffix}">
-                            <xsl:value-of select="i18n:translate('component.mods.derivate.editDerivate')" />
+                          <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?objectid={../../../@ID}&amp;id={@xlink:href}{$suffix}">
+                            <xsl:value-of select="i18n:translate('component.mods.derivate.addFile')" />
                           </a>
                         </li>
-                        <xsl:if test="$derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID)">
-                          <xsl:variable name="apos">
-                            <xsl:text>'</xsl:text>
-                          </xsl:variable>
-                          <li>
-                            <xsl:if test="not(acl:checkPermission(./@xlink:href,'deletedb'))">
-                              <xsl:attribute name="class">last</xsl:attribute>
-                            </xsl:if>
-                            <a href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={@xlink:href}" onclick="{concat('return confirm(',$apos, i18n:translate('component.mods.metaData.options.urn.confirm'), $apos, ');')}">
-                              <xsl:value-of select="i18n:translate('component.mods.metaData.options.urn')" />
-                            </a>
-                          </li>
+                      </xsl:if>
+                      <li>
+                        <xsl:if test="not($derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID))">
+                          <xsl:attribute name="class">last</xsl:attribute>
                         </xsl:if>
-                        <xsl:if test="acl:checkPermission(./@xlink:href,'deletedb') and $derivateWithURN=false()">
-                          <li class="last">
-                            <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}" class="confirm_derivate_deletion">
-                              <xsl:value-of select="i18n:translate('component.mods.derivate.delDerivate')" />
-                            </a>
-                          </li>
-                        </xsl:if>
-                      </ul>
-                    </div>
+                        <a href="{$ServletsBaseURL}derivate/update{$HttpSession}?id={@xlink:href}{$suffix}">
+                          <xsl:value-of select="i18n:translate('component.mods.derivate.editDerivate')" />
+                        </a>
+                      </li>
+                      <xsl:if test="$derivateWithURN=false() and mcrxsl:isAllowedObjectForURNAssignment($parentObjID)">
+                        <xsl:variable name="apos">
+                          <xsl:text>'</xsl:text>
+                        </xsl:variable>
+                        <li>
+                          <xsl:if test="not(acl:checkPermission(./@xlink:href,'deletedb'))">
+                            <xsl:attribute name="class">last</xsl:attribute>
+                          </xsl:if>
+                          <a href="{$ServletsBaseURL}MCRAddURNToObjectServlet{$HttpSession}?object={@xlink:href}" onclick="{concat('return confirm(',$apos, i18n:translate('component.mods.metaData.options.urn.confirm'), $apos, ');')}">
+                            <xsl:value-of select="i18n:translate('component.mods.metaData.options.urn')" />
+                          </a>
+                        </li>
+                      </xsl:if>
+                      <xsl:if test="acl:checkPermission(./@xlink:href,'deletedb') and $derivateWithURN=false()">
+                        <li class="last">
+                          <a href="{$ServletsBaseURL}derivate/delete{$HttpSession}?id={@xlink:href}" class="confirm_derivate_deletion">
+                            <xsl:value-of select="i18n:translate('component.mods.derivate.delDerivate')" />
+                          </a>
+                        </li>
+                      </xsl:if>
+                    </ul>
                   </div>
-                </xsl:if>
-              </div>
-            </xsl:for-each>
-          </xsl:if>
+                </div>
+              </xsl:if>
+            </div>
+          </xsl:for-each>
         </td>
       </tr>
     </xsl:if>
@@ -418,134 +407,132 @@
       </xsl:for-each>
     </xsl:variable>
 
-    <xsl:if test="$objectHost = 'local'">
-      <xsl:choose>
-        <xsl:when test="$accessedit or $accessdelete or $accesscreate">
-          <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
-          <xsl:variable name="child-layout">
-            <xsl:choose>
-              <xsl:when test="$mods-type = 'book'">
-                <xsl:value-of select="'chapter'" />
-              </xsl:when>
-              <xsl:when test="$mods-type = 'confpro'">
-                <xsl:value-of select="'confpub'" />
-              </xsl:when>
-              <xsl:when test="$mods-type = 'journal'">
-                <xsl:value-of select="'article'" />
-              </xsl:when>
-              <xsl:when test="$mods-type = 'series'">
-                <xsl:value-of select="'book|confpro'" />
-              </xsl:when>
-            </xsl:choose>
-          </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$accessedit or $accessdelete or $accesscreate">
+        <xsl:variable name="type" select="substring-before(substring-after($id,'_'),'_')" />
+        <xsl:variable name="child-layout">
+          <xsl:choose>
+            <xsl:when test="$mods-type = 'book'">
+              <xsl:value-of select="'chapter'" />
+            </xsl:when>
+            <xsl:when test="$mods-type = 'confpro'">
+              <xsl:value-of select="'confpub'" />
+            </xsl:when>
+            <xsl:when test="$mods-type = 'journal'">
+              <xsl:value-of select="'article'" />
+            </xsl:when>
+            <xsl:when test="$mods-type = 'series'">
+              <xsl:value-of select="'book|confpro'" />
+            </xsl:when>
+          </xsl:choose>
+        </xsl:variable>
 
-          <div class="document_options">
-            <!-- TODO: refacture! -->
-            <img class="button_options" src="{$WebApplicationBaseURL}images/icon_arrow_circled_red_down.png"
-              alt="show document options" title="{i18n:translate('component.mods.metaData.options')}" />
-            <div class="options">
-              <ul>
-                <xsl:if test="$accessedit or $accesscreate">
-                  <li>
-                    <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and
-                                  $displayAddDerivate!='true' and
-                                  $accessdelete and $hasDerivateWithURN and
-                                  string-length($child-layout)=0 and not($accesscreate)">
-                      <xsl:attribute name="class">last</xsl:attribute>
-                    </xsl:if>
-                    <xsl:choose>
-                      <xsl:when test="string-length($editURL) &gt; 0">
-                        <a href="{$editURL}">
-                          <xsl:value-of select="i18n:translate('object.editObject')" />
-                        </a>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="i18n:translate('object.locked')" />
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </li>
-
-                  <xsl:apply-templates select="." mode="externalObjectActions" />
-
-                  <xsl:if test="$displayAddDerivate='true'">
-                    <li>
-                      <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and
-                                    $accessdelete and $hasDerivateWithURN and
-                                    string-length($child-layout)=0 and not(acl:checkPermission(./@ID,'writedb'))">
-                        <xsl:attribute name="class">last</xsl:attribute>
-                      </xsl:if>
-                      <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
-                        <xsl:value-of select="i18n:translate('derivate.addDerivate')" />
-                      </a>
-                    </li>
+        <div class="document_options">
+          <!-- TODO: refacture! -->
+          <img class="button_options" src="{$WebApplicationBaseURL}images/icon_arrow_circled_red_down.png"
+            alt="show document options" title="{i18n:translate('component.mods.metaData.options')}" />
+          <div class="options">
+            <ul>
+              <xsl:if test="$accessedit or $accesscreate">
+                <li>
+                  <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and
+                                $displayAddDerivate!='true' and
+                                $accessdelete and $hasDerivateWithURN and
+                                string-length($child-layout)=0 and not($accesscreate)">
+                    <xsl:attribute name="class">last</xsl:attribute>
                   </xsl:if>
-                </xsl:if>
-                <xsl:if test="$accessdelete and string-length($hasDerivateWithURN)=0">
-                  <li>
-                    <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and string-length($child-layout)=0 and not(acl:checkPermission(./@ID,'writedb'))">
-                      <xsl:attribute name="class">last</xsl:attribute>
-                    </xsl:if>
-                    <xsl:choose>
-                      <xsl:when test="/mycoreobject/structure/children/child">
-                        <xsl:value-of select="i18n:translate('object.hasChildren')" />
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
-                          <xsl:value-of select="i18n:translate('object.delObject')" />
-                        </a>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </li>
-                </xsl:if>
-                <xsl:if test="string-length($child-layout) &gt; 0 and $accesscreate">
                   <xsl:choose>
-                    <xsl:when test="$mods-type = 'series'">
-                      <li>
-                        <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;parentId={./@ID}">
-                          <xsl:value-of select="i18n:translate('component.mods.metaData.types.book')" />
-                        </a>
-                      </li>
-                      <li>
-                        <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName)">
-                          <xsl:attribute name="class">last</xsl:attribute>
-                        </xsl:if>
-                        <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;parentId={./@ID}">
-                          <xsl:value-of select="i18n:translate('component.mods.metaData.types.confpro')" />
-                        </a>
-                      </li>
+                    <xsl:when test="string-length($editURL) &gt; 0">
+                      <a href="{$editURL}">
+                        <xsl:value-of select="i18n:translate('object.editObject')" />
+                      </a>
                     </xsl:when>
                     <xsl:otherwise>
-                      <li>
-                        <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName)">
-                          <xsl:attribute name="class">last</xsl:attribute>
-                        </xsl:if>
-                        <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentId={./@ID}">
-                          <xsl:value-of select="i18n:translate(concat('component.mods.metaData.types.',$child-layout))" />
-                        </a>
-                      </li>
+                      <xsl:value-of select="i18n:translate('object.locked')" />
                     </xsl:otherwise>
                   </xsl:choose>
-                </xsl:if>
-                <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
-                  <li class="last">
-                    <xsl:choose>
-                      <xsl:when test="string-length($editURL_allMods) &gt; 0">
-                        <a href="{$editURL_allMods}">
-                          <xsl:value-of select="i18n:translate('component.mods.object.editAllModsXML')" />
-                        </a>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:value-of select="i18n:translate('object.locked')" />
-                      </xsl:otherwise>
-                    </xsl:choose>
+                </li>
+
+                <xsl:apply-templates select="." mode="externalObjectActions" />
+
+                <xsl:if test="$displayAddDerivate='true'">
+                  <li>
+                    <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and
+                                  $accessdelete and $hasDerivateWithURN and
+                                  string-length($child-layout)=0 and not(acl:checkPermission(./@ID,'writedb'))">
+                      <xsl:attribute name="class">last</xsl:attribute>
+                    </xsl:if>
+                    <a href="{$ServletsBaseURL}derivate/create{$HttpSession}?id={$id}">
+                      <xsl:value-of select="i18n:translate('derivate.addDerivate')" />
+                    </a>
                   </li>
                 </xsl:if>
-              </ul>
-            </div>
+              </xsl:if>
+              <xsl:if test="$accessdelete and string-length($hasDerivateWithURN)=0">
+                <li>
+                  <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName) and string-length($child-layout)=0 and not(acl:checkPermission(./@ID,'writedb'))">
+                    <xsl:attribute name="class">last</xsl:attribute>
+                  </xsl:if>
+                  <xsl:choose>
+                    <xsl:when test="/mycoreobject/structure/children/child">
+                      <xsl:value-of select="i18n:translate('object.hasChildren')" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <a href="{$ServletsBaseURL}object/delete{$HttpSession}?id={$id}" id="confirm_deletion">
+                        <xsl:value-of select="i18n:translate('object.delObject')" />
+                      </a>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </li>
+              </xsl:if>
+              <xsl:if test="string-length($child-layout) &gt; 0 and $accesscreate">
+                <xsl:choose>
+                  <xsl:when test="$mods-type = 'series'">
+                    <li>
+                      <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=book&amp;parentId={./@ID}">
+                        <xsl:value-of select="i18n:translate('component.mods.metaData.types.book')" />
+                      </a>
+                    </li>
+                    <li>
+                      <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName)">
+                        <xsl:attribute name="class">last</xsl:attribute>
+                      </xsl:if>
+                      <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout=confpro&amp;parentId={./@ID}">
+                        <xsl:value-of select="i18n:translate('component.mods.metaData.types.confpro')" />
+                      </a>
+                    </li>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <li>
+                      <xsl:if test="not($CurrentUser=$MCR.Users.Superuser.UserName)">
+                        <xsl:attribute name="class">last</xsl:attribute>
+                      </xsl:if>
+                      <a href="{$ServletsBaseURL}object/create{$HttpSession}?type=mods&amp;layout={$child-layout}&amp;parentId={./@ID}">
+                        <xsl:value-of select="i18n:translate(concat('component.mods.metaData.types.',$child-layout))" />
+                      </a>
+                    </li>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:if>
+              <xsl:if test="$CurrentUser=$MCR.Users.Superuser.UserName">
+                <li class="last">
+                  <xsl:choose>
+                    <xsl:when test="string-length($editURL_allMods) &gt; 0">
+                      <a href="{$editURL_allMods}">
+                        <xsl:value-of select="i18n:translate('component.mods.object.editAllModsXML')" />
+                      </a>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="i18n:translate('object.locked')" />
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </li>
+              </xsl:if>
+            </ul>
           </div>
-        </xsl:when>
-      </xsl:choose>
-    </xsl:if>
+        </div>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="mods.getObjectEditURL">
