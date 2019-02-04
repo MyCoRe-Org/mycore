@@ -173,7 +173,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
             String prefix = baseURI.substring(0, pos + 1);
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("prefix of baseURI ''{}'' is: {}", baseURI, prefix);
-                LOGGER.debug("systemId: {0} prefixed? {1}", systemId, systemId.startsWith(prefix));
+                LOGGER.debug("systemId: {} prefixed? {}", systemId, systemId.startsWith(prefix));
             }
             if (prefix.length() > 0 && systemId.startsWith(prefix)) {
                 systemId = systemId.substring(prefix.length());

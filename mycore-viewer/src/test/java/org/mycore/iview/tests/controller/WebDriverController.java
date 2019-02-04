@@ -119,7 +119,7 @@ public class WebDriverController {
         List<WebElement> element = getDriver().findElements(selector);
         for (WebElement webElement : element) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Found ''{0}'' with selector :''{1}''", webElement.toString(), selector.toString());
+                LOGGER.debug("Found ''{}'' with selector :''{}''", webElement.toString(), selector.toString());
             }
             if (webElement.getAttribute(attribute) != null) {
                 return webElement.getAttribute(attribute).contains(assertion);

@@ -351,13 +351,13 @@ public class MCRSolrSearchServlet extends MCRServlet {
             LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.TypeParameter.toString());
             return SolrParameterGroup.TypeParameter;
         } else if (isSolrParameter(parameterName)) {
-            LOGGER.debug("Parameter {0} is a {1}", parameterName, SolrParameterGroup.SolrParameter.toString());
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter.toString());
             return SolrParameterGroup.SolrParameter;
         } else if (isSortParameter(parameterName)) {
-            LOGGER.debug("Parameter {0} is a {1}", parameterName, SolrParameterGroup.SolrParameter.toString());
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.SolrParameter.toString());
             return SolrParameterGroup.SortParameter;
         } else {
-            LOGGER.debug("Parameter {0} is a {1}", parameterName, SolrParameterGroup.QueryParameter.toString());
+            LOGGER.debug("Parameter {} is a {}", parameterName, SolrParameterGroup.QueryParameter.toString());
             return SolrParameterGroup.QueryParameter;
         }
     }
