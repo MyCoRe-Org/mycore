@@ -33,10 +33,10 @@ import javax.ws.rs.core.Response;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.MCRJWTUtil;
 import org.mycore.frontend.jersey.MCRStaticContent;
-import org.mycore.frontend.servlets.MCRServlet;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -62,11 +62,11 @@ public class MCRJWTResource {
         noCache = @MCRCacheControl.FieldArgument(active = true))
     public Response getTokenFromSession() throws IOException {
         if (!Optional.ofNullable(request.getSession(false))
-            .map(s -> s.getAttribute(MCRServlet.ATTR_MYCORE_SESSION))
+            .map(s -> s.getAttribute(MCRFrontendUtil.MYCORE_SESSION_ATTRIBUTE))
             .isPresent()) {
             return MCRJWTUtil.getJWTLoginErrorResponse("No active MyCoRe session found.");
         }
-        MCRSession mcrSession = MCRServlet.getSession(request);
+        MCRSession mcrSession = MCRFrontendUtil.getMCRSessionFromRequest(request);
         String jwt = getToken(mcrSession);
         return MCRJWTUtil.getJWTLoginSuccessResponse(jwt);
     }

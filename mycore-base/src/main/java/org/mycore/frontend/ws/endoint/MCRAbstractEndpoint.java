@@ -28,7 +28,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * Starting class for all mycore websocket endpoints.
@@ -77,7 +77,7 @@ public abstract class MCRAbstractEndpoint {
      */
     protected void activate(Session session) {
         MCRSessionMgr.unlock();
-        String mcrSessionKey = MCRServlet.ATTR_MYCORE_SESSION;
+        String mcrSessionKey = MCRFrontendUtil.MYCORE_SESSION_ATTRIBUTE;
         Optional<MCRSession> optionalSession = ((MCRSessionResolver) session.getUserProperties()
             .get(mcrSessionKey))
                 .resolveSession();

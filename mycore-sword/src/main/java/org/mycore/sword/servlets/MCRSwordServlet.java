@@ -42,7 +42,7 @@ public class MCRSwordServlet extends HttpServlet {
             String webappBase = MCRFrontendUtil.getBaseURL(req);
             req.setAttribute(MCRFrontendUtil.BASE_URL_ATTRIBUTE, webappBase);
         }
-        MCRSession session = MCRServlet.getSession(req);
+        MCRSession session = MCRFrontendUtil.getMCRSessionFromRequest(req);
         MCRSessionMgr.setCurrentSession(session);
         LOGGER.info(MessageFormat.format("{0} ip={1} mcr={2} user={3}", req.getPathInfo(),
             MCRFrontendUtil.getRemoteAddr(req), session.getID(), session.getUserInformation().getUserID()));

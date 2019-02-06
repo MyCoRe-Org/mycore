@@ -24,7 +24,7 @@ import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.mycore.common.inject.MCRInjectorConfig;
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * Default mycore configuration for websocket endpoints.
@@ -42,8 +42,8 @@ public class MCRWebsocketDefaultConfigurator extends ServerEndpointConfig.Config
     @Override
     public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
         HttpSession httpSession = (HttpSession) request.getHttpSession();
-        config.getUserProperties().put(MCRServlet.ATTR_MYCORE_SESSION,
-            httpSession.getAttribute(MCRServlet.ATTR_MYCORE_SESSION));
+        config.getUserProperties().put(MCRFrontendUtil.MYCORE_SESSION_ATTRIBUTE,
+            httpSession.getAttribute(MCRFrontendUtil.MYCORE_SESSION_ATTRIBUTE));
     }
 
 }

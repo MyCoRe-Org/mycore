@@ -18,15 +18,16 @@
 
 package org.mycore.common;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.frontend.servlets.MCRServlet;
-
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
+
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * This Class will be stored in the a {@link javax.servlet.http.HttpSession} and can be used to resolve the
@@ -35,7 +36,9 @@ import java.util.Optional;
  */
 public final class MCRSessionResolver implements Serializable, HttpSessionBindingListener {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger LOGGER = LogManager.getLogger();
 
     private final String sessionID;
 
@@ -72,7 +75,7 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
     public void valueUnbound(HttpSessionBindingEvent hsbe) {
         // hsbe.getValue() does not work right with tomcat
         Optional<MCRSessionResolver> newSessionResolver = Optional
-                .ofNullable(hsbe.getSession().getAttribute(MCRServlet.ATTR_MYCORE_SESSION))
+                .ofNullable(hsbe.getSession().getAttribute(MCRFrontendUtil.MYCORE_SESSION_ATTRIBUTE))
                 .filter(o -> o instanceof MCRSessionResolver)
                 .map(MCRSessionResolver.class::cast);
         MCRSessionResolver oldResolver = this;

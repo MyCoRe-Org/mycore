@@ -137,7 +137,7 @@ public class MCRErrorServlet extends HttpServlet {
         if (session == null) {
             return null;
         }
-        return MCRServlet.getSession(req);
+        return MCRFrontendUtil.getMCRSessionFromRequest(req);
     }
 
     private void setWebAppBaseURL(MCRSession session, HttpServletRequest request) {

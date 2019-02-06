@@ -18,16 +18,17 @@
 
 package org.mycore.common.events;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionResolver;
-import org.mycore.frontend.servlets.MCRServlet;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import java.util.Enumeration;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionResolver;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * Handles different HttpSession events.
@@ -62,7 +63,7 @@ public class MCRHttpSessionListener implements HttpSessionListener {
         LOGGER.debug("Removing any MCRSessions from HttpSession");
         for (Enumeration<String> e = httpSession.getAttributeNames(); e.hasMoreElements(); ) {
             String key = e.nextElement();
-            if (key.equals(MCRServlet.ATTR_MYCORE_SESSION)) {
+            if (key.equals(MCRFrontendUtil.MYCORE_SESSION_ATTRIBUTE)) {
                 ((MCRSessionResolver) httpSession.getAttribute(key))
                         .resolveSession()
                         .ifPresent(MCRSession::close);

@@ -37,7 +37,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.frontend.servlets.MCRServlet;
 
 @Priority(Priorities.AUTHENTICATION)
 public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerResponseFilter {
@@ -55,7 +54,7 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
     @Override
     public void filter(ContainerRequestContext request) {
         MCRSessionMgr.unlock();
-        MCRSession session = MCRServlet.getSession(httpRequest);
+        MCRSession session = MCRFrontendUtil.getMCRSessionFromRequest(httpRequest);
         request.setProperty(ATTR, session);
         MCRSessionMgr.setCurrentSession(session);
         LOGGER.info(MessageFormat.format("{0} ip={1} mcr={2} user={3}", request.getUriInfo().getPath(),

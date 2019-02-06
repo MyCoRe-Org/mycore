@@ -33,7 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.MCRFrontendUtil;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -92,12 +92,12 @@ public class MCRPersistenceServletFilter implements Filter {
         String type = pathElements[2];
         String operation = pathElements[3];
         //get session for DB access
-        MCRSession session = MCRServlet.getSession(req);
+        MCRSession session = MCRFrontendUtil.getMCRSessionFromRequest(req);
         MCRSessionMgr.setCurrentSession(session);
         session.beginTransaction();
         try {
             String url;
-            String mcrId = MCRServlet.getProperty(req, "id");
+            String mcrId = MCRFrontendUtil.getProperty(req, "id").orElse(null);
             if (mcrId == null) {
                 String collection = getCollection(req);
                 url = MCRURLRetriever.getURLforCollection(operation, collection, false);
@@ -114,11 +114,11 @@ public class MCRPersistenceServletFilter implements Filter {
 
     private String getCollection(HttpServletRequest req) {
         //layout is collection string
-        String layout = MCRServlet.getProperty(req, "layout");
+        String layout = MCRFrontendUtil.getProperty(req, "layout").orElse(null);
         if (layout != null) {
             return layout;
         }
-        String mcrId = MCRServlet.getProperty(req, "id");
+        String mcrId = MCRFrontendUtil.getProperty(req, "id").orElse(null);
         return MCRClassificationUtils.getCollection(mcrId);
     }
 
