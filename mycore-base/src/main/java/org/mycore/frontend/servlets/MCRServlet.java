@@ -39,7 +39,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -114,24 +113,6 @@ public class MCRServlet extends HttpServlet {
             return value + "servlets/";
         }
         return SERVLET_URL != null ? SERVLET_URL : MCRFrontendUtil.getBaseURL() + "servlets/";
-    }
-
-    /**
-     * Initialisation of the static values for the base URL and servlet URL of the mycore system.
-     */
-    private static synchronized void prepareBaseURLs(ServletContext context, HttpServletRequest req) {
-        String contextPath = req.getContextPath() + "/";
-
-        String requestURL = req.getRequestURL().toString();
-        int pos = requestURL.indexOf(contextPath, 9);
-        String baseURLofRequest = requestURL.substring(0, pos) + contextPath;
-
-        prepareBaseURLs(baseURLofRequest);
-    }
-
-    private static void prepareBaseURLs(String baseURLofRequest) {
-        MCRFrontendUtil.prepareBaseURLs(baseURLofRequest);
-        SERVLET_URL = MCRFrontendUtil.getBaseURL() + "servlets/";
     }
 
     // The methods doGet() and doPost() simply call the private method
@@ -290,7 +271,8 @@ public class MCRServlet extends HttpServlet {
         }
 
         if (SERVLET_URL == null) {
-            prepareBaseURLs(getServletContext(), req);
+            MCRFrontendUtil.prepareBaseURLs(req);
+            SERVLET_URL = MCRFrontendUtil.getBaseURL() + "servlets/";
         }
 
         MCRServletJob job = new MCRServletJob(req, res);

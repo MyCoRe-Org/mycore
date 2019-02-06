@@ -127,6 +127,20 @@ public class MCRFrontendUtil {
         return webappBase.toString();
     }
 
+    
+    /**
+     * Initialisation of the static values for the base URL and servlet URL of the mycore system.
+     */
+    public static synchronized void prepareBaseURLs(HttpServletRequest req) {
+        String contextPath = req.getContextPath() + "/";
+
+        String requestURL = req.getRequestURL().toString();
+        int pos = requestURL.indexOf(contextPath, 9);
+        String baseURLofRequest = requestURL.substring(0, pos) + contextPath;
+
+        prepareBaseURLs(baseURLofRequest);
+    }
+
     public static synchronized void prepareBaseURLs(String baseURL) {
         BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl", baseURL);
         if (!BASE_URL.endsWith("/")) {
