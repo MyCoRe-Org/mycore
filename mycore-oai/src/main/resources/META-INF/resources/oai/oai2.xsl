@@ -512,7 +512,7 @@ p.intro {
   <xsl:apply-templates select="oai:setSpec" />
   </table>
   <xsl:if test="@status='deleted'">
-    <p>This record has been deleted.</p>
+    <p>This record has been deleted, blocked or is not yet published.</p>
   </xsl:if>
 </xsl:template>
 
