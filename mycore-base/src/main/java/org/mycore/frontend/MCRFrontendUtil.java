@@ -24,8 +24,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -39,19 +43,29 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSessionResolver;
+import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * Servlet/Jersey Resource utility class.
  */
 public class MCRFrontendUtil {
+
+    public static final String CURRENT_THREAD_NAME_KEY = "currentThreadName";
+
+    public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
+
+    public static final String MYCORE_SESSION_ATTRIBUTE = "mycore.session";
 
     private static final String PROXY_HEADER_HOST = "X-Forwarded-Host";
 
@@ -63,8 +77,6 @@ public class MCRFrontendUtil {
 
     private static final String PROXY_HEADER_REMOTE_IP = "X-Forwarded-For";
 
-    public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
-
     private static String BASE_URL;
 
     private static String BASE_HOST_IP;
@@ -72,7 +84,7 @@ public class MCRFrontendUtil {
     private static Logger LOGGER = LogManager.getLogger();
 
     static {
-        prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
+        prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request
     }
 
     /** The IP addresses of trusted web proxies */
@@ -96,7 +108,7 @@ public class MCRFrontendUtil {
     }
 
     /**
-     * returns the base URL of the mycore system. This method uses the request to 'calculate' the right baseURL.
+     * returns the base URL of the mycore system. This method uses the request to 'calculate' the right baseURL. 
      * Generally it is sufficent to use {@link #getBaseURL()} instead.
      */
     public static String getBaseURL(ServletRequest req) {
@@ -127,7 +139,6 @@ public class MCRFrontendUtil {
         return webappBase.toString();
     }
 
-    
     /**
      * Initialisation of the static values for the base URL and servlet URL of the mycore system.
      */
@@ -157,6 +168,21 @@ public class MCRFrontendUtil {
         }
     }
 
+    public static synchronized void bindSessionToThread(HttpServletRequest req, MCRSession session) {
+        if (!isSessionBoundToThread(req)) {
+            // Bind current session to this thread:
+            MCRSessionMgr.setCurrentSession(session);
+            req.setAttribute(CURRENT_THREAD_NAME_KEY, Thread.currentThread().getName());
+        }
+    }
+
+    private static boolean isSessionBoundToThread(HttpServletRequest req) {
+        String currentThread = MCRFrontendUtil.getProperty(req, CURRENT_THREAD_NAME_KEY).orElse(null);
+        // check if this is request passed the same thread before
+        // (RequestDispatcher)
+        return currentThread != null && currentThread.equals(Thread.currentThread().getName());
+    }
+
     public static void configureSession(MCRSession session, HttpServletRequest request, HttpServletResponse response) {
         session.setServletJob(new MCRServletJob(request, response));
         // language
@@ -173,7 +199,59 @@ public class MCRFrontendUtil {
         }
 
         // Store XSL.*.SESSION parameters to MCRSession
-        putParamsToSession(request);
+        putParamsToSession(request, session);
+    }
+
+    public static MCRSession getMCRSessionFromRequest(HttpServletRequest req) {
+        boolean reusedSession = req.isRequestedSessionIdValid();
+        HttpSession theSession = req.getSession(true);
+        if (reusedSession) {
+            LOGGER.debug(() -> "Reused HTTP session: " + theSession.getId() + ", created: " + LocalDateTime
+                    .ofInstant(Instant.ofEpochMilli(theSession.getCreationTime()), ZoneId.systemDefault()));
+        } else {
+            LOGGER.info(() -> "Created new HTTP session: " + theSession.getId());
+        }
+        MCRSession session = null;
+
+        MCRSession fromHttpSession = Optional
+                .ofNullable((MCRSessionResolver) theSession.getAttribute(MYCORE_SESSION_ATTRIBUTE))
+                .flatMap(MCRSessionResolver::resolveSession).orElse(null);
+
+        MCRSessionMgr.unlock();
+        if (fromHttpSession != null && fromHttpSession.getID() != null) {
+            // Take session from HttpSession with servlets
+            session = fromHttpSession;
+            String lastIP = session.getCurrentIP();
+            if (lastIP.length() != 0) {
+                // check if request IP equals last known IP
+                String newip = MCRFrontendUtil.getRemoteAddr(req);
+                if (!lastIP.equals(newip) && !newip.equals(MCRFrontendUtil.getHostIP())) {
+                    LOGGER.warn("Session steal attempt from IP {}, previous IP was {}. Session: {}", newip, lastIP,
+                            session);
+                    MCRSessionMgr.releaseCurrentSession();
+                    session.close(); // MCR-1409 do not leak old session
+                    session = MCRSessionMgr.getCurrentSession();
+                    session.setCurrentIP(newip);
+                }
+            }
+        } else {
+            // Create a new session
+            session = MCRSessionMgr.getCurrentSession();
+        }
+
+        // Store current session in HttpSession
+        theSession.setAttribute(MYCORE_SESSION_ATTRIBUTE, new MCRSessionResolver(session));
+        // store the HttpSession ID in MCRSession
+        if (session.put("http.session", theSession.getId()) == null) {
+            // first request
+            MCRStreamUtils.asStream(req.getLocales()).map(Locale::toString)
+                    .filter(MCRTranslation.getAvailableLanguages()::contains).findFirst()
+                    .ifPresent(session::setCurrentLanguage);
+        }
+        // Forward MCRSessionID to XSL Stylesheets
+        req.setAttribute("XSL.MCRSessionID", session.getID());
+
+        return session;
     }
 
     /**
@@ -234,9 +312,7 @@ public class MCRFrontendUtil {
         return xff;
     }
 
-    private static void putParamsToSession(HttpServletRequest request) {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-
+    private static void putParamsToSession(HttpServletRequest request, MCRSession mcrSession) {
         for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             String name = e.nextElement();
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {

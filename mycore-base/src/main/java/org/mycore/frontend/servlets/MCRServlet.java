@@ -31,29 +31,20 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSessionResolver;
-import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -71,11 +62,8 @@ import org.xml.sax.SAXParseException;
  * @version $Revision$ $Date$
  */
 public class MCRServlet extends HttpServlet {
-    public static final String ATTR_MYCORE_SESSION = "mycore.session";
-
-    private static final String CURRENT_THREAD_NAME_KEY = "currentThreadName";
-
-    private static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
+    
+	public static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
 
     private static final long serialVersionUID = 1L;
 
@@ -164,76 +152,6 @@ public class MCRServlet extends HttpServlet {
         doGetPost(job);
     }
 
-    public static MCRSession getSession(HttpServletRequest req) {
-        boolean reusedSession = req.isRequestedSessionIdValid();
-        HttpSession theSession = req.getSession(true);
-        if (reusedSession) {
-            LOGGER.debug(() -> "Reused HTTP session: " + theSession.getId() + ", created: " + LocalDateTime
-                .ofInstant(Instant.ofEpochMilli(theSession.getCreationTime()), ZoneId.systemDefault()));
-        } else {
-            LOGGER.info(() -> "Created new HTTP session: " + theSession.getId());
-        }
-        MCRSession session = null;
-
-        MCRSession fromHttpSession = Optional
-            .ofNullable((MCRSessionResolver) theSession.getAttribute(ATTR_MYCORE_SESSION))
-            .flatMap(MCRSessionResolver::resolveSession)
-            .orElse(null);
-
-        MCRSessionMgr.unlock();
-        if (fromHttpSession != null && fromHttpSession.getID() != null) {
-            // Take session from HttpSession with servlets
-            session = fromHttpSession;
-            String lastIP = session.getCurrentIP();
-            if (lastIP.length() != 0) {
-                //check if request IP equals last known IP
-                String newip = MCRFrontendUtil.getRemoteAddr(req);
-                if (!lastIP.equals(newip) && !newip.equals(MCRFrontendUtil.getHostIP())) {
-                    LOGGER.warn("Session steal attempt from IP {}, previous IP was {}. Session: {}", newip, lastIP,
-                        session);
-                    MCRSessionMgr.releaseCurrentSession();
-                    session.close(); //MCR-1409 do not leak old session
-                    session = MCRSessionMgr.getCurrentSession();
-                    session.setCurrentIP(newip);
-                }
-            }
-        } else {
-            // Create a new session
-            session = MCRSessionMgr.getCurrentSession();
-        }
-
-        // Store current session in HttpSession
-        theSession.setAttribute(ATTR_MYCORE_SESSION, new MCRSessionResolver(session));
-        // store the HttpSession ID in MCRSession
-        if (session.put("http.session", theSession.getId()) == null) {
-            //first request
-            MCRStreamUtils.asStream(req.getLocales())
-                .map(Locale::toString)
-                .filter(MCRTranslation.getAvailableLanguages()::contains)
-                .findFirst()
-                .ifPresent(session::setCurrentLanguage);
-        }
-        // Forward MCRSessionID to XSL Stylesheets
-        req.setAttribute("XSL.MCRSessionID", session.getID());
-
-        return session;
-    }
-
-    private static void bindSessionToRequest(HttpServletRequest req, String servletName, MCRSession session) {
-        if (!isSessionBoundToRequest(req)) {
-            // Bind current session to this thread:
-            MCRSessionMgr.setCurrentSession(session);
-            req.setAttribute(CURRENT_THREAD_NAME_KEY, Thread.currentThread().getName());
-            req.setAttribute(INITIAL_SERVLET_NAME_KEY, servletName);
-        }
-    }
-
-    private static boolean isSessionBoundToRequest(HttpServletRequest req) {
-        String currentThread = getProperty(req, CURRENT_THREAD_NAME_KEY);
-        // check if this is request passed the same thread before
-        // (RequestDispatcher)
-        return currentThread != null && currentThread.equals(Thread.currentThread().getName());
-    }
 
     /**
      * This private method handles both GET and POST requests and is invoked by doGet() and doPost().
@@ -254,31 +172,17 @@ public class MCRServlet extends HttpServlet {
             // intialized
             init();
         }
-
-        // Try to set encoding of form values
-        String ReqCharEncoding = req.getCharacterEncoding();
-
-        if (ReqCharEncoding == null) {
-            // Set default to UTF-8
-            ReqCharEncoding = MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8");
-            req.setCharacterEncoding(ReqCharEncoding);
-            LOGGER.debug("Setting ReqCharEncoding to: {}", ReqCharEncoding);
-        }
-
-        if ("true".equals(req.getParameter("reload.properties"))) {
-            MCRConfigurationDirSetup setup = new MCRConfigurationDirSetup();
-            setup.startUp(getServletContext());
-        }
-
         if (SERVLET_URL == null) {
             MCRFrontendUtil.prepareBaseURLs(req);
             SERVLET_URL = MCRFrontendUtil.getBaseURL() + "servlets/";
         }
+        
+        if(!MCRFrontendUtil.getProperty(req, INITIAL_SERVLET_NAME_KEY).isPresent()) {
+        	req.setAttribute(INITIAL_SERVLET_NAME_KEY, getServletName());
+        }
 
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         MCRServletJob job = new MCRServletJob(req, res);
-
-        MCRSession session = getSession(job.getRequest());
-        bindSessionToRequest(req, getServletName(), session);
         try {
             // transaction around 1st phase of request
             Exception thinkException = processThinkPhase(job);
@@ -287,13 +191,13 @@ public class MCRServlet extends HttpServlet {
         } catch (Error error) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                session.rollbackTransaction();
+            	mcrSession.rollbackTransaction();
             }
             throw error;
         } catch (Exception ex) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                session.rollbackTransaction();
+            	mcrSession.rollbackTransaction();
             }
             if (isBrokenPipe(ex)) {
                 LOGGER.info("Ignore broken pipe.");
@@ -304,6 +208,8 @@ public class MCRServlet extends HttpServlet {
             } else {
                 LOGGER.error("Exception while in rendering phase: {}", ex.getMessage());
             }
+            MCRSessionMgr.releaseCurrentSession();
+            
             if (ex instanceof ServletException) {
                 throw (ServletException) ex;
             } else if (ex instanceof IOException) {
@@ -316,14 +222,6 @@ public class MCRServlet extends HttpServlet {
                 throw (RuntimeException) ex;
             } else {
                 throw new RuntimeException(ex);
-            }
-        } finally {
-            // Release current MCRSession from current Thread,
-            // in case that Thread pooling will be used by servlet engine
-            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
-                // current Servlet not called via RequestDispatcher
-                MCRSessionMgr.releaseCurrentSession();
-                MCRSessionMgr.lock();
             }
         }
     }
@@ -342,7 +240,7 @@ public class MCRServlet extends HttpServlet {
         String c = getClass().getName();
         c = c.substring(c.lastIndexOf(".") + 1);
 
-        String msg = c + " ip=" + MCRFrontendUtil.getRemoteAddr(job.getRequest()) + " mcr=" + session.getID() + " user="
+        String msg = c + " thread=" + Thread.currentThread().getName() + " ip=" + MCRFrontendUtil.getRemoteAddr(job.getRequest()) + " mcr=" + session.getID() + " user="
             + session.getUserInformation().getUserID();
         LOGGER.info(msg);
 

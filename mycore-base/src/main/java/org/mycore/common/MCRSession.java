@@ -39,9 +39,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletRequest;
@@ -86,8 +88,13 @@ public class MCRSession implements Cloneable {
     AtomicInteger accessCount;
 
     AtomicInteger concurrentAccess;
-
-    ThreadLocal<AtomicInteger> currentThreadCount = ThreadLocal.withInitial(AtomicInteger::new);
+    
+    ThreadLocal<Semaphore> semConcurrentAccess = ThreadLocal.withInitial(new Supplier<Semaphore>() {
+        @Override
+        public Semaphore get() {
+            return new Semaphore(1);
+        }
+    });
 
     /** the logger */
     static Logger LOGGER = LogManager.getLogger(MCRSession.class.getName());
@@ -362,14 +369,19 @@ public class MCRSession implements Cloneable {
         lastAccessTime = thisAccessTime;
         thisAccessTime = System.currentTimeMillis();
         accessCount.incrementAndGet();
-        if (currentThreadCount.get().getAndIncrement() == 0) {
-            lastActivatedStackTrace.set(new RuntimeException("This is for debugging purposes only"));
+        
+        try {
+            semConcurrentAccess.get().tryAcquire(30, TimeUnit.SECONDS);
+            lastActivatedStackTrace.set(new MCRException("This is for debugging purposes only"));
             fireSessionEvent(activated, concurrentAccess.incrementAndGet());
-        } else {
-            MCRException e = new MCRException(
-                "Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
-            LOGGER.warn("Too many activate() calls stacktrace:", e);
-            LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace.get());
+        } catch (InterruptedException e) {
+            LOGGER.warn("Could not aquire semaphore for MCRSession: " + sessionID+ " / another request is still running: "
+                    + firstURI.get());
+            MCRException eStack = new MCRException
+                    ("Could not aquire semaphore for MCRSession: " + sessionID+ " / another request is still running: "
+                            + firstURI.get());
+                LOGGER.warn("Too many activate() calls stacktrace:", eStack);
+                LOGGER.warn("First activate() call stacktrace:", lastActivatedStackTrace.get());
         }
     }
 
@@ -379,11 +391,12 @@ public class MCRSession implements Cloneable {
      * @see MCRSessionMgr#releaseCurrentSession()
      */
     void passivate() {
-        if (currentThreadCount.get().getAndDecrement() == 1) {
+        if (semConcurrentAccess.get().availablePermits()==0) {
+            semConcurrentAccess.get().release();
             lastActivatedStackTrace.set(null);
             fireSessionEvent(passivated, concurrentAccess.decrementAndGet());
         } else {
-            LOGGER.debug("deactivate currentThreadCount: {}", currentThreadCount.get().get());
+            LOGGER.debug("The session "+ sessionID + " could not be passivated (was not active)");
         }
         if (!firstURI.isPresent()) {
             firstURI = Optional.of(defaultURI);

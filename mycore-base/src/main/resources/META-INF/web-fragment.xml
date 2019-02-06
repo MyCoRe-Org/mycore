@@ -52,6 +52,10 @@
     <filter-name>RequestAuthenticationFilter</filter-name>
     <filter-class>org.mycore.frontend.filter.MCRRequestAuthenticationFilter</filter-class>
   </filter>
+  <filter>
+    <filter-name>MCRSessionInitializationFilter</filter-name>
+    <filter-class>org.mycore.frontend.filter.MCRSessionInitializationFilter</filter-class>
+  </filter>
 
   <servlet id="CreateObjectServlet">
     <servlet-name>CreateObjectServlet</servlet-name>
@@ -179,6 +183,15 @@
   <filter-mapping>
     <filter-name>WebAppBaseFilter</filter-name>
     <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>MCRSessionInitializationFilter</filter-name>
+    <url-pattern>/servlets/*</url-pattern>
+	<url-pattern>*.xml</url-pattern>
+	<url-pattern>/receive/*</url-pattern>
+	<url-pattern>/storeBrowser/*</url-pattern>
+	<url-pattern>/img/qrcodes/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
