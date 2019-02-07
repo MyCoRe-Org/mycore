@@ -1,16 +1,19 @@
 package org.mycore.pi;
 
 import java.text.ParseException;
+import java.util.AbstractMap;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.persistence.EntityManager;
 import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
@@ -48,16 +51,18 @@ public class MCRPICronJob implements Runnable, MCRStartupHandler.AutoExecutable 
 
     private static final ExecutorService CHECK_URN_EXECUTOR_SERVICE = getCheckUrnExecutorService();
 
-    private static final List<Future<Void>> tasks = new LinkedList<>();
-
     private ScheduledExecutorService cronExcutorService;
 
-    public MCRPICronJob() {
-        cronExcutorService = Executors.newScheduledThreadPool(CRON_THREAD_COUNT);
-    }
+    private ExecutorService updateExecutorService;
 
     private static ExecutorService getCheckUrnExecutorService() {
-        final ExecutorService executorService = Executors.newFixedThreadPool(CHECK_URN_THREAD_COUNT);
+        final AtomicInteger num = new AtomicInteger();
+        final ExecutorService executorService = Executors.newFixedThreadPool(CHECK_URN_THREAD_COUNT, r -> {
+            int tNum = num.incrementAndGet();
+            Thread t = new Thread(r);
+            t.setName(MCRPICronJob.class.getSimpleName() + ".urn#" + tNum);
+            return t;
+        });
         addShutdownHandler(executorService);
         return executorService;
     }
@@ -75,50 +80,64 @@ public class MCRPICronJob implements Runnable, MCRStartupHandler.AutoExecutable 
 
     public void run() {
         LOGGER.info("Running " + getName() + "..");
-        if (tasks.stream().allMatch(Future::isDone)) {
-            tasks.clear();
-            final List<MCRPI> urns = MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE, -1);
-            urns.stream().map(mcrpi -> {
-                MCREntityManagerProvider.getCurrentEntityManager().detach(mcrpi);
-                return getCheckPICallable(mcrpi);
-            }).map(CHECK_URN_EXECUTOR_SERVICE::submit)
-                .forEach(tasks::add);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        final List<MCRPI> urns = MCRPIManager.getInstance().getUnregisteredIdentifiers(MCRDNBURN.TYPE, -1);
 
-            tasks.forEach(voidFuture -> {
-                try {
-                    voidFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    LOGGER.error("Error in PICronjob!", e);
+        CompletableFuture[] cfs = urns.stream()
+            .peek(em::detach)
+            .map(mcrpi -> CompletableFuture.supplyAsync(() -> getDateRegistred(mcrpi), CHECK_URN_EXECUTOR_SERVICE))
+            .map(cf -> cf.thenAcceptAsync(result -> {
+                if (result == null) {
+                    return;
                 }
-            });
+                try {
+                    updateFlags(result.getKey(), result.getValue()).call();
+                } catch (RuntimeException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new MCRException(e);
+                }
+            }, updateExecutorService))
+            .toArray(CompletableFuture[]::new);
+
+        if (cfs.length == 0) {
+            return;
         }
+
+        try {
+            LOGGER.info("Waiting for {} updates to complete", cfs.length);
+            CompletableFuture
+                .allOf(cfs)
+                .join();
+            LOGGER.info("{} updates completed", cfs.length);
+        } catch (CompletionException e) {
+            LOGGER.error("Error in PICronjob!", e);
+        }
+
     }
 
-    private MCRFixedUserCallable<Void> getCheckPICallable(MCRPI mcrpi) {
-        return new MCRFixedUserCallable<Void>(() -> {
-            LOGGER.info("check {} is registered.", mcrpi.getIdentifier());
-            MCRDNBURN dnburn = new MCRDNBURNParser()
-                .parse(mcrpi.getIdentifier())
-                .orElseThrow(() -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
+    private Map.Entry<MCRPI, Date> getDateRegistred(MCRPI mcrpi) {
+        LOGGER.info("check {} is registered.", mcrpi.getIdentifier());
+        MCRDNBURN dnburn = new MCRDNBURNParser()
+            .parse(mcrpi.getIdentifier())
+            .orElseThrow(() -> new MCRException("Cannot parse Identifier from table: " + mcrpi.getIdentifier()));
+        try {
+            // Find register date in dnb rest
+            return new AbstractMap.SimpleEntry<>(mcrpi, MCRURNUtils.getDNBRegisterDate(dnburn));
+        } catch (ParseException e) {
+            LOGGER.error("Could not parse Date from PIDEF ! URN wont be marked as registered because of this! ", e);
+        } catch (MCRIdentifierUnresolvableException e) {
+            LOGGER.error("Could not update Date from PIDEF ! URN wont be marked as registered because of this! ", e);
+        }
+        return null;
+    }
 
-            try {
-                // Find register date in dnb rest
-                Date dnbRegisteredDate = MCRURNUtils.getDNBRegisterDate(dnburn);
-
-                if (dnbRegisteredDate == null) {
-                    return null;
-                }
-
-                mcrpi.setRegistered(dnbRegisteredDate);
-                MCRPIServiceManager.getInstance().getRegistrationService(mcrpi.getService())
-                    .updateFlag(MCRObjectID.getInstance(mcrpi.getMycoreID()), mcrpi.getAdditional(), mcrpi);
-                MCREntityManagerProvider.getCurrentEntityManager().merge(mcrpi);
-            } catch (ParseException e) {
-                LOGGER.error("Could not parse Date from PIDEF ! URN wont be marked as registered because of this! ", e);
-            } catch (MCRIdentifierUnresolvableException e) {
-                LOGGER
-                    .error("Could not update Date from PIDEF ! URN wont be marked as registered because of this! ", e);
-            }
+    private MCRFixedUserCallable<Void> updateFlags(MCRPI mcrpi, Date registerDate) {
+        return new MCRFixedUserCallable<>(() -> {
+            mcrpi.setRegistered(registerDate);
+            MCRPIServiceManager.getInstance().getRegistrationService(mcrpi.getService())
+                .updateFlag(MCRObjectID.getInstance(mcrpi.getMycoreID()), mcrpi.getAdditional(), mcrpi);
+            MCREntityManagerProvider.getCurrentEntityManager().merge(mcrpi);
             return null;
         }, MCRSystemUserInformation.getJanitorInstance());
     }
@@ -130,11 +149,19 @@ public class MCRPICronJob implements Runnable, MCRStartupHandler.AutoExecutable 
 
     @Override
     public int getPriority() {
-        return 0;
+        return Integer.MIN_VALUE + 1000;
     }
 
     @Override
     public void startUp(ServletContext servletContext) {
+        if (servletContext == null) {
+            return; //do not run in CLI
+        }
+        updateExecutorService = Executors
+            .newSingleThreadExecutor(r -> new Thread(r, MCRPICronJob.class.getSimpleName() + ".update"));
+        addShutdownHandler(updateExecutorService);
+        cronExcutorService = Executors.newScheduledThreadPool(CRON_THREAD_COUNT,
+            r -> new Thread(r, MCRPICronJob.class.getSimpleName() + ".cron"));
         addShutdownHandler(cronExcutorService);
         cronExcutorService
             .scheduleWithFixedDelay(this, CRON_INITIAL_DELAY_MINUTES, CRON_PERIOD_MINUTES, TimeUnit.MINUTES);

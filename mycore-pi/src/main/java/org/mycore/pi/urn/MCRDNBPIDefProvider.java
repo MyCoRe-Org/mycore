@@ -26,8 +26,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRStreamContent;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
+import org.xml.sax.SAXParseException;
 
 public class MCRDNBPIDefProvider {
     private static final String RESOLVING_URL_TEMPLATE = "https://nbn-resolving.org/resolver?identifier={urn}&verb=full&xml=on";
@@ -41,8 +44,9 @@ public class MCRDNBPIDefProvider {
         try (CloseableHttpClient httpClient = MCRHttpUtils.getHttpClient()) {
             CloseableHttpResponse response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
-            return new SAXBuilder().build(entity.getContent());
-        } catch (IOException | JDOMException e) {
+            MCRContent content = new MCRStreamContent(entity.getContent(), get.getURI().toString());
+            return MCRXMLParserFactory.getNonValidatingParser().parseXML(content);
+        } catch (IOException | SAXParseException e) {
             String message = "The identifier " + identifier + " is not resolvable!";
             throw new MCRIdentifierUnresolvableException(identifier, message, e);
         }
