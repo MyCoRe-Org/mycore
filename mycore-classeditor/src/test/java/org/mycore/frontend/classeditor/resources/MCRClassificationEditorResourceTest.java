@@ -57,6 +57,7 @@ import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 import org.mycore.frontend.classeditor.mocks.CategoryLinkServiceMock;
 import org.mycore.frontend.classeditor.mocks.LinkTableStoreMock;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
+import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 import org.mycore.frontend.jersey.resources.MCRJerseyTest;
 
 public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
@@ -123,6 +124,7 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     @BeforeClass
     public static void register() {
         JERSEY_CLASSES.add(MCRClassificationEditorResource.class);
+        JERSEY_CLASSES.add(MCRSessionHookFilter.class);
         JERSEY_CLASSES.add(MultiPartFeature.class);
     }
 

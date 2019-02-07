@@ -100,7 +100,6 @@ public abstract class MCRAbstractEndpoint {
      */
     protected void passivate(Session session) {
         MCRSessionMgr.releaseCurrentSession();
-        MCRSessionMgr.lock();
     }
 
 }

@@ -169,6 +169,7 @@ public class MCRCommandLineInterface {
     }
 
     private static void initSession() {
+        MCRSessionMgr.unlock();
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.setCurrentIP("127.0.0.1");
         session.setUserInformation(MCRSystemUserInformation.getSuperUserInstance());
@@ -394,9 +395,12 @@ public class MCRCommandLineInterface {
     }
 
     private static void showSessionDuration() {
+        MCRSessionMgr.unlock();
         MCRSession session = MCRSessionMgr.getCurrentSession();
         long duration = System.currentTimeMillis() - session.getLoginTime();
         output("Session duration: " + duration + " ms");
+        MCRSessionMgr.releaseCurrentSession();
+        session.close();
     }
 
     static void output(String message) {

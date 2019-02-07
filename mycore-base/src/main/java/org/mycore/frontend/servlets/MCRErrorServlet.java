@@ -239,7 +239,6 @@ public class MCRErrorServlet extends HttpServlet {
                     //new session created for transaction
                     session.close();
                 }
-                MCRSessionMgr.lock();
             }
         } else {
             if (request.getAttribute(requestAttr) != null) {

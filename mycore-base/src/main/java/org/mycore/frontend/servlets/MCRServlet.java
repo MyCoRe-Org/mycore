@@ -213,6 +213,7 @@ public class MCRServlet extends HttpServlet {
                         session);
                     MCRSessionMgr.releaseCurrentSession();
                     session.close(); //MCR-1409 do not leak old session
+                    MCRSessionMgr.unlock();//due to release above
                     session = MCRSessionMgr.getCurrentSession();
                     session.setCurrentIP(newip);
                 }
@@ -367,7 +368,6 @@ public class MCRServlet extends HttpServlet {
         if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(servletName)) {
             // current Servlet not called via RequestDispatcher
             MCRSessionMgr.releaseCurrentSession();
-            MCRSessionMgr.lock();
         }
     }
 

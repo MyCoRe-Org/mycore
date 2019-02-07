@@ -70,6 +70,7 @@ public class MCRTransactionableRunnable implements Runnable, MCRDecorator<Runnab
     @Override
     public void run() {
         boolean newSession = this.session == null;
+        MCRSessionMgr.unlock();
         boolean closeSession = newSession && !MCRSessionMgr.hasCurrentSession();
         if (newSession) {
             this.session = MCRSessionMgr.getCurrentSession();

@@ -110,6 +110,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         waiter = Thread.currentThread();
         Thread.currentThread().setName("TileMaster");
         //get this MCRSession a speaking name
+        MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         boolean activated = MCRConfiguration.instance().getBoolean(

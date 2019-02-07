@@ -69,7 +69,7 @@ public class MCRSessionMgr {
     private static ThreadLocal<Boolean> isSessionCreationLocked = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
-            return Boolean.FALSE;
+            return Boolean.TRUE;
         }
     };
 
@@ -78,6 +78,7 @@ public class MCRSessionMgr {
      * with the default MyCoRe session data.
      * 
      * @return MyCoRe MCRSession object
+     * @throws MCRException if the current Thread {@link #isLocked()}
      */
     public static MCRSession getCurrentSession() {
         if (isSessionCreationLocked.get()) {
@@ -87,9 +88,16 @@ public class MCRSessionMgr {
         return theThreadLocalSession.get();
     }
 
+    private static void checkSessionLock() {
+        if (isSessionCreationLocked.get()) {
+            throw new MCRException("Session creation is locked!");
+        }
+    }
+
     /**
      * This method sets a MyCoRe session object for the current Thread. This method fires a "activated" event, when
      * called the first time for this session and thread.
+     * Calling this method also unlocks the current Thread for MCRSession handling.
      * 
      * @see org.mycore.common.events.MCRSessionEvent.Type#activated
      */
@@ -103,6 +111,7 @@ public class MCRSessionMgr {
             }
 
         }
+        unlock();
         theSession.activate();
         theThreadLocalSession.set(theSession);
         isSessionAttached.set(Boolean.TRUE);
@@ -124,6 +133,7 @@ public class MCRSessionMgr {
             MCRSession.LOGGER.debug("MCRSession released {}", session.getID());
             theThreadLocalSession.remove();
             isSessionAttached.remove();
+            lock();
         }
     }
 
@@ -149,14 +159,23 @@ public class MCRSessionMgr {
         return null;
     }
 
+    /**
+     * Locks the MCRSessionMgr and no {@link MCRSession}s can be attached to the current Thread.
+     */
     public static void lock() {
         isSessionCreationLocked.set(true);
     }
 
+    /**
+     * Unlocks the MCRSessionMgr to allow management of {@link MCRSession}s on the current Thread.
+     */
     public static void unlock() {
         isSessionCreationLocked.set(false);
     }
 
+    /**
+     * @return the lock status of MCRSessionMgr, defaults to <code>true</code> on new Threads
+     */
     public static boolean isLocked() {
         return isSessionCreationLocked.get();
     }

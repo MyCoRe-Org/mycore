@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
@@ -34,6 +35,7 @@ public class MCRLocaleResourceTest extends MCRJerseyTest {
 
     @BeforeClass
     public static void register() {
+        JERSEY_CLASSES.add(MCRSessionHookFilter.class);
         JERSEY_CLASSES.add(MCRLocaleResource.class);
     }
 

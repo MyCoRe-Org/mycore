@@ -33,17 +33,11 @@ import org.mycore.common.MCRSessionMgr;
  * Opposite of {@link MCRSessionHookFilter}.
  */
 @Priority(Priorities.AUTHENTICATION-1)
-public class MCRSessionLockFilter implements ContainerRequestFilter, ContainerResponseFilter {
+public class MCRSessionLockFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         MCRSessionMgr.lock();
-    }
-
-    @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-        throws IOException {
-        MCRSessionMgr.unlock();
     }
 
 }

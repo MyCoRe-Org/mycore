@@ -272,7 +272,6 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             } finally {
                 MCRSessionMgr.releaseCurrentSession();
                 currentSession.close();
-                MCRSessionMgr.lock();
                 LOGGER.debug("Session closed.");
             }
         }

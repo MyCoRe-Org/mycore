@@ -53,7 +53,6 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
 
     @Override
     public void filter(ContainerRequestContext request) {
-        MCRSessionMgr.unlock();
         MCRSession session = MCRServlet.getSession(httpRequest);
         request.setProperty(ATTR, session);
         MCRSessionMgr.setCurrentSession(session);
@@ -105,7 +104,6 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
                     LOGGER.warn("Found orphaned MCRSession. Closing {} ", currentSession);
                     currentSession.close(); //is not bound to HttpSession
                 }
-                MCRSessionMgr.lock();
                 LOGGER.debug("Session released.");
             }
         }
