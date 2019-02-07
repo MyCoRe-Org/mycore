@@ -273,30 +273,15 @@ public class MCRServlet extends HttpServlet {
             // intialized
             init();
         }
-
-        // Try to set encoding of form values
-        String ReqCharEncoding = req.getCharacterEncoding();
-
-        if (ReqCharEncoding == null) {
-            // Set default to UTF-8
-            ReqCharEncoding = MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8");
-            req.setCharacterEncoding(ReqCharEncoding);
-            LOGGER.debug("Setting ReqCharEncoding to: {}", ReqCharEncoding);
-        }
-
-        if ("true".equals(req.getParameter("reload.properties"))) {
-            MCRConfigurationDirSetup setup = new MCRConfigurationDirSetup();
-            setup.startUp(getServletContext());
-        }
+        initializeMCRSession(req, getServletName());
 
         if (SERVLET_URL == null) {
             prepareBaseURLs(getServletContext(), req);
         }
 
         MCRServletJob job = new MCRServletJob(req, res);
+        MCRSession session = MCRSessionMgr.getCurrentSession();
 
-        MCRSession session = getSession(job.getRequest());
-        bindSessionToRequest(req, getServletName(), session);
         try {
             // transaction around 1st phase of request
             Exception thinkException = processThinkPhase(job);
@@ -336,16 +321,58 @@ public class MCRServlet extends HttpServlet {
                 throw new RuntimeException(ex);
             }
         } finally {
-            // Release current MCRSession from current Thread,
-            // in case that Thread pooling will be used by servlet engine
-            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
-                // current Servlet not called via RequestDispatcher
-                MCRSessionMgr.releaseCurrentSession();
-                MCRSessionMgr.lock();
-            }
+            cleanupMCRSession(req, getServletName());
         }
     }
 
+
+    /**
+     * Code to initialize a MyCoRe Session
+     * may be reused in ServletFilter, MVC controller, etc.
+     * 
+     * @param req - the HTTP request
+     * @param servletName - the servletName
+     * @throws IOException
+     */
+    
+    public static void initializeMCRSession(HttpServletRequest req, String servletName) throws IOException {
+        // Try to set encoding of form values
+        String reqCharEncoding = req.getCharacterEncoding();
+
+        if (reqCharEncoding == null) {
+            // Set default to UTF-8
+            reqCharEncoding = MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8");
+            req.setCharacterEncoding(reqCharEncoding);
+            LOGGER.debug("Setting ReqCharEncoding to: {}", reqCharEncoding);
+        }
+
+        if ("true".equals(req.getParameter("reload.properties"))) {
+            MCRConfigurationDirSetup setup = new MCRConfigurationDirSetup();
+            setup.startUp(req.getServletContext());
+        }
+        if (getProperty(req, INITIAL_SERVLET_NAME_KEY) == null) {
+            MCRSession session = getSession(req);
+            bindSessionToRequest(req, servletName, session);
+        }
+    }
+    
+    /**
+     * Code to cleanup a MyCoRe Session
+     * may be reused in ServletFilter, MVC controller, etc. 
+     * @param req - the HTTP Request
+     * @param servletName - the Servlet name
+     */
+    public static void cleanupMCRSession(HttpServletRequest req, String servletName) {
+     // Release current MCRSession from current Thread,
+        // in case that Thread pooling will be used by servlet engine
+        if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(servletName)) {
+            // current Servlet not called via RequestDispatcher
+            MCRSessionMgr.releaseCurrentSession();
+            MCRSessionMgr.lock();
+        }
+    }
+    
+    
     private static boolean isBrokenPipe(Throwable throwable) {
         String message = throwable.getMessage();
         if (message != null && throwable instanceof IOException && message.contains("Broken pipe")) {
