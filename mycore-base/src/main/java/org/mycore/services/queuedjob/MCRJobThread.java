@@ -60,6 +60,7 @@ public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
     }
 
     public void run() {
+        MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         EntityManager em = MCREntityManagerProvider.getEntityManagerFactory().createEntityManager();

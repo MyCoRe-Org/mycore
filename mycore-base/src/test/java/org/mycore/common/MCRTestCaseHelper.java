@@ -66,6 +66,7 @@ public class MCRTestCaseHelper {
         HashMap<String, String> baseProperties = new HashMap<>(configurationLoader.load());
         baseProperties.putAll(testProperties);
         config.initialize(baseProperties, true);
+        MCRSessionMgr.unlock();
     }
 
     public static void after() {

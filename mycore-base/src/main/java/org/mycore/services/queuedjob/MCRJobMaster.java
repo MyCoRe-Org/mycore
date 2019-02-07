@@ -136,6 +136,7 @@ public class MCRJobMaster implements Runnable, Closeable {
     public void run() {
         Thread.currentThread().setName(getName());
         //get this MCRSession a speaking name
+        MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
 

@@ -71,6 +71,7 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
     @Override
     public V call() throws Exception {
         boolean newSession = this.session == null;
+        MCRSessionMgr.unlock();
         boolean closeSession = newSession && !MCRSessionMgr.hasCurrentSession();
         if (newSession) {
             this.session = MCRSessionMgr.getCurrentSession();

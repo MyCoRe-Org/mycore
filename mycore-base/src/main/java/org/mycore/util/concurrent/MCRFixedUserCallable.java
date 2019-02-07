@@ -51,6 +51,7 @@ public class MCRFixedUserCallable<V> extends MCRTransactionableCallable<V> {
     @Override
     public V call() throws Exception {
         final boolean hasSession = MCRSessionMgr.hasCurrentSession();
+        MCRSessionMgr.unlock();
         this.session = MCRSessionMgr.getCurrentSession();
         try {
             MCRUserInformation currentUser = this.session.getUserInformation();

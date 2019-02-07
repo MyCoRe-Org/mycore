@@ -212,7 +212,6 @@ public class MCRMETSServlet extends MCRServlet {
             session.commitTransaction();
             MCRSessionMgr.releaseCurrentSession();
             session.close(); // just created session for db transaction
-            MCRSessionMgr.lock();
         }
     }
 
