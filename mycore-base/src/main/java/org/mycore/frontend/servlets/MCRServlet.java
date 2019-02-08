@@ -325,7 +325,6 @@ public class MCRServlet extends HttpServlet {
         }
     }
 
-
     /**
      * Code to initialize a MyCoRe Session
      * may be reused in ServletFilter, MVC controller, etc.
@@ -334,7 +333,6 @@ public class MCRServlet extends HttpServlet {
      * @param servletName - the servletName
      * @throws IOException
      */
-    
     public static void initializeMCRSession(HttpServletRequest req, String servletName) throws IOException {
         // Try to set encoding of form values
         String reqCharEncoding = req.getCharacterEncoding();
@@ -355,7 +353,7 @@ public class MCRServlet extends HttpServlet {
             bindSessionToRequest(req, servletName, session);
         }
     }
-    
+
     /**
      * Code to cleanup a MyCoRe Session
      * may be reused in ServletFilter, MVC controller, etc. 
@@ -363,7 +361,7 @@ public class MCRServlet extends HttpServlet {
      * @param servletName - the Servlet name
      */
     public static void cleanupMCRSession(HttpServletRequest req, String servletName) {
-     // Release current MCRSession from current Thread,
+        // Release current MCRSession from current Thread,
         // in case that Thread pooling will be used by servlet engine
         if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(servletName)) {
             // current Servlet not called via RequestDispatcher
@@ -371,8 +369,7 @@ public class MCRServlet extends HttpServlet {
             MCRSessionMgr.lock();
         }
     }
-    
-    
+
     private static boolean isBrokenPipe(Throwable throwable) {
         String message = throwable.getMessage();
         if (message != null && throwable instanceof IOException && message.contains("Broken pipe")) {
