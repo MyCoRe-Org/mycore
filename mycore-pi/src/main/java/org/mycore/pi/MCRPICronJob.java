@@ -43,7 +43,7 @@ public class MCRPICronJob implements Runnable, MCRStartupHandler.AutoExecutable 
 
     private static final int CRON_INITIAL_DELAY_MINUTES = 1;
 
-    private static final int CRON_PERIOD_MINUTES = 15;
+    private static final int CRON_PERIOD_MINUTES = (int) TimeUnit.HOURS.toMinutes(12);
 
     private static final int CRON_THREAD_COUNT = 1;
 
