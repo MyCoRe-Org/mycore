@@ -42,6 +42,7 @@ public class MCRGsonUTCDateAdapter implements JsonSerializer<Date>, JsonDeserial
     private final DateFormat dateFormat;
 
     private final DateFormat enUsFormat;
+    private final DateFormat enUsFormat2;
 
     private final DateFormat localFormat;
 
@@ -50,6 +51,7 @@ public class MCRGsonUTCDateAdapter implements JsonSerializer<Date>, JsonDeserial
         dateFormat.setTimeZone(TimeZone.getTimeZone(
             "UTC"));                               //This is the key line which converts the date to UTC which cannot be accessed with the default serializer
         enUsFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US);
+        enUsFormat2 = new SimpleDateFormat("MMM d, yyyy h:mm:ss a", Locale.US);
         localFormat = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.ROOT);
     }
 
@@ -69,6 +71,10 @@ public class MCRGsonUTCDateAdapter implements JsonSerializer<Date>, JsonDeserial
             synchronized (localFormat) {
                 try {
                     return localFormat.parse(json.getAsString());
+                } catch (ParseException ignored) {
+                }
+                try {
+                    return enUsFormat2.parse(json.getAsString());
                 } catch (ParseException ignored) {
                 }
                 try {
