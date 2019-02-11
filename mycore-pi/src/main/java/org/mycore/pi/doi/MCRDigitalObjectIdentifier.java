@@ -45,10 +45,6 @@ public class MCRDigitalObjectIdentifier implements MCRPersistentIdentifier {
         return suffix;
     }
 
-    public MCRDigitalObjectIdentifier toTestPrefix() {
-        return new MCRDigitalObjectIdentifier(TEST_DOI_PREFIX, suffix);
-    }
-
     @Override
     public String asString() {
         return String.format(Locale.ENGLISH, "%s/%s", prefix, suffix);

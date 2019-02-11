@@ -81,15 +81,11 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  */
 public class MCRDataciteClient {
 
-    public static final String TEST_MODE_PARAMETER_NAME = "testMode";
-
     public static final String DOI_REGISTER_REQUEST_TEMPLATE = "doi=%s\nurl=%s";
 
     private static final String HTTPS_SCHEME = "https";
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private boolean testPrefix;
 
     private String host;
 
@@ -97,21 +93,15 @@ public class MCRDataciteClient {
 
     private String password;
 
-    private boolean testMode;
-
     /**
      * @param host       the host (in most cases mds.datacite.org)
      * @param userName   the login username will be used in every method or null if no login should be used
      * @param password   the password
-     * @param testMode   changes are not written to the Database (just tests requests)
-     * @param testPrefix automaticaly sets the test PREFIX (can be used to test)
      */
-    public MCRDataciteClient(String host, String userName, String password, Boolean testMode, Boolean testPrefix) {
+    public MCRDataciteClient(String host, String userName, String password) {
         this.host = host;
         this.userName = userName;
         this.password = password;
-        this.testPrefix = (testPrefix != null) ? testPrefix : false;
-        this.testMode = (testMode != null) ? testMode : false;
     }
 
     private static byte[] documentToByteArray(Document document) throws IOException {
@@ -138,23 +128,9 @@ public class MCRDataciteClient {
         return statusStringBuilder.toString();
     }
 
-    public boolean isTestPrefix() {
-        return testPrefix;
-    }
-
-    public void setTestPrefix(boolean testPrefix) {
-        this.testPrefix = testPrefix;
-    }
-
-    public void setTestMode(boolean testMode) {
-        this.testMode = testMode;
-    }
-
-    public List<Map.Entry<String, URI>> getMediaList(final MCRDigitalObjectIdentifier doiParam)
+    public List<Map.Entry<String, URI>> getMediaList(final MCRDigitalObjectIdentifier doi)
         throws MCRPersistentIdentifierException {
         ArrayList<Map.Entry<String, URI>> entries = new ArrayList<>();
-
-        MCRDigitalObjectIdentifier doi = isTestPrefix() ? doiParam.toTestPrefix() : doiParam;
 
         URI requestURI = getRequestURI("/media/" + doi.asString());
         HttpGet httpGet = new HttpGet(requestURI);
@@ -192,9 +168,8 @@ public class MCRDataciteClient {
         }
     }
 
-    public void setMediaList(final MCRDigitalObjectIdentifier doiParam, List<Map.Entry<String, URI>> mediaList)
+    public void setMediaList(final MCRDigitalObjectIdentifier doi, List<Map.Entry<String, URI>> mediaList)
         throws MCRPersistentIdentifierException {
-        MCRDigitalObjectIdentifier doi = isTestPrefix() ? doiParam.toTestPrefix() : doiParam;
         URI requestURI = getRequestURI("/media/" + doi.asString());
 
         HttpPost post = new HttpPost(requestURI);
@@ -233,8 +208,7 @@ public class MCRDataciteClient {
         return entry -> entry.getKey() + "=" + entry.getValue();
     }
 
-    public void mintDOI(final MCRDigitalObjectIdentifier doiParam, URI url) throws MCRPersistentIdentifierException {
-        MCRDigitalObjectIdentifier doi = isTestPrefix() ? doiParam.toTestPrefix() : doiParam;
+    public void mintDOI(final MCRDigitalObjectIdentifier doi, URI url) throws MCRPersistentIdentifierException {
         URI requestURI = getRequestURI("/doi");
 
         HttpPost post = new HttpPost(requestURI);
@@ -341,9 +315,6 @@ public class MCRDataciteClient {
                 .setHost(this.host)
                 .setPath(path);
 
-            if (isTestMode()) {
-                builder.setParameter(TEST_MODE_PARAMETER_NAME, "true");
-            }
             return builder.build();
         } catch (URISyntaxException e) {
             throw new MCRConfigurationException("Invalid URI Exception!", e);
@@ -352,15 +323,14 @@ public class MCRDataciteClient {
 
     /**
      *
-     * @param doiParam the doi
+     * @param doi the doi
      * @return the resolved metadata of the doi
      * @throws MCRDatacenterAuthenticationException if the authentication is wrong
      * @throws MCRIdentifierUnresolvableException if the doi is not valid or can not be resolved
      * @throws JDOMException if the metadata is empty or not a valid xml document
      * @throws MCRDatacenterException if there is something wrong with the communication with the datacenter
      */
-    public Document resolveMetadata(final MCRDigitalObjectIdentifier doiParam) throws MCRDatacenterAuthenticationException, MCRIdentifierUnresolvableException, JDOMException, MCRDatacenterException {
-        MCRDigitalObjectIdentifier doi = isTestPrefix() ? doiParam.toTestPrefix() : doiParam;
+    public Document resolveMetadata(final MCRDigitalObjectIdentifier doi) throws MCRDatacenterAuthenticationException, MCRIdentifierUnresolvableException, JDOMException, MCRDatacenterException {
         URI requestURI = getRequestURI("/metadata/" + doi.asString());
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
@@ -392,10 +362,6 @@ public class MCRDataciteClient {
 
     public URI storeMetadata(Document metadata) throws MCRPersistentIdentifierException {
         URI requestURI = getRequestURI("/metadata");
-
-        if (isTestPrefix()) {
-            changeToTestDOI(metadata);
-        }
 
         HttpPost post = new HttpPost(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
@@ -441,8 +407,7 @@ public class MCRDataciteClient {
         }
     }
 
-    public void deleteMetadata(final MCRDigitalObjectIdentifier doiParam) throws MCRPersistentIdentifierException {
-        MCRDigitalObjectIdentifier doi = isTestPrefix() ? doiParam.toTestPrefix() : doiParam;
+    public void deleteMetadata(final MCRDigitalObjectIdentifier doi) throws MCRPersistentIdentifierException {
         URI requestURI = getRequestURI("/metadata/" + doi.asString());
 
         HttpDelete delete = new HttpDelete(requestURI);
@@ -466,18 +431,6 @@ public class MCRDataciteClient {
         }
     }
 
-    private void changeToTestDOI(Document metadata) {
-        XPathExpression<Element> compile = XPathFactory.instance().compile(
-            "//datacite:identifier[@identifierType='DOI']", Filters.element(), null,
-            Namespace.getNamespace("datacite", metadata.getRootElement().getNamespace().getURI()));
-        Element element = compile.evaluateFirst(metadata);
-        MCRDigitalObjectIdentifier doi = new MCRDOIParser()
-            .parse(element.getText())
-            .orElseThrow(() -> new MCRException("Datacite Document contains invalid DOI!"));
-        String testDOI = doi.toTestPrefix().asString();
-        element.setText(testDOI);
-    }
-
     private CloseableHttpClient getHttpClient() {
         return HttpClientBuilder.create().setDefaultCredentialsProvider(getCredentialsProvider()).build();
     }
@@ -494,10 +447,6 @@ public class MCRDataciteClient {
 
     private UsernamePasswordCredentials getCredentials() {
         return new UsernamePasswordCredentials(this.userName, this.password);
-    }
-
-    public Boolean isTestMode() {
-        return testMode;
     }
 
 }

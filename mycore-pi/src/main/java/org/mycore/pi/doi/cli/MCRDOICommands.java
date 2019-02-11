@@ -108,7 +108,7 @@ public class MCRDOICommands {
 
             doiList.stream().filter(doi -> {
                 boolean isTestDOI = doi.getPrefix().equals(MCRDigitalObjectIdentifier.TEST_DOI_PREFIX);
-                return !isTestDOI || registrationService.usesTestPrefix();
+                return !isTestDOI;
             }).forEach(doi -> {
                 try {
                     URI uri = dataciteClient.resolveDOI(doi);
@@ -162,7 +162,7 @@ public class MCRDOICommands {
             return doiList.stream()
                 .filter(doi -> {
                     boolean isTestDOI = doi.getPrefix().equals(MCRDigitalObjectIdentifier.TEST_DOI_PREFIX);
-                    return !isTestDOI || registrationService.usesTestPrefix();
+                    return !isTestDOI;
                 })
                 .map(MCRDigitalObjectIdentifier::asString)
                 .map(doiStr -> new MessageFormat(REPAIR_MEDIALIST_OF_0_AND_SERVICE_1, Locale.ROOT).format(
