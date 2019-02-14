@@ -17,6 +17,16 @@ public class MCRDerivateUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Renames multiple files in one Derivate with the given pattern. You can try out your pattern with the method
+     * {@link #testRenameFile(String, String, String) testRenameFile}.
+     *
+     * @param derivate the Derivate ID as String
+     * @param pattern the RegEx pattern to find the wanted files
+     * @param replacement the new name for the files
+     * @return a Hashmap with the old name and the new name
+     * @throws IOException
+     */
     public static Map<String, String> renameFiles(String derivate, String pattern, String replacement)
         throws IOException {
         MCRPath derivateRoot = MCRPath.getPath(derivate, "/");
@@ -49,13 +59,22 @@ public class MCRDerivateUtil {
         return resultMap;
     }
 
+    /**
+     * Tests the rename pattern on one file, so you can try the rename befor renaming all files. This method does not
+     * change any files.
+     *
+     * @param filename a filename to try the pattern on
+     * @param pattern the RegEx pattern to find the wanted files
+     * @param replacement the new name for the files
+     * @return the new filename
+     */
     public static String testRenameFile(String filename, String pattern, String replacement) {
         String newFilename = "";
         try {
             Pattern patternObj = Pattern.compile(pattern);
             Matcher matcher = patternObj.matcher(filename);
             newFilename = matcher.replaceAll(replacement);
-            LOGGER.debug("The file {} will be renamed to {}", filename, newFilename);
+            LOGGER.info("The file {} will be renamed to {}", filename, newFilename);
         } catch (PatternSyntaxException e) {
             LOGGER.error("The pattern '{}' contains errors!", pattern, e);
         } catch (IndexOutOfBoundsException e) {
