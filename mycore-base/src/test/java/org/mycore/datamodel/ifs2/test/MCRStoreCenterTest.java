@@ -23,8 +23,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +39,9 @@ import org.mycore.datamodel.ifs2.MCRStore;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 import org.mycore.datamodel.ifs2.MCRStoreAlreadyExistsException;
 import org.mycore.datamodel.ifs2.MCRStoreCenter;
+
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 
 public class MCRStoreCenterTest {
     @Before
@@ -43,7 +53,7 @@ public class MCRStoreCenterTest {
     public void heapOp() throws Exception {
         MCRStoreCenter storeHeap = MCRStoreCenter.instance();
 
-        FakeStoreConfig config = new FakeStoreConfig();
+        FakeStoreConfig config = new FakeStoreConfig("heapOp");
         storeHeap.addStore(config.getID(), new FakeStore(config));
         String storeID = config.getID();
         FakeStore fakeStore = storeHeap.getStore(storeID, FakeStore.class);
@@ -58,13 +68,26 @@ public class MCRStoreCenterTest {
     @Test(expected = MCRStoreAlreadyExistsException.class)
     public void addStoreTwice() throws Exception {
         MCRStoreCenter storeHeap = MCRStoreCenter.instance();
-        FakeStoreConfig config = new FakeStoreConfig();
+        FakeStoreConfig config = new FakeStoreConfig("addStoreTwice");
         FakeStore fakeStore = new FakeStore(config);
         storeHeap.addStore(config.getID(), fakeStore);
         storeHeap.addStore(config.getID(), fakeStore);
     }
 
     class FakeStoreConfig implements MCRStoreConfig {
+        private final Path baseDir;
+
+        public FakeStoreConfig(String id) throws IOException {
+            String fsName = MCRStoreCenterTest.class.getSimpleName() + "." + id;
+            URI jimfsURI = URI.create("jimfs://" + fsName);
+            FileSystem fileSystem;
+            try {
+                fileSystem = FileSystems.getFileSystem(jimfsURI);
+            } catch (FileSystemNotFoundException e) {
+                fileSystem = Jimfs.newFileSystem(fsName, Configuration.unix());
+            }
+            baseDir = fileSystem.getPath("/");
+        }
 
         @Override
         public String getID() {
@@ -73,7 +96,7 @@ public class MCRStoreCenterTest {
 
         @Override
         public String getBaseDir() {
-            return "ram://fake";
+            return baseDir.toUri().toString();
         }
 
         @Override

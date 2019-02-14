@@ -19,16 +19,15 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.Comparator;
 
-import org.apache.commons.vfs2.FileObject;
-
-class MCRFileObjectComparator implements Comparator<FileObject>, Serializable {
+class MCRPathComparator implements Comparator<Path>, Serializable {
 
     @Override
-    public int compare(FileObject o1, FileObject o2) {
-        String path1 = o1.getName().getBaseName();
-        String path2 = o2.getName().getBaseName();
+    public int compare(Path o1, Path o2) {
+        String path1 = o1.getFileName().toString();
+        String path2 = o2.getFileName().toString();
         return path1.compareTo(path2);
     }
 

@@ -19,14 +19,16 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
-import org.apache.commons.vfs2.FileContent;
-import org.apache.commons.vfs2.FileObject;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRVFSContent;
+import org.mycore.common.content.MCRPathContent;
 import org.xml.sax.SAXException;
 
 /**
@@ -40,7 +42,7 @@ public class MCRStoredMetadata {
     protected int id;
 
     /** The file object in local filesystem storing the data */
-    protected FileObject fo;
+    protected Path path;
 
     /** The store this document is stored in */
     protected MCRMetadataStore store;
@@ -54,17 +56,17 @@ public class MCRStoredMetadata {
      *
      * @param store
      *            the store this document is stored in
-     * @param fo
+     * @param path
      *            the file object storing the data
      * @param id
      *            the ID of the metadata document
      * @param docType
      *            if not null overwrites any detected doctype
      */
-    MCRStoredMetadata(MCRMetadataStore store, FileObject fo, int id, String docType) {
+    MCRStoredMetadata(MCRMetadataStore store, Path path, int id, String docType) {
         this.store = store;
         this.id = id;
-        this.fo = fo;
+        this.path = path;
         this.docType = docType;
         this.deleted = false;
     }
@@ -84,8 +86,10 @@ public class MCRStoredMetadata {
                 throw new IOException(e);
             }
         }
-        fo.createFile();
-        xml.sendTo(fo);
+        if (!Files.exists(path.getParent())) {
+            Files.createDirectories(path.getParent());
+        }
+        xml.sendTo(path);
     }
 
     /**
@@ -107,7 +111,7 @@ public class MCRStoredMetadata {
                 throw new IOException(e);
             }
         }
-        xml.sendTo(fo);
+        xml.sendTo(path, StandardCopyOption.REPLACE_EXISTING);
     }
 
     /**
@@ -116,7 +120,9 @@ public class MCRStoredMetadata {
      * @return the stored XML document
      */
     public MCRContent getMetadata() throws IOException {
-        return new MCRVFSContent(fo, docType);
+        MCRPathContent pathContent = new MCRPathContent(path);
+        pathContent.setDocType(docType);
+        return pathContent;
     }
 
     /**
@@ -143,10 +149,7 @@ public class MCRStoredMetadata {
      * @return the date this metadata document was last modified
      */
     public Date getLastModified() throws IOException {
-        try (FileContent fileContent = fo.getContent()) {
-            long time = fileContent.getLastModifiedTime();
-            return new Date(time);
-        }
+        return Date.from(Files.getLastModifiedTime(path).toInstant());
     }
 
     /**
@@ -157,9 +160,7 @@ public class MCRStoredMetadata {
      */
     public void setLastModified(Date date) throws IOException {
         if (!isDeleted()) {
-            try (FileContent fileContent = fo.getContent()) {
-                fo.getContent().setLastModifiedTime(date.getTime());
-            }
+            Files.setLastModifiedTime(path, FileTime.from(date.toInstant()));
         }
     }
 
@@ -170,7 +171,7 @@ public class MCRStoredMetadata {
      */
     public void delete() throws IOException {
         if (!deleted) {
-            store.delete(fo);
+            store.delete(path);
             deleted = true;
         }
     }

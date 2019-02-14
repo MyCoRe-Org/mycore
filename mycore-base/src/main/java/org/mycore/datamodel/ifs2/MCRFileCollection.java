@@ -20,12 +20,14 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.commons.vfs2.VFS;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
@@ -33,7 +35,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.common.content.MCRVFSContent;
+import org.mycore.common.content.MCRPathContent;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.util.concurrent.MCRReadWriteGuard;
 import org.xml.sax.SAXException;
 
@@ -86,10 +89,10 @@ public class MCRFileCollection extends MCRDirectory {
         this.store = store;
         this.id = id;
         this.dataGuard = new MCRReadWriteGuard();
-        if (fo.exists()) {
+        if (Files.exists(path)) {
             readAdditionalData();
         } else {
-            fo.createFolder();
+            Files.createDirectories(path);
             writeData(Document::new);
             saveAdditionalData();
         }
@@ -100,8 +103,8 @@ public class MCRFileCollection extends MCRDirectory {
     }
 
     private void readAdditionalData() throws IOException {
-        FileObject src = VFS.getManager().resolveFile(fo, dataFile);
-        if (!src.exists()) {
+        Path src = path.resolve(dataFile);
+        if (!Files.exists(src)) {
             LOGGER.warn("Metadata file is missing, repairing metadata...");
             writeData(e -> {
                 e.detach();
@@ -112,7 +115,7 @@ public class MCRFileCollection extends MCRDirectory {
             repairMetadata();
         }
         try {
-            Element parsed = new MCRVFSContent(src).asXML().getRootElement();
+            Element parsed = new MCRPathContent(src).asXML().getRootElement();
             writeData(e -> {
                 e.detach();
                 e.setName("collection");
@@ -128,11 +131,21 @@ public class MCRFileCollection extends MCRDirectory {
     }
 
     protected void saveAdditionalData() throws IOException {
-        FileObject target = VFS.getManager().resolveFile(fo, dataFile);
+        Path target = path.resolve(dataFile);
         try {
             readData(e -> {
                 try {
-                    new MCRJDOMContent(e.getDocument()).sendTo(target);
+                    boolean needsUpdate = true;
+                    while (needsUpdate) {
+                        try {
+                            new MCRJDOMContent(e.getDocument()).sendTo(target, StandardCopyOption.REPLACE_EXISTING);
+                            needsUpdate = false;
+                        } catch (FileAlreadyExistsException ex) {
+                            //other process writes to the same file, let us win
+                        } catch (IOException | RuntimeException ex) {
+                            throw ex;
+                        }
+                    }
                     return null;
                 } catch (IOException e1) {
                     throw new UncheckedIOException(e1);
@@ -143,12 +156,18 @@ public class MCRFileCollection extends MCRDirectory {
         }
     }
 
+    @Override
+    public Stream<MCRNode> getChildren() throws IOException {
+        return super.getChildren()
+            .filter(f -> !dataFile.equals(f.getName()));
+    }
+
     /**
      * Deletes this file collection with all its data and children
      */
     public void delete() throws IOException {
         writeData(Element::removeContent);
-        fo.delete(Selectors.SELECT_ALL);
+        Files.walkFileTree(path, MCRRecursiveDeleter.instance());
     }
 
     /**

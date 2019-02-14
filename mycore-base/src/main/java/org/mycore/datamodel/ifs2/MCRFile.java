@@ -19,9 +19,11 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -56,7 +58,7 @@ public class MCRFile extends MCRStoredNode {
      * @param fo
      *            the file in the local underlying filesystem storing this file
      */
-    protected MCRFile(MCRDirectory parent, FileObject fo, Element data) throws IOException {
+    protected MCRFile(MCRDirectory parent, Path fo, Element data) throws IOException {
         super(parent, fo, data);
     }
 
@@ -70,7 +72,7 @@ public class MCRFile extends MCRStoredNode {
      */
     protected MCRFile(MCRDirectory parent, String name) throws IOException {
         super(parent, name, "file");
-        fo.createFile();
+        Files.createFile(path);
         writeData(e -> e.setAttribute("md5", MCRFile.MD5_OF_EMPTY_FILE));
         getRoot().saveAdditionalData();
     }
@@ -80,8 +82,9 @@ public class MCRFile extends MCRStoredNode {
      * is a container, like zip or tar, may contain other files as children.
      */
     @Override
-    protected MCRVirtualNode buildChildNode(FileObject fo) throws IOException {
-        return new MCRVirtualNode(this, fo);
+    protected MCRVirtualNode buildChildNode(Path fo) {
+        throw new UnsupportedOperationException("not yet implemented");
+        //return new MCRVirtualNode(this, path);
     }
 
     /**
@@ -115,7 +118,7 @@ public class MCRFile extends MCRStoredNode {
      */
     public String setContent(MCRContent source) throws IOException {
         MCRContentInputStream cis = source.getContentInputStream();
-        source.sendTo(fo);
+        source.sendTo(path, StandardCopyOption.REPLACE_EXISTING);
         String md5 = cis.getMD5String();
         writeData(e -> e.setAttribute("md5", md5));
         getRoot().saveAdditionalData();

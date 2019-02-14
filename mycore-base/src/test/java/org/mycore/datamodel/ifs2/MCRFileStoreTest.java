@@ -24,15 +24,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.vfs2.FileObject;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRByteContent;
@@ -176,7 +179,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         Date modified = col.getLastModified();
         assertTrue(modified.after(created));
         assertEquals(1, col.getNumChildren());
-        assertEquals(1, col.getChildren().size());
+        assertEquals(1, col.getChildren().count());
         assertEquals(0, build.getSize());
         assertTrue(created.before(build.getLastModified()));
         build.setContent(new MCRJDOMContent(new Element("project")));
@@ -217,6 +220,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         Document xml1 = col.getMetadata().clone();
         col.repairMetadata();
         Document xml2 = col.getMetadata().clone();
+        xml1 = col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
         MCRDirectory dir = col.createDir("foo");
@@ -238,19 +242,21 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
 
         col.repairMetadata();
         xml1 = col.getMetadata().clone();
+        XMLOutputter xout=new XMLOutputter(Format.getPrettyFormat());
+        xout.output(xml1, System.out);
+        xout.output(xml2, System.out);
         assertTrue(equals(xml1, xml2));
 
         file3.clearLabels();
         xml2 = col.getMetadata().clone();
 
-        col.fo.getChild("mcrdata.xml").delete();
+        Files.delete(col.path.resolve("mcrdata.xml"));
         col = getStore().retrieve(col.getID());
         xml1 = col.getMetadata().clone();
         assertTrue(equals(xml1, xml2));
 
-        col.fo.getChild("test1.txt").delete();
-        FileObject tmp = col.fo.resolveFile("test3.txt");
-        tmp.createFile();
+        Files.delete(col.path.resolve("test1.txt"));
+        Path tmp = col.path.resolve("test3.txt");
         new MCRStringContent("Hallo Welt!").sendTo(tmp);
         col.repairMetadata();
         String xml3 = new MCRJDOMContent(col.getMetadata()).asString();

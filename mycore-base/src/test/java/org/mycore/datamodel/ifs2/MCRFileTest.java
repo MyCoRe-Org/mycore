@@ -26,11 +26,12 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.RandomAccessContent;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.junit.Test;
@@ -64,7 +65,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
         file.renameTo("readme");
         assertEquals("readme", file.getName());
         assertEquals("", file.getExtension());
-        assertTrue(file.getLastModified().after(created));
+        assertTrue(file.getLastModified() + " is not after " + created, file.getLastModified().after(created));
     }
 
     @SuppressWarnings("deprecation")
@@ -99,7 +100,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
     public void children() throws Exception {
         MCRFile file = col.createFile("foo.txt");
         assertNull(file.getChild("foo"));
-        assertEquals(0, file.getChildren().size());
+        assertEquals(0, file.getChildren().count());
         assertFalse(file.hasChildren());
         assertEquals(0, file.getNumChildren());
     }
@@ -133,15 +134,15 @@ public class MCRFileTest extends MCRIFS2TestCase {
     @Test
     public void randomAccessContent() throws Exception {
         MCRFile file = col.createFile("foo.txt");
-        byte[] content = "Hello World".getBytes("UTF-8");
+        byte[] content = "Hello World".getBytes(StandardCharsets.UTF_8);
         file.setContent(new MCRByteContent(content, System.currentTimeMillis()));
-        RandomAccessContent rac = file.getRandomAccessContent();
-        rac.skipBytes(6);
-        InputStream in = rac.getInputStream();
-        char c = (char) in.read();
-        assertEquals('W', c);
-        in.close();
-        rac.close();
+        try (SeekableByteChannel rac = file.getRandomAccessContent()) {
+            rac.position(6);
+            ByteBuffer dst = ByteBuffer.allocate(Character.BYTES);
+            rac.read(dst);
+            char c = new String(dst.array(), StandardCharsets.UTF_8).charAt(0);
+            assertEquals('W', c);
+        }
     }
 
     @Test
