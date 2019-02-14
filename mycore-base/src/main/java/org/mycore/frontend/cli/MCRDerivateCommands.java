@@ -69,6 +69,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
+import org.mycore.datamodel.niofs.utils.MCRDerivateUtil;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXException;
@@ -901,6 +902,21 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         derivate.getDerivate().getInternals().setMainDoc(cleanPath);
         MCRMetadataManager.updateMCRDerivateXML(derivate);
         LOGGER.info("The main file of {} is now '{}'!", derivateIDString, cleanPath);
+    }
+
+    @MCRCommand(syntax = "rename files from derivate {0} with {1} to {2}",
+        help = "Renames multiple files in one Derivate with the ID {0} the given RegEx pattern {1} and the replacement"
+            + " {2}. You can try out your pattern with the command: 'test rename file {0} with {1} to {2}'.")
+    public static void renameFiles(String derivate, String pattern, String newName)
+        throws IOException {
+        MCRDerivateUtil.renameFiles(derivate, pattern, newName);
+    }
+
+    @MCRCommand(syntax = "test rename file {0} with {1} to {2}",
+        help = "Tests the rename pattern {1} on one file {0} and replaces it with {2}, so you can try the rename befor"
+            + " renaming all files. This command does not change any files.")
+    public static void testRenameFile(String filename, String pattern, String newName) {
+        MCRDerivateUtil.testRenameFile(filename, pattern, newName);
     }
 
 }
