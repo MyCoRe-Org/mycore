@@ -20,10 +20,13 @@ package org.mycore.mods;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -177,9 +180,16 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         linkId.setReference(documentID, null, null);
         derivate.getDerivate().setLinkMeta(linkId);
 
+        final Path rootPath = fileDir.toPath();
+        final Optional<String> firstRegularFile = Files.list(rootPath).filter(Files::isRegularFile)
+            .map(rootPath::relativize)
+            .map(Path::toString)
+            .findFirst();
+
         MCRMetaIFS ifs = new MCRMetaIFS();
         ifs.setSubTag("internal");
         ifs.setSourcePath(fileDir.getAbsolutePath());
+        firstRegularFile.ifPresent(ifs::setMainDoc);
         derivate.getDerivate().setInternals(ifs);
 
         LOGGER.debug("Creating new derivate with ID {}", derivate.getId());
