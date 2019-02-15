@@ -62,7 +62,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.content.MCRURLContent;
-import org.mycore.common.content.MCRVFSContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -714,7 +713,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     public static MCRCategory loadClassificationResource(String resourceName) throws SAXParseException, IOException,
         URISyntaxException {
         URL classResourceUrl = MCRCategoryDAOImplTest.class.getResource(resourceName);
-        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(classResourceUrl));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(classResourceUrl));
         return MCRXMLTransformer.getCategory(xml);
     }
 

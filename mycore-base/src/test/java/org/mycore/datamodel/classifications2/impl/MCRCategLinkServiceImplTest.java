@@ -47,7 +47,7 @@ import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRJPATestCase;
-import org.mycore.common.content.MCRVFSContent;
+import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -274,7 +274,7 @@ public class MCRCategLinkServiceImplTest extends MCRJPATestCase {
 
     private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException, IOException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
-        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(worlClassUrl));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(worlClassUrl));
         category = MCRXMLTransformer.getCategory(xml);
     }
 

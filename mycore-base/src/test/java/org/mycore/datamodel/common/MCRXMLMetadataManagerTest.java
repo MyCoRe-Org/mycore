@@ -28,11 +28,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.commons.vfs2.Selectors;
-import org.apache.commons.vfs2.VFS;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
@@ -47,6 +46,7 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.xml.sax.SAXException;
 
@@ -77,13 +77,13 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     public void tearDown() throws Exception {
         for (File projectDir : getStoreBaseDir().toFile().listFiles()) {
             for (File typeDir : projectDir.listFiles()) {
-                VFS.getManager().resolveFile(typeDir.getAbsolutePath()).delete(Selectors.SELECT_ALL);
+                Files.walkFileTree(typeDir.toPath(), MCRRecursiveDeleter.instance());
                 typeDir.mkdir();
             }
         }
         for (File projectDir : getSvnBaseDir().toFile().listFiles()) {
             for (File typeDir : projectDir.listFiles()) {
-                VFS.getManager().resolveFile(typeDir.getAbsolutePath()).delete(Selectors.SELECT_ALL);
+                Files.walkFileTree(typeDir.toPath(), MCRRecursiveDeleter.instance());
                 typeDir.mkdir();
                 SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
             }
