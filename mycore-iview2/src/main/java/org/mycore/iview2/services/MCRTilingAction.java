@@ -71,6 +71,7 @@ public class MCRTilingAction implements Runnable {
             LOGGER.error("Error while retrieving image for job: {}", tileJob, e);
             return;
         }
+        MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
         Transaction transaction = null;
