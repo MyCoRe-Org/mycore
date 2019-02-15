@@ -618,7 +618,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         /**
          * This method set the text element.
          * 
-         * @param set_text
+         * @param text
          *            the text String of a date value
          */
         @Deprecated
@@ -633,7 +633,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         /**
          * This method set the lang element.
          * 
-         * @param set_lang
+         * @param lang
          *            the language String of a date value
          */
         @Deprecated
