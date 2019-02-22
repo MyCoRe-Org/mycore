@@ -19,8 +19,7 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
-
-import org.apache.commons.vfs2.FileObject;
+import java.nio.file.Path;
 
 /**
  * A virtual node in a file collection, which may be a child node of a container
@@ -38,7 +37,7 @@ public class MCRVirtualNode extends MCRNode {
      * @param fo
      *            the file object in Apache VFS representing this node
      */
-    protected MCRVirtualNode(MCRNode parent, FileObject fo) {
+    protected MCRVirtualNode(MCRNode parent, Path fo) {
         super(parent, fo);
     }
 
@@ -46,7 +45,7 @@ public class MCRVirtualNode extends MCRNode {
      * Returns a virtual node that is a child of this virtual node.
      */
     @Override
-    protected MCRVirtualNode buildChildNode(FileObject fo) throws IOException {
+    protected MCRVirtualNode buildChildNode(Path fo) throws IOException {
         return new MCRVirtualNode(this, fo);
     }
 }

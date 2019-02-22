@@ -611,7 +611,7 @@ public abstract class MCRPath implements Path {
             return false;
         }
         final int thatPathLength = that.path.length();
-        // return false if this.path==/foo/bar and that.path==/fo
+        // return false if this.path==/foo/bar and that.path==/path
         return thatPathLength >= path.length() || path.charAt(thatPathLength) == SEPARATOR;
     }
 

@@ -33,7 +33,7 @@ import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.common.content.MCRVFSContent;
+import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.xml.sax.SAXParseException;
 
@@ -190,7 +190,7 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      */
     protected final void setFromURI(URI uri) throws MCRException, SAXParseException, IOException {
-        Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(uri));
+        Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(uri.toURL()));
         setFromJDOM(jdom);
     }
 

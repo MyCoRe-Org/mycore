@@ -19,19 +19,18 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.UncheckedIOException;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
-import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Stream;
 
-import org.apache.commons.vfs2.FileContent;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.RandomAccessContent;
-import org.apache.commons.vfs2.VFS;
-import org.apache.commons.vfs2.util.RandomAccessMode;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRVFSContent;
+import org.mycore.common.content.MCRPathContent;
 
 /**
  * Represents a file, directory or file collection within a file store. Files
@@ -42,9 +41,9 @@ import org.mycore.common.content.MCRVFSContent;
  */
 public abstract class MCRNode {
     /**
-     * The file object representing this node in the underlying filesystem.
+     * The path object representing this node in the underlying filesystem.
      */
-    protected FileObject fo;
+    protected Path path;
 
     /**
      * The parent node owning this file, a directory or container file
@@ -56,12 +55,12 @@ public abstract class MCRNode {
      * 
      * @param parent
      *            the parent node
-     * @param fo
+     * @param path
      *            the file object representing this node in the underlying
      *            filesystem
      */
-    protected MCRNode(MCRNode parent, FileObject fo) {
-        this.fo = fo;
+    protected MCRNode(MCRNode parent, Path path) {
+        this.path = path;
         this.parent = parent;
     }
 
@@ -71,7 +70,7 @@ public abstract class MCRNode {
      * @return the node's filename
      */
     public String getName() {
-        return fo.getName().getBaseName();
+        return path.getFileName().toString();
     }
 
     /**
@@ -116,7 +115,7 @@ public abstract class MCRNode {
      * @return true if this node is a file
      */
     public boolean isFile() throws IOException {
-        return fo.getType().equals(FileType.FILE);
+        return Files.isRegularFile(path);
     }
 
     /**
@@ -125,7 +124,7 @@ public abstract class MCRNode {
      * @return true if this node is a directory
      */
     public boolean isDirectory() throws IOException {
-        return fo.getType().equals(FileType.FOLDER);
+        return Files.isDirectory(path);
     }
 
     /**
@@ -135,27 +134,17 @@ public abstract class MCRNode {
      * @return the file size in bytes
      */
     public long getSize() throws IOException {
-        if (isFile()) {
-            return fo.getContent().getSize();
-        } else {
-            return 0;
-        }
+        BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+        return attr.isRegularFile() ? attr.size() : 0;
     }
 
     /**
-     * Returns the time this node was last modified, or null if no such time is
-     * defined in the underlying filesystem
+     * Returns the time this node was last modified.
      * 
      * @return the time this node was last modified
      */
     public Date getLastModified() throws IOException {
-        try (FileContent content = fo.getContent()) {
-            if (content != null) {
-                return new Date(content.getLastModifiedTime());
-            } else {
-                return null;
-            }
-        }
+        return Date.from(Files.getLastModifiedTime(path).toInstant());
     }
 
     /**
@@ -169,63 +158,40 @@ public abstract class MCRNode {
     }
 
     /**
-     * Returns the FileObject that is the father of all logical children of this
-     * FileObject. This may not be the current node itself, in case the node is
-     * a container file, because then intermediate FileObject instances are
-     * created by Apache VFS.
-     * 
-     * @return the father of this node's children in VFS
-     */
-    private FileObject getFather() throws IOException {
-        if (isDirectory()) {
-            return fo;
-        } else if (getSize() == 0) {
-            return null;
-        } else if (VFS.getManager().canCreateFileSystem(fo)) {
-            FileObject father = fo;
-            while (VFS.getManager().canCreateFileSystem(father)) {
-                father = VFS.getManager().createFileSystem(father);
-            }
-            return father;
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Returns the number of child nodes of this node.
      * 
      * @return the number of child nodes of this node.
      */
     public int getNumChildren() throws IOException {
-        FileObject father = getFather();
-        if (father == null) {
+        if (isFile()) {
             return 0;
-        } else {
-            return father.getChildren().length;
         }
+        return Math.toIntExact(Files.list(path).count());
     }
 
     /**
-     * Returns the children of this node. Directories and container files like
-     * zip or tar may have child nodes.
+     * Returns the children of this node.
      * 
      * @return a List of child nodes, which may be empty, in undefined order
      */
-    public List<MCRNode> getChildren() throws IOException {
-        List<MCRNode> children = new ArrayList<>();
-        FileObject father = getFather();
-        if (father != null) {
-            FileObject[] childFos = father.getChildren();
-            for (FileObject childFo : childFos) {
-                String name = childFo.getName().getBaseName();
-                MCRNode child = getChild(name);
-                if (child != null) {
-                    children.add(child);
-                }
-            }
+    public Stream<MCRNode> getChildren() throws IOException {
+        if (isFile()) {
+            return Stream.empty();
         }
-        return children;
+        try {
+            return Files.list(path)
+                .map(Path::getFileName)
+                .map(path::resolve)
+                .map(child -> {
+                    try {
+                        return buildChildNode(child);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                }
+                });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
     /**
@@ -237,7 +203,7 @@ public abstract class MCRNode {
      *            filesystem
      * @return the child node
      */
-    protected abstract MCRNode buildChildNode(FileObject fo) throws IOException;
+    protected abstract MCRNode buildChildNode(Path fo) throws IOException;
 
     /**
      * Returns the child node with the given filename, or null
@@ -247,8 +213,8 @@ public abstract class MCRNode {
      * @return the child node with that name, or null when no such file exists
      */
     public MCRNode getChild(String name) throws IOException {
-        FileObject father = getFather();
-        return father == null ? null : buildChildNode(getFather().getChild(name));
+        Path child = path.resolve(name);
+        return Files.exists(child) ? buildChildNode(child) : null;
     }
 
     /**
@@ -289,13 +255,12 @@ public abstract class MCRNode {
      * @return the content of the file
      */
     public MCRContent getContent() throws IOException {
-        return isFile() ? doGetContent() : null;
+        BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+        return attrs.isRegularFile() ? doGetContent(attrs) : null;
     }
 
-    private MCRVFSContent doGetContent() throws IOException {
-        MCRVFSContent content = new MCRVFSContent(fo);
-        content.setName(getName());
-        return content;
+    private MCRPathContent doGetContent(BasicFileAttributes attrs) throws IOException {
+        return new MCRPathContent(path, attrs);
     }
 
     /**
@@ -305,7 +270,7 @@ public abstract class MCRNode {
      * 
      * @return the content of this file, for random access
      */
-    public RandomAccessContent getRandomAccessContent() throws IOException {
-        return isFile() ? fo.getContent().getRandomAccessContent(RandomAccessMode.READ) : null;
+    public SeekableByteChannel getRandomAccessContent() throws IOException {
+        return isFile() ? Files.newByteChannel(path, StandardOpenOption.READ) : null;
     }
 }

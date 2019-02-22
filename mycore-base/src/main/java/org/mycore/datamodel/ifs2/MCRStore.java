@@ -19,6 +19,12 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,14 +33,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.commons.vfs2.VFS;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 
 /**
  * Stores metadata files or file collections containing files and directories in
@@ -84,7 +89,7 @@ public abstract class MCRStore {
     protected String id;
 
     /** The base directory containing the stored data */
-    protected FileObject baseDirectory;
+    protected Path baseDirectory;
 
     /** The maximum length of IDs **/
     protected int idLength;
@@ -102,6 +107,8 @@ public abstract class MCRStore {
     protected String suffix = "";
 
     private MCRStoreConfig storeConfig;
+
+    private Function<String, String> toNativePath;
 
     /**
      * Offset to add to the maximum ID found in the store to build the new ID.
@@ -121,6 +128,8 @@ public abstract class MCRStore {
      */
     protected int lastID = 0;
 
+    public static final Logger LOGGER = LogManager.getLogger();
+
     /**
      * Deletes the data stored under the given ID from the store
      * 
@@ -139,21 +148,19 @@ public abstract class MCRStore {
      * @return true, if data for the given ID is existing in the store.
      */
     public boolean exists(final int id) throws IOException {
-        return getSlot(id).exists();
+        return Files.exists(getSlot(id));
     }
 
     public synchronized int getHighestStoredID() {
-        int found = 0;
         try {
-            String max;
-            max = findMaxID(baseDirectory, 0);
+            String max = findMaxID(baseDirectory, 0);
             if (max != null) {
-                found = slot2id(max);
+                return slot2id(max);
             }
-        } catch (final FileSystemException e) {
-            e.printStackTrace();
+        } catch (final IOException e) {
+            LOGGER.error("Error while getting highest stored ID in " + baseDirectory, e);
         }
-        return found;
+        return 0;
     }
 
     /**
@@ -179,12 +186,11 @@ public abstract class MCRStore {
 
     public boolean isEmpty() {
         try {
-            return baseDirectory.getChildren().length == 0;
-        } catch (final FileSystemException e) {
-            e.printStackTrace();
+            return Files.list(baseDirectory).findAny().isPresent();
+        } catch (final IOException e) {
+            LOGGER.error("Error whil checking if base directory is empty: " + baseDirectory, e);
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -203,7 +209,7 @@ public abstract class MCRStore {
             /**
              * List of files or directories in store not yet handled
              */
-            List<FileObject> files = new ArrayList<>();
+            List<Path> files = new ArrayList<>();
 
             /**
              * The next ID to return, when 0, all IDs have been returned
@@ -261,8 +267,8 @@ public abstract class MCRStore {
                 this.order = order;
                 try {
                     addChildren(baseDirectory);
-                } catch (final FileSystemException e) {
-                    e.printStackTrace();
+                } catch (final IOException e) {
+                    LOGGER.error("Error while iterating over children of " + baseDirectory, e);
                 }
                 nextID = findNextID();
                 return this;
@@ -275,12 +281,12 @@ public abstract class MCRStore {
              * 
              * @param dir
              *            the directory thats children should be added
-             * @throws FileSystemException 
+             * @throws IOException
              */
-            private void addChildren(final FileObject dir) throws FileSystemException {
-                if (dir.getType() == FileType.FOLDER) {
-                    final FileObject[] children = dir.getChildren();
-                    Arrays.sort(children, new MCRFileObjectComparator());
+            private void addChildren(final Path dir) throws IOException {
+                if (Files.isDirectory(dir)) {
+                    final Path[] children = Files.list(dir).toArray(Path[]::new);
+                    Arrays.sort(children, new MCRPathComparator());
 
                     for (int i = 0; i < children.length; i++) {
                         files.add(order ? i : 0, children[i]);
@@ -298,17 +304,18 @@ public abstract class MCRStore {
                     return 0;
                 }
 
-                final FileObject first = files.remove(0);
+                final Path first = files.remove(0);
                 // checks basename length against prefix (projectId_typeId), file suffix (.xml) and configured id length
                 // if they match it should be a parseable id
-                if (first.getName().getBaseName().length() == idLength + prefix.length() + suffix.length()) {
-                    return MCRStore.this.slot2id(first.getName().getBaseName());
+                String fileName = first.getFileName().toString();
+                if (fileName.length() == idLength + prefix.length() + suffix.length()) {
+                    return MCRStore.this.slot2id(fileName);
                 }
 
                 try {
                     addChildren(first);
-                } catch (final FileSystemException e) {
-                    e.printStackTrace();
+                } catch (final IOException e) {
+                    LOGGER.error("Error while finding next id.", e);
                 }
                 return findNextID();
             }
@@ -318,21 +325,24 @@ public abstract class MCRStore {
     /**
      * Deletes the data stored in the given file object from the store
      * 
-     * @param fo
+     * @param path
      *            the file object to be deleted
      */
-    void delete(FileObject fo) throws IOException {
-        FileObject parent = fo.getParent();
-        fo.delete(Selectors.SELECT_ALL);
+    void delete(final Path path) throws IOException {
+        if (!path.startsWith(baseDirectory)) {
+            throw new IllegalArgumentException(path + " is not in the base directory " + baseDirectory);
+        }
+        Path current = path;
+        Path parent = path.getParent();
+        Files.walkFileTree(path, MCRRecursiveDeleter.instance());
 
-        while (!parent.equals(baseDirectory)) {
-            final FileObject[] children = parent.getChildren();
-            if (children.length > 0) {
+        while (!Files.isSameFile(baseDirectory, parent)) {
+            if (Files.list(parent).findAny().isPresent()) {
                 break;
             }
-            fo = parent;
-            parent = fo.getParent();
-            fo.delete();
+            current = parent;
+            parent = current.getParent();
+            Files.delete(current);
         }
     }
 
@@ -342,7 +352,7 @@ public abstract class MCRStore {
      * @return the base directory storing the data
      */
     String getBaseDirURI() {
-        return baseDirectory.getName().getURI();
+        return baseDirectory.toAbsolutePath().toUri().toString();
     }
 
     /** Returns the maximum length of any ID stored in this store */
@@ -411,8 +421,9 @@ public abstract class MCRStore {
      *            the ID of the data
      * @return the file object storing that data
      */
-    protected FileObject getSlot(final int ID) throws IOException {
-        return VFS.getManager().resolveFile(baseDirectory, getSlotPath(ID));
+    protected Path getSlot(final int ID) throws IOException {
+        String slotPath = getSlotPath(ID);
+        return baseDirectory.resolve(toNativePath.apply(slotPath));
     }
 
     protected MCRStoreConfig getStoreConfig() {
@@ -435,23 +446,51 @@ public abstract class MCRStore {
         idLength += Integer.parseInt(st.nextToken());
 
         try {
-            baseDirectory = VFS.getManager().resolveFile(getStoreConfig().getBaseDir());
+            try {
+                URI uri = new URI(getStoreConfig().getBaseDir());
+                if (uri.getScheme() != null) {
+                    baseDirectory = Paths.get(uri);
+                }
+            } catch (URISyntaxException e) {
+                //not a uri, handle as relative path
+            }
+            if (baseDirectory == null) {
+                baseDirectory = Paths.get(getStoreConfig().getBaseDir());
+            }
 
-            if (!baseDirectory.exists()) {
-                baseDirectory.createFolder();
+            String separator = baseDirectory.getFileSystem().getSeparator();
+            if (separator.equals("/")) {
+                toNativePath = s -> s;
             } else {
-                if (!baseDirectory.isReadable()) {
+                toNativePath = s -> {
+                    if (s.contains("/")) {
+                        if (s.contains(separator)) {
+                            throw new IllegalArgumentException(
+                                s + " may not contain both '/' and '" + separator + "'.");
+                        }
+                        return s.replace("/", separator);
+                    }
+                    return s;
+                };
+            }
+
+            try {
+                BasicFileAttributes attrs = Files.readAttributes(baseDirectory, BasicFileAttributes.class);
+                if (!attrs.isDirectory()) {
+                    final String msg = "Store " + getStoreConfig().getBaseDir() + " is not a directory";
+                    throw new MCRConfigurationException(msg);
+                }
+
+                if (!Files.isReadable(baseDirectory)) {
                     final String msg = "Store directory " + getStoreConfig().getBaseDir() + " is not readable";
                     throw new MCRConfigurationException(msg);
                 }
-
-                if (baseDirectory.getType() != FileType.FOLDER) {
-                    final String msg = "Store " + getStoreConfig().getBaseDir() + " is a file, not a directory";
-                    throw new MCRConfigurationException(msg);
-                }
+            } catch (IOException e) {
+                //does not exist;
+                Files.createDirectories(baseDirectory);
             }
-        } catch (final FileSystemException e) {
-            e.printStackTrace();
+        } catch (final IOException e) {
+            LOGGER.error("Could not initialize store " + config.getID() + " correctly.", e);
         }
     }
 
@@ -483,22 +522,22 @@ public abstract class MCRStore {
      *            the subdirectory depth level of the dir
      * @return the highest slot file name / ID currently stored
      */
-    private String findMaxID(final FileObject dir, final int depth) throws FileSystemException {
-        final FileObject[] children = dir.getChildren();
+    private String findMaxID(final Path dir, final int depth) throws IOException {
+        final Path[] children = Files.list(dir).toArray(Path[]::new);
 
         if (children.length == 0) {
             return null;
         }
 
-        Arrays.sort(children, new MCRFileObjectComparator());
+        Arrays.sort(children, new MCRPathComparator());
 
         if (depth == slotLength.length) {
-            return children[children.length - 1].getName().getBaseName();
+            return children[children.length - 1].getFileName().toString();
         }
 
         for (int i = children.length - 1; i >= 0; i--) {
-            final FileObject child = children[i];
-            if (!child.getType().hasChildren()) {
+            final Path child = children[i];
+            if (!Files.isDirectory(child) || Files.list(child).findAny().isEmpty()) {
                 continue;
             }
             final String found = findMaxID(child, depth + 1);

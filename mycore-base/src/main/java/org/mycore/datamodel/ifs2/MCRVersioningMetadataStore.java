@@ -22,9 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.Iterator;
 
-import org.apache.commons.vfs2.FileObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -263,7 +263,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
     }
 
     @Override
-    protected MCRVersionedMetadata buildMetadataObject(FileObject fo, int id) {
+    protected MCRVersionedMetadata buildMetadataObject(Path fo, int id) {
         return new MCRVersionedMetadata(this, fo, id, super.forceDocType, false);
     }
 

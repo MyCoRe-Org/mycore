@@ -62,6 +62,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -94,7 +95,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING));
 
     private static LoadingCache<MCRPath, String> nodeCache = CacheBuilder.newBuilder()
-        .maximumSize(MCRConfiguration.instance().getInt("MCR.IFS.FileMetadataStore.CacheSize", 500))
+        .maximumSize(300)
         .weakValues()
         .build(new CacheLoader<MCRPath, String>() {
 

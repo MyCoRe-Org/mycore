@@ -21,7 +21,6 @@ package org.mycore.common.content.util;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,7 +40,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSeekableChannelContent;
-import org.mycore.common.content.MCRVFSContent;
 
 final class ContentUtils {
     static final int MIN_BUFFER_SIZE = 512;
@@ -317,7 +315,6 @@ final class ContentUtils {
      * @param content MCRContent instance associated with contentIS
      */
     static boolean isInputStreamBuffered(final InputStream contentIS, final MCRContent content) {
-        return contentIS instanceof BufferedInputStream || contentIS instanceof ByteArrayInputStream
-            || contentIS instanceof FilterInputStream && content instanceof MCRVFSContent;
+        return contentIS instanceof BufferedInputStream || contentIS instanceof ByteArrayInputStream;
     }
 }

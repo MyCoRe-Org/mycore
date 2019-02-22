@@ -72,9 +72,9 @@ public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
         map.put("MCR.Metadata.Store.BaseDir", "/tmp");
         map.put("MCR.Metadata.Store.SVNBase", "/tmp/versions");
         map.put("MCR.IFS2.Store.jportal_jpclassi.ForceXML", "true");
-        map.put("MCR.IFS2.Store.jportal_jpclassi.BaseDir", "ram:///tmp");
+        map.put("MCR.IFS2.Store.jportal_jpclassi.BaseDir", "jimfs:");
         map.put("MCR.IFS2.Store.jportal_jpclassi.SlotLayout", "4-2-2");
-        map.put("MCR.IFS2.Store.jportal_jpclassi.SVNRepositoryURL", "ram:///tmp");
+        map.put("MCR.IFS2.Store.jportal_jpclassi.SVNRepositoryURL", "jimfs:");
         map.put("MCR.EventHandler.MCRObject.2.Class",
             "org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
         map.put("MCR.Persistence.LinkTable.Store.Class", LinkTableStoreMock.class.getName());

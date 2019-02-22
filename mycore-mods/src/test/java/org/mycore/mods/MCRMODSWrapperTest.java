@@ -39,7 +39,7 @@ import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.content.MCRVFSContent;
+import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -69,7 +69,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
 
     private Document loadMODSDocument() throws SAXParseException, IOException {
         URL worldClassUrl = this.getClass().getResource("/mods80700998.xml");
-        return MCRXMLParserFactory.getParser().parseXML(new MCRVFSContent(worldClassUrl));
+        return MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(worldClassUrl));
     }
 
     @Test

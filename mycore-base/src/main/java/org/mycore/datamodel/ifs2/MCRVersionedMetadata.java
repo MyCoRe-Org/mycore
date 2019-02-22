@@ -20,13 +20,14 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.apache.commons.vfs2.FileObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -78,7 +79,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * @param id
      *            the id of the metadata object
      */
-    MCRVersionedMetadata(MCRMetadataStore store, FileObject fo, int id, String docType, boolean deleted) {
+    MCRVersionedMetadata(MCRMetadataStore store, Path fo, int id, String docType, boolean deleted) {
         super(store, fo, id, docType);
         super.deleted = deleted;
         revision = () -> {
@@ -170,9 +171,10 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             editor.applyTextDelta(filePath, null);
             SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
 
-            InputStream in = fo.getContent().getInputStream();
-            String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
-            in.close();
+            String checksum;
+            try (InputStream in = Files.newInputStream(path)) {
+                checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
+            }
 
             if (store.shouldForceXML()) {
                 editor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, SVNPropertyValue.create("text/xml"));
@@ -225,7 +227,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         long rev = repository.getFile(getFilePath(), -1, null, baos);
         revision = () -> Optional.of(rev);
         baos.close();
-        new MCRByteContent(baos.getBuffer(), 0, baos.size(), this.getLastModified().getTime()).sendTo(fo);
+        new MCRByteContent(baos.getBuffer(), 0, baos.size(), this.getLastModified().getTime()).sendTo(path);
     }
 
     /**

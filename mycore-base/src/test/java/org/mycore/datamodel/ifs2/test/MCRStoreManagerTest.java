@@ -20,20 +20,46 @@ package org.mycore.datamodel.ifs2.test;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.Map;
+
 import org.junit.Test;
 import org.mycore.datamodel.ifs2.MCRFileStore;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
 
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
+
 public class MCRStoreManagerTest {
     @Test
     public void createMCRFileStore() throws Exception {
-        MCRFileStore fileStore = MCRStoreManager.createStore(new StoreConfig(), MCRFileStore.class);
+        StoreConfig config = new StoreConfig();
+        MCRFileStore fileStore = MCRStoreManager.createStore(config, MCRFileStore.class);
 
         assertNotNull("MCRStoreManager could not create Filestore.", fileStore);
     }
 
     class StoreConfig implements MCRStoreConfig {
+
+        private final Path baseDir;
+
+        public StoreConfig() throws IOException {
+            String fsName = MCRStoreManagerTest.class.getSimpleName();
+            URI jimfsURI = URI.create("jimfs://" + fsName);
+            FileSystem fileSystem = Jimfs.newFileSystem(fsName, Configuration.unix());
+            try {
+                fileSystem = FileSystems.getFileSystem(jimfsURI);
+            } catch (FileSystemNotFoundException e) {
+                fileSystem = FileSystems.newFileSystem(jimfsURI, Map.of("fileSystem", fileSystem));
+            }
+            baseDir = fileSystem.getPath("/");
+        }
 
         @Override
         public String getID() {
@@ -42,7 +68,7 @@ public class MCRStoreManagerTest {
 
         @Override
         public String getBaseDir() {
-            return "ram:///fake";
+            return baseDir.toUri().toString();
         }
 
         @Override

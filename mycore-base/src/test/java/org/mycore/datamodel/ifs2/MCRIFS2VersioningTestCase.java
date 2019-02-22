@@ -21,8 +21,6 @@ package org.mycore.datamodel.ifs2;
 import java.net.MalformedURLException;
 import java.util.Map;
 
-import org.apache.commons.vfs2.Selectors;
-import org.apache.commons.vfs2.VFS;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -45,7 +43,7 @@ public class MCRIFS2VersioningTestCase extends MCRIFS2TestCase {
         super.tearDown();
         System.out.println("teardown: " + getVersStore().repURL);
         MCRStoreManager.removeStore(STORE_ID);
-        VFS.getManager().resolveFile(getVersStore().repURL.getPath()).delete(Selectors.SELECT_ALL);
+        versionBaseDir.delete();
     }
 
     public void setVersStore(MCRVersioningMetadataStore versStore) {

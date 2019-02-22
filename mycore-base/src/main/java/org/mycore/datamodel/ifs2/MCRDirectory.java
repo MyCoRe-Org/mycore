@@ -19,9 +19,10 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileType;
 import org.jdom2.Element;
 
 /**
@@ -40,7 +41,7 @@ public class MCRDirectory extends MCRStoredNode {
      * @param fo
      *            the local directory in the store storing this directory
      */
-    protected MCRDirectory(MCRDirectory parent, FileObject fo, Element data) throws IOException {
+    protected MCRDirectory(MCRDirectory parent, Path fo, Element data) throws IOException {
         super(parent, fo, data);
     }
 
@@ -54,7 +55,7 @@ public class MCRDirectory extends MCRStoredNode {
      */
     protected MCRDirectory(MCRDirectory parent, String name) throws IOException {
         super(parent, name, "dir");
-        fo.createFolder();
+        Files.createDirectory(path);
         getRoot().saveAdditionalData();
     }
 
@@ -100,13 +101,16 @@ public class MCRDirectory extends MCRStoredNode {
      * @return an MCRFile or MCRDirectory child
      */
     @Override
-    protected MCRStoredNode buildChildNode(FileObject fo) throws IOException {
+    protected MCRStoredNode buildChildNode(Path fo) throws IOException {
         if (fo == null) {
             return null;
         }
+        if (!Files.isSameFile(this.path, fo.getParent())) {
+            throw new IllegalArgumentException(fo + " is not a direct child of " + this.path + ".");
+        }
 
-        Element childData = getChildData(fo.getName().getBaseName());
-        if (fo.getType().equals(FileType.FILE)) {
+        Element childData = getChildData(fo.getFileName().toString());
+        if (Files.isRegularFile(fo)) {
             return new MCRFile(this, fo, childData);
         } else {
             return new MCRDirectory(this, fo, childData);
@@ -127,9 +131,20 @@ public class MCRDirectory extends MCRStoredNode {
                 childEntry.setName("node");
             }
         });
-
-        for (MCRNode child : getChildren()) {
-            ((MCRStoredNode) child).repairMetadata();
+        try {
+            getChildren()
+                .filter(MCRStoredNode.class::isInstance)
+                .map(MCRStoredNode.class::cast)
+                .sequential()
+                .forEach(mcrStoredNode -> {
+                    try {
+                        mcrStoredNode.repairMetadata();
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
 
         writeData(e -> e.removeChildren("node"));

@@ -42,8 +42,6 @@ import javax.xml.transform.Source;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.vfs2.FileContent;
-import org.apache.commons.vfs2.FileObject;
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -222,18 +220,6 @@ public abstract class MCRContent {
     public void sendTo(Path target, CopyOption... options) throws IOException {
         try (InputStream in = getInputStream()) {
             Files.copy(in, target, options);
-        }
-    }
-
-    /**
-     * Sends the content to the given Apache VFS file object
-     * 
-     * @param target
-     *            the file to write the content to
-     */
-    public void sendTo(FileObject target) throws IOException {
-        try (FileContent content = target.getContent(); OutputStream outputStream = content.getOutputStream()) {
-            sendTo(outputStream, false);
         }
     }
 

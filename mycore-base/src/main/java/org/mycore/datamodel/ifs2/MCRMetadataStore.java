@@ -19,8 +19,9 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import org.apache.commons.vfs2.FileObject;
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
@@ -118,13 +119,15 @@ public class MCRMetadataStore extends MCRStore {
         if (id <= 0) {
             throw new MCRException("ID of metadata object must be a positive integer");
         }
-        FileObject fo = getSlot(id);
-        if (fo.exists()) {
+        Path path = getSlot(id);
+        if (Files.exists(path)) {
             String msg = "Metadata object with ID " + id + " already exists in store";
             throw new MCRException(msg);
         }
-        fo.createFile();
-        MCRStoredMetadata meta = buildMetadataObject(fo, id);
+        if (!Files.exists(path.getParent())) {
+            Files.createDirectories(path.getParent());
+        }
+        MCRStoredMetadata meta = buildMetadataObject(path, id);
         meta.create(xml);
         return meta;
     }
@@ -138,11 +141,11 @@ public class MCRMetadataStore extends MCRStore {
      *         metadata object
      */
     public MCRStoredMetadata retrieve(int id) throws IOException {
-        FileObject fo = getSlot(id);
-        if (!fo.exists()) {
+        Path path = getSlot(id);
+        if (!Files.exists(path)) {
             return null;
         } else {
-            return buildMetadataObject(fo, id);
+            return buildMetadataObject(path, id);
         }
     }
 
@@ -154,7 +157,7 @@ public class MCRMetadataStore extends MCRStore {
      * @param id
      *            the ID of the metadata object
      */
-    protected MCRStoredMetadata buildMetadataObject(FileObject fo, int id) {
+    protected MCRStoredMetadata buildMetadataObject(Path fo, int id) {
         return new MCRStoredMetadata(this, fo, id, forceDocType);
     }
 }

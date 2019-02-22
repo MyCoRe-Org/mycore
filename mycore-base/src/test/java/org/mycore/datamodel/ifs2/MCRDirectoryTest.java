@@ -107,16 +107,16 @@ public class MCRDirectoryTest extends MCRIFS2TestCase {
         assertFalse(parent.hasChildren());
         assertEquals(0, parent.getNumChildren());
         assertNotNull(parent.getChildren());
-        assertEquals(0, parent.getChildren().size());
+        assertEquals(0, parent.getChildren().count());
         assertNull(parent.getChild("bar"));
 
         parent.createDir("bar");
         assertTrue(parent.hasChildren());
         assertEquals(1, parent.getNumChildren());
         assertNotNull(parent.getChildren());
-        assertEquals(1, parent.getChildren().size());
+        assertEquals(1, parent.getChildren().count());
         assertNotNull(parent.getChild("bar"));
-        MCRNode fromList = parent.getChildren().get(0);
+        MCRNode fromList = parent.getChildren().findFirst().get();
         assertTrue(fromList instanceof MCRDirectory);
         assertEquals("bar", fromList.getName());
 
@@ -124,13 +124,13 @@ public class MCRDirectoryTest extends MCRIFS2TestCase {
         assertTrue(parent.hasChildren());
         assertEquals(2, parent.getNumChildren());
         assertNotNull(parent.getChildren());
-        assertEquals(2, parent.getChildren().size());
+        assertEquals(2, parent.getChildren().count());
         assertNotNull(parent.getChild("bar"));
         assertNotNull(parent.getChild("readme.txt"));
-        List<MCRNode> children = parent.getChildren();
-        assertFalse(children.get(0).getName().equals(children.get(1).getName()));
-        assertTrue("bar readme.txt".contains(children.get(0).getName()));
-        assertTrue("bar readme.txt".contains(children.get(1).getName()));
+        MCRNode[] children = parent.getChildren().toArray(MCRNode[]::new);
+        assertFalse(children[0].getName().equals(children[1].getName()));
+        assertTrue("bar readme.txt".contains(children[0].getName()));
+        assertTrue("bar readme.txt".contains(children[1].getName()));
     }
 
     @Test

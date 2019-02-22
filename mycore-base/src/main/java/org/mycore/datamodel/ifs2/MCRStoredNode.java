@@ -20,21 +20,22 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.Selectors;
-import org.apache.commons.vfs2.VFS;
-import org.apache.commons.vfs2.provider.local.LocalFile;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 
 /**
  * A file or directory really stored by importing it from outside the system.
@@ -66,7 +67,7 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the additional data of this node that is not stored in the
      *            file object
      */
-    protected MCRStoredNode(MCRDirectory parent, FileObject fo, Element data) throws IOException {
+    protected MCRStoredNode(MCRDirectory parent, Path fo, Element data) throws IOException {
         super(parent, fo);
         this.additionalData = data;
     }
@@ -82,7 +83,7 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the node type, dir or file
      */
     protected MCRStoredNode(MCRDirectory parent, String name, String type) throws IOException {
-        super(parent, VFS.getManager().resolveFile(parent.fo, name));
+        super(parent, parent.path.resolve(name));
         additionalData = new Element(type);
         additionalData.setAttribute(NAME_ATT, name);
         parent.writeData(e -> e.addContent(additionalData));
@@ -95,11 +96,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * @return the file in the local filesystem representing this file
      */
     public File getLocalFile() throws IOException {
-        if (fo instanceof LocalFile) {
-            return new File(fo.getURL().getPath());
-        } else {
-            return null;
-        }
+        return path.toFile();
     }
 
     /**
@@ -107,7 +104,7 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     public void delete() throws IOException {
         writeData(Element::detach);
-        fo.delete(Selectors.SELECT_ALL);
+        Files.walkFileTree(path, MCRRecursiveDeleter.instance());
         getRoot().saveAdditionalData();
     }
 
@@ -118,10 +115,11 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the new file name
      */
     public void renameTo(String name) throws IOException {
-        FileObject fNew = VFS.getManager().resolveFile(fo.getParent(), name);
-        fo.moveTo(fNew);
-        fo = fNew;
-        fo.getContent().setLastModifiedTime(System.currentTimeMillis());
+        Path oldPath = path;
+        Path newPath = path.resolveSibling(name);
+        Files.move(oldPath, newPath);
+        Files.setLastModifiedTime(newPath, FileTime.from(Instant.now()));
+        path = newPath;
         writeData(e -> e.setAttribute(NAME_ATT, name));
         getRoot().saveAdditionalData();
     }
@@ -133,7 +131,7 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the time to be stored as last modification time
      */
     public void setLastModified(Date time) throws IOException {
-        fo.getContent().setLastModifiedTime(time.getTime());
+        Files.setLastModifiedTime(path, FileTime.from(time.toInstant()));
     }
 
     /**

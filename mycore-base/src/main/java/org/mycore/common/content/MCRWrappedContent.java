@@ -28,7 +28,6 @@ import java.nio.file.Path;
 
 import javax.xml.transform.Source;
 
-import org.apache.commons.vfs2.FileObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -106,11 +105,6 @@ public abstract class MCRWrappedContent extends MCRContent {
 
     @Override
     public void sendTo(File target) throws IOException {
-        getBaseContent().sendTo(target);
-    }
-
-    @Override
-    public void sendTo(FileObject target) throws IOException {
         getBaseContent().sendTo(target);
     }
 

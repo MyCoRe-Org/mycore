@@ -19,9 +19,10 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 
-import org.apache.commons.vfs2.FileObject;
 import org.mycore.common.MCRException;
 
 import com.google.common.cache.CacheBuilder;
@@ -78,8 +79,8 @@ public class MCRFileStore extends MCRStore {
      *             when a file collection with the given ID already exists
      */
     public MCRFileCollection create(int id) throws IOException {
-        FileObject fo = getSlot(id);
-        if (fo.exists()) {
+        Path path = getSlot(id);
+        if (Files.exists(path)) {
             String msg = "FileCollection with ID " + id + " already exists";
             throw new MCRException(msg);
         }
@@ -95,8 +96,8 @@ public class MCRFileStore extends MCRStore {
      * @return the file collection with the given ID, or null
      */
     public MCRFileCollection retrieve(int id) throws IOException {
-        FileObject fo = getSlot(id);
-        if (!fo.exists()) {
+        Path path = getSlot(id);
+        if (!Files.exists(path)) {
             return null;
         } else {
             return collectionLoadingCache.getUnchecked(id);
