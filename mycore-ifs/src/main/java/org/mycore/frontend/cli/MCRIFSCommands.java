@@ -35,6 +35,7 @@ import java.nio.file.NotDirectoryException;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
 import java.text.MessageFormat;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -46,6 +47,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -68,6 +70,7 @@ import org.apache.commons.io.comparator.NameFileComparator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRFSNODES_;
@@ -83,6 +86,8 @@ import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.ifs2.MCRCStoreIFS2;
+import org.mycore.datamodel.ifs2.MCRFileCollection;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -808,6 +813,101 @@ public class MCRIFSCommands {
             .forEach(missingDerivate -> LOGGER.error("   !!!! Can't find MCRFSNODES entry {} as existing derivate",
                 missingDerivate));
         LOGGER.info("Check done for {} entries", counter.get());
+    }
+
+    @MCRCommand(syntax = "check IFS2 compatibility", help = "checks if content is compatible with MyCoRe 2019 LTS")
+    public static void checkBeforeUpgrade() {
+        AtomicBoolean result = new AtomicBoolean(true);
+        List<String> usedStores = getUsedStores();
+        if (usedStores.size() > 1) {
+            LOGGER.error("MyCoRe LTS 2019 does not support multiple content stores. "
+                + "Please move your content from store(s) {} to store IFS2.",
+                usedStores.stream().filter(s -> !"IFS2".equals(s)).collect(Collectors.joining(", ")));
+            result.set(false);
+        }
+        usedStores
+            .stream()
+            .filter(storeId -> !MCRCStoreIFS2.class.isInstance(MCRContentStoreFactory.getStore(storeId)))
+            .forEach(storeId -> {
+                LOGGER.error("Content store {} is not an instance of {}. Please move content.", storeId,
+                    MCRCStoreIFS2.class);
+                result.set(false);
+            });
+        usedStores
+            .stream()
+            .map(MCRContentStoreFactory::getStore)
+            .filter(MCRCStoreIFS2.class::isInstance)
+            .forEach(store -> checkStore(result, (MCRCStoreIFS2) store));
+        if (result.get()) {
+            LOGGER.info("Your content is ready for MyCoRe LTS 2019");
+        } else {
+            LOGGER.error("Your content is not yet ready for MyCoRe LTS 2019. "
+                + "Please correct the errors and run this command again.");
+        }
+
+    }
+
+    private static List<String> getUsedStores() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Root<MCRFSNODES> root = query.from(MCRFSNODES.class);
+        return em.createQuery(query
+            .distinct(true)
+            .select(root.get(MCRFSNODES_.storeid))
+            .where(cb.equal(root.get(MCRFSNODES_.type), "F"))).getResultList();
+
+    }
+
+    private static void checkStore(AtomicBoolean result, MCRCStoreIFS2 storeIFS2) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
+        Root<MCRFSNODES> root = query.from(MCRFSNODES.class);
+        ((Query<MCRFSNODES>)em.createQuery(query
+            .where(cb.equal(root.get(MCRFSNODES_.storeid), storeIFS2.getID()),
+                cb.equal(root.get(MCRFSNODES_.type), "F"))
+            .orderBy(cb.asc(root.get(MCRFSNODES_.owner)), cb.asc(cb.length(root.get(MCRFSNODES_.storageid))))))
+            .stream()
+            .peek(em::detach)
+            .filter(f -> MCRObjectID.isValid(f.getOwner()))
+            .map(f -> {
+                try {
+                    return new AbstractMap.SimpleEntry<String, org.mycore.datamodel.ifs2.MCRFile>(f.getMd5(),
+                        toFile(storeIFS2, f));
+                } catch (IOException e) {
+                    LOGGER.error("Could not get information from ifs node {}", f.getStorageid(), e);
+                    result.set(false);
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .forEach(e -> {
+                if (!e.getKey().equals(e.getValue().getMD5())) {
+                    String path = null;
+                    try {
+                        path = e.getValue().getLocalFile().toPath().toAbsolutePath().toString();
+                    } catch (IOException e1) {
+                        LOGGER.warn("Could not get local file.", e);
+                        result.set(false);
+                        path = e.getValue().getName();
+                    }
+                    LOGGER.error("MD5 sum mismatch for file {}. DB:{}, mcrdata.xml:{}",
+                        path, e.getKey(), e.getValue().getMD5());
+                    result.set(false);
+                }
+            });
+    }
+
+    private static org.mycore.datamodel.ifs2.MCRFile toFile(MCRCStoreIFS2 store, MCRFSNODES node) throws IOException {
+        MCRFileCollection derivateRoot = store.getIFS2FileCollection(MCRObjectID.getInstance(node.getOwner()));
+        String path = toPath(node.getStorageid());
+        return (org.mycore.datamodel.ifs2.MCRFile) derivateRoot.getNodeByPath(path);
+    }
+
+    private static String toPath(String storageID) {
+        int pos = storageID.indexOf("/") + 1;
+        return storageID.substring(pos);
     }
 
 }
