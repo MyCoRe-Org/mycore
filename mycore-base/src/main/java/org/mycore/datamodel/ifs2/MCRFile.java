@@ -123,6 +123,18 @@ public class MCRFile extends MCRStoredNode {
     }
 
     /**
+     * updates the MD5 sum of this file to the given value.
+     *
+     * Use only if you modified the content outside of {@link #setContent(MCRContent)}.
+     * @param md5
+     * @throws IOException
+     */
+    public void setMD5(String md5) throws IOException{
+        writeData(e -> e.setAttribute("md5", md5));
+        getRoot().saveAdditionalData();
+    }
+
+    /**
      * Repairs additional metadata of this file and all its children
      */
     @Override

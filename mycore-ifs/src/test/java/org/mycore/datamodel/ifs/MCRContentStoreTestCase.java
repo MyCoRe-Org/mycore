@@ -27,7 +27,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 import org.apache.commons.io.input.CharSequenceInputStream;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,6 +46,12 @@ public class MCRContentStoreTestCase extends MCRJPATestCase {
 
     @Rule
     public TemporaryFolder storeBaseDir = new TemporaryFolder();
+
+    @BeforeClass
+    @AfterClass
+    public static void clearStores(){
+        MCRContentStoreFactory.getAvailableStores().clear();
+    }
 
     @Override
     protected Map<String, String> getTestProperties() {
@@ -75,7 +83,6 @@ public class MCRContentStoreTestCase extends MCRJPATestCase {
     }
 
     @Test
-    @Ignore("Until MCR-2031 is implemented")
     public void md5Sum() throws IOException {
         MCRObjectID derId = MCRObjectID.getInstance("MCR_derivate_00000002");
         String fileName = "hallo.txt";
