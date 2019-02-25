@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.commons.io.input.CharSequenceInputStream;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -74,6 +75,7 @@ public class MCRContentStoreTestCase extends MCRJPATestCase {
     }
 
     @Test
+    @Ignore("Until MCR-2031 is implemented")
     public void md5Sum() throws IOException {
         MCRObjectID derId = MCRObjectID.getInstance("MCR_derivate_00000002");
         String fileName = "hallo.txt";
