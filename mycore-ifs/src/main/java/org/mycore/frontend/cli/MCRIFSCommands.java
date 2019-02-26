@@ -847,6 +847,65 @@ public class MCRIFSCommands {
 
     }
 
+    @MCRCommand(syntax = "update IFS2 MD5 sums", help = "copies verified IFS1 MD5 sums to IFS2")
+    public static void copyMD5ToIFS2() {
+        AtomicBoolean result = new AtomicBoolean(true);
+        List<String> usedStores = getUsedStores();
+        usedStores
+            .stream()
+            .map(MCRContentStoreFactory::getStore)
+            .filter(MCRCStoreIFS2.class::isInstance)
+            .forEach(store -> copyMD5ToIFS2(result, (MCRCStoreIFS2) store));
+        if (!result.get()){
+            throw new MCRException("Could not copy all MD5 information to IFS2. Please see error messages above.");
+        }
+    }
+
+    private static void copyMD5ToIFS2(AtomicBoolean result, MCRCStoreIFS2 storeIFS2) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
+        Root<MCRFSNODES> root = query.from(MCRFSNODES.class);
+        ((Query<MCRFSNODES>) em.createQuery(query
+            .where(cb.equal(root.get(MCRFSNODES_.storeid), storeIFS2.getID()),
+                cb.equal(root.get(MCRFSNODES_.type), "F"))
+            .orderBy(cb.asc(root.get(MCRFSNODES_.owner)), cb.asc(cb.length(root.get(MCRFSNODES_.storageid))))))
+                .stream()
+                .peek(em::detach)
+                .filter(f -> MCRObjectID.isValid(f.getOwner()))
+                .map(f -> {
+                    try {
+                        return new AbstractMap.SimpleEntry<String, org.mycore.datamodel.ifs2.MCRFile>(f.getMd5(),
+                            toFile(storeIFS2, f));
+                    } catch (IOException e) {
+                        LOGGER.error("Could not get information from ifs node {}", f.getStorageid(), e);
+                        result.set(false);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .forEach(e -> {
+                    if (!e.getKey().equals(e.getValue().getMD5())) {
+                        String path = null;
+                        try {
+                            path = e.getValue().getLocalFile().toPath().toAbsolutePath().toString();
+                        } catch (IOException e1) {
+                            LOGGER.warn("Could not get local file " + e.getValue().getName(), e);
+                            result.set(false);
+                            return;
+                        }
+                        LOGGER.info("Update MD5 sum for file {} to {}",
+                            path, e.getKey());
+                        try {
+                            e.getValue().setMD5(e.getKey());
+                        } catch (IOException e1) {
+                            LOGGER.error("Could not update MD5 sum of " + path, e);
+                            result.set(false);
+                        }
+                    }
+                });
+    }
+
     private static List<String> getUsedStores() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
