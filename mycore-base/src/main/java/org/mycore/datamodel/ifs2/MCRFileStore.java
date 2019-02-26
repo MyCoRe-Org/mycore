@@ -87,6 +87,15 @@ public class MCRFileStore extends MCRStore {
         return collectionLoadingCache.getUnchecked(id);
     }
 
+    @Override
+    public void delete(int id) throws IOException {
+        Path path = getSlot(id);
+        if (Files.exists(path)) {
+            super.delete(path);
+        }
+        collectionLoadingCache.invalidate(id);
+    }
+
     /**
      * Returns the file collection stored under the given ID, or null when no
      * collection is stored for the given ID.

@@ -109,6 +109,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @param set_text
      *            the text string for a date or range
      */
+    @Deprecated
     public final void setText(String set_text) {
         setText(set_text, lang);
     }
@@ -123,7 +124,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the language of the text in the ISO format
      */
     public final void setText(String set_text, String set_lang) {
-        if (set_text == null) {
+        if (set_text == null || set_text.length() == 0) {
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
@@ -150,7 +151,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
 
     public final void addText(String set_text, String set_lang) {
-        if (set_text == null) {
+        if (set_text == null || set_text.length() == 0) {
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
@@ -560,75 +561,97 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * language notation is in the ISO format.
      * 
      */
-    protected static class MCRMetaHistoryDateText implements Cloneable {
-        private String datetext;
+    public static class MCRMetaHistoryDateText implements Cloneable {
+        private String text;
 
         private String lang;
 
         public MCRMetaHistoryDateText() {
-            datetext = "";
+            text = "";
             lang = DEFAULT_LANGUAGE;
         }
 
-        public MCRMetaHistoryDateText(String datetext, String lang) {
-            setText(datetext);
-            setLang(lang);
+        public MCRMetaHistoryDateText(String text, String lang) {
+            setText(text, lang);
         }
 
         /**
-         * This method get the datetext element as field text (String) .
+         * This method get the text element as String.
          * 
-         * @return the datetext
+         * @return the text
          */
 
         public String getText() {
-            return datetext;
+            return text;
         }
 
         /**
-         * This method set the datetext element as field text (String) .
+         * This method get the language element as String of ISO code.
          * 
-         * @param datetext
-         *            the text String of a date value
-         */
-        public void setText(String datetext) {
-            if (datetext == null) {
-                this.datetext = "";
-            } else {
-                this.datetext = datetext;
-            }
-        }
-
-        /**
-         * This method get the lang element as language field (String) .
-         * 
-         * @return the lang
+         * @return the language
          */
         public String getLang() {
             return lang;
         }
 
         /**
-         * This method set the lang element as language field (String) .
+         * This method set the text element with the corresponding language.
          * 
-         * @param set_lang
-         *            the language String of a date value
+         * @param text
+         *            the text String
+         * @param lang
+         *            the language String
          */
-        public void setLang(String set_lang) {
-            if (set_lang == null) {
-                lang = DEFAULT_LANGUAGE;
+        public void setText(String text, String lang) {
+            if (lang == null || lang.length() == 0) {
+                this.lang = DEFAULT_LANGUAGE;
             } else {
-                lang = set_lang;
+                this.lang = lang;
+            }
+            if (text == null || text.length() == 0) {
+                this.text = "";
+            } else {
+                this.text = text;
             }
         }
 
         /**
-         * This mehtod validate the content. If lang and text are not empty, it return true otherwise it return false.
+         * This method set the text element.
+         * 
+         * @param text
+         *            the text String of a date value
+         */
+        @Deprecated
+        public void setText(String text) {
+            if (text == null || text.length() == 0) {
+                this.text = "";
+            } else {
+                this.text = text;
+            }
+        }
+
+        /**
+         * This method set the lang element.
+         * 
+         * @param lang
+         *            the language String of a date value
+         */
+        @Deprecated
+        public void setLang(String lang) {
+            if (lang == null || lang.length() == 0) {
+                this.lang = DEFAULT_LANGUAGE;
+            } else {
+                this.lang = lang;
+            }
+        }
+
+        /**
+         * This method validate the content. If lang and text are not empty, it return true otherwise it return false.
          * 
          * @return true if the content is valid.
          */
         public boolean isValid() {
-            return !(lang.length() == 0 || datetext.length() == 0);
+            return !(lang.length() == 0 || text.length() == 0);
         }
 
         /**
@@ -638,7 +661,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          * @return true if both parts are equal
          */
         public boolean equals(MCRMetaHistoryDateText obj) {
-            return lang.equals(obj.getLang()) && datetext.equals(obj.getText());
+            return lang.equals(obj.getLang()) && text.equals(obj.getText());
         }
 
         @Override
@@ -650,7 +673,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
                 // this can not happen!
             }
 
-            clone.datetext = this.datetext;
+            clone.text = this.text;
             clone.lang = this.lang;
 
             return clone;

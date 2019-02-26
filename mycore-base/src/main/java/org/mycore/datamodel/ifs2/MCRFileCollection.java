@@ -168,6 +168,7 @@ public class MCRFileCollection extends MCRDirectory {
     public void delete() throws IOException {
         writeData(Element::removeContent);
         Files.walkFileTree(path, MCRRecursiveDeleter.instance());
+        store.delete(id);
     }
 
     /**
