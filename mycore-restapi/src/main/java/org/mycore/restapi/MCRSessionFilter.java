@@ -110,7 +110,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        LOGGER.info("Filter start.");
+        LOGGER.debug("Filter start.");
         boolean isSecure = requestContext.getSecurityContext().isSecure();
         if (MCRSessionMgr.hasCurrentSession()) {
             throw new InternalServerErrorException("Session is already attached.");

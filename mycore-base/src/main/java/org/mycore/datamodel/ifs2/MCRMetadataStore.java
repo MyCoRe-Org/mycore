@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
@@ -42,6 +43,8 @@ import org.mycore.common.content.MCRContent;
  * @author Frank Lützenkirchen
  */
 public class MCRMetadataStore extends MCRStore {
+
+    public static final Logger LOGGER = LogManager.getLogger(MCRMetadataStore.class);
 
     /**
      * If true (which is default), store will enforce it gets
@@ -67,7 +70,7 @@ public class MCRMetadataStore extends MCRStore {
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
         if (forceXML) {
             forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".ForceDocType", null);
-            LogManager.getLogger(MCRMetadataStore.class).info("Set doctype for {} to {}", type, forceDocType);
+            LOGGER.debug("Set doctype for {} to {}", type, forceDocType);
         }
     }
 
@@ -86,7 +89,7 @@ public class MCRMetadataStore extends MCRStore {
         if (forceXML) {
             forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType",
                 null);
-            LogManager.getLogger(MCRMetadataStore.class).info("Set doctype for {} to {}", config.getID(), forceDocType);
+            LOGGER.debug("Set doctype for {} to {}", config.getID(), forceDocType);
         }
     }
 

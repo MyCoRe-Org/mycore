@@ -23,8 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -61,6 +59,8 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
 
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for logging and managing the current
@@ -382,12 +382,12 @@ public class MCRServlet extends HttpServlet {
     private void configureSession(MCRServletJob job) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
 
-        String c = getClass().getName();
-        c = c.substring(c.lastIndexOf(".") + 1);
+        String longName = getClass().getName();
+        final String shortName = longName.substring(longName.lastIndexOf(".") + 1);
 
-        String msg = c + " ip=" + MCRFrontendUtil.getRemoteAddr(job.getRequest()) + " mcr=" + session.getID() + " user="
-            + session.getUserInformation().getUserID();
-        LOGGER.info(msg);
+        LOGGER.info(() -> String
+            .format(Locale.ROOT, "%s ip=%s mcr=%s path=%s", shortName, MCRFrontendUtil.getRemoteAddr(job.getRequest()),
+                session.getID(), job.getRequest().getPathInfo()));
 
         MCRFrontendUtil.configureSession(session, job.getRequest(), job.getResponse());
     }

@@ -74,12 +74,12 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
         MCRConfiguration config = MCRConfiguration.instance();
         baseDir = config.getString(storeConfigPrefix + "BaseDir");
-        LOGGER.info("Base directory for store {} is {}", storeID, baseDir);
+        LOGGER.debug("Base directory for store {} is {}", storeID, baseDir);
 
         String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
         slotLayout = pattern.length() - 4 + "-2-2";
         slotLayout = config.getString(storeConfigPrefix + "SlotLayout", slotLayout);
-        LOGGER.info("Default slot layout for store {} is {}", storeID, slotLayout);
+        LOGGER.debug("Default slot layout for store {} is {}", storeID, slotLayout);
 
         ignoreOwnerBase = config.getBoolean(storeConfigPrefix + "IgnoreOwnerBase", false);
         MCREventManager.instance().addEventHandler(MCREvent.PATH_TYPE, new UpdateMetadataHandler(this));

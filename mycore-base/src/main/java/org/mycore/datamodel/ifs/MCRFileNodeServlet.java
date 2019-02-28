@@ -113,7 +113,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
 
     private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestPath = request.getPathInfo();
-        LOGGER.info("request path = {}", requestPath);
+        LOGGER.debug("request path = {}", requestPath);
 
         if (requestPath == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error: HTTP request path is null");
