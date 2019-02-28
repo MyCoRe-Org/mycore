@@ -190,9 +190,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
             .installedProviders()
             .stream()
             .map(FileSystemProvider::getScheme)
-            .filter(Objects.requireNonNull(scheme)::equals)
-            .findAny()
-            .isPresent();
+            .anyMatch(Objects.requireNonNull(scheme)::equals);
     }
 
     private URI resolveRelativeURI(String baseURI, String systemId) {
@@ -211,7 +209,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
 
     private InputSource resolvedEntity(InputSource entity) {
         String msg = "Resolved  to: " + entity.getSystemId() + ".";
-        LOGGER.info(msg);
+        LOGGER.debug(msg);
         return entity;
     }
 
@@ -240,11 +238,11 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     public XMLInputSource resolveEntity(XMLResourceIdentifier resourceIdentifier) throws XNIException, IOException {
         XMLInputSource entity = catalogResolver.resolveEntity(resourceIdentifier);
         if (entity == null) {
-            LOGGER.info("Could not resolve entity: {}", resourceIdentifier.getBaseSystemId());
-            LOGGER.info("Identifer: {}", catalogResolver.resolveIdentifier(resourceIdentifier));
+            LOGGER.debug("Could not resolve entity: {}", resourceIdentifier.getBaseSystemId());
+            LOGGER.debug("Identifer: {}", catalogResolver.resolveIdentifier(resourceIdentifier));
             return null;
         }
-        LOGGER.info("Resolve entity: {} --> {}", resourceIdentifier.getBaseSystemId(), entity.getBaseSystemId());
+        LOGGER.debug("Resolve entity: {} --> {}", resourceIdentifier.getBaseSystemId(), entity.getBaseSystemId());
         return entity;
     }
 

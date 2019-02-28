@@ -27,6 +27,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -35,6 +36,8 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
 
     public static final String PROP_REQUIRE_TRANSACTION = "mcr:jpaTrans";
 
+    public static final Logger LOGGER = LogManager.getLogger();
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         if (MCRSessionMgr.isLocked()) {
@@ -42,7 +45,7 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
         }
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         if (mcrSession.isTransactionActive()) {
-            LogManager.getLogger().info("Filter scoped JPA transaction is active.");
+            LOGGER.debug("Filter scoped JPA transaction is active.");
             if (mcrSession.transactionRequiresRollback()) {
                 try {
                     mcrSession.rollbackTransaction();
@@ -53,7 +56,7 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
             mcrSession.commitTransaction();
         }
         if (Boolean.TRUE.equals(requestContext.getProperty(PROP_REQUIRE_TRANSACTION))) {
-            LogManager.getLogger().info("Starting user JPA transaction.");
+            LOGGER.debug("Starting user JPA transaction.");
             mcrSession.beginTransaction();
         }
     }

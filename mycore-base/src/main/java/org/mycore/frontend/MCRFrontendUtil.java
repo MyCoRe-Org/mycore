@@ -304,7 +304,7 @@ public class MCRFrontendUtil {
         response.setDateHeader("Last-Modified", lastModified);
         if (useExpire) {
             Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
-            LOGGER.info("Last-Modified: {}, expire on: {}", new Date(lastModified), expires);
+            LOGGER.debug("Last-Modified: {}, expire on: {}", new Date(lastModified), expires);
             response.setDateHeader("Expires", expires.getTime());
         }
     }

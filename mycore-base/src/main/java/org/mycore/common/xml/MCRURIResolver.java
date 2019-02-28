@@ -1301,7 +1301,7 @@ public final class MCRURIResolver implements URIResolver {
                 Element includeElement = new Element("include", xslNamespace);
                 includeElement.setAttribute("href", include);
                 root.addContent(includeElement);
-                LOGGER.info("Resolved XSL include: {}", include);
+                LOGGER.debug("Resolved XSL include: {}", include);
             }
             return new JDOMSource(root);
         }
@@ -1330,13 +1330,13 @@ public final class MCRURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             String importXSL = MCRXMLFunctions.nextImportStep(href.substring(href.indexOf(':') + 1));
             if (importXSL.isEmpty()) {
-                LOGGER.info("End of import queue: {}", href);
+                LOGGER.debug("End of import queue: {}", href);
                 Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
                 Element root = new Element("stylesheet", xslNamespace);
                 root.setAttribute("version", "1.0");
                 return new JDOMSource(root);
             }
-            LOGGER.info("xslImport importing {}", importXSL);
+            LOGGER.debug("xslImport importing {}", importXSL);
             return fallback.resolve("resource:xsl/" + importXSL, base);
         }
     }

@@ -78,11 +78,11 @@ public class MCRLayoutTransformerFactory {
 
     private static MCRContentTransformer buildLayoutTransformer(String id) throws Exception {
         String idStripped = id.replaceAll("-default$", "");
-        LOGGER.info("Configure property MCR.ContentTransformer.{}.Class if you do not want to use default behaviour.",
+        LOGGER.debug("Configure property MCR.ContentTransformer.{}.Class if you do not want to use default behaviour.",
             idStripped);
         String stylesheet = getResourceName(id);
         if (stylesheet == null) {
-            LOGGER.info("Using noop transformer for {}", idStripped);
+            LOGGER.debug("Using noop transformer for {}", idStripped);
             return NOOP_TRANSFORMER;
         }
         String[] stylesheets = getStylesheets(idStripped, stylesheet);
@@ -90,10 +90,10 @@ public class MCRLayoutTransformerFactory {
         String mimeType = transformer.getMimeType();
         if (isPDF(mimeType)) {
             transformer = new MCRTransformerPipe(transformer, fopper);
-            LOGGER.info("Using stylesheet '{}' for {} and MCRFopper for PDF output.", Lists.newArrayList(stylesheets),
+            LOGGER.debug("Using stylesheet '{}' for {} and MCRFopper for PDF output.", Lists.newArrayList(stylesheets),
                 idStripped);
         } else {
-            LOGGER.info("Using stylesheet '{}' for {}", Lists.newArrayList(stylesheets), idStripped);
+            LOGGER.debug("Using stylesheet '{}' for {}", Lists.newArrayList(stylesheets), idStripped);
         }
         transformers.put(id, transformer);
         return transformer;

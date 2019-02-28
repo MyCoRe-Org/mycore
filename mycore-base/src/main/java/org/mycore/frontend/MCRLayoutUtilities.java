@@ -18,8 +18,6 @@
 
 package org.mycore.frontend;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -75,6 +73,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
 /**
  *
@@ -152,7 +152,7 @@ public class MCRLayoutUtilities {
             public ListenableFuture<DocumentHolder> reload(final String key, DocumentHolder oldValue) throws Exception {
                 URL url = SERVLET_CONTEXT.getResource(key);
                 if (oldValue.isValid(url)) {
-                    LOGGER.info("Keeping {} in cache", url);
+                    LOGGER.debug("Keeping {} in cache", url);
                     return Futures.immediateFuture(oldValue);
                 }
                 ListenableFutureTask<DocumentHolder> task = ListenableFutureTask.create(() -> load(key));

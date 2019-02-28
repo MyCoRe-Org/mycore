@@ -116,13 +116,13 @@ public final class MCRURLRetriever {
         String parentCollection = getParentCollection(collection);
         String defaultCollectionName = defaultCollection == null ? null : defaultCollection.getName();
         if (parentCollection == null) {
-            LOGGER.info("Using default collection '{}' for action: {}", defaultCollectionName, action);
+            LOGGER.debug("Using default collection '{}' for action: {}", defaultCollectionName, action);
             return defaultCollection;
         }
-        LOGGER.info("Checking parent collection '{}' for action: {}", parentCollection, action);
+        LOGGER.debug("Checking parent collection '{}' for action: {}", parentCollection, action);
         MCRCollection collectionWithAction = getCollectionWithAction(parentCollection, action, defaultCollection);
         if (collectionWithAction == null) {
-            LOGGER.info("Using default collection '{}' for action: {}", defaultCollectionName, action);
+            LOGGER.debug("Using default collection '{}' for action: {}", defaultCollectionName, action);
             return defaultCollection;
         }
         if (mcrCollection == null) {
