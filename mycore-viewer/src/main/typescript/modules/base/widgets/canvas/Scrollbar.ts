@@ -92,7 +92,28 @@ namespace mycore.viewer.widgets.canvas {
                 }, 111);
             });
 
+            jQuery(document.body).mousemove((e) => {
+                if (this._mouseDown != -1) {
+                    let val = (this._horizontal ? (e.clientX - this._scrollbarElement.offset().left) :
+                        (e.clientY - this._scrollbarElement.offset().top)) - this._mouseDown;
+                    let realSize = (this._horizontal ? this._scrollbarElement.width() :
+                        this._scrollbarElement.height()) - 30;
+                    let relation = realSize / this._areaSize;
+                    this._position = (val) / relation;
+                    this.update();
+                    if (this.scrollHandler != null) {
+                        this.scrollHandler();
+                    }
+                }
+            });
 
+            jQuery(document.body).mouseup((e) => {
+                this._mouseDown = -1;
+                if (interv != -1) {
+                    window.clearInterval(interv);
+                    interv = -1;
+                }
+            });
 
         }
 
