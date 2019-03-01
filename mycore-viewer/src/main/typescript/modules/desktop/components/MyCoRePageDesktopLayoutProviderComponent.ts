@@ -23,18 +23,25 @@ namespace mycore.viewer.components {
 
     export class MyCoRePageDesktopLayoutProviderComponent extends ViewerComponent {
 
-        constructor(private _settings:MyCoReViewerSettings) {
+        constructor(private _settings: MyCoReViewerSettings) {
             super();
         }
 
-        public get handlesEvents():string[] {
+        public get handlesEvents(): string[] {
             return [];
         }
 
         public init() {
-            this.trigger(new events.ProvidePageLayoutEvent(this, new widgets.canvas.SinglePageLayout(), true));
-            this.trigger(new events.ProvidePageLayoutEvent(this, new widgets.canvas.DoublePageLayout()));
-            this.trigger(new events.ProvidePageLayoutEvent(this, new widgets.canvas.DoublePageRelocatedLayout()));
+            const singlePageLayout = new widgets.canvas.SinglePageLayout();
+            const doublePageLayout = new widgets.canvas.DoublePageLayout();
+            const doublePageRelocatedLayout = new widgets.canvas.DoublePageRelocatedLayout();
+
+            singlePageLayout.maximalPageScale = doublePageLayout.maximalPageScale =
+                doublePageRelocatedLayout.maximalPageScale = parseInt(this._settings.maximalPageScale, 10) || 4;
+
+            this.trigger(new events.ProvidePageLayoutEvent(this, singlePageLayout, true));
+            this.trigger(new events.ProvidePageLayoutEvent(this, doublePageLayout));
+            this.trigger(new events.ProvidePageLayoutEvent(this, doublePageRelocatedLayout));
         }
     }
 
