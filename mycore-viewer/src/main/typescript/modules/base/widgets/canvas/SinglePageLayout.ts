@@ -148,6 +148,8 @@ namespace mycore.viewer.widgets.canvas {
             vp.position = new Position2D(xPos, scrollPos.y + (vp.size.height / vp.scale / 2));
         }
 
+        public maximalPageScale = 4;
+
         private correctViewport():void {
             let vp = this._pageController.viewport;
             let pageScaling = this.getCurrentPageScaling();
@@ -162,9 +164,9 @@ namespace mycore.viewer.widgets.canvas {
                 }
 
                 let completeScale = vp.scale * pageScaling;
-                if (completeScale > 4) {
+                if (completeScale > this.maximalPageScale) {
                     vp.stopAnimation();
-                    vp.scale = 4 / pageScaling;
+                    vp.scale = this.maximalPageScale / pageScaling;
                 }
             }
 

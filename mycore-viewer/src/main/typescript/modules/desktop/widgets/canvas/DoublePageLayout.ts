@@ -165,6 +165,8 @@ namespace mycore.viewer.widgets.canvas {
             return pageRect.getMiddlePoint();
         }
 
+        public maximalPageScale = 4;
+
         private correctViewport():void {
             var vp = this._pageController.viewport;
             var widthMultiplicator = (this._rotation == 90 || this._rotation == 270) ? 1 : 2;
@@ -181,9 +183,9 @@ namespace mycore.viewer.widgets.canvas {
                 }
 
                 var completeScale = vp.scale * pageScaling;
-                if (completeScale > 4) {
+                if (completeScale > this.maximalPageScale) {
                     vp.stopAnimation();
-                    vp.scale = 4 / pageScaling;
+                    vp.scale = this.maximalPageScale / pageScaling;
                 }
             }
 

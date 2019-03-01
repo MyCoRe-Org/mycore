@@ -102,6 +102,12 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
 
             addLocalCSS("default.css");
         }
+
+        String maximalScale = MCRConfiguration.instance().getString("MCR.Viewer.Canvas.Startup.MaximalPageScale", "");
+        if (!maximalScale.isEmpty()) {
+            setProperty("maximalPageScale", maximalScale);
+        }
+
         return this;
     }
 

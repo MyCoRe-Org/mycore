@@ -31,6 +31,7 @@ namespace mycore.viewer {
         onClose:()=>void;
         adminMail:string;
         leftShowOnStart:string;
+        maximalPageScale: string;
 
         static normalize(settings: MyCoReViewerSettings): MyCoReViewerSettings {
             var parameter = ViewerParameterMap.fromCurrentUrl();
