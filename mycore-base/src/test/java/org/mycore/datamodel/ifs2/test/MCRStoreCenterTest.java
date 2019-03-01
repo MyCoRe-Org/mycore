@@ -31,7 +31,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,13 +55,17 @@ public class MCRStoreCenterTest {
         FakeStoreConfig config = new FakeStoreConfig("heapOp");
         storeHeap.addStore(config.getID(), new FakeStore(config));
         String storeID = config.getID();
-        FakeStore fakeStore = storeHeap.getStore(storeID, FakeStore.class);
+        FakeStore fakeStore = storeHeap.getStore(storeID);
 
         assertNotNull("The store should be not null.", fakeStore);
         assertEquals("Fake Store", fakeStore.getMsg());
 
+        assertTrue("Could not find store with ID: " + storeID, storeHeap.getCurrentStores(FakeStore.class)
+            .filter(s -> storeID.equals(s.getID()))
+            .findAny().isPresent());
+
         assertTrue("Could not remove store with ID: " + storeID, storeHeap.removeStore(storeID));
-        assertNull("There should be no store with ID: " + storeID, storeHeap.getStore(storeID, FakeStore.class));
+        assertNull("There should be no store with ID: " + storeID, storeHeap.<FakeStore> getStore(storeID));
     }
 
     @Test(expected = MCRStoreAlreadyExistsException.class)
@@ -92,6 +95,11 @@ public class MCRStoreCenterTest {
         @Override
         public String getID() {
             return "fake";
+        }
+
+        @Override
+        public String getPrefix() {
+            return "fake_";
         }
 
         @Override

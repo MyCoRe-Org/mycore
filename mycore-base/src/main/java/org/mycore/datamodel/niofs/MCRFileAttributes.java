@@ -29,7 +29,19 @@ import java.util.regex.Pattern;
  */
 public class MCRFileAttributes<T> implements BasicFileAttributes {
     enum fileType {
-        file, directory, link, other
+        file, directory, link, other;
+        public static fileType fromAttribute(BasicFileAttributes attrs) {
+            if (attrs.isRegularFile()) {
+                return file;
+            }
+            if (attrs.isDirectory()) {
+                return directory;
+            }
+            if (attrs.isSymbolicLink()) {
+                return link;
+            }
+            return other;
+        }
     }
 
     private static final FileTime EPOCHE_TIME = FileTime.fromMillis(0);
@@ -77,6 +89,11 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
         final FileTime creationTime, final FileTime lastModified, final FileTime lastAccessTime) {
         return new MCRFileAttributes<>(fileType.file, size, filekey, md5sum, creationTime, lastModified,
             lastAccessTime);
+    }
+
+    public static <T> MCRFileAttributes<T> fromAttributes(BasicFileAttributes attrs, String md5) {
+        return new MCRFileAttributes<>(fileType.fromAttribute(attrs), attrs.size(), (T) attrs.fileKey(), md5,
+            attrs.creationTime(), attrs.lastModifiedTime(), attrs.lastAccessTime());
     }
 
     /* (non-Javadoc)

@@ -21,12 +21,14 @@ package org.mycore.datamodel.ifs2;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 
 /**
@@ -44,7 +46,7 @@ import org.mycore.common.content.MCRContent;
  */
 public class MCRMetadataStore extends MCRStore {
 
-    public static final Logger LOGGER = LogManager.getLogger(MCRMetadataStore.class);
+    public static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * If true (which is default), store will enforce it gets
@@ -65,11 +67,11 @@ public class MCRMetadataStore extends MCRStore {
     @Override
     protected void init(String type) {
         super.init(type);
-        prefix = type + "_";
+        prefix = MCRConfiguration2.getString("MCR.IFS2.Store." + type + ".Prefix").orElse(type + "_");
         suffix = ".xml";
-        forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
+        forceXML = MCRConfiguration2.getBoolean("MCR.IFS2.Store." + type + ".ForceXML").orElse(true);
         if (forceXML) {
-            forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".ForceDocType", null);
+            forceDocType = MCRConfiguration2.getString("MCR.IFS2.Store." + type + ".ForceDocType").orElse(null);
             LOGGER.debug("Set doctype for {} to {}", type, forceDocType);
         }
     }
@@ -83,7 +85,7 @@ public class MCRMetadataStore extends MCRStore {
     @Override
     protected void init(MCRStoreConfig config) {
         super.init(config);
-        prefix = config.getID() + "_";
+        prefix = Optional.ofNullable(config.getPrefix()).orElseGet(() -> config.getID() + "_");
         suffix = ".xml";
         forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML", true);
         if (forceXML) {

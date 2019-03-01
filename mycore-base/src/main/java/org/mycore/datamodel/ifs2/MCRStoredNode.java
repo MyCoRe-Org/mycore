@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.Date;
@@ -35,6 +36,7 @@ import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 
 /**
@@ -67,7 +69,7 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the additional data of this node that is not stored in the
      *            file object
      */
-    protected MCRStoredNode(MCRDirectory parent, Path fo, Element data) throws IOException {
+    protected MCRStoredNode(MCRDirectory parent, Path fo, Element data) {
         super(parent, fo);
         this.additionalData = data;
     }
@@ -82,7 +84,7 @@ public abstract class MCRStoredNode extends MCRNode {
      * @param type
      *            the node type, dir or file
      */
-    protected MCRStoredNode(MCRDirectory parent, String name, String type) throws IOException {
+    protected MCRStoredNode(MCRDirectory parent, String name, String type) {
         super(parent, parent.path.resolve(name));
         additionalData = new Element(type);
         additionalData.setAttribute(NAME_ATT, name);
@@ -90,13 +92,25 @@ public abstract class MCRStoredNode extends MCRNode {
     }
 
     /**
-     * Returns the local java.io.File representing this stored file or directory. Be careful
+     * Returns the local {@link File} representing this stored file or directory. Be careful
      * to use this only for reading data, do never modify directly!
-     * 
+     *
+     * @return the file in the local filesystem representing this file
+     * @deprecated use {@link #getLocalPath()} instead
+     */
+    @Deprecated
+    public File getLocalFile() {
+        return path.toFile();
+    }
+
+    /**
+     * Returns the local {@link Path} representing this stored file or directory. Be careful
+     * to use this only for reading data, do never modify directly!
+     *
      * @return the file in the local filesystem representing this file
      */
-    public File getLocalFile() throws IOException {
-        return path.toFile();
+    public Path getLocalPath() {
+        return path;
     }
 
     /**
@@ -231,6 +245,11 @@ public abstract class MCRStoredNode extends MCRNode {
 
     protected <T> void writeData(Consumer<Element> writeOperation) {
         getRoot().getDataGuard().write(() -> writeOperation.accept(additionalData));
+    }
+
+    public MCRFileAttributes<String> getBasicFileAttributes() throws IOException{
+        BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+        return MCRFileAttributes.fromAttributes(attrs, null);
     }
 
 }

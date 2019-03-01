@@ -51,10 +51,14 @@ public class MCRStoreManager {
      * @param ID
      *            the ID of the store
      */
-    public static MCRStore getStore(String ID) {
-        return getStore(ID, MCRStore.class);
+    public static <T extends MCRStore> T getStore(String ID) {
+        return MCRStoreCenter.instance().getStore(ID);
     }
 
+    /**
+     * @deprecated use {@link #getStore(String)} instead
+     */
+    @Deprecated
     public static <T extends MCRStore> T getStore(String ID, Class<T> storeClass) {
         return MCRStoreCenter.instance().getStore(ID, storeClass);
     }

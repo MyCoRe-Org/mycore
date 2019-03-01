@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +31,7 @@ import org.jdom2.Element;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 /**
  * Represents a file stored in a file collection. This is a file that is
@@ -58,7 +60,7 @@ public class MCRFile extends MCRStoredNode {
      * @param fo
      *            the file in the local underlying filesystem storing this file
      */
-    protected MCRFile(MCRDirectory parent, Path fo, Element data) throws IOException {
+    protected MCRFile(MCRDirectory parent, Path fo, Element data) {
         super(parent, fo, data);
     }
 
@@ -83,8 +85,7 @@ public class MCRFile extends MCRStoredNode {
      */
     @Override
     protected MCRVirtualNode buildChildNode(Path fo) {
-        throw new UnsupportedOperationException("not yet implemented");
-        //return new MCRVirtualNode(this, path);
+        return null; //not implemented
     }
 
     /**
@@ -158,5 +159,11 @@ public class MCRFile extends MCRStoredNode {
                 e.setAttribute("md5", md5);
             }
         });
+    }
+
+    @Override
+    public MCRFileAttributes<String> getBasicFileAttributes() throws IOException {
+        BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
+        return MCRFileAttributes.fromAttributes(attrs, getMD5());
     }
 }

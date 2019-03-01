@@ -885,14 +885,7 @@ public class MCRIFSCommands {
                 .filter(Objects::nonNull)
                 .forEach(e -> {
                     if (!e.getKey().equals(e.getValue().getMD5())) {
-                        String path = null;
-                        try {
-                            path = e.getValue().getLocalFile().toPath().toAbsolutePath().toString();
-                        } catch (IOException e1) {
-                            LOGGER.warn("Could not get local file " + e.getValue().getName(), e);
-                            result.set(false);
-                            return;
-                        }
+                        String path = e.getValue().getLocalPath().toAbsolutePath().toString();
                         LOGGER.info("Update MD5 sum for file {} to {}",
                             path, e.getKey());
                         try {
@@ -942,14 +935,7 @@ public class MCRIFSCommands {
             .filter(Objects::nonNull)
             .forEach(e -> {
                 if (!e.getKey().equals(e.getValue().getMD5())) {
-                    String path = null;
-                    try {
-                        path = e.getValue().getLocalFile().toPath().toAbsolutePath().toString();
-                    } catch (IOException e1) {
-                        LOGGER.warn("Could not get local file.", e);
-                        result.set(false);
-                        path = e.getValue().getName();
-                    }
+                    String path = e.getValue().getLocalPath().toAbsolutePath().toString();
                     LOGGER.error("MD5 sum mismatch for file {}. DB:{}, mcrdata.xml:{}",
                         path, e.getKey(), e.getValue().getMD5());
                     result.set(false);

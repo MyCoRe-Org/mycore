@@ -210,17 +210,27 @@ public class MCRFileCollection extends MCRDirectory {
     }
 
     @Override
-    public int getNumChildren() throws IOException {
-        return super.getNumChildren() - 1;
-    }
-
-    @Override
-    public MCRNode getChild(String name) throws IOException {
+    public MCRNode getChild(String name) {
         if (dataFile.equals(name)) {
             return null;
         } else {
             return super.getChild(name);
         }
+    }
+
+    @Override
+    public boolean hasChildren() throws IOException {
+        return getUsableChildSream().findAny().isPresent();
+    }
+
+    private Stream<Path> getUsableChildSream() throws IOException {
+        return Files.list(path)
+            .filter(p -> !dataFile.equals(p.getFileName().toString()));
+    }
+
+    @Override
+    public int getNumChildren() throws IOException {
+        return Math.toIntExact(getUsableChildSream().count());
     }
 
     @Override

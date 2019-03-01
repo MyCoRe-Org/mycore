@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
@@ -243,8 +244,8 @@ public class MCRIFS2Commands {
         // list all files
         try {
             MCRFileCollection file_collection = ((MCRCStoreIFS2) store).getIFS2FileCollection(mcr_derivate_id);
-            File root_node = file_collection.getLocalFile();
-            String storage_base = root_node.getAbsolutePath();
+            Path root_node = file_collection.getLocalPath();
+            String storage_base = root_node.toAbsolutePath().toString();
             storage_base = storage_base.substring(0, storage_base.length() - derivate_id.length());
             fixMCRFSNODESForNode(root_node, content_store, derivate_id, storage_base, check_only);
         } catch (IOException e) {
@@ -258,27 +259,27 @@ public class MCRIFS2Commands {
         }
     }
 
-    private static void fixMCRFSNODESForNode(File node, String content_store, String derivate_id, String storage_base,
-        boolean check_only) {
-        if (node.isDirectory()) {
-            LOGGER.debug("fixMCRFSNODESForNode (directory) : {}", node.getAbsolutePath());
+    private static void fixMCRFSNODESForNode(Path node, String content_store, String derivate_id, String storage_base,
+        boolean check_only) throws IOException {
+        if (Files.isDirectory(node)) {
+            LOGGER.debug("fixMCRFSNODESForNode (directory) : {}", node.toAbsolutePath().toString());
             fixDirectoryEntry(node, derivate_id, storage_base, check_only);
-            File[] nodes = node.listFiles();
-            for (File next_node : nodes) {
+            Path[] nodes = Files.list(node).toArray(Path[]::new);
+            for (Path next_node : nodes) {
                 fixMCRFSNODESForNode(next_node, content_store, derivate_id, storage_base, check_only);
             }
         } else {
-            if (node.getName().equals("mcrdata.xml")) {
+            if (node.getFileName().toString().equals("mcrdata.xml")) {
                 return;
             }
-            LOGGER.debug("fixMCRFSNODESForNode (file) : {}", node.getAbsolutePath());
+            LOGGER.debug("fixMCRFSNODESForNode (file) : {}", node.toAbsolutePath().toString());
             fixFileEntry(node, content_store, derivate_id, storage_base, check_only);
         }
 
     }
 
-    private static void fixDirectoryEntry(File node, String derivate_id, String storage_base, boolean check_only) {
-        String name = node.getName();
+    private static void fixDirectoryEntry(Path node, String derivate_id, String storage_base, boolean check_only) {
+        String name = node.getFileName().toString();
         LOGGER.debug("fixDirectoryEntry : name = {}", name);
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.getTransaction();
@@ -322,7 +323,7 @@ public class MCRIFS2Commands {
             }
         } catch (NonUniqueResultException e1) {
             LOGGER.error("The directory entry for {} and {} is not unique!", derivate_id,
-                node.getParentFile().getName());
+                node.getParent().getFileName());
             return;
         }
         try {
@@ -331,8 +332,8 @@ public class MCRIFS2Commands {
             mcrfsnodes.setPid(pid);
             mcrfsnodes.setType("D");
             mcrfsnodes.setOwner(derivate_id);
-            mcrfsnodes.setName(node.getName());
-            mcrfsnodes.setDate(new Date(node.lastModified()));
+            mcrfsnodes.setName(node.getFileName().toString());
+            mcrfsnodes.setDate(Date.from(Files.getLastModifiedTime(node).toInstant()));
             em.persist(mcrfsnodes);
             tx.commit();
             LOGGER.debug("Entry {} fixed.", name);
@@ -346,10 +347,10 @@ public class MCRIFS2Commands {
         }
     }
 
-    private static void fixFileEntry(File node, String content_store, String derivate_id, String storage_base,
+    private static void fixFileEntry(Path node, String content_store, String derivate_id, String storage_base,
         boolean check_only) {
-        LOGGER.debug("fixFileEntry : name = {}", node.getName());
-        String storageid = node.getAbsolutePath().substring(storage_base.length()).replace("\\", "/");
+        LOGGER.debug("fixFileEntry : name = {}", node.getFileName());
+        String storageid = node.toAbsolutePath().toString().substring(storage_base.length()).replace("\\", "/");
         LOGGER.debug("fixFileEntry : storageid = {}", storageid);
         String id = "";
         String md5_old = "";
@@ -393,16 +394,17 @@ public class MCRIFS2Commands {
         // check fctid, size and MD5 of the file
         String fctid = "";
         String md5 = "";
-        try (MCRContentInputStream cis = new MCRContentInputStream(new FileInputStream(node))) {
+        long size;
+        try (MCRContentInputStream cis = new MCRContentInputStream(Files.newInputStream(node))) {
             byte[] header = cis.getHeader();
-            fctid = MCRFileContentTypeFactory.detectType(node.getName(), header).getID();
+            fctid = MCRFileContentTypeFactory.detectType(node.getFileName().toString(), header).getID();
             ByteStreams.copy(cis, ByteStreams.nullOutputStream());
             md5 = cis.getMD5String();
+            size = Files.size(node);
         } catch (MCRException | IOException e1) {
             e1.printStackTrace();
             return;
         }
-        long size = node.length();
         LOGGER.debug("size old : {} <--> size : {}", Long.toString(size_old), Long.toString(size));
         LOGGER.debug("MD5 old : {} <--> MD5 : {}", md5_old, md5);
         if (size_old == size && md5_old.equals(md5)) {
@@ -429,7 +431,7 @@ public class MCRIFS2Commands {
             LOGGER.error("Can't find parent id of directory for file {}", storageid);
         } catch (NonUniqueResultException e1) {
             LOGGER.error("The directory entry for {} and {} is not unique!", derivate_id,
-                node.getParentFile().getName());
+                node.getParent().getFileName());
             return;
         }
         try {
@@ -438,16 +440,16 @@ public class MCRIFS2Commands {
             mcrfsnodes.setPid(pid);
             mcrfsnodes.setType("F");
             mcrfsnodes.setOwner(derivate_id);
-            mcrfsnodes.setName(node.getName());
+            mcrfsnodes.setName(node.getFileName().toString());
             mcrfsnodes.setSize(size);
-            mcrfsnodes.setDate(new Date(node.lastModified()));
+            mcrfsnodes.setDate(Date.from(Files.getLastModifiedTime(node).toInstant()));
             mcrfsnodes.setStoreid(content_store);
             mcrfsnodes.setStorageid(storageid);
             mcrfsnodes.setFctid(fctid);
             mcrfsnodes.setMd5(md5);
             em.merge(mcrfsnodes);
             mcrSession.commitTransaction();
-            LOGGER.debug("Entry {} fixed.", node.getName());
+            LOGGER.debug("Entry {} fixed.", node.getFileName());
         } catch (PersistenceException pe) {
             mcrSession.rollbackTransaction();
             pe.printStackTrace();
@@ -456,9 +458,9 @@ public class MCRIFS2Commands {
         }
     }
 
-    private static String getParentID(File node, String derivate_id)
+    private static String getParentID(Path node, String derivate_id)
         throws NoResultException, NonUniqueResultException {
-        File parent_node = node.getParentFile();
+        Path parent_node = node.getParent();
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
@@ -466,10 +468,10 @@ public class MCRIFS2Commands {
         MCRFSNODES fsNode = em.createQuery(query
             .where(
                 cb.equal(nodes.get(MCRFSNODES_.owner), derivate_id),
-                cb.equal(nodes.get(MCRFSNODES_.name), parent_node.getName()),
+                cb.equal(nodes.get(MCRFSNODES_.name), parent_node.getFileName().toString()),
                 cb.equal(nodes.get(MCRFSNODES_.type), "D")))
             .getSingleResult();
-        LOGGER.debug("Found directory entry for {}", parent_node.getName());
+        LOGGER.debug("Found directory entry for {}", parent_node.getFileName());
         em.detach(fsNode);
         return fsNode.getId();
     }
