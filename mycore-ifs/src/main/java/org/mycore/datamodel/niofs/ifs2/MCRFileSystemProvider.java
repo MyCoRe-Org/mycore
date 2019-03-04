@@ -203,7 +203,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRStoredNode node = MCRFileSystemUtils.resolvePath(mcrPath);
         if (node instanceof MCRDirectory) {
-            return new MCRDirectoryStream((MCRDirectory) node, mcrPath);
+            return MCRDirectoryStream.getInstance((MCRDirectory) node, mcrPath);
         }
         throw new NotDirectoryException(dir.toString());
     }

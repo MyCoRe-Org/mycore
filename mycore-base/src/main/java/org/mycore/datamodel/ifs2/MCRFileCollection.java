@@ -54,7 +54,7 @@ public class MCRFileCollection extends MCRDirectory {
      */
     private static final Logger LOGGER = LogManager.getLogger(MCRFileCollection.class);
 
-    private static final String dataFile = "mcrdata.xml";
+    public static final String DATA_FILE = "mcrdata.xml";
 
     /**
      * The store this file collection is stored in.
@@ -103,7 +103,7 @@ public class MCRFileCollection extends MCRDirectory {
     }
 
     private void readAdditionalData() throws IOException {
-        Path src = path.resolve(dataFile);
+        Path src = path.resolve(DATA_FILE);
         if (!Files.exists(src)) {
             LOGGER.warn("Metadata file is missing, repairing metadata...");
             writeData(e -> {
@@ -131,7 +131,7 @@ public class MCRFileCollection extends MCRDirectory {
     }
 
     protected void saveAdditionalData() throws IOException {
-        Path target = path.resolve(dataFile);
+        Path target = path.resolve(DATA_FILE);
         try {
             readData(e -> {
                 try {
@@ -159,7 +159,7 @@ public class MCRFileCollection extends MCRDirectory {
     @Override
     public Stream<MCRNode> getChildren() throws IOException {
         return super.getChildren()
-            .filter(f -> !dataFile.equals(f.getName()));
+            .filter(f -> !DATA_FILE.equals(f.getName()));
     }
 
     /**
@@ -211,7 +211,7 @@ public class MCRFileCollection extends MCRDirectory {
 
     @Override
     public MCRNode getChild(String name) {
-        if (dataFile.equals(name)) {
+        if (DATA_FILE.equals(name)) {
             return null;
         } else {
             return super.getChild(name);
@@ -225,7 +225,7 @@ public class MCRFileCollection extends MCRDirectory {
 
     private Stream<Path> getUsableChildSream() throws IOException {
         return Files.list(path)
-            .filter(p -> !dataFile.equals(p.getFileName().toString()));
+            .filter(p -> !DATA_FILE.equals(p.getFileName().toString()));
     }
 
     @Override

@@ -20,33 +20,29 @@ package org.mycore.datamodel.niofs.ifs2;
 
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.ClosedDirectoryStreamException;
-import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.SecureDirectoryStream;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
+import java.nio.file.attribute.FileTime;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.function.MCRThrowFunction;
 import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.ifs2.MCRFile;
-import org.mycore.datamodel.ifs2.MCRNode;
+import org.mycore.datamodel.ifs2.MCRFileCollection;
 import org.mycore.datamodel.ifs2.MCRStoredNode;
+import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -57,277 +53,226 @@ import org.mycore.datamodel.niofs.MCRPath;
  *
  * @author Thomas Scheffler (yagee)
  */
-public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
+public class MCRDirectoryStream {
     static Logger LOGGER = LogManager.getLogger();
 
-    private MCRDirectory dir;
+    private static class AcceptAllFilter
+        implements DirectoryStream.Filter<Path> {
+        @Override
+        public boolean accept(Path entry) {
+            return true;
+        }
 
-    private MCRPath path;
-
-    private Iterator<Path> iterator;
-
-    /**
-     * @throws IOException
-     *             if 'path' is not from {@link MCRIFSFileSystem}
-     */
-    public MCRDirectoryStream(MCRDirectory dir, MCRPath path) throws IOException {
-        this.dir = Objects.requireNonNull(dir, "'dir' may not be null");
-        this.path = Optional.of(path).orElseGet(() -> MCRFileSystemUtils.toPath(dir));
-        this.iterator = new MCRDirectoryIterator(this);
+        static final MCRDirectoryStream.AcceptAllFilter FILTER = new AcceptAllFilter();
     }
 
-    @Override
-    public Iterator<Path> iterator() {
-        checkClosed();
-        synchronized (this) {
-            if (iterator == null) {
-                throw new IllegalStateException("Iterator already obtained");
+    private static class MCRFileCollectionFilter
+        implements DirectoryStream.Filter<Path> {
+        @Override
+        public boolean accept(Path entry) {
+            return !entry.getFileName().toString().equals(MCRFileCollection.DATA_FILE);
+        }
+
+        static final MCRDirectoryStream.MCRFileCollectionFilter FILTER = new MCRFileCollectionFilter();
+    }
+
+    public static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
+        DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER
+            : AcceptAllFilter.FILTER;
+        LOGGER.info("Dir {}, class {}, filter {}", path, dir.getClass(), filter.getClass());
+        DirectoryStream<Path> baseDirectoryStream = Files.newDirectoryStream(dir.getLocalPath(), filter);
+        LOGGER.info("baseStream {}", baseDirectoryStream.getClass());
+        if (baseDirectoryStream instanceof java.nio.file.SecureDirectoryStream) {
+            LOGGER.info("Returning SecureDirectoryStream");
+            return new SecureDirectoryStream(dir, path,
+                (java.nio.file.SecureDirectoryStream<Path>) baseDirectoryStream);
+        }
+        return new SimpleDirectoryStream(path, baseDirectoryStream);
+    }
+
+    private static class SimpleDirectoryStream<T extends DirectoryStream<Path>> implements DirectoryStream<Path> {
+        protected final MCRPath dirPath;
+
+        protected final T baseStream;
+
+        boolean isClosed;
+
+        public SimpleDirectoryStream(MCRPath dirPath, T baseStream) {
+            this.dirPath = dirPath;
+            this.baseStream = baseStream;
+        }
+
+        @Override
+        public Iterator<Path> iterator() {
+            return new SimpleDirectoryIterator(dirPath, baseStream);
+        }
+
+        @Override
+        public void close() throws IOException {
+            baseStream.close();
+            isClosed = true;
+        }
+
+        protected boolean isClosed() {
+            return isClosed;
+        }
+    }
+
+    private static class SecureDirectoryStream extends SimpleDirectoryStream<java.nio.file.SecureDirectoryStream<Path>>
+        implements java.nio.file.SecureDirectoryStream<Path> {
+
+        private final MCRDirectory dir;
+
+        public SecureDirectoryStream(MCRDirectory dir, MCRPath dirPath,
+            java.nio.file.SecureDirectoryStream<Path> baseStream) {
+            super(dirPath, baseStream);
+            this.dir = dir;
+        }
+
+        @Override
+        public java.nio.file.SecureDirectoryStream<Path> newDirectoryStream(Path path, LinkOption... options)
+            throws IOException {
+            checkClosed();
+            if (path.isAbsolute()) {
+                return (SecureDirectoryStream) Files.newDirectoryStream(path);
             }
-            Iterator<Path> pathIterator = this.iterator;
-            iterator = null;
-            return pathIterator;
+            MCRStoredNode nodeByPath = resolve(path);
+            if (!nodeByPath.isDirectory()) {
+                throw new NotDirectoryException(nodeByPath.getPath());
+            }
+            MCRDirectory newDir = (MCRDirectory) nodeByPath;
+            return (java.nio.file.SecureDirectoryStream<Path>) MCRDirectoryStream.getInstance(newDir,
+                getCurrentSecurePath(newDir));
         }
-    }
 
-    @Override
-    public void close() throws IOException {
-        dir = null;
-    }
+        private MCRStoredNode resolve(Path path) throws IOException {
+            checkRelativePath(path);
+            return (MCRStoredNode) dir.getNodeByPath(path.toString());
+        }
 
-    void checkClosed() {
-        if (dir == null) {
-            throw new ClosedDirectoryStreamException();
+        /**
+         * always resolves the path to this directory
+         * currently not really secure, but more secure than sticking to <code>dirPath</code>
+         * @param node to get Path from
+         */
+        private MCRPath getCurrentSecurePath(MCRStoredNode node) {
+            return MCRAbstractFileSystem.getPath(MCRFileSystemUtils.getOwnerID(node), node.getPath(),
+                MCRFileSystemProvider.getMCRIFSFileSystem());
         }
-    }
 
-    MCRPath checkRelativePath(Path path) {
-        if (path.isAbsolute()) {
-            throw new IllegalArgumentException(path + " is absolute.");
+        @Override
+        public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options,
+            FileAttribute<?>... attrs) throws IOException {
+            checkClosed();
+            if (path.isAbsolute()) {
+                return Files.newByteChannel(path, options);
+            }
+            MCRPath mcrPath = checkRelativePath(path);
+            Path resolved = getCurrentSecurePath(dir).resolve(mcrPath);
+            return Files.newByteChannel(resolved, options);
         }
-        return checkFileSystem(path);
-    }
 
-    private MCRPath checkFileSystem(Path path) {
-        if (!(path.getFileSystem() instanceof MCRIFSFileSystem)) {
-            throw new IllegalArgumentException(path + " is not from " + MCRIFSFileSystem.class.getSimpleName());
+        @Override
+        public void deleteFile(Path path) throws IOException {
+            checkClosed();
+            if (path.isAbsolute()) {
+                Files.delete(path);
+            }
+            resolve(path).delete();
         }
-        return MCRPath.toMCRPath(path);
-    }
 
-    @Override
-    public SecureDirectoryStream<Path> newDirectoryStream(Path path, LinkOption... options) throws IOException {
-        checkClosed();
-        MCRPath mcrPath = checkFileSystem(path);
-        if (mcrPath.isAbsolute()) {
-            return (SecureDirectoryStream<Path>) Files.newDirectoryStream(mcrPath);
+        @Override
+        public void deleteDirectory(Path path) throws IOException {
+            deleteFile(path);
         }
-        MCRNode childByPath = dir.getNodeByPath(mcrPath.toString());
-        if (childByPath == null || childByPath instanceof MCRFile) {
-            throw new NoSuchFileException(dir.toString(), path.toString(), "Does not exist or is a file.");
-        }
-        return new MCRDirectoryStream((MCRDirectory) childByPath, MCRPath.toMCRPath(path.resolve(mcrPath)));
-    }
 
-    @Override
-    public SeekableByteChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)
-        throws IOException {
-        checkClosed();
-        MCRPath mcrPath = checkRelativePath(path);
-        if (mcrPath.isAbsolute()) {
-            return mcrPath.getFileSystem().provider().newByteChannel(mcrPath, options, attrs);
+        @Override
+        public void move(Path srcpath, java.nio.file.SecureDirectoryStream<Path> targetdir, Path targetpath)
+            throws IOException {
+
         }
-        Set<? extends OpenOption> fileOpenOptions = options.stream()
-            .filter(option -> !(option == StandardOpenOption.CREATE || option == StandardOpenOption.CREATE_NEW))
-            .collect(Collectors.toSet());
-        boolean create = options.contains(StandardOpenOption.CREATE);
-        boolean createNew = options.contains(StandardOpenOption.CREATE_NEW);
-        if (create || createNew) {
-            for (OpenOption option : fileOpenOptions) {
-                //check before we create any file instance
-                MCRFileSystemProvider.checkOpenOption(option);
+
+        @Override
+        public <V extends FileAttributeView> V getFileAttributeView(Class<V> type) {
+            V fileAttributeView = baseStream.getFileAttributeView(type);
+            if (fileAttributeView != null) {
+                return fileAttributeView;
+            }
+            if (type == MCRMD5AttributeView.class) {
+                BasicFileAttributeView baseView = baseStream.getFileAttributeView(BasicFileAttributeView.class);
+                return (V) new MD5FileAttributeViewImpl(baseView, (v) -> dir);
+            }
+            return null;
+        }
+
+        @Override
+        public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
+            Path localRelativePath = MCRFileSystemUtils.toNativePath(dir.getLocalPath().getFileSystem(), path);
+            V fileAttributeView = baseStream.getFileAttributeView(localRelativePath, type, options);
+            if (fileAttributeView != null) {
+                return fileAttributeView;
+            }
+            if (type == MCRMD5AttributeView.class) {
+                BasicFileAttributeView baseView = baseStream.getFileAttributeView(BasicFileAttributeView.class);
+                return (V) new MD5FileAttributeViewImpl(baseView, (v) -> resolve(path));
+            }
+            return null;
+        }
+
+        void checkClosed() {
+            if (isClosed) {
+                throw new ClosedDirectoryStreamException();
             }
         }
-        MCRFileSystemProvider provider = (MCRFileSystemProvider) mcrPath.getFileSystem().provider();
-        MCRFileSystemUtils.getMCRFile(dir, mcrPath, create, createNew);
-        return provider.newByteChannel(this.path.resolve(mcrPath), fileOpenOptions, attrs);
-    }
 
-    @Override
-    public void deleteFile(Path path) throws IOException {
-        deleteFileSystemNode(checkFileSystem(path));
-    }
-
-    @Override
-    public void deleteDirectory(Path path) throws IOException {
-        deleteFileSystemNode(checkFileSystem(path));
-    }
-
-    /**
-     * Deletes {@link MCRStoredNode} if it exists.
-     *
-     * @param path
-     *            relative or absolute
-     * @throws IOException
-     */
-    private void deleteFileSystemNode(MCRPath path) throws IOException {
-        checkClosed();
-        if (path.isAbsolute()) {
-            Files.delete(path);
-        }
-        MCRStoredNode childByPath = (MCRStoredNode) dir.getNodeByPath(path.toString());
-        if (childByPath == null) {
-            throw new NoSuchFileException(this.path.toString(), path.toString(), null);
-        }
-        childByPath.delete();
-    }
-
-    @Override
-    public void move(Path srcpath, SecureDirectoryStream<Path> targetdir, Path targetpath) throws IOException {
-        checkClosed();
-        checkFileSystem(srcpath);
-        checkFileSystem(targetpath);
-        throw new AtomicMoveNotSupportedException(srcpath.toString(), targetpath.toString(),
-            "Currently not implemented");
-    }
-
-    @Override
-    public <V extends FileAttributeView> V getFileAttributeView(Class<V> type) {
-        return getFileAttributeView(null, type, (LinkOption[]) null);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
-        if (path != null) {
-            MCRPath file = checkRelativePath(path);
-            if (file.getNameCount() != 1) {
-                throw new InvalidPathException(path.toString(), "'path' must have one name component.");
+        MCRPath checkRelativePath(Path path) {
+            if (path.isAbsolute()) {
+                throw new IllegalArgumentException(path + " is absolute.");
             }
+            return checkFileSystem(path);
         }
-        checkClosed();
-        if (type == null) {
-            throw new NullPointerException();
+
+        private MCRPath checkFileSystem(Path path) {
+            if (!(path.getFileSystem() instanceof MCRIFSFileSystem)) {
+                throw new IllegalArgumentException(path + " is not from " + MCRIFSFileSystem.class.getSimpleName());
+            }
+            return MCRPath.toMCRPath(path);
         }
-        //must support BasicFileAttributeView
-        if (type == BasicFileAttributeView.class) {
-            return (V) new BasicFileAttributeViewImpl(this, path);
-        }
-        if (type == MCRMD5AttributeView.class) {
-            return (V) new MD5FileAttributeViewImpl(this, path);
-        }
-        return null;
     }
 
-    private static class MCRDirectoryIterator implements Iterator<Path> {
+    private static class SimpleDirectoryIterator implements Iterator<Path> {
+        private final Iterator<Path> baseIterator;
 
-        Path nextPath;
+        private final MCRPath dir;
 
-        boolean hasNextCalled;
-
-        private MCRDirectoryStream mcrDirectoryStream;
-
-        MCRStoredNode[] children;
-
-        private int pos;
-
-        public MCRDirectoryIterator(MCRDirectoryStream mcrDirectoryStream) throws IOException {
-            this.mcrDirectoryStream = mcrDirectoryStream;
-            children = mcrDirectoryStream.dir.getChildren().toArray(MCRStoredNode[]::new);
-            this.nextPath = null;
-            hasNextCalled = false;
-            pos = -1;
+        public SimpleDirectoryIterator(MCRPath dir, DirectoryStream<Path> baseStream) {
+            this.baseIterator = baseStream.iterator();
+            this.dir = dir;
         }
 
         @Override
         public boolean hasNext() {
-            LOGGER.debug(() -> "hasNext() called: " + pos);
-            if (mcrDirectoryStream.dir == null) {
-                return false; //stream closed
-            }
-            int nextPos = pos + 1;
-            if (nextPos >= children.length) {
-                return false;
-            }
-            //we are OK
-            nextPath = getPath(children, nextPos);
-            hasNextCalled = true;
-            return true;
-        }
-
-        private MCRPath getPath(MCRStoredNode[] children, int index) {
-            try {
-                MCRPath path = MCRPath.toMCRPath(mcrDirectoryStream.path.resolve(children[index].getName()));
-                LOGGER.debug(() -> "getting path at index " + index + ": " + path);
-                return path;
-            } catch (RuntimeException e) {
-                throw new DirectoryIteratorException(new IOException(e));
-            }
+            return baseIterator.hasNext();
         }
 
         @Override
         public Path next() {
-            LOGGER.debug(() -> "next() called: " + pos);
-            pos++;
-            if (hasNextCalled) {
-                hasNextCalled = false;
-                return nextPath;
-            }
-            mcrDirectoryStream.checkClosed();
-            if (pos >= children.length) {
-                throw new NoSuchElementException();
-            }
-            return getPath(children, pos);
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-    }
-
-    static class BasicFileAttributeViewImpl extends MCRBasicFileAttributeViewImpl {
-
-        private MCRDirectoryStream mcrDirectoryStream;
-
-        private Path fileName;
-
-        public BasicFileAttributeViewImpl(MCRDirectoryStream mcrDirectoryStream, Path path) {
-            this.mcrDirectoryStream = mcrDirectoryStream;
-            if (path.toString().length() <= 2 && (path.toString().equals(".") || path.toString().equals(".."))) {
-                throw new InvalidPathException(path.toString(), "'path' must be a valid file name.");
-            }
-            this.fileName = path;
-        }
-
-        @Override
-        protected MCRStoredNode resolveNode() throws IOException {
-            MCRDirectory parent = mcrDirectoryStream.dir;
-            mcrDirectoryStream.checkClosed();
-            MCRStoredNode child;
-            try {
-                child = (MCRStoredNode) parent.getChild(fileName.toString());
-            } catch (RuntimeException e) {
-                throw new IOException(e);
-            }
-            if (child == null) {
-                throw new NoSuchFileException(mcrDirectoryStream.path.toString(), fileName.toString(), null);
-            }
-            return child;
+            Path basePath = baseIterator.next();
+            return dir.resolve(basePath.getFileName().toString());
         }
     }
 
-    private static class MD5FileAttributeViewImpl extends BasicFileAttributeViewImpl implements
-        MCRMD5AttributeView<String> {
+    private static class MD5FileAttributeViewImpl implements
+        MCRMD5AttributeView {
 
-        public MD5FileAttributeViewImpl(MCRDirectoryStream mcrDirectoryStream, Path path) {
-            super(mcrDirectoryStream, path);
-            // TODO Auto-generated constructor stub
-        }
+        private final BasicFileAttributeView baseAttrView;
 
-        @Override
-        public MCRFileAttributes<String> readAllAttributes() throws IOException {
-            return readAttributes();
+        private final MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier;
+
+        public MD5FileAttributeViewImpl(BasicFileAttributeView baseAttrView,
+            MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) {
+            this.baseAttrView = baseAttrView;
+            this.nodeSupplier = nodeSupplier;
         }
 
         @Override
@@ -335,5 +280,25 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
             return "md5";
         }
 
+        @Override
+        public BasicFileAttributes readAttributes() throws IOException {
+            return null;
+        }
+
+        @Override
+        public void setTimes(FileTime lastModifiedTime, FileTime lastAccessTime, FileTime createTime)
+            throws IOException {
+            baseAttrView.setTimes(lastModifiedTime, lastAccessTime, createTime);
+        }
+
+        @Override
+        public MCRFileAttributes readAllAttributes() throws IOException {
+            MCRStoredNode node = nodeSupplier.apply(null);
+            if (node instanceof MCRFile) {
+                return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(),
+                    ((MCRFile) nodeSupplier).getMD5());
+            }
+            return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(), null);
+        }
     }
 }

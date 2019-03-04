@@ -21,6 +21,7 @@ package org.mycore.datamodel.niofs.ifs2;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystem;
 import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -258,7 +259,27 @@ abstract class MCRFileSystemUtils {
             .map(MCRStoredNode.class::cast)
             .orElseThrow(
                 () -> new NoSuchFileException(path.getParent().toString(), fileOrDir, "file does not exist"));
+    }
 
+    static Path toNativePath(FileSystem fs, Path path) {
+        if (fs.equals(path.getFileSystem())) {
+            return path;
+        }
+        if (path.isAbsolute()) {
+            throw new IllegalArgumentException("path is absolute");
+        }
+        switch (path.getNameCount()){
+            case 0:
+                return fs.getPath("");
+            case 1:
+                return fs.getPath(path.toString());
+            default:
+                String[] pathComp = new String[path.getNameCount() - 1];
+                for (int i = 1; i < pathComp.length; i++) {
+                    pathComp[i] = path.getName(i).toString();
+                }
+                return fs.getPath(path.getName(0).toString(), pathComp);
+        }
     }
 
     private static Optional<MCRDirectory> doResolveParent(MCRPath parent) {
