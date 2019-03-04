@@ -112,36 +112,39 @@ namespace mycore.viewer.widgets.pdf {
             });
         }
 
+        public getPageNumberFromDestination(dest:String, callback:(number:number)=>void){
+            let promise;
+
+            if (typeof dest === 'string') {
+                promise = this._document.getDestination(dest);
+            } else {
+                promise = (<any>window).Promise.resolve(dest);
+            }
+
+            promise.then((destination) => {
+                if (!(destination instanceof Array)) {
+                    console.error("Invalid destination " + destination);
+                    return;
+                } else {
+                    this._document.getPageIndex(destination[ 0 ]).then((pageNumber) => {
+                        if (typeof pageNumber != "undefined" && pageNumber != null) {
+                            if (pageNumber > this._pageCount) {
+                                console.error("Destination outside of Document! (" + pageNumber + ")");
+                            } else {
+                                callback(pageNumber + 1);
+                            }
+                        }
+                    });
+                }
+            });
+        }
 
         private getChapterFromOutline(parent:model.StructureChapter, nodes:Array<PDFTreeNode>, currentCount:number):Array<model.StructureChapter> {
             let chapterArr = new Array<model.StructureChapter>();
             for (let nodeIndex in nodes) {
                 let currentNode = nodes[nodeIndex];
                 let destResolver = ((copyChapter) => (callback) => {
-                    let promise;
-                    if (typeof copyChapter.dest === 'string') {
-                        promise = this._document.getDestination(copyChapter.dest);
-                    } else {
-                        promise = (<any>window).Promise.resolve(copyChapter.dest);
-                    }
-
-
-                    promise.then((destination) => {
-                        if (!(destination instanceof Array)) {
-                            console.error("Invalid destination " + destination);
-                            return;
-                        } else {
-                            this._document.getPageIndex(destination[ 0 ]).then((pageNumber) => {
-                                if (typeof pageNumber != "undefined" && pageNumber != null) {
-                                    if (pageNumber > this._pageCount) {
-                                        console.error("Destination outside of Document! (" + pageNumber + ")");
-                                    } else {
-                                        callback(pageNumber + 1);
-                                    }
-                                }
-                            });
-                        }
-                    });
+                    this.getPageNumberFromDestination(copyChapter.dest, callback);
                 })(currentNode);
                 let chapter = new model.StructureChapter(parent, "pdfChapter", Utils.hash(currentNode.title+currentCount++).toString(), currentNode.title, null, null,destResolver);
                 let children = this.getChapterFromOutline(chapter, currentNode.items, currentCount++);

@@ -19,7 +19,7 @@
 /// <reference path="../../components/model/TextContent.ts" />
 namespace mycore.viewer.widgets.canvas {
     export class TextRenderer {
-        constructor(private _vp:Viewport, private _area:PageArea, private _view:PageView, private _textContentProvider:(page:model.AbstractPage, contentProvider:(textContent:model.TextContentModel)=>void)=>void) {
+        constructor(private _vp:Viewport, private _area:PageArea, private _view:PageView, private _textContentProvider:(page:model.AbstractPage, contentProvider:(textContent:model.TextContentModel)=>void)=>void, private pageLinkClicked:(page:string)=>void) {
             this.textContainer = document.createElement("div");
             this.textContainer.style.cssText = "line-height: 1;" +
                 "white-space: pre;" +
@@ -151,6 +151,29 @@ namespace mycore.viewer.widgets.canvas {
                     this._elementCache.set(cacheKey, linkElement);
                     pageHtml.appendChild(linkElement);
                 }
+            });
+
+            textContent.internLinks.forEach((link)=>{
+                var cacheKey = link.rect.toString()+"DEST";
+                if (!this._elementCache.has(cacheKey)) {
+                    const linkElement = document.createElement("a");
+                    linkElement.style.left = link.rect.getX() + "px";
+                    linkElement.style.top = link.rect.getY() + "px";
+                    linkElement.style.width = link.rect.getWidth() + "px";
+                    linkElement.style.height = link.rect.getHeight() + "px";
+                    linkElement.style.display = "block";
+                    linkElement.style.position = "fixed";
+                    linkElement.style.zIndex = "8";
+                    linkElement.style.cursor = 'pointer';
+                    linkElement.addEventListener('click', ()=>{
+                        link.pageNumberResolver((number)=>{
+                            this.pageLinkClicked(number);
+                        });
+                    });
+                    this._elementCache.set(cacheKey, linkElement);
+                    pageHtml.appendChild(linkElement);
+                }
+
             });
 
             var pageElement = <HTMLElement>this._pageElementCache.get(page).children[0];

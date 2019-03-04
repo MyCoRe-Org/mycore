@@ -17,14 +17,16 @@
  */
 
 /// <reference path="../definitions/pdf.d.ts" />
+/// <reference path="PDFStructureBuilder.ts" />
+
 namespace mycore.viewer.widgets.canvas {
     export class PDFPage implements model.AbstractPage {
 
-        constructor(public id, private _pdfPage:PDFPageProxy) {
-            var width = (this._pdfPage.view[ 2 ] - this._pdfPage.view[ 0 ]) * PDFPage.CSS_UNITS;
-            var height = (this._pdfPage.view[ 3 ] - this._pdfPage.view[ 1 ]) * PDFPage.CSS_UNITS;
+        constructor(public id: string, private pdfPage: PDFPageProxy, private builder: pdf.PDFStructureBuilder) {
+            let width = (this.pdfPage.view[ 2 ] - this.pdfPage.view[ 0 ]) * PDFPage.CSS_UNITS;
+            let height = (this.pdfPage.view[ 3 ] - this.pdfPage.view[ 1 ]) * PDFPage.CSS_UNITS;
 
-            var pageRotation = (<any>_pdfPage).pageInfo.rotate;
+            const pageRotation = (<any>pdfPage).pageInfo.rotate;
             if (pageRotation == 90 || pageRotation == 270) {
                 width = width ^ height;
                 height = height ^ width;
@@ -53,34 +55,50 @@ namespace mycore.viewer.widgets.canvas {
             if (this._textData == null) {
                 var textContent:model.TextContentModel = {
                     content : [],
-                    links : []
+                    links : [],
+                    internLinks: []
                 };
                 this._textData = textContent;
                 let contentReady = false, linksReady = false;
                 let completeCall = () => (contentReady && linksReady) ? callback(textContent) : null;
 
-                this._pdfPage.getAnnotations().then((anotations) => {
+                this.pdfPage.getAnnotations().then((anotations) => {
                     linksReady = true;
                     if (anotations.length > 0) {
                         for (var annotation of anotations) {
                             if ((<any>annotation).annotationType == 2 && (<any>annotation).subtype == 'Link') {
-                                textContent.links.push({
-                                    rect : new Rect(
-                                        new Position2D(annotation.rect[ 0 ] * PDFPage.CSS_UNITS, this.size.height - (annotation.rect[ 1 ] * PDFPage.CSS_UNITS) - ((annotation.rect[ 3 ] - annotation.rect[ 1 ]) * PDFPage.CSS_UNITS)),
-                                        new Size2D((annotation.rect[ 2 ] - annotation.rect[ 0 ]) * PDFPage.CSS_UNITS, (annotation.rect[ 3 ] - annotation.rect[ 1 ]) * PDFPage.CSS_UNITS))
-                                    , url : (<any>annotation).url
-                                });
+                                if ("url" in annotation) {
+                                    textContent.links.push({
+                                        rect: this.getRectFromAnnotation(annotation),
+                                        url: (<any>annotation).url
+                                    });
+                                } else if ("dest" in annotation) {
+                                    let numberResolver = ((annotation) => {
+                                        return (callback) => {
+                                            this.builder.getPageNumberFromDestination(annotation.dest, (pageNumber) => {
+                                                callback(pageNumber+"");
+                                            });
+                                        }
+                                    })(annotation);
+
+                                    textContent.internLinks.push(
+                                        {
+                                            rect: this.getRectFromAnnotation(annotation),
+                                            pageNumberResolver:numberResolver
+                                        }
+                                    );
+                                }
                             }
                         }
                     }
                     completeCall();
                 });
 
-                this._pdfPage.getTextContent().then((textData:PDFPageTextData)=> {
+                this.pdfPage.getTextContent().then((textData:PDFPageTextData)=> {
                     contentReady = true;
                     textData.items.forEach((e)=> {
 
-                        var vp = (<any>this._pdfPage.getViewport(1));
+                        var vp = (<any>this.pdfPage.getViewport(1));
                         var transform = (<any>PDFJS).Util.transform(vp.transform, e.transform);
 
                         var style = textData.styles[ e.fontName ];
@@ -120,6 +138,14 @@ namespace mycore.viewer.widgets.canvas {
 
         }
 
+        private getRectFromAnnotation(annotation) {
+            return new Rect(
+                new Position2D(annotation.rect[0] * PDFPage.CSS_UNITS, this.size.height - (annotation.rect[1] * PDFPage.CSS_UNITS) - ((annotation.rect[3] - annotation.rect[1]) * PDFPage.CSS_UNITS)),
+                new Size2D((annotation.rect[2] - annotation.rect[0]) * PDFPage.CSS_UNITS, (annotation.rect[3] - annotation.rect[1]) * PDFPage.CSS_UNITS)
+            );
+
+        }
+
         public draw(ctx: CanvasRenderingContext2D, rect: Rect, sourceScale, overview: boolean, infoScale:number): void {
             if (!overview && sourceScale != this._fbScale) {
                 if(!this._promiseRunning ){
@@ -148,8 +174,8 @@ namespace mycore.viewer.widgets.canvas {
         }
 
         private _updateBackBuffer(newScale) {
-            var vp = this._pdfPage.getViewport(newScale * PDFPage.CSS_UNITS, this._rotation);
-            var task = <any> this._pdfPage.render(<PDFRenderParams>{
+            var vp = this.pdfPage.getViewport(newScale * PDFPage.CSS_UNITS, this._rotation);
+            var task = <any> this.pdfPage.render(<PDFRenderParams>{
                 canvasContext : <CanvasRenderingContext2D>this._backBuffer.getContext('2d'),
                 viewport : vp
             });
@@ -187,7 +213,7 @@ namespace mycore.viewer.widgets.canvas {
         }
 
         toString():string {
-            return <any>this._pdfPage.pageNumber;
+            return <any>this.pdfPage.pageNumber;
         }
 
         public clear() {
