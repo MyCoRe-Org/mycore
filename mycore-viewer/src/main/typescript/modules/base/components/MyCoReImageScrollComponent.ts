@@ -197,6 +197,8 @@ namespace mycore.viewer.components {
                     this.trigger(new RequestTextContentEvent(this, page.id, (id, model) => {
                         contentProvider(model);
                     }))
+                }, (href)=>{
+                    this.changeImage(href, true);
                 });
                 this._pageController.textRenderer = textRenderer;
             }
