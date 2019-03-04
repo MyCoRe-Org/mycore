@@ -68,7 +68,12 @@ namespace mycore.viewer.widgets.pdf {
             var collectedCallbacks = new Array<(string)=>void>();
             return (callback:(string)=>void)=> {
                 if (imgData == null) {
-                    collectedCallbacks.push(callback);
+                    collectedCallbacks.push((url)=>{
+                        if (imgData == null) {
+                            imgData = url;
+                        }
+                        callback(url);
+                    });
                     if (collectedCallbacks.length == 1) {
                         that._document.getPage(i).then((page) => {
                             that._renderPage(collectedCallbacks, page);
