@@ -207,12 +207,15 @@ namespace mycore.viewer.widgets.canvas {
         }
 
         private _cachedScrollbarElementSize:Size2D = null;
+        private _cacheTime: number = -1;
 
         private getScrollbarElementSize() {
-            if (this._cachedScrollbarElementSize == null) {
+            const currentTime = new Date().getTime();
+            if (this._cachedScrollbarElementSize == null || (currentTime - 1000 > this._cacheTime)) {
                 var elementHeight = this._scrollbarElement.height();
                 var elementWidth = this._scrollbarElement.width();
                 this._cachedScrollbarElementSize = new Size2D(elementWidth, elementHeight);
+                this._cacheTime = new Date().getTime();
             }
 
             return  this._cachedScrollbarElementSize;
