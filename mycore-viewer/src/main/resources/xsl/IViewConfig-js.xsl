@@ -41,27 +41,49 @@
         }
         return existingScripts;
       },
-      addRequiredScripts: function (scripts) {
+      addRequiredScripts: function (scripts, mobile) {
+        if(!mobile &amp;&amp; !loader.isBootstrapPresent()){
+            notLoadedCount++;
+            interval = window.setInterval(function(){
+                if(loader.isBootstrapPresent()){
+                    notLoadedCount--;
+                    window.clearInterval(interval);
+                    loader.excecuteOnReadyFn();
+                }
+            }, 50);
+        }
         scripts.filter(function (script) {
           return loader.getLoadedScripts().indexOf(script) === -1;
         }).forEach(function (scriptSrc) {
           let script = document.createElement('script');
           script.async = false;
           notLoadedCount++;
-          script.onload = function() {
-            notLoadedCount--;
 
-            if(notLoadedCount==0){
-              let current;
-              while((current=executeOnReady.pop()) != null){
-                  current();
-              }
-            }
+        script.onload = function() {
+            notLoadedCount--;
+            loader.excecuteOnReadyFn();
           };
           script.async = false;
           script.src = scriptSrc;
           document.head.appendChild(script);
         });
+
+
+      },
+      excecuteOnReadyFn: function(){
+        if(notLoadedCount==0){
+          let current;
+          while((current=executeOnReady.pop()) != null){
+            current();
+          }
+        }
+      },
+      isBootstrapPresent: function(){
+        return  typeof $ !='undefined' &amp;&amp;
+                typeof $.fn !='undefined' &amp;&amp;
+                typeof $.fn.tooltip !='undefined' &amp;&amp;
+                typeof $.fn.tooltip.Constructor!='undefined' &amp;&amp;
+                typeof $.fn.tooltip.Constructor.VERSION!='undefined';
       },
       addRequiredCss: function (styles) {
         styles.filter(function (s) {
@@ -84,7 +106,7 @@
   let configuration =<xsl:value-of select="IViewConfig/json"/>;
 
   viewerLoader.addRequiredCss(configuration.resources.css);
-  viewerLoader.addRequiredScripts(configuration.resources.script);
+  viewerLoader.addRequiredScripts(configuration.resources.script, configuration.properties.mobile);
   viewerLoader.addConstructorExecution(function(){
           let container = jQuery("[data-viewer='"+configuration.properties.derivate+":"+configuration.properties.filePath+"']");
           new mycore.viewer.MyCoReViewer(container, configuration.properties);
