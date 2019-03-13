@@ -20,14 +20,22 @@ namespace mycore.viewer.widgets.toolbar {
     export class BootstrapToolbarView implements ToolbarView {
 
         constructor() {
-            this._toolbar = jQuery("<section></section>");
-            this._toolbar.addClass("navbar navbar-default");
+            this._toolbar = jQuery("<nav></nav>");
+            this._toolbar.addClass("navbar navbar-expand-lg navbar-light bg-light");
         }
 
         private _toolbar: JQuery;
 //navbar-header
         public addChild(child: JQuery): void {
             this._toolbar.append(child);
+            this._toolbar.find(".btn-group.right.ml-auto").removeClass("ml-auto");
+            const sortedElements = this._toolbar.find(".btn-group.right[data-tb-order]")
+                .toArray()
+                .sort((a,b)=> parseInt(a.getAttribute("data-tb-order")) - parseInt(b.getAttribute("data-tb-order")));
+
+            if(sortedElements.length>0){
+                jQuery(sortedElements[0]).addClass("ml-auto");
+            }
         }
 
         public removeChild(child: JQuery): void {

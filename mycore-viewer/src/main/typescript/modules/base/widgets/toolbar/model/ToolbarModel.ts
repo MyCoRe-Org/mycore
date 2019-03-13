@@ -25,7 +25,7 @@ namespace mycore.viewer.widgets.toolbar {
     export class ToolbarModel extends widgets.toolbar.ToolbarGroup implements ContainerObserver<ToolbarGroup, ToolbarComponent> {
 
         constructor(name: string) {
-            super(name);
+            super(name, 0);
             this._children = new MyCoReMap<string, ToolbarGroup>();
             this._groupObserverArray = new Array<ContainerObserver<ToolbarModel, ToolbarGroup>>();
         }

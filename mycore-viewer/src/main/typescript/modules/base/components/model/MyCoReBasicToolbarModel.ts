@@ -67,8 +67,8 @@ namespace mycore.viewer.model {
 
         public initComponents(): void {
             // Dropdown Menu
-            this._sidebarControllGroup = new widgets.toolbar.ToolbarGroup("SidebarControllGroup");
-            this._sidebarControllDropdownButton = new widgets.toolbar.ToolbarDropdownButton("SidebarControllDropdownButton", "", [], "menu-hamburger");
+            this._sidebarControllGroup = new widgets.toolbar.ToolbarGroup("SidebarControllGroup", 10);
+            this._sidebarControllDropdownButton = new widgets.toolbar.ToolbarDropdownButton("SidebarControllDropdownButton", "", [], "fa-bars");
 
             this._imageOverviewDropdownChild = { id: "imageOverview", label: "Bildübersicht" };
             this._chapterOverviewDropdownChild = { id: "chapterOverview", label: "Strukturübersicht" };
@@ -80,8 +80,8 @@ namespace mycore.viewer.model {
 
             this._sidebarControllGroup.addComponent(this._sidebarControllDropdownButton);
 
-            this._imageChangeControllGroup = new widgets.toolbar.ToolbarGroup("ImageChangeControllGroup");
-            this._previousImageButton = new widgets.toolbar.ToolbarButton("PreviousImageButton", "", "previous-image", "arrow-left");
+            this._imageChangeControllGroup = new widgets.toolbar.ToolbarGroup("ImageChangeControllGroup", 45);
+            this._previousImageButton = new widgets.toolbar.ToolbarButton("PreviousImageButton", "", "previous-image", "fa-arrow-left");
             this._pageSelect = new widgets.toolbar.ToolbarDropdownButton("PageSelect", "", [], null, true);
 
             this._pageSelectChildren = new Array<{
@@ -89,19 +89,19 @@ namespace mycore.viewer.model {
             }>();
             this._pageSelect.children = this._pageSelectChildren;
 
-            this._nextImageButton = new widgets.toolbar.ToolbarButton("NextImageButton", "", "next-image", "arrow-right");
+            this._nextImageButton = new widgets.toolbar.ToolbarButton("NextImageButton", "", "next-image", "fa-arrow-right");
 
             this._imageChangeControllGroup.addComponent(this._previousImageButton);
             this._imageChangeControllGroup.addComponent(this._pageSelect);
             this._imageChangeControllGroup.addComponent(this._nextImageButton);
 
             // Zoom Group
-            this._zoomControllGroup = new widgets.toolbar.ToolbarGroup("ZoomControllGroup");
-            this._zoomInButton = new widgets.toolbar.ToolbarButton("ZoomInButton", "", "zoom-in", "plus");
-            this._zoomOutButton = new widgets.toolbar.ToolbarButton("ZoomOutButton", "", "zoom-out", "minus");
-            this._zoomWidthButton = new widgets.toolbar.ToolbarButton("ZoomWidthButton", "", "zoom-width", "resize-horizontal");
-            this._zoomFitButton = new widgets.toolbar.ToolbarButton("ZoomFitButton", "", "zoom-fit-in", "resize-full");
-            this._rotateButton = new widgets.toolbar.ToolbarButton("RotateButton", "", "Rotate", "repeat");
+            this._zoomControllGroup = new widgets.toolbar.ToolbarGroup("ZoomControllGroup", 20);
+            this._zoomInButton = new widgets.toolbar.ToolbarButton("ZoomInButton", "", "zoom-in", "fa-search-plus");
+            this._zoomOutButton = new widgets.toolbar.ToolbarButton("ZoomOutButton", "", "zoom-out", "fa-search-minus");
+            this._zoomWidthButton = new widgets.toolbar.ToolbarButton("ZoomWidthButton", "", "zoom-width", "fa-arrows-alt-h");
+            this._zoomFitButton = new widgets.toolbar.ToolbarButton("ZoomFitButton", "", "zoom-fit-in", "fa-expand-arrows-alt");
+            this._rotateButton = new widgets.toolbar.ToolbarButton("RotateButton", "", "Rotate", "fa-undo");
 
             this._zoomControllGroup.addComponent(this._zoomInButton);
             this._zoomControllGroup.addComponent(this._zoomOutButton);
@@ -109,24 +109,24 @@ namespace mycore.viewer.model {
             this._zoomControllGroup.addComponent(this._zoomFitButton);
             this._zoomControllGroup.addComponent(this._rotateButton);
 
-            this._layoutControllGroup = new widgets.toolbar.ToolbarGroup("LayoutControllGroup");
+            this._layoutControllGroup = new widgets.toolbar.ToolbarGroup("LayoutControllGroup", 30);
             this._layoutDropdownButtonChilds = [
             ];
-            this._layoutDropdownButton = new widgets.toolbar.ToolbarDropdownButton("LayoutDropdownButton", "", this._layoutDropdownButtonChilds, "book", false);
+            this._layoutDropdownButton = new widgets.toolbar.ToolbarDropdownButton("LayoutDropdownButton", "", this._layoutDropdownButtonChilds, "fa-book", false);
             this._layoutControllGroup.addComponent(this._layoutDropdownButton);
             
 
 
 
-            this._actionControllGroup = new widgets.toolbar.ToolbarGroup("ActionControllGroup");
-            this._shareButton = new widgets.toolbar.ToolbarButton("ShareButton", "", "share", "share");
+            this._actionControllGroup = new widgets.toolbar.ToolbarGroup("ActionControllGroup", 60);
+            this._shareButton = new widgets.toolbar.ToolbarButton("ShareButton", "", "share", "fa-share");
             this._actionControllGroup.addComponent(this._shareButton);
 
-            this._searchGroup = new widgets.toolbar.ToolbarGroup("SearchGroup", true);
+            this._searchGroup = new widgets.toolbar.ToolbarGroup("SearchGroup",80, true);
 
 
-            this._closeViewerGroup = new widgets.toolbar.ToolbarGroup("CloseViewerGroup", true);
-            this._closeViewerButton = new widgets.toolbar.ToolbarButton("CloseViewerButton", "", "close-viewer", "off");
+            this._closeViewerGroup = new widgets.toolbar.ToolbarGroup("CloseViewerGroup", 100,true);
+            this._closeViewerButton = new widgets.toolbar.ToolbarButton("CloseViewerButton", "", "close-viewer", "fa-power-off");
             this._closeViewerGroup.addComponent(this._closeViewerButton);
         }
 

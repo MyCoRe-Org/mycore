@@ -41,7 +41,7 @@ namespace mycore.viewer.components {
 
                     var ptme = <events.ProvideToolbarModelEvent>e;
 
-                    var logoGroup = new widgets.toolbar.ToolbarGroup("LogoGroup", true);
+                    var logoGroup = new widgets.toolbar.ToolbarGroup("LogoGroup", 90, true);
                     var logo = new widgets.toolbar.ToolbarImage("ToolbarImage", logoUrl);
 
                     logoGroup.addComponent(logo);

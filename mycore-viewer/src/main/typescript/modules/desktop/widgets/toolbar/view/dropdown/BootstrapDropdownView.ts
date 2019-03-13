@@ -61,7 +61,7 @@ namespace mycore.viewer.widgets.toolbar {
                     newChild = newChild.add("<li class='dropdown-header disabled' value='divider-" + current.id + "' data-id=\"divider-" + current.id + "\"><a>" + current.label + "</a></li>");
                 } else {
                     var anchor = jQuery("<a>" + current.label + "</a>");
-                    newChild = jQuery(jQuery("<li value='" + current.id + "' data-id=\"" + current.id + "\"></li>"));
+                    newChild = jQuery(jQuery("<li class='dropdown-item' value='" + current.id + "' data-id=\"" + current.id + "\"></li>"));
 
 
                     if("icon" in current){

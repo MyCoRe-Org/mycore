@@ -26,8 +26,6 @@ namespace mycore.viewer.model {
 
 
         public addComponents():void {
-            this._viewSelectGroup=new widgets.toolbar.ToolbarGroup("viewSelectGroup");
-
             this.addGroup(this._sidebarControllGroup);
             this.addGroup(this._zoomControllGroup);
             this.addGroup(this._imageChangeControllGroup);
@@ -39,8 +37,8 @@ namespace mycore.viewer.model {
                 this.removeGroup(logoGroup);
             }
 
-            var toolbarButton = new mycore.viewer.widgets.toolbar.ToolbarButton("MaximizeButton", "", "", "fullscreen");
-            var toolbarGroup = new mycore.viewer.widgets.toolbar.ToolbarGroup("MaximizeToolbarGroup", true);
+            var toolbarButton = new mycore.viewer.widgets.toolbar.ToolbarButton("MaximizeButton", "", "", "fa-fullscreen");
+            var toolbarGroup = new mycore.viewer.widgets.toolbar.ToolbarGroup("MaximizeToolbarGroup", 100, true);
 
             this.addGroup(toolbarGroup);
             toolbarGroup.addComponent(toolbarButton);

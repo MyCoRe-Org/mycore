@@ -30,6 +30,7 @@ namespace mycore.viewer.components {
         tooltip?: string;
         action?: ()=>void;
         inGroup?: string;
+        order?: number;
     }
 
     export interface ToolbarExtenderSettings extends MyCoReViewerSettings {
@@ -55,7 +56,7 @@ namespace mycore.viewer.components {
             if ("toolbar" in this._settings) {
                 this._settings.toolbar.forEach((settingsEntry: ToolbarExtenderEntry)=> {
                     if (settingsEntry.type == "group") {
-                        this.idGroupMapping.set(settingsEntry.id, new ToolbarGroup(settingsEntry.id));
+                        this.idGroupMapping.set(settingsEntry.id, new ToolbarGroup(settingsEntry.id, settingsEntry.order || 70));
 
                     } else if (settingsEntry.type == "button") {
                         this.idButtonMapping.set(settingsEntry.id, new ToolbarButton(settingsEntry.id, settingsEntry.label, settingsEntry.tooltip || settingsEntry.label, settingsEntry.icon));

@@ -2,7 +2,7 @@
 
 .mycoreViewer {
 
-  > div:not(.navbar) {
+  > div:not(.navbar):not(.modal-backdrop) {
     top: 51px;
   }
 
@@ -61,7 +61,7 @@
       -moz-appearance: none;
       -ms-expand: none;
       appearance: none;
-      height: 34px;
+      height: 38px;
       max-width: 300px;
       text-indent: 0.25px;
       white-space: nowrap;
@@ -86,11 +86,7 @@
 
     .expander {
       cursor: pointer;
-      font-size: 10px;
-      top: 3px;
-      width: 10px;
-      height: 10px;
-      display: inline-block;
+      margin-top: 3px;
     }
 
     ol[data-opened=false] {
@@ -342,4 +338,14 @@
       display: table;
     }
   }
+
+  .tb-loop (@i) when (@i > 0) {
+    .btn-group[data-tb-order='@{i}'] {
+      order: ~"@{i}";
+    }
+    .tb-loop(@i - 1);
+  }
+
+  @iterations: 100;
+  .tb-loop(@iterations);
 }

@@ -56,7 +56,7 @@ namespace mycore.viewer.widgets.layout {
             var that = this;
             window.onresize = function () {
                 that.updateSizes();
-            }
+            };
 
             this._initCenter();
         }

@@ -35,10 +35,10 @@ namespace mycore.viewer.widgets.modal {
             this._previewBox = jQuery("<div></div>");
             this._previewBox.addClass("printPreview");
             this._previewBox.addClass("col-sm-12");
-            this._previewBox.addClass("thumbnail");
             this._previewBox.appendTo(this._inputRow);
 
             this._previewImage = jQuery("<img />");
+            this._previewImage.addClass("img-thumbnail mx-auto d-block");
             this._previewImage.appendTo(this._previewBox);
 
             this._pageSelectBox = jQuery("<form></form>");
@@ -104,24 +104,20 @@ namespace mycore.viewer.widgets.modal {
 
         private _radioAllPages: JQuery;
         private _radioAllPagesLabelElement: JQuery;
-        private _radioAllPagesLabel: JQuery;
         private _radioAllPagesInput: JQuery;
 
         private _radioCurrentPage: JQuery;
         private _radioCurrentPageLabelElement: JQuery;
-        private _radioCurrentPageLabel: JQuery;
         private _radioCurrentPageInput: JQuery;
 
         private _radioRangePages: JQuery;
         private _radioRangePagesLabelElement: JQuery;
-        private _radioRangePagesLabel: JQuery;
         private _radioRangePagesInput: JQuery;
         private _radioRangePagesInputText: JQuery;
 
         private _radioChapter: JQuery;
         private _radioChapterInput: JQuery;
         private _chapterLabelElement: JQuery;
-        private _radioChapterLabel: JQuery;
         private _chapterSelect: JQuery;
 
         private _validationMessage: JQuery;
@@ -134,138 +130,20 @@ namespace mycore.viewer.widgets.modal {
 
         public okayClickHandler: () => void = null;
 
-        private _createRadioAllPages() {
-            this._radioAllPages = jQuery("<div></div>");
-            this._radioAllPages.addClass("radio");
-            this._radioAllPagesLabelElement = jQuery("<label></label>");
-            this._radioAllPagesInput = jQuery("<input>");
-            this._radioAllPagesInput.attr("type", "radio");
-            this._radioAllPagesInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioAllPagesInput.attr("id", ViewerPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioAllPagesInput.attr("value", ViewerPrintModalWindow.INPUT_ALL_VALUE);
-            this._radioAllPagesLabel = jQuery("<p></p>");
-
-            this._radioAllPagesInput.change(() => {
-                if (this.checkEventHandler != null) {
-                    this.checkEventHandler(ViewerPrintModalWindow.INPUT_ALL_VALUE);
-                }
-            });
-
-            this._radioAllPages.append(this._radioAllPagesLabelElement);
-            this._radioAllPagesLabelElement.append(this._radioAllPagesInput);
-            this._radioAllPagesLabelElement.append(this._radioAllPagesLabel);
-
-            this._radioAllPages.appendTo(this._selectGroup);
+        public get currentPageLabel() {
+            return this._radioCurrentPageLabelElement.text();
         }
 
-
-        private _createRadioCurrentPage() {
-            this._radioCurrentPage = jQuery("<div></div>");
-            this._radioCurrentPage.addClass("radio");
-            this._radioCurrentPageLabelElement = jQuery("<label></label>");
-            this._radioCurrentPageInput = jQuery("<input>");
-            this._radioCurrentPageInput.attr("type", "radio");
-            this._radioCurrentPageInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioCurrentPageInput.attr("id", ViewerPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioCurrentPageInput.attr("value", ViewerPrintModalWindow.INPUT_CURRENT_VALUE);
-            this._radioCurrentPageLabel = jQuery("<p></p>");
-
-            this._radioCurrentPageInput.change(() => {
-                if (this.checkEventHandler != null) {
-                    this.checkEventHandler(ViewerPrintModalWindow.INPUT_CURRENT_VALUE);
-                }
-            });
-
-            this._radioCurrentPage.append(this._radioCurrentPageLabelElement);
-            this._radioCurrentPageLabelElement.append(this._radioCurrentPageInput);
-            this._radioCurrentPageLabelElement.append(this._radioCurrentPageLabel);
-
-            this._radioCurrentPage.appendTo(this._selectGroup);
+        public set currentPageLabel(label: string) {
+            this._radioCurrentPageLabelElement.text(label);
         }
 
-
-        private _createRadioRangePages() {
-            this._radioRangePages = jQuery("<div></div>");
-            this._radioRangePages.addClass("radio");
-            this._radioRangePagesLabelElement = jQuery("<label></label>");
-            this._radioRangePagesInput = jQuery("<input>");
-            this._radioRangePagesInput.attr("type", "radio");
-            this._radioRangePagesInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioRangePagesInput.attr("id", ViewerPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioRangePagesInput.attr("value", ViewerPrintModalWindow.INPUT_RANGE_VALUE);
-            this._radioRangePagesLabel = jQuery("<p></p>");
-            this._radioRangePagesInputText = jQuery("<input>");
-            this._radioRangePagesInputText.addClass("form-control");
-            this._radioRangePagesInputText.attr("type", "text");
-            this._radioRangePagesInputText.attr("name", ViewerPrintModalWindow.INPUT_RANGE_TEXT_IDENTIFIER);
-            this._radioRangePagesInputText.attr("id", ViewerPrintModalWindow.INPUT_RANGE_TEXT_IDENTIFIER);
-            this._radioRangePagesInputText.attr("placeholder", "1,3-5,8");
-
-            const that = this;
-            const onActivateHandler = () => {
-                if (that.checkEventHandler != null) {
-                    that.checkEventHandler(ViewerPrintModalWindow.INPUT_RANGE_VALUE);
-                }
-                this._radioRangePagesInputText.focus();
-            };
-            this._radioRangePagesInput.change(onActivateHandler);
-            this._radioRangePagesInput.click(onActivateHandler);
-
-            this._radioRangePagesInputText.click(() => {
-                this.allChecked = false;
-                this.currentChecked = false;
-                this.rangeChecked = true;
-                onActivateHandler();
-                this._radioRangePagesInputText.focus();
-            });
-
-            this._radioRangePagesInputText.keyup(() => {
-                if (that.rangeInputEventHandler != null) {
-                    this.rangeInputEventHandler(this._radioRangePagesInputText.val());
-                }
-            });
-
-            this._radioRangePages.append(this._radioRangePagesLabelElement);
-            this._radioRangePagesLabelElement.append(this._radioRangePagesInput);
-            this._radioRangePagesLabelElement.append(this._radioRangePagesLabel);
-            this._radioRangePagesLabelElement.append(this._radioRangePagesInputText);
-            this._radioRangePages.appendTo(this._selectGroup);
+        public get allPagesLabel() {
+            return this._radioAllPagesLabelElement.text();
         }
 
-        private _createRadioChapters() {
-            this._radioChapter = jQuery("<div></div>");
-            this._radioChapter.addClass("radio");
-
-            this._radioChapterInput = jQuery("<input>");
-            this._radioChapterInput.attr("type", "radio");
-            this._radioChapterInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioChapterInput.attr("id", ViewerPrintModalWindow.INPUT_IDENTIFIER);
-            this._radioChapterInput.attr("value", ViewerPrintModalWindow.INPUT_CHAPTER_VALUE);
-
-            this._chapterLabelElement = jQuery("<label></label>");
-            this._radioChapterLabel = jQuery("<p></p>");
-            this._chapterSelect = jQuery("<select></select>");
-
-            this._radioRangePages.append(this._chapterLabelElement);
-            this._chapterLabelElement.append(this._radioChapterInput);
-            this._chapterLabelElement.append(this._radioChapterLabel);
-            this._chapterLabelElement.append(this._chapterSelect);
-            this._radioChapter.appendTo(this._selectGroup);
-
-            let onActivate = () => {
-                if (this.checkEventHandler != null) {
-                    this.checkEventHandler(ViewerPrintModalWindow.INPUT_CHAPTER_VALUE);
-                }
-            };
-            this._radioChapterInput.change(onActivate);
-
-            this._chapterSelect.change(()=>{
-                onActivate();
-                this.chapterChecked = true;
-                if(this.chapterInputEventHandler != null) {
-                    this.chapterInputEventHandler(this._chapterSelect.val());
-                }
-            });
+        public set allPagesLabel(label: string) {
+            this._radioAllPagesLabelElement.text(label);
         }
 
         public set rangeChecked(checked: boolean) {
@@ -320,28 +198,115 @@ namespace mycore.viewer.widgets.modal {
             return <string>this._validationMessage.text();
         }
 
-        public set currentPageLabel(label: string) {
-            this._radioCurrentPageLabel.text(label);
-        }
-
-        public get currentPageLabel() {
-            return this._radioCurrentPageLabel.text();
-        }
-
-        public set allPagesLabel(label: string) {
-            this._radioAllPagesLabel.text(label);
-        }
-
-        public get allPagesLabel() {
-            return this._radioAllPagesLabel.text();
+        public get rangeLabel() {
+            return this._radioRangePagesLabelElement.text();
         }
 
         public set rangeLabel(label: string) {
-            this._radioRangePagesLabel.text(label);
+            this._radioRangePagesLabelElement.text(label);
         }
 
-        public get rangeLabel() {
-            return this._radioRangePagesLabel.text();
+        public get chapterLabel(){
+            return this._chapterLabelElement.text();
+        }
+
+        public set chapterLabel(label:string){
+            this._chapterLabelElement.text(label);
+        }
+
+        private _createRadioRangePages() {
+            const radioIdentifier = `${ViewerPrintModalWindow.INPUT_IDENTIFIER}_radio_range`;
+
+            this._radioRangePages = jQuery("<div></div>");
+            this._radioRangePages.addClass("form-check");
+
+            this._radioRangePagesLabelElement = jQuery("<label></label>");
+            this._radioRangePagesLabelElement.addClass("form-check-label");
+            this._radioRangePagesLabelElement.attr("for", radioIdentifier);
+
+            this._radioRangePagesInput = jQuery("<input>");
+            this._radioRangePagesInput.addClass("form-check-input");
+            this._radioRangePagesInput.attr("type", "radio");
+            this._radioRangePagesInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioRangePagesInput.attr("id", radioIdentifier);
+            this._radioRangePagesInput.attr("value", ViewerPrintModalWindow.INPUT_RANGE_VALUE);
+
+            this._radioRangePagesInputText = jQuery("<input>");
+            this._radioRangePagesInputText.addClass("form-control");
+            this._radioRangePagesInputText.attr("type", "text");
+            this._radioRangePagesInputText.attr("name", ViewerPrintModalWindow.INPUT_RANGE_TEXT_IDENTIFIER);
+            this._radioRangePagesInputText.attr("id", ViewerPrintModalWindow.INPUT_RANGE_TEXT_IDENTIFIER);
+            this._radioRangePagesInputText.attr("placeholder", "1,3-5,8");
+
+            const that = this;
+            const onActivateHandler = () => {
+                if (that.checkEventHandler != null) {
+                    that.checkEventHandler(ViewerPrintModalWindow.INPUT_RANGE_VALUE);
+                }
+                this._radioRangePagesInputText.focus();
+            };
+            this._radioRangePagesInput.change(onActivateHandler);
+            this._radioRangePagesInput.click(onActivateHandler);
+
+            this._radioRangePagesInputText.click(() => {
+                this.allChecked = false;
+                this.currentChecked = false;
+                this.rangeChecked = true;
+                onActivateHandler();
+                this._radioRangePagesInputText.focus();
+            });
+
+            this._radioRangePagesInputText.keyup(() => {
+                if (that.rangeInputEventHandler != null) {
+                    this.rangeInputEventHandler(this._radioRangePagesInputText.val());
+                }
+            });
+
+            this._radioRangePages.append(this._radioRangePagesInput);
+            this._radioRangePages.append(this._radioRangePagesLabelElement);
+            this._radioRangePages.append(this._radioRangePagesInputText);
+            this._radioRangePages.appendTo(this._selectGroup);
+        }
+
+        private _createRadioChapters() {
+            const radioIdentifier = `${ViewerPrintModalWindow.INPUT_IDENTIFIER}_radio_chapter`;
+
+            this._radioChapter = jQuery("<div></div>");
+            this._radioChapter.addClass("form-check");
+
+            this._radioChapterInput = jQuery("<input>");
+            this._radioChapterInput.addClass("form-check-input");
+            this._radioChapterInput.attr("type", "radio");
+            this._radioChapterInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioChapterInput.attr("id", radioIdentifier);
+            this._radioChapterInput.attr("value", ViewerPrintModalWindow.INPUT_CHAPTER_VALUE);
+
+            this._chapterLabelElement = jQuery("<label></label>");
+            this._chapterLabelElement.addClass("form-check-label");
+            this._chapterLabelElement.attr("for", radioIdentifier);
+
+            this._chapterSelect = jQuery("<select></select>");
+            this._chapterSelect.addClass("form-control")
+
+            this._radioChapter.append(this._radioChapterInput);
+            this._radioChapter.append(this._chapterLabelElement);
+            this._radioChapter.append(this._chapterSelect);
+            this._radioChapter.appendTo(this._selectGroup);
+
+            let onActivate = () => {
+                if (this.checkEventHandler != null) {
+                    this.checkEventHandler(ViewerPrintModalWindow.INPUT_CHAPTER_VALUE);
+                }
+            };
+            this._radioChapterInput.change(onActivate);
+
+            this._chapterSelect.change(()=>{
+                onActivate();
+                this.chapterChecked = true;
+                if(this.chapterInputEventHandler != null) {
+                    this.chapterInputEventHandler(this._chapterSelect.val());
+                }
+            });
         }
 
         public set previewImageSrc(src: string) {
@@ -365,12 +330,63 @@ namespace mycore.viewer.widgets.modal {
             return <string>this._previewImage.attr("src");
         }
 
-        public get chapterLabel(){
-            return this._radioChapterLabel.text();
+        private _createRadioAllPages() {
+            const radioIdentifier = `${ViewerPrintModalWindow.INPUT_IDENTIFIER}_radio_all`;
+
+            this._radioAllPages = jQuery("<div></div>");
+            this._radioAllPages.addClass("form-check");
+
+            this._radioAllPagesLabelElement = jQuery(`<label></label>`);
+            this._radioAllPagesLabelElement.addClass("form-check-label");
+            this._radioAllPagesLabelElement.attr("for", radioIdentifier);
+
+            this._radioAllPagesInput = jQuery("<input>");
+            this._radioAllPagesInput.attr("type", "radio");
+            this._radioAllPagesInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioAllPagesInput.attr("id", radioIdentifier);
+            this._radioAllPagesInput.attr("value", ViewerPrintModalWindow.INPUT_ALL_VALUE);
+            this._radioAllPagesInput.addClass("form-check-input");
+
+            this._radioAllPagesInput.change(() => {
+                if (this.checkEventHandler != null) {
+                    this.checkEventHandler(ViewerPrintModalWindow.INPUT_ALL_VALUE);
+                }
+            });
+
+            this._radioAllPages.append(this._radioAllPagesInput);
+            this._radioAllPages.append(this._radioAllPagesLabelElement);
+
+            this._radioAllPages.appendTo(this._selectGroup);
         }
 
-        public set chapterLabel(label:string){
-            this._radioChapterLabel.text(label);
+        private _createRadioCurrentPage() {
+            const radioIdentifier = `${ViewerPrintModalWindow.INPUT_IDENTIFIER}_radio_current`;
+
+            this._radioCurrentPage = jQuery("<div></div>");
+            this._radioCurrentPage.addClass("form-check");
+
+            this._radioCurrentPageLabelElement = jQuery("<label></label>");
+            this._radioCurrentPageLabelElement.addClass("form-check-label");
+            this._radioCurrentPageLabelElement.attr("for", radioIdentifier);
+
+
+            this._radioCurrentPageInput = jQuery("<input>");
+            this._radioCurrentPageInput.addClass("form-check-input");
+            this._radioCurrentPageInput.attr("type", "radio");
+            this._radioCurrentPageInput.attr("name", ViewerPrintModalWindow.INPUT_IDENTIFIER);
+            this._radioCurrentPageInput.attr("id", radioIdentifier);
+            this._radioCurrentPageInput.attr("value", ViewerPrintModalWindow.INPUT_CURRENT_VALUE);
+
+            this._radioCurrentPageInput.change(() => {
+                if (this.checkEventHandler != null) {
+                    this.checkEventHandler(ViewerPrintModalWindow.INPUT_CURRENT_VALUE);
+                }
+            });
+
+            this._radioCurrentPage.append(this._radioCurrentPageInput);
+            this._radioCurrentPage.append(this._radioCurrentPageLabelElement);
+
+            this._radioCurrentPage.appendTo(this._selectGroup);
         }
 
         public set maximalPages(number: string) {

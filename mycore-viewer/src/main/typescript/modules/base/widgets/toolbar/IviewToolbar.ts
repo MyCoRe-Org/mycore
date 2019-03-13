@@ -111,7 +111,7 @@ namespace mycore.viewer.widgets.toolbar {
                 var parentModel = <ToolbarModel>parent;
                 var childGroup = <ToolbarGroup>component;
 
-                var gv = this.createGroupView(childGroup.name, childGroup.align);
+                var gv = this.createGroupView(childGroup.name, childGroup.order ,childGroup.align);
                 this._idGroupViewMap.set(childGroup.name, gv);
                 this._toolbarView.addChild(gv.getElement());
 
@@ -159,8 +159,8 @@ namespace mycore.viewer.widgets.toolbar {
             return ToolbarViewFactoryImpl.createToolbarView();
         }
 
-        private createGroupView(id:string, align:string):GroupView {
-            return ToolbarViewFactoryImpl.createGroupView(id, align);
+        private createGroupView(id:string, order:number, align:string):GroupView {
+            return ToolbarViewFactoryImpl.createGroupView(id, order, align);
         }
 
 

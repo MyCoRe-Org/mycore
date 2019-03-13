@@ -40,8 +40,8 @@ namespace mycore.viewer.widgets.toolbar {
             return new BootstrapImageView(id);
         }
 
-        createGroupView(id:string, align:string):GroupView {
-            return new BootstrapGroupView(id, align);
+        createGroupView(id:string, order:number, align:string):GroupView {
+            return new BootstrapGroupView(id, order, align);
         }
 
         createDropdownView(id:string):DropdownView {
