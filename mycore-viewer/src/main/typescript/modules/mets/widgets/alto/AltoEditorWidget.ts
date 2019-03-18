@@ -197,7 +197,7 @@ namespace mycore.viewer.widgets.alto {
     <h3 class="small-heading">${this.getLabel("altoWidget.heading")}</h3>     
     <div class="btn-toolbar edit">
         <div class="btn-group btn-group-xs button-group-container">
-            <button type="button" class="btn btn-default changeWord">${this.getLabel("altoWidget.changeWord")}</button>
+            <button type="button" class="btn btn-secondary changeWord">${this.getLabel("altoWidget.changeWord")}</button>
         </div>
     </div>
     <h3 class="small-heading">${this.getLabel("altoWidget.changesHeading")}</h3>

@@ -66,7 +66,7 @@ namespace mycore.viewer.widgets.modal {
 
             this._okayButton = jQuery("<a>OK</a>");
             this._okayButton.attr("type", "button");
-            this._okayButton.addClass("btn btn-default");
+            this._okayButton.addClass("btn btn-secondary");
             this._okayButton.appendTo(this.modalFooter);
 
             this._maximalPageMessage = jQuery("<div class='row'><span class='col-sm-12 message'></span></div>");

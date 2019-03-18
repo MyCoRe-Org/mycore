@@ -162,7 +162,7 @@ namespace mycore.viewer.components {
                 this.updateContainerSize();
             });
 
-            this._panel = jQuery("<div class='panel search'></div>");
+            this._panel = jQuery("<div class='card search'></div>");
             this._container.append(this._panel);
 
             this._initProgressbar();

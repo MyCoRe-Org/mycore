@@ -22,7 +22,7 @@ namespace mycore.viewer.widgets.toolbar {
 
         constructor(private _id:string) {
             this._buttonElement = jQuery("<select></select>");
-            this._buttonElement.addClass("btn btn-default navbar-btn dropdown");
+            this._buttonElement.addClass("btn btn-secondary navbar-btn dropdown");
             this._childMap = new MyCoReMap<string, JQuery>();
         }
 

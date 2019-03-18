@@ -37,7 +37,7 @@ namespace mycore.viewer.model {
                 this.removeGroup(logoGroup);
             }
 
-            var toolbarButton = new mycore.viewer.widgets.toolbar.ToolbarButton("MaximizeButton", "", "", "fa-fullscreen");
+            var toolbarButton = new mycore.viewer.widgets.toolbar.ToolbarButton("MaximizeButton", "", "", "fa-window-maximize");
             var toolbarGroup = new mycore.viewer.widgets.toolbar.ToolbarGroup("MaximizeToolbarGroup", 100, true);
 
             this.addGroup(toolbarGroup);

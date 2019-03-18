@@ -75,7 +75,7 @@ namespace mycore.viewer.components {
         }
 
         private correctToToolbarSize() {
-            const toolbar = this._container.parent().find(".navbar.navbar-default");
+            const toolbar = this._container.parent().find(".navbar.navbar-light");
             const heightOfToolbar = toolbar.outerHeight(false);
             toolbar.siblings().css({"top": heightOfToolbar + "px"});
         }
