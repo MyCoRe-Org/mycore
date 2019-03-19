@@ -24,6 +24,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Iterator;
 import java.util.Optional;
@@ -332,8 +333,11 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     private class UpdateMetadataHandler extends MCREventHandlerBase {
         private final MCRCStoreIFS2 myStore;
 
+        private final Path baseDir;
+
         public UpdateMetadataHandler(MCRCStoreIFS2 storeIFS2) {
             myStore = storeIFS2;
+            baseDir = Paths.get(myStore.baseDir);
         }
 
         @Override
@@ -356,7 +360,10 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             }
             String md5 = ((MCRFileAttributes) attrs).md5sum();
             try {
-                getFile(path).ifPresent(f -> updateMD5(f, path, md5));
+                Path physicalPath = MCRPath.toMCRPath(path).toPhysicalPath();
+                if (physicalPath.startsWith(baseDir)) {
+                    getFile(path).ifPresent(f -> updateMD5(f, path, md5));
+                }
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
