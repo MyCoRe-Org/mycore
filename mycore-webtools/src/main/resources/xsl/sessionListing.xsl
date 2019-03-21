@@ -14,32 +14,28 @@
       </div>
 
       <div id="sessionListingContent" class="hidden">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">
+        <div class="card">
+          <div class="card-header">
+            <h3>
               <xsl:value-of select="i18n:translate('component.session-listing.options')"/>
             </h3>
           </div>
-          <div class="panel-body">
-            <div class="form-horizontal">
-              <div class="form-group">
-                <label for="sessionListingFilter" class="col-sm-2 control-label">
-                  <xsl:value-of select="i18n:translate('component.session-listing.filter')"/>
-                </label>
-                <div class="col-sm-10">
-                  <input type="text" class="form-control" id="sessionListingFilter" placeholder="Filter"
-                         onchange="mycore.session.listing.onFilterChange()"/>
-                </div>
+          <div class="card-body">
+            <div class="form-group row">
+              <label for="sessionListingFilter" class="col-sm-2 col-form-label">
+                <xsl:value-of select="i18n:translate('component.session-listing.filter')"/>
+              </label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="sessionListingFilter" placeholder="Filter"
+                       onchange="mycore.session.listing.onFilterChange()"/>
               </div>
-              <div class="form-group">
-                <label for="sessionListingFilter" class="col-sm-2 control-label">
-                  <xsl:value-of select="i18n:translate('component.session-listing.resolveHostNames')"/>
-                </label>
-                <div class="col-sm-10" style="margin-top: 5px;">
-                  <input id="sessionListingResolveHostname" type="checkbox"
-                         onchange="mycore.session.listing.onHostnameResolvingChange()"/>
-                </div>
-              </div>
+            </div>
+            <div class="form-check">
+              <input id="sessionListingResolveHostname" class="form-check-input" type="checkbox"
+                     onchange="mycore.session.listing.onHostnameResolvingChange()"/>
+              <label for="sessionListingFilter" class="form-check-label">
+                <xsl:value-of select="i18n:translate('component.session-listing.resolveHostNames')"/>
+              </label>
             </div>
           </div>
         </div>
@@ -89,7 +85,7 @@
             <pre id="stacktraceModalBody" class="pre-scrollable"></pre>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Schließen</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
           </div>
         </div>
       </div>

@@ -5,19 +5,22 @@
 
 	<div class="collection-content">
 		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation" class="active">
-				<a href="#processing_{{model.id}}" aria-controls="processing" role="tab" data-toggle="tab">
-					<span>Processing</span><span class="badge">{{model.processingProcessables?.length}}</span>
+			<li role="presentation" class="nav-item">
+				<a class="nav-link active" href="#processing_{{model.id}}" aria-controls="processing" role="tab" data-toggle="tab">
+					<span>Processing</span>
+					<span class="badge badge-pill badge-primary">{{model.processingProcessables?.length}}</span>
 				</a>
 			</li>
-			<li role="presentation">
-				<a href="#created_{{model.id}}" aria-controls="created" role="tab" data-toggle="tab">
-					<span>Waiting</span><span class="badge">{{model.createdProcessables?.length}}</span>
+			<li role="presentation" class="nav-item">
+				<a class="nav-link" href="#created_{{model.id}}" aria-controls="created" role="tab" data-toggle="tab">
+					<span>Waiting</span>
+					<span class="badge badge-pill badge-primary">{{model.createdProcessables?.length}}</span>
 				</a>
 			</li>
-			<li role="presentation">
-				<a href="#finished_{{model.id}}" aria-controls="finished" role="tab" data-toggle="tab">
-					<span>Finished</span><span class="badge">{{model.finishedProcessables?.length}}</span>
+			<li role="presentation" class="nav-item">
+				<a class="nav-link" href="#finished_{{model.id}}" aria-controls="finished" role="tab" data-toggle="tab">
+					<span>Finished</span>
+					<span class="badge badge-pill badge-primary">{{model.finishedProcessables?.length}}</span>
 				</a>
 			</li>
 		</ul>
