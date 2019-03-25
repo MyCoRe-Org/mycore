@@ -31,7 +31,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
@@ -219,11 +218,9 @@ public class MCRConfigurationDir {
 
         if (override != null) {
             final String[] uris = override.split(",");
-            final List<Path> paths = Stream.of(uris).map(Paths::get)
+            final Optional<Path> resource = Stream.of(uris).map(Paths::get)
                 .filter(Files::exists)
-                .collect(Collectors.toList());
-
-            final Optional<Path> resource = paths.stream().map(p -> p.resolve(relativePath))
+                .map(p -> p.resolve(relativePath))
                 .filter(Files::exists)
                 .peek(p -> LogManager.getLogger().info("Found overridden File in path: " + p.toAbsolutePath()))
                 .findFirst();
