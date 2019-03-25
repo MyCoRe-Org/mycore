@@ -22,11 +22,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 
@@ -209,6 +215,28 @@ public class MCRConfigurationDir {
      * @param classLoader a classLoader to resolve the resource (see above), null defaults to this class' class loader
      */
     public static URL getConfigResource(String relativePath, ClassLoader classLoader) {
+        final String override = MCRConfiguration.instance().getString("MCR.Developer.Resource.Override", null);
+
+        if (override != null) {
+            final String[] uris = override.split(",");
+            final List<Path> paths = Stream.of(uris).map(Paths::get)
+                .filter(Files::exists)
+                .collect(Collectors.toList());
+
+            final Optional<Path> resource = paths.stream().map(p -> p.resolve(relativePath))
+                .filter(Files::exists)
+                .peek(p -> LogManager.getLogger().info("Found overridden File in path: " + p.toAbsolutePath()))
+                .findFirst();
+
+            if (resource.isPresent()) {
+                try {
+                    return resource.get().toUri().toURL();
+                } catch (MalformedURLException e) {
+                    // Ignore
+                }
+            }
+        }
+
         File resolvedFile = getConfigFile("resources/" + relativePath);
         if (resolvedFile != null && resolvedFile.exists()) {
             try {
