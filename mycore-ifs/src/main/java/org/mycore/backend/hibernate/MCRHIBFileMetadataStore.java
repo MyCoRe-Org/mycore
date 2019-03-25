@@ -170,10 +170,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     @Override
     public void deleteNode(String ID) throws MCRPersistenceException {
         Session session = getSession();
-        MCRFSNODES node = session.get(MCRFSNODES.class, ID);
-        if (node != null) {
-            session.delete(node); //MCR-1634
-        }
+        session.delete(session.get(MCRFSNODES.class, ID));
     }
 
     @Override

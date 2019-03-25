@@ -24,8 +24,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -37,13 +35,9 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
-import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
@@ -83,7 +77,6 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         LOGGER.info("Default slot layout for store {} is {}", storeID, slotLayout);
 
         ignoreOwnerBase = config.getBoolean(storeConfigPrefix + "IgnoreOwnerBase", false);
-        MCREventManager.instance().addEventHandler(MCREvent.PATH_TYPE, new UpdateMetadataHandler(this));
     }
 
     private MCRFileStore getStore(String base) {
@@ -328,64 +321,5 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     @Override
     public File getBaseDir() throws IOException {
         return new File(baseDir);
-    }
-
-    private class UpdateMetadataHandler extends MCREventHandlerBase {
-        private final MCRCStoreIFS2 myStore;
-
-        private final Path baseDir;
-
-        public UpdateMetadataHandler(MCRCStoreIFS2 storeIFS2) {
-            myStore = storeIFS2;
-            baseDir = Paths.get(myStore.baseDir);
-        }
-
-        @Override
-        protected void handlePathCreated(MCREvent evt, Path path, BasicFileAttributes attrs) {
-            updateMD5(path, attrs);
-        }
-
-        @Override
-        protected void handlePathUpdated(MCREvent evt, Path path, BasicFileAttributes attrs) {
-            updateMD5(path, attrs);
-        }
-
-        private void updateMD5(Path path, BasicFileAttributes attrs) {
-            if (!attrs.isRegularFile()){
-                return;
-            }
-            if (!(attrs instanceof MCRFileAttributes)) {
-                LOGGER.warn("Cannot handle update of {} with file attribut class {}", path, attrs.getClass());
-                return;
-            }
-            String md5 = ((MCRFileAttributes) attrs).md5sum();
-            try {
-                Path physicalPath = MCRPath.toMCRPath(path).toPhysicalPath();
-                if (physicalPath.startsWith(baseDir)) {
-                    getFile(path).ifPresent(f -> updateMD5(f, path, md5));
-                }
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }
-
-        private void updateMD5(MCRFile file, Path path, String md5) {
-            try {
-                file.setMD5(md5);
-                LOGGER.info("Updated MD5 sum of {} to {}", path, md5);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }
-
-        private Optional<MCRFile> getFile(Path path) throws IOException {
-            MCRPath mcrPath = MCRPath.toMCRPath(path);
-            MCRFileCollection fileCollection = myStore
-                .getIFS2FileCollection(MCRObjectID.getInstance(mcrPath.getOwner()));
-            MCRNode nodeByPath = fileCollection.getNodeByPath(mcrPath.getOwnerRelativePath());
-            return Optional.ofNullable(nodeByPath)
-                .filter(MCRFile.class::isInstance)
-                .map(MCRFile.class::cast);
-        }
     }
 }
