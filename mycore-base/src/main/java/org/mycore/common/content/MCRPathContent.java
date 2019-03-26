@@ -137,10 +137,14 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
         if (attrs instanceof MCRFileAttributes){
             return ((MCRFileAttributes) attrs).md5sum();
         }
-        Object fileKey = Files.getAttribute(path, "md5:md5");
-        if (fileKey instanceof String) {
-            return fileKey.toString();
+
+        if(Files.getFileStore(path).supportsFileAttributeView("md5")){
+            Object fileKey = Files.getAttribute(path, "md5:md5");
+            if (fileKey instanceof String) {
+                return fileKey.toString();
+            }
         }
+
         return super.getETag();
     }
 
