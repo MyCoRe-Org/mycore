@@ -54,14 +54,19 @@ public class MCRContentStoreFactory {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRContentStoreFactory.class);
 
-    public static Map<String, MCRContentStore> getAvailableStores() {
-        Map<String, String> properties = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX);
-        for (Map.Entry<String, String> prop : properties.entrySet()) {
-            String key = prop.getKey();
-            if (key.endsWith(CLASS_SUFFIX)) {
-                String storeID = key.replace(CONFIG_PREFIX, "").replace(CLASS_SUFFIX, "");
-                initStore(storeID);
+    private static boolean storeInitialized = false;
+
+    public static synchronized Map<String, MCRContentStore> getAvailableStores() {
+        if(!storeInitialized) {
+            Map<String, String> properties = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX);
+            for (Map.Entry<String, String> prop : properties.entrySet()) {
+                String key = prop.getKey();
+                if (key.endsWith(CLASS_SUFFIX)) {
+                    String storeID = key.replace(CONFIG_PREFIX, "").replace(CLASS_SUFFIX, "");
+                    initStore(storeID);
+                }
             }
+            storeInitialized =true;
         }
         return STORES;
     }
