@@ -63,7 +63,7 @@
       <div class="form-actions">
         <xsl:choose>
           <xsl:when test="$direction = 'rtl' ">
-            <button class="btn btn-default" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
+            <button class="btn btn-secondary" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
             <xsl:value-of select="' '" />
@@ -76,7 +76,7 @@
               <xsl:value-of select="i18n:translate('component.user2.button.login')" />
             </button>
             <xsl:value-of select="' '" />
-            <button class="btn btn-default" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
+            <button class="btn btn-secondary" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
           </xsl:otherwise>
@@ -133,7 +133,8 @@
       </div>
     </xsl:if>
   </xsl:template>
-  <xsl:template match="login" mode="controlGroupClass">
+
+  <xsl:template match="input" mode="controlGroupClass">
     <xsl:attribute name="class">
       <xsl:value-of select="'form-group'" />
       <xsl:if test="@loginFailed='true'">
