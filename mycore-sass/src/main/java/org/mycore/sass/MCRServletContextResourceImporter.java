@@ -25,6 +25,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,6 +41,7 @@ import javax.servlet.ServletContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.util.IOUtils;
+import org.mycore.common.config.MCRConfiguration;
 
 import io.bit3.jsass.importer.Import;
 import io.bit3.jsass.importer.Importer;
@@ -58,16 +62,32 @@ public class MCRServletContextResourceImporter implements Importer {
     @Override
     public Collection<Import> apply(String url, Import previous) {
         try {
-            String absolute = url;
-            if (previous != null) {
-                absolute = previous.getAbsoluteUri().resolve(absolute).toString();
-            }
+            final String override = MCRConfiguration
+                .instance().getString("MCR.Developer.Resource.Override", null);
+
+            final String absolute = previous != null ? previous.getAbsoluteUri().resolve(url).toString() : url;
 
             List<String> possibleNameForms = getPossibleNameForms(absolute);
 
             Optional<URL> firstPossibleName = possibleNameForms.stream()
                 .map(form -> {
                     try {
+                        if (override != null) {
+                            final String[] uris = override.split(",");
+                            final Optional<Path> resource = Stream.of(uris)
+                                .map(Paths::get)
+                                .map(p -> p.resolve("META-INF").resolve("resources"))
+                                .filter(Files::exists)
+                                .map(p -> p.resolve(form.startsWith("/") ? form.substring(1) : form))
+                                .filter(Files::exists)
+                                .peek(p -> LogManager.getLogger()
+                                    .info("Found overridden File in path: " + p.toAbsolutePath()))
+                                .findFirst();
+
+                            if (resource.isPresent()) {
+                                return resource.get().toUri().toURL();
+                            }
+                        }
                         return context.getResource(normalize(form));
                     } catch (MalformedURLException e) {
                         // ignore exception because it seems to be a not valid name form
@@ -86,11 +106,15 @@ public class MCRServletContextResourceImporter implements Importer {
             URI absoluteUri = resource.toURI();
 
             LOGGER.debug("Resolved {} to {}", url, absoluteUri);
-            return Stream.of(new Import(absolute, absolute, contents)).collect(Collectors.toList());
+            return buildImport(absolute, contents);
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("Error while resolving {}", url, e);
             return null;
         }
+    }
+
+    private List<Import> buildImport(String absolute, String contents) throws URISyntaxException {
+        return Stream.of(new Import(absolute, absolute, contents)).collect(Collectors.toList());
     }
 
     private List<String> getPossibleNameForms(String relative) {

@@ -171,15 +171,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         throws TransformerConfigurationException, SAXException, ParserConfigurationException {
         boolean check = System.currentTimeMillis() - modifiedChecked > CHECK_PERIOD;
         boolean useCache = MCRConfiguration.instance().getBoolean("MCR.UseXSLTemplateCache", true);
-        if (!useCache) {
-            check = true;
-            LOGGER.info("XSL template cache OFF.");
-        }
 
-        if (check) {
+        if (check || !useCache) {
             for (int i = 0; i < templateSources.length; i++) {
                 long lastModified = templateSources[i].getLastModified();
-                if (templates[i] == null || modified[i] < lastModified) {
+                if (templates[i] == null || modified[i] < lastModified || !useCache) {
                     SAXSource source = templateSources[i].getSource();
                     templates[i] = tFactory.newTemplates(source);
                     if (templates[i] == null) {
