@@ -52,6 +52,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaDerivateLinkID;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -173,7 +174,7 @@ public class MCRRestAPIUploadHelper {
 
                 MCRMetadataManager.create(mcrDerivate);
                 MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-                    new MCRMetaLinkID("derobject", derID, null, label));
+                    new MCRMetaDerivateLinkID("derobject", derID, null, label));
             }
 
             response = Response

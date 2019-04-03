@@ -63,6 +63,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaDerivateLinkID;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -132,8 +133,8 @@ public class MCRRestDerivates {
             return cachedResponse.get();
         }
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrId);
-        List<MCRMetaLinkID> derivates = obj.getStructure().getDerivates();
-        GenericEntity<List<MCRMetaLinkID>> entity = new GenericEntity<List<MCRMetaLinkID>>(derivates) {
+        List<MCRMetaDerivateLinkID> derivates = obj.getStructure().getDerivates();
+        GenericEntity<List<MCRMetaDerivateLinkID>> entity = new GenericEntity<List<MCRMetaDerivateLinkID>>(derivates) {
         };
         return Response.ok()
             .entity(entity,

@@ -23,14 +23,12 @@
 
 package org.mycore.iview2.frontend;
 
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetaDerivateLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -39,6 +37,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -77,7 +77,7 @@ public class MCRIView2XSLFunctions {
         }
 
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
-        List<MCRMetaLinkID> derivates = obj.getStructure().getDerivates();
+        List<MCRMetaDerivateLinkID> derivates = obj.getStructure().getDerivates();
         if (derivates.size() > 0) {
             return derivates.get(0) + "/" + ADAPTER.getSupportedMainFile(derivates.get(0).toString());
         }

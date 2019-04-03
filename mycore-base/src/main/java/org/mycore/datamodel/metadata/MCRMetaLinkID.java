@@ -39,12 +39,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * &lt;subtag xlink:type="arc" xlink:from=" <em>MCRObjectID</em>"
  * xlink:to="MCRObjectID"/&gt; <br>
  * &lt;/tag&gt; <br>
- * 
+ *
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 @JsonClassDescription("Links to other objects or derivates")
-public final class MCRMetaLinkID extends MCRMetaLink {
+public class MCRMetaLinkID extends MCRMetaLink {
     /**
      * initializes with empty values.
      */
@@ -54,7 +54,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
 
     /**
      * initializes with given values.
-     * @see MCRMetaLink#MCRMetaLink(String, int) 
+     * @see MCRMetaLink#MCRMetaLink(String, int)
      */
     public MCRMetaLinkID(String set_subtag, int set_inherted) {
         super(set_subtag, set_inherted);
@@ -62,7 +62,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
 
     /**
      * initializes with all values needed to link to an MCRObject.
-     * 
+     *
      *  This is the same as running {@link #MCRMetaLinkID(String, int)} and {@link #setReference(MCRObjectID, String, String)}.
      */
     public MCRMetaLinkID(String set_subtag, MCRObjectID id, String label, String title) {
@@ -71,7 +71,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
 
     /**
      * initializes with all values needed to link to an MCRObject.
-     * 
+     *
      */
     public MCRMetaLinkID(String set_subtag, MCRObjectID id, String label, String title, String role) {
         this(set_subtag, 0);
@@ -81,7 +81,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
 
     /**
      * This method set a reference with xlink:href, xlink:label and xlink:title.
-     * 
+     *
      * @param set_href
      *            the reference as MCRObjectID string
      * @param set_label
@@ -103,7 +103,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
 
     /**
      * This method set a reference with xlink:href, xlink:label and xlink:title.
-     * 
+     *
      * @param set_href
      *            the reference as MCRObjectID
      * @param set_label
@@ -124,7 +124,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
     /**
      * This method set a bidirectional link with xlink:from, xlink:to and
      * xlink:title.
-     * 
+     *
      * @param set_from
      *            the source MCRObjectID string
      * @param set_to
@@ -149,7 +149,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
     /**
      * This method set a bidirectional link with xlink:from, xlink:to and
      * xlink:title.
-     * 
+     *
      * @param set_from
      *            the source MCRObjectID
      * @param set_to
@@ -169,7 +169,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
 
     /**
      * This method get the xlink:href element as MCRObjectID.
-     * 
+     *
      * @return the xlink:href element as MCRObjectID
      */
     @JsonIgnore
@@ -179,7 +179,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
 
     /**
      * This method get the xlink:from element as MCRObjectID.
-     * 
+     *
      * @return the xlink:from element as MCRObjectID
      */
     @JsonIgnore
@@ -189,7 +189,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
 
     /**
      * This method get the xlink:to element as MCRObjectID.
-     * 
+     *
      * @return the xlink:to element as MCRObjectID
      */
     @JsonIgnore
@@ -200,7 +200,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
     /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
-     * 
+     *
      * @param element
      *            a relevant DOM element for the metadata
      * @exception MCRException
@@ -208,7 +208,7 @@ public final class MCRMetaLinkID extends MCRMetaLink {
      *                and to are not a MCRObjectID
      */
     @Override
-    public final void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
 
         if (linktype.equals("locator")) {

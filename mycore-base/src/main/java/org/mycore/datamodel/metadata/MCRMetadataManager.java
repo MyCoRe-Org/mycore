@@ -22,20 +22,16 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -65,6 +61,9 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.xml.sax.SAXException;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 /**
  * Delivers persistence operations for {@link MCRObject} and {@link MCRDerivate} .
@@ -154,8 +153,8 @@ public final class MCRMetadataManager {
         } else {
             if (exists(objectId)) {
                 MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectId);
-                List<MCRMetaLinkID> derivates = mcrObject.getStructure().getDerivates();
-                for (MCRMetaLinkID der : derivates) {
+                List<MCRMetaDerivateLinkID> derivates = mcrObject.getStructure().getDerivates();
+                for (MCRMetaDerivateLinkID der : derivates) {
                     derivateIds.add(der.getXLinkHrefID());
                 }
             }
@@ -213,7 +212,7 @@ public final class MCRMetadataManager {
         fireEvent(mcrDerivate, null, MCREvent.CREATE_EVENT);
 
         // add the link to metadata
-        final MCRMetaLinkID der = new MCRMetaLinkID();
+        final MCRMetaDerivateLinkID der = new MCRMetaDerivateLinkID();
         der.setReference(mcrDerivate.getId().toString(), null, mcrDerivate.getLabel());
         der.setSubTag("derobject");
 
@@ -776,7 +775,7 @@ public final class MCRMetadataManager {
                 }
             }
             // add the link to metadata
-            final MCRMetaLinkID der = new MCRMetaLinkID("derobject", id, null, mcrDerivate.getLabel(),
+            final MCRMetaDerivateLinkID der = new MCRMetaDerivateLinkID("derobject", id, null, mcrDerivate.getLabel(),
                 newLink.getXLinkRole());
             addOrUpdateDerivateToObject(newMetadataObjectID, der);
         }
@@ -837,44 +836,27 @@ public final class MCRMetadataManager {
             .map(MCRMetaLinkID::getXLinkHref)
             .collect(Collectors.toList());
         mcrObject.getStructure().clearChildren();
-        List<String> derOrder = mcrObject.getStructure()
-            .getDerivates()
-            .stream()
-            .map(MCRMetaLink::getXLinkHref)
-            .collect(Collectors.toList());
-        HashMap<String, String> newlinkTitles = new HashMap<>();
-        HashMap<String, String> newlinkLabels = new HashMap<>();
-        for (MCRMetaLinkID newlinkID : mcrObject.getStructure().getDerivates()) {
-            if (newlinkID.getXLinkTitle() != null) {
-                newlinkTitles.put(newlinkID.getXLinkHref(), newlinkID.getXLinkTitle());
-            }
-            if (newlinkID.getXLinkLabel() != null) {
-                newlinkLabels.put(newlinkID.getXLinkHref(), newlinkID.getXLinkLabel());
-            }
-        }
-        mcrObject.getStructure().clearDerivates();
 
-        // set the derivate data in structure
-        List<MCRMetaLinkID> linkIDs = mcrObject.getStructure().getDerivates();
-        List<MCRMetaLinkID> oldlinkIDs = old.getStructure().getDerivates();
-        for (MCRMetaLinkID oldlinkID : oldlinkIDs) {
-            if (newlinkTitles.containsKey(oldlinkID.getXLinkHref())) {
-                oldlinkID.setXLinkTitle(newlinkTitles.get(oldlinkID.getXLinkHref()));
-            }
-            if (newlinkLabels.containsKey(oldlinkID.getXLinkHref())) {
-                oldlinkID.setXLinkLabel(newlinkLabels.get(oldlinkID.getXLinkHref()));
-            }
-            linkIDs.add(oldlinkID);
+        final Set<String> derivates = mcrObject.getStructure().getDerivates().stream()
+            .map(MCRMetaDerivateLinkID::getXLinkHref).collect(Collectors.toSet());
+        final List<MCRMetaDerivateLinkID> oldDerivates = old.getStructure().getDerivates();
+
+        final String missingIDs = oldDerivates.stream()
+            .map(MCRMetaDerivateLinkID::getXLinkHref)
+            .filter(o -> !derivates.contains(o))
+            .collect(Collectors.joining(","));
+
+        if (missingIDs.length() > 0) {
+            throw new MCRPersistenceException("The ids " + missingIDs + " got removed from the MCRObject!");
         }
 
-        //set the new order of derivates
-        for (int newPos = 0; newPos < derOrder.size(); newPos++) {
-            for (int pos = 0; pos < mcrObject.getStructure().getDerivates().size(); pos++) {
-                if (derOrder.get(newPos).equals(mcrObject.getStructure().getDerivates().get(pos).getXLinkHref())) {
-                    Collections.swap(mcrObject.getStructure().getDerivates(), pos, newPos);
-                    break;
-                }
-            }
+        if (mcrObject.getStructure().getDerivates().size() != oldDerivates.size()) {
+            final String oldIDS = oldDerivates.stream()
+                .map(MCRMetaDerivateLinkID::getXLinkHref).collect(Collectors.joining(","));
+            final String newIds = mcrObject.getStructure().getDerivates().stream()
+                .map(MCRMetaDerivateLinkID::getXLinkHref).collect(Collectors.joining(","));
+            throw new MCRPersistenceException(
+                "There are more or less derivates before editing! [" + oldIDS + "] -> [" + newIds + "]");
         }
 
         // set the parent from the original and this update
@@ -965,7 +947,7 @@ public final class MCRMetadataManager {
      * @throws MCRPersistenceException
      *             if a persistence problem is occurred
      */
-    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaLinkID link)
+    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaDerivateLinkID link)
         throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
         if (!object.getStructure().addOrUpdateDerivate(link)) {
