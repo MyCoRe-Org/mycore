@@ -60,6 +60,7 @@ public class MCRContentStoreTestCase extends MCRJPATestCase {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.Metadata.Type.derivate", "true");
         testProperties.put("MCR.IFS.ContentStore.IFS2.BaseDir", storeBaseDir.getRoot().getAbsolutePath());
+        testProperties.put("MCR.datadir", "%MCR.basedir%/data");
         return testProperties;
     }
 

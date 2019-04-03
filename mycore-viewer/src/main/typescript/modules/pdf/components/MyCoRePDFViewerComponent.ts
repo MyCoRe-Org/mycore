@@ -18,8 +18,8 @@
 
 /// <reference path="../definitions/pdf.d.ts" />
 /// <reference path="PDFSettings.ts" />
-/// <reference path="../widgets/PDFPage.ts" />
 /// <reference path="../widgets/PDFStructureBuilder.ts" />
+/// <reference path="../widgets/PDFPage.ts" />
 
 namespace mycore.viewer.components {
 
@@ -104,7 +104,7 @@ namespace mycore.viewer.components {
                 if (!this._pageCache.has(Number(pageID))) {
                     var promise = this._pdfDocument.getPage(Number(pageID));
                     promise.then((page:PDFPageProxy) => {
-                            var pdfPage = new widgets.canvas.PDFPage(rpe._pageId, page);
+                            var pdfPage = new widgets.canvas.PDFPage(rpe._pageId, page, this._structureBuilder);
                             this._pageCache.set(Number(rpe._pageId), pdfPage);
                             rpe._onResolve(rpe._pageId, pdfPage);
                         },

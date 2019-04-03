@@ -22,11 +22,17 @@ namespace mycore.viewer.model {
     export interface TextContentModel {
         content : Array<TextElement>;
         links: Link[];
+        internLinks: InternLink[];
     }
 
     export interface Link {
         url: string;
         rect: Rect;
+    }
+
+    export interface InternLink {
+        rect: Rect;
+        pageNumberResolver(callback: (page: string) => void): void;
     }
 
     export interface TextElement {
