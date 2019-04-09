@@ -5,7 +5,7 @@
   <xsl:output method="html" encoding="UTF-8" indent="yes" />
 
   <xsl:template match="mods:mods|mets:mdWrap[@MDTYPE='MODS']/mets:xmlData/mods:mods">
-    <div class="metadata well">
+    <div class="metadata jumbotron">
       <!-- Print Authors -->
       <xsl:if test="mods:name/mods:displayForm[../mods:role/mods:roleTerm='aut']">
         <span class="names">
