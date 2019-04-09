@@ -5,6 +5,7 @@
                 exclude-result-prefixes="iview2">
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="MCR.Viewer.bootstrapURL" />
+  <xsl:param name="MCR.Viewer.FontaweSomeURL" />
 
   <xsl:output method="html" encoding="UTF-8" indent="yes" />
 
@@ -27,6 +28,9 @@
             <xsl:if test="string-length($MCR.Viewer.bootstrapURL)&gt;0">
               <script type="text/javascript" src="{$MCR.Viewer.bootstrapURL}/js/bootstrap.min.js"></script>
               <link href="{$MCR.Viewer.bootstrapURL}/css/bootstrap.css" type="text/css" rel="stylesheet"></link>
+            </xsl:if>
+            <xsl:if test="string-length($MCR.Viewer.FontaweSomeURL)&gt;0">
+              <link href="{$MCR.Viewer.FontaweSomeURL}" type="text/css" rel="stylesheet"></link>
             </xsl:if>
           </xsl:otherwise>
         </xsl:choose>
