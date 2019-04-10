@@ -71,6 +71,7 @@ public class MCRURNGranularRESTRegistrationStarter
 
     @Override
     public void startUp(ServletContext servletContext) {
+        MCRShutdownHandler.getInstance().addCloseable(this);
         getUsernamePassword()
             .map(this::getEpicureProvider)
             .map(MCRDNBURNRestClient::new)
