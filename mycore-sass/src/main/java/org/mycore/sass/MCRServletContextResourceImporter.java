@@ -25,9 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +39,7 @@ import javax.servlet.ServletContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.util.IOUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.MCRDeveloperTools;
 
 import io.bit3.jsass.importer.Import;
 import io.bit3.jsass.importer.Importer;
@@ -62,8 +60,6 @@ public class MCRServletContextResourceImporter implements Importer {
     @Override
     public Collection<Import> apply(String url, Import previous) {
         try {
-            final String override = MCRConfiguration
-                .instance().getString("MCR.Developer.Resource.Override", null);
 
             final String absolute = previous != null ? previous.getAbsoluteUri().resolve(url).toString() : url;
 
@@ -72,22 +68,15 @@ public class MCRServletContextResourceImporter implements Importer {
             Optional<URL> firstPossibleName = possibleNameForms.stream()
                 .map(form -> {
                     try {
-                        if (override != null) {
-                            final String[] uris = override.split(",");
-                            final Optional<Path> resource = Stream.of(uris)
-                                .map(Paths::get)
-                                .map(p -> p.resolve("META-INF").resolve("resources"))
-                                .filter(Files::exists)
-                                .map(p -> p.resolve(form.startsWith("/") ? form.substring(1) : form))
-                                .filter(Files::exists)
-                                .peek(p -> LogManager.getLogger()
-                                    .info("Found overridden File in path: " + p.toAbsolutePath()))
-                                .findFirst();
+                        if(MCRDeveloperTools.overrideActive()){
+                            final Optional<Path> overriddenFilePath = MCRDeveloperTools
+                                .getOverriddenFilePath(form.startsWith("/") ? form.substring(1) : form, true);
 
-                            if (resource.isPresent()) {
-                                return resource.get().toUri().toURL();
+                            if (overriddenFilePath.isPresent()) {
+                                return overriddenFilePath.get().toUri().toURL();
                             }
                         }
+
                         return context.getResource(normalize(form));
                     } catch (MalformedURLException e) {
                         // ignore exception because it seems to be a not valid name form

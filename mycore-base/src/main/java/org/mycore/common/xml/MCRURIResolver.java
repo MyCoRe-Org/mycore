@@ -79,6 +79,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
@@ -627,6 +628,14 @@ public final class MCRURIResolver implements URIResolver {
             if (path.charAt(0) != '/') {
                 path = '/' + path;
             }
+
+            if(MCRDeveloperTools.overrideActive()){
+                final Optional<Path> overriddenFilePath = MCRDeveloperTools.getOverriddenFilePath(path, true);
+                if(overriddenFilePath.isPresent()){
+                    return new StreamSource(overriddenFilePath.get().toFile());
+                }
+            }
+
             LOGGER.debug("Reading xml from webapp {}", path);
             try {
                 URL resource = context.getResource(path);
