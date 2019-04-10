@@ -22,21 +22,19 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRDeveloperTools;
 
 /**
  * This helper class determines in which directory to look for addition configuration files.
@@ -214,20 +212,11 @@ public class MCRConfigurationDir {
      * @param classLoader a classLoader to resolve the resource (see above), null defaults to this class' class loader
      */
     public static URL getConfigResource(String relativePath, ClassLoader classLoader) {
-        final String override = MCRConfiguration.instance().getString("MCR.Developer.Resource.Override", null);
-
-        if (override != null) {
-            final String[] uris = override.split(",");
-            final Optional<Path> resource = Stream.of(uris).map(Paths::get)
-                .filter(Files::exists)
-                .map(p -> p.resolve(relativePath))
-                .filter(Files::exists)
-                .peek(p -> LogManager.getLogger().info("Found overridden File in path: " + p.toAbsolutePath()))
-                .findFirst();
-
-            if (resource.isPresent()) {
+        if (MCRDeveloperTools.overrideActive()) {
+            final Optional<Path> overriddenFilePath = MCRDeveloperTools.getOverriddenFilePath(relativePath, false);
+            if (overriddenFilePath.isPresent()) {
                 try {
-                    return resource.get().toUri().toURL();
+                    return overriddenFilePath.get().toUri().toURL();
                 } catch (MalformedURLException e) {
                     // Ignore
                 }

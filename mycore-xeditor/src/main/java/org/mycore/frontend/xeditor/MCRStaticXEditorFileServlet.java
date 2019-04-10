@@ -20,9 +20,7 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
@@ -72,26 +71,15 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
     protected MCRContent getResourceContent(HttpServletRequest request, HttpServletResponse response, URL resource)
         throws IOException, JDOMException, SAXException {
         MCRContent content = super.getResourceContent(request, response, resource);
-        if(MCRConfiguration.instance().getString("MCR.Developer.Resource.Override", null) != null){
-            final String[] pathParts = request.getServletPath().split("/");
-            final Optional<Path> override = MCRConfiguration.instance().getStrings("MCR.Developer.Resource.Override")
-                .stream()
-                .map(Paths::get)
-                .map(path -> path.resolve("META-INF").resolve("resources"))
-                .map(p -> {
-                    for (String part : pathParts) {
-                        p = p.resolve(part);
-                    }
-                    return p;
-                })
-                .filter(Files::exists)
-                .peek(p-> LOGGER.info("Found overridden Resource: {}", p.toAbsolutePath().toString()))
-                .findFirst();
 
-            if(override.isPresent()){
-                content = new MCRPathContent(override.get());
+        if (MCRDeveloperTools.overrideActive()) {
+            final Optional<Path> overriddenFilePath = MCRDeveloperTools
+                .getOverriddenFilePath(request.getServletPath(), true);
+            if (overriddenFilePath.isPresent()) {
+                content = new MCRPathContent(overriddenFilePath.get());
             }
         }
+
         if (mayContainEditorForm(content)) {
             content = doExpandEditorElements(content, request, response,
                 request.getParameter(MCREditorSessionStore.XEDITOR_SESSION_PARAM),
