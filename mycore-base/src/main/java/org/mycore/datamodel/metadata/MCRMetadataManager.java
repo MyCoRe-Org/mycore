@@ -28,10 +28,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ import javax.persistence.PersistenceException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
@@ -837,26 +839,69 @@ public final class MCRMetadataManager {
             .collect(Collectors.toList());
         mcrObject.getStructure().clearChildren();
 
-        final Set<String> derivates = mcrObject.getStructure().getDerivates().stream()
-            .map(MCRMetaDerivateLinkID::getXLinkHref).collect(Collectors.toSet());
-        final List<MCRMetaDerivateLinkID> oldDerivates = old.getStructure().getDerivates();
+        List<String> derOrder = mcrObject.getStructure()
+            .getDerivates()
+            .stream()
+            .map(MCRMetaLink::getXLinkHref)
+            .collect(Collectors.toList());
 
-        final String missingIDs = oldDerivates.stream()
-            .map(MCRMetaDerivateLinkID::getXLinkHref)
-            .filter(o -> !derivates.contains(o))
-            .collect(Collectors.joining(","));
+        HashMap<String, String> newlinkTitles = new HashMap<>();
+        HashMap<String, String> newlinkLabels = new HashMap<>();
+        HashMap<String, List<Content>> newContent = new HashMap<>();
+        HashMap<String, String> newMainDoc = new HashMap<>();
 
-        if (missingIDs.length() > 0) {
-            throw new MCRPersistenceException("The ids " + missingIDs + " got removed from the MCRObject!");
+
+        for (MCRMetaDerivateLinkID newlinkID : mcrObject.getStructure().getDerivates()) {
+            if (newlinkID.getXLinkTitle() != null) {
+                newlinkTitles.put(newlinkID.getXLinkHref(), newlinkID.getXLinkTitle());
+            }
+
+            if (newlinkID.getXLinkLabel() != null) {
+                newlinkLabels.put(newlinkID.getXLinkHref(), newlinkID.getXLinkLabel());
+            }
+
+            if(newlinkID.getContentList() != null){
+                newContent.put(newlinkID.getXLinkHref(), newlinkID
+                    .getContentList()
+                    .stream()
+                    .map(Content::clone)
+                    .collect(Collectors.toList()));
+            }
+
+            if(newlinkID.getMainDoc() != null) {
+                newMainDoc.put(newlinkID.getXLinkHref(), newlinkID.getMainDoc());
+            }
+        }
+        mcrObject.getStructure().clearDerivates();
+
+        // set the derivate data in structure
+        List<MCRMetaDerivateLinkID> linkIDs = mcrObject.getStructure().getDerivates();
+        List<MCRMetaDerivateLinkID> oldlinkIDs = old.getStructure().getDerivates();
+        for (MCRMetaDerivateLinkID oldlinkID : oldlinkIDs) {
+            final String derivateID = oldlinkID.getXLinkHref();
+            if (newlinkTitles.containsKey(derivateID)) {
+                oldlinkID.setXLinkTitle(newlinkTitles.get(derivateID));
+            }
+            if (newlinkLabels.containsKey(derivateID)) {
+                oldlinkID.setXLinkLabel(newlinkLabels.get(derivateID));
+            }
+            if(newContent.containsKey(derivateID)){
+                oldlinkID.setContentList(newContent.get(derivateID));
+            }
+            if(newMainDoc.containsKey(derivateID)){
+                oldlinkID.setMainDoc(newMainDoc.get(derivateID));
+            }
+            linkIDs.add(oldlinkID);
         }
 
-        if (mcrObject.getStructure().getDerivates().size() != oldDerivates.size()) {
-            final String oldIDS = oldDerivates.stream()
-                .map(MCRMetaDerivateLinkID::getXLinkHref).collect(Collectors.joining(","));
-            final String newIds = mcrObject.getStructure().getDerivates().stream()
-                .map(MCRMetaDerivateLinkID::getXLinkHref).collect(Collectors.joining(","));
-            throw new MCRPersistenceException(
-                "There are more or less derivates before editing! [" + oldIDS + "] -> [" + newIds + "]");
+        //set the new order of derivates
+        for (int newPos = 0; newPos < derOrder.size(); newPos++) {
+            for (int pos = 0; pos < mcrObject.getStructure().getDerivates().size(); pos++) {
+                if (derOrder.get(newPos).equals(mcrObject.getStructure().getDerivates().get(pos).getXLinkHref())) {
+                    Collections.swap(mcrObject.getStructure().getDerivates(), pos, newPos);
+                    break;
+                }
+            }
         }
 
         // set the parent from the original and this update
