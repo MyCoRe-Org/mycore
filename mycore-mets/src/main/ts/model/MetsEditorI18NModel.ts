@@ -47,6 +47,6 @@ namespace org.mycore.mets.model {
 
     export interface I18nModel {
         messages: any;
-        get(str:string):string;
+        get(str: string): string;
     }
 }
