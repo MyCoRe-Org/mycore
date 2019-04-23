@@ -64,8 +64,8 @@ namespace org.mycore.mets.controller {
 
                     this.privateErrorModal = this.$modal.open(options);
                     this.privateErrorModal.errorModel = new org.mycore.mets.model.ErrorModalModel(
-                        this.i18nModel.get("messages.noLockTitle") || '???noLockTitle???',
-                        this.i18nModel.get("messages.noLockMessage") || '???noLockMessage???'
+                        this.i18nModel.get('messages.noLockTitle') || '???noLockTitle???',
+                        this.i18nModel.get('messages.noLockMessage') || '???noLockMessage???'
                     );
 
                     this.privateErrorModal.result.then(emptyCallback, emptyCallback);
