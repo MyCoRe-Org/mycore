@@ -22,7 +22,11 @@ namespace org.mycore.mets.model {
     export function i18n($http: ng.IHttpService,
                          $location: ng.ILocationService,
                          $log: ng.ILogService, editorConfiguration: MetsEditorConfiguration) {
-        const metsEditorMessageModel = {messages : []};
+        const metsEditorMessageModel = {
+            get : function (str: string) {
+                return this.messages[ str ];
+            }, messages : []
+        };
 
         (<any> $http.get(editorConfiguration.i18URL)).success((i18nData) => {
             for (const index in i18nData) {
@@ -43,5 +47,6 @@ namespace org.mycore.mets.model {
 
     export interface I18nModel {
         messages: any;
+        get(str:string):string;
     }
 }
