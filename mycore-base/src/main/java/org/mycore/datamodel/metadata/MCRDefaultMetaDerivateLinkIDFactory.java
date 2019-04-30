@@ -10,8 +10,7 @@ public class MCRDefaultMetaDerivateLinkIDFactory extends MCRMetaDerivateLinkIDFa
 
     @Override
     public MCRMetaDerivateLinkID getDerivateLink(MCRDerivate der) {
-
-        final MCRMetaDerivateLinkID derivateLinkID = new MCRMetaDerivateLinkID();
+        final MCRMetaDerivateLinkID derivateLinkID = getEmptyDerivateLink();
         final String mainDoc = der.getDerivate().getInternals().getMainDoc();
         final String label = der.getLabel();
 
@@ -38,7 +37,7 @@ public class MCRDefaultMetaDerivateLinkIDFactory extends MCRMetaDerivateLinkIDFa
         });
 
         der.getDerivate().getClassifications().forEach(clazz -> {
-            final Element classElement = new Element("title");
+            final Element classElement = new Element("classification");
             classElement.setAttribute("classid", clazz.getClassId());
             classElement.setAttribute("categid", clazz.getCategId());
             contentList.add(classElement);

@@ -12,7 +12,7 @@ public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
 
     private List<Content> contentList;
 
-    public MCRMetaDerivateLinkID() {
+    MCRMetaDerivateLinkID() {
     }
 
     public static MCRMetaDerivateLinkID fromDom(Element element){

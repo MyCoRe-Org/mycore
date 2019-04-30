@@ -409,6 +409,7 @@ public class MCRObjectDerivate {
             classifications.stream()
                 .map(MCRMetaClassification::createXML)
                 .forEach(clazzElement::addContent);
+            elm.addContent(clazzElement);
         }
 
         if (this.derivateURN != null || !files.isEmpty()) {

@@ -18,10 +18,6 @@
 
 package org.mycore.frontend.servlets.persistence;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.io.IOException;
 import java.util.Properties;
 
@@ -34,17 +30,17 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXParseException;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * Handles UPDATE operation on {@link MCRDerivate}.
@@ -109,28 +105,14 @@ public class MCRUpdateDerivateServlet extends MCRPersistenceServlet {
      */
     private MCRObjectID updateDerivateXML(Document editorSubmission)
         throws SAXParseException, IOException, MCRAccessException {
-        MCRObjectID objectID;
         Element root = editorSubmission.getRootElement();
         root.setAttribute("noNamespaceSchemaLocation", "datamodel-derivate.xsd", XSI_NAMESPACE);
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         byte[] xml = new MCRJDOMContent(editorSubmission).asByteArray();
         MCRDerivate der = new MCRDerivate(xml, true);
-        MCRObjectID derivateID = der.getId();
-        // store entry of derivate xlink:title in object
-        objectID = der.getDerivate().getMetaLink().getXLinkHrefID();
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
-        MCRObjectStructure structure = obj.getStructure();
-        MCRMetaLinkID linkID = structure.getDerivateLink(derivateID);
-        linkID.setXLinkTitle(der.getLabel());
-        try {
-            MCRMetadataManager.update(obj);
-            MCRMetadataManager.update(der);
-        } catch (MCRPersistenceException | MCRAccessException e) {
-            throw new MCRPersistenceException("Can't store label of derivate " + derivateID
-                + " in derivate list of object " + objectID + ".", e);
-        }
-        return objectID;
+        MCRMetadataManager.update(der);
+        return der.getOwnerID();
     }
 
     /**

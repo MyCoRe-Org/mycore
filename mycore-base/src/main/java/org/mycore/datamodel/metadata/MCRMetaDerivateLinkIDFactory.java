@@ -14,4 +14,8 @@ public abstract class MCRMetaDerivateLinkIDFactory {
     }
 
     public abstract MCRMetaDerivateLinkID getDerivateLink(MCRDerivate der);
+
+    public MCRMetaDerivateLinkID getEmptyDerivateLink(){
+        return new MCRMetaDerivateLinkID();
+    }
 }
