@@ -136,10 +136,10 @@ public class MCRBasketPersistence {
      * @throws IOException 
      */
     private static void writeBasketToFile(MCRBasket basket, MCRDerivate derivate, MCRPath basketFile)
-        throws IOException {
+        throws IOException, MCRAccessException {
         Document xml = new MCRBasketXMLBuilder(false).buildXML(basket);
         XMLOutputter xout = new XMLOutputter();
         xout.output(xml, Files.newOutputStream(basketFile));
-        MCRMetadataManager.updateMCRDerivateXML(derivate);
+        MCRMetadataManager.update(derivate);
     }
 }

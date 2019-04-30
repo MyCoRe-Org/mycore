@@ -17,8 +17,6 @@
  */
 package org.mycore.restapi.v1.utils;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -52,7 +50,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaDerivateLinkID;
+import org.mycore.datamodel.metadata.MCRMetaDerivateLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -63,6 +61,8 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
@@ -174,7 +174,7 @@ public class MCRRestAPIUploadHelper {
 
                 MCRMetadataManager.create(mcrDerivate);
                 MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-                    new MCRMetaDerivateLinkID("derobject", derID, null, label));
+                    MCRMetaDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
             }
 
             response = Response

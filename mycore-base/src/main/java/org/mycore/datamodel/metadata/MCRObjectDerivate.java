@@ -52,6 +52,8 @@ public class MCRObjectDerivate {
 
     private final ArrayList<MCRMetaLangText> titles;
 
+    private final ArrayList<MCRMetaClassification> classifications;
+
     private String derivateURN;
 
     private boolean display;
@@ -69,6 +71,7 @@ public class MCRObjectDerivate {
         externals = new ArrayList<>();
         internals = null;
         titles = new ArrayList<>();
+        classifications = new ArrayList<>();
         files = Collections.emptyList();
         display = true;
         this.derivateID = derivateID;
@@ -86,15 +89,15 @@ public class MCRObjectDerivate {
      * @param derivate
      *            a list of relevant DOM elements for the derivate
      */
-    private void setFromDOM(org.jdom2.Element derivate) {
+    private void setFromDOM(Element derivate) {
         // Link to Metadata part
-        org.jdom2.Element linkmeta_element = derivate.getChild("linkmetas").getChild("linkmeta");
+        Element linkmeta_element = derivate.getChild("linkmetas").getChild("linkmeta");
         MCRMetaLinkID link = new MCRMetaLinkID();
         link.setFromDOM(linkmeta_element);
         linkmeta = link;
 
         // External part
-        org.jdom2.Element externalsElement = derivate.getChild("externals");
+        Element externalsElement = derivate.getChild("externals");
         externals.clear();
         if (externalsElement != null) {
             List<Element> externalList = externalsElement.getChildren();
@@ -106,9 +109,9 @@ public class MCRObjectDerivate {
         }
 
         // Internal part
-        org.jdom2.Element internals_element = derivate.getChild("internals");
+        Element internals_element = derivate.getChild("internals");
         if (internals_element != null) {
-            org.jdom2.Element internal_element = internals_element.getChild("internal");
+            Element internal_element = internals_element.getChild("internal");
             if (internal_element != null) {
                 internals = new MCRMetaIFS();
                 internals.setFromDOM(internal_element);
@@ -116,7 +119,7 @@ public class MCRObjectDerivate {
         }
 
         // Title part
-        org.jdom2.Element titlesElement = derivate.getChild("titles");
+        Element titlesElement = derivate.getChild("titles");
         titles.clear();
         if (titlesElement != null) {
             List<Element> titleList = titlesElement.getChildren();
@@ -127,6 +130,18 @@ public class MCRObjectDerivate {
                     titles.add(text);
                 }
             }
+        }
+
+        // Classification part
+        Element classificationElement = derivate.getChild("classifications");
+        classifications.clear();
+        if (classificationElement != null) {
+            final List<Element> classificationList = classificationElement.getChildren();
+            classificationList.stream().map((classElement) -> {
+                MCRMetaClassification clazzObject = new MCRMetaClassification();
+                clazzObject.setFromDOM(classElement);
+                return clazzObject;
+            }).forEach(classifications::add);
         }
 
         // fileset part
@@ -343,23 +358,23 @@ public class MCRObjectDerivate {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the structure data part
      */
-    public final org.jdom2.Element createXML() throws MCRException {
+    public final Element createXML() throws MCRException {
         try {
             validate();
         } catch (MCRException exc) {
             throw new MCRException("The content is not valid.", exc);
         }
-        org.jdom2.Element elm = new org.jdom2.Element("derivate");
+        Element elm = new Element("derivate");
         elm.setAttribute("display", String.valueOf(display));
 
-        org.jdom2.Element linkmetas = new org.jdom2.Element("linkmetas");
+        Element linkmetas = new Element("linkmetas");
         linkmetas.setAttribute("class", "MCRMetaLinkID");
         linkmetas.setAttribute("heritable", "false");
         linkmetas.addContent(linkmeta.createXML());
         elm.addContent(linkmetas);
 
         if (externals.size() != 0) {
-            org.jdom2.Element extEl = new org.jdom2.Element("externals");
+            Element extEl = new Element("externals");
             extEl.setAttribute("class", "MCRMetaLink");
             extEl.setAttribute("heritable", "false");
             for (MCRMetaLink external : externals) {
@@ -369,7 +384,7 @@ public class MCRObjectDerivate {
         }
 
         if (internals != null) {
-            org.jdom2.Element intEl = new org.jdom2.Element("internals");
+            Element intEl = new Element("internals");
             intEl.setAttribute("class", "MCRMetaIFS");
             intEl.setAttribute("heritable", "false");
             intEl.addContent(internals.createXML());
@@ -377,13 +392,23 @@ public class MCRObjectDerivate {
         }
 
         if (titles.size() != 0) {
-            org.jdom2.Element titEl = new org.jdom2.Element("titles");
+            Element titEl = new Element("titles");
             titEl.setAttribute("class", "MCRMetaLangText");
             titEl.setAttribute("heritable", "false");
-            for (MCRMetaLangText title : titles) {
-                titEl.addContent(title.createXML());
-            }
+            titles.stream()
+                .map(MCRMetaLangText::createXML)
+                .forEach(titEl::addContent);
             elm.addContent(titEl);
+        }
+
+        if (classifications.size() > 0) {
+            Element clazzElement = new Element("classifications");
+            clazzElement.setAttribute("class", "MCRMetaClassification");
+            clazzElement.setAttribute("heritable", "false");
+
+            classifications.stream()
+                .map(MCRMetaClassification::createXML)
+                .forEach(clazzElement::addContent);
         }
 
         if (this.derivateURN != null || !files.isEmpty()) {
@@ -471,4 +496,11 @@ public class MCRObjectDerivate {
         this.derivateID = id;
     }
 
+    public ArrayList<MCRMetaClassification> getClassifications() {
+        return classifications;
+    }
+
+    public ArrayList<MCRMetaLangText> getTitles() {
+        return titles;
+    }
 }

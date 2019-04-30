@@ -1,6 +1,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.jdom2.Content;
@@ -9,29 +10,15 @@ import org.mycore.common.MCRException;
 
 public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
 
-    private String mainDoc;
-
     private List<Content> contentList;
 
     public MCRMetaDerivateLinkID() {
     }
 
-    public MCRMetaDerivateLinkID(String set_subtag, int set_inherted) {
-        super(set_subtag, set_inherted);
-    }
-
-    public MCRMetaDerivateLinkID(String set_subtag, MCRObjectID id, String label, String title) {
-        super(set_subtag, id, label, title);
-    }
-
-    public MCRMetaDerivateLinkID(String set_subtag, MCRObjectID id, String label, String title, String role) {
-        super(set_subtag, id, label, title, role);
-    }
-
-    public MCRMetaDerivateLinkID(MCRMetaLinkID old, String mainDoc, List<Content> contentList) {
-        setFromDOM(old.createXML());
-        this.mainDoc = mainDoc;
-        this.contentList = contentList;
+    public static MCRMetaDerivateLinkID fromDom(Element element){
+        final MCRMetaDerivateLinkID mcrMetaDerivateLinkID = new MCRMetaDerivateLinkID();
+        mcrMetaDerivateLinkID.setFromDOM(element);
+        return mcrMetaDerivateLinkID;
     }
 
     @Override
@@ -39,7 +26,6 @@ public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
         super.setFromDOM(element);
 
         contentList = element.getContent().stream().map(Content::clone).collect(Collectors.toList());
-        mainDoc = element.getAttributeValue("mainDoc");
     }
 
     @Override public Element createXML() throws MCRException {
@@ -49,19 +35,7 @@ public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
             contentList.stream().map(Content::clone).forEach(xml::addContent);
         }
 
-        if (this.mainDoc != null) {
-            xml.setAttribute("mainDoc", this.mainDoc);
-        }
-
         return xml;
-    }
-
-    public String getMainDoc() {
-        return mainDoc;
-    }
-
-    public void setMainDoc(String mainDoc) {
-        this.mainDoc = mainDoc;
     }
 
     public List<Content> getContentList() {
@@ -70,5 +44,31 @@ public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
 
     public void setContentList(List<Content> contentList) {
         this.contentList = contentList;
+    }
+
+
+    public int getOrder(){
+        return getContentList().stream()
+            .filter(el-> el instanceof Element)
+            .map(Element.class::cast)
+            .filter(el-> "order".equals(el.getName()))
+            .findFirst()
+            .map(Element::getTextNormalize)
+            .map(Integer::valueOf)
+            .orElse(1);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o))
+            return false;
+
+        MCRMetaDerivateLinkID that = (MCRMetaDerivateLinkID) o;
+
+        return Objects.equals(getContentList(), that.getContentList());
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(super.hashCode(), getContentList());
     }
 }

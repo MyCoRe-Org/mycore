@@ -28,9 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +39,6 @@ import javax.persistence.PersistenceException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
@@ -214,9 +211,7 @@ public final class MCRMetadataManager {
         fireEvent(mcrDerivate, null, MCREvent.CREATE_EVENT);
 
         // add the link to metadata
-        final MCRMetaDerivateLinkID der = new MCRMetaDerivateLinkID();
-        der.setReference(mcrDerivate.getId().toString(), null, mcrDerivate.getLabel());
-        der.setSubTag("derobject");
+        final MCRMetaDerivateLinkID der = MCRMetaDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
 
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -738,17 +733,17 @@ public final class MCRMetadataManager {
      */
     public static void update(final MCRDerivate mcrDerivate)
         throws MCRPersistenceException, MCRAccessException {
-        MCRObjectID id = mcrDerivate.getId();
+        MCRObjectID derivateId = mcrDerivate.getId();
         // check deletion mark
-        if (MCRMarkManager.instance().isMarkedForDeletion(id)) {
+        if (MCRMarkManager.instance().isMarkedForDeletion(derivateId)) {
             return;
         }
-        if (!MCRMetadataManager.exists(id)) {
+        if (!MCRMetadataManager.exists(derivateId)) {
             MCRMetadataManager.create(mcrDerivate);
             return;
         }
-        if (!MCRAccessManager.checkDerivateMetadataPermission(id, PERMISSION_WRITE)) {
-            throw MCRAccessException.missingPermission("Update derivate", id.toString(), PERMISSION_WRITE);
+        if (!MCRAccessManager.checkDerivateMetadataPermission(derivateId, PERMISSION_WRITE)) {
+            throw MCRAccessException.missingPermission("Update derivate", derivateId.toString(), PERMISSION_WRITE);
         }
         File fileSourceDirectory = null;
         if (mcrDerivate.getDerivate().getInternals() != null
@@ -756,31 +751,29 @@ public final class MCRMetadataManager {
             fileSourceDirectory = new File(mcrDerivate.getDerivate().getInternals().getSourcePath());
 
             if (!fileSourceDirectory.exists()) {
-                LOGGER.warn("{}: the directory {} was not found.", id, fileSourceDirectory);
+                LOGGER.warn("{}: the directory {} was not found.", derivateId, fileSourceDirectory);
                 fileSourceDirectory = null;
             }
         }
         // get the old Item
-        MCRDerivate old = MCRMetadataManager.retrieveMCRDerivate(id);
+        MCRDerivate old = MCRMetadataManager.retrieveMCRDerivate(derivateId);
 
         // remove the old link to metadata
         MCRMetaLinkID oldLink = old.getDerivate().getMetaLink();
         MCRMetaLinkID newLink = mcrDerivate.getDerivate().getMetaLink();
-        if (!oldLink.equals(newLink)) {
-            MCRObjectID oldMetadataObjectID = oldLink.getXLinkHrefID();
-            MCRObjectID newMetadataObjectID = newLink.getXLinkHrefID();
-            if (!oldMetadataObjectID.equals(newLink.getXLinkHrefID())) {
-                try {
-                    MCRMetadataManager.removeDerivateFromObject(oldMetadataObjectID, id);
-                } catch (final MCRException e) {
-                    LOGGER.warn(e.getMessage(), e);
-                }
+        MCRObjectID oldMetadataObjectID = oldLink.getXLinkHrefID();
+        MCRObjectID newMetadataObjectID = newLink.getXLinkHrefID();
+        if (!oldMetadataObjectID.equals(newLink.getXLinkHrefID())) {
+            try {
+                MCRMetadataManager.removeDerivateFromObject(oldMetadataObjectID, derivateId);
+            } catch (final MCRException e) {
+                LOGGER.warn(e.getMessage(), e);
             }
-            // add the link to metadata
-            final MCRMetaDerivateLinkID der = new MCRMetaDerivateLinkID("derobject", id, null, mcrDerivate.getLabel(),
-                newLink.getXLinkRole());
-            addOrUpdateDerivateToObject(newMetadataObjectID, der);
         }
+        // add the link to metadata
+        final MCRMetaDerivateLinkID der = MCRMetaDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+        addOrUpdateDerivateToObject(newMetadataObjectID, der);
+
         // update the derivate
         mcrDerivate.getService().setDate("createdate", old.getService().getDate("createdate"));
         if (!mcrDerivate.getService().isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) {
@@ -794,7 +787,7 @@ public final class MCRMetadataManager {
         // update to IFS
         if (fileSourceDirectory != null) {
             Path sourcePath = fileSourceDirectory.toPath();
-            MCRPath targetPath = MCRPath.getPath(id.toString(), "/");
+            MCRPath targetPath = MCRPath.getPath(derivateId.toString(), "/");
             try {
                 Files.walkFileTree(sourcePath, new MCRTreeCopier(sourcePath, targetPath));
             } catch (Exception exc) {
@@ -839,70 +832,10 @@ public final class MCRMetadataManager {
             .collect(Collectors.toList());
         mcrObject.getStructure().clearChildren();
 
-        List<String> derOrder = mcrObject.getStructure()
-            .getDerivates()
-            .stream()
-            .map(MCRMetaLink::getXLinkHref)
-            .collect(Collectors.toList());
-
-        HashMap<String, String> newlinkTitles = new HashMap<>();
-        HashMap<String, String> newlinkLabels = new HashMap<>();
-        HashMap<String, List<Content>> newContent = new HashMap<>();
-        HashMap<String, String> newMainDoc = new HashMap<>();
-
-
-        for (MCRMetaDerivateLinkID newlinkID : mcrObject.getStructure().getDerivates()) {
-            if (newlinkID.getXLinkTitle() != null) {
-                newlinkTitles.put(newlinkID.getXLinkHref(), newlinkID.getXLinkTitle());
-            }
-
-            if (newlinkID.getXLinkLabel() != null) {
-                newlinkLabels.put(newlinkID.getXLinkHref(), newlinkID.getXLinkLabel());
-            }
-
-            if(newlinkID.getContentList() != null){
-                newContent.put(newlinkID.getXLinkHref(), newlinkID
-                    .getContentList()
-                    .stream()
-                    .map(Content::clone)
-                    .collect(Collectors.toList()));
-            }
-
-            if(newlinkID.getMainDoc() != null) {
-                newMainDoc.put(newlinkID.getXLinkHref(), newlinkID.getMainDoc());
-            }
-        }
-        mcrObject.getStructure().clearDerivates();
-
-        // set the derivate data in structure
-        List<MCRMetaDerivateLinkID> linkIDs = mcrObject.getStructure().getDerivates();
-        List<MCRMetaDerivateLinkID> oldlinkIDs = old.getStructure().getDerivates();
-        for (MCRMetaDerivateLinkID oldlinkID : oldlinkIDs) {
-            final String derivateID = oldlinkID.getXLinkHref();
-            if (newlinkTitles.containsKey(derivateID)) {
-                oldlinkID.setXLinkTitle(newlinkTitles.get(derivateID));
-            }
-            if (newlinkLabels.containsKey(derivateID)) {
-                oldlinkID.setXLinkLabel(newlinkLabels.get(derivateID));
-            }
-            if(newContent.containsKey(derivateID)){
-                oldlinkID.setContentList(newContent.get(derivateID));
-            }
-            if(newMainDoc.containsKey(derivateID)){
-                oldlinkID.setMainDoc(newMainDoc.get(derivateID));
-            }
-            linkIDs.add(oldlinkID);
-        }
-
-        //set the new order of derivates
-        for (int newPos = 0; newPos < derOrder.size(); newPos++) {
-            for (int pos = 0; pos < mcrObject.getStructure().getDerivates().size(); pos++) {
-                if (derOrder.get(newPos).equals(mcrObject.getStructure().getDerivates().get(pos).getXLinkHref())) {
-                    Collections.swap(mcrObject.getStructure().getDerivates(), pos, newPos);
-                    break;
-                }
-            }
-        }
+        final List<MCRMetaDerivateLinkID> derivates = mcrObject.getStructure().getDerivates();
+        derivates.clear();
+        old.getStructure().getDerivates()
+            .forEach(mcrObject.getStructure()::addDerivate);
 
         // set the parent from the original and this update
         MCRObjectID oldParentID = old.getStructure().getParentID();
@@ -973,7 +906,7 @@ public final class MCRMetadataManager {
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
      */
-    public static void updateMCRDerivateXML(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
+    private static void updateMCRDerivateXML(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
         if (!mcrDerivate.isImportMode() || mcrDerivate.getService().getDate("modifydate") == null) {
             mcrDerivate.getService().setDate("modifydate");
         }

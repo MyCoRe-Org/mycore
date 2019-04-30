@@ -236,7 +236,7 @@ public class MCRMetaLinkID extends MCRMetaLink {
     }
 
     @Override
-    public final boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (!super.equals(obj)) {
             return false;
         }

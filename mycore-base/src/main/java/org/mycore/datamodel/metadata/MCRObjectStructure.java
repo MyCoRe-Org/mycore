@@ -19,9 +19,10 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -183,7 +184,7 @@ public class MCRObjectStructure {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Remove child ID {}", href);
         }
-        return removeMetaLink(getChildren().iterator(), href);
+        return removeMetaLink(getChildren(), href);
     }
 
     /**
@@ -208,24 +209,21 @@ public class MCRObjectStructure {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Remove derivate ID {}", href);
         }
-        return removeMetaLink(getDerivates().stream().map(MCRMetaLinkID.class::cast).iterator(), href);
+        return removeMetaLink(getDerivates(), href);
     }
 
     /**
      * Removes a MCRMetaLinkID instance by it MCRObjectID.
-     * @param it
+     * @param list
      * @param href
      * @return
      */
-    private boolean removeMetaLink(Iterator<MCRMetaLinkID> it, MCRObjectID href) {
-        while (it.hasNext()) {
-            MCRMetaLinkID derLink = it.next();
-            if (derLink.getXLinkHrefID().equals(href)) {
-                it.remove();
-                return true;
-            }
-        }
-        return false;
+    private boolean removeMetaLink(List<? extends MCRMetaLinkID> list, MCRObjectID href) {
+        final List<MCRMetaLink> toRemove =
+            list.stream()
+                .filter(ml -> ml.getXLinkHrefID().equals(href))
+                .collect(Collectors.toList());
+        return  list.removeAll(toRemove);
     }
 
     /**
@@ -252,6 +250,7 @@ public class MCRObjectStructure {
             LOGGER.warn("Cannot find derivate {}, will add it anyway.", href);
         }
         derivates.add(add_derivate);
+        derivates.sort(Comparator.comparingInt(MCRMetaDerivateLinkID::getOrder));
         return true;
     }
 
@@ -341,9 +340,7 @@ public class MCRObjectStructure {
             List<Element> derobjectList = subElement.getChildren();
 
             for (Element derElement : derobjectList) {
-                MCRMetaDerivateLinkID der = new MCRMetaDerivateLinkID();
-                der.setFromDOM(derElement);
-                addDerivate(der);
+                addDerivate(MCRMetaDerivateLinkID.fromDom(derElement));
             }
         }
     }

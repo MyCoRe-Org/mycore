@@ -160,7 +160,6 @@
         <xs:any maxOccurs="unbounded" minOccurs="0" processContents="lax" />
       </xs:sequence>
       <xs:attribute name="inherited" use="required" type="xs:integer" fixed="0" />
-      <xs:attribute name="mainDoc" use="optional" type="xs:string" />
       <xs:attributeGroup ref="supportedXlinks" />
     </xs:complexType>
   </xs:element>

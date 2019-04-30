@@ -24,6 +24,7 @@
         <xs:element ref="externals" minOccurs="0" />
         <xs:element ref="internals" minOccurs="0" />
         <xs:element ref="titles" minOccurs="0" />
+        <xs:element ref="classifications" minOccurs="0"/>
         <xs:element ref="fileset" minOccurs="0" />
       </xs:all>
       <xs:attribute name="display" type="xs:boolean" use="optional" />
@@ -96,6 +97,22 @@
           <xs:attribute name="type" type="xs:string" />
         </xs:extension>
       </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="classifications">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="classification"/>
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:NCName" fixed="MCRMetaClassification"/>
+      <xs:attribute name="notinherit" type="xs:boolean"/>
+      <xs:attribute name="heritable" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="classification">
+    <xs:complexType>
+      <xs:attribute name="classid" type="xs:NCName"/>
+      <xs:attribute name="categid" type="xs:NCName"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="fileset">

@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.common;
 
+import org.mycore.access.MCRAccessException;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
@@ -116,7 +118,11 @@ public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
         MCRCategoryID oldState = derivate.getService().getState();
         if (!state.equals(oldState)) {
             derivate.getService().setState(state);
-            MCRMetadataManager.updateMCRDerivateXML(derivate);
+            try {
+                MCRMetadataManager.update(derivate);
+            } catch (MCRAccessException e) {
+                throw new MCRException("Error while updating derivate state!", e);
+            }
         }
     }
 

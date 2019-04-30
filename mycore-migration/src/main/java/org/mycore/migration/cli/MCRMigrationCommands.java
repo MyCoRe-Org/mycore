@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -52,6 +53,7 @@ import org.mycore.backend.jpa.links.MCRLINKHREF;
 import org.mycore.backend.jpa.links.MCRLINKHREFPK_;
 import org.mycore.backend.jpa.links.MCRLINKHREF_;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
@@ -66,6 +68,7 @@ import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
+import org.mycore.datamodel.metadata.MCRMetaDerivateLinkID;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -135,11 +138,7 @@ public class MCRMigrationCommands {
                 service.addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY, modifyUser);
             }
             obj.setImportMode(true);
-            if (obj instanceof MCRDerivate) {
-                MCRMetadataManager.updateMCRDerivateXML((MCRDerivate) obj);
-            } else {
-                MCRMetadataManager.update((MCRObject) obj);
-            }
+            MCRMetadataManager.update(obj);
         }
     }
 
@@ -315,6 +314,39 @@ public class MCRMigrationCommands {
         }
 
         LOGGER.info("Migrated mets of " + derivateIdStr);
+    }
+
+    // 2018 -> 2019
+    @MCRCommand(syntax = "migrate MCR-2003 for object {0}")
+    public static List<String> migrateMCR2003ObjectStep1(String objectIDStr) {
+        final MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
+
+        if (!MCRMetadataManager.exists(objectID)) {
+            throw new MCRException("The object " + objectIDStr + "does not exist!");
+        }
+
+        final MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
+        final List<MCRMetaDerivateLinkID> derivates = mcrObject.getStructure().getDerivates();
+
+        return derivates.stream().map(
+            (der) -> "migrate MCR-2003 set order of Derivate " + der.getXLinkHrefID().toString() + " to " + (
+                derivates.indexOf(der) + 1)).collect(Collectors.toList());
+    }
+
+    @MCRCommand(syntax = "migrate MCR-2003 set order of Derivate {0} to {1}")
+    public static void migrateMCR2003Derivate(String derivateIDStr, String orderStr) throws MCRAccessException {
+        final int order = Integer.parseInt(orderStr);
+
+        final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDStr);
+
+        if (!MCRMetadataManager.exists(derivateID)) {
+            throw new MCRException("The object " + derivateIDStr + "does not exist!");
+        }
+
+        final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+        derivate.setOrder(order);
+        MCRMetadataManager.update(derivate);
+
     }
 
     private static void logInfo(MCRPI urn) {
