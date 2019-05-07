@@ -79,7 +79,6 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.iview2.services.MCRTileJob;
-import org.mycore.pi.backend.MCRPI;
 import org.xml.sax.SAXException;
 
 /**
@@ -317,7 +316,7 @@ public class MCRMigrationCommands {
     }
 
     // 2018 -> 2019
-    @MCRCommand(syntax = "migrate MCR-2003 for object {0}")
+    @MCRCommand(syntax = "migrate derivatelink for object {0}", help = "Migrates the Order of derivates from object {0} to derivate (MCR-2003)")
     public static List<String> migrateMCR2003ObjectStep1(String objectIDStr) {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
 
@@ -329,11 +328,11 @@ public class MCRMigrationCommands {
         final List<MCRMetaDerivateLinkID> derivates = mcrObject.getStructure().getDerivates();
 
         return derivates.stream().map(
-            (der) -> "migrate MCR-2003 set order of Derivate " + der.getXLinkHrefID().toString() + " to " + (
+            (der) -> "set order of derivate " + der.getXLinkHrefID().toString() + " to " + (
                 derivates.indexOf(der) + 1)).collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "migrate MCR-2003 set order of Derivate {0} to {1}")
+    @MCRCommand(syntax = "set order of derivate {0} to {1}", help = "Sets the order of derivate {0} ti {1} see also (MCR-2003)")
     public static void migrateMCR2003Derivate(String derivateIDStr, String orderStr) throws MCRAccessException {
         final int order = Integer.parseInt(orderStr);
 
@@ -349,10 +348,4 @@ public class MCRMigrationCommands {
 
     }
 
-    private static void logInfo(MCRPI urn) {
-        String urnStr = urn.getIdentifier();
-        String mycoreID = urn.getMycoreID();
-        String path = urn.getAdditional();
-        LOGGER.info("Migrating: {} - {}:{}", urnStr, mycoreID, path);
-    }
 }

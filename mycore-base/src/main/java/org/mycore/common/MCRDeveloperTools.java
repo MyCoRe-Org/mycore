@@ -45,7 +45,7 @@ public class MCRDeveloperTools {
                     return p;
                 })
                 .filter(Files::exists)
-                .peek(p -> LOGGER.info("Found overridden Resource: {}", p.toAbsolutePath().toString()))
+                .peek(p -> LOGGER.debug("Found overridden Resource: {}", p.toAbsolutePath().toString()))
                 .findFirst();
         }
         return Optional.empty();

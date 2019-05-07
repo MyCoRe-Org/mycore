@@ -9,7 +9,7 @@ public abstract class MCRMetaDerivateLinkIDFactory {
 
     public static MCRMetaDerivateLinkIDFactory getInstance() {
         return MCRConfiguration.instance()
-            .getInstanceOf("MCR.Metadata.DerivateLinkIDFactory.class",
+            .getInstanceOf("MCR.Metadata.DerivateLinkIDFactory.Class",
                 MCRDefaultMetaDerivateLinkIDFactory.class.getName());
     }
 

@@ -8,6 +8,11 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
+/**
+ * A Link to a {@link MCRDerivate}. In addition to {@link MCRMetaLink} this class contains information about the
+ * {@link MCRDerivate} like mainDoc, titles and classifications. The implementations of the Class
+ * {@link MCRMetaDerivateLinkIDFactory} handle which information is present in the {@link MCRMetaDerivateLinkID}
+ */
 public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
 
     private List<Content> contentList;
