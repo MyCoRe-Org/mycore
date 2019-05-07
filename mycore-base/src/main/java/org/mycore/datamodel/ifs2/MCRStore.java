@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -325,6 +326,7 @@ public abstract class MCRStore {
     /**
      * Deletes the data stored in the given file object from the store
      * 
+     * @see <a href="https://stackoverflow.com/questions/39628328/trying-to-create-a-directory-immediately-after-a-successful-deleteifexists-throw">stackoverflow</a>
      * @param path
      *            the file object to be deleted
      */
@@ -336,14 +338,23 @@ public abstract class MCRStore {
         Path parent = path.getParent();
         Files.walkFileTree(path, MCRRecursiveDeleter.instance());
 
-        while (!Files.isSameFile(baseDirectory, parent)) {
-            if (Files.list(parent).findAny().isPresent()) {
-                break;
-            }
-            current = parent;
-            parent = current.getParent();
-            Files.delete(current);
-        }
+		while (!Files.isSameFile(baseDirectory, parent)) {
+
+			// Prevent access denied error in windows with closing the stream correctly
+			Stream<Path> streamParent = Files.list(parent);
+
+			try {
+				if (streamParent.findAny().isPresent()) {
+					break;
+				}
+				current = parent;
+				parent = current.getParent();
+				Files.delete(current);
+
+			} finally {
+				streamParent.close();
+			}
+		}
     }
 
     /**
