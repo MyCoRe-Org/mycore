@@ -317,7 +317,7 @@ public class MCRMigrationCommands {
 
     // 2018 -> 2019
     @MCRCommand(syntax = "migrate derivatelink for object {0}", help = "Migrates the Order of derivates from object {0} to derivate (MCR-2003)")
-    public static List<String> migrateMCR2003ObjectStep1(String objectIDStr) {
+    public static List<String> migrateDerivateLink(String objectIDStr) {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
 
         if (!MCRMetadataManager.exists(objectID)) {
@@ -332,8 +332,8 @@ public class MCRMigrationCommands {
                 derivates.indexOf(der) + 1)).collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "set order of derivate {0} to {1}", help = "Sets the order of derivate {0} ti {1} see also (MCR-2003)")
-    public static void migrateMCR2003Derivate(String derivateIDStr, String orderStr) throws MCRAccessException {
+    @MCRCommand(syntax = "set order of derivate {0} to {1}", help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
+    public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
         final int order = Integer.parseInt(orderStr);
 
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDStr);
