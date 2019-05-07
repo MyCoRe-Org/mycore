@@ -10,20 +10,19 @@ import org.mycore.common.MCRException;
 
 /**
  * A Link to a {@link MCRDerivate}. In addition to {@link MCRMetaLink} this class contains information about the
- * {@link MCRDerivate} like mainDoc, titles and classifications. The implementations of the Class
- * {@link MCRMetaDerivateLinkIDFactory} handle which information is present in the {@link MCRMetaDerivateLinkID}
+ * linked {@link MCRBase} like mainDoc, titles and classifications in {@link MCRDerivate}.
  */
-public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
+public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
 
     private List<Content> contentList;
 
-    MCRMetaDerivateLinkID() {
+    MCRMetaEnrichedLinkID() {
     }
 
-    public static MCRMetaDerivateLinkID fromDom(Element element){
-        final MCRMetaDerivateLinkID mcrMetaDerivateLinkID = new MCRMetaDerivateLinkID();
-        mcrMetaDerivateLinkID.setFromDOM(element);
-        return mcrMetaDerivateLinkID;
+    public static MCRMetaEnrichedLinkID fromDom(Element element){
+        final MCRMetaEnrichedLinkID mcrMetaEnrichedLinkID = new MCRMetaEnrichedLinkID();
+        mcrMetaEnrichedLinkID.setFromDOM(element);
+        return mcrMetaEnrichedLinkID;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class MCRMetaDerivateLinkID extends MCRMetaLinkID {
         if (!super.equals(o))
             return false;
 
-        MCRMetaDerivateLinkID that = (MCRMetaDerivateLinkID) o;
+        MCRMetaEnrichedLinkID that = (MCRMetaEnrichedLinkID) o;
 
         return Objects.equals(getContentList(), that.getContentList());
     }

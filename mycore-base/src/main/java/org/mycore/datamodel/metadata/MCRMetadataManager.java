@@ -152,8 +152,8 @@ public final class MCRMetadataManager {
         } else {
             if (exists(objectId)) {
                 MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectId);
-                List<MCRMetaDerivateLinkID> derivates = mcrObject.getStructure().getDerivates();
-                for (MCRMetaDerivateLinkID der : derivates) {
+                List<MCRMetaEnrichedLinkID> derivates = mcrObject.getStructure().getDerivates();
+                for (MCRMetaEnrichedLinkID der : derivates) {
                     derivateIds.add(der.getXLinkHrefID());
                 }
             }
@@ -211,7 +211,7 @@ public final class MCRMetadataManager {
         fireEvent(mcrDerivate, null, MCREvent.CREATE_EVENT);
 
         // add the link to metadata
-        final MCRMetaDerivateLinkID der = MCRMetaDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+        final MCRMetaEnrichedLinkID der = MCRMetaEnrichedDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
 
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -771,8 +771,8 @@ public final class MCRMetadataManager {
             }
         }
         // add the link to metadata
-        final MCRMetaDerivateLinkID der = MCRMetaDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
-        addOrUpdateDerivateToObject(newMetadataObjectID, der);
+        final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+        addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink);
 
         // update the derivate
         mcrDerivate.getService().setDate("createdate", old.getService().getDate("createdate"));
@@ -832,8 +832,8 @@ public final class MCRMetadataManager {
             .collect(Collectors.toList());
         mcrObject.getStructure().clearChildren();
 
-        final List<MCRMetaDerivateLinkID> derivates = mcrObject.getStructure().getDerivates();
-        derivates.clear();
+        final List<MCRMetaEnrichedLinkID> derivateLinks = mcrObject.getStructure().getDerivates();
+        derivateLinks.clear();
         old.getStructure().getDerivates()
             .forEach(mcrObject.getStructure()::addDerivate);
 
@@ -925,7 +925,7 @@ public final class MCRMetadataManager {
      * @throws MCRPersistenceException
      *             if a persistence problem is occurred
      */
-    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaDerivateLinkID link)
+    public static boolean addOrUpdateDerivateToObject(final MCRObjectID id, final MCRMetaEnrichedLinkID link)
         throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(id);
         if (!object.getStructure().addOrUpdateDerivate(link)) {

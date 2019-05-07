@@ -64,7 +64,7 @@ public class MCRObjectStructure {
 
     private final ArrayList<MCRMetaLinkID> children;
 
-    private final ArrayList<MCRMetaDerivateLinkID> derivates;
+    private final ArrayList<MCRMetaEnrichedLinkID> derivates;
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -241,7 +241,7 @@ public class MCRObjectStructure {
      * @param add_derivate
      *            the link to be added as MCRMetaLinkID
      */
-    public final boolean addDerivate(MCRMetaDerivateLinkID add_derivate) {
+    public final boolean addDerivate(MCRMetaEnrichedLinkID add_derivate) {
         MCRObjectID href = add_derivate.getXLinkHrefID();
         if (containsDerivate(href)) {
             return false;
@@ -250,7 +250,7 @@ public class MCRObjectStructure {
             LOGGER.warn("Cannot find derivate {}, will add it anyway.", href);
         }
         derivates.add(add_derivate);
-        derivates.sort(Comparator.comparingInt(MCRMetaDerivateLinkID::getOrder));
+        derivates.sort(Comparator.comparingInt(MCRMetaEnrichedLinkID::getOrder));
         return true;
     }
 
@@ -261,7 +261,7 @@ public class MCRObjectStructure {
      * @param derivateLink the link to add or update
      * @return true when the structure is changed
      */
-    public final boolean addOrUpdateDerivate(MCRMetaDerivateLinkID derivateLink) {
+    public final boolean addOrUpdateDerivate(MCRMetaEnrichedLinkID derivateLink) {
         if (derivateLink == null) {
             return false;
         }
@@ -288,7 +288,7 @@ public class MCRObjectStructure {
     /**
      * Returns the derivate link by id or null.
      */
-    public final MCRMetaDerivateLinkID getDerivateLink(MCRObjectID derivateId) {
+    public final MCRMetaEnrichedLinkID getDerivateLink(MCRObjectID derivateId) {
         return getDerivates().stream()
             .filter(derivate -> derivate.getXLinkHrefID().equals(derivateId))
             .findAny()
@@ -298,7 +298,7 @@ public class MCRObjectStructure {
     /** 
      * @return a list with all related derivate ids encapsulated within a {@link MCRMetaLinkID}
      * */
-    public List<MCRMetaDerivateLinkID> getDerivates() {
+    public List<MCRMetaEnrichedLinkID> getDerivates() {
         return this.derivates;
     }
 
@@ -340,7 +340,7 @@ public class MCRObjectStructure {
             List<Element> derobjectList = subElement.getChildren();
 
             for (Element derElement : derobjectList) {
-                addDerivate(MCRMetaDerivateLinkID.fromDom(derElement));
+                addDerivate(MCRMetaEnrichedLinkID.fromDom(derElement));
             }
         }
     }
@@ -380,7 +380,7 @@ public class MCRObjectStructure {
 
         if (derivates.size() > 0) {
             Element elmm = new Element("derobjects");
-            elmm.setAttribute("class", "MCRMetaDerivateLinkID");
+            elmm.setAttribute("class", "MCRMetaEnrichedLinkID");
             for (MCRMetaLinkID derivate : getDerivates()) {
                 elmm.addContent(derivate.createXML());
             }

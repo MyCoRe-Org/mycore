@@ -68,7 +68,7 @@ import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
-import org.mycore.datamodel.metadata.MCRMetaDerivateLinkID;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -325,7 +325,7 @@ public class MCRMigrationCommands {
         }
 
         final MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
-        final List<MCRMetaDerivateLinkID> derivates = mcrObject.getStructure().getDerivates();
+        final List<MCRMetaEnrichedLinkID> derivates = mcrObject.getStructure().getDerivates();
 
         return derivates.stream().map(
             (der) -> "set order of derivate " + der.getXLinkHrefID().toString() + " to " + (

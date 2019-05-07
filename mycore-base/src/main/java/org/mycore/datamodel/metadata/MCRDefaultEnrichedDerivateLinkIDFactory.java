@@ -6,11 +6,11 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 
-public class MCRDefaultMetaDerivateLinkIDFactory extends MCRMetaDerivateLinkIDFactory{
+public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedDerivateLinkIDFactory {
 
     @Override
-    public MCRMetaDerivateLinkID getDerivateLink(MCRDerivate der) {
-        final MCRMetaDerivateLinkID derivateLinkID = getEmptyDerivateLink();
+    public MCRMetaEnrichedLinkID getDerivateLink(MCRDerivate der) {
+        final MCRMetaEnrichedLinkID derivateLinkID = getEmptyLinkID();
         final String mainDoc = der.getDerivate().getInternals().getMainDoc();
         final String label = der.getLabel();
 

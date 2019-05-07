@@ -28,7 +28,7 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRMetaDerivateLinkID;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -77,7 +77,7 @@ public class MCRIView2XSLFunctions {
         }
 
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(objectID);
-        List<MCRMetaDerivateLinkID> derivates = obj.getStructure().getDerivates();
+        List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
         if (derivates.size() > 0) {
             return derivates.get(0) + "/" + ADAPTER.getSupportedMainFile(derivates.get(0).toString());
         }
