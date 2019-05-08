@@ -78,7 +78,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaDerivateLinkID;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -1042,7 +1042,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             // get from data
             MCRObjectID mcrobjid = MCRObjectID.getInstance(objid);
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrobjid);
-            List<MCRMetaDerivateLinkID> derivate_entries = obj.getStructure().getDerivates();
+            List<MCRMetaEnrichedLinkID> derivate_entries = obj.getStructure().getDerivates();
             for (MCRMetaLinkID derivate_entry : derivate_entries) {
                 String derid = derivate_entry.getXLinkHref();
                 if (!mgr.exists(MCRObjectID.getInstance(derid))) {
@@ -1172,7 +1172,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
 
-        List<MCRMetaDerivateLinkID> derivateLinkIDs = object.getStructure().getDerivates();
+        List<MCRMetaEnrichedLinkID> derivateLinkIDs = object.getStructure().getDerivates();
         List<MCRObjectID> derivateIDs = derivateLinkIDs.stream().map(MCRMetaLinkID::getXLinkHrefID)
             .collect(Collectors.toList());
 

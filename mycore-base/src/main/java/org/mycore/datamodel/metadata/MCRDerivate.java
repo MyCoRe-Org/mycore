@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,6 +58,8 @@ public final class MCRDerivate extends MCRBase {
     // the object content
     private MCRObjectDerivate mcr_derivate;
 
+    private int order;
+
     /**
      * This is the constructor of the MCRDerivate class. It make an instance of
      * the parser class and the metadata class.
@@ -67,6 +70,7 @@ public final class MCRDerivate extends MCRBase {
     public MCRDerivate() throws MCRException {
         super();
         mcr_derivate = new MCRObjectDerivate(getId());
+        order = 1;
     }
 
     public MCRDerivate(byte[] bytes, boolean valid) throws SAXParseException {
@@ -122,6 +126,7 @@ public final class MCRDerivate extends MCRBase {
     public final org.jdom2.Document createXML() throws MCRException {
         Document doc = super.createXML();
         Element elm = doc.getRootElement();
+        elm.setAttribute("order", String.valueOf(order));
         elm.addContent(mcr_derivate.createXML());
         elm.addContent(mcr_service.createXML());
         return doc;
@@ -212,5 +217,21 @@ public final class MCRDerivate extends MCRBase {
     public void setId(MCRObjectID id) {
         super.setId(id);
         this.mcr_derivate.setDerivateID(id);
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    @Override
+    protected void setFromJDOM(Document doc) {
+        super.setFromJDOM(doc);
+        this.order = Optional.ofNullable(doc.getRootElement().getAttributeValue("order"))
+            .map(Integer::valueOf)
+            .orElse(1);
     }
 }

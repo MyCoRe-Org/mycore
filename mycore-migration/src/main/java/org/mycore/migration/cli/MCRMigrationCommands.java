@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -52,6 +53,7 @@ import org.mycore.backend.jpa.links.MCRLINKHREF;
 import org.mycore.backend.jpa.links.MCRLINKHREFPK_;
 import org.mycore.backend.jpa.links.MCRLINKHREF_;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
@@ -66,6 +68,7 @@ import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -76,7 +79,6 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.iview2.services.MCRTileJob;
-import org.mycore.pi.backend.MCRPI;
 import org.xml.sax.SAXException;
 
 /**
@@ -135,11 +137,7 @@ public class MCRMigrationCommands {
                 service.addFlag(MCRObjectService.FLAG_TYPE_MODIFIEDBY, modifyUser);
             }
             obj.setImportMode(true);
-            if (obj instanceof MCRDerivate) {
-                MCRMetadataManager.updateMCRDerivateXML((MCRDerivate) obj);
-            } else {
-                MCRMetadataManager.update((MCRObject) obj);
-            }
+            MCRMetadataManager.update(obj);
         }
     }
 
@@ -317,10 +315,37 @@ public class MCRMigrationCommands {
         LOGGER.info("Migrated mets of " + derivateIdStr);
     }
 
-    private static void logInfo(MCRPI urn) {
-        String urnStr = urn.getIdentifier();
-        String mycoreID = urn.getMycoreID();
-        String path = urn.getAdditional();
-        LOGGER.info("Migrating: {} - {}:{}", urnStr, mycoreID, path);
+    // 2018 -> 2019
+    @MCRCommand(syntax = "migrate derivatelink for object {0}", help = "Migrates the Order of derivates from object {0} to derivate (MCR-2003)")
+    public static List<String> migrateDerivateLink(String objectIDStr) {
+        final MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
+
+        if (!MCRMetadataManager.exists(objectID)) {
+            throw new MCRException("The object " + objectIDStr + "does not exist!");
+        }
+
+        final MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
+        final List<MCRMetaEnrichedLinkID> derivates = mcrObject.getStructure().getDerivates();
+
+        return derivates.stream().map(
+            (der) -> "set order of derivate " + der.getXLinkHrefID().toString() + " to " + (
+                derivates.indexOf(der) + 1)).collect(Collectors.toList());
     }
+
+    @MCRCommand(syntax = "set order of derivate {0} to {1}", help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
+    public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
+        final int order = Integer.parseInt(orderStr);
+
+        final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDStr);
+
+        if (!MCRMetadataManager.exists(derivateID)) {
+            throw new MCRException("The object " + derivateIDStr + "does not exist!");
+        }
+
+        final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+        derivate.setOrder(order);
+        MCRMetadataManager.update(derivate);
+
+    }
+
 }

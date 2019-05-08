@@ -308,7 +308,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     @Override
-    public synchronized void finishUpload() throws IOException {
+    public synchronized void finishUpload() throws IOException, MCRAccessException {
         if (this.derivate == null) {
             return;
         }
@@ -323,7 +323,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         this.setStatus(MCRProcessableStatus.successful);
     }
 
-    private void updateMainFile() throws IOException {
+    private void updateMainFile() throws IOException, MCRAccessException {
         String mainFile = derivate.getDerivate().getInternals().getMainDoc();
         MCRObjectDerivate der = MCRMetadataManager.retrieveMCRDerivate(getOrCreateDerivateID()).getDerivate();
         boolean hasNoMainFile = ((der.getInternals().getMainDoc() == null) || (der.getInternals().getMainDoc().trim()
@@ -332,7 +332,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             mainFile = getPathOfMainFile();
             LOGGER.debug("Setting main file to {}", mainFile);
             derivate.getDerivate().getInternals().setMainDoc(mainFile);
-            MCRMetadataManager.updateMCRDerivateXML(derivate);
+            MCRMetadataManager.update(derivate);
         }
     }
 
