@@ -40,7 +40,7 @@ public class BaseTestConstants {
 
         @Override
         public URL getZipLocation() throws IOException {
-            return new URL("http://www.mycore.de/tests/derivate_0000005.zip");
+            return new URL("https://www.mycore.de/tests/derivate_0000005.zip");
         }
 
     };
@@ -59,7 +59,7 @@ public class BaseTestConstants {
 
         @Override
         public URL getZipLocation() throws IOException {
-            return new URL("http://www.mycore.de/tests/PDF-Test.pdf");
+            return new URL("https://www.mycore.de/tests/PDF-Test.pdf");
         }
 
     };
