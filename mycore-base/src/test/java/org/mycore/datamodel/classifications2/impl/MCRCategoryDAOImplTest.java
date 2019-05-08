@@ -23,12 +23,6 @@
  */
 package org.mycore.datamodel.classifications2.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -72,6 +66,12 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRStringTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.xml.sax.SAXParseException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class MCRCategoryDAOImplTest extends MCRJPATestCase {
 
@@ -119,7 +119,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void testLicenses() throws Exception {
         Document xml = MCRXMLParserFactory.getParser()
-            .parseXML(new MCRURLContent(new URL("http://mycore.de/classifications/mir_licenses.xml")));
+            .parseXML(new MCRURLContent(new URL("https://mycore.de/classifications/mir_licenses.xml")));
         MCRCategory licenses = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, licenses);
         MCRCategoryID cc_30 = new MCRCategoryID(licenses.getId().getRootID(), "cc_3.0");
@@ -131,7 +131,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     public void testClassEditorBatch() throws Exception {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         Document xml = MCRXMLParserFactory.getParser()
-            .parseXML(new MCRURLContent(new URL("http://mycore.de/classifications/nameIdentifier.xml")));
+            .parseXML(new MCRURLContent(new URL("https://mycore.de/classifications/nameIdentifier.xml")));
         MCRCategory nameIdentifier = MCRXMLTransformer.getCategory(xml);
         MCRCategory secondCateg = nameIdentifier.getChildren().get(1);
         DAO.addCategory(null, nameIdentifier);
