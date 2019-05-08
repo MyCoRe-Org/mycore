@@ -325,7 +325,7 @@ public abstract class MCRStore {
 
     /**
      * Deletes the data stored in the given file object from the store
-     * 
+     *
      * @see <a href="https://stackoverflow.com/questions/39628328/trying-to-create-a-directory-immediately-after-a-successful-deleteifexists-throw">stackoverflow</a>
      * @param path
      *            the file object to be deleted
@@ -338,23 +338,18 @@ public abstract class MCRStore {
         Path parent = path.getParent();
         Files.walkFileTree(path, MCRRecursiveDeleter.instance());
 
-		while (!Files.isSameFile(baseDirectory, parent)) {
+        while (!Files.isSameFile(baseDirectory, parent)) {
 
 			// Prevent access denied error in windows with closing the stream correctly
-			Stream<Path> streamParent = Files.list(parent);
-
-			try {
+			try (Stream<Path> streamParent = Files.list(parent)) {
 				if (streamParent.findAny().isPresent()) {
 					break;
 				}
 				current = parent;
 				parent = current.getParent();
 				Files.delete(current);
-
-			} finally {
-				streamParent.close();
 			}
-		}
+        }
     }
 
     /**
