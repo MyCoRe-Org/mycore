@@ -292,9 +292,11 @@ form .optional.expanded .fieldset{
           </xed:bind>
         </xed:form>
       </div>
-      <div class="col-xs-6 col-sm-5 col-md-4 sidebar-offcanvas" id="sidebar">
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-7 col-md-8" id="sidebar">
         <mcrsolr:fieldsHelp />
-      </div><!--/span-->
+    </div>
     </div>
     <div style="display:none" id="formSpace" />
   </section>
