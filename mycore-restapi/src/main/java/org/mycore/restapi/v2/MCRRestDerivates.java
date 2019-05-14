@@ -18,9 +18,6 @@
 
 package org.mycore.restapi.v2;
 
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -63,7 +60,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaDerivateLinkID;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -91,6 +88,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
+import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates")
 public class MCRRestDerivates {
@@ -133,8 +132,8 @@ public class MCRRestDerivates {
             return cachedResponse.get();
         }
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrId);
-        List<MCRMetaDerivateLinkID> derivates = obj.getStructure().getDerivates();
-        GenericEntity<List<MCRMetaDerivateLinkID>> entity = new GenericEntity<List<MCRMetaDerivateLinkID>>(derivates) {
+        List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
+        GenericEntity<List<MCRMetaEnrichedLinkID>> entity = new GenericEntity<List<MCRMetaEnrichedLinkID>>(derivates) {
         };
         return Response.ok()
             .entity(entity,

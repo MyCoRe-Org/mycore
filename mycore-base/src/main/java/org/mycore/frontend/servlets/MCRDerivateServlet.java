@@ -18,9 +18,6 @@
 
 package org.mycore.frontend.servlets;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Locale;
@@ -28,12 +25,16 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 /**
  * @author Sebastian Hofmann; Silvio Hermann; Thomas Scheffler (yagee); Sebastian Röher
@@ -77,7 +78,7 @@ public class MCRDerivateServlet extends MCRServlet {
     }
 
     private boolean performTask(MCRServletJob job, String task, String myCoreDerivateId, String file)
-        throws IOException {
+        throws IOException, MCRAccessException {
         switch (task) {
             case "ssetfile":
                 setMainFile(myCoreDerivateId, file, job.getResponse());
@@ -99,12 +100,13 @@ public class MCRDerivateServlet extends MCRServlet {
      * server. The method use the input parameter: <b>type</b>,<b>step</b>
      * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'writedb'.
      */
-    private void setMainFile(String derivateId, String file, HttpServletResponse response) throws IOException {
+    private void setMainFile(String derivateId, String file, HttpServletResponse response)
+        throws IOException, MCRAccessException {
         if (MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
             MCRObjectID mcrid = MCRObjectID.getInstance(derivateId);
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mcrid);
             der.getDerivate().getInternals().setMainDoc(file);
-            MCRMetadataManager.updateMCRDerivateXML(der);
+            MCRMetadataManager.update(der);
         } else {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, String.format(Locale.ENGLISH, "User has not the \""
                 + PERMISSION_WRITE + "\" permission on object %s.", derivateId));
