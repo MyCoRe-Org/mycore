@@ -230,23 +230,64 @@
     <xsl:param name="solrUrl" />
     <div class="table-responsive">
       <table class="table table-striped table-hover table-condensed">
-        <xsl:variable name="url" select="concat($solrUrl, 'solr/', $core, '/admin/luke?wt=xml')" />
+        <xsl:variable name="url" select="concat($solrUrl, '/solr/', $core, '/admin/luke?wt=xml')" />
         <xsl:variable name="availableFields" select="document($url)" />
         <caption><xsl:value-of select="concat('Fields of core ',$type,'(',$core,')')" /></caption>
         <tr>
           <th>field</th>
+          <th>static/dynamic</th>
           <th>type</th>
         </tr>
         <xsl:for-each select="$availableFields/response/lst[@name='fields']/lst">
           <xsl:sort select="@name" />
-          <tr>
+          
+          <xsl:choose>
+            <!-- <xsl:when test="str/@name='dynamicBase' and not(str[@name='dynamicBase']=preceding-sibling::lst[1]/str[@name='dynamicBase']) and "> -->
+            <xsl:when test="str/@name='dynamicBase' and not(str[@name='dynamicBase']=preceding-sibling::lst[1]/str[@name='dynamicBase'])">
+              <xsl:variable name="dynamicBase" select="str[@name='dynamicBase']"/>
+              <xsl:variable name="genId" select="generate-id(.)"/>
+              <xsl:variable name="count" select="count(preceding-sibling::lst[str[@name='dynamicBase']=$dynamicBase])"/>
+              <xsl:if test="$count = 0">
+                <tr data-toggle="collapse" data-target="#{$genId}" class="clickable">
+                  <td>
+                    <xsl:value-of select="$dynamicBase" /><span class="caret"></span>
+                  </td>
+                  <td>
+                    <xsl:value-of select="'dynamic'" />
+                  </td>
+                  <td>
+                    <xsl:value-of select="str[@name='type']" />
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="3">
+                    <div id="{$genId}" class="collapse">
+                      <table class="table table-striped table-hover table-condensed">
+                        <xsl:for-each select="$availableFields/response/lst[@name='fields']/lst[str[@name='dynamicBase']=$dynamicBase]">
+                          <tr>
+                            <td><xsl:value-of select="@name"/></td>
+                          </tr>
+                        </xsl:for-each>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </xsl:if>
+            </xsl:when>
+            <xsl:when test="not(str[@name='dynamicBase'])">
+              <tr>
             <td>
               <xsl:value-of select="@name" />
+            </td>
+            <td>
+              <xsl:value-of select="'static'" />
             </td>
             <td>
               <xsl:value-of select="str[@name='type']" />
             </td>
           </tr>
+            </xsl:when>
+          </xsl:choose>
         </xsl:for-each>
       </table>
     </div>
