@@ -18,8 +18,10 @@
 
 package org.mycore.mods.identifier;
 
+import java.util.Optional;
+
 import org.jdom2.Element;
-import org.mycore.common.MCRException;
+import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -27,9 +29,6 @@ import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.MCRPersistentIdentifier;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Base class for all ModsMetadataServices. Basically in mods just the type is different, which will be resolved from
@@ -59,8 +58,20 @@ public class MCRAbstractMODSMetadataService
             throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(base);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        wrapper.setElement("identifier", "type", getIdentifierType(), identifier.asString())
-               .orElseThrow(() -> new MCRException("Could not insert " + getIdentifierType() + " into mods document!"));
+
+        Element identifierElement = wrapper.getElement(getXPath());
+        final String type = getIdentifierType();
+
+        if (identifierElement != null) {
+            throw new MCRPersistentIdentifierException(
+                type + "with prefix " + getProperties().get(PREFIX_PROPERTY_KEY) + " already exist!");
+        }
+
+        identifierElement = new Element("identifier", MCRConstants.MODS_NAMESPACE);
+        identifierElement.setAttribute("type", type);
+        identifierElement.setText(identifier.asString());
+
+        wrapper.addElement(identifierElement);
     }
 
     private MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {
@@ -80,10 +91,8 @@ public class MCRAbstractMODSMetadataService
             throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(base);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        final String prefixCondition = (getProperties().containsKey(PREFIX_PROPERTY_KEY) ?
-                " and starts-with(text(), '" + getProperties().get(PREFIX_PROPERTY_KEY) + "')" : "");
-        final String identifierType = getIdentifierType();
-        final String xPath = "mods:identifier[@type='" + identifierType + "'" + prefixCondition + "]";
+
+        final String xPath = getXPath();
         Element element = wrapper.getElement(xPath);
         if (element == null) {
             return Optional.empty();
@@ -91,13 +100,25 @@ public class MCRAbstractMODSMetadataService
 
         String text = element.getTextNormalize();
 
-        return MCRPIManager.getInstance().getParserForType(identifierType)
+        return MCRPIManager.getInstance().getParserForType(getIdentifierType())
                 .parse(text)
-                .filter(Objects::nonNull)
                 .map(MCRPersistentIdentifier.class::cast);
     }
 
     protected String getIdentifierType() {
         return getProperties().get("Type");
+    }
+
+    private String getXPath() {
+        final String prefixCondition;
+
+        if (getProperties().containsKey(PREFIX_PROPERTY_KEY)) {
+            prefixCondition = " and starts-with(text(), '" + getProperties().get(PREFIX_PROPERTY_KEY) + "')";
+        } else {
+            prefixCondition = "";
+        }
+
+        final String identifierType = getIdentifierType();
+        return "mods:identifier[@type='" + identifierType + "'" + prefixCondition + "]";
     }
 }

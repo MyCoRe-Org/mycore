@@ -43,9 +43,9 @@ namespace org.mycore.mets.model.state {
                 (success: boolean) => {
                     if (success) {
                         this.metsEditorModel.stateEngine.markServerState();
-                        alert(this.i18nModel.messages.save.success);
+                        alert(this.i18nModel.get('save.success'));
                     } else {
-                        alert(this.i18nModel.messages.save.fail);
+                        alert(this.i18nModel.get('save.fail'));
                     }
                 });
         }
