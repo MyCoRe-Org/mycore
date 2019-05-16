@@ -498,6 +498,7 @@ public final class MCRURIResolver implements URIResolver {
                 .setCacheConfig(cacheConfig)
                 .setDefaultRequestConfig(requestConfig)
                 .setUserAgent(userAgent)
+                .useSystemProperties()
                 .build();
             MCRShutdownHandler.getInstance().addCloseable(this::close);
             this.logger = LogManager.getLogger();
