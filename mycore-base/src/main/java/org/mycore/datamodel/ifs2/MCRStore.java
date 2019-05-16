@@ -529,7 +529,12 @@ public abstract class MCRStore {
      * @return the highest slot file name / ID currently stored
      */
     private String findMaxID(final Path dir, final int depth) throws IOException {
-        final Path[] children = Files.list(dir).toArray(Path[]::new);
+        
+        final Path[] children;
+        
+        try (Stream<Path> streamDirectory = Files.list(dir)) {
+            children = streamDirectory.toArray(Path[]::new);
+        }
 
         if (children.length == 0) {
             return null;
@@ -543,9 +548,13 @@ public abstract class MCRStore {
 
         for (int i = children.length - 1; i >= 0; i--) {
             final Path child = children[i];
-            if (!Files.isDirectory(child) || Files.list(child).findAny().isEmpty()) {
-                continue;
+            
+            try (Stream<Path> streamChild = Files.list(child)) {
+                if (!Files.isDirectory(child) || streamChild.findAny().isEmpty()) {
+                    continue;
+                }
             }
+            
             final String found = findMaxID(child, depth + 1);
             if (found != null) {
                 return found;
