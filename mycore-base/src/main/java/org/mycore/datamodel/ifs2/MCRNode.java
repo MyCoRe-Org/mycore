@@ -166,7 +166,10 @@ public abstract class MCRNode {
         if (isFile()) {
             return 0;
         }
-        return Math.toIntExact(Files.list(path).count());
+        
+        try (Stream<Path> streamPath = Files.list(path)) {     
+            return Math.toIntExact(streamPath.count());
+        }   
     }
 
     /**
