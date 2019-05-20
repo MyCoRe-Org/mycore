@@ -340,15 +340,15 @@ public abstract class MCRStore {
 
         while (!Files.isSameFile(baseDirectory, parent)) {
 
-			// Prevent access denied error in windows with closing the stream correctly
-			try (Stream<Path> streamParent = Files.list(parent)) {
-				if (streamParent.findAny().isPresent()) {
-					break;
-				}
-				current = parent;
-				parent = current.getParent();
-				Files.delete(current);
-			}
+            // Prevent access denied error in windows with closing the stream correctly
+            try (Stream<Path> streamParent = Files.list(parent)) {
+                if (streamParent.findAny().isPresent()) {
+                    break;
+                }
+                current = parent;
+                parent = current.getParent();
+                Files.delete(current);
+            }
         }
     }
 
@@ -529,9 +529,9 @@ public abstract class MCRStore {
      * @return the highest slot file name / ID currently stored
      */
     private String findMaxID(final Path dir, final int depth) throws IOException {
-        
+
         final Path[] children;
-        
+
         try (Stream<Path> streamDirectory = Files.list(dir)) {
             children = streamDirectory.toArray(Path[]::new);
         }
@@ -548,13 +548,13 @@ public abstract class MCRStore {
 
         for (int i = children.length - 1; i >= 0; i--) {
             final Path child = children[i];
-            
+
             try (Stream<Path> streamChild = Files.list(child)) {
                 if (!Files.isDirectory(child) || streamChild.findAny().isEmpty()) {
                     continue;
                 }
             }
-            
+
             final String found = findMaxID(child, depth + 1);
             if (found != null) {
                 return found;
@@ -565,7 +565,9 @@ public abstract class MCRStore {
 
     public interface MCRStoreConfig {
         String getBaseDir();
+
         String getID();
+
         String getSlotLayout();
     }
 }
