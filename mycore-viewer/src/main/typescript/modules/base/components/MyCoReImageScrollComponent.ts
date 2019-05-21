@@ -71,6 +71,10 @@ namespace mycore.viewer.components {
         }
 
         public init() {
+            if(!this.isImageDoctype()){
+                return;
+            }
+
             this.changeImage(this._settings.filePath, false);
             this.trigger(new events.ComponentInitializedEvent(this));
             this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
@@ -120,6 +124,10 @@ namespace mycore.viewer.components {
 
 
             this.trigger(new events.ShowContentEvent(this, componentContent, events.ShowContentEvent.DIRECTION_CENTER));
+        }
+
+        private isImageDoctype() {
+            return this._settings.doctype === "mets" || this._settings.doctype === "pdf";
         }
 
         private initOverview(overviewEnabled: any | any | any | boolean) {
@@ -330,6 +338,10 @@ namespace mycore.viewer.components {
         public get handlesEvents(): string[] {
             var handleEvents = [];
 
+            if(!this.isImageDoctype()){
+                return handleEvents;
+            }
+
             handleEvents.push(mycore.viewer.widgets.toolbar.events.ButtonPressedEvent.TYPE);
             handleEvents.push(mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent.TYPE);
             handleEvents.push(mycore.viewer.components.events.ImageSelectedEvent.TYPE);
@@ -461,6 +473,10 @@ namespace mycore.viewer.components {
 
 
         public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
+            if(!this.isImageDoctype()){
+                return;
+            }
+
             if (e.type == events.ProvideToolbarModelEvent.TYPE) {
                 var ptme = <events.ProvideToolbarModelEvent>e;
                 this._rotateButton = ptme.model._rotateButton;

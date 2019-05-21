@@ -41,7 +41,7 @@ namespace mycore.viewer.widgets.alto {
 
         constructor(styles:Element, layout:Element) {
             // set style
-            var styleList:NodeListOf<Element> = styles.getElementsByTagName("TextStyle");
+            var styleList:HTMLCollectionOf<Element> = styles.getElementsByTagName("TextStyle");
             for(var index = 0; index < styleList.length; index++) {
                 var style:Element = styleList.item(index);
                 var altoStyle:AltoStyle = this.createAltoStyle(style);
@@ -49,7 +49,7 @@ namespace mycore.viewer.widgets.alto {
             }
 
             // set width/height
-            var pages:NodeListOf<Element> = layout.getElementsByTagName("Page");
+            var pages:HTMLCollectionOf<Element> = layout.getElementsByTagName("Page");
             var page:Element = pages.item(0);
             if(page == null) {
                 return;
@@ -58,7 +58,7 @@ namespace mycore.viewer.widgets.alto {
             this._pageHeight = parseInt(page.getAttribute("HEIGHT"));
 
             // extract content
-            var printSpaces:NodeListOf<Element> = page.getElementsByTagName("PrintSpace");
+            var printSpaces:HTMLCollectionOf<Element> = page.getElementsByTagName("PrintSpace");
             var printSpace:Element = printSpaces.item(0);
             if(printSpace == null) {
                 return;

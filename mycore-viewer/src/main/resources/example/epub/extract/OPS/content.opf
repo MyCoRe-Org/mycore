@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+		      <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="uid" version="3.0" xml:lang="de" prefix="cc: http://creativecommons.org/ns#">
+			     <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+				    <dc:identifier id="uid">https://de.wikisource.org/wiki/Beethoven%E2%80%99s_neunte_Symphonie</dc:identifier>
+				    <meta property="dcterms:modified">2019-05-14T11:07:28Z</meta>
+				    <dc:language>de</dc:language>
+				    <dc:title id="meta-title">Beethoven’s neunte Symphonie</dc:title>
+				    <meta refines="#meta-title" property="title-type">main</meta>
+				    <dc:source>https://de.wikisource.org/wiki/Beethoven%E2%80%99s_neunte_Symphonie</dc:source>
+				    <dc:rights xml:lang="en">Creative Commons BY-SA 3.0</dc:rights>
+				    <link rel="cc:license" href="http://creativecommons.org/licenses/by-sa/3.0/" />
+				    <dc:rights xml:lang="en">GNU Free Documentation License</dc:rights>
+				    <link rel="cc:license" href="http://www.gnu.org/copyleft/fdl.html" />
+				    <dc:contributor id="meta-bkp">Wikisource</dc:contributor>
+				    <meta refines="#meta-bkp" property="role" scheme="marc:relators">bkp</meta><dc:creator id="meta-aut">Herrmann Hirschbach, Georg Dietrich Otten, Robert Schumann</dc:creator>
+					       <meta refines="#meta-aut" property="role" scheme="marc:relators">aut</meta><dc:date>1838</dc:date><meta name="cover" content="cover" /></metadata>
+			     <manifest>
+				    <item href="nav.xhtml" id="nav" media-type="application/xhtml+xml" properties="nav" />
+				    <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/><item id="cover" href="cover.xhtml" media-type="application/xhtml+xml" /><item id="title" href="title.xhtml" media-type="application/xhtml+xml" />
+				    <item id="mainCss" href="main.css" media-type="text/css" />
+				    <item id="Accueil_scribe.png" href="images/Accueil_scribe.png" media-type="image/png" /><item id="c0_Beethoven_s_neunte_Symphonie" href="c0_Beethoven_s_neunte_Symphonie.xhtml" media-type="application/xhtml+xml" />
+<item id="c1_Beethoven_s_neunte_Symphonie.pdf.jpg" href="images/c1_Beethoven_s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" properties="cover-image" />
+<item id="c2_page19_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c2_page19_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c3_page20_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c3_page20_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c4_page21_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c4_page21_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c5_page22_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c5_page22_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c6_page23_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c6_page23_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c7_page24_250px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c7_page24_250px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c8_page25_200px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c8_page25_200px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c9_page26_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c9_page26_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c10_page27_250px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c10_page27_250px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c11_page28_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c11_page28_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c12_page29_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c12_page29_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c13_page30_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c13_page30_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c14_page31_120px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c14_page31_120px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c15_page32_150px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c15_page32_150px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c16_page33_150px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c16_page33_150px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c17_page34_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c17_page34_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c18_page35_150px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c18_page35_150px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c19_page36_120px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c19_page36_120px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c20_page37_350px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c20_page37_350px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c21_page38_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" href="images/c21_page38_400px_Beethoven_E2_80_99s_neunte_Symphonie.pdf.jpg" media-type="image/jpeg" />
+<item id="c22_394px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_1_29.svg.png" href="images/c22_394px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_1_29.svg.png" media-type="image/png" />
+<item id="c23_620px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_2_29.svg.png" href="images/c23_620px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_2_29.svg.png" media-type="image/png" />
+<item id="c24_608px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_3_29.svg.png" href="images/c24_608px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_3_29.svg.png" media-type="image/png" />
+<item id="c25_462px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_4_29.svg.png" href="images/c25_462px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_4_29.svg.png" media-type="image/png" />
+<item id="c26_683px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_5_29.svg.png" href="images/c26_683px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_5_29.svg.png" media-type="image/png" />
+<item id="c27_235px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_6_29.svg.png" href="images/c27_235px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_6_29.svg.png" media-type="image/png" />
+<item id="c28_206px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_7_29.svg.png" href="images/c28_206px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_7_29.svg.png" media-type="image/png" />
+<item id="c29_314px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_8_29.svg.png" href="images/c29_314px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_8_29.svg.png" media-type="image/png" />
+<item id="c30_205px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_9_29.svg.png" href="images/c30_205px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_9_29.svg.png" media-type="image/png" />
+<item id="c31_673px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_10_29.svg.png" href="images/c31_673px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_10_29.svg.png" media-type="image/png" />
+<item id="c32_620px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_11_29.svg.png" href="images/c32_620px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_11_29.svg.png" media-type="image/png" />
+<item id="c33_585px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_12_29.svg.png" href="images/c33_585px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_12_29.svg.png" media-type="image/png" />
+<item id="c34_77px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_13_29.svg.png" href="images/c34_77px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_13_29.svg.png" media-type="image/png" />
+<item id="c35_182px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_14_29.svg.png" href="images/c35_182px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_14_29.svg.png" media-type="image/png" />
+<item id="c36_192px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_15_29.svg.png" href="images/c36_192px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_15_29.svg.png" media-type="image/png" />
+<item id="c37_620px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_16_29.svg.png" href="images/c37_620px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_16_29.svg.png" media-type="image/png" />
+<item id="c38_113px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_17_29.svg.png" href="images/c38_113px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_17_29.svg.png" media-type="image/png" />
+<item id="c39_92px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_18_29.svg.png" href="images/c39_92px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_18_29.svg.png" media-type="image/png" />
+<item id="c40_323px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_19_29.svg.png" href="images/c40_323px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_19_29.svg.png" media-type="image/png" />
+<item id="c41_563px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_20_29.svg.png" href="images/c41_563px_Beethoven_E2_80_99s_neunte_Symphonie__281838_3B_20_29.svg.png" media-type="image/png" />
+<item id="about" href="about.xhtml" media-type="application/xhtml+xml" />
+			     </manifest>
+			     <spine toc="ncx"><itemref idref="cover" linear="no" /><itemref idref="title" linear="yes" /><itemref idref="c0_Beethoven_s_neunte_Symphonie" linear="yes" /><itemref idref="about" linear="yes" />
+			     </spine>
+		      </package>

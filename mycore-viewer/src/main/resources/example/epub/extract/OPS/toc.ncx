@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+			<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+				<head>
+					<meta name="dtb:uid" content="https://de.wikisource.org/wiki/Beethoven%E2%80%99s_neunte_Symphonie" />
+					<meta name="dtb:depth" content="1" />
+					<meta name="dtb:totalPageCount" content="0" />
+					<meta name="dtb:maxPageNumber" content="0" />
+				</head>
+				<docTitle><text>Beethoven’s neunte Symphonie</text></docTitle>
+				<docAuthor><text>Herrmann Hirschbach, Georg Dietrich Otten, Robert Schumann</text></docAuthor>
+				<navMap>
+					<navPoint id="title" playOrder="1">
+						<navLabel><text>Titel</text></navLabel>
+						<content src="title.xhtml"/>
+					</navPoint><navPoint id="c0_Beethoven_s_neunte_Symphonie" playOrder="2">
+						    <navLabel><text>Beethoven’s neunte Symphonie</text></navLabel>
+						    <content src="c0_Beethoven_s_neunte_Symphonie.xhtml" />
+					    </navPoint><navPoint id="about" playOrder="3">
+						<navLabel>
+							<text>Über</text>
+						</navLabel>
+						<content src="about.xhtml"/>
+					</navPoint>
+			       </navMap>
+			</ncx>

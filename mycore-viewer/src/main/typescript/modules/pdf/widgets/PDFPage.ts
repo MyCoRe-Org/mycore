@@ -73,7 +73,7 @@ namespace mycore.viewer.widgets.canvas {
                                         url: (<any>annotation).url
                                     });
                                 } else if ("dest" in annotation) {
-                                    let numberResolver = ((annotation) => {
+                                    let numberResolver = ((annotation:any) => {
                                         return (callback) => {
                                             this.builder.getPageNumberFromDestination(annotation.dest, (pageNumber) => {
                                                 callback(pageNumber+"");

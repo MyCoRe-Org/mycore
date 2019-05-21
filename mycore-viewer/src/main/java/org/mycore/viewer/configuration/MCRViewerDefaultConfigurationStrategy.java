@@ -34,9 +34,17 @@ public class MCRViewerDefaultConfigurationStrategy implements MCRViewerConfigura
     public MCRViewerConfiguration get(HttpServletRequest request) {
         if (isPDF(request)) {
             return getPDF(request);
+        } else if (isEpub(request)) {
+            return getEpub(request);
         } else {
             return getMETS(request);
         }
+
+    }
+
+    private boolean isEpub(HttpServletRequest request) {
+        String filePath = MCRViewerConfiguration.getFilePath(request);
+        return filePath != null && filePath.toLowerCase(Locale.ROOT).endsWith(".epub");
     }
 
     protected boolean isPDF(HttpServletRequest request) {
@@ -47,6 +55,11 @@ public class MCRViewerDefaultConfigurationStrategy implements MCRViewerConfigura
 
     protected MCRViewerConfiguration getPDF(HttpServletRequest request) {
         return MCRViewerConfigurationBuilder.pdf(request).mixin(MCRViewerConfigurationBuilder.plugins(request).get())
+            .get();
+    }
+
+    protected MCRViewerConfiguration getEpub(HttpServletRequest request) {
+        return MCRViewerConfigurationBuilder.epub(request).mixin(MCRViewerConfigurationBuilder.plugins(request).get())
             .get();
     }
 

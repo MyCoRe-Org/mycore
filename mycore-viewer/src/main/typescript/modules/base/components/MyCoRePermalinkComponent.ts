@@ -127,19 +127,19 @@ namespace mycore.viewer.components {
 
         private buildPermalink(state:ViewerParameterMap) {
             var file;
-            if (this._settings.doctype == "pdf") {
-                file = this._settings.filePath;
+            if (this._settings.doctype === 'mets' ) {
+                file = state.get('page');
+                state.remove('page');
             } else {
-                file = state.get("page");
-                state.remove("page");
+                file = this._settings.filePath;
             }
             var baseURL = this.getBaseURL(file);
-            state.remove("derivate");
+            state.remove('derivate');
             return baseURL + state.toParameterString();
         }
 
         private getBaseURL(file) {
-            var pattern = Utils.getVar<string>(this._settings, "permalink.viewerLocationPattern", "{baseURL}/rsc/viewer/{derivate}/{file}", (p) => p != null);
+            var pattern = Utils.getVar<string>(this._settings, 'permalink.viewerLocationPattern', '{baseURL}/rsc/viewer/{derivate}/{file}', (p) => p != null);
             return ViewerFormatString(pattern, {
                 baseURL : this._settings.webApplicationBaseURL,
                 derivate : this._settings.derivate,

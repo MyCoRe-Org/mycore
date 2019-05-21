@@ -260,7 +260,7 @@ namespace mycore.viewer.widgets.mets {
             }
         }
 
-        private getAttributeNs(element: Element, namespaceKey: string, attribute: string) {
+        private getAttributeNs(element: any, namespaceKey: string, attribute: string) {
             if ("getAttributeNS" in element) {
                 return element.getAttributeNS(MetsStructureBuilder.NS_MAP.get(namespaceKey), attribute);
             } else {

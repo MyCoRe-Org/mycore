@@ -119,6 +119,14 @@ public class MCRViewerConfigurationBuilder {
     }
 
     /**
+     * Builds the default pdf configuration without any plugins.
+     */
+    public static MCRViewerConfigurationBuilder epub(HttpServletRequest request) {
+        MCRViewerEPUBConfiguration epubConfig = new MCRViewerEPUBConfiguration();
+        return MCRViewerConfigurationBuilder.build(request).mixin(epubConfig);
+    }
+
+    /**
      * Builds just the plugins (metadata, piwik, logo).
      */
     public static MCRViewerConfigurationBuilder plugins(HttpServletRequest request) {

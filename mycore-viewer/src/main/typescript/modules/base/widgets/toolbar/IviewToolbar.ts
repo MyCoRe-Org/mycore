@@ -189,6 +189,12 @@ namespace mycore.viewer.widgets.toolbar {
                 this._textInputController.childRemoved(parent, component);
                 return;
             }
+
+            if(component instanceof ToolbarGroup){
+                const element = this._idGroupViewMap.get(component.name).getElement();
+                element.remove();
+                return;
+            }
         }
 
         public getView(componentId:string):ToolbarView;

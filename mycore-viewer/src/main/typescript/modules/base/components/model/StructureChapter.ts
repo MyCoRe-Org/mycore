@@ -67,7 +67,11 @@ namespace mycore.viewer.model {
         }
 
         public resolveDestination(callbackFn: (targetId) => void): void {
-            this._destinationResolver(callbackFn);
+            if (this._destinationResolver !== null) {
+                this._destinationResolver(callbackFn);
+            } else {
+                return null;
+            }
         }
 
     }
