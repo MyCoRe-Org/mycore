@@ -77,23 +77,26 @@ namespace mycore.viewer.components {
 
                 if (e.type == events.StructureModelLoadedEvent.TYPE) {
                     if (!this._settings.mobile) {
-                        var smlEvent = <events.StructureModelLoadedEvent> e;
-                        var imgList = smlEvent.structureModel._imageList;
-                        var pageSelect:widgets.toolbar.ToolbarDropdownButton = <widgets.toolbar.ToolbarDropdownButton> this._toolbarModel.getGroup("ImageChangeControllGroup").getComponentById("PageSelect");
+                        let smlEvent = <events.StructureModelLoadedEvent> e;
+                        let imgList = smlEvent.structureModel._imageList;
+                        const group = this._toolbarModel.getGroup('ImageChangeControllGroup');
+                        if (group != null || typeof group !== 'undefined') {
+                            const pageSelect: widgets.toolbar.ToolbarDropdownButton =
+                                <widgets.toolbar.ToolbarDropdownButton>group.getComponentById('PageSelect');
+                            this._imageIdMap = new MyCoReMap<string, model.StructureImage>();
+                            const childs = new Array<widgets.toolbar.ToolbarDropdownButtonChild>();
+                            for (const imgElement of imgList) {
+                                this._imageIdMap.set(imgElement.id, imgElement);
+                                const toolbarDropDownElement = {
+                                    id: imgElement.id,
+                                    label: `[${imgElement.order}]${imgElement.orderLabel != null ? ' - ' + imgElement.orderLabel : ''}`
+                                };
+                                childs.push(toolbarDropDownElement);
+                            }
 
-                        this._imageIdMap = new MyCoReMap<string, model.StructureImage>();
-                        var childs = new Array<widgets.toolbar.ToolbarDropdownButtonChild>();
-                        for (var imgIndex in imgList) {
-                            var imgElement = imgList[imgIndex];
-                            this._imageIdMap.set(imgElement.id, imgElement);
-                            var toolbarDropDownElement = {
-                                id : imgElement.id,
-                                label : "[" + imgElement.order + "]" + (imgElement.orderLabel!=null ? " - " + imgElement.orderLabel : "")
-                            };
-                            childs.push(toolbarDropDownElement);
+                            pageSelect.children = childs;
                         }
 
-                        pageSelect.children = childs;
                     }
 
                     this._sync(this);

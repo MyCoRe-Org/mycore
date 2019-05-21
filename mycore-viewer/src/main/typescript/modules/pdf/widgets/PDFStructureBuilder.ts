@@ -22,6 +22,7 @@
 
 namespace mycore.viewer.widgets.pdf {
     import StructureChapter = mycore.viewer.model.StructureChapter;
+
     export class PDFStructureBuilder {
 
         constructor(private _document:PDFDocumentProxy, private _name:string) {

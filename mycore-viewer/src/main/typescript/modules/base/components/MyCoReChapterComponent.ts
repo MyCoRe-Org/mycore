@@ -119,13 +119,15 @@ namespace mycore.viewer.components {
         }
 
         public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
-            if (e.type == events.ProvideToolbarModelEvent.TYPE) {
+            if (e.type === events.ProvideToolbarModelEvent.TYPE) {
                 let ptme = <events.ProvideToolbarModelEvent>e;
-                ptme.model._sidebarControllDropdownButton.children = ptme.model._sidebarControllDropdownButton.children.filter((my)=>my.id != "chapterOverview");
+                ptme.model._sidebarControllDropdownButton.children = ptme.model._sidebarControllDropdownButton
+                    .children
+                    .filter((my) => my.id !== 'chapterOverview');
             }
 
-            if (e.type == mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent.TYPE) {
-                var dropdownButtonPressedEvent = <mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent> e;
+            if (e.type === mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent.TYPE) {
+                const dropdownButtonPressedEvent = <mycore.viewer.widgets.toolbar.events.DropdownButtonPressedEvent>e;
 
                 if (dropdownButtonPressedEvent.childId == "chapterOverview") {
                     var direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_WEST;
@@ -135,17 +137,17 @@ namespace mycore.viewer.components {
             }
 
 
-            if (e.type == events.StructureModelLoadedEvent.TYPE) {
+            if (e.type === events.StructureModelLoadedEvent.TYPE) {
                 let structureModelLoadedEvent = <events.StructureModelLoadedEvent>e;
                 let model = structureModelLoadedEvent.structureModel._rootChapter;
 
                 this._structureModel = structureModelLoadedEvent.structureModel;
 
-                this._structureModel._imageList.forEach(img=>{
+                this._structureModel._imageList.forEach((img) => {
                     this._idImageMap.set(img.id, img);
-                   if("orderLabel" in img && img.orderLabel != null){
-                       this._autoPagination = false;
-                   }
+                    if ('orderLabel' in img && img.orderLabel !== null) {
+                        this._autoPagination = false;
+                    }
                 });
 
                 let chapterLabelMap = this.createChapterLabelMap(this._structureModel);
@@ -156,17 +158,17 @@ namespace mycore.viewer.components {
                 if (this._spinner != null) {
                     this._spinner.detach();
                 }
-                if(this._chapterToActivate!=null){
+                if (this._chapterToActivate != null) {
                     this.setChapter(this._chapterToActivate);
                 }
             }
 
 
-            if (e.type == events.ImageChangedEvent.TYPE) {
+            if (e.type === events.ImageChangedEvent.TYPE) {
                 if (typeof this._structureModel === "undefined" || this._structureModel._imageToChapterMap.isEmpty()) {
                     return;
                 }
-                var imageChangedEvent = <events.ImageChangedEvent> e;
+                const imageChangedEvent = <events.ImageChangedEvent>e;
                 if (imageChangedEvent.image != null && this._initialized) {
                     if (this._chapterWidget.getSelectedChapter() == null ||
                         this._structureModel.chapterToImageMap.get(this._chapterWidget.getSelectedChapter().id) != imageChangedEvent.image) {
@@ -179,40 +181,40 @@ namespace mycore.viewer.components {
                 }
             }
 
-            if (e.type == events.LanguageModelLoadedEvent.TYPE) {
+            if (e.type === events.LanguageModelLoadedEvent.TYPE) {
                 let lmle = <events.LanguageModelLoadedEvent>e;
                 this._sidebarLabel.text(lmle.languageModel.getTranslation("sidebar.chapterOverview"));
             }
 
-            if(e.type == events.RequestStateEvent.TYPE){
-                let rse = <events.RequestStateEvent> e;
-                if(this._currentChapter!=null){
-                    rse.stateMap.set("logicalDiv",this.persistChapterToString(this._currentChapter));
+            if (e.type === events.RequestStateEvent.TYPE) {
+                let rse = <events.RequestStateEvent>e;
+                if (this._currentChapter != null) {
+                    rse.stateMap.set("logicalDiv", this.persistChapterToString(this._currentChapter));
                 }
             }
 
-            if(e.type == events.RestoreStateEvent.TYPE){
+            if (e.type === events.RestoreStateEvent.TYPE) {
                 let rse = <events.RestoreStateEvent>e;
-                let activateChapter = (div)=>{
-                    if(this._initialized){
+                let activateChapter = (div) => {
+                    if (this._initialized) {
                         this.setChapter(div);
                     } else {
                         this._chapterToActivate = div;
                     }
                 };
-                rse.restoredState.hasThen("logicalDiv", activateChapter);
-                rse.restoredState.hasThen("div", activateChapter);
+                rse.restoredState.hasThen('logicalDiv', activateChapter);
+                rse.restoredState.hasThen('div', activateChapter);
 
             }
 
-            if(e.type === events.ChapterChangedEvent.TYPE) {
+            if (e.type === events.ChapterChangedEvent.TYPE) {
                 let cce = <events.ChapterChangedEvent>e;
                 if (cce == null || cce.chapter == null) {
                     return;
                 }
-                this.setChapter(cce.chapter.id, false);
+                this._chapterWidget.setChapterExpanded(<model.StructureChapter>cce.chapter, true);
+                this._chapterWidget.jumpToChapter(<model.StructureChapter>cce.chapter);
             }
-
         }
 
         private persistChapterToString(chapter:model.StructureChapter):string{
@@ -236,7 +238,7 @@ namespace mycore.viewer.components {
             });
         }
 
-        private setChapter(id: string, jumpToFirstImageOfChapter:boolean = true, node?: JQuery) {
+        private setChapter(id: string, jumpToFirstImageOfChapter:boolean = true, node?: JQuery, trigger=true) {
             if(this._currentChapter != null && this._currentChapter.id == id) {
                 return;
             }
@@ -245,17 +247,17 @@ namespace mycore.viewer.components {
                 return;
             }
             let changeChapter = (firstImageOfChapter) => {
-                if (typeof firstImageOfChapter != "undefined" && firstImageOfChapter !== null) {
-                    this._currentChapter = <model.StructureChapter>newSelectedChapter;
+                this._currentChapter = <model.StructureChapter>newSelectedChapter;
 
-                    this._chapterWidget.setChapterExpanded(<model.StructureChapter>newSelectedChapter, true);
-                    this._chapterWidget.setChapterSelected(<model.StructureChapter>newSelectedChapter);
-                    this._chapterWidget.jumpToChapter(<model.StructureChapter>newSelectedChapter);
+                this._chapterWidget.setChapterExpanded(<model.StructureChapter>newSelectedChapter, true);
+                this._chapterWidget.setChapterSelected(<model.StructureChapter>newSelectedChapter);
+                this._chapterWidget.jumpToChapter(<model.StructureChapter>newSelectedChapter);
 
+                if(trigger){
                     this.trigger(new events.ChapterChangedEvent(this, <model.StructureChapter>newSelectedChapter));
-                    if(jumpToFirstImageOfChapter) {
-                        this.trigger(new events.ImageSelectedEvent(this, firstImageOfChapter));
-                    }
+                }
+                if (typeof firstImageOfChapter !== "undefined" && firstImageOfChapter !== null && jumpToFirstImageOfChapter) {
+                    this.trigger(new events.ImageSelectedEvent(this, firstImageOfChapter));
                 }
             };
 
@@ -271,7 +273,7 @@ namespace mycore.viewer.components {
                     if (typeof node != "undefined") {
                         node.css("cursor", oldVal);
                     }
-                    changeChapter(this._idImageMap.get(targetId));
+                    changeChapter(targetId !== null ? this._idImageMap.get(targetId) : null);
                 });
             }
         }

@@ -1159,3 +1159,22 @@ class ClassDescriber {
     }
 
 }
+
+class Debounce<T> {
+
+    private _timeout: number = null;
+
+    constructor(private time: number, private handler: (param: T) => void) {
+    }
+
+    public call(param: T) {
+        if (this._timeout !== null) {
+            window.clearTimeout(this._timeout);
+            this._timeout=null;
+        }
+        this._timeout = window.setTimeout(() => {
+            this._timeout = null;
+            this.handler(param);
+        }, this.time);
+    }
+}

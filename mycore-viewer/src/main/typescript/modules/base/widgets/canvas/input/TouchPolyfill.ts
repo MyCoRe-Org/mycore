@@ -20,7 +20,7 @@ namespace mycore.viewer.widgets.canvas {
     export class TouchPolyfill {
         constructor(private _inputElement: Element) {
 
-            this._inputElement.addEventListener("pointerdown", (e) => {
+            this._inputElement.addEventListener("pointerdown", (e:PointerEvent) => {
                 if (e.pointerType == "touch") {
                     e.stopImmediatePropagation();
                     e.preventDefault();
@@ -30,7 +30,7 @@ namespace mycore.viewer.widgets.canvas {
                 }
             });
 
-            this._inputElement.addEventListener("pointerup", (e) => {
+            this._inputElement.addEventListener("pointerup", (e:PointerEvent) => {
                 if (e.pointerType == "touch") {
                     e.stopImmediatePropagation();
                     e.preventDefault();
@@ -40,7 +40,7 @@ namespace mycore.viewer.widgets.canvas {
                 }
             });
 
-            this._inputElement.addEventListener("pointermove", (e) => {
+            this._inputElement.addEventListener("pointermove", (e:PointerEvent) => {
                 if (e.pointerType == "touch") {
                     e.stopImmediatePropagation();
                     e.preventDefault();
@@ -50,7 +50,7 @@ namespace mycore.viewer.widgets.canvas {
                 }
             });
 
-            this._inputElement.addEventListener("pointercancel", (e) => {
+            this._inputElement.addEventListener("pointercancel", (e:PointerEvent) => {
                 if (e.pointerType == "touch") {
                     e.stopImmediatePropagation();
                     e.preventDefault();
