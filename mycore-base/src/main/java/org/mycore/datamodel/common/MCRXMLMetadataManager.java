@@ -554,11 +554,9 @@ public class MCRXMLMetadataManager {
      */
     public byte[] retrieveBLOB(MCRObjectID mcrid) throws IOException {
         MCRContent metadata = retrieveContent(mcrid);
-        return metadata == null ? null
-            : metadata instanceof MCRPathContent ? Files.readAllBytes(((MCRPathContent) metadata).getPath())
-                : metadata.asByteArray();
+        return metadata == null ? null : metadata.asByteArray();
     }
-
+    
     public MCRContent retrieveContent(MCRObjectID mcrid) throws IOException {
         MCRContent metadata;
         MCRStoredMetadata storedMetadata = retrieveStoredMetadata(mcrid);
