@@ -178,4 +178,7 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
         Files.copy(path, target, options);
     }
 
+    public Path getPath() {
+        return path;
+    }
 }

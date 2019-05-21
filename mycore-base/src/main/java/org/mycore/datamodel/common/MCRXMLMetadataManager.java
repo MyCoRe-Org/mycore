@@ -50,6 +50,7 @@ import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
@@ -553,7 +554,9 @@ public class MCRXMLMetadataManager {
      */
     public byte[] retrieveBLOB(MCRObjectID mcrid) throws IOException {
         MCRContent metadata = retrieveContent(mcrid);
-        return metadata == null ? null : metadata.asByteArray();
+        return metadata == null ? null
+            : metadata instanceof MCRPathContent ? Files.readAllBytes(((MCRPathContent) metadata).getPath())
+                : metadata.asByteArray();
     }
 
     public MCRContent retrieveContent(MCRObjectID mcrid) throws IOException {
