@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -181,17 +182,19 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         derivate.getDerivate().setLinkMeta(linkId);
 
         final Path rootPath = fileDir.toPath();
-        final Optional<String> firstRegularFile = Files.list(rootPath).filter(Files::isRegularFile)
-            .map(rootPath::relativize)
-            .map(Path::toString)
-            .findFirst();
-
-        MCRMetaIFS ifs = new MCRMetaIFS();
-        ifs.setSubTag("internal");
-        ifs.setSourcePath(fileDir.getAbsolutePath());
-        firstRegularFile.ifPresent(ifs::setMainDoc);
-        derivate.getDerivate().setInternals(ifs);
-
+        try (Stream<Path> streamRootPath = Files.list(rootPath)) {
+            final Optional<String> firstRegularFile = streamRootPath.filter(Files::isRegularFile)
+                .map(rootPath::relativize)
+                .map(Path::toString)
+                .findFirst();
+            
+            MCRMetaIFS ifs = new MCRMetaIFS();
+            ifs.setSubTag("internal");
+            ifs.setSourcePath(fileDir.getAbsolutePath());
+            firstRegularFile.ifPresent(ifs::setMainDoc);
+            derivate.getDerivate().setInternals(ifs);
+        }
+        
         LOGGER.debug("Creating new derivate with ID {}", derivate.getId());
         MCRMetadataManager.create(derivate);
 

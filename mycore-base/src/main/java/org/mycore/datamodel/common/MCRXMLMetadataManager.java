@@ -723,16 +723,18 @@ public class MCRXMLMetadataManager {
      * @return list of all mycore identifiers found in the metadata store for the given type
      */
     public List<String> listIDsOfType(String type) {
-        return list(basePath).flatMap(projectPath -> {
-            final String project = projectPath.getFileName().toString();
-            return list(projectPath).flatMap(typePath -> {
-                if (type.equals(typePath.getFileName().toString())) {
-                    final String base = getStoryKey(project, type);
-                    return listIDsForBase(base).stream();
-                }
-                return Stream.empty();
-            });
-        }).collect(Collectors.toList());
+        try (Stream<Path> streamBasePath = list(basePath)) {
+            return streamBasePath.flatMap(projectPath -> {
+                final String project = projectPath.getFileName().toString();
+                return list(projectPath).flatMap(typePath -> {
+                    if (type.equals(typePath.getFileName().toString())) {
+                        final String base = getStoryKey(project, type);
+                        return listIDsForBase(base).stream();
+                    }
+                    return Stream.empty();
+                });
+            }).collect(Collectors.toList());
+        }
     }
 
     /**
@@ -741,14 +743,16 @@ public class MCRXMLMetadataManager {
      * @return list of all mycore identifiers found in the metadata store
      */
     public List<String> listIDs() {
-        return list(basePath).flatMap(projectPath -> {
-            final String project = projectPath.getFileName().toString();
-            return list(projectPath).flatMap(typePath -> {
-                final String type = typePath.getFileName().toString();
-                final String base = getStoryKey(project, type);
-                return listIDsForBase(base).stream();
-            });
-        }).collect(Collectors.toList());
+        try (Stream<Path> streamBasePath = list(basePath)) {
+            return streamBasePath.flatMap(projectPath -> {
+                final String project = projectPath.getFileName().toString();
+                return list(projectPath).flatMap(typePath -> {
+                    final String type = typePath.getFileName().toString();
+                    final String base = getStoryKey(project, type);
+                    return listIDsForBase(base).stream();
+                });
+            }).collect(Collectors.toList());
+        }
     }
 
     /**
@@ -758,12 +762,14 @@ public class MCRXMLMetadataManager {
      * @see MCRObjectID#getTypeId()
      */
     public Collection<String> getObjectTypes() {
-        return list(basePath).flatMap(this::list)
-                             .map(Path::getFileName)
-                             .map(Path::toString)
-                             .filter(MCRObjectID::isValidType)
-                             .distinct()
-                             .collect(Collectors.toSet());
+        try (Stream<Path> streamBasePath = list(basePath)) {
+            return streamBasePath.flatMap(this::list)
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .filter(MCRObjectID::isValidType)
+                .distinct()
+                .collect(Collectors.toSet());
+        }
     }
 
     /**
@@ -773,10 +779,12 @@ public class MCRXMLMetadataManager {
      * @see MCRObjectID#getBase()
      */
     public Collection<String> getObjectBaseIds() {
-        return list(basePath).flatMap(this::list)
-                             .filter(p -> MCRObjectID.isValidType(p.getFileName().toString()))
-                             .map(p -> p.getParent().getFileName().toString() + "_" + p.getFileName().toString())
-                             .collect(Collectors.toSet());
+        try (Stream<Path> streamBasePath = list(basePath)) {
+            return streamBasePath.flatMap(this::list)
+                .filter(p -> MCRObjectID.isValidType(p.getFileName().toString()))
+                .map(p -> p.getParent().getFileName().toString() + "_" + p.getFileName().toString())
+                .collect(Collectors.toSet()); 
+        } 
     }
 
     /**

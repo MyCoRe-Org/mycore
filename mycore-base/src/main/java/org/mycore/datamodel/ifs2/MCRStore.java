@@ -186,8 +186,8 @@ public abstract class MCRStore {
     }
 
     public boolean isEmpty() {
-        try {
-            return Files.list(baseDirectory).findAny().isPresent();
+        try (Stream<Path> streamBaseDirectory = Files.list(baseDirectory)) {
+            return streamBaseDirectory.findAny().isPresent();
         } catch (final IOException e) {
             LOGGER.error("Error whil checking if base directory is empty: " + baseDirectory, e);
             return false;
@@ -286,11 +286,13 @@ public abstract class MCRStore {
              */
             private void addChildren(final Path dir) throws IOException {
                 if (Files.isDirectory(dir)) {
-                    final Path[] children = Files.list(dir).toArray(Path[]::new);
-                    Arrays.sort(children, new MCRPathComparator());
+                    try (Stream<Path> steamDir = Files.list(dir)) {
+                        final Path[] children = steamDir.toArray(Path[]::new);
+                        Arrays.sort(children, new MCRPathComparator());
 
-                    for (int i = 0; i < children.length; i++) {
-                        files.add(order ? i : 0, children[i]);
+                        for (int i = 0; i < children.length; i++) {
+                            files.add(order ? i : 0, children[i]);
+                        }
                     }
                 }
             }
