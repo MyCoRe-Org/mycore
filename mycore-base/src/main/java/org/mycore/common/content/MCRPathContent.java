@@ -84,42 +84,8 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
     }
 
     @Override
-    public byte[] asByteArray() throws IOException {
-        long len = length();
-        if (len > Integer.MAX_VALUE) {
-            throw new IOException("Content does not fit into byte array: " + len);
-        }
-        int size = (int) len;
-        try (SeekableByteChannel channel = getSeekableByteChannel()) {
-            if (channel instanceof FileChannel) {
-                MappedByteBuffer mappedByteBuffer = ((FileChannel) channel).map(MapMode.READ_ONLY, 0, size);
-                if (mappedByteBuffer.hasArray()) {
-                    LOGGER.debug(() -> path + " -> shortcut via MappedByteBuffer available");
-                    return mappedByteBuffer.array();
-                }
-                LOGGER.debug(() -> path + " -> shortcut via MappedByteBuffer NOT available");
-                byte[] returns = new byte[size];
-                int nGet, offset;
-                while (mappedByteBuffer.hasRemaining()) {
-                    offset = mappedByteBuffer.position();
-                    nGet = Math.min(mappedByteBuffer.remaining(), BUFFER_SIZE);
-                    mappedByteBuffer.get(returns, offset, nGet);
-                }
-                return returns;
-            }
-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(size);
-            if (!byteBuffer.hasArray()) {
-                LOGGER.debug(() -> "Your OS does not support byte[] backed ByteBuffer.");
-                byteBuffer.clear();
-                byteBuffer = ByteBuffer.wrap(new byte[size]);
-            }
-            while (byteBuffer.hasRemaining()) {
-                if (channel.read(byteBuffer) < 0) {
-                    throw new IOException("Bytebuffer size does not match");
-                }
-            }
-            return byteBuffer.array();
-        }
+    public byte[] asByteArray() throws IOException {     
+        return Files.readAllBytes(path);
     }
 
     @Override
@@ -177,5 +143,4 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
     public void sendTo(Path target, CopyOption... options) throws IOException {
         Files.copy(path, target, options);
     }
-
 }

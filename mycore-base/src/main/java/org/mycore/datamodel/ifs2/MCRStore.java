@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -185,8 +186,8 @@ public abstract class MCRStore {
     }
 
     public boolean isEmpty() {
-        try {
-            return Files.list(baseDirectory).findAny().isPresent();
+        try (Stream<Path> streamBaseDirectory = Files.list(baseDirectory)) {
+            return streamBaseDirectory.findAny().isPresent();
         } catch (final IOException e) {
             LOGGER.error("Error whil checking if base directory is empty: " + baseDirectory, e);
             return false;
@@ -285,11 +286,13 @@ public abstract class MCRStore {
              */
             private void addChildren(final Path dir) throws IOException {
                 if (Files.isDirectory(dir)) {
-                    final Path[] children = Files.list(dir).toArray(Path[]::new);
-                    Arrays.sort(children, new MCRPathComparator());
+                    try (Stream<Path> steamDir = Files.list(dir)) {
+                        final Path[] children = steamDir.toArray(Path[]::new);
+                        Arrays.sort(children, new MCRPathComparator());
 
-                    for (int i = 0; i < children.length; i++) {
-                        files.add(order ? i : 0, children[i]);
+                        for (int i = 0; i < children.length; i++) {
+                            files.add(order ? i : 0, children[i]);
+                        }
                     }
                 }
             }
@@ -324,7 +327,8 @@ public abstract class MCRStore {
 
     /**
      * Deletes the data stored in the given file object from the store
-     * 
+     *
+     * @see <a href="https://stackoverflow.com/questions/39628328/trying-to-create-a-directory-immediately-after-a-successful-deleteifexists-throw">stackoverflow</a>
      * @param path
      *            the file object to be deleted
      */
@@ -337,12 +341,16 @@ public abstract class MCRStore {
         Files.walkFileTree(path, MCRRecursiveDeleter.instance());
 
         while (!Files.isSameFile(baseDirectory, parent)) {
-            if (Files.list(parent).findAny().isPresent()) {
-                break;
+
+            // Prevent access denied error in windows with closing the stream correctly
+            try (Stream<Path> streamParent = Files.list(parent)) {
+                if (streamParent.findAny().isPresent()) {
+                    break;
+                }
+                current = parent;
+                parent = current.getParent();
+                Files.delete(current);
             }
-            current = parent;
-            parent = current.getParent();
-            Files.delete(current);
         }
     }
 
@@ -523,7 +531,12 @@ public abstract class MCRStore {
      * @return the highest slot file name / ID currently stored
      */
     private String findMaxID(final Path dir, final int depth) throws IOException {
-        final Path[] children = Files.list(dir).toArray(Path[]::new);
+
+        final Path[] children;
+
+        try (Stream<Path> streamDirectory = Files.list(dir)) {
+            children = streamDirectory.toArray(Path[]::new);
+        }
 
         if (children.length == 0) {
             return null;
@@ -537,9 +550,13 @@ public abstract class MCRStore {
 
         for (int i = children.length - 1; i >= 0; i--) {
             final Path child = children[i];
-            if (!Files.isDirectory(child) || Files.list(child).findAny().isEmpty()) {
-                continue;
+
+            try (Stream<Path> streamChild = Files.list(child)) {
+                if (!Files.isDirectory(child) || streamChild.findAny().isEmpty()) {
+                    continue;
+                }
             }
+
             final String found = findMaxID(child, depth + 1);
             if (found != null) {
                 return found;
@@ -550,7 +567,9 @@ public abstract class MCRStore {
 
     public interface MCRStoreConfig {
         String getBaseDir();
+
         String getID();
+
         String getSlotLayout();
     }
 }

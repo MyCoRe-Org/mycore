@@ -28,11 +28,13 @@ import org.mycore.util.concurrent.MCRFixedUserCallable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -50,8 +52,9 @@ public class MCRIFSCopyTest extends MCRIFSTest {
         copy("/anpassbar.jpg", "anpassbar.jpg", derivate);
         copy("/nachhaltig.jpg", "nachhaltig.jpg", derivate);
         copy("/vielseitig.jpg", "vielseitig.jpg", derivate);
-        assertEquals("the derivate should contain three files", 3,
-            Files.list(MCRPath.getPath(derivate.getId().toString(), "/")).count());
+        try (Stream<Path> streamPath = Files.list(MCRPath.getPath(derivate.getId().toString(), "/"))) {
+            assertEquals("the derivate should contain three files", 3, streamPath.count());
+        }
     }
 
     @Test
@@ -72,8 +75,9 @@ public class MCRIFSCopyTest extends MCRIFSTest {
         throwException(future1.get(5, TimeUnit.SECONDS));
         throwException(future2.get(5, TimeUnit.SECONDS));
         throwException(future3.get(5, TimeUnit.SECONDS));
-        assertEquals("the derivate should contain three files", 3,
-            Files.list(MCRPath.getPath(derivate.getId().toString(), "/")).count());
+        try (Stream<Path> streamPath = Files.list(MCRPath.getPath(derivate.getId().toString(), "/"))) {
+            assertEquals("the derivate should contain three files", 3, streamPath.count());
+        }
 
         executorService.awaitTermination(1, TimeUnit.SECONDS);
     }

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import org.jdom2.Element;
 
@@ -131,9 +132,9 @@ public class MCRDirectory extends MCRStoredNode {
                 childEntry.setName("node");
             }
         });
-        try {
-            getChildren()
-                .filter(MCRStoredNode.class::isInstance)
+        
+        try (Stream<MCRNode> streamMCRNode = getChildren()) {
+            streamMCRNode.filter(MCRStoredNode.class::isInstance)
                 .map(MCRStoredNode.class::cast)
                 .sequential()
                 .forEach(mcrStoredNode -> {

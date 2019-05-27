@@ -117,12 +117,13 @@ public class MCRFile extends MCRStoredNode {
      * @return the MD5 checksum of the stored content
      */
     public String setContent(MCRContent source) throws IOException {
-        MCRContentInputStream cis = source.getContentInputStream();
-        source.sendTo(path, StandardCopyOption.REPLACE_EXISTING);
-        String md5 = cis.getMD5String();
-        writeData(e -> e.setAttribute("md5", md5));
-        getRoot().saveAdditionalData();
-        return md5;
+        try (MCRContentInputStream cis = source.getContentInputStream()) {
+            source.sendTo(path, StandardCopyOption.REPLACE_EXISTING);
+            String md5 = cis.getMD5String();
+            writeData(e -> e.setAttribute("md5", md5));
+            getRoot().saveAdditionalData();
+            return md5;
+        }
     }
 
     /**
