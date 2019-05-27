@@ -150,7 +150,7 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="derobject" />
       </xs:sequence>
-      <xs:attribute name="class" use="required" type="xs:string" fixed="MCRMetaDerivateLinkID" />
+      <xs:attribute name="class" use="required" type="xs:string" fixed="MCRMetaEnrichedDerivateLink" />
       <xs:attributeGroup ref="structureInheritance" />
     </xs:complexType>
   </xs:element>
