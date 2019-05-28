@@ -4,10 +4,10 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>40</version>
+    <version>40-20190215.095342-1</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2019.05</version>
+  <version>2019.08-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -30,7 +30,7 @@
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>v2019.05</tag>
+    <tag>HEAD</tag>
   </scm>
   <properties>
     <argLine />
