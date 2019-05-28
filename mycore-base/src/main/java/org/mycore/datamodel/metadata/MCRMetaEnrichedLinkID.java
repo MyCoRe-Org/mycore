@@ -16,7 +16,7 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
 
     private List<Content> contentList;
 
-    MCRMetaEnrichedLinkID() {
+    public MCRMetaEnrichedLinkID() {
     }
 
     public static MCRMetaEnrichedLinkID fromDom(Element element){

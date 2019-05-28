@@ -18,10 +18,6 @@
 
 package org.mycore.datamodel.metadata.validator;
 
-import static org.jdom2.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -55,6 +51,7 @@ import org.mycore.datamodel.metadata.MCRMetaAddress;
 import org.mycore.datamodel.metadata.MCRMetaBoolean;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaHistoryDate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaInstitutionName;
@@ -67,6 +64,10 @@ import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXParseException;
+
+import static org.jdom2.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -158,6 +159,7 @@ public class MCREditorOutValidator {
         map.put(MCRMetaAddress.class.getSimpleName(), new MCRMetaAdressCheck());
         map.put(MCRMetaNumber.class.getSimpleName(), getObjectCheckWithLangNotEmptyInstance(MCRMetaNumber.class));
         map.put(MCRMetaLinkID.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaLinkID.class));
+        map.put(MCRMetaEnrichedLinkID.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaEnrichedLinkID.class));
         map.put(MCRMetaDerivateLink.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaDerivateLink.class));
         map.put(MCRMetaLink.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaLink.class));
         map.put(MCRMetaISO8601Date.class.getSimpleName(),
