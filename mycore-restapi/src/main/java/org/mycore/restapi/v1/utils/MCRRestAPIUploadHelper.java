@@ -50,7 +50,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaEnrichedDerivateLinkIDFactory;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -174,7 +174,7 @@ public class MCRRestAPIUploadHelper {
 
                 MCRMetadataManager.create(mcrDerivate);
                 MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-                    MCRMetaEnrichedDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
+                    MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
             }
 
             response = Response

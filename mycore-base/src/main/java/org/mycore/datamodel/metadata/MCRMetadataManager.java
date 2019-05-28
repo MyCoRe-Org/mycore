@@ -211,7 +211,7 @@ public final class MCRMetadataManager {
         fireEvent(mcrDerivate, null, MCREvent.CREATE_EVENT);
 
         // add the link to metadata
-        final MCRMetaEnrichedLinkID der = MCRMetaEnrichedDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+        final MCRMetaEnrichedLinkID der = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
 
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -771,7 +771,7 @@ public final class MCRMetadataManager {
             }
         }
         // add the link to metadata
-        final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedDerivateLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+        final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
         addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink);
 
         // update the derivate

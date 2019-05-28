@@ -6,12 +6,12 @@ import org.mycore.common.config.MCRConfiguration;
  * Handles andle which information is present in the {@link MCRMetaEnrichedLinkID} for Derivates.
  * Set class with: MCR.Metadata.EnrichedDerivateLinkIDFactory.Class
  */
-public abstract class MCRMetaEnrichedDerivateLinkIDFactory {
+public abstract class MCRMetaEnrichedLinkIDFactory {
 
-    protected MCRMetaEnrichedDerivateLinkIDFactory() {
+    protected MCRMetaEnrichedLinkIDFactory() {
     }
 
-    public static MCRMetaEnrichedDerivateLinkIDFactory getInstance() {
+    public static MCRMetaEnrichedLinkIDFactory getInstance() {
         return MCRConfiguration.instance()
             .getInstanceOf("MCR.Metadata.EnrichedDerivateLinkIDFactory.Class",
                 MCRDefaultEnrichedDerivateLinkIDFactory.class.getName());
