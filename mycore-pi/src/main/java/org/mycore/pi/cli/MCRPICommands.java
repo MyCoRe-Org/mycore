@@ -55,7 +55,7 @@ public class MCRPICommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @MCRCommand(syntax = "add pi flags to all objects", help = "Should only be used if you used mycore-pi pre 2016 lts!")
+    @MCRCommand(syntax = "add pi flags to all objects", help = "Should only be used if you used mycore-pi pre 2016 lts!", order = 10)
     public static List<String> addFlagsToObjects() {
         return MCRPIManager.getInstance().getList().stream()
             .filter(registrationInfo -> {
@@ -70,7 +70,7 @@ public class MCRPICommands {
             .collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "add pi flags to object {0}", help = "see add pi flags to all objects!")
+    @MCRCommand(syntax = "add pi flags to object {0}", help = "see add pi flags to all objects!", order = 20)
     public static void addFlagToObject(String mycoreIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(mycoreIDString);
         MCRBase base = MCRMetadataManager.retrieve(objectID);
@@ -96,7 +96,7 @@ public class MCRPICommands {
 
     @MCRCommand(syntax = "migrate urn granular to service id {0}", help = "Used to migrate urn granular to MyCoRe-PI. "
         +
-        "{0} should be your granular service id.")
+        "{0} should be your granular service id.", order = 30)
     public static void migrateURNGranularToServiceID(String serviceID) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRXMLMetadataManager.instance().listIDsOfType("derivate").forEach(derivateID -> {
@@ -125,7 +125,7 @@ public class MCRPICommands {
 
     @MCRCommand(syntax = "try to control {0} with pi service {1}", help = "This command tries to" +
         " read a pi from the object {0} with the MetadataManager from the specified service {1}." +
-        " If the service configuration is right then the pi is under control of MyCoRe.")
+        " If the service configuration is right then the pi is under control of MyCoRe.", order = 50)
     public static void controlObjectWithService(String objectIDString, String serviceID)
         throws MCRAccessException, MCRActiveLinkException, IOException {
         controlObjectWithServiceAndAdditional(objectIDString, serviceID, null);
@@ -133,7 +133,7 @@ public class MCRPICommands {
 
     @MCRCommand(syntax = "try to control {0} with pi service {1} with additional {2}", help = "This command tries to" +
         " read a pi from the object {0} with the MetadataManager from the specified service {1}." +
-        " If the service configuration is right then the pi is under control of MyCoRe.")
+        " If the service configuration is right then the pi is under control of MyCoRe.", order = 40)
     public static void controlObjectWithServiceAndAdditional(String objectIDString, String serviceID,
         final String additional)
         throws MCRAccessException, MCRActiveLinkException, IOException {
@@ -172,7 +172,7 @@ public class MCRPICommands {
     }
 
     @MCRCommand(syntax = "remove control {0} with pi service {1} with additional {2}", help = "This commands removes the "
-        + "pi control from the object {0}(object id) with the serivce {1}(service id) and the additional {2}")
+        + "pi control from the object {0}(object id) with the serivce {1}(service id) and the additional {2}", order = 60)
     public static void removeControlFromObject(String objectIDString, String serviceID, String additional)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
@@ -189,13 +189,13 @@ public class MCRPICommands {
     }
 
     @MCRCommand(syntax = "remove control {0} with pi service {1}", help = "This commands removes the "
-        + "pi control from the object {0}(object id) with the serivce {1}(service id)")
+        + "pi control from the object {0}(object id) with the serivce {1}(service id)", order = 70)
     public static void removeControlFromObject(String objectIDString, String serviceID)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException {
         removeControlFromObject(objectIDString, serviceID, null);
     }
 
-    @MCRCommand(syntax = "update all PI of object {0}", help = "Triggers the update method of every Object!")
+    @MCRCommand(syntax = "update all PI of object {0}", help = "Triggers the update method of every Object!", order = 80)
     public static void updateObject(String objectIDString) {
         MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
         MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);

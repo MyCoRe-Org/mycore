@@ -80,6 +80,7 @@
     </xsl:param>
     <xsl:param name="mcrid" />
     <xsl:param name="fileName" />
+    <xsl:param name="class" select="'resultListPreviewImage'" />
 
     <xsl:comment>
       Start - iViewLinkPrev (iview2-solrresponse.xsl)
@@ -126,7 +127,7 @@
               <xsl:call-template name="iview2.getImageElement">
                 <xsl:with-param select="$derivate" name="derivate" />
                 <xsl:with-param select="$pageToDisplay" name="imagePath" />
-                <xsl:with-param select="'resultListPreviewImage'" name="class" />
+                <xsl:with-param select="$class" name="class" />
               </xsl:call-template>
             </a>
           </xsl:when>
