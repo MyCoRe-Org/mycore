@@ -6,7 +6,7 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 
-public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedDerivateLinkIDFactory {
+public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLinkIDFactory {
 
     @Override
     public MCRMetaEnrichedLinkID getDerivateLink(MCRDerivate der) {

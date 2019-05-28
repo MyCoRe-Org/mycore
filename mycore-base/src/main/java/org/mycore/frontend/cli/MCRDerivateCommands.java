@@ -63,7 +63,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
-import org.mycore.datamodel.metadata.MCRMetaEnrichedDerivateLinkIDFactory;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -782,7 +782,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             oldObjectToDerivateLink = new MCRMetaLinkID();
         }
         LOGGER.info("Linking derivate {} to {}", derID, objID);
-        MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedDerivateLinkIDFactory.getInstance().getDerivateLink(derObj);
+        MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(derObj);
         MCRMetadataManager.addOrUpdateDerivateToObject(objID, derivateLink);
 
         /* removing link from old parent */
