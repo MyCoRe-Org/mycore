@@ -46,7 +46,7 @@
     <hk2.version>2.5.0-b61</hk2.version>
     <httpcomponents.version>4.5.5</httpcomponents.version>
     <httpcore.version>4.4.9</httpcore.version>
-    <jackson.version>2.9.6</jackson.version>
+    <jackson.version>2.9.9</jackson.version>
     <java.target.version>1.8</java.target.version>
     <jersey.version>2.27</jersey.version>
     <jetty.version>9.3.14.v20161028</jetty.version>
