@@ -206,11 +206,11 @@ namespace mycore.viewer.widgets.modal {
             this._radioRangePagesLabelElement.text(label);
         }
 
-        public get chapterLabel(){
+        public get chapterLabel() {
             return this._chapterLabelElement.text();
         }
 
-        public set chapterLabel(label:string){
+        public set chapterLabel(label: string) {
             this._chapterLabelElement.text(label);
         }
 
@@ -395,7 +395,7 @@ namespace mycore.viewer.widgets.modal {
 
         public set maximalPageMessage(message: string) {
             this._maximalPageNumber.detach();
-            let messageDiv = this._maximalPageMessage.find('.message');
+            const messageDiv = this._maximalPageMessage.find('.message');
             messageDiv.text(message + ' ');
             messageDiv.append(this._maximalPageNumber);
         }

@@ -33,7 +33,7 @@ namespace mycore.viewer.model {
             //this.addGroup(this._layoutControllGroup);
             //this.addGroup(this._actionControllGroup);
             const logoGroup = this.getGroup('LogoGroup');
-            if (typeof  logoGroup != 'undefined') {
+            if (typeof  logoGroup !== 'undefined') {
                 this.removeGroup(logoGroup);
             }
 
