@@ -20,20 +20,20 @@ namespace mycore.viewer.widgets.toolbar {
 
     export class BootstrapGroupView {
 
-        constructor(id: string, order:number ,align: string) {
-            this._element = jQuery("<div></div>");
-            this._element.attr("data-id", id);
-            this._element.addClass("btn-group");
+        private _element: JQuery;
 
-            if(align!=null && align=='right'){
-                this._element.addClass("right");
+        constructor(id: string, order: number, align: string) {
+            this._element = jQuery('<div></div>');
+            this._element.attr('data-id', id);
+            this._element.addClass('btn-group');
+
+            if (align !== null && align === 'right') {
+                this._element.addClass('right');
             }
 
-            this._element.attr("data-tb-order", order);
+            this._element.attr('data-tb-order', order);
 
         }
-
-        private _element: JQuery;
 
         public addChild(child: JQuery): void {
             this._element.append(child);

@@ -16,11 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../widgets/toolbar/model/ToolbarModel.ts" />
-/// <reference path="../../widgets/toolbar/model/ToolbarGroup.ts" />
-/// <reference path="../../widgets/toolbar/model/ToolbarButton.ts" />
-/// <reference path="../../widgets/toolbar/model/ToolbarDropdownButton.ts" />
-/// <reference path="LanguageModel.ts" />
+/// <reference path='../../widgets/toolbar/model/ToolbarModel.ts' />
+/// <reference path='../../widgets/toolbar/model/ToolbarGroup.ts' />
+/// <reference path='../../widgets/toolbar/model/ToolbarButton.ts' />
+/// <reference path='../../widgets/toolbar/model/ToolbarDropdownButton.ts' />
+/// <reference path='LanguageModel.ts' />
 
 namespace mycore.viewer.model {
     import ToolbarButton = mycore.viewer.widgets.toolbar.ToolbarButton;
@@ -67,11 +67,11 @@ namespace mycore.viewer.model {
 
         public initComponents(): void {
             // Dropdown Menu
-            this._sidebarControllGroup = new widgets.toolbar.ToolbarGroup("SidebarControllGroup", 10);
-            this._sidebarControllDropdownButton = new widgets.toolbar.ToolbarDropdownButton("SidebarControllDropdownButton", "", [], "fa-bars");
+            this._sidebarControllGroup = new widgets.toolbar.ToolbarGroup('SidebarControllGroup', 10);
+            this._sidebarControllDropdownButton = new widgets.toolbar.ToolbarDropdownButton('SidebarControllDropdownButton', '', [], 'fa-bars');
 
-            this._imageOverviewDropdownChild = { id: "imageOverview", label: "Bildübersicht" };
-            this._chapterOverviewDropdownChild = { id: "chapterOverview", label: "Strukturübersicht" };
+            this._imageOverviewDropdownChild = { id: 'imageOverview', label: 'Bildübersicht' };
+            this._chapterOverviewDropdownChild = { id: 'chapterOverview', label: 'Strukturübersicht' };
 
             this._dropdownChildren.push(this._imageOverviewDropdownChild);
             this._dropdownChildren.push(this._chapterOverviewDropdownChild);
@@ -80,28 +80,28 @@ namespace mycore.viewer.model {
 
             this._sidebarControllGroup.addComponent(this._sidebarControllDropdownButton);
 
-            this._imageChangeControllGroup = new widgets.toolbar.ToolbarGroup("ImageChangeControllGroup", 45);
-            this._previousImageButton = new widgets.toolbar.ToolbarButton("PreviousImageButton", "", "previous-image", "fa-arrow-left");
-            this._pageSelect = new widgets.toolbar.ToolbarDropdownButton("PageSelect", "", [], null, true);
+            this._imageChangeControllGroup = new widgets.toolbar.ToolbarGroup('ImageChangeControllGroup', 45);
+            this._previousImageButton = new widgets.toolbar.ToolbarButton('PreviousImageButton', '', 'previous-image', 'fa-arrow-left');
+            this._pageSelect = new widgets.toolbar.ToolbarDropdownButton('PageSelect', '', [], null, true);
 
             this._pageSelectChildren = new Array<{
                 id: string; label: string
             }>();
             this._pageSelect.children = this._pageSelectChildren;
 
-            this._nextImageButton = new widgets.toolbar.ToolbarButton("NextImageButton", "", "next-image", "fa-arrow-right");
+            this._nextImageButton = new widgets.toolbar.ToolbarButton('NextImageButton', '', 'next-image', 'fa-arrow-right');
 
             this._imageChangeControllGroup.addComponent(this._previousImageButton);
             this._imageChangeControllGroup.addComponent(this._pageSelect);
             this._imageChangeControllGroup.addComponent(this._nextImageButton);
 
             // Zoom Group
-            this._zoomControllGroup = new widgets.toolbar.ToolbarGroup("ZoomControllGroup", 20);
-            this._zoomInButton = new widgets.toolbar.ToolbarButton("ZoomInButton", "", "zoom-in", "fa-search-plus");
-            this._zoomOutButton = new widgets.toolbar.ToolbarButton("ZoomOutButton", "", "zoom-out", "fa-search-minus");
-            this._zoomWidthButton = new widgets.toolbar.ToolbarButton("ZoomWidthButton", "", "zoom-width", "fa-arrows-alt-h");
-            this._zoomFitButton = new widgets.toolbar.ToolbarButton("ZoomFitButton", "", "zoom-fit-in", "fa-expand-arrows-alt");
-            this._rotateButton = new widgets.toolbar.ToolbarButton("RotateButton", "", "Rotate", "fa-undo");
+            this._zoomControllGroup = new widgets.toolbar.ToolbarGroup('ZoomControllGroup', 20);
+            this._zoomInButton = new widgets.toolbar.ToolbarButton('ZoomInButton', '', 'zoom-in', 'fa-search-plus');
+            this._zoomOutButton = new widgets.toolbar.ToolbarButton('ZoomOutButton', '', 'zoom-out', 'fa-search-minus');
+            this._zoomWidthButton = new widgets.toolbar.ToolbarButton('ZoomWidthButton', '', 'zoom-width', 'fa-arrows-alt-h');
+            this._zoomFitButton = new widgets.toolbar.ToolbarButton('ZoomFitButton', '', 'zoom-fit-in', 'fa-expand-arrows-alt');
+            this._rotateButton = new widgets.toolbar.ToolbarButton('RotateButton', '', 'Rotate', 'fa-undo');
 
             this._zoomControllGroup.addComponent(this._zoomInButton);
             this._zoomControllGroup.addComponent(this._zoomOutButton);
@@ -109,24 +109,24 @@ namespace mycore.viewer.model {
             this._zoomControllGroup.addComponent(this._zoomFitButton);
             this._zoomControllGroup.addComponent(this._rotateButton);
 
-            this._layoutControllGroup = new widgets.toolbar.ToolbarGroup("LayoutControllGroup", 30);
+            this._layoutControllGroup = new widgets.toolbar.ToolbarGroup('LayoutControllGroup', 30);
             this._layoutDropdownButtonChilds = [
             ];
-            this._layoutDropdownButton = new widgets.toolbar.ToolbarDropdownButton("LayoutDropdownButton", "", this._layoutDropdownButtonChilds, "fa-book", false);
+            this._layoutDropdownButton = new widgets.toolbar.ToolbarDropdownButton('LayoutDropdownButton', '', this._layoutDropdownButtonChilds, 'fa-book', false);
             this._layoutControllGroup.addComponent(this._layoutDropdownButton);
             
 
 
 
-            this._actionControllGroup = new widgets.toolbar.ToolbarGroup("ActionControllGroup", 60);
-            this._shareButton = new widgets.toolbar.ToolbarButton("ShareButton", "", "share", "fa-share");
+            this._actionControllGroup = new widgets.toolbar.ToolbarGroup('ActionControllGroup', 60);
+            this._shareButton = new widgets.toolbar.ToolbarButton('ShareButton', '', 'share', 'fa-share');
             this._actionControllGroup.addComponent(this._shareButton);
 
-            this._searchGroup = new widgets.toolbar.ToolbarGroup("SearchGroup",80, true);
+            this._searchGroup = new widgets.toolbar.ToolbarGroup('SearchGroup',80, true);
 
 
-            this._closeViewerGroup = new widgets.toolbar.ToolbarGroup("CloseViewerGroup", 100,true);
-            this._closeViewerButton = new widgets.toolbar.ToolbarButton("CloseViewerButton", "", "close-viewer", "fa-power-off");
+            this._closeViewerGroup = new widgets.toolbar.ToolbarGroup('CloseViewerGroup', 100,true);
+            this._closeViewerButton = new widgets.toolbar.ToolbarButton('CloseViewerButton', '', 'close-viewer', 'fa-power-off');
             this._closeViewerGroup.addComponent(this._closeViewerButton);
         }
 
@@ -135,19 +135,19 @@ namespace mycore.viewer.model {
 
 
         public i18n(model: model.LanguageModel) {
-            this._previousImageButton.tooltip = model.getTranslation("toolbar.backward");
-            this._nextImageButton.tooltip = model.getTranslation("toolbar.forward");
-            this._zoomInButton.tooltip = model.getTranslation("toolbar.zoomIn");
-            this._zoomOutButton.tooltip = model.getTranslation("toolbar.zoomOut");
-            this._zoomWidthButton.tooltip = model.getTranslation("toolbar.toWidth");
-            this._zoomFitButton.tooltip = model.getTranslation("toolbar.toScreen");
-            this._shareButton.tooltip = model.getTranslation("toolbar.permalink");
+            this._previousImageButton.tooltip = model.getTranslation('toolbar.backward');
+            this._nextImageButton.tooltip = model.getTranslation('toolbar.forward');
+            this._zoomInButton.tooltip = model.getTranslation('toolbar.zoomIn');
+            this._zoomOutButton.tooltip = model.getTranslation('toolbar.zoomOut');
+            this._zoomWidthButton.tooltip = model.getTranslation('toolbar.toWidth');
+            this._zoomFitButton.tooltip = model.getTranslation('toolbar.toScreen');
+            this._shareButton.tooltip = model.getTranslation('toolbar.permalink');
 
-            this._closeViewerButton.tooltip = model.getTranslation("toolbar.normalView");
-            this._rotateButton.tooltip = model.getTranslation("toolbar.rotate");
+            this._closeViewerButton.tooltip = model.getTranslation('toolbar.normalView');
+            this._rotateButton.tooltip = model.getTranslation('toolbar.rotate');
 
-            this._imageOverviewDropdownChild.label = model.getTranslation("toolbar.openThumbnailPanel");
-            this._chapterOverviewDropdownChild.label = model.getTranslation("toolbar.openChapter");
+            this._imageOverviewDropdownChild.label = model.getTranslation('toolbar.openThumbnailPanel');
+            this._chapterOverviewDropdownChild.label = model.getTranslation('toolbar.openChapter');
 
             this._sidebarControllDropdownButton.children = this._sidebarControllDropdownButton.children;
         }

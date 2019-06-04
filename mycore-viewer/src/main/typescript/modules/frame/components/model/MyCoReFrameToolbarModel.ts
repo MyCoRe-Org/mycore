@@ -16,12 +16,12 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../../../desktop/components/model/MyCoReDesktopToolbarModel.ts" />
+/// <reference path='../../../desktop/components/model/MyCoReDesktopToolbarModel.ts' />
 namespace mycore.viewer.model {
     export class MyCoReFrameToolbarModel extends model.MyCoReDesktopToolbarModel {
 
         constructor() {
-            super("MyCoReFrameToolbar");
+            super('MyCoReFrameToolbar');
         }
 
 
@@ -32,13 +32,13 @@ namespace mycore.viewer.model {
 
             //this.addGroup(this._layoutControllGroup);
             //this.addGroup(this._actionControllGroup);
-            var logoGroup = this.getGroup("LogoGroup");
-            if (typeof  logoGroup != "undefined") {
+            const logoGroup = this.getGroup('LogoGroup');
+            if (typeof  logoGroup != 'undefined') {
                 this.removeGroup(logoGroup);
             }
 
-            var toolbarButton = new mycore.viewer.widgets.toolbar.ToolbarButton("MaximizeButton", "", "", "fa-window-maximize");
-            var toolbarGroup = new mycore.viewer.widgets.toolbar.ToolbarGroup("MaximizeToolbarGroup", 100, true);
+            const toolbarButton = new mycore.viewer.widgets.toolbar.ToolbarButton('MaximizeButton', '', '', 'fa-window-maximize');
+            const toolbarGroup = new mycore.viewer.widgets.toolbar.ToolbarGroup('MaximizeToolbarGroup', 100, true);
 
             this.addGroup(toolbarGroup);
             toolbarGroup.addComponent(toolbarButton);
