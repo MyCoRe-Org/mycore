@@ -22,9 +22,26 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
+/**
+ * Modifies a uploaded file before it will be written to the destination Derivate.
+ */
 public abstract class MCRPostUploadFileProcessor {
+
+    /**
+     * Checks a file if it is processable.
+     * @param path to the temp file
+     * @return true if this {@link MCRPostUploadFileProcessor} can process this file
+     */
     public abstract boolean isProcessable(String path);
 
+    /**
+     *
+     * @param path the actual relative path in the derivate
+     * @param tempFileContent the actual path to the temporary file
+     * @param tempFileSupplier a supplier which creates a new temporary file which can be used for processing.
+     * @return the {@link Path} of the final file, which was provided by the tempFileSupplier
+     * @throws IOException if the processing failed
+     */
     public abstract Path processFile(String path, Path tempFileContent, Supplier<Path> tempFileSupplier)
         throws IOException;
 }
