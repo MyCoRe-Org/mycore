@@ -23,7 +23,6 @@
 
 package org.mycore.common.xml;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -90,6 +89,7 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
@@ -549,26 +549,22 @@ public final class MCRURIResolver implements URIResolver {
                     .map(Header::getValue)
                     .orElse(null);
 
-                try {
-                    InputStream content = response.getEntity().getContent();
-                    responseStream = new FilterInputStream(content) {
-                        @Override
-                        public void close() throws IOException {
-                            super.close();
-                            response.close();
-                        }
-                    };
+                try (InputStream content = response.getEntity().getContent()) {
+                    final Source source = new MCRStreamContent(content).getReusableCopy().getSource();
+                    source.setSystemId(hrefURI.toASCIIString());
+                    return new MCRCacheableURIResponse(source,
+                        () -> getHash(lastModified, eTag), () -> lastModified != null || eTag != null);
                 } catch (Exception e) {
+                    throw new MCRException(e);
+                } finally {
                     response.close();
                     get.reset();
-                    throw e;
                 }
             } catch (IOException e) {
                 throw new TransformerException(e);
             }
-            return new MCRCacheableURIResponse(new StreamSource(responseStream, hrefURI.toASCIIString()),
-                () -> getHash(lastModified, eTag), () -> lastModified != null || eTag != null);
         }
+
 
         private static int getHash(String lastModified, String eTag) {
             final int prime = 31;
