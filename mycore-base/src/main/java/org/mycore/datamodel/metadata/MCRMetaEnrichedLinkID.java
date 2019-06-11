@@ -8,10 +8,14 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * A Link to a {@link MCRDerivate}. In addition to {@link MCRMetaLink} this class contains information about the
  * linked {@link MCRBase} like mainDoc, titles and classifications in {@link MCRDerivate}.
  */
+@JsonClassDescription("Links to derivates")
 public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
 
     private List<Content> contentList;
@@ -42,6 +46,7 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
         return xml;
     }
 
+    @JsonIgnore
     public List<Content> getContentList() {
         return contentList;
     }
