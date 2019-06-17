@@ -30,7 +30,7 @@ import org.mycore.common.xml.MCRNodeBuilder;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class MCRTestNameMerger extends MCRTestCase {
+public class MCRNameMergerTest extends MCRTestCase {
 
     @Test
     public void testIsProbablySameAs() throws Exception {
@@ -67,8 +67,8 @@ public class MCRTestNameMerger extends MCRTestCase {
         assertTrue(i.isProbablySameAs(d));
 
         try {
-            buildNameEntry("[mods:role[mods:roleTerm[@type='code' and @authority='marcrelator']='aut']]");
-            Assert.fail("No name should result in NPE while creating a MCRNameMerger");
+            new MCRNameMerger().setElement(null);
+        Assert.fail("No name should result in NPE while creating a MCRNameMerger");
         } catch (NullPointerException ex) {
             // exception excepted
         }
@@ -90,7 +90,7 @@ public class MCRTestNameMerger extends MCRTestCase {
             + "[mods:namePart[@type='family']='Müller'][mods:namePart[@type='termsOfAddress']='Jun.']]";
         String e = "[mods:name[@type='personal'][mods:namePart[@type='given']='Thomas']"
             + "[mods:namePart[@type='family']='Müller'][mods:namePart[@type='termsOfAddress']='Jun.']]";
-        MCRTestMerger.test(a, b, e);
+        MCRMergerTest.test(a, b, e);
     }
 
     @Test
@@ -101,14 +101,14 @@ public class MCRTestNameMerger extends MCRTestCase {
             + "[mods:nameIdentifier[@type='lsf']='1'][mods:nameIdentifier[@type='gnd']='2']]";
         String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']"
             + "[mods:nameIdentifier[@type='gnd']='2'][mods:nameIdentifier[@type='lsf']='1']]";
-        MCRTestMerger.test(a, b, e);
+        MCRMergerTest.test(a, b, e);
     }
 
     @Test
     public void testMergeDisplayForm() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:displayForm='Tommy']]";
         String b = "[mods:name[@type='personal'][mods:namePart='Mueller, T'][mods:displayForm='Tom']]";
-        MCRTestMerger.test(a, b, a);
+        MCRMergerTest.test(a, b, a);
     }
 
     @Test
@@ -116,21 +116,21 @@ public class MCRTestNameMerger extends MCRTestCase {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:affiliation='UDE']]";
         String b = "[mods:name[@type='personal'][mods:namePart='Mueller, T'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
         String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:affiliation='UDE'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
-        MCRTestMerger.test(a, b, e);
+        MCRMergerTest.test(a, b, e);
     }
 
     @Test
     public void testMergeFirstLastVsLastFirst() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']]";
         String b = "[mods:name[@type='personal'][mods:namePart='Mueller, T']]";
-        MCRTestMerger.test(a, b, a);
+        MCRMergerTest.test(a, b, a);
     }
 
     @Test
     public void testPreferFamilyGiven() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']]";
         String b = "[mods:name[@type='personal'][mods:namePart[@type='family']='Müller'][mods:namePart[@type='given']='T.']]";
-        MCRTestMerger.test(a, b, b);
+        MCRMergerTest.test(a, b, b);
     }
 
     private MCRNameMerger buildNameEntry(String predicates) throws JaxenException {

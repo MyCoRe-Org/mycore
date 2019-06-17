@@ -21,27 +21,27 @@ package org.mycore.mods.merger;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
-public class MCRTestExtentMerger extends MCRTestCase {
+public class MCRExtentMergerTest extends MCRTestCase {
 
     @Test
     public void testPhysicalDescriptionExtent() throws Exception {
         String a = "[mods:physicalDescription[mods:extent='360 pages']]";
         String b = "[mods:physicalDescription[mods:extent='7\" x 9\"']]";
-        MCRTestMerger.test(a, b, a);
+        MCRMergerTest.test(a, b, a);
     }
 
     @Test
     public void testPartExtentList() throws Exception {
         String a = "[mods:part[mods:extent[@unit='pages'][mods:list='S. 64-67']]]";
         String b = "[mods:part[mods:extent[@unit='pages'][mods:list='pp. 64-67']]]";
-        MCRTestMerger.test(a, b, a);
+        MCRMergerTest.test(a, b, a);
     }
 
     @Test
     public void testPartExtentStartEnd() throws Exception {
         String a = "[mods:part[mods:extent[@unit='pages'][mods:list='S. 64-67']]]";
         String b = "[mods:part[mods:extent[@unit='pages'][mods:start='64'][mods:end='67']]]";
-        MCRTestMerger.test(a, b, b);
-        MCRTestMerger.test(b, a, b);
+        MCRMergerTest.test(a, b, b);
+        MCRMergerTest.test(b, a, b);
     }
 }

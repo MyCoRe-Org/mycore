@@ -24,28 +24,28 @@ import org.jaxen.JaxenException;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
-public class MCRTestTitleInfoMerger extends MCRTestCase {
+public class MCRTitleInfoMergerTest extends MCRTestCase {
 
     @Test
     public void testMerge() throws Exception {
         String a = "[mods:titleInfo[mods:title='Testing'][mods:subTitle='All You have to know about']]";
         String b = "[mods:titleInfo[mods:title='testing: all you have to know about']]";
         String e = "[mods:titleInfo[mods:title='Testing'][mods:subTitle='All You have to know about']]";
-        MCRTestMerger.test(a, b, e);
+        MCRMergerTest.test(a, b, e);
     }
 
     @Test
     public void testLongerWins() throws Exception {
         String a = "[mods:titleInfo[mods:title='Applied Physics A']]";
         String b = "[mods:titleInfo[mods:title='Applied Physics A : Materials Science & Processing']]";
-        MCRTestMerger.test(a, b, b);
+        MCRMergerTest.test(a, b, b);
     }
 
     @Test
     public void testMergingTitleSubtitle() throws JaxenException, IOException {
         String a = "[mods:titleInfo[mods:title='testing: all you have to know about']]";
         String b = "[mods:titleInfo[mods:title='Testing'][mods:subTitle='All You have to know about']]";
-        MCRTestMerger.test(a, b, b);
+        MCRMergerTest.test(a, b, b);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class MCRTestTitleInfoMerger extends MCRTestCase {
             + "][mods:titleInfo[mods:title='second'][@xml:lang='en'][@type='alternative']]";
         String e = "[mods:titleInfo[mods:title='first'][@xml:lang='de']]"
             + "[mods:titleInfo[mods:title='second'][@xml:lang='en'][@type='alternative']]";
-        MCRTestMerger.test(a, b, e);
+        MCRMergerTest.test(a, b, e);
     }
 
     @Test
@@ -63,12 +63,12 @@ public class MCRTestTitleInfoMerger extends MCRTestCase {
         String a = "[mods:titleInfo[mods:title='a']]";
         String b = "[mods:titleInfo[mods:title='b']]";
         String e = "[mods:titleInfo[mods:title='a']][mods:titleInfo[mods:title='b']]";
-        MCRTestMerger.test(a, b, e);
+        MCRMergerTest.test(a, b, e);
     }
 
     @Test
     public void testMergingIdentical() throws JaxenException, IOException {
         String a = "[mods:titleInfo[mods:title='test']]";
-        MCRTestMerger.test(a, a, a);
+        MCRMergerTest.test(a, a, a);
     }
 }
