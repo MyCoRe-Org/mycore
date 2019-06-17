@@ -18,16 +18,17 @@
 
 package org.mycore.mods.merger;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MCRTestNameMerger extends MCRTestCase {
 
@@ -64,6 +65,13 @@ public class MCRTestNameMerger extends MCRTestCase {
         assertTrue(i.isProbablySameAs(h));
         assertTrue(i.isProbablySameAs(a));
         assertTrue(i.isProbablySameAs(d));
+
+        try {
+            buildNameEntry("[mods:role[mods:roleTerm[@type='code' and @authority='marcrelator']='aut']]");
+            Assert.fail("No name should result in NPE while creating a MCRNameMerger");
+        } catch (NullPointerException ex) {
+            // exception excepted
+        }
     }
 
     @Test
