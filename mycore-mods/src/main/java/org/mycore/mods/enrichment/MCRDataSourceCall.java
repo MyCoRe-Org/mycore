@@ -18,14 +18,19 @@
 
 package org.mycore.mods.enrichment;
 
+import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.mods.MCRMODSCommands;
 import org.mycore.mods.MCRMODSSorter;
 import org.mycore.mods.merger.MCRMerger;
 import org.mycore.mods.merger.MCRMergerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * Used to request publication data from a given data source,
@@ -65,7 +70,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
                 for (MCRIdentifier id : idPool.getIdentifiersOfType(type)) {
                     result = idResolver.resolve(id.getValue());
                     LOGGER.info(ds.getID() + " with " + id + " returned " + (wasSuccessful() ? "" : "no ") + "data ");
-                    if (wasSuccessful()) {
+                    if (wasSuccessful() && validate(id.getValue())) {
                         MCRMODSSorter.sort(result);
                         idPool.addIdentifiersFrom(result);
                         return true;
@@ -74,6 +79,20 @@ class MCRDataSourceCall implements Callable<Boolean> {
             }
         }
         return false;
+    }
+
+    protected Boolean validate(String id) {
+        final Document doc = new Document();
+        doc.addContent(this.result.detach());
+
+        try {
+            MCRXMLHelper.validate(doc, MCRMODSCommands.MODS_V3_XSD_URI);
+        } catch (SAXException | IOException e) {
+            LOGGER.warn(ds.getID() + " with " + id + " returned invalid mods!", e);
+            return false;
+        }
+
+        return true;
     }
 
     boolean wasSuccessful() {
