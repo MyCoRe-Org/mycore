@@ -117,7 +117,13 @@ public class MCRDOIService extends MCRDOIBaseService {
 
     private static final int MAX_URL_LENGTH = 255;
 
-    private static final String DEFAULT_DATACITE_SCHEMA_PATH = "xsd/datacite/v3/metadata.xsd";
+    public static final String DATACITE_SCHEMA_V3 = "xsd/datacite/v3/metadata.xsd";
+
+    public static final String DATACITE_SCHEMA_V4 = "xsd/datacite/v4/metadata.xsd";
+
+    public static final String DATACITE_SCHEMA_V41 = "xsd/datacite/v4.1/metadata.xsd";
+
+    private static final String DEFAULT_DATACITE_SCHEMA_PATH = DATACITE_SCHEMA_V3;
 
     private static final String TRANSLATE_PREFIX = "component.pi.register.error.";
 
