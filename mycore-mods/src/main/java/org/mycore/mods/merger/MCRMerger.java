@@ -21,6 +21,7 @@ package org.mycore.mods.merger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.jdom2.Attribute;
 import org.jdom2.Element;
@@ -52,6 +53,7 @@ public class MCRMerger {
 
     /** Sets the MODS element wrapped and compared by this merger */
     public void setElement(Element element) {
+        Objects.requireNonNull(element);
         this.element = element;
     }
 

@@ -21,7 +21,7 @@ package org.mycore.mods.merger;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
-public class MCRTestOriginInfoMerger extends MCRTestCase {
+public class MCROriginInfoMergerTest extends MCRTestCase {
 
     @Test
     public void testMerge() throws Exception {
@@ -30,7 +30,7 @@ public class MCRTestOriginInfoMerger extends MCRTestCase {
             + "[mods:edition='4. Aufl.'][mods:place='Berlin']]";
         String e = "[mods:originInfo[mods:dateIssued[@encoding='w3cdtf']='2017']"
             + "[mods:publisher='Elsevier'][mods:edition='4. Aufl.'][mods:place='Berlin']]";
-        MCRTestMerger.test(a, b, e);
+        MCRMergerTest.test(a, b, e);
     }
 
     @Test
@@ -39,6 +39,6 @@ public class MCRTestOriginInfoMerger extends MCRTestCase {
         String b = "[mods:originInfo[mods:dateOther[@type='submitted']='2018']]";
         String e = "[mods:originInfo[mods:dateOther[@type='accepted']='2017']"
             + "[mods:dateOther[@type='submitted']='2018']]";
-        MCRTestMerger.test(a, b, e);
+        MCRMergerTest.test(a, b, e);
     }
 }

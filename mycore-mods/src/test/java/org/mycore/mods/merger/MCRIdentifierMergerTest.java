@@ -21,22 +21,20 @@ package org.mycore.mods.merger;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
-public class MCRTestRelatedItemMerger extends MCRTestCase {
+public class MCRIdentifierMergerTest extends MCRTestCase {
 
     @Test
-    public void testMergeHost() throws Exception {
-        String a = "[mods:relatedItem[@type='host'][mods:identifier='foo']]";
-        String b = "[mods:relatedItem[@type='host'][mods:note='bar']]";
-        String e = "[mods:relatedItem[@type='host'][mods:identifier='foo'][mods:note='bar']]";
-        MCRTestMerger.test(a, b, e);
+    public void testMergeDifferent() throws Exception {
+        String a = "[mods:identifier[@type='doi']='10.123/456']";
+        String b = "[mods:identifier[@type='issn']='1234-5678']";
+        String e = "[mods:identifier[@type='doi']='10.123/456'][mods:identifier[@type='issn']='1234-5678']";
+        MCRMergerTest.test(a, b, e);
     }
 
     @Test
-    public void testMergeSeries() throws Exception {
-        String a = "[mods:relatedItem[@type='series'][mods:identifier='foo']]";
-        String b = "[mods:relatedItem[@type='series'][mods:note='bar']]";
-        String e = "[mods:relatedItem[@type='series'][mods:identifier='foo']]"
-            + "[mods:relatedItem[@type='series'][mods:note='bar']]";
-        MCRTestMerger.test(a, b, e);
+    public void testMergeSame() throws Exception {
+        String a = "[mods:identifier[@type='issn']='12345678']";
+        String b = "[mods:identifier[@type='issn']='1234-5678']";
+        MCRMergerTest.test(a, b, b);
     }
 }
