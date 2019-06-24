@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -208,6 +209,7 @@ public class MCRParameterCollector {
      * others will be ignored. The "XSL." prefix is cut off from the name.
      */
     private void setFromSession(MCRSession session) {
+        Objects.requireNonNull(session,"Session needs to be not null!");
         for (Map.Entry<Object, Object> entry : session.getMapEntries()) {
             String key = entry.getKey().toString();
             if (entry.getValue() != null) {

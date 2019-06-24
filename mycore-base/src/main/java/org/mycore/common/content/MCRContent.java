@@ -321,8 +321,11 @@ public abstract class MCRContent {
             MCRContent copy = new MCRByteContent(asByteArray(), lastModified());
             copy.setSystemId(getSystemId());
             copy.setName(getName());
-            copy.setDocType(getDocType());
             copy.setMimeType(getMimeType());
+            if (docType != null) {
+                copy.setDocType(getDocType());
+            }
+
             return copy;
         }
     }

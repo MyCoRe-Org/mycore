@@ -21,32 +21,32 @@ package org.mycore.mods.merger;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 
-public class MCRTestAbstractMerger extends MCRTestCase {
+public class MCRAbstractMergerTest extends MCRTestCase {
 
     @Test
     public void testMerge() throws Exception {
         String a = "[mods:abstract[@xml:lang='de']='deutsch']";
         String b = "[mods:abstract='deutsch'][mods:abstract[@xml:lang='en']='english']";
         String e = "[mods:abstract[@xml:lang='de']='deutsch'][mods:abstract[@xml:lang='en']='english']";
-        MCRTestMerger.test(a, b, e);
+        MCRMergerTest.test(a, b, e);
     }
 
     @Test
     public void testXLink() throws Exception {
         String a = "[mods:abstract[@xlink:href='foo']]";
         String b = "[mods:abstract[@xml:lang='de'][@xlink:href='foo']][mods:abstract[@xml:lang='en'][@xlink:href='bar']]";
-        MCRTestMerger.test(a, b, b);
+        MCRMergerTest.test(a, b, b);
     }
 
     @Test
     public void testSimilar() throws Exception {
         String a = "[mods:abstract[@xml:lang='de']='Dies ist der deutsche Abstract']";
         String b = "[mods:abstract='Dies ist der deitsche Abstract']";
-        MCRTestMerger.test(a, b, a);
+        MCRMergerTest.test(a, b, a);
 
         String a2 = "[mods:abstract[@xml:lang='de']='Dies ist der deutsche Abstract']";
         String b2 = "[mods:abstract='Dieses ist der doitsche Äbschträkt']";
         String e2 = a2 + b2;
-        MCRTestMerger.test(a2, b2, e2);
+        MCRMergerTest.test(a2, b2, e2);
     }
 }
