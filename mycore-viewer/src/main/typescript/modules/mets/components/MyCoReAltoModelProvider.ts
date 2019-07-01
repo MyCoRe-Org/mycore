@@ -155,7 +155,7 @@ namespace mycore.viewer.components {
             var layouts:NodeListOf<HTMLAreaElement> = xml.getElementsByTagName("Layout");
             var layout:Element = layouts.item(0);
 
-            if (styles != null && layout != null) {
+            if (layout != null) {
                 var altoContainer = new widgets.alto.AltoFile(styles, layout);
                 MyCoReAltoModelProvider.altoHrefModelMap.set(altoHref, altoContainer);
                 callback(altoContainer);
