@@ -49,6 +49,7 @@ import org.mycore.common.content.MCRURLContent;
  * </ol>
  * 
  * @author Thomas Scheffler (yagee)
+ * @author Robert Stephan
  * @since 2013.12
  */
 public class MCRConfigurationInputStream extends InputStream {
@@ -173,8 +174,6 @@ public class MCRConfigurationInputStream extends InputStream {
     /**
      * return an enumeration of input streams of configuration files
      * found in MyCoRe components and modules, respecting the proper loading order 
-     * 
-     * @author Robert Stephan
      */
     public static List<byte[]> getConfigFileContents(String filename) throws IOException {
         ArrayList<byte[]> cList = new ArrayList<>();
