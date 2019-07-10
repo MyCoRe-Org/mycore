@@ -34,9 +34,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.common.content.transformer.MCRFopper;
 import org.mycore.common.content.transformer.MCRIdentityTransformer;
-import org.mycore.common.content.transformer.MCRTransformerPipe;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.xml.sax.SAXException;
 
@@ -53,8 +51,6 @@ public class MCRLayoutTransformerFactory {
     private static HashMap<String, MCRContentTransformer> transformers = new HashMap<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRLayoutTransformerFactory.class);
-
-    private static MCRFopper fopper = new MCRFopper();
 
     private static final MCRIdentityTransformer NOOP_TRANSFORMER = new MCRIdentityTransformer("text/xml", "xml");
 
@@ -87,20 +83,9 @@ public class MCRLayoutTransformerFactory {
         }
         String[] stylesheets = getStylesheets(idStripped, stylesheet);
         MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheets);
-        String mimeType = transformer.getMimeType();
-        if (isPDF(mimeType)) {
-            transformer = new MCRTransformerPipe(transformer, fopper);
-            LOGGER.debug("Using stylesheet '{}' for {} and MCRFopper for PDF output.", Lists.newArrayList(stylesheets),
-                idStripped);
-        } else {
-            LOGGER.debug("Using stylesheet '{}' for {}", Lists.newArrayList(stylesheets), idStripped);
-        }
+        LOGGER.debug("Using stylesheet '{}' for {}", Lists.newArrayList(stylesheets), idStripped);
         transformers.put(id, transformer);
         return transformer;
-    }
-
-    private static boolean isPDF(String mimeType) {
-        return MediaType.parse(mimeType).is(MediaType.PDF);
     }
 
     private static String[] getStylesheets(String id, String stylesheet)
@@ -111,7 +96,7 @@ public class MCRLayoutTransformerFactory {
         if (!ignore.contains(id)) {
             MCRXSLTransformer transformerTest = MCRXSLTransformer.getInstance(stylesheet);
             String outputMethod = transformerTest.getOutputProperties().getProperty(OutputKeys.METHOD, "xml");
-            if ("xml".equals(outputMethod) && !isPDF(transformerTest.getMimeType())) {
+            if ("xml".equals(outputMethod)) {
                 defaults = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Stylesheets",
                     Collections.emptyList());
             }

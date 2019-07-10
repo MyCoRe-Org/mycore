@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
+import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.fo.MCRFoFactory;
 
 /**
@@ -66,4 +67,5 @@ public class MCRFopper extends MCRContentTransformer {
     public String getFileExtension() {
         return "pdf";
     }
+    
 }
