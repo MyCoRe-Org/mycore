@@ -45,15 +45,16 @@ import com.google.common.collect.Lists;
 import com.google.common.net.MediaType;
 
 /**
- * This class acts as a {@link org.mycore.common.content.transformer.MCRContentTransformer} factory for {@link org.mycore.common.xml.MCRLayoutService}.
+ * This class acts as a {@link org.mycore.common.content.transformer.MCRContentTransformer} factory for 
+ * {@link org.mycore.common.xml.MCRLayoutService}.
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRLayoutTransformerFactory {
+public class MCRLayoutTransformerFoFactory {
     /** Map of transformer instances by ID */
     private static HashMap<String, MCRContentTransformer> transformers = new HashMap<>();
 
-    private static Logger LOGGER = LogManager.getLogger(MCRLayoutTransformerFactory.class);
+    private static Logger LOGGER = LogManager.getLogger(MCRLayoutTransformerFoFactory.class);
 
     private static MCRFopper fopper = new MCRFopper();
 

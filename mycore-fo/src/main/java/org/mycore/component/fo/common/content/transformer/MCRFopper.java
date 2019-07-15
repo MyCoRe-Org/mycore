@@ -26,8 +26,7 @@ import javax.xml.transform.TransformerException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
-import org.mycore.common.content.transformer.MCRContentTransformer;
-import org.mycore.common.fo.MCRFoFactory;
+import org.mycore.common.fo.MCRFoFormatterFactoryHelper;
 
 /**
  * Transforms XSL-FO xml content to PDF. 
@@ -42,7 +41,7 @@ public class MCRFopper extends MCRContentTransformer {
     public MCRContent transform(MCRContent source) throws IOException {
         MCRByteArrayOutputStream pdf = new MCRByteArrayOutputStream(32 * 1024);
         try {
-            MCRFoFactory.getFoFormatter().transform(source, pdf);
+            MCRFoFormatterFactoryHelper.getFoFormatter().transform(source, pdf);
         } catch (TransformerException e) {
             throw new IOException(e);
         }
@@ -52,7 +51,7 @@ public class MCRFopper extends MCRContentTransformer {
     @Override
     public void transform(MCRContent source, OutputStream out) throws IOException {
         try {
-            MCRFoFactory.getFoFormatter().transform(source, out);
+            MCRFoFormatterFactoryHelper.getFoFormatter().transform(source, out);
         } catch (TransformerException e) {
             throw new IOException(e);
         }
