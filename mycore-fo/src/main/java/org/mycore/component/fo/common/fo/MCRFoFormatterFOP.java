@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.fo;
+package org.mycore.component.fo.common.fo;
 
 import java.io.IOException;
 import java.io.OutputStream;

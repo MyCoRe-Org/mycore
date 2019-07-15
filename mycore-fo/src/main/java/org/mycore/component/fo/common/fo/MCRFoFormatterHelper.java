@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.fo;
+package org.mycore.component.fo.common.fo;
 
 import org.mycore.common.config.MCRConfiguration;
 
@@ -31,7 +31,7 @@ import org.mycore.common.config.MCRConfiguration;
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRFoFormatterFactoryHelper {
+public class MCRFoFormatterHelper {
 
     /** The configuration PROPERTY */
     private static final String PROPERTY = "MCR.LayoutService.FoFormatter.class";

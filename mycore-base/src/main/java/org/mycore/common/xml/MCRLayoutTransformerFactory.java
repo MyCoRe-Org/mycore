@@ -39,7 +39,6 @@ import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
-import com.google.common.net.MediaType;
 
 /**
  * This class acts as a {@link MCRContentTransformer} factory for {@link MCRLayoutService}.
@@ -58,7 +57,7 @@ public class MCRLayoutTransformerFactory {
      * Returns the transformer with the given ID. If the transformer is not instantiated yet,
      * it is created and initialized.
      */
-    public static MCRContentTransformer getTransformer(String id) throws Exception {
+    public MCRContentTransformer getTransformer(String id) throws Exception {
         MCRContentTransformer transformer = transformers.get(id);
         if (transformer != null) {
             return transformer;

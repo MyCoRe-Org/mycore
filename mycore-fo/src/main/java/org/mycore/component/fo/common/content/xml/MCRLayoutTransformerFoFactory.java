@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.content.xml;
+package org.mycore.component.fo.common.content.xml;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,11 +34,12 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.common.content.transformer.MCRFopper;
 import org.mycore.common.content.transformer.MCRIdentityTransformer;
 import org.mycore.common.content.transformer.MCRTransformerPipe;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
+import org.mycore.common.xml.MCRLayoutTransformerFactory;
 import org.mycore.common.xml.MCRXMLResource;
+import org.mycore.component.fo.common.content.transformer.MCRFopper;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
@@ -50,7 +51,7 @@ import com.google.common.net.MediaType;
  * @author Thomas Scheffler (yagee)
  *
  */
-public class MCRLayoutTransformerFoFactory {
+public class MCRLayoutTransformerFoFactory extends MCRLayoutTransformerFactory {
     /** Map of transformer instances by ID */
     private static HashMap<String, MCRContentTransformer> transformers = new HashMap<>();
 
@@ -64,7 +65,8 @@ public class MCRLayoutTransformerFoFactory {
      * Returns the transformer with the given ID. If the transformer is not instantiated yet,
      * it is created and initialized.
      */
-    public static MCRContentTransformer getTransformer(String id) throws Exception {
+    @Override
+    public MCRContentTransformer getTransformer(String id) throws Exception {
         MCRContentTransformer transformer = transformers.get(id);
         if (transformer != null) {
             return transformer;
