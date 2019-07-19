@@ -1210,7 +1210,6 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRLayoutTransformerResolver implements URIResolver {
 
         private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
-        private static final String TRANSFORMER_FACTORY_PROPERTY_DEFAULT = "org.mycore.common.xml.MCRLayoutTransformerFactory";
         
         @Override
         public Source resolve(String href, String base) throws TransformerException {
@@ -1238,7 +1237,7 @@ public final class MCRURIResolver implements URIResolver {
                 if (resolved != null) {
                     MCRSourceContent content = new MCRSourceContent(resolved);
                     MCRLayoutTransformerFactory factory = MCRConfiguration.instance()
-                        .getInstanceOf(TRANSFORMER_FACTORY_PROPERTY, TRANSFORMER_FACTORY_PROPERTY_DEFAULT);
+                        .getInstanceOf(TRANSFORMER_FACTORY_PROPERTY, MCRLayoutTransformerFactory.class.getName());
                     MCRContentTransformer transformer = factory.getTransformer(transformerId);
                     MCRContent result;
                     if (transformer instanceof MCRParameterizedTransformer) {

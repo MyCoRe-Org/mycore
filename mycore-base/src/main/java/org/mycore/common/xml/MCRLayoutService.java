@@ -59,7 +59,6 @@ public class MCRLayoutService {
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
     
     private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
-    private static final String TRANSFORMER_FACTORY_PROPERTY_DEFAULT = "org.mycore.common.xml.MCRLayoutTransformerFactory";
     
     public static MCRLayoutService instance() {
         return SINGLETON;
@@ -142,7 +141,7 @@ public class MCRLayoutService {
             transformerId = new MessageFormat("{0}-{1}", Locale.ROOT).format(new Object[] { docType, style });
         }
         MCRLayoutTransformerFactory factory = MCRConfiguration.instance()
-            .getInstanceOf(TRANSFORMER_FACTORY_PROPERTY, TRANSFORMER_FACTORY_PROPERTY_DEFAULT);
+            .getInstanceOf(TRANSFORMER_FACTORY_PROPERTY, MCRLayoutTransformerFactory.class.getName());
         return factory.getTransformer(transformerId);
     }
 
