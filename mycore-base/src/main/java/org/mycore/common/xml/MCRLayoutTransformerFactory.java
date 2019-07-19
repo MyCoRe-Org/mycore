@@ -87,7 +87,7 @@ public class MCRLayoutTransformerFactory {
         return transformer;
     }
 
-    private static String[] getStylesheets(String id, String stylesheet)
+    public static String[] getStylesheets(String id, String stylesheet)
         throws TransformerException, SAXException, ParserConfigurationException {
         List<String> ignore = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Ignore",
             Collections.emptyList());
@@ -111,11 +111,11 @@ public class MCRLayoutTransformerFactory {
     /**
      * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
      */
-    private static String buildStylesheetName(String id) {
+    public static String buildStylesheetName(String id) {
         return String.format(Locale.ROOT, "xsl/%s.xsl", id.replaceAll("-default$", ""));
     }
 
-    private static String getResourceName(String id) {
+    public static String getResourceName(String id) {
         LOGGER.debug("MCRLayoutService using style {}", id);
 
         String styleName = buildStylesheetName(id);
