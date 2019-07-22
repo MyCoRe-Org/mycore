@@ -19,9 +19,11 @@
 package org.mycore.common.xml;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -43,35 +45,40 @@ import com.google.common.collect.Lists;
 /**
  * This class acts as a {@link MCRContentTransformer} factory for {@link MCRLayoutService}.
  * @author Thomas Scheffler (yagee)
- *
+ * @author Sebastian Hofmann
  */
 public class MCRLayoutTransformerFactory {
     /** Map of transformer instances by ID */
-    private static HashMap<String, MCRContentTransformer> transformers = new HashMap<>();
+    private static Map<String, MCRContentTransformer> transformers = new ConcurrentHashMap<>();
 
     private static Logger LOGGER = LogManager.getLogger(MCRLayoutTransformerFactory.class);
 
-    private static final MCRIdentityTransformer NOOP_TRANSFORMER = new MCRIdentityTransformer("text/xml", "xml");
+    protected static final MCRIdentityTransformer NOOP_TRANSFORMER = new MCRIdentityTransformer("text/xml", "xml");
 
     /**
      * Returns the transformer with the given ID. If the transformer is not instantiated yet,
      * it is created and initialized.
      */
-    public MCRContentTransformer getTransformer(String id) throws Exception {
-        MCRContentTransformer transformer = transformers.get(id);
-        if (transformer != null) {
-            return transformer;
-        }
-        //try to get configured transformer
-        transformer = MCRContentTransformerFactory.getTransformer(id.replaceAll("-default$", ""));
-        if (transformer != null) {
-            transformers.put(id, transformer);
-            return transformer;
-        }
-        return buildLayoutTransformer(id);
+    public MCRContentTransformer getTransformer(String id) {
+        return transformers.computeIfAbsent(id, (transformerID) -> {
+            try {
+                Optional<MCRContentTransformer> configuredTransformer = getConfiguredTransformer(id);
+                if (configuredTransformer.isPresent()) {
+                    return configuredTransformer.get();
+                }
+                return buildLayoutTransformer(id);
+            } catch (Exception e) {
+                throw new MCRException("Error while creating Transformer!", e);
+            }
+        });
     }
 
-    private static MCRContentTransformer buildLayoutTransformer(String id) throws Exception {
+    protected Optional<MCRContentTransformer> getConfiguredTransformer(String id) {
+        return Optional.ofNullable(MCRContentTransformerFactory.getTransformer(id.replaceAll("-default$", "")));
+    }
+
+    private MCRContentTransformer buildLayoutTransformer(String id)
+        throws ParserConfigurationException, TransformerException, SAXException {
         String idStripped = id.replaceAll("-default$", "");
         LOGGER.debug("Configure property MCR.ContentTransformer.{}.Class if you do not want to use default behaviour.",
             idStripped);
@@ -83,11 +90,11 @@ public class MCRLayoutTransformerFactory {
         String[] stylesheets = getStylesheets(idStripped, stylesheet);
         MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheets);
         LOGGER.debug("Using stylesheet '{}' for {}", Lists.newArrayList(stylesheets), idStripped);
-        transformers.put(id, transformer);
         return transformer;
     }
 
-    public static String[] getStylesheets(String id, String stylesheet)
+
+    protected String[] getStylesheets(String id, String stylesheet)
         throws TransformerException, SAXException, ParserConfigurationException {
         List<String> ignore = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Ignore",
             Collections.emptyList());
@@ -95,7 +102,7 @@ public class MCRLayoutTransformerFactory {
         if (!ignore.contains(id)) {
             MCRXSLTransformer transformerTest = MCRXSLTransformer.getInstance(stylesheet);
             String outputMethod = transformerTest.getOutputProperties().getProperty(OutputKeys.METHOD, "xml");
-            if ("xml".equals(outputMethod)) {
+            if (isXMLOutput(outputMethod, transformerTest)) {
                 defaults = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Stylesheets",
                     Collections.emptyList());
             }
@@ -108,14 +115,12 @@ public class MCRLayoutTransformerFactory {
         return stylesheets;
     }
 
-    /**
-     * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
-     */
-    public static String buildStylesheetName(String id) {
-        return String.format(Locale.ROOT, "xsl/%s.xsl", id.replaceAll("-default$", ""));
+    protected boolean isXMLOutput(String outputMethod, MCRXSLTransformer transformerTest)
+        throws ParserConfigurationException, TransformerException, SAXException {
+        return "xml".equals(outputMethod);
     }
 
-    public static String getResourceName(String id) {
+    private String getResourceName(String id) {
         LOGGER.debug("MCRLayoutService using style {}", id);
 
         String styleName = buildStylesheetName(id);
@@ -135,6 +140,13 @@ public class MCRLayoutTransformerFactory {
             return null;
         }
         throw new MCRException("XSL stylesheet not found: " + styleName);
+    }
+
+    /**
+     * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
+     */
+    private String buildStylesheetName(String id) {
+        return String.format(Locale.ROOT, "xsl/%s.xsl", id.replaceAll("-default$", ""));
     }
 
 }

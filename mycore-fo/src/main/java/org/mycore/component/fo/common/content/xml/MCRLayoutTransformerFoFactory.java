@@ -18,81 +18,63 @@
 
 package org.mycore.component.fo.common.content.xml;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.mycore.common.MCRException;
 import org.mycore.common.content.transformer.MCRContentTransformer;
-import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.common.content.transformer.MCRIdentityTransformer;
 import org.mycore.common.content.transformer.MCRTransformerPipe;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRLayoutTransformerFactory;
 import org.mycore.component.fo.common.content.transformer.MCRFopper;
-
-import com.google.common.collect.Lists;
-import com.google.common.net.MediaType;
+import org.xml.sax.SAXException;
 
 /**
  * This class acts as a {@link org.mycore.common.content.transformer.MCRContentTransformer} factory for 
  * {@link org.mycore.common.xml.MCRLayoutService}.
  * @author Thomas Scheffler (yagee)
+ * @author Sebastian Hofmann
  *
  */
 public class MCRLayoutTransformerFoFactory extends MCRLayoutTransformerFactory {
-    /** Map of transformer instances by ID */
-    private static HashMap<String, MCRContentTransformer> transformers = new HashMap<>();
 
-    private static Logger LOGGER = LogManager.getLogger(MCRLayoutTransformerFoFactory.class);
+    private static final String APPLICATION_PDF = "application/pdf";
+
+    /** Map of transformer instances by ID */
+    private static Map<String, MCRContentTransformer> transformers = new ConcurrentHashMap<>();
 
     private static MCRFopper fopper = new MCRFopper();
 
-    private static final MCRIdentityTransformer NOOP_TRANSFORMER = new MCRIdentityTransformer("text/xml", "xml");
-
-    /**
-     * Returns the transformer with the given ID. If the transformer is not instantiated yet,
-     * it is created and initialized.
-     */
     @Override
-    public MCRContentTransformer getTransformer(String id) throws Exception {
-        MCRContentTransformer transformer = transformers.get(id);
-        if (transformer != null) {
-            return transformer;
-        }
-        //try to get configured transformer
-        transformer = MCRContentTransformerFactory.getTransformer(id.replaceAll("-default$", ""));
-        if (transformer != null) {
-            transformers.put(id, transformer);
-            return transformer;
-        }
-        return buildLayoutTransformer(id);
+    public MCRContentTransformer getTransformer(String id) {
+        return transformers.computeIfAbsent(id, (transformerId) -> {
+            try {
+                MCRContentTransformer transformer = super.getTransformer(transformerId);
+                if (MCRLayoutTransformerFoFactory.NOOP_TRANSFORMER.equals(transformer) ||
+                    getConfiguredTransformer(id).isPresent()) {
+                    return transformer;
+                }
+
+                if (APPLICATION_PDF.equals(transformer.getMimeType())) {
+                    return new MCRTransformerPipe(transformer, fopper);
+                }
+
+                return transformer;
+            } catch (Exception e) {
+                throw new MCRException("Error while transforming!", e);
+            }
+        });
     }
 
-    private static MCRContentTransformer buildLayoutTransformer(String id) throws Exception {
-        String idStripped = id.replaceAll("-default$", "");
-        LOGGER.debug("Configure property MCR.ContentTransformer.{}.Class if you do not want to use default behaviour.",
-            idStripped);
-        String stylesheet = getResourceName(id);
-        if (stylesheet == null) {
-            LOGGER.debug("Using noop transformer for {}", idStripped);
-            return NOOP_TRANSFORMER;
-        }
-        String[] stylesheets = getStylesheets(idStripped, stylesheet);
-        MCRContentTransformer transformer = MCRXSLTransformer.getInstance(stylesheets);
-        String mimeType = transformer.getMimeType();
-        if (isPDF(mimeType)) {
-            transformer = new MCRTransformerPipe(transformer, fopper);
-            LOGGER.debug("Using stylesheet '{}' for {} and MCRFopper for PDF output.", Lists.newArrayList(stylesheets),
-                idStripped);
-        } else {
-            LOGGER.debug("Using stylesheet '{}' for {}", Lists.newArrayList(stylesheets), idStripped);
-        }
-        transformers.put(id, transformer);
-        return transformer;
-    }
 
-    private static boolean isPDF(String mimeType) {
-        return MediaType.parse(mimeType).is(MediaType.PDF);
+    @Override
+    protected boolean isXMLOutput(String outputMethod, MCRXSLTransformer transformerTest)
+        throws ParserConfigurationException, TransformerException, SAXException {
+        return super.isXMLOutput(outputMethod, transformerTest) &&
+            !APPLICATION_PDF.equals(transformerTest.getMimeType());
     }
 
 }
