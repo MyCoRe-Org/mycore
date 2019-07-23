@@ -25,9 +25,11 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -47,12 +49,14 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -87,6 +91,16 @@ public class MCRServlet extends HttpServlet {
     private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration.instance().getBoolean(
         "MCR.Servlet.BrowserCache.enable", false);
 
+    private static final String SESSION_NETMASK_IPV4_STRING = MCRConfiguration.instance()
+        .getString("MCR.Servlet.Session.NetMask.IPv4", "255.255.255.255");
+
+    private static final String SESSION_NETMASK_IPV6_STRING = MCRConfiguration.instance()
+        .getString("MCR.Servlet.Session.NetMask.IPv6", "FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF");
+
+    private static byte[] SESSION_NETMASK_IPV4;
+
+    private static byte[] SESSION_NETMASK_IPV6;
+
     private static MCRLayoutService LAYOUT_SERVICE;
 
     private static String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
@@ -100,6 +114,18 @@ public class MCRServlet extends HttpServlet {
         super.init();
         if (LAYOUT_SERVICE == null) {
             LAYOUT_SERVICE = MCRLayoutService.instance();
+        }
+        try {
+            SESSION_NETMASK_IPV4 = InetAddress.getByName(SESSION_NETMASK_IPV4_STRING).getAddress();
+        } catch (UnknownHostException e) {
+            throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv4 is not a correct IPv4 network mask.",
+                e);
+        }
+        try {
+            SESSION_NETMASK_IPV6 = InetAddress.getByName(SESSION_NETMASK_IPV6_STRING).getAddress();
+        } catch (UnknownHostException e) {
+            throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv6 is not a correct IPv6 network mask.",
+                e);
         }
     }
 
@@ -204,19 +230,37 @@ public class MCRServlet extends HttpServlet {
         if (fromHttpSession != null && fromHttpSession.getID() != null) {
             // Take session from HttpSession with servlets
             session = fromHttpSession;
+
             String lastIP = session.getCurrentIP();
-            if (lastIP.length() != 0) {
-                //check if request IP equals last known IP
-                String newip = MCRFrontendUtil.getRemoteAddr(req);
-                if (!lastIP.equals(newip) && !newip.equals(MCRFrontendUtil.getHostIP())) {
-                    LOGGER.warn("Session steal attempt from IP {}, previous IP was {}. Session: {}", newip, lastIP,
+            String newIP = MCRFrontendUtil.getRemoteAddr(req);
+            String hostIP = MCRFrontendUtil.getHostIP();
+
+            try {
+                InetAddress lastIPAddress = InetAddress.getByName(lastIP);
+                InetAddress newIPAddress = InetAddress.getByName(newIP);
+                InetAddress hostIPAddress = InetAddress.getByName(hostIP);
+
+                byte[] lastIPMask = decideNetmask(lastIPAddress);
+                byte[] newIPMask = decideNetmask(newIPAddress);
+                byte[] hostIPMask = decideNetmask(hostIPAddress);
+
+                lastIPAddress = InetAddress.getByAddress(filterIPByNetmask(lastIPAddress.getAddress(), lastIPMask));
+                newIPAddress = InetAddress.getByAddress(filterIPByNetmask(newIPAddress.getAddress(), newIPMask));
+                hostIPAddress = InetAddress.getByAddress(filterIPByNetmask(hostIPAddress.getAddress(), hostIPMask));
+
+                if (!lastIPAddress.equals(newIPAddress) && !newIPAddress.equals(hostIPAddress)) {
+                    LOGGER.warn("Session steal attempt from IP {}, previous IP was {}. Session: {}", newIP, lastIP,
                         session);
                     MCRSessionMgr.releaseCurrentSession();
                     session.close(); //MCR-1409 do not leak old session
                     MCRSessionMgr.unlock();//due to release above
                     session = MCRSessionMgr.getCurrentSession();
-                    session.setCurrentIP(newip);
+                    session.setCurrentIP(newIP);
                 }
+            } catch (UnknownHostException e) {
+                throw new MCRException("Wrong transformation of IP address for this session.", e);
+            } catch (IOException e) {
+                throw new MCRException(e);
             }
         } else {
             // Create a new session
@@ -238,6 +282,38 @@ public class MCRServlet extends HttpServlet {
         req.setAttribute("XSL.MCRSessionID", session.getID());
 
         return session;
+    }
+
+    private static byte[] filterIPByNetmask(final byte[] ip_array, final byte[] mask_array) {
+        for (int i = 0; i < ip_array.length; i++) {
+            ip_array[i] = (byte) (ip_array[i] & mask_array[i]);
+        }
+        return ip_array;
+    }
+
+    private static byte[] decideNetmask(InetAddress IP) throws IOException {
+        if (hasIPVersion(IP, 4)) {
+            return SESSION_NETMASK_IPV4;
+        } else if (hasIPVersion(IP, 6)) {
+            return SESSION_NETMASK_IPV6;
+        } else {
+            throw new IOException("Unknown or unidentifiable version of IP: " + IP.toString());
+        }
+    }
+
+    private static Boolean hasIPVersion(InetAddress IP, int version) {
+        int byteLength;
+        switch (version) {
+            case 4:
+                byteLength = 4;
+                break;
+            case 6:
+                byteLength = 16;
+                break;
+            default:
+                throw new IndexOutOfBoundsException("Unknown IP version: " + version);
+        }
+        return IP.getAddress().length == byteLength;
     }
 
     private static void bindSessionToRequest(HttpServletRequest req, String servletName, MCRSession session) {
