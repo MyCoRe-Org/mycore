@@ -41,11 +41,13 @@ namespace mycore.viewer.widgets.alto {
 
         constructor(styles:Element, layout:Element) {
             // set style
-            var styleList:HTMLCollectionOf<Element> = styles.getElementsByTagName("TextStyle");
-            for(var index = 0; index < styleList.length; index++) {
-                var style:Element = styleList.item(index);
-                var altoStyle:AltoStyle = this.createAltoStyle(style);
-                this._allStyles[altoStyle.getId()] = altoStyle;
+            if (styles !== null && typeof styles !== 'undefined') {
+                const styleList = styles.getElementsByTagName('TextStyle');
+                for (let index = 0; index < styleList.length; index++) {
+                    const style: Element = styleList.item(index);
+                    const altoStyle: AltoStyle = this.createAltoStyle(style);
+                    this._allStyles[ altoStyle.getId() ] = altoStyle;
+                }
             }
 
             // set width/height
@@ -153,7 +155,7 @@ namespace mycore.viewer.widgets.alto {
         public getBlocks():Array<AltoElement> {
             return this._allTextBlocks;
         }
-        
+
         public getBlockContent(id:string): string {
             var content:string = "";
             for (var index = 0; index < this._allTextBlocks.length; index++) {
