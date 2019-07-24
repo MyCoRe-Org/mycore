@@ -19,6 +19,7 @@
 package org.mycore.datamodel.ifs2;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
 class MCRStoreDefaultConfig implements MCRStoreConfig {
@@ -34,6 +35,11 @@ class MCRStoreDefaultConfig implements MCRStoreConfig {
     @Override
     public String getBaseDir() {
         return MCRConfiguration.instance().getString(storeConfigPrefix + "BaseDir");
+    }
+
+    @Override
+    public String getPrefix() {
+        return MCRConfiguration2.getString(storeConfigPrefix + "Prefix").orElse(id + "_");
     }
 
     @Override

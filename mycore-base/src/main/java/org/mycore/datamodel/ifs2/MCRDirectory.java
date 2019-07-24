@@ -23,6 +23,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import org.jdom2.Element;
 
@@ -42,7 +43,7 @@ public class MCRDirectory extends MCRStoredNode {
      * @param fo
      *            the local directory in the store storing this directory
      */
-    protected MCRDirectory(MCRDirectory parent, Path fo, Element data) throws IOException {
+    protected MCRDirectory(MCRDirectory parent, Path fo, Element data) {
         super(parent, fo, data);
     }
 
@@ -102,16 +103,23 @@ public class MCRDirectory extends MCRStoredNode {
      * @return an MCRFile or MCRDirectory child
      */
     @Override
-    protected MCRStoredNode buildChildNode(Path fo) throws IOException {
+    protected MCRStoredNode buildChildNode(Path fo) {
         if (fo == null) {
             return null;
         }
-        if (!Files.isSameFile(this.path, fo.getParent())) {
+        if (!this.path.equals(fo.getParent())) {
             throw new IllegalArgumentException(fo + " is not a direct child of " + this.path + ".");
+        }
+        BasicFileAttributes attrs;
+        try {
+            attrs = Files.readAttributes(fo, BasicFileAttributes.class);
+        } catch (IOException e) {
+            //does not exist
+            return null;
         }
 
         Element childData = getChildData(fo.getFileName().toString());
-        if (Files.isRegularFile(fo)) {
+        if (attrs.isRegularFile()) {
             return new MCRFile(this, fo, childData);
         } else {
             return new MCRDirectory(this, fo, childData);

@@ -32,9 +32,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -192,6 +196,19 @@ public abstract class MCRStore {
             LOGGER.error("Error whil checking if base directory is empty: " + baseDirectory, e);
             return false;
         }
+    }
+
+    /**
+     * @return all Ids of this store
+     */
+    public IntStream getStoredIDs() {
+        int characteristics = Spliterator.ORDERED | Spliterator.DISTINCT | Spliterator.SORTED;
+        return StreamSupport
+            .stream(() -> Spliterators
+                .spliteratorUnknownSize(listIDs(ASCENDING), characteristics),
+                characteristics,
+                false)
+            .mapToInt(Integer::intValue);
     }
 
     /**
@@ -355,6 +372,13 @@ public abstract class MCRStore {
     }
 
     /**
+     * @return the absolute path of the local base directory
+     */
+    public Path getBaseDirectory() {
+        return baseDirectory.toAbsolutePath();
+    }
+
+    /**
      * Returns the absolute path of the local base directory
      * 
      * @return the base directory storing the data
@@ -452,6 +476,7 @@ public abstract class MCRStore {
             idLength += slotLength[i++];
         }
         idLength += Integer.parseInt(st.nextToken());
+        prefix = config.getPrefix();
 
         try {
             try {
@@ -567,9 +592,8 @@ public abstract class MCRStore {
 
     public interface MCRStoreConfig {
         String getBaseDir();
-
         String getID();
-
+        String getPrefix();
         String getSlotLayout();
     }
 }

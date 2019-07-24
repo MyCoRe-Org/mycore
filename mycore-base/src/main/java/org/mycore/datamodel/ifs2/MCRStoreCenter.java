@@ -20,6 +20,10 @@ package org.mycore.datamodel.ifs2;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import org.mycore.common.function.MCRFunctions;
 
 public class MCRStoreCenter {
     private Map<String, MCRStore> storeHeap;
@@ -41,23 +45,44 @@ public class MCRStoreCenter {
      * @throws MCRStoreAlreadyExistsException If with the same id already exists in the store center
      */
     public void addStore(String id, MCRStore store) throws MCRStoreAlreadyExistsException {
-        if (storeHeap.containsKey(id)) {
+        if (storeHeap.putIfAbsent(id, store) != null) {
             throw new MCRStoreAlreadyExistsException("Could not add store with ID " + id + ", store allready exists");
         }
-
-        storeHeap.put(id, store);
     }
 
     /**
      * Get the MyCoRe Store with the given ID from store center.
-     * 
+     *
      * @param id - The id of the to retrieved store
      * @param storeClass - The class type of the retrieved store
      * @return The retrieved store or null if not exists
+     * @deprecated use {@link #getStore(String)} instead
      */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public <T extends MCRStore> T getStore(String id, Class<T> storeClass) {
         return (T) storeHeap.get(id);
+    }
+
+    /**
+     * Get the MyCoRe Store with the given ID from store center.
+     *
+     * @param id - The id of the to retrieved store
+     * @return The retrieved store or null if not exists
+     */
+    public <T extends MCRStore> T getStore(String id) {
+        return (T) storeHeap.get(id);
+    }
+
+    /**
+     * @return a Stream of all {@link MCRStore}s that are an instance of <code>&lt;T&gt;</code>
+     */
+    public <T extends MCRStore> Stream<T> getCurrentStores(Class<T> sClass) {
+        return storeHeap.values()
+            .stream()
+            .filter(sClass::isInstance)
+            .map(s -> (T) s)
+            .filter(Objects::nonNull);
     }
 
     /**

@@ -88,7 +88,7 @@ class MCRStoreBrowserRequest {
             store = MCRXMLMetadataManager.instance().getStore(storeID);
         // TODO: the store can never be null, instead an MCRPersistenceException is thrown
         if (store == null) {
-            store = MCRStoreManager.getStore(storeID, MCRMetadataStore.class);
+            store = MCRStoreManager.getStore(storeID);
             if (store == null)
                 store = MCRStoreManager.createStore(storeID, MCRMetadataStore.class);
         }

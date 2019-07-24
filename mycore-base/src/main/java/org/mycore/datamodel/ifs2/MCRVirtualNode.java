@@ -18,7 +18,6 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -45,7 +44,7 @@ public class MCRVirtualNode extends MCRNode {
      * Returns a virtual node that is a child of this virtual node.
      */
     @Override
-    protected MCRVirtualNode buildChildNode(Path fo) throws IOException {
+    protected MCRVirtualNode buildChildNode(Path fo) {
         return new MCRVirtualNode(this, fo);
     }
 }

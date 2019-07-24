@@ -334,7 +334,7 @@ public class MCRXMLMetadataManager {
                 }
             }
         }
-        MCRMetadataStore store = MCRStoreManager.getStore(projectType, MCRMetadataStore.class);
+        MCRMetadataStore store = MCRStoreManager.getStore(projectType);
         if (store == null) {
             throw new MCRPersistenceException(
                 new MessageFormat("Metadata store for project {0} and object type {1} is unconfigured.", Locale.ROOT)

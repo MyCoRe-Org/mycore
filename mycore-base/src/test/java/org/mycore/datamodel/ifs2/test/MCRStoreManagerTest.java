@@ -67,6 +67,11 @@ public class MCRStoreManagerTest {
         }
 
         @Override
+        public String getPrefix() {
+            return getID() + "_";
+        }
+
+        @Override
         public String getBaseDir() {
             return baseDir.toUri().toString();
         }

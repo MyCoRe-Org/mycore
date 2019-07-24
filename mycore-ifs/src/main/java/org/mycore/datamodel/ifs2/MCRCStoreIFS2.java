@@ -97,10 +97,10 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             prefix = base + "_";
         }
 
-        MCRFileStore store = MCRStoreManager.getStore(sid, MCRFileStore.class);
+        MCRFileStore store = MCRStoreManager.getStore(sid);
         if (store == null) {
             synchronized (this) {
-                store = MCRStoreManager.getStore(sid, MCRFileStore.class);
+                store = MCRStoreManager.getStore(sid);
                 if (store == null) {
                     store = createStore(sid, storeBaseDir);
                 }
@@ -288,7 +288,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             throw new IOException("No storage id");
         }
         MCRFile file = getFile(storageId);
-        return file.getLocalFile();
+        return file.getLocalPath().toFile();
     }
 
     private MCRFileCollection getSlot(MCRObjectID derivateID) throws IOException {

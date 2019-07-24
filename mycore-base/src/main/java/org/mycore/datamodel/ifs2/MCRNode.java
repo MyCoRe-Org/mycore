@@ -19,7 +19,6 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,7 +78,7 @@ public abstract class MCRNode {
      * 
      * @return the absolute path of this node
      */
-    public String getPath() throws IOException {
+    public String getPath() {
         if (parent != null) {
             if (parent.parent == null) {
                 return "/" + getName();
@@ -154,7 +153,7 @@ public abstract class MCRNode {
      * @return true if children exist
      */
     public boolean hasChildren() throws IOException {
-        return getNumChildren() > 0;
+        return isFile() ? false : Files.list(path).findAny().isPresent();
     }
 
     /**
@@ -181,20 +180,8 @@ public abstract class MCRNode {
         if (isFile()) {
             return Stream.empty();
         }
-        try {
-            return Files.list(path)
-                .map(Path::getFileName)
-                .map(path::resolve)
-                .map(child -> {
-                    try {
-                        return buildChildNode(child);
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                }
-                });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
-        }
+        return Files.list(path)
+            .map(child -> buildChildNode(child));
     }
 
     /**
@@ -204,9 +191,10 @@ public abstract class MCRNode {
      * @param fo
      *            the FileObject representing the child in the underlying
      *            filesystem
-     * @return the child node
+     * @return the child node or null, if the fo does not exists
+     * @throws IllegalArgumentException if fo is not valid path for a child of this
      */
-    protected abstract MCRNode buildChildNode(Path fo) throws IOException;
+    protected abstract MCRNode buildChildNode(Path fo);
 
     /**
      * Returns the child node with the given filename, or null
@@ -215,9 +203,9 @@ public abstract class MCRNode {
      *            the name of the child node
      * @return the child node with that name, or null when no such file exists
      */
-    public MCRNode getChild(String name) throws IOException {
+    public MCRNode getChild(String name) {
         Path child = path.resolve(name);
-        return Files.exists(child) ? buildChildNode(child) : null;
+        return buildChildNode(child);
     }
 
     /**
