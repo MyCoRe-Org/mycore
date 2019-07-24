@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.fo;
+package org.mycore.component.fo.common.fo;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -100,11 +100,11 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         // use restricted io to prevent issues with font caching on some systems
         fopFactoryBuilder = new FopFactoryBuilder(
             EnvironmentalProfileFactory.createRestrictedIO(URI.create("resource:/"), resolver));
-        final String fo_cfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
-        if (!fo_cfg.isEmpty()) {
+        final String foCfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
+        if (!foCfg.isEmpty()) {
             try {
                 final DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-                final Configuration cfg = cfgBuilder.build(MCRConfigurationDir.getConfigResource(fo_cfg).toString());
+                final Configuration cfg = cfgBuilder.build(MCRConfigurationDir.getConfigResource(foCfg).toString());
                 fopFactoryBuilder.setConfiguration(cfg);
 
                 // FIXME Workaround to get hyphenation work in FOP.
@@ -127,7 +127,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                 });
 
             } catch (ConfigurationException | SAXException | IOException e) {
-                LOGGER.error("Exception while loading FOP configuration from {}.", fo_cfg, e);
+                LOGGER.error("Exception while loading FOP configuration from {}.", foCfg, e);
             }
         }
         fopFactory = fopFactoryBuilder.build();

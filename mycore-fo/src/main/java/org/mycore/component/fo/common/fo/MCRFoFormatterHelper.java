@@ -16,12 +16,12 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.fo;
+package org.mycore.component.fo.common.fo;
 
 import org.mycore.common.config.MCRConfiguration;
 
 /**
- * Returns the XSL-FO formatter instance configured via property, for example
+ * Returns the XSL-FO formatter instance configured via PROPERTY, for example
  * 
  * MCR.LayoutService.FoFormatter.class=org.mycore.common.fo.MCRFoFormatterFOP
  * 
@@ -31,10 +31,10 @@ import org.mycore.common.config.MCRConfiguration;
  * 
  * @author Frank L\u00FCtzenkirchen
  */
-public class MCRFoFactory {
+public class MCRFoFormatterHelper {
 
-    /** The configuration property */
-    private static final String property = "MCR.LayoutService.FoFormatter.class";
+    /** The configuration PROPERTY */
+    private static final String PROPERTY = "MCR.LayoutService.FoFormatter.class";
 
     /** The singleton */
     private static MCRFoFormatterInterface formatter;
@@ -42,7 +42,7 @@ public class MCRFoFactory {
     /** Returns the XSL-FO formatter instance configured */
     public static synchronized MCRFoFormatterInterface getFoFormatter() {
         if (formatter == null) {
-            formatter = MCRConfiguration.instance().getInstanceOf(property, MCRFoFormatterFOP.class.getName());
+            formatter = MCRConfiguration.instance().getInstanceOf(PROPERTY, MCRFoFormatterFOP.class.getName());
         }
         return formatter;
     }

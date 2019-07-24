@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.content.transformer;
+package org.mycore.component.fo.common.content.transformer;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,12 +26,13 @@ import javax.xml.transform.TransformerException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
-import org.mycore.common.fo.MCRFoFactory;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.component.fo.common.fo.MCRFoFormatterHelper;
 
 /**
  * Transforms XSL-FO xml content to PDF. 
  * 
- * @see org.mycore.common.fo.MCRFoFormatterInterface
+ * @see org.mycore.component.fo.common.fo.MCRFoFormatterInterface
  *
  * @author Frank L\u00FCtzenkirchen
  */
@@ -41,7 +42,7 @@ public class MCRFopper extends MCRContentTransformer {
     public MCRContent transform(MCRContent source) throws IOException {
         MCRByteArrayOutputStream pdf = new MCRByteArrayOutputStream(32 * 1024);
         try {
-            MCRFoFactory.getFoFormatter().transform(source, pdf);
+            MCRFoFormatterHelper.getFoFormatter().transform(source, pdf);
         } catch (TransformerException e) {
             throw new IOException(e);
         }
@@ -51,7 +52,7 @@ public class MCRFopper extends MCRContentTransformer {
     @Override
     public void transform(MCRContent source, OutputStream out) throws IOException {
         try {
-            MCRFoFactory.getFoFormatter().transform(source, out);
+            MCRFoFormatterHelper.getFoFormatter().transform(source, out);
         } catch (TransformerException e) {
             throw new IOException(e);
         }
@@ -66,4 +67,5 @@ public class MCRFopper extends MCRContentTransformer {
     public String getFileExtension() {
         return "pdf";
     }
+    
 }

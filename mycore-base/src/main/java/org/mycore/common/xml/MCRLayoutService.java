@@ -36,6 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
@@ -56,7 +57,9 @@ public class MCRLayoutService {
     static final Logger LOGGER = LogManager.getLogger(MCRLayoutService.class);
 
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
-
+    
+    private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
+    
     public static MCRLayoutService instance() {
         return SINGLETON;
     }
@@ -137,7 +140,9 @@ public class MCRLayoutService {
             String style = parameter.getParameter("Style", "default");
             transformerId = new MessageFormat("{0}-{1}", Locale.ROOT).format(new Object[] { docType, style });
         }
-        return MCRLayoutTransformerFactory.getTransformer(transformerId);
+        MCRLayoutTransformerFactory factory = MCRConfiguration.instance()
+            .getInstanceOf(TRANSFORMER_FACTORY_PROPERTY, MCRLayoutTransformerFactory.class.getName());
+        return factory.getTransformer(transformerId);
     }
 
     private String getFileName(HttpServletRequest req, MCRParameterCollector parameter) {

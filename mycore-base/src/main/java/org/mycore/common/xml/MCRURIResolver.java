@@ -1209,6 +1209,8 @@ public final class MCRURIResolver implements URIResolver {
      */
     private static class MCRLayoutTransformerResolver implements URIResolver {
 
+        private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
+        
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String help = href.substring(href.indexOf(":") + 1);
@@ -1234,7 +1236,9 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 if (resolved != null) {
                     MCRSourceContent content = new MCRSourceContent(resolved);
-                    MCRContentTransformer transformer = MCRLayoutTransformerFactory.getTransformer(transformerId);
+                    MCRLayoutTransformerFactory factory = MCRConfiguration.instance()
+                        .getInstanceOf(TRANSFORMER_FACTORY_PROPERTY, MCRLayoutTransformerFactory.class.getName());
+                    MCRContentTransformer transformer = factory.getTransformer(transformerId);
                     MCRContent result;
                     if (transformer instanceof MCRParameterizedTransformer) {
                         MCRParameterCollector paramcollector = MCRParameterCollector.getInstanceFromUserSession();

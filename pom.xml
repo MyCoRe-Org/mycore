@@ -125,6 +125,10 @@
                 <packages>org.mycore.user*</packages>
               </group>
               <group>
+                <title>MyCoRe Component: FO</title>
+                <packages>org.mycore.fo*</packages>
+              </group>
+              <group>
                 <title>MyCoRe Component: IView 2</title>
                 <packages>org.mycore.iview2*</packages>
               </group>
@@ -555,6 +559,10 @@
                 <group>
                   <title>MyCoRe User and Group Management</title>
                   <packages>org.mycore.user*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Component: FO</title>
+                  <packages>org.mycore.fo*</packages>
                 </group>
                 <group>
                   <title>MyCoRe Component: IView 2</title>
@@ -1160,6 +1168,11 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-coma</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-fo</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2056,6 +2069,7 @@
     <module>mycore-acl-editor2</module>
     <module>mycore-classbrowser</module>
     <module>mycore-classeditor</module>
+    <module>mycore-fo</module>
     <module>mycore-indexing</module>
     <module>mycore-ifs</module>
     <module>mycore-iiif</module>
