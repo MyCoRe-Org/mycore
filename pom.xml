@@ -7,7 +7,7 @@
     <version>40-20190215.095342-1</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2019.06.0-SNAPSHOT</version>
+  <version>2019.06.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
