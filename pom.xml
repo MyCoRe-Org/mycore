@@ -7,7 +7,7 @@
     <version>40-20190215.095342-1</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2019.06.1-SNAPSHOT</version>
+  <version>2019.08-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -30,7 +30,7 @@
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>2019.06.x</tag>
+    <tag>HEAD</tag>
   </scm>
   <properties>
     <argLine />
