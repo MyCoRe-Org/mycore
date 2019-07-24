@@ -29,7 +29,7 @@ namespace mycore.viewer.widgets.toolbar {
         createToolbarView():ToolbarView;
         createTextView(id:string):TextView;
         createImageView(id:string):ImageView;
-        createGroupView(id:string, align:string):GroupView;
+        createGroupView(id:string, order:number, align:string):GroupView;
         createDropdownView(id:string):DropdownView;
         createLargeDropdownView(id:string):DropdownView;
         createButtonView(id:string):ButtonView;

@@ -35,7 +35,7 @@ namespace mycore.viewer.components {
 
         public init() {
             this._container = jQuery("<div></div>");
-            this._container.addClass("panel-body");
+            this._container.addClass("card-body");
             if (typeof this._settings.metadataURL != "undefined" && this._settings.metadataURL != null) {
                 var metadataUrl = ViewerFormatString(this._settings.metadataURL, {
                     derivateId : this._settings.derivate,

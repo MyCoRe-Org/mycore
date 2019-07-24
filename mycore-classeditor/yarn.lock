@@ -117,12 +117,14 @@ delayed-stream@~1.0.0:
 dijit@1.9.8:
   version "1.9.8"
   resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.9.8.tgz#2d905f5d5032d968dee27c80995b7865b43e537a"
+  integrity sha1-LZBfXVAy2Wje4nyAmVt4ZbQ+U3o=
   dependencies:
     dojo "1.9.8"
 
 dojo@1.9.8:
   version "1.9.8"
   resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.9.8.tgz#28deca8a221ff54284d4de383831cc43b63424af"
+  integrity sha1-KN7KiiIf9UKE1N44ODHMQ7Y0JK8=
 
 ecc-jsbn@~0.1.1:
   version "0.1.1"

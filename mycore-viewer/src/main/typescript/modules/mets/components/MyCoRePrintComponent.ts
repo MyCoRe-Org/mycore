@@ -61,10 +61,9 @@ namespace mycore.viewer.components {
                 this._printButton = new widgets.toolbar.ToolbarButton("PrintButton", "PDF", "", "");
 
 
-                if (this._settings.mobile) {
-                    this._printButton.icon = "file-pdf-o";
-                    this._printButton.label = "";
-                }
+                this._printButton.icon = "fa-file-pdf";
+                this._printButton.label = "";
+
                 if (ptme.model.name == "MyCoReFrameToolbar") {
                     ptme.model._zoomControllGroup.addComponent(this._printButton);
                 } else {

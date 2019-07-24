@@ -36,7 +36,7 @@ namespace mycore.viewer.widgets.modal {
             let key = confirm ? "yes" : "no";
             let button = jQuery("<a data-i18n='modal." + key + "'></a>");
             button.attr("type", "button");
-            button.addClass("btn btn-default");
+            button.addClass("btn btn-secondary");
             button.appendTo(this.modalFooter);
 
             var that = this;

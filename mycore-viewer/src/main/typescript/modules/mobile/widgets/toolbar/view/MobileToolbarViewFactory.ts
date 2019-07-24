@@ -39,7 +39,7 @@ namespace mycore.viewer.widgets.toolbar {
             throw new ViewerError("image view not supported by Mobile!");
         }
 
-        createGroupView(id:string, align:string):GroupView {
+        createGroupView(id:string, order:number, align:string):GroupView {
             return new MobileGroupView(id, align);
         }
 

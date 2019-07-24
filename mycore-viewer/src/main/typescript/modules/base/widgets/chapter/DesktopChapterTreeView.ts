@@ -31,8 +31,8 @@ namespace mycore.viewer.widgets.chaptertree {
             this._container.append(this.list);
         }
 
-        private static CLOSE_ICON_CLASS:string = "glyphicon-chevron-right";
-        private static OPEN_ICON_CLASS:string = "glyphicon-chevron-down";
+        private static CLOSE_ICON_CLASS:string = "fa-chevron-right";
+        private static OPEN_ICON_CLASS:string = "fa-chevron-down";
         public list:JQuery;
 
         public addNode(parentId:string, id:string, label:string, childLabel:string, expandable:boolean) {
@@ -81,7 +81,7 @@ namespace mycore.viewer.widgets.chaptertree {
             this._inputHandler.registerNode(labelElement, id);
 
             if (expandable) {
-                var expander = jQuery("<span class=\"expander glyphicon " + DesktopChapterTreeView.OPEN_ICON_CLASS + "\"></span>");
+                var expander = jQuery("<span class=\"expander fa " + DesktopChapterTreeView.OPEN_ICON_CLASS + "\"></span>");
                 insertedNode.prepend(expander);
                 this._inputHandler.registerExpander(expander, id);
             }

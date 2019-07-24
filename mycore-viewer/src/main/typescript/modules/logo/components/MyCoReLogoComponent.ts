@@ -25,7 +25,7 @@ namespace mycore.viewer.components {
 
     /**
      * A Logo component wich inserts a application specific logo to the Toolbar
-     * 1. if you implement your own iview configuration you can add this with setProperty("logoUrl", url);
+     * 1. if you implement your own iview configuration you can add this with setProperty('logoUrl', url);
      * 2. if you use the default configuration you can add MCR.Module-iview2.logoUrl to mycore properties
      */
     export class MyCoReLogoComponent extends ViewerComponent {
@@ -41,8 +41,8 @@ namespace mycore.viewer.components {
 
                     var ptme = <events.ProvideToolbarModelEvent>e;
 
-                    var logoGroup = new widgets.toolbar.ToolbarGroup("LogoGroup", true);
-                    var logo = new widgets.toolbar.ToolbarImage("ToolbarImage", logoUrl);
+                    const logoGroup = new widgets.toolbar.ToolbarGroup('LogoGroup', 90, true);
+                    var logo = new widgets.toolbar.ToolbarImage('ToolbarImage', logoUrl);
 
                     logoGroup.addComponent(logo);
 

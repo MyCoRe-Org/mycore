@@ -47,7 +47,7 @@
             <xsl:variable name="rclass"> 
               <xsl:if test="@required = 'true'"> required </xsl:if>
             </xsl:variable>
-            <xsl:attribute name="class">form-group {$xed-validation-marker} <xsl:value-of select="$rclass"/> </xsl:attribute>
+            <xsl:attribute name="class">form-group {$xed-validation-marker} row <xsl:value-of select="$rclass"/></xsl:attribute>
             <xsl:apply-templates select="." mode="formline" />
           </div>
         </xsl:otherwise>
@@ -78,7 +78,7 @@
   </xsl:template>
 
   <xsl:template match="mcruser:template[@name='cancelButton']">
-    <button type="submit" xed:target="cancel" class="btn btn-default btn-{$input-size}">
+    <button type="submit" xed:target="cancel" class="btn btn-secondary btn-{$input-size}">
       <xed:output i18n="{@i18n}" />
     </button>
   </xsl:template>
@@ -92,7 +92,7 @@
     <div>
       <xsl:attribute name="class">
         <xsl:if test="string-length(@i18n) = 0">
-          <xsl:value-of select="concat('col-md-offset-',$label-width, ' ')" />
+          <xsl:value-of select="concat('offset-md-',$label-width, ' ')" />
         </xsl:if>
         <xsl:if test="@tooltip">
           <xsl:value-of select="'input-group '" />

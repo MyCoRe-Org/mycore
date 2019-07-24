@@ -64,10 +64,10 @@ namespace mycore.viewer.components {
             if (!this._settings.mobile) {
                 this._sidebar = this._layout.getContainer(MyCoReViewerContainerComponent.SIDEBAR_DIRECTION);
                 this._informationBar = this._layout.getContainer(MyCoReViewerContainerComponent.INFORMATION_BAR_DIRECTION);
-                this._sidebar.addClass("panel panel-default sidebar");
+                this._sidebar.addClass("card sidebar");
 
                 this._informationBar = this._layout.getContainer(MyCoReViewerContainerComponent.INFORMATION_BAR_DIRECTION);
-                this._layout.getContainer(widgets.layout.IviewBorderLayout.DIRECTION_EAST).addClass("panel panel-default sidebar");
+                this._layout.getContainer(widgets.layout.IviewBorderLayout.DIRECTION_EAST).addClass("card sidebar");
                 this._container.bind("iviewResize", () => {
                     this.correctToToolbarSize();
                 });
@@ -75,7 +75,7 @@ namespace mycore.viewer.components {
         }
 
         private correctToToolbarSize() {
-            const toolbar = this._container.parent().find(".navbar.navbar-default");
+            const toolbar = this._container.parent().find(".navbar.navbar-light");
             const heightOfToolbar = toolbar.outerHeight(false);
             toolbar.siblings().css({"top": heightOfToolbar + "px"});
         }
@@ -105,8 +105,8 @@ namespace mycore.viewer.components {
 
 
                 if (sce.text != null && !this._settings.mobile) {
-                    var heading = jQuery("<div></div>");
-                    heading.addClass("panel-heading");
+                    var header = jQuery("<div></div>");
+                    header.addClass("card-header");
 
                     var closeButton = jQuery("<button></button>");
                     closeButton.attr("type", "button");
@@ -114,10 +114,10 @@ namespace mycore.viewer.components {
 
                     var inSpan = jQuery("<span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span>")
                     closeButton.append(inSpan);
-                    heading.prepend(sce.text);
-                    heading.append(closeButton);
+                    header.prepend(sce.text);
+                    header.append(closeButton);
 
-                    container.prepend(heading);
+                    container.prepend(header);
 
                     closeButton.click(() => {
                         sce.component = this;

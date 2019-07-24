@@ -57,9 +57,9 @@ namespace mycore.viewer.widgets.modal {
             this._footer.addClass("modal-footer");
             this._footer.appendTo(this._content);
 
-            this._close = jQuery("<a data-i18n='modal.close'>Close</a>");
+            this._close = jQuery("<button data-i18n='modal.close'>Close</button>");
             this._close.attr("type", "button");
-            this._close.addClass("btn btn-default");
+            this._close.addClass("btn btn-secondary");
             this._close.appendTo(this._footer);
 
             this._close.click(()=> {

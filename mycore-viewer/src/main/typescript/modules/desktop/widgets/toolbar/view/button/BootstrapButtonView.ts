@@ -23,7 +23,7 @@ namespace mycore.viewer.widgets.toolbar {
         constructor(id: string) {
             this._buttonElement = jQuery("<button></button>");
             this._buttonElement.attr("data-id", id);
-            this._buttonElement.addClass("btn btn-default navbar-btn");
+            this._buttonElement.addClass("btn btn-secondary navbar-btn");
 
             this._buttonLabel = jQuery("<span></span>");
             this._buttonLabel.appendTo(this._buttonElement);

@@ -22,7 +22,7 @@
 namespace mycore.viewer.widgets.toolbar {
     export class ToolbarGroup {
 
-        constructor(private _name: string, private _right: boolean = false) {
+        constructor(private _name: string, private _order: number, private _right: boolean = false) {
             this._idComponentMap = new MyCoReMap<string, ToolbarComponent>();
             this._observerArray = new Array<ContainerObserver<ToolbarGroup, ToolbarComponent>>();
         }
@@ -107,6 +107,14 @@ namespace mycore.viewer.widgets.toolbar {
             return (this._right) ? "right" : "left";
         }
 
+
+        get order(): number {
+            return this._order;
+        }
+
+        set order(value: number) {
+            this._order = value;
+        }
 
         /**
         * [DO NOT CALL THIS] (Protected)

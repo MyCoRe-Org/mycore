@@ -22,7 +22,7 @@
         <div class="section">
           <form class="form-inline" action="{$ServletsBaseURL}MCRUserServlet" onsubmit="document.getElementById('indicator').style.display='inline';">
             <div class="form-group">
-              <label class="control-label" for="name">
+              <label for="search">
                 <xsl:value-of select="i18n:translate('component.user2.admin.search')" />
                 <xsl:text>&#160;</xsl:text>
               </label>

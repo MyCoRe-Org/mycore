@@ -10,7 +10,7 @@
             {{model.status}}
         </div>
         <div class="progress" *ngSwitchDefault>
-            <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"
+            <div class="progress-bar bg-info progress-bar-striped" role="progressbar"
                  [style.width]="getProgress()"
                  aria-valuemin="0" aria-valuemax="100">
                 <span>{{model.progressText}}</span>
@@ -29,9 +29,11 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Basic Properties</div>
-                        <div class="panel-body">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            Basic Properties
+                        </div>
+                        <div class="card-body">
                             <div class="properties-header row">
                                 <div class="col-md-2">Name</div>
                                 <div class="col-md-10">Value</div>
@@ -80,9 +82,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">External Properties</div>
-                        <div class="panel-body">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            External Properties
+                        </div>
+                        <div class="card-body">
                             <div class="properties-header row">
                                 <div class="col-md-2">Name</div>
                                 <div class="col-md-10">Value</div>

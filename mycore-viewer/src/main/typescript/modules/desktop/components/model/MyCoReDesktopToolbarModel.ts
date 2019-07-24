@@ -31,7 +31,7 @@ namespace mycore.viewer.model {
         public selectionSwitchButton:widgets.toolbar.ToolbarButton;
 
         public addComponents():void {
-            this._viewSelectGroup=new widgets.toolbar.ToolbarGroup("viewSelectGroup");
+            this._viewSelectGroup=new widgets.toolbar.ToolbarGroup("viewSelectGroup", 40);
 
             this.addGroup(this._sidebarControllGroup);
             this.addGroup(this._zoomControllGroup);
@@ -39,8 +39,8 @@ namespace mycore.viewer.model {
             this.addGroup(this._viewSelectGroup);
             this.addGroup(this._imageChangeControllGroup);
             this.addGroup(this._actionControllGroup);
-            this.addGroup(this._closeViewerGroup);
             this.addGroup(this._searchGroup);
+            this.addGroup(this._closeViewerGroup);
         }
 
 
@@ -62,13 +62,13 @@ namespace mycore.viewer.model {
                 label: "textView"
             });
 
-            this.viewSelect = new widgets.toolbar.ToolbarDropdownButton("viewSelect", "viewSelect", this.viewSelectChilds, "eye-open");
+            this.viewSelect = new widgets.toolbar.ToolbarDropdownButton("viewSelect", "viewSelect", this.viewSelectChilds, "fa-eye");
             this._viewSelectGroup.addComponent(this.viewSelect);
         }
 
         public addSelectionSwitchButton():void{
             this.selectionSwitchButton = new widgets.toolbar.ToolbarButton("selectionSwitchButton", "", "");
-            this.selectionSwitchButton.icon = "text-width";
+            this.selectionSwitchButton.icon = "fa-text-width";
             //this._actionControllGroup.addComponent(this.selectionSwitchButton);
         }
 
