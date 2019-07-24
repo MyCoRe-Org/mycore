@@ -30,7 +30,7 @@
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>HEAD</tag>
+    <tag>2019.06.x</tag>
   </scm>
   <properties>
     <argLine />
