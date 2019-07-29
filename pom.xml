@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>40-20190215.095342-1</version>
+    <version>41-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <version>2019.08-SNAPSHOT</version>
@@ -34,9 +34,9 @@
   </scm>
   <properties>
     <argLine />
-    <changelog.since>2019-02-15</changelog.since>
+    <changelog.since>2019-05-28</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2019.05</changes.version>
+    <changes.version>2019.08</changes.version>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
     <forbiddenapis.version>2.6</forbiddenapis.version>
     <frontend.maven.plugin.version>1.6</frontend.maven.plugin.version>
