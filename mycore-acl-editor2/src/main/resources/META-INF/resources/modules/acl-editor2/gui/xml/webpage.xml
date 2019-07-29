@@ -42,7 +42,7 @@
                   <th><input id="acle2-new-access-pool" type="text" class="input-sm form-control"></input></th>
                   <th class="acle2-new-access-rule"></th>
                   <th>
-                    <i id="acle2-button-new-access" class="fa fa-floppy-o acle2-icon" title="i18n:ACLE.title.save"></i>
+                    <i id="acle2-button-new-access" class="fa fa-download acle2-icon" title="i18n:ACLE.title.save"></i>
                   </th>
                  </tr>
                </thead>
