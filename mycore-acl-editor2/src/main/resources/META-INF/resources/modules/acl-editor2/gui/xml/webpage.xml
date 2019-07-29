@@ -3,167 +3,163 @@
 <MyCoReWebPage>
   <section xml:lang="all" title="ACL Editor">
     <div id="mycore-acl-editor2">
-      	<link href="gui/css/webpage.css" rel="stylesheet" type="text/css" />
-      	<link href="gui/node_modules/select2/select2.css" rel="stylesheet" type="text/css" />
-      	<div id="acle2-header">
-        	<span>          		
-          		<text i18n="ACLE.labels.header"/>
-        	</span>
-        	<ul class="nav nav-tabs" id="tab-nav">
-        		<li class="active">
-					<a id="acle2-ruleAllocation-tab" class="tab-active tab" href="#acle2-ruleAllocation" data-toggle=""><text i18n="ACLE.labels.tab.access"/></a>
-				</li>
-				<li><a id="acle2-rules-tab" class="tab" href="#acle2-rules" data-toggle=""><text i18n="ACLE.labels.tab.rule"/></a></li>
-			</ul>
-			<div id="acle2-alert-area" class="alert fade">...</div>
-      	</div>
-      	
-      	<div id="acle2-loading" ><span class="acl2-spinner glyphicon glyphicon-refresh"></span></div>
-      	
-      	<div class="tab-content">
-	      	<div class="tab-pane active" id="acle2-ruleAllocation" style="display:none">
-	      		<div id="acle2-access-filter" class="row">
-	      			<div class="col-lg-4"><input id="acle2-access-filter-input-id" type="text" placeholder="i18n:ACLE.placeholder.filter.id" class="input-sm acle2-access-filter-input form-control i18n"></input></div>
-	      			<div class="col-lg-4"><input id="acle2-access-filter-input-pool" type="text" placeholder="i18n:ACLE.placeholder.filter.pool" class="input-sm acle2-access-filter-input form-control i18n"></input></div>
-	      			<div class="col-lg-4"><input id="acle2-access-filter-input-rule" type="text" placeholder="i18n:ACLE.placeholder.filter.rule" class="input-sm acle2-access-filter-input form-control i18n"></input></div>
-	      			<i id="acle2-button-access-filter" class="glyphicon glyphicon-search acle2-icon" title="i18n:ACLE.title.filter"></i>
-	      		</div>
-		      	<table id="acle2-access-table" class="table table-hover table-condensed" cellspacing="0">
-		      		<thead>
-				   		<tr id="acle2-table-head">
-				   			<th></th>
-				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.id"/><i class="glyphicon acle2-icon sort-icon"></i></th>
-				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.pool"/><i class="glyphicon acle2-icon sort-icon"></i></th>
-				   			<th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.rule"/><i class="glyphicon acle2-icon sort-icon"></i></th>
-				   			<th></th>
-				   		</tr>
-			   		
-				   		<tr id="acle2-table-new-access">
-				   			<th></th>
-				   			<th><input id="acle2-new-access-id" type="text" class="input-sm form-control"></input></th>
-				   			<th><input id="acle2-new-access-pool" type="text" class="input-sm form-control"></input></th>
-				   			<th class="acle2-new-access-rule"></th>
-				   			<th>
-				    			<i id="acle2-button-new-access" class="glyphicon glyphicon-save acle2-icon" title="i18n:ACLE.title.save"></i>
-				   			</th>
-				   		</tr>
-				   	</thead>
-			   		<tbody>
-			   		</tbody>
-		     	</table>
-		     	<div id="acle2-bottom-buttons" class="">
-					<input type='checkbox' id="acle2-button-select-multi-access" class="acle2-icon"/>
-		     		<button type="button" id="acle2-button-remove-multi-access" class="btn btn-danger"><text i18n="ACLE.buttons.access.delete"/></button>
-		     		<button type="button" id="acle2-button-edit-multi-access" class="btn btn-primary"><text i18n="ACLE.buttons.access.editMulti"/></button>
-		     		<div id="acle2-page-buttons" class="pull-right">
-			     		<div id="acle2-paginator" class="">
-						    <ul class="pagination pull-right">
-						    </ul>
-						</div>
-						<div id="acle2-elem-per-page" class="">
-							<text i18n="ACLE.labels.access.elemPerPage"/>
-							<input class="input-sm form-control" id="acle2-elem-per-page-input" type="text" value="10"></input>
-						</div>						
-					</div>
-		      	</div>
-		     	
-				<div class="modal fade" id="acle2-lightbox-new-rule" tabindex="-1" role="dialog" aria-labelledby="lightbox-label" aria-hidden="true">
-				    <div class="modal-dialog">
-      					<div class="modal-content">
-						 	<div class="modal-header">
-								<button type="button" class="close acle2-new-rule-cancel" data-dismiss="modal" aria-hidden="true">X</button>
-								<h4 class="modal-title" id="lightbox-label"><text i18n="ACLE.labels.access.newRule"/></h4>
-							</div>
-							<div class="modal-body">
-								<div id="acle2-lightbox-new-rule-alert-area" class="acle2-lightbox-alert-area alert fade alert-danger"><text i18n="ACLE.alert.rule.noRule"/></div>
-								<dl id="acle2-lightbox-rule-detail-table" class="dl-horizontal acle2-rule-detail-table">
-									<dt><text i18n="ACLE.labels.rule.desc"/></dt>
-									<dd><input id="acle2-new-rule-desc" type="text" class="input-sm form-control" tabindex="1"></input></dd>
-									<dt><text i18n="ACLE.labels.rule.text"/></dt>
-									<dd><textarea class="acle2-new-rule-text input-sm form-control" tabindex="2"></textarea></dd>
-								</dl>
-							</div>						
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default acle2-new-rule-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
-								<button type="button" id="acle2-new-rule-add" class="btn btn-primary" ><text i18n="ACLE.buttons.access.newRule"/></button>
-							</div>
-						</div>
-					</div>
-				</div>
-									
-				<div class="modal fade" id="acle2-lightbox-multi-edit" tabindex="-1" role="dialog" aria-labelledby="acle2-lightbox-multi-edit-label" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-						 	<div class="modal-header">
-								<button type="button" class="close acle2-lightbox-multi-edit-cancel" data-dismiss="modal" aria-hidden="true">X</button>
-								<h4 id="acle2-lightbox-multi-edit-label" class="modal-title"><text i18n="ACLE.labels.access.multiEdit"/></h4>
-							</div>
-							<div class="modal-body">
-								<div id="acle2-lightbox-multi-edit-alert-area" class="acle2-lightbox-alert-area alert fade alert-danger"><text i18n="ACLE.alert.access.edit.multi.noRule"/></div>
-								<div id="acle2-lightbox-multi-edit-main" class="dl-horizontal">
-									<p id="acle2-lightbox-multi-edit-text"></p><i id="acle2-lightbox-multi-edit-plus" class="glyphicon glyphicon-plus acle2-icon"></i>
-									<div id="acle2-lightbox-multi-edit-list" style="display:none"></div>
-									<div id="acle2-lightbox-multi-edit-select"></div>
-								</div>
-							</div>						
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default acle2-lightbox-multi-edit-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
-								<button type="button" id="acle2-lightbox-multi-edit-edit" class="btn btn-primary" ><text i18n="ACLE.buttons.access.save"/></button>
-							</div>
-						</div>
-					</div>
-				</div>
-													
-				<div class="modal fade" id="acle2-lightbox-multi-delete" tabindex="-1" role="dialog" aria-labelledby="acle2-lightbox-multi-delete-label" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-						 	<div class="modal-header">
-								<button type="button" class="close acle2-lightbox-multi-delete-cancel" data-dismiss="modal" aria-hidden="true">X</button>
-								<h4 id="acle2-lightbox-multi-delete-label" class="modal-title"><text i18n="ACLE.labels.access.multiDelete"/></h4>
-							</div>
-							<div class="modal-body">
-								<div id="acle2-lightbox-multi-delete-main" class="dl-horizontal">
-									<div class="alert alert-warning acle2-delete-warning">
-		   						 		<h4><text i18n="ACLE.labels.access.warning"/></h4>
-		    							<text i18n="ACLE.labels.access.delete"/>
-		    							<div id="acle2-lightbox-multi-delete-list"></div>
-		    						</div>
-								</div>
-							</div>						
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default acle2-lightbox-multi-delete-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
-								<button type="button" id="acle2-lightbox-multi-delete-delete" class="btn btn-danger" ><text i18n="ACLE.buttons.access.deleteone"/></button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="tab-pane" id="acle2-rules">
-				<ul id="acle2-rule-list">
-				</ul>
-				<dl id="acle2-rule-detail-table" class="dl-horizontal acle2-rule-detail-table">
-					<dt><text i18n="ACLE.labels.rule.id"/></dt>
-					<dd id="acle2-rule-detail-ruleID" class=""></dd>
-					<dt><text i18n="ACLE.labels.rule.desc"/></dt>
-					<dd><input id="acle2-rule-detail-ruleDesc" type="text" class="input-sm form-control" tabindex="1"></input></dd>
-					<dt><text i18n="ACLE.labels.rule.text"/></dt>
-					<dd><textarea class="acle2-rule-detail-ruleText input-sm form-control" rows="6" tabindex="2"></textarea></dd>
-					<dt></dt>
-					<dd>
-						<i id="acle2-button-save-rule" class="glyphicon glyphicon-save acle2-icon" title="i18n:ACLE.title.save"></i>
-		    			<i id="acle2-button-delete-rule" class="glyphicon glyphicon-trash acle2-icon" title="i18n:ACLE.title.delete"></i>
-		    			<i id="acle2-button-filter-rule" class="glyphicon glyphicon-filter acle2-icon" title="i18n:ACLE.title.filter"></i>
-					</dd>
-				</dl>
-			</div>
-		</div>
-      	<script type="text/javascript" src="gui/js/mycore-acl-editor.js" />
-      	<script type="text/javascript" src="gui/js/mycore-acl-editor-ruleSelector.js" />
-      	<script type="text/javascript" src="gui/js/mycore-acl-editor-accessTable.js" />
-      	<script type="text/javascript" src="gui/js/mycore-acl-editor-ruleList.js" />
-    	<script type="text/javascript" src="gui/node_modules/select2/select2.js" />
-    	<script type="text/javascript" src="gui/node_modules/stupidtable.min.js" />
-    	<script type="text/javascript" src="gui/node_modules/bootstrap3-typeahead.min.js" />
+      <link href="gui/css/webpage.css" rel="stylesheet" type="text/css" />
+      <link href="gui/node_modules/select2/select2.css" rel="stylesheet" type="text/css" />
+      <div id="acle2-header">
+        <span>
+          <text i18n="ACLE.labels.header"/>
+        </span>
+        <ul class="nav nav-tabs" id="tab-nav">
+          <li class="active">
+            <a id="acle2-ruleAllocation-tab" class="tab-active tab" href="#acle2-ruleAllocation" data-toggle=""><text i18n="ACLE.labels.tab.access"/></a>
+          </li>
+          <li><a id="acle2-rules-tab" class="tab" href="#acle2-rules" data-toggle=""><text i18n="ACLE.labels.tab.rule"/></a></li>
+        </ul>
+        <div id="acle2-alert-area" class="alert fade">...</div>
+      </div>
+  
+      <div id="acle2-loading" ><span class="acl2-spinner fa fa-refresh"></span></div>
+        <div class="tab-content">
+          <div class="tab-pane active" id="acle2-ruleAllocation" style="display:none">
+            <div id="acle2-access-filter" class="row">
+              <div class="col-lg-4"><input id="acle2-access-filter-input-id" type="text" placeholder="i18n:ACLE.placeholder.filter.id" class="input-sm acle2-access-filter-input form-control i18n"></input></div>
+              <div class="col-lg-4"><input id="acle2-access-filter-input-pool" type="text" placeholder="i18n:ACLE.placeholder.filter.pool" class="input-sm acle2-access-filter-input form-control i18n"></input></div>
+              <div class="col-lg-4"><input id="acle2-access-filter-input-rule" type="text" placeholder="i18n:ACLE.placeholder.filter.rule" class="input-sm acle2-access-filter-input form-control i18n"></input></div>
+              <i id="acle2-button-access-filter" class="fa fa-search acle2-icon" title="i18n:ACLE.title.filter"></i>
+            </div>
+            <table id="acle2-access-table" class="table table-hover table-condensed" cellspacing="0">
+              <thead>
+                <tr id="acle2-table-head">
+                  <th></th>
+                  <th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.id"/><i class="fa acle2-icon sort-icon"></i></th>
+                  <th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.pool"/><i class="fa acle2-icon sort-icon"></i></th>
+                  <th class="sort-table-head" data-sort="string-ins" data-resort="true"><text i18n="ACLE.labels.access.table.rule"/><i class="fa acle2-icon sort-icon"></i></th>
+                  <th></th>
+                </tr>
+                 <tr id="acle2-table-new-access">
+                  <th></th>
+                  <th><input id="acle2-new-access-id" type="text" class="input-sm form-control"></input></th>
+                  <th><input id="acle2-new-access-pool" type="text" class="input-sm form-control"></input></th>
+                  <th class="acle2-new-access-rule"></th>
+                  <th>
+                    <i id="acle2-button-new-access" class="fa fa-floppy-o acle2-icon" title="i18n:ACLE.title.save"></i>
+                  </th>
+                 </tr>
+               </thead>
+               <tbody>
+               </tbody>
+             </table>
+             <div id="acle2-bottom-buttons" class="">
+               <input type='checkbox' id="acle2-button-select-multi-access" class="acle2-icon"/>
+               <button type="button" id="acle2-button-remove-multi-access" class="btn btn-danger"><text i18n="ACLE.buttons.access.delete"/></button>
+               <button type="button" id="acle2-button-edit-multi-access" class="btn btn-primary"><text i18n="ACLE.buttons.access.editMulti"/></button>
+               <div id="acle2-page-buttons" class="pull-right">
+                 <div id="acle2-paginator" class="">
+                  <ul class="pagination pull-right">
+                  </ul>
+               </div>
+               <div id="acle2-elem-per-page" class="">
+                 <text i18n="ACLE.labels.access.elemPerPage"/>
+                 <input class="input-sm form-control" id="acle2-elem-per-page-input" type="text" value="10"></input>
+              </div>
+            </div>
+          </div>
+  
+          <div class="modal fade" id="acle2-lightbox-new-rule" tabindex="-1" role="dialog" aria-labelledby="lightbox-label" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close acle2-new-rule-cancel" data-dismiss="modal" aria-hidden="true">X</button>
+                  <h4 class="modal-title" id="lightbox-label"><text i18n="ACLE.labels.access.newRule"/></h4>
+                </div>
+                <div class="modal-body">
+                  <div id="acle2-lightbox-new-rule-alert-area" class="acle2-lightbox-alert-area alert fade alert-danger"><text i18n="ACLE.alert.rule.noRule"/></div>
+                  <dl id="acle2-lightbox-rule-detail-table" class="dl-horizontal acle2-rule-detail-table">
+                    <dt><text i18n="ACLE.labels.rule.desc"/></dt>
+                    <dd><input id="acle2-new-rule-desc" type="text" class="input-sm form-control" tabindex="1"></input></dd>
+                    <dt><text i18n="ACLE.labels.rule.text"/></dt>
+                    <dd><textarea class="acle2-new-rule-text input-sm form-control" tabindex="2"></textarea></dd>
+                  </dl>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default acle2-new-rule-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
+                  <button type="button" id="acle2-new-rule-add" class="btn btn-primary" ><text i18n="ACLE.buttons.access.newRule"/></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="acle2-lightbox-multi-edit" tabindex="-1" role="dialog" aria-labelledby="acle2-lightbox-multi-edit-label" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close acle2-lightbox-multi-edit-cancel" data-dismiss="modal" aria-hidden="true">X</button>
+                  <h4 id="acle2-lightbox-multi-edit-label" class="modal-title"><text i18n="ACLE.labels.access.multiEdit"/></h4>
+                </div>
+                <div class="modal-body">
+                  <div id="acle2-lightbox-multi-edit-alert-area" class="acle2-lightbox-alert-area alert fade alert-danger"><text i18n="ACLE.alert.access.edit.multi.noRule"/></div>
+                  <div id="acle2-lightbox-multi-edit-main" class="dl-horizontal">
+                    <p id="acle2-lightbox-multi-edit-text"></p><i id="acle2-lightbox-multi-edit-plus" class="fa fa-plus acle2-icon"></i>
+                    <div id="acle2-lightbox-multi-edit-list" style="display:none"></div>
+                    <div id="acle2-lightbox-multi-edit-select"></div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default acle2-lightbox-multi-edit-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
+                  <button type="button" id="acle2-lightbox-multi-edit-edit" class="btn btn-primary" ><text i18n="ACLE.buttons.access.save"/></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="acle2-lightbox-multi-delete" tabindex="-1" role="dialog" aria-labelledby="acle2-lightbox-multi-delete-label" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                 <div class="modal-header">
+                  <button type="button" class="close acle2-lightbox-multi-delete-cancel" data-dismiss="modal" aria-hidden="true">X</button>
+                  <h4 id="acle2-lightbox-multi-delete-label" class="modal-title"><text i18n="ACLE.labels.access.multiDelete"/></h4>
+                </div>
+                <div class="modal-body">
+                  <div id="acle2-lightbox-multi-delete-main" class="dl-horizontal">
+                    <div class="alert alert-warning acle2-delete-warning">
+                      <h4><text i18n="ACLE.labels.access.warning"/></h4>
+                      <text i18n="ACLE.labels.access.delete"/>
+                      <div id="acle2-lightbox-multi-delete-list"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default acle2-lightbox-multi-delete-cancel" data-dismiss="modal" aria-hidden="true"><text i18n="ACLE.buttons.access.cancel"/></button>
+                  <button type="button" id="acle2-lightbox-multi-delete-delete" class="btn btn-danger" ><text i18n="ACLE.buttons.access.deleteone"/></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="acle2-rules">
+          <ul id="acle2-rule-list">
+          </ul>
+          <dl id="acle2-rule-detail-table" class="dl-horizontal acle2-rule-detail-table">
+            <dt><text i18n="ACLE.labels.rule.id"/></dt>
+            <dd id="acle2-rule-detail-ruleID" class=""></dd>
+            <dt><text i18n="ACLE.labels.rule.desc"/></dt>
+            <dd><input id="acle2-rule-detail-ruleDesc" type="text" class="input-sm form-control" tabindex="1"></input></dd>
+            <dt><text i18n="ACLE.labels.rule.text"/></dt>
+            <dd><textarea class="acle2-rule-detail-ruleText input-sm form-control" rows="6" tabindex="2"></textarea></dd>
+            <dt></dt>
+            <dd>
+              <i id="acle2-button-save-rule" class="fa fa-floppy-o acle2-icon" title="i18n:ACLE.title.save"></i>
+              <i id="acle2-button-delete-rule" class="fa fa-trash acle2-icon" title="i18n:ACLE.title.delete"></i>
+              <i id="acle2-button-filter-rule" class="fa fa-filter acle2-icon" title="i18n:ACLE.title.filter"></i>
+            </dd>
+          </dl>
+        </div>
+      </div>
+      <script type="text/javascript" src="gui/js/mycore-acl-editor.js" />
+      <script type="text/javascript" src="gui/js/mycore-acl-editor-ruleSelector.js" />
+      <script type="text/javascript" src="gui/js/mycore-acl-editor-accessTable.js" />
+      <script type="text/javascript" src="gui/js/mycore-acl-editor-ruleList.js" />
+      <script type="text/javascript" src="gui/node_modules/select2/select2.js" />
+      <script type="text/javascript" src="gui/node_modules/stupidtable.min.js" />
+      <script type="text/javascript" src="gui/node_modules/bootstrap3-typeahead.min.js" />
     </div>
   </section>
 </MyCoReWebPage>
