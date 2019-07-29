@@ -7,13 +7,13 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer"
   exclude-result-prefixes="xsl xed xalan i18n transformer">
-  
+
   <!-- ========== Repeater buttons: <xed:repeat><xed:controls> ========== -->
-  
+
   <xsl:template match="text()" mode="xed.control">
     <!-- append insert remove up down -->
     <xsl:param name="name" /> <!-- name to submit as request parameter when button/image is clicked -->
-    
+
     <!-- Choose a label for the button -->
     <xsl:variable name="symbol">
       <xsl:choose>
@@ -34,25 +34,25 @@
         </xsl:when>
       </xsl:choose>
     </xsl:variable>
-    
+
     <button type="submit" class="btn btn-secondary" name="{$name}">
       <i class="fa fa-{$symbol}">
       </i>
     </button>
   </xsl:template>
-  
+
   <!-- ========== Validation error messages: <xed:validate /> ========== -->
-  
+
   <xsl:template match="xed:validate[@i18n]" mode="message">
     <span class="help-inline">
       <xsl:value-of select="i18n:translate(@i18n)" />
     </span>
   </xsl:template>
-  
+
   <xsl:template match="xed:validate" mode="message">
     <span class="help-inline">
       <xsl:apply-templates select="node()" mode="xeditor" />
     </span>
   </xsl:template>
-  
+
 </xsl:stylesheet>
