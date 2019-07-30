@@ -32,9 +32,7 @@
     <module name="LocalFinalVariableName"/>
     <module name="UnusedImports"/>
     <module name="IllegalImport"/>
-    <module name="LeftCurly">
-      <property name="maxLineLength" value="120"/>
-    </module>
+    <module name="LeftCurly"/>
     <module name="RightCurly"/>
 
 <!-- old mycore rules -->
