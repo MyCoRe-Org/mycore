@@ -129,7 +129,7 @@ mycore.session.listing = {
         " onclick='mycore.session.listing.showStacktrace(\"" + session.id + "\");'" +
         " data-toggle='modal' data-target='#stacktraceModal'></div>" +
         "</td>" +
-        "<td><i href='javascript:void(0)' onclick='mycore.session.listing.kill(`" + session.id + "`)' class='fa fa-times' style='cursor: pointer;'></i></td>" +
+        "<td><i href='javascript:void(0)' onclick='mycore.session.listing.kill(`" + session.id + "`)' class='fas fa-times' style='cursor: pointer;'></i></td>" +
         "</tr>"
       );
       table.append(tr);

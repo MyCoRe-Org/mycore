@@ -151,7 +151,7 @@
   <xsl:template match="mcruser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]" mode="validation">
     <xsl:if test="@required = 'true' or @validate = 'true'">
       <xed:if test="contains($xed-validation-marker, 'has-error')">
-        <span class="glyphicon glyphicon-warning-sign form-control-feedback" data-toggle="tooltip" data-placement="top" title="{concat('{i18n:', @i18n.error, '}')}"></span>
+        <span class="fas fa-exclamation-triangle form-control-feedback" data-toggle="tooltip" data-placement="top" title="{concat('{i18n:', @i18n.error, '}')}"></span>
       </xed:if>
       <xed:validate display="local" required="{@required}">
         <xsl:copy-of select="@*[contains('matches|test|format|type', name())]" />

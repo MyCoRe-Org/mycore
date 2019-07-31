@@ -218,7 +218,7 @@ var ACLEditor = function(){
 						editAccess(json);
 					}
 					else{
-						parent.html($(this).val( )+ "<i class='glyphicon glyphicon-pencil acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>");
+						parent.html($(this).val( )+ "<i class='fas fa-pencil-alt acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>");
 						parent.attr("title", $(this).val());
 						parent.removeClass("acle2-show-input");
 						$(this).remove();
@@ -234,14 +234,14 @@ var ACLEditor = function(){
 			
 			$("body").on("click", ".sort-table-head", function() {
 				if($(this).data("sort-dir") == "asc"){
-					$(".glyphicon-chevron-up").removeClass("glyphicon-chevron-up");
-					$(".glyphicon-chevron-down").removeClass("glyphicon-chevron-down");
-					$(this).children(".sort-icon").addClass("glyphicon-chevron-up")
+					$(".fa-chevron-up").removeClass("fa-chevron-up");
+					$(".fa-chevron-down").removeClass("fa-chevron-down");
+					$(this).children(".sort-icon").addClass("fa-chevron-up")
 				}
 				else{
-					$(".glyphicon-chevron-up").removeClass("glyphicon-chevron-up");
-					$(".glyphicon-chevron-down").removeClass("glyphicon-chevron-down");
-					$(this).children(".sort-icon").addClass("glyphicon-chevron-down")
+					$(".fa-chevron-up").removeClass("fa-chevron-up");
+					$(".fa-chevron-down").removeClass("fa-chevron-down");
+					$(this).children(".sort-icon").addClass("fa-chevron-down")
 				}
 			});
 			
@@ -301,14 +301,14 @@ var ACLEditor = function(){
 						$("#acle2-lightbox-multi-edit-list").append(p);
 					});
 					$("#acle2-lightbox-multi-edit-list").show();
-					$("#acle2-lightbox-multi-edit-plus").addClass("glyphicon-minus");
-					$("#acle2-lightbox-multi-edit-plus").removeClass("glyphicon-plus");
+					$("#acle2-lightbox-multi-edit-plus").addClass("fa-minus");
+					$("#acle2-lightbox-multi-edit-plus").removeClass("fa-plus");
 				}
 				else{
 					$("#acle2-lightbox-multi-edit-list").html("");
 					$("#acle2-lightbox-multi-edit-list").hide();
-					$("#acle2-lightbox-multi-edit-plus").addClass("glyphicon-plus");
-					$("#acle2-lightbox-multi-edit-plus").removeClass("glyphicon-minus");
+					$("#acle2-lightbox-multi-edit-plus").addClass("fa-plus");
+					$("#acle2-lightbox-multi-edit-plus").removeClass("fa-minus");
 				}
 			});
 			
@@ -455,7 +455,7 @@ var ACLEditor = function(){
 					ruleListInstance.updateCanDelete();
 				},
 				500: function(error) {
-					showAlert(geti18n("ACLE.alert.access.remove.error"));					
+					showAlert(geti18n("ACLE.alert.access.remove.error"));
 				}
 			}
 		});
@@ -749,16 +749,16 @@ var ACLEditor = function(){
 	
 	function addPageToPaginator(href, name, state) {
 		if (state == ""){
-			var pageButton = $('<a href="#" onclick="return false;">' + name + '</a>');
+			var pageButton = $('<a  class="page-link" href="#" onclick="return false;">' + name + '</a>');
 			pageButton.bind("click", function() {
 				showPage(href);
 				buildPaginator(href);
 			});
 		}
 		else{
-			var pageButton = $('<span>' + name + '</span>');
+			var pageButton = $('<span class="page-link">' + name + '</span><span class="sr-only">(current)</span>');
 		}
-		$("<li></li>").append(pageButton).addClass(state).appendTo(".pagination");
+		$('<li class="page-item"></li>').append(pageButton).addClass(state).appendTo('.pagination');
 	}
 	
 	function refreshPageNumbers() {
@@ -795,8 +795,8 @@ var ACLEditor = function(){
 		$("#acle2-lightbox-multi-edit-list").hide();
 		$("#acle2-lightbox-multi-edit-select").find("select").select2("destroy");
 		$("#acle2-lightbox-multi-edit-select").find("select").remove();
-		$("#acle2-lightbox-multi-edit-plus").addClass("glyphicon-plus");
-		$("#acle2-lightbox-multi-edit-plus").removeClass("glyphicon-minus");
+		$("#acle2-lightbox-multi-edit-plus").addClass("fa-plus");
+		$("#acle2-lightbox-multi-edit-plus").removeClass("fa-minus");
 	}
 	
 	function geti18n(key) {

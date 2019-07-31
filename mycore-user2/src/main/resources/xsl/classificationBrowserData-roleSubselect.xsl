@@ -23,9 +23,9 @@
     </xsl:call-template>
   </xsl:variable>
 
-  <xsl:variable name="folder.closed" select="'fa fa-lg fa-fw fa-plus-square-o'" />
-  <xsl:variable name="folder.open" select="'fa fa-lg fa-fw fa-minus-square-o'" />
-  <xsl:variable name="folder.leaf" select="'fa fa-lg fa-fw fa-square-o'" />
+  <xsl:variable name="folder.closed" select="'far fa-lg fa-fw fa-plus-square'" />
+  <xsl:variable name="folder.open" select="'far fa-lg fa-fw fa-minus-square'" />
+  <xsl:variable name="folder.leaf" select="'far fa-lg fa-fw fa-square'" />
 
   <xsl:template match="/classificationBrowserData">
     <ul class="cbList">
