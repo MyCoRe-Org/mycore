@@ -749,7 +749,7 @@ var ACLEditor = function(){
 	
 	function addPageToPaginator(href, name, state) {
 		if (state == ""){
-			var pageButton = $('<a href="#" onclick="return false;">' + name + '</a>');
+			var pageButton = $('<a  class="page-link" href="#" onclick="return false;">' + name + '</a>');
 			pageButton.bind("click", function() {
 				showPage(href);
 				buildPaginator(href);
@@ -758,7 +758,7 @@ var ACLEditor = function(){
 		else{
 			var pageButton = $('<span>' + name + '</span>');
 		}
-		$("<li></li>").append(pageButton).addClass(state).appendTo(".pagination");
+		$('<li class="page-item"></li>').append(pageButton).addClass(state).appendTo('.pagination');
 	}
 	
 	function refreshPageNumbers() {

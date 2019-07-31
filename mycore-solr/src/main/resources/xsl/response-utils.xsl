@@ -137,7 +137,7 @@
     <xsl:variable name="prev" select="'«'" />
     <xsl:variable name="next" select="'»'" />
 
-    <div class="pagination_box text-center">
+    <div class="pagination_box">
       <ul>
         <xsl:attribute name="class">
           <xsl:value-of select="concat('pagination ',$class)" />
@@ -146,14 +146,14 @@
           <xsl:choose>
             <xsl:when test="$currentpage = 1">
               <xsl:attribute name="class">
-                <xsl:value-of select="'disabled'" />
+                <xsl:value-of select="'page-item disabled'" />
               </xsl:attribute>
-              <a href="#">
+              <a class="page-link" href="#">
                 <xsl:value-of select="$prev" />
               </a>
             </xsl:when>
             <xsl:otherwise>
-              <a href="{concat($href, '&amp;start=',(($currentpage -2) * $size), '&amp;rows=', $size)}">
+              <a class="page-link" href="{concat($href, '&amp;start=',(($currentpage -2) * $size), '&amp;rows=', $size)}">
                 <xsl:value-of select="$prev" />
               </a>
             </xsl:otherwise>
@@ -170,14 +170,14 @@
           <xsl:choose>
             <xsl:when test="$currentpage = $totalpage">
               <xsl:attribute name="class">
-                <xsl:value-of select="'disabled'" />
+                <xsl:value-of select="'page-item disabled'" />
               </xsl:attribute>
-              <a href="#">
+              <a class="page-link" href="#">
                 <xsl:value-of select="$next" />
               </a>
             </xsl:when>
             <xsl:otherwise>
-              <a href="{concat($href, '&amp;start=',($currentpage * $size), '&amp;rows=', $size)}">
+              <a class="page-link" href="{concat($href, '&amp;start=',($currentpage * $size), '&amp;rows=', $size)}">
                 <xsl:value-of select="$next" />
               </a>
             </xsl:otherwise>
@@ -261,19 +261,26 @@
     </xsl:variable>
     <xsl:if test="$running='true'">
       <li>
-        <xsl:if test="$i=$currentpage">
-          <xsl:attribute name="class">
-            <xsl:value-of select="'active'" />
-          </xsl:attribute>
-        </xsl:if>
+        <xsl:choose>
+          <xsl:when test="$i=$currentpage">
+            <xsl:attribute name="class">
+              <xsl:value-of select="'page-item active'" />
+            </xsl:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:attribute name="class">
+              <xsl:value-of select="'page-item'" />
+            </xsl:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
         <!-- XSL.Style parameter in order to view search-results in a list -->
-        <a href="{concat($href, '&amp;start=',(($i -1) * $size), '&amp;rows=', $size)}">
+        <a class="page-link" href="{concat($href, '&amp;start=',(($i -1) * $size), '&amp;rows=', $size)}">
           <xsl:value-of select="$i" />
         </a>
       </li>
       <xsl:if test="$jumpSize &gt; 1">
-        <li class="disabled">
-          <a href="#">...</a>
+        <li class="page-item disabled">
+          <a class="page-link" href="#">...</a>
         </li>
       </xsl:if>
       <xsl:call-template name="solr.PageGen">
