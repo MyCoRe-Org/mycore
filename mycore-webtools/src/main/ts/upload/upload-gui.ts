@@ -299,7 +299,7 @@ namespace mycore.upload {
     <div class="panel panel-default" style="height: 100%;">
         <div class="panel-heading">
             <span class="mcr-upload-title" data-i18n="component.webtools.upload.title"></span>
-            <span class="fa fa-window-minimize pull-right" style="font-size: 11px;line-height: 22px;"></span></div>
+            <span class="fas fa-window-minimize pull-right" style="font-size: 11px;line-height: 22px;"></span></div>
         <div class="panel-body mcr-upload-entry-list" style="overflow-y:  scroll;">
             <div class="row hidden mcr-commit-warn bg-info">
                 <div class="col-md-12" data-i18n="component.webtools.upload.processing"></div>
@@ -309,7 +309,7 @@ namespace mycore.upload {
 
                 <small class="col-md-3 mcr-upload-transfer-all-rate"></small>
                 <div class="col-md-1">
-                    <span class="text-danger fa fa-remove mcr-upload-transfer-all-abort"></span>
+                    <span class="text-danger fas fa-times mcr-upload-transfer-all-abort"></span>
                 </div>
             </div>
             <div class="hidden mcr-upload-active-insert-marker"></div>
@@ -323,7 +323,7 @@ namespace mycore.upload {
     <small class="col-md-3 mcr-upload-file-size"></small>
     <small class="col-md-3 mcr-upload-transfer-rate"></small>
     <div class="col-md-1">
-        <span class="text-danger fa fa-remove mcr-upload-abort-transfer"></span>
+        <span class="text-danger fas fa-times mcr-upload-abort-transfer"></span>
     </div>
     <div class="col-md-12">
         <div class="progress">

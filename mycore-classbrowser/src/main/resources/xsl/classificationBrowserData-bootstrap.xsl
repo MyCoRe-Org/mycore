@@ -12,9 +12,9 @@
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="template" />
 
-  <xsl:param name="MCR.classbrowser.folder.closed" select="'fa fa-expand'" />
-  <xsl:param name="MCR.classbrowser.folder.open" select="'fa fa-compress'" />
-  <xsl:param name="MCR.classbrowser.folder.leaf" select="'fa fa-square-o'" />
+  <xsl:param name="MCR.classbrowser.folder.closed" select="'fas fa-expand'" />
+  <xsl:param name="MCR.classbrowser.folder.open" select="'fas fa-compress'" />
+  <xsl:param name="MCR.classbrowser.folder.leaf" select="'fas fa-square'" />
 
   <xsl:output method="xml" omit-xml-declaration="yes" />
 

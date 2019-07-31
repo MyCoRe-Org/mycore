@@ -218,7 +218,7 @@ var ACLEditor = function(){
 						editAccess(json);
 					}
 					else{
-						parent.html($(this).val( )+ "<i class='fa fa-pencil acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>");
+						parent.html($(this).val( )+ "<i class='fas fa-pencil-alt acle2-icon acle2-button-edit' title='" + geti18n("ACLE.title.edit") + "'></i>");
 						parent.attr("title", $(this).val());
 						parent.removeClass("acle2-show-input");
 						$(this).remove();
