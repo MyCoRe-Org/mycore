@@ -756,7 +756,7 @@ var ACLEditor = function(){
 			});
 		}
 		else{
-			var pageButton = $('<span>' + name + '</span>');
+			var pageButton = $('<span class="page-link">' + name + '</span><span class="sr-only">(current)</span>');
 		}
 		$('<li class="page-item"></li>').append(pageButton).addClass(state).appendTo('.pagination');
 	}
