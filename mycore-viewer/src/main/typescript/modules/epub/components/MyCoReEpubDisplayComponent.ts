@@ -170,7 +170,7 @@ namespace mycore.viewer.components {
             ptme.model.removeGroup(ptme.model._imageChangeControllGroup);
 
             const lcg = ptme.model.getGroup(ptme.model._layoutControllGroup.name);
-            if (lcg !== null && typeof lcg !=="undefined") {
+            if (lcg !== null && typeof lcg !== 'undefined') {
                 ptme.model.removeGroup(ptme.model._layoutControllGroup);
             }
         }
