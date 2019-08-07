@@ -85,20 +85,13 @@ async-each@^0.1.5:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/async-each/-/async-each-0.1.6.tgz#b67e99edcddf96541e44af56290cd7d5c6e70439"
 
-async@0.2.10, async@~0.2.9:
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/async/-/async-0.2.10.tgz#b6bbe0b0674b9d719708ca38de8c237cb526c3d1"
-
-async@^2.0.0:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/async/-/async-2.6.2.tgz#18330ea7e6e313887f5d2f2a904bac6fe4dd5381"
-  integrity sha512-H1qVYh1MYhEEFLsP97cVKqCGo7KfCyTt6uEWqsTBr9SO84oK9Uwbyd/yCW+6rKJLHksBNUVWZDAjfS+Ccx0Bbg==
-  dependencies:
-    lodash "^4.17.11"
-
 async@~0.1.22:
   version "0.1.22"
   resolved "https://registry.yarnpkg.com/async/-/async-0.1.22.tgz#0fc1aaa088a0e3ef0ebe2d8831bab0dcf8845061"
+
+async@~0.2.9:
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/async/-/async-0.2.10.tgz#b6bbe0b0674b9d719708ca38de8c237cb526c3d1"
 
 async@~0.9.0:
   version "0.9.2"
@@ -568,13 +561,6 @@ grunt-maven@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/grunt-maven/-/grunt-maven-1.1.0.tgz#a0e2055158bcff30de9dca9aa63f8514dc38f39c"
 
-grunt-newer@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/grunt-newer/-/grunt-newer-0.7.0.tgz#376d9d9b64ce5c648b6bfa1bda98f7bc2193e41e"
-  dependencies:
-    async "0.2.10"
-    rimraf "2.2.6"
-
 grunt-npmcopy@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/grunt-npmcopy/-/grunt-npmcopy-0.2.0.tgz#183b700636eb595f86f7f182858f6594723ea3ad"
@@ -582,18 +568,6 @@ grunt-npmcopy@^0.2.0:
   dependencies:
     glob "^7.1.3"
     lodash "^4.17.11"
-
-grunt-string-replace@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/grunt-string-replace/-/grunt-string-replace-1.3.1.tgz#633a03bc78482a0e0e1f9df7f645811fc1fbb162"
-  integrity sha1-YzoDvHhIKg4OH5339kWBH8H7sWI=
-  dependencies:
-    async "^2.0.0"
-    chalk "^1.0.0"
-
-grunt-svninfo@^0.1.4:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/grunt-svninfo/-/grunt-svninfo-0.1.6.tgz#7bbb028bdb833d6b0c6ad9e61a4e7a794f888202"
 
 grunt-ts@5.5.1:
   version "5.5.1"
