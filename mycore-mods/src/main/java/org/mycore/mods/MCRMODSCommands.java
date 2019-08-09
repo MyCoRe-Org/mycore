@@ -64,7 +64,7 @@ import org.xml.sax.SAXException;
 @MCRCommandGroup(name = "MODS Commands")
 public class MCRMODSCommands extends MCRAbstractCommands {
 
-    public static final String MODS_V3_XSD_URI = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
+    public static final String MODS_V3_XSD_URI = "http://www.loc.gov/standards/mods/v3/mods-3-7.xsd";
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMODSCommands.class);
 
