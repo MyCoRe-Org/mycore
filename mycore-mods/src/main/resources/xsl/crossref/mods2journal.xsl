@@ -5,6 +5,8 @@
                 version="3.0"
 >
 
+  <xsl:variable name="marcrelator" select="document('classification:metadata:-1:children:marcrelator')"/>
+
   <xsl:template
       match="mods:mods[count(mods:classification[ends-with(@authorityURI, 'crossrefTypes') and contains(@valueURI, '#journal')])&gt;0]">
     <xsl:message>Match journal</xsl:message>
@@ -61,11 +63,9 @@
   </xsl:template>
 
   <xsl:template
-      match="mods:mods[count(mods:classification[ends-with(@authorityURI, 'crossrefTypes') and ends-with(@valueURI, '#journal_article')])&gt;0]"
-      priority="9001">
+      match="mods:mods[count(mods:classification[ends-with(@authorityURI, 'crossrefTypes') and ends-with(@valueURI, '#journal_article')])&gt;0]">
     <xsl:call-template name="crossrefContainer">
       <xsl:with-param name="content">
-        <Match_journal_article/>
         <cr:journal>
           <xsl:choose>
             <xsl:when
@@ -87,7 +87,6 @@
               <xsl:call-template name="journalContent">
                 <xsl:with-param name="journal" select="$journal"/>
               </xsl:call-template>
-
               <xsl:call-template name="issueContent">
                 <xsl:with-param name="journal" select="$journal"/>
                 <xsl:with-param name="issue" select="$issue"/>
@@ -102,11 +101,10 @@
                 <xsl:with-param name="journal" select="$journal"/>
               </xsl:call-template>
               <xsl:if test="$journal/mods:part">
-                <cr:journal_issue>
-                  <xsl:call-template name="printModsPart">
-                    <xsl:with-param name="mods" select="$journal"/>
-                  </xsl:call-template>
-                </cr:journal_issue>
+                <xsl:call-template name="issueContent">
+                  <xsl:with-param name="journal" select="$journal"/>
+                  <xsl:with-param name="issue" select="/@my_EmPtY_NoDeSeT"/>
+                </xsl:call-template>
               </xsl:if>
             </xsl:when>
             <xsl:otherwise>
@@ -115,11 +113,24 @@
           </xsl:choose>
 
           <cr:journal_article>
-            <xsl:call-template name="modsTitle"/>
-            <xsl:call-template name="articleAbstract"/>
-            <xsl:call-template name="publicationYear">
-              <xsl:with-param name="modsNode" select="."/>
+            <xsl:variable name="article" select="."/>
+
+            <xsl:call-template name="modsTitle">
+              <xsl:with-param name="mods" select="$article"/>
             </xsl:call-template>
+
+            <xsl:call-template name="createContributors">
+              <xsl:with-param name="modsNode" select="$article"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="articleAbstract">
+                <xsl:with-param name="articleMods" select="$article"/>
+            </xsl:call-template>
+
+            <xsl:call-template name="publicationYear">
+              <xsl:with-param name="modsNode" select="$article"/>
+            </xsl:call-template>
+
             <!-- TODO: pages -->
             <xsl:call-template name="doiData">
               <xsl:with-param name="id" select="/mycoreobject/@ID"/>
@@ -176,7 +187,8 @@
   </xsl:template>
 
   <xsl:template name="articleAbstract">
-    <xsl:for-each select="mods:abstract">
+    <xsl:param name="articleMods" select="." />
+    <xsl:for-each select="$articleMods/mods:abstract">
       <jats:abstract>
         <xsl:if test="@xml:lang">
           <xsl:copy-of select="@xml:lang"/>
@@ -226,8 +238,37 @@
     <xsl:param name="journal"/>
 
     <cr:journal_issue>
+      <xsl:variable name="contributors">
+        <xsl:call-template name="createContributors">
+          <xsl:with-param name="modsNode" select="$issue"/>
+        </xsl:call-template>
+        <xsl:call-template name="createContributors">
+          <xsl:with-param name="modsNode" select="$journal"/>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:if test="count($contributors)&gt;0">
+        <cr:contributors>
+          <xsl:for-each select="$contributors/*[string-length(@contributor_role)&gt;0]">
+            <xsl:copy>
+              <xsl:attribute name="sequence">
+                <xsl:choose>
+                  <xsl:when test="position() = 1">first</xsl:when>
+                  <xsl:otherwise>additional</xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
+              <xsl:copy-of select="@*|node()"/>
+            </xsl:copy>
+          </xsl:for-each>
+        </cr:contributors>
+      </xsl:if>
+
       <xsl:call-template name="modsTitle">
         <xsl:with-param name="mods" select="$issue"/>
+      </xsl:call-template>
+
+      <xsl:call-template name="publicationYear">
+        <xsl:with-param name="modsNode" select="$issue"/>
       </xsl:call-template>
 
       <xsl:if test="$journal/mods:part">
@@ -235,22 +276,85 @@
           <xsl:with-param name="mods" select="$journal"/>
         </xsl:call-template>
       </xsl:if>
-
-      <xsl:for-each
-          select="$issue/mods:name[count(mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']) &gt;0 and @type='corporate' and count(mods:displayForm)&gt;0]">
-        <cr:contributors>
-          <cr:organization>
-            <xsl:value-of select="mods:displayForm"/>
-          </cr:organization>
-        </cr:contributors>
-      </xsl:for-each>
-
-
-      <xsl:call-template name="publicationYear">
-        <xsl:with-param name="modsNode" select="$issue"/>
-      </xsl:call-template>
-
     </cr:journal_issue>
+  </xsl:template>
+
+  <xsl:template name="createContributors">
+    <xsl:param name="modsNode"/>
+    <xsl:for-each
+        select="$modsNode/mods:name[count(mods:displayForm)&gt;0]">
+      <xsl:choose>
+        <xsl:when test="@type='corporate'">
+          <xsl:call-template name="createOrganisationContributor">
+            <xsl:with-param name="modsName" select="."/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="@type='personal'">
+          <xsl:variable name="modsName" select="."/>
+          <xsl:call-template name="createPersonContributor">
+            <xsl:with-param name="modsName" select="."/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="createPersonContributor">
+    <xsl:param name="modsName"/>
+    <cr:person_name>
+      <xsl:call-template name="createRoleAttribute">
+        <xsl:with-param name="modsName" select="$modsName"/>
+      </xsl:call-template>
+      <xsl:for-each select="$modsName/mods:namePart[@type='given']">
+        <cr:given_name>
+          <xsl:value-of select="text()"/>
+        </cr:given_name>
+      </xsl:for-each>
+      <xsl:for-each select="$modsName/mods:namePart[@type='family']">
+        <cr:surname>
+          <xsl:value-of select="text()"/>
+        </cr:surname>
+      </xsl:for-each>
+    </cr:person_name>
+  </xsl:template>
+
+  <xsl:template name="createOrganisationContributor">
+    <xsl:param name="modsName"/>
+    <cr:organization>
+      <xsl:call-template name="createRoleAttribute">
+        <xsl:with-param name="modsName" select="$modsName"/>
+      </xsl:call-template>
+      <xsl:value-of select="$modsName/mods:displayForm"/>
+    </cr:organization>
+  </xsl:template>
+
+  <xsl:template name="createRoleAttribute">
+    <xsl:param name="modsName"/>
+    <xsl:variable name="mappedRole">
+      <xsl:call-template name="mapMarcRelator">
+        <xsl:with-param name="roleTerms"
+                        select="$modsName/mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']/text()"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:if test="string-length($mappedRole)&gt;0">
+      <xsl:attribute name="contributor_role">
+        <xsl:value-of select="$mappedRole"/>
+      </xsl:attribute>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="mapMarcRelator">
+    <xsl:param name="roleTerms"/>
+    <!-- chair??? ,review-assistant???,stats-reviewer ???,reviewer-external ???,reader ???-->
+    <xsl:variable name="mapping">
+      <aut>author</aut>
+      <edt>editor</edt>
+      <rev>reviewer</rev>
+      <trl>translator</trl>
+    </xsl:variable>
+    <xsl:if test="count($mapping/*[local-name()=$roleTerms])&gt;0">
+      <xsl:value-of select="$mapping/*[local-name()=$roleTerms][1]"/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="printModsPart">
