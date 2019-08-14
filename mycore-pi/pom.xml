@@ -118,6 +118,7 @@
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
     </dependency>
+    <?SORTPOM IGNORE?>
     <!-- don't change order of jmockit and junit prior junit 5+ -->
     <!-- jmockit have to be load before junit to run properly -->
     <dependency>
@@ -130,6 +131,7 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <?SORTPOM RESUME?>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-ifs</artifactId>
