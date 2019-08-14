@@ -147,7 +147,7 @@ End list of "top level" MODS elements
 			<xs:extension base="stringPlusLanguage">
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
-				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="xlink:simpleAttrs"/>
 				<xs:attribute name="shareable" fixed="no"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 				<xs:attributeGroup ref="altFormatAttributeGroup"/>
@@ -165,7 +165,7 @@ End list of "top level" MODS elements
 	<xs:complexType name="accessConditionDefinition" mixed="true">
 		<xs:complexContent mixed="true">
 			<xs:extension base="extensionDefinition">
-				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="xlink:simpleAttrs"/>
 				<xs:attributeGroup ref="languageAttributeGroup"/>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
@@ -328,7 +328,7 @@ End list of "top level" MODS elements
 	<xs:complexType name="physicalLocationDefinition">
 		<xs:simpleContent>
 			<xs:extension base="stringPlusLanguagePlusAuthority">
-				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="xlink:simpleAttrs"/>
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
 			</xs:extension>
@@ -363,7 +363,7 @@ End list of "top level" MODS elements
 						<xs:extension base="stringPlusLanguage">
 							<xs:attribute name="displayLabel" type="xs:string"/>
 							<xs:attribute name="type" type="xs:string"/>
-							<xs:attributeGroup ref="xlink:simpleLink"/>
+							<xs:attributeGroup ref="xlink:simpleAttrs"/>
 							<xs:attribute name="ID" type="xs:ID"/>
 						</xs:extension>
 					</xs:simpleContent>
@@ -509,7 +509,7 @@ Choice two.	With <etal>.
 		</xs:choice>
 		<xs:attribute name="ID" type="xs:ID"/>
 		<xs:attributeGroup ref="authorityAttributeGroup"/>
-		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		<xs:attributeGroup ref="languageAttributeGroup"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="altRepGroup" type="xs:string"/>
@@ -598,7 +598,7 @@ Choice two.	With <etal>.
 				<xs:element ref="nameIdentifier"/>				
 		</xs:choice>
 			<!-- -->
-		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		<xs:attributeGroup ref="languageAttributeGroup"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="altType" type="xs:string"/>
@@ -618,7 +618,7 @@ Choice two.	With <etal>.
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="typeURI" type="xs:anyURI"/>
-				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="xlink:simpleAttrs"/>
 				<xs:attribute name="ID" type="xs:ID"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 			</xs:extension>
@@ -867,7 +867,7 @@ Choice two.	With <etal>.
 				<xs:extension base="stringPlusLanguage">
 					<xs:attribute name="displayLabel" type="xs:string"/>
 					<xs:attribute name="type" type="xs:string"/>
-					<xs:attributeGroup ref="xlink:simpleLink"/>
+					<xs:attributeGroup ref="xlink:simpleAttrs"/>
 				</xs:extension>
 			</xs:simpleContent>
 		</xs:complexType>
@@ -948,7 +948,7 @@ Choice two.	With <etal>.
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="typeURI" type="xs:anyURI"/>
-				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="xlink:simpleAttrs"/>
 				<xs:attribute name="ID" type="xs:ID"/>
 			</xs:extension>
 		</xs:simpleContent>
@@ -1038,7 +1038,7 @@ Choice two.	With <etal>.
 		<xs:attribute name="otherTypeURI" type="xs:string"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="ID" type="xs:ID"/>
-		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		
 	</xs:complexType>
 	<!--  
@@ -1066,7 +1066,7 @@ Choice two.	With <etal>.
 		<xs:attribute name="ID" type="xs:ID"/>
 		<xs:attributeGroup ref="authorityAttributeGroup"/>
 		<xs:attributeGroup ref="languageAttributeGroup"/>
-		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="altRepGroup" type="xs:string"/>
 		<xs:attribute name="usage" fixed="primary"/>
@@ -1103,7 +1103,7 @@ Choice two.	With <etal>.
 		</xs:choice>
 		<xs:attribute name="ID" type="xs:ID"/>
 		<xs:attributeGroup ref="authorityAttributeGroup"/>
-		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		<xs:attributeGroup ref="languageAttributeGroup"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="type">
@@ -1142,7 +1142,7 @@ Choice two.	With <etal>.
 		</xs:attribute>
 		<xs:attribute name="ID" type="xs:ID"/>
 		<xs:attributeGroup ref="authorityAttributeGroup"/>
-		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		<xs:attributeGroup ref="languageAttributeGroup"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 	</xs:complexType>
@@ -1289,7 +1289,7 @@ Choice two.	With <etal>.
 			<xs:extension base="stringPlusLanguage">
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
-				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="xlink:simpleAttrs"/>
 				<xs:attribute name="shareable" fixed="no"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 				<xs:attributeGroup ref="altFormatAttributeGroup"/>
@@ -1345,7 +1345,7 @@ Choice two.	With <etal>.
 		<xs:attribute name="usage" fixed="primary"/>
 		<xs:attribute name="ID" type="xs:ID"/>
 		<xs:attributeGroup ref="authorityAttributeGroup"/>
-		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		<xs:attributeGroup ref="languageAttributeGroup"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 	</xs:complexType>
