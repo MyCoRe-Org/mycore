@@ -21,6 +21,7 @@ before_install:
   # geckodriver
   - sudo apt-get update
   - sudo apt-get upgrade
+  - java -version
   - |
         export PATH=$PWD/geckodriver/${GECKODRIVER_VERSION}:$PATH && \
         if ! type geckodriver/${GECKODRIVER_VERSION} > /dev/null 2>&1; then \
