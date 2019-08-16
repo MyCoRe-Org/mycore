@@ -114,11 +114,13 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         Set<String> paths = getServletContext().getResourcePaths(base);
 
         Set<String> more = new HashSet<>();
-        more.addAll(paths);
+        if (paths != null) {
+            more.addAll(paths);
 
-        for (String path : paths)
-            if (path.endsWith("/"))
-                more.addAll(diveInto(path));
+            for (String path : paths)
+                if (path.endsWith("/"))
+                    more.addAll(diveInto(path));
+        }
 
         return more;
     }
