@@ -24,7 +24,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-npmcopy');
-    grunt.loadNpmTasks('grunt-string-replace');
 
     var globalConfig = {
         projectBase: grunt.option('projectBase') || ''
@@ -42,19 +41,6 @@ module.exports = function (grunt) {
                     files: {
                         'epubjs': 'epubjs/dist',
                         'jszip': 'jszip/dist'
-                    }
-                }
-            },
-            "string-replace": {
-                dist: {
-                    files: {
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.js'
-                    },
-                    options: {
-                        replacements: [{
-                            pattern: 'this.settings.method = this.supportsSrcdoc ? "srcdoc" : "write";',
-                            replacement: 'this.settings.method = "write";'
-                        }]
                     }
                 }
             },
@@ -82,13 +68,6 @@ module.exports = function (grunt) {
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-tei.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-tei.js",
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-epub.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-epub.js"
 
-                    }
-                },
-                epubjs: {
-                    mangle: false,
-                    files: {
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.js',
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.legacy.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.legacy.js'
                     }
                 },
                 jszip: {
@@ -221,7 +200,7 @@ module.exports = function (grunt) {
         });
 
 
-    grunt.registerTask('default', ['ts', 'less', 'npmcopy', 'string-replace', 'uglify']);
+    grunt.registerTask('default', ['ts', 'less', 'npmcopy', 'uglify']);
 
 };
 

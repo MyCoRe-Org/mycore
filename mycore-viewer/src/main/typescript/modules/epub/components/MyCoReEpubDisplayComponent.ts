@@ -93,7 +93,8 @@ namespace mycore.viewer.components {
                 manager: 'continuous',
                 flow: 'scrolled',
                 width: '100%',
-                height: '100%'
+                height: '100%',
+                offset: 1 // required or the viewer will jump around on chapter change
             });
             this.rendition.display();
 
@@ -136,7 +137,7 @@ namespace mycore.viewer.components {
                 //let navigationPoint = book.navigation.get(section.start.href);
                 if (section.start.href !== this.currentHref) {
                     this.currentHref = section.start.href;
-                    this.trigger(new mycore.viewer.components.events.ChapterChangedEvent(this, idChapterMap.get(section.start.href)));
+                    //this.trigger(new mycore.viewer.components.events.ChapterChangedEvent(this, idChapterMap.get(section.start.href)));
                 }
             });
 
@@ -177,9 +178,11 @@ namespace mycore.viewer.components {
 
         private handleChapterChangedEvent(cce: mycore.viewer.components.events.ChapterChangedEvent) {
             const chapter = <widgets.epub.EpubStructureChapter>cce.chapter;
-            this.currentHref = chapter.id;
-            if (chapter.epubChapter !== null && cce.component !== this) {
-                this.rendition.display(chapter.epubChapter.href);
+            if (chapter != null || typeof chapter !== 'undefined') {
+                this.currentHref = chapter.id;
+                if (chapter.epubChapter !== null && cce.component !== this) {
+                    this.rendition.display(chapter.epubChapter.href);
+                }
             }
         }
     }
