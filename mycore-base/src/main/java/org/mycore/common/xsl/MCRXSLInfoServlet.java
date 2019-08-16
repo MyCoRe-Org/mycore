@@ -104,9 +104,11 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     }
 
     private void findXSLinLibJars() throws IOException {
-        for (String path : diveInto("/WEB-INF/lib/"))
-            if (path.endsWith(".jar"))
+        for (String path : diveInto("/WEB-INF/lib/")) {
+            if (path.endsWith(".jar")) {
                 findXSLinJar(path);
+            }
+        }
     }
 
     private Set<String> diveInto(String base) {
@@ -114,11 +116,15 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         Set<String> paths = getServletContext().getResourcePaths(base);
 
         Set<String> more = new HashSet<>();
-        more.addAll(paths);
+        if (paths != null) {
+            more.addAll(paths);
 
-        for (String path : paths)
-            if (path.endsWith("/"))
-                more.addAll(diveInto(path));
+            for (String path : paths) {
+                if (path.endsWith("/")) {
+                    more.addAll(diveInto(path));
+                }
+            }
+        }
 
         return more;
     }
@@ -131,8 +137,9 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
         for (ZipEntry ze = null; (ze = zis.getNextEntry()) != null;) {
             String name = ze.getName();
-            if (name.startsWith("xsl/") && name.endsWith(".xsl"))
+            if (name.startsWith("xsl/") && name.endsWith(".xsl")) {
                 foundStylesheet(name, pathOfJarFile);
+            }
             zis.closeEntry();
         }
         zis.close();
@@ -141,8 +148,9 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     private void findXSLinClassesDir() {
         String base = "/WEB-INF/classes/xsl/";
         for (String path : diveInto(base))
-            if (path.endsWith(".xsl"))
+            if (path.endsWith(".xsl")) {
                 foundStylesheet(path, base);
+            }
     }
 
     private void foundStylesheet(String path, String source) {
