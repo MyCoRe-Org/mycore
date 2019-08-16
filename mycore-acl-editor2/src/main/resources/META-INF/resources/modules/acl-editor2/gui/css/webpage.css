@@ -118,7 +118,7 @@ label{
 }
 
 #acle2-access-table th:nth-child(1) {
-	width: 20px; 
+	width: 20px;
 }
 
 #acle2-access-table td:nth-child(1) {
@@ -126,7 +126,7 @@ label{
 }
 
 #acle2-access-table th:nth-child(5) {
-	width: 30px; 
+	width: 30px;
 }
 #acle2-access-table td:nth-child(5) {
 	width: 30px;
@@ -146,8 +146,8 @@ select, textarea, input[type="text"]{
 }
 
 #acle2-access-table tr.odd {
-	background-color: #F9F9F9; 
-	
+	background-color: #F9F9F9;
+
 }
 
 #acle2-bottom-buttons{
@@ -191,11 +191,11 @@ select, textarea, input[type="text"]{
 }
 
 #acle2-rule-list li:nth-child(odd) {
-	background-color:#eee; 
+	background-color:#eee;
 }
 
 #acle2-rule-list li:nth-child(even) {
-	background-color:#fff; 
+	background-color:#fff;
 }
 
 #acle2-rule-list > li.acle2-rule-selected{
@@ -244,7 +244,7 @@ select, textarea, input[type="text"]{
 	display: none;
 }
 
-.form-group.has-error .select2-container .select2-choice{
+.form-group.mcr-invalid .select2-container .select2-choice{
 	color: #B94A48;
 	border-color: #B94A48;
 }

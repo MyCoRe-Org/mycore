@@ -20,11 +20,11 @@ var ACLEditor = function(){
 	var $this = this;
 	var i18nKeys =[];
 	var timeOutID = null;
-	
+
 	var ruleSelectorInstance;
 	var accessTableInstance;
 	var ruleListInstance;
-	
+
 	return {
 		init: function(ruleSelect, accessTable, ruleList){
 			$("body").on("change", "select", function() {
@@ -33,7 +33,7 @@ var ACLEditor = function(){
 				}
 				$(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
 			});
-			
+
 			$("body").on("change", ".acle2-access-rule-parent > .acle2-access-rule", function() {
 				var access = $(this).parents(".acle2-table-access-entry");
 				var json = {
@@ -44,40 +44,40 @@ var ACLEditor = function(){
 							"accessPoolNew": access.find(".acle2-access-pool").text(),
 							"accessRuleNew": access.find(".acle2-access-rule:not(.select2-container)").val()
 						};
-				editAccess(json); 
+				editAccess(json);
 				$(this).siblings("div.acle2-access-rule").attr("title", $(this).children("option:selected").attr("title"));
 			});
-			
+
 			$("body").on("click", "#acle2-button-new-access", function() {
-				$("#acle2-table-new-access > .form-group.has-error").removeClass("form-group has-error");
+				$("#acle2-table-new-access > .form-group.mcr-invalid").removeClass("form-group mcr-invalid");
 				var accessID = $("#acle2-new-access-id").val();
 				var accessPool = $("#acle2-new-access-pool").val();
 				var accessRule = $(".acle2-new-access-rule > select").val();
-				
+
 				if(accessID != "" &&  accessPool != "" && accessRule != "" && accessRule != "new"){
-					addAccess(accessID, accessPool , accessRule); 
+					addAccess(accessID, accessPool , accessRule);
 				}
 				else{
 					showAlert(geti18n("ACLE.alert.access.fields"));
 					if (accessID == ""){
-						$("#acle2-new-access-id").parent().addClass("form-group has-error");
+						$("#acle2-new-access-id").parent().addClass("form-group mcr-invalid");
 					}
 					if (accessPool == ""){
-						$("#acle2-new-access-pool").parent().addClass("form-group has-error");
+						$("#acle2-new-access-pool").parent().addClass("form-group mcr-invalid");
 					}
 					if (accessRule == "" || accessRule == "new"){
-						$(".acle2-new-access-rule").addClass("form-group has-error");
+						$(".acle2-new-access-rule").addClass("form-group mcr-invalid");
 					}
 				}
 			});
-						
+
 			$("body").on("click", "#acle2-button-remove-multi-access", function() {
 				var elm = $(".acle2-table-access-entry .acle2-access-select:checked").length;
 				if (elm > 0){
-					$(".acle2-table-access-entry .acle2-access-select:checked").each(function() {						
+					$(".acle2-table-access-entry .acle2-access-select:checked").each(function() {
 						var access = $(this).parents(".acle2-table-access-entry");
 						var p = $("<p></p>");
-						p.html(access.find(".acle2-access-id").text() + " : " + access.find(".acle2-access-pool").text() + " : " + access.find(".acle2-access-rule:not(.select2-container)").val()); 
+						p.html(access.find(".acle2-access-id").text() + " : " + access.find(".acle2-access-pool").text() + " : " + access.find(".acle2-access-rule:not(.select2-container)").val());
 						$("#acle2-lightbox-multi-delete-list").append(p);
 					});
 					$('#acle2-lightbox-multi-delete').modal('show');
@@ -86,7 +86,7 @@ var ACLEditor = function(){
 					showAlert(geti18n("ACLE.alert.access.edit.select.error"));
 				}
 			});
-					
+
 			$("body").on("click", "#acle2-lightbox-multi-delete-delete", function() {
 				var json = {
 						  "access": [],
@@ -100,14 +100,14 @@ var ACLEditor = function(){
 				$("#acle2-lightbox-multi-delete-list").html("");
 				$('#acle2-lightbox-multi-delete').modal('hide');
 			});
-			
+
 			$("body").on("hidden.bs.modal", "#acle2-lightbox-multi-delete", function() {
 				$("#acle2-lightbox-multi-delete-list").html("");
 			});
-						
+
 			$("body").on("click", "#acle2-new-rule-add", function() {
 				$("#acle2-lightbox-new-rule-alert-area").removeClass("in");
-				$("#acle2-lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
+				$("#acle2-lightbox-rule-detail-table > .form-group.mcr-invalid").removeClass("form-group mcr-invalid");
 				if ($(".acle2-new-rule-text").val() != ""){
 					addRule($("#acle2-new-rule-desc").val(), $(".acle2-new-rule-text").val());
 					$('#acle2-lightbox-new-rule').modal('hide');
@@ -116,29 +116,29 @@ var ACLEditor = function(){
 				}
 				else{
 					$("#acle2-lightbox-new-rule-alert-area").addClass("in");
-					$(".acle2-new-rule-text").parent().addClass("form-group has-error");
+					$(".acle2-new-rule-text").parent().addClass("form-group mcr-invalid");
 				}
 			});
-			
+
 			$("body").on("hidden.bs.modal", "#acle2-lightbox-new-rule", function() {
 				$("#acle2-lightbox-new-rule-alert-area").removeClass("in");
-				$("#acle2-lightbox-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
+				$("#acle2-lightbox-rule-detail-table > .form-group.mcr-invalid").removeClass("form-group mcr-invalid");
 				$("#acle2-new-rule-desc").val("");
 				$(".acle2-new-rule-text").val("");
 			});
-			
+
 			$("body").on("click", ".acle2-new-rule-cancel", function(event) {
 				$(".acle2-new-access-rule > select").select2("val", "");
 			});
-						
+
 			$("body").on("click", ".tab", function(event) {
 				event.preventDefault();
 			});
-			
+
 			$("body").on("click", ".acle2-rule-list-entry", function() {
 				ruleListInstance.select($(this).attr("ruleid"));
 			});
-			
+
 			$("body").on("click", "#acle2-button-delete-rule", function() {
 				var ruleID = $(this).parents("#acle2-rule-detail-table").find("#acle2-rule-detail-ruleID").html();
 				if ($("#acle2-rule-list .acle2-rule-selected[ruleid=" + ruleID + "]").hasClass("acle2-canDelete")){
@@ -148,9 +148,9 @@ var ACLEditor = function(){
 					showAlert(geti18n("ACLE.alert.rule.inUse"), false);
 				}
 			});
-			
+
 			$("body").on("click", "#acle2-button-save-rule", function() {
-				$("#acle2-rule-detail-table > .form-group.has-error").removeClass("form-group has-error");
+				$("#acle2-rule-detail-table > .form-group.mcr-invalid").removeClass("form-group mcr-invalid");
 				if ($(".acle2-rule-detail-ruleText").val() != ""){
 					if ($("#acle2-rule-detail-ruleID").html() == ""){
 						addRule($("#acle2-rule-detail-ruleDesc").val(), $(".acle2-rule-detail-ruleText").val());
@@ -160,11 +160,11 @@ var ACLEditor = function(){
 					}
 				}
 				else{
-					$(".acle2-rule-detail-ruleText").parent().addClass("form-group has-error");
-					showAlert(geti18n("ACLE.alert.rule.noRule"))	
+					$(".acle2-rule-detail-ruleText").parent().addClass("form-group mcr-invalid");
+					showAlert(geti18n("ACLE.alert.rule.noRule"))
 				}
 			});
-			
+
 			$("body").on("click", "#acle2-button-select-multi-access", function() {
 				if ($(this).is(":checked")){
 					$(".acle2-access-select:visible").prop("checked", true);
@@ -173,17 +173,17 @@ var ACLEditor = function(){
 					$(".acle2-access-select:visible").prop("checked", false);
 				}
 			});
-			
+
 			$("body").on("click", "#acle2-button-access-filter", function() {
 				filterTable();
 			});
-			
+
 			$("body").on("keydown", ".acle2-access-filter-input", function(key) {
 				if(key.which == 13) {
 					filterTable();
 				}
 			});
-			
+
 			$("body").on("click", ".acle2-button-edit", function() {
 				var elm = $(this).parent();
 				if(!elm.hasClass("acle2-show-input")){
@@ -194,10 +194,10 @@ var ACLEditor = function(){
 					elm.addClass("acle2-show-input");
 				}
 			});
-			
+
 			$("body").on("keydown", ".acle2-table-access-entry-input", function(key) {
 				if(key.which == 13) {
-					$(".acle2-edit").find(".acle2-show-input").removeClass("form-group has-error");
+					$(".acle2-edit").find(".acle2-show-input").removeClass("form-group mcr-invalid");
 					var parent = $(this).parent();
 					var entry = parent.parent();
 					if($(this).val() != parent.attr("title")){
@@ -207,9 +207,9 @@ var ACLEditor = function(){
 								"mode": "idPool",
 								"accessIDNew": "",
 								"accessPoolNew": "",
-								"accessRuleNew": ""						
+								"accessRuleNew": ""
 							};
-						 
+
 						json.accessIDNew = entry.find(".acle2-access-id").hasClass("acle2-show-input") ? entry.find(".acle2-access-id input").val() : entry.find(".acle2-access-id").text();
 						json.accessPoolNew = entry.find(".acle2-access-pool").hasClass("acle2-show-input") ? entry.find(".acle2-access-pool input").val() : entry.find(".acle2-access-pool").text();
 						json.accessRuleNew = entry.find(".acle2-access-rule:not(.select2-container)").val();
@@ -225,13 +225,13 @@ var ACLEditor = function(){
 					}
 				}
 				if(key.which == 27) {
-					$(".acle2-edit").find(".acle2-show-input").removeClass("form-group has-error");
+					$(".acle2-edit").find(".acle2-show-input").removeClass("form-group mcr-invalid");
 					var parent = $(this).parent();
 					var entry = parent.parent();
 					accessTableInstance.edit(entry, entry.find(".acle2-access-id").attr("title"), entry.find(".acle2-access-pool").attr("title"), entry.find(".acle2-access-rule:not(.select2-container)").val());
 				}
 			});
-			
+
 			$("body").on("click", ".sort-table-head", function() {
 				if($(this).data("sort-dir") == "asc"){
 					$(".fa-chevron-up").removeClass("fa-chevron-up");
@@ -244,19 +244,19 @@ var ACLEditor = function(){
 					$(this).children(".sort-icon").addClass("fa-chevron-down")
 				}
 			});
-			
+
 			$("body").on("keydown", "#acle2-elem-per-page", function(key) {
 				if(key.which == 13) {
 					splitTable();
 				}
 			});
-			
+
 			$("body").on("click", "#acle2-button-filter-rule", function() {
 				$("#acle2-access-filter-input-rule").val($(this).parents("#acle2-rule-detail-table").find("#acle2-rule-detail-ruleID").html());
 				filterTable();
 				$("#acle2-ruleAllocation-tab").tab("show");
 			});
-						
+
 			$("body").on("click", "#acle2-button-edit-multi-access", function() {
 				var elm = $(".acle2-table-access-entry .acle2-access-select:checked").length;
 				if (elm > 0){
@@ -267,12 +267,12 @@ var ACLEditor = function(){
 				}
 				else{
 					showAlert(geti18n("ACLE.alert.access.edit.select.error"));
-				}				
+				}
 			});
-			
+
 			$("body").on("click", "#acle2-lightbox-multi-edit-edit", function() {
 				$("#acle2-lightbox-multi-edit-alert-area").removeClass("in");
-				$("#acle2-lightbox-multi-edit-select").removeClass("form-group has-error");
+				$("#acle2-lightbox-multi-edit-select").removeClass("form-group mcr-invalid");
 				if ($("#acle2-lightbox-multi-edit-select select").val() != ""){
 					var json = {
 							  "access": [],
@@ -288,16 +288,16 @@ var ACLEditor = function(){
 				}
 				else{
 					$("#acle2-lightbox-multi-edit-alert-area").addClass("in");
-					$("#acle2-lightbox-multi-edit-select").addClass("form-group has-error");
+					$("#acle2-lightbox-multi-edit-select").addClass("form-group mcr-invalid");
 				}
 			});
-			
+
 			$("body").on("click", "#acle2-lightbox-multi-edit-plus", function() {
 				if ($("#acle2-lightbox-multi-edit-list:visible").length == 0){
-					$(".acle2-table-access-entry .acle2-access-select:checked").each(function() {						
+					$(".acle2-table-access-entry .acle2-access-select:checked").each(function() {
 						var access = $(this).parents(".acle2-table-access-entry");
 						var p = $("<p></p>");
-						p.html(access.find(".acle2-access-id").text() + " : " + access.find(".acle2-access-pool").text() + " : " + access.find(".acle2-access-rule:not(.select2-container)").val()); 
+						p.html(access.find(".acle2-access-id").text() + " : " + access.find(".acle2-access-pool").text() + " : " + access.find(".acle2-access-rule:not(.select2-container)").val());
 						$("#acle2-lightbox-multi-edit-list").append(p);
 					});
 					$("#acle2-lightbox-multi-edit-list").show();
@@ -311,17 +311,17 @@ var ACLEditor = function(){
 					$("#acle2-lightbox-multi-edit-plus").removeClass("fa-minus");
 				}
 			});
-			
+
 			$("body").on("hidden.bs.modal", "#acle2-lightbox-multi-edit", function() {
 				hideMultiEdit();
 			});
-			
+
 			$("body").on("click", ".acle2-button-filter-access", function() {
 				ruleListInstance.select($(this).parents(".acle2-table-access-entry").find("select.acle2-access-rule").val());
 				$("#acle2-rules-tab").tab("show");
 				$('#acle2-rule-list').animate({scrollTop: $('#acle2-rule-list > .acle2-rule-selected').index() * $('#acle2-rule-list > .acle2-rule-selected').outerHeight()});
 			});
-			
+
 			ruleSelectorInstance = ruleSelect;
 			accessTableInstance = accessTable;
 			ruleListInstance = ruleList;
@@ -335,7 +335,7 @@ var ACLEditor = function(){
 			$.fn.modal.Constructor.prototype.enforceFocus = function() {};
 		}
 	}
-	
+
 	function getAccess(){
 		$.ajax({
 			url: ".",
@@ -356,7 +356,7 @@ var ACLEditor = function(){
 					}
 		});
 	}
-	
+
 	function addAccess(accessID, accessPool, rule){
 		$.ajax({
 			url: ".",
@@ -383,7 +383,7 @@ var ACLEditor = function(){
 			}
 		});
 	}
-	
+
 	function editAccess(json){
 		$.ajax({
 			url: ".",
@@ -400,7 +400,7 @@ var ACLEditor = function(){
 					$(".acle2-edit").removeClass("acle2-edit");
 				},
 				409: function() {
-					$(".acle2-edit").find(".acle2-show-input").addClass("form-group has-error");
+					$(".acle2-edit").find(".acle2-show-input").addClass("form-group mcr-invalid");
 					showAlert(geti18n("ACLE.alert.access.add.exist"));
 				},
 				500: function(error) {
@@ -409,7 +409,7 @@ var ACLEditor = function(){
 			}
 		});
 	}
-	
+
 	function editMultiAccess(json){
 		$.ajax({
 			url: "multi",
@@ -434,7 +434,7 @@ var ACLEditor = function(){
 			}
 		});
 	}
-	
+
 	function removeAccess(json){
 		$.ajax({
 			url: ".",
@@ -465,7 +465,7 @@ var ACLEditor = function(){
 		$(".acle2-access-select:checked").prop("checked", false);
 		$('#acle2-button-select-multi-access:checked').prop("checked", false);
 	}
-	
+
 	function addRule(ruleDesc, ruleText){
 		$.ajax({
 			url: "rule",
@@ -497,7 +497,7 @@ var ACLEditor = function(){
 			}
 		});
 	}
-	
+
 	function removeRule(ruleID){
 		$.ajax({
 			url: "rule",
@@ -526,7 +526,7 @@ var ACLEditor = function(){
 			}
 		});
 	}
-	
+
 	function editRule(ruleID, ruleDesc, ruleText){
 		$.ajax({
 			url: "rule",
@@ -558,7 +558,7 @@ var ACLEditor = function(){
 		filterID = filterID.replace("?", ".?");
 		filterID = filterID.replace("(", "\\(");
 		filterID = filterID.replace(")", "\\)");
-		
+
 		if(filterID != ""){
 			$(".acle2-table-access-entry")
 		    .filter(function() {
@@ -566,13 +566,13 @@ var ACLEditor = function(){
 		    })
 		    .removeClass("acle2-filter-hide");
 		}
-		
+
 		var filterPool = $("#acle2-access-filter-input-pool").val();
 		filterPool = filterPool.replace("*", ".*");
 		filterPool = filterPool.replace("?", ".?");
 		filterPool = filterPool.replace("(", "\\(");
 		filterPool = filterPool.replace(")", "\\)");
-		
+
 		if(filterPool != ""){
 			$(".acle2-table-access-entry")
 		    .filter(function() {
@@ -580,20 +580,20 @@ var ACLEditor = function(){
 		    })
 		    .removeClass("acle2-filter-hide");
 		}
-		
+
 	    var filterRule = $("#acle2-access-filter-input-rule").val();
 		filterRule = filterRule.replace("*", ".*");
 		filterRule = filterRule.replace("?", ".?");
 		filterRule = filterRule.replace("(", "\\(");
 		filterRule = filterRule.replace(")", "\\)");
-		
+
 	    if(filterRule != ""){
 			$(".acle2-table-access-entry")
 		    .filter(function() {
 		        return $(this).find(".acle2-access-rule option:selected").val().match(new RegExp("^" + filterRule, "i"));
 		    })
 		    .removeClass("acle2-filter-hide");
-			
+
 			$(".acle2-table-access-entry")
 		    .filter(function() {
 		        return $(this).find(".acle2-access-rule option:selected").html().match(new RegExp("^" + filterRule, "i"));
@@ -606,7 +606,7 @@ var ACLEditor = function(){
 	    splitTable();
 		accessTableInstance.zebra();
 	}
-		
+
 	function showAlert(text, success) {
 		$('#acle2-alert-area').removeClass("in");
 		$("#acle2-alert-area").removeClass("alert-success");
@@ -630,7 +630,7 @@ var ACLEditor = function(){
 				$("#acle2-alert-area").removeClass("alert-danger");
 			}, 5000);
 	}
-	
+
 	function addTypeahead() {
 		var ids = new Array();
 		$.each($(".acle2-access-id"), function() {
@@ -642,7 +642,7 @@ var ACLEditor = function(){
 			  name: 'access-ids',
               source: ids
 			});
-		
+
 		var pools = new Array();
 		$.each($(".acle2-access-pool"), function() {
 			if($.inArray($(this).attr("title"), pools) == -1){
@@ -653,7 +653,7 @@ var ACLEditor = function(){
 			  name: 'access-pools',
               source: pools
 			});
-		
+
 		var rules = new Array();
 		$.each($(".acle2-access-rule option:selected"), function() {
 			if($.inArray($(this).val(), rules) == -1){
@@ -668,7 +668,7 @@ var ACLEditor = function(){
 			  source: rules
 			});
 	}
-	
+
 	function splitTable() {
 		var elemPerPage = $("#acle2-elem-per-page-input").val();
 		$("#acle2-access-table tbody tr:not(.acle2-filter-hide)").each(function(i, row){
@@ -679,7 +679,7 @@ var ACLEditor = function(){
 		$("#acle2-access-table tbody tr:not(.acle2-filter-hide)").addClass("acle2-page-hide");
 		$("[data-page=1]").removeClass("acle2-page-hide");
 	}
-	
+
 	function buildPaginator(page) {
 		$(".pagination").html("");
 		pagecount = Math.ceil($("#acle2-access-table tbody tr:not(.acle2-filter-hide)").size() / $("#acle2-elem-per-page-input").val());
@@ -738,7 +738,7 @@ var ACLEditor = function(){
 					else{
 						addPageToPaginator(i, i, "");
 					}
-					
+
 				}
 			}
 			else{
@@ -746,7 +746,7 @@ var ACLEditor = function(){
 			}
 		}
 	}
-	
+
 	function addPageToPaginator(href, name, state) {
 		if (state == ""){
 			var pageButton = $('<a  class="page-link" href="#" onclick="return false;">' + name + '</a>');
@@ -760,7 +760,7 @@ var ACLEditor = function(){
 		}
 		$('<li class="page-item"></li>').append(pageButton).addClass(state).appendTo('.pagination');
 	}
-	
+
 	function refreshPageNumbers() {
 		var elemPerPage = $("#acle2-elem-per-page-input").val();
 		$("#acle2-access-table tbody tr:not(.acle2-filter-hide)").each(function(i, row){
@@ -772,25 +772,25 @@ var ACLEditor = function(){
 		}
 		else{
 			showPage($(".pagination .active span").html());
-		}	
+		}
 	}
-	
+
 	function showPage(num) {
 		$("#acle2-access-table tbody tr:not(.acle2-filter-hide)").addClass("acle2-page-hide");
 		$(".acle2-access-select:checked").parents(".acle2-table-access-entry").removeClass("acle2-page-hide");
 		$("[data-page=" + num + "]").removeClass("acle2-page-hide");
 	}
-	
+
 	function formatSelect(item) {
 		var span = $("<span></span>")
 		span.text($(item.element).text());
 		span.attr("title", $(item.element).attr("title"));
 		return span;
 	}
-	
+
 	function hideMultiEdit() {
 		$("#acle2-lightbox-multi-edit-alert-area").removeClass("in");
-		$("#acle2-lightbox-multi-edit-select").removeClass("form-group has-error");
+		$("#acle2-lightbox-multi-edit-select").removeClass("form-group mcr-invalid");
 		$("#acle2-lightbox-multi-edit-list").html("");
 		$("#acle2-lightbox-multi-edit-list").hide();
 		$("#acle2-lightbox-multi-edit-select").find("select").select2("destroy");
@@ -798,7 +798,7 @@ var ACLEditor = function(){
 		$("#acle2-lightbox-multi-edit-plus").addClass("fa-plus");
 		$("#acle2-lightbox-multi-edit-plus").removeClass("fa-minus");
 	}
-	
+
 	function geti18n(key) {
 		var string = i18nKeys[key];
 		if (string != undefined){

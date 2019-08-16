@@ -50,7 +50,7 @@
   <xsl:template match="login" mode="userAction">
     <xsl:apply-templates select="form" />
   </xsl:template>
-  
+
   <xsl:template match="form">
     <form action="{@action}{$HttpSession}" method="post" role="form" class="form-login">
       <h2 class="form-login-heading">
@@ -84,7 +84,7 @@
       </div>
     </form>
   </xsl:template>
-  
+
   <xsl:template match="input">
     <xsl:choose>
       <xsl:when test="@isHidden='true'">
@@ -138,7 +138,7 @@
     <xsl:attribute name="class">
       <xsl:value-of select="'form-group'" />
       <xsl:if test="@loginFailed='true'">
-        <xsl:value-of select="' has-error'" />
+        <xsl:value-of select="' mcr-invalid'" />
       </xsl:if>
     </xsl:attribute>
   </xsl:template>

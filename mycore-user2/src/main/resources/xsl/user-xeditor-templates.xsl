@@ -44,7 +44,7 @@
         </xsl:when>
         <xsl:otherwise>
           <div>
-            <xsl:variable name="rclass"> 
+            <xsl:variable name="rclass">
               <xsl:if test="@required = 'true'"> required </xsl:if>
             </xsl:variable>
             <xsl:attribute name="class">form-group {$xed-validation-marker} row <xsl:value-of select="$rclass"/></xsl:attribute>
@@ -150,7 +150,7 @@
 
   <xsl:template match="mcruser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]" mode="validation">
     <xsl:if test="@required = 'true' or @validate = 'true'">
-      <xed:if test="contains($xed-validation-marker, 'has-error')">
+      <xed:if test="contains($xed-validation-marker, 'mcr-invalid')">
         <span class="fas fa-exclamation-triangle form-control-feedback" data-toggle="tooltip" data-placement="top" title="{concat('{i18n:', @i18n.error, '}')}"></span>
       </xed:if>
       <xed:validate display="local" required="{@required}">
