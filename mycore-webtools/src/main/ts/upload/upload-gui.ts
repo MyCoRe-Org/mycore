@@ -249,10 +249,10 @@ namespace mycore.upload {
         private showCommitWarning(show:boolean) {
             const warning = this._uploadBox.querySelector(".mcr-commit-warn");
 
-            if(show && warning.classList.contains("hidden")){
-                warning.classList.remove("hidden");
-            } else if(!show && !warning.classList.contains("hidden")){
-                warning.classList.add("hidden");
+            if(show && warning.classList.contains("d-none")){
+                warning.classList.remove("d-none");
+            } else if(!show && !warning.classList.contains("d-none")){
+                warning.classList.add("d-none");
             }
         }
     }
@@ -296,36 +296,38 @@ namespace mycore.upload {
 
         private static _boxTemplate =
             `<div class="mcr-upload">
-    <div class="panel panel-default" style="height: 100%;">
-        <div class="panel-heading">
+    <div class="card" style="height: 100%;">
+        <div class="card-header">
             <span class="mcr-upload-title" data-i18n="component.webtools.upload.title"></span>
-            <span class="fas fa-window-minimize pull-right" style="font-size: 11px;line-height: 22px;"></span></div>
-        <div class="panel-body mcr-upload-entry-list" style="overflow-y:  scroll;">
-            <div class="row hidden mcr-commit-warn bg-info">
-                <div class="col-md-12" data-i18n="component.webtools.upload.processing"></div>
-            </div>
-            <div class="row status">
-                <div class="col-md-8 mcr-upload-transfer-all-progress"></div>
-
-                <small class="col-md-3 mcr-upload-transfer-all-rate"></small>
-                <div class="col-md-1">
-                    <span class="text-danger fas fa-times mcr-upload-transfer-all-abort"></span>
+            <span class="fas fa-window-minimize float-right" style="font-size: 11px;line-height: 22px;"></span></div>
+        <div class="card-body mcr-upload-entry-list" style="overflow-y:  scroll;">
+            <div class="container-fluid">
+                <div class="row d-none mcr-commit-warn bg-info">
+                    <div class="col-12" data-i18n="component.webtools.upload.processing"></div>
                 </div>
+                <div class="row status">
+                    <div class="col mcr-upload-transfer-all-progress"></div>
+    
+                    <small class="col-2 mcr-upload-transfer-all-rate"></small>
+                    <div class="col-1">
+                        <span class="text-danger fas fa-times mcr-upload-transfer-all-abort" style="cursor: pointer;"></span>
+                    </div>
+                </div>
+                <div class="d-none mcr-upload-active-insert-marker"></div>
             </div>
-            <div class="hidden mcr-upload-active-insert-marker"></div>
         </div>
     </div>
 </div>`;
 
 
         private static _entryTemplate = `<div class="entry row">
-    <span class="col-md-5 mcr-upload-file-name"></span>
-    <small class="col-md-3 mcr-upload-file-size"></small>
-    <small class="col-md-3 mcr-upload-transfer-rate"></small>
-    <div class="col-md-1">
-        <span class="text-danger fas fa-times mcr-upload-abort-transfer"></span>
+    <span class="col mcr-upload-file-name"></span>
+    <small class="col-2 mcr-upload-file-size"></small>
+    <small class="col-2 mcr-upload-transfer-rate"></small>
+    <div class="col-1">
+        <span class="text-danger fas fa-times mcr-upload-abort-transfer" style="cursor: pointer;"></span>
     </div>
-    <div class="col-md-12">
+    <div class="col-12 pb-2 pt-2">
         <div class="progress">
             <div class="progress-bar mcr-upload-progressbar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
                  aria-valuemax="100" style="width:0%">

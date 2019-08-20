@@ -6,7 +6,8 @@
     min-height: 200px;
     min-width: 200px;
     height: 33%;
-    width: 33%;
+    width: 50%;
+    z-index: 25;
 }
 
 .mcr-upload .entry {
