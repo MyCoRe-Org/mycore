@@ -425,3 +425,28 @@ select, textarea, input[type="text"]{
 .tt-suggestion p {
     margin: 0;
 }
+
+
+/* bootstrap 4 fix
+ * this is only a workaround for server side validation, we should
+ * refacture the html an use html5 features here - TODO
+ */
+.mcr-invalid {
+  label {
+    color: red;
+  }
+  input,
+  select {
+    border: 1px solid red;
+    padding-right: calc((1em + .75rem) * 3 / 4 + 1.75rem);
+  }
+}
+.mcr-valid {
+  label {
+    color: green;
+  }
+  input,
+  select {
+    border: 1px solid green;
+  }
+}
