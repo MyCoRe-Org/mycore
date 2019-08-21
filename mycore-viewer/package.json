@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "epubjs": "0.3.84",
+    "es6-promise": "^4.2.8",
     "jszip": "^3.2.1"
   },
   "devDependencies": {

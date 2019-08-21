@@ -40,7 +40,8 @@ module.exports = function (grunt) {
                     },
                     files: {
                         'epubjs': 'epubjs/dist',
-                        'jszip': 'jszip/dist'
+                        'jszip': 'jszip/dist',
+                        'es6-promise': 'es6-promise/dist'
                     }
                 }
             },
