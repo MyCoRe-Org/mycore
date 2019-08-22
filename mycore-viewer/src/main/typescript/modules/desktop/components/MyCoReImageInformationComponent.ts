@@ -38,7 +38,7 @@ namespace mycore.viewer.components {
             this._scaleEdit.appendTo(this._scaleEditForm);
             this.initScaleChangeLogic();
 
-            this._informationBar.addClass("well");
+            this._informationBar.addClass("card");
             this._imageLabel = jQuery("<span></span>");
             this._imageLabel.addClass("imageLabel");
             this._imageLabel.appendTo(this._informationBar);
