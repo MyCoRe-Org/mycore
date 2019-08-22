@@ -139,7 +139,8 @@ namespace mycore.viewer.components {
         }
 
         private getBaseURL(file) {
-            var pattern = Utils.getVar<string>(this._settings, 'permalink.viewerLocationPattern', '{baseURL}/rsc/viewer/{derivate}/{file}', (p) => p != null);
+            let iiif = (location.href.indexOf("/iiif/") > 0) ? "iiif/" : "";
+            var pattern = Utils.getVar<string>(this._settings, 'permalink.viewerLocationPattern', '{baseURL}/rsc/viewer/' + iiif + '{derivate}/{file}', (p) => p != null);
             return ViewerFormatString(pattern, {
                 baseURL : this._settings.webApplicationBaseURL,
                 derivate : this._settings.derivate,

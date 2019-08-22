@@ -41,7 +41,9 @@ namespace mycore.viewer.model {
             public mimetype: string,
             public requestImgdataUrl: (callback: (imgdata: string) => void) => void,
             public additionalHrefs = new MyCoReMap<string, string>(),
-            uniqueIdentifier?: string) {
+            uniqueIdentifier?: string,
+            public width?: number,
+            public height?: number) {
             if (typeof uniqueIdentifier == "undefined" || uniqueIdentifier == null || uniqueIdentifier == "") {
                 this.uniqueIdentifier = null;
             } else {
