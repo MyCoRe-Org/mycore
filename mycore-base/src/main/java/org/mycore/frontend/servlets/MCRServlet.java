@@ -109,12 +109,7 @@ public class MCRServlet extends HttpServlet {
         return LAYOUT_SERVICE;
     }
 
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        if (LAYOUT_SERVICE == null) {
-            LAYOUT_SERVICE = MCRLayoutService.instance();
-        }
+    static {
         try {
             SESSION_NETMASK_IPV4 = InetAddress.getByName(SESSION_NETMASK_IPV4_STRING).getAddress();
         } catch (UnknownHostException e) {
@@ -126,6 +121,14 @@ public class MCRServlet extends HttpServlet {
         } catch (UnknownHostException e) {
             throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv6 is not a correct IPv6 network mask.",
                 e);
+        }
+    }
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        if (LAYOUT_SERVICE == null) {
+            LAYOUT_SERVICE = MCRLayoutService.instance();
         }
     }
 
