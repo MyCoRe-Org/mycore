@@ -43,6 +43,10 @@ public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLink
             contentList.add(classElement);
         });
 
+        final Element displayElement = new Element("display");
+        displayElement.setText(Boolean.toString(der.getDerivate().isDisplayEnabled()));
+        contentList.add(displayElement);
+
         derivateLinkID.setContentList(contentList);
         return derivateLinkID;
     }
