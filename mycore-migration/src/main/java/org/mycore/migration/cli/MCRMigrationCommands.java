@@ -60,6 +60,8 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -67,8 +69,10 @@ import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
+import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -316,7 +320,22 @@ public class MCRMigrationCommands {
     }
 
     // 2018 -> 2019
-    @MCRCommand(syntax = "migrate derivatelink for object {0}", help = "Migrates the Order of derivates from object {0} to derivate (MCR-2003)")
+    @MCRCommand(syntax = "migrate all derivates", help = "Migrates the order and label of all derivates (MCR-2003, MCR-2099)")
+    public static List<String> migrateAllDerivates() {
+        List<String> objectTypes = MCRObjectID.listTypes();
+        objectTypes.remove("derivate");
+        objectTypes.remove("class");
+        
+        ArrayList<String> commands = new ArrayList<>();
+        for(String t : objectTypes) {
+            for (String objID : MCRXMLMetadataManager.instance().listIDsOfType(t)) {
+                commands.add("migrate derivatelink for object " + objID);
+            }
+        }
+        return commands;
+    }
+    
+    @MCRCommand(syntax = "migrate derivatelink for object {0}", help = "Migrates the Order of derivates from object {0} to derivate (MCR-2003, MCR-2099)")
     public static List<String> migrateDerivateLink(String objectIDStr) {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
 
@@ -328,11 +347,11 @@ public class MCRMigrationCommands {
         final List<MCRMetaEnrichedLinkID> derivates = mcrObject.getStructure().getDerivates();
 
         return derivates.stream().map(
-            (der) -> "set order of derivate " + der.getXLinkHrefID().toString() + " to " + (
+            (der) -> "migrate derivate " + der.getXLinkHrefID().toString() + " using order " + (
                 derivates.indexOf(der) + 1)).collect(Collectors.toList());
     }
-
-    @MCRCommand(syntax = "set order of derivate {0} to {1}", help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
+    
+    @MCRCommand(syntax = "migrate derivate {0} using order {1}", help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
     public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
         final int order = Integer.parseInt(orderStr);
 
@@ -344,8 +363,31 @@ public class MCRMigrationCommands {
 
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         derivate.setOrder(order);
+        
+        //migrate label to classification 
+        //(only if label looks like an identifier and exists in derivate_type classification)
+        String label = derivate.getLabel();
+        if (label != null && label.length() > 0 && !label.contains(" ")) {
+            if (MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID("derivate_types", label))) {
+                derivate.getDerivate().getClassifications()
+                        .add(new MCRMetaClassification("classification", 0, null, "derivate_types", label));
+                derivate.setLabel(null);
+            } else {
+                LOGGER.warn("Classification 'derivate_types' does not contain a category with ID: " + label);
+            }
+        }
+        
+        //migrate title:
+        //in professorenkatalog we used a service flag to store the title -> should be moved to titles/tile
+        if("person".equals(derivate.getOwnerID().getTypeId())){
+            if (derivate.getService().getFlags("title").size() > 0) {
+               String title = derivate.getService().getFlags("title").get(0);
+               derivate.getDerivate().getTitles().add(new MCRMetaLangText("title", "de", null, 0, "main", title));
+               derivate.getService().removeFlags("title");
+           }
+        }
+        
+        //update derivate
         MCRMetadataManager.update(derivate);
-
     }
-
 }

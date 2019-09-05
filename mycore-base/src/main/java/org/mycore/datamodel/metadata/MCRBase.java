@@ -225,10 +225,13 @@ public abstract class MCRBase {
      *            the object label
      */
     public final void setLabel(String label) {
-        mcr_label = label.trim();
-
-        if (mcr_label.length() > MAX_LABEL_LENGTH) {
-            mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
+        if (label == null) {
+            mcr_label = label;
+        } else {
+            mcr_label = label.trim();
+            if (mcr_label.length() > MAX_LABEL_LENGTH) {
+                mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
+            }
         }
     }
 

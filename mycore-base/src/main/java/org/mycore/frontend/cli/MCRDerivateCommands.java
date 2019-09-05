@@ -917,5 +917,21 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     public static void testRenameFile(String filename, String pattern, String newName) {
         MCRDerivateUtil.testRenameFile(filename, pattern, newName);
     }
+    
+    @MCRCommand(syntax = "set order of derivate {0} to {1}", help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
+    public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
+        final int order = Integer.parseInt(orderStr);
+
+        final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDStr);
+
+        if (!MCRMetadataManager.exists(derivateID)) {
+            throw new MCRException("The object " + derivateIDStr + "does not exist!");
+        }
+
+        final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+        derivate.setOrder(order);
+        MCRMetadataManager.update(derivate);
+
+    }
 
 }
