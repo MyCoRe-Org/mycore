@@ -204,7 +204,8 @@ public class MCRMigrationCommands {
                     changedObject = true;
                 } else {
                     LOGGER.warn(
-                        "{} of {} isn't URI encoded and cannot be found on file system. This is most likly a dead link.",
+                        "{} of {} isn't URI encoded and cannot be found on file system." 
+                           + " This is most likly a dead link.",
                         href, objectID);
                 }
             }
@@ -320,7 +321,8 @@ public class MCRMigrationCommands {
     }
 
     // 2018 -> 2019
-    @MCRCommand(syntax = "migrate all derivates", help = "Migrates the order and label of all derivates (MCR-2003, MCR-2099)")
+    @MCRCommand(syntax = "migrate all derivates",
+        help = "Migrates the order and label of all derivates (MCR-2003, MCR-2099)")
     public static List<String> migrateAllDerivates() {
         List<String> objectTypes = MCRObjectID.listTypes();
         objectTypes.remove("derivate");
@@ -335,7 +337,8 @@ public class MCRMigrationCommands {
         return commands;
     }
     
-    @MCRCommand(syntax = "migrate derivatelink for object {0}", help = "Migrates the Order of derivates from object {0} to derivate (MCR-2003, MCR-2099)")
+    @MCRCommand(syntax = "migrate derivatelink for object {0}",
+        help = "Migrates the Order of derivates from object {0} to derivate (MCR-2003, MCR-2099)")
     public static List<String> migrateDerivateLink(String objectIDStr) {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
 
@@ -351,7 +354,8 @@ public class MCRMigrationCommands {
                 derivates.indexOf(der) + 1)).collect(Collectors.toList());
     }
     
-    @MCRCommand(syntax = "migrate derivate {0} using order {1}", help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
+    @MCRCommand(syntax = "migrate derivate {0} using order {1}", 
+        help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
     public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
         final int order = Integer.parseInt(orderStr);
 
@@ -379,12 +383,11 @@ public class MCRMigrationCommands {
         
         //migrate title:
         //in professorenkatalog we used a service flag to store the title -> should be moved to titles/tile
-        if("person".equals(derivate.getOwnerID().getTypeId())){
-            if (derivate.getService().getFlags("title").size() > 0) {
+        if("person".equals(derivate.getOwnerID().getTypeId())
+            && derivate.getService().getFlags("title").size() > 0) {
                String title = derivate.getService().getFlags("title").get(0);
                derivate.getDerivate().getTitles().add(new MCRMetaLangText("title", "de", null, 0, "main", title));
                derivate.getService().removeFlags("title");
-           }
         }
         
         //update derivate

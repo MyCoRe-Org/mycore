@@ -912,13 +912,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "test rename file {0} with {1} to {2}",
-        help = "Tests the rename pattern {1} on one file {0} and replaces it with {2}, so you can try the rename befor"
-            + " renaming all files. This command does not change any files.")
+        help = "Tests the rename pattern {1} on one file {0} and replaces it with {2}, so you can try the rename"
+            + " before renaming all files. This command does not change any files.")
     public static void testRenameFile(String filename, String pattern, String newName) {
         MCRDerivateUtil.testRenameFile(filename, pattern, newName);
     }
     
-    @MCRCommand(syntax = "set order of derivate {0} to {1}", help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
+    @MCRCommand(syntax = "set order of derivate {0} to {1}",
+        help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
     public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
         final int order = Integer.parseInt(orderStr);
 
