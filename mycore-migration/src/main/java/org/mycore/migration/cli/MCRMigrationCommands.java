@@ -368,7 +368,7 @@ public class MCRMigrationCommands {
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         derivate.setOrder(order);
         
-        //migrate label to classification 
+        //migrate label to classification:
         //(only if label looks like an identifier and exists in derivate_type classification)
         String label = derivate.getLabel();
         if (label != null && label.length() > 0 && !label.contains(" ")) {
@@ -383,8 +383,7 @@ public class MCRMigrationCommands {
         
         //migrate title:
         //in professorenkatalog we used a service flag to store the title -> should be moved to titles/tile
-        if("person".equals(derivate.getOwnerID().getTypeId())
-            && derivate.getService().getFlags("title").size() > 0) {
+        if(derivate.getService().getFlags("title").size() > 0) {
                String title = derivate.getService().getFlags("title").get(0);
                derivate.getDerivate().getTitles().add(new MCRMetaLangText("title", "de", null, 0, "main", title));
                derivate.getService().removeFlags("title");
