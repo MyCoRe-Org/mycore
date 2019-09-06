@@ -55,7 +55,7 @@
       <xsl:value-of select="derivate/internals/internal/@maindoc" />
     </field>
     <field name="derivateOrder">
-      <xsl:value-of select="derivate/@order"/>
+      <xsl:value-of select="@order"/>
     </field>
     <xsl:for-each select="derivate/titles/title">
       <field name="derivateTitle">
