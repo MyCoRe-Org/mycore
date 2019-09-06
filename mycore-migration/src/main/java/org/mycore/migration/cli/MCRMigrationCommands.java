@@ -331,13 +331,13 @@ public class MCRMigrationCommands {
         ArrayList<String> commands = new ArrayList<>();
         for(String t : objectTypes) {
             for (String objID : MCRXMLMetadataManager.instance().listIDsOfType(t)) {
-                commands.add("migrate derivatelink for object " + objID);
+                commands.add("migrate derivatelinks for object " + objID);
             }
         }
         return commands;
     }
     
-    @MCRCommand(syntax = "migrate derivatelink for object {0}",
+    @MCRCommand(syntax = "migrate derivatelinks for object {0}",
         help = "Migrates the Order of derivates from object {0} to derivate (MCR-2003, MCR-2099)")
     public static List<String> migrateDerivateLink(String objectIDStr) {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
@@ -355,7 +355,7 @@ public class MCRMigrationCommands {
     }
     
     @MCRCommand(syntax = "migrate derivate {0} using order {1}", 
-        help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
+        help = "Sets the order of derivate {0} to the number {1} and migrates label to classification (MCR-2003, MCR-2099)")
     public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
         final int order = Integer.parseInt(orderStr);
 
