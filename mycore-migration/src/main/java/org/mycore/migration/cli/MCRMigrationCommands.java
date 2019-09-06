@@ -338,7 +338,8 @@ public class MCRMigrationCommands {
     }
     
     @MCRCommand(syntax = "migrate derivatelinks for object {0}",
-        help = "Migrates the Order of derivates from object {0} to derivate (MCR-2003, MCR-2099)")
+        help = "Migrates the Order of derivates from object {0} to derivate " 
+               + "(MCR-2003, MCR-2099)")
     public static List<String> migrateDerivateLink(String objectIDStr) {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
 
