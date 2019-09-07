@@ -356,7 +356,8 @@ public class MCRMigrationCommands {
     }
     
     @MCRCommand(syntax = "migrate derivate {0} using order {1}", 
-        help = "Sets the order of derivate {0} to the number {1} and migrates label to classification (MCR-2003, MCR-2099)")
+        help = "Sets the order of derivate {0} to the number {1}"
+                + " and migrates label to classification (MCR-2003, MCR-2099)")
     public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
         final int order = Integer.parseInt(orderStr);
 
