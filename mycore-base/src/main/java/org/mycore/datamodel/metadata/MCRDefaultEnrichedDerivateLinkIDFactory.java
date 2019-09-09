@@ -24,7 +24,7 @@ public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLink
         contentList.add(orderElement);
 
         if (mainDoc != null) {
-            final Element mainDocElement = new Element("mainDoc");
+            final Element mainDocElement = new Element("maindoc");
             mainDocElement.setText(mainDoc);
             contentList.add(mainDocElement);
         }
