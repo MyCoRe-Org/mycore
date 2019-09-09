@@ -512,10 +512,17 @@ public class MCRLinkTableManager {
     }
 
     public void create(MCRDerivate der) {
-        final List<MCRCategoryID> categoryList = der.getDerivate().getClassifications()
+        Collection<MCRCategoryID> categoryList = new HashSet<>();
+        categoryList.addAll(der.getDerivate().getClassifications()
             .stream()
             .map(this::metaClassToCategoryID)
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
+
+        MCRCategoryID state = der.getService().getState();
+        if (state != null) {
+            categoryList.add(state);
+        }
+
         MCRCategLinkReference objectReference = new MCRCategLinkReference(der.getId());
         MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categoryList);
     }
