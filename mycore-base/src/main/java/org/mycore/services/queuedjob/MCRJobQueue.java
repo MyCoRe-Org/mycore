@@ -366,7 +366,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
-        StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '"
+        StringBuilder qStr = new StringBuilder("FROM MCRJob job WHERE action = '"
                 + action.getName() + "' ");
         for (String paramKey : params.keySet()) {
             qStr.append(" AND job.parameters['")
