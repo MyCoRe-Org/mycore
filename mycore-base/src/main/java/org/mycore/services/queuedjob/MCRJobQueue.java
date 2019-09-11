@@ -349,6 +349,44 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         }
     }
 
+    /**
+     * returns specific jobs by the given parameters or an empty list.
+     *
+     * @param params the parameters
+     * @return the job
+     */
+    public List<MCRJob> getJobs(Map<String, String> params) {
+        return getJobs(action, params);
+    }
+
+    private List<MCRJob> getJobs(Class<? extends MCRJobAction> action, Map<String, String> params) {
+        if (!running) {
+            return null;
+        }
+
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+
+        StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '"
+                + action.getName() + "' ");
+        for (String paramKey : params.keySet()) {
+            qStr.append(" AND job.parameters['")
+                    .append(paramKey)
+                    .append("'] = '")
+                    .append(params.get(paramKey))
+                    .append('\'');
+        }
+
+        TypedQuery<MCRJob> query = em.createQuery(qStr.toString(), MCRJob.class);
+
+        try {
+            List<MCRJob> jobs = query.getResultList();
+            clearPreFetch();
+            return jobs;
+        } catch (NoResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
     private MCRJob getElement() {
         if (!running) {
             return null;
