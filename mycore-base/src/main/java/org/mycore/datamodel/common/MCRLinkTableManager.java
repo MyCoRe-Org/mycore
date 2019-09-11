@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,6 +34,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -501,7 +503,30 @@ public class MCRLinkTableManager {
      */
     public void update(MCRObjectID id) {
         delete(id);
-        create(MCRMetadataManager.retrieveMCRObject(id));
+        if ("derivate".equals(id.getTypeId())) {
+            create(MCRMetadataManager.retrieveMCRDerivate(id));
+        } else {
+            create(MCRMetadataManager.retrieveMCRObject(id));
+        }
     }
 
+    public void create(MCRDerivate der) {
+        Collection<MCRCategoryID> categoryList = new HashSet<>();
+        categoryList.addAll(der.getDerivate().getClassifications()
+            .stream()
+            .map(this::metaClassToCategoryID)
+            .collect(Collectors.toList()));
+
+        MCRCategoryID state = der.getService().getState();
+        if (state != null) {
+            categoryList.add(state);
+        }
+
+        MCRCategLinkReference objectReference = new MCRCategLinkReference(der.getId());
+        MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categoryList);
+    }
+
+    private MCRCategoryID metaClassToCategoryID(MCRMetaClassification metaClazz) {
+        return new MCRCategoryID(metaClazz.getClassId(), metaClazz.getCategId());
+    }
 }

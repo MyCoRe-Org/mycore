@@ -20,6 +20,7 @@ package org.mycore.datamodel.common;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
@@ -81,4 +82,23 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         MCRLinkTableManager.instance().update(obj.getId());
     }
 
+    @Override
+    protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
+        MCRLinkTableManager.instance().create(der);
+    }
+
+    @Override
+    protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
+        MCRLinkTableManager.instance().update(der.getId());
+    }
+
+    @Override
+    protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
+        handleDerivateRepaired(evt, der);
+    }
+
+    @Override
+    protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
+        MCRLinkTableManager.instance().delete(der.getId());
+    }
 }

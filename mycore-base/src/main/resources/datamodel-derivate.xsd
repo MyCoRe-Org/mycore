@@ -112,6 +112,8 @@
   </xs:element>
   <xs:element name="classification">
     <xs:complexType>
+      <xs:attribute name="inherited" use="optional" type="xs:integer" fixed="0" />
+      <xs:attribute name="type" use="optional" type="xs:string" />
       <xs:attribute name="classid" type="xs:NCName"/>
       <xs:attribute name="categid" type="xs:NCName"/>
     </xs:complexType>
