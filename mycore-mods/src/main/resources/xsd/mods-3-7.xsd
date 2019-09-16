@@ -148,7 +148,7 @@ End list of "top level" MODS elements
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attributeGroup ref="xlink:simpleAttrs"/>
-				<xs:attribute name="shareable" fixed="no"/>
+				<xs:attribute name="shareable" type="no"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 				<xs:attributeGroup ref="altFormatAttributeGroup"/>
 			</xs:extension>
@@ -186,7 +186,7 @@ End list of "top level" MODS elements
 				<xs:attribute name="edition" type="xs:string"/>
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
-				<xs:attribute name="usage" fixed="primary"/>
+				<xs:attribute name="usage" type="primary"/>
 				<xs:attribute name="generator" type="xs:string"/>
 			</xs:extension>
 		</xs:simpleContent>
@@ -217,7 +217,7 @@ End list of "top level" MODS elements
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
-				<xs:attribute name="usage" fixed="primary"/>
+				<xs:attribute name="usage" type="primary"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -234,7 +234,7 @@ End list of "top level" MODS elements
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="typeURI" type="xs:anyURI"/>
-				<xs:attribute name="invalid" fixed="yes"/>
+				<xs:attribute name="invalid" type="yes"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 			</xs:extension>
 		</xs:simpleContent>
@@ -255,7 +255,7 @@ End list of "top level" MODS elements
 		<xs:attributeGroup ref="languageAttributeGroup"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="altRepGroup" type="xs:string"/>
-		<xs:attribute name="usage" fixed="primary"/>
+		<xs:attribute name="usage" type="primary"/>
 	</xs:complexType>
 	<!--
 
@@ -514,7 +514,7 @@ Choice two.	With <etal>.
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="altRepGroup" type="xs:string"/>
 		<xs:attribute name="nameTitleGroup" type="xs:string"/>
-		<xs:attribute name="usage" fixed="primary"/>
+		<xs:attribute name="usage" type="primary"/>
 		<xs:attribute name="type">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -665,7 +665,7 @@ Choice two.	With <etal>.
 		<xs:sequence>
 			<xs:element ref="placeTerm" maxOccurs="unbounded"/>
 		</xs:sequence>
-		<xs:attribute name="supplied" fixed="yes"/>
+		<xs:attribute name="supplied" type="yes"/>
 	</xs:complexType>
 	<!-- 
 *** placeTerm ***
@@ -752,7 +752,7 @@ Choice two.	With <etal>.
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:attribute>
-				<xs:attribute name="keyDate" fixed="yes"/>
+				<xs:attribute name="keyDate" type="yes"/>
 				<!-- 
 				***********  Following attribute, @calendar, added in 3.7
 				-->
@@ -1069,7 +1069,7 @@ Choice two.	With <etal>.
 		<xs:attributeGroup ref="xlink:simpleAttrs"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
 		<xs:attribute name="altRepGroup" type="xs:string"/>
-		<xs:attribute name="usage" fixed="primary"/>
+		<xs:attribute name="usage" type="primary"/>
 	</xs:complexType>
 	<!--
 
@@ -1290,7 +1290,7 @@ Choice two.	With <etal>.
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attributeGroup ref="xlink:simpleAttrs"/>
-				<xs:attribute name="shareable" fixed="no"/>
+				<xs:attribute name="shareable" type="no"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 				<xs:attributeGroup ref="altFormatAttributeGroup"/>
 			</xs:extension>
@@ -1338,11 +1338,11 @@ Choice two.	With <etal>.
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="otherType"/>
-		<xs:attribute name="supplied" fixed="yes"/>
+		<xs:attribute name="supplied" type="yes"/>
 		<xs:attribute name="altRepGroup" type="xs:string"/>
 		<xs:attributeGroup ref="altFormatAttributeGroup"/>
 		<xs:attribute name="nameTitleGroup" type="xs:string"/>
-		<xs:attribute name="usage" fixed="primary"/>
+		<xs:attribute name="usage" type="primary"/>
 		<xs:attribute name="ID" type="xs:ID"/>
 		<xs:attributeGroup ref="authorityAttributeGroup"/>
 		<xs:attributeGroup ref="xlink:simpleAttrs"/>
@@ -1386,11 +1386,11 @@ Choice two.	With <etal>.
 				In 3.7 resourceTypeDefinition is removed, so
 				any value may be supplied.
 				-->
-				<xs:attribute name="collection" fixed="yes"/>
-				<xs:attribute name="manuscript" fixed="yes"/>
+				<xs:attribute name="collection" type="yes"/>
+				<xs:attribute name="manuscript" type="yes"/>
 				<xs:attribute name="displayLabel" type="xs:string"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
-				<xs:attribute name="usage" fixed="primary"/>
+				<xs:attribute name="usage" type="primary"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -1432,7 +1432,7 @@ String Definitions
 	<xs:complexType name="stringPlusLanguagePlusSupplied">
 		<xs:simpleContent>
 			<xs:extension base="stringPlusLanguage">
-				<xs:attribute name="supplied" fixed="yes"/>
+				<xs:attribute name="supplied" type="yes"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -1483,4 +1483,20 @@ String Definitions
 		</xs:restriction>
 	</xs:simpleType>
 	<!-- -->
+  <!-- Robert: new simpleTypes for former fixed-value attributes -->
+  <xs:simpleType name="yes">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="yes" />
+    </xs:restriction>
+    </xs:simpleType>
+  <xs:simpleType name="no">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="no" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="primary">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="primary" />
+    </xs:restriction>
+  </xs:simpleType>  
 </xs:schema>
