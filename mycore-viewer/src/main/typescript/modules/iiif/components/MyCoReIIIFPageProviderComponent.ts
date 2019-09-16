@@ -66,7 +66,6 @@ namespace mycore.viewer.components {
         }
 
         private createPageFromMetadata(imageId:string, metadata:widgets.image.IIIFImageInformation):widgets.canvas.TileImagePageIIIF {
-            // var tiles = this._settings.tileProviderPath.split(",");
             var paths = new Array<string>();
             paths.push(metadata.path + "/{x},{y},{w},{h}/!{tx},{ty}/0/default.jpg");
 
@@ -75,6 +74,7 @@ namespace mycore.viewer.components {
 
         private getPageMetadata(image:string, resolve:(metadata:widgets.image.IIIFImageInformation) => void) {
             image = (image.charAt(0) == "/") ? image.substr(1) : image;
+
             if (this._imageInformationMap.has(image)) {
                 resolve(this._imageInformationMap.get(image));
             } else {
@@ -104,6 +104,7 @@ namespace mycore.viewer.components {
         public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
             if (e.type == events.RequestPageEvent.TYPE) {
                 let rpe = <events.RequestPageEvent> e;
+
                 this.getPage(rpe._pageId, (page:widgets.canvas.TileImagePageIIIF) => {
                     rpe._onResolve(rpe._pageId, page);
                 });

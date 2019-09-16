@@ -20,32 +20,32 @@ namespace mycore.viewer.widgets.canvas {
 
     export class TileImagePage implements model.AbstractPage {
 
-        constructor(public id:string, private _width:number, private _height:number, _tilePaths:Array<string>) {
+        constructor(public id:string, protected _width:number, protected _height:number, _tilePaths:Array<string>) {
             this._tilePath = _tilePaths;
             this.loadTile(new Position3D(0, 0, 0));
 
         }
 
-        private static TILE_SIZE = 256;
-        private _tilePath: string[];
-        private _tiles: MyCoReMap<Position3D, HTMLImageElement> = new MyCoReMap<Position3D, HTMLImageElement>();
-        private _loadingTiles: MyCoReMap<Position3D, HTMLImageElement> = new MyCoReMap<Position3D, HTMLImageElement>();
+        protected static TILE_SIZE = 256;
+        protected _tilePath: string[];
+        protected _tiles: MyCoReMap<Position3D, HTMLImageElement> = new MyCoReMap<Position3D, HTMLImageElement>();
+        protected _loadingTiles: MyCoReMap<Position3D, HTMLImageElement> = new MyCoReMap<Position3D, HTMLImageElement>();
 
 
-        private _backBuffer: HTMLCanvasElement = document.createElement("canvas");
-        private _backBufferArea: Rect = null;
-        private _backBufferAreaZoom: number = null;
+        protected _backBuffer: HTMLCanvasElement = document.createElement("canvas");
+        protected _backBufferArea: Rect = null;
+        protected _backBufferAreaZoom: number = null;
 
-        private _previewBackBuffer: HTMLCanvasElement = document.createElement("canvas");
-        private _previewBackBufferArea: Rect = null;
-        private _previewBackBufferAreaZoom: number = null;
+        protected _previewBackBuffer: HTMLCanvasElement = document.createElement("canvas");
+        protected _previewBackBufferArea: Rect = null;
+        protected _previewBackBufferAreaZoom: number = null;
 
 
 
-        private _imgPreviewLoaded: boolean = false;
-        private _imgNotPreviewLoaded: boolean = false;
+        protected _imgPreviewLoaded: boolean = false;
+        protected _imgNotPreviewLoaded: boolean = false;
 
-        private htmlContent: ViewerProperty<HTMLElement> = new ViewerProperty<HTMLElement>(this, "htmlContent");
+        protected htmlContent: ViewerProperty<HTMLElement> = new ViewerProperty<HTMLElement>(this, "htmlContent");
 
 
         public get size(): Size2D {
@@ -94,7 +94,7 @@ namespace mycore.viewer.widgets.canvas {
             return this.htmlContent;
         }
 
-        private updateHTML() {
+        protected updateHTML() {
             if (typeof this.refreshCallback != "undefined" && this.refreshCallback != null) {
                 this.refreshCallback();
             }
@@ -124,7 +124,7 @@ namespace mycore.viewer.widgets.canvas {
         }
 
 
-        private _updateBackbuffer(startX, startY, endX, endY, zoomLevel, overview: boolean) {
+        protected _updateBackbuffer(startX, startY, endX, endY, zoomLevel, overview: boolean) {
             var newBackBuffer = new Rect(new Position2D(startX, startY), new Size2D(endX - startX, endY - startY));
             if (overview) {
                 if (this._previewBackBufferArea !== null && !this._imgPreviewLoaded && this._previewBackBufferArea.equals(newBackBuffer) && zoomLevel == this._previewBackBufferAreaZoom) {
@@ -178,10 +178,10 @@ namespace mycore.viewer.widgets.canvas {
 
         }
 
-        private static EMPTY_FUNCTION = ()=> {
+        protected static EMPTY_FUNCTION = ()=> {
         };
 
-        private _abortLoadingTiles() {
+        protected _abortLoadingTiles() {
             this._loadingTiles.forEach((k, v) => {
                 v.onerror = TileImagePage.EMPTY_FUNCTION;
                 v.onload = TileImagePage.EMPTY_FUNCTION;
@@ -191,7 +191,7 @@ namespace mycore.viewer.widgets.canvas {
         }
 
 
-        private _drawToBackbuffer(startX, startY, endX, endY, zoomLevel, _overview: boolean) {
+        protected _drawToBackbuffer(startX, startY, endX, endY, zoomLevel, _overview: boolean) {
             var ctx: CanvasRenderingContext2D;
             if (_overview) {
                 ctx = <CanvasRenderingContext2D> this._previewBackBuffer.getContext("2d");
@@ -218,7 +218,7 @@ namespace mycore.viewer.widgets.canvas {
             }
         }
 
-        private drawPreview(ctx: CanvasRenderingContext2D, targetPosition: Position2D, tile: PreviewTile) {
+        protected drawPreview(ctx: CanvasRenderingContext2D, targetPosition: Position2D, tile: PreviewTile) {
             tile.areaToDraw.size.width = Math.min(tile.areaToDraw.pos.x + tile.areaToDraw.size.width, tile.tile.naturalWidth) - tile.areaToDraw.pos.x;
             tile.areaToDraw.size.height = Math.min(tile.areaToDraw.pos.y + tile.areaToDraw.size.height, tile.tile.naturalHeight) - tile.areaToDraw.pos.y;
 
@@ -234,7 +234,7 @@ namespace mycore.viewer.widgets.canvas {
                 );
         }
 
-        private loadTile(tilePos: Position3D) {
+        protected loadTile(tilePos: Position3D) {
             if (this._tiles.has(tilePos)) {
                 return this._tiles.get(tilePos);
             } else {
@@ -261,7 +261,7 @@ namespace mycore.viewer.widgets.canvas {
          * @param tilePos the tile
          * @returns { tile:HTMLImageElement; areaToDraw: Rect } tile contains the Image to draw and areaToDraw contains the coordinates in the Image.
          */
-        private getPreview(tilePos: Position3D, scale: number = 1): PreviewTile {
+        protected getPreview(tilePos: Position3D, scale: number = 1): PreviewTile {
             if (this._tiles.has(tilePos)) {
                 var tile = this._tiles.get(tilePos);
                 return { tile: tile, areaToDraw: new Rect(new Position2D(0, 0), new Size2D(256, 256)), scale: scale };
@@ -295,19 +295,19 @@ namespace mycore.viewer.widgets.canvas {
             }
         }
 
-        private maxZoomLevel(): number {
+        protected maxZoomLevel(): number {
             return Math.max(Math.ceil(Math.log(Math.max(this._width, this._height) / TileImagePage.TILE_SIZE) / Math.LN2), 0);
         }
 
-        private getZoomLevel(scale: number): number {
+        protected getZoomLevel(scale: number): number {
             return Math.max(0, Math.ceil(this.maxZoomLevel() - Math.log(scale) / Utils.LOG_HALF));
         }
 
-        private scaleForLevel(level: number): number {
+        protected scaleForLevel(level: number): number {
             return Math.pow(0.5, this.maxZoomLevel() - level);
         }
 
-        private _loadTile(tilePos: Position3D, okCallback: (image: HTMLImageElement) => void, errorCallback: () => void): void {
+        protected _loadTile(tilePos: Position3D, okCallback: (image: HTMLImageElement) => void, errorCallback: () => void): void {
             var pathSelect = Utils.hash(tilePos.toString()) % this._tilePath.length;
 
             var path = this._tilePath[pathSelect];

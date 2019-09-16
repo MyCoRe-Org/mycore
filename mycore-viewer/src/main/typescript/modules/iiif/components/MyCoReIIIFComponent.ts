@@ -20,13 +20,15 @@
 
 /// <reference path="IIIFSettings.ts" />
 
+/// <reference path="../../base/components/MyCoReComponent.ts" />
+
 namespace mycore.viewer.components {
 
     import ShowContentEvent = mycore.viewer.components.events.ShowContentEvent;
-    export class MyCoReIIIFComponent extends ViewerComponent {
+    export class MyCoReIIIFComponent extends MyCoReComponent {
 
-        constructor(private _settings:IIIFSettings, private container:JQuery) {
-            super();
+        constructor(protected _settings:IIIFSettings, protected container:JQuery) {
+            super(_settings, container);
         }
 
         private errorSync = Utils.synchronize<MyCoReIIIFComponent>([ (context:MyCoReIIIFComponent)=> {
@@ -34,31 +36,27 @@ namespace mycore.viewer.components {
         } ], (context:MyCoReIIIFComponent)=> {
             new mycore.viewer.widgets.modal.ViewerErrorModal(
                 this._settings.mobile,
-                context.lm.getTranslation("noMetsShort"),
-                context.lm.getFormatedTranslation("noMets", "<a href='mailto:"
+                context.lm.getTranslation("noManifestShort"),
+                context.lm.getFormatedTranslation("noManifest", "<a href='mailto:"
                     + this._settings.adminMail + "'>" + this._settings.adminMail + "</a>"),
                 this._settings.webApplicationBaseURL + "/modules/iview2/img/sad-emotion-egg.jpg",
                 this.container[ 0 ]).show();
             context.trigger(new ShowContentEvent(this, jQuery(), mycore.viewer.widgets.layout.IviewBorderLayout.DIRECTION_WEST, 0));
         });
 
-        private manifestAndLanguageSync = Utils.synchronize<MyCoReIIIFComponent>([
+        private structFileAndLanguageSync = Utils.synchronize<MyCoReIIIFComponent>([
             (context:MyCoReIIIFComponent)=> context.mm != null,
             (context:MyCoReIIIFComponent)=> context.lm != null
         ], (context:MyCoReIIIFComponent)=> {
-            this.manifestLoaded(this.mm.model);
+            this.structFileLoaded(this.mm.model);
         });
-
-        private error = false;
-        private lm:mycore.viewer.model.LanguageModel = null;
-        private mm:{ model:model.StructureModel; document:Document } = null;
 
         public init() {
             var settings = this._settings;
             if (settings.doctype == "manifest") {
 
                 var that = this;
-                this._manifestLoaded = false;
+                this._structFileLoaded = false;
                 var tilePathBuilder = (imageUrl: string, width: number, height: number) => {
                     let scaleFactor = this.getScaleFactor(width, height);
                     return imageUrl + "/full/" + Math.floor(width/scaleFactor) + "," + Math.floor(height/scaleFactor) + "/0/default.jpg";
@@ -77,7 +75,7 @@ namespace mycore.viewer.components {
 
                     this.mm = resolved;
 
-                    this.manifestAndLanguageSync(this);
+                    this.structFileAndLanguageSync(this);
                 });
 
 
@@ -91,60 +89,13 @@ namespace mycore.viewer.components {
             }
         }
 
-        private _manifestLoaded:boolean;
-        private _eventToTrigger:events.StructureModelLoadedEvent;
-
-        private postProcessChapter(chapter:model.StructureChapter) {
-            if (chapter.label == null || typeof chapter.label == "undefined" || chapter.label == "") {
-                if (chapter.type != null && typeof chapter.type != "undefined" && chapter.type != "") {
-                    let translationKey = this.buildTranslationKey(chapter.type || "");
-                    if (this.lm.hasTranslation(translationKey)) {
-                        (<any>chapter)._label = this.lm.getTranslation(translationKey);
-                    }
-                }
-            }
-
-            chapter.chapter.forEach((chapter)=> {
-                this.postProcessChapter(chapter);
-            })
-        }
-
-        private buildTranslationKey(type:string) {
-            return "dfgStructureSet." + type.replace('- ', '');
-        }
-
-        private manifestLoaded(structureModel:model.StructureModel) {
-            this.postProcessChapter(structureModel._rootChapter);
-
-            var ev = new events.StructureModelLoadedEvent(this, structureModel);
-            this.trigger(ev);
-            this._manifestLoaded = true;
-            this._eventToTrigger = ev;
-
-            var href = this._settings.filePath;
-            var currentImage:model.StructureImage = null;
-            structureModel._imageList.forEach((image) => {
-                if ("/" + image.href == href || image.href == href) {
-                    currentImage = image;
-                }
-            });
-
-            if (currentImage != null) {
-                this.trigger(new events.ImageSelectedEvent(this, currentImage));
-            }
-        }
-
-        public get handlesEvents():string[] {
-            return [ events.LanguageModelLoadedEvent.TYPE ];
-        }
-
         public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
 
             if (e.type == events.LanguageModelLoadedEvent.TYPE) {
                 var languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
                 this.lm = languageModelLoadedEvent.languageModel;
                 this.errorSync(this);
-                this.manifestAndLanguageSync(this);
+                this.structFileAndLanguageSync(this);
             }
 
             return;
