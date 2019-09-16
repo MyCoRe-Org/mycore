@@ -26,8 +26,8 @@ namespace mycore.viewer.components {
             super();
         }
 
-        private _btn: mycore.viewer.widgets.toolbar.ToolbarButton = null;
-        private _translation: string = null;
+        private btn: mycore.viewer.widgets.toolbar.ToolbarButton = null;
+        private translation: string = null;
 
         public get handlesEvents():string[] {
             return [mycore.viewer.widgets.toolbar.events.ButtonPressedEvent.TYPE,
@@ -42,7 +42,7 @@ namespace mycore.viewer.components {
 
             this.trigger(new events.ProvideToolbarModelEvent(
                 this, frameToolbarModel));
-            this._btn = frameToolbarModel.closeToolbarButton;
+            this.btn = frameToolbarModel.closeToolbarButton;
             this.trigger(new events.WaitForEvent(this, mycore.viewer.components.events.LanguageModelLoadedEvent.TYPE));
         }
 
@@ -56,11 +56,11 @@ namespace mycore.viewer.components {
                 }
             }
 
-            if (e.type == mycore.viewer.components.events.LanguageModelLoadedEvent.TYPE) {
-                let lmle = <events.LanguageModelLoadedEvent>e;
-                this._translation = lmle.languageModel.getTranslation("toolbar.maximize");
-                if (this._translation != null && this._btn != null) {
-                    this._btn.tooltip = this._translation;
+            if (e.type === mycore.viewer.components.events.LanguageModelLoadedEvent.TYPE) {
+                const lmle = <events.LanguageModelLoadedEvent>e;
+                this.translation = lmle.languageModel.getTranslation('toolbar.maximize');
+                if (this.translation != null && this.btn != null) {
+                    this.btn.tooltip = this.translation;
                 }
             }
         }

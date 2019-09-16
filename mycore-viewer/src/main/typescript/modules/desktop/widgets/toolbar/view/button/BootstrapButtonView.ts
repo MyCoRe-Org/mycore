@@ -63,12 +63,12 @@ namespace mycore.viewer.widgets.toolbar {
                 return;
             }
 
-            this._icon.removeClass("glyphicon-" + this._lastIconClass);
+            this._icon.removeClass(`fa-${this._lastIconClass}`);
             this._icon.removeClass(this._lastIconClass);
-            this._icon.removeClass("icon-" + this._lastIconClass);
+            this._icon.removeClass(`icon-${this._lastIconClass}`);
 
-            this._icon.addClass("fas");
-            this._icon.addClass("fa-" + icon);
+            this._icon.addClass('fas');
+            this._icon.addClass(`fa-${icon}`);
 
             this._lastIconClass = icon;
         }
