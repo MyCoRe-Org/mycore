@@ -223,14 +223,17 @@ public class MCRLanguageFactory {
      * Reads in the language classification and builds language objects from its categories
      */
     private void readLanguageClassification() {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        if (!session.isTransactionActive()) {
-            session.beginTransaction();
-            buildLanguagesFromClassification();
-            session.commitTransaction();
-        } else {
-            buildLanguagesFromClassification();
+        if (!MCRSessionMgr.isLocked()) {
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            if (!session.isTransactionActive()) {
+                session.beginTransaction();
+                buildLanguagesFromClassification();
+                session.commitTransaction();
+                return;
+            }
         }
+        //fallback:
+        buildLanguagesFromClassification();
     }
 
     /**
