@@ -19,6 +19,7 @@
 /// <reference path='../../../desktop/components/model/MyCoReDesktopToolbarModel.ts' />
 namespace mycore.viewer.model {
     export class MyCoReFrameToolbarModel extends model.MyCoReDesktopToolbarModel {
+        public closeToolbarButton: mycore.viewer.widgets.toolbar.ToolbarButton;
 
         constructor() {
             super('MyCoReFrameToolbar');
@@ -37,11 +38,11 @@ namespace mycore.viewer.model {
                 this.removeGroup(logoGroup);
             }
 
-            const toolbarButton = new mycore.viewer.widgets.toolbar.ToolbarButton('MaximizeButton', '', '', 'fa-window-maximize');
+            this.closeToolbarButton = new mycore.viewer.widgets.toolbar.ToolbarButton('MaximizeButton', '', 'maximize', 'expand');
             const toolbarGroup = new mycore.viewer.widgets.toolbar.ToolbarGroup('MaximizeToolbarGroup', 100, true);
 
             this.addGroup(toolbarGroup);
-            toolbarGroup.addComponent(toolbarButton);
+            toolbarGroup.addComponent(this.closeToolbarButton);
 
 
         }

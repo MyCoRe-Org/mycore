@@ -67,14 +67,8 @@ namespace mycore.viewer.widgets.toolbar {
             this._icon.removeClass(this._lastIconClass);
             this._icon.removeClass("icon-" + this._lastIconClass);
 
-            if (icon.indexOf("fa") == 0) {
-                this._icon.addClass("fa");
-                this._icon.addClass(icon);
-            } else {
-                this._icon.addClass("glyphicon");
-                this._icon.addClass("glyphicon-" + icon);
-                this._icon.addClass("icon-" + icon);
-            }
+            this._icon.addClass("fas");
+            this._icon.addClass("fa-" + icon);
 
             this._lastIconClass = icon;
         }

@@ -81,7 +81,7 @@ namespace mycore.viewer.widgets.chaptertree {
             this._inputHandler.registerNode(labelElement, id);
 
             if (expandable) {
-                var expander = jQuery("<span class=\"expander fa " + DesktopChapterTreeView.OPEN_ICON_CLASS + "\"></span>");
+                var expander = jQuery("<span class=\"expander fas " + DesktopChapterTreeView.OPEN_ICON_CLASS + "\"></span>");
                 insertedNode.prepend(expander);
                 this._inputHandler.registerExpander(expander, id);
             }
