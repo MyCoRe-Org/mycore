@@ -36,8 +36,11 @@ public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
         // properties
         final String derivate = getDerivate(request);
 
-        setProperty("manifestURL", MCRFrontendUtil.getBaseURL() + "rsc/iiif/presentation/mets/" + derivate + "/manifest");
-        setProperty("imageAPIURL", MCRFrontendUtil.getBaseURL() + "rsc/iiif/image/Iview/");
+        setProperty("manifestURL", MCRFrontendUtil.getBaseURL()
+            + MCRConfiguration.instance().getString("MCR.Viewer.IIIF.URL.Presentation", "rsc/iiif/presentation/mets/")
+            + derivate + "/manifest");
+        setProperty("imageAPIURL", MCRFrontendUtil.getBaseURL()
+            + MCRConfiguration.instance().getString("MCR.Viewer.IIIF.URL.Image", "rsc/iiif/image/Iview/"));
 //        String imageXmlPath = MCRConfiguration.instance().getString("MCR.Viewer.BaseURL", null); // Parameter can be used to provide multiple urls
 //
 //        if (imageXmlPath == null || imageXmlPath.isEmpty()) {
@@ -48,15 +51,7 @@ public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
         // script
         final boolean debugParameterSet = isDebugMode(request);
         addLocalScript("iview-client-iiif.js", true, debugParameterSet);
-        addLocalScript("lib/manifesto/manifesto.js", true, isDebugMode(request));
-
-        final MCRPath teiDirectoryPath = MCRPath.getPath(derivate, "/tei");
-        if (Files.exists(teiDirectoryPath) && Files.isDirectory(teiDirectoryPath)) {
-            addLocalScript("iview-client-tei.js", true, debugParameterSet);
-            addLocalCSS("tei.css");
-            MCRConfiguration2.getString("MCR.Viewer.TeiStyle")
-                .ifPresent((style)-> setProperty("teiStylesheet", style));
-        }
+        addLocalScript("lib/manifesto/manifesto.js", true, debugParameterSet);
 
         return this;
     }

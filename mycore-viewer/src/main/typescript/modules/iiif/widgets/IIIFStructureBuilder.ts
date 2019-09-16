@@ -33,9 +33,6 @@ namespace mycore.viewer.widgets.iiif {
 
         private static METS_NAMESPACE_URI = "http://www.loc.gov/METS/";
         private static XLINK_NAMESPACE_URI = "http://www.w3.org/1999/xlink";
-        private static ALTO_TEXT = "AltoHref";
-        private static TEI_TRANSCRIPTION = "TeiTranscriptionHref";
-        private static TEI_TRANSLATION = "TeiTranslationHref";
 
         private hrefResolverElement = document.createElement("a");
 
@@ -110,8 +107,7 @@ namespace mycore.viewer.widgets.iiif {
                 this._imageList,
                 this._chapterImageMap,
                 this._imageChapterMap,
-                this._imageHrefImageMap,
-                useFilesMap.has("ALTO")  && useFilesMap.get("ALTO").length > 0);
+                this._imageHrefImageMap);
 
             return this._structureModel;
         }

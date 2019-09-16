@@ -16,17 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../widgets/alto/AltoChange.ts" />
-
 namespace mycore.viewer.components {
-    import AltoChangeSet = mycore.viewer.widgets.alto.AltoChangeSet;
     export interface IIIFSettings extends MyCoReViewerSettings {
-        altoChangePID: string;
         manifestURL: string;
         imageAPIURL: string;
         pageRange: number;
-        altoChanges?:AltoChangeSet;
-        altoEditorPostURL?:string;
-        altoReviewer?:boolean;
     }
 }

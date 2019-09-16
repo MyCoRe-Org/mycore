@@ -17,7 +17,6 @@
  */
 
 /// <reference path="../widgets/IviewIIIFProvider.ts" />
-/// <reference path="../components/events/IIIFLoadedEvent.ts" />
 
 /// <reference path="IIIFSettings.ts" />
 
@@ -48,7 +47,6 @@ namespace mycore.viewer.components {
             (context:MyCoReIIIFComponent)=> context.lm != null
         ], (context:MyCoReIIIFComponent)=> {
             this.manifestLoaded(this.mm.model);
-            this.trigger(new events.MetsLoadedEvent(this, this.mm));
         });
 
         private error = false;

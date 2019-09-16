@@ -16,16 +16,12 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="events/RequestAltoModelEvent.ts" />
 /// <reference path="../widgets/IIIFImageInformationProvider.ts" />
 /// <reference path="../widgets/TileImagePageIIIF.ts" />
-/// <reference path="../widgets/alto/AltoHTMLGenerator.ts" />
 /// <reference path="IIIFSettings.ts" />
 
 namespace mycore.viewer.components {
 
-    import RequestAltoModelEvent = mycore.viewer.components.events.RequestAltoModelEvent;
-    import AltoHTMLGenerator = mycore.viewer.widgets.alto.AltoHTMLGenerator;
     import PageLoadedEvent = mycore.viewer.components.events.PageLoadedEvent;
 
     export class MyCoReIIIFPageProviderComponent extends ViewerComponent {
@@ -42,7 +38,6 @@ namespace mycore.viewer.components {
 
         private _imageInformationMap:MyCoReMap<string, widgets.image.IIIFImageInformation> = new MyCoReMap<string, widgets.image.IIIFImageInformation>();
         private _imagePageMap:MyCoReMap<string, widgets.canvas.TileImagePageIIIF> = new MyCoReMap<string, widgets.canvas.TileImagePageIIIF>();
-        private _altoHTMLGenerator = new AltoHTMLGenerator();
         private _imageHTMLMap:MyCoReMap<string,HTMLElement> = new MyCoReMap<string, HTMLElement>();
         private _imageCallbackMap = new MyCoReMap<string, Array<(page: widgets.canvas.TileImagePageIIIF) => void>>();
 
@@ -58,15 +53,6 @@ namespace mycore.viewer.components {
                     this._imageCallbackMap.set(image, initialArray);
                     this.getPageMetadata(image, (metadata) => {
                         let imagePage = this.createPageFromMetadata(image, metadata);
-                        if (!this._imageHTMLMap.has(image)) {
-                            this.trigger(new RequestAltoModelEvent(this, image, (page, altoHref, altoModel) => {
-                                if (!this._imageHTMLMap.has(image)) {
-                                    let htmlElement = this._altoHTMLGenerator.generateHtml(altoModel, altoHref);
-                                    imagePage.getHTMLContent().value = htmlElement;
-                                    this._imageHTMLMap.set(image, htmlElement);
-                                }
-                            }));
-                        }
                         let resolveList = this._imageCallbackMap.get(image);
                         let pop;
                         while (pop = resolveList.pop()) {
