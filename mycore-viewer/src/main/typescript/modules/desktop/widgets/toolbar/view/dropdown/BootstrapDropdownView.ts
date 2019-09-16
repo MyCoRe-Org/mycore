@@ -65,7 +65,7 @@ namespace mycore.viewer.widgets.toolbar {
 
 
                     if("icon" in current){
-                        let icon = jQuery(`<i class="fas fa-${current.icon} dropdown-icon"></i>`);
+                        const icon = jQuery(`<i class="fas fa-${current.icon} dropdown-icon"></i>`);
                         anchor.prepend(icon);
                     }
                     newChild.append(anchor);

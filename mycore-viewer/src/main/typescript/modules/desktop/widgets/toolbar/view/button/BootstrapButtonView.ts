@@ -106,9 +106,6 @@ namespace mycore.viewer.widgets.toolbar {
             }
         }
 
-        public static getBootstrapIcon(icon: string): string {
-            return "glyphicon-" + icon;
-        }
 
         public getElement(): JQuery {
             return this._buttonElement;
