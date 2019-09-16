@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -365,21 +366,15 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         }
 
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-
-        StringBuilder qStr = new StringBuilder("FROM MCRJob job WHERE action = '"
-                + action.getName() + "' ");
-        for (String paramKey : params.keySet()) {
-            qStr.append(" AND job.parameters['")
-                    .append(paramKey)
-                    .append("'] = '")
-                    .append(params.get(paramKey))
-                    .append('\'');
-        }
-
-        TypedQuery<MCRJob> query = em.createQuery(qStr.toString(), MCRJob.class);
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<MCRJob> criteria = builder.createQuery(MCRJob.class);
+        Root<MCRJob> root = criteria.from(MCRJob.class);
+        List<Predicate> parameters = new ArrayList<Predicate>();
+        parameters.add(builder.equal(root.get(MCRJob_.action),action.getName()));
+        TypedQuery<MCRJob> typedQuery = em.createQuery(criteria);
 
         try {
-            List<MCRJob> jobs = query.getResultList();
+            List<MCRJob> jobs = typedQuery.getResultList();
             clearPreFetch();
             return jobs;
         } catch (NoResultException e) {
