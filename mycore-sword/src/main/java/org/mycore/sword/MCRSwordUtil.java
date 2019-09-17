@@ -182,36 +182,34 @@ public class MCRSwordUtil {
 
     private static void addDirectoryToZip(ZipArchiveOutputStream zipOutputStream, Path directory) {
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-        final DirectoryStream<Path> paths;
-        try {
-            paths = Files.newDirectoryStream(directory);
+         
+        try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory)) {
+            paths.forEach(p -> {
+                final boolean isDir = Files.isDirectory(p);
+                final ZipArchiveEntry zipArchiveEntry;
+                try {
+                    final String fileName = getFilename(p);
+                    LOGGER.info("Addding {} to zip file!", fileName);
+                    if (isDir) {
+                        addDirectoryToZip(zipOutputStream, p);
+                    } else {
+                        zipArchiveEntry = new ZipArchiveEntry(fileName);
+                        zipArchiveEntry.setSize(Files.size(p));
+                        zipOutputStream.putArchiveEntry(zipArchiveEntry);
+                        if (currentSession.isTransactionActive()) {
+                            currentSession.commitTransaction();
+                        }
+                        Files.copy(p, zipOutputStream);
+                        currentSession.beginTransaction();
+                        zipOutputStream.closeArchiveEntry();
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Could not add path {}", p);
+                }
+            });
         } catch (IOException e) {
             throw new MCRException(e);
         }
-
-        paths.forEach(p -> {
-            final boolean isDir = Files.isDirectory(p);
-            final ZipArchiveEntry zipArchiveEntry;
-            try {
-                final String fileName = getFilename(p);
-                LOGGER.info("Addding {} to zip file!", fileName);
-                if (isDir) {
-                    addDirectoryToZip(zipOutputStream, p);
-                } else {
-                    zipArchiveEntry = new ZipArchiveEntry(fileName);
-                    zipArchiveEntry.setSize(Files.size(p));
-                    zipOutputStream.putArchiveEntry(zipArchiveEntry);
-                    if (currentSession.isTransactionActive()) {
-                        currentSession.commitTransaction();
-                    }
-                    Files.copy(p, zipOutputStream);
-                    currentSession.beginTransaction();
-                    zipOutputStream.closeArchiveEntry();
-                }
-            } catch (IOException e) {
-                LOGGER.error("Could not add path {}", p);
-            }
-        });
     }
 
     public static String getFilename(Path path) {

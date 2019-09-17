@@ -220,17 +220,21 @@ public class MCRFileCollection extends MCRDirectory {
 
     @Override
     public boolean hasChildren() throws IOException {
-        return getUsableChildSream().findAny().isPresent();
-    }
-
-    private Stream<Path> getUsableChildSream() throws IOException {
-        return Files.list(path)
-            .filter(p -> !DATA_FILE.equals(p.getFileName().toString()));
+        try(Stream<Path> stream = getUsableChildSream()){
+            return stream.findAny().isPresent();
+        }
     }
 
     @Override
     public int getNumChildren() throws IOException {
-        return Math.toIntExact(getUsableChildSream().count());
+        try(Stream<Path> stream = getUsableChildSream()){
+            return Math.toIntExact(stream.count());
+        }
+    }
+    
+    private Stream<Path> getUsableChildSream() throws IOException {
+        return Files.list(path)
+            .filter(p -> !DATA_FILE.equals(p.getFileName().toString()));
     }
 
     @Override
