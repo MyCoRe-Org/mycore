@@ -676,7 +676,10 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     //This is code to get JAXB work
 
-    private static class Password {
+    private static class Password implements Serializable{
+        
+        private static final long serialVersionUID = 8068063832119405080L;
+
         @XmlAttribute
         private String hash;
 
