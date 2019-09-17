@@ -20,54 +20,40 @@
 
 /// <reference path="IIIFSettings.ts" />
 
-/// <reference path="../../base/components/MyCoReComponent.ts" />
+/// <reference path="../../base/components/MyCoReStructFileComponent.ts" />
 
 namespace mycore.viewer.components {
 
-    import ShowContentEvent = mycore.viewer.components.events.ShowContentEvent;
-    export class MyCoReIIIFComponent extends MyCoReComponent {
+    export class MyCoReIIIFComponent extends MyCoReStructFileComponent {
 
-        constructor(protected _settings:IIIFSettings, protected container:JQuery) {
-            super(_settings, container);
+        constructor(protected settings: IIIFSettings, protected container: JQuery) {
+            super(settings, container);
         }
 
-        private errorSync = Utils.synchronize<MyCoReIIIFComponent>([ (context:MyCoReIIIFComponent)=> {
-            return context.lm != null && context.error;
-        } ], (context:MyCoReIIIFComponent)=> {
-            new mycore.viewer.widgets.modal.ViewerErrorModal(
-                this._settings.mobile,
-                context.lm.getTranslation("noManifestShort"),
-                context.lm.getFormatedTranslation("noManifest", "<a href='mailto:"
-                    + this._settings.adminMail + "'>" + this._settings.adminMail + "</a>"),
-                this._settings.webApplicationBaseURL + "/modules/iview2/img/sad-emotion-egg.jpg",
-                this.container[ 0 ]).show();
-            context.trigger(new ShowContentEvent(this, jQuery(), mycore.viewer.widgets.layout.IviewBorderLayout.DIRECTION_WEST, 0));
-        });
-
         private structFileAndLanguageSync = Utils.synchronize<MyCoReIIIFComponent>([
-            (context:MyCoReIIIFComponent)=> context.mm != null,
-            (context:MyCoReIIIFComponent)=> context.lm != null
-        ], (context:MyCoReIIIFComponent)=> {
+            (context: MyCoReIIIFComponent) => context.mm != null,
+            (context: MyCoReIIIFComponent) => context.lm != null
+        ], (context: MyCoReIIIFComponent) => {
             this.structFileLoaded(this.mm.model);
         });
 
         public init() {
-            var settings = this._settings;
-            if (settings.doctype == "manifest") {
+            const settings = this.settings;
+            if (settings.doctype === 'manifest') {
 
-                var that = this;
-                this._structFileLoaded = false;
-                var tilePathBuilder = (imageUrl: string, width: number, height: number) => {
-                    let scaleFactor = this.getScaleFactor(width, height);
-                    return imageUrl + "/full/" + Math.floor(width/scaleFactor) + "," + Math.floor(height/scaleFactor) + "/0/default.jpg";
+                this.vStructFileLoaded = false;
+                const tilePathBuilder = (imageUrl: string, width: number, height: number) => {
+                    const scaleFactor = this.getScaleFactor(width, height);
+                    return imageUrl + '/full/' + Math.floor(width / scaleFactor) + ','
+                        + Math.floor(height / scaleFactor) + '/0/default.jpg';
                 };
 
-                var manifestPromise = mycore.viewer.widgets.iiif.IviewIIIFProvider.loadModel(this._settings.manifestURL, tilePathBuilder);
-                manifestPromise.then((resolved:{ model: model.StructureModel; document: Document }) => {
+                const manifestPromise = mycore.viewer.widgets.iiif.IviewIIIFProvider.loadModel(this.settings.manifestURL, tilePathBuilder);
+                manifestPromise.then((resolved: { model: model.StructureModel; document: Document }) => {
                     var model = resolved.model;
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
 
-                    if (model == null) {
+                    if (model === null) {
                         this.error = true;
                         this.errorSync(this);
                         return;
@@ -78,8 +64,7 @@ namespace mycore.viewer.components {
                     this.structFileAndLanguageSync(this);
                 });
 
-
-                manifestPromise.onreject(()=>{
+                manifestPromise.onreject(() =>{
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
                     this.error = true;
                     this.errorSync(this);
@@ -91,7 +76,7 @@ namespace mycore.viewer.components {
 
         public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
 
-            if (e.type == events.LanguageModelLoadedEvent.TYPE) {
+            if (e.type === events.LanguageModelLoadedEvent.TYPE) {
                 var languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
                 this.lm = languageModelLoadedEvent.languageModel;
                 this.errorSync(this);

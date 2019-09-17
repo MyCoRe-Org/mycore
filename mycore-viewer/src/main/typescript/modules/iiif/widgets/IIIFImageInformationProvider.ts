@@ -18,18 +18,48 @@
 
 namespace mycore.viewer.widgets.image {
 
+    /**
+     * Represents information of a Image
+     */
+    export class IIIFImageInformation {
+        constructor(private vPath: string, private vTiles: number,
+                    private vWidth: number, private vHeight: number, private vZoomlevel: number) {
+        }
+
+        public get path() {
+            return this.vPath;
+        }
+
+        public get tiles() {
+            return this.vTiles;
+        }
+
+        public get width() {
+            return this.vWidth;
+        }
+
+        public get height() {
+            return this.vHeight;
+        }
+
+        public get zoomlevel() {
+            return this.vZoomlevel;
+        }
+    }
+
     export class IIIFImageInformationProvider {
-        public static getInformation(href: string, callback: (IIIFImageInformation) => void, errorCallback: (err) => void = (err) => {
+        public static getInformation(href: string, callback: (info: IIIFImageInformation)
+            => void, errorCallback: (err: string) => void = (err: string) => {
             return;
         }) {
-            var settings = {
-                url: href + "/info.json",
+            const settings = {
+                url: href + '/info.json',
                 async: true,
-                success: function(response) {
-                    var imageInformation = IIIFImageInformationProvider.proccessJSON(response, href);
+                success: (response: any) => {
+                    const imageInformation = IIIFImageInformationProvider.proccessJSON(response, href);
                     callback(imageInformation);
                 },
-                error: function(request, status, exception) {
+                error: (request: any, status: string, exception: string) => {
                     errorCallback(exception);
                 }
             };
@@ -38,56 +68,16 @@ namespace mycore.viewer.widgets.image {
 
         }
 
-        private static proccessJSON(node, path:string): IIIFImageInformation {
-            var zommLevels = node.tiles[0].scaleFactors;
-            var width = node.width;
-            var height = node.height;
-            var tiles = 0;
+        private static proccessJSON(node: any, path: string): IIIFImageInformation {
+            const zommLevels = node.tiles[0].scaleFactors;
+            const width = node.width;
+            const height = node.height;
+            let tiles = 0;
             for (let i = 0; i < zommLevels.length + 1; i++) {
                 tiles = tiles + (Math.ceil(width / (256 * Math.pow(2, i))) * Math.ceil(height / (256 * Math.pow(2, i))));
             }
             return new IIIFImageInformation(path, tiles, width , height, zommLevels.length);
         }
 
-        // private static getDerivateFromURL(url: string) {
-        //     let id = url.substr(url.lastIndexOf("/") + 1);
-        //     return id.substring(0, url.indexOf("%2F"));
-        // }
-
     }
-
-    /**
-     * Represents information of a Image
-     */
-    export class IIIFImageInformation {
-        constructor(private _path: string, private _tiles, private _width: number, private _height: number, private _zoomlevel: number) {
-        }
-
-        // public get derivate() {
-        //     return this._derivate;
-        // }
-
-        public get path() {
-            return this._path;
-        }
-
-        public get tiles() {
-            return this._tiles;
-        }
-
-        public get width() {
-            return this._width;
-        }
-
-        public get height() {
-            return this._height;
-        }
-
-        public get zoomlevel() {
-            return this._zoomlevel;
-        }
-
-    }
-
-
 }

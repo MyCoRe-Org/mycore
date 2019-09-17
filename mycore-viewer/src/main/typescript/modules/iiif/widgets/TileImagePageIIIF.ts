@@ -24,19 +24,19 @@ namespace mycore.viewer.widgets.canvas {
 
         protected loadTile(tilePos: Position3D) {
             let iiifPos = this.tilePosToIIIFPos(tilePos);
-            if (this._tiles.has(tilePos)) {
-                return this._tiles.get(tilePos);
+            if (this.vTiles.has(tilePos)) {
+                return this.vTiles.get(tilePos);
             } else {
-                if (!this._loadingTiles.has(tilePos)) {
+                if (!this.vLoadingTiles.has(tilePos)) {
                     this._loadTileIIIF(tilePos, iiifPos, (img: HTMLImageElement) => {
-                        this._tiles.set(tilePos, img);
-                        if (typeof this.refreshCallback != "undefined" && this.refreshCallback != null) {
-                            this._imgPreviewLoaded = true;
-                            this._imgNotPreviewLoaded = true;
+                        this.vTiles.set(tilePos, img);
+                        if (typeof this.refreshCallback != 'undefined' && this.refreshCallback != null) {
+                            this.vImgPreviewLoaded = true;
+                            this.vImgNotPreviewLoaded = true;
                             this.refreshCallback();
                         }
                     }, () => {
-                            console.error("Could not load tile : " + tilePos.toString());
+                            console.error('Could not load tile : ' + tilePos.toString());
                         });
                 }
 
@@ -52,20 +52,20 @@ namespace mycore.viewer.widgets.canvas {
             iiifPos.w = 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
             iiifPos.y = iiifPos.y * 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
             iiifPos.h = 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
-            iiifPos.tx = ((iiifPos.x + iiifPos.w) > this._width) ? Math.ceil((this._width - iiifPos.x) / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
-            iiifPos.ty = ((iiifPos.y + iiifPos.h) > this._height) ? Math.ceil((this._height - iiifPos.y) / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
+            iiifPos.tx = ((iiifPos.x + iiifPos.w) > this.width) ? Math.ceil((this.width - iiifPos.x) / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
+            iiifPos.ty = ((iiifPos.y + iiifPos.h) > this.height) ? Math.ceil((this.height - iiifPos.y) / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
             return iiifPos;
         }
 
         private _loadTileIIIF(tilePos: Position3D, iiifPos: any, okCallback: (image: HTMLImageElement) => void, errorCallback: () => void): void {
-            var pathSelect = Utils.hash(tilePos.toString()) % this._tilePath.length;
+            const pathSelect = Utils.hash(tilePos.toString()) % this.vTilePath.length;
 
-            var path = this._tilePath[pathSelect];
-            var image = new Image();
+            const path = this.vTilePath[pathSelect];
+            let image = new Image();
 
 
             image.onload = () => {
-                this._loadingTiles.remove(tilePos);
+                this.vLoadingTiles.remove(tilePos);
                 okCallback(image);
             };
 
@@ -73,7 +73,7 @@ namespace mycore.viewer.widgets.canvas {
                 errorCallback();
             };
             image.src = ViewerFormatString(path, iiifPos);
-            this._loadingTiles.set(tilePos, image);
+            this.vLoadingTiles.set(tilePos, image);
         }
     }
 }

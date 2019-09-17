@@ -26,16 +26,21 @@ namespace mycore.viewer.widgets.iiif {
 
     export class IviewIIIFProvider {
 
-        public static loadModel(manifestDocumentLocation:string, tilePathBuilder:(href:string,width:number,height:number)=>string):GivenViewerPromise<{model:model.StructureModel; document:Document}, any> {
-            let promise = new ViewerPromise<{model:model.StructureModel; document:Document}, any>();
-            let settings = {
+        public static loadModel(manifestDocumentLocation: string,
+                                tilePathBuilder: (href: string,
+                                                  width: number,
+                                                  height: number)
+                                    => string): GivenViewerPromise<{model: model.StructureModel;
+                                    document: Document}, any> {
+            const promise = new ViewerPromise<{model: model.StructureModel; document: Document}, any>();
+            const settings = {
                 url: manifestDocumentLocation,
-                success: function (response) {
-                    var manifest = <Manifest> manifesto.create(response);
-                    let builder = new IIIFStructureBuilder(<Manifest> manifest, tilePathBuilder);
+                success: (response: any) => {
+                    const manifest = <Manifest> manifesto.create(response);
+                    const builder = new IIIFStructureBuilder(<Manifest> manifest, tilePathBuilder);
                     promise.resolve({model : builder.processManifest(), document : response});
                 },
-                error: function (request, status, exception) {
+                error: (request: any, status: string, exception: string) => {
                     promise.reject(exception);
                 }
             };

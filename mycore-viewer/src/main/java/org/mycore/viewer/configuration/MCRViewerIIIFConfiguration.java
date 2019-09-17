@@ -19,13 +19,9 @@
 package org.mycore.viewer.configuration;
 
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
-import org.mycore.frontend.servlets.MCRServlet;
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.file.Files;
 
 public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
 
@@ -41,12 +37,6 @@ public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
             + derivate + "/manifest");
         setProperty("imageAPIURL", MCRFrontendUtil.getBaseURL()
             + MCRConfiguration.instance().getString("MCR.Viewer.IIIF.URL.Image", "rsc/iiif/image/Iview/"));
-//        String imageXmlPath = MCRConfiguration.instance().getString("MCR.Viewer.BaseURL", null); // Parameter can be used to provide multiple urls
-//
-//        if (imageXmlPath == null || imageXmlPath.isEmpty()) {
-//            imageXmlPath = MCRServlet.getServletBaseURL() + "MCRTileServlet/";
-//        }
-//        setProperty("tileProviderPath", imageXmlPath);
 
         // script
         final boolean debugParameterSet = isDebugMode(request);

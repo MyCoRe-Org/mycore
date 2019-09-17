@@ -21,13 +21,13 @@ namespace mycore.viewer.widgets.iiif {
     export class IIIFStructureModel extends model.StructureModel {
 
         constructor(
-                public smLinkMap: MyCoReMap<string, Array<string>>,
-                _rootChapter:model.StructureChapter,
-                _imageList:Array<model.StructureImage>,
-                _chapterToImageMap:MyCoReMap<string,model.StructureImage>,
-                _imageToChapterMap:MyCoReMap<string,model.StructureChapter>,
-                _imageHrefImageMap:MyCoReMap<string, model.StructureImage>) {
-            super(_rootChapter, _imageList, _chapterToImageMap, _imageToChapterMap, _imageHrefImageMap, false);
+                public smLinkMap: MyCoReMap<string, string[]>,
+                rootChapter: model.StructureChapter,
+                imageList: Array<model.StructureImage>,
+                chapterToImageMap: MyCoReMap<string,model.StructureImage>,
+                imageToChapterMap: MyCoReMap<string,model.StructureChapter>,
+                imageHrefImageMap: MyCoReMap<string, model.StructureImage>) {
+            super(rootChapter, imageList, chapterToImageMap, imageToChapterMap, imageHrefImageMap, false);
         }
 
     }

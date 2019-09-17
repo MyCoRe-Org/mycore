@@ -154,7 +154,7 @@ module.exports = function (grunt) {
                         sourceMap: false
                     }
                 },
-				viewer_iiif: {
+				viewerIiif: {
 					out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.js",
 					src:["<%= globalConfig.projectBase %>src/main/typescript/modules/iiif/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
 					options: {

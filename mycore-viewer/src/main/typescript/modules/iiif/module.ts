@@ -19,4 +19,4 @@
 /// <reference path="components/MyCoReIIIFComponent.ts" />
 /// <reference path="components/MyCoReIIIFPageProviderComponent.ts" />
 
-console.log("IIIF MODULE");
+console.log('IIIF MODULE');

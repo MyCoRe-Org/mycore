@@ -74,18 +74,17 @@ public class MCRViewerResource {
     @Path("{derivate}{path: (/[^?#]*)?}")
     public Response show(@Context HttpServletRequest request, @Context Request jaxReq,
         @Context ServletContext context, @Context ServletConfig config) throws Exception {
-        return showViewer(request, jaxReq, context, config);
+        return showViewer(request, jaxReq);
     }
 
     @GET
     @Path("iiif/{derivate}{path: (/[^?#]*)?}")
     public Response showIIIF(@Context HttpServletRequest request, @Context Request jaxReq,
         @Context ServletContext context, @Context ServletConfig config) throws Exception {
-        return showViewer(request, jaxReq, context, config);
+        return showViewer(request, jaxReq);
     }
 
-    private Response showViewer(HttpServletRequest request, Request jaxReq, ServletContext context,
-        ServletConfig config) throws Exception {
+    private Response showViewer(HttpServletRequest request, Request jaxReq) throws Exception {
         MCRContent content = getContent(request);
         String contentETag = content.getETag();
         Response.ResponseBuilder responseBuilder = null;

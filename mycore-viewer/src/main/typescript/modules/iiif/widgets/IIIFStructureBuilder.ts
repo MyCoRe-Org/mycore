@@ -21,9 +21,6 @@
 
 namespace mycore.viewer.widgets.iiif {
 
-
-    // import IIIFCanvas = mycore.viewer.components.manifest.IIIFCanvas;
-    // import IIIFImage = mycore.viewer.components.manifest.IIIFImage;
     import Manifest = Manifesto.Manifest;
     import IRange = Manifesto.IRange;
     import ICanvas = Manifesto.ICanvas;
@@ -31,73 +28,55 @@ namespace mycore.viewer.widgets.iiif {
 
     export class IIIFStructureBuilder {
 
-        private static METS_NAMESPACE_URI = "http://www.loc.gov/METS/";
-        private static XLINK_NAMESPACE_URI = "http://www.w3.org/1999/xlink";
+        private hrefResolverElement = document.createElement('a');
 
-        private hrefResolverElement = document.createElement("a");
+        private vSmLinkMap: MyCoReMap<string, string[]>;
+        private vChapterIdMap: MyCoReMap<string, model.StructureChapter>;
+        private vIdFileMap: MyCoReMap<string, IAnnotation>;
+        private vIdPhysicalFileMap: MyCoReMap<string, Element>;
 
-        private _smLinkMap: MyCoReMap<string, Array<string>>;
-        private _chapterIdMap: MyCoReMap<string, model.StructureChapter>;
-        private _idFileMap: MyCoReMap<string, IAnnotation>;
-        private _idPhysicalFileMap: MyCoReMap<string, Element>;
+        private vChapterImageMap: MyCoReMap<string, model.StructureImage>;
+        private vImageChapterMap: MyCoReMap<string, model.StructureChapter>;
+        private ManifestChapter: model.StructureChapter;
+        private vImageList: Array<model.StructureImage>;
+        private vStructureModel: IIIFStructureModel;
+        private vIdImageMap: MyCoReMap<string, model.StructureImage>;
+        private vImprovisationMap: MyCoReMap<string, boolean>;
+        private vImageHrefImageMap: MyCoReMap<string, model.StructureImage>;
 
-        private _chapterImageMap: MyCoReMap<string, model.StructureImage>;
-        private _imageChapterMap: MyCoReMap<string, model.StructureChapter>;
-        private _manifestChapter: model.StructureChapter;
-        private _imageList: Array<model.StructureImage>;
-        private _structureModel: IIIFStructureModel;
-        private _idImageMap: MyCoReMap<string, model.StructureImage>;
-        private _improvisationMap: MyCoReMap<string, boolean>;
-        private _imageHrefImageMap: MyCoReMap<string, model.StructureImage>;
-
-        private static NS_RESOLVER = {
-            lookupNamespaceURI: (nsPrefix: String) => {
-                if (nsPrefix == "manifest") {
-                    return IIIFStructureBuilder.METS_NAMESPACE_URI;
-                }
-                return null;
-            }
-        };
-
-        private static NS_MAP = (() => {
-            let nsMap = new MyCoReMap<string, string>();
-            nsMap.set("manifest", IIIFStructureBuilder.METS_NAMESPACE_URI);
-            nsMap.set("xlink", IIIFStructureBuilder.XLINK_NAMESPACE_URI);
-            return nsMap;
-        })();
-
-        constructor(private manifestDocument: Manifest, private tilePathBuilder: (href: string,width:number,height:number) => string) {
+        constructor(private manifestDocument: Manifest,
+                    private tilePathBuilder: (href: string, width: number, height: number) => string) {
 
         }
 
         public processManifest(): model.StructureModel {
-            this._idFileMap = this.getIdFileMap();
+            this.vIdFileMap = this.getIdFileMap();
 
 
-            const useFilesMap = new MyCoReMap<string, Array<Node>>();
+            const useFilesMap = new MyCoReMap<string, Node[]>();
 
-            this._chapterIdMap = new MyCoReMap<string, model.StructureChapter>();
-            this._idPhysicalFileMap = undefined;
-            this._smLinkMap = new MyCoReMap<string, Array<string>>();
-            this._chapterImageMap = new MyCoReMap<string, model.StructureImage>();
-            this._imageChapterMap = new MyCoReMap<string, model.StructureChapter>();
-            this._improvisationMap = new MyCoReMap<string, boolean>(); // see makeLink
-            this._manifestChapter = this.processChapter(null,this.manifestDocument.getTopRanges()[0]);
-            this._imageHrefImageMap = new MyCoReMap<string, model.StructureImage>();
-            this._imageList = [];
+            this.vChapterIdMap = new MyCoReMap<string, model.StructureChapter>();
+            this.vIdPhysicalFileMap = undefined;
+            this.vSmLinkMap = new MyCoReMap<string, string[]>();
+            this.vChapterImageMap = new MyCoReMap<string, model.StructureImage>();
+            this.vImageChapterMap = new MyCoReMap<string, model.StructureChapter>();
+            this.vImprovisationMap = new MyCoReMap<string, boolean>(); // see makeLink
+            this.ManifestChapter = this.processChapter(null, this.manifestDocument.getTopRanges()[0]);
+            this.vImageHrefImageMap = new MyCoReMap<string, model.StructureImage>();
+            this.vImageList = [];
 
-            this._idImageMap = new MyCoReMap<string, model.StructureImage>();
+            this.vIdImageMap = new MyCoReMap<string, model.StructureImage>();
             this.processImages();
 
-            this._structureModel = new widgets.iiif.IIIFStructureModel(
-                this._smLinkMap,
-                this._manifestChapter,
-                this._imageList,
-                this._chapterImageMap,
-                this._imageChapterMap,
-                this._imageHrefImageMap);
+            this.vStructureModel = new widgets.iiif.IIIFStructureModel(
+                this.vSmLinkMap,
+                this.ManifestChapter,
+                this.vImageList,
+                this.vChapterImageMap,
+                this.vImageChapterMap,
+                this.vImageHrefImageMap);
 
-            return this._structureModel;
+            return this.vStructureModel;
         }
 
         private processChapter(parent: model.StructureChapter, chapter: IRange): model.StructureChapter {
@@ -105,10 +84,11 @@ namespace mycore.viewer.widgets.iiif {
             //     return;
             // }
             //TODO Chaptertype currently not in Manifest
-            let chapterObject = new model.StructureChapter(parent, "", this.getIDFromURL(chapter.id), chapter.getDefaultLabel());
+            let chapterObject = new model.StructureChapter(parent,
+                '', this.getIDFromURL(chapter.id), chapter.getDefaultLabel());
             // let chapterChildren = chapter.getRanges();
 
-            this._chapterIdMap.set(chapterObject.id, chapterObject);
+            this.vChapterIdMap.set(chapterObject.id, chapterObject);
 
             chapter.getRanges().forEach((childChap: IRange) => {
                 chapterObject.chapter.push(this.processChapter(chapterObject, childChap));
@@ -130,62 +110,65 @@ namespace mycore.viewer.widgets.iiif {
             let count = 1;
             this.manifestDocument.getSequences()[0].getCanvases().forEach((canvas: ICanvas) => {
                 const image = this.parseFile(canvas, count++);
-                if (image != null) {
-                    this._imageList.push(image);
-                    this._idImageMap.set(this.getIDFromURL(canvas.id), image);
+                if (image !== null) {
+                    this.vImageList.push(image);
+                    this.vIdImageMap.set(this.getIDFromURL(canvas.id), image);
                 }
             });
 
-            this._imageList = this._imageList.sort((x, y) => x.order - y.order);
+            this.vImageList = this.vImageList.sort((x, y) => x.order - y.order);
 
             this.makeLinks(this.manifestDocument.getTopRanges()[0]);
 
-            this._imageList = this._imageList.filter((el => this._imageChapterMap.has(el.id)));
-            this._imageList.forEach((image, i) => {
+            this.vImageList = this.vImageList.filter(el => this.vImageChapterMap.has(el.id));
+            this.vImageList.forEach((image, i) => {
                 // fix order
                 image.order = i + 1;
                 // build href map
-                this._imageHrefImageMap.set(image.href, image);
+                this.vImageHrefImageMap.set(image.href, image);
             });
         }
 
         private makeLinks(elem: IRange) {
             let chapter = elem;
             elem.getCanvasIds().forEach((can: string) => {
-                this.makeLink(this._chapterIdMap.get(this.getIDFromURL(chapter.id)), this._idImageMap.get(this.getIDFromURL(can)));
+                this.makeLink(this.vChapterIdMap.get(this.getIDFromURL(chapter.id)),
+                    this.vIdImageMap.get(this.getIDFromURL(can)));
             });
             elem.getRanges().forEach((range: IRange) => {
-                this.makeLinks(range)
+                this.makeLinks(range);
             });
         }
 
         private makeLink(chapter: model.StructureChapter, image: model.StructureImage) {
-            if (chapter.parent != null && !this._chapterImageMap.has(chapter.parent.id)) {
-                this._improvisationMap.set(chapter.parent.id, true); // we flag this link as improvisation
-                this._chapterImageMap.set(chapter.parent.id, image);
+            if (chapter.parent !== null && !this.vChapterImageMap.has(chapter.parent.id)) {
+                this.vImprovisationMap.set(chapter.parent.id, true); // we flag this link as improvisation
+                this.vChapterImageMap.set(chapter.parent.id, image);
             }
 
-            if (!this._chapterImageMap.has(chapter.id) || this._imageList.indexOf(this._chapterImageMap.get(chapter.id)) > this._imageList.indexOf(image) || (this._improvisationMap.has(chapter.id) && this._improvisationMap.get(chapter.id))) {
-                this._chapterImageMap.set(chapter.id, image);
-                this._improvisationMap.set(chapter.id, false);
+            if (!this.vChapterImageMap.has(chapter.id)
+                || this.vImageList.indexOf(this.vChapterImageMap.get(chapter.id)) > this.vImageList.indexOf(image)
+                || (this.vImprovisationMap.has(chapter.id) && this.vImprovisationMap.get(chapter.id))) {
+                this.vChapterImageMap.set(chapter.id, image);
+                this.vImprovisationMap.set(chapter.id, false);
             }
 
-            if (!this._imageChapterMap.has(image.id)) {
-                this._imageChapterMap.set(image.id, chapter);
+            if (!this.vImageChapterMap.has(image.id)) {
+                this.vImageChapterMap.set(image.id, chapter);
             }
 
-            if (!this._smLinkMap.has(chapter.id)) {
-                this._smLinkMap.set(chapter.id, []);
+            if (!this.vSmLinkMap.has(chapter.id)) {
+                this.vSmLinkMap.set(chapter.id, []);
             }
-            this._smLinkMap.get(chapter.id).push(image.href);
+            this.vSmLinkMap.get(chapter.id).push(image.href);
         }
 
         private parseFile(canvas: ICanvas, defaultOrder: number): model.StructureImage {
-            const type: string = "page"; //TODO set real type, not in use currently
+            const type: string = 'page'; //TODO set real type, not in use currently
             const id: string = this.getHrefFromID(this.getIDFromURL(canvas.id));
             const order: number = parseInt('' + defaultOrder, 10); //TODO wo bekommen wir die Order sonst her?
             const orderLabel: string = canvas.getDefaultLabel();
-            const contentIds: string = ""; //TODO was ist das? wo kommt es her?
+            const contentIds: string = ''; //TODO was ist das? wo kommt es her?
             const additionalHrefs = new MyCoReMap<string, string>();
 
             let imgHref: string = null;
@@ -215,11 +198,11 @@ namespace mycore.viewer.widgets.iiif {
         }
 
         private getIDFromURL(url: String) {
-            return url.substr(url.lastIndexOf("/") + 1);
+            return url.substr(url.lastIndexOf('/') + 1);
         }
 
         private getHrefFromID(url: String) {
-            return url.substr(url.indexOf("%2F") + 3);
+            return url.substr(url.indexOf('%2F') + 3);
         }
     }
 }

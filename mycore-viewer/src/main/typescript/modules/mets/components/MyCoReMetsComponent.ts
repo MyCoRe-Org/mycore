@@ -21,62 +21,47 @@
 
 /// <reference path="MetsSettings.ts" />
 
-/// <reference path="../../base/components/MyCoReComponent.ts" />
+/// <reference path="../../base/components/MyCoReStructFileComponent.ts" />
 
 namespace mycore.viewer.components {
 
-    import ShowContentEvent = mycore.viewer.components.events.ShowContentEvent;
-    export class MyCoReMetsComponent extends MyCoReComponent {
+    export class MyCoReMetsComponent extends MyCoReStructFileComponent {
 
-        constructor(protected _settings:MetsSettings, protected container:JQuery) {
-            super(_settings, container);
+        constructor(protected settings: MetsSettings, protected container: JQuery) {
+            super(settings, container);
         }
 
-        private errorSync = Utils.synchronize<MyCoReMetsComponent>([ (context:MyCoReMetsComponent)=> {
-            return context.lm != null && context.error;
-        } ], (context:MyCoReMetsComponent)=> {
-            new mycore.viewer.widgets.modal.ViewerErrorModal(
-                this._settings.mobile,
-                context.lm.getTranslation("noMetsShort"),
-                context.lm.getFormatedTranslation("noMets", "<a href='mailto:"
-                    + this._settings.adminMail + "'>" + this._settings.adminMail + "</a>"),
-                this._settings.webApplicationBaseURL + "/modules/iview2/img/sad-emotion-egg.jpg",
-                this.container[ 0 ]).show();
-            context.trigger(new ShowContentEvent(this, jQuery(), mycore.viewer.widgets.layout.IviewBorderLayout.DIRECTION_WEST, 0));
-        });
-
         private structFileAndLanguageSync = Utils.synchronize<MyCoReMetsComponent>([
-            (context:MyCoReMetsComponent)=> context.mm != null,
-            (context:MyCoReMetsComponent)=> context.lm != null
-        ], (context:MyCoReMetsComponent)=> {
+            (context: MyCoReMetsComponent)=> context.mm != null,
+            (context: MyCoReMetsComponent)=> context.lm != null
+        ], (context: MyCoReMetsComponent)=> {
             this.structFileLoaded(this.mm.model);
             this.trigger(new events.MetsLoadedEvent(this, this.mm));
         });
 
         public init() {
-            var settings = this._settings;
-            if (settings.doctype == "mets") {
+            let settings = this.settings;
+            if (settings.doctype === 'mets') {
                 if ((settings.imageXmlPath.charAt(settings.imageXmlPath.length - 1) != '/')) {
-                    settings.imageXmlPath = settings.imageXmlPath + "/";
+                    settings.imageXmlPath = settings.imageXmlPath + '/';
                 }
 
                 if ((settings.tileProviderPath.charAt(settings.tileProviderPath.length - 1) != '/')) {
-                    settings.tileProviderPath = settings.tileProviderPath + "/";
+                    settings.tileProviderPath = settings.tileProviderPath + '/';
                 }
 
-
-                var that = this;
-                this._structFileLoaded = false;
-                var tilePathBuilder = (image:string) => {
-                    return that._settings.tileProviderPath.split(",")[0] + that._settings.derivate + "/" + image + "/0/0/0.jpg";
+                const that = this;
+                this.vStructFileLoaded = false;
+                const tilePathBuilder = (image: string) => {
+                    return that.settings.tileProviderPath.split(',')[0] + that.settings.derivate + '/' + image + '/0/0/0.jpg';
                 };
 
-                var metsPromise = mycore.viewer.widgets.mets.IviewMetsProvider.loadModel(this._settings.metsURL, tilePathBuilder);
+                const metsPromise = mycore.viewer.widgets.mets.IviewMetsProvider.loadModel(this.settings.metsURL, tilePathBuilder);
                 metsPromise.then((resolved:{ model: model.StructureModel; document: Document }) => {
-                    var model = resolved.model;
+                    const model = resolved.model;
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
 
-                    if (model == null) {
+                    if (model === null) {
                         this.error = true;
                         this.errorSync(this);
                         return;
@@ -88,7 +73,7 @@ namespace mycore.viewer.components {
                 });
 
 
-                metsPromise.onreject(()=>{
+                metsPromise.onreject(() =>{
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
                     this.error = true;
                     this.errorSync(this);
@@ -98,9 +83,9 @@ namespace mycore.viewer.components {
             }
         }
 
-        public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
 
-            if (e.type == events.LanguageModelLoadedEvent.TYPE) {
+            if (e.type === events.LanguageModelLoadedEvent.TYPE) {
                 var languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
                 this.lm = languageModelLoadedEvent.languageModel;
                 this.errorSync(this);
