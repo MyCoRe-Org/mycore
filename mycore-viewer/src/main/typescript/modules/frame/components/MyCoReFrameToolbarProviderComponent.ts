@@ -42,7 +42,7 @@ namespace mycore.viewer.components {
 
             this.trigger(new events.ProvideToolbarModelEvent(
                 this, frameToolbarModel));
-            this.btn = frameToolbarModel.closeToolbarButton;
+            this.btn = frameToolbarModel.maximizeViewerToolbarButton;
             this.trigger(new events.WaitForEvent(this, mycore.viewer.components.events.LanguageModelLoadedEvent.TYPE));
         }
 

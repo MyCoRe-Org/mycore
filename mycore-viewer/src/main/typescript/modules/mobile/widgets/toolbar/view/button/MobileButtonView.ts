@@ -48,7 +48,7 @@ namespace mycore.viewer.widgets.toolbar {
 
         public updateButtonIcon(icon:string):void {
             this._buttonIcon.removeClass(`fas`);
-            this._buttonIcon.removeClass(`fas${this._lastIcon}`);
+            this._buttonIcon.removeClass(`fa-${this._lastIcon}`);
             this._buttonIcon.removeClass(`icon-${this._lastIcon}`);
 
             this._lastIcon = icon;
