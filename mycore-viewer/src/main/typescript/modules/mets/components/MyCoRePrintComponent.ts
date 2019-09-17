@@ -61,7 +61,7 @@ namespace mycore.viewer.components {
                 this._printButton = new widgets.toolbar.ToolbarButton("PrintButton", "PDF", "", "");
 
 
-                this._printButton.icon = "fa-file-pdf";
+                this._printButton.icon = "file-pdf";
                 this._printButton.label = "";
 
                 if (ptme.model.name == "MyCoReFrameToolbar") {

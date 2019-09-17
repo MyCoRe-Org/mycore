@@ -145,7 +145,7 @@
       <xsl:copy-of select="@initially" />
       <xsl:copy-of select="@default" />
       <div class="form-group">
-        <div class="col-md-offset-{$mcrsolr:label-width} col-md-{$mcrsolr:input-width}">
+        <div class="offset-md-{$mcrsolr:label-width} col-md-{$mcrsolr:input-width}">
           <div class="checkbox">
             <label for="{$id}">
               <input type="checkbox" value="{$value}" id="{$id}">
