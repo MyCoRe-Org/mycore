@@ -1,6 +1,5 @@
 language: java
-sudo: false
-dist: trusty
+dist: xenial
 group: beta
 install: true
 addons:
