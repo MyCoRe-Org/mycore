@@ -85,8 +85,6 @@ public class MCRFileSystemProvider extends FileSystemProvider {
 
     private static MCRAbstractFileSystem FILE_SYSTEM_INSTANCE;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRFileSystemProvider.class);
-
     private static final Set<? extends CopyOption> SUPPORTED_COPY_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING));
 
@@ -294,9 +292,9 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             throw new NotDirectoryException(MCRFileSystemUtils.toPath(parentNode).toString());
         }
         MCRDirectory parentDir = (MCRDirectory) parentNode;
-        try(Stream<MCRNode> s= parentDir.getChildren()){
-          //warm-up cache
-        };
+        //warm-up cache
+        parentDir.getChildren().close();
+
         return parentDir;
     }
 
