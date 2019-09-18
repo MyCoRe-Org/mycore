@@ -23,9 +23,9 @@ namespace mycore.viewer.widgets.iiif {
         constructor(
                 public smLinkMap: MyCoReMap<string, string[]>,
                 rootChapter: model.StructureChapter,
-                imageList: Array<model.StructureImage>,
-                chapterToImageMap: MyCoReMap<string,model.StructureImage>,
-                imageToChapterMap: MyCoReMap<string,model.StructureChapter>,
+                imageList: model.StructureImage[],
+                chapterToImageMap: MyCoReMap<string, model.StructureImage>,
+                imageToChapterMap: MyCoReMap<string, model.StructureChapter>,
                 imageHrefImageMap: MyCoReMap<string, model.StructureImage>) {
             super(rootChapter, imageList, chapterToImageMap, imageToChapterMap, imageHrefImageMap, false);
         }

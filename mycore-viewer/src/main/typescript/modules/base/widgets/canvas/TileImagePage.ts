@@ -31,7 +31,6 @@ namespace mycore.viewer.widgets.canvas {
         protected vTiles: MyCoReMap<Position3D, HTMLImageElement> = new MyCoReMap<Position3D, HTMLImageElement>();
         protected vLoadingTiles: MyCoReMap<Position3D, HTMLImageElement> = new MyCoReMap<Position3D, HTMLImageElement>();
 
-
         protected vBackBuffer: HTMLCanvasElement = document.createElement('canvas');
         protected vBackBufferArea: Rect = null;
         protected vBackBufferAreaZoom: number = null;
@@ -40,13 +39,10 @@ namespace mycore.viewer.widgets.canvas {
         protected vPreviewBackBufferArea: Rect = null;
         protected vPreviewBackBufferAreaZoom: number = null;
 
-
-
         protected vImgPreviewLoaded: boolean = false;
         protected vImgNotPreviewLoaded: boolean = false;
 
         protected htmlContent: ViewerProperty<HTMLElement> = new ViewerProperty<HTMLElement>(this, 'htmlContent');
-
 
         public get size(): Size2D {
             return new Size2D(this.width, this.height);
@@ -59,24 +55,24 @@ namespace mycore.viewer.widgets.canvas {
                 rect = new Rect(rect.pos.max(0, 0), rect.size);
             }
 
-            let zoomLevel = Math.min(this.getZoomLevel(scale), this.maxZoomLevel());
-            let zoomLevelScale = this.scaleForLevel(zoomLevel);
+            const zoomLevel = Math.min(this.getZoomLevel(scale), this.maxZoomLevel());
+            const zoomLevelScale = this.scaleForLevel(zoomLevel);
 
-            let diff = scale / zoomLevelScale;
+            const diff = scale / zoomLevelScale;
 
-            let tileSizeInZoomLevel = TileImagePage.TILE_SIZE / zoomLevelScale;
+            const tileSizeInZoomLevel = TileImagePage.TILE_SIZE / zoomLevelScale;
 
-            let startX = Math.floor(rect.pos.x / tileSizeInZoomLevel);
-            let startY = Math.floor(rect.pos.y / tileSizeInZoomLevel);
-            let endX = Math.ceil(Math.min(rect.pos.x + rect.size.width, this.size.width) / tileSizeInZoomLevel);
-            let endY = Math.ceil(Math.min(rect.pos.y + rect.size.height, this.size.height) / tileSizeInZoomLevel);
+            const startX = Math.floor(rect.pos.x / tileSizeInZoomLevel);
+            const startY = Math.floor(rect.pos.y / tileSizeInZoomLevel);
+            const endX = Math.ceil(Math.min(rect.pos.x + rect.size.width, this.size.width) / tileSizeInZoomLevel);
+            const endY = Math.ceil(Math.min(rect.pos.y + rect.size.height, this.size.height) / tileSizeInZoomLevel);
 
             this.updateBackbuffer(startX, startY, endX, endY, zoomLevel, overview);
 
             ctx.save();
             {
-                let xBase = (startX * tileSizeInZoomLevel - rect.pos.x) * scale;
-                let yBase = (startY * tileSizeInZoomLevel - rect.pos.y) * scale;
+                const xBase = (startX * tileSizeInZoomLevel - rect.pos.x) * scale;
+                const yBase = (startY * tileSizeInZoomLevel - rect.pos.y) * scale;
                 ctx.translate(xBase, yBase);
                 ctx.scale(diff, diff);
                 if (overview) {
@@ -89,8 +85,7 @@ namespace mycore.viewer.widgets.canvas {
 
         }
 
-
-        public getHTMLContent(){
+        public getHTMLContent() {
             return this.htmlContent;
         }
 
@@ -105,12 +100,13 @@ namespace mycore.viewer.widgets.canvas {
             this.vBackBuffer.width = 1;
             this.vBackBuffer.height = 1;
             this.vBackBufferAreaZoom = null;
+            let tile: HTMLImageElement = null;
 
             const previewTilePos = new Position3D(0, 0, 0);
             const hasPreview = this.vTiles.has(previewTilePos);
 
             if (hasPreview) {
-                var tile = this.vTiles.get(previewTilePos);
+                tile = this.vTiles.get(previewTilePos);
             }
 
             this.vTiles.clear();
@@ -119,16 +115,17 @@ namespace mycore.viewer.widgets.canvas {
                 this.vTiles.set(previewTilePos, tile);
             }
 
-
             this.vLoadingTiles.clear();
         }
-
 
         protected updateBackbuffer(startX: number, startY: number,
                                    endX: number, endY: number, zoomLevel: number, overview: boolean) {
             const newBackBuffer = new Rect(new Position2D(startX, startY), new Size2D(endX - startX, endY - startY));
             if (overview) {
-                if (this.vPreviewBackBufferArea !== null && !this.vImgPreviewLoaded && this.vPreviewBackBufferArea.equals(newBackBuffer) && zoomLevel == this.vPreviewBackBufferAreaZoom) {
+                if (this.vPreviewBackBufferArea !== null
+                    && !this.vImgPreviewLoaded
+                    && this.vPreviewBackBufferArea.equals(newBackBuffer)
+                    && zoomLevel === this.vPreviewBackBufferAreaZoom) {
                     return;
                 } else {
                     this.vPreviewBackBuffer.width = newBackBuffer.size.width * 256;
@@ -139,7 +136,10 @@ namespace mycore.viewer.widgets.canvas {
                 this.vPreviewBackBufferAreaZoom = zoomLevel;
                 this.vImgPreviewLoaded = false;
             } else {
-                if (this.vBackBufferArea !== null && !this.vImgNotPreviewLoaded && this.vBackBufferArea.equals(newBackBuffer) && zoomLevel == this.vBackBufferAreaZoom) {
+                if (this.vBackBufferArea !== null
+                    && !this.vImgNotPreviewLoaded
+                    && this.vBackBufferArea.equals(newBackBuffer)
+                    && zoomLevel === this.vBackBufferAreaZoom) {
                     // backbuffer content is the same
                     return;
                 } else {
@@ -153,7 +153,6 @@ namespace mycore.viewer.widgets.canvas {
                 this.vBackBufferAreaZoom = zoomLevel;
                 this.vImgNotPreviewLoaded = false;
             }
-
 
             /*
              else {
@@ -171,11 +170,12 @@ namespace mycore.viewer.widgets.canvas {
              var ctx = this._backBuffer.getContext("2d");
              ctx.save();
              ctx.translate(xTranslate, yTranslate);
-             this._drawToBackbuffer(reusableContent.pos.x, reusableContent.pos.y, reusableContent.pos.x + reusableContent.size.width, reusableContent.pos.y + reusableContent.size.height, zoomLevel);
+             this._drawToBackbuffer(reusableContent.pos.x, reusableContent.pos.y,
+                reusableContent.pos.x + reusableContent.size.width,
+                reusableContent.pos.y + reusableContent.size.height, zoomLevel);
              ctx.restore();
              }
              }         */
-
 
         }
 
@@ -191,11 +191,10 @@ namespace mycore.viewer.widgets.canvas {
             this.vLoadingTiles.clear();
         }
 
-
         protected drawToBackbuffer(startX: number, startY: number,
-                                   endX: number, endY: number, zoomLevel: number, _overview: boolean) {
+                                   endX: number, endY: number, zoomLevel: number, overview: boolean) {
             let ctx: CanvasRenderingContext2D;
-            if (_overview) {
+            if (overview) {
                 ctx = <CanvasRenderingContext2D> this.vPreviewBackBuffer.getContext('2d');
             } else {
                 ctx = <CanvasRenderingContext2D> this.vBackBuffer.getContext('2d');
@@ -209,7 +208,8 @@ namespace mycore.viewer.widgets.canvas {
                     const rasterPositionY = (y - startY) * 256;
 
                     if (tile !== null) {
-                        ctx.drawImage(tile, Math.floor(rasterPositionX), rasterPositionY, tile.naturalWidth, tile.naturalHeight);
+                        ctx.drawImage(tile, Math.floor(rasterPositionX),
+                            rasterPositionY, tile.naturalWidth, tile.naturalHeight);
                     } else {
                         const preview = this.getPreview(tilePosition);
                         if (preview !== null) {
@@ -221,8 +221,10 @@ namespace mycore.viewer.widgets.canvas {
         }
 
         protected drawPreview(ctx: CanvasRenderingContext2D, targetPosition: Position2D, tile: PreviewTile) {
-            tile.areaToDraw.size.width = Math.min(tile.areaToDraw.pos.x + tile.areaToDraw.size.width, tile.tile.naturalWidth) - tile.areaToDraw.pos.x;
-            tile.areaToDraw.size.height = Math.min(tile.areaToDraw.pos.y + tile.areaToDraw.size.height, tile.tile.naturalHeight) - tile.areaToDraw.pos.y;
+            tile.areaToDraw.size.width = Math.min(tile.areaToDraw.pos.x + tile.areaToDraw.size.width,
+                tile.tile.naturalWidth) - tile.areaToDraw.pos.x;
+            tile.areaToDraw.size.height = Math.min(tile.areaToDraw.pos.y + tile.areaToDraw.size.height,
+                tile.tile.naturalHeight) - tile.areaToDraw.pos.y;
 
             ctx.drawImage(tile.tile,
                 tile.areaToDraw.pos.x,
@@ -260,8 +262,9 @@ namespace mycore.viewer.widgets.canvas {
 
         /**
          * Gets a preview draw instruction for a specific tile.
-         * @param tilePos the tile
-         * @returns { tile:HTMLImageElement; areaToDraw: Rect } tile contains the Image to draw and areaToDraw contains the coordinates in the Image.
+         * param tilePos the tile
+         * returns { tile:HTMLImageElement; areaToDraw: Rect } tile contains the Image to draw and areaToDraw
+         * contains the coordinates in the Image.
          */
         protected getPreview(tilePos: Position3D, scale: number = 1): PreviewTile {
             if (this.vTiles.has(tilePos)) {
@@ -313,7 +316,7 @@ namespace mycore.viewer.widgets.canvas {
             const pathSelect = Utils.hash(tilePos.toString()) % this.vTilePath.length;
 
             const path = this.vTilePath[pathSelect];
-            let image = new Image();
+            const image = new Image();
 
 
             image.onload = () => {
@@ -339,6 +342,5 @@ namespace mycore.viewer.widgets.canvas {
         areaToDraw: Rect;
         scale: number;
     }
-
 
 }

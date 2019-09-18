@@ -23,14 +23,14 @@ namespace mycore.viewer.widgets.canvas {
     export class TileImagePageIIIF extends canvas.TileImagePage {
 
         protected loadTile(tilePos: Position3D) {
-            let iiifPos = this.tilePosToIIIFPos(tilePos);
+            const iiifPos = this.tilePosToIIIFPos(tilePos);
             if (this.vTiles.has(tilePos)) {
                 return this.vTiles.get(tilePos);
             } else {
                 if (!this.vLoadingTiles.has(tilePos)) {
                     this._loadTileIIIF(tilePos, iiifPos, (img: HTMLImageElement) => {
                         this.vTiles.set(tilePos, img);
-                        if (typeof this.refreshCallback != 'undefined' && this.refreshCallback != null) {
+                        if (typeof this.refreshCallback !== 'undefined' && this.refreshCallback !== null) {
                             this.vImgPreviewLoaded = true;
                             this.vImgNotPreviewLoaded = true;
                             this.refreshCallback();
@@ -46,23 +46,25 @@ namespace mycore.viewer.widgets.canvas {
         }
 
         private tilePosToIIIFPos(tilePos: Position3D) {
-            let iiifPos:any;
+            let iiifPos: any;
             iiifPos = tilePos;
             iiifPos.x = iiifPos.x * 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
             iiifPos.w = 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
             iiifPos.y = iiifPos.y * 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
             iiifPos.h = 256 * Math.pow(2, this.maxZoomLevel() - iiifPos.z);
-            iiifPos.tx = ((iiifPos.x + iiifPos.w) > this.width) ? Math.ceil((this.width - iiifPos.x) / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
-            iiifPos.ty = ((iiifPos.y + iiifPos.h) > this.height) ? Math.ceil((this.height - iiifPos.y) / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
+            iiifPos.tx = ((iiifPos.x + iiifPos.w) > this.width) ? Math.ceil((this.width - iiifPos.x)
+                / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
+            iiifPos.ty = ((iiifPos.y + iiifPos.h) > this.height) ? Math.ceil((this.height - iiifPos.y)
+                / Math.pow(2, this.maxZoomLevel() - iiifPos.z)) : 256;
             return iiifPos;
         }
 
-        private _loadTileIIIF(tilePos: Position3D, iiifPos: any, okCallback: (image: HTMLImageElement) => void, errorCallback: () => void): void {
+        private _loadTileIIIF(tilePos: Position3D, iiifPos: any,
+                              okCallback: (image: HTMLImageElement) => void, errorCallback: () => void): void {
             const pathSelect = Utils.hash(tilePos.toString()) % this.vTilePath.length;
 
             const path = this.vTilePath[pathSelect];
-            let image = new Image();
-
+            const image = new Image();
 
             image.onload = () => {
                 this.vLoadingTiles.remove(tilePos);

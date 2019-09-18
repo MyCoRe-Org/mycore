@@ -25,13 +25,13 @@ namespace mycore.viewer.components {
             super();
         }
 
-        protected errorSync = Utils.synchronize<MyCoReStructFileComponent>([ (context: MyCoReStructFileComponent) => {
+        protected errorSync: any = Utils.synchronize<MyCoReStructFileComponent>([ (context: MyCoReStructFileComponent) => {
             return context.lm != null && context.error;
-        } ], (context:MyCoReStructFileComponent) => {
+        } ], (context: MyCoReStructFileComponent) => {
             new mycore.viewer.widgets.modal.ViewerErrorModal(
                 this.settings.mobile,
                 context.lm.getTranslation('noStructFileShort'),
-                context.lm.getFormatedTranslation('noStructFile', "<a href='mailto:'"
+                context.lm.getFormatedTranslation('noStructFile', '<a href="ailto:"'
                     + this.settings.adminMail + '>' + this.settings.adminMail + '</a>'),
                 this.settings.webApplicationBaseURL + '/modules/iview2/img/sad-emotion-egg.jpg',
                 this.container[ 0 ]).show();

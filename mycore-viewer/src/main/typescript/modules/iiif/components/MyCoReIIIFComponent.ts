@@ -30,7 +30,7 @@ namespace mycore.viewer.components {
             super(settings, container);
         }
 
-        private structFileAndLanguageSync = Utils.synchronize<MyCoReIIIFComponent>([
+        private structFileAndLanguageSync: any = Utils.synchronize<MyCoReIIIFComponent>([
             (context: MyCoReIIIFComponent) => context.mm != null,
             (context: MyCoReIIIFComponent) => context.lm != null
         ], (context: MyCoReIIIFComponent) => {
@@ -50,7 +50,7 @@ namespace mycore.viewer.components {
 
                 const manifestPromise = mycore.viewer.widgets.iiif.IviewIIIFProvider.loadModel(this.settings.manifestURL, tilePathBuilder);
                 manifestPromise.then((resolved: { model: model.StructureModel; document: Document }) => {
-                    var model = resolved.model;
+                    const model = resolved.model;
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
 
                     if (model === null) {
@@ -64,7 +64,7 @@ namespace mycore.viewer.components {
                     this.structFileAndLanguageSync(this);
                 });
 
-                manifestPromise.onreject(() =>{
+                manifestPromise.onreject(() => {
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
                     this.error = true;
                     this.errorSync(this);
@@ -74,10 +74,10 @@ namespace mycore.viewer.components {
             }
         }
 
-        public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent):void {
 
             if (e.type === events.LanguageModelLoadedEvent.TYPE) {
-                var languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
+                const languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
                 this.lm = languageModelLoadedEvent.languageModel;
                 this.errorSync(this);
                 this.structFileAndLanguageSync(this);
@@ -88,7 +88,7 @@ namespace mycore.viewer.components {
 
         private getScaleFactor(width: number, height: number) {
             let largestScaling = Math.min(256 / width , 256 / height); //TODO make smallest size dynamic
-            return Math.pow(2, Math.ceil(Math.log(largestScaling) / Math.log(1/2)));
+            return Math.pow(2, Math.ceil(Math.log(largestScaling) / Math.log(1 / 2)));
         }
 
     }

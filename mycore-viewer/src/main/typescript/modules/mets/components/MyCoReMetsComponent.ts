@@ -31,7 +31,7 @@ namespace mycore.viewer.components {
             super(settings, container);
         }
 
-        private structFileAndLanguageSync = Utils.synchronize<MyCoReMetsComponent>([
+        private structFileAndLanguageSync: any = Utils.synchronize<MyCoReMetsComponent>([
             (context: MyCoReMetsComponent)=> context.mm != null,
             (context: MyCoReMetsComponent)=> context.lm != null
         ], (context: MyCoReMetsComponent)=> {
@@ -40,7 +40,7 @@ namespace mycore.viewer.components {
         });
 
         public init() {
-            let settings = this.settings;
+            const settings = this.settings;
             if (settings.doctype === 'mets') {
                 if ((settings.imageXmlPath.charAt(settings.imageXmlPath.length - 1) != '/')) {
                     settings.imageXmlPath = settings.imageXmlPath + '/';
@@ -50,13 +50,14 @@ namespace mycore.viewer.components {
                     settings.tileProviderPath = settings.tileProviderPath + '/';
                 }
 
-                const that = this;
                 this.vStructFileLoaded = false;
                 const tilePathBuilder = (image: string) => {
-                    return that.settings.tileProviderPath.split(',')[0] + that.settings.derivate + '/' + image + '/0/0/0.jpg';
+                    return this.settings.tileProviderPath.split(',')[0]
+                        + this.settings.derivate + '/' + image + '/0/0/0.jpg';
                 };
 
-                const metsPromise = mycore.viewer.widgets.mets.IviewMetsProvider.loadModel(this.settings.metsURL, tilePathBuilder);
+                const metsPromise = mycore.viewer.widgets.mets.IviewMetsProvider.loadModel(this.settings.metsURL,
+                    tilePathBuilder);
                 metsPromise.then((resolved:{ model: model.StructureModel; document: Document }) => {
                     const model = resolved.model;
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
@@ -72,8 +73,7 @@ namespace mycore.viewer.components {
                     this.structFileAndLanguageSync(this);
                 });
 
-
-                metsPromise.onreject(() =>{
+                metsPromise.onreject(() => {
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
                     this.error = true;
                     this.errorSync(this);

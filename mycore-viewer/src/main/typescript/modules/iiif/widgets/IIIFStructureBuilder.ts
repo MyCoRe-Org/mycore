@@ -28,7 +28,7 @@ namespace mycore.viewer.widgets.iiif {
 
     export class IIIFStructureBuilder {
 
-        private hrefResolverElement = document.createElement('a');
+        private hrefResolverElement: any = document.createElement('a');
 
         private vSmLinkMap: MyCoReMap<string, string[]>;
         private vChapterIdMap: MyCoReMap<string, model.StructureChapter>;
@@ -37,8 +37,8 @@ namespace mycore.viewer.widgets.iiif {
 
         private vChapterImageMap: MyCoReMap<string, model.StructureImage>;
         private vImageChapterMap: MyCoReMap<string, model.StructureChapter>;
-        private ManifestChapter: model.StructureChapter;
-        private vImageList: Array<model.StructureImage>;
+        private vManifestChapter: model.StructureChapter;
+        private vImageList: model.StructureImage[];
         private vStructureModel: IIIFStructureModel;
         private vIdImageMap: MyCoReMap<string, model.StructureImage>;
         private vImprovisationMap: MyCoReMap<string, boolean>;
@@ -52,7 +52,6 @@ namespace mycore.viewer.widgets.iiif {
         public processManifest(): model.StructureModel {
             this.vIdFileMap = this.getIdFileMap();
 
-
             const useFilesMap = new MyCoReMap<string, Node[]>();
 
             this.vChapterIdMap = new MyCoReMap<string, model.StructureChapter>();
@@ -61,7 +60,7 @@ namespace mycore.viewer.widgets.iiif {
             this.vChapterImageMap = new MyCoReMap<string, model.StructureImage>();
             this.vImageChapterMap = new MyCoReMap<string, model.StructureChapter>();
             this.vImprovisationMap = new MyCoReMap<string, boolean>(); // see makeLink
-            this.ManifestChapter = this.processChapter(null, this.manifestDocument.getTopRanges()[0]);
+            this.vManifestChapter = this.processChapter(null, this.manifestDocument.getTopRanges()[0]);
             this.vImageHrefImageMap = new MyCoReMap<string, model.StructureImage>();
             this.vImageList = [];
 
@@ -70,7 +69,7 @@ namespace mycore.viewer.widgets.iiif {
 
             this.vStructureModel = new widgets.iiif.IIIFStructureModel(
                 this.vSmLinkMap,
-                this.ManifestChapter,
+                this.vManifestChapter,
                 this.vImageList,
                 this.vChapterImageMap,
                 this.vImageChapterMap,
@@ -84,7 +83,7 @@ namespace mycore.viewer.widgets.iiif {
             //     return;
             // }
             //TODO Chaptertype currently not in Manifest
-            let chapterObject = new model.StructureChapter(parent,
+            const chapterObject = new model.StructureChapter(parent,
                 '', this.getIDFromURL(chapter.id), chapter.getDefaultLabel());
             // let chapterChildren = chapter.getRanges();
 
@@ -97,7 +96,7 @@ namespace mycore.viewer.widgets.iiif {
         }
 
         private getIdFileMap(): MyCoReMap<string, IAnnotation> {
-            let map = new MyCoReMap<string, IAnnotation>();
+            const map = new MyCoReMap<string, IAnnotation>();
             this.manifestDocument.getSequences()[0].getCanvases().forEach((canvas: ICanvas) => {
                 canvas.getImages().forEach((image: IAnnotation) => {
                         map.set(image.id, image);
@@ -120,7 +119,7 @@ namespace mycore.viewer.widgets.iiif {
 
             this.makeLinks(this.manifestDocument.getTopRanges()[0]);
 
-            this.vImageList = this.vImageList.filter(el => this.vImageChapterMap.has(el.id));
+            this.vImageList = this.vImageList.filter((el) => this.vImageChapterMap.has(el.id));
             this.vImageList.forEach((image, i) => {
                 // fix order
                 image.order = i + 1;
@@ -130,7 +129,7 @@ namespace mycore.viewer.widgets.iiif {
         }
 
         private makeLinks(elem: IRange) {
-            let chapter = elem;
+            const chapter = elem;
             elem.getCanvasIds().forEach((can: string) => {
                 this.makeLink(this.vChapterIdMap.get(this.getIDFromURL(chapter.id)),
                     this.vIdImageMap.get(this.getIDFromURL(can)));
@@ -193,7 +192,7 @@ namespace mycore.viewer.widgets.iiif {
             }
 
             return new model.StructureImage(type, id, order, orderLabel, imgHref, imgMimeType, (cb) => {
-                cb(this.tilePathBuilder(imgHref, width, height ));
+                cb(this.tilePathBuilder(imgHref, width, height));
             }, additionalHrefs, contentIds, width, height);
         }
 

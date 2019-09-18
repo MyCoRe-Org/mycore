@@ -31,15 +31,18 @@ namespace mycore.viewer.components {
         }
 
         public init() {
-            if (this.settings.doctype == 'manifest') {
+            if (this.settings.doctype === 'manifest') {
                 this.trigger(new events.WaitForEvent(this, events.RequestPageEvent.TYPE));
             }
         }
 
-        private vImageInformationMap: MyCoReMap<string, widgets.image.IIIFImageInformation> = new MyCoReMap<string, widgets.image.IIIFImageInformation>();
-        private vImagePageMap: MyCoReMap<string, widgets.canvas.TileImagePageIIIF> = new MyCoReMap<string, widgets.canvas.TileImagePageIIIF>();
-        private vImageHTMLMap: MyCoReMap<string,HTMLElement> = new MyCoReMap<string, HTMLElement>();
-        private vImageCallbackMap = new MyCoReMap<string, Array<(page: widgets.canvas.TileImagePageIIIF) => void>>();
+        private vImageInformationMap: MyCoReMap<string, widgets.image.IIIFImageInformation>
+            = new MyCoReMap<string, widgets.image.IIIFImageInformation>();
+        private vImagePageMap: MyCoReMap<string, widgets.canvas.TileImagePageIIIF>
+            = new MyCoReMap<string, widgets.canvas.TileImagePageIIIF>();
+        private vImageHTMLMap: MyCoReMap<string, HTMLElement> = new MyCoReMap<string, HTMLElement>();
+        private vImageCallbackMap: MyCoReMap<string, ((page: widgets.canvas.TileImagePageIIIF) => void)[]>
+            = new MyCoReMap<string, ((page: widgets.canvas.TileImagePageIIIF) => void)[]>();
 
         private getPage(image: string, resolve: (page: widgets.canvas.TileImagePageIIIF) => void) {
             if (this.vImagePageMap.has(image)) {
@@ -48,18 +51,18 @@ namespace mycore.viewer.components {
                 if (this.vImageCallbackMap.has(image)) {
                     this.vImageCallbackMap.get(image).push(resolve);
                 } else {
-                    let initialArray = [];
+                    const initialArray = [];
                     initialArray.push(resolve);
                     this.vImageCallbackMap.set(image, initialArray);
                     this.getPageMetadata(image, (metadata) => {
-                        let imagePage = this.createPageFromMetadata(image, metadata);
+                        const imagePage = this.createPageFromMetadata(image, metadata);
                         let resolveList = this.vImageCallbackMap.get(image);
                         let pop;
                         while (pop = resolveList.pop()) {
                             pop(imagePage);
                         }
                         this.vImagePageMap.set(image, imagePage);
-                        this.trigger(new PageLoadedEvent(this,image,imagePage));
+                        this.trigger(new PageLoadedEvent(this, image, imagePage));
                     });
                 }
             }
@@ -67,13 +70,13 @@ namespace mycore.viewer.components {
 
         private createPageFromMetadata(imageId: string,
                                        metadata: widgets.image.IIIFImageInformation): widgets.canvas.TileImagePageIIIF {
-            let paths: string[] = [];
+            const paths: string[] = [];
             paths.push(metadata.path + '/{x},{y},{w},{h}/!{tx},{ty}/0/default.jpg');
 
             return new widgets.canvas.TileImagePageIIIF(imageId, metadata.width, metadata.height, paths);
         }
 
-        private getPageMetadata(image: string, resolve: (metadata:widgets.image.IIIFImageInformation) => void) {
+        private getPageMetadata(image: string, resolve: (metadata: widgets.image.IIIFImageInformation) => void) {
             image = (image.charAt(0) === '/') ? image.substr(1) : image;
 
             if (this.vImageInformationMap.has(image)) {
@@ -84,11 +87,11 @@ namespace mycore.viewer.components {
                     path = this.settings.imageAPIURL + this.settings.derivate + '%2F' + path;
                 }
                 mycore.viewer.widgets.image.IIIFImageInformationProvider.getInformation(path,
-                    (info:widgets.image.IIIFImageInformation) => {
+                    (info: widgets.image.IIIFImageInformation) => {
                         this.vImageInformationMap.set(image, info);
                         resolve(info);
-                    }, function (error) {
-                        console.log('Error while loading ImageInformations', +error.toString());
+                    }, (error: any) => {
+                        console.log('Error while loading ImageInformations', + error.toString());
                     });
             }
         }
@@ -96,14 +99,14 @@ namespace mycore.viewer.components {
         public get handlesEvents(): string[] {
             if (this.settings.doctype === 'manifest') {
                 return [ events.RequestPageEvent.TYPE ];
-            } else { 
+            }else {
                 return [];
             }
         }
 
-        public handle(e:mycore.viewer.widgets.events.ViewerEvent): void {
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
             if (e.type === events.RequestPageEvent.TYPE) {
-                let rpe = <events.RequestPageEvent> e;
+                const rpe = <events.RequestPageEvent> e;
 
                 this.getPage(rpe._pageId, (page: widgets.canvas.TileImagePageIIIF) => {
                     rpe._onResolve(rpe._pageId, page);
@@ -113,7 +116,6 @@ namespace mycore.viewer.components {
 
             return;
         }
-
 
     }
 
