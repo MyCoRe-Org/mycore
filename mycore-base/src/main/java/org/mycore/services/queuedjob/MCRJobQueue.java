@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -40,6 +41,9 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.MapJoin;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -326,33 +330,21 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             return null;
         }
 
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        return buildQuery(action, params, (q) -> {
+            try {
+                return q.getSingleResult();
+            } catch (NoResultException e) {
+                return null;
+            }
 
-        StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '"
-            + action.getName() + "' ");
-        for (String paramKey : params.keySet()) {
-            qStr.append(" AND job.parameters['")
-                .append(paramKey)
-                .append("'] = '")
-                .append(params.get(paramKey))
-                .append('\'');
-        }
-
-        TypedQuery<MCRJob> query = em.createQuery(qStr.toString(), MCRJob.class);
-
-        try {
-            MCRJob job = query.getSingleResult();
-            clearPreFetch();
-            return job;
-        } catch (NoResultException e) {
-            return null;
-        }
+        });
     }
 
     /**
-     * returns specific jobs by the given parameters or an empty list.
+     * Returns specific jobs by the given parameters or an empty list.
      *
      * @param params the parameters
+     *
      * @return the job
      */
     public List<MCRJob> getJobs(Map<String, String> params) {
@@ -364,27 +356,36 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             return null;
         }
 
+        return buildQuery(action, params, TypedQuery::getResultList);
+    }
+
+    /**
+     * @param action
+     * @param params
+     *
+     * @return the query for the given parameters
+     * */
+    private <T> T buildQuery(Class<? extends MCRJobAction> action, Map<String, String> params,
+        Function<TypedQuery<MCRJob>, T> consumer) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
 
-        StringBuilder qStr = new StringBuilder("FROM MCRJob job JOIN FETCH job.parameters WHERE action = '"
-                + action.getName() + "' ");
-        for (String paramKey : params.keySet()) {
-            qStr.append(" AND job.parameters['")
-                    .append(paramKey)
-                    .append("'] = '")
-                    .append(params.get(paramKey))
-                    .append('\'');
-        }
+        CriteriaQuery<MCRJob> query = cb.createQuery(MCRJob.class);
+        Root<MCRJob> jobRoot = query.from(MCRJob.class);
+        query.select(jobRoot);
 
-        TypedQuery<MCRJob> query = em.createQuery(qStr.toString(), MCRJob.class);
+        params.keySet().forEach(key ->
+        {
+            MapJoin<MCRJob, String, String> parameterJoin = jobRoot.join(MCRJob_.parameters, JoinType.INNER);
+            Path<String> keyPath = parameterJoin.key();
+            Path<String> valuePath = parameterJoin.value();
+            parameterJoin.on(cb.equal(keyPath, key), cb.equal(valuePath, params.get(key)));
+        });
 
-        try {
-            List<MCRJob> jobs = query.getResultList();
-            clearPreFetch();
-            return jobs;
-        } catch (NoResultException e) {
-            return new ArrayList<>();
-        }
+        query.where(cb.equal(jobRoot.get(MCRJob_.action), action));
+        T result = consumer.apply(em.createQuery(query));
+        clearPreFetch();
+        return result;
     }
 
     private MCRJob getElement() {
