@@ -51,7 +51,7 @@
     <field name="derivateDisplay">
       <xsl:value-of select="not(derivate/@display='false')" />
     </field>
-    <field name="maindoc">
+    <field name="derivateMaindoc">
       <xsl:value-of select="derivate/internals/internal/@maindoc" />
     </field>
     <field name="derivateOrder">
