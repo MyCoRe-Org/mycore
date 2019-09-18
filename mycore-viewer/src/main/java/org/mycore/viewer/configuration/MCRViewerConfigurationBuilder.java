@@ -104,6 +104,16 @@ public class MCRViewerConfigurationBuilder {
     }
 
     /**
+     * Builds the default mets configuration without any plugins.
+     */
+    public static MCRViewerConfigurationBuilder iiif(HttpServletRequest request) {
+        MCRViewerIIIFConfiguration iiifConfig = new MCRViewerIIIFConfiguration();
+        return MCRViewerConfigurationBuilder.build(request)
+            .mixin(iiifConfig)
+            .mixin(new MCRViewerAltoEditorConfiguration().setup(request));
+    }
+
+    /**
      * Builds the mets configuration with the metadata, piwik and logo plugin.
      */
     public static MCRViewerConfigurationBuilder metsAndPlugins(HttpServletRequest request) {

@@ -308,10 +308,10 @@ public class MCRViewerConfiguration {
         private Map<String, Object> properties;
 
         @SuppressWarnings("unused")
-        public MCRIViewClientXMLConfiguration() {
+        MCRIViewClientXMLConfiguration() {
         }
 
-        public MCRIViewClientXMLConfiguration(Multimap<ResourceType, String> resources,
+        MCRIViewClientXMLConfiguration(Multimap<ResourceType, String> resources,
             Map<String, Object> properties) {
             this.resources = resources;
             this.properties = properties;
@@ -347,20 +347,22 @@ public class MCRViewerConfiguration {
         public String url;
 
         @SuppressWarnings("unused")
-        public MCRIViewClientResource() {
+        MCRIViewClientResource() {
         }
 
-        public MCRIViewClientResource(ResourceType type, String url) {
+        MCRIViewClientResource(ResourceType type, String url) {
             this.type = type;
             this.url = url;
         }
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof MCRIViewClientResource))
+            if (!(obj instanceof MCRIViewClientResource)) {
                 return false;
-            if (obj == this)
+            }
+            if (obj == this) {
                 return true;
+            }
             MCRIViewClientResource rhs = (MCRIViewClientResource) obj;
             return new EqualsBuilder().append(type, rhs.type).append(url, rhs.url).isEquals();
         }
@@ -387,10 +389,10 @@ public class MCRViewerConfiguration {
         }
 
         @SuppressWarnings("unused")
-        public MCRIViewClientProperty() {
+        MCRIViewClientProperty() {
         }
 
-        public MCRIViewClientProperty(String name, Object value) {
+        MCRIViewClientProperty(String name, Object value) {
             this.name = name;
             this.value = value;
         }

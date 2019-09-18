@@ -36,6 +36,8 @@ public class MCRViewerDefaultConfigurationStrategy implements MCRViewerConfigura
             return getPDF(request);
         } else if (isEpub(request)) {
             return getEpub(request);
+        } else if (isIIIF(request)) {
+            return getIIIF(request);
         } else {
             return getMETS(request);
         }
@@ -53,6 +55,10 @@ public class MCRViewerDefaultConfigurationStrategy implements MCRViewerConfigura
         return filePath != null && filePath.toLowerCase(Locale.ROOT).endsWith(".pdf");
     }
 
+    private boolean isIIIF(HttpServletRequest request) {
+        return request.getPathInfo().contains("/iiif/");
+    }
+
     protected MCRViewerConfiguration getPDF(HttpServletRequest request) {
         return MCRViewerConfigurationBuilder.pdf(request).mixin(MCRViewerConfigurationBuilder.plugins(request).get())
             .get();
@@ -65,6 +71,11 @@ public class MCRViewerDefaultConfigurationStrategy implements MCRViewerConfigura
 
     protected MCRViewerConfiguration getMETS(HttpServletRequest request) {
         return MCRViewerConfigurationBuilder.metsAndPlugins(request).get();
+    }
+
+    protected MCRViewerConfiguration getIIIF(HttpServletRequest request) {
+        return MCRViewerConfigurationBuilder.iiif(request).mixin(MCRViewerConfigurationBuilder.plugins(request).get())
+            .get();
     }
 
 }

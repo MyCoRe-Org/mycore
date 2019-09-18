@@ -17,7 +17,7 @@
  */
 
 /// <reference path="../widgets/XMLImageInformationProvider.ts" />
-/// <reference path="../widgets/TileImagePage.ts" />
+/// <reference path="../../base/widgets/canvas/TileImagePage.ts" />
 /// <reference path="MetsSettings.ts" />
 /// <reference path="../widgets/alto/AltoFile.ts" />
 /// <reference path="events/RequestAltoModelEvent.ts" />

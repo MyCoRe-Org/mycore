@@ -37,7 +37,8 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
         final String derivate = getDerivate(request);
 
         setProperty("metsURL", MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivate);
-        String imageXmlPath = MCRConfiguration.instance().getString("MCR.Viewer.BaseURL", null); // Parameter can be used to provide multiple urls
+        // Parameter can be used to provide multiple urls
+        String imageXmlPath = MCRConfiguration.instance().getString("MCR.Viewer.BaseURL", null);
 
         if (imageXmlPath == null || imageXmlPath.isEmpty()) {
             imageXmlPath = MCRServlet.getServletBaseURL() + "MCRTileServlet/";

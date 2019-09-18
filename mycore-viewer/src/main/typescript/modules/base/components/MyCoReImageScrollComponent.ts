@@ -127,7 +127,7 @@ namespace mycore.viewer.components {
         }
 
         private isImageDoctype() {
-            return this._settings.doctype === "mets" || this._settings.doctype === "pdf";
+            return this._settings.doctype === "mets" || this._settings.doctype === "pdf" || this._settings.doctype === "manifest";
         }
 
         private initOverview(overviewEnabled: any | any | any | boolean) {

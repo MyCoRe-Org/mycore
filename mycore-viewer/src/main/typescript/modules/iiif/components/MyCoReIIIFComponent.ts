@@ -16,49 +16,40 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// <reference path="../widgets/IviewMetsProvider.ts" />
-/// <reference path="../components/events/MetsLoadedEvent.ts" />
+/// <reference path="../widgets/IviewIIIFProvider.ts" />
 
-/// <reference path="MetsSettings.ts" />
+/// <reference path="IIIFSettings.ts" />
 
 /// <reference path="../../base/components/MyCoReStructFileComponent.ts" />
 
 namespace mycore.viewer.components {
 
-    export class MyCoReMetsComponent extends MyCoReStructFileComponent {
+    export class MyCoReIIIFComponent extends MyCoReStructFileComponent {
 
-        constructor(protected settings: MetsSettings, protected container: JQuery) {
+        constructor(protected settings: IIIFSettings, protected container: JQuery) {
             super(settings, container);
         }
 
-        private structFileAndLanguageSync: any = Utils.synchronize<MyCoReMetsComponent>([
-            (context: MyCoReMetsComponent)=> context.mm != null,
-            (context: MyCoReMetsComponent)=> context.lm != null
-        ], (context: MyCoReMetsComponent)=> {
+        private structFileAndLanguageSync: any = Utils.synchronize<MyCoReIIIFComponent>([
+            (context: MyCoReIIIFComponent) => context.mm != null,
+            (context: MyCoReIIIFComponent) => context.lm != null
+        ], (context: MyCoReIIIFComponent) => {
             this.structFileLoaded(this.mm.model);
-            this.trigger(new events.MetsLoadedEvent(this, this.mm));
         });
 
         public init() {
             const settings = this.settings;
-            if (settings.doctype === 'mets') {
-                if ((settings.imageXmlPath.charAt(settings.imageXmlPath.length - 1) != '/')) {
-                    settings.imageXmlPath = settings.imageXmlPath + '/';
-                }
-
-                if ((settings.tileProviderPath.charAt(settings.tileProviderPath.length - 1) != '/')) {
-                    settings.tileProviderPath = settings.tileProviderPath + '/';
-                }
+            if (settings.doctype === 'manifest') {
 
                 this.vStructFileLoaded = false;
-                const tilePathBuilder = (image: string) => {
-                    return this.settings.tileProviderPath.split(',')[0]
-                        + this.settings.derivate + '/' + image + '/0/0/0.jpg';
+                const tilePathBuilder = (imageUrl: string, width: number, height: number) => {
+                    const scaleFactor = this.getScaleFactor(width, height);
+                    return imageUrl + '/full/' + Math.floor(width / scaleFactor) + ','
+                        + Math.floor(height / scaleFactor) + '/0/default.jpg';
                 };
 
-                const metsPromise = mycore.viewer.widgets.mets.IviewMetsProvider.loadModel(this.settings.metsURL,
-                    tilePathBuilder);
-                metsPromise.then((resolved:{ model: model.StructureModel; document: Document }) => {
+                const manifestPromise = mycore.viewer.widgets.iiif.IviewIIIFProvider.loadModel(this.settings.manifestURL, tilePathBuilder);
+                manifestPromise.then((resolved: { model: model.StructureModel; document: Document }) => {
                     const model = resolved.model;
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
 
@@ -73,7 +64,7 @@ namespace mycore.viewer.components {
                     this.structFileAndLanguageSync(this);
                 });
 
-                metsPromise.onreject(() => {
+                manifestPromise.onreject(() => {
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
                     this.error = true;
                     this.errorSync(this);
@@ -83,10 +74,10 @@ namespace mycore.viewer.components {
             }
         }
 
-        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent):void {
 
             if (e.type === events.LanguageModelLoadedEvent.TYPE) {
-                var languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
+                const languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
                 this.lm = languageModelLoadedEvent.languageModel;
                 this.errorSync(this);
                 this.structFileAndLanguageSync(this);
@@ -95,7 +86,12 @@ namespace mycore.viewer.components {
             return;
         }
 
+        private getScaleFactor(width: number, height: number) {
+            let largestScaling = Math.min(256 / width , 256 / height); //TODO make smallest size dynamic
+            return Math.pow(2, Math.ceil(Math.log(largestScaling) / Math.log(1 / 2)));
+        }
+
     }
 }
 
-addViewerComponent(mycore.viewer.components.MyCoReMetsComponent);
+addViewerComponent(mycore.viewer.components.MyCoReIIIFComponent);
