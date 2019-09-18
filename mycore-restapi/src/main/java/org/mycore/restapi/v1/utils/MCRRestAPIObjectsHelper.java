@@ -922,8 +922,9 @@ public class MCRRestAPIObjectsHelper {
     public static boolean hasChildren(Path p) {
         try {
             if (Files.isDirectory(p)) {
-                DirectoryStream<Path> ds = Files.newDirectoryStream(p);
-                return ds.iterator().hasNext();
+                try(DirectoryStream<Path> ds = Files.newDirectoryStream(p)){
+                    return ds.iterator().hasNext();
+                }
             }
         } catch (IOException e) {
             LOGGER.error(e);

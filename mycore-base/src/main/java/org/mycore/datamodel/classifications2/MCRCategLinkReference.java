@@ -115,4 +115,9 @@ public class MCRCategLinkReference implements Serializable {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "MCRCategLinkReference [objectID=" + objectID + ", type=" + type + "]";
+    }
+
 }
