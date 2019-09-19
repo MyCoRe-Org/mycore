@@ -5,8 +5,8 @@
 
   <section i18n="component.base.page.deleted.title" xml:lang="all">
     <div class="row">
-      <div class="col-xs-8 col-xs-offset-2">
-        <p style="padding: 15px;" class="bg-success text-center">
+      <div class="col-8 offset-2">
+        <p class="bg-success text-center text-white p-3 mb-2">
           <i18n key="component.base.page.deleted.text"/>
         </p>
       </div>

@@ -162,7 +162,7 @@ namespace mycore.viewer.components {
         }
 
         private addDownloadButton() {
-            this._toolbarModel._actionControllGroup.addComponent(new mycore.viewer.widgets.toolbar.ToolbarButton("PdfDownloadButton", "", this._languageModel.getTranslation("toolbar.pdfDownload"), "fa-download"));
+            this._toolbarModel._actionControllGroup.addComponent(new mycore.viewer.widgets.toolbar.ToolbarButton("PdfDownloadButton", "", this._languageModel.getTranslation("toolbar.pdfDownload"), "download"));
         }
 
     }

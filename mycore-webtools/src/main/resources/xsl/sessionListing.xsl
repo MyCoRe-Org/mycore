@@ -8,7 +8,7 @@
 
       <div id="sessionListingLoadingSpinner">
         <h3 class="text-center">
-          <i class="fa fa-circle-o-notch fa-spin"></i>
+          <i class="fas fa-circle-notch fa-spin"></i>
           <xsl:value-of select="i18n:translate('component.session-listing.loadingPleaseWait')"/>
         </h3>
       </div>
@@ -44,26 +44,26 @@
           <tr>
             <th data-criteria="login" role="button" tabindex="0" onclick="mycore.session.listing.sortByLogin()">
               <xsl:value-of select="i18n:translate('component.session-listing.login')"/>
-              <i class="fa fa-sort "></i>
+              <i class="fas fa-sort "></i>
             </th>
             <th data-criteria="ip" role="button" tabindex="0" onclick="mycore.session.listing.sortByIP()">
               <xsl:value-of select="i18n:translate('component.session-listing.ip')"/>
-              <i class="fa fa-sort "></i>
+              <i class="fas fa-sort "></i>
             </th>
             <th data-criteria="createTime" role="button" tabindex="0"
                 onclick="mycore.session.listing.sortByFirstAccess()">
               <xsl:value-of select="i18n:translate('component.session-listing.firstAccess')"/>
-              <i class="fa fa-sort "></i>
+              <i class="fas fa-sort "></i>
             </th>
             <th data-criteria="lastAccess" role="button" tabindex="0"
                 onclick="mycore.session.listing.sortByLastAccess()">
               <xsl:value-of select="i18n:translate('component.session-listing.lastAccess')"/>
-              <i class="fa fa-sort "></i>
+              <i class="fas fa-sort "></i>
             </th>
             <th data-criteria="stackTrace" role="button" tabindex="0"
                 onclick="mycore.session.listing.sortByStacktrace()">
               Stacktrace
-              <i class="fa fa-sort "></i>
+              <i class="fas fa-sort "></i>
             </th>
             <th>
               <span id="i18n-kill-question" style="display: none;">

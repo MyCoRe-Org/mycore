@@ -5,7 +5,7 @@
     <form action="http://localhost:8291/servlets/XEditor" method="post">
       <h3>Fehlerhafte Eingabe:</h3>
       <span class="help-inline">Titel erforderlich, muss utopisch sein!</span>
-      <div class="form-group has-error">
+      <div class="form-group mcr-invalid">
         <span class="help-inline">Titel erforderlich, muss utopisch sein!</span>
         <input name="/document/title" value="" type="text" />
         <span class="help-inline">Titel erforderlich, muss utopisch sein!</span>

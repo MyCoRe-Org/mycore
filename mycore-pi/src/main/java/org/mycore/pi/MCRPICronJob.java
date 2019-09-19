@@ -87,7 +87,7 @@ public class MCRPICronJob implements Runnable, MCRStartupHandler.AutoExecutable 
             .peek(em::detach)
             .map(mcrpi -> CompletableFuture.supplyAsync(() -> getDateRegistred(mcrpi), CHECK_URN_EXECUTOR_SERVICE))
             .map(cf -> cf.thenAcceptAsync(result -> {
-                if (result == null) {
+                if (result == null || result.getKey() == null || result.getValue() == null) {
                     return;
                 }
                 try {

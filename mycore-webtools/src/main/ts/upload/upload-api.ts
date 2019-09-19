@@ -75,7 +75,8 @@ namespace mycore.upload {
             });
 
             if (manualToggle != null) {
-                manualToggle.addEventListener("click", () => {
+                manualToggle.addEventListener("click", (e) => {
+                    e.preventDefault();
                     const fileInput = document.createElement("input");
                     const uploadID = (Math.random() * 10000).toString(10);
 

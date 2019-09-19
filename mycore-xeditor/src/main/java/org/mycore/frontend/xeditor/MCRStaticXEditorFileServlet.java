@@ -20,11 +20,9 @@ package org.mycore.frontend.xeditor;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -34,10 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.servlets.MCRStaticXMLFileServlet;
 import org.xml.sax.SAXException;
@@ -71,14 +67,6 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
     protected MCRContent getResourceContent(HttpServletRequest request, HttpServletResponse response, URL resource)
         throws IOException, JDOMException, SAXException {
         MCRContent content = super.getResourceContent(request, response, resource);
-
-        if (MCRDeveloperTools.overrideActive()) {
-            final Optional<Path> overriddenFilePath = MCRDeveloperTools
-                .getOverriddenFilePath(request.getServletPath(), true);
-            if (overriddenFilePath.isPresent()) {
-                content = new MCRPathContent(overriddenFilePath.get());
-            }
-        }
 
         if (mayContainEditorForm(content)) {
             content = doExpandEditorElements(content, request, response,

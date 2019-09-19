@@ -127,7 +127,7 @@ namespace mycore.viewer.components {
         }
 
         private isImageDoctype() {
-            return this._settings.doctype === "mets" || this._settings.doctype === "pdf";
+            return this._settings.doctype === "mets" || this._settings.doctype === "pdf" || this._settings.doctype === "manifest";
         }
 
         private initOverview(overviewEnabled: any | any | any | boolean) {
@@ -137,7 +137,7 @@ namespace mycore.viewer.components {
                     return !isNaN((<any>value) * 1) && parseInt(value, 10) > 1;
                 }), 10);
 
-                var iconChild = this._toggleButton.children(".glyphicon");
+                var iconChild = this._toggleButton.children('.fas');
                 if (this._container.width() < minVisibleSize) {
                     jQuery(overviewContainer).hide();
                     iconChild.addClass(MyCoReImageScrollComponent.OVERVIEW_VISIBLE_ICON);
@@ -169,7 +169,7 @@ namespace mycore.viewer.components {
 
                 this._horizontalScrollbar = new widgets.canvas.Scrollbar(true);
                 this._verticalScrollbar = new widgets.canvas.Scrollbar(false);
-                this._toggleButton = jQuery(`<div class='overViewToggle'><div class="glyphicon"></div></div>`);
+                this._toggleButton = jQuery(`<div class='overViewToggle'><div class="fas"></div></div>`);
 
                 this._pageController.viewport.sizeProperty.addObserver({
                     propertyChanged : (_old, _new) => {
@@ -307,8 +307,8 @@ namespace mycore.viewer.components {
         private pageWidth = 2480;
         private pageHeight = 3508;
         private static DEFAULT_CANVAS_OVERVIEW_MIN_VISIBLE_SIZE = "800";
-        private static OVERVIEW_VISIBLE_ICON = `glyphicon-triangle-top`;
-        private static OVERVIEW_INVISIBLE_ICON = `glyphicon-triangle-bottom`;
+        private static OVERVIEW_VISIBLE_ICON = `fa-caret-up`;
+        private static OVERVIEW_INVISIBLE_ICON = `fa-caret-down`;
 
         private changeImage(image: string, extern: boolean) {
             if (this._currentImage != image) {

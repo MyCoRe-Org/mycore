@@ -14,10 +14,12 @@
   <xsl:template name="derivateView">
     <xsl:param name="derivateID" />
     <xsl:param name="extensions" />
+    <xsl:param name="imageSize" />
     <xsl:call-template name="derivateLinkView">
       <xsl:with-param name="derivateID" select="$derivateID" />
       <xsl:with-param name="file" select="iview2:getSupportedMainFile($derivateID)" />
       <xsl:with-param name="extensions" select="$extensions" />
+      <xsl:with-param name="imageSize" select="$imageSize" />
     </xsl:call-template>
   </xsl:template>
 
@@ -25,17 +27,20 @@
     <xsl:param name="file" />
     <xsl:param name="derivateID" />
     <xsl:param name="extensions" />
+    <xsl:param name="imageSize" />
     <xsl:if test="$file != ''">
       <xsl:call-template name="iview2.clientLink">
         <xsl:with-param name="derivateID" select="$derivateID" />
-          <xsl:with-param name="file" select="$file" />
-        </xsl:call-template>
+        <xsl:with-param name="file" select="$file" />
+        <xsl:with-param name="imageSize" select="$imageSize" />
+      </xsl:call-template>
     </xsl:if>
   </xsl:template>
 
   <xsl:template name="iview2.clientLink">
     <xsl:param name="file" />
     <xsl:param name="derivateID" />
+    <xsl:param name="imageSize" />
     
     <xsl:variable name="linkedFile">
       <xsl:choose>
@@ -52,6 +57,7 @@
         <xsl:call-template name="iview2.getImageElement">
           <xsl:with-param name="derivate" select="$derivateID" />
           <xsl:with-param name="imagePath" select="$file" />
+          <xsl:with-param name="imageSize" select="$imageSize" />
         </xsl:call-template>
       </a>
     </div>
@@ -60,6 +66,7 @@
   <xsl:template name="iview2.getImageElement">
     <xsl:param name="derivate" />
     <xsl:param name="imagePath" />
+    <xsl:param name="imageSize" select="'THUMBNAIL'" />
     <xsl:param name="style" select="''" />
     <xsl:param name="class" select="''" />
 
@@ -78,7 +85,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/THUMBNAIL/',$derivate,'/',$file)}" style="{$style}" class="{$class}" />
+    <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/',$imageSize,'/',$derivate,'/',$file)}" style="{$style}" class="{$class}" />
 
     <xsl:comment>
       End - iview2.getImageElement (mcr-module-iview2.xsl)

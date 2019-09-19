@@ -28,14 +28,7 @@
     <field name="worldReadableComplete">
       <xsl:value-of select="mcrxsl:isWorldReadableComplete(@ID)" />
     </field>
-    <xsl:for-each select="./descendant::*[@classid and @categid]">
-      <xsl:variable name="classid" select="@classid" />
-      <xsl:variable name="uri" select="concat('classification:metadata:0:parents:', @classid, ':', mcrxsl:encodeURIPath(@categid))" />
-      <xsl:apply-templates select="document($uri)//category" mode="category">
-        <xsl:with-param name="classid" select="$classid" />
-        <xsl:with-param name="withTopField" select="@inherited = '0'" />
-      </xsl:apply-templates>
-    </xsl:for-each>
+    <xsl:call-template name="applyClassifications" />
     <xsl:for-each select="metadata/*//*[@xlink:title|text()]">
       <xsl:for-each select="text()|@xlink:title">
         <xsl:variable name="trimmed" select="normalize-space(.)" />
@@ -58,9 +51,21 @@
     <field name="derivateDisplay">
       <xsl:value-of select="not(derivate/@display='false')" />
     </field>
-    <field name="maindoc">
+    <field name="derivateMaindoc">
       <xsl:value-of select="derivate/internals/internal/@maindoc" />
     </field>
+    <field name="derivateOrder">
+      <xsl:value-of select="@order"/>
+    </field>
+    <xsl:for-each select="derivate/titles/title">
+      <field name="derivateTitle">
+        <xsl:value-of select="text()"/>
+      </field>
+      <field name="derivateTitle.{@xml:lang}">
+        <xsl:value-of select="text()"/>
+      </field>
+    </xsl:for-each>
+    <xsl:call-template name="applyClassifications" />
   </xsl:template>
 
   <xsl:template match="mycoreobject|mycorederivate" mode="baseFields">
@@ -142,6 +147,17 @@
     <field name="allMeta">
       <xsl:value-of select="." />
     </field>
+  </xsl:template>
+
+  <xsl:template name="applyClassifications">
+    <xsl:for-each select="./descendant::*[@classid and @categid]">
+      <xsl:variable name="classid" select="@classid" />
+      <xsl:variable name="uri" select="concat('classification:metadata:0:parents:', @classid, ':', mcrxsl:encodeURIPath(@categid))" />
+      <xsl:apply-templates select="document($uri)//category" mode="category">
+        <xsl:with-param name="classid" select="$classid" />
+        <xsl:with-param name="withTopField" select="@inherited = '0'" />
+      </xsl:apply-templates>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>

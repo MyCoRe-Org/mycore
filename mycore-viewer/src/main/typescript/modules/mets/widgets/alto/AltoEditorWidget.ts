@@ -181,12 +181,12 @@ namespace mycore.viewer.widgets.alto {
         }
 
         private downArrow = jQuery(`
-<span class='glyphicon glyphicon-arrow-down sortArrow'>
+<span class='fas fa-caret-down sortArrow'>
 </span> 
 `);
 
         private upArrow = jQuery(`    
-<span class='glyphicon glyphicon-arrow-up sortArrow'>
+<span class='fas fa-caret-up sortArrow'>
 </span> 
 `);
 
@@ -329,7 +329,7 @@ namespace mycore.viewer.widgets.alto {
 
         private getChangeHTMLContent(change: mycore.viewer.widgets.alto.AltoChange) {
             return `
-<td><span class="glyphicon glyphicon-remove remove"></span></td>
+<td><span class="fas fa-ban remove"></span></td>
 <td>${change.pageOrder}</td>
 <td>${this.i18n.getTranslation("altoWidget.change." + change.type)}</td>
 <td>${this.getChangeText(change)}</td>

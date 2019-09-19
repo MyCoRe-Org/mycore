@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -264,9 +265,11 @@ public class MCRIFS2Commands {
         if (Files.isDirectory(node)) {
             LOGGER.debug("fixMCRFSNODESForNode (directory) : {}", node.toAbsolutePath().toString());
             fixDirectoryEntry(node, derivate_id, storage_base, check_only);
-            Path[] nodes = Files.list(node).toArray(Path[]::new);
-            for (Path next_node : nodes) {
-                fixMCRFSNODESForNode(next_node, content_store, derivate_id, storage_base, check_only);
+            try(Stream<Path> stream = Files.list(node)){
+                Path[] nodes = stream.toArray(Path[]::new);
+                for (Path next_node : nodes) {
+                    fixMCRFSNODESForNode(next_node, content_store, derivate_id, storage_base, check_only);
+                }
             }
         } else {
             if (node.getFileName().toString().equals("mcrdata.xml")) {

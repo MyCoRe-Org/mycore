@@ -156,7 +156,10 @@ namespace mycore.viewer.components {
                 var image = images[imageIndex];
                 var path;
                 if (image.href.indexOf("data:") == -1) {
-                    path = basePath + image.href + "/0/0/0.jpg";
+                    // path = basePath + image.href + "/0/0/0.jpg";
+                    image.requestImgdataUrl((url: string) => {
+                        path = url;
+                    });
                 } else {
                     path = image.href;
                 }

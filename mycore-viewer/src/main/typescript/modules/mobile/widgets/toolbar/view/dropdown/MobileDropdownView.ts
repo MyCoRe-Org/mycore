@@ -25,7 +25,7 @@ namespace mycore.viewer.widgets.toolbar {
             this._buttonElement.addClass("dropdown");
 
             this._buttonElementInner = jQuery("<span></span>");
-            this._buttonElementInner.addClass("fa fa-bars");
+            this._buttonElementInner.addClass("fas fa-bars");
             this._buttonElementInner.appendTo(this._buttonElement);
 
             this._dropdown = jQuery("<select></select>");

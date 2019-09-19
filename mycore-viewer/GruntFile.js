@@ -24,7 +24,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-npmcopy');
-    grunt.loadNpmTasks('grunt-string-replace');
 
     var globalConfig = {
         projectBase: grunt.option('projectBase') || ''
@@ -41,20 +40,9 @@ module.exports = function (grunt) {
                     },
                     files: {
                         'epubjs': 'epubjs/dist',
-                        'jszip': 'jszip/dist'
-                    }
-                }
-            },
-            "string-replace": {
-                dist: {
-                    files: {
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.js'
-                    },
-                    options: {
-                        replacements: [{
-                            pattern: 'this.settings.method = this.supportsSrcdoc ? "srcdoc" : "write";',
-                            replacement: 'this.settings.method = "write";'
-                        }]
+                        'jszip': 'jszip/dist',
+                        'es6-promise': 'es6-promise/dist',
+						'manifesto': 'manifesto.js/dist/client'
                     }
                 }
             },
@@ -75,6 +63,7 @@ module.exports = function (grunt) {
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-logo.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-logo.js",
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-metadata.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-metadata.js",
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mets.js",
+						"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.js",
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.js",
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-pdf.js",
                         "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.min.js":"<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-piwik.js",
@@ -84,19 +73,18 @@ module.exports = function (grunt) {
 
                     }
                 },
-                epubjs: {
-                    mangle: false,
-                    files: {
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.js',
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.legacy.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/epubjs/epub.legacy.js'
-                    }
-                },
                 jszip: {
                     mangle: false,
                     files: {
                         '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/jszip/jszip.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/jszip/jszip.js'
                     }
-                }
+                },
+				manifesto: {
+					mangle: false,
+					files: {
+						'<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/manifesto/manifesto.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/manifesto/manifesto.js'
+					}
+				}
             },
             watch: {
                 /*ts: {
@@ -166,6 +154,14 @@ module.exports = function (grunt) {
                         sourceMap: false
                     }
                 },
+				viewerIiif: {
+					out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-iiif.js",
+					src:["<%= globalConfig.projectBase %>src/main/typescript/modules/iiif/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
+					options: {
+						declaration: true,
+						sourceMap: false
+					}
+				},
                 viewer_mobile: {
                     out: "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-mobile.js",
                     src:["<%= globalConfig.projectBase %>src/main/typescript/modules/mobile/module.ts", "<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/iview-client-base.d.ts"],
@@ -221,7 +217,7 @@ module.exports = function (grunt) {
         });
 
 
-    grunt.registerTask('default', ['ts', 'less', 'npmcopy', 'string-replace', 'uglify']);
+    grunt.registerTask('default', ['ts', 'less', 'npmcopy', 'uglify']);
 
 };
 

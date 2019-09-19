@@ -62,13 +62,13 @@ namespace mycore.viewer.model {
                 label: "textView"
             });
 
-            this.viewSelect = new widgets.toolbar.ToolbarDropdownButton("viewSelect", "viewSelect", this.viewSelectChilds, "fa-eye");
+            this.viewSelect = new widgets.toolbar.ToolbarDropdownButton('viewSelect', 'viewSelect', this.viewSelectChilds, 'eye');
             this._viewSelectGroup.addComponent(this.viewSelect);
         }
 
         public addSelectionSwitchButton():void{
             this.selectionSwitchButton = new widgets.toolbar.ToolbarButton("selectionSwitchButton", "", "");
-            this.selectionSwitchButton.icon = "fa-text-width";
+            this.selectionSwitchButton.icon = 'text-width';
             //this._actionControllGroup.addComponent(this.selectionSwitchButton);
         }
 

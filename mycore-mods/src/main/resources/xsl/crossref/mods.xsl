@@ -5,8 +5,8 @@
 >
 
   <xsl:include href="crossref-helper-4.4.1.xsl"/>
-  <xsl:include href="mods2journal.xsl" />
-  <xsl:include href="mods2book.xsl" />
+  <xsl:include href="mods2journal.xsl"/>
+  <xsl:include href="mods2book.xsl"/>
 
   <xsl:template match="/">
     <xsl:apply-templates select="mycoreobject/metadata/def.modsContainer/modsContainer/mods:mods"/>
@@ -24,23 +24,23 @@
   </xsl:template>
 
   <xsl:template match="mods:nonSort" mode="printFullTitle">
-    <xsl:value-of select="text()" />
-    <xsl:text> </xsl:text>
+    <xsl:value-of select="text()"/>
+    <xsl:text></xsl:text>
   </xsl:template>
 
   <xsl:template match="mods:title" mode="printFullTitle">
-    <xsl:value-of select="text()" />
+    <xsl:value-of select="text()"/>
   </xsl:template>
 
   <xsl:template match="mods:subTitle" mode="printFullTitle">
-    <xsl:text>: </xsl:text>
-    <xsl:value-of select="text()" />
+    <xsl:text>:</xsl:text>
+    <xsl:value-of select="text()"/>
   </xsl:template>
 
   <xsl:template match="mods:partNumber|mods:partName" mode="printFullTitle">
-    <xsl:value-of select="text()" />
+    <xsl:value-of select="text()"/>
     <xsl:if test="position() != last()">
-      <xsl:text>, </xsl:text>
+      <xsl:text>,</xsl:text>
     </xsl:if>
   </xsl:template>
 
@@ -48,10 +48,17 @@
     <xsl:param name="modsNode"/>
     <xsl:variable name="publicationNode" select="$modsNode/mods:originInfo[@eventType='publication']"/>
     <xsl:if test="$publicationNode/mods:dateIssued[@encoding='w3cdtf']/text()">
+      <xsl:variable name="date" select="$publicationNode/mods:dateIssued[@encoding='w3cdtf']/text()"/>
       <cr:publication_date>
         <cr:year>
-          <xsl:value-of
-              select="substring-before($publicationNode/mods:dateIssued[@encoding='w3cdtf']/text(), '-')"/>
+          <xsl:choose>
+            <xsl:when test="contains($date, '-')">
+              <xsl:value-of select="substring-before($date, '-')"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$date"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </cr:year>
       </cr:publication_date>
     </xsl:if>

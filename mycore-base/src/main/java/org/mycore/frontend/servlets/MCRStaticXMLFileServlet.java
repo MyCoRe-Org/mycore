@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
@@ -85,6 +88,14 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     private URL resolveResource(MCRServletJob job) throws IOException {
         String requestedPath = job.getRequest().getServletPath();
         LOGGER.info("MCRStaticXMLFileServlet {}", requestedPath);
+
+        if (MCRDeveloperTools.overrideActive()) {
+            final Optional<Path> overriddenFilePath = MCRDeveloperTools
+                .getOverriddenFilePath(requestedPath, true);
+            if (overriddenFilePath.isPresent()) {
+                return overriddenFilePath.get().toUri().toURL();
+            }
+        }
 
         URL resource = getServletContext().getResource(requestedPath);
         if (resource != null) {

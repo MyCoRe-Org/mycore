@@ -18,7 +18,7 @@
 
 /// <reference path="events/RequestAltoModelEvent.ts" />
 /// <reference path="../widgets/XMLImageInformationProvider.ts" />
-/// <reference path="../widgets/TileImagePage.ts" />
+/// <reference path="../../base/widgets/canvas/TileImagePage.ts" />
 /// <reference path="../widgets/alto/AltoHTMLGenerator.ts" />
 /// <reference path="MetsSettings.ts" />
 
@@ -30,107 +30,108 @@ namespace mycore.viewer.components {
 
     export class MyCoReMetsPageProviderComponent extends ViewerComponent {
 
-        constructor(private _settings:MetsSettings) {
+        constructor(private settings: MetsSettings) {
             super();
         }
 
         public init() {
-            if (this._settings.doctype == 'mets') {
+            if (this.settings.doctype === 'mets') {
                 this.trigger(new events.WaitForEvent(this, events.RequestPageEvent.TYPE));
             }
         }
 
-        private _imageInformationMap:MyCoReMap<string, widgets.image.XMLImageInformation> = new MyCoReMap<string, widgets.image.XMLImageInformation>();
-        private _imagePageMap:MyCoReMap<string, widgets.canvas.TileImagePage> = new MyCoReMap<string, widgets.canvas.TileImagePage>();
-        private _altoHTMLGenerator = new AltoHTMLGenerator();
-        private _imageHTMLMap:MyCoReMap<string,HTMLElement> = new MyCoReMap<string, HTMLElement>();
-        private _imageCallbackMap = new MyCoReMap<string, Array<(page: widgets.canvas.TileImagePage) => void>>();
+        private vImageInformationMap: MyCoReMap<string, widgets.image.XMLImageInformation>
+            = new MyCoReMap<string, widgets.image.XMLImageInformation>();
+        private vImagePageMap: MyCoReMap<string, widgets.canvas.TileImagePage>
+            = new MyCoReMap<string, widgets.canvas.TileImagePage>();
+        private vAltoHTMLGenerator: AltoHTMLGenerator = new AltoHTMLGenerator();
+        private vImageHTMLMap: MyCoReMap<string, HTMLElement> = new MyCoReMap<string, HTMLElement>();
+        private vImageCallbackMap: MyCoReMap<string, ((page: widgets.canvas.TileImagePage) => void)[]>
+            = new MyCoReMap<string, ((page: widgets.canvas.TileImagePage) => void)[]>();
 
-        private getPage(image:string, resolve:(page:widgets.canvas.TileImagePage) => void) {
-            if (this._imagePageMap.has(image)) {
-                resolve(this._imagePageMap.get(image));
+        private getPage(image: string, resolve: (page: widgets.canvas.TileImagePage) => void) {
+            if (this.vImagePageMap.has(image)) {
+                resolve(this.vImagePageMap.get(image));
             } else {
-                if (this._imageCallbackMap.has(image)) {
-                    this._imageCallbackMap.get(image).push(resolve);
+                if (this.vImageCallbackMap.has(image)) {
+                    this.vImageCallbackMap.get(image).push(resolve);
                 } else {
-                    let initialArray = new Array();
+                    const initialArray = [];
                     initialArray.push(resolve);
-                    this._imageCallbackMap.set(image, initialArray);
+                    this.vImageCallbackMap.set(image, initialArray);
                     this.getPageMetadata(image, (metadata) => {
-                        let imagePage = this.createPageFromMetadata(image, metadata);
-                        if (!this._imageHTMLMap.has(image)) {
+                        const imagePage = this.createPageFromMetadata(image, metadata);
+                        if (!this.vImageHTMLMap.has(image)) {
                             this.trigger(new RequestAltoModelEvent(this, image, (page, altoHref, altoModel) => {
-                                if (!this._imageHTMLMap.has(image)) {
-                                    let htmlElement = this._altoHTMLGenerator.generateHtml(altoModel, altoHref);
+                                if (!this.vImageHTMLMap.has(image)) {
+                                    let htmlElement = this.vAltoHTMLGenerator.generateHtml(altoModel, altoHref);
                                     imagePage.getHTMLContent().value = htmlElement;
-                                    this._imageHTMLMap.set(image, htmlElement);
+                                    this.vImageHTMLMap.set(image, htmlElement);
                                 }
                             }));
                         }
-                        let resolveList = this._imageCallbackMap.get(image);
+                        const resolveList = this.vImageCallbackMap.get(image);
                         let pop;
                         while (pop = resolveList.pop()) {
                             pop(imagePage);
                         }
-                        this._imagePageMap.set(image, imagePage);
-                        this.trigger(new PageLoadedEvent(this,image,imagePage));
+                        this.vImagePageMap.set(image, imagePage);
+                        this.trigger(new PageLoadedEvent(this, image, imagePage));
                     });
                 }
             }
         }
 
-        private createPageFromMetadata(imageId:string, metadata:widgets.image.XMLImageInformation):widgets.canvas.TileImagePage {
-            var tiles = this._settings.tileProviderPath.split(",");
-            var paths = new Array<string>();
+        private createPageFromMetadata(imageId: string,
+                                       metadata: widgets.image.XMLImageInformation): widgets.canvas.TileImagePage {
+            const tiles = this.settings.tileProviderPath.split(',');
+            const paths = new Array<string>();
 
-            tiles.forEach((path:string) => {
-                paths.push(path + this._settings.derivate + metadata.path + "/{z}/{y}/{x}.jpg");
+            tiles.forEach((path: string) => {
+                paths.push(path + this.settings.derivate + metadata.path + '/{z}/{y}/{x}.jpg');
             });
 
             return new widgets.canvas.TileImagePage(imageId, metadata.width, metadata.height, paths);
         }
 
-        private getPageMetadata(image:string, resolve:(metadata:widgets.image.XMLImageInformation) => void) {
-            image = (image.charAt(0) == "/") ? image.substr(1) : image;
+        private getPageMetadata(image: string, resolve: (metadata: widgets.image.XMLImageInformation) => void) {
+            image = (image.charAt(0) === '/') ? image.substr(1) : image;
 
-            if (this._imageInformationMap.has(image)) {
-                resolve(this._imageInformationMap.get(image));
+            if (this.vImageInformationMap.has(image)) {
+                resolve(this.vImageInformationMap.get(image));
             } else {
-                var path = "/" + image;
-                mycore.viewer.widgets.image.XMLImageInformationProvider.getInformation(this._settings.imageXmlPath + this._settings.derivate, path,
-                    (info:widgets.image.XMLImageInformation) => {
-                        this._imageInformationMap.set(image, info);
+                const path = '/' + image;
+                mycore.viewer.widgets.image.XMLImageInformationProvider.getInformation(this.settings.imageXmlPath
+                    + this.settings.derivate, path,
+                    (info: widgets.image.XMLImageInformation) => {
+                        this.vImageInformationMap.set(image, info);
                         resolve(info);
-                    }, function (error) {
-                        console.log("Error while loading ImageInformations", +error.toString());
+                    }, (error: any) => {
+                        console.log('Error while loading ImageInformations', +error.toString());
                     });
             }
         }
 
-
-        public get handlesEvents():string[] {
-            if (this._settings.doctype == 'mets') {
+        public get handlesEvents(): string[] {
+            if (this.settings.doctype === 'mets') {
                 return [ events.RequestPageEvent.TYPE ];
-            } else { 
+            }else {
                 return [];
             }
         }
 
-        public handle(e:mycore.viewer.widgets.events.ViewerEvent):void {
-            if (e.type == events.RequestPageEvent.TYPE) {
-                let rpe = <events.RequestPageEvent> e;
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent):void {
+            if (e.type === events.RequestPageEvent.TYPE) {
+                const rpe = <events.RequestPageEvent> e;
 
-                this.getPage(rpe._pageId, (page:widgets.canvas.TileImagePage) => {
+                this.getPage(rpe._pageId, (page: widgets.canvas.TileImagePage) => {
                     rpe._onResolve(rpe._pageId, page);
                 });
 
-
             }
-
 
             return;
         }
-
 
     }
 

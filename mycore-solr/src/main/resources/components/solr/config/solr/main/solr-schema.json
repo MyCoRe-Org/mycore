@@ -338,6 +338,36 @@
   },
   {
     "add-field": {
+      "name": "derivateTitle",
+      "type": "text_general"
+    }
+  },
+  {
+    "add-field": {
+      "name": "derivateTitle.de",
+      "type": "text_de"
+    }
+  },
+  {
+    "add-field": {
+      "name": "derivateTitle.en",
+      "type": "text_en"
+    }
+  },
+  {
+    "add-field": {
+      "name": "derivateMaindoc",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
+      "name": "derivateOrder",
+      "type": "pint"
+    }
+  },
+  {
+    "add-field": {
       "name": "derivateID",
       "type": "string"
     }
@@ -398,12 +428,6 @@
       "name": "link",
       "type": "string",
       "multiValued": true
-    }
-  },
-  {
-    "add-field": {
-      "name": "maindoc",
-      "type": "string"
     }
   },
   {

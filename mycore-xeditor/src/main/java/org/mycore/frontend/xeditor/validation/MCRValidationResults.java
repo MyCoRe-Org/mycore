@@ -36,8 +36,8 @@ public class MCRValidationResults {
     static {
         String prefix = "MCR.XEditor.Validation.Marker.";
         MARKER_DEFAULT = MCRConfiguration.instance().getString(prefix + "default", "");
-        MARKER_SUCCESS = MCRConfiguration.instance().getString(prefix + "success", "has-success");
-        MARKER_ERROR = MCRConfiguration.instance().getString(prefix + "error", "has-error");
+        MARKER_SUCCESS = MCRConfiguration.instance().getString(prefix + "success", "mcr-valid");
+        MARKER_ERROR = MCRConfiguration.instance().getString(prefix + "error", "mcr-invalid");
     }
 
     private Map<String, String> xPath2Marker = new HashMap<>();

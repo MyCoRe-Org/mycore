@@ -10,9 +10,11 @@ public class MCRViewerEPUBConfiguration extends MCRViewerBaseConfiguration {
     public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
 
-        addLocalScript("lib/epubjs/epub.js", true, isDebugMode(request));
-        addLocalScript("lib/jszip/jszip.js", true, isDebugMode(request));
-        addLocalScript("iview-client-epub.js", true, isDebugMode(request));
+        final boolean debugMode = isDebugMode(request);
+        addLocalScript("lib/epubjs/epub.js", true, debugMode);
+        addLocalScript("lib/jszip/jszip.js", true, debugMode);
+        addLocalScript("iview-client-epub.js", true, debugMode);
+        addLocalScript("lib/es6-promise/es6-promise.auto.js", true, debugMode);
 
         final String derivate = getDerivate(request);
         final String filePath = getFilePath(request);
