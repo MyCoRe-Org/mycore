@@ -210,7 +210,7 @@
                   <pluginExecutionFilter>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>${forbiddenapis.version}</version>
+                    <versionRange>[${forbiddenapis.version}]</versionRange>
                     <goals>
                       <goal>check</goal>
                     </goals>
@@ -218,6 +218,19 @@
                   <action>
                     <ignore />
                   </action>
+                </pluginExecution>
+                <pluginExecution>
+                	<pluginExecutionFilter>
+                		<groupId>org.apache.maven.plugins</groupId>
+                		<artifactId>maven-dependency-plugin</artifactId>
+                		<versionRange>[3.1.1,)</versionRange>
+                		<goals>
+                			<goal>properties</goal>
+                		</goals>
+                	</pluginExecutionFilter>
+                	<action>
+                		<ignore></ignore>
+                	</action>
                 </pluginExecution>
               </pluginExecutions>
             </lifecycleMappingMetadata>
