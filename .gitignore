@@ -174,3 +174,5 @@ bower_components/
 typings/
 .tscache/
 package-lock.json
+/.flattened-pom.xml
+/.flattened-pom.xml
