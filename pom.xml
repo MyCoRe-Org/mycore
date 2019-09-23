@@ -7,7 +7,7 @@
     <version>42-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>${mycore.version}</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
@@ -33,8 +33,8 @@
     <tag>2019.06.x</tag>
   </scm>
   <properties>
-    <mycore.version>2019.06.2-SNAPSHOT</mycore.version>
     <argLine />
+    <revision>2019.06.2-SNAPSHOT</revision>
     <changelog.since>2019-05-28</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2019.06.1</changes.version>
@@ -261,6 +261,31 @@
             </execution>
           </executions>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>flatten-maven-plugin</artifactId>
+          <version>1.1.0</version>
+          <configuration>
+            <updatePomFile>true</updatePomFile>
+            <flattenMode>resolveCiFriendliesOnly</flattenMode>
+          </configuration>
+          <executions>
+            <execution>
+              <id>flatten</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>flatten</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>flatten.clean</id>
+              <phase>clean</phase>
+              <goals>
+                <goal>clean</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -320,6 +345,10 @@
         <configuration>
           <additionalparam>${javadoc.doclint.none}</additionalparam>
         </configuration>
+      </plugin>
+      <plugin>
+       <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
@@ -457,7 +486,7 @@
     <profile>
       <id>release-profile</id>
       <properties>
-        <site.suffix>-${project.version}</site.suffix>
+        <site.suffix>-${revision}</site.suffix>
       </properties>
     </profile>
     <profile>
@@ -670,7 +699,7 @@
                 </manifest>
                 <manifestEntries>
                   <Specification-Title>${project.name}</Specification-Title>
-                  <Specification-Version>${project.version}</Specification-Version>
+                  <Specification-Version>${revision}</Specification-Version>
                   <Implementation-Version>${bambooPlanRepositoryBranchName}</Implementation-Version>
                   <Implementation-Build>${bambooBuildNumber}</Implementation-Build>
                   <Implementation-Revision>${bambooPlanRepositoryRevision}</Implementation-Revision>
@@ -1149,153 +1178,153 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-acl-editor2</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-base</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-classbrowser</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-classeditor</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-coma</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-fo</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-ifs</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-iiif</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-indexing</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-iview2</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-media</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-meta</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
         <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-mets</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-migration</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-mods</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-oai</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-orcid</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-pi</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-restapi</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-sass</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-solr</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-sword</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-tei</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-user2</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-viewer</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-wcms2</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-webcli</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-webtools</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-wfc</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-xeditor</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
@@ -1625,7 +1654,7 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-base</artifactId>
-        <version>${mycore.version}</version>
+        <version>${revision}</version>
         <type>test-jar</type>
         <scope>test</scope>
       </dependency>
