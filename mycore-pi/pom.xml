@@ -26,9 +26,8 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.0</version>
         <configuration>
-          <argLine>${env.MAVEN_OPTS} @{argLine} -javaagent:${org.jmockit:jmockit:jar}</argLine>
+          <argLine><!-- ${env.MAVEN_OPTS} --> @{argLine} -javaagent:${org.jmockit:jmockit:jar}</argLine>
           <useSystemClassLoader>true</useSystemClassLoader>
           <trimStackTrace>false</trimStackTrace>
         </configuration>

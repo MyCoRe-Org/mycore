@@ -154,20 +154,11 @@ namespace mycore.viewer.components {
 
             for (var imageIndex in images) {
                 var image = images[imageIndex];
-                var path;
-                if (image.href.indexOf("data:") == -1) {
-                    // path = basePath + image.href + "/0/0/0.jpg";
-                    image.requestImgdataUrl((url: string) => {
-                        path = url;
-                    });
-                } else {
-                    path = image.href;
-                }
                 var label = "" + (image.orderLabel || image.order);
                 var id = image.id;
 
                 this._idMetsImageMap.set(id, image);
-                result.push({ id: id, label: label, href: path, requestImgdataUrl: image.requestImgdataUrl });
+                result.push({ id: id, label: label, requestImgdataUrl: image.requestImgdataUrl });
             }
 
 

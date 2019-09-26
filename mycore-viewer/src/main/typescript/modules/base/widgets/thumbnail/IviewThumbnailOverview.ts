@@ -138,7 +138,7 @@ namespace mycore.viewer.widgets.thumbnail {
                             tile.requestImgdataUrl(((id) => (href: string) => {
                                 that._view.updateTileHref(id, href);
                             })(tile.id));
-                            if (this._model.selectedThumbnail != null && this._model.selectedThumbnail.href == tile.href) {
+                            if (this._model.selectedThumbnail != null && this._model.selectedThumbnail.id === tile.id) {
                                 this.setThumbnailSelected(tile.id);
                             }
                         } else {

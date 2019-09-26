@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>41-SNAPSHOT</version>
+    <version>42-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <version>2019.08-SNAPSHOT</version>
@@ -195,7 +195,7 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <argLine>${env.MAVEN_OPTS} @{argLine}</argLine>
+            <argLine>@{argLine}</argLine>
           </configuration>
         </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
@@ -210,13 +210,26 @@
                   <pluginExecutionFilter>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>${forbiddenapis.version}</version>
+                    <versionRange>[${forbiddenapis.version}]</versionRange>
                     <goals>
                       <goal>check</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
                     <ignore />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[3.1.1,)</versionRange>
+                    <goals>
+                      <goal>properties</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -375,6 +388,24 @@
     </site>
   </distributionManagement>
   <profiles>
+    <profile>
+      <id>pass-maven_opts</id>
+      <activation>
+        <property>
+          <name>env.MAVEN_OPTS</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>${env.MAVEN_OPTS} @{argLine}</argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>checks</id>
       <activation>
