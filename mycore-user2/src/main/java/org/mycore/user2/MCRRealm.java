@@ -20,6 +20,7 @@ package org.mycore.user2;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -188,20 +189,17 @@ public class MCRRealm {
         }
         StringBuilder loginURL = new StringBuilder(getLoginURL());
         boolean firstParameter = !getLoginURL().contains("?");
-        try {
-            for (Entry<String, String> entry : parameter.entrySet()) {
-                if (firstParameter) {
-                    loginURL.append('?');
-                    firstParameter = false;
-                } else {
-                    loginURL.append('&');
-                }
-                loginURL.append(entry.getKey()).append('=').append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        for (Entry<String, String> entry : parameter.entrySet()) {
+            if (firstParameter) {
+                loginURL.append('?');
+                firstParameter = false;
+            } else {
+                loginURL.append('&');
             }
-            return loginURL.toString();
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException(e);
+            loginURL.append(entry.getKey()).append('=').append(URLEncoder.encode(entry.getValue(),
+                StandardCharsets.UTF_8));
         }
+        return loginURL.toString();
     }
 
     /**

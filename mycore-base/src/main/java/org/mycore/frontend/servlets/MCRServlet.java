@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -300,7 +301,7 @@ public class MCRServlet extends HttpServlet {
         } else if (hasIPVersion(IP, 6)) {
             return SESSION_NETMASK_IPV6;
         } else {
-            throw new IOException("Unknown or unidentifiable version of IP: " + IP.toString());
+            throw new IOException("Unknown or unidentifiable version of IP: " + IP);
         }
     }
 
@@ -601,11 +602,7 @@ public class MCRServlet extends HttpServlet {
 
             String name = (String) e.nextElement();
             String value = null;
-            try {
-                value = URLEncoder.encode(parameters.getProperty(name), "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                value = parameters.getProperty(name);
-            }
+            value = URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8);
 
             redirectURL.append(name).append("=").append(value);
         }

@@ -21,11 +21,11 @@ package org.mycore.restapi.annotations;
 import java.lang.annotation.Annotation;
 
 public @interface MCRParam {
-    public String name();
+    String name();
 
-    public String value();
+    String value();
 
-    public static class Factory {
+    class Factory {
         public static MCRParam get(String name, String value) {
             return new MCRParam() {
                 @Override

@@ -114,7 +114,7 @@ public class MCRPIManager {
 
     }
 
-    public synchronized static MCRPIManager getInstance() {
+    public static synchronized MCRPIManager getInstance() {
         if (instance == null) {
             instance = new MCRPIManager();
         }

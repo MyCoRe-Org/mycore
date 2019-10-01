@@ -569,8 +569,8 @@ public class MCRRestDerivateContents {
     }
 
     @FunctionalInterface
-    private static interface IOOperation {
-        public void run() throws IOException;
+    private interface IOOperation {
+        void run() throws IOException;
     }
 
 }

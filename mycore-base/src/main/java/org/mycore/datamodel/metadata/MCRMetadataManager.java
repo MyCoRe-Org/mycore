@@ -841,7 +841,7 @@ public final class MCRMetadataManager {
         MCRObjectID oldParentID = old.getStructure().getParentID();
         MCRObjectID newParentID = mcrObject.getStructure().getParentID();
 
-        if (oldParentID != null && exists(oldParentID) && (newParentID == null || !newParentID.equals(oldParentID))) {
+        if (oldParentID != null && exists(oldParentID) && (!oldParentID.equals(newParentID))) {
             // remove child from the old parent
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Parent ID = {}", oldParentID);

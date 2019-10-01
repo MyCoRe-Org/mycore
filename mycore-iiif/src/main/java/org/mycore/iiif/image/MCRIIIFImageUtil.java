@@ -22,6 +22,7 @@ import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_AP
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
@@ -34,7 +35,7 @@ public class MCRIIIFImageUtil {
 
     public static String buildCanonicalURL(MCRIIIFImageImpl impl, String identifier)
         throws UnsupportedEncodingException {
-        return "<" + getIIIFURL(impl) + URLEncoder.encode(identifier, "UTF-8")
+        return "<" + getIIIFURL(impl) + URLEncoder.encode(identifier, StandardCharsets.UTF_8)
             + "/full/full/0/color.jpg>;rel=\"canonical\"";
     }
 

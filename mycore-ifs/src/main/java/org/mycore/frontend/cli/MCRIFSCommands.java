@@ -826,7 +826,7 @@ public class MCRIFSCommands {
         }
         usedStores
             .stream()
-            .filter(storeId -> !MCRCStoreIFS2.class.isInstance(MCRContentStoreFactory.getStore(storeId)))
+            .filter(storeId -> !(MCRContentStoreFactory.getStore(storeId) instanceof MCRCStoreIFS2))
             .forEach(storeId -> {
                 LOGGER.error("Content store {} is not an instance of {}. Please move content.", storeId,
                     MCRCStoreIFS2.class);

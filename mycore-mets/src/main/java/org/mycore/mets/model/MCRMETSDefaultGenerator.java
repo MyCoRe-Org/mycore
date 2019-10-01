@@ -163,7 +163,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
             if (isInExcludedRootFolder(directory.getKey())) {
                 structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, lOrder);
             } else {
-                LogicalDiv section = new LogicalDiv("log_" + Integer.toString(++lOrder), "section", dirName);
+                LogicalDiv section = new LogicalDiv("log_" + ++lOrder, "section", dirName);
                 logicalDiv.add(section);
                 structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, section, structLink, lOrder);
             }

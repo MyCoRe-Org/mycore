@@ -68,13 +68,9 @@ class MCRPermissionHandle {
             return false;
         }
         if (permission == null) {
-            if (other.permission != null) {
-                return false;
-            }
-        } else if (!permission.equals(other.permission)) {
-            return false;
-        }
-        return true;
+            return other.permission == null;
+        } else
+            return permission.equals(other.permission);
     }
 
 }

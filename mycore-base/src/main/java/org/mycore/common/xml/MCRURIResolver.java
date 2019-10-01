@@ -32,6 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1393,12 +1394,7 @@ public final class MCRURIResolver implements URIResolver {
 
             while (tok.hasMoreTokens()) {
                 param = tok.nextToken().split("=");
-                try {
-                    params.put(URLDecoder.decode(param[0], "UTF-8"), URLDecoder.decode(param[1], "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    // should never happen
-                    LOGGER.error("UTF-8 is a unknown encoding.", e);
-                }
+                params.put(URLDecoder.decode(param[0], StandardCharsets.UTF_8), URLDecoder.decode(param[1], StandardCharsets.UTF_8));
             }
             return params;
         }

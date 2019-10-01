@@ -208,7 +208,7 @@ class MCREventHandler {
             JsonObject event = new JsonObject();
             event.addProperty("id", der.getId().toString());
             event.addProperty("uri",
-                uriResolver.apply(getPathURI("objects/" + der.getOwnerID())).toString() + "/derivates/" + der.getId());
+                uriResolver.apply(getPathURI("objects/" + der.getOwnerID())) + "/derivates/" + der.getId());
             event.addProperty("object", der.getOwnerID().toString());
             event.addProperty("objectUri", uriResolver.apply(getPathURI("objects/" + der.getOwnerID())).toString());
             copyFlagToProperty(der, event, "createdby", "createdBy");

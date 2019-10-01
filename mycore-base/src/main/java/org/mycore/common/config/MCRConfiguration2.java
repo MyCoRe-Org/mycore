@@ -89,7 +89,7 @@ public class MCRConfiguration2 {
      *             if the the class can not be loaded or instantiated
      */
     public static <T> Optional<Class<? extends T>> getClass(String name) throws MCRConfigurationException{
-        return getString(name).map(MCRConfiguration2::<T>getClassObject);
+        return getString(name).map(MCRConfiguration2::<T> getClassObject);
     }
 
     /**
@@ -365,13 +365,9 @@ public class MCRConfiguration2 {
                 return false;
             }
             if (property == null) {
-                if (other.property != null) {
-                    return false;
-                }
-            } else if (!property.equals(other.property)) {
-                return false;
-            }
-            return true;
+                return other.property == null;
+            } else
+                return property.equals(other.property);
         }
     }
 

@@ -34,6 +34,6 @@ public @interface MCRAccessControlExposeHeaders {
     /**
      * @return values for {@code Access-Control-Expose-Headers} header
      */
-    public String[] value();
+    String[] value();
 
 }

@@ -242,7 +242,7 @@ public abstract class MCRMETSHierarchyGenerator extends MCRMETSAbstractGenerator
             imageFile.setFLocat(fLocat);
             fileGroup.addFile(imageFile);
         } catch (Exception exc) {
-            LOGGER.error("invalid href for " + fileRef.getPath().toString(), exc);
+            LOGGER.error("invalid href for " + fileRef.getPath(), exc);
         }
     }
 

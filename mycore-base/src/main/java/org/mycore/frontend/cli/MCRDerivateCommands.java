@@ -887,7 +887,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         // remove leading slash
         String cleanPath = filePath;
         if (filePath.startsWith(String.valueOf(MCRAbstractFileSystem.SEPARATOR))) {
-            cleanPath = filePath.substring(1, filePath.length());
+            cleanPath = filePath.substring(1);
         }
 
         // check for file exist

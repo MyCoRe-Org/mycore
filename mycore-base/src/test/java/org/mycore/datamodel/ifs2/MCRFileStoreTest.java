@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -189,7 +190,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
         MCRDirectory dir = col.createDir("documentation");
         assertEquals(2, col.getNumChildren());
         assertTrue(modified.before(col.getLastModified()));
-        byte[] content = "Hello World!".getBytes("UTF-8");
+        byte[] content = "Hello World!".getBytes(StandardCharsets.UTF_8);
         dir.createFile("readme.txt").setContent(new MCRByteContent(content, System.currentTimeMillis()));
         MCRFile child = (MCRFile) dir.getChild("readme.txt");
         assertNotNull(child);

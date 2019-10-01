@@ -47,7 +47,7 @@ public class MCRDerivateContentTransformerServlet extends MCRContentServlet {
 
         FileTime lastModifiedTime = Files.getLastModifiedTime(mcrPath);
 
-        MCRFrontendUtil.writeCacheHeaders(resp, (long) CACHE_TIME, lastModifiedTime.toMillis(), true);
+        MCRFrontendUtil.writeCacheHeaders(resp, CACHE_TIME, lastModifiedTime.toMillis(), true);
 
         try {
             return getLayoutService().getTransformedContent(req, resp, pc);

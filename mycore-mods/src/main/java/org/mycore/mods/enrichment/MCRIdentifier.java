@@ -53,7 +53,7 @@ class MCRIdentifier {
 
     @Override
     public boolean equals(Object other) {
-        return (other instanceof MCRIdentifier ? this.toString().equals(other.toString()) : false);
+        return (other instanceof MCRIdentifier && this.toString().equals(other.toString()));
     }
 
     @Override

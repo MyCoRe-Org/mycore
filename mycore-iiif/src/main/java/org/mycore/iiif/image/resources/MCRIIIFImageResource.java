@@ -29,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.GET;
@@ -103,9 +104,9 @@ public class MCRIIIFImageResource {
     public Response getInfoRedirect(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
-            String uriString = getIIIFURL(getImpl(impl)) + URLEncoder.encode(identifier, "UTF-8") + "/info.json";
+            String uriString = getIIIFURL(getImpl(impl)) + URLEncoder.encode(identifier, StandardCharsets.UTF_8) + "/info.json";
             return Response.temporaryRedirect(new URI(uriString)).build();
-        } catch (URISyntaxException | UnsupportedEncodingException e) {
+        } catch (URISyntaxException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }

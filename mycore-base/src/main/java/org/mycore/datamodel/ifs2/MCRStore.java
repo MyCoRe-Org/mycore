@@ -421,7 +421,7 @@ public abstract class MCRStore {
         final StringBuilder path = new StringBuilder();
         int offset = 0;
         for (int i = 0; i < paths.length - 1; i++) {
-            path.append(id.substring(offset, offset + slotLength[i]));
+            path.append(id, offset, offset + slotLength[i]);
             paths[i] = path.toString();
             path.append("/");
             offset += slotLength[i];

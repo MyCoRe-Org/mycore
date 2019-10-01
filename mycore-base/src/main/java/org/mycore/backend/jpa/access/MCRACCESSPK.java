@@ -93,13 +93,9 @@ public class MCRACCESSPK implements Serializable {
             return false;
         }
         if (objid == null) {
-            if (other.objid != null) {
-                return false;
-            }
-        } else if (!objid.equals(other.objid)) {
-            return false;
-        }
-        return true;
+            return other.objid == null;
+        } else
+            return objid.equals(other.objid);
     }
 
 }

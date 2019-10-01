@@ -21,6 +21,7 @@ package org.mycore.sass.resources;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -83,7 +84,8 @@ public class MCRSassResource {
                     .build();
             }
         } catch (IOException | CompilationException e) {
-            StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os, true, "UTF-8"));
+            StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os, true,
+                StandardCharsets.UTF_8));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }

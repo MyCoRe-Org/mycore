@@ -98,7 +98,7 @@ public class MCRCrossrefService extends MCRDOIBaseService {
         final Element root = resultDocument.getRootElement();
 
         final Element headElement = root.getChild("head", MCRConstants.CROSSREF_NAMESPACE);
-        final String batchID = UUID.randomUUID().toString() + "_" + obj.getId().toString();
+        final String batchID = UUID.randomUUID() + "_" + obj.getId();
         final String timestampMilliseconds = String.valueOf(new Date().getTime());
         MCRCrossrefUtil.insertBatchInformation(headElement, batchID, timestampMilliseconds, depositor, depositorMail,
             registrant);

@@ -94,7 +94,7 @@ public class MCRCoreVersion {
             .collect(Collectors.toMap(e -> e.getKey().toString(), e -> e.getValue().toString()));
     }
 
-    public static void main(String arg[]) throws IOException {
+    public static void main(String[] arg) throws IOException {
         System.out.printf(Locale.ROOT, "MyCoRe\tver: %s\tbranch: %s\tcommit: %s%n", VERSION, BRANCH, DESCRIBE);
         System.out.printf(Locale.ROOT, "Config directory: %s%n", MCRConfigurationDir.getConfigurationDirectory());
         prop.store(System.out, "Values of '/org/mycore/version.properties' resource");

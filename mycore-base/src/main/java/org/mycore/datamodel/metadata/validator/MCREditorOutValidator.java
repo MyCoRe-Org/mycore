@@ -486,7 +486,7 @@ public class MCREditorOutValidator {
                     if (i != -1) {
                         String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
                         firstcond.setAttribute("value",
-                            value.substring(0, i) + thisip + value.substring(i + 10, value.length()));
+                            value.substring(0, i) + thisip + value.substring(i + 10));
                     }
                 }
             }

@@ -22,6 +22,7 @@ import static org.mycore.user2.utils.MCRUserTransformer.JAXB_CONTEXT;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -344,7 +345,7 @@ public class MCRUserServlet extends MCRServlet {
         }
 
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&id="
-            + URLEncoder.encode(user.getUserID(), "UTF-8")));
+            + URLEncoder.encode(user.getUserID(), StandardCharsets.UTF_8)));
     }
 
     private String convertToUTC(String validUntilText, String format) throws ParseException {
@@ -410,7 +411,7 @@ public class MCRUserServlet extends MCRServlet {
         MCRUserManager.setPassword(user, password);
 
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&XSL.step=changedPassword&id="
-            + URLEncoder.encode(user.getUserID(), "UTF-8")));
+            + URLEncoder.encode(user.getUserID(), StandardCharsets.UTF_8)));
     }
 
     /**

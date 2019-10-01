@@ -344,7 +344,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         } else {
             nextFreeID = ruleStore.getNextFreeRuleID(prefix);
         }
-        sNextFreeID = lexicographicalPattern + String.valueOf(nextFreeID);
+        sNextFreeID = lexicographicalPattern + nextFreeID;
         sNextFreeID = sNextFreeID.substring(sNextFreeID.length() - lexicographicalPattern.length());
         nextFreeRuleID.put(prefix, nextFreeID + 1);
         return prefix + sNextFreeID;

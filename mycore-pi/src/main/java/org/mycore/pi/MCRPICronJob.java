@@ -39,7 +39,7 @@ import org.mycore.util.concurrent.MCRFixedUserCallable;
  */
 public class MCRPICronJob implements Runnable, MCRStartupHandler.AutoExecutable {
 
-    private static final int CHECK_URN_THREAD_COUNT = (int) Math.max(1, Runtime.getRuntime().availableProcessors() / 4);
+    private static final int CHECK_URN_THREAD_COUNT = Math.max(1, Runtime.getRuntime().availableProcessors() / 4);
 
     private static final int CRON_INITIAL_DELAY_MINUTES = 1;
 

@@ -19,6 +19,7 @@
 package org.mycore.user2.login;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -301,7 +302,7 @@ public class MCRLoginServlet extends MCRServlet {
                     result.append(token);
                     break;
                 default:
-                    result.append(java.net.URLEncoder.encode(token, "UTF-8"));
+                    result.append(java.net.URLEncoder.encode(token, StandardCharsets.UTF_8));
                     break;
             }
         }

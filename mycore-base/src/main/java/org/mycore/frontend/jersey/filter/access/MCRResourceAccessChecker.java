@@ -19,6 +19,7 @@
 package org.mycore.frontend.jersey.filter.access;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -38,7 +39,7 @@ public interface MCRResourceAccessChecker {
      * @return the string
      */
     default String convertStreamToString(InputStream is) {
-        try (Scanner s = new Scanner(is, "UTF-8")) {
+        try (Scanner s = new Scanner(is, StandardCharsets.UTF_8)) {
             s.useDelimiter("\\A");
             return s.hasNext() ? s.next() : "";
         }

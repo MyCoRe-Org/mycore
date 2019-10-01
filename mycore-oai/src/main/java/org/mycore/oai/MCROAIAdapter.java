@@ -159,7 +159,7 @@ public class MCROAIAdapter implements OAIAdapter {
 
     @SuppressWarnings("unchecked")
     private OAIDataList<Set> cast(OAIDataList<? extends Set> setList) {
-        return (OAIDataList<Set>) setList;
+        return setList;
     }
 
     /*

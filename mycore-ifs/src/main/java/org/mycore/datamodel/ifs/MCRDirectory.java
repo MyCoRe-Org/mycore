@@ -19,6 +19,7 @@
 package org.mycore.datamodel.ifs;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
@@ -511,11 +512,7 @@ public class MCRDirectory extends MCRFilesystemNode {
 
         String s = sb.toString();
 
-        try {
-            return s.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException shouldNeverBeThrown) {
-            return null;
-        }
+        return s.getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpEntity;
@@ -52,7 +53,7 @@ public class MCRDataciteRest {
             HttpEntity entity = response.getEntity();
 
             try (BufferedReader buffer = new BufferedReader(
-                new InputStreamReader(entity.getContent(), Charset.forName("UTF-8")))) {
+                new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8))) {
                 String json = buffer.lines().collect(Collectors.joining("\n"));
                 Gson gson = new GsonBuilder().registerTypeAdapter(MCRDataciteRestResponseEntryData.class,
                     new MCRDOIRestResponseEntryDataValueDeserializer()).create();

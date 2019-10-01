@@ -165,7 +165,7 @@ public class MCRTranslation {
             if (!DEPRECATED_MESSAGES_PRESENT) {
                 LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES
                     + "' to check for depreacted I18N keys.");
-            } else if (DEPRECATED_MAPPING.keySet().contains(label)) {
+            } else if (DEPRECATED_MAPPING.containsKey(label)) {
                 String newLabel = DEPRECATED_MAPPING.getProperty(label);
                 try {
                     result = message.getString(newLabel);
@@ -325,7 +325,7 @@ public class MCRTranslation {
             }
             a.add(buf.toString());
         }
-        return a.toArray(new String[a.size()]);
+        return a.toArray(String[]::new);
     }
 
     static boolean isArray(String masked) {

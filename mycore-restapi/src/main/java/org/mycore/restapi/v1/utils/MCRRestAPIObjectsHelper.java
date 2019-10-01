@@ -802,11 +802,7 @@ public class MCRRestAPIObjectsHelper {
             key = idString.substring(0, pos);
             idString = idString.substring(pos + 1);
             if (!key.equals("mcr")) {
-                try {
-                    idString = URLDecoder.decode(idString, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    //will not happen
-                }
+                idString = URLDecoder.decode(idString, StandardCharsets.UTF_8);
                 //ToDo - Shall we restrict the key set with a property?
 
                 //throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.BAD_REQUEST,

@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Date;
 import java.util.Map;
@@ -65,11 +66,11 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     public void setUp() throws Exception {
         super.setUp();
         MyCoRe_document_00000001 = new XMLInfo("MyCoRe_document_00000001",
-            "<object id=\"MyCoRe_document_00000001\"/>".getBytes("UTF-8"), new Date());
+            "<object id=\"MyCoRe_document_00000001\"/>".getBytes(StandardCharsets.UTF_8), new Date());
         MyCoRe_document_00000001_new = new XMLInfo("MyCoRe_document_00000001",
-            "<object id=\"MyCoRe_document_00000001\" update=\"true\"/>".getBytes("UTF-8"), new Date());
+            "<object id=\"MyCoRe_document_00000001\" update=\"true\"/>".getBytes(StandardCharsets.UTF_8), new Date());
         MCR_document_00000001 = new XMLInfo("MCR_document_00000001",
-            "<object id=\"MCR_document_00000001\"/>".getBytes("UTF-8"), new Date());
+            "<object id=\"MCR_document_00000001\"/>".getBytes(StandardCharsets.UTF_8), new Date());
     }
 
     @Override

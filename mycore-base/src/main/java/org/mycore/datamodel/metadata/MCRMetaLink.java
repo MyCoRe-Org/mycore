@@ -241,10 +241,8 @@ public class MCRMetaLink extends MCRMetaDefault {
         }
 
         if (linktype.equals("arc")) {
-            if (linktype.equals(input.getXLinkType()) && from.equals(input.getXLinkFrom())
-                && to.equals(input.getXLinkTo())) {
-                return true;
-            }
+            return linktype.equals(input.getXLinkType()) && from.equals(input.getXLinkFrom())
+                && to.equals(input.getXLinkTo());
         }
 
         return false;
@@ -273,10 +271,8 @@ public class MCRMetaLink extends MCRMetaDefault {
             return false;
         } else if (!Objects.equals(title, other.title)) {
             return false;
-        } else if (!Objects.equals(to, other.to)) {
-            return false;
-        }
-        return true;
+        } else
+            return Objects.equals(to, other.to);
     }
 
     /**

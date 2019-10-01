@@ -782,7 +782,7 @@ public class MCRXMLMetadataManager {
         try (Stream<Path> streamBasePath = list(basePath)) {
             return streamBasePath.flatMap(this::list)
                 .filter(p -> MCRObjectID.isValidType(p.getFileName().toString()))
-                .map(p -> p.getParent().getFileName().toString() + "_" + p.getFileName().toString())
+                .map(p -> p.getParent().getFileName() + "_" + p.getFileName())
                 .collect(Collectors.toSet()); 
         } 
     }

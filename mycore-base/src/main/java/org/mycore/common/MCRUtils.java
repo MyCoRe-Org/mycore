@@ -33,6 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -327,18 +328,14 @@ public class MCRUtils {
             iterations = 0;
         }
         byte[] data;
-        try {
-            digest = MessageDigest.getInstance(algorithm);
-            text = Normalizer.normalize(text, Form.NFC);
-            if (salt != null) {
-                digest.update(salt);
-            }
-            data = digest.digest(text.getBytes("UTF-8"));
-            for (int i = 0; i < iterations; i++) {
-                data = digest.digest(data);
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException("Could not get " + algorithm + " checksum", e);
+        digest = MessageDigest.getInstance(algorithm);
+        text = Normalizer.normalize(text, Form.NFC);
+        if (salt != null) {
+            digest.update(salt);
+        }
+        data = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+        for (int i = 0; i < iterations; i++) {
+            data = digest.digest(data);
         }
         return toHexString(data);
     }

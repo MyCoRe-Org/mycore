@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -554,7 +555,7 @@ public class MCRMetsSave {
             String idMets = divChild.getChildren().get(0).getFileId();
 
             // check if there is a URN for the file
-            String file = "/" + URLDecoder.decode(idFileMap.get(idMets), "UTF-8");
+            String file = "/" + URLDecoder.decode(idFileMap.get(idMets), StandardCharsets.UTF_8);
             if (fileUrnMap.containsKey(file)) {
                 divChild.setContentIds(fileUrnMap.get(file));
             }

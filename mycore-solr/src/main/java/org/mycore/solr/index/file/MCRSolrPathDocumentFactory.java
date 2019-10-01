@@ -48,7 +48,7 @@ public class MCRSolrPathDocumentFactory {
     private static Logger LOGGER = LogManager.getLogger(MCRSolrPathDocumentFactory.class);
 
     private static MCRSolrPathDocumentFactory instance = MCRConfiguration.instance()
-        .getInstanceOf(SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory", (String) null);
+        .getInstanceOf(SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory", null);
 
     private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
 

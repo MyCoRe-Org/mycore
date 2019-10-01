@@ -192,7 +192,7 @@ public class MCRConfiguration {
     public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         return defaultname == null ? MCRConfiguration2.getOrThrow(name, MCRConfiguration2::instantiateClass)
             : MCRConfiguration2.<T> getInstanceOf(name)
-                .orElseGet(() -> MCRConfiguration2.<T> instantiateClass(defaultname));
+                .orElseGet(() -> MCRConfiguration2.instantiateClass(defaultname));
     }
 
     /**

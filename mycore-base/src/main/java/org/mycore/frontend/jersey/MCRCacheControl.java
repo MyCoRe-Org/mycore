@@ -98,14 +98,14 @@ public @interface MCRCacheControl {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.ANNOTATION_TYPE)
-    public static @interface Age {
+    @interface Age {
         long time();
 
         TimeUnit unit() default TimeUnit.MINUTES;
 
     }
 
-    public static @interface FieldArgument {
+    @interface FieldArgument {
         /**
          * if true, this directive is present in header value
          */
@@ -117,7 +117,7 @@ public @interface MCRCacheControl {
         String[] fields() default {};
     }
 
-    public static @interface Extension {
+    @interface Extension {
         String directive();
 
         String argument() default "";

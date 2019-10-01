@@ -73,7 +73,7 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
         return bucketMap.get(bucketID);
     }
 
-    public synchronized static MCRFileUploadBucket getOrCreateBucket(String bucketID, String objectID) {
+    public static synchronized MCRFileUploadBucket getOrCreateBucket(String bucketID, String objectID) {
         final MCRFileUploadBucket mcrFileUploadBucket = bucketMap
             .computeIfAbsent(bucketID, (id) -> new MCRFileUploadBucket(bucketID, objectID));
         return mcrFileUploadBucket;

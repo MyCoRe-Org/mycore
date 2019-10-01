@@ -47,7 +47,7 @@ public class MCRSessionHookFilter implements ContainerRequestFilter, ContainerRe
     @Context
     private HttpServletResponse httpResponse;
 
-    private final static String ATTR = MCRSessionHookFilter.class.getName() + ".session";
+    private static final String ATTR = MCRSessionHookFilter.class.getName() + ".session";
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSessionHookFilter.class);
 

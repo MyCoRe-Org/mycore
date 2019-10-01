@@ -351,7 +351,7 @@ public class MCRMigrationCommands {
         final List<MCRMetaEnrichedLinkID> derivates = mcrObject.getStructure().getDerivates();
 
         return derivates.stream().map(
-            (der) -> "migrate derivate " + der.getXLinkHrefID().toString() + " using order " + (
+            (der) -> "migrate derivate " + der.getXLinkHrefID() + " using order " + (
                 derivates.indexOf(der) + 1)).collect(Collectors.toList());
     }
     
