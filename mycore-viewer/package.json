@@ -15,9 +15,13 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-maven": "~1.1.0",
     "grunt-newer": "^0.7.0",
+    "grunt-npmcopy": "^0.2.0",
     "grunt-svninfo": "^0.1.4",
     "grunt-ts": "5.5.1"
   },
   "author": "Sebastian Hofmann <hofmann.s@uni-jena.de>",
-  "license": "GPL"
+  "license": "GPL",
+  "dependencies": {
+    "pdfjs-dist": "^1.10.100"
+  }
 }
