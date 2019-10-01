@@ -45,7 +45,7 @@ public class MCRBooleanClauseParserTest {
     public void testSingleStrings() {
         MCROrCondition c01 = new MCROrCondition(new MCRTrueCondition(),
             new MCRFalseCondition(), new MCRTrueCondition());
-        System.out.println("Boolean claus test 1 --> " + c01.toString());
+        System.out.println("Boolean claus test 1 --> " + c01);
         assertEquals("Returned value is not", c01.toString(), p.parse("true or false or true").toString());
         assertEquals("Returned value is not", c01.toString(), p.parse("(true) or (false) or (true)").toString());
         
@@ -56,16 +56,16 @@ public class MCRBooleanClauseParserTest {
 
         MCRAndCondition c03 = new MCRAndCondition(new MCRTrueCondition(),
             new MCRFalseCondition(), new MCRTrueCondition());
-        System.out.println("Boolean claus test 3 --> " + c03.toString());
+        System.out.println("Boolean claus test 3 --> " + c03);
         assertEquals("Returned value is not", c03.toString(), p.parse("true and false and true").toString());
         
         MCROrCondition c04 = new MCROrCondition(new MCRTrueCondition(),new MCRAndCondition(
             new MCRFalseCondition(), new MCRTrueCondition()));
-        System.out.println("Boolean claus test 4 --> " + c04.toString());
+        System.out.println("Boolean claus test 4 --> " + c04);
         assertEquals("Returned value is not", c04.toString(), p.parse("true or false and true").toString());
         
         MCRCondition c05 = new MCRTrueCondition();
-        System.out.println("Boolean claus test 5 --> " + c05.toString());
+        System.out.println("Boolean claus test 5 --> " + c05);
         assertEquals("Returned value is not", c05.toString(), p.parse("true").toString());
         assertEquals("Returned value is not", c05.toString(), p.parse("(true)").toString());
         assertEquals("Returned value is not", c05.toString(), p.parse("(true )").toString());

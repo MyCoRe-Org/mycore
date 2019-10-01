@@ -176,7 +176,7 @@ public class MCRConfigurationDir {
      * @return null if System property {@value #DISABLE_CONFIG_DIR_PROPERTY} is set.
      */
     public static File getConfigurationDirectory() {
-        if (!System.getProperties().keySet().contains(DISABLE_CONFIG_DIR_PROPERTY)) {
+        if (!System.getProperties().containsKey(DISABLE_CONFIG_DIR_PROPERTY)) {
             return new File(getMyCoReDirectory(), getPrefix() + getAppName());
         }
         return null;

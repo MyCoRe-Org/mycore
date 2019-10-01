@@ -66,7 +66,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     private static final String CFG_SUFFIX_ADD = ".Path2Add";
 
-    private static enum Action {
+    private enum Action {
         ADD, ADD_IF, REMOVE, REMOVE_IF, REPLACE
     }
 

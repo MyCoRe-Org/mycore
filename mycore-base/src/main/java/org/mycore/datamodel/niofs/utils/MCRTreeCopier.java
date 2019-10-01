@@ -91,7 +91,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 String fileName = target.getFileName().toString();
                 int numberPosition = fileName.lastIndexOf(".") == -1 ? fileName.length() : fileName.lastIndexOf(".");
                 String prefixString = fileName.substring(0, numberPosition);
-                String suffixString = fileName.substring(numberPosition, fileName.length());
+                String suffixString = fileName.substring(numberPosition);
                 String newName = null;
                 Path parent = target.getParent();
                 do {

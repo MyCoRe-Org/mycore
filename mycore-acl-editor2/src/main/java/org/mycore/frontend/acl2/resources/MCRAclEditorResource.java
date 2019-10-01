@@ -345,7 +345,7 @@ public class MCRAclEditorResource {
 
     private MCRAccessRule createAccessRule(String ruleDesc, String ruleText) {
         int freeRuleID = RULE_STORE.getNextFreeRuleID("SYSTEMRULE");
-        String ruleID = "0000000000" + String.valueOf(freeRuleID);
+        String ruleID = "0000000000" + freeRuleID;
         ruleID = ruleID.substring(ruleID.length() - "0000000000".length());
         String newRuleID = "SYSTEMRULE" + ruleID;
         String uid = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();

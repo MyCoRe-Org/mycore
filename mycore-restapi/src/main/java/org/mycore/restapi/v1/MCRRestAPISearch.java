@@ -103,48 +103,44 @@ public class MCRRestAPISearch {
         StringBuilder url = new StringBuilder(MCRSolrClientFactory.getMainSolrCore().getV1CoreURL());
         url.append("/select?");
 
-        try {
-            if (query != null) {
-                url.append("&q=").append(URLEncoder.encode(query, "UTF-8"));
-            }
-            if (sort != null) {
-                url.append("&sort=").append(URLEncoder.encode(sort, "UTF-8"));
-            }
-            if (wt != null) {
-                url.append("&wt=").append(wt);
-            }
-            if (start != null) {
-                url.append("&start=").append(start);
-            }
-            if (rows != null) {
-                url.append("&rows=").append(rows);
-            }
-            if (fq != null) {
-                url.append("&fq=").append(URLEncoder.encode(fq, "UTF-8"));
-            }
-            if (fl != null) {
-                url.append("&fl=").append(URLEncoder.encode(fl, "UTF-8"));
-            }
-            if (facet != null) {
-                url.append("&facet=").append(URLEncoder.encode(facet, "UTF-8"));
-            }
-            for (String ff : facetFields) {
-                url.append("&facet.field=").append(URLEncoder.encode(ff, "UTF-8"));
-            }
-            if (facetSort != null) {
-                url.append("&facet.sort=").append(facetSort);
-            }
-            if (facetLimit != null) {
-                url.append("&facet.limit=").append(facetLimit);
-            }
-            if (facetMinCount != null) {
-                url.append("&facet.mincount=").append(facetMinCount);
-            }
-            if (jsonWrf != null) {
-                url.append("&json.wrf=").append(jsonWrf);
-            }
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error(e);
+        if (query != null) {
+            url.append("&q=").append(URLEncoder.encode(query, StandardCharsets.UTF_8));
+        }
+        if (sort != null) {
+            url.append("&sort=").append(URLEncoder.encode(sort, StandardCharsets.UTF_8));
+        }
+        if (wt != null) {
+            url.append("&wt=").append(wt);
+        }
+        if (start != null) {
+            url.append("&start=").append(start);
+        }
+        if (rows != null) {
+            url.append("&rows=").append(rows);
+        }
+        if (fq != null) {
+            url.append("&fq=").append(URLEncoder.encode(fq, StandardCharsets.UTF_8));
+        }
+        if (fl != null) {
+            url.append("&fl=").append(URLEncoder.encode(fl, StandardCharsets.UTF_8));
+        }
+        if (facet != null) {
+            url.append("&facet=").append(URLEncoder.encode(facet, StandardCharsets.UTF_8));
+        }
+        for (String ff : facetFields) {
+            url.append("&facet.field=").append(URLEncoder.encode(ff, StandardCharsets.UTF_8));
+        }
+        if (facetSort != null) {
+            url.append("&facet.sort=").append(facetSort);
+        }
+        if (facetLimit != null) {
+            url.append("&facet.limit=").append(facetLimit);
+        }
+        if (facetMinCount != null) {
+            url.append("&facet.mincount=").append(facetMinCount);
+        }
+        if (jsonWrf != null) {
+            url.append("&json.wrf=").append(jsonWrf);
         }
 
         try (InputStream is = new URL(url.toString()).openStream()) {

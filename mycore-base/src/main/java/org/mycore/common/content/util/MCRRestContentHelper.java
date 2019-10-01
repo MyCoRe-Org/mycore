@@ -52,7 +52,7 @@ public abstract class MCRRestContentHelper {
         .createHeaderDelegate(Date.class);
 
     public enum ContentDispositionType {
-        inline, attachment;
+        inline, attachment
     }
 
     public static class Config {

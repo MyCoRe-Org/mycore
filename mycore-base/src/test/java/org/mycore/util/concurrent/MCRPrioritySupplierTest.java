@@ -37,7 +37,7 @@ public class MCRPrioritySupplierTest {
 
     private static Logger LOGGER = LogManager.getLogger(MCRPrioritySupplierTest.class);
 
-    static int EXCPECTED[] = { 1, 10, 5, 4, 3, 2 };
+    static int[] EXCPECTED = { 1, 10, 5, 4, 3, 2 };
 
     @Test
     public void priortiy() throws Exception {
@@ -63,7 +63,7 @@ public class MCRPrioritySupplierTest {
     private static class TaskConsumer implements Consumer<Integer> {
         static int COUNTER = 0;
 
-        static int ORDER[] = { 0, 0, 0, 0, 0, 0 };
+        static int[] ORDER = { 0, 0, 0, 0, 0, 0 };
 
         @Override
         public void accept(Integer value) {

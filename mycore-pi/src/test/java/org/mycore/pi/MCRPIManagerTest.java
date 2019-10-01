@@ -142,7 +142,7 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
         MCRHIBConnection.instance().getSession().save(generateMCRPI());
 
-        long numOfUnregisteredPI = (long) MCRPIManager.getInstance()
+        long numOfUnregisteredPI = MCRPIManager.getInstance()
             .getUnregisteredIdentifiers("Unregistered")
             .size();
 

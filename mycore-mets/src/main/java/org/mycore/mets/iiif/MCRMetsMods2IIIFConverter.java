@@ -230,7 +230,7 @@ public class MCRMetsMods2IIIFConverter {
             .findAny().get();
 
         String cleanHref = file.getFLocat().getHref();
-        cleanHref = cleanHref.substring(cleanHref.indexOf(this.identifier), cleanHref.length());
+        cleanHref = cleanHref.substring(cleanHref.indexOf(this.identifier));
 
         return cleanHref;
     }

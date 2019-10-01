@@ -47,7 +47,7 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MCRMetadataVersion {
 
-    private static enum Type {
+    private enum Type {
         created(MCRMetadataVersion.CREATED), modified(MCRMetadataVersion.UPDATED), deleted(MCRMetadataVersion.DELETED);
 
         private final char charValue;

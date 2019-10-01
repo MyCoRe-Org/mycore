@@ -94,7 +94,7 @@ public class MCRCalendar {
     public static final int MAX_JULIAN_DAY_NUMBER = 3182057;
 
     /** all available calendars of ICU as String area */
-    public static final String CALENDARS_ICU[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN,
+    public static final String[] CALENDARS_ICU = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN,
         TAG_HEBREW, TAG_ISLAMIC, TAG_JAPANESE };
 
     /** a list of calendar tags they are supported in this class */
@@ -283,20 +283,20 @@ public class MCRCalendar {
             if (iso) {
                 year = Integer.parseInt(date_string.substring(start, firstdot));
                 mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
-                day = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+                day = Integer.parseInt(date_string.substring(secdot + 1));
             } else {
                 day = Integer.parseInt(date_string.substring(start, firstdot));
                 mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
-                year = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+                year = Integer.parseInt(date_string.substring(secdot + 1));
             }
         } else {
             if (firstdot != -1) {
                 if (iso) {
                     year = Integer.parseInt(date_string.substring(start, firstdot));
-                    mon = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length())) - 1;
+                    mon = Integer.parseInt(date_string.substring(firstdot + 1)) - 1;
                 } else {
                     mon = Integer.parseInt(date_string.substring(start, firstdot)) - 1;
-                    year = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length()));
+                    year = Integer.parseInt(date_string.substring(firstdot + 1));
                 }
                 if (last) {
                     if (mon == 0 || mon == 2 || mon == 4 || mon == 6 || mon == 7 || mon == 9 || mon == 11) {
@@ -312,7 +312,7 @@ public class MCRCalendar {
 
                 }
             } else {
-                year = Integer.parseInt(date_string.substring(start, date_string.length()));
+                year = Integer.parseInt(date_string.substring(start));
                 if (last) {
                     mon = 11;
                     day = 31;
@@ -366,7 +366,7 @@ public class MCRCalendar {
     protected static GregorianCalendar getCalendarFromGregorianDate(String date_string, boolean last)
         throws MCRException {
         try {
-            int fields[] = checkDateStringForJulianCalendar(date_string, last);
+            int[] fields = checkDateStringForJulianCalendar(date_string, last);
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.set(fields[0], fields[1], fields[2]);
             if (fields[3] == -1) {
@@ -407,7 +407,7 @@ public class MCRCalendar {
      */
     protected static Calendar getCalendarFromJulianDate(String date_string, boolean last) throws MCRException {
         try {
-            int fields[] = checkDateStringForJulianCalendar(date_string, last);
+            int[] fields = checkDateStringForJulianCalendar(date_string, last);
             Calendar calendar = new GregorianCalendar();
             calendar.set(fields[0], fields[1], fields[2]);
             if (fields[3] == -1) {
@@ -537,20 +537,20 @@ public class MCRCalendar {
                 if (iso) {
                     year = Integer.parseInt(date_string.substring(start, firstdot));
                     mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+                    day = Integer.parseInt(date_string.substring(secdot + 1));
                 } else {
                     day = Integer.parseInt(date_string.substring(start, firstdot));
                     mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
-                    year = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+                    year = Integer.parseInt(date_string.substring(secdot + 1));
                 }
             } else {
                 if (firstdot != -1) { // month year
                     if (iso) {
                         year = Integer.parseInt(date_string.substring(start, firstdot));
-                        mon = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length())) - 1;
+                        mon = Integer.parseInt(date_string.substring(firstdot + 1)) - 1;
                     } else {
                         mon = Integer.parseInt(date_string.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length()));
+                        year = Integer.parseInt(date_string.substring(firstdot + 1));
                     }
 
                     if (last) {
@@ -563,7 +563,7 @@ public class MCRCalendar {
 
                     }
                 } else { // year
-                    year = Integer.parseInt(date_string.substring(start, date_string.length()));
+                    year = Integer.parseInt(date_string.substring(start));
 
                     if (last) {
                         mon = 11;
@@ -635,20 +635,20 @@ public class MCRCalendar {
                 if (iso) {
                     year = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    day = Integer.parseInt(datestr.substring(secdot + 1));
                 } else {
                     day = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(secdot + 1));
                 }
             } else {
                 if (firstdot != -1) {
                     if (iso) {
                         year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length())) - 1;
+                        mon = Integer.parseInt(datestr.substring(firstdot + 1)) - 1;
                     } else {
                         mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
+                        year = Integer.parseInt(datestr.substring(firstdot + 1));
                     }
 
                     if (last) {
@@ -661,7 +661,7 @@ public class MCRCalendar {
                         day = 1;
                     }
                 } else {
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(start));
 
                     if (last) {
                         mon = 11;
@@ -739,20 +739,20 @@ public class MCRCalendar {
             if (iso) {
                 year = Integer.parseInt(date_string.substring(start, firstdot));
                 mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
-                day = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+                day = Integer.parseInt(date_string.substring(secdot + 1));
             } else {
                 day = Integer.parseInt(date_string.substring(start, firstdot));
                 mon = Integer.parseInt(date_string.substring(firstdot + 1, secdot)) - 1;
-                year = Integer.parseInt(date_string.substring(secdot + 1, date_string.length()));
+                year = Integer.parseInt(date_string.substring(secdot + 1));
             }
         } else {
             if (firstdot != -1) { // mon, year
                 if (iso) {
                     year = Integer.parseInt(date_string.substring(start, firstdot));
-                    mon = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length())) - 1;
+                    mon = Integer.parseInt(date_string.substring(firstdot + 1)) - 1;
                 } else {
                     mon = Integer.parseInt(date_string.substring(start, firstdot)) - 1;
-                    year = Integer.parseInt(date_string.substring(firstdot + 1, date_string.length()));
+                    year = Integer.parseInt(date_string.substring(firstdot + 1));
                 }
 
                 if (last) {
@@ -763,7 +763,7 @@ public class MCRCalendar {
                     }
                 }
             } else { // year
-                year = Integer.parseInt(date_string.substring(start, date_string.length()));
+                year = Integer.parseInt(date_string.substring(start));
 
                 if (last) {
                     mon = 12;
@@ -808,7 +808,7 @@ public class MCRCalendar {
      */
     protected static CopticCalendar getCalendarFromCopticDate(String date_string, boolean last) {
         try {
-            int fields[] = checkDateStringForCopticCalendar(date_string, last);
+            int[] fields = checkDateStringForCopticCalendar(date_string, last);
             CopticCalendar calendar = new CopticCalendar();
             calendar.set(fields[0], fields[1], fields[2]);
             return calendar;
@@ -837,7 +837,7 @@ public class MCRCalendar {
      */
     protected static EthiopicCalendar getCalendarFromEthiopicDate(String date_string, boolean last) {
         try {
-            int fields[] = checkDateStringForCopticCalendar(date_string, last);
+            int[] fields = checkDateStringForCopticCalendar(date_string, last);
             EthiopicCalendar calendar = new EthiopicCalendar();
             calendar.set(fields[0], fields[1], fields[2]);
             return calendar;
@@ -898,20 +898,20 @@ public class MCRCalendar {
                 if (iso) {
                     syear = datestr.substring(start, firstdot);
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    day = Integer.parseInt(datestr.substring(secdot + 1));
                 } else {
                     day = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    syear = datestr.substring(secdot + 1, datestr.length());
+                    syear = datestr.substring(secdot + 1);
                 }
             } else {
                 if (firstdot != -1) { // mon, year
                     if (iso) {
                         syear = datestr.substring(start, firstdot);
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length())) - 1;
+                        mon = Integer.parseInt(datestr.substring(firstdot + 1)) - 1;
                     } else {
                         mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        syear = datestr.substring(firstdot + 1, datestr.length());
+                        syear = datestr.substring(firstdot + 1);
                     }
 
                     if (last) {
@@ -924,7 +924,7 @@ public class MCRCalendar {
                         day = 1;
                     }
                 } else { // year
-                    syear = datestr.substring(start, datestr.length());
+                    syear = datestr.substring(start);
 
                     if (last) {
                         mon = 12;
@@ -1047,20 +1047,20 @@ public class MCRCalendar {
                 if (iso) {
                     year = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    day = Integer.parseInt(datestr.substring(secdot + 1));
                 } else {
                     day = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(secdot + 1));
                 }
             } else {
                 if (firstdot != -1) { // month, year
                     if (iso) {
                         year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length())) - 1;
+                        mon = Integer.parseInt(datestr.substring(firstdot + 1)) - 1;
                     } else {
                         mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
+                        year = Integer.parseInt(datestr.substring(firstdot + 1));
                     }
 
                     if (last) {
@@ -1077,7 +1077,7 @@ public class MCRCalendar {
                         day = 1;
                     }
                 } else { // year
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(start));
 
                     if (last) {
                         mon = 11;
@@ -1172,20 +1172,20 @@ public class MCRCalendar {
                 if (iso) {
                     year = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    day = Integer.parseInt(datestr.substring(secdot + 1));
                 } else {
                     day = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(secdot + 1));
                 }
             } else {
                 if (firstdot != -1) { // year, month
                     if (iso) {
                         year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length())) - 1;
+                        mon = Integer.parseInt(datestr.substring(firstdot + 1)) - 1;
                     } else {
                         mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
+                        year = Integer.parseInt(datestr.substring(firstdot + 1));
                     }
 
                     if (last) {
@@ -1203,7 +1203,7 @@ public class MCRCalendar {
                         day = 1;
                     }
                 } else { // year
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(start));
 
                     if (last) {
                         mon = 11;
@@ -1279,7 +1279,7 @@ public class MCRCalendar {
             year = newdate.get(Calendar.YEAR);
             mon = newdate.get(Calendar.MONTH) + 1;
             if (year == 1582 && mon == 10 && day >= 5 && day < 15) {
-                newdate.set(1582, mon - 1, 15);
+                newdate.set(1582, 9, 15);
             }
 
             return newdate;
@@ -1346,20 +1346,20 @@ public class MCRCalendar {
                 if (iso) {
                     year = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot));
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    day = Integer.parseInt(datestr.substring(secdot + 1));
                 } else {
                     day = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot));
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(secdot + 1));
                 }
             } else {
                 if (firstdot != -1) { // year, month
                     if (iso) {
                         year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
+                        mon = Integer.parseInt(datestr.substring(firstdot + 1));
                     } else {
                         mon = Integer.parseInt(datestr.substring(start, firstdot));
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
+                        year = Integer.parseInt(datestr.substring(firstdot + 1));
                     }
 
                     if (last) {
@@ -1374,7 +1374,7 @@ public class MCRCalendar {
                         day = 1;
                     }
                 } else { // year
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(start));
 
                     if (last) {
                         mon = 13;
@@ -1524,20 +1524,20 @@ public class MCRCalendar {
                 if (iso) {
                     year = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot));
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    day = Integer.parseInt(datestr.substring(secdot + 1));
                 } else {
                     day = Integer.parseInt(datestr.substring(start, firstdot));
                     mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot));
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(secdot + 1));
                 }
             } else {
                 if (firstdot != -1) { // year, month
                     if (iso) {
                         year = Integer.parseInt(datestr.substring(start, firstdot));
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
+                        mon = Integer.parseInt(datestr.substring(firstdot + 1));
                     } else {
                         mon = Integer.parseInt(datestr.substring(start, firstdot));
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
+                        year = Integer.parseInt(datestr.substring(firstdot + 1));
                     }
 
                     if (last) {
@@ -1552,7 +1552,7 @@ public class MCRCalendar {
                         day = 1;
                     }
                 } else { // year
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
+                    year = Integer.parseInt(datestr.substring(start));
 
                     if (last) {
                         mon = 13;

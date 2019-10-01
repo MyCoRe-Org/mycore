@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -120,9 +121,9 @@ public class MCRDerivateURNUtils {
 
             String spec = null;
             String baseURL = MCRFrontendUtil.getBaseURL();
-            String id = URLEncoder.encode(derivateId.toString(), "UTF-8");
+            String id = URLEncoder.encode(derivateId.toString(), StandardCharsets.UTF_8);
             if (mainDoc != null && mainDoc.length() > 0) {
-                String mainDocEnc = URLEncoder.encode(mainDoc, "UTF-8");
+                String mainDocEnc = URLEncoder.encode(mainDoc, StandardCharsets.UTF_8);
                 spec = String.format(Locale.ROOT, "%sservlets/MCRDFGLinkServlet?deriv=%s&file=%s", baseURL, id,
                     mainDocEnc);
             } else {
@@ -132,7 +133,7 @@ public class MCRDerivateURNUtils {
 
             LOGGER.debug("Generated URL for urn {} is {}", urn.getIdentifier(), spec);
             url = new URL(spec);
-        } catch (UnsupportedEncodingException | MalformedURLException e) {
+        } catch (MalformedURLException e) {
             LOGGER.error("Could not create dfg viewer url", e);
         }
         return url;

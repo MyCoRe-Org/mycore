@@ -128,7 +128,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH) + 1;
         int day = cal.get(Calendar.DAY_OF_MONTH);
-        return String.valueOf(day) + "." + String.valueOf(month) + "." + String.valueOf(year);
+        return day + "." + month + "." + year;
     }
 
     /** Pattern for MCRQueryConditions expressed as String */

@@ -57,7 +57,7 @@ public class MCRBooleanClauseParser<T> {
 
             if (m.find()) {
                 String c = m.group();
-                String clause = (String) l.get(Integer.parseInt(m.group(1)));
+                String clause = l.get(Integer.parseInt(m.group(1)));
                 sintern = sintern.replaceAll(c, clause);
             } else {
                 break;

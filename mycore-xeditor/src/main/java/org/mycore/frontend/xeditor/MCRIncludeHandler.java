@@ -80,14 +80,14 @@ public class MCRIncludeHandler {
      *               otherwise reload at each XEditor form transformation
      */
     public void preloadFromURIs(String uris, String sStatic)
-        throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerException, TransformerFactoryConfigurationError {
         for (String uri : uris.split(",")) {
             preloadFromURI(uri, sStatic);
         }
     }
 
     private void preloadFromURI(String uri, String sStatic)
-        throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerException, TransformerFactoryConfigurationError {
         if (uri.trim().isEmpty()) {
             return;
         }
@@ -234,7 +234,7 @@ public class MCRIncludeHandler {
     }
 
     private Element resolve(String uri, String sStatic)
-        throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerException, TransformerFactoryConfigurationError {
         Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
 
         if (cache.containsKey(uri)) {

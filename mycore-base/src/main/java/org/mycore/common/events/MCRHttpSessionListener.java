@@ -39,7 +39,7 @@ import java.util.Optional;
  */
 public class MCRHttpSessionListener implements HttpSessionListener {
 
-    private final static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /*
      * (non-Javadoc)

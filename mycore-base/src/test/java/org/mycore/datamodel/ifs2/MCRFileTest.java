@@ -81,7 +81,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
     public void getMD5() throws Exception {
         MCRFile file = col.createFile("foo.txt");
         assertEquals(MCRFile.MD5_OF_EMPTY_FILE, file.getMD5());
-        byte[] content = "Hello World".getBytes("UTF-8");
+        byte[] content = "Hello World".getBytes(StandardCharsets.UTF_8);
         file.setContent(new MCRByteContent(content, System.currentTimeMillis()));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         MCRFileCollection col2 = getStore().retrieve(col.getID());
@@ -110,7 +110,7 @@ public class MCRFileTest extends MCRIFS2TestCase {
         MCRFile file = col.createFile("foo.txt");
         File src = File.createTempFile("foo", "txt");
         src.deleteOnExit();
-        byte[] content = "Hello World".getBytes("UTF-8");
+        byte[] content = "Hello World".getBytes(StandardCharsets.UTF_8);
         try (FileOutputStream fo = new FileOutputStream(src)) {
             IOUtils.copy(new ByteArrayInputStream(content), fo);
         }

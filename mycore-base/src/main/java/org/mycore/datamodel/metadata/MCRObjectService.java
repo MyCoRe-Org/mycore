@@ -354,7 +354,7 @@ public class MCRObjectService {
      * @return the flags string
      */
     public final String getFlags() {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
 
         for (MCRMetaLangText flag : flags) {
             sb.append(flag.getText()).append(" ");

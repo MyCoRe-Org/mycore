@@ -292,9 +292,9 @@ final class ContentUtils {
             int read;
             while (bytesToRead > 0 && -1 != (read = input.read(buffer, 0, bytesToRead))) {
                 output.write(buffer, 0, read);
-                totalRead += (long) read;
+                totalRead += read;
                 if (length > 0L) {
-                    bytesToRead = (int) Math.min(length - totalRead, (long) bufferLength);
+                    bytesToRead = (int) Math.min(length - totalRead, bufferLength);
                 }
             }
 

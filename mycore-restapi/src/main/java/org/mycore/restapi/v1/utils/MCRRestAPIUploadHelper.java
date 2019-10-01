@@ -122,7 +122,7 @@ public class MCRRestAPIUploadHelper {
         } catch (Exception e) {
             LOGGER.error("Unable to Upload file: {}", String.valueOf(fXML), e);
             throw new MCRRestAPIException(Status.BAD_REQUEST, new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
-                "Unable to Upload file: " + String.valueOf(fXML), e.getMessage()));
+                "Unable to Upload file: " + fXML, e.getMessage()));
         } finally {
             if (fXML != null) {
                 try {

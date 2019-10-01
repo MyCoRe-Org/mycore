@@ -726,7 +726,7 @@ public class MCRMailer extends MCRServlet {
                 }
                 if (message != null) {
                     builder.append("message=");
-                    builder.append(message.substring(0, Math.min(message.length(), maxLen)));
+                    builder.append(message, 0, Math.min(message.length(), maxLen));
                 }
                 builder.append("]");
                 return builder.toString();

@@ -85,7 +85,7 @@ public class MCRIPAddress {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < address.length; i++) {
             if (i > 0) {
                 sb.append(".");

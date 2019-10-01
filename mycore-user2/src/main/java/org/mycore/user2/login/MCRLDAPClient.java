@@ -221,7 +221,7 @@ public class MCRLDAPClient {
         int pos = name.lastIndexOf(' ');
         if (pos == -1)
             return name;
-        return name.substring(pos + 1, name.length()) + ", " + name.substring(0, pos);
+        return name.substring(pos + 1) + ", " + name.substring(0, pos);
     }
 
     public static void main(String[] args) throws Exception {

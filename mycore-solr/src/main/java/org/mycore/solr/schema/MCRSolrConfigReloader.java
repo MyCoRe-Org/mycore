@@ -197,7 +197,7 @@ public class MCRSolrConfigReloader {
     private static boolean isKnownSolrConfigCommmand(String cmd) {
         String cfgObjName = cmd.substring(cmd.indexOf("-") + 1).toLowerCase(Locale.ROOT);
         return ((cmd.startsWith("add-") || cmd.startsWith("update-") || cmd.startsWith("delete-"))
-            && (SOLR_CONFIG_OBJECT_NAMES.keySet().contains(cfgObjName)))
+            && (SOLR_CONFIG_OBJECT_NAMES.containsKey(cfgObjName)))
             || SOLR_CONFIG_PROPERTY_COMMANDS.contains(cmd);
     }
 

@@ -20,6 +20,7 @@ package org.mycore.common.xml;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -73,11 +74,7 @@ public class MCRXPathEvaluator {
         while (m.find()) {
             String replacement = replaceXPathOrI18n(m.group(1));
             if (urlEncode) {
-                try {
-                    replacement = URLEncoder.encode(replacement, "UTF-8");
-                } catch (UnsupportedEncodingException ex) {
-                    throw new MCRException(ex);
-                }
+                replacement = URLEncoder.encode(replacement, StandardCharsets.UTF_8);
             }
             m.appendReplacement(sb, replacement);
         }

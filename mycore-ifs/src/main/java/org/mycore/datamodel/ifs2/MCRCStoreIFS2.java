@@ -260,7 +260,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             MCRPath path = MCRPath.getPath(owner, dir.getPath());
             LOGGER.debug("Checking {}", path);
             if (Files.isDirectory(path)) {
-                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path);) {
+                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path)) {
                     Iterator<Path> pathIterator = ds.iterator();
                     if (pathIterator.hasNext()) {
                         //has children

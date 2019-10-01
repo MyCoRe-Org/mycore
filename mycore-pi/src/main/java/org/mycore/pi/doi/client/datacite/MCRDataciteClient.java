@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -371,7 +372,7 @@ public class MCRDataciteClient {
 
             StringBuilder sb = new StringBuilder();
             try (InputStream is = response.getEntity().getContent()) {
-                Scanner scanner = new Scanner(is, "UTF-8");
+                Scanner scanner = new Scanner(is, StandardCharsets.UTF_8);
                 while (scanner.hasNextLine()) {
                     sb.append(scanner.nextLine()).append(System.lineSeparator());
                 }

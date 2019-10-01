@@ -25,13 +25,13 @@ import javax.ws.rs.container.ContainerRequestContext;
 
 public interface MCRRequestScopeACL {
 
-    public boolean checkPermission(String privilege);
+    boolean checkPermission(String privilege);
 
-    public boolean checkPermission(String id, String permission);
+    boolean checkPermission(String id, String permission);
 
-    public boolean isPrivate();
+    boolean isPrivate();
 
-    public static MCRRequestScopeACL getInstance(ContainerRequestContext requestContext) {
+    static MCRRequestScopeACL getInstance(ContainerRequestContext requestContext) {
         Object property = requestContext.getProperty(MCRRequestScopeACLFilter.ACL_INSTANT_KEY);
         Objects.requireNonNull(property, "Please register " + MCRRequestScopeACLFilter.class);
         if (property instanceof Supplier) {

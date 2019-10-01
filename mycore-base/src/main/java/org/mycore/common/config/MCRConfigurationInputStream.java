@@ -244,7 +244,7 @@ public class MCRConfigurationInputStream extends InputStream {
     }
 
     @Override
-    public int read(byte b[], int off, int len) throws IOException {
+    public int read(byte[] b, int off, int len) throws IOException {
         if (in == null) {
             return -1;
         }

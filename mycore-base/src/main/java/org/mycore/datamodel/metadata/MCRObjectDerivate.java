@@ -201,7 +201,7 @@ public class MCRObjectDerivate {
      */
     public final MCRMetaLink getExternal(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > externals.size())) {
-            throw new IndexOutOfBoundsException("Index error in getExternal(" + Integer.toString(index) + ").");
+            throw new IndexOutOfBoundsException("Index error in getExternal(" + index + ").");
         }
 
         return externals.get(index);
@@ -223,7 +223,7 @@ public class MCRObjectDerivate {
      */
     public final MCRMetaLangText getTitle(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > titles.size())) {
-            throw new IndexOutOfBoundsException("Index error in getTitle(" + Integer.toString(index) + ").");
+            throw new IndexOutOfBoundsException("Index error in getTitle(" + index + ").");
         }
 
         return titles.get(index);

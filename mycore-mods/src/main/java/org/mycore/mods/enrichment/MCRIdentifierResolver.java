@@ -19,6 +19,7 @@
 package org.mycore.mods.enrichment;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Locale;
 
@@ -71,7 +72,7 @@ class MCRIdentifierResolver {
         Element resolved = null;
         try {
             String uri = new MessageFormat(uriPattern, Locale.ROOT)
-                .format(new Object[] { identifier, URLEncoder.encode(identifier, "UTF-8") });
+                .format(new Object[] { identifier, URLEncoder.encode(identifier, StandardCharsets.UTF_8) });
             resolved = MCRURIResolver.instance().resolve(uri);
         } catch (Exception ex) {
             LOGGER.error("Exception resolving " + identifier, ex);
