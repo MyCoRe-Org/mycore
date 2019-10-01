@@ -30,6 +30,8 @@ namespace mycore.viewer.components {
 
             // see MV-53
             (<any>PDFJS).disableAutoFetch=true;
+            (<any> PDFJS).cMapUrl=this._settings.webApplicationBaseURL + "/modules/iview2/cmaps/";
+            (<any> PDFJS).cMapPacked = true;
         }
 
         private _structureBuilder:widgets.pdf.PDFStructureBuilder;
