@@ -179,7 +179,7 @@ public class MCRLinkTableManager {
             linkTableInstance.delete(from, null, null);
         } catch (Exception e) {
             LOGGER.warn("An error occured while deleting a dataset from the" + from
-                    + " reference link table, deleting could be not succesful.", e);
+                + " reference link table, deleting could be not succesful.", e);
         }
     }
 
@@ -260,7 +260,7 @@ public class MCRLinkTableManager {
         try {
             if (types != null && types.length > 0) {
                 return Stream.of(types).mapToInt(type -> linkTableInstance.countTo(null, myTo.get(), type, restriction))
-                             .sum();
+                    .sum();
             }
             return linkTableInstance.countTo(null, myTo.get(), null, restriction);
         } catch (Exception e) {
@@ -459,10 +459,10 @@ public class MCRLinkTableManager {
                 categories.add(new MCRCategoryID(classId, categId));
             } else if (inf instanceof MCRMetaLinkID) {
                 addReferenceLink(mcrId.toString(), ((MCRMetaLink) inf).getXLinkHref(),
-                        MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
+                    MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
             } else if (inf instanceof MCRMetaDerivateLink) {
                 addReferenceLink(mcrId.toString(), ((MCRMetaLink) inf).getXLinkHref(),
-                        MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK, "");
+                    MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK, "");
             }
         });
         MCRCategoryID state = obj.getService().getState();

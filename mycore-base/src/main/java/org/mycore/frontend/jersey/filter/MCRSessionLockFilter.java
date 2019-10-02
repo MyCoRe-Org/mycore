@@ -30,7 +30,7 @@ import org.mycore.common.MCRSessionMgr;
 /**
  * Opposite of {@link MCRSessionHookFilter}.
  */
-@Priority(Priorities.AUTHENTICATION-1)
+@Priority(Priorities.AUTHENTICATION - 1)
 public class MCRSessionLockFilter implements ContainerRequestFilter {
 
     @Override

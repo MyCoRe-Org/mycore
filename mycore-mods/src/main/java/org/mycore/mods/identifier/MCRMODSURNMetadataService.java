@@ -29,5 +29,4 @@ public class MCRMODSURNMetadataService extends MCRAbstractMODSMetadataService {
         return "urn";
     }
 
-
 }

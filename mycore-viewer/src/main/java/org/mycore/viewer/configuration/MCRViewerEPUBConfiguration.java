@@ -20,7 +20,7 @@ public class MCRViewerEPUBConfiguration extends MCRViewerBaseConfiguration {
         final String filePath = getFilePath(request);
 
         // put / at the end to let epubjs know its extracted
-        setProperty("epubPath",  MCRFrontendUtil.getBaseURL(request) + "rsc/epub/" + derivate + filePath + "/");
+        setProperty("epubPath", MCRFrontendUtil.getBaseURL(request) + "rsc/epub/" + derivate + filePath + "/");
 
         return this;
     }

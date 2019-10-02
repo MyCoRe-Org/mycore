@@ -189,7 +189,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException(
                 "Configurated class (" + (METADATA_SERVICE_CONFIG_PREFIX + metadataManager) + ") not found: "
-                    + className, e);
+                    + className,
+                e);
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException(
                 "Configurated class (" + (METADATA_SERVICE_CONFIG_PREFIX + metadataManager)
@@ -345,8 +346,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
         try {
             return REGISTER_POOL.submit(createPICallable).get();
-        } catch (ExecutionException e){
-            if(e.getCause()!=null && e.getCause() instanceof MCRPersistentIdentifierException){
+        } catch (ExecutionException e) {
+            if (e.getCause() != null && e.getCause() instanceof MCRPersistentIdentifierException) {
                 throw (MCRPersistentIdentifierException) e.getCause();
             }
             throw e;
@@ -447,7 +448,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             final String presentObject = mayInfo.get().getMycoreID();
             throw new MCRPersistentIdentifierException(
                 "The Generated identifier " + generatedIdentifier + " is already present in database in object "
-                    + presentObject, MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_0_1),
+                    + presentObject,
+                MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_0_1),
                 ERR_CODE_0_1);
         }
         return generated;
@@ -486,11 +488,12 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @return the property
      * @throws MCRConfigurationException if property is not set or empty
      */
-    protected String requireNotEmptyProperty(String propertyName) throws MCRConfigurationException{
+    protected String requireNotEmptyProperty(String propertyName) throws MCRConfigurationException {
         final Map<String, String> properties = getProperties();
         if (!properties.containsKey(propertyName) && properties.get(propertyName).length() > 0) {
             throw new MCRConfigurationException(String
-                .format(Locale.ROOT,"The property %s%s.%s is empty or not set!", REGISTRATION_CONFIG_PREFIX, registrationServiceID,
+                .format(Locale.ROOT, "The property %s%s.%s is empty or not set!", REGISTRATION_CONFIG_PREFIX,
+                    registrationServiceID,
                     propertyName));
         }
         return properties.get(propertyName);

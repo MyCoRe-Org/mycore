@@ -48,6 +48,7 @@ public class MCRBooleanClauseParser<T> {
      * in a text string in a condition like 'title contains "foo (and bar)".
      */
     private static String opening_bracket = "%%%%%%%%%%";
+
     private static String closing_bracket = "##########";
 
     private static String extendClauses(final String s, final List<String> l) {

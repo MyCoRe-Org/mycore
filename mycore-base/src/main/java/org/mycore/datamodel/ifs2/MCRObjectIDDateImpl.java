@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 
 @XmlRootElement(name = "mycoreobject")
-@XmlType(propOrder = {"id", "lastModified"})
+@XmlType(propOrder = { "id", "lastModified" })
 public class MCRObjectIDDateImpl implements MCRObjectIDDate {
 
     protected Date lastModified;

@@ -352,8 +352,8 @@ public class MCRRestAPIUploadHelper {
     public static Response deleteDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) throws MCRRestAPIException {
 
-            MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
-            MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
+        MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
+        MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
         try {
             MCRMetadataManager.deleteMCRDerivate(derID);

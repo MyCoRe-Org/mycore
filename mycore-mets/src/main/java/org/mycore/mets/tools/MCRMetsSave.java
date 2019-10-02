@@ -318,7 +318,7 @@ public class MCRMetsSave {
             .format(
                 Locale.ROOT,
                 "mets:mets/mets:structMap[@TYPE='PHYSICAL']/mets:div[@TYPE='physSequence']" +
-                        "/mets:div[mets:fptr/@FILEID='%s']",
+                    "/mets:div[mets:fptr/@FILEID='%s']",
                 matchId);
         xpath = XPathFactory.instance().compile(physicalFileExistsXpathString, Filters.element(), null,
             MCRConstants.METS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);

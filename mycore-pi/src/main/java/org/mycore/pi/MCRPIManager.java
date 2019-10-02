@@ -242,8 +242,8 @@ public class MCRPIManager {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRPI> getQuery = cb.createQuery(MCRPI.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
-        Predicate additionalPredicate = additional == null ?
-            cb.isNull(pi.get(MCRPI_.additional)) : cb.equal(pi.get(MCRPI_.additional), additional);
+        Predicate additionalPredicate = additional == null ? cb.isNull(pi.get(MCRPI_.additional))
+            : cb.equal(pi.get(MCRPI_.additional), additional);
         em.remove(
             em.createQuery(
                 getQuery
@@ -354,11 +354,10 @@ public class MCRPIManager {
         final List<MCRPIRegistrationInfo> resultList = em.createQuery(
             getQuery
                 .select(pi)
-                .where(cb.equal(pi.get(MCRPI_.identifier), identifier),cb.equal(pi.get(MCRPI_.type), type)))
+                .where(cb.equal(pi.get(MCRPI_.identifier), identifier), cb.equal(pi.get(MCRPI_.type), type)))
             .getResultList();
-        return resultList.size()==0 ? Optional.empty():Optional.of(resultList.get(0));
+        return resultList.size() == 0 ? Optional.empty() : Optional.of(resultList.get(0));
     }
-
 
     /**
      * Returns a parser for a specific type of persistent identifier.

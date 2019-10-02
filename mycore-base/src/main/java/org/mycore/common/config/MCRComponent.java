@@ -151,6 +151,7 @@ public class MCRComponent implements Comparable<MCRComponent> {
         }
         return resourceURL;
     }
+
     /**
      * Returns resource base path to this components config resources.
      */

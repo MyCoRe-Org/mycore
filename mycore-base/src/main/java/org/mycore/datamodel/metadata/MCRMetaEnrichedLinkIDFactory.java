@@ -19,7 +19,7 @@ public abstract class MCRMetaEnrichedLinkIDFactory {
 
     public abstract MCRMetaEnrichedLinkID getDerivateLink(MCRDerivate der);
 
-    public MCRMetaEnrichedLinkID getEmptyLinkID(){
+    public MCRMetaEnrichedLinkID getEmptyLinkID() {
         return new MCRMetaEnrichedLinkID();
     }
 }

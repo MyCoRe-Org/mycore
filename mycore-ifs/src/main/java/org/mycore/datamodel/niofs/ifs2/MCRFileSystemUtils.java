@@ -268,7 +268,7 @@ abstract class MCRFileSystemUtils {
         if (path.isAbsolute()) {
             throw new IllegalArgumentException("path is absolute");
         }
-        switch (path.getNameCount()){
+        switch (path.getNameCount()) {
             case 0:
                 return fs.getPath("");
             case 1:

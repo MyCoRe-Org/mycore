@@ -45,6 +45,7 @@ import com.google.inject.ConfigurationException;
 public class MCRConfiguration2 {
 
     private static ConcurrentHashMap<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
+
     static ConcurrentHashMap<SingletonKey, Object> instanceHolder = new ConcurrentHashMap<>();
 
     public static Map<String, String> getPropertiesMap() {
@@ -77,7 +78,7 @@ public class MCRConfiguration2 {
     public static <T> Optional<T> getSingleInstanceOf(String name) {
         return getString(name)
             .map(className -> new SingletonKey(name, className))
-            .map(key -> (T)instanceHolder.computeIfAbsent(key, k -> getInstanceOf(name).orElse(null)));
+            .map(key -> (T) instanceHolder.computeIfAbsent(key, k -> getInstanceOf(name).orElse(null)));
     }
 
     /**
@@ -88,7 +89,7 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException
      *             if the the class can not be loaded or instantiated
      */
-    public static <T> Optional<Class<? extends T>> getClass(String name) throws MCRConfigurationException{
+    public static <T> Optional<Class<? extends T>> getClass(String name) throws MCRConfigurationException {
         return getString(name).map(MCRConfiguration2::<T> getClassObject);
     }
 
@@ -153,7 +154,7 @@ public class MCRConfiguration2 {
      * @param value a property value
      * @return a Stream of trimmed, non-empty Strings
      */
-    public static Stream<String> splitValue(String value){
+    public static Stream<String> splitValue(String value) {
         return MCRConfigurationBase.PROPERTY_SPLITTER.splitAsStream(value)
             .map(String::trim)
             .filter(s -> !s.isEmpty());
@@ -309,8 +310,6 @@ public class MCRConfiguration2 {
         }
     }
 
-
-
     private static class EventListener {
 
         private Predicate<String> keyPredicate;
@@ -327,6 +326,7 @@ public class MCRConfiguration2 {
         }
 
     }
+
     static class SingletonKey {
         private String property, className;
 

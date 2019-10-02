@@ -48,7 +48,7 @@ public class MCRMODSDOIMetadataServiceTest extends MCRTestCase {
         final MCRPersistentIdentifier doi1_read = service1.getIdentifier(object, "").get();
         Assert.assertEquals("The dois should match!", doi1.asString(), doi1_read.asString());
 
-        service2.insertIdentifier(doi2,object,"");
+        service2.insertIdentifier(doi2, object, "");
         final MCRPersistentIdentifier doi2_read = service2.getIdentifier(object, "").get();
         Assert.assertEquals("The dois should match!", doi2.asString(), doi2_read.asString());
 

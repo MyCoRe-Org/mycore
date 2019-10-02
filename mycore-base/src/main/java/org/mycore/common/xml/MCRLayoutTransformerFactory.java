@@ -93,7 +93,6 @@ public class MCRLayoutTransformerFactory {
         return transformer;
     }
 
-
     protected String[] getStylesheets(String id, String stylesheet)
         throws TransformerException, SAXException, ParserConfigurationException {
         List<String> ignore = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Ignore",

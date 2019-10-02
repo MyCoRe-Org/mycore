@@ -273,7 +273,7 @@ public class MCRWebCLIContainer {
             logEventProcessor.subscribe(log2web);
             this.logEventProcessor = logEventProcessor;
             logGrabber.subscribe(logEventProcessor);
-            if (logGrabber.isStopped()){
+            if (logGrabber.isStopped()) {
                 logGrabber.start();
             }
         }

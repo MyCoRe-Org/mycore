@@ -73,10 +73,9 @@ public final class MCRSolrClientFactory {
     }
 
     private static MCRSolrCore initializeSolrCore(String coreID) {
-        final String coreNameKey =
-            MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
-        final String coreServerKey =
-            MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
+        final String coreNameKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID + MCRSolrConstants.SOLR_CORE_NAME_SUFFIX;
+        final String coreServerKey = MCRSolrConstants.SOLR_CORE_PREFIX + coreID
+            + MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
 
         String coreName = MCRConfiguration2.getString(coreNameKey)
             .orElseThrow(() -> new MCRConfigurationException("Missing property " + coreNameKey));
@@ -141,7 +140,7 @@ public final class MCRSolrClientFactory {
     /**
      * @return the read only core map wich contains the coreId and the core
      */
-    public static Map<String, MCRSolrCore> getCoreMap(){
+    public static Map<String, MCRSolrCore> getCoreMap() {
         return Collections.unmodifiableMap(CORE_MAP);
     }
 

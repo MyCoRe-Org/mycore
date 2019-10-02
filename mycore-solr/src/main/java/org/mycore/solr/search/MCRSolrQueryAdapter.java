@@ -101,8 +101,8 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
 
     private void configureSolrQuery() {
         this.solrQuery.clear();
-        String queryString = filterCategory ?
-            new MessageFormat("{0}{1}", Locale.ROOT).format(new Object[] { objectType, restriction })
+        String queryString = filterCategory
+            ? new MessageFormat("{0}{1}", Locale.ROOT).format(new Object[] { objectType, restriction })
             : new MessageFormat("+{0}:\"{1}\"{2}{3}", Locale.ROOT)
                 .format(new Object[] { fieldName, category, objectType, restriction });
         this.solrQuery.setQuery(queryString.trim());

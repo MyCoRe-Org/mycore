@@ -217,7 +217,7 @@ public abstract class MCRTransferPackageUtil {
         }
         Document objXML = sax.build(targetXML.toFile());
         MCRObject mcr = new MCRObject(objXML);
-        if(parentId != null) {
+        if (parentId != null) {
             mcr.getStructure().setParent(parentId);
         }
         mcr.setImportMode(true);
@@ -264,15 +264,15 @@ public abstract class MCRTransferPackageUtil {
             MCRMetadataManager.update(der);
         }
         try (Stream<Path> stream = Files.find(derivateDirectory, 5,
-                (path, attr) -> !path.toString().endsWith(".md5") && Files.isRegularFile(path) && !path.equals(
-                        derivatePath))) {
+            (path, attr) -> !path.toString().endsWith(".md5") && Files.isRegularFile(path) && !path.equals(
+                derivatePath))) {
             stream.forEach(path -> {
                 String targetPath = derivateDirectory.relativize(path).toString();
                 try (InputStream in = Files.newInputStream(path)) {
                     Files.copy(in, MCRPath.getPath(derivateId, targetPath), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ioExc) {
                     throw new MCRException("Unable to add file " + path.toAbsolutePath() + " to derivate " + derivateId,
-                            ioExc);
+                        ioExc);
                 }
             });
         }

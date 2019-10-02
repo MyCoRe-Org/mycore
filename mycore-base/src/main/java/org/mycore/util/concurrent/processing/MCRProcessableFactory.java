@@ -138,11 +138,11 @@ public abstract class MCRProcessableFactory {
             MCRProcessableSupplier<R> supplier = MCRProcessableSupplier.of(callable, this.executor, priority);
             if (this.collection != null) {
                 MCRProcessable processable = supplier;
-                if(callable instanceof MCRProcessable) {
+                if (callable instanceof MCRProcessable) {
                     processable = (MCRProcessable) callable;
-                } else if(callable instanceof RunnableProgressableAdapter) {
+                } else if (callable instanceof RunnableProgressableAdapter) {
                     Runnable task = ((RunnableProgressableAdapter) callable).get();
-                    if(task instanceof MCRProcessable) {
+                    if (task instanceof MCRProcessable) {
                         processable = (MCRProcessable) task;
                     }
                 }

@@ -111,11 +111,12 @@ public class MCRRestObjects {
     @Context
     ServletContext context;
 
-    public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS =Collections.unmodifiableList(MCRConfiguration2
-        .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
-        .map(MCRConfiguration2::instantiateClass)
-        .map(MCRThumbnailGenerator.class::cast)
-        .collect(Collectors.toList()));
+    public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
+        .unmodifiableList(MCRConfiguration2
+            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
+            .map(MCRConfiguration2::instantiateClass)
+            .map(MCRThumbnailGenerator.class::cast)
+            .collect(Collectors.toList()));
 
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })

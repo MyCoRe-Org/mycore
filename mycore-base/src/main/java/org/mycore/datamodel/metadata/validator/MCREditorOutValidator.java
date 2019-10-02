@@ -159,7 +159,8 @@ public class MCREditorOutValidator {
         map.put(MCRMetaAddress.class.getSimpleName(), new MCRMetaAdressCheck());
         map.put(MCRMetaNumber.class.getSimpleName(), getObjectCheckWithLangNotEmptyInstance(MCRMetaNumber.class));
         map.put(MCRMetaLinkID.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaLinkID.class));
-        map.put(MCRMetaEnrichedLinkID.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaEnrichedLinkID.class));
+        map.put(MCRMetaEnrichedLinkID.class.getSimpleName(),
+            getObjectCheckWithLinksInstance(MCRMetaEnrichedLinkID.class));
         map.put(MCRMetaDerivateLink.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaDerivateLink.class));
         map.put(MCRMetaLink.class.getSimpleName(), getObjectCheckWithLinksInstance(MCRMetaLink.class));
         map.put(MCRMetaISO8601Date.class.getSimpleName(),

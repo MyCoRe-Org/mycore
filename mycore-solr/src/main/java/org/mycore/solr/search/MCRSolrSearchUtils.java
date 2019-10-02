@@ -52,7 +52,7 @@ import org.mycore.services.fieldquery.MCRQuery;
  * @author Matthias Eichner
  */
 public abstract class MCRSolrSearchUtils {
-    
+
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
     /**
@@ -216,7 +216,7 @@ public abstract class MCRSolrSearchUtils {
     @SuppressWarnings("rawtypes")
     public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
         int rows = query.getNumPerPage();
-        List <String> returnFields = query.getReturnFields();
+        List<String> returnFields = query.getReturnFields();
         MCRCondition condition = query.getCondition();
         HashMap<String, List<MCRCondition>> table;
 

@@ -131,19 +131,19 @@ public class MCRPersistentIdentifierRegistrationResource {
         MCRBase object = MCRMetadataManager.retrieve(mycoreIDObject);
         try {
             identifier = registrationService.register(object, additional, true);
-        } catch (MCRPersistentIdentifierException | MCRActiveLinkException | ExecutionException | InterruptedException e) {
-            LOGGER.error("Error while registering PI:",e);
+        } catch (MCRPersistentIdentifierException | MCRActiveLinkException | ExecutionException
+            | InterruptedException e) {
+            LOGGER.error("Error while registering PI:", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(buildErrorJSON("Error while register new identifier!", e)).build();
         } catch (MCRAccessException e) {
-            LOGGER.error("Error while registering PI:",e);
+            LOGGER.error("Error while registering PI:", e);
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(buildErrorJSON("Error while register new identifier!", e)).build();
-        } catch (Throwable t){
-            LOGGER.error("Error while registering PI:",t);
+        } catch (Throwable t) {
+            LOGGER.error("Error while registering PI:", t);
             throw t;
         }
-
 
         return Response.status(Response.Status.CREATED).entity(buildIdentifierObject(identifier)).build();
     }

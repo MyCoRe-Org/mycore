@@ -71,10 +71,10 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         // test get(service, id, additional)
         MockMetadataManager mockMetadataManager = new MockMetadataManager();
         MCRPIService<MCRMockIdentifier> registrationService = MCRPIServiceManager
-                .getInstance()
-                .getRegistrationService(MOCK_SERVICE);
+            .getInstance()
+            .getRegistrationService(MOCK_SERVICE);
 
-        ((MCRMockIdentifierService)registrationService).reset();
+        ((MCRMockIdentifierService) registrationService).reset();
 
         MCRObject mcrObject = buildMockObject();
         mockMetadataManager.put(mcrObject.getId(), mcrObject);
@@ -188,7 +188,8 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         configuration.put("MCR.PI.Service." + MOCK_SERVICE + ".MetadataService", MOCK_METADATA_SERVICE);
 
         configuration.put("MCR.PI.MetadataService." + MOCK_METADATA_SERVICE, MCRMockMetadataService.class.getName());
-        configuration.put("MCR.PI.MetadataService." + MOCK_METADATA_SERVICE + "." + MCRMockMetadataService.TEST_PROPERTY,
+        configuration.put(
+            "MCR.PI.MetadataService." + MOCK_METADATA_SERVICE + "." + MCRMockMetadataService.TEST_PROPERTY,
             MCRMockMetadataService.TEST_PROPERTY_VALUE);
 
         configuration.put("MCR.PI.Generator." + MOCK_PID_GENERATOR, MCRMockIdentifierGenerator.class.getName());

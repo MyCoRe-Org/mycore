@@ -69,7 +69,6 @@ public class MCRLayoutTransformerFoFactory extends MCRLayoutTransformerFactory {
         });
     }
 
-
     @Override
     protected boolean isXMLOutput(String outputMethod, MCRXSLTransformer transformerTest)
         throws ParserConfigurationException, TransformerException, SAXException {

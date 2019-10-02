@@ -45,7 +45,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  * </dl>
  */
 public class MCRAbstractMODSMetadataService
-        extends MCRPIMetadataService<MCRPersistentIdentifier> {
+    extends MCRPIMetadataService<MCRPersistentIdentifier> {
 
     public static final String PREFIX_PROPERTY_KEY = "Prefix";
 
@@ -55,7 +55,7 @@ public class MCRAbstractMODSMetadataService
 
     @Override
     public void insertIdentifier(MCRPersistentIdentifier identifier, MCRBase base, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(base);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
 
@@ -88,7 +88,7 @@ public class MCRAbstractMODSMetadataService
 
     @Override
     public Optional<MCRPersistentIdentifier> getIdentifier(MCRBase base, String additional)
-            throws MCRPersistentIdentifierException {
+        throws MCRPersistentIdentifierException {
         MCRObject object = checkObject(base);
         MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
 
@@ -101,8 +101,8 @@ public class MCRAbstractMODSMetadataService
         String text = element.getTextNormalize();
 
         return MCRPIManager.getInstance().getParserForType(getIdentifierType())
-                .parse(text)
-                .map(MCRPersistentIdentifier.class::cast);
+            .parse(text)
+            .map(MCRPersistentIdentifier.class::cast);
     }
 
     protected String getIdentifierType() {

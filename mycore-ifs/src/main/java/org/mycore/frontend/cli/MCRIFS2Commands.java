@@ -264,7 +264,7 @@ public class MCRIFS2Commands {
         if (Files.isDirectory(node)) {
             LOGGER.debug("fixMCRFSNODESForNode (directory) : {}", node.toAbsolutePath().toString());
             fixDirectoryEntry(node, derivate_id, storage_base, check_only);
-            try(Stream<Path> stream = Files.list(node)){
+            try (Stream<Path> stream = Files.list(node)) {
                 Path[] nodes = stream.toArray(Path[]::new);
                 for (Path next_node : nodes) {
                     fixMCRFSNODESForNode(next_node, content_store, derivate_id, storage_base, check_only);

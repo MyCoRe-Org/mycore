@@ -94,7 +94,8 @@ public final class MCRConstants {
 
     public static final Namespace PIDEF_NAMESPACE = Namespace.getNamespace("pidef", "http://nbn-resolving.org/pidef");
 
-    public static final Namespace CROSSREF_NAMESPACE = Namespace.getNamespace("cr","http://www.crossref.org/schema/4.4.1");
+    public static final Namespace CROSSREF_NAMESPACE = Namespace.getNamespace("cr",
+        "http://www.crossref.org/schema/4.4.1");
 
     public static final Namespace DIAG_NAMESPACE = Namespace.getNamespace("diag",
         "http://www.loc.gov/zing/srw/diagnostic");

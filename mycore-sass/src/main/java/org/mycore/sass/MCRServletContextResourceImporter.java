@@ -69,7 +69,7 @@ public class MCRServletContextResourceImporter implements Importer {
             Optional<URL> firstPossibleName = possibleNameForms.stream()
                 .map(form -> {
                     try {
-                        if(MCRDeveloperTools.overrideActive()){
+                        if (MCRDeveloperTools.overrideActive()) {
                             final Optional<Path> overriddenFilePath = MCRDeveloperTools
                                 .getOverriddenFilePath(form.startsWith("/") ? form.substring(1) : form, true);
 

@@ -44,7 +44,8 @@ public class MCRDataciteRest {
         return HttpClientBuilder.create().build();
     }
 
-    public static MCRDataciteRestResponse get(MCRDigitalObjectIdentifier doi) throws MCRIdentifierUnresolvableException {
+    public static MCRDataciteRestResponse get(MCRDigitalObjectIdentifier doi)
+        throws MCRIdentifierUnresolvableException {
 
         HttpGet get = new HttpGet(URL_TEMPLATE.replaceAll("\\{doi\\}", doi.asString()));
         try (CloseableHttpClient httpClient = getHttpClient()) {

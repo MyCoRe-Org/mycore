@@ -23,7 +23,7 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
     public MCRMetaEnrichedLinkID() {
     }
 
-    public static MCRMetaEnrichedLinkID fromDom(Element element){
+    public static MCRMetaEnrichedLinkID fromDom(Element element) {
         final MCRMetaEnrichedLinkID mcrMetaEnrichedLinkID = new MCRMetaEnrichedLinkID();
         mcrMetaEnrichedLinkID.setFromDOM(element);
         return mcrMetaEnrichedLinkID;
@@ -36,7 +36,8 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
         contentList = element.getContent().stream().map(Content::clone).collect(Collectors.toList());
     }
 
-    @Override public Element createXML() throws MCRException {
+    @Override
+    public Element createXML() throws MCRException {
         final Element xml = super.createXML();
 
         if (contentList != null) {
@@ -55,12 +56,11 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
         this.contentList = contentList;
     }
 
-
-    public int getOrder(){
+    public int getOrder() {
         return getContentList().stream()
-            .filter(el-> el instanceof Element)
+            .filter(el -> el instanceof Element)
             .map(Element.class::cast)
-            .filter(el-> "order".equals(el.getName()))
+            .filter(el -> "order".equals(el.getName()))
             .findFirst()
             .map(Element::getTextNormalize)
             .map(Integer::valueOf)
@@ -77,7 +77,8 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
         return Objects.equals(getContentList(), that.getContentList());
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return Objects.hash(super.hashCode(), getContentList());
     }
 }

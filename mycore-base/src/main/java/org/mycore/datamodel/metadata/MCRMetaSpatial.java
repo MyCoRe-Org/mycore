@@ -101,13 +101,13 @@ public class MCRMetaSpatial extends MCRMetaDefault {
         String[] splitData = textData.split(",");
         if (splitData.length % 2 != 0) {
             throw new MCRException(String.format(Locale.ROOT,
-                    "Unable to parse MCRMetaSpatial cause text data '%s' contains invalid content", textData));
+                "Unable to parse MCRMetaSpatial cause text data '%s' contains invalid content", textData));
         }
         try {
             Arrays.stream(splitData).map(BigDecimal::new).forEach(this.data::add);
         } catch (NumberFormatException nfe) {
             throw new MCRException(String.format(Locale.ROOT,
-                    "Unable to parse MCRMetaSpatial cause text data '%s' contains invalid content", textData), nfe);
+                "Unable to parse MCRMetaSpatial cause text data '%s' contains invalid content", textData), nfe);
         }
     }
 
@@ -145,7 +145,7 @@ public class MCRMetaSpatial extends MCRMetaDefault {
         }
         if (this.data.size() % 2 != 0) {
             throw new MCRException(
-                    String.format(Locale.ROOT, "spatial list content '%s' is uneven", this.data.toString()));
+                String.format(Locale.ROOT, "spatial list content '%s' is uneven", this.data.toString()));
         }
     }
 

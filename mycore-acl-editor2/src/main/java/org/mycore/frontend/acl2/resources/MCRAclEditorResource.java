@@ -69,8 +69,11 @@ public class MCRAclEditorResource {
     private static final MCRAccessStore ACCESS_STORE = MCRAccessStore.getInstance();
 
     private static final String JSON_ACCESSID = "accessID";
+
     private static final String JSON_ACCESSPOOL = "accessPool";
+
     private static final String JSON_RULE = "rule";
+
     private static final String JSON_SUCCESS = "success";
 
     @Context

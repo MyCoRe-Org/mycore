@@ -187,7 +187,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         String classifID = category.getId().getRootID();
         Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(category,
-                objType, true);
+            objType, true);
         for (Iterator<Element> it = data.iterator(); it.hasNext();) {
             Element child = it.next();
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));

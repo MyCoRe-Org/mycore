@@ -53,7 +53,7 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
 
     @Override
     public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)
-            throws IOException {
+        throws IOException {
         String parentPath = MCRPath.toMCRPath(filePath).getParent().getOwnerRelativePath();
         if (!parentPath.startsWith("/alto")) {
             return;
@@ -80,7 +80,7 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
             }
             String regEx = "\\.0";
             String altoWord = String.join("|", content, hpos.replaceAll(regEx, ""), vpos.replaceAll(regEx, ""),
-                    width.replaceAll(regEx, ""), height.replaceAll(regEx, ""));
+                width.replaceAll(regEx, ""), height.replaceAll(regEx, ""));
             altoContent.append(content).append(' ');
             document.addField("alto_words", altoWord);
         }

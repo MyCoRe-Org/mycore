@@ -88,18 +88,18 @@ public class MCRMetsMods2IIIFConverter {
         this.identifier = identifier;
 
         FileGrp imageGrp = mets.getFileSec().getFileGroup("MASTER");
-        if (imageGrp  == null) {
+        if (imageGrp == null) {
             imageGrp = mets.getFileSec().getFileGroup("IVIEW");
         }
-            if (imageGrp  == null) {
-                imageGrp = mets.getFileSec().getFileGroup("MAX");
-            }
-                if (imageGrp == null) {
-                    imageGrp = mets.getFileSec().getFileGroup("DEFAULT");
-                }
-                    if (imageGrp == null) {
-                        throw new MCRException("Could not find a image file group in mets!");
-                    }
+        if (imageGrp == null) {
+            imageGrp = mets.getFileSec().getFileGroup("MAX");
+        }
+        if (imageGrp == null) {
+            imageGrp = mets.getFileSec().getFileGroup("DEFAULT");
+        }
+        if (imageGrp == null) {
+            throw new MCRException("Could not find a image file group in mets!");
+        }
         this.imageGrp = imageGrp;
 
         this.mets.getPhysicalStructMap()

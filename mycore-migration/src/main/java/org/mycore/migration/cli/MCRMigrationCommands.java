@@ -204,8 +204,8 @@ public class MCRMigrationCommands {
                     changedObject = true;
                 } else {
                     LOGGER.warn(
-                        "{} of {} isn't URI encoded and cannot be found on file system." 
-                           + " This is most likly a dead link.",
+                        "{} of {} isn't URI encoded and cannot be found on file system."
+                            + " This is most likly a dead link.",
                         href, objectID);
                 }
             }
@@ -327,19 +327,19 @@ public class MCRMigrationCommands {
         List<String> objectTypes = MCRObjectID.listTypes();
         objectTypes.remove("derivate");
         objectTypes.remove("class");
-        
+
         ArrayList<String> commands = new ArrayList<>();
-        for(String t : objectTypes) {
+        for (String t : objectTypes) {
             for (String objID : MCRXMLMetadataManager.instance().listIDsOfType(t)) {
                 commands.add("migrate derivatelinks for object " + objID);
             }
         }
         return commands;
     }
-    
+
     @MCRCommand(syntax = "migrate derivatelinks for object {0}",
-        help = "Migrates the Order of derivates from object {0} to derivate " 
-               + "(MCR-2003, MCR-2099)")
+        help = "Migrates the Order of derivates from object {0} to derivate "
+            + "(MCR-2003, MCR-2099)")
     public static List<String> migrateDerivateLink(String objectIDStr) {
         final MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
 
@@ -351,13 +351,13 @@ public class MCRMigrationCommands {
         final List<MCRMetaEnrichedLinkID> derivates = mcrObject.getStructure().getDerivates();
 
         return derivates.stream().map(
-            (der) -> "migrate derivate " + der.getXLinkHrefID() + " using order " + (
-                derivates.indexOf(der) + 1)).collect(Collectors.toList());
+            (der) -> "migrate derivate " + der.getXLinkHrefID() + " using order " + (derivates.indexOf(der) + 1))
+            .collect(Collectors.toList());
     }
-    
-    @MCRCommand(syntax = "migrate derivate {0} using order {1}", 
+
+    @MCRCommand(syntax = "migrate derivate {0} using order {1}",
         help = "Sets the order of derivate {0} to the number {1}"
-                + " and migrates label to classification (MCR-2003, MCR-2099)")
+            + " and migrates label to classification (MCR-2003, MCR-2099)")
     public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
         final int order = Integer.parseInt(orderStr);
 
@@ -369,28 +369,28 @@ public class MCRMigrationCommands {
 
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         derivate.setOrder(order);
-        
+
         //migrate label to classification:
         //(only if label looks like an identifier and exists in derivate_type classification)
         String label = derivate.getLabel();
         if (label != null && label.length() > 0 && !label.contains(" ")) {
             if (MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID("derivate_types", label))) {
                 derivate.getDerivate().getClassifications()
-                        .add(new MCRMetaClassification("classification", 0, null, "derivate_types", label));
+                    .add(new MCRMetaClassification("classification", 0, null, "derivate_types", label));
                 derivate.setLabel(null);
             } else {
                 LOGGER.warn("Classification 'derivate_types' does not contain a category with ID: " + label);
             }
         }
-        
+
         //migrate title:
         //in professorenkatalog we used a service flag to store the title -> should be moved to titles/tile
-        if(derivate.getService().getFlags("title").size() > 0) {
-               String title = derivate.getService().getFlags("title").get(0);
-               derivate.getDerivate().getTitles().add(new MCRMetaLangText("title", "de", null, 0, "main", title));
-               derivate.getService().removeFlags("title");
+        if (derivate.getService().getFlags("title").size() > 0) {
+            String title = derivate.getService().getFlags("title").get(0);
+            derivate.getDerivate().getTitles().add(new MCRMetaLangText("title", "de", null, 0, "main", title));
+            derivate.getService().removeFlags("title");
         }
-        
+
         //update derivate
         MCRMetadataManager.update(derivate);
     }

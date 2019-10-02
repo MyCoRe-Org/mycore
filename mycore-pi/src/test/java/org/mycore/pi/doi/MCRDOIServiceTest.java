@@ -14,30 +14,29 @@ import org.xml.sax.SAXException;
 
 public class MCRDOIServiceTest extends MCRTestCase {
 
-
     @Test
     public void testSchemaV3() {
-        try{
+        try {
             loadSchema(MCRDOIService.DATACITE_SCHEMA_V3);
-        } catch (SAXException ignored){
+        } catch (SAXException ignored) {
             Assert.fail();
         }
     }
 
     @Test
     public void testSchemaV4() {
-        try{
+        try {
             loadSchema(MCRDOIService.DATACITE_SCHEMA_V4);
-        } catch (SAXException ignored){
+        } catch (SAXException ignored) {
             Assert.fail();
         }
     }
 
     @Test
     public void testSchemaV41() {
-        try{
+        try {
             loadSchema(MCRDOIService.DATACITE_SCHEMA_V41);
-        } catch (SAXException ignored){
+        } catch (SAXException ignored) {
             Assert.fail();
         }
     }

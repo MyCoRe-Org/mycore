@@ -24,8 +24,8 @@ public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
     @Override
     public Optional<BufferedImage> getThumbnail(MCRPath path, int size) throws IOException {
         try (InputStream fileIS = Files.newInputStream(path); PDDocument pdf = PDDocument.load(fileIS)) {
-            float pdfWidth =  pdf.getPage(0).getCropBox().getWidth();
-            float pdfHeight =  pdf.getPage(0).getCropBox().getHeight();
+            float pdfWidth = pdf.getPage(0).getCropBox().getWidth();
+            float pdfHeight = pdf.getPage(0).getCropBox().getHeight();
             final int newWidth = pdfWidth > pdfHeight ? (int) Math.ceil(size * pdfWidth / pdfHeight) : size;
             final float scale = newWidth / pdfWidth;
 

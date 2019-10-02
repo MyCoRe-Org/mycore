@@ -92,7 +92,8 @@ public class MCRCrossrefService extends MCRDOIBaseService {
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRConfigurationException(
                 String.format(Locale.ROOT, "Could not transform the object %s with the trasformer %s", obj.getId(),
-                    getTransformerID()), e);
+                    getTransformerID()),
+                e);
         }
 
         final Element root = resultDocument.getRootElement();

@@ -182,7 +182,7 @@ public class MCRSwordUtil {
 
     private static void addDirectoryToZip(ZipArchiveOutputStream zipOutputStream, Path directory) {
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-         
+
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory)) {
             paths.forEach(p -> {
                 final boolean isDir = Files.isDirectory(p);

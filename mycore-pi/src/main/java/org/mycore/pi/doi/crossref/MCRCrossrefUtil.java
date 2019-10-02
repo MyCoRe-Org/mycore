@@ -21,7 +21,6 @@ public class MCRCrossrefUtil {
 
     private static final Namespace CR = MCRConstants.CROSSREF_NAMESPACE;
 
-
     /**
      * Inserts informations to the crossref head element.
      * @param headElement existing head element
@@ -84,6 +83,5 @@ public class MCRCrossrefUtil {
         }
 
     }
-
 
 }

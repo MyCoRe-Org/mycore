@@ -374,7 +374,6 @@ public class MCRRestDerivates {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-
     static class DerivateMetadata {
         private String label;
 

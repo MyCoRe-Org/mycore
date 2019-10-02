@@ -54,8 +54,8 @@ public class MCRHttpUtils {
 
     public static String getHttpUserAgent() {
         return String.format(Locale.ROOT, "MyCoRe/%s (%s; java %s)", MCRCoreVersion.getCompleteVersion(),
-                MCRConfiguration.instance().getString("MCR.NameOfProject", "undefined"),
-                System.getProperty("java.version"));
+            MCRConfiguration.instance().getString("MCR.NameOfProject", "undefined"),
+            System.getProperty("java.version"));
     }
 
     public static PoolingHttpClientConnectionManager getConnectionManager(int maxConnections) {

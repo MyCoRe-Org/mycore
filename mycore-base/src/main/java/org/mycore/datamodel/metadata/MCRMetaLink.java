@@ -444,7 +444,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     public MCRMetaLink clone() {
         MCRMetaLink clone = (MCRMetaLink) super.clone();
 
-        clone.href=this.href;
+        clone.href = this.href;
         clone.label = this.label;
         clone.title = this.title;
         clone.linktype = this.linktype;

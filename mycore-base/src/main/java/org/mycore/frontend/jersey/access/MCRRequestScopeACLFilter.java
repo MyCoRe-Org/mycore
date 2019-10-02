@@ -34,6 +34,6 @@ public class MCRRequestScopeACLFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        requestContext.setProperty(ACL_INSTANT_KEY, (Supplier<MCRRequestScopeACL>)factory::provide);
+        requestContext.setProperty(ACL_INSTANT_KEY, (Supplier<MCRRequestScopeACL>) factory::provide);
     }
 }

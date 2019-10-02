@@ -22,10 +22,8 @@ import org.mycore.services.i18n.MCRTranslation;
 
 public class MCRUploadException extends RuntimeException {
 
-
-
     public MCRUploadException(String messageKey) {
-        super( MCRTranslation.translate(messageKey));
+        super(MCRTranslation.translate(messageKey));
     }
 
     public MCRUploadException(String messageKey, Throwable throwable) {

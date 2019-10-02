@@ -37,6 +37,7 @@ import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
 public class MCRForbiddenExceptionMapper implements ExceptionMapper<ForbiddenException> {
     @Context
     Application app;
+
     public Response toResponse(ForbiddenException ex) {
         String userID = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
         if (userID.equals(MCRSystemUserInformation.getGuestInstance().getUserID())) {

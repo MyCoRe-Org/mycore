@@ -156,7 +156,7 @@ public class MCRRestAPIObjectsHelper {
         StringWriter sw = new StringWriter();
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         try {
-            String filter_id = MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.XML","");
+            String filter_id = MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.XML", "");
             if (filter_id.length() > 0) {
                 MCRContentTransformer trans = MCRContentTransformerFactory.getTransformer(filter_id);
                 Document filtered_doc = trans.transform(new MCRJDOMContent(doc)).asXML();
@@ -195,7 +195,7 @@ public class MCRRestAPIObjectsHelper {
             StringWriter sw = new StringWriter();
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(doc, sw);
-            
+
             return Response.ok(sw.toString())
                 .type("application/xml")
                 .build();
@@ -917,7 +917,7 @@ public class MCRRestAPIObjectsHelper {
     public static boolean hasChildren(Path p) {
         try {
             if (Files.isDirectory(p)) {
-                try(DirectoryStream<Path> ds = Files.newDirectoryStream(p)){
+                try (DirectoryStream<Path> ds = Files.newDirectoryStream(p)) {
                     return ds.iterator().hasNext();
                 }
             }

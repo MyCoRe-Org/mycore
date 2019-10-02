@@ -153,7 +153,7 @@ public class MCRDataciteClient {
                 case HttpStatus.SC_NOT_FOUND:
                     throw new MCRIdentifierUnresolvableException(doi.asString(),
                         doi.asString() + " is not resolvable! " + getStatusString(response));
-                    // return entries; // datacite says no media attached or doi does not exist (not sure what to do)
+                // return entries; // datacite says no media attached or doi does not exist (not sure what to do)
                 default:
                     throw new MCRDatacenterException(
                         String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
@@ -279,7 +279,7 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    try(final Scanner scanner = new Scanner(entity.getContent(), "UTF-8")){
+                    try (final Scanner scanner = new Scanner(entity.getContent(), "UTF-8")) {
                         String uriString = scanner.nextLine();
                         return new URI(uriString);
                     }
@@ -328,7 +328,8 @@ public class MCRDataciteClient {
      * @throws JDOMException if the metadata is empty or not a valid xml document
      * @throws MCRDatacenterException if there is something wrong with the communication with the datacenter
      */
-    public Document resolveMetadata(final MCRDigitalObjectIdentifier doi) throws MCRDatacenterAuthenticationException, MCRIdentifierUnresolvableException, JDOMException, MCRDatacenterException {
+    public Document resolveMetadata(final MCRDigitalObjectIdentifier doi) throws MCRDatacenterAuthenticationException,
+        MCRIdentifierUnresolvableException, JDOMException, MCRDatacenterException {
         URI requestURI = getRequestURI("/metadata/" + doi.asString());
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
