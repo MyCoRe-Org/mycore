@@ -51,7 +51,6 @@ import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
 import org.mycore.solr.index.handlers.MCRSolrOptimizeIndexHandler;
@@ -200,11 +199,10 @@ public class MCRSolrIndexer {
      * @throws SolrServerException solr server exception
      * @throws IOException io exception
      */
-    public static UpdateResponse deleteOrphanedNestedDocuments() throws SolrServerException, IOException {
+    public static UpdateResponse deleteOrphanedNestedDocuments(SolrClient solrClient) throws SolrServerException, IOException {
         if (!MCRSolrUtils.useNestedDocuments()) {
             return null;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         return solrClient.deleteByQuery("-({!join from=id to=_root_ score=none}_root_:*) +_root_:*", 0);
     }
     
@@ -260,11 +258,10 @@ public class MCRSolrIndexer {
      * @param id the derivate id
      * @return the solr response
      */
-    public static UpdateResponse deleteDerivate(String id) {
+    public static UpdateResponse deleteDerivate(SolrClient solrClient, String id) {
         if (id == null) {
             return null;
         }
-        SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         UpdateResponse updateResponse = null;
         long start = System.currentTimeMillis();
         try {
@@ -535,7 +532,7 @@ public class MCRSolrIndexer {
             LOGGER.info("remove {} zombie objects from solr", toRemove.size());
             deleteById(client, toRemove.toArray(new String[toRemove.size()]));
         }
-        deleteOrphanedNestedDocuments();
+        deleteOrphanedNestedDocuments(client);
         // documents to add
         storeList.removeAll(solrList);
         if (!storeList.isEmpty()) {
