@@ -18,7 +18,6 @@
 
 package org.mycore.common.xml;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 
 /**

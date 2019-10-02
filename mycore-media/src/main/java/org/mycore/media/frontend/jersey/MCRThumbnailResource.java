@@ -1,12 +1,14 @@
 package org.mycore.media.frontend.jersey;
 
-import org.mycore.access.MCRAccessManager;
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.frontend.jersey.MCRJerseyUtil;
-import org.mycore.media.services.MCRThumbnailGenerator;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,16 +19,14 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.nio.file.Files;
 
-import java.nio.file.attribute.FileTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.frontend.jersey.MCRJerseyUtil;
+import org.mycore.media.services.MCRThumbnailGenerator;
 
 @Path("thumbnail")
 public class MCRThumbnailResource {

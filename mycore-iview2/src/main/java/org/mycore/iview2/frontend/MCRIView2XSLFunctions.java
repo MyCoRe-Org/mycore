@@ -23,6 +23,8 @@
 
 package org.mycore.iview2.frontend;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -37,8 +39,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 /**
  * @author Thomas Scheffler (yagee)

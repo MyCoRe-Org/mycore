@@ -21,7 +21,7 @@ package org.mycore.iview.tests.image.api;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 public class DebugBufferedImageWindow extends JFrame {
 

@@ -1,10 +1,10 @@
 package org.mycore.media.services;
 
-import org.mycore.datamodel.niofs.MCRPath;
-
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Optional;
+
+import org.mycore.datamodel.niofs.MCRPath;
 
 public interface MCRThumbnailGenerator {
 

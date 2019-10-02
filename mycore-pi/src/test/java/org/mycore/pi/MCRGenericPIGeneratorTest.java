@@ -1,7 +1,6 @@
 package org.mycore.pi;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

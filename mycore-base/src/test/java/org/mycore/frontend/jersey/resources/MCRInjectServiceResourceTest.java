@@ -27,10 +27,9 @@ import javax.ws.rs.core.Application;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 import com.google.inject.AbstractModule;
-import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRInjectServiceResourceTest extends MCRJerseyTest {
 

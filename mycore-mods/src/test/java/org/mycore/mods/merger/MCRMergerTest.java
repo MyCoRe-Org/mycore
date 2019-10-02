@@ -18,6 +18,8 @@
 
 package org.mycore.mods.merger;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
 import org.jaxen.JaxenException;
@@ -29,8 +31,6 @@ import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.common.xml.MCRXMLHelper;
-
-import static org.junit.Assert.assertTrue;
 
 public class MCRMergerTest extends MCRTestCase {
 

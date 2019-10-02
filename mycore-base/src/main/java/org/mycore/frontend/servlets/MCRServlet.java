@@ -23,8 +23,9 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
+
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -64,8 +65,6 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-
-import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
 
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for logging and managing the current

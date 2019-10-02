@@ -17,6 +17,8 @@
  */
 package org.mycore.restapi.v1.utils;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -61,8 +63,6 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);

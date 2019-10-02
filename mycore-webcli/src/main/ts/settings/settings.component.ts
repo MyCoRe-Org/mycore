@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {CommunicationService} from '../service/communication.service';
 import {RESTService} from '../service/rest.service';
 import {Settings} from './settings';

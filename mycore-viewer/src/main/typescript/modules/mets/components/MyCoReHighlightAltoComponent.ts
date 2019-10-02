@@ -25,7 +25,6 @@
 namespace mycore.viewer.components {
     import RequestAltoModelEvent = events.RequestAltoModelEvent;
     import WaitForEvent = events.WaitForEvent;
-    import AltoElement = mycore.viewer.widgets.alto.AltoElement;
 
     export class MyCoReHighlightAltoComponent extends ViewerComponent {
         private pageLayout: widgets.canvas.PageLayout = null;

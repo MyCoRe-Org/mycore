@@ -19,7 +19,6 @@
 package org.mycore.services.http;
 
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 

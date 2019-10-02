@@ -22,7 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFilter;
 import org.mycore.frontend.jersey.feature.MCRGuiceBridgeFeature;
 

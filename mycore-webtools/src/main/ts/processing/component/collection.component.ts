@@ -16,10 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, Input, SimpleChanges} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Collection} from '../model/model';
 import {HtmlService} from './../service/html.service';
-import {JsonStringPipe} from './../pipe/json.pipe';
 
 @Component({
     selector: 'collection',

@@ -17,7 +17,6 @@
  */
 
 import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {Log} from './log';
 import {Settings} from '../settings/settings';
 import {RESTService} from '../service/rest.service';
 import {CommunicationService} from '../service/communication.service';

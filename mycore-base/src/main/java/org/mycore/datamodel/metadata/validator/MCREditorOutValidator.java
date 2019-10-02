@@ -18,6 +18,10 @@
 
 package org.mycore.datamodel.metadata.validator;
 
+import static org.jdom2.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -64,10 +68,6 @@ import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXParseException;
-
-import static org.jdom2.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * @author Thomas Scheffler (yagee)

@@ -25,7 +25,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRXMLParserFactory;

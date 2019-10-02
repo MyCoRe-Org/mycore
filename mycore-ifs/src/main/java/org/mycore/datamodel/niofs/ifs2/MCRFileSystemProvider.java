@@ -57,14 +57,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.ifs2.MCRFileCollection;
-import org.mycore.datamodel.ifs2.MCRNode;
 import org.mycore.datamodel.ifs2.MCRStoredNode;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;

@@ -24,7 +24,6 @@ import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
 import org.mycore.parsers.bool.MCRCondition;
-import org.mycore.services.fieldquery.MCRQueryParser;
 
 /**
  * This class is a JUnit test case for org.mycore.MCRBooleanClausParser.

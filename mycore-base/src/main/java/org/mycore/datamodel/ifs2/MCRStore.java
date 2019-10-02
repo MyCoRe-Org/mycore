@@ -36,8 +36,8 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.StringTokenizer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.logging.log4j.LogManager;

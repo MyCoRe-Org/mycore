@@ -18,12 +18,10 @@
 
 package org.mycore.iiif.presentation;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.model.MCRIIIFBase;
 import org.mycore.iiif.presentation.model.additional.MCRIIIFAnnotation;

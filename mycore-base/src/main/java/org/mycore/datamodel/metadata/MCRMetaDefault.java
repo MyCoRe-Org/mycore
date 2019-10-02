@@ -18,8 +18,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +33,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.JsonObject;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * This class implements any methods for handling the basic data for all

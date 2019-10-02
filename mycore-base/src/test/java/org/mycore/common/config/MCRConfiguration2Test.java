@@ -4,9 +4,10 @@ import static org.junit.Assert.assertEquals;
 
 import javax.inject.Inject;
 
-import com.google.inject.AbstractModule;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+
+import com.google.inject.AbstractModule;
 
 public class MCRConfiguration2Test extends MCRTestCase {
 

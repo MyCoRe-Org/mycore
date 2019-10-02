@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;

@@ -22,6 +22,9 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -60,9 +63,6 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.xml.sax.SAXException;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 /**
  * Delivers persistence operations for {@link MCRObject} and {@link MCRDerivate} .

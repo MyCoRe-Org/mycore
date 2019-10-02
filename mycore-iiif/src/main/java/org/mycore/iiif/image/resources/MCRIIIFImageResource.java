@@ -104,7 +104,8 @@ public class MCRIIIFImageResource {
     public Response getInfoRedirect(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
-            String uriString = getIIIFURL(getImpl(impl)) + URLEncoder.encode(identifier, StandardCharsets.UTF_8) + "/info.json";
+            String uriString = getIIIFURL(getImpl(impl)) + URLEncoder.encode(identifier, StandardCharsets.UTF_8)
+                + "/info.json";
             return Response.temporaryRedirect(new URI(uriString)).build();
         } catch (URISyntaxException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();

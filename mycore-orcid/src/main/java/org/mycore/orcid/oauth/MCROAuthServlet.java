@@ -19,7 +19,6 @@
 package org.mycore.orcid.oauth;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletResponse;

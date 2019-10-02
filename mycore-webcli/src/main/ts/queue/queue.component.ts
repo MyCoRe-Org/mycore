@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {Settings} from '../settings/settings';
 import {RESTService} from '../service/rest.service';
 
 @Component({

@@ -18,6 +18,8 @@
 
 package org.mycore.common;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
@@ -28,8 +30,6 @@ import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
-import java.util.Map;
 
 public abstract class MCRIFSTest extends MCRStoreTestCase {
 

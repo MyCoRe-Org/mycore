@@ -32,8 +32,6 @@ import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
@@ -49,6 +47,9 @@ import org.mycore.common.processing.MCRProgressableListener;
 import org.mycore.frontend.ws.common.MCRWebsocketDefaultConfigurator;
 import org.mycore.frontend.ws.common.MCRWebsocketJSONDecoder;
 import org.mycore.frontend.ws.endoint.MCRAbstractEndpoint;
+
+import com.google.gson.JsonObject;
+import com.google.inject.Inject;
 
 @ServerEndpoint(value = "/ws/mycore-webtools/processing",
     configurator = MCRWebsocketDefaultConfigurator.class,

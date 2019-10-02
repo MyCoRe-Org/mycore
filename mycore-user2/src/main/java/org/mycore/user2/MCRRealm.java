@@ -18,7 +18,6 @@
 
 package org.mycore.user2;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -26,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 

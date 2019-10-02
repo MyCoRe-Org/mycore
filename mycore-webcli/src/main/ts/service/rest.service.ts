@@ -17,10 +17,9 @@
  */
 
 import {Injectable} from '@angular/core';
-import {Http, Response} from '@angular/http';
+import {Http} from '@angular/http';
 import {Commands} from '../commands/commands';
 import {Log} from '../log/log';
-import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 
 @Injectable()

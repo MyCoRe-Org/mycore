@@ -16,11 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Component, ViewEncapsulation, ChangeDetectorRef} from '@angular/core';
+import {ChangeDetectorRef, Component, ViewEncapsulation} from '@angular/core';
 
 import {ProcessingService} from './../service/processing.service';
 import {Settings} from './../settings';
-import {Registry, Collection} from '../model/model';
+import {Collection, Registry} from '../model/model';
 
 @Component({
     selector: 'processing',

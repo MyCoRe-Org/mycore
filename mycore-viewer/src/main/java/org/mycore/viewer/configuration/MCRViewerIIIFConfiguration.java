@@ -18,10 +18,10 @@
 
 package org.mycore.viewer.configuration;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
 

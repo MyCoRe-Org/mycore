@@ -18,19 +18,14 @@
 
 package org.mycore.pi.urn;
 
-import java.text.ParseException;
 import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIService;
-import org.mycore.pi.backend.MCRPI;
-import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**

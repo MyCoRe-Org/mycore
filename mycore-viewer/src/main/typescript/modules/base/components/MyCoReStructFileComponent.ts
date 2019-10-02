@@ -19,6 +19,7 @@
 namespace mycore.viewer.components {
 
     import ShowContentEvent = mycore.viewer.components.events.ShowContentEvent;
+
     export class MyCoReStructFileComponent extends ViewerComponent {
 
         constructor(protected settings: MyCoReViewerSettings, protected container: JQuery) {

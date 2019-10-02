@@ -21,6 +21,7 @@
 
 namespace mycore.viewer.widgets.modal {
     import LanguageModel = mycore.viewer.model.LanguageModel;
+
     export class IviewModalWindow {
         constructor(private _mobile:boolean, _title:string, parent:HTMLElement = document.body) {
             let that = this;
