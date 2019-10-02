@@ -18,6 +18,10 @@
 
 package org.mycore.frontend.servlets.persistence;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.io.IOException;
 import java.util.Properties;
 
@@ -37,10 +41,6 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXParseException;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * Handles UPDATE operation on {@link MCRDerivate}.

@@ -47,9 +47,9 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.oai.pmh.OAIConstants;
 import org.mycore.oai.pmh.dataprovider.OAIAdapter;
+import org.mycore.oai.pmh.dataprovider.OAIProvider;
 import org.mycore.oai.pmh.dataprovider.OAIRequest;
 import org.mycore.oai.pmh.dataprovider.OAIResponse;
-import org.mycore.oai.pmh.dataprovider.OAIProvider;
 import org.mycore.oai.pmh.dataprovider.jaxb.JAXBOAIProvider;
 
 /**

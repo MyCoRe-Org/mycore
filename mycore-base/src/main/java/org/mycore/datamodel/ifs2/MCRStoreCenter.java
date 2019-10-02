@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.mycore.common.function.MCRFunctions;
-
 public class MCRStoreCenter {
     private Map<String, MCRStore> storeHeap;
 

@@ -20,7 +20,6 @@ package org.mycore.restapi.v1.utils;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;

@@ -18,15 +18,16 @@
 
 package org.mycore.common;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.frontend.servlets.MCRServlet;
-
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
+
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * This Class will be stored in the a {@link javax.servlet.http.HttpSession} and can be used to resolve the

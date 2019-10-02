@@ -18,7 +18,7 @@
 
 package org.mycore.services.fieldquery;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 

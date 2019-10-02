@@ -61,6 +61,7 @@
 namespace mycore.viewer.components {
 
     import RequestTextContentEvent = mycore.viewer.components.events.RequestTextContentEvent;
+
     /**
      * canvas.overview.enabled:boolean      if true the overview will be shown in the lower right corner
      */

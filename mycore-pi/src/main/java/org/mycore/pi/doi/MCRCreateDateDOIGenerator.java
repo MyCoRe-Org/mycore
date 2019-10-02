@@ -38,12 +38,9 @@ import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.MCRPersistentIdentifier;
-import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPersistentIdentifier;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 

@@ -18,6 +18,8 @@
 
 package org.mycore.pi.urn.rest;
 
+import static org.apache.http.entity.ContentType.APPLICATION_XML;
+
 import java.net.URL;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -32,8 +34,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.pi.MCRPIRegistrationInfo;
-
-import static org.apache.http.entity.ContentType.APPLICATION_XML;
 
 /**
  * Created by chi on 25.01.17.

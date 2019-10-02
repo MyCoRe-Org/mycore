@@ -39,6 +39,7 @@
 namespace mycore.viewer.components {
 
     import StructureImage = mycore.viewer.model.StructureImage;
+
     /**
      * Settings
      * chapter.enabled: boolean // enables the chapter in toolbar dropdown menu

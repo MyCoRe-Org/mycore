@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.jdom2.Element;
 import org.junit.Test;

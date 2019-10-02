@@ -18,6 +18,8 @@
 
 package org.mycore.pi;
 
+import static org.mycore.pi.MCRPIService.METADATA_SERVICE_CONFIG_PREFIX;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -27,8 +29,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import static org.mycore.pi.MCRPIService.METADATA_SERVICE_CONFIG_PREFIX;
 
 /**
  * Should be able to insert/remove DOI, URN or other identifiers to metadata and check if they already have a

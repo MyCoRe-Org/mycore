@@ -18,8 +18,6 @@
 
 package org.mycore.solr.search;
 
-import javax.servlet.http.HttpServletRequest;
-
 import static org.junit.Assert.assertEquals;
 
 import org.apache.logging.log4j.LogManager;

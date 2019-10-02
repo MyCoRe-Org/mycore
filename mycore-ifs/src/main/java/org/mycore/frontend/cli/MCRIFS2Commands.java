@@ -19,7 +19,6 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;

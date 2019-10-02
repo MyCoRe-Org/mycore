@@ -18,7 +18,6 @@
 
 import {Injectable} from '@angular/core';
 import {Settings} from '../settings/settings';
-import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 
 

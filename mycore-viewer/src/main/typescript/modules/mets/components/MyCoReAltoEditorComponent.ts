@@ -25,9 +25,7 @@ namespace mycore.viewer.components {
     import AltoEditorWidget = mycore.viewer.widgets.alto.AltoEditorWidget;
     import TileImagePage = mycore.viewer.widgets.canvas.TileImagePage;
     import AltoWordChange = mycore.viewer.widgets.alto.AltoWordChange;
-    import DesktopInputListener = mycore.viewer.widgets.canvas.DesktopInputListener;
     import DesktopInputAdapter = mycore.viewer.widgets.canvas.DesktopInputAdapter;
-    import AbstractPage = mycore.viewer.model.AbstractPage;
     import StructureImage = mycore.viewer.model.StructureImage;
     import AltoChange = mycore.viewer.widgets.alto.AltoChange;
     import PageLoadedEvent = mycore.viewer.components.events.PageLoadedEvent;

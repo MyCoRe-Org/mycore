@@ -304,8 +304,9 @@ public class MCRClassMapper {
             }
             if (categID == null) {
                 return other.categID == null;
-            } else
+            } else {
                 return categID.equals(other.categID);
+            }
         }
 
     }

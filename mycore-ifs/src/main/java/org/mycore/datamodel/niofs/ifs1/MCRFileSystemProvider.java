@@ -61,8 +61,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;

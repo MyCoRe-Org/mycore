@@ -18,6 +18,8 @@
 
 package org.mycore.frontend;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -73,8 +75,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
 /**
  *

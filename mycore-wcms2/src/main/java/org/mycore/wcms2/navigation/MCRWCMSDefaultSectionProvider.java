@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.ws.rs.WebApplicationException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
@@ -37,13 +39,11 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.tools.MyCoReWebPageProvider;
+import org.xml.sax.SAXParseException;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.xml.sax.SAXParseException;
-
-import javax.ws.rs.WebApplicationException;
 
 /**
  * The default implementation to convert MyCoRe Webpage sections

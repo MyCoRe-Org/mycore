@@ -34,9 +34,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
+import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
-import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
 

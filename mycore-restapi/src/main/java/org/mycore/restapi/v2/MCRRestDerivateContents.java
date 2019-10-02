@@ -19,8 +19,8 @@
 package org.mycore.restapi.v2;
 
 import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
 import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DER_PATH;
+import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import java.io.IOException;
 import java.io.InputStream;

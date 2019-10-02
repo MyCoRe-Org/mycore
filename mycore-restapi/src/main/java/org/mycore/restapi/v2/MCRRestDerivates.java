@@ -18,6 +18,9 @@
 
 package org.mycore.restapi.v2;
 
+import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
+import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -88,8 +91,6 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates")
 public class MCRRestDerivates {
