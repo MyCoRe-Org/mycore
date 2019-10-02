@@ -225,10 +225,6 @@
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-support</artifactId>
     </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-    </dependency>
   </dependencies>
   <profiles>
     <profile>

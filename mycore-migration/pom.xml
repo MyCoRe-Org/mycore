@@ -33,9 +33,5 @@
       <groupId>org.mycore</groupId>
       <artifactId>mycore-iview2</artifactId>
     </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-    </dependency>
   </dependencies>
 </project>
