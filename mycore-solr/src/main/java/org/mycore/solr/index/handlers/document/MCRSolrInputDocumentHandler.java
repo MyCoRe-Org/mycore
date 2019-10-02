@@ -62,12 +62,9 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
         SolrClient solrClient = getSolrClient();
         LOGGER.info("Sending {} to SOLR...", id);
         if (MCRSolrUtils.useNestedDocuments()) {
-            
-            if(id.contains("_derivate_")){
-               MCRSolrIndexer.deleteDerivate(solrClient, id);
-                  
-            }
-            else{
+            if (id.contains("_derivate_")) {
+                MCRSolrIndexer.deleteDerivate(solrClient, id);
+            } else {
                 MCRSolrIndexer.deleteById(solrClient, id);
             }
         }

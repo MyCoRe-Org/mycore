@@ -199,7 +199,8 @@ public class MCRSolrIndexer {
      * @throws SolrServerException solr server exception
      * @throws IOException io exception
      */
-    public static UpdateResponse deleteOrphanedNestedDocuments(SolrClient solrClient) throws SolrServerException, IOException {
+    public static UpdateResponse deleteOrphanedNestedDocuments(SolrClient solrClient)
+            throws SolrServerException, IOException {
         if (!MCRSolrUtils.useNestedDocuments()) {
             return null;
         }
