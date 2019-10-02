@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -202,4 +203,34 @@ public class MCRPICommands {
         MCRPersistentIdentifierEventHandler.updateObject(object);
     }
 
+    @MCRCommand(syntax = "create pi with {0} for object {1} with additional ({2})", help = "Creates a persistent identifier with the pi "
+        + "service with the id {0} for the object {1} with additional ({2}). Does nothing if the object already has a pi from the service {0}.", order = 90)
+    public static void createPIForObjectIfNotExist(String serviceID, String objectIDString, String additional)
+        throws MCRAccessException, ExecutionException, MCRActiveLinkException, MCRPersistentIdentifierException,
+        InterruptedException {
+        final MCRObjectID objectID = MCRObjectID.getInstance(objectIDString);
+
+        if (!MCRMetadataManager.exists(objectID)) {
+            LOGGER.error("Object {} does not exist!", objectID);
+            return;
+        }
+
+        MCRPIService<MCRPersistentIdentifier> registrationService = MCRPIServiceManager
+            .getInstance().getRegistrationService(serviceID);
+
+        if (registrationService.isCreated(objectID, "")) {
+            LOGGER.info("Object {} already has a DOI!", objectID);
+        }
+        final MCRBase object = MCRMetadataManager.retrieve(objectID);
+        final MCRPersistentIdentifier doi = registrationService.register(object, additional);
+        LOGGER.info("Registered pi with {}: {} for object {}", serviceID, doi.asString(), objectID);
+    }
+
+    @MCRCommand(syntax = "create pi with {0} for object {1}", help = "Creates a persistent identifier with the pi "
+        + "service with the id {0} for the object {1}. Does nothing if the object already has a pi from the service {0}.", order = 100)
+    public static void createPIForObjectIfNotExist(String serviceID, String objectIDString)
+        throws MCRAccessException, ExecutionException, MCRActiveLinkException, MCRPersistentIdentifierException,
+        InterruptedException {
+        createPIForObjectIfNotExist(serviceID, objectIDString, "");
+    }
 }
