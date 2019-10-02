@@ -88,11 +88,6 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         }, DELAY_IN_MS * 2, DELAY_IN_MS * 2, TimeUnit.MILLISECONDS);
 
         MCRShutdownHandler.getInstance().addCloseable(new MCRShutdownHandler.Closeable() {
-
-            @Override
-            public void prepareClose() {
-            }
-
             @Override
             public int getPriority() {
                 return Integer.MIN_VALUE + 10;
