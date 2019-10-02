@@ -97,9 +97,5 @@
       <groupId>org.mycore.iview2</groupId>
       <artifactId>image-tiler</artifactId>
     </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-    </dependency>
   </dependencies>
 </project>
