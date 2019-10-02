@@ -23,11 +23,6 @@ import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-
 import com.google.common.primitives.Ints;
 
 /**
@@ -43,52 +38,22 @@ import com.google.common.primitives.Ints;
  */
 public class MCRDelayedRunnable implements Delayed, Runnable, MCRDecorator<Runnable> {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     private static AtomicLong ATOMIC_SYSTEM_TIME = new AtomicLong(System.currentTimeMillis());
 
     protected Runnable runnable;
-
-    private MCRSession session;
 
     private long startTimeInMs = -1;
 
     private String id;
 
     /**
-     * Creates a new {@link Runnable} encapsulating the {@link #run()} method with a new
-     * {@link MCRSession} and a database transaction. Afterwards the transaction will
-     * be committed and the session will be released and closed.
-     * 
-     * If you want to execute your runnable in the context of an already existing
-     * session use the {@link MCRDelayedRunnable#MCRDelayedRunnable(String, long, MCRsession, Runnable)}
-     * constructor instead.
+     * Creates a new {@link MCRDelayedRunnable} encapsulating a Runnable for delayed execution.
      * 
      * @param id, - the id of the runnable (used for equals-check)
+     * @param delayInMs - the time in (ms) the task should be delayed
      * @param runnable the runnable to execute within a session and transaction
-     * @param delayInMS - the time in (ms) the task should be delayed
      */
     public MCRDelayedRunnable(String id, long delayInMs, Runnable runnable) {
-        init(id, delayInMs, runnable);
-    }
-
-    /**
-     * Creates a new {@link Runnable} encapsulating the {@link #run()} method with a new
-     * a database transaction. The transaction will be created in the context of the
-     * given session. Afterwards the transaction will be committed and the session
-     * will be released (but not closed!).
-     * 
-     * @param id, - the id of the runnable (used for equals-check)
-     * @param runnable the runnable to execute within a session and transaction
-     * @param delayInMS - the time in (ms) the task should be delayed
-     * @param session the MCRSession to use
-     */
-    public MCRDelayedRunnable(String id, long delayInMs, MCRSession session, Runnable runnable) {
-        init(id, delayInMs, runnable);
-        this.session = Objects.requireNonNull(session, "session must not be null");
-    }
-
-    private void init(String id, long delayInMs, Runnable runnable) {
         this.id = id;
         this.runnable = Objects.requireNonNull(runnable, "runnable must not be null");
 
@@ -98,33 +63,7 @@ public class MCRDelayedRunnable implements Delayed, Runnable, MCRDecorator<Runna
 
     @Override
     public void run() {
-        boolean newSession = this.session == null;
-        MCRSessionMgr.unlock();
-        boolean closeSession = newSession && !MCRSessionMgr.hasCurrentSession();
-        if (newSession) {
-            this.session = MCRSessionMgr.getCurrentSession();
-        }
-        MCRSessionMgr.setCurrentSession(this.session);
-        session.beginTransaction();
-        try {
-            this.runnable.run();
-        } finally {
-            try {
-                session.commitTransaction();
-            } catch (Exception commitExc) {
-                LOGGER.error("Error while commiting transaction.", commitExc);
-                try {
-                    session.rollbackTransaction();
-                } catch (Exception rollbackExc) {
-                    LOGGER.error("Error while rollbacking transaction.", commitExc);
-                }
-            } finally {
-                MCRSessionMgr.releaseCurrentSession();
-                if (closeSession && session != null) {
-                    session.close();
-                }
-            }
-        }
+        this.runnable.run();
     }
 
     @Override
