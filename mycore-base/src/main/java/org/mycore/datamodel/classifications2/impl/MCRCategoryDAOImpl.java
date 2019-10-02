@@ -141,7 +141,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         MCRCategoryImpl category = getByNaturalID(entityManager, id);
         try {
             entityManager.refresh(category); //for MCR-1863
-        } catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             //required since hibernate 5.3 if category is deleted within same transaction.
             //junit: testLicenses()
         }

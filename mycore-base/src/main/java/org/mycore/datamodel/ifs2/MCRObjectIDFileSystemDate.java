@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "mycoreobject")
 public class MCRObjectIDFileSystemDate extends MCRObjectIDDateImpl {
 
-    private MCRObjectIDFileSystemDate(){
+    private MCRObjectIDFileSystemDate() {
         //JAXB requirement
     }
 

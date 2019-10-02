@@ -57,7 +57,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
     static {
         String alternative = MCRConfiguration.instance().getString("MCR.datadir") + File.separator + "transferPackages";
         String directoryPath = MCRConfiguration.instance()
-                                               .getString("MCR.TransferPackage.Save.to.Directory", alternative);
+            .getString("MCR.TransferPackage.Save.to.Directory", alternative);
         SAVE_DIRECTORY_PATH = Paths.get(directoryPath);
     }
 
@@ -93,7 +93,7 @@ public class MCRTransferPackagePacker extends MCRPacker {
         MCRObjectID mcrId = MCRObjectID.getInstance(sourceId);
         if (!MCRMetadataManager.exists(mcrId)) {
             throw new MCRUsageException(
-                    "Requested object '" + sourceId + "' does not exist. Thus a transfer package cannot be created.");
+                "Requested object '" + sourceId + "' does not exist. Thus a transfer package cannot be created.");
         }
         return MCRMetadataManager.retrieveMCRObject(mcrId);
     }

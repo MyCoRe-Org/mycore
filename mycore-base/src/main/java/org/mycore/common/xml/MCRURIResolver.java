@@ -562,7 +562,6 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
-
         private static int getHash(String lastModified, String eTag) {
             final int prime = 31;
             int result = 1;
@@ -626,9 +625,9 @@ public final class MCRURIResolver implements URIResolver {
                 path = '/' + path;
             }
 
-            if(MCRDeveloperTools.overrideActive()){
+            if (MCRDeveloperTools.overrideActive()) {
                 final Optional<Path> overriddenFilePath = MCRDeveloperTools.getOverriddenFilePath(path, true);
-                if(overriddenFilePath.isPresent()){
+                if (overriddenFilePath.isPresent()) {
                     return new StreamSource(overriddenFilePath.get().toFile());
                 }
             }
@@ -1210,7 +1209,7 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRLayoutTransformerResolver implements URIResolver {
 
         private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
-        
+
         @Override
         public Source resolve(String href, String base) throws TransformerException {
             String help = href.substring(href.indexOf(":") + 1);
@@ -1393,7 +1392,8 @@ public final class MCRURIResolver implements URIResolver {
 
             while (tok.hasMoreTokens()) {
                 param = tok.nextToken().split("=");
-                params.put(URLDecoder.decode(param[0], StandardCharsets.UTF_8), URLDecoder.decode(param[1], StandardCharsets.UTF_8));
+                params.put(URLDecoder.decode(param[0], StandardCharsets.UTF_8),
+                    URLDecoder.decode(param[1], StandardCharsets.UTF_8));
             }
             return params;
         }

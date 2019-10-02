@@ -146,7 +146,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
                 List<File> fileList = fileGrp.getFileList();
                 for (File file : fileList) {
                     FLocat fLocat = file.getFLocat();
-                    if (fLocat.getHref().equals( MCRXMLFunctions.encodeURIPath(fileHref, true))) {
+                    if (fLocat.getHref().equals(MCRXMLFunctions.encodeURIPath(fileHref, true))) {
                         fileID = file.getId();
                     }
                 }

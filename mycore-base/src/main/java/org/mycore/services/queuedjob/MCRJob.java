@@ -50,7 +50,7 @@ import javax.persistence.Transient;
 @Entity
 @NamedQueries({
     @NamedQuery(name = "mcrjob.classes",
-        query = "select DISTINCT(o.action) from MCRJob o")})
+        query = "select DISTINCT(o.action) from MCRJob o") })
 @Table(name = "MCRJob")
 public class MCRJob implements Cloneable {
     private long id;
@@ -263,8 +263,9 @@ public class MCRJob implements Cloneable {
      */
     @Override
     public String toString() {
-        return new MessageFormat("MCRJob [id:{0}, action:{1}, status:{2}, added:{3}, parameters:{4}]", Locale.ROOT).format(
-            new Object[] { getId(), getAction().getName(), getStatus(), getAdded(), getParameters() });
+        return new MessageFormat("MCRJob [id:{0}, action:{1}, status:{2}, added:{3}, parameters:{4}]", Locale.ROOT)
+            .format(
+                new Object[] { getId(), getAction().getName(), getStatus(), getAdded(), getParameters() });
     }
 
 }

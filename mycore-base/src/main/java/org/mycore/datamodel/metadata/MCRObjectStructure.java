@@ -219,11 +219,10 @@ public class MCRObjectStructure {
      * @return
      */
     private boolean removeMetaLink(List<? extends MCRMetaLinkID> list, MCRObjectID href) {
-        final List<MCRMetaLink> toRemove =
-            list.stream()
-                .filter(ml -> ml.getXLinkHrefID().equals(href))
-                .collect(Collectors.toList());
-        return  list.removeAll(toRemove);
+        final List<MCRMetaLink> toRemove = list.stream()
+            .filter(ml -> ml.getXLinkHrefID().equals(href))
+            .collect(Collectors.toList());
+        return list.removeAll(toRemove);
     }
 
     /**

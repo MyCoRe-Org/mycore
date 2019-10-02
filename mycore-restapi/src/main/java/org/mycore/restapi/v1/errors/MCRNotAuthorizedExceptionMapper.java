@@ -30,11 +30,11 @@ import javax.ws.rs.ext.ExceptionMapper;
  */
 public class MCRNotAuthorizedExceptionMapper implements ExceptionMapper<NotAuthorizedException> {
     public Response toResponse(NotAuthorizedException ex) {
-        if (ex.getMessage()==null || ex.getResponse().getEntity() != null){
+        if (ex.getMessage() == null || ex.getResponse().getEntity() != null) {
             return ex.getResponse();
         }
         return Response.fromResponse(ex.getResponse())
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN+ ";charset=utf-8")
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN + ";charset=utf-8")
             .entity(ex.getMessage())
             .build();
     }

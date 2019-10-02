@@ -31,7 +31,7 @@ public class MCRJSONCategoriesSaveList {
     ArrayList<CategorySaveElement> deleteList = new ArrayList<>();
 
     public void add(MCRCategory categ, MCRCategoryID parentID, int index, String status)
-            throws WebApplicationException {
+        throws WebApplicationException {
         if ("updated".equals(status)) {
             updateList.add(new CategorySaveElement(categ, parentID, index));
         } else if ("deleted".equals(status)) {
@@ -43,7 +43,9 @@ public class MCRJSONCategoriesSaveList {
 
     private class CategorySaveElement {
         private MCRCategory categ;
+
         private MCRCategoryID parentID;
+
         private int index;
 
         CategorySaveElement(MCRCategory categ, MCRCategoryID parentID, int index) {

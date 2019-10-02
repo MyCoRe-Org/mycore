@@ -247,7 +247,7 @@ public abstract class MCRStoredNode extends MCRNode {
         getRoot().getDataGuard().write(() -> writeOperation.accept(additionalData));
     }
 
-    public MCRFileAttributes<String> getBasicFileAttributes() throws IOException{
+    public MCRFileAttributes<String> getBasicFileAttributes() throws IOException {
         BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
         return MCRFileAttributes.fromAttributes(attrs, null);
     }

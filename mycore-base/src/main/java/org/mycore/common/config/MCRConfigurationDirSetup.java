@@ -118,7 +118,8 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             .map(URLClassLoader.class::cast)
             .findFirst();
         if (!classLoaderOptional.isPresent()) {
-            System.err.println(classLoaderOptional.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
+            System.err
+                .println(classLoaderOptional.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
             return;
         }
         File libDir = MCRConfigurationDir.getConfigFile("lib");

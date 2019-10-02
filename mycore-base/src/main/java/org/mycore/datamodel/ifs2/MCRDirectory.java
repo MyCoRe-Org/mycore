@@ -140,7 +140,7 @@ public class MCRDirectory extends MCRStoredNode {
                 childEntry.setName("node");
             }
         });
-        
+
         try (Stream<MCRNode> streamMCRNode = getChildren()) {
             streamMCRNode.filter(MCRStoredNode.class::isInstance)
                 .map(MCRStoredNode.class::cast)

@@ -68,7 +68,7 @@ public class MCRNameMergerTest extends MCRTestCase {
 
         try {
             new MCRNameMerger().setElement(null);
-        Assert.fail("No name should result in NPE while creating a MCRNameMerger");
+            Assert.fail("No name should result in NPE while creating a MCRNameMerger");
         } catch (NullPointerException ex) {
             // exception excepted
         }

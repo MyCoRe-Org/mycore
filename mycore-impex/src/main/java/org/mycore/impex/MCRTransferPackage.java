@@ -219,7 +219,7 @@ public class MCRTransferPackage {
         // classifications
         for (String classId : this.classifications) {
             Document classification = MCRClassificationUtils.asDocument(classId);
-            if(classification == null) {
+            if (classification == null) {
                 LogManager.getLogger().warn("Unable to get classification " + classId);
                 continue;
             }

@@ -117,9 +117,9 @@ public class MCRSolrSchemaReloader {
         SchemaRequest.DynamicFields dynFieldsReq = new SchemaRequest.DynamicFields();
         for (Map<String, Object> field : dynFieldsReq.process(solrClient).getDynamicFields()) {
             String fieldName = field.get("name").toString();
-                LOGGER.debug("remove SOLR DynamicField " + fieldName);
-                SchemaRequest.DeleteDynamicField delField = new SchemaRequest.DeleteDynamicField(fieldName);
-                delField.process(solrClient);
+            LOGGER.debug("remove SOLR DynamicField " + fieldName);
+            SchemaRequest.DeleteDynamicField delField = new SchemaRequest.DeleteDynamicField(fieldName);
+            delField.process(solrClient);
 
         }
     }
@@ -158,8 +158,8 @@ public class MCRSolrSchemaReloader {
      * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processSchemaFiles(String configType, String coreID) {
-        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID).orElseThrow(()
-            -> MCRSolrUtils.getCoreConfigMissingException(coreID));
+        MCRSolrCore solrCore = MCRSolrClientFactory.get(coreID)
+            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
 
         LOGGER.info("Load schema definitions for core " + coreID + " using configuration " + configType);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -182,7 +182,8 @@ public class MCRSolrSchemaReloader {
                     HttpPost post = new HttpPost(solrCore.getV1CoreURL() + "/schema");
                     post.setHeader("Content-type", "application/json");
                     post.setEntity(new StringEntity(command));
-                    String commandprefix = command.indexOf('-') != -1 ? command.substring(2,command.indexOf('-')) : "unknown command";
+                    String commandprefix = command.indexOf('-') != -1 ? command.substring(2, command.indexOf('-'))
+                        : "unknown command";
 
                     try (CloseableHttpResponse response = httpClient.execute(post)) {
                         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -194,7 +195,8 @@ public class MCRSolrSchemaReloader {
                             String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
                                 StandardCharsets.UTF_8);
                             LOGGER
-                                .error("SOLR schema " + commandprefix + " error: {} {}\n{}", response.getStatusLine().getStatusCode(),
+                                .error("SOLR schema " + commandprefix + " error: {} {}\n{}",
+                                    response.getStatusLine().getStatusCode(),
                                     response.getStatusLine().getReasonPhrase(), respContent);
                         }
                     }

@@ -80,7 +80,7 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
     }
 
     @Override
-    public byte[] asByteArray() throws IOException {     
+    public byte[] asByteArray() throws IOException {
         return Files.readAllBytes(path);
     }
 
@@ -96,11 +96,11 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
 
     @Override
     public String getETag() throws IOException {
-        if (attrs instanceof MCRFileAttributes){
+        if (attrs instanceof MCRFileAttributes) {
             return ((MCRFileAttributes) attrs).md5sum();
         }
 
-        if(Files.getFileStore(path).supportsFileAttributeView("md5")){
+        if (Files.getFileStore(path).supportsFileAttributeView("md5")) {
             Object fileKey = Files.getAttribute(path, "md5:md5");
             if (fileKey instanceof String) {
                 return fileKey.toString();

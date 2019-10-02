@@ -78,13 +78,12 @@ import org.mycore.common.MCRCoreVersion;
 @Table(
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "identifier", "type" }),
-        @UniqueConstraint(columnNames = { "mycoreid", "service", "additional"})
+        @UniqueConstraint(columnNames = { "mycoreid", "service", "additional" })
     },
     indexes = {
         @Index(name = "Identifier", columnList = "identifier"),
         @Index(name = "MCRIdentifierService", columnList = "mycoreid, service")
-    }
-)
+    })
 public class MCRPI implements org.mycore.pi.MCRPIRegistrationInfo {
 
     private static final long serialVersionUID = 234168232792525611L;

@@ -258,7 +258,8 @@ public class MCRMetaLinkID extends MCRMetaLink {
         }
     }
 
-    @Override public MCRMetaLinkID clone() {
+    @Override
+    public MCRMetaLinkID clone() {
         return (MCRMetaLinkID) super.clone();
     }
 

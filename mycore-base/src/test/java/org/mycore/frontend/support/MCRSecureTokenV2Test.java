@@ -68,7 +68,7 @@ public class MCRSecureTokenV2Test {
         String contentPath = "vod/_definst_/mp4:Überraschung.mp4";
         String sharedSecret = "JUnitSecret";
         String ipAddress = "192.168.1.2";
-        String[] parameters = { };
+        String[] parameters = {};
         return new MCRSecureTokenV2(contentPath, ipAddress, sharedSecret, parameters);
     }
 

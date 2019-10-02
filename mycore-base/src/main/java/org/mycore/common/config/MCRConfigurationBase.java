@@ -127,7 +127,8 @@ public final class MCRConfigurationBase {
                 .filter(File::isDirectory).isPresent()) {
                 lastModifiedFile = dataDir.map(p -> new File(p, ".systemTime")).get();
             } else {
-                dataDir.ifPresent(d -> System.err.println("WARNING: MCR.dataDir does not exist: " + d.getAbsolutePath()));
+                dataDir
+                    .ifPresent(d -> System.err.println("WARNING: MCR.dataDir does not exist: " + d.getAbsolutePath()));
             }
         }
         if (lastModifiedFile == null) {
@@ -296,7 +297,7 @@ public final class MCRConfigurationBase {
      * that existing mycore.properties files must not be migrated immediately.
      */
     private static synchronized void loadDeprecatedProperties() throws IOException {
-        try (InputStream in = MCRConfigurationBase.class.getResourceAsStream("/deprecated.properties")){
+        try (InputStream in = MCRConfigurationBase.class.getResourceAsStream("/deprecated.properties")) {
             if (in == null) {
                 return;
             }

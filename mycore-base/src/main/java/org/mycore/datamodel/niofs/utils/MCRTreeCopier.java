@@ -56,10 +56,11 @@ public class MCRTreeCopier implements FileVisitor<Path> {
     }
 
     public MCRTreeCopier(Path source, Path target, boolean renameOnExisting) throws NoSuchFileException {
-        this(source,target,renameOnExisting, false);
+        this(source, target, renameOnExisting, false);
     }
 
-    public MCRTreeCopier(Path source, Path target, boolean renameOnExisting, boolean restartTransaction) throws NoSuchFileException {
+    public MCRTreeCopier(Path source, Path target, boolean renameOnExisting, boolean restartTransaction)
+        throws NoSuchFileException {
         this.renameExisting = renameOnExisting;
         if (Files.notExists(target)) {
             throw new NoSuchFileException(target.toString(), null, "Target directory does not exist.");

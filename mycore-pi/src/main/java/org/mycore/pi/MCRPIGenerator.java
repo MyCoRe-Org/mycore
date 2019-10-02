@@ -66,8 +66,9 @@ public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
      * @throws MCRConfigurationException if property does not exist
      */
     protected void checkPropertyExists(final String propertyName) throws MCRConfigurationException {
-        if(!getProperties().containsKey(propertyName)){
-            throw new MCRConfigurationException("Missing property " + GENERATOR_CONFIG_PREFIX + getGeneratorID() + "." + propertyName);
+        if (!getProperties().containsKey(propertyName)) {
+            throw new MCRConfigurationException(
+                "Missing property " + GENERATOR_CONFIG_PREFIX + getGeneratorID() + "." + propertyName);
         }
     }
 

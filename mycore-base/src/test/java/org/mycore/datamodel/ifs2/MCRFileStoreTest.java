@@ -243,7 +243,7 @@ public class MCRFileStoreTest extends MCRIFS2TestCase {
 
         col.repairMetadata();
         xml1 = col.getMetadata().clone();
-        XMLOutputter xout=new XMLOutputter(Format.getPrettyFormat());
+        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         xout.output(xml1, System.out);
         xout.output(xml2, System.out);
         assertTrue(equals(xml1, xml2));

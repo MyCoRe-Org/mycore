@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 public class MCRFileAttributes<T> implements BasicFileAttributes {
     enum fileType {
         file, directory, link, other;
+
         public static fileType fromAttribute(BasicFileAttributes attrs) {
             if (attrs.isRegularFile()) {
                 return file;

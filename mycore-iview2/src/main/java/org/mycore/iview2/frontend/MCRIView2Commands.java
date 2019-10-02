@@ -180,7 +180,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX,
         help = "checks if all images of derivate {0} with a supported image type as main document have valid iview2" +
-                " files and start tiling if not ",
+            " files and start tiling if not ",
         order = 20)
     public static List<String> checkTilesOfDerivate(String derivateID) throws IOException {
         return forAllImages(derivateID, CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX);
@@ -226,7 +226,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = CHECK_TILES_OF_IMAGE_COMMAND_SYNTAX,
         help = "checks if tiles a specific file identified by its derivate {0} and absolute path {1} are valid or" +
-                " generates new one",
+            " generates new one",
         order = 30)
     public static void checkImage(String derivate, String absoluteImagePath) throws IOException {
         Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);

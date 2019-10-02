@@ -122,20 +122,20 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
     }
 
     @XmlRootElement(name = "error")
-    private static class MCRExceptionContainer{
+    private static class MCRExceptionContainer {
         private Exception exception;
 
         private MCRExceptionContainer() {
             //required for JAXB
         }
 
-        public MCRExceptionContainer(Exception e){
-            this.exception=e;
+        public MCRExceptionContainer(Exception e) {
+            this.exception = e;
         }
 
         @XmlElement
         @XmlJavaTypeAdapter(ExceptionTypeAdapter.class)
-        public Exception getException(){
+        public Exception getException() {
             return exception;
         }
 

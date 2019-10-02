@@ -771,7 +771,8 @@ public final class MCRMetadataManager {
             }
         }
         // add the link to metadata
-        final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+        final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance()
+            .getDerivateLink(mcrDerivate);
         addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink);
 
         // update the derivate

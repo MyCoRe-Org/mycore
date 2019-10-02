@@ -53,7 +53,6 @@ public final class MCRObject extends MCRBase {
 
     private final MCRObjectMetadata mcr_metadata;
 
-
     /**
      * This is the constructor of the MCRObject class. It creates an instance of
      * the parser class and the metadata class. <br>

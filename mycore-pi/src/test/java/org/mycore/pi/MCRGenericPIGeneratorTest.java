@@ -20,7 +20,8 @@ public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
     @Test
     public void testGenerate() throws MCRPersistentIdentifierException {
         final MCRGenericPIGenerator generator = new MCRGenericPIGenerator("test1",
-            "urn:nbn:de:gbv:$CurrentDate-$ObjectType-$ObjectProject-$ObjectNumber-$Count-", new SimpleDateFormat("yyyy", Locale.ROOT), null, null, 3,
+            "urn:nbn:de:gbv:$CurrentDate-$ObjectType-$ObjectProject-$ObjectNumber-$Count-",
+            new SimpleDateFormat("yyyy", Locale.ROOT), null, null, 3,
             "dnbUrn");
 
         MCRObjectID testID = MCRObjectID.getInstance("my_test_00000001");

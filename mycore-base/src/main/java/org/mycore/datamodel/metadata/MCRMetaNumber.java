@@ -325,7 +325,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
     public final MCRMetaNumber clone() {
         MCRMetaNumber clone = (MCRMetaNumber) super.clone();
 
-        clone.dimension =this.dimension;
+        clone.dimension = this.dimension;
         clone.measurement = this.measurement;
         clone.number = this.number;
 

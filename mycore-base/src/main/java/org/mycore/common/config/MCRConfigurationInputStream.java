@@ -97,7 +97,7 @@ public class MCRConfigurationInputStream extends InputStream {
         InputStream initStream = null;
         if (configurationDirectory != null) {
             LogManager.getLogger().info("Current configuration directory: {}",
-                    configurationDirectory.getAbsolutePath());
+                configurationDirectory.getAbsolutePath());
             // set MCR.basedir, is normally overwritten later
             if (configurationDirectory.isDirectory()) {
                 initStream = getBaseDirInputStream(configurationDirectory);
@@ -128,8 +128,8 @@ public class MCRConfigurationInputStream extends InputStream {
                 cList.add(new ByteArrayInputStream(lbr));
             } else {
                 cList.add(new ByteArrayInputStream(
-                        ("# Unable to find " + filename + " in " + component.getResourceBase() + "\n")
-                                .getBytes(StandardCharsets.ISO_8859_1)));
+                    ("# Unable to find " + filename + " in " + component.getResourceBase() + "\n")
+                        .getBytes(StandardCharsets.ISO_8859_1)));
             }
         }
         InputStream propertyStream = getConfigFileStream(filename);
@@ -191,7 +191,7 @@ public class MCRConfigurationInputStream extends InputStream {
                 cList.add(IOUtils.toByteArray(configStream));
             }
         }
-        
+
         //load config file from app config dir
         File localConfigFile = MCRConfigurationDir.getConfigFile(filename);
         if (localConfigFile != null && localConfigFile.canRead()) {

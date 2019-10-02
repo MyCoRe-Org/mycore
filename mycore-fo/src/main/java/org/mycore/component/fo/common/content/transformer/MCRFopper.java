@@ -67,5 +67,5 @@ public class MCRFopper extends MCRContentTransformer {
     public String getFileExtension() {
         return "pdf";
     }
-    
+
 }

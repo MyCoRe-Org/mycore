@@ -86,11 +86,11 @@ public class MCRQLSearchUtils {
             if (sortBy != null && sortBy.getChildren().size() == 0) {
                 sortBy.detach();
             }
-            
+
             // Remove empty returnFields
             Element returnFields = root.getChild("returnFields");
             if (returnFields != null && returnFields.getText().length() == 0) {
-            	returnFields.detach();
+                returnFields.detach();
             }
         }
 

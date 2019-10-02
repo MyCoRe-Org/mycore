@@ -693,7 +693,7 @@ public class MCRIFSCommands {
     public static void moveFile(String ifsId, String storeID) throws IOException {
         MCRContentStore store = MCRContentStoreFactory.getStore(storeID);
         String storageID = moveFile(ifsId, store);
-        LOGGER.debug("File id={} has storage ID {} in store {}.",ifsId,storageID, store);
+        LOGGER.debug("File id={} has storage ID {} in store {}.", ifsId, storageID, store);
     }
 
     private static String moveFile(String ifsId, MCRContentStore target) throws IOException {
@@ -855,7 +855,7 @@ public class MCRIFSCommands {
             .map(MCRContentStoreFactory::getStore)
             .filter(MCRCStoreIFS2.class::isInstance)
             .forEach(store -> copyMD5ToIFS2(result, (MCRCStoreIFS2) store));
-        if (!result.get()){
+        if (!result.get()) {
             throw new MCRException("Could not copy all MD5 information to IFS2. Please see error messages above.");
         }
     }
@@ -915,32 +915,32 @@ public class MCRIFSCommands {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
         Root<MCRFSNODES> root = query.from(MCRFSNODES.class);
-        ((Query<MCRFSNODES>)em.createQuery(query
+        ((Query<MCRFSNODES>) em.createQuery(query
             .where(cb.equal(root.get(MCRFSNODES_.storeid), storeIFS2.getID()),
                 cb.equal(root.get(MCRFSNODES_.type), "F"))
             .orderBy(cb.asc(root.get(MCRFSNODES_.owner)), cb.asc(cb.length(root.get(MCRFSNODES_.storageid))))))
-            .stream()
-            .peek(em::detach)
-            .filter(f -> MCRObjectID.isValid(f.getOwner()))
-            .map(f -> {
-                try {
-                    return new AbstractMap.SimpleEntry<String, org.mycore.datamodel.ifs2.MCRFile>(f.getMd5(),
-                        toFile(storeIFS2, f));
-                } catch (IOException e) {
-                    LOGGER.error("Could not get information from ifs node {}", f.getStorageid(), e);
-                    result.set(false);
-                    return null;
-                }
-            })
-            .filter(Objects::nonNull)
-            .forEach(e -> {
-                if (!e.getKey().equals(e.getValue().getMD5())) {
-                    String path = e.getValue().getLocalPath().toAbsolutePath().toString();
-                    LOGGER.error("MD5 sum mismatch for file {}. DB:{}, mcrdata.xml:{}",
-                        path, e.getKey(), e.getValue().getMD5());
-                    result.set(false);
-                }
-            });
+                .stream()
+                .peek(em::detach)
+                .filter(f -> MCRObjectID.isValid(f.getOwner()))
+                .map(f -> {
+                    try {
+                        return new AbstractMap.SimpleEntry<String, org.mycore.datamodel.ifs2.MCRFile>(f.getMd5(),
+                            toFile(storeIFS2, f));
+                    } catch (IOException e) {
+                        LOGGER.error("Could not get information from ifs node {}", f.getStorageid(), e);
+                        result.set(false);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .forEach(e -> {
+                    if (!e.getKey().equals(e.getValue().getMD5())) {
+                        String path = e.getValue().getLocalPath().toAbsolutePath().toString();
+                        LOGGER.error("MD5 sum mismatch for file {}. DB:{}, mcrdata.xml:{}",
+                            path, e.getKey(), e.getValue().getMD5());
+                        result.set(false);
+                    }
+                });
     }
 
     private static org.mycore.datamodel.ifs2.MCRFile toFile(MCRCStoreIFS2 store, MCRFSNODES node) throws IOException {

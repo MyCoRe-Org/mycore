@@ -117,7 +117,8 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
             return;
         }
         boolean readPermission = id.getTypeId().equals("derivate") ? MCRAccessManager
-            .checkDerivateContentPermission(id, PERMISSION_READ) : MCRAccessManager.checkPermission(id, PERMISSION_READ);
+            .checkDerivateContentPermission(id, PERMISSION_READ)
+            : MCRAccessManager.checkPermission(id, PERMISSION_READ);
         if (!readPermission) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, "You may not read " + id);
             return;

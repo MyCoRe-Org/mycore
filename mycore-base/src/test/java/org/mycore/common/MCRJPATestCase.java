@@ -46,7 +46,7 @@ public class MCRJPATestCase extends MCRTestCase {
 
     private EntityManager entityManager;
 
-    protected Optional<EntityManager> getEntityManager(){
+    protected Optional<EntityManager> getEntityManager() {
         return Optional.ofNullable(entityManager);
     }
 

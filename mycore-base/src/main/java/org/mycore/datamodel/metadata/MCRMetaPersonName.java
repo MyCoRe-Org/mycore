@@ -458,7 +458,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
             LOGGER.debug("");
         }
     }
-    
+
     /**
      * This method compares this instance with a MCRMetaPersonName object
      */
@@ -473,5 +473,5 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
             Objects.equals(this.academic, other.academic) && Objects.equals(this.peerage, other.peerage) &&
             Objects.equals(this.numeration, other.numeration) && Objects.equals(this.title, other.title) &&
             Objects.equals(this.prefix, other.prefix) && Objects.equals(this.affix, other.affix);
-    }    
+    }
 }

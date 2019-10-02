@@ -152,7 +152,8 @@ public class MCRFileImportExport {
                 file = (MCRFile) existing; // Update existing MCRFile
 
                 // Determine MD5 checksum of local file
-                try(FileInputStream fin = new FileInputStream(local); MCRMD5InputStream cis = new MCRMD5InputStream(fin)) {
+                try (FileInputStream fin = new FileInputStream(local);
+                    MCRMD5InputStream cis = new MCRMD5InputStream(fin)) {
                     IOUtils.copy(cis, new MCRDevNull());
                     String local_md5 = cis.getMD5String();
 

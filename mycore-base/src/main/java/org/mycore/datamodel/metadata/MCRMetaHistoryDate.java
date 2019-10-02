@@ -550,8 +550,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     private boolean equalText(ArrayList<MCRMetaHistoryDateText> objtexts) {
         boolean testflag = true;
         int size = texts.size() < objtexts.size() ? texts.size() : objtexts.size();
-        for (int i = 0 ; i < size; i++) {
-            testflag &= texts.get(i).equals(objtexts.get(i));  
+        for (int i = 0; i < size; i++) {
+            testflag &= texts.get(i).equals(objtexts.get(i));
         }
         return testflag;
     }

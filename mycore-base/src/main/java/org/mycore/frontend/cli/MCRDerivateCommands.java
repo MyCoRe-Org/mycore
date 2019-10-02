@@ -869,8 +869,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     }
 
-    @MCRCommand(syntax = "set main file of {0} to {1}", help = "Sets the main file of the derivate with the id {0} to "
-        + "the file with the path {1}")
+    @MCRCommand(syntax = "set main file of {0} to {1}",
+        help = "Sets the main file of the derivate with the id {0} to "
+            + "the file with the path {1}")
     public static void setMainFile(final String derivateIDString, final String filePath) throws MCRAccessException {
         if (!MCRObjectID.isValid(derivateIDString)) {
             LOGGER.error("{} is not valid. ", derivateIDString);
@@ -917,7 +918,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     public static void testRenameFile(String filename, String pattern, String newName) {
         MCRDerivateUtil.testRenameFile(filename, pattern, newName);
     }
-    
+
     @MCRCommand(syntax = "set order of derivate {0} to {1}",
         help = "Sets the order of derivate {0} to the number {1} see also MCR-2003")
     public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {

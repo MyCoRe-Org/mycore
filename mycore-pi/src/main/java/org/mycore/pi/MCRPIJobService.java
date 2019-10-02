@@ -328,10 +328,9 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     protected Predicate<MCRBase> getRegistrationCondition(String objectType) {
         return Optional.ofNullable(getProperties().get(MCRDOIService.REGISTRATION_CONDITION_PROVIDER))
             .map(clazz -> {
-                String errorMessageBegin =
-                    "Configured class " + clazz + "(" + MCRPIService.REGISTRATION_CONFIG_PREFIX
-                        + getServiceID() + "." + MCRDOIService.REGISTRATION_CONDITION_PROVIDER
-                        + ")";
+                String errorMessageBegin = "Configured class " + clazz + "(" + MCRPIService.REGISTRATION_CONFIG_PREFIX
+                    + getServiceID() + "." + MCRDOIService.REGISTRATION_CONDITION_PROVIDER
+                    + ")";
                 try {
                     return MCRClassTools.forName(clazz)
                         .getConstructor()
@@ -354,7 +353,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                 } catch (ClassCastException e) {
                     throw new MCRConfigurationException(
                         errorMessageBegin + " needs to extend " + MCRPIObjectRegistrationConditionProvider.class
-                            .getName(), e);
+                            .getName(),
+                        e);
                 }
             })
             .map(MCRPIObjectRegistrationConditionProvider.class::cast)

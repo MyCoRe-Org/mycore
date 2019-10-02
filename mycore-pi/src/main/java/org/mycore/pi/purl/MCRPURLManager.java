@@ -242,8 +242,8 @@ public class MCRPURLManager {
             // Create a 410 purl
 
             String strURL = purlServerBaseURL + PURL_PATH + purl;
-            strURL +=
-                "?target=" + URLEncoder.encode(target, StandardCharsets.UTF_8) + "&maintainers=" + maintainers + "&type=" + type;
+            strURL += "?target=" + URLEncoder.encode(target, StandardCharsets.UTF_8) + "&maintainers=" + maintainers
+                + "&type=" + type;
 
             URL url = new URL(strURL);
             LOGGER.debug(url.toString());

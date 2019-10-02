@@ -36,8 +36,8 @@ public class MCRTextNormalizer {
         //canonical decomposition, remove accents
         normalizedText = Normalizer.normalize(normalizedText, Form.NFD).replaceAll("\\p{M}", "");
         normalizedText = normalizedText.replace("ue", "u")
-                                        .replace("oe", "o").replace("ae", "a")
-                                        .replace("ß", "s").replace("ss", "s");
+            .replace("oe", "o").replace("ae", "a")
+            .replace("ß", "s").replace("ss", "s");
         //remove all non-alphabetic characters
         normalizedText = normalizedText.replaceAll("[^a-z0-9]\\s]", "");
         // remove all words with fewer than four characters

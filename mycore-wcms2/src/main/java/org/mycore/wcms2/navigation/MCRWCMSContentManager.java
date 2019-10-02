@@ -174,7 +174,7 @@ public class MCRWCMSContentManager {
     private Optional<String> getWebPageId(JsonObject item) {
         JsonElement webpageIdElement = item.has("href") ? item.get("href")
             : (item.has("hrefStartingPage") ? item
-            .get("hrefStartingPage") : null);
+                .get("hrefStartingPage") : null);
         if (webpageIdElement == null || !webpageIdElement.isJsonPrimitive()) {
             return Optional.empty();
         }

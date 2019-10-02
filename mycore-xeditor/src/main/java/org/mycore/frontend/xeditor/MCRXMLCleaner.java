@@ -65,8 +65,7 @@ public class MCRXMLCleaner {
         Document clone = xml.clone();
         do {
             mapNodesToRules(clone);
-        }
-        while (clean(clone.getRootElement()));
+        } while (clean(clone.getRootElement()));
         return clone;
     }
 

@@ -96,10 +96,10 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         assertEquals(2, user.getAttributes().size());
 
         startNewTransaction();
-        MCRUser user2 = MCRUserManager.getUsers("id_orcid","1234-5678-1234-0000").findFirst().get();
-        assertEquals("john", user2.getUserName() );
+        MCRUser user2 = MCRUserManager.getUsers("id_orcid", "1234-5678-1234-0000").findFirst().get();
+        assertEquals("john", user2.getUserName());
 
-        MCRUser user3 = MCRUserManager.getUser( user2.getUserName(), user2.getRealmID() );
+        MCRUser user3 = MCRUserManager.getUser(user2.getUserName(), user2.getRealmID());
         assertEquals(2, user3.getAttributes().size());
     }
 

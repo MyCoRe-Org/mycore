@@ -82,7 +82,7 @@ public class MCRIFSCopyTest extends MCRIFSTest {
     }
 
     private void throwException(Exception e) throws Exception {
-        if (e != null){
+        if (e != null) {
             throw e;
         }
     }

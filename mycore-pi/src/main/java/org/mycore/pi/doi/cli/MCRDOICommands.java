@@ -283,7 +283,8 @@ public class MCRDOICommands {
         }
 
         final Element root = document.getRootElement();
-        MCRCrossrefUtil.insertBatchInformation(root.getChild("head",MCRConstants.CROSSREF_NAMESPACE), UUID.randomUUID().toString(), String.valueOf(new Date().getTime()),
+        MCRCrossrefUtil.insertBatchInformation(root.getChild("head", MCRConstants.CROSSREF_NAMESPACE),
+            UUID.randomUUID().toString(), String.valueOf(new Date().getTime()),
             "Test-Depositor", "email@mycore.de", "Test-Registrant");
 
         MCRCrossrefUtil.replaceDOIData(root, "DOI for "::concat, "http://baseURL.de/");
@@ -308,7 +309,7 @@ public class MCRDOICommands {
         try {
             schema.newValidator().validate(new JDOMSource(document));
             LOGGER.info("Check Complete!");
-        } catch (SAXException|IOException e) {
+        } catch (SAXException | IOException e) {
             LOGGER.error("Error while checking schema!", e);
         }
     }

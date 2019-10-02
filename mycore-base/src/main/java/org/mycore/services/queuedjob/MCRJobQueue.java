@@ -374,8 +374,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         Root<MCRJob> jobRoot = query.from(MCRJob.class);
         query.select(jobRoot);
 
-        params.keySet().forEach(key ->
-        {
+        params.keySet().forEach(key -> {
             MapJoin<MCRJob, String, String> parameterJoin = jobRoot.join(MCRJob_.parameters, JoinType.INNER);
             Path<String> keyPath = parameterJoin.key();
             Path<String> valuePath = parameterJoin.value();

@@ -91,7 +91,6 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
         }
     }
 
-
     public String getBucketID() {
         return bucketID;
     }
@@ -108,7 +107,7 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
     public void sessionEvent(MCRSessionEvent event) {
         if (event.getType().equals(MCRSessionEvent.Type.destroyed)) {
             final String sessionID = event.getSession().getID();
-            if(sessionID.equals(this.sessionID)){
+            if (sessionID.equals(this.sessionID)) {
                 close();
             }
         }

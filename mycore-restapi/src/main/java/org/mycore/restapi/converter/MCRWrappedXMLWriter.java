@@ -50,7 +50,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @Provider
-@Produces({MediaType.APPLICATION_XML, MediaType.TEXT_XML})
+@Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public class MCRWrappedXMLWriter implements MessageBodyWriter<Object> {
 
     private static final ConcurrentHashMap<Class, JAXBContext> CTX_MAP = new ConcurrentHashMap<>();
@@ -113,10 +113,12 @@ public class MCRWrappedXMLWriter implements MessageBodyWriter<Object> {
             return false;
         }
         if (Collection.class.isAssignableFrom(type)) {
-            return verifyGenericType(genericType) && Stream.of(MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_XML_TYPE).anyMatch(t -> t.isCompatible(mediaType));
+            return verifyGenericType(genericType) && Stream.of(MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_XML_TYPE)
+                .anyMatch(t -> t.isCompatible(mediaType));
         } else {
             return type.isArray() && verifyArrayType(type)
-                && Stream.of(MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_XML_TYPE).anyMatch(t -> t.isCompatible(mediaType));
+                && Stream.of(MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_XML_TYPE)
+                    .anyMatch(t -> t.isCompatible(mediaType));
         }
     }
 

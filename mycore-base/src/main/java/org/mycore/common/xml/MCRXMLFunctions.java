@@ -1016,11 +1016,13 @@ public class MCRXMLFunctions {
             objects = set.toArray();
         }
 
-        @Override public Node item(int index) {
+        @Override
+        public Node item(int index) {
             return (Node) objects[index];
         }
 
-        @Override public int getLength() {
+        @Override
+        public int getLength() {
             return objects.length;
         }
     }

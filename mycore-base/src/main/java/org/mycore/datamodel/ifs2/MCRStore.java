@@ -592,8 +592,11 @@ public abstract class MCRStore {
 
     public interface MCRStoreConfig {
         String getBaseDir();
+
         String getID();
+
         String getPrefix();
+
         String getSlotLayout();
     }
 }

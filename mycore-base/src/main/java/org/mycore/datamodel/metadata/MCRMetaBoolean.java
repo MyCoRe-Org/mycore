@@ -115,7 +115,7 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
     public MCRMetaBoolean(String set_subtag, String set_type, int set_inherted, boolean set_value) throws MCRException {
         super(set_subtag, null, set_type, set_inherted);
         setValue(set_value);
-   }
+    }
 
     /**
      * This method set value. It set false if the string is corrupt.

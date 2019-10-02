@@ -98,7 +98,8 @@ public class MCRCrossrefClient {
         final String metadataXmlAsString = METADATA_OUTPUTTER.outputString(metadata);
 
         HttpEntity reqEntity = MultipartEntityBuilder.create()
-            .addBinaryBody("fname",metadataXmlAsString.getBytes(StandardCharsets.UTF_8), ContentType.APPLICATION_XML, "crossref_query.xml")
+            .addBinaryBody("fname", metadataXmlAsString.getBytes(StandardCharsets.UTF_8), ContentType.APPLICATION_XML,
+                "crossref_query.xml")
             .build();
         postRequest.setEntity(reqEntity);
 

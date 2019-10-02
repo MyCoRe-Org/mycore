@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class MCRUnmappedCategoryRemover {
 
-    private static final Logger  LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final String classificationID;
 
@@ -38,7 +38,7 @@ public class MCRUnmappedCategoryRemover {
             .getCategory(MCRCategoryID.fromString(classificationID), -1);
         collectRemovableCategories(category);
 
-        filtered.forEach(categoryToDelete-> {
+        filtered.forEach(categoryToDelete -> {
             LOGGER.info("Delete Category {}", categoryToDelete);
             dao.deleteCategory(categoryToDelete);
         });
@@ -78,7 +78,7 @@ public class MCRUnmappedCategoryRemover {
         final List<MCRCategory> rootCategories = dao
             .getRootCategories()
             .stream()
-            .map(category -> dao.getRootCategory(category.getId(),-1 ))
+            .map(category -> dao.getRootCategory(category.getId(), -1))
             .collect(Collectors.toList());
 
         for (MCRCategory rootCategory : rootCategories) {
@@ -97,7 +97,7 @@ public class MCRUnmappedCategoryRemover {
                 final String[] kv = mappingTarget.split(":");
                 String clazz = kv[0];
                 if (classificationID.equals(clazz)) {
-                    LOGGER.info("Found mapping from {} to {}", category.getId(), mappingTarget );
+                    LOGGER.info("Found mapping from {} to {}", category.getId(), mappingTarget);
                     toFromMapping.put(MCRCategoryID.fromString(mappingTarget), category.getId());
                 }
             }
