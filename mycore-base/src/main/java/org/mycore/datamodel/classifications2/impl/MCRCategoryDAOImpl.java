@@ -504,7 +504,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             int parentPos = category.getPositionInParent();
             MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
             @SuppressWarnings("unchecked")
-            ArrayList<MCRCategoryImpl> copy = (ArrayList<MCRCategoryImpl>) new ArrayList(category.children);
+            ArrayList<MCRCategoryImpl> copy = new ArrayList(category.children);
             copy.forEach(MCRCategoryImpl::detachFromParent);
             parent.children.addAll(parentPos, copy);
             copy.forEach(c -> c.parent = parent); //fixes MCR-1963

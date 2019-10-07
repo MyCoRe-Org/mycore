@@ -52,7 +52,7 @@ public class MCRSwordCollectionManager implements CollectionListManager, Collect
     public Feed listCollectionContents(IRI collectionIRI, AuthCredentials authCredentials, SwordConfiguration config)
         throws SwordServerException, SwordAuthException, SwordError {
         String collection = MCRSwordUtil.ParseLinkUtil.CollectionIRI.getCollectionNameFromCollectionIRI(collectionIRI);
-        String path = collectionIRI.getPath();
+        collectionIRI.getPath();
 
         LOGGER.info("List Collection: {}", collection);
 

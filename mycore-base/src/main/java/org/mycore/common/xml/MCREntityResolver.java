@@ -263,7 +263,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
 
         URL url;
 
-        public InputSourceProvider(byte[] bytes, URL url) {
+        InputSourceProvider(byte[] bytes, URL url) {
             this.bytes = bytes;
             this.url = url;
         }

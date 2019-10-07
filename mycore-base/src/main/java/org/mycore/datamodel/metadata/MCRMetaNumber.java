@@ -166,7 +166,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @param dimension
      *            the dimension string
      */
-    public final void setDimension(String dimension) {
+    public void setDimension(String dimension) {
         if (dimension == null) {
             this.dimension = "";
         } else {
@@ -186,7 +186,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @param measurement
      *            the measurement string
      */
-    public final void setMeasurement(String measurement) {
+    public void setMeasurement(String measurement) {
         if (measurement == null) {
             this.measurement = "";
         } else {
@@ -208,7 +208,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @exception MCRException
      *                if the number string is not in a number format
      */
-    public final void setNumber(String number) throws MCRException {
+    public void setNumber(String number) throws MCRException {
         try {
             if (number == null) {
                 throw new MCRException("Number cannot be null");
@@ -228,7 +228,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @exception MCRException
      *                if the number string is null
      */
-    public final void setNumber(BigDecimal number) throws MCRException {
+    public void setNumber(BigDecimal number) throws MCRException {
         if (number == null) {
             throw new MCRException("Number cannot be null");
         }
@@ -240,7 +240,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *
      * @return the dimension String
      */
-    public final String getDimension() {
+    public String getDimension() {
         return dimension;
     }
 
@@ -249,7 +249,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *
      * @return the measurement String
      */
-    public final String getMeasurement() {
+    public String getMeasurement() {
         return measurement;
     }
 
@@ -258,7 +258,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *
      * @return the number as BigDecimal
      */
-    public final BigDecimal getNumberAsBigDecimal() {
+    public BigDecimal getNumberAsBigDecimal() {
         return number;
     }
 
@@ -269,7 +269,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *
      * @return the number as formatted String
      */
-    public final String getNumberAsString() {
+    public String getNumberAsString() {
         final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.ENGLISH);
         numberFormat.setGroupingUsed(false);
         numberFormat.setMaximumFractionDigits(FRACTION_DIGITS);
@@ -285,7 +285,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public final void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         setMeasurement(element.getAttributeValue("measurement"));
         setDimension(element.getAttributeValue("dimension"));
@@ -301,7 +301,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRNumber part
      */
     @Override
-    public final org.jdom2.Element createXML() throws MCRException {
+    public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         if (dimension != null && dimension.length() != 0) {
             elm.setAttribute("dimension", dimension);
@@ -322,7 +322,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @see java.lang.Object#clone()
      */
     @Override
-    public final MCRMetaNumber clone() {
+    public MCRMetaNumber clone() {
         MCRMetaNumber clone = (MCRMetaNumber) super.clone();
 
         clone.dimension = this.dimension;
@@ -336,7 +336,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * Logs debug output.
      */
     @Override
-    public final void debug() {
+    public void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Measurement        = {}", measurement);

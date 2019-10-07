@@ -281,7 +281,6 @@ public class MCRConfiguration2 {
     public static <T> T instantiateClass(String classname) {
         LogManager.getLogger().debug("Loading Class: {}", classname);
 
-        T o = null;
         Class<? extends T> cl = getClassObject(classname);
         try {
             return MCRInjectorConfig.injector().getInstance(cl);
@@ -318,7 +317,7 @@ public class MCRConfiguration2 {
 
         private UUID uuid;
 
-        public EventListener(Predicate<String> keyPredicate,
+        EventListener(Predicate<String> keyPredicate,
             MCRTriConsumer<String, Optional<String>, Optional<String>> listener) {
             this.keyPredicate = keyPredicate;
             this.listener = listener;
@@ -330,7 +329,7 @@ public class MCRConfiguration2 {
     static class SingletonKey {
         private String property, className;
 
-        public SingletonKey(String property, String className) {
+        SingletonKey(String property, String className) {
             super();
             this.property = property;
             this.className = className;

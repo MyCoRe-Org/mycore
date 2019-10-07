@@ -129,7 +129,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
             //required for JAXB
         }
 
-        public MCRExceptionContainer(Exception e) {
+        MCRExceptionContainer(Exception e) {
             this.exception = e;
         }
 

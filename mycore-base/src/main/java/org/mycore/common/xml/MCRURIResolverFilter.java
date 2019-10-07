@@ -183,7 +183,7 @@ public class MCRURIResolverFilter implements Filter {
             }
         }
 
-        public MyResponseWrapper(HttpServletResponse response) {
+        MyResponseWrapper(HttpServletResponse response) {
             super(response);
             output = new ByteArrayOutputStream(16 * 1024);
         }

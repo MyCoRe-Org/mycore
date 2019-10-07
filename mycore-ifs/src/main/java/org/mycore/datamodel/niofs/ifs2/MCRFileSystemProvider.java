@@ -594,7 +594,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
 
         protected MCRPath path;
 
-        public BasicFileAttributeViewImpl(Path path) {
+        BasicFileAttributeViewImpl(Path path) {
             this.path = MCRPath.toMCRPath(path);
             if (!path.isAbsolute()) {
                 throw new InvalidPathException(path.toString(), "'path' must be absolute.");
@@ -702,7 +702,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         private static Set<String> allowedAttr = Sets.union(BasicFileAttributeViewImpl.allowedAttr,
             Sets.newHashSet(MD5_NAME));
 
-        public MD5FileAttributeViewImpl(Path path) {
+        MD5FileAttributeViewImpl(Path path) {
             super(path);
         }
 

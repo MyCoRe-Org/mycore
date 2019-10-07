@@ -209,10 +209,10 @@ public class MCRJobQueueResource {
         @XmlElement(name = "parameter")
         List<Parameter> parameters;
 
-        public Job() {
+        Job() {
         }
 
-        public Job(MCRJob job) {
+        Job(MCRJob job) {
             this.id = job.getId();
             this.status = job.getStatus().toString().toLowerCase(Locale.ROOT);
 

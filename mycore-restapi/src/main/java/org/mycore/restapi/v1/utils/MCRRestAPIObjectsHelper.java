@@ -322,9 +322,7 @@ public class MCRRestAPIObjectsHelper {
 
         //analyze format
 
-        if (format.equals(MCRRestAPIObjects.FORMAT_JSON) || format.equals(MCRRestAPIObjects.FORMAT_XML)) {
-            //ok
-        } else {
+        if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
             errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The parameter 'format' is wrong.",
                 "Allowed values for format are 'json' or 'xml'."));
         }
@@ -530,9 +528,7 @@ public class MCRRestAPIObjectsHelper {
 
         //analyze format
 
-        if (format.equals(MCRRestAPIObjects.FORMAT_JSON) || format.equals(MCRRestAPIObjects.FORMAT_XML)) {
-            //ok
-        } else {
+        if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
             errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The Parameter format is wrong.",
                 "Allowed values for format are 'json' or 'xml'."));
         }

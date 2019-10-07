@@ -103,8 +103,8 @@ public class MCRCrossrefClient {
             .build();
         postRequest.setEntity(reqEntity);
 
-        try (final CloseableHttpClient client = getHttpClient()) {
-            try (final CloseableHttpResponse response = client.execute(postRequest)) {
+        try (CloseableHttpClient client = getHttpClient()) {
+            try (CloseableHttpResponse response = client.execute(postRequest)) {
                 final int statusCode = response.getStatusLine().getStatusCode();
                 final HttpEntity entity = response.getEntity();
                 String message = "";

@@ -75,14 +75,14 @@ public final class MCRConfigurationBase {
      *
      * @see System#currentTimeMillis()
      */
-    public static final long getSystemLastModified() {
+    public static long getSystemLastModified() {
         return lastModifiedFile.lastModified();
     }
 
     /**
      * signalize that the system state has changed. Call this method when ever you changed the persistency layer.
      */
-    public static final void systemModified() {
+    public static void systemModified() {
         if (!lastModifiedFile.exists()) {
             try {
                 createLastModifiedFile();

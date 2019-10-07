@@ -91,7 +91,7 @@ public final class MCRObject extends MCRBase {
      * 
      * @return the instance of the MCRObjectMetadata class
      */
-    public final MCRObjectMetadata getMetadata() {
+    public MCRObjectMetadata getMetadata() {
         return mcr_metadata;
     }
 
@@ -101,7 +101,7 @@ public final class MCRObject extends MCRBase {
      * 
      * @return the instance of the MCRObjectStructure class
      */
-    public final MCRObjectStructure getStructure() {
+    public MCRObjectStructure getStructure() {
         return mcr_struct;
     }
 
@@ -114,7 +114,7 @@ public final class MCRObject extends MCRBase {
      *                general Exception of MyCoRe
      */
     @Override
-    protected final void setUp() throws MCRException {
+    protected void setUp() throws MCRException {
         super.setUp();
 
         // get the structure data of the object
@@ -139,7 +139,7 @@ public final class MCRObject extends MCRBase {
      * @return a JDOM Document with the XML data of the object as byte array
      */
     @Override
-    public final Document createXML() throws MCRException {
+    public Document createXML() throws MCRException {
         try {
             Document doc = super.createXML();
             Element elm = doc.getRootElement();
@@ -183,7 +183,7 @@ public final class MCRObject extends MCRBase {
     /**
      * The method print all informations about this MCRObject.
      */
-    public final void debug() {
+    public void debug() {
         if (LOGGER.isDebugEnabled()) {
             if (mcr_id == null) {
                 LOGGER.debug("MCRObject ID : missing");

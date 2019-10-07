@@ -54,7 +54,7 @@ public class MCRIgnoreClientAbortInterceptor implements WriterInterceptor {
     }
 
     private static class ClientAbortExceptionOutputStream extends ProxyOutputStream {
-        public ClientAbortExceptionOutputStream(OutputStream out) {
+        ClientAbortExceptionOutputStream(OutputStream out) {
             super(out);
         }
 
@@ -66,7 +66,7 @@ public class MCRIgnoreClientAbortInterceptor implements WriterInterceptor {
 
     @SuppressWarnings("serial")
     private static class ClientAbortException extends IOException {
-        public ClientAbortException(IOException e) {
+        ClientAbortException(IOException e) {
             super(e);
         }
     }

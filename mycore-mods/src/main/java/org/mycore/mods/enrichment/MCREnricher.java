@@ -88,7 +88,7 @@ class MCREnricher {
 
     MCRIdentifierPool idPool;
 
-    Map<String, MCRDataSourceCall> id2call = new HashMap<String, MCRDataSourceCall>();
+    Map<String, MCRDataSourceCall> id2call = new HashMap<>();
 
     MCREnricher(String configID) {
         xPath2FindNestedObjects = XPathFactory.instance().compile(XPATH_HOST_SERIES, Filters.element(), null,

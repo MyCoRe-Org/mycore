@@ -30,7 +30,7 @@ class MCRCategoryChildList extends ArrayList<MCRCategory> {
 
     private MCRCategory thisCategory;
 
-    public MCRCategoryChildList(MCRCategory root, MCRCategory thisCategory) {
+    MCRCategoryChildList(MCRCategory root, MCRCategory thisCategory) {
         super();
         this.root = root;
         this.thisCategory = thisCategory;

@@ -92,7 +92,7 @@ class MCREventHandler {
 
         private final Function<URI, URI> uriResolver;
 
-        public MCRObjectHandler(SseBroadcaster sseBroadcaster, Sse sse,
+        MCRObjectHandler(SseBroadcaster sseBroadcaster, Sse sse,
             Function<URI, URI> uriResolver) {
             this.sseBroadcaster = sseBroadcaster;
             this.sse = sse;
@@ -173,8 +173,7 @@ class MCREventHandler {
 
         private final Function<URI, URI> uriResolver;
 
-        public MCRDerivateHandler(SseBroadcaster sseBroadcaster, Sse sse,
-            Function<URI, URI> uriResolver) {
+        MCRDerivateHandler(SseBroadcaster sseBroadcaster, Sse sse, Function<URI, URI> uriResolver) {
             this.sseBroadcaster = sseBroadcaster;
             this.sse = sse;
             this.uriResolver = uriResolver;
@@ -233,8 +232,7 @@ class MCREventHandler {
 
         private final Function<URI, URI> uriResolver;
 
-        public MCRPathHandler(SseBroadcaster sseBroadcaster, Sse sse,
-            Function<URI, URI> uriResolver, ServletContext context) {
+        MCRPathHandler(SseBroadcaster sseBroadcaster, Sse sse, Function<URI, URI> uriResolver, ServletContext context) {
             this.sseBroadcaster = sseBroadcaster;
             this.sse = sse;
             this.context = context;

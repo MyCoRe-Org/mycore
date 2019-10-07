@@ -245,7 +245,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      *
      * @return the string of the project id
      */
-    public final String getProjectId() {
+    public String getProjectId() {
         return projectId;
     }
 
@@ -255,7 +255,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      *
      * @return the string of the type id
      */
-    public final String getTypeId() {
+    public String getTypeId() {
         return objectType;
     }
 
@@ -265,7 +265,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      *
      * @return the string of the number
      */
-    public final String getNumberAsString() {
+    public String getNumberAsString() {
         return idFormat.numberFormat().format(numberPart);
     }
 
@@ -275,7 +275,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      *
      * @return the number as integer
      */
-    public final int getNumberAsInteger() {
+    public int getNumberAsInteger() {
         return numberPart;
     }
 

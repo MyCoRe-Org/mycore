@@ -125,7 +125,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaAddress part
      */
     @Override
-    public final org.jdom2.Element createXML() throws MCRException {
+    public org.jdom2.Element createXML() throws MCRException {
         final Element elm = super.createXML();
         if (getCountry() != null) {
             elm.addContent(new Element("country").addContent(getCountry()));
@@ -193,7 +193,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     @Override
-    public final void debug() {
+    public void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Country            = {}", country);
@@ -306,7 +306,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public final void setFromDOM(final org.jdom2.Element element) {
+    public void setFromDOM(final org.jdom2.Element element) {
         super.setFromDOM(element);
         country = element.getChildTextTrim("country");
         state = element.getChildTextTrim("state");

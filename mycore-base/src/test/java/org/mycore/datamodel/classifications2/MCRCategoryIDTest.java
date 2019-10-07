@@ -57,25 +57,21 @@ public class MCRCategoryIDTest extends MCRTestCase {
 
     @Test(expected = MCRException.class)
     public void testInvalidRootID() {
-        @SuppressWarnings("unused")
-        MCRCategoryID categID = new MCRCategoryID(invalidID, validCategID);
+        new MCRCategoryID(invalidID, validCategID);
     }
 
     @Test(expected = MCRException.class)
     public void testInvalidCategID() {
-        @SuppressWarnings("unused")
-        MCRCategoryID categID = new MCRCategoryID(validRootID, invalidID);
+        new MCRCategoryID(validRootID, invalidID);
     }
 
     @Test(expected = MCRException.class)
     public void testLongCategID() {
-        @SuppressWarnings("unused")
-        MCRCategoryID categID = new MCRCategoryID(validRootID, toLongCategID);
+        new MCRCategoryID(validRootID, toLongCategID);
     }
 
     @Test(expected = MCRException.class)
     public void testLongRootID() {
-        @SuppressWarnings("unused")
-        MCRCategoryID categID = new MCRCategoryID(toLongRootID, validCategID);
+        new MCRCategoryID(toLongRootID, validCategID);
     }
 }

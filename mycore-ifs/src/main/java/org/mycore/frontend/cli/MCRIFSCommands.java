@@ -217,7 +217,7 @@ public class MCRIFSCommands {
 
         @Override
         public Iterator<File> iterator() {
-            return new Iterator<File>() {
+            return new Iterator<>() {
                 File currentDir = baseDir;
 
                 LinkedList<File> files = getInitialList(currentDir);
@@ -874,7 +874,7 @@ public class MCRIFSCommands {
                 .filter(f -> MCRObjectID.isValid(f.getOwner()))
                 .map(f -> {
                     try {
-                        return new AbstractMap.SimpleEntry<String, org.mycore.datamodel.ifs2.MCRFile>(f.getMd5(),
+                        return new AbstractMap.SimpleEntry<>(f.getMd5(),
                             toFile(storeIFS2, f));
                     } catch (IOException e) {
                         LOGGER.error("Could not get information from ifs node {}", f.getStorageid(), e);
@@ -924,7 +924,7 @@ public class MCRIFSCommands {
                 .filter(f -> MCRObjectID.isValid(f.getOwner()))
                 .map(f -> {
                     try {
-                        return new AbstractMap.SimpleEntry<String, org.mycore.datamodel.ifs2.MCRFile>(f.getMd5(),
+                        return new AbstractMap.SimpleEntry<>(f.getMd5(),
                             toFile(storeIFS2, f));
                     } catch (IOException e) {
                         LOGGER.error("Could not get information from ifs node {}", f.getStorageid(), e);

@@ -278,7 +278,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
         private String leadingZeros;
 
-        public GranularURNGenerator(int seed, MCRDNBURN derivURN, String setID) {
+        GranularURNGenerator(int seed, MCRDNBURN derivURN, String setID) {
             this.counter = seed;
             this.urn = derivURN;
             this.setID = setID;

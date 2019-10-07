@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import javax.activation.MimetypesFileTypeMap;
+import javax.activation.FileTypeMap;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -132,7 +132,7 @@ public class MCRIView2Tools {
      * @return true if the file is supported, false otherwise
      */
     public static boolean isFileSupported(String filename) {
-        return SUPPORTED_CONTENT_TYPE.contains(MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(
+        return SUPPORTED_CONTENT_TYPE.contains(FileTypeMap.getDefaultFileTypeMap().getContentType(
             filename.toLowerCase(Locale.ROOT)));
     }
 

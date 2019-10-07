@@ -28,7 +28,7 @@ final class MCRSimpleAbstractCategoryImpl extends MCRAbstractCategoryImpl {
         labels = new HashSet<>();
     }
 
-    public MCRSimpleAbstractCategoryImpl() {
+    MCRSimpleAbstractCategoryImpl() {
         super();
     }
 

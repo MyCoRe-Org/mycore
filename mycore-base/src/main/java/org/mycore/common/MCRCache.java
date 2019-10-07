@@ -59,7 +59,7 @@ public class MCRCache<K, V> {
     }
 
     private static class MCRCacheEntry<V> {
-        public MCRCacheEntry(V value) {
+        MCRCacheEntry(V value) {
             this.value = value;
             this.insertTime = System.currentTimeMillis();
         }

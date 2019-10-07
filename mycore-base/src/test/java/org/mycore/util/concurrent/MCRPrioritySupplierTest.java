@@ -75,7 +75,7 @@ public class MCRPrioritySupplierTest {
     private static class Task implements Supplier<Integer> {
         private int id;
 
-        public Task(Integer id) {
+        Task(Integer id) {
             this.id = id;
         }
 

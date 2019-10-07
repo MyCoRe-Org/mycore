@@ -49,7 +49,7 @@ public class MCRStoreManagerTest {
 
         private final Path baseDir;
 
-        public StoreConfig() throws IOException {
+        StoreConfig() throws IOException {
             String fsName = MCRStoreManagerTest.class.getSimpleName();
             URI jimfsURI = URI.create("jimfs://" + fsName);
             FileSystem fileSystem = Jimfs.newFileSystem(fsName, Configuration.unix());

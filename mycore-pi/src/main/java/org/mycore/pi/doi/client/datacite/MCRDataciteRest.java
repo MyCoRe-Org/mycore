@@ -68,7 +68,7 @@ public class MCRDataciteRest {
     }
 
     public static void main(String[] args) throws MCRIdentifierUnresolvableException {
-        MCRDataciteRestResponse mcrdoiRestResponse = get(new MCRDOIParser().parse("10.1000/1").get());
+        get(new MCRDOIParser().parse("10.1000/1").get());
     }
 
 }

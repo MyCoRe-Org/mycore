@@ -305,7 +305,7 @@ public class MCRCrypt {
             0x08000000, 0x08200020, 0x00008000, 0x00208020 } };
 
     private static int byteToUnsigned(byte b) {
-        return b >= 0 ? (int) b : (int) b + 256;
+        return b >= 0 ? (int) b : b + 256;
     }
 
     private static int fourBytesToInt(byte[] b, int offset) {

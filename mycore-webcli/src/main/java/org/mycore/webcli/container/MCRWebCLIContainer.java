@@ -528,7 +528,7 @@ public class MCRWebCLIContainer {
             if (this.publisher != null && !this.publisher.isClosed()) {
                 stop();
             }
-            this.publisher = new SubmissionPublisher<LogEvent>(ForkJoinPool.commonPool(), MAX_BUFFER);
+            this.publisher = new SubmissionPublisher<>(ForkJoinPool.commonPool(), MAX_BUFFER);
             if (subscribers != null) {
                 subscribers.stream().forEach(publisher::subscribe);
             }

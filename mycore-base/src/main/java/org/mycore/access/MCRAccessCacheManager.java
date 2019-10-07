@@ -73,7 +73,7 @@ class MCRAccessCacheManager implements MCRSessionListener {
         return new MCRCache<>(CAPACITY, "Access rights in MCRSession " + session.getID());
     }
 
-    public MCRAccessCacheManager() {
+    MCRAccessCacheManager() {
         //init for current user done
         MCRSessionMgr.addSessionListener(this);
     }

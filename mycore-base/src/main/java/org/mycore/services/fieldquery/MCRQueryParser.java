@@ -191,13 +191,14 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
             sc = sc instanceof MCRAndCondition ? new MCRAndCondition<>() : new MCROrCondition<>();
             for (MCRCondition<Void> child : children) {
                 child = normalizeCondition(child);
-                if (child == null) {
-                } else if (child instanceof MCRSetCondition
-                    && sc.getOperator().equals(((MCRSetCondition) child).getOperator())) {
-                    // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
-                    sc.addAll(((MCRSetCondition<Void>) child).getChildren());
-                } else {
-                    sc.addChild(child);
+                if (child != null) {
+                    if (child instanceof MCRSetCondition
+                        && sc.getOperator().equals(((MCRSetCondition) child).getOperator())) {
+                        // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
+                        sc.addAll(((MCRSetCondition<Void>) child).getChildren());
+                    } else {
+                        sc.addChild(child);
+                    }
                 }
             }
             children = sc.getChildren();

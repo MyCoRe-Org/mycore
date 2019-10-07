@@ -78,7 +78,6 @@ public class MCRCORSFilter implements Filter {
         throws IOException, ServletException {
         // check if the request is a http request
         if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
-            HttpServletRequest req = (HttpServletRequest) servletRequest;
             HttpServletResponse resp = (HttpServletResponse) servletResponse;
             resp.setHeader("Access-Control-Allow-Origin", this.allowOriginValue);
         }

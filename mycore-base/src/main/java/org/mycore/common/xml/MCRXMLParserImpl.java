@@ -124,7 +124,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
 
         private static URI baseDirURI = Paths.get("").toAbsolutePath().toUri();
 
-        public XercesBugFixResolver(EntityResolver2 fallback) {
+        XercesBugFixResolver(EntityResolver2 fallback) {
             this.fallback = fallback;
         }
 

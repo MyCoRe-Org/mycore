@@ -115,7 +115,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
         JDOMException {
         final Iterator<Element> delegate;
         delegate = result.asXML().getRootElement().getChildren("doc").iterator();
-        return new Iterator<SolrInputDocument>() {
+        return new Iterator<>() {
 
             @Override
             public boolean hasNext() {

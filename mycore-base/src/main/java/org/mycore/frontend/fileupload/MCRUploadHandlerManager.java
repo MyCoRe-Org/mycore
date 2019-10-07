@@ -96,7 +96,7 @@ public class MCRUploadHandlerManager {
         /** The MCRUploadHander instance to be used */
         private MCRUploadHandler handler;
 
-        public MCRUploadHandlerCacheEntry(String sessionID, MCRUploadHandler handler) {
+        MCRUploadHandlerCacheEntry(String sessionID, MCRUploadHandler handler) {
             this.sessionID = sessionID;
             this.handler = handler;
         }

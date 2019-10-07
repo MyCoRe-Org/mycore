@@ -111,7 +111,7 @@ public class MCRLayoutUtilities {
 
         long lastModified;
 
-        public DocumentHolder(URL url) throws JDOMException, IOException {
+        DocumentHolder(URL url) throws JDOMException, IOException {
             docURL = url;
             parseDocument();
         }

@@ -361,7 +361,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
         private MCRXSLTransformer instance;
 
-        public MCRTransformedContent(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
+        MCRTransformedContent(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
             long transformerLastModified, MCRParameterCollector parameter, String fileName, String mimeType,
             String encoding, MCRXSLTransformer instance) throws IOException {
             this.source = source;

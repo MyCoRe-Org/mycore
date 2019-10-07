@@ -47,7 +47,7 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
 
     private java.util.Set<String> idsInSet;
 
-    public MCROAIQuerySetResolver(String query) {
+    MCROAIQuerySetResolver(String query) {
         super();
         this.query = query;
     }

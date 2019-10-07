@@ -157,13 +157,12 @@ public class MCRSwordUtil {
             throw new MCRException("Could not create temp file!", e);
         }
 
-        try (final OutputStream tempFileStream = Files.newOutputStream(tempFile)) {
-            final ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(tempFileStream);
+        try (OutputStream tempFileStream = Files.newOutputStream(tempFile);
+            ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(tempFileStream)) {
             zipOutputStream.setLevel(Deflater.BEST_COMPRESSION);
 
             final MCRPath root = MCRPath.getPath(object, "/");
             addDirectoryToZip(zipOutputStream, root);
-            zipOutputStream.close();
         } catch (IOException e) {
             throw new MCRException(e);
         }

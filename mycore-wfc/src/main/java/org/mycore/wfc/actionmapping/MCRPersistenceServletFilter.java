@@ -89,7 +89,6 @@ public class MCRPersistenceServletFilter implements Filter {
     private String getURL(HttpServletRequest req) {
         String servletPath = req.getServletPath();
         String[] pathElements = servletPath.split("/");
-        String type = pathElements[2];
         String operation = pathElements[3];
         //get session for DB access
         MCRSession session = MCRServlet.getSession(req);

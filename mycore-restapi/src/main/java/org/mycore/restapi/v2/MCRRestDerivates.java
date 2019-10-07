@@ -134,7 +134,7 @@ public class MCRRestDerivates {
         }
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrId);
         List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
-        GenericEntity<List<MCRMetaEnrichedLinkID>> entity = new GenericEntity<List<MCRMetaEnrichedLinkID>>(derivates) {
+        GenericEntity<List<MCRMetaEnrichedLinkID>> entity = new GenericEntity<>(derivates) {
         };
         return Response.ok()
             .entity(entity,
