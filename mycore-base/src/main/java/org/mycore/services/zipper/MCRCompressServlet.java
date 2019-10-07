@@ -263,7 +263,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
 
         private T container;
 
-        public CompressVisitor(MCRCompressServlet<T> impl, T container) {
+        CompressVisitor(MCRCompressServlet<T> impl, T container) {
             this.impl = impl;
             this.container = container;
         }

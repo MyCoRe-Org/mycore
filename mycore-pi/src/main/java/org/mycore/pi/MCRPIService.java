@@ -323,7 +323,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
         // There are many querys that require the current database state.
         // So we start a new transaction within the synchronized block
-        final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<T>(() -> {
+        final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<>(() -> {
             this.validateRegistration(obj, additional);
             final T identifier = getNewIdentifier(obj, additional);
             this.registerIdentifier(obj, additional, identifier);

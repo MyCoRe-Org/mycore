@@ -66,7 +66,7 @@ public class MCRSessionMgr {
 
     private static ThreadLocal<Boolean> isSessionAttached = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
-    private static ThreadLocal<Boolean> isSessionCreationLocked = new ThreadLocal<Boolean>() {
+    private static ThreadLocal<Boolean> isSessionCreationLocked = new ThreadLocal<>() {
         @Override
         protected Boolean initialValue() {
             return Boolean.TRUE;

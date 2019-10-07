@@ -28,7 +28,7 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
 
-    public MCRBasicFileAttributeViewImpl() {
+    MCRBasicFileAttributeViewImpl() {
         super();
     }
 

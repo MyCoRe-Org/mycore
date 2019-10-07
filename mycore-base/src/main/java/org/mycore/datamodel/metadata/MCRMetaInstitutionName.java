@@ -92,7 +92,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      * @param set_property
      *            the property title
      */
-    public final void set(String set_fullname, String set_nickname, String set_property) {
+    public void set(String set_fullname, String set_nickname, String set_property) {
         if (set_fullname == null || set_nickname == null || set_property == null) {
             throw new MCRException("One parameter is null.");
         }
@@ -107,7 +107,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      * 
      * @return the fullname
      */
-    public final String getFullName() {
+    public String getFullName() {
         return fullname;
     }
 
@@ -116,7 +116,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      * 
      * @return the nickname
      */
-    public final String getNickname() {
+    public String getNickname() {
         return nickname;
     }
 
@@ -125,7 +125,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      * 
      * @return the property
      */
-    public final String getProperty() {
+    public String getProperty() {
         return property;
     }
 
@@ -137,7 +137,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      *            a relevant DOM element for the metadata
      */
     @Override
-    public final void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         fullname = element.getChildTextTrim("fullname");
 
@@ -167,7 +167,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaInstitutionName part
      */
     @Override
-    public final org.jdom2.Element createXML() throws MCRException {
+    public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         elm.addContent(new org.jdom2.Element("fullname").addContent(fullname));
 

@@ -482,7 +482,7 @@ public final class MCRURIResolver implements URIResolver {
 
         private org.apache.logging.log4j.Logger logger;
 
-        public MCRRESTResolver() {
+        MCRRESTResolver() {
             CacheConfig cacheConfig = CacheConfig.custom()
                 .setMaxObjectSize(MAX_OBJECT_SIZE)
                 .setMaxCacheEntries(MAX_CACHE_ENTRIES)
@@ -935,7 +935,7 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
-        public MCRClassificationResolver() {
+        MCRClassificationResolver() {
         }
 
         /**

@@ -75,7 +75,7 @@ public class MCRPropertiesResolver extends MCRTextResolver {
         registerTerm(Property.class);
     }
 
-    private static class Property extends Variable {
+    public static class Property extends Variable {
         public Property(MCRTextResolver textResolver) {
             super(textResolver);
         }

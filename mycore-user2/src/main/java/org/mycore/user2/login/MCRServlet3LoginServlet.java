@@ -127,7 +127,7 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
 
         private String realm;
 
-        public Servlet3ContainerUserInformation(MCRSession session, String realm) {
+        Servlet3ContainerUserInformation(MCRSession session, String realm) {
             super(session);
             this.realm = realm;
         }

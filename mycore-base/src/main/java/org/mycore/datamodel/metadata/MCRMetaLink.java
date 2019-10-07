@@ -380,7 +380,7 @@ public class MCRMetaLink extends MCRMetaDefault {
             obj.addProperty("label", label);
         }
         if (role != null) {
-
+            obj.addProperty("role", role);
         }
         if (linktype.equals("locator")) {
             obj.addProperty("href", href);

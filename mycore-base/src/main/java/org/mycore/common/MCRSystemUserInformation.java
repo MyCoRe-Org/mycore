@@ -102,7 +102,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
 
         private String property;
 
-        public UserIdResolver(String userId, String property) {
+        UserIdResolver(String userId, String property) {
             this.userId = userId;
             this.property = property;
         }

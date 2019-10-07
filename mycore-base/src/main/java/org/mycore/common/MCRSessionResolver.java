@@ -48,7 +48,7 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
         this(session.getID());
     }
 
-    public final String getSessionID() {
+    public String getSessionID() {
         return sessionID;
     }
 
@@ -57,7 +57,7 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
      *
      * @return if is already closed it will return a {@link Optional#empty()}
      */
-    public final Optional<MCRSession> resolveSession() {
+    public Optional<MCRSession> resolveSession() {
         return Optional.ofNullable(MCRSessionMgr.getSession(sessionID));
     }
 

@@ -199,7 +199,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     }
 
     private static class XMLInfo {
-        public XMLInfo(String id, byte[] blob, Date lastModified) {
+        XMLInfo(String id, byte[] blob, Date lastModified) {
             this.id = MCRObjectID.getInstance(id);
             this.blob = blob;
             this.lastModified = lastModified;

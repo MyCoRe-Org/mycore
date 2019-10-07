@@ -42,7 +42,7 @@ class MCRIdentifierTypeFactory {
 
     private static MCRIdentifierTypeFactory INSTANCE = new MCRIdentifierTypeFactory();
 
-    private Map<String, MCRIdentifierType> id2type = new HashMap<String, MCRIdentifierType>();
+    private Map<String, MCRIdentifierType> id2type = new HashMap<>();
 
     static MCRIdentifierTypeFactory instance() {
         return INSTANCE;

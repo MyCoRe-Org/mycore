@@ -79,7 +79,7 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
     }
 
     private Set<MCRUser> getUsersForGivenNameIdentifiers(Set<String> nameIdentifierKeys) {
-        Set<MCRUser> users = new HashSet<MCRUser>();
+        Set<MCRUser> users = new HashSet<>();
         for (String key : nameIdentifierKeys) {
             String name = MCRORCIDUser.ATTR_ID_PREFIX + key.split(":")[0];
             String value = key.split(":")[1];

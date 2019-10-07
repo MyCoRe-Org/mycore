@@ -81,7 +81,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * 
      * @return the sourcepath
      */
-    public final String getSourcePath() {
+    public String getSourcePath() {
         return sourcepath;
     }
 
@@ -90,7 +90,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * 
      * @return the main document name.
      */
-    public final String getMainDoc() {
+    public String getMainDoc() {
         return maindoc;
     }
 
@@ -99,7 +99,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * 
      * @return the IFS ID.
      */
-    public final String getIFSID() {
+    public String getIFSID() {
         return ifsid;
     }
 
@@ -109,7 +109,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * @param set_sourcepath
      *            the derivate source path
      */
-    public final void setSourcePath(String set_sourcepath) {
+    public void setSourcePath(String set_sourcepath) {
         sourcepath = set_sourcepath;
     }
 
@@ -119,7 +119,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * @param set_maindoc
      *            the derivate main document name
      */
-    public final void setMainDoc(String set_maindoc) {
+    public void setMainDoc(String set_maindoc) {
         if (set_maindoc == null) {
             maindoc = "";
         } else {
@@ -133,7 +133,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * @param set_ifsid
      *            the derivate IFS ID
      */
-    public final void setIFSID(String set_ifsid) {
+    public void setIFSID(String set_ifsid) {
         if (set_ifsid == null) {
             ifsid = "";
         } else {
@@ -151,7 +151,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      *                if the set_sourcepath value is null or empty
      */
     @Override
-    public final void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public void setFromDOM(org.jdom2.Element element) throws MCRException {
         super.setFromDOM(element);
         setSourcePath(element.getAttributeValue("sourcepath"));
         setMainDoc(element.getAttributeValue("maindoc"));
@@ -167,7 +167,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRClassification part
      */
     @Override
-    public final Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
         if (sourcepath != null) {
             elm.setAttribute("sourcepath", sourcepath);
@@ -221,7 +221,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
     }
 
     @Override
-    public final MCRMetaIFS clone() {
+    public MCRMetaIFS clone() {
         MCRMetaIFS clone = (MCRMetaIFS) super.clone();
 
         clone.maindoc = this.maindoc;

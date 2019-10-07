@@ -370,9 +370,9 @@ public class MCRCalendar {
             GregorianCalendar calendar = new GregorianCalendar();
             calendar.set(fields[0], fields[1], fields[2]);
             if (fields[3] == -1) {
-                calendar.set(GregorianCalendar.ERA, GregorianCalendar.BC);
+                calendar.set(Calendar.ERA, GregorianCalendar.BC);
             } else {
-                calendar.set(GregorianCalendar.ERA, GregorianCalendar.AD);
+                calendar.set(Calendar.ERA, GregorianCalendar.AD);
             }
             return calendar;
         } catch (Exception e) {
@@ -966,7 +966,7 @@ public class MCRCalendar {
             JapaneseCalendar jcal = new JapaneseCalendar();
             // GregorianCalendar jcal = new GregorianCalendar();
             jcal.set(year, mon, day);
-            jcal.set(JapaneseCalendar.ERA, era);
+            jcal.set(Calendar.ERA, era);
             jcal.add(Calendar.DATE, 0); // Calendar correction
             GregorianCalendar xcal = new GregorianCalendar();
             xcal.setTime(jcal.getTime());

@@ -111,14 +111,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the first name
      */
-    public final String getFirstName() {
+    public String getFirstName() {
         return firstname;
     }
 
     /**
      * This method set the first name text element.
      */
-    public final void setFirstName(String set_firstname) {
+    public void setFirstName(String set_firstname) {
         if (set_firstname != null) {
             firstname = set_firstname.trim();
         } else {
@@ -131,14 +131,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the call name
      */
-    public final String getCallName() {
+    public String getCallName() {
         return callname;
     }
 
     /**
      * This method set the call name text element.
      */
-    public final void setCallName(String set_callname) {
+    public void setCallName(String set_callname) {
         if (set_callname != null) {
             callname = set_callname.trim();
         } else {
@@ -151,14 +151,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the surname
      */
-    public final String getSurName() {
+    public String getSurName() {
         return surname;
     }
 
     /**
      * This method set the surname text element.
      */
-    public final void setSurName(String set_surname) {
+    public void setSurName(String set_surname) {
         if (set_surname != null) {
             surname = set_surname.trim();
         } else {
@@ -171,14 +171,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the full name
      */
-    public final String getFullName() {
+    public String getFullName() {
         return fullname;
     }
 
     /**
      * This method set the full name text element.
      */
-    public final void setFullName(String set_fullname) {
+    public void setFullName(String set_fullname) {
         if (set_fullname != null) {
             fullname = set_fullname.trim();
         } else {
@@ -191,14 +191,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the academic
      */
-    public final String getAcademic() {
+    public String getAcademic() {
         return academic;
     }
 
     /**
      * This method set the academic text element.
      */
-    public final void setAcademic(String set_academic) {
+    public void setAcademic(String set_academic) {
         if (set_academic != null) {
             academic = set_academic.trim();
         } else {
@@ -211,14 +211,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the peerage
      */
-    public final String getPeerage() {
+    public String getPeerage() {
         return peerage;
     }
 
     /**
      * This method set the peerage text element.
      */
-    public final void setPeerage(String set_peerage) {
+    public void setPeerage(String set_peerage) {
         if (set_peerage != null) {
             peerage = set_peerage.trim();
         } else {
@@ -231,14 +231,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the numeration
      */
-    public final String getNumeration() {
+    public String getNumeration() {
         return numeration;
     }
 
     /**
      * This method set the numeration text element.
      */
-    public final void setNumeration(String set_numeration) {
+    public void setNumeration(String set_numeration) {
         if (set_numeration != null) {
             numeration = set_numeration.trim();
         } else {
@@ -251,14 +251,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the title
      */
-    public final String getTitle() {
+    public String getTitle() {
         return title;
     }
 
     /**
      * This method set the title text element.
      */
-    public final void setTitle(String set_title) {
+    public void setTitle(String set_title) {
         if (set_title != null) {
             title = set_title.trim();
         } else {
@@ -271,14 +271,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the prefix
      */
-    public final String getPrefix() {
+    public String getPrefix() {
         return prefix;
     }
 
     /**
      * This method set the prefix text element.
      */
-    public final void setPrefix(String set_prefix) {
+    public void setPrefix(String set_prefix) {
         if (set_prefix != null) {
             prefix = set_prefix.trim();
         } else {
@@ -291,14 +291,14 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * 
      * @return the affix
      */
-    public final String getAffix() {
+    public String getAffix() {
         return affix;
     }
 
     /**
      * This method set the affix text element.
      */
-    public final void setAffix(String set_affix) {
+    public void setAffix(String set_affix) {
         if (set_affix != null) {
             affix = set_affix.trim();
         } else {
@@ -314,7 +314,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public final void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(org.jdom2.Element element) {
         super.setFromDOM(element);
         setFirstName(element.getChildTextTrim("firstname"));
         setCallName(element.getChildTextTrim("callname"));
@@ -337,7 +337,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaPersonName part
      */
     @Override
-    public final org.jdom2.Element createXML() throws MCRException {
+    public org.jdom2.Element createXML() throws MCRException {
         Element elm = super.createXML();
         if ((firstname = firstname.trim()).length() != 0) {
             elm.addContent(new org.jdom2.Element("firstname").addContent(firstname));
@@ -421,7 +421,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * @see java.lang.Object#clone()
      */
     @Override
-    public final MCRMetaPersonName clone() {
+    public MCRMetaPersonName clone() {
         MCRMetaPersonName clone = (MCRMetaPersonName) super.clone();
 
         clone.firstname = this.firstname;
@@ -442,7 +442,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     @Override
-    public final void debug() {
+    public void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("First name         = {}", firstname);

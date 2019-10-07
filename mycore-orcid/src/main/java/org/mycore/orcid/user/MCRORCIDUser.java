@@ -118,7 +118,7 @@ public class MCRORCIDUser {
     }
 
     private Set<String> getUserIdentifierKeys() {
-        Set<String> identifierKeys = new HashSet<String>();
+        Set<String> identifierKeys = new HashSet<>();
         for (String attribute : user.getAttributes().keySet()) {
             if (attribute.startsWith("id_")) {
                 String idType = attribute.substring(3);
@@ -131,7 +131,7 @@ public class MCRORCIDUser {
     }
 
     public static Set<String> getNameIdentifierKeys(MCRMODSWrapper wrapper) {
-        Set<String> identifierKeys = new HashSet<String>();
+        Set<String> identifierKeys = new HashSet<>();
 
         List<Element> nameIdentifiers = wrapper.getElements("mods:name/mods:nameIdentifier");
         for (Element nameIdentifier : nameIdentifiers) {

@@ -73,7 +73,7 @@ public class MCRClass {
 
     public List<MCRLabel> getLabel() {
         if (label == null) {
-            label = new ArrayList<MCRLabel>();
+            label = new ArrayList<>();
         }
         return this.label;
     }

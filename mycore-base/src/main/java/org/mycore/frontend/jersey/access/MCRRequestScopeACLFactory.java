@@ -40,7 +40,7 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
 
         private boolean isPrivate;
 
-        public MCRRequestScopeACLImpl() {
+        MCRRequestScopeACLImpl() {
             LogManager.getLogger().debug("Constructor called");
             this.isPrivate = false;
         }

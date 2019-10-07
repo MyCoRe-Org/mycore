@@ -117,7 +117,7 @@ public class MCRDataciteClient {
         statusStringBuilder.append(statusLine.getStatusCode()).append(" - ").append(statusLine.getReasonPhrase())
             .append(" - ");
 
-        try (final Scanner scanner = new Scanner(resp.getEntity().getContent(), "UTF-8")) {
+        try (Scanner scanner = new Scanner(resp.getEntity().getContent(), "UTF-8")) {
             while (scanner.hasNextLine()) {
                 statusStringBuilder.append(scanner.nextLine());
             }
@@ -138,7 +138,7 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    try (final Scanner scanner = new Scanner(response.getEntity().getContent(), "UTF-8")) {
+                    try (Scanner scanner = new Scanner(response.getEntity().getContent(), "UTF-8")) {
                         while (scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             String[] parts = line.split("=", 2);
@@ -246,7 +246,7 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    try (final Scanner scanner = new Scanner(entity.getContent(), "UTF-8")) {
+                    try (Scanner scanner = new Scanner(entity.getContent(), "UTF-8")) {
                         List<MCRDigitalObjectIdentifier> doiList = new ArrayList<>();
                         while (scanner.hasNextLine()) {
                             String line = scanner.nextLine();
@@ -279,7 +279,7 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    try (final Scanner scanner = new Scanner(entity.getContent(), "UTF-8")) {
+                    try (Scanner scanner = new Scanner(entity.getContent(), "UTF-8")) {
                         String uriString = scanner.nextLine();
                         return new URI(uriString);
                     }

@@ -18,7 +18,6 @@
 
 package org.mycore.iview2.frontend;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
@@ -276,14 +275,12 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             }
             try {
                 ImageReader imageReader = MCRIView2Tools.getTileImageReader();
-                @SuppressWarnings("unused")
-                BufferedImage thumbnail = MCRIView2Tools.getZoomLevel(iviewFileRoot, props, imageReader, 0);
+                MCRIView2Tools.getZoomLevel(iviewFileRoot, props, imageReader, 0);
                 int maxX = (int) Math.ceil((double) props.getWidth() / MCRImage.getTileSize());
                 int maxY = (int) Math.ceil((double) props.getHeight() / MCRImage.getTileSize());
                 LOGGER.debug("Image size:{}x{}, tiles:{}x{}", props.getWidth(), props.getHeight(), maxX, maxY);
                 try {
-                    @SuppressWarnings("unused")
-                    BufferedImage sampleTile = MCRIView2Tools.readTile(iviewFileRoot, imageReader,
+                    MCRIView2Tools.readTile(iviewFileRoot, imageReader,
                         props.getZoomlevel(), maxX - 1, 0);
                 } finally {
                     imageReader.dispose();
@@ -441,7 +438,7 @@ public class MCRIView2Commands extends MCRAbstractCommands {
 
     private static List<MCRPath> getSupportedFiles(MCRPath rootNode) throws IOException {
         final ArrayList<MCRPath> files = new ArrayList<>();
-        SimpleFileVisitor<Path> test = new SimpleFileVisitor<Path>() {
+        SimpleFileVisitor<Path> test = new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 Objects.requireNonNull(file);

@@ -39,7 +39,6 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.condition.MCRPIObjectRegistrationConditionProvider;
-import org.mycore.pi.doi.MCRDOIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
@@ -326,10 +325,10 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     protected Predicate<MCRBase> getRegistrationCondition(String objectType) {
-        return Optional.ofNullable(getProperties().get(MCRDOIService.REGISTRATION_CONDITION_PROVIDER))
+        return Optional.ofNullable(getProperties().get(MCRPIJobService.REGISTRATION_CONDITION_PROVIDER))
             .map(clazz -> {
                 String errorMessageBegin = "Configured class " + clazz + "(" + MCRPIService.REGISTRATION_CONFIG_PREFIX
-                    + getServiceID() + "." + MCRDOIService.REGISTRATION_CONDITION_PROVIDER
+                    + getServiceID() + "." + MCRPIJobService.REGISTRATION_CONDITION_PROVIDER
                     + ")";
                 try {
                     return MCRClassTools.forName(clazz)

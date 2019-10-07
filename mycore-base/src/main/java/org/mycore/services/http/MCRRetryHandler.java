@@ -35,7 +35,7 @@ import org.apache.http.protocol.HttpContext;
 class MCRRetryHandler implements HttpRequestRetryHandler {
     int maxExecutionCount;
 
-    public MCRRetryHandler(int maxExecutionCount) {
+    MCRRetryHandler(int maxExecutionCount) {
         super();
         this.maxExecutionCount = maxExecutionCount;
     }

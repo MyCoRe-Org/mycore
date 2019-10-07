@@ -28,7 +28,7 @@ class MCRPermissionHandle {
 
     private String permission;
 
-    public MCRPermissionHandle(String id, String permission) {
+    MCRPermissionHandle(String id, String permission) {
         this.id = id;
         this.permission = permission.intern();
     }

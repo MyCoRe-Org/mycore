@@ -338,7 +338,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
         private final Path baseDir;
 
-        public UpdateMetadataHandler(MCRCStoreIFS2 storeIFS2) {
+        UpdateMetadataHandler(MCRCStoreIFS2 storeIFS2) {
             myStore = storeIFS2;
             baseDir = Paths.get(myStore.baseDir);
         }

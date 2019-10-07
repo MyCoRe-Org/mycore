@@ -71,7 +71,7 @@ public class MCREventManager {
 
         private String mode;
 
-        public EventHandlerProperty(String propertyKey) {
+        EventHandlerProperty(String propertyKey) {
             String[] splitedKey = propertyKey.split("\\.");
             if (splitedKey.length != 5) {
                 throw new MCRConfigurationException("Property key " + propertyKey + " for event handler not valid.");

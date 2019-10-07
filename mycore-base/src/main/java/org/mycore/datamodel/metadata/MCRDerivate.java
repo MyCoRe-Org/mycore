@@ -94,7 +94,7 @@ public final class MCRDerivate extends MCRBase {
      * 
      * @return the instance of the MCRObjectDerivate class
      */
-    public final MCRObjectDerivate getDerivate() {
+    public MCRObjectDerivate getDerivate() {
         return mcr_derivate;
     }
 
@@ -107,7 +107,7 @@ public final class MCRDerivate extends MCRBase {
      *                general Exception of MyCoRe
      */
     @Override
-    protected final void setUp() throws MCRException {
+    protected void setUp() throws MCRException {
         super.setUp();
 
         // get the derivate data of the object
@@ -123,7 +123,7 @@ public final class MCRDerivate extends MCRBase {
      * @return a JDOM Document with the XML data of the object as byte array
      */
     @Override
-    public final org.jdom2.Document createXML() throws MCRException {
+    public org.jdom2.Document createXML() throws MCRException {
         Document doc = super.createXML();
         Element elm = doc.getRootElement();
         elm.setAttribute("order", String.valueOf(order));
@@ -172,7 +172,7 @@ public final class MCRDerivate extends MCRBase {
     /**
      * The method print all informations about this MCRObject.
      */
-    public final void debug() {
+    public void debug() {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("MCRDerivate ID : {}", mcr_id);
             LOGGER.debug("MCRDerivate Label : {}", mcr_label);

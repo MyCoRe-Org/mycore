@@ -281,7 +281,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         private final DecodedJWT jwt;
 
-        public MCRJWTUserInformation(DecodedJWT token) {
+        MCRJWTUserInformation(DecodedJWT token) {
             this.jwt = token;
         }
 
@@ -315,7 +315,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         private final Principal principal;
 
-        public MCRRestSecurityContext(MCRUserInformation ui, boolean isSecure) {
+        MCRRestSecurityContext(MCRUserInformation ui, boolean isSecure) {
             this.principal = ui::getUserID;
             this.ui = ui;
             this.isSecure = isSecure;

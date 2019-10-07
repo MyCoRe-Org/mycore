@@ -27,7 +27,7 @@ class MCRStoreDefaultConfig implements MCRStoreConfig {
 
     private String id;
 
-    public MCRStoreDefaultConfig(String id) {
+    MCRStoreDefaultConfig(String id) {
         this.id = id;
         storeConfigPrefix = "MCR.IFS2.Store." + id + ".";
     }

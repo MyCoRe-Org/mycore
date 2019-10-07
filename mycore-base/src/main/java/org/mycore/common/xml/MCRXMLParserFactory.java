@@ -103,7 +103,7 @@ public class MCRXMLParserFactory {
      */
     private static class MCRXMLReaderSAX2Factory extends XMLReaderSAX2Factory {
 
-        public MCRXMLReaderSAX2Factory(boolean validate) {
+        MCRXMLReaderSAX2Factory(boolean validate) {
             super(validate);
         }
 

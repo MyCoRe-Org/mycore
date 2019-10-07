@@ -263,7 +263,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @SuppressWarnings("unchecked")
     private Map<MCRCategoryID, Boolean> hasLinksForClassifications() {
-        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>() {
+        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<>() {
             private static final long serialVersionUID = 1L;
 
             @Override

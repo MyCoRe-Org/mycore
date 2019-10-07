@@ -49,7 +49,7 @@ class MCRSessionContext implements MCRSessionListener {
 
     private ThreadLocal<EntityManager> context;
 
-    public MCRSessionContext(EntityManagerFactory factory) {
+    MCRSessionContext(EntityManagerFactory factory) {
         this.factory = factory;
         this.context = new ThreadLocal<>();
         MCRSessionMgr.addSessionListener(this);

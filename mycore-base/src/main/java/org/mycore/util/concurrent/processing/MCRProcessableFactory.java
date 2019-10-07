@@ -120,11 +120,11 @@ public abstract class MCRProcessableFactory {
 
         private MCRProcessableCollection collection;
 
-        public MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate) {
+        MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate) {
             this(delegate, null);
         }
 
-        public MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate, MCRProcessableCollection collection) {
+        MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate, MCRProcessableCollection collection) {
             this.executor = delegate;
             this.collection = collection;
         }

@@ -90,7 +90,7 @@ public class MCRRestClassifications {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        GenericEntity<List<MCRClass>> entity = new GenericEntity<List<MCRClass>>(
+        GenericEntity<List<MCRClass>> entity = new GenericEntity<>(
             categoryDAO.getRootCategories()
                 .stream()
                 .map(MCRRestClassifications::convertToClass)

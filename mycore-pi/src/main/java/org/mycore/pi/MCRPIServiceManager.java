@@ -73,7 +73,7 @@ public class MCRPIServiceManager {
                 throw new MCRException("Cant initialize class the class defined in: " + propertyName, e);
             }
         });
-        return (MCRPIService<T>) mcrpiService;
+        return mcrpiService;
     }
 
     private static class InstanceHolder {
