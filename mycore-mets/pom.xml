@@ -12,7 +12,6 @@
   <name>MyCoRe METS</name>
   <properties>
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <jetty.port>9301</jetty.port>
     <manifest.priority>45</manifest.priority>
   </properties>

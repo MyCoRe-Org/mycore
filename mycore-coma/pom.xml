@@ -11,7 +11,6 @@
   <name>MyCoRe Content Manager</name>
   <description>Manages MyCoRe objects and derivates</description>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
 </project>

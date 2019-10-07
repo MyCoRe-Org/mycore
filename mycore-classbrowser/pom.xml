@@ -10,7 +10,6 @@
   <artifactId>mycore-classbrowser</artifactId>
   <name>MyCoRe Classification Browser</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>25</manifest.priority>
   </properties>
   <dependencies>

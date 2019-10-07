@@ -37,7 +37,8 @@
     <changelog.since>2019-05-28</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2019.06.1</changes.version>
-    <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <forbiddenapis.version>2.6</forbiddenapis.version>
     <frontend.maven.plugin.version>1.6</frontend.maven.plugin.version>
     <grizzly.version>2.3.35</grizzly.version>

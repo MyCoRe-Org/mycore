@@ -81,9 +81,37 @@ public class MCROAIIdentify extends SimpleIdentify {
         }
     }
 
+    /**
+     * Calculates the earliest date stamp.
+     *
+     * @return the create date of the oldest document within the repository
+     */
+    protected Instant calculateEarliestTimestamp() {
+        MCROAISearcher searcher = MCROAISearchManager.getSearcher(this, null, 1, null, null);
+        return searcher.getEarliestTimestamp().orElse(DateUtils
+            .parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01")));
+    }
+
+    public String getConfigPrefix() {
+        return configPrefix;
+    }
+
     private Collection<String> getDescriptionURIs() {
         String descriptionConfig = getConfigPrefix() + "DescriptionURI";
         return MCRConfiguration.instance().getPropertiesMap(descriptionConfig).values();
+    }
+
+    public FriendsDescription getFriendsDescription() {
+        FriendsDescription desc = new FriendsDescription();
+        Map<String, String> friends = this.config.getPropertiesMap(this.configPrefix + "Friends.");
+        desc.getFriendsList().addAll(friends.values());
+        return desc;
+    }
+
+    public OAIIdentifierDescription getIdentifierDescription() {
+        String reposId = this.config.getString(this.configPrefix + "RepositoryIdentifier");
+        String sampleId = this.config.getString(this.configPrefix + "RecordSampleID");
+        return new OAIIdentifierDescription(reposId, sampleId);
     }
 
     class CustomDescription implements Description {
@@ -95,42 +123,14 @@ public class MCROAIIdentify extends SimpleIdentify {
         }
 
         @Override
-        public Element toXML() {
-            return description.getChildren().get(0).clone();
-        }
-
-        @Override
         public void fromXML(Element description) {
             this.description = description;
         }
-    }
 
-    public OAIIdentifierDescription getIdentifierDescription() {
-        String reposId = this.config.getString(this.configPrefix + "RepositoryIdentifier");
-        String sampleId = this.config.getString(this.configPrefix + "RecordSampleID");
-        return new OAIIdentifierDescription(reposId, sampleId);
-    }
-
-    public FriendsDescription getFriendsDescription() {
-        FriendsDescription desc = new FriendsDescription();
-        Map<String, String> friends = this.config.getPropertiesMap(this.configPrefix + "Friends.");
-        desc.getFriendsList().addAll(friends.values());
-        return desc;
-    }
-
-    public String getConfigPrefix() {
-        return configPrefix;
-    }
-
-    /**
-     * Calculates the earliest date stamp.
-     *
-     * @return the create date of the oldest document within the repository
-     */
-    protected Instant calculateEarliestTimestamp() {
-        MCROAISearcher searcher = MCROAISearchManager.getSearcher(this, null, 1, null, null);
-        return searcher.getEarliestTimestamp().orElse(DateUtils
-            .parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01")));
+        @Override
+        public Element toXML() {
+            return description.getChildren().get(0).clone();
+        }
     }
 
 }
