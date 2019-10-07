@@ -83,8 +83,9 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
 
     @Override
     public void add(int index, MCRBasketEntry entry) {
-        if (!contains(entry))
+        if (!contains(entry)) {
             list.add(index, entry);
+        }
     }
 
     @Override
@@ -95,11 +96,12 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
     @Override
     public boolean addAll(Collection<? extends MCRBasketEntry> collection) {
         boolean changed = false;
-        for (MCRBasketEntry entry : collection)
+        for (MCRBasketEntry entry : collection) {
             if (!contains(entry)) {
                 changed = true;
                 add(entry);
             }
+        }
         return changed;
     }
 
@@ -184,8 +186,9 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
      */
     public boolean removeEntry(String id) {
         MCRBasketEntry entry = get(id);
-        if (entry == null)
+        if (entry == null) {
             return false;
+        }
         return remove(entry);
     }
 
@@ -249,8 +252,9 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
     public void move(MCRBasketEntry entry, int change) {
         int posOld = indexOf(entry);
         int posNew = posOld + change;
-        if ((posNew < 0) || (posNew > list.size() - 1))
+        if ((posNew < 0) || (posNew > list.size() - 1)) {
             return;
+        }
 
         remove(posOld);
         add(posNew, entry);
@@ -263,8 +267,9 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
     public void resolveContent() {
         for (MCRBasketEntry entry : list) {
             Element content = entry.getContent();
-            if (content == null)
+            if (content == null) {
                 entry.resolveContent();
+            }
         }
     }
 

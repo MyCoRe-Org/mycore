@@ -551,10 +551,12 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         List<String> log) {
         int curValue = leftStart;
         final int nextLevel = levelStart + 1;
-        if (leftStart != category.getLeft())
+        if (leftStart != category.getLeft()) {
             log.add("LEFT of " + category.getId() + " is " + category.getLeft() + " should be " + leftStart);
-        if (levelStart != category.getLevel())
+        }
+        if (levelStart != category.getLevel()) {
             log.add("LEVEL of " + category.getId() + " is " + category.getLevel() + " should be " + levelStart);
+        }
         int position = 0;
         for (MCRCategory child : category.getChildren()) {
             if (child == null) {
@@ -566,8 +568,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             position++;
         }
         ++curValue;
-        if (curValue != category.getRight())
+        if (curValue != category.getRight()) {
             log.add("RIGHT of " + category.getId() + " is " + category.getRight() + " should be " + curValue);
+        }
         return curValue;
     }
 

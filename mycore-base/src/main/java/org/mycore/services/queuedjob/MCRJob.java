@@ -220,8 +220,9 @@ public class MCRJob implements Cloneable {
      */
     @Transient
     public String getParameter(String key) {
-        if (parameters == null)
+        if (parameters == null) {
             return null;
+        }
 
         return parameters.get(key);
     }
@@ -233,8 +234,9 @@ public class MCRJob implements Cloneable {
      * @param value - the parameter value
      */
     public void setParameter(String key, String value) {
-        if (parameters == null)
+        if (parameters == null) {
             parameters = new HashMap<>();
+        }
 
         parameters.put(key, value);
     }

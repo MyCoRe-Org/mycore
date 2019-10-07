@@ -163,8 +163,9 @@ public class MCRLINKHREFPK implements Serializable {
         }
         if (mcrtype == null) {
             return other.mcrtype == null;
-        } else
+        } else {
             return mcrtype.equals(other.mcrtype);
+        }
     }
 
     @Override

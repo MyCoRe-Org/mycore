@@ -107,8 +107,9 @@ public class MCRCategLinkReference implements Serializable {
         }
         if (type == null) {
             return other.type == null;
-        } else
+        } else {
             return type.equals(other.type);
+        }
     }
 
     @Override

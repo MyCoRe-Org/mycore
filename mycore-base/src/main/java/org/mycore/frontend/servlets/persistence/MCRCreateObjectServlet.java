@@ -133,8 +133,9 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
             if (objectId.getNumberAsInteger() == 0) {
                 String objId = mcrObject.getId().toString();
                 objectId = MCRObjectID.getNextFreeId(objectId.getBase());
-                if (mcrObject.getLabel().equals(objId))
+                if (mcrObject.getLabel().equals(objId)) {
                     mcrObject.setLabel(objectId.toString());
+                }
                 mcrObject.setId(objectId);
             }
         }

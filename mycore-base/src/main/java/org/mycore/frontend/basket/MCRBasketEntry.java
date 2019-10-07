@@ -75,8 +75,9 @@ public class MCRBasketEntry {
      * and stores it in the basket entry.
      */
     public void resolveContent() {
-        if ((uri != null) && !uri.isEmpty())
+        if ((uri != null) && !uri.isEmpty()) {
             setContent(MCRURIResolver.instance().resolve(uri));
+        }
     }
 
     /**
@@ -110,10 +111,11 @@ public class MCRBasketEntry {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRBasketEntry)
+        if (obj instanceof MCRBasketEntry) {
             return ((MCRBasketEntry) obj).id.equals(id);
-        else
+        } else {
             return false;
+        }
     }
 
     @Override

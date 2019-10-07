@@ -96,8 +96,9 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
             if (uid == null) {
                 presentLoginForm(req, res, null);
             }
-            if (!job.getResponse().isCommitted())
+            if (!job.getResponse().isCommitted()) {
                 super.render(job, ex);
+            }
         }
     }
 

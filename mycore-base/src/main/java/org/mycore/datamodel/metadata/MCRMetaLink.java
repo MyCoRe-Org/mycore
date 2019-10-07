@@ -271,8 +271,9 @@ public class MCRMetaLink extends MCRMetaDefault {
             return false;
         } else if (!Objects.equals(title, other.title)) {
             return false;
-        } else
+        } else {
             return Objects.equals(to, other.to);
+        }
     }
 
     /**

@@ -152,10 +152,11 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
         MCRObjectID derivateID = getOrCreateDerivateID();
 
-        if (MCRMetadataManager.exists(derivateID))
+        if (MCRMetadataManager.exists(derivateID)) {
             this.derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
-        else
+        } else {
             this.derivate = createDerivate(derivateID);
+        }
 
         getOrCreateRootDirectory();
 
@@ -168,8 +169,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             MCRObjectID oid = MCRObjectID.getNextFreeId(projectID + '_' + ID_TYPE);
             this.derivateID = oid.toString();
             return oid;
-        } else
+        } else {
             return MCRObjectID.getInstance(derivateID);
+        }
     }
 
     private MCRDerivate createDerivate(MCRObjectID derivateID)

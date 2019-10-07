@@ -303,8 +303,9 @@ public class MCRIFS2Commands {
             return;
         } catch (NoResultException e) {
             LOGGER.error("Can't find directory entry for {}", name);
-            if (check_only)
+            if (check_only) {
                 return;
+            }
         } catch (NonUniqueResultException e) {
             LOGGER.error("Non unique directory entry for {}", name);
             return;
@@ -384,8 +385,9 @@ public class MCRIFS2Commands {
                 em.detach(fsNode);
             } catch (NoResultException e) {
                 LOGGER.error("Can't find file entry for {}", storageid);
-                if (check_only)
+                if (check_only) {
                     return;
+                }
             } catch (NonUniqueResultException e) {
                 LOGGER.error("Non unique file entry for {}", storageid);
                 return;
@@ -418,8 +420,9 @@ public class MCRIFS2Commands {
         if (foundEntry && !md5.equals(md5_old)) {
             LOGGER.warn("Wrong file md5 for {} : {} <-> {}", storageid, md5_old, md5);
         }
-        if (check_only)
+        if (check_only) {
             return;
+        }
         // fix entry
         LOGGER.info("Fix entry for file {}", storageid);
         if (!foundEntry) {
@@ -517,8 +520,9 @@ public class MCRIFS2Commands {
 
     private static void searchRecurive(ArrayList<String> derivates, File dir, int max_slot_deep, int current_slot_deep,
         String project_id) {
-        if (current_slot_deep == max_slot_deep)
+        if (current_slot_deep == max_slot_deep) {
             return;
+        }
         File[] dir_list = dir.listFiles();
         current_slot_deep++;
         for (File dir_dir : dir_list) {

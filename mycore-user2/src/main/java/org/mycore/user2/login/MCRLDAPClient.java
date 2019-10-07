@@ -129,8 +129,9 @@ public class MCRLDAPClient {
         mapEMail = config.getString(prefix + "E-Mail");
 
         String group = config.getString(prefix + "Group.DefaultGroup", null);
-        if (group != null)
+        if (group != null) {
             defaultGroup = MCRRoleManager.getRole(group);
+        }
 
         ldapEnv = new Hashtable<>();
         ldapEnv.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -216,11 +217,13 @@ public class MCRLDAPClient {
      */
     private String formatName(String name) {
         name = name.replaceAll("\\s+", " ").trim();
-        if (name.contains(","))
+        if (name.contains(",")) {
             return name;
+        }
         int pos = name.lastIndexOf(' ');
-        if (pos == -1)
+        if (pos == -1) {
             return name;
+        }
         return name.substring(pos + 1) + ", " + name.substring(0, pos);
     }
 

@@ -545,8 +545,9 @@ public class MCRServlet extends HttpServlet {
      */
     protected void render(MCRServletJob job, Exception ex) throws Exception {
         // no info here how to handle
-        if (ex != null)
+        if (ex != null) {
             throw ex;
+        }
         if (job.getRequest().getMethod().equals("POST")) {
             doPost(job);
         } else {

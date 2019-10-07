@@ -428,11 +428,13 @@ public class MCRRestAPIObjectsHelper {
             objIdDates = new ArrayList<>();
             for (MCRObjectIDDate oid : testObjIdDates) {
                 String test = SDF_UTC.format(oid.getLastModified());
-                if (lastModifiedAfter != null && test.compareTo(lastModifiedAfter) < 0)
+                if (lastModifiedAfter != null && test.compareTo(lastModifiedAfter) < 0) {
                     continue;
+                }
                 if (lastModifiedBefore != null
-                    && lastModifiedBefore.compareTo(test.substring(0, lastModifiedBefore.length())) < 0)
+                    && lastModifiedBefore.compareTo(test.substring(0, lastModifiedBefore.length())) < 0) {
                     continue;
+                }
                 objIdDates.add(oid);
             }
         }
@@ -746,8 +748,9 @@ public class MCRRestAPIObjectsHelper {
      */
     private static boolean validateDateInput(String test) {
         String base = "0000-00-00T00:00:00Z";
-        if (test.length() > base.length())
+        if (test.length() > base.length()) {
             return false;
+        }
         test = test + base.substring(test.length());
         try {
             SDF_UTC.parse(test);

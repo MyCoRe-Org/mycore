@@ -111,10 +111,11 @@ public class MCRFileContentType {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof MCRFileContentType)
+        if (other instanceof MCRFileContentType) {
             return ((MCRFileContentType) other).ID.equals(ID);
-        else
+        } else {
             return false;
+        }
     }
 
     @Override

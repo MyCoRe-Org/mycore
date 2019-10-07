@@ -162,8 +162,9 @@ public class MCRContentInputStream extends FilterInputStream {
      * @return the MD5 message digest checksum of all bytes that have been read
      */
     public byte[] getMD5() {
-        if (md5 == null)
+        if (md5 == null) {
             md5 = digest.digest();
+        }
         return md5;
     }
 

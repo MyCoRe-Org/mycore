@@ -61,8 +61,9 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     private Set<String> unknown = new HashSet<>();
 
     protected void doGetPost(MCRServletJob job) throws Exception {
-        if ("true".equals(job.getRequest().getParameter("reload")))
+        if ("true".equals(job.getRequest().getParameter("reload"))) {
             stylesheets.clear();
+        }
 
         if (stylesheets.isEmpty()) {
             LOGGER.info("Collecting stylesheet information....");
@@ -76,8 +77,9 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     }
 
     private void inspectStylesheets() {
-        for (Entry<String, Stylesheet> entry : stylesheets.entrySet())
+        for (Entry<String, Stylesheet> entry : stylesheets.entrySet()) {
             entry.getValue().inspect();
+        }
     }
 
     private void handleUnknownStylesheets() {
@@ -147,10 +149,11 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private void findXSLinClassesDir() {
         String base = "/WEB-INF/classes/xsl/";
-        for (String path : diveInto(base))
+        for (String path : diveInto(base)) {
             if (path.endsWith(".xsl")) {
                 foundStylesheet(path, base);
             }
+        }
     }
 
     private void foundStylesheet(String path, String source) {
@@ -249,15 +252,17 @@ public final class MCRXSLInfoServlet extends MCRServlet {
             addValues(elem, "includes", includes);
             addValues(elem, "imports", imports);
 
-            for (Element template : templates)
+            for (Element template : templates) {
                 elem.addContent(template.clone());
+            }
 
             return elem;
         }
 
         private void addValues(Element parent, String tag, Set<String> set) {
-            for (String value : set)
+            for (String value : set) {
                 parent.addContent(new Element(tag).setText(value));
+            }
         }
     }
 }

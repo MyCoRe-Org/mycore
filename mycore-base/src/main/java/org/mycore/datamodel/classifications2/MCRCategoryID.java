@@ -150,8 +150,9 @@ public class MCRCategoryID implements Serializable {
         }
         if (rootID == null) {
             return other.rootID == null;
-        } else
+        } else {
             return rootID.equals(other.rootID);
+        }
     }
 
     /**

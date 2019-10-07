@@ -577,8 +577,9 @@ public class MCRDataURL implements Serializable {
         }
         if (parameters == null) {
             return other.parameters == null;
-        } else
+        } else {
             return parameters.equals(other.parameters);
+        }
     }
 
     private static String encode(final String str, final Charset charset) throws UnsupportedEncodingException {

@@ -274,8 +274,9 @@ public class MCRSwordUtil {
                         try {
                             Files.copy(dir, targetdir);
                         } catch (FileAlreadyExistsException e) {
-                            if (!Files.isDirectory(targetdir))
+                            if (!Files.isDirectory(targetdir)) {
                                 throw e;
+                            }
                         }
                         return FileVisitResult.CONTINUE;
                     }

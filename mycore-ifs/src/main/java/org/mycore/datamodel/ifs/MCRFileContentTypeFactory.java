@@ -136,8 +136,9 @@ public class MCRFileContentTypeFactory {
         for (String key : types) {
             MCRFileContentType contentType = typesTable.get(key);
 
-            if (mimeType.equals(contentType.getMimeType()))
+            if (mimeType.equals(contentType.getMimeType())) {
                 return typesTable.get(key);
+            }
         }
         String msg = "There is no file content type for mime type = " + mimeType + " configured";
         throw new MCRConfigurationException(msg);

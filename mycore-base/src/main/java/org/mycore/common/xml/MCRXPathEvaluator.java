@@ -93,8 +93,9 @@ public class MCRXPathEvaluator {
                 String key = expression.substring(0, pos);
                 String xPath = expression.substring(pos + 1);
                 expression = "i18n:translate('" + key + "'," + xPath + ")";
-            } else
+            } else {
                 expression = "i18n:translate('" + expression + "')";
+            }
         }
         return expression;
     }
@@ -107,12 +108,13 @@ public class MCRXPathEvaluator {
 
     public boolean test(String xPathExpression) {
         Object result = evaluateFirst(xPathExpression);
-        if (result == null)
+        if (result == null) {
             return false;
-        else if (result instanceof Boolean)
+        } else if (result instanceof Boolean) {
             return (Boolean) result;
-        else
+        } else {
             return true;
+        }
     }
 
     public Object evaluateFirst(String xPathExpression) {

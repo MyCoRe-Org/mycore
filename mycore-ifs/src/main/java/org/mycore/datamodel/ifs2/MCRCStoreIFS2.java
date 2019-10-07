@@ -151,8 +151,9 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
         try {
             MCRFileCollection slot = store.retrieve(slotID);
-            if (slot == null)
+            if (slot == null) {
                 return false;
+            }
 
             String path = fr.getAbsolutePath();
             MCRNode node = slot.getNodeByPath(path);
@@ -194,14 +195,16 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             String step = steps.nextToken();
             if (steps.hasMoreTokens()) {
                 MCRNode child = dir.getChild(step);
-                if (child == null)
+                if (child == null) {
                     dir = dir.createDir(step);
-                else
+                } else {
                     dir = (MCRDirectory) child;
+                }
             } else {
                 MCRFile file = (MCRFile) (dir.getChild(step));
-                if (file == null)
+                if (file == null) {
                     file = dir.createFile(step);
+                }
 
                 file.setContent(new MCRStreamContent(source));
             }

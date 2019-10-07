@@ -49,8 +49,9 @@ public class MCRLanguageResolver implements URIResolver {
     private Element buildXML(MCRLanguage language) {
         Element xml = new Element("language");
 
-        for (Entry<MCRLanguageCodeType, String> entry : language.getCodes().entrySet())
+        for (Entry<MCRLanguageCodeType, String> entry : language.getCodes().entrySet()) {
             xml.setAttribute(entry.getKey().name(), entry.getValue());
+        }
 
         for (Entry<MCRLanguage, String> entry : language.getLabels().entrySet()) {
             Element label = new Element("label");

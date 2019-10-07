@@ -65,8 +65,9 @@ public class MCRStreamContent extends MCRContent {
 
     @Override
     public MCRContentInputStream getContentInputStream() throws IOException {
-        if (!(in instanceof MCRContentInputStream))
+        if (!(in instanceof MCRContentInputStream)) {
             in = super.getContentInputStream();
+        }
         return (MCRContentInputStream) in;
     }
 

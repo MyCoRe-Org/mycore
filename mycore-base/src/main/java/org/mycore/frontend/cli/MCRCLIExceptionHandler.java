@@ -59,8 +59,9 @@ public class MCRCLIExceptionHandler {
         for (String curDest : links.keySet()) {
             LOGGER.debug("Current Destination: {}", curDest);
             Collection<String> sources = links.get(curDest);
-            for (String source : sources)
+            for (String source : sources) {
                 MCRCommandLineInterface.output(source + " ==> " + curDest);
+            }
         }
     }
 
@@ -88,8 +89,9 @@ public class MCRCLIExceptionHandler {
 
     private static void showCauseOf(Throwable ex) {
         ex = ex.getCause();
-        if (ex == null)
+        if (ex == null) {
             return;
+        }
 
         MCRCommandLineInterface.output("");
         MCRCommandLineInterface.output("This exception was caused by:");

@@ -187,8 +187,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         int next = last + numberDistance;
 
         int rest = next % numberDistance;
-        if (rest != 0)
+        if (rest != 0) {
             next += numberDistance - rest;
+        }
 
         lastNumber.put(base_id, next);
         String[] idParts = getIDParts(base_id);
@@ -217,8 +218,9 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      */
     public static MCRObjectID getLastID(String base_id) {
         int lastIDNumber = getLastIDNumber(base_id);
-        if (lastIDNumber == 0)
+        if (lastIDNumber == 0) {
             return null;
+        }
 
         String[] idParts = getIDParts(base_id);
         return getInstance(formatID(idParts[0], idParts[1], lastIDNumber));

@@ -190,8 +190,9 @@ public class MCRJobMaster implements Runnable, Closeable {
                     while (activeThreads.get() < jobThreadCount) {
                         runLock.lock();
                         try {
-                            if (!running)
+                            if (!running) {
                                 break;
+                            }
 
                             EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
                             EntityTransaction transaction = em.getTransaction();
@@ -248,13 +249,14 @@ public class MCRJobMaster implements Runnable, Closeable {
                             runLock.unlock();
                         }
                     } // while(activeThreads.get() < jobThreadCount)
-                    if (activeThreads.get() < jobThreadCount)
+                    if (activeThreads.get() < jobThreadCount) {
                         try {
                             LOGGER.info("Waiting for a job to finish");
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             LOGGER.error("Job thread was interrupted.", e);
                         }
+                    }
                 } catch (PersistenceException e) {
                     LOGGER.warn("We have an database error, sleep and run later.", e);
                     try {

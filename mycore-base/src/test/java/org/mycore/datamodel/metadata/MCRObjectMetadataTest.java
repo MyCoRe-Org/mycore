@@ -96,8 +96,9 @@ public class MCRObjectMetadataTest extends MCRTestCase {
         assertEquals("Not all inherited metadata was removed", 1, defJunit.size());
         defJunit = getInheritedMetadata();
         for (MCRMetaInterface i : defJunit) {
-            if (i.getInherited() == 0)
+            if (i.getInherited() == 0) {
                 i.setInherited(1);
+            }
         }
         testMetadata.setMetadataElement(defJunit);
         testMetadata.removeInheritedMetadata();

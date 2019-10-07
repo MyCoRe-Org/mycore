@@ -520,8 +520,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
-            if (!id.startsWith(project))
+            if (!id.startsWith(project)) {
                 continue;
+            }
             cmds.add("export derivate " + id + " to directory " + dirname + " with " + style);
         }
         return cmds;

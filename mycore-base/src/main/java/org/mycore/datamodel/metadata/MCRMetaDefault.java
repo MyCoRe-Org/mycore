@@ -289,8 +289,9 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             throw exc;
         }
         Element elm = new Element(subtag);
-        if (getLang() != null && getLang().length() > 0)
+        if (getLang() != null && getLang().length() > 0) {
             elm.setAttribute("lang", getLang(), Namespace.XML_NAMESPACE);
+        }
         if (getType() != null && getType().length() > 0) {
             elm.setAttribute("type", getType());
         }
@@ -372,10 +373,12 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null || getClass() != obj.getClass())
+        }
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
+        }
         MCRMetaDefault other = (MCRMetaDefault) obj;
         return Objects.equals(datapart, other.datapart) && Objects.equals(inherited, other.inherited)
             && Objects.equals(lang, other.lang) && Objects.equals(subtag, other.subtag)
