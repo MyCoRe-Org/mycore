@@ -10,6 +10,7 @@
   <artifactId>mycore-user2</artifactId>
   <name>MyCoRe New User System</name>
   <properties>
+    <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
     <manifest.priority>15</manifest.priority>
   </properties>
   <dependencies>

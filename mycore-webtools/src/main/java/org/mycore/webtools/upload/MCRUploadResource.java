@@ -218,8 +218,8 @@ public class MCRUploadResource {
 
     private void setDefaultPermissions(MCRObjectID derivateID) {
         if (MCRConfiguration.instance().getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
-            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+            MCRAccessInterface aclImpl = MCRAccessManager.getAccessImpl();
+            Collection<String> configuredPermissions = aclImpl.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
                     "default derivate rule");

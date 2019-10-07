@@ -10,7 +10,6 @@
   <artifactId>mycore-webcli</artifactId>
   <name>MyCoRe Web CLI</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>80</manifest.priority>
     <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>

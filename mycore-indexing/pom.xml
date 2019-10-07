@@ -10,7 +10,6 @@
   <artifactId>mycore-indexing</artifactId>
   <name>MyCoRe Sitemap Protocol support</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>30</manifest.priority>
     <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>

@@ -37,7 +37,7 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
  */
 public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandler.Closeable {
 
-    private static final ConcurrentHashMap<String, MCRFileUploadBucket> bucketMap = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, MCRFileUploadBucket> BUCKET_MAP = new ConcurrentHashMap<>();
 
     private String bucketID;
 
@@ -68,18 +68,18 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
     }
 
     public static MCRFileUploadBucket getBucket(String bucketID) {
-        return bucketMap.get(bucketID);
+        return BUCKET_MAP.get(bucketID);
     }
 
     public static synchronized MCRFileUploadBucket getOrCreateBucket(String bucketID, String objectID) {
-        final MCRFileUploadBucket mcrFileUploadBucket = bucketMap
+        final MCRFileUploadBucket mcrFileUploadBucket = BUCKET_MAP
             .computeIfAbsent(bucketID, (id) -> new MCRFileUploadBucket(bucketID, objectID));
         return mcrFileUploadBucket;
     }
 
     public static synchronized void releaseBucket(String bucketID) {
-        if (bucketMap.containsKey(bucketID)) {
-            final MCRFileUploadBucket bucket = bucketMap.get(bucketID);
+        if (BUCKET_MAP.containsKey(bucketID)) {
+            final MCRFileUploadBucket bucket = BUCKET_MAP.get(bucketID);
             if (Files.exists(bucket.root)) {
                 try {
                     Files.walkFileTree(bucket.root, MCRRecursiveDeleter.instance());
@@ -87,7 +87,7 @@ public class MCRFileUploadBucket implements MCRSessionListener, MCRShutdownHandl
                     throw new MCRUploadException("MCR.Upload.TempDirectory.Delete.Failed", e);
                 }
             }
-            bucketMap.remove(bucketID);
+            BUCKET_MAP.remove(bucketID);
         }
     }
 

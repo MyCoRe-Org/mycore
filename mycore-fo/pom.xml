@@ -10,7 +10,6 @@
   <artifactId>mycore-fo</artifactId>
   <name>MyCoRe FO</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>31</manifest.priority>
     <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>

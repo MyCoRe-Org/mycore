@@ -29,7 +29,6 @@
   <artifactId>mycore-tei</artifactId>
   <name>MyCoRe TEI</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <dependencies>

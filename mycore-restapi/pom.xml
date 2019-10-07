@@ -10,6 +10,7 @@
   <artifactId>mycore-restapi</artifactId>
   <name>MyCoRe REST API</name>
   <properties>
+    <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
     <manifest.priority>65</manifest.priority>
   </properties>
   <dependencies>

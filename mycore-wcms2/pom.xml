@@ -10,7 +10,6 @@
   <artifactId>mycore-wcms2</artifactId>
   <name>MyCoRe WCMS 2</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>90</manifest.priority>
     <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>

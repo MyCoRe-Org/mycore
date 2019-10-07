@@ -132,8 +132,8 @@ public class MCRSwordUtil {
         MCRMetadataManager.create(derivate);
 
         if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
-            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+            MCRAccessInterface aclImpl = MCRAccessManager.getAccessImpl();
+            Collection<String> configuredPermissions = aclImpl.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
                     "default derivate rule");
@@ -530,10 +530,10 @@ public class MCRSwordUtil {
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                         throws IOException {
                         String relativePath = derivateRootPath.relativize(file).toString();
-                        final String URI = new MessageFormat("{0}{1}{2}/{3}/{4}", Locale.ROOT).format(
+                        final String uri = new MessageFormat("{0}{1}{2}/{3}/{4}", Locale.ROOT).format(
                             new Object[] { MCRFrontendUtil.getBaseURL(), MCRSwordConstants.SWORD2_EDIT_MEDIA_IRI,
                                 collection, derivateId, encodeURLPart(relativePath) });
-                        iris.add(new IRI(URI));
+                        iris.add(new IRI(uri));
                         return FileVisitResult.CONTINUE;
                     }
                 });
@@ -554,7 +554,8 @@ public class MCRSwordUtil {
          * @param collectionIRI      IRI of the collection
          * @param collection         name of the collection
          * @param feed               the feed where the link will be inserted
-         * @param collectionProvider {@link MCRSwordCollectionProvider} of the collection (needed to count how much objects)
+         * @param collectionProvider 
+         * {@link MCRSwordCollectionProvider} of the collection (needed to count how much objects)
          * @throws SwordServerException when the {@link MCRSwordObjectIDSupplier} throws a exception.
          */
         public static void addPaginationLinks(IRI collectionIRI, String collection, Feed feed,

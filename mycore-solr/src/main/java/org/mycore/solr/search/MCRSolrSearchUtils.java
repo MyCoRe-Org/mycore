@@ -71,6 +71,38 @@ public abstract class MCRSolrSearchUtils {
         return response.getResults().isEmpty() ? null : response.getResults().get(0);
     }
 
+    @SuppressWarnings("rawtypes")
+    public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
+        int rows = query.getNumPerPage();
+        List<String> returnFields = query.getReturnFields();
+        MCRCondition condition = query.getCondition();
+        HashMap<String, List<MCRCondition>> table;
+
+        if (condition instanceof MCRSetCondition) {
+            table = MCRConditionTransformer.groupConditionsByIndex((MCRSetCondition) condition);
+        } else {
+            // if there is only one condition its no set condition. we don't need to group
+            LOGGER.warn("Condition is not SetCondition.");
+            table = new HashMap<>();
+
+            ArrayList<MCRCondition> conditionList = new ArrayList<>();
+            conditionList.add(condition);
+
+            table.put("metadata", conditionList);
+
+        }
+
+        boolean booleanAnd = !(condition instanceof MCROrCondition<?>);
+        SolrQuery mergedSolrQuery = MCRConditionTransformer.buildMergedSolrQuery(query.getSortBy(), false, booleanAnd,
+            table, rows, returnFields);
+        String mask = input.getRootElement().getAttributeValue("mask");
+        if (mask != null) {
+            mergedSolrQuery.setParam("mask", mask);
+            mergedSolrQuery.setParam("_session", request.getParameter("_session"));
+        }
+        return mergedSolrQuery;
+    }
+
     /**
      * Returns a list of ids found by the given query. Returns an empty list
      * when nothing is found.
@@ -133,6 +165,46 @@ public abstract class MCRSolrSearchUtils {
             this.size = size;
         }
 
+        @Override
+        public int characteristics() {
+            return Spliterator.SIZED | Spliterator.SUBSIZED | Spliterator.ORDERED;
+        }
+
+        @Override
+        public long estimateSize() {
+            if (this.size == null) {
+                ModifiableSolrParams sizeParams = new ModifiableSolrParams(this.params);
+                sizeParams.set("start", 0);
+                sizeParams.set("rows", 0);
+                try {
+                    QueryResponse response = solrClient.query(sizeParams);
+                    this.size = response.getResults().getNumFound();
+                } catch (SolrServerException | IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+            return this.size;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super SolrDocument> action) {
+            if (action == null) {
+                throw new NullPointerException();
+            }
+            ModifiableSolrParams p = new ModifiableSolrParams(params);
+            p.set("rows", (int) rows);
+            long start = this.start, size = estimateSize(), fetched = 0;
+            while (fetched < size) {
+                p.set("start", (int) (start + fetched));
+                response = query(p);
+                SolrDocumentList results = response.getResults();
+                for (SolrDocument doc : results) {
+                    action.accept(doc);
+                }
+                fetched += results.size();
+            }
+        }
+
         protected QueryResponse query(SolrParams params) {
             try {
                 return solrClient.query(params);
@@ -163,25 +235,6 @@ public abstract class MCRSolrSearchUtils {
         }
 
         @Override
-        public void forEachRemaining(Consumer<? super SolrDocument> action) {
-            if (action == null) {
-                throw new NullPointerException();
-            }
-            ModifiableSolrParams p = new ModifiableSolrParams(params);
-            p.set("rows", (int) rows);
-            long start = this.start, size = estimateSize(), fetched = 0;
-            while (fetched < size) {
-                p.set("start", (int) (start + fetched));
-                response = query(p);
-                SolrDocumentList results = response.getResults();
-                for (SolrDocument doc : results) {
-                    action.accept(doc);
-                }
-                fetched += results.size();
-            }
-        }
-
-        @Override
         public Spliterator<SolrDocument> trySplit() {
             long s = estimateSize(), i = start, l = rows;
             if (l >= s) {
@@ -190,59 +243,6 @@ public abstract class MCRSolrSearchUtils {
             this.size = l;
             return new SolrDocumentSpliterator(solrClient, params, i + l, l, s - l);
         }
-
-        @Override
-        public long estimateSize() {
-            if (this.size == null) {
-                ModifiableSolrParams sizeParams = new ModifiableSolrParams(this.params);
-                sizeParams.set("start", 0);
-                sizeParams.set("rows", 0);
-                try {
-                    QueryResponse response = solrClient.query(sizeParams);
-                    this.size = response.getResults().getNumFound();
-                } catch (SolrServerException | IOException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-            return this.size;
-        }
-
-        @Override
-        public int characteristics() {
-            return Spliterator.SIZED | Spliterator.SUBSIZED | Spliterator.ORDERED;
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static SolrQuery getSolrQuery(MCRQuery query, Document input, HttpServletRequest request) {
-        int rows = query.getNumPerPage();
-        List<String> returnFields = query.getReturnFields();
-        MCRCondition condition = query.getCondition();
-        HashMap<String, List<MCRCondition>> table;
-
-        if (condition instanceof MCRSetCondition) {
-            table = MCRConditionTransformer.groupConditionsByIndex((MCRSetCondition) condition);
-        } else {
-            // if there is only one condition its no set condition. we don't need to group
-            LOGGER.warn("Condition is not SetCondition.");
-            table = new HashMap<>();
-
-            ArrayList<MCRCondition> conditionList = new ArrayList<>();
-            conditionList.add(condition);
-
-            table.put("metadata", conditionList);
-
-        }
-
-        boolean booleanAnd = !(condition instanceof MCROrCondition<?>);
-        SolrQuery mergedSolrQuery = MCRConditionTransformer.buildMergedSolrQuery(query.getSortBy(), false, booleanAnd,
-            table, rows, returnFields);
-        String mask = input.getRootElement().getAttributeValue("mask");
-        if (mask != null) {
-            mergedSolrQuery.setParam("mask", mask);
-            mergedSolrQuery.setParam("_session", request.getParameter("_session"));
-        }
-        return mergedSolrQuery;
     }
 
 }
