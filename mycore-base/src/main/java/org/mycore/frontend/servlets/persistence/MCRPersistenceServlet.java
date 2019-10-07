@@ -69,8 +69,9 @@ abstract class MCRPersistenceServlet extends MCRServlet {
     protected void think(MCRServletJob job) throws Exception {
         //If admin mode, do not change any data
         if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(),
-            MCRFrontendUtil.getBaseURL()))
+            MCRFrontendUtil.getBaseURL())) {
             return;
+        }
         handlePersistenceOperation(job.getRequest(), job.getResponse());
     }
 

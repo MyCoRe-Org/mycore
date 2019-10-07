@@ -82,8 +82,9 @@ public class MCRBibUtilsTransformer extends MCRContentTransformer {
             ep = new MCRExternalProcess(arguments);
             ep.run();
             String errors = ep.getErrors();
-            if (!errors.isEmpty())
+            if (!errors.isEmpty()) {
                 LOGGER.warn(errors);
+            }
             return ep.getOutput();
         } catch (Exception ex) {
             String msg = "Exception invoking external command " + command;

@@ -366,8 +366,9 @@ public class MCRConfiguration2 {
             }
             if (property == null) {
                 return other.property == null;
-            } else
+            } else {
                 return property.equals(other.property);
+            }
         }
     }
 

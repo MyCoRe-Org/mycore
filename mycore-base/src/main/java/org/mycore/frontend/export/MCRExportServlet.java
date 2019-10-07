@@ -90,21 +90,23 @@ public class MCRExportServlet extends MCRServlet {
             LOGGER.info("exporting basket {} via {}", basketID, req.getParameter("transformer"));
         }
 
-        if (req.getParameter("uri") != null)
+        if (req.getParameter("uri") != null) {
             for (String uri : req.getParameterValues("uri")) {
                 if (isAllowed(uri)) {
                     collection.add(uri);
                     LOGGER.info("exporting {} via {}", uri, req.getParameter("transformer"));
                 }
             }
+        }
     }
 
     private boolean isAllowed(String uri) {
-        for (String prefix : forbiddenURIs)
+        for (String prefix : forbiddenURIs) {
             if (uri.startsWith(prefix)) {
                 LOGGER.warn("URI {} is not allowed for security reasons", uri);
                 return false;
             }
+        }
         return true;
     }
 
@@ -115,8 +117,9 @@ public class MCRExportServlet extends MCRServlet {
         MCRExportCollection collection = new MCRExportCollection();
         String root = req.getParameter("root");
         String ns = req.getParameter("ns");
-        if (!((root == null) || root.isEmpty()))
+        if (!((root == null) || root.isEmpty())) {
             collection.setRootElement(root, ns);
+        }
         return collection;
     }
 }

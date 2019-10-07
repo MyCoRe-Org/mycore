@@ -487,8 +487,9 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         }
         if (userName == null) {
             return other.userName == null;
-        } else
+        } else {
             return userName.equals(other.userName);
+        }
     }
 
     /* (non-Javadoc)

@@ -66,8 +66,9 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response listByType(@PathParam("type") String type, @DefaultValue("0") @QueryParam("from") int from,
         @DefaultValue("50") @QueryParam("size") int size) {
         Response errorResponse = validateParameters(from, size);
-        if (errorResponse != null)
+        if (errorResponse != null) {
             return errorResponse;
+        }
         List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.getInstance().getList(type,
             from, size);
         return Response.status(Response.Status.OK)
@@ -81,8 +82,9 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response list(@DefaultValue("0") @QueryParam("from") int from,
         @DefaultValue("50") @QueryParam("size") int size) {
         Response errorResponse = validateParameters(from, size);
-        if (errorResponse != null)
+        if (errorResponse != null) {
             return errorResponse;
+        }
         List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.getInstance().getList(from,
             size);
         return Response.status(Response.Status.OK)

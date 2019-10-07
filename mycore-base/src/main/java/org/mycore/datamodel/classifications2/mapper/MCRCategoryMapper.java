@@ -44,8 +44,9 @@ public class MCRCategoryMapper extends MCRCategoryMapperBase {
 
     protected void addParentsToList(MCRCategoryID childID, List<MCRCategoryID> list) {
         for (MCRCategory parent : DAO.getParents(childID)) {
-            if (parent.isCategory())
+            if (parent.isCategory()) {
                 list.add(parent.getId());
+            }
         }
     }
 }

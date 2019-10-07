@@ -89,10 +89,11 @@ class MCRPersistenceHelper {
     static Document getEditorSubmission(HttpServletRequest request, boolean failOnMissing) throws ServletException {
         Document inDoc = (Document) request.getAttribute("MCRXEditorSubmission");
         if (inDoc == null) {
-            if (failOnMissing)
+            if (failOnMissing) {
                 throw new ServletException("No MCREditorSubmission");
-            else
+            } else {
                 return null;
+            }
         }
         if (inDoc.getRootElement().getAttribute("ID") == null) {
             String mcrID = MCRServlet.getProperty(request, "mcrid");

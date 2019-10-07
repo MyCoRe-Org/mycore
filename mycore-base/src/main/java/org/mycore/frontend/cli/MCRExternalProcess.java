@@ -50,8 +50,9 @@ public class MCRExternalProcess {
 
     public int run() throws IOException, InterruptedException {
 
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             debug(command);
+        }
 
         ProcessBuilder pb = new ProcessBuilder(command);
         Process p = pb.start();
@@ -72,8 +73,9 @@ public class MCRExternalProcess {
 
     private void debug(String... command) {
         StringBuilder sb = new StringBuilder();
-        for (String arg : command)
+        for (String arg : command) {
             sb.append(arg).append(" ");
+        }
         LOGGER.debug(sb.toString().trim());
     }
 
@@ -112,8 +114,9 @@ class MCRStreamSucker extends Thread {
         try {
             byte[] buffer = new byte[1024];
             int num;
-            while ((num = in.read(buffer, 0, buffer.length)) >= 0)
+            while ((num = in.read(buffer, 0, buffer.length)) >= 0) {
                 out.write(buffer, 0, num);
+            }
             out.close();
         } catch (IOException ex) {
             LOGGER.warn(ex);

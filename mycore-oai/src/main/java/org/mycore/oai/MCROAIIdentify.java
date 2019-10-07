@@ -76,8 +76,9 @@ public class MCROAIIdentify extends SimpleIdentify {
     }
 
     private void addCustomDescriptions() {
-        for (final String descriptionURI : getDescriptionURIs())
+        for (final String descriptionURI : getDescriptionURIs()) {
             this.getDescriptionList().add(new CustomDescription(descriptionURI));
+        }
     }
 
     private Collection<String> getDescriptionURIs() {

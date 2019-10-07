@@ -116,10 +116,11 @@ public class MCRCASServlet extends MCRServlet {
 
         MCRUser user;
         boolean userExists = MCRUserManager.exists(userName, realmID);
-        if (userExists)
+        if (userExists) {
             user = MCRUserManager.getUser(userName, realmID);
-        else
+        } else {
             user = new MCRUser(userName, realmID);
+        }
 
         // Get user properties from LDAP server
         boolean userChanged = MCRLDAPClient.instance().updateUserProperties(user);

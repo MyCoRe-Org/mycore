@@ -43,8 +43,9 @@ public class MCRHeaderInputStreamTest {
         byte[] data = "data".getBytes();
         MCRHeaderInputStream h = new MCRHeaderInputStream(new ByteArrayInputStream(data));
         assertArrayEquals(data, h.getHeader());
-        for (byte aData : data)
+        for (byte aData : data) {
             assertEquals(aData, (byte) (h.read()));
+        }
         assertEquals(-1, h.read());
         h.close();
     }
@@ -52,15 +53,18 @@ public class MCRHeaderInputStreamTest {
     @Test
     public void largeStream() throws Exception {
         byte[] data = new byte[MCRHeaderInputStream.MAX_HEADER_SIZE + 1000];
-        for (int i = 0; i < data.length; i++)
+        for (int i = 0; i < data.length; i++) {
             data[i] = (byte) i;
+        }
 
         MCRHeaderInputStream h = new MCRHeaderInputStream(new ByteArrayInputStream(data));
         assertEquals(MCRHeaderInputStream.MAX_HEADER_SIZE, h.getHeader().length);
-        for (int i = 0; i < MCRHeaderInputStream.MAX_HEADER_SIZE; i++)
+        for (int i = 0; i < MCRHeaderInputStream.MAX_HEADER_SIZE; i++) {
             assertEquals(data[i], h.getHeader()[i]);
-        for (byte aData : data)
+        }
+        for (byte aData : data) {
             assertEquals(aData, (byte) (h.read()));
+        }
         assertEquals(-1, h.read());
         h.close();
     }

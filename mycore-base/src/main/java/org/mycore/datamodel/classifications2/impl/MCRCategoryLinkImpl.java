@@ -180,8 +180,9 @@ class MCRCategoryLinkImpl implements MCRCategoryLink {
         }
         if (objectReference == null) {
             return other.objectReference == null;
-        } else
+        } else {
             return objectReference.equals(other.objectReference);
+        }
     }
 
 }

@@ -69,8 +69,9 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
 
     @Override
     public boolean equals(Object o) {
-        if (!super.equals(o))
+        if (!super.equals(o)) {
             return false;
+        }
 
         MCRMetaEnrichedLinkID that = (MCRMetaEnrichedLinkID) o;
 

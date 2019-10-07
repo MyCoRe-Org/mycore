@@ -65,15 +65,17 @@ public class MCRUploadHandlerManager {
         long yesterday = System.currentTimeMillis() - 86400000;
         MCRUploadHandlerCacheEntry entry = HANDLERS.getIfUpToDate(uploadID, yesterday);
 
-        if (entry == null)
+        if (entry == null) {
             throw new MCRUsageException("Upload session " + uploadID + " timed out");
+        }
 
         String sessionID = entry.getSessionID();
 
         if (!sessionID.equals(MCRSessionMgr.getCurrentSessionID())) {
             MCRSession session = MCRSessionMgr.getSession(sessionID);
-            if (session != null)
+            if (session != null) {
                 MCRSessionMgr.setCurrentSession(session);
+            }
         }
 
         return entry.getUploadHandler();

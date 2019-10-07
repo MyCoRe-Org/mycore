@@ -120,8 +120,9 @@ public class MCRRestAPIClassifications {
      * @throws IOException
      */
     private static void writeChildrenAsJSON(Element eParent, JsonWriter writer, String lang) throws IOException {
-        if (eParent.getChildren("category").size() == 0)
+        if (eParent.getChildren("category").size() == 0) {
             return;
+        }
 
         writer.name("categories");
         writer.beginArray();

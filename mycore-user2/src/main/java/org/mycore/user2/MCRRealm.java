@@ -146,10 +146,11 @@ public class MCRRealm {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRRealm)
+        if (obj instanceof MCRRealm) {
             return ((MCRRealm) obj).id.equals(id);
-        else
+        } else {
             return false;
+        }
     }
 
     @Override

@@ -379,17 +379,20 @@ public class MCRMailer extends MCRServlet {
         msg.setFrom(EMail.buildAddress(mail.from));
 
         Optional<List<InternetAddress>> toList = EMail.buildAddressList(mail.to);
-        if (toList.isPresent())
+        if (toList.isPresent()) {
             msg.addRecipients(Message.RecipientType.TO, toList.get().toArray(new InternetAddress[toList.get().size()]));
+        }
 
         Optional<List<InternetAddress>> replyToList = EMail.buildAddressList(mail.replyTo);
-        if (replyToList.isPresent())
+        if (replyToList.isPresent()) {
             msg.setReplyTo((replyToList.get().toArray(new InternetAddress[replyToList.get().size()])));
+        }
 
         Optional<List<InternetAddress>> bccList = EMail.buildAddressList(mail.bcc);
-        if (bccList.isPresent())
+        if (bccList.isPresent()) {
             msg.addRecipients(Message.RecipientType.BCC,
                 bccList.get().toArray(new InternetAddress[bccList.get().size()]));
+        }
 
         msg.setSentDate(new Date());
         msg.setSubject(mail.subject, encoding);
@@ -465,16 +468,18 @@ public class MCRMailer extends MCRServlet {
      */
     public static Element sendMail(Document input, String stylesheet, Map<String, String> parameters) throws Exception {
         LOGGER.info("Generating e-mail from {} using {}.xsl", input.getRootElement().getName(), stylesheet);
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             debug(input.getRootElement());
+        }
 
         Element eMail = transform(input, stylesheet, parameters).getRootElement();
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             debug(eMail);
+        }
 
-        if (eMail.getChildren("to").isEmpty())
+        if (eMail.getChildren("to").isEmpty()) {
             LOGGER.warn("Will not send e-mail, no 'to' address specified");
-        else {
+        } else {
             LOGGER.info("Sending e-mail to {}: {}", eMail.getChildText("to"), eMail.getChildText("subject"));
             MCRMailer.send(eMail);
         }

@@ -148,7 +148,8 @@ public class MCRACCESSRULE {
         }
         if (rule == null) {
             return other.getRule() == null;
-        } else
+        } else {
             return rule.equals(other.getRule());
+        }
     }
 }

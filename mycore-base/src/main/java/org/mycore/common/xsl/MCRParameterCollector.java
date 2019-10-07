@@ -161,12 +161,14 @@ public class MCRParameterCollector {
      * Sets the parameter only if it is not empty and starts with "XSL." or onlySetXSLParameters is false
      */
     private void setXSLParameter(String name, String value) {
-        if ((value == null) || value.isEmpty())
+        if ((value == null) || value.isEmpty()) {
             return;
-        if (name.startsWith("XSL."))
+        }
+        if (name.startsWith("XSL.")) {
             parameters.put(name.substring(4), value);
-        else if (!onlySetXSLParameters)
+        } else if (!onlySetXSLParameters) {
             parameters.put(name, value);
+        }
     }
 
     /**
@@ -225,8 +227,9 @@ public class MCRParameterCollector {
     private void setFromRequestParameters(HttpServletRequest request) {
         for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             String name = e.nextElement();
-            if (!(name.endsWith(".SESSION")))
+            if (!(name.endsWith(".SESSION"))) {
                 setXSLParameter(name, request.getParameter(name));
+            }
         }
     }
 

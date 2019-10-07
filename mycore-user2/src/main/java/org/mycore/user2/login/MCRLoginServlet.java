@@ -135,10 +135,11 @@ public class MCRLoginServlet extends MCRServlet {
     private void chooseLoginMethod(HttpServletRequest req, HttpServletResponse res) throws Exception {
         storeURL(getReturnURL(req));
         // redirect directly to login url if there is only one realm available and the user is not logged in
-        if ((getNumLoginOptions() == 1) && currentUserIsGuest())
+        if ((getNumLoginOptions() == 1) && currentUserIsGuest()) {
             redirectToUniqueRealm(req, res);
-        else
+        } else {
             listRealms(req, res);
+        }
     }
 
     protected static String getReturnURL(HttpServletRequest req) {
@@ -198,8 +199,9 @@ public class MCRLoginServlet extends MCRServlet {
         for (Element realm : realmList) {
             String realmID = realm.getAttributeValue("id");
             Element login = realm.getChild("login");
-            if (login != null)
+            if (login != null) {
                 login.setAttribute("url", MCRRealmFactory.getRealm(realmID).getLoginURL(redirectURL));
+            }
         }
         getLayoutService().doLayout(req, res, new MCRJDOMContent(realmsDoc));
     }
@@ -273,9 +275,9 @@ public class MCRLoginServlet extends MCRServlet {
      * successful login, the browser is redirected to that url. 
      */
     private void storeURL(String url) throws Exception {
-        if ((url == null) || (url.trim().length() == 0))
+        if ((url == null) || (url.trim().length() == 0)) {
             url = MCRFrontendUtil.getBaseURL();
-        else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {
+        } else if (url.startsWith(MCRFrontendUtil.getBaseURL()) && !url.equals(MCRFrontendUtil.getBaseURL())) {
             String rest = url.substring(MCRFrontendUtil.getBaseURL().length());
             url = MCRFrontendUtil.getBaseURL() + encodePath(rest);
         }

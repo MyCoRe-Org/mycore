@@ -106,8 +106,9 @@ public class DefaultNavigationProviderTest {
         List<JsonObject> itemList = new ArrayList<>();
         for (JsonElement e : items) {
             JsonObject item = (JsonObject) e;
-            if (item.getAsJsonPrimitive("wcmsType").getAsString().equals(type))
+            if (item.getAsJsonPrimitive("wcmsType").getAsString().equals(type)) {
                 itemList.add(item);
+            }
         }
         return itemList;
     }
@@ -116,8 +117,9 @@ public class DefaultNavigationProviderTest {
     private JsonObject getByWebpageId(String id, JsonArray items) {
         for (JsonElement e : items) {
             JsonObject item = (JsonObject) e;
-            if (item.getAsJsonPrimitive("href") != null && item.getAsJsonPrimitive("href").getAsString().equals(id))
+            if (item.getAsJsonPrimitive("href") != null && item.getAsJsonPrimitive("href").getAsString().equals(id)) {
                 return item;
+            }
         }
         return null;
     }

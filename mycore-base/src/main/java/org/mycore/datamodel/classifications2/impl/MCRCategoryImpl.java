@@ -483,19 +483,25 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         MCRCategoryImpl other = (MCRCategoryImpl) obj;
-        if (internalID != other.internalID)
+        if (internalID != other.internalID) {
             return false;
-        if (left != other.left)
+        }
+        if (left != other.left) {
             return false;
-        if (level != other.level)
+        }
+        if (level != other.level) {
             return false;
+        }
         return right == other.right;
     }
 

@@ -228,8 +228,9 @@ public class MCRErrorServlet extends HttpServlet {
                     setWebAppBaseURL(session, request);
                     LAYOUT_SERVICE.doLayout(request, response, new MCRJDOMContent(errorDoc));
                 } finally {
-                    if (!openTransaction)
+                    if (!openTransaction) {
                         session.commitTransaction();
+                    }
                 }
             } finally {
                 if (exceptionThrown || !currentSessionActive) {

@@ -52,13 +52,15 @@ public class MCRBasketXMLBuilder {
 
         if (addContent) {
             Element content = entry.getContent();
-            if (content != null)
+            if (content != null) {
                 xml.addContent(content.clone());
+            }
         }
 
         String comment = entry.getComment();
-        if (comment != null)
+        if (comment != null) {
             xml.addContent(new Element("comment").setText(comment));
+        }
 
         return xml;
     }
@@ -71,11 +73,13 @@ public class MCRBasketXMLBuilder {
         xml.setAttribute("type", basket.getType());
 
         String derivateID = basket.getDerivateID();
-        if (derivateID != null)
+        if (derivateID != null) {
             xml.setAttribute("id", derivateID);
+        }
 
-        for (MCRBasketEntry entry : basket)
+        for (MCRBasketEntry entry : basket) {
             xml.addContent(buildXML(entry));
+        }
         return new Document(xml);
     }
 }

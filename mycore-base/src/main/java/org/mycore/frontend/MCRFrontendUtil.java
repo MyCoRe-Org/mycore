@@ -190,8 +190,9 @@ public class MCRFrontendUtil {
         String remoteAddress = req.getRemoteAddr();
         if (TRUSTED_PROXIES.contains(remoteAddress)) {
             String xff = getXForwardedFor(req);
-            if (xff != null)
+            if (xff != null) {
                 remoteAddress = xff;
+            }
         }
         return remoteAddress;
     }
@@ -204,8 +205,9 @@ public class MCRFrontendUtil {
         if ((xff == null) || xff.trim().isEmpty()) {
             xff = req.getHeader(PROXY_HEADER_REMOTE_IP);
         }
-        if ((xff == null) || xff.trim().isEmpty())
+        if ((xff == null) || xff.trim().isEmpty()) {
             return null;
+        }
 
         // X_FORWARDED_FOR can be comma separated list of hosts,
         // if so, take last entry, all others are not reliable because
