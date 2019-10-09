@@ -45,6 +45,12 @@ import org.mycore.common.content.MCRContent;
  * @version $Revision$ $Date$
  */
 public abstract class MCRContentStore {
+    /** DateFormat used to construct new unique IDs based on timecode */
+    protected static DateFormat formatter = new SimpleDateFormat("yyMMdd-HHmmss-SSS", Locale.ROOT);
+
+    /** The last timestamp that was constructed */
+    protected static String lastTimestamp = null;
+
     /** The unique store ID for this MCRContentStore implementation */
     protected String storeID;
 
@@ -59,11 +65,40 @@ public abstract class MCRContentStore {
     }
 
     /**
+     * Constructs a new unique ID for storing content
+     */
+    protected static synchronized String buildNextID(MCRFile file) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(buildNextTimestamp());
+        sb.append("-").append(file.getID());
+
+        if (file.getExtension().length() > 0) {
+            sb.append(".").append(file.getExtension());
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Helper method for constructing a unique storage ID from a timestamp.
+     */
+    protected static synchronized String buildNextTimestamp() {
+        String ts = null;
+
+        do {
+            ts = formatter.format(new Date());
+        } while (ts.equals(lastTimestamp));
+        lastTimestamp = ts;
+        return ts;
+    }
+
+    /**
      * Initializes the store and sets its unique store ID. MCRFiles must
      * remember this ID to indentify the store that holds their file content.
      * The store ID is set by MCRContentStoreFactory when a new store instance
      * is built. Subclasses should override this method.
-     * 
+     *
      * @param storeID
      *            the non-null unique store ID for this store instance
      */
@@ -75,7 +110,7 @@ public abstract class MCRContentStore {
 
     /**
      * Returns the unique store ID that was set for this store instance
-     * 
+     *
      * @return the unique store ID that was set for this store instance
      */
     public String getID() {
@@ -86,7 +121,7 @@ public abstract class MCRContentStore {
      * Stores the content of an MCRFile by reading from an
      * MCRContentInputStream. Returns a StorageID to identify the place where
      * the content was stored.
-     * 
+     *
      * @param file
      *            the MCRFile thats content is to be stored
      * @param source
@@ -125,7 +160,7 @@ public abstract class MCRContentStore {
      * Stores the content of an MCRFile by reading from an
      * MCRContentInputStream. Returns a StorageID to identify the place where
      * the content was stored.
-     * 
+     *
      * @param file
      *            the MCRFile thats content is to be stored
      * @param source
@@ -137,7 +172,7 @@ public abstract class MCRContentStore {
     /**
      * Deletes the content of an MCRFile object that is stored under the given
      * Storage ID in this store instance.
-     * 
+     *
      * @param storageID
      *            the storage ID of the MCRFile object
      */
@@ -157,7 +192,7 @@ public abstract class MCRContentStore {
     /**
      * Deletes the content of an MCRFile object that is stored under the given
      * Storage ID in this store instance.
-     * 
+     *
      * @param storageID
      *            the storage ID of the MCRFile object
      */
@@ -167,7 +202,7 @@ public abstract class MCRContentStore {
      * Retrieves the content of an MCRFile. Uses the
      * StorageID to indentify the place where the file content was stored in
      * this store instance.
-     * 
+     *
      * @param file
      *            the MCRFile thats content should be retrieved
      * @since 2.2
@@ -176,7 +211,7 @@ public abstract class MCRContentStore {
 
     /**
      * Retrieves the content of an MCRFile as an InputStream.
-     * 
+     *
      * @param file
      *            the MCRFile thats content should be retrieved
      */
@@ -195,58 +230,23 @@ public abstract class MCRContentStore {
     }
 
     /**
-     * Returns the local java.io.File that really stores the content of the MCRFile 
+     * Returns the local java.io.File that really stores the content of the MCRFile
      */
     public File getLocalFile(MCRFile reader) throws IOException {
         return getLocalFile(reader.getStorageID());
     }
 
     /**
-     * Returns the local java.io.File that really stores the content of the MCRFile 
+     * Returns the local java.io.File that really stores the content of the MCRFile
      */
     public abstract File getLocalFile(String storageId) throws IOException;
 
     /**
      * Returns the base dir as {@link File} if available or null if the base directory is no local file.
-     * 
+     *
      * All files handled by this content store instance must resist under this directory.
      */
     public abstract File getBaseDir() throws IOException;
-
-    /** DateFormat used to construct new unique IDs based on timecode */
-    protected static DateFormat formatter = new SimpleDateFormat("yyMMdd-HHmmss-SSS", Locale.ROOT);
-
-    /**
-     * Constructs a new unique ID for storing content
-     */
-    protected static synchronized String buildNextID(MCRFile file) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(buildNextTimestamp());
-        sb.append("-").append(file.getID());
-
-        if (file.getExtension().length() > 0) {
-            sb.append(".").append(file.getExtension());
-        }
-
-        return sb.toString();
-    }
-
-    /** The last timestamp that was constructed */
-    protected static String lastTimestamp = null;
-
-    /**
-     * Helper method for constructing a unique storage ID from a timestamp.
-     */
-    protected static synchronized String buildNextTimestamp() {
-        String ts = null;
-
-        do {
-            ts = formatter.format(new Date());
-        } while (ts.equals(lastTimestamp));
-
-        return lastTimestamp = ts;
-    }
 
     /**
      * Some content store implementations store the file's content in a
