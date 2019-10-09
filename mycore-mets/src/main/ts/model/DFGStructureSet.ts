@@ -50,6 +50,7 @@ namespace org.mycore.mets.model {
                 new StructureSetElement('habilitation_thesis'),
                 new StructureSetElement('manuscript'),
                 new StructureSetElement('issue'),
+                new StructureSetElement('image'),
                 new StructureSetElement('illustration'),
                 new StructureSetElement('imprint'),
                 new StructureSetElement('contents'),
