@@ -56,13 +56,13 @@ import org.xml.sax.helpers.DefaultHandler;
  * @version $Revision$ $Date$
  */
 public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
+    private static Logger logger = LogManager.getLogger(MCRSimpleFCTDetector.class);
+
     /** List of file content types we have rules for */
     private List<MCRFileContentType> typesList = new Vector<>();
 
     /** Keys are file content types, values are vectors of MCRDetectionRule */
     private Hashtable<MCRFileContentType, Vector> rulesTable = new Hashtable<>();
-
-    private static Logger logger = LogManager.getLogger(MCRSimpleFCTDetector.class);
 
     /** Creates a new detector */
     public MCRSimpleFCTDetector() {
@@ -161,6 +161,49 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         return detected;
     }
 
+    /**
+     * Copy from MCRLayoutServlet, messages changed from MCRLayoutServlet to
+     * MCRSimpleFCTDetector Try to detect doctype of xml data
+     *
+     * @param in
+     *            xml data
+     *
+     * @return detected doctype
+     */
+    protected String parseDocumentType(InputStream in) {
+        SAXParser parser = null;
+
+        try {
+            parser = SAXParserFactory.newInstance().newSAXParser();
+        } catch (Exception ex) {
+            String msg = "Could not build a SAX Parser for processing XML input";
+            throw new MCRConfigurationException(msg, ex);
+        }
+
+        final Properties detected = new Properties();
+        final String forcedInterrupt = "mcr.forced.interrupt";
+
+        DefaultHandler handler = new DefaultHandler() {
+            @Override
+            public void startElement(String uri, String localName, String qName, Attributes attributes) {
+                logger.debug("MCRSimpleFCTDetector detected root element = {}", qName);
+                detected.setProperty("docType", qName);
+                throw new MCRException(forcedInterrupt);
+            }
+        };
+
+        try {
+            parser.parse(new InputSource(in), handler);
+        } catch (Exception ex) {
+            if (!forcedInterrupt.equals(ex.getMessage())) {
+                String msg = "Error while detecting XML document type from input source";
+                throw new MCRException(msg, ex);
+            }
+        }
+
+        return detected.getProperty("docType");
+    }
+
     /** Common superclass of different kinds of detection rules */
     abstract class MCRDetectionRule {
         /** The score for matching this rule, a value between 0.0 and 1.0 */
@@ -168,7 +211,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
         /**
          * Creates a new detection rule
-         * 
+         *
          * @param score
          *            The score for matching this rule, a value between 0.0 and
          *            1.0
@@ -180,12 +223,12 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
         /**
          * Returns the score if filename and/or header matches this rule, or 0.0
-         * 
+         *
          * @param filename
          *            the name of the file to detect the content type of
          * @param header
          *            the first bytes of the file content
-         * 
+         *
          * @return the score between 0.0 and 1.0 for matching this rule
          */
         abstract double getScore(String filename, byte[] header);
@@ -198,7 +241,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
         /**
          * Creates a new rule based on a match of the file extension
-         * 
+         *
          * @param extension
          *            lowercase file name extension that a file must match
          * @param score
@@ -233,7 +276,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         /**
          * Creates a new rule for a match based on a magic bytes pattern at a
          * given offset
-         * 
+         *
          * @param pattern
          *            the magic bytes pattern this rule matches
          * @param format
@@ -295,7 +338,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
         /**
          * Creates a new rule based on a match of the doctype of a xml file
-         * 
+         *
          * @param doctype
          *            the doctype the file must match
          * @param score
@@ -328,7 +371,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
         /**
          * Creates a new rule based on a match of a String at any position in the head of the file
-         * 
+         *
          * @param string
          *            the string in the head of the file must match
          * @param score
@@ -348,48 +391,5 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
             }
             return 0;
         }
-    }
-
-    /**
-     * Copy from MCRLayoutServlet, messages changed from MCRLayoutServlet to
-     * MCRSimpleFCTDetector Try to detect doctype of xml data
-     * 
-     * @param in
-     *            xml data
-     * 
-     * @return detected doctype
-     */
-    protected String parseDocumentType(InputStream in) {
-        SAXParser parser = null;
-
-        try {
-            parser = SAXParserFactory.newInstance().newSAXParser();
-        } catch (Exception ex) {
-            String msg = "Could not build a SAX Parser for processing XML input";
-            throw new MCRConfigurationException(msg, ex);
-        }
-
-        final Properties detected = new Properties();
-        final String forcedInterrupt = "mcr.forced.interrupt";
-
-        DefaultHandler handler = new DefaultHandler() {
-            @Override
-            public void startElement(String uri, String localName, String qName, Attributes attributes) {
-                logger.debug("MCRSimpleFCTDetector detected root element = {}", qName);
-                detected.setProperty("docType", qName);
-                throw new MCRException(forcedInterrupt);
-            }
-        };
-
-        try {
-            parser.parse(new InputSource(in), handler);
-        } catch (Exception ex) {
-            if (!forcedInterrupt.equals(ex.getMessage())) {
-                String msg = "Error while detecting XML document type from input source";
-                throw new MCRException(msg, ex);
-            }
-        }
-
-        return detected.getProperty("docType");
     }
 }

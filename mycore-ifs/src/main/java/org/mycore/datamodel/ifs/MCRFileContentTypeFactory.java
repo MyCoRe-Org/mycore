@@ -77,13 +77,13 @@ public class MCRFileContentTypeFactory {
         for (Object type1 : types) {
             // Build file content type from XML element
             Element xType = (Element) type1;
-            String ID = xType.getAttributeValue("ID");
+            String id = xType.getAttributeValue("ID");
             String label = xType.getChildTextTrim("label");
             String url = xType.getChildTextTrim("url");
             String mime = xType.getChildTextTrim("mime");
 
-            MCRFileContentType type = new MCRFileContentType(ID, label, url, mime);
-            typesTable.put(ID, type);
+            MCRFileContentType type = new MCRFileContentType(id, label, url, mime);
+            typesTable.put(id, type);
 
             // Add a detection rule for this file content type
             Element xRules = xType.getChild("rules");
@@ -101,22 +101,22 @@ public class MCRFileContentTypeFactory {
     /**
      * Returns the file content type with the given ID
      * 
-     * @param ID
+     * @param id
      *            The non-null ID of the content type that should be returned
      * @return The file content type with the given ID
      * 
      * @throws MCRConfigurationException
      *             if no such file content type is known in the system
      */
-    public static MCRFileContentType getType(String ID) throws MCRConfigurationException {
-        if (Objects.requireNonNull(ID, "ID" + " is null").trim().isEmpty()) {
+    public static MCRFileContentType getType(String id) throws MCRConfigurationException {
+        if (Objects.requireNonNull(id, "ID" + " is null").trim().isEmpty()) {
             throw new MCRUsageException("ID" + " is an empty String");
         }
 
-        if (typesTable.containsKey(ID)) {
-            return typesTable.get(ID);
+        if (typesTable.containsKey(id)) {
+            return typesTable.get(id);
         }
-        String msg = "There is no file content type with ID = " + ID + " configured";
+        String msg = "There is no file content type with ID = " + id + " configured";
         throw new MCRConfigurationException(msg);
     }
 
@@ -147,16 +147,16 @@ public class MCRFileContentTypeFactory {
     /**
      * Returns true if the file content type with the given ID is configured
      * 
-     * @param ID
+     * @param id
      *            The non-null ID of the content type that should be returned
      * @return true if content type is available, else false
      */
-    public static boolean isTypeAvailable(String ID) throws MCRConfigurationException {
-        if (Objects.requireNonNull(ID, "ID" + " is null").trim().isEmpty()) {
+    public static boolean isTypeAvailable(String id) throws MCRConfigurationException {
+        if (Objects.requireNonNull(id, "ID" + " is null").trim().isEmpty()) {
             throw new MCRUsageException("ID" + " is an empty String");
         }
 
-        return typesTable.containsKey(ID);
+        return typesTable.containsKey(id);
     }
 
     /**

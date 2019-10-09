@@ -102,8 +102,8 @@ public class MCRFile extends MCRFilesystemNode {
     private boolean isNew;
 
     /**
-     * Creates a new and empty root MCRFile with the given filename, belonging to the given ownerID. The file is assumed to be a standalone "root file" that has
-     * no parent directory.
+     * Creates a new and empty root MCRFile with the given filename, belonging to the given ownerID.
+     * The file is assumed to be a standalone "root file" that has no parent directory.
      *
      * @param name
      *            the filename of the new MCRFile
@@ -153,9 +153,9 @@ public class MCRFile extends MCRFilesystemNode {
     /*
      * Internal constructor, do not use on your own.
      */
-    public MCRFile(String ID, String parentID, String ownerID, String name, String label, long size,
+    public MCRFile(String id, String parentID, String ownerID, String name, String label, long size,
         GregorianCalendar date, String storeID, String storageID, String fctID, String md5) {
-        super(ID, parentID, ownerID, name, label, size, date);
+        super(id, parentID, ownerID, name, label, size, date);
 
         this.storageID = storageID;
         this.storeID = storeID;
@@ -167,12 +167,12 @@ public class MCRFile extends MCRFilesystemNode {
     /**
      * Returns the MCRFile with the given ID.
      *
-     * @param ID
+     * @param id
      *            the unique ID of the MCRFile to return
      * @return the MCRFile with the given ID, or null if no such file exists
      */
-    public static MCRFile getFile(String ID) {
-        return (MCRFile) MCRFilesystemNode.getNode(ID);
+    public static MCRFile getFile(String id) {
+        return (MCRFile) MCRFilesystemNode.getNode(id);
     }
 
     /**
@@ -308,8 +308,8 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * Reads the content of this file from a java.lang.String and stores its text as bytes, encoded in the default encoding of the platform where this is
-     * running.
+     * Reads the content of this file from a {@link String} and stores its text as bytes,
+     * encoded in the default encoding of the platform where this is running.
      *
      * @param source
      *            the String that is the file's content
@@ -323,7 +323,8 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * Reads the content of this file from a java.lang.String and stores its text as bytes, encoded in the encoding given, in an MCRContentStore.
+     * Reads the content of this file from a {@link String} and stores its text as bytes,
+     * encoded in the encoding given, in an MCRContentStore.
      *
      * @param source
      *            the String that is the file's content
@@ -395,8 +396,8 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * Reads the content of this file from the source InputStream and stores it in an MCRContentStore. InputStream does NOT get closed at end of process, this
-     * must be done by invoking code if required/appropriate.
+     * Reads the content of this file from the source {@link InputStream} and stores it in an MCRContentStore.
+     * InputStream does NOT get closed at end of process, this must be done by invoking code if required/appropriate.
      *
      * @param source
      *            the source for the file's content bytes
@@ -408,11 +409,11 @@ public class MCRFile extends MCRFilesystemNode {
     public long setContentFrom(InputStream source, boolean storeContentChange) throws MCRPersistenceException {
         ensureNotDeleted();
 
-        String old_md5 = md5;
-        long old_size = size;
-        String old_storageID = storageID;
-        String old_storeID = storeID;
-        MCRContentStore old_store = getContentStore();
+        String oldMd5 = md5;
+        long oldSize = size;
+        String oldStorageID = storageID;
+        String oldStoreID = storeID;
+        MCRContentStore oldStore = getContentStore();
 
         initContentFields();
 
@@ -426,28 +427,28 @@ public class MCRFile extends MCRFilesystemNode {
         storageID = store.storeContent(this, cis);
         storeID = store.getID();
 
-        long new_size = cis.getLength();
-        String new_md5 = cis.getMD5String();
+        long newSize = cis.getLength();
+        String newMd5 = cis.getMD5String();
 
-        if ((old_storageID.length() != 0) && (!(old_storageID.equals(storageID) && (old_storeID.equals(storeID))))) {
-            old_store.deleteContent(old_storageID);
+        if ((oldStorageID.length() != 0) && (!(oldStorageID.equals(storageID) && (oldStoreID.equals(storeID))))) {
+            oldStore.deleteContent(oldStorageID);
         }
 
-        boolean changed = new_size != old_size || new_md5.equals(old_md5);
+        boolean changed = newSize != oldSize || newMd5.equals(oldMd5);
 
         if (changed) {
             if (storeContentChange) {
                 try {
-                    adjustMetadata(FileTime.fromMillis(System.currentTimeMillis()), new_md5, new_size);
+                    adjustMetadata(FileTime.fromMillis(System.currentTimeMillis()), newMd5, newSize);
                 } catch (IOException e) {
                     throw new MCRPersistenceException("Error while updating file metadata", e);
                 }
             } else {
-                this.md5 = new_md5;
+                this.md5 = newMd5;
             }
         }
 
-        return new_size - old_size;
+        return newSize - oldSize;
     }
 
     public void storeContentChange(long sizeDiff) throws IOException {
@@ -586,8 +587,8 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * Gets an InputStream to read the content of this file from the underlying store. It is important that you close() the stream when you are finished reading
-     * content from it.
+     * Gets an InputStream to read the content of this file from the underlying store.
+     * It is important that you close() the stream when you are finished reading content from it.
      *
      * @return an InputStream to read the file's content from
      */
@@ -665,7 +666,8 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * Returns true, if this file is stored in a content store that provides an MCRAudioVideoExtender for audio/video streaming and additional metadata
+     * Returns true, if this file is stored in a content store that provides an MCRAudioVideoExtender
+     * for audio/video streaming and additional metadata
      */
     public boolean hasAudioVideoExtender() {
         ensureNotDeleted();
@@ -677,7 +679,8 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * Returns the AudioVideoExtender in case this file is streaming audio/video and stored in a ContentStore that supports this
+     * Returns the AudioVideoExtender in case this file is streaming audio/video and stored in a ContentStore
+     * that supports this
      */
     public MCRAudioVideoExtender getAudioVideoExtender() {
         ensureNotDeleted();
@@ -725,8 +728,8 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * Build a XML representation of all technical metadata of this MCRFile and its MCRAudioVideoExtender, if present. That xml can be used for indexing this
-     * data.
+     * Build a XML representation of all technical metadata of this MCRFile and its MCRAudioVideoExtender, if present.
+     * That xml can be used for indexing this data.
      */
     public Document createXML() {
         Element root = new Element("file");
@@ -764,7 +767,8 @@ public class MCRFile extends MCRFilesystemNode {
     }
 
     /**
-     * Gets the {@link MCRObjectID} for the {@link MCRObject} where this file is related to (the owner id of the derivate).
+     * Gets the {@link MCRObjectID} for the {@link MCRObject} where this file is related to
+     * (the owner id of the derivate).
      *
      * @return the {@link MCRObjectID}
      */

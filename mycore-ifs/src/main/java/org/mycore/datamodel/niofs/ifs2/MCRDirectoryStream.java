@@ -56,26 +56,6 @@ import org.mycore.datamodel.niofs.MCRPath;
 public class MCRDirectoryStream {
     static Logger LOGGER = LogManager.getLogger();
 
-    private static class AcceptAllFilter
-        implements DirectoryStream.Filter<Path> {
-        @Override
-        public boolean accept(Path entry) {
-            return true;
-        }
-
-        static final MCRDirectoryStream.AcceptAllFilter FILTER = new AcceptAllFilter();
-    }
-
-    private static class MCRFileCollectionFilter
-        implements DirectoryStream.Filter<Path> {
-        @Override
-        public boolean accept(Path entry) {
-            return !entry.getFileName().toString().equals(MCRFileCollection.DATA_FILE);
-        }
-
-        static final MCRDirectoryStream.MCRFileCollectionFilter FILTER = new MCRFileCollectionFilter();
-    }
-
     static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
         DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER
             : AcceptAllFilter.FILTER;
@@ -88,6 +68,26 @@ public class MCRDirectoryStream {
                 (java.nio.file.SecureDirectoryStream<Path>) baseDirectoryStream);
         }
         return new SimpleDirectoryStream(path, baseDirectoryStream);
+    }
+
+    private static class AcceptAllFilter
+        implements DirectoryStream.Filter<Path> {
+        static final MCRDirectoryStream.AcceptAllFilter FILTER = new AcceptAllFilter();
+
+        @Override
+        public boolean accept(Path entry) {
+            return true;
+        }
+    }
+
+    private static class MCRFileCollectionFilter
+        implements DirectoryStream.Filter<Path> {
+        static final MCRDirectoryStream.MCRFileCollectionFilter FILTER = new MCRFileCollectionFilter();
+
+        @Override
+        public boolean accept(Path entry) {
+            return !entry.getFileName().toString().equals(MCRFileCollection.DATA_FILE);
+        }
     }
 
     private static class SimpleDirectoryStream<T extends DirectoryStream<Path>> implements DirectoryStream<Path> {

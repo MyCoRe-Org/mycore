@@ -49,11 +49,11 @@ public interface MCRFileMetadataStore {
     /**
      * Retrieves the MCRFilesystemNode with that ID from the persistent store.
      * 
-     * @param ID the
+     * @param id the
      *            unique ID of the MCRFilesystemNode
      * @return the node with that ID, or null if no such node exists
      */
-    MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException;
+    MCRFilesystemNode retrieveNode(String id) throws MCRPersistenceException;
 
     /**
      * Retrieves a child node of an MCRDirectory from the persistent store.
@@ -90,10 +90,10 @@ public interface MCRFileMetadataStore {
      * Deletes all data of a given MCRFilesystemNode in the persistent metadata
      * store.
      * 
-     * @param ID
+     * @param id
      *            the unique ID of the MCRFilesystemNode to delete
      */
-    void deleteNode(String ID) throws MCRPersistenceException;
+    void deleteNode(String id) throws MCRPersistenceException;
 
     /**
      * Returns an object to iterate over the owner IDs.
