@@ -247,13 +247,13 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     }
 
     protected void validatePermission(MCRBase obj) throws MCRAccessException {
-        String missingPermission;
-        if (!MCRAccessManager.checkPermission(obj.getId(), missingPermission = PERMISSION_WRITE) ||
-            !MCRAccessManager
-                .checkPermission(obj.getId(), missingPermission = "register-" + getServiceID())) {
+        Optional<String> missingPermission = Stream.of(PERMISSION_WRITE, "register-" + getServiceID())
+            .filter(permission -> !MCRAccessManager.checkPermission(obj.getId(), permission))
+            .findFirst();
+        if (missingPermission.isPresent()) {
             throw MCRAccessException
                 .missingPermission("Register a " + type + " & Update object.", obj.getId().toString(),
-                    missingPermission);
+                    missingPermission.get());
         }
     }
 
@@ -268,8 +268,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * Validates if an object can get an Identifier assigned from this service! <b>Better call super when overwrite!</b>
      *
      * @param obj
-     * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
-     * @throws MCRAccessException               if the user does not have the rights to assign a pi to the specific object
+     * @throws MCRPersistentIdentifierException
+     * see {@link org.mycore.pi.exceptions}
+     * @throws MCRAccessException
+     * if the user does not have the rights to assign a pi to the specific object
      */
     public void validateRegistration(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException, MCRAccessException {
@@ -293,9 +295,11 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *
      * @param obj the object which has to be identified
      * @return the assigned Identifier
-     * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException           the {@link MCRPIMetadataService} lets
-     *                                          {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
+     * @throws MCRAccessException
+     * the current User doesn't have the rights to insert the Identifier to Metadata
+     * @throws MCRActiveLinkException
+     * the {@link MCRPIMetadataService} lets
+     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
     public T register(MCRBase obj)
@@ -312,10 +316,13 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @param additional   additional information for the persistent identifier
      * @param updateObject if true this method calls {@link MCRMetadataManager#update(MCRBase)}
      * @return the assigned Identifier
-     * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException           the {@link MCRPIMetadataService} lets
-     *                                          {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
-     * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
+     * @throws MCRAccessException
+     * the current User doesn't have the rights to insert the Identifier to Metadata
+     * @throws MCRActiveLinkException
+     * the {@link MCRPIMetadataService} lets
+     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
+     * @throws MCRPersistentIdentifierException
+     * see {@link org.mycore.pi.exceptions}
      */
     public synchronized T register(MCRBase obj, String additional, boolean updateObject)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
@@ -391,8 +398,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @param identifier the Identifier
      * @param obj        the deleted object
      * @param additional
-     * @throws MCRPersistentIdentifierException to abort deletion of the object  or if something went wrong.
-     *                                          (E.G. {@link MCRDOIService} throws if not superuser tries to delete the object)
+     * @throws MCRPersistentIdentifierException
+     * to abort deletion of the object or if something went wrong, (e.g. {@link MCRDOIService} throws if not a superuser
+     * tries to delete the object)
      */
     protected abstract void delete(T identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException;

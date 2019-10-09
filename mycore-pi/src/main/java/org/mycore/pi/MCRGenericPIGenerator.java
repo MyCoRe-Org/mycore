@@ -48,7 +48,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * You can also map the projectid
  *
- * Set a optional Count precision, if not set or set to -1 the pure number is used (1,2,.., 999). Count always relativ to type and date.
+ * Set a optional Count precision, if not set or set to -1 the pure number is used (1,2,.., 999).
+ * Count always relativ to type and date.
  *
  * MCR.PI.Generator.myGenerator.CountPrecision=3 # will produce 001, 002, ... , 999
  *

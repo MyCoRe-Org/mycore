@@ -18,7 +18,6 @@
 
 package org.mycore.pi;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,12 +86,9 @@ public class MCRPIManager {
         Stream.of(MCRConfiguration.instance().getString(RESOLVER_CONFIGURATION).split(","))
             .forEach(className -> {
                 try {
-                    @SuppressWarnings("unchecked")
-                    Class<MCRPIResolver<MCRPersistentIdentifier>> resolverClass = (Class<MCRPIResolver<MCRPersistentIdentifier>>) Class
-                        .forName(className);
-                    Constructor<MCRPIResolver<MCRPersistentIdentifier>> resolverClassConstructor = resolverClass
-                        .getConstructor();
-                    MCRPIResolver<MCRPersistentIdentifier> resolver = resolverClassConstructor
+                    MCRPIResolver<MCRPersistentIdentifier> resolver =
+                        ((Class<MCRPIResolver<MCRPersistentIdentifier>>) Class.forName(className))
+                        .getConstructor()
                         .newInstance();
                     resolverList.add(resolver);
                 } catch (ClassNotFoundException e) {

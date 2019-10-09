@@ -200,8 +200,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * Tries to parse a identifier with a specific type.
      *
      * @param identifier the identifier to parse
-     * @return parsed identifier or {@link Optional#empty()} if there is no parser for the type or the parser can`t parse
-     * the identifier
+     * @return parsed identifier or {@link Optional#empty()} if there is no parser for the type
+     * or the parser can't parse the identifier
      * @throws ClassCastException when type does not match the type of T
      */
     protected Optional<T> parseIdentifier(String identifier) {
@@ -230,7 +230,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * Result of this will be passed to {@link MCRJobAction#name()}
      *
      * @param contextParameters the parameters of the job
-     * @return Some Information what this job will do or just {@link Optional#empty()}, then a default message is generated.
+     * @return Some Information what this job will do or just {@link Optional#empty()},
+     * then a default message is generated.
      */
     protected abstract Optional<String> getJobInformation(Map<String, String> contextParameters);
 

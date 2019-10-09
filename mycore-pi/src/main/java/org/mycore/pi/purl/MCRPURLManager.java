@@ -25,8 +25,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -55,15 +55,11 @@ import org.w3c.dom.Element;
 public class MCRPURLManager {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String UTF_8_STR = "UTF-8";
-
     private static final String ADMIN_PATH = "/admin";
 
     private static final String PURL_PATH = ADMIN_PATH + "/purl";
 
     private static final String COOKIE_HEADER_PARAM = "Cookie";
-
-    private final Charset UTF_8 = StandardCharsets.UTF_8;
 
     private String purlServerBaseURL;
 
@@ -85,13 +81,12 @@ public class MCRPURLManager {
             conn = (HttpURLConnection) url.openConnection();
             conn.connect();
 
-            String headerName;
-            for (int i = 1; (headerName = conn.getHeaderFieldKey(i)) != null; i++) {
-                if ("Set-Cookie".equals(headerName)) {
-                    cookie = conn.getHeaderField(i);
+            conn.getHeaderFields()
+                .getOrDefault("Set-Cookie", List.of())
+                .forEach(cookie -> {
+                    this.cookie = cookie;
                     LOGGER.debug("Cookie: " + cookie);
-                }
-            }
+                });
             conn.disconnect();
 
             // Login
@@ -104,13 +99,14 @@ public class MCRPURLManager {
             conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
 
             conn.setDoOutput(true);
-            try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8)) {
+            try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
                 wr.write(data);
                 wr.flush();
                 LOGGER.error(url + " -> " + conn.getResponseCode());
 
                 // Get the response
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), UTF_8))) {
+                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(),
+                    StandardCharsets.UTF_8))) {
 
                     String line;
                     while ((line = rd.readLine()) != null) {
@@ -148,7 +144,7 @@ public class MCRPURLManager {
             conn.setRequestProperty(COOKIE_HEADER_PARAM, cookie);
 
             conn.setDoOutput(true);
-            try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8)) {
+            try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
                 wr.flush();
             }
             LOGGER.debug(url + " -> " + conn.getResponseCode());
@@ -200,14 +196,15 @@ public class MCRPURLManager {
 
             conn.setDoOutput(true);
 
-            try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), UTF_8)) {
+            try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
                 wr.write(data);
                 wr.flush();
             }
             response = conn.getResponseCode();
 
             if (response != 200 && conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
+                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
+                    StandardCharsets.UTF_8))) {
                     String line;
                     while ((line = rd.readLine()) != null) {
                         LOGGER.error(line);
@@ -254,7 +251,8 @@ public class MCRPURLManager {
             response = conn.getResponseCode();
 
             if (response != 200 && conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
-                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8))) {
+                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
+                    StandardCharsets.UTF_8))) {
                     String line = null;
                     while ((line = rd.readLine()) != null) {
                         LOGGER.error(line);
@@ -290,7 +288,8 @@ public class MCRPURLManager {
             response = conn.getResponseCode();
 
             if (response != 200 || conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(), UTF_8));
+                BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
+                    StandardCharsets.UTF_8));
                 String line = null;
                 while ((line = rd.readLine()) != null) {
                     LOGGER.error(line);
