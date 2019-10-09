@@ -26,7 +26,8 @@ import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 /**
- * The property BaseURLTemplate is your url and the {@link MCRIDPURLGenerator} will replace $ID with the actual MyCoRe-ID.
+ * The property BaseURLTemplate is your url and the {@link MCRIDPURLGenerator}
+ * will replace $ID with the actual MyCoRe-ID.
  */
 public class MCRIDPURLGenerator extends MCRPIGenerator<MCRPURL> {
 

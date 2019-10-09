@@ -90,21 +90,20 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
 
     private MCRDNBURN registerSingleURN(MCRBase obj, String additional, MCRObjectDerivate derivate)
         throws MCRPersistentIdentifierException {
-        MCRDNBURN newURN;
         LOGGER.info("Add single urn to {} / {}", obj.getId(), additional);
 
         Session session = MCRHIBConnection.instance().getSession();
-        MCRPath filePath;
-        if (!Files.exists(filePath = MCRPath.getPath(obj.getId().toString(), additional))) {
+        MCRPath filePath = MCRPath.getPath(obj.getId().toString(), additional);
+        if (!Files.exists(filePath)) {
             throw new MCRPersistentIdentifierException("Invalid path : " + additional);
         }
 
         int count = Math.toIntExact(derivate.getFileMetadata().stream().filter(file -> file.getUrn() != null).count());
-        MCRDNBURN dnbURN = newURN = (MCRDNBURN) MCRPIManager.getInstance().get(derivate.getURN())
+        MCRDNBURN newURN = (MCRDNBURN) MCRPIManager.getInstance().get(derivate.getURN())
             .findFirst().get();
 
         String setID = obj.getId().getNumberAsString();
-        MCRDNBURN urntoAssign = dnbURN.toGranular(setID, count + 1, count + 1);
+        MCRDNBURN urntoAssign = newURN.toGranular(setID, count + 1, count + 1);
         derivate.getOrCreateFileMetadata(filePath, urntoAssign.asString()).setUrn(urntoAssign.asString());
         MCRPI databaseEntry = new MCRPI(urntoAssign.asString(), getType(), obj.getId().toString(), additional,
             this.getServiceID(), new Date());

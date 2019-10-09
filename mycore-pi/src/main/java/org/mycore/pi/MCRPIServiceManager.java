@@ -34,7 +34,7 @@ public class MCRPIServiceManager {
     public static final String REGISTRATION_SERVICE_CONFIG_PREFIX = "MCR.PI.Service.";
 
     public static MCRPIServiceManager getInstance() {
-        return InstanceHolder.instance;
+        return InstanceHolder.INSTANCE;
     }
 
     private Map<String, MCRPIService> serviceCache = new ConcurrentHashMap<>();
@@ -77,7 +77,7 @@ public class MCRPIServiceManager {
     }
 
     private static class InstanceHolder {
-        private static final MCRPIServiceManager instance = new MCRPIServiceManager();
+        private static final MCRPIServiceManager INSTANCE = new MCRPIServiceManager();
     }
 
 }

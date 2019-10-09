@@ -68,9 +68,7 @@ public class MCRDerivateURNUtils {
                 MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
                 return new URL(
                     MCRFrontendUtil.getBaseURL() + "receive/" + derivate.getOwnerID() + "?derivate=" + derivateID);
-            }
-            // an urn for a certain file, links to iview2
-            else {
+            } else /* an urn for a certain file, links to iview2 */ {
                 MCRPath file = MCRPath.getPath(derivateID, piInfo.getAdditional());
 
                 if (!Files.exists(file)) {

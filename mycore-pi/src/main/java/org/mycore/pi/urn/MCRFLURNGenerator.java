@@ -49,10 +49,10 @@ public class MCRFLURNGenerator extends MCRDNBURNGenerator {
         int ss = now.get(Calendar.SECOND);
         int sss = 99999 - (hh * 3600 + mm * 60 + ss);
 
-        String DDDDD = String.valueOf(yyy * 366 + ddd);
+        String ddddd = String.valueOf(yyy * 366 + ddd);
 
-        String niss = String.valueOf(DDDDD.charAt(4)) + DDDDD.charAt(2) + DDDDD.charAt(1) + DDDDD.charAt(3)
-            + DDDDD.charAt(0)
+        String niss = String.valueOf(ddddd.charAt(4)) + ddddd.charAt(2) + ddddd.charAt(1) + ddddd.charAt(3)
+            + ddddd.charAt(0)
             + sss;
 
         if (niss.equals(last)) {

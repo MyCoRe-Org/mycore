@@ -119,7 +119,8 @@ public class MCRDOICommands {
     }
 
     @MCRCommand(syntax = "repair registered dois {0}",
-        help = "Contacts the Registration Service and inserts all registered DOIs to the Database. It also updates all media files. The Service ID{0} is the id from the configuration.",
+        help = "Contacts the Registration Service and inserts all registered DOIs to the Database. "
+            + "It also updates all media files. The Service ID{0} is the id from the configuration.",
         order = 10)
     public static void synchronizeDatabase(String serviceID) {
         MCRDOIService registrationService = new MCRDOIService(serviceID);

@@ -72,8 +72,10 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 /**
  * Used for DOI registration.
  * <ol>
- * <li>use {@link #storeMetadata(Document)} to store a datacite document (should include a {@link MCRDigitalObjectIdentifier})</li>
- * <li>use {@link #mintDOI(MCRDigitalObjectIdentifier, URI)} to "register" the {@link MCRDigitalObjectIdentifier} with a URI</li>
+ * <li>use {@link #storeMetadata(Document)} to store a datacite document
+ * (should include a {@link MCRDigitalObjectIdentifier})</li>
+ * <li>use {@link #mintDOI(MCRDigitalObjectIdentifier, URI)} to "register"
+ * the {@link MCRDigitalObjectIdentifier} with a URI</li>
  * <li>use {@link #setMediaList(MCRDigitalObjectIdentifier, List)} to add a list of mime-type URI pairs to a DOI</li>
  * </ol>
  */
