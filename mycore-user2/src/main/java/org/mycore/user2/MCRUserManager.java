@@ -229,7 +229,8 @@ public class MCRUserManager {
     /**
      * Checks whether the user is invalid.
      *
-     * MCRUser is not allowed to overwrite information returned by {@link MCRSystemUserInformation#getGuestInstance()} or {@link MCRSystemUserInformation#getSystemUserInstance()}.
+     * MCRUser is not allowed to overwrite information returned by {@link MCRSystemUserInformation#getGuestInstance()}
+     * or {@link MCRSystemUserInformation#getSystemUserInstance()}.
      * @return true if {@link #createUser(MCRUser)} or {@link #updateUser(MCRUser)} would reject the given user
      */
     public static boolean isInvalidUser(MCRUser user) {
@@ -445,8 +446,8 @@ public class MCRUserManager {
     /**
      * Returns a {@link MCRUser} instance if the login succeeds.
      * This method will return <code>null</code> if the user does not exist or the login is disabled.
-     * If the {@link MCRUser#getHashType()} is {@link MCRPasswordHashType#crypt}, {@link MCRPasswordHashType#md5} or {@link MCRPasswordHashType#sha1}
-     * the hash value is automatically upgraded to {@link MCRPasswordHashType#sha256}.
+     * If the {@link MCRUser#getHashType()} is {@link MCRPasswordHashType#crypt}, {@link MCRPasswordHashType#md5} or
+     * {@link MCRPasswordHashType#sha1} the hash value is automatically upgraded to {@link MCRPasswordHashType#sha256}.
      * @param userName Name of the user to login.
      * @param password clear text password.
      * @return authenticated {@link MCRUser} instance or <code>null</code>.

@@ -66,13 +66,6 @@ public class MCRUserResolver implements URIResolver {
         }
     }
 
-    @XmlRootElement(name = "owns")
-    @XmlAccessorType(XmlAccessType.FIELD)
-    private static class MCROwns {
-        @XmlElement(name = "user")
-        MCRUser[] users;
-    }
-
     private Source getOwnedUsers(String userName) throws JAXBException {
         MCRUser owner = MCRUserManager.getUser(userName);
         List<MCRUser> listUsers = MCRUserManager.listUsers(owner);
@@ -83,6 +76,13 @@ public class MCRUserResolver implements URIResolver {
             mcrOwns.users[i] = listUsers.get(i).getBasicCopy();
         }
         return new JAXBSource(MCRUserTransformer.JAXB_CONTEXT, mcrOwns);
+    }
+
+    @XmlRootElement(name = "owns")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    private static class MCROwns {
+        @XmlElement(name = "user")
+        MCRUser[] users;
     }
 
 }

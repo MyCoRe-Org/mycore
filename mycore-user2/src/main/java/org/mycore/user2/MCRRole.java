@@ -32,7 +32,8 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
  * Represents a role of users.
- * Roles are {@link MCRCategory} instances and every category from {@link MCRUser2Constants#ROLE_CLASSID} {@link MCRRole#isSystemRole()}.
+ * Roles are {@link MCRCategory} instances and every category from {@link MCRUser2Constants#ROLE_CLASSID}
+ * {@link MCRRole#isSystemRole()}.
  * 
  * @author Thomas Scheffler (yagee)
  */
