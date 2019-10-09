@@ -85,6 +85,24 @@ class MCREventHandler {
         jEvent.addProperty("user", userID);
     }
 
+    private static void copyServiceDateToProperty(MCRBase obj, JsonObject jsonObj, String dateType,
+        String propertyName) {
+        Optional.ofNullable(obj.getService().getDate(dateType))
+            .map(Date::toInstant)
+            .map(Instant::toString)
+            .ifPresent(d -> jsonObj.addProperty(propertyName, d));
+    }
+
+    private static void copyFlagToProperty(MCRBase obj, JsonObject json, String flagName, String propertyName) {
+        obj.getService()
+            .getFlags(flagName)
+            .stream()
+            .findFirst()
+            .ifPresent(c -> {
+                json.addProperty(propertyName, c);
+            });
+    }
+
     public static class MCRObjectHandler implements org.mycore.common.events.MCREventHandler {
         private final SseBroadcaster sseBroadcaster;
 
@@ -146,24 +164,6 @@ class MCREventHandler {
         public void undoHandleEvent(MCREvent evt) throws MCRException {
             //do nothing
         }
-    }
-
-    private static void copyServiceDateToProperty(MCRBase obj, JsonObject jsonObj, String dateType,
-        String propertyName) {
-        Optional.ofNullable(obj.getService().getDate(dateType))
-            .map(Date::toInstant)
-            .map(Instant::toString)
-            .ifPresent(d -> jsonObj.addProperty(propertyName, d));
-    }
-
-    private static void copyFlagToProperty(MCRBase obj, JsonObject json, String flagName, String propertyName) {
-        obj.getService()
-            .getFlags(flagName)
-            .stream()
-            .findFirst()
-            .ifPresent(c -> {
-                json.addProperty(propertyName, c);
-            });
     }
 
     public static class MCRDerivateHandler implements org.mycore.common.events.MCREventHandler {
