@@ -10,7 +10,7 @@
   <module name="TreeWalker">
     <property name="tabWidth" value="4"/>
     <module name="LineLength">
-      <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+      <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|@see"/>
       <property name="max" value="120"/>
     </module>
     <module name="ModifiedControlVariable" />

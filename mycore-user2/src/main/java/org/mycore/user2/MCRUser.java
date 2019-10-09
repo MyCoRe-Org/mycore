@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -257,6 +258,17 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
+     * Sets the realm this user belongs to.
+     * The realm can be changed as long as the login user name
+     * is unique within the new realm.
+     *
+     * @param realm the realm the user belongs to.
+     */
+    void setRealm(MCRRealm realm) {
+        this.realmID = realm.getID();
+    }
+
+    /**
      * Returns the ID of the realm the user belongs to.
      *
      * @return the ID of the realm the user belongs to.
@@ -279,17 +291,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         } else {
             setRealm(MCRRealmFactory.getRealm(realmID));
         }
-    }
-
-    /**
-     * Sets the realm this user belongs to.
-     * The realm can be changed as long as the login user name
-     * is unique within the new realm.
-     *
-     * @param realm the realm the user belongs to.
-     */
-    void setRealm(MCRRealm realm) {
-        this.realmID = realm.getID();
     }
 
     /**
@@ -351,6 +352,16 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
+     * Sets the user that owns this user.
+     * Setting this to null makes the user independent.
+     *
+     * @param owner the owner of the user.
+     */
+    public void setOwner(MCRUser owner) {
+        this.owner = owner;
+    }
+
+    /**
      * Returns true if this user has no owner and therefore
      * is independent. Independent users may change their passwords
      * etc., owned users may not, they are created to limit read access
@@ -373,6 +384,15 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
+     * Sets the name of the person this login user represents.
+     *
+     * @param realName the name of the person this login user represents.
+     */
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    /**
      * Returns the E-Mail address of the person this login user represents.
      *
      * @return the E-Mail address of the person this login user represents.
@@ -388,6 +408,15 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
+     * Sets the E-Mail address of the person this user represents.
+     *
+     * @param eMail the E-Mail address
+     */
+    public void setEMail(String eMail) {
+        this.eMail = eMail;
+    }
+
+    /**
      * Returns a hint the user has stored in case of forgotten hash.
      *
      * @return a hint the user has stored in case of forgotten hash.
@@ -395,6 +424,15 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Column(name = "hint", nullable = true)
     public String getHint() {
         return password == null ? null : password.hint;
+    }
+
+    /**
+     * Sets a hint to store in case of hash loss.
+     *
+     * @param hint a hint for the user in case hash is forgotten.
+     */
+    public void setHint(String hint) {
+        this.password.hint = hint;
     }
 
     /**
@@ -411,40 +449,12 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * Sets the user that owns this user.
-     * Setting this to null makes the user independent.
+     * Sets the time of last login.
      *
-     * @param owner the owner of the user.
+     * @param lastLogin the last time the user logged in.
      */
-    public void setOwner(MCRUser owner) {
-        this.owner = owner;
-    }
-
-    /**
-     * Sets the name of the person this login user represents.
-     *
-     * @param realName the name of the person this login user represents.
-     */
-    public void setRealName(String realName) {
-        this.realName = realName;
-    }
-
-    /**
-     * Sets a hint to store in case of hash loss.
-     *
-     * @param hint a hint for the user in case hash is forgotten.
-     */
-    public void setHint(String hint) {
-        this.password.hint = hint;
-    }
-
-    /**
-     * Sets the E-Mail address of the person this user represents.
-     *
-     * @param eMail the E-Mail address
-     */
-    public void setEMail(String eMail) {
-        this.eMail = eMail;
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin == null ? null : new Date(lastLogin.getTime());
     }
 
     /**
@@ -452,15 +462,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
      */
     public void setLastLogin() {
         this.lastLogin = new Date();
-    }
-
-    /**
-     * Sets the time of last login.
-     *
-     * @param lastLogin the last time the user logged in.
-     */
-    public void setLastLogin(Date lastLogin) {
-        this.lastLogin = lastLogin == null ? null : new Date(lastLogin.getTime());
     }
 
     /* (non-Javadoc)
@@ -673,48 +674,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     //This is code to get JAXB work
 
-    private static class Password implements Serializable {
-
-        private static final long serialVersionUID = 8068063832119405080L;
-
-        @XmlAttribute
-        private String hash;
-
-        //base64 encoded
-        @XmlAttribute
-        private String salt;
-
-        @XmlAttribute
-        private MCRPasswordHashType hashType;
-
-        /** A hint stored by the user in case hash is forgotten */
-        @XmlAttribute
-        private String hint;
-
-    }
-
-    private static class MapEntry implements Serializable {
-
-        private static final long serialVersionUID = 5974260806892613120L;
-
-        @XmlAttribute
-        public String name;
-
-        @XmlAttribute
-        public String value;
-    }
-
-    private static class UserIdentifier implements Serializable {
-
-        private static final long serialVersionUID = 4654103884660408929L;
-
-        @XmlAttribute
-        public String name;
-
-        @XmlAttribute
-        public String realm;
-    }
-
     @Transient
     @XmlElementWrapper(name = "roles")
     @XmlElement(name = "role")
@@ -738,15 +697,17 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
 
     @SuppressWarnings("unused")
     private void setRoles(MCRRole[] roles) {
-        for (MCRRole role : roles) {
-            //check if role does exist, so we wont lose it on export
-            String roleName = role.getName();
-            role = MCRRoleManager.getRole(roleName);
-            if (role == null) {
-                throw new MCRException("Could not load role: " + roleName);
-            }
-            assignRole(role);
-        }
+        Stream.of(roles)
+            .map(MCRRole::getName)
+            .map(roleName -> {
+                //check if role does exist, so we wont lose it on export
+                MCRRole role = MCRRoleManager.getRole(roleName);
+                if (role == null) {
+                    throw new MCRException("Could not load role: " + roleName);
+                }
+                return role;
+            })
+            .forEach(this::assignRole);
     }
 
     @Transient
@@ -861,5 +822,47 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         copy.externalRoles.addAll(this.externalRoles);
         copy.attributes.putAll(this.attributes);
         return copy;
+    }
+
+    private static class Password implements Serializable {
+
+        private static final long serialVersionUID = 8068063832119405080L;
+
+        @XmlAttribute
+        private String hash;
+
+        //base64 encoded
+        @XmlAttribute
+        private String salt;
+
+        @XmlAttribute
+        private MCRPasswordHashType hashType;
+
+        /** A hint stored by the user in case hash is forgotten */
+        @XmlAttribute
+        private String hint;
+
+    }
+
+    private static class MapEntry implements Serializable {
+
+        private static final long serialVersionUID = 5974260806892613120L;
+
+        @XmlAttribute
+        public String name;
+
+        @XmlAttribute
+        public String value;
+    }
+
+    private static class UserIdentifier implements Serializable {
+
+        private static final long serialVersionUID = 4654103884660408929L;
+
+        @XmlAttribute
+        public String name;
+
+        @XmlAttribute
+        public String realm;
     }
 }

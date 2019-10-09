@@ -49,7 +49,8 @@ import org.mycore.user2.annotation.MCRUserAttribute;
 import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
 
 /**
- * This class is used to map attributes on {@link MCRUser} or {@link MCRUserInformation} to annotated properties or methods.
+ * This class is used to map attributes on {@link MCRUser} or {@link MCRUserInformation}
+ * to annotated properties or methods.
  * <br><br>
  * You can configure the mapping within <code>realms.xml</code> like this:
  * <br>
