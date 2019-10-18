@@ -100,6 +100,10 @@ import org.xml.sax.SAXException;
  */
 public class MCRXMLMetadataManager {
 
+    public static final int REV_LATEST = -1;
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRXMLMetadataManager.class);
+
     /** The singleton */
     private static MCRXMLMetadataManager SINGLETON;
 
@@ -132,29 +136,9 @@ public class MCRXMLMetadataManager {
      */
     private URI svnBase;
 
-    public static final int REV_LATEST = -1;
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRXMLMetadataManager.class);
-
-    private static final class StoreModifiedHandle implements MCRCache.ModifiedHandle {
-        private final long expire;
-
-        private final MCRObjectID id;
-
-        private StoreModifiedHandle(MCRObjectID id, long time, TimeUnit unit) {
-            this.expire = unit.toMillis(time);
-            this.id = id;
-        }
-
-        @Override
-        public long getCheckPeriod() {
-            return expire;
-        }
-
-        @Override
-        public long getLastModified() throws IOException {
-            return MCRXMLMetadataManager.instance().getLastModified(id);
-        }
+    protected MCRXMLMetadataManager() {
+        this.createdStores = new HashSet<>();
+        reload();
     }
 
     /** Returns the singleton */
@@ -163,11 +147,6 @@ public class MCRXMLMetadataManager {
             SINGLETON = new MCRXMLMetadataManager();
         }
         return SINGLETON;
-    }
-
-    protected MCRXMLMetadataManager() {
-        this.createdStores = new HashSet<>();
-        reload();
     }
 
     /**
@@ -854,5 +833,26 @@ public class MCRXMLMetadataManager {
 
     public MCRCache.ModifiedHandle getLastModifiedHandle(final MCRObjectID id, final long expire, TimeUnit unit) {
         return new StoreModifiedHandle(id, expire, unit);
+    }
+
+    private static final class StoreModifiedHandle implements MCRCache.ModifiedHandle {
+        private final long expire;
+
+        private final MCRObjectID id;
+
+        private StoreModifiedHandle(MCRObjectID id, long time, TimeUnit unit) {
+            this.expire = unit.toMillis(time);
+            this.id = id;
+        }
+
+        @Override
+        public long getCheckPeriod() {
+            return expire;
+        }
+
+        @Override
+        public long getLastModified() throws IOException {
+            return MCRXMLMetadataManager.instance().getLastModified(id);
+        }
     }
 }

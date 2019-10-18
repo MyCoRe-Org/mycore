@@ -30,10 +30,10 @@ import javax.ws.rs.container.ContainerRequestFilter;
 public class MCRRequestScopeACLFilter implements ContainerRequestFilter {
     public static String ACL_INSTANT_KEY = "requestScopeACL";
 
-    private static final MCRRequestScopeACLFactory factory = new MCRRequestScopeACLFactory();
+    private static final MCRRequestScopeACLFactory ACL_FACTORY = new MCRRequestScopeACLFactory();
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        requestContext.setProperty(ACL_INSTANT_KEY, (Supplier<MCRRequestScopeACL>) factory::provide);
+        requestContext.setProperty(ACL_INSTANT_KEY, (Supplier<MCRRequestScopeACL>) ACL_FACTORY::provide);
     }
 }

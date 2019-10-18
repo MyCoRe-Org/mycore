@@ -353,7 +353,8 @@ public class MCRTopologicalSort {
     public int[] doTopoSort() {
         if (dirty) {
             LOGGER.error(
-                "The data of this instance is inconsistent. Please call prepareData() again or start with a new instance!");
+                "The data of this instance is inconsistent."
+                    + " Please call prepareData() again or start with a new instance!");
             return null;
         }
         dirty = true;

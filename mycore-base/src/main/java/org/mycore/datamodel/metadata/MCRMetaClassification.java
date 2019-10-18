@@ -59,44 +59,44 @@ public class MCRMetaClassification extends MCRMetaDefault {
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the
-     * value of <em>set_subtag</em> is null or empty an exception was throwed.
+     * the value of <em>subtag</em>. If the
+     * value of <em>subtag</em> is null or empty an exception was throwed.
      * The type element was set to an empty string.
-     * the <em>set_classid</em> and the <em>categid</em> must be not null
+     * the <em>classid</em> and the <em>categid</em> must be not null
      * or empty!
-     * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value &gt;= 0
-     * @param set_type         the type attribute
-     * @param set_classid      the classification ID
-     * @param set_categid      the category ID
+     * @param subtag       the name of the subtag
+     * @param inherted     a value &gt;= 0
+     * @param type         the type attribute
+     * @param classid      the classification ID
+     * @param categid      the category ID
      *
-     * @exception MCRException if the set_subtag value, the set_classid value or
-     * the set_categid are null, empty, too long or not a MCRObjectID
+     * @exception MCRException if the subtag value, the classid value or
+     * the categid are null, empty, too long or not a MCRObjectID
      */
-    public MCRMetaClassification(String set_subtag, int set_inherted, String set_type, String set_classid,
-        String set_categid) throws MCRException {
-        super(set_subtag, null, set_type, set_inherted);
-        setValue(set_classid, set_categid);
+    public MCRMetaClassification(String subtag, int inherted, String type, String classid,
+        String categid) throws MCRException {
+        super(subtag, null, type, inherted);
+        setValue(classid, categid);
     }
 
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the
-     * value of <em>set_subtag</em> is null or empty an exception was throwed.
+     * the value of <em>subtag</em>. If the
+     * value of <em>subtag</em> is null or empty an exception was throwed.
      * The type element was set to an empty string.
-     * the <em>set_classid</em> and the <em>categid</em> must be not null
+     * the <em>classid</em> and the <em>categid</em> must be not null
      * or empty!
-     * @param set_subtag       the name of the subtag
-     * @param set_inherted     a value &gt;= 0
-     * @param set_type         the type attribute
+     * @param subtag       the name of the subtag
+     * @param inherted     a value &gt;= 0
+     * @param type         the type attribute
      * @param category         a category id
      *
-     * @exception MCRException if the set_subtag value is empty, too long or not a MCRObjectID
+     * @exception MCRException if the subtag value is empty, too long or not a MCRObjectID
      */
-    public MCRMetaClassification(String set_subtag, int set_inherted, String set_type, MCRCategoryID category)
+    public MCRMetaClassification(String subtag, int inherted, String type, MCRCategoryID category)
         throws MCRException {
-        super(set_subtag, null, set_type, set_inherted);
+        super(subtag, null, type, inherted);
         if (category == null) {
             throw new MCRException("Category is not set in " + getSubTag());
         }
@@ -124,23 +124,16 @@ public class MCRMetaClassification extends MCRMetaDefault {
     /**
      * This method set values of classid and categid.
      * 
-     * @param set_classid
+     * @param classid
      *            the classification ID
-     * @param set_categid
+     * @param categid
      *            the category ID
      * @exception MCRException
-     *                if the set_classid value or the set_categid are null,
+     *                if the classid value or the categid are null,
      *                empty, too long or not a MCRObjectID
      */
-    public final void setValue(String set_classid, String set_categid) throws MCRException {
-        if (set_classid == null || (set_classid = set_classid.trim()).length() == 0) {
-            throw new MCRException("The classid is empty.");
-        }
-
-        if (set_categid == null || (set_categid = set_categid.trim()).length() == 0) {
-            throw new MCRException("The categid is empty.");
-        }
-        category = new MCRCategoryID(set_classid, set_categid);
+    public final void setValue(String classid, String categid) throws MCRException {
+        category = new MCRCategoryID(classid, categid);
     }
 
     /**
@@ -150,16 +143,16 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      * @exception MCRException
-     *                if the set_classid value or the set_categid are null,
+     *                if the classid value or the categid are null,
      *                empty, too long or not a MCRObjectID
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public void setFromDOM(Element element) throws MCRException {
         super.setFromDOM(element);
 
-        String set_classid = element.getAttributeValue("classid");
-        String set_categid = element.getAttributeValue("categid");
-        setValue(set_classid, set_categid);
+        String classid = element.getAttributeValue("classid");
+        String categid = element.getAttributeValue("categid");
+        setValue(classid, categid);
     }
 
     /**

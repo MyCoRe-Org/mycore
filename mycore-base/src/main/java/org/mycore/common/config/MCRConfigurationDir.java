@@ -183,7 +183,8 @@ public class MCRConfigurationDir {
     }
 
     /**
-     * Returns a File object, if {@link #getConfigurationDirectory()} does not return <code>null</code> and directory exists.
+     * Returns a File object, if {@link #getConfigurationDirectory()} does not return <code>null</code>
+     * and directory exists.
      * @param relativePath relative path to file or directory with configuration directory as base.
      * @return null if configuration directory does not exist or is disabled.
      */

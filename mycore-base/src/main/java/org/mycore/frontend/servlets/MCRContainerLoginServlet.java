@@ -56,13 +56,13 @@ public class MCRContainerLoginServlet extends MCRServlet {
      */
     @Override
     protected void render(MCRServletJob job, Exception ex) throws Exception {
-        String backto_url = getProperty(job.getRequest(), "url");
+        String backToUrl = getProperty(job.getRequest(), "url");
 
-        if (backto_url == null) {
+        if (backToUrl == null) {
             String referer = job.getRequest().getHeader("Referer");
-            backto_url = (referer != null) ? referer : MCRFrontendUtil.getBaseURL();
+            backToUrl = (referer != null) ? referer : MCRFrontendUtil.getBaseURL();
         }
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backToUrl));
     }
 
     protected static class ContainerUserInformation implements MCRUserInformation {

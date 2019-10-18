@@ -76,7 +76,8 @@ public class MCRStoredMetadata {
      *
      * @param xml
      *            the XML to save to a new file
-     * @throws JDOMException if content is not XML and corresponding {@link MCRMetadataStore} forces MCRContent to be XML
+     * @throws JDOMException if content is not XML and corresponding
+     *                       {@link MCRMetadataStore} forces MCRContent to be XML
      */
     void create(MCRContent xml) throws IOException, JDOMException {
         if (store.shouldForceXML()) {
@@ -97,7 +98,8 @@ public class MCRStoredMetadata {
      *
      * @param xml
      *            the XML document to be stored
-     * @throws JDOMException if content is not XML and corresponding {@link MCRMetadataStore} forces MCRContent to be XML
+     * @throws JDOMException if content is not XML and corresponding
+     *                       {@link MCRMetadataStore} forces MCRContent to be XML
      */
     public void update(MCRContent xml) throws IOException, JDOMException {
         if (isDeleted()) {

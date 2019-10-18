@@ -54,7 +54,7 @@ abstract class MCRPersistenceServlet extends MCRServlet {
 
     protected static final String OBJECT_ID_KEY = MCRPersistenceServlet.class.getCanonicalName() + ".MCRObjectID";
 
-    private Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String uploadPage;
 

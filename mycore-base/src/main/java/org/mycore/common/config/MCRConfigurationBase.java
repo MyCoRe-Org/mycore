@@ -200,7 +200,8 @@ public final class MCRConfigurationBase {
             throw new MCRConfigurationException(
                 depUsedProps.entrySet().stream().map(e -> e.getKey() + " ==> " + e.getValue())
                     .collect(Collectors.joining("\n",
-                        "Found deprecated properties that are defined but will NOT BE USED. Please use the replacements:\n",
+                        "Found deprecated properties that are defined but will NOT BE USED. "
+                            + "Please use the replacements:\n",
                         "\n")));
         }
     }

@@ -393,40 +393,40 @@ public abstract class MCRStore {
     }
 
     /**
-     * Returns the relative path used to store data for the given ID within the
+     * Returns the relative path used to store data for the given id within the
      * store base directory
      * 
-     * @param ID
-     *            the ID of the data
+     * @param id
+     *            the id of the data
      * @return the relative path storing that data
      */
-    String getSlotPath(final int ID) {
-        final String[] paths = getSlotPaths(ID);
+    String getSlotPath(final int id) {
+        final String[] paths = getSlotPaths(id);
         return paths[paths.length - 1];
     }
 
     /**
      * Returns the paths of all subdirectories and the slot itself used to store
-     * data for the given ID relative to the store base directory
+     * data for the given id relative to the store base directory
      * 
-     * @param ID
-     *            the ID of the data
+     * @param id
+     *            the id of the data
      * @return the directory and file names of the relative path storing that
      *         data
      */
-    String[] getSlotPaths(final int ID) {
-        final String id = createIDWithLeadingZeros(ID);
+    String[] getSlotPaths(final int id) {
+        final String paddedId = createIDWithLeadingZeros(id);
 
         final String[] paths = new String[slotLength.length + 1];
         final StringBuilder path = new StringBuilder();
         int offset = 0;
         for (int i = 0; i < paths.length - 1; i++) {
-            path.append(id, offset, offset + slotLength[i]);
+            path.append(paddedId, offset, offset + slotLength[i]);
             paths[i] = path.toString();
             path.append("/");
             offset += slotLength[i];
         }
-        path.append(prefix).append(id).append(suffix);
+        path.append(prefix).append(paddedId).append(suffix);
         paths[paths.length - 1] = path.toString();
         return paths;
     }
@@ -445,16 +445,16 @@ public abstract class MCRStore {
     }
 
     /**
-     * Returns the slot file object used to store data for the given ID. This
+     * Returns the slot file object used to store data for the given id. This
      * may be a file or directory, depending on the subclass of MCRStore that is
      * used.
      * 
-     * @param ID
-     *            the ID of the data
+     * @param id
+     *            the id of the data
      * @return the file object storing that data
      */
-    protected Path getSlot(final int ID) throws IOException {
-        String slotPath = getSlotPath(ID);
+    protected Path getSlot(final int id) throws IOException {
+        String slotPath = getSlotPath(id);
         return baseDirectory.resolve(toNativePath.apply(slotPath));
     }
 
@@ -538,11 +538,11 @@ public abstract class MCRStore {
         this.storeConfig = storeConfig;
     }
 
-    private String createIDWithLeadingZeros(final int ID) {
+    private String createIDWithLeadingZeros(final int id) {
         final NumberFormat numWithLeadingZerosFormat = NumberFormat.getIntegerInstance(Locale.ROOT);
         numWithLeadingZerosFormat.setMinimumIntegerDigits(idLength);
         numWithLeadingZerosFormat.setGroupingUsed(false);
-        return numWithLeadingZerosFormat.format(ID);
+        return numWithLeadingZerosFormat.format(id);
     }
 
     /**

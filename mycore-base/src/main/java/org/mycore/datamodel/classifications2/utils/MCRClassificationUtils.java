@@ -106,23 +106,23 @@ public class MCRClassificationUtils {
      */
     public static void fromStream(InputStream inputStream)
         throws MCRException, SAXParseException, URISyntaxException, MCRAccessException {
-        MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         Document jdom = MCRXMLParserFactory.getParser().parseXML(new MCRStreamContent(inputStream));
         MCRCategory classification = MCRXMLTransformer.getCategory(jdom);
-        if (DAO.exist(classification.getId())) {
+        if (categoryDAO.exist(classification.getId())) {
             if (!MCRAccessManager.checkPermission(classification.getId().getRootID(), PERMISSION_WRITE)) {
                 throw MCRAccessException.missingPermission(
                     "update classification " + classification.getId().getRootID(), classification.getId().getRootID(),
                     PERMISSION_WRITE);
             }
-            DAO.replaceCategory(classification);
+            categoryDAO.replaceCategory(classification);
         } else {
             if (!MCRAccessManager.checkPermission(CREATE_CLASS_PERMISSION)) {
                 throw MCRAccessException.missingPermission(
                     "create classification " + classification.getId().getRootID(), classification.getId().getRootID(),
                     CREATE_CLASS_PERMISSION);
             }
-            DAO.addCategory(null, classification);
+            categoryDAO.addCategory(null, classification);
         }
     }
 

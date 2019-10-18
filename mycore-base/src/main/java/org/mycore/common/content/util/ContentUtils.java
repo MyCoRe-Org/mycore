@@ -244,7 +244,8 @@ final class ContentUtils {
      * @param inPosition Current position of the input
      * @param start Start position to be copied
      * @param end End position to be copied
-     * @return Exception which occurred during processing or if less than <code>end - start + 1</code> bytes were read/written.
+     * @return Exception which occurred during processing or if less than <code>end - start + 1</code>
+     * bytes were read/written.
      */
     static IOException copyRange(final InputStream in, final OutputStream out, final long inPosition,
         final long start, final long end, final int outputBufferSize) {
@@ -289,8 +290,11 @@ final class ContentUtils {
 
             long totalRead = 0L;
 
-            int read;
-            while (bytesToRead > 0 && -1 != (read = input.read(buffer, 0, bytesToRead))) {
+            while (bytesToRead > 0) {
+                int read = input.read(buffer, 0, bytesToRead);
+                if (read == -1) {
+                    break;
+                }
                 output.write(buffer, 0, read);
                 totalRead += read;
                 if (length > 0L) {

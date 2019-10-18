@@ -25,7 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  */
 public class MCRResourceAccessCheckerFactory {
-    private static ConcurrentHashMap<Class<? extends MCRResourceAccessChecker>, MCRResourceAccessChecker> implMap = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Class<? extends MCRResourceAccessChecker>, MCRResourceAccessChecker> implMap;
+    static {
+        //static block as code style requires 120 character line width
+        implMap = new ConcurrentHashMap<>();
+    }
 
     public static <T extends MCRResourceAccessChecker> T getInstance(Class<T> clazz)
         throws ReflectiveOperationException {

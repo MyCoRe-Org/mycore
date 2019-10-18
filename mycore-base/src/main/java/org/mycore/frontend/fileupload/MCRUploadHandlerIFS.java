@@ -204,8 +204,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     protected void setDefaultPermissions(MCRObjectID derivateID) {
         if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
-            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+            MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+            Collection<String> configuredPermissions = accessImpl.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
                     "default derivate rule");

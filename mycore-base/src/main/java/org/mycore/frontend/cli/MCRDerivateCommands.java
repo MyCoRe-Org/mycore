@@ -113,7 +113,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * Delete an MCRDerivate from the datastore.
      *
-     * @param ID
+     * @param id
      *            the ID of the MCRDerivate that should be deleted
      * @throws MCRActiveLinkException
      * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)}
@@ -121,8 +121,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "delete derivate {0}",
         help = "The command remove a derivate with the MCRObjectID {0}",
         order = 30)
-    public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
-        MCRObjectID objectID = MCRObjectID.getInstance(ID);
+    public static void delete(String id) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+        MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCRMetadataManager.deleteMCRDerivate(objectID);
         LOGGER.info("{} deleted.", objectID);
     }
@@ -130,30 +130,28 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * Delete MCRDerivates form ID to ID from the datastore.
      *
-     * @param IDfrom
+     * @param idFrom
      *            the start ID for deleting the MCRDerivate
-     * @param IDto
+     * @param idTo
      *            the stop ID for deleting the MCRDerivate
      * @throws MCRAccessException see {@link MCRMetadataManager#delete(MCRDerivate)}
      */
     @MCRCommand(syntax = "delete derivate from {0} to {1}",
         help = "The command remove derivates in the number range between the MCRObjectID {0} and {1}.",
         order = 20)
-    public static void delete(String IDfrom, String IDto)
+    public static void delete(String idFrom, String idTo)
         throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
-        int from_i = 0;
-        int to_i = 0;
 
-        MCRObjectID from = MCRObjectID.getInstance(IDfrom);
-        MCRObjectID to = MCRObjectID.getInstance(IDto);
-        from_i = from.getNumberAsInteger();
-        to_i = to.getNumberAsInteger();
+        MCRObjectID from = MCRObjectID.getInstance(idFrom);
+        MCRObjectID to = MCRObjectID.getInstance(idTo);
+        int lowerBound = from.getNumberAsInteger();
+        int upperBound = to.getNumberAsInteger();
 
-        if (from_i > to_i) {
+        if (lowerBound > upperBound) {
             throw new MCRException("The from-to-interval is false.");
         }
 
-        for (int i = from_i; i < to_i + 1; i++) {
+        for (int i = lowerBound; i < upperBound + 1; i++) {
 
             String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
             if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
@@ -364,7 +362,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * derivate files aren't saved, for reloading purpose after deleting a
      * derivate in the datastore
      *
-     * @param ID
+     * @param id
      *            the ID of the MCRDerivate to be save.
      * @param dirname
      *            the dirname to store the derivate
@@ -372,8 +370,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "show loadable derivate of {0} to directory {1}",
         help = "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata",
         order = 130)
-    public static void show(String ID, String dirname) {
-        export(ID, ID, dirname, "save");
+    public static void show(String id, String dirname) {
+        export(id, id, dirname, "save");
     }
 
     /**
@@ -382,7 +380,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * directory under them named <em>MCRObjectID</em>. The method use the
      * converter stylesheet mcr_<em>style</em>_object.xsl.
      *
-     * @param ID
+     * @param id
      *            the ID of the MCRDerivate to be save.
      * @param dirname
      *            the dirname to store the derivate
@@ -390,10 +388,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     @MCRCommand(syntax = "export derivate {0} to directory {1} with {2}",
-        help = "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.",
+        help = "The command store the derivate with the MCRObjectID {0} to the directory {1}"
+            + " with the stylesheet {2}-object.xsl. For {2} save is the default.",
         order = 90)
-    public static void export(String ID, String dirname, String style) {
-        export(ID, ID, dirname, style);
+    public static void export(String id, String dirname, String style) {
+        export(id, id, dirname, style);
     }
 
     /**
@@ -414,7 +413,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
 
     @MCRCommand(syntax = "export derivate from {0} to {1} to directory {2} with {3}",
-        help = "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.",
+        help = "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2}"
+            + " with the stylesheet {3}-object.xsl. For {3} save is the default.",
         order = 80)
     public static void export(String fromID, String toID, String dirname, String style) {
         // check fromID and toID
@@ -478,7 +478,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @return a list of export commands for each derivate
      */
     @MCRCommand(syntax = "export all derivates to directory {0} with {1}",
-        help = "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.",
+        help = "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl."
+            + " For {1} save is the default.",
         order = 100)
     public static List<String> exportAllDerivates(String dirname, String style) {
         // check dirname
@@ -507,7 +508,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @return a list of export commands for derivates with project name
      */
     @MCRCommand(syntax = "export all derivates of project {0} to directory {1} with {2}",
-        help = "Stores all derivates of project {0} to the directory {1} with the stylesheet mcr_{2}-derivate.xsl. For {2} save is the default.",
+        help = "Stores all derivates of project {0} to the directory {1} with the stylesheet mcr_{2}-derivate.xsl."
+            + " For {2} save is the default.",
         order = 110)
     public static List<String> exportAllDerivatesOfProject(String project, String dirname, String style) {
         // check dirname
@@ -677,7 +679,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * The method start the repair the content search index for all derivates.
      */
     @MCRCommand(syntax = "synchronize all derivates",
-        help = "The command read each derivate and synchronize the xlink:label with the derivate entry of the mycoreobject.",
+        help = "The command read each derivate and synchronize the xlink:label with "
+            + "the derivate entry of the mycoreobject.",
         order = 160)
     public static List<String> synchronizeAllDerivates() {
         LOGGER.info("Start the synchronization for derivates.");
@@ -701,7 +704,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the MCRObjectID as String
      */
     @MCRCommand(syntax = "synchronize derivate with ID {0}",
-        help = "The command read a derivate with the MCRObjectID {0} and synchronize the xlink:label with the derivate entry of the mycoreobject.",
+        help = "The command read a derivate with the MCRObjectID {0} and synchronize the xlink:label "
+            + "with the derivate entry of the mycoreobject.",
         order = 170)
     public static void synchronizeDerivateForID(String id) {
         MCRObjectID mid = null;
@@ -793,29 +797,30 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Check the object links in derivates of MCR base ID for existing. It looks to the XML store on the disk to get all object IDs.
+     * Check the object links in derivates of MCR base ID for existing.
+     * It looks to the XML store on the disk to get all object IDs.
      *
-     * @param base_id
+     * @param baseId
      *            the base part of a MCRObjectID e.g. DocPortal_derivate
      */
     @MCRCommand(syntax = "check object entries in derivates for base {0}",
         help = "check in all derivates of MCR base ID {0} for existing linked objects",
         order = 400)
-    public static void checkObjectsInDerivates(String base_id) throws IOException {
-        if (base_id == null || base_id.length() == 0) {
+    public static void checkObjectsInDerivates(String baseId) throws IOException {
+        if (baseId == null || baseId.length() == 0) {
             LOGGER.error("Base ID missed for check object entries in derivates for base {0}");
             return;
         }
-        int project_part_position = base_id.indexOf('_');
-        if (project_part_position == -1) {
-            LOGGER.error("The given base ID {} has not the syntax of project_type", base_id);
+        int projectPartPosition = baseId.indexOf('_');
+        if (projectPartPosition == -1) {
+            LOGGER.error("The given base ID {} has not the syntax of project_type", baseId);
             return;
         }
         MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        List<String> id_list = mgr.listIDsForBase(base_id.substring(0, project_part_position + 1) + "derivate");
+        List<String> idList = mgr.listIDsForBase(baseId.substring(0, projectPartPosition + 1) + "derivate");
         int counter = 0;
-        int maxresults = id_list.size();
-        for (String derid : id_list) {
+        int maxresults = idList.size();
+        for (String derid : idList) {
             counter++;
             LOGGER.info("Processing dataset {} from {} with ID: {}", counter, maxresults, derid);
             // get from data
@@ -830,7 +835,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "transform xml matching file name pattern {0} in derivate {1} with stylesheet {2}",
-        help = "Finds all files in Derivate {1} which match the pattern {0} (the complete path with regex: or glob:*.xml syntax) and transforms them with stylesheet {2}")
+        help = "Finds all files in Derivate {1} which match the pattern {0} "
+            + "(the complete path with regex: or glob:*.xml syntax) and transforms them with stylesheet {2}")
     public static void transformXMLMatchingPatternWithStylesheet(String pattern, String derivate, String stylesheet)
         throws IOException {
         MCRXSLTransformer transformer = new MCRXSLTransformer(stylesheet);

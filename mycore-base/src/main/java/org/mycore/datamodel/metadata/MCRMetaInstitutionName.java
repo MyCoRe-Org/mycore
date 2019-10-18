@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 
 import com.google.gson.JsonObject;
 
@@ -55,51 +56,51 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
+     * The language element was set. If the value of <em>lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * the value of <em>subtag</em>. If the value of <em>subtag</em>
      * is null or empty an exception was throwed. The type element was set to
-     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * the value of <em>type</em>, if it is null, an empty string was set
      * to the type element. The fullname, nickname  and property element
      * was set to the value of <em>set_...</em>, if they are null,
      * an empty string was set to this element.
-     * @param set_subtag      the name of the subtag
-     * @param default_lang    the default language
-     * @param set_type        the optional type string
-     * @param set_inherted    a value &gt;= 0
-     * @param set_fullname    the full name
-     * @param set_nickname    the nickname
-     * @param set_property       the property title
+     * @param subtag      the name of the subtag
+     * @param lang    the default language
+     * @param type        the optional type string
+     * @param inherted    a value &gt;= 0
+     * @param fullname    the full name
+     * @param nickname    the nickname
+     * @param property       the property title
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaInstitutionName(String set_subtag, String default_lang, String set_type, int set_inherted,
-        String set_fullname, String set_nickname, String set_property) throws MCRException {
-        super(set_subtag, default_lang, set_type, set_inherted);
-        fullname = "";
-        nickname = "";
-        property = "";
-        set(set_fullname, set_nickname, set_property);
+    public MCRMetaInstitutionName(String subtag, String lang, String type, int inherted,
+        String fullname, String nickname, String property) throws MCRException {
+        super(subtag, lang, type, inherted);
+        this.fullname = "";
+        this.nickname = "";
+        this.property = "";
+        set(fullname, nickname, property);
     }
 
     /**
      * This methode set all name componets.
      * 
-     * @param set_fullname
+     * @param fullname
      *            the full name
-     * @param set_nickname
+     * @param nickname
      *            the nickname
-     * @param set_property
+     * @param property
      *            the property title
      */
-    public void set(String set_fullname, String set_nickname, String set_property) {
-        if (set_fullname == null || set_nickname == null || set_property == null) {
+    public void set(String fullname, String nickname, String property) {
+        if (fullname == null || nickname == null || property == null) {
             throw new MCRException("One parameter is null.");
         }
 
-        fullname = set_fullname.trim();
-        nickname = set_nickname.trim();
-        property = set_property.trim();
+        this.fullname = fullname.trim();
+        this.nickname = nickname.trim();
+        this.property = property.trim();
     }
 
     /**
@@ -137,7 +138,7 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      *            a relevant DOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
         fullname = element.getChildTextTrim("fullname");
 
@@ -167,16 +168,18 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaInstitutionName part
      */
     @Override
-    public org.jdom2.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
-        elm.addContent(new org.jdom2.Element("fullname").addContent(fullname));
+        elm.addContent(new Element("fullname").addContent(fullname));
 
-        if ((nickname = nickname.trim()).length() != 0) {
-            elm.addContent(new org.jdom2.Element("nickname").addContent(nickname));
+        nickname = nickname.trim();
+        if (nickname.length() != 0) {
+            elm.addContent(new Element("nickname").addContent(nickname));
         }
 
-        if ((property = property.trim()).length() != 0) {
-            elm.addContent(new org.jdom2.Element("property").addContent(property));
+        property = property.trim();
+        if (property.length() != 0) {
+            elm.addContent(new Element("property").addContent(property));
         }
 
         return elm;
@@ -220,9 +223,8 @@ public final class MCRMetaInstitutionName extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if (fullname == null || (fullname = fullname.trim()).length() == 0) {
-            throw new MCRException(getSubTag() + ": fullname is null or empty");
-        }
+        fullname = MCRUtils.filterTrimmedNotEmpty(fullname)
+            .orElseThrow(() -> new MCRException(getSubTag() + ": fullname is null or empty"));
     }
 
     /**

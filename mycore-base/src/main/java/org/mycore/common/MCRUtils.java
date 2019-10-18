@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -451,16 +452,16 @@ public class MCRUtils {
         String sizeText;
         double sizeValue;
 
-        if (bytes >= 1024 * 1024) // >= 1 MB
-        {
+        if (bytes >= 1024 * 1024) {
+            // >= 1 MB
             sizeUnit = "MB";
             sizeValue = (double) Math.round(bytes / 10485.76) / 100;
-        } else if (bytes >= 5 * 1024) // >= 5 KB
-        {
+        } else if (bytes >= 5 * 1024) {
+            // >= 5 KB
             sizeUnit = "KB";
             sizeValue = (double) Math.round(bytes / 102.4) / 10;
-        } else // < 5 KB
-        {
+        } else {
+            // < 5 KB
             sizeUnit = "Byte";
             sizeValue = bytes;
         }
@@ -509,5 +510,16 @@ public class MCRUtils {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw)); // closing string writer has no effect
         return sw.toString();
+    }
+
+    /**
+     * Checks is trimmed <code>value</code> is not empty.
+     * @param value String to test
+     * @return <em>empty</em> if value is <code>null</code> or empty after trimming.
+     */
+    public static Optional<String> filterTrimmedNotEmpty(String value) {
+        return Optional.ofNullable(value)
+            .map(String::trim)
+            .filter(s -> !s.isEmpty());
     }
 }

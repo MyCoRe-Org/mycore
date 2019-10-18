@@ -82,16 +82,16 @@ public final class MCRMetaNumber extends MCRMetaDefault {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private int FRACTION_DIGITS;
+    private int fractionDigits;
 
-    private int DIMENSION_LENGTH;
+    private int dimensionLength;
 
-    private int MEASUREMENT_LENGTH;
+    private int measurementLength;
 
     private void loadProperties() {
-        FRACTION_DIGITS = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits", DEFAULT_FRACTION_DIGITS);
-        DIMENSION_LENGTH = CONFIG.getInt("MCR.Metadata.MetaNumber.DimensionLength", MAX_DIMENSION_LENGTH);
-        MEASUREMENT_LENGTH = CONFIG.getInt("MCR.Metadata.MetaNumber.MeasurementLength", MAX_MEASUREMENT_LENGTH);
+        fractionDigits = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits", DEFAULT_FRACTION_DIGITS);
+        dimensionLength = CONFIG.getInt("MCR.Metadata.MetaNumber.DimensionLength", MAX_DIMENSION_LENGTH);
+        measurementLength = CONFIG.getInt("MCR.Metadata.MetaNumber.MeasurementLength", MAX_MEASUREMENT_LENGTH);
     }
 
     /**
@@ -170,8 +170,8 @@ public final class MCRMetaNumber extends MCRMetaDefault {
         if (dimension == null) {
             this.dimension = "";
         } else {
-            if (dimension.length() > DIMENSION_LENGTH) {
-                this.dimension = dimension.substring(DIMENSION_LENGTH);
+            if (dimension.length() > dimensionLength) {
+                this.dimension = dimension.substring(dimensionLength);
                 LOGGER.warn("{}: dimension is too long: {}", getSubTag(), dimension.length());
             } else {
                 this.dimension = dimension;
@@ -190,8 +190,8 @@ public final class MCRMetaNumber extends MCRMetaDefault {
         if (measurement == null) {
             this.measurement = "";
         } else {
-            if (measurement.length() > MEASUREMENT_LENGTH) {
-                this.measurement = measurement.substring(MEASUREMENT_LENGTH);
+            if (measurement.length() > measurementLength) {
+                this.measurement = measurement.substring(measurementLength);
                 LOGGER.warn("{}: measurement is too long: {}", getSubTag(), measurement.length());
             } else {
                 this.measurement = measurement;
@@ -213,8 +213,8 @@ public final class MCRMetaNumber extends MCRMetaDefault {
             if (number == null) {
                 throw new MCRException("Number cannot be null");
             }
-            String tmp_number = number.replace(',', '.');
-            this.number = new BigDecimal(tmp_number);
+            String tmpNumber = number.replace(',', '.');
+            this.number = new BigDecimal(tmpNumber);
         } catch (NumberFormatException e) {
             throw new MCRException("The format of a number is invalid.");
         }
@@ -272,8 +272,8 @@ public final class MCRMetaNumber extends MCRMetaDefault {
     public String getNumberAsString() {
         final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.ENGLISH);
         numberFormat.setGroupingUsed(false);
-        numberFormat.setMaximumFractionDigits(FRACTION_DIGITS);
-        numberFormat.setMinimumFractionDigits(FRACTION_DIGITS);
+        numberFormat.setMaximumFractionDigits(fractionDigits);
+        numberFormat.setMinimumFractionDigits(fractionDigits);
         return numberFormat.format(number);
     }
 

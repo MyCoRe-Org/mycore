@@ -56,25 +56,26 @@ public class MCRMetaLinkID extends MCRMetaLink {
      * initializes with given values.
      * @see MCRMetaLink#MCRMetaLink(String, int)
      */
-    public MCRMetaLinkID(String set_subtag, int set_inherted) {
-        super(set_subtag, set_inherted);
+    public MCRMetaLinkID(String subtag, int inherted) {
+        super(subtag, inherted);
     }
 
     /**
      * initializes with all values needed to link to an MCRObject.
      *
-     *  This is the same as running {@link #MCRMetaLinkID(String, int)} and {@link #setReference(MCRObjectID, String, String)}.
+     *  This is the same as running {@link #MCRMetaLinkID(String, int)} and
+     *  {@link #setReference(MCRObjectID, String, String)}.
      */
-    public MCRMetaLinkID(String set_subtag, MCRObjectID id, String label, String title) {
-        this(set_subtag, id, label, title, null);
+    public MCRMetaLinkID(String subtag, MCRObjectID id, String label, String title) {
+        this(subtag, id, label, title, null);
     }
 
     /**
      * initializes with all values needed to link to an MCRObject.
      *
      */
-    public MCRMetaLinkID(String set_subtag, MCRObjectID id, String label, String title, String role) {
-        this(set_subtag, 0);
+    public MCRMetaLinkID(String subtag, MCRObjectID id, String label, String title, String role) {
+        this(subtag, 0);
         setReference(id, label, title);
         setXLinkRole(role);
     }
@@ -82,64 +83,64 @@ public class MCRMetaLinkID extends MCRMetaLink {
     /**
      * This method set a reference with xlink:href, xlink:label and xlink:title.
      *
-     * @param set_href
+     * @param href
      *            the reference as MCRObjectID string
-     * @param set_label
+     * @param label
      *            the new label string
-     * @param set_title
+     * @param title
      *            the new title string
      * @exception MCRException
      *                if the set_href value is null, empty or not a MCRObjectID
      */
     @Override
-    public final void setReference(String set_href, String set_label, String set_title) throws MCRException {
+    public final void setReference(String href, String label, String title) throws MCRException {
         try {
-            MCRObjectID hrefid = MCRObjectID.getInstance(set_href);
-            super.setReference(hrefid.toString(), set_label, set_title);
+            MCRObjectID hrefid = MCRObjectID.getInstance(href);
+            super.setReference(hrefid.toString(), label, title);
         } catch (Exception e) {
-            throw new MCRException("The href value is not a MCRObjectID: " + set_href, e);
+            throw new MCRException("The href value is not a MCRObjectID: " + href, e);
         }
     }
 
     /**
      * This method set a reference with xlink:href, xlink:label and xlink:title.
      *
-     * @param set_href
+     * @param href
      *            the reference as MCRObjectID
-     * @param set_label
+     * @param label
      *            the new label string
-     * @param set_title
+     * @param title
      *            the new title string
      * @exception MCRException
-     *                if the set_href value is null, empty or not a MCRObjectID
+     *                if the href value is null, empty or not a MCRObjectID
      */
-    public final void setReference(MCRObjectID set_href, String set_label, String set_title) throws MCRException {
-        if (set_href == null) {
+    public final void setReference(MCRObjectID href, String label, String title) throws MCRException {
+        if (href == null) {
             throw new MCRException("The href value is null.");
         }
 
-        super.setReference(set_href.toString(), set_label, set_title);
+        super.setReference(href.toString(), label, title);
     }
 
     /**
      * This method set a bidirectional link with xlink:from, xlink:to and
      * xlink:title.
      *
-     * @param set_from
+     * @param from
      *            the source MCRObjectID string
-     * @param set_to
+     * @param to
      *            the target MCRObjectID string
-     * @param set_title
+     * @param title
      *            the new title string
      * @exception MCRException
      *                if the from or to element is not a MCRObjectId
      */
     @Override
-    public final void setBiLink(String set_from, String set_to, String set_title) throws MCRException {
+    public final void setBiLink(String from, String to, String title) throws MCRException {
         try {
-            MCRObjectID fromid = MCRObjectID.getInstance(set_from);
-            MCRObjectID toid = MCRObjectID.getInstance(set_to);
-            super.setBiLink(fromid.toString(), toid.toString(), set_title);
+            MCRObjectID fromid = MCRObjectID.getInstance(from);
+            MCRObjectID toid = MCRObjectID.getInstance(to);
+            super.setBiLink(fromid.toString(), toid.toString(), title);
         } catch (Exception e) {
             linktype = null;
             throw new MCRException("The from/to value is not a MCRObjectID.");
@@ -150,21 +151,21 @@ public class MCRMetaLinkID extends MCRMetaLink {
      * This method set a bidirectional link with xlink:from, xlink:to and
      * xlink:title.
      *
-     * @param set_from
+     * @param from
      *            the source MCRObjectID
-     * @param set_to
+     * @param to
      *            the target MCRObjectID
-     * @param set_title
+     * @param title
      *            the new title string
      * @exception MCRException
      *                if the from or to element is not a MCRObjectId
      */
-    public final void setBiLink(MCRObjectID set_from, MCRObjectID set_to, String set_title) throws MCRException {
-        if (set_from == null || set_to == null) {
+    public final void setBiLink(MCRObjectID from, MCRObjectID to, String title) throws MCRException {
+        if (from == null || to == null) {
             throw new MCRException("The from/to value is null.");
         }
 
-        super.setBiLink(set_from.toString(), set_to.toString(), set_title);
+        super.setBiLink(from.toString(), to.toString(), title);
     }
 
     /**

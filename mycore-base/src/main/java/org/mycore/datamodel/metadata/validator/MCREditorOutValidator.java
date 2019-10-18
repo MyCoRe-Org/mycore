@@ -48,6 +48,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
@@ -75,15 +76,15 @@ import org.xml.sax.SAXParseException;
  */
 public class MCREditorOutValidator {
 
+    private static final String CONFIG_PREFIX = "MCR.EditorOutValidator.";
+
+    private static final SAXBuilder SAX_BUILDER = new org.jdom2.input.SAXBuilder();
+
     private static Logger LOGGER = LogManager.getLogger();
 
     private static Map<String, MCREditorMetadataValidator> VALIDATOR_MAP = getValidatorMap();
 
     private static Map<String, Class<? extends MCRMetaInterface>> CLASS_MAP = new HashMap<>();
-
-    private static final String CONFIG_PREFIX = "MCR.EditorOutValidator.";
-
-    private static final SAXBuilder SAX_BUILDER = new org.jdom2.input.SAXBuilder();
 
     private Document input;
 
@@ -97,12 +98,12 @@ public class MCREditorOutValidator {
      * <code>id</code> will be set as the MCRObjectID for the resulting object
      * that can be fetched with <code>generateValidMyCoReObject()</code>
      * 
-     * @param jdom_in
+     * @param jdomIn
      *            editor input
      */
-    public MCREditorOutValidator(Document jdom_in, MCRObjectID id) throws JDOMException, IOException {
+    public MCREditorOutValidator(Document jdomIn, MCRObjectID id) throws JDOMException, IOException {
         errorlog = new ArrayList<>();
-        input = jdom_in;
+        input = jdomIn;
         this.id = id;
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("XML before validation:\n{}", new XMLOutputter(Format.getPrettyFormat()).outputString(input));
@@ -111,43 +112,6 @@ public class MCREditorOutValidator {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("XML after validation:\n{}", new XMLOutputter(Format.getPrettyFormat()).outputString(input));
         }
-    }
-
-    /**
-     * tries to generate a valid MCRObject as JDOM Document.
-     * 
-     * @return MCRObject
-     */
-    public Document generateValidMyCoReObject() throws JDOMException, SAXParseException, IOException {
-        MCRObject obj;
-        // load the JDOM object
-        XPathFactory.instance()
-            .compile("/mycoreobject/*/*/*/@editor.output", Filters.attribute())
-            .evaluate(input)
-            .forEach(Attribute::detach);
-        try {
-            byte[] xml = new MCRJDOMContent(input).asByteArray();
-            obj = new MCRObject(xml, true);
-        } catch (SAXParseException e) {
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            LOGGER.warn("Failure while parsing document:\n{}", xout.outputString(input));
-            throw e;
-        }
-        Date curTime = new Date();
-        obj.getService().setDate("modifydate", curTime);
-
-        // return the XML tree
-        input = obj.createXML();
-        return input;
-    }
-
-    /**
-     * returns a List of Error log entries
-     * 
-     * @return log entries for the whole validation process
-     */
-    public List<String> getErrorLog() {
-        return errorlog;
     }
 
     private static Map<String, MCREditorMetadataValidator> getValidatorMap() {
@@ -278,61 +242,68 @@ public class MCREditorOutValidator {
         return datasubtag -> MCREditorOutValidator.checkMetaObjectWithLinks(datasubtag, clazz);
     }
 
-    static class MCRMetaHistoryDateCheck implements MCREditorMetadataValidator {
-        public String checkDataSubTag(Element datasubtag) {
-            List<Element> children = datasubtag.getChildren("text");
-            for (int i = 0; i < children.size(); i++) {
-                Element child = children.get(i);
-                String text = child.getTextTrim();
-                if (text == null || text.length() == 0) {
-                    datasubtag.removeContent(child);
-                    i--;
-                    continue;
-                }
-                if (child.getAttribute("lang") != null) {
-                    child.getAttribute("lang").setNamespace(XML_NAMESPACE);
-                    LOGGER.warn("namespace add for xml:lang attribute in {}", datasubtag.getName());
-                }
-            }
-            if (children.size() == 0) {
-                return "history date is empty";
-            }
-            return checkMetaObjectWithLang(datasubtag, MCRMetaHistoryDate.class);
+    /**
+     * The method add a default ACL-block.
+     */
+    public static void setDefaultDerivateACLs(org.jdom2.Element service) {
+        // Read stylesheet and add user
+        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_derivate.xml");
+        if (aclxml == null) {
+            LOGGER.warn("Can't find default derivate ACL file editor_default_acls_derivate.xml.");
+            return;
         }
-    }
-
-    static class MCRMetaClassificationCheck implements MCREditorMetadataValidator {
-        public String checkDataSubTag(Element datasubtag) {
-            String categid = datasubtag.getAttributeValue("categid");
-            if (categid == null) {
-                return "Attribute categid is empty";
+        try {
+            org.jdom2.Document xml = SAX_BUILDER.build(aclxml);
+            org.jdom2.Element acls = xml.getRootElement().getChild("servacls");
+            if (acls != null) {
+                service.addContent(acls.detach());
             }
-            return checkMetaObject(datasubtag, MCRMetaClassification.class, false);
-        }
-    }
-
-    static class MCRMetaAdressCheck implements MCREditorMetadataValidator {
-        public String checkDataSubTag(Element datasubtag) {
-            if (datasubtag.getChildren().size() == 0) {
-                return "adress is empty";
-            }
-            return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
-        }
-    }
-
-    static class MCRMetaPersonNameCheck implements MCREditorMetadataValidator {
-        public String checkDataSubTag(Element datasubtag) {
-            if (datasubtag.getChildren().size() == 0) {
-                return "person name is empty";
-            }
-            return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
+        } catch (Exception e) {
+            LOGGER.warn("Error while parsing file editor_default_acls_derivate.xml.");
         }
     }
 
     /**
-     * @throws IOException 
-     * @throws JDOMException 
-     * 
+     * tries to generate a valid MCRObject as JDOM Document.
+     *
+     * @return MCRObject
+     */
+    public Document generateValidMyCoReObject() throws JDOMException, SAXParseException, IOException {
+        MCRObject obj;
+        // load the JDOM object
+        XPathFactory.instance()
+            .compile("/mycoreobject/*/*/*/@editor.output", Filters.attribute())
+            .evaluate(input)
+            .forEach(Attribute::detach);
+        try {
+            byte[] xml = new MCRJDOMContent(input).asByteArray();
+            obj = new MCRObject(xml, true);
+        } catch (SAXParseException e) {
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            LOGGER.warn("Failure while parsing document:\n{}", xout.outputString(input));
+            throw e;
+        }
+        Date curTime = new Date();
+        obj.getService().setDate("modifydate", curTime);
+
+        // return the XML tree
+        input = obj.createXML();
+        return input;
+    }
+
+    /**
+     * returns a List of Error log entries
+     *
+     * @return log entries for the whole validation process
+     */
+    public List<String> getErrorLog() {
+        return errorlog;
+    }
+
+    /**
+     * @throws IOException
+     * @throws JDOMException
+     *
      */
     private void checkObject() throws JDOMException, IOException {
         // add the namespaces (this is a workaround)
@@ -340,11 +311,12 @@ public class MCREditorOutValidator {
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         // set the schema
-        String mcr_schema = "datamodel-" + id.getTypeId() + ".xsd";
-        root.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
+        String mcrSchema = "datamodel-" + id.getTypeId() + ".xsd";
+        root.setAttribute("noNamespaceSchemaLocation", mcrSchema, XSI_NAMESPACE);
         // check the label
-        String label = root.getAttributeValue("label");
-        if (label == null || (label = label.trim()).length() == 0) {
+        String label = MCRUtils.filterTrimmedNotEmpty(root.getAttributeValue("label"))
+            .orElse(null);
+        if (label == null) {
             root.setAttribute("label", id.toString());
         }
         // remove the path elements from the incoming
@@ -401,8 +373,8 @@ public class MCREditorOutValidator {
 
     /**
      * @param service
-     * @throws IOException 
-     * @throws JDOMException 
+     * @throws IOException
+     * @throws JDOMException
      */
     private void checkObjectService(Element root, Element service) throws JDOMException, IOException {
         if (service == null) {
@@ -425,10 +397,10 @@ public class MCREditorOutValidator {
 
     /**
      * The method add a default ACL-block.
-     * 
+     *
      * @param service
-     * @throws IOException 
-     * @throws JDOMException 
+     * @throws IOException
+     * @throws JDOMException
      */
     private void setDefaultObjectACLs(org.jdom2.Element service) throws JDOMException, IOException {
         if (!MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true)) {
@@ -481,7 +453,8 @@ public class MCREditorOutValidator {
                     }
                     if (value.equals("$CurrentGroup")) {
                         throw new MCRException(
-                            "The parameter $CurrentGroup in default ACLs is no more supported since MyCoRe 2014.06 because it is not supported in Servlet API 3.0");
+                            "The parameter $CurrentGroup in default ACLs is not supported as of MyCoRe 2014.06"
+                                + " because it is not supported in Servlet API 3.0");
                     }
                     int i = value.indexOf("$CurrentIP");
                     if (i != -1) {
@@ -521,24 +494,55 @@ public class MCREditorOutValidator {
         structure.getChildren().removeIf(datatag -> !checkMetaTags(datatag));
     }
 
-    /**
-     * The method add a default ACL-block.
-     */
-    public static void setDefaultDerivateACLs(org.jdom2.Element service) {
-        // Read stylesheet and add user
-        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_derivate.xml");
-        if (aclxml == null) {
-            LOGGER.warn("Can't find default derivate ACL file editor_default_acls_derivate.xml.");
-            return;
-        }
-        try {
-            org.jdom2.Document xml = SAX_BUILDER.build(aclxml);
-            org.jdom2.Element acls = xml.getRootElement().getChild("servacls");
-            if (acls != null) {
-                service.addContent(acls.detach());
+    static class MCRMetaHistoryDateCheck implements MCREditorMetadataValidator {
+        public String checkDataSubTag(Element datasubtag) {
+            Element[] children = datasubtag.getChildren("text").toArray(Element[]::new);
+            int textCount = children.length;
+            for (int i = 0; i < children.length; i++) {
+                Element child = children[i];
+                String text = child.getTextTrim();
+                if (text == null || text.length() == 0) {
+                    child.detach();
+                    textCount--;
+                    continue;
+                }
+                if (child.getAttribute("lang") != null) {
+                    child.getAttribute("lang").setNamespace(XML_NAMESPACE);
+                    LOGGER.warn("namespace add for xml:lang attribute in {}", datasubtag.getName());
+                }
             }
-        } catch (Exception e) {
-            LOGGER.warn("Error while parsing file editor_default_acls_derivate.xml.");
+            if (textCount == 0) {
+                return "history date is empty";
+            }
+            return checkMetaObjectWithLang(datasubtag, MCRMetaHistoryDate.class);
+        }
+    }
+
+    static class MCRMetaClassificationCheck implements MCREditorMetadataValidator {
+        public String checkDataSubTag(Element datasubtag) {
+            String categid = datasubtag.getAttributeValue("categid");
+            if (categid == null) {
+                return "Attribute categid is empty";
+            }
+            return checkMetaObject(datasubtag, MCRMetaClassification.class, false);
+        }
+    }
+
+    static class MCRMetaAdressCheck implements MCREditorMetadataValidator {
+        public String checkDataSubTag(Element datasubtag) {
+            if (datasubtag.getChildren().size() == 0) {
+                return "adress is empty";
+            }
+            return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
+        }
+    }
+
+    static class MCRMetaPersonNameCheck implements MCREditorMetadataValidator {
+        public String checkDataSubTag(Element datasubtag) {
+            if (datasubtag.getChildren().size() == 0) {
+                return "person name is empty";
+            }
+            return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
         }
     }
 

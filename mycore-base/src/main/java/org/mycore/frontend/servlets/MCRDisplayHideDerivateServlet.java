@@ -77,13 +77,12 @@ public class MCRDisplayHideDerivateServlet extends MCRServlet {
 
         Attribute displayAttr = derivateNode.getAttribute("display");
 
-        /* the attributs is not existing, user wants to hide derivate */
         if (displayAttr == null) {
+            /* the attributs is not existing, user wants to hide derivate */
             displayAttr = new Attribute("display", "false");
             derivateNode.setAttribute(displayAttr);
-        }
-        /* attribute exists, thus toggle the attribute value */
-        else {
+        } else {
+            /* attribute exists, thus toggle the attribute value */
             String oldVal = displayAttr.getValue();
             String newVal = oldVal.equals(String.valueOf(true)) ? String.valueOf(false) : String.valueOf(true);
             displayAttr.setValue(newVal);

@@ -113,7 +113,8 @@ public class MCRErrorServlet extends HttpServlet {
                         }
                     }
                     if (quality > 0.5) {
-                        //firefox 18 accepts every media type when requesting images with 0.5 but closes stream immediately when detecting text/html
+                        //firefox 18 accepts every media type when requesting images with 0.5
+                        // but closes stream immediately when detecting text/html
                         return true;
                     }
                 }

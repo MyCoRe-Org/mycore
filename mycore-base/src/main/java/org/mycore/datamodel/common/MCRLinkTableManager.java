@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -123,24 +124,25 @@ public class MCRLinkTableManager {
      *            the optional attribute of the reference as String
      */
     public void addReferenceLink(String from, String to, String type, String attr) {
-        if (from == null || (from = from.trim()).length() == 0) {
+        from = MCRUtils.filterTrimmedNotEmpty(from).orElse(null);
+        if (from == null) {
             LOGGER.warn("The from value of a reference link is false, the link was not added to the link table");
             return;
         }
 
-        if (to == null || (to = to.trim()).length() == 0) {
+        to = MCRUtils.filterTrimmedNotEmpty(to).orElse(null);
+        if (to == null) {
             LOGGER.warn("The to value of a reference link is false, the link was not added to the link table");
             return;
         }
 
-        if (type == null || (type = type.trim()).length() == 0) {
+        type = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
+        if (type == null) {
             LOGGER.warn("The type value of a reference link is false, the link was not added to the link table");
             return;
         }
 
-        if (attr == null) {
-            attr = "";
-        }
+        attr = MCRUtils.filterTrimmedNotEmpty(attr).orElse("");
 
         LOGGER.debug("Link in table {} add for {}<-->{} with {} and {}", type, from, to, type, attr);
 
@@ -169,7 +171,8 @@ public class MCRLinkTableManager {
      *            the source of the reference as String
      */
     public void deleteReferenceLink(String from) {
-        if (from == null || (from = from.trim()).length() == 0) {
+        from = MCRUtils.filterTrimmedNotEmpty(from).orElse(null);
+        if (from == null) {
             LOGGER
                 .warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
@@ -194,7 +197,8 @@ public class MCRLinkTableManager {
      *            the type of the reference as String
      */
     public void deleteReferenceLink(String from, String to, String type) {
-        if (from == null || (from = from.trim()).length() == 0) {
+        from = MCRUtils.filterTrimmedNotEmpty(from).orElse(null);
+        if (from == null) {
             LOGGER
                 .warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
             return;
@@ -226,7 +230,8 @@ public class MCRLinkTableManager {
      * @return the number of references
      */
     public int countReferenceLinkTo(String to) {
-        if (to == null || (to = to.trim()).length() == 0) {
+        to = MCRUtils.filterTrimmedNotEmpty(to).orElse(null);
+        if (to == null) {
             LOGGER.warn("The to value of a reference link is false, the link was " + "not added to the link table");
 
             return 0;
@@ -251,7 +256,7 @@ public class MCRLinkTableManager {
      * @return the number of references
      */
     public int countReferenceLinkTo(String to, String[] types, String restriction) {
-        Optional<String> myTo = Optional.ofNullable(to).map(String::trim).filter(s -> !s.isEmpty());
+        Optional<String> myTo = MCRUtils.filterTrimmedNotEmpty(to);
         if (!myTo.isPresent()) {
             LOGGER.warn("The to value of a reference link is false, the link was " + "not added to the link table");
             return 0;

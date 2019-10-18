@@ -16,5 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** Automatically maps classification categories that have been set manually in object metadata to other classification categories */
+/**
+ *  Automatically maps classification categories that have been set manually
+ *  in object metadata to other classification categories */
 package org.mycore.datamodel.classifications2.mapper;

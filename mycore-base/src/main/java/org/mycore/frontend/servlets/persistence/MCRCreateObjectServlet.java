@@ -47,12 +47,9 @@ import org.xml.sax.SAXParseException;
  */
 public class MCRCreateObjectServlet extends MCRPersistenceServlet {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 4143057048219690238L;
 
-    Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private boolean appendDerivate = false;
 
@@ -175,8 +172,8 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
         if (layout != null && layout.length() != 0) {
             sb.append('-').append(layout);
         }
-        String base_name = sb.toString();
-        String form = MCRPersistenceHelper.getWebPage(getServletContext(), base_name + ".xed", base_name + ".xml");
+        String baseName = sb.toString();
+        String form = MCRPersistenceHelper.getWebPage(getServletContext(), baseName + ".xed", baseName + ".xml");
         Properties params = new Properties();
         params.put("cancelUrl", MCRPersistenceHelper.getCancelUrl(request));
         params.put("mcrid", objectID.toString());

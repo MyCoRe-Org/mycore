@@ -55,7 +55,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     private MCRCategoryID id;
 
-    private URI URI;
+    private URI uri;
 
     private String defaultLang;
 
@@ -111,11 +111,11 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public URI getURI() {
-        return URI;
+        return uri;
     }
 
     public void setURI(URI uri) {
-        URI = uri;
+        this.uri = uri;
     }
 
     public boolean hasChildren() {

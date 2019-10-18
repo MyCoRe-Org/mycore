@@ -126,12 +126,12 @@ public class MCRObjectStructure {
     /**
      * This method set the parent value from a given MCRMetaLinkID.
      * 
-     * @param in_parent
+     * @param parent
      *            the MCRMetaLinkID to set
      *  
      */
-    public final void setParent(MCRMetaLinkID in_parent) {
-        parent = in_parent;
+    public final void setParent(MCRMetaLinkID parent) {
+        this.parent = parent;
     }
 
     public final void setParent(MCRObjectID parentID) {
@@ -237,18 +237,18 @@ public class MCRObjectStructure {
      * derivate vector. If the link could be added a "true" will be returned,
      * otherwise "false".
      * 
-     * @param add_derivate
+     * @param derivate
      *            the link to be added as MCRMetaLinkID
      */
-    public final boolean addDerivate(MCRMetaEnrichedLinkID add_derivate) {
-        MCRObjectID href = add_derivate.getXLinkHrefID();
+    public final boolean addDerivate(MCRMetaEnrichedLinkID derivate) {
+        MCRObjectID href = derivate.getXLinkHrefID();
         if (containsDerivate(href)) {
             return false;
         }
         if (!MCRMetadataManager.exists(href)) {
             LOGGER.warn("Cannot find derivate {}, will add it anyway.", href);
         }
-        derivates.add(add_derivate);
+        derivates.add(derivate);
         derivates.sort(Comparator.comparingInt(MCRMetaEnrichedLinkID::getOrder));
         return true;
     }

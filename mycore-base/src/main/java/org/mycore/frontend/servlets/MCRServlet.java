@@ -287,24 +287,24 @@ public class MCRServlet extends HttpServlet {
         return session;
     }
 
-    private static byte[] filterIPByNetmask(final byte[] ip_array, final byte[] mask_array) {
-        for (int i = 0; i < ip_array.length; i++) {
-            ip_array[i] = (byte) (ip_array[i] & mask_array[i]);
+    private static byte[] filterIPByNetmask(final byte[] ip, final byte[] mask) {
+        for (int i = 0; i < ip.length; i++) {
+            ip[i] = (byte) (ip[i] & mask[i]);
         }
-        return ip_array;
+        return ip;
     }
 
-    private static byte[] decideNetmask(InetAddress IP) throws IOException {
-        if (hasIPVersion(IP, 4)) {
+    private static byte[] decideNetmask(InetAddress ip) throws IOException {
+        if (hasIPVersion(ip, 4)) {
             return SESSION_NETMASK_IPV4;
-        } else if (hasIPVersion(IP, 6)) {
+        } else if (hasIPVersion(ip, 6)) {
             return SESSION_NETMASK_IPV6;
         } else {
-            throw new IOException("Unknown or unidentifiable version of IP: " + IP);
+            throw new IOException("Unknown or unidentifiable version of ip: " + ip);
         }
     }
 
-    private static Boolean hasIPVersion(InetAddress IP, int version) {
+    private static Boolean hasIPVersion(InetAddress ip, int version) {
         int byteLength;
         switch (version) {
             case 4:
@@ -314,9 +314,9 @@ public class MCRServlet extends HttpServlet {
                 byteLength = 16;
                 break;
             default:
-                throw new IndexOutOfBoundsException("Unknown IP version: " + version);
+                throw new IndexOutOfBoundsException("Unknown ip version: " + version);
         }
-        return IP.getAddress().length == byteLength;
+        return ip.getAddress().length == byteLength;
     }
 
     private static void bindSessionToRequest(HttpServletRequest req, String servletName, MCRSession session) {

@@ -9,9 +9,6 @@
   </parent>
   <artifactId>mycore-base</artifactId>
   <name>MyCoRe Base Components</name>
-  <properties>
-    <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
-  </properties>
   <build>
     <plugins>
       <plugin>

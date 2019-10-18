@@ -131,17 +131,17 @@ import org.xml.sax.XMLReader;
 public final class MCRURIResolver implements URIResolver {
     static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);
 
-    private static Map<String, URIResolver> SUPPORTED_SCHEMES;
+    static final String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
+
+    private static Map<String, URIResolver> SUPPORTED_SCHEMES;
 
     private static MCRResolverProvider EXT_RESOLVER;
 
     private static MCRURIResolver singleton;
 
     private static ServletContext context;
-
-    static final String SESSION_OBJECT_NAME = "URI_RESOLVER_DEBUG";
 
     static {
         try {
@@ -169,6 +169,46 @@ public final class MCRURIResolver implements URIResolver {
                     return null;
                 }
             }).orElse(HashMap::new);
+    }
+
+    /**
+     * Returns the MCRURIResolver singleton
+     */
+    public static MCRURIResolver instance() {
+        return singleton;
+    }
+
+    /**
+     * Initializes the MCRURIResolver for servlet applications.
+     *
+     * @param ctx
+     *            the servlet context of this web application
+     */
+    public static synchronized void init(ServletContext ctx) {
+        context = ctx;
+    }
+
+    public static Hashtable<String, String> getParameterMap(String key) {
+        String[] param;
+        StringTokenizer tok = new StringTokenizer(key, "&");
+        Hashtable<String, String> params = new Hashtable<>();
+
+        while (tok.hasMoreTokens()) {
+            param = tok.nextToken().split("=");
+            params.put(param[0], param.length >= 2 ? param[1] : "");
+        }
+        return params;
+    }
+
+    static URI resolveURI(String href, String base) {
+        return Optional.ofNullable(base)
+            .map(URI::create)
+            .map(u -> u.resolve(href))
+            .orElse(URI.create(href));
+    }
+
+    public static ServletContext getServletContext() {
+        return context;
     }
 
     private HashMap<String, URIResolver> getResolverMapping() {
@@ -207,35 +247,6 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("https", restResolver);
         supportedSchemes.put("file", new MCRFileResolver());
         return supportedSchemes;
-    }
-
-    /**
-     * Returns the MCRURIResolver singleton
-     */
-    public static MCRURIResolver instance() {
-        return singleton;
-    }
-
-    /**
-     * Initializes the MCRURIResolver for servlet applications.
-     *
-     * @param ctx
-     *            the servlet context of this web application
-     */
-    public static synchronized void init(ServletContext ctx) {
-        context = ctx;
-    }
-
-    public static Hashtable<String, String> getParameterMap(String key) {
-        String[] param;
-        StringTokenizer tok = new StringTokenizer(key, "&");
-        Hashtable<String, String> params = new Hashtable<>();
-
-        while (tok.hasMoreTokens()) {
-            param = tok.nextToken().split("=");
-            params.put(param[0], param.length >= 2 ? param[1] : "");
-        }
-        return params;
     }
 
     /**
@@ -361,13 +372,6 @@ public final class MCRURIResolver implements URIResolver {
         return builder.build(in).getRootElement();
     }
 
-    static URI resolveURI(String href, String base) {
-        return Optional.ofNullable(base)
-            .map(URI::create)
-            .map(u -> u.resolve(href))
-            .orElse(URI.create(href));
-    }
-
     /**
      * provides a URI -- Resolver Mapping One can implement this interface to provide additional URI schemes this
      * MCRURIResolver should handle, too. To add your mapping you have to set the
@@ -394,6 +398,10 @@ public final class MCRURIResolver implements URIResolver {
             return getResponse(href, base).getSource();
         }
 
+    }
+
+    public interface MCRXslIncludeHrefs {
+        List<String> getHrefs();
     }
 
     public static class MCRCacheableURIResponse {
@@ -501,6 +509,14 @@ public final class MCRURIResolver implements URIResolver {
             this.logger = LogManager.getLogger();
         }
 
+        private static int getHash(String lastModified, String eTag) {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((eTag == null) ? 0 : eTag.hashCode());
+            result = prime * result + ((lastModified == null) ? 0 : lastModified.hashCode());
+            return result;
+        }
+
         public void close() {
             try {
                 restClient.close();
@@ -560,14 +576,6 @@ public final class MCRURIResolver implements URIResolver {
             } catch (IOException e) {
                 throw new TransformerException(e);
             }
-        }
-
-        private static int getHash(String lastModified, String eTag) {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((eTag == null) ? 0 : eTag.hashCode());
-            result = prime * result + ((lastModified == null) ? 0 : lastModified.hashCode());
-            return result;
         }
 
     }
@@ -648,32 +656,6 @@ public final class MCRURIResolver implements URIResolver {
 
     private static class MCRChooseTemplateResolver implements URIResolver {
 
-        @Override
-        public Source resolve(String href, String base) throws TransformerException {
-            String type = href.substring(href.indexOf(":") + 1);
-            String path = "/templates/" + type + "/";
-            LOGGER.debug("Reading templates from {}", path);
-            Set<String> resourcePaths = context.getResourcePaths(path);
-            ArrayList<String> templates = new ArrayList<>();
-            if (resourcePaths != null) {
-                for (String resourcePath : resourcePaths) {
-                    if (!resourcePath.endsWith("/")) {
-                        //only handle directories
-                        continue;
-                    }
-                    String templateName = resourcePath.substring(path.length(), resourcePath.length() - 1);
-                    LOGGER.debug("Checking if template: {}", templateName);
-                    if (templateName.contains("/")) {
-                        continue;
-                    }
-                    templates.add(templateName);
-                }
-                Collections.sort(templates);
-            }
-            LOGGER.info("Found theses templates: {}", templates);
-            return new JDOMSource(getStylesheets(templates));
-        }
-
         private static Document getStylesheets(List<String> temps) {
 
             Element rootOut = new Element("stylesheet", MCRConstants.XSL_NAMESPACE).setAttribute("version", "1.0");
@@ -716,6 +698,32 @@ public final class MCRURIResolver implements URIResolver {
             template2.addContent(templates);
             rootOut.addContent(template2);
             return jdom;
+        }
+
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            String type = href.substring(href.indexOf(":") + 1);
+            String path = "/templates/" + type + "/";
+            LOGGER.debug("Reading templates from {}", path);
+            Set<String> resourcePaths = context.getResourcePaths(path);
+            ArrayList<String> templates = new ArrayList<>();
+            if (resourcePaths != null) {
+                for (String resourcePath : resourcePaths) {
+                    if (!resourcePath.endsWith("/")) {
+                        //only handle directories
+                        continue;
+                    }
+                    String templateName = resourcePath.substring(path.length(), resourcePath.length() - 1);
+                    LOGGER.debug("Checking if template: {}", templateName);
+                    if (templateName.contains("/")) {
+                        continue;
+                    }
+                    templates.add(templateName);
+                }
+                Collections.sort(templates);
+            }
+            LOGGER.info("Found theses templates: {}", templates);
+            return new JDOMSource(getStylesheets(templates));
         }
 
     }
@@ -938,6 +946,25 @@ public final class MCRURIResolver implements URIResolver {
         MCRClassificationResolver() {
         }
 
+        private static String getLabelFormat(String editorString) {
+            Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
+            if (m.find() && m.groupCount() == 3) {
+                String formatDef = m.group(2);
+                return MCRConfiguration.instance().getString(FORMAT_CONFIG_PREFIX + formatDef);
+            }
+            return null;
+        }
+
+        private static boolean shouldSortCategories(String classId) {
+            return MCRConfiguration.instance().getBoolean(SORT_CONFIG_PREFIX + classId, true);
+        }
+
+        private static long getSystemLastModified() {
+            long xmlLastModified = MCRXMLMetadataManager.instance().getLastModified();
+            long classLastModified = DAO.getLastModified();
+            return Math.max(xmlLastModified, classLastModified);
+        }
+
         /**
          * returns a classification in a specific format. Syntax:
          * <code>classification:{editor[Complete]['['formatAlias']']|metadata}:{Levels}[:noEmptyLeaves]:{parents|
@@ -1020,7 +1047,8 @@ public final class MCRURIResolver implements URIResolver {
                 if (categ.length() == 0) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: {}", uri);
                     throw new IllegalArgumentException(
-                        "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: "
+                        "Invalid format (categID is required in mode 'parents') "
+                            + "of uri for retrieval of classification: "
                             + uri);
                 }
                 cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
@@ -1049,25 +1077,6 @@ public final class MCRURIResolver implements URIResolver {
             }
             LOGGER.debug("end resolving {}", uri);
             return returns;
-        }
-
-        private static String getLabelFormat(String editorString) {
-            Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
-            if (m.find() && m.groupCount() == 3) {
-                String formatDef = m.group(2);
-                return MCRConfiguration.instance().getString(FORMAT_CONFIG_PREFIX + formatDef);
-            }
-            return null;
-        }
-
-        private static boolean shouldSortCategories(String classId) {
-            return MCRConfiguration.instance().getBoolean(SORT_CONFIG_PREFIX + classId, true);
-        }
-
-        private static long getSystemLastModified() {
-            long xmlLastModified = MCRXMLMetadataManager.instance().getLastModified();
-            long classLastModified = DAO.getLastModified();
-            return Math.max(xmlLastModified, classLastModified);
         }
 
     }
@@ -1316,10 +1325,6 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
-    public interface MCRXslIncludeHrefs {
-        List<String> getHrefs();
-    }
-
     /**
      * Imports xsl files which are set in the mycore.properties file. Example:
      * MCR.URIResolver.xslImports.components=first.xsl,second.xsl Every file must import this URIResolver to form a
@@ -1357,33 +1362,6 @@ public final class MCRURIResolver implements URIResolver {
      * &lt;/parents&gt; &lt;/metadata&gt; &lt;/mycoreobject&gt;
      */
     private static class MCRBuildXMLResolver implements URIResolver {
-
-        /**
-         * Builds a simple xml node tree on basis of name value pair
-         */
-        public Source resolve(String href, String base) throws TransformerException {
-            String key = href.substring(href.indexOf(":") + 1);
-            LOGGER.debug("Building xml from {}", key);
-
-            Hashtable<String, String> params = getParameterMap(key);
-
-            Element defaultRoot = new Element("root");
-            Element root = defaultRoot;
-            String rootName = params.get("_rootName_");
-            if (rootName != null) {
-                root = new Element(getLocalName(rootName), getNamespace(rootName));
-                params.remove("_rootName_");
-            }
-
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                constructElement(root, entry.getKey(), entry.getValue());
-            }
-            if (root == defaultRoot && root.getChildren().size() > 1) {
-                LOGGER.warn("More than 1 root node defined, returning first");
-                return new JDOMSource(root.getChildren().get(0).detach());
-            }
-            return new JDOMSource(root);
-        }
 
         private static Hashtable<String, String> getParameterMap(String key) {
             String[] param;
@@ -1443,6 +1421,33 @@ public final class MCRURIResolver implements URIResolver {
             } else {
                 return name.split(":")[1];
             }
+        }
+
+        /**
+         * Builds a simple xml node tree on basis of name value pair
+         */
+        public Source resolve(String href, String base) throws TransformerException {
+            String key = href.substring(href.indexOf(":") + 1);
+            LOGGER.debug("Building xml from {}", key);
+
+            Hashtable<String, String> params = getParameterMap(key);
+
+            Element defaultRoot = new Element("root");
+            Element root = defaultRoot;
+            String rootName = params.get("_rootName_");
+            if (rootName != null) {
+                root = new Element(getLocalName(rootName), getNamespace(rootName));
+                params.remove("_rootName_");
+            }
+
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                constructElement(root, entry.getKey(), entry.getValue());
+            }
+            if (root == defaultRoot && root.getChildren().size() > 1) {
+                LOGGER.warn("More than 1 root node defined, returning first");
+                return new JDOMSource(root.getChildren().get(0).detach());
+            }
+            return new JDOMSource(root);
         }
 
     }
@@ -1587,9 +1592,5 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
-    }
-
-    public static ServletContext getServletContext() {
-        return context;
     }
 }

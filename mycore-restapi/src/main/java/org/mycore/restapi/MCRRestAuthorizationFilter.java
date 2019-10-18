@@ -118,7 +118,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         List<String> missedPermissions = Stream.of(detail)
             .map(d -> "rest-detail-" + d)
-            .filter(d -> MCRAccessManager.hasRule(MCRAccessControlSystem.poolPrivilegeID, d))
+            .filter(d -> MCRAccessManager.hasRule(MCRAccessControlSystem.POOL_PRIVILEGE_ID, d))
             .filter(d -> !aclProvider.checkPermission(d))
             .collect(Collectors.toList());
         if (!missedPermissions.isEmpty()) {

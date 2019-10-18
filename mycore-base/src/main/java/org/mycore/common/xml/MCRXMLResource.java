@@ -46,7 +46,7 @@ import org.mycore.common.content.MCRURLContent;
  */
 public class MCRXMLResource {
 
-    private static final MCRCache<String, CacheEntry> resourceCache = new MCRCache<>(
+    private static final MCRCache<String, CacheEntry> RESOURCE_CACHE = new MCRCache<>(
         MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100),
         "XML resources");
 
@@ -62,6 +62,27 @@ public class MCRXMLResource {
      */
     public static MCRXMLResource instance() {
         return instance;
+    }
+
+    private static URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
+        LOGGER.debug("Reading xml from classpath resource {}", name);
+        URL url = MCRConfigurationDir.getConfigResource(name, classLoader);
+        LOGGER.debug("Resource URL:{}", url);
+        if (url == null) {
+            return null;
+        }
+        return url.openConnection();
+    }
+
+    private static MCRContent getDocument(URL url) {
+        return new MCRURLContent(url);
+    }
+
+    private static void closeURLConnection(URLConnection con) throws IOException {
+        if (con == null) {
+            return;
+        }
+        con.getInputStream().close();
     }
 
     public URL getURL(String name) throws IOException {
@@ -119,7 +140,7 @@ public class MCRXMLResource {
      */
     public MCRContent getResource(String name, ClassLoader classLoader) throws IOException {
         ResourceModifiedHandle modifiedHandle = getModifiedHandle(name, classLoader, 10000);
-        CacheEntry entry = resourceCache.getIfUpToDate(name, modifiedHandle);
+        CacheEntry entry = RESOURCE_CACHE.getIfUpToDate(name, modifiedHandle);
         URL resolvedURL = modifiedHandle.getURL();
         if (entry != null && (resolvedURL == null || entry.resourceURL.equals(resolvedURL))) {
             LOGGER.debug("Using cached resource {}", name);
@@ -130,7 +151,7 @@ public class MCRXMLResource {
             return null;
         }
         entry = new CacheEntry();
-        resourceCache.put(name, entry);
+        RESOURCE_CACHE.put(name, entry);
         entry.resourceURL = resolvedURL;
         entry.content = getDocument(entry.resourceURL);
         return entry.content;
@@ -164,20 +185,6 @@ public class MCRXMLResource {
         } finally {
             closeURLConnection(con);
         }
-    }
-
-    private static URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
-        LOGGER.debug("Reading xml from classpath resource {}", name);
-        URL url = MCRConfigurationDir.getConfigResource(name, classLoader);
-        LOGGER.debug("Resource URL:{}", url);
-        if (url == null) {
-            return null;
-        }
-        return url.openConnection();
-    }
-
-    private static MCRContent getDocument(URL url) {
-        return new MCRURLContent(url);
     }
 
     public long getLastModified(String name, ClassLoader classLoader) throws IOException {
@@ -245,12 +252,5 @@ public class MCRXMLResource {
             }
         }
 
-    }
-
-    private static void closeURLConnection(URLConnection con) throws IOException {
-        if (con == null) {
-            return;
-        }
-        con.getInputStream().close();
     }
 }

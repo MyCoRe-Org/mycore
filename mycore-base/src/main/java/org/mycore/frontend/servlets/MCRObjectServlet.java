@@ -126,7 +126,8 @@ public class MCRObjectServlet extends MCRContentServlet {
         if (id != null) {
             try {
                 mcrid = MCRObjectID.getInstance(id); // create Object with given ID, only ID syntax check performed
-            } catch (final MCRException e) { // handle exception: invalid ID syntax, set HTTP error 400 "Invalid request"
+            } catch (final MCRException e) {
+                // handle exception: invalid ID syntax, set HTTP error 400 "Invalid request"
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, getErrorI18N(I18N_ERROR_PREFIX, "invalidID", id));
                 return null; // sorry, no object to return
             }

@@ -25,7 +25,8 @@ import java.util.function.Function;
 /**
  * Represents a function that accepts one argument and produces a result and throws an Exception.
  *
- * <p>Use {@link #toFunction()} or {@link #toFunction(BiFunction, Class)} to transform this MCRThrowFunction into a Function that can be handled throughout Java 8.</p>
+ * <p>Use {@link #toFunction()} or {@link #toFunction(BiFunction, Class)} to transform this
+ * MCRThrowFunction into a Function that can be handled throughout Java 8.</p>
  *
  * @param <T> the type of the input to the function
  * @param <R> the type of the result of the function
@@ -86,7 +87,8 @@ public interface MCRThrowFunction<T, R, E extends Throwable> {
     /**
      * Returns a function that catches &lt;E&gt; and forwards it to the <code>throwableHandler</code> together with the Exception.
      * 
-     * Use this method if you want to react on the certain Exceptions and return a result or rethrow a specific RuntimeExption.
+     * Use this method if you want to react on the certain Exceptions and return a result
+     * or rethrow a specific RuntimeExption.
      * @param throwableHandler a BiFunction that handles original Input and caught Exception
      * @param exClass class of exception to catch
      */

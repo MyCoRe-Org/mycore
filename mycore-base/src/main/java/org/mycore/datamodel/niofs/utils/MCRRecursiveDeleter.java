@@ -36,13 +36,13 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public final class MCRRecursiveDeleter extends SimpleFileVisitor<Path> {
 
-    private static final MCRRecursiveDeleter instance = new MCRRecursiveDeleter();
+    private static final MCRRecursiveDeleter INSTANCE = new MCRRecursiveDeleter();
 
     private MCRRecursiveDeleter() {
     }
 
     public static MCRRecursiveDeleter instance() {
-        return instance;
+        return INSTANCE;
     }
 
     @Override

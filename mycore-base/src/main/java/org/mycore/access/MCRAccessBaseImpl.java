@@ -45,7 +45,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     private static MCRAccessInterface SINGLETON;
 
-    protected static final String AccessPermissions = MCRConfiguration.instance().getString(
+    protected static final String ACCESS_PERMISSIONS = MCRConfiguration.instance().getString(
         "MCR.Access.AccessPermissions", "read,write,delete");
 
     /** the logger */
@@ -311,7 +311,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @return the permissions as List
      */
     public Collection<String> getAccessPermissionsFromConfiguration() {
-        String[] permissions = AccessPermissions.split(",");
+        String[] permissions = ACCESS_PERMISSIONS.split(",");
         return Arrays.asList(permissions);
     }
 

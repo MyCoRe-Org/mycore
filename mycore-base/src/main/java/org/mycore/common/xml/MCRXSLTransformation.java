@@ -85,7 +85,7 @@ public class MCRXSLTransformation {
 
     private static TransformerFactory factory = TransformerFactory.newInstance();
 
-    private static final Map emptyParameters = Collections.unmodifiableMap(new HashMap(0, 1));
+    private static final Map EMPTY_PARAMETERS = Collections.unmodifiableMap(new HashMap(0, 1));
 
     private static MCRXSLTransformation singleton = null;
 
@@ -236,7 +236,7 @@ public class MCRXSLTransformation {
      * @return Document The new document or null, if an exception was thrown.
      */
     public static org.jdom2.Document transform(org.jdom2.Document in, String stylesheet) {
-        return transform(in, stylesheet, emptyParameters);
+        return transform(in, stylesheet, EMPTY_PARAMETERS);
     }
 
     /**

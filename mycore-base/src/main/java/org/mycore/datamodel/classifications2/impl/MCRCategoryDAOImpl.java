@@ -452,7 +452,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 .flatten(oldCategory, MCRCategory::getChildren, Collection::stream)
                 .filter(c -> newMap.containsKey(c.getId()))
                 .map(MCRCategoryImpl.class::cast)
-                .map(c -> new AbstractMap.SimpleEntry<>(c, newMap.get(c.getId()))) // key: category of old version, value: category of new version
+                .map(c -> new AbstractMap.SimpleEntry<>(c, newMap.get(c.getId())))
+                // key: category of old version, value: category of new version
                 .peek(e -> syncLabels(e.getValue(), e.getKey())) //sync from new to old version
                 .forEach(e -> e.getKey().setURI(e.getValue().getURI()));
             //detach all categories, we will rebuild tree structure later

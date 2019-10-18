@@ -48,7 +48,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 public class MCRLanguageFactory {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRLanguageFactory singleton = new MCRLanguageFactory();
+    private static final MCRLanguageFactory SINGLETON = new MCRLanguageFactory();
 
     public static final MCRLanguage GERMAN = MCRLanguageFactory.instance().getLanguage("de");
 
@@ -64,7 +64,7 @@ public class MCRLanguageFactory {
      */
     private MCRCategoryID classification = null;
 
-    private MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
 
     /**
      * Language classification may change at runtime, so we remember the time we last read the languages in.
@@ -91,7 +91,7 @@ public class MCRLanguageFactory {
      * Returns the MCRLanguageFactory singleton
      */
     public static MCRLanguageFactory instance() {
-        return singleton;
+        return SINGLETON;
     }
 
     /**
@@ -139,7 +139,11 @@ public class MCRLanguageFactory {
      *            with x- or i-, otherwise return false;
      */
     public final boolean isSupportedLanguage(String code) {
-        if (code == null || (code = code.trim()).length() == 0) {
+        if (code == null) {
+            return false;
+        }
+        code = code.trim();
+        if (code.length() == 0) {
             return false;
         }
         if (code.startsWith("x-") || code.startsWith("i-")) {
@@ -154,7 +158,7 @@ public class MCRLanguageFactory {
      */
     private boolean classificationHasChanged() {
         return MCRHIBConnection.isEnabled() && (classification != null)
-            && (DAO.getLastModified() > classificationLastRead);
+            && (categoryDAO.getLastModified() > classificationLastRead);
     }
 
     /**
@@ -237,9 +241,9 @@ public class MCRLanguageFactory {
      * Builds language objects from classification categories
      */
     private void buildLanguagesFromClassification() {
-        this.classificationLastRead = DAO.getLastModified();
+        this.classificationLastRead = categoryDAO.getLastModified();
 
-        MCRCategory root = DAO.getCategory(classification, -1);
+        MCRCategory root = categoryDAO.getCategory(classification, -1);
         if (root == null) {
             LOGGER.warn("Language classification {} not found", classification.getRootID());
             return;

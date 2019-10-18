@@ -41,7 +41,7 @@ import org.mycore.common.content.streams.MCRBlockingInputStream;
  */
 public class MCRContentInputStream extends FilterInputStream {
     /** The number of bytes that will be read for content type detection */
-    protected static final int headerSize = 65536;
+    protected static final int HEADER_SIZE = 65536;
 
     /** The MD5 checksum of all bytes read through this stream */
     protected byte[] md5 = null;
@@ -69,9 +69,9 @@ public class MCRContentInputStream extends FilterInputStream {
         digest = buildMD5Digest();
 
         DigestInputStream dis = new DigestInputStream(in, digest);
-        MCRBlockingInputStream bis = new MCRBlockingInputStream(dis, headerSize);
+        MCRBlockingInputStream bis = new MCRBlockingInputStream(dis, HEADER_SIZE);
 
-        byte[] buffer = new byte[headerSize];
+        byte[] buffer = new byte[HEADER_SIZE];
 
         try {
             int num = bis.read(buffer, 0, buffer.length);

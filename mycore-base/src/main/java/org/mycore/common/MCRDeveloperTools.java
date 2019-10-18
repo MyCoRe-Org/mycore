@@ -24,7 +24,8 @@ public class MCRDeveloperTools {
     }
 
     /**
-     * Reads the property <code>MCR.Developer.Resource.Override</code> and checks if any of the containing paths contains the path parameter.
+     * Reads the property <code>MCR.Developer.Resource.Override</code> and checks if any of the containing paths
+     * contains the path parameter.
      * @param path the resource to override
      * @param webResource if true META-INF/resources will be appended to the paths in the property
      * @return the path to new file

@@ -69,7 +69,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
  *  <li>if id=derivateID/directoryPath (delivers all files in the given directory of the derivate)</li>
  * </ol>
  * 
- * "id" maybe specified as {@link HttpServletRequest#getPathInfo()} or as {@link MCRServlet#getProperty(HttpServletRequest, String)}.
+ * "id" maybe specified as {@link HttpServletRequest#getPathInfo()} or as
+ * {@link MCRServlet#getProperty(HttpServletRequest, String)}.
  * @author Thomas Scheffler (yagee)
  *
  */

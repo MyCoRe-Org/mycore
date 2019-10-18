@@ -226,7 +226,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     /**
      * Save a MCRClassification.
      *
-     * @param ID
+     * @param id
      *            the ID of the MCRClassification to be save.
      * @param dirname
      *            the directory to export the classification to
@@ -236,9 +236,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @return false if an error was occured, else true
      */
     @MCRCommand(syntax = "export classification {0} to directory {1} with {2}",
-        help = "The command exports the classification with MCRObjectID {0} as xml file to directory named {1} using the stylesheet {2}-object.xsl. For {2} save is the default.",
+        help = "The command exports the classification with MCRObjectID {0} as xml file to directory named {1} "
+            + "using the stylesheet {2}-object.xsl. For {2} save is the default.",
         order = 60)
-    public static boolean export(String ID, String dirname, String style) throws Exception {
+    public static boolean export(String id, String dirname, String style) throws Exception {
         String dname = "";
         if (dirname.length() != 0) {
             try {
@@ -257,11 +258,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
                 return false;
             }
         }
-        MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(ID), -1);
+        MCRCategory cl = DAO.getCategory(MCRCategoryID.rootID(id), -1);
         Document classDoc = MCRCategoryTransformer.getMetaDataDocument(cl, false);
 
         Transformer trans = getTransformer(style);
-        File xmlOutput = new File(dname, ID + ".xml");
+        File xmlOutput = new File(dname, id + ".xml");
         FileOutputStream out = new FileOutputStream(xmlOutput);
         if (trans != null) {
             StreamResult sr = new StreamResult(out);
@@ -271,7 +272,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             xout.output(classDoc, out);
             out.flush();
         }
-        LOGGER.info("Classifcation {} saved to {}.", ID, xmlOutput.getCanonicalPath());
+        LOGGER.info("Classifcation {} saved to {}.", id, xmlOutput.getCanonicalPath());
         return true;
     }
 
@@ -322,7 +323,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @return false if an error was occured, else true
      */
     @MCRCommand(syntax = "export all classifications to directory {0} with {1}",
-        help = "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default.",
+        help = "The command store all classifications to the directory with name {0} with the stylesheet "
+            + "{1}-object.xsl. For {1} save is the default.",
         order = 70)
     public static boolean exportAll(String dirname, String style) throws Exception {
         List<MCRCategoryID> allClassIds = DAO.getRootCategoryIDs();
@@ -394,7 +396,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         String deleteEmptyLabels = "delete from {h-schema}MCRCategoryLabels where text is null or trim(text) = ''";
         int affected = session.createNativeQuery(deleteEmptyLabels).executeUpdate();
         LOGGER.info("Deleted {} labels.", affected);
-        String sqlQuery = "select cat.classid,cat.categid from {h-schema}MCRCategory cat left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where label.text is null";
+        String sqlQuery = "select cat.classid,cat.categid from {h-schema}MCRCategory cat "
+            + "left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where "
+            + "label.text is null";
         @SuppressWarnings("unchecked")
         List<Object[]> list = session.createNativeQuery(sqlQuery).getResultList();
 
@@ -478,7 +482,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         // at 3 the position get faulty, 5 is the min. of the position greather
         // 3
         // so the reate is 5-3 = 2
-        String sqlQuery = "update {h-schema}MCRCategory set positioninparent=(positioninparent - (select min(positioninparent) from {h-schema}MCRCategory where parentid="
+        String sqlQuery = "update {h-schema}MCRCategory "
+            + "set positioninparent=(positioninparent - (select min(positioninparent) from "
+            + "{h-schema}MCRCategory where parentid="
             + parentID
             + " and positioninparent > "
             + firstErrorPositionInParent
@@ -576,7 +582,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
     private static void checkEmptyLabels(String classID, List<String> log) {
         Session session = MCRHIBConnection.instance().getSession();
-        String sqlQuery = "select cat.categid from {h-schema}MCRCategory cat left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where cat.classid='"
+        String sqlQuery = "select cat.categid from {h-schema}MCRCategory cat "
+            + "left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where "
+            + "cat.classid='"
             + classID + "' and (label.text is null or trim(label.text) = '')";
         @SuppressWarnings("unchecked")
         List<String> list = session.createNativeQuery(sqlQuery).getResultList();
@@ -603,9 +611,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 130)
     public static void repairMissingParent(String classID) {
         Session session = MCRHIBConnection.instance().getSession();
-        String sqlQuery = "update {h-schema}MCRCategory cat set cat.parentID=(select parent.internalID from {h-schema}MCRCategory parent WHERE parent.classid='"
+        String sqlQuery = "update {h-schema}MCRCategory cat set cat.parentID=(select parent.internalID from "
+            + "{h-schema}MCRCategory parent WHERE parent.classid='"
             + classID
-            + "' and parent.leftValue<cat.leftValue and parent.rightValue>cat.rightValue and parent.level=(cat.level-1)) WHERE cat.classid='"
+            + "' and parent.leftValue<cat.leftValue and parent.rightValue>cat.rightValue and "
+            + "parent.level=(cat.level-1)) WHERE cat.classid='"
             + classID + "' and cat.level > 0 and cat.parentID is NULL";
         int updates = session.createNativeQuery(sqlQuery).executeUpdate();
         LOGGER.info(() -> "Repaired " + updates + " parentID columns for classification " + classID);
