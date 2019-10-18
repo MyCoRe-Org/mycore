@@ -31,9 +31,9 @@ public class MCRFunctions {
 
     private static char END_OF_PATTERN = 0;
 
-    private static final String globReservedChars = "?*\\{[";
+    private static final String GLOB_RESERVED_CHARS = "?*\\{[";
 
-    private static final String regexReservedChars = "^$.{()+*[]|";
+    private static final String REGEX_RESERVED_CHARS = "^$.{()+*[]|";
 
     /**
      * converts a Glob pattern into a regex pattern.
@@ -131,7 +131,8 @@ public class MCRFunctions {
                 if (!inRange) {
                     throw new PatternSyntaxException("Invalid range.", globPattern, nextPos - 1);
                 }
-                if ((curChar = nextCharAt(globPattern, nextPos++)) == END_OF_PATTERN || curChar == ']') {
+                curChar = nextCharAt(globPattern, nextPos++);
+                if (curChar == END_OF_PATTERN || curChar == ']') {
                     break;
                 }
                 if (curChar < rangeStartChar) {
@@ -186,11 +187,11 @@ public class MCRFunctions {
     }
 
     private static boolean isGlobReserved(final char c) {
-        return globReservedChars.indexOf(c) != -1;
+        return GLOB_RESERVED_CHARS.indexOf(c) != -1;
     }
 
     private static boolean isRegexReserved(final char c) {
-        return regexReservedChars.indexOf(c) != -1;
+        return REGEX_RESERVED_CHARS.indexOf(c) != -1;
     }
 
     private static char nextCharAt(final String glob, final int i) {

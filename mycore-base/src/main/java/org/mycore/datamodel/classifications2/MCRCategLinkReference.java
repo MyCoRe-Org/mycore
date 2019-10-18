@@ -79,10 +79,10 @@ public class MCRCategLinkReference implements Serializable {
 
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = 1;
-        result = PRIME * result + (objectID == null ? 0 : objectID.hashCode());
-        result = PRIME * result + (type == null ? 0 : type.hashCode());
+        result = prime * result + (objectID == null ? 0 : objectID.hashCode());
+        result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
 

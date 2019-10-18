@@ -57,84 +57,84 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * the value of <em>subtag</em>. If the value of <em>subtag</em>
      * is null or empty an exception was thrown. The type element was set to
-     * the value of <em>set_type</em>, if it is null, an empty string was set
-     * to the type element. The boolean string <em>set_value</em>
+     * the value of <em>type</em>, if it is null, an empty string was set
+     * to the type element. The boolean string <em>value</em>
      * was set to a boolean element, if it is null, false was set.
-     * @param set_subtag       the name of the subtag
-     * @param default_lang     the language
-     * @param set_type         the optional type string
-     * @param set_inherted     a value &gt;= 0
-     * @param set_value        the boolean value (true or false) as string
+     * @param subtag       the name of the subtag
+     * @param lang         the language
+     * @param type         the optional type string
+     * @param inherted     a value &gt;= 0
+     * @param value        the boolean value (true or false) as string
      *
-     * @exception MCRException if the set_subtag value is null or empty
+     * @exception MCRException if the subtag value is null or empty
      */
     @Deprecated
-    public MCRMetaBoolean(String set_subtag, String default_lang, String set_type, int set_inherted, String set_value)
+    public MCRMetaBoolean(String subtag, String lang, String type, int inherted, String value)
         throws MCRException {
-        this(set_subtag, set_type, set_inherted, false);
-        setValue(set_value);
+        this(subtag, type, inherted, false);
+        setValue(value);
     }
 
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * the value of <em>subtag</em>. If the value of <em>subtag</em>
      * is null or empty an exception was thrown. The type element was set to
-     * the value of <em>set_type</em>, if it is null, an empty string was set
-     * to the type element. The boolean string <em>set_value</em>
+     * the value of <em>type</em>, if it is null, an empty string was set
+     * to the type element. The boolean string <em>value</em>
      * was set to a boolean element, if it is null, false was set.
-     * @param set_subtag       the name of the subtag
-     * @param set_type         the optional type string
-     * @param set_inherted     a value &gt;= 0
-     * @param set_value        the boolean value (true or false) as string
+     * @param subtag       the name of the subtag
+     * @param type         the optional type string
+     * @param inherted     a value &gt;= 0
+     * @param value        the boolean value (true or false) as string
      *
-     * @exception MCRException if the set_subtag value is null or empty
+     * @exception MCRException if the subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_subtag, String set_type, int set_inherted, String set_value)
+    public MCRMetaBoolean(String subtag, String type, int inherted, String value)
         throws MCRException {
-        super(set_subtag, null, set_type, set_inherted);
-        setValue(set_value);
+        super(subtag, null, type, inherted);
+        setValue(value);
     }
 
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * the value of <em>subtag</em>. If the value of <em>subtag</em>
      * is null or empty an exception was thrown. The type element was set to
-     * the value of <em>set_type</em>, if it is null, an empty string was set
-     * to the type element. The boolean string <em>set_value</em>
+     * the value of <em>type</em>, if it is null, an empty string was set
+     * to the type element. The boolean string <em>value</em>
      * was set to a boolean element, if it is null, false was set.
-     * @param set_subtag       the name of the subtag
-     * @param set_type         the optional type string
-     * @param set_inherted     a value &gt;= 0
-     * @param set_value        the boolean value (true or false)
-     * @exception MCRException if the set_subtag value is null or empty
+     * @param subtag       the name of the subtag
+     * @param type         the optional type string
+     * @param inherted     a value &gt;= 0
+     * @param value        the boolean value (true or false)
+     * @exception MCRException if the subtag value is null or empty
      */
-    public MCRMetaBoolean(String set_subtag, String set_type, int set_inherted, boolean set_value) throws MCRException {
-        super(set_subtag, null, set_type, set_inherted);
-        setValue(set_value);
+    public MCRMetaBoolean(String subtag, String type, int inherted, boolean value) throws MCRException {
+        super(subtag, null, type, inherted);
+        setValue(value);
     }
 
     /**
      * This method set value. It set false if the string is corrupt.
      * 
-     * @param set_value
+     * @param value
      *            the boolean value (true or false) as string
      */
-    public void setValue(String set_value) {
-        value = Boolean.parseBoolean(set_value);
+    public void setValue(String value) {
+        this.value = Boolean.parseBoolean(value);
     }
 
     /**
      * This method set the value.
      * 
-     * @param set_value
+     * @param value
      *            the boolean value
      */
-    public void setValue(boolean set_value) {
-        value = set_value;
+    public void setValue(boolean value) {
+        this.value = value;
     }
 
     /**
@@ -163,7 +163,7 @@ public final class MCRMetaBoolean extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
         setValue(element.getTextTrim());
     }

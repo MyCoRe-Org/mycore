@@ -44,7 +44,7 @@ public class MCRXPathEvaluator {
 
     private static final Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
 
-    private static final XPathFactory factory;
+    private static final XPathFactory XPATH_FACTORY;
 
     private Map<String, Object> variables;
 
@@ -52,7 +52,7 @@ public class MCRXPathEvaluator {
 
     static {
         String factoryClass = MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null);
-        factory = factoryClass == null ? XPathFactory.instance() : XPathFactory.newInstance(factoryClass);
+        XPATH_FACTORY = factoryClass == null ? XPathFactory.instance() : XPathFactory.newInstance(factoryClass);
     }
 
     public MCRXPathEvaluator(Map<String, Object> variables, List<Object> context) {
@@ -119,12 +119,12 @@ public class MCRXPathEvaluator {
 
     public Object evaluateFirst(String xPathExpression) {
         try {
-            XPathExpression<Object> xPath = factory.compile(xPathExpression, Filters.fpassthrough(), variables,
+            XPathExpression<Object> xPath = XPATH_FACTORY.compile(xPathExpression, Filters.fpassthrough(), variables,
                 MCRConstants.getStandardNamespaces());
             return xPath.evaluateFirst(context);
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: {}", xPathExpression);
-            LOGGER.warn("XPath factory used is {} {}", factory.getClass().getCanonicalName(),
+            LOGGER.warn("XPath factory used is {} {}", XPATH_FACTORY.getClass().getCanonicalName(),
                 MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null));
             LOGGER.warn(ex);
             return null;

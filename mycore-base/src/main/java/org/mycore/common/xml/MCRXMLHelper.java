@@ -350,7 +350,8 @@ public class MCRXMLHelper {
      * </pre>
      * <ul>
      *   <li><b>get the version</b> -> mods._version -> "3.0"</li>
-     *   <li><b>get the text of the title</b> -> mods["mods:titleInfo"]["mods:title"].$text -> "hello xml serializer"</li>
+     *   <li><b>get the text of the title</b> -> mods["mods:titleInfo"]["mods:title"].$text
+     *   -> "hello xml serializer"</li>
      * </ul>
      * <b>BE AWARE THAT MIXED CONTENT IS NOT SUPPORTED!</b>
      *

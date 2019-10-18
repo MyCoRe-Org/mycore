@@ -33,11 +33,15 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @since 2016.04
  */
 public class MCRCategoryDTO {
-    public static final String SELECT = "select new org.mycore.datamodel.classifications2.impl.MCRCategoryDTO(cat.internalID, cat.URI, cat.id, cat.left, cat.right, cat.level, labels.lang, labels.text, labels.description) from MCRCategoryImpl cat LEFT OUTER JOIN cat.labels labels";
+    public static final String SELECT = "select new org.mycore.datamodel.classifications2.impl.MCRCategoryDTO"
+        + "(cat.internalID, cat.URI, cat.id, cat.left, cat.right, cat.level, labels.lang, labels.text,"
+        + " labels.description) from MCRCategoryImpl cat LEFT OUTER JOIN cat.labels labels";
 
-    public static final String CAT_SELECT = "select new org.mycore.datamodel.classifications2.impl.MCRCategoryDTO(cat.internalID, cat.URI, cat.id, cat.left, cat.right, cat.level) from MCRCategoryImpl cat";
+    public static final String CAT_SELECT = "select new org.mycore.datamodel.classifications2.impl.MCRCategoryDTO"
+        + "(cat.internalID, cat.URI, cat.id, cat.left, cat.right, cat.level) from MCRCategoryImpl cat";
 
-    public static final String LRL_SELECT = "select new org.mycore.datamodel.classifications2.impl.MCRCategoryDTO(cat.left, cat.right, cat.level) from MCRCategoryImpl cat";
+    public static final String LRL_SELECT = "select new org.mycore.datamodel.classifications2.impl.MCRCategoryDTO"
+        + "(cat.left, cat.right, cat.level) from MCRCategoryImpl cat";
 
     int internalID;
 
@@ -116,7 +120,8 @@ public class MCRCategoryDTO {
     @Override
     public String toString() {
         return String.format(Locale.ROOT,
-            "MCRCategoryDTO [internalID=%s, id=%s, uri=%s, leftValue=%s, level=%s, rightValue=%s, lang=%s, text=%s, description=%s]",
+            "MCRCategoryDTO [internalID=%s, id=%s, uri=%s, leftValue=%s, level=%s, "
+                + "rightValue=%s, lang=%s, text=%s, description=%s]",
             internalID, id, uri, leftValue, level, rightValue, lang, text, description);
     }
 

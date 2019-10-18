@@ -54,7 +54,8 @@ public class MCRBasket implements List<MCRBasketEntry>, Set<MCRBasketEntry> {
     /**
      * Creates a new basket of the given type.
      * 
-     * @param type the type of basket, an attribute that can be used by the application to distinguish multiple basket within the same session.
+     * @param type the type of basket, an attribute that can be used by the application to distinguish
+     *            multiple basket within the same session.
      */
     public MCRBasket(String type) {
         this.type = type;

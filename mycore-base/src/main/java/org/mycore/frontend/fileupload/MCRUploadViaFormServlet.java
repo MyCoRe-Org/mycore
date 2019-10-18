@@ -145,7 +145,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     private void handleZipFile(MCRUploadHandler handler, InputStream in) throws Exception {
         ZipInputStream zis = new ZipInputStream(in);
         MCRNotClosingInputStream nis = new MCRNotClosingInputStream(zis);
-        for (ZipEntry entry; (entry = zis.getNextEntry()) != null;) {
+        for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
             String path = convertAbsolutePathToRelativePath(entry.getName());
             if (entry.isDirectory()) {
                 LOGGER.debug("UploadServlet skipping ZIP entry {}, is a directory", path);

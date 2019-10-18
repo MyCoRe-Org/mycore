@@ -57,7 +57,7 @@ public class MCRConfigurationInputStream extends InputStream {
     private static final String MYCORE_PROPERTIES = "mycore.properties";
 
     // latin1 for properties
-    private static final byte[] lbr = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] LINE_BREAK = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1);
 
     InputStream in;
 
@@ -125,7 +125,7 @@ public class MCRConfigurationInputStream extends InputStream {
                 cList.add(new ByteArrayInputStream(comment.getBytes(StandardCharsets.ISO_8859_1)));
                 cList.add(is);
                 //workaround if last property is not terminated with line break
-                cList.add(new ByteArrayInputStream(lbr));
+                cList.add(new ByteArrayInputStream(LINE_BREAK));
             } else {
                 cList.add(new ByteArrayInputStream(
                     ("# Unable to find " + filename + " in " + component.getResourceBase() + "\n")
@@ -136,14 +136,14 @@ public class MCRConfigurationInputStream extends InputStream {
         if (propertyStream != null) {
             empty = false;
             cList.add(propertyStream);
-            cList.add(new ByteArrayInputStream(lbr));
+            cList.add(new ByteArrayInputStream(LINE_BREAK));
         }
         File localProperties = MCRConfigurationDir.getConfigFile(filename);
         if (localProperties != null && localProperties.canRead()) {
             empty = false;
             LogManager.getLogger().info("Loading additional properties from {}", localProperties.getAbsolutePath());
             cList.add(new FileInputStream(localProperties));
-            cList.add(new ByteArrayInputStream(lbr));
+            cList.add(new ByteArrayInputStream(LINE_BREAK));
         }
         return Collections.enumeration(cList);
     }

@@ -50,7 +50,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
  * 
  */
 public class MCRJPAAccessStore extends MCRAccessStore {
-    private final DateFormat dateFormat = new SimpleDateFormat(sqlDateformat, Locale.ROOT);
+    private final DateFormat dateFormat = new SimpleDateFormat(SQL_DATEFORMAT, Locale.ROOT);
 
     private static final Logger LOGGER = LogManager.getLogger();
 

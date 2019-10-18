@@ -86,7 +86,8 @@ public class MCRParameterCollector {
      * Next, HTTP request attributes are copied.
      * 
      * @param request the HttpRequest causing the XSL transformation, must NOT be null
-     * @param onlySetXSLParameters if true, only those parameters starting with "XSL." are copied from session and request
+     * @param onlySetXSLParameters if true, only those parameters starting with "XSL."
+     *                            are copied from session and request
      */
     public MCRParameterCollector(HttpServletRequest request, boolean onlySetXSLParameters) {
         this.onlySetXSLParameters = onlySetXSLParameters;

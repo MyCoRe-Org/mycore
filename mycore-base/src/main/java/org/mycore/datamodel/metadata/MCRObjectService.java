@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -29,6 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
@@ -127,16 +129,16 @@ public class MCRObjectService {
      */
     public final void setFromDOM(Element service) {
         // Date part
-        org.jdom2.Element dates_element = service.getChild("servdates");
+        org.jdom2.Element servdates = service.getChild("servdates");
         dates.clear();
 
-        if (dates_element != null) {
-            List<Element> dateList = dates_element.getChildren();
+        if (servdates != null) {
+            List<Element> dateList = servdates.getChildren();
 
             for (Element dateElement : dateList) {
-                String date_element_name = dateElement.getName();
+                String dateElementName = dateElement.getName();
 
-                if (!date_element_name.equals("servdate")) {
+                if (!dateElementName.equals("servdate")) {
                     continue;
                 }
 
@@ -320,12 +322,7 @@ public class MCRObjectService {
      *            the new flag as string
      */
     public final void addFlag(String value) {
-        if (value == null || (value = value.trim()).length() == 0) {
-            return;
-        }
-
-        MCRMetaLangText flag = new MCRMetaLangText("servflag", null, null, 0, null, value);
-        flags.add(flag);
+        addFlag(null, value);
     }
 
     /**
@@ -337,15 +334,10 @@ public class MCRObjectService {
      *              the new flag value as string
      */
     public final void addFlag(String type, String value) {
-        if (value == null || (value = value.trim()).length() == 0) {
-            return;
-        }
-        if (type == null || (type = type.trim()).length() == 0) {
-            type = null;
-        }
-
-        MCRMetaLangText flag = new MCRMetaLangText("servflag", null, type, 0, null, value);
-        flags.add(flag);
+        String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
+        MCRUtils.filterTrimmedNotEmpty(value)
+            .map(flagValue -> new MCRMetaLangText("servflag", null, lType, 0, null, flagValue))
+            .ifPresent(flags::add);
     }
 
     /**
@@ -443,17 +435,9 @@ public class MCRObjectService {
      * @return true if the flag was found in the list
      */
     public final boolean isFlagSet(String value) {
-        if (value == null || (value = value.trim()).length() == 0) {
-            return false;
-        }
-
-        for (MCRMetaLangText flag : flags) {
-            if (flag.getText().equals(value)) {
-                return true;
-            }
-        }
-
-        return false;
+        return MCRUtils.filterTrimmedNotEmpty(value)
+            .map(flagValue -> flags.stream().anyMatch(flag -> flag.getText().equals(flagValue)))
+            .orElse(false);
     }
 
     /**
@@ -464,8 +448,9 @@ public class MCRObjectService {
      *          otherwise false
      */
     public final boolean isFlagTypeSet(String type) {
-        ArrayList<MCRMetaLangText> internalList = getFlagsAsMCRMetaLangText(type);
-        return internalList.size() > 0;
+        return MCRUtils.filterTrimmedNotEmpty(type)
+            .map(flagType -> flags.stream().anyMatch(flag -> flag.getType().equals(flagType)))
+            .orElse(false);
     }
 
     /**
@@ -507,15 +492,13 @@ public class MCRObjectService {
      *                throw this exception, if the index is false
      */
     public final void replaceFlag(int index, String value) throws IndexOutOfBoundsException {
-        if (index < 0 || index > flags.size()) {
-            throw new IndexOutOfBoundsException("Index error in replaceFlag.");
-        }
-        if (value == null || (value = value.trim()).length() == 0) {
-            return;
-        }
-        MCRMetaLangText oldFlag = flags.get(index);
-        MCRMetaLangText flag = new MCRMetaLangText("servflag", null, oldFlag.getType(), 0, null, value);
-        flags.set(index, flag);
+        MCRUtils.filterTrimmedNotEmpty(value)
+            .ifPresent(flagValue -> updateFlag(index, flag -> flag.setText(value)));
+    }
+
+    private void updateFlag(int index, Consumer<MCRMetaLangText> flagUpdater) {
+        MCRMetaLangText flag = flags.get(index);
+        flagUpdater.accept(flag);
     }
 
     /**
@@ -529,15 +512,8 @@ public class MCRObjectService {
      *                throw this exception, if the index is false
      */
     public final void replaceFlagType(int index, String value) throws IndexOutOfBoundsException {
-        if (index < 0 || index > flags.size()) {
-            throw new IndexOutOfBoundsException("Index error in replaceFlag.");
-        }
-        if (value == null || (value = value.trim()).length() == 0) {
-            return;
-        }
-        MCRMetaLangText oldFlag = flags.get(index);
-        MCRMetaLangText flag = new MCRMetaLangText("servflag", null, value, 0, null, oldFlag.getText());
-        flags.set(index, flag);
+        MCRUtils.filterTrimmedNotEmpty(value)
+            .ifPresent(flagValue -> updateFlag(index, flag -> flag.setType(value)));
     }
 
     /**
@@ -548,17 +524,14 @@ public class MCRObjectService {
      * @param condition -
      *            the new rule as JDOM tree Element
      */
-    public final void addRule(String permission, org.jdom2.Element condition) {
+    public final void addRule(String permission, Element condition) {
         if (condition == null) {
             return;
         }
-        if (permission == null || (permission = permission.trim()).length() == 0) {
-            return;
-        }
-        if (getRuleIndex(permission) == -1) {
-            MCRMetaAccessRule acl = new MCRMetaAccessRule("servacl", null, 0, permission, condition);
-            rules.add(acl);
-        }
+        MCRUtils.filterTrimmedNotEmpty(permission)
+            .filter(p -> getRuleIndex(p) == -1)
+            .map(p -> new MCRMetaAccessRule("servacl", null, 0, p, condition))
+            .ifPresent(rules::add);
     }
 
     /**
@@ -813,15 +786,16 @@ public class MCRObjectService {
      * @return the index number or -1 if the value was not found
      */
     public final int getFlagIndex(String value) {
-        if (value == null || (value = value.trim()).length() == 0) {
-            return -1;
-        }
-        for (int i = 0; i < flags.size(); i++) {
-            if (flags.get(i).getText().equals(value)) {
-                return i;
-            }
-        }
-        return -1;
+        return MCRUtils.filterTrimmedNotEmpty(value)
+            .map(v -> {
+                for (int i = 0; i < flags.size(); i++) {
+                    if (flags.get(i).getText().equals(v)) {
+                        return i;
+                    }
+                }
+                return -1;
+            })
+            .orElse(-1);
     }
 
 }

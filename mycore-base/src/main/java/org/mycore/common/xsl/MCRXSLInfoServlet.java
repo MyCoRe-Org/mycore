@@ -137,7 +137,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         InputStream in = getServletContext().getResourceAsStream(pathOfJarFile);
         ZipInputStream zis = new ZipInputStream(in);
 
-        for (ZipEntry ze = null; (ze = zis.getNextEntry()) != null;) {
+        for (ZipEntry ze = zis.getNextEntry(); ze != null; ze = zis.getNextEntry()) {
             String name = ze.getName();
             if (name.startsWith("xsl/") && name.endsWith(".xsl")) {
                 foundStylesheet(name, pathOfJarFile);

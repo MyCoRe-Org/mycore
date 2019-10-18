@@ -30,7 +30,7 @@ import org.mycore.common.MCRSessionMgr;
 
 public class MCREditorItemComparator implements Comparator<Element> {
 
-    private static final HashMap<String, MCREditorItemComparator> myCollators = new HashMap<>();
+    private static final HashMap<String, MCREditorItemComparator> MY_COLLATORS = new HashMap<>();
 
     private Collator myCollator;
 
@@ -66,13 +66,13 @@ public class MCREditorItemComparator implements Comparator<Element> {
     }
 
     private static MCREditorItemComparator getLangCollator(String lang) {
-        MCREditorItemComparator comperator = myCollators.get(lang);
+        MCREditorItemComparator comperator = MY_COLLATORS.get(lang);
         if (comperator == null) {
             Locale l = new Locale(lang);
             Collator collator = Collator.getInstance(l);
             collator.setStrength(Collator.SECONDARY);
             comperator = new MCREditorItemComparator(collator, lang);
-            myCollators.put(lang, comperator);
+            MY_COLLATORS.put(lang, comperator);
         }
         return comperator;
     }

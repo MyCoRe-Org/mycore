@@ -42,21 +42,11 @@ import org.mycore.common.content.MCRContent;
  */
 public abstract class MCRServletContentHelper {
 
-    private static Logger LOGGER = LogManager.getLogger(MCRServletContentHelper.class);
-
     public static final int DEFAULT_BUFFER_SIZE = ContentUtils.DEFAULT_BUFFER_SIZE;
 
     public static final String ATT_SERVE_CONTENT = MCRServletContentHelper.class.getName() + ".serveContent";
 
-    public static class Config {
-
-        public boolean useAcceptRanges = true;
-
-        public int inputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
-
-        public int outputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
-
-    }
+    private static Logger LOGGER = LogManager.getLogger(MCRServletContentHelper.class);
 
     public static Config buildConfig(ServletConfig servletConfig) {
         Config config = new Config();
@@ -471,6 +461,16 @@ public abstract class MCRServletContentHelper {
 
     private static void setContentLengthLong(final HttpServletResponse response, final long length) {
         response.setHeader("Content-Length", String.valueOf(length));
+    }
+
+    public static class Config {
+
+        public boolean useAcceptRanges = true;
+
+        public int inputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
+
+        public int outputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
+
     }
 
 }

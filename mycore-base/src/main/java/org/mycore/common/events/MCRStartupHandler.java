@@ -49,23 +49,6 @@ public class MCRStartupHandler {
 
     private static boolean isWebApp;
 
-    public interface AutoExecutable {
-        /**
-         * returns a name to display on start-up.
-         */
-        String getName();
-
-        /**
-         * If order is important returns as 'heigher' priority.
-         */
-        int getPriority();
-
-        /**
-         * This method get executed by {@link MCRStartupHandler#startUp(ServletContext)}
-         */
-        void startUp(ServletContext servletContext);
-    }
-
     public static void startUp(ServletContext servletContext) {
         //setup configuration
         MCRConfigurationDirSetup dirSetup = new MCRConfigurationDirSetup();
@@ -116,5 +99,22 @@ public class MCRStartupHandler {
         } catch (ReflectiveOperationException e) {
             throw new MCRConfigurationException("Could not initialize 'MCR.Startup.Class': " + className, e);
         }
+    }
+
+    public interface AutoExecutable {
+        /**
+         * returns a name to display on start-up.
+         */
+        String getName();
+
+        /**
+         * If order is important returns as 'heigher' priority.
+         */
+        int getPriority();
+
+        /**
+         * This method get executed by {@link MCRStartupHandler#startUp(ServletContext)}
+         */
+        void startUp(ServletContext servletContext);
     }
 }

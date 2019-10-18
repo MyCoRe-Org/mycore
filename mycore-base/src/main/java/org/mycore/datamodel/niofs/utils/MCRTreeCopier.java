@@ -97,7 +97,8 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 Path parent = target.getParent();
                 do {
                     newName = prefixString + nameTry++ + suffixString;
-                } while (Files.exists(target = parent.resolve(newName)));
+                    target = parent.resolve(newName);
+                } while (Files.exists(target));
             }
             if (restartTransaction && MCRSessionMgr.hasCurrentSession()) {
                 final MCRSession currentSession = MCRSessionMgr.getCurrentSession();

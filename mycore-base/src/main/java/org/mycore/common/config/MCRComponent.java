@@ -33,8 +33,8 @@ import org.mycore.common.MCRException;
 
 /**
  * This class abstracts different MyCoRe component types.
- * As every component (mycore component, application module) holds it configuration in different places, you can use this class to
- * get uniform access to these configuration resources. 
+ * As every component (mycore component, application module) holds it configuration in different places,
+ * you can use this class to get uniform access to these configuration resources.
  * 
  * As this class is immutable it could be used as key in a {@link Map}
  * @author Thomas Scheffler (yagee)

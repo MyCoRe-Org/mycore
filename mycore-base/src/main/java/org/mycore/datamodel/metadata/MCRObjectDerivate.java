@@ -91,9 +91,9 @@ public class MCRObjectDerivate {
      */
     private void setFromDOM(Element derivate) {
         // Link to Metadata part
-        Element linkmeta_element = derivate.getChild("linkmetas").getChild("linkmeta");
+        Element linkmetaElement = derivate.getChild("linkmetas").getChild("linkmeta");
         MCRMetaLinkID link = new MCRMetaLinkID();
-        link.setFromDOM(linkmeta_element);
+        link.setFromDOM(linkmetaElement);
         linkmeta = link;
 
         // External part
@@ -109,12 +109,12 @@ public class MCRObjectDerivate {
         }
 
         // Internal part
-        Element internals_element = derivate.getChild("internals");
-        if (internals_element != null) {
-            Element internal_element = internals_element.getChild("internal");
-            if (internal_element != null) {
+        Element internalsElement = derivate.getChild("internals");
+        if (internalsElement != null) {
+            Element internalElement = internalsElement.getChild("internal");
+            if (internalElement != null) {
                 internals = new MCRMetaIFS();
-                internals.setFromDOM(internal_element);
+                internals.setFromDOM(internalElement);
             }
         }
 
@@ -178,11 +178,11 @@ public class MCRObjectDerivate {
     /**
      * This method set the metadata link
      * 
-     * @param in_link
+     * @param link
      *            the MCRMetaLinkID object
      */
-    public final void setLinkMeta(MCRMetaLinkID in_link) {
-        linkmeta = in_link;
+    public final void setLinkMeta(MCRMetaLinkID link) {
+        linkmeta = link;
     }
 
     /**
@@ -340,15 +340,15 @@ public class MCRObjectDerivate {
     /**
      * This method set the metadata internals (the IFS data)
      * 
-     * @param in_ifs
+     * @param ifs
      *            the MCRMetaIFS object
      */
-    public final void setInternals(MCRMetaIFS in_ifs) {
-        if (in_ifs == null) {
+    public final void setInternals(MCRMetaIFS ifs) {
+        if (ifs == null) {
             return;
         }
 
-        internals = in_ifs;
+        internals = ifs;
     }
 
     /**

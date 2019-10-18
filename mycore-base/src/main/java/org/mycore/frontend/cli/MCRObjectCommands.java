@@ -181,8 +181,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Delete a MCRObject from the datastore.
      *
-     * @param ID
-     *            the ID of the MCRObject that should be deleted
+     * @param id
+     *            the id of the MCRObject that should be deleted
      * @throws MCRPersistenceException  if a persistence problem is occurred
      * @throws MCRAccessException see {@link MCRMetadataManager#deleteMCRObject(MCRObjectID)}
      * @throws MCRActiveLinkException if object is referenced by other objects
@@ -191,8 +191,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "delete object {0}",
         help = "Removes a MCRObject with the MCRObjectID {0}",
         order = 40)
-    public static void delete(String ID) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
-        MCRObjectID mcrId = MCRObjectID.getInstance(ID);
+    public static void delete(String id) throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
+        MCRObjectID mcrId = MCRObjectID.getInstance(id);
         MCRMetadataManager.deleteMCRObject(mcrId);
         LOGGER.info("{} deleted.", mcrId);
     }
@@ -201,16 +201,17 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * Runs though all mycore objects which are linked with the given object and removes its link. This includes
      * parent/child relations and all {@link MCRMetaLinkID} in the metadata section.
      *
-     * @param ID
-     *            the ID of the MCRObject that should be deleted
+     * @param id
+     *            the id of the MCRObject that should be deleted
      * @throws MCRPersistenceException  if a persistence problem is occurred
      */
     @MCRCommand(
         syntax = "clear links of object {0}",
-        help = "removes all links of this object, including parent/child relations and all MetaLinkID's in the metadata section",
+        help = "removes all links of this object, including parent/child relations"
+            + " and all MetaLinkID's in the metadata section",
         order = 45)
-    public static void clearLinks(String ID) throws MCRPersistenceException {
-        final MCRObjectID mcrId = MCRObjectID.getInstance(ID);
+    public static void clearLinks(String id) throws MCRPersistenceException {
+        final MCRObjectID mcrId = MCRObjectID.getInstance(id);
         AtomicInteger counter = new AtomicInteger(0);
         MCRObjectUtils.removeLinks(mcrId).forEach(linkedObject -> {
             try {
@@ -227,9 +228,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Delete MCRObject's form ID to ID from the datastore.
      *
-     * @param IDfrom
+     * @param idFrom
      *            the start ID for deleting the MCRObjects
-     * @param IDto
+     * @param idTo
      *            the stop ID for deleting the MCRObjects
      * @return list of delete commands
      */
@@ -237,18 +238,18 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "delete object from {0} to {1}",
         help = "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.",
         order = 30)
-    public static List<String> deleteFromTo(String IDfrom, String IDto) {
-        MCRObjectID from = MCRObjectID.getInstance(IDfrom);
-        MCRObjectID to = MCRObjectID.getInstance(IDto);
-        int from_i = from.getNumberAsInteger();
-        int to_i = to.getNumberAsInteger();
+    public static List<String> deleteFromTo(String idFrom, String idTo) {
+        MCRObjectID from = MCRObjectID.getInstance(idFrom);
+        MCRObjectID to = MCRObjectID.getInstance(idTo);
+        int lowerBound = from.getNumberAsInteger();
+        int upperBound = to.getNumberAsInteger();
 
-        if (from_i > to_i) {
+        if (lowerBound > upperBound) {
             throw new MCRException("The from-to-interval is false.");
         }
-        List<String> cmds = new ArrayList<>(to_i - from_i);
+        List<String> cmds = new ArrayList<>(upperBound - lowerBound);
 
-        for (int i = from_i; i < to_i + 1; i++) {
+        for (int i = lowerBound; i < upperBound + 1; i++) {
             String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
             if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
                 cmds.add("delete object " + id);
@@ -265,7 +266,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "load all objects in topological order from directory {0}",
-        help = "Loads all MCRObjects form the directory {0} to the system respecting the order of parents and children.",
+        help = "Loads all MCRObjects form the directory {0} to the system "
+            + "respecting the order of parents and children.",
         order = 75)
     public static List<String> loadTopologicalFromDirectory(String directory) {
         return processFromDirectory(true, directory, false);
@@ -279,7 +281,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "update all objects in topological order from directory {0}",
-        help = "Updates all MCRObjects from the directory {0} in the system respecting the order of parents and children.",
+        help = "Updates all MCRObjects from the directory {0} in the system "
+            + "respecting the order of parents and children.",
         order = 95)
     public static List<String> updateTopologicalFromDirectory(String directory) {
         return processFromDirectory(true, directory, true);
@@ -503,8 +506,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * Export an MCRObject to a file named <em>MCRObjectID</em> .xml in a directory. The method use the converter
      * stylesheet mcr_<em>style</em>_object.xsl.
      *
-     * @param ID
-     *            the ID of the MCRObject to be save.
+     * @param id
+     *            the id of the MCRObject to be save.
      * @param dirname
      *            the dirname to store the object
      * @param style
@@ -512,10 +515,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = EXPORT_OBJECT_TO_DIRECTORY_COMMAND,
-        help = "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.",
+        help = "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl."
+            + " For {2} save is the default.",
         order = 110)
-    public static void export(String ID, String dirname, String style) {
-        export(ID, ID, dirname, style);
+    public static void export(String id, String dirname, String style) {
+        export(id, id, dirname, style);
     }
 
     /**
@@ -534,7 +538,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "export object from {0} to {1} to directory {2} with {3}",
-        help = "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.",
+        help = "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} "
+            + "with the stylesheet {3}-object.xsl. For {3} save is the default.",
         order = 100)
     public static void export(String fromID, String toID, String dirname, String style) {
         MCRObjectID fid, tid;
@@ -588,7 +593,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "export all objects of type {0} to directory {1} with {2}",
-        help = "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.",
+        help = "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl."
+            + " For {2} save is the default.",
         order = 120)
     public static List<String> exportAllObjectsOfType(String type, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
@@ -608,7 +614,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "export all objects of base {0} to directory {1} with {2}",
-        help = "Stores all MCRObjects of base {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.",
+        help = "Stores all MCRObjects of base {0} to directory {1} with the stylesheet mcr_{2}-object.xsl."
+            + " For {2} save is the default.",
         order = 130)
     public static List<String> exportAllObjectsOfBase(String base, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsForBase(base);
@@ -1020,33 +1027,33 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * Check the derivate links in objects of MCR base ID for existing. It looks to the XML store on the disk to get all
      * object IDs.
      *
-     * @param base_id
+     * @param baseId
      *            the base part of a MCRObjectID e.g. DocPortal_document
      */
     @MCRCommand(
         syntax = "check derivate entries in objects for base {0}",
         help = "check in all objects with MCR base ID {0} for existing linked derivates",
         order = 400)
-    public static void checkDerivatesInObjects(String base_id) {
-        if (base_id == null || base_id.length() == 0) {
+    public static void checkDerivatesInObjects(String baseId) {
+        if (baseId == null || baseId.length() == 0) {
             LOGGER.error("Base ID missed for check derivate entries in objects for base {0}");
             return;
         }
         MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        List<String> id_list = mgr.listIDsForBase(base_id);
+        List<String> idList = mgr.listIDsForBase(baseId);
         int counter = 0;
-        int maxresults = id_list.size();
-        for (String objid : id_list) {
+        int maxresults = idList.size();
+        for (String objid : idList) {
             counter++;
             LOGGER.info("Processing dataset {} from {} with ID: {}", counter, maxresults, objid);
             // get from data
             MCRObjectID mcrobjid = MCRObjectID.getInstance(objid);
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrobjid);
-            List<MCRMetaEnrichedLinkID> derivate_entries = obj.getStructure().getDerivates();
-            for (MCRMetaLinkID derivate_entry : derivate_entries) {
-                String derid = derivate_entry.getXLinkHref();
+            List<MCRMetaEnrichedLinkID> derivateEntries = obj.getStructure().getDerivates();
+            for (MCRMetaLinkID derivateEntry : derivateEntries) {
+                String derid = derivateEntry.getXLinkHref();
                 if (!mgr.exists(MCRObjectID.getInstance(derid))) {
-                    LOGGER.error("   !!! Missing derivate {} in database for base ID {}", derid, base_id);
+                    LOGGER.error("   !!! Missing derivate {} in database for base ID {}", derid, baseId);
                 }
             }
         }

@@ -45,11 +45,11 @@ import org.mycore.common.config.MCRConfiguration;
  */
 public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
-    public static final String systemRulePrefix = "SYSTEMRULE";
+    public static final String SYSTEM_RULE_PREFIX = "SYSTEMRULE";
 
-    public static final String poolPrivilegeID = "POOLPRIVILEGE";
+    public static final String POOL_PRIVILEGE_ID = "POOLPRIVILEGE";
 
-    public static final String lexicographicalPattern = "0000000000";
+    public static final String LEXICOGRAPHICAL_PATTERN = "0000000000";
 
     MCRAccessStore accessStore;
 
@@ -93,7 +93,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     @Override
     public void createRule(String ruleString, String creator, String description) {
-        String ruleID = getNextFreeRuleID(systemRulePrefix);
+        String ruleID = getNextFreeRuleID(SYSTEM_RULE_PREFIX);
         MCRAccessRule accessRule = new MCRAccessRule(ruleID, creator, new Date(), ruleString, description);
         ruleStore.createRule(accessRule);
     }
@@ -116,7 +116,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     @Override
     public void addRule(String permission, org.jdom2.Element rule, String description) {
-        addRule(poolPrivilegeID, permission, rule, description);
+        addRule(POOL_PRIVILEGE_ID, permission, rule, description);
     }
 
     @Override
@@ -127,7 +127,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     @Override
     public void removeRule(String permission) throws MCRException {
-        removeRule(poolPrivilegeID, permission);
+        removeRule(POOL_PRIVILEGE_ID, permission);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     @Override
     public void updateRule(String permission, Element rule, String description) throws MCRException {
-        updateRule(poolPrivilegeID, permission, rule, description);
+        updateRule(POOL_PRIVILEGE_ID, permission, rule, description);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     @Override
     public boolean checkPermission(String permission) {
         LOGGER.debug("Execute MCRAccessControlSystem checkPermission for permission {}", permission);
-        boolean ret = checkPermission(poolPrivilegeID, permission);
+        boolean ret = checkPermission(POOL_PRIVILEGE_ID, permission);
         LOGGER.debug("Execute MCRAccessControlSystem checkPermission result: {}", String.valueOf(ret));
         return ret;
     }
@@ -178,12 +178,12 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     @Override
     @Deprecated
     public boolean checkPermissionForUser(String permission, String userID) {
-        return checkAccess(poolPrivilegeID, permission, userID, null);
+        return checkAccess(POOL_PRIVILEGE_ID, permission, userID, null);
     }
 
     @Override
     public boolean checkPermissionForUser(String permission, MCRUserInformation userInfo) {
-        return checkAccess(poolPrivilegeID, permission, userInfo, null);
+        return checkAccess(POOL_PRIVILEGE_ID, permission, userInfo, null);
     }
 
     @Override
@@ -216,12 +216,12 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     @Override
     public Element getRule(String permission) {
-        return getRule(poolPrivilegeID, permission);
+        return getRule(POOL_PRIVILEGE_ID, permission);
     }
 
     @Override
     public String getRuleDescription(String permission) {
-        return getRuleDescription(poolPrivilegeID, permission);
+        return getRuleDescription(POOL_PRIVILEGE_ID, permission);
     }
 
     @Override
@@ -240,7 +240,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
 
     @Override
     public Collection<String> getPermissions() {
-        return accessStore.getPoolsForObject(poolPrivilegeID);
+        return accessStore.getPoolsForObject(POOL_PRIVILEGE_ID);
     }
 
     @Override
@@ -344,8 +344,8 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         } else {
             nextFreeID = ruleStore.getNextFreeRuleID(prefix);
         }
-        sNextFreeID = lexicographicalPattern + nextFreeID;
-        sNextFreeID = sNextFreeID.substring(sNextFreeID.length() - lexicographicalPattern.length());
+        sNextFreeID = LEXICOGRAPHICAL_PATTERN + nextFreeID;
+        sNextFreeID = sNextFreeID.substring(sNextFreeID.length() - LEXICOGRAPHICAL_PATTERN.length());
         nextFreeRuleID.put(prefix, nextFreeID + 1);
         return prefix + sNextFreeID;
     }
@@ -390,7 +390,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
                 // rule yet exists
                 ruleID = existingIDs.iterator().next();
             } else {
-                ruleID = getNextFreeRuleID(systemRulePrefix);
+                ruleID = getNextFreeRuleID(SYSTEM_RULE_PREFIX);
                 MCRAccessRule accessRule = new MCRAccessRule(ruleID, creator, new Date(), ruleString, description);
                 ruleStore.createRule(accessRule);
             }

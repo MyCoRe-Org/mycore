@@ -38,10 +38,12 @@ import org.mycore.common.config.MCRConfigurationException;
 /**
  * This filter can be used to add a specific Access-Control-Allow-Origin header to a response.
  * Access-Control-Allow-Origin is processed by the browser if a ajax request was made.
- * If the origin from where the request was made is not contained in the Access-Control-Allow-Origin field, then the Request will be rejected.
+ * If the origin from where the request was made is not contained in the Access-Control-Allow-Origin field,
+ * then the Request will be rejected.
  * <p>
  * Parameter:
- * corsFilterSuffix - MCR.CORSFilter.%corsFilterSuffix% will be resolved from the mycore.properties and used as Access-Control-Allow-Origin header field
+ * corsFilterSuffix - MCR.CORSFilter.%corsFilterSuffix% will be resolved from the mycore.properties and used as
+ * Access-Control-Allow-Origin header field
  * </p>
  * @author Sebastian Hofmann
  */

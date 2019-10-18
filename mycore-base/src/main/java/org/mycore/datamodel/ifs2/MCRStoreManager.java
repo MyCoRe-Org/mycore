@@ -26,9 +26,9 @@ import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 public class MCRStoreManager {
     private static final Logger LOGGER = LogManager.getLogger(MCRStoreManager.class);
 
-    public static <T extends MCRStore> T createStore(String ID, Class<T> storeClass)
+    public static <T extends MCRStore> T createStore(String id, Class<T> storeClass)
         throws ReflectiveOperationException {
-        return createStore(new MCRStoreDefaultConfig(ID), storeClass);
+        return createStore(new MCRStoreDefaultConfig(id), storeClass);
     }
 
     public static <T extends MCRStore> T createStore(MCRStoreConfig config, Class<T> storeClass)
@@ -46,21 +46,21 @@ public class MCRStoreManager {
     }
 
     /**
-     * Returns the store with the given ID
+     * Returns the store with the given id
      * 
-     * @param ID
+     * @param id
      *            the ID of the store
      */
-    public static <T extends MCRStore> T getStore(String ID) {
-        return MCRStoreCenter.instance().getStore(ID);
+    public static <T extends MCRStore> T getStore(String id) {
+        return MCRStoreCenter.instance().getStore(id);
     }
 
     /**
      * @deprecated use {@link #getStore(String)} instead
      */
     @Deprecated
-    public static <T extends MCRStore> T getStore(String ID, Class<T> storeClass) {
-        return MCRStoreCenter.instance().getStore(ID, storeClass);
+    public static <T extends MCRStore> T getStore(String id, Class<T> storeClass) {
+        return MCRStoreCenter.instance().getStore(id, storeClass);
     }
 
     public static void removeStore(String id) {

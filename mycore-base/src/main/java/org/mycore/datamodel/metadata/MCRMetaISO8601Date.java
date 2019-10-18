@@ -71,8 +71,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * 
      * @see MCRMetaDefault#MCRMetaDefault(String, String, String, int)
      */
-    public MCRMetaISO8601Date(String set_subtag, String set_type, int set_inherted) {
-        super(set_subtag, null, set_type, set_inherted);
+    public MCRMetaISO8601Date(String subtag, String type, int inherted) {
+        super(subtag, null, type, inherted);
         this.isoDate = new MCRISO8601Date();
     }
 

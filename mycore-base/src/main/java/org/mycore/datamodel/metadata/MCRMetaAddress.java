@@ -61,38 +61,38 @@ public final class MCRMetaAddress extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
+     * The language element was set. If the value of <em>defaultLang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * the value of <em>subtag</em>. If the value of <em>subtag</em>
      * is null or empty an exception was thrown. The type element was set to
-     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * the value of <em>type</em>, if it is null, an empty string was set
      * to the type element. The country, state, zipCode, city, street and
-     * number element was set to the value of <em>set_...</em>, if they are null,
+     * number element was set to the value of <em>...</em>, if they are null,
      * an empty string was set to this element.
-     * @param set_subtag      the name of the subtag
-     * @param default_lang    the default language
-     * @param set_type        the optional type string
-     * @param set_inherted    a value &gt;= 0
-     * @param set_country     the country name
-     * @param set_state       the state name
-     * @param set_zipcode     the zipCode string
-     * @param set_city        the city name
-     * @param set_street      the street name
-     * @param set_number      the number string
+     * @param subtag      the name of the subtag
+     * @param defaultLang    the default language
+     * @param type        the optional type string
+     * @param inherted    a value &gt;= 0
+     * @param country     the country name
+     * @param state       the state name
+     * @param zipcode     the zipCode string
+     * @param city        the city name
+     * @param street      the street name
+     * @param number      the number string
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaAddress(final String set_subtag, final String default_lang, final String set_type,
-        final int set_inherted, final String set_country,
-        final String set_state, final String set_zipcode, final String set_city, final String set_street,
-        final String set_number) throws MCRException {
-        super(set_subtag, default_lang, set_type, set_inherted);
-        setCountry(set_country);
-        setState(set_state);
-        setZipCode(set_zipcode);
-        setCity(set_city);
-        setStreet(set_street);
-        setNumber(set_number);
+    public MCRMetaAddress(final String subtag, final String defaultLang, final String type,
+        final int inherted, final String country,
+        final String state, final String zipcode, final String city, final String street,
+        final String number) throws MCRException {
+        super(subtag, defaultLang, type, inherted);
+        setCountry(country);
+        setState(state);
+        setZipCode(zipcode);
+        setCity(city);
+        setStreet(street);
+        setNumber(number);
     }
 
     /**
@@ -125,7 +125,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaAddress part
      */
     @Override
-    public org.jdom2.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         final Element elm = super.createXML();
         if (getCountry() != null) {
             elm.addContent(new Element("country").addContent(getCountry()));
@@ -306,7 +306,7 @@ public final class MCRMetaAddress extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(final org.jdom2.Element element) {
+    public void setFromDOM(final Element element) {
         super.setFromDOM(element);
         country = element.getChildTextTrim("country");
         state = element.getChildTextTrim("state");

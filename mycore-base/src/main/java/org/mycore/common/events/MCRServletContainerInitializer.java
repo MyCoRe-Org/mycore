@@ -56,18 +56,18 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         shutdownHandler.leakPreventor = leakPreventor;
         MCRStartupHandler.startUp(ctx);
         //Make sure logging is configured
-        final Logger LOGGER = LogManager.getLogger();
-        if (LOGGER.isDebugEnabled()) {
+        final Logger logger = LogManager.getLogger();
+        if (logger.isDebugEnabled()) {
             try {
                 Enumeration<URL> resources = MCRClassTools.getClassLoader().getResources("META-INF/web-fragment.xml");
                 while (resources.hasMoreElements()) {
-                    LOGGER.debug("Found: {}", resources.nextElement());
+                    logger.debug("Found: {}", resources.nextElement());
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            LOGGER.debug("This class is here: {}", getSource(this.getClass()));
+            logger.debug("This class is here: {}", getSource(this.getClass()));
         }
     }
 

@@ -27,11 +27,15 @@ import org.apache.logging.log4j.Logger;
 import org.apache.xerces.util.XMLChar;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 
 import com.google.gson.JsonObject;
 
 /**
- * This class implements all method for generic handling with the MCRMetaLink part of a metadata object. The MCRMetaLink class present two types. At once a reference to an URL. At second a bidirectional link between two URL's. Optional you can append the reference with the label attribute. See to W3C XLink Standard for more informations.
+ * This class implements all method for generic handling with the MCRMetaLink part of a metadata object.
+ * The MCRMetaLink class present two types. At once a reference to an URL.
+ * At second a bidirectional link between two URL's. Optional you can append the reference with the label attribute.
+ * See to W3C XLink Standard for more informations.
  * <p>
  * &lt;tag class="MCRMetaLink"&gt; <br>
  * &lt;subtag xlink:type="locator" xlink:href=" <em>URL</em>" xlink:label="..." xlink:title="..."/&gt; <br>
@@ -67,65 +71,60 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is null, empty or false <b>en </b> was set. The subtag element was set to the value of <em>set_subtag</em>. If the value of <em>set_subtag</em> is null or empty an exception was throwed.
-     * @param set_subtag
+     * The language element was set. If the value of <em>default_lang</em> is null, empty or false <b>en </b> was set.
+     * The subtag element was set to the value of <em>subtag</em>.
+     * If the value of <em>subtag</em> is null or empty an exception was throwed.
+     * @param subtag
      *            the name of the subtag
-     * @param set_inherted
+     * @param inherted
      *            a value &gt;= 0
      * @exception MCRException
-     *                if the set_datapart or set_subtag value is null or empty
+     *                if the set_datapart or subtag value is null or empty
      */
-    public MCRMetaLink(String set_subtag, int set_inherted) throws MCRException {
-        super(set_subtag, null, null, set_inherted);
+    public MCRMetaLink(String subtag, int inherted) throws MCRException {
+        super(subtag, null, null, inherted);
     }
 
     /**
      * This method set a reference with xlink:href, xlink:label and xlink:title.
      * 
-     * @param set_href
+     * @param href
      *            the reference
-     * @param set_label
+     * @param label
      *            the new label string
-     * @param set_title
+     * @param title
      *            the new title string
      * @exception MCRException
-     *                if the set_href value is null or empty
+     *                if the href value is null or empty
      */
-    public void setReference(String set_href, String set_label, String set_title) throws MCRException {
+    public void setReference(String href, String label, String title) throws MCRException {
         linktype = "locator";
 
-        if (set_href == null || (set_href = set_href.trim()).length() == 0) {
-            throw new MCRException("The href value is null or empty.");
-        }
-
-        href = set_href;
-        setXLinkLabel(set_label);
-        title = set_title;
+        this.href = MCRUtils.filterTrimmedNotEmpty(href)
+            .orElseThrow(() -> new MCRException("The href value is null or empty."));
+        setXLinkLabel(label);
+        this.title = title;
     }
 
     /**
      * This method set a bidirectional link with xlink:from, xlink:to and xlink:title.
      * 
-     * @param set_from
+     * @param from
      *            the source
-     * @param set_to
+     * @param to
      *            the target
-     * @param set_title
+     * @param title
      *            the new title string
      * @exception MCRException
      *                if the from or to element is null or empty
      */
-    public void setBiLink(String set_from, String set_to, String set_title) throws MCRException {
-        if (set_from == null || (set_from = set_from.trim()).length() == 0) {
-            throw new MCRException("The from value is null or empty.");
-        }
-        if (set_to == null || (set_to = set_to.trim()).length() == 0) {
-            throw new MCRException("The to value is null or empty.");
-        }
+    public void setBiLink(String from, String to, String title) throws MCRException {
+        this.from = MCRUtils.filterTrimmedNotEmpty(from)
+            .orElseThrow(() -> new MCRException("The from value is null or empty."));
+        this.to = MCRUtils.filterTrimmedNotEmpty(to)
+            .orElseThrow(() -> new MCRException("The to value is null or empty."));
         linktype = "arc";
-        from = set_from;
-        to = set_to;
-        title = set_title;
+        this.title = title;
     }
 
     /**
@@ -222,7 +221,8 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * The method compare this instance of MCRMetaLink with a input object of the class type MCRMetaLink. The both instances are equal, if: <br>
+     * The method compare this instance of MCRMetaLink with a input object of the class type MCRMetaLink.
+     * The both instances are equal, if: <br>
      * <ul>
      * <li>for the type 'arc' the 'from' and 'to' element is equal</li>
      * <li>for the type 'locator' the 'href' element is equal</li>
@@ -312,7 +312,8 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * This method create a XML stream for all data in this class, defined by the MyCoRe XML MCRMetaLink definition for the given subtag.
+     * This method create a XML stream for all data in this class,
+     * defined by the MyCoRe XML MCRMetaLink definition for the given subtag.
      * 
      * @exception MCRException
      *                if the content of this class is not valid

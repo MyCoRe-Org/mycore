@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.logging.log4j.LogManager;
@@ -151,13 +152,10 @@ public class MCRCommandLineInterface {
     }
 
     private static void addCommands(String line) {
-        String[] cmds = line.split(";;");
-        for (String cmd : cmds) {
-            cmd = cmd.trim();
-            if (!cmd.isEmpty()) {
-                commandQueue.add(cmd);
-            }
-        }
+        Stream.of(line.split(";;"))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .forEachOrdered(commandQueue::add);
     }
 
     private static String readLineFromArguments(String[] args) {
@@ -214,7 +212,8 @@ public class MCRCommandLineInterface {
 
     /**
      * Expands variables in a command.
-     * Replaces any variables in form ${propertyName} to the value defined by {@link MCRConfiguration#getString(String)}.
+     * Replaces any variables in form ${propertyName} to the value defined by
+     * {@link MCRConfiguration#getString(String)}.
      * If the property is not defined not variable replacement takes place.
      * @param command a CLI command that should be expanded
      * @return expanded command

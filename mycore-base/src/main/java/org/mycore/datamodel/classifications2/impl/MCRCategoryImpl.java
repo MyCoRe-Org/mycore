@@ -77,13 +77,18 @@ import org.mycore.datamodel.classifications2.MCRLabel;
         @UniqueConstraint(columnNames = { "ClassID", "rightValue" }, name = "ClassRightUnique") })
 @NamedQueries({
     @NamedQuery(name = "MCRCategory.updateLeft",
-        query = "UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.id.rootID= :classID AND cat.left >= :left"),
+        query = "UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE "
+            + "cat.id.rootID= :classID AND cat.left >= :left"),
     @NamedQuery(name = "MCRCategory.updateRight",
-        query = "UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.id.rootID= :classID AND cat.right >= :left"),
+        query = "UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE "
+            + "cat.id.rootID= :classID AND cat.right >= :left"),
     @NamedQuery(name = "MCRCategory.commonAncestor",
-        query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:rootID AND cat.left < :left AND cat.right > :right ORDER BY cat.left DESC"),
+        query = "FROM MCRCategoryImpl as cat WHERE "
+            + "cat.id.rootID=:rootID AND cat.left < :left AND cat.right > :right "
+            + "ORDER BY cat.left DESC"),
     @NamedQuery(name = "MCRCategory.byNaturalId",
-        query = "FROM MCRCategoryImpl as cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL)"),
+        query = "FROM MCRCategoryImpl as cat WHERE "
+            + "cat.id.rootID=:classID and (cat.id.id=:categID OR cat.id.id IS NULL AND :categID IS NULL)"),
     @NamedQuery(name = "MCRCategory.byLabelInClass",
         query = "FROM MCRCategoryImpl as cat "
             + "INNER JOIN cat.labels as label "
@@ -107,19 +112,23 @@ import org.mycore.datamodel.classifications2.MCRLabel;
             + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) ORDER BY cat.left"),
     @NamedQuery(name = "MCRCategory.prefetchCategLevelQuery",
         query = MCRCategoryDTO.SELECT
-            + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) AND cat.level <= :endlevel ORDER BY cat.left"),
+            + " WHERE cat.id.rootID=:classID AND (cat.left BETWEEN :left AND :right OR cat.left=0) AND "
+            + "cat.level <= :endlevel ORDER BY cat.left"),
     @NamedQuery(name = "MCRCategory.leftRightLevelQuery",
         query = MCRCategoryDTO.LRL_SELECT
             + " WHERE cat.id=:categID "),
     @NamedQuery(name = "MCRCategory.parentQuery",
         query = MCRCategoryDTO.SELECT
-            + " WHERE cat.id.rootID=:classID AND (cat.left < :left AND cat.right > :right OR cat.id.ID=:categID) ORDER BY cat.left"),
+            + " WHERE cat.id.rootID=:classID AND (cat.left < :left AND cat.right > :right OR cat.id.id=:categID) "
+            + "ORDER BY cat.left"),
     @NamedQuery(name = "MCRCategory.rootCategs",
         query = MCRCategoryDTO.SELECT
             + " WHERE cat.left = 0 ORDER BY cat.id.rootID"),
     @NamedQuery(name = "MCRCategory.rootIds", query = "SELECT cat.id FROM MCRCategoryImpl cat WHERE cat.left = 0"),
     @NamedQuery(name = "MCRCategory.childCount",
-        query = "SELECT CAST(count(*) AS integer) FROM MCRCategoryImpl children WHERE children.parent=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE cat.id.rootID=:classID and (cat.id.ID=:categID OR cat.id.ID IS NULL AND :categID IS NULL))"),
+        query = "SELECT CAST(count(*) AS integer) FROM MCRCategoryImpl children WHERE "
+            + "children.parent=(SELECT cat.internalID FROM MCRCategoryImpl cat WHERE "
+            + "cat.id.rootID=:classID and (cat.id.id=:categID OR cat.id.id IS NULL AND :categID IS NULL))"),
 })
 
 @Access(AccessType.PROPERTY)

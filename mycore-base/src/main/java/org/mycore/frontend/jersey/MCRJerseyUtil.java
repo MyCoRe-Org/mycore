@@ -112,8 +112,8 @@ public abstract class MCRJerseyUtil {
     }
 
     /**
-     * Checks if the current user has the read permission on the given derivate content. Throws an unauthorized exception
-     * otherwise.
+     * Checks if the current user has the read permission on the given derivate content.
+     * Throws an unauthorized exception otherwise.
      * 
      * @param id
      *            mycore object id

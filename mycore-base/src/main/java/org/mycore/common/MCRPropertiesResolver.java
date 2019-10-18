@@ -75,26 +75,10 @@ public class MCRPropertiesResolver extends MCRTextResolver {
         registerTerm(Property.class);
     }
 
-    public static class Property extends Variable {
-        public Property(MCRTextResolver textResolver) {
-            super(textResolver);
-        }
-
-        @Override
-        public String getStartEnclosingString() {
-            return "%";
-        }
-
-        @Override
-        public String getEndEnclosingString() {
-            return "%";
-        }
-    }
-
     /**
      * Substitute all %references% of the given <code>Properties</code> and
      * return a new <code>Properties</code> object.
-     * 
+     *
      * @param toResolve properties to resolve
      * @return resolved properties
      */
@@ -112,7 +96,7 @@ public class MCRPropertiesResolver extends MCRTextResolver {
     /**
      * Substitute all %references% of the given <code>Map</code> and
      * return a new <code>Map</code> object.
-     * 
+     *
      * @param toResolve properties to resolve
      * @return resolved properties
      */
@@ -124,6 +108,22 @@ public class MCRPropertiesResolver extends MCRTextResolver {
             resolvedMap.put(key, this.resolve(value));
         }
         return resolvedMap;
+    }
+
+    public static class Property extends Variable {
+        public Property(MCRTextResolver textResolver) {
+            super(textResolver);
+        }
+
+        @Override
+        public String getStartEnclosingString() {
+            return "%";
+        }
+
+        @Override
+        public String getEndEnclosingString() {
+            return "%";
+        }
     }
 
 }

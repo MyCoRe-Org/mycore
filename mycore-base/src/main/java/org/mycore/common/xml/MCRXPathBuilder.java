@@ -94,7 +94,8 @@ public class MCRXPathBuilder {
     }
 
     /**
-     * Returns the namespace prefix for this element, followed by a ":", or the empty string if no namespace prefix known.
+     * Returns the namespace prefix for this element, followed by a ":",
+     * or the empty string if no namespace prefix known.
      */
     public static String getNamespacePrefix(Element element) {
         Namespace nsElement = element.getNamespace();

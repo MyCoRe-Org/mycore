@@ -51,45 +51,48 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
     @NamedQuery(name = "MCRCategoryLink.ObjectIDByCategory",
         query = "SELECT objectReference.objectID FROM MCRCategoryLinkImpl WHERE category.id=:id"),
     @NamedQuery(name = "MCRCategoryLink.deleteByObjectCollection",
-        query = "DELETE FROM MCRCategoryLinkImpl WHERE objectReference.objectID IN (:ids) and objectReference.type=:type"),
+        query = "DELETE FROM MCRCategoryLinkImpl WHERE "
+            + "objectReference.objectID IN (:ids) and objectReference.type=:type"),
     @NamedQuery(name = "MCRCategoryLink.NumberPerClassID",
-        query = "SELECT cat.id.ID, count(distinct link.objectReference.objectID) as num"
+        query = "SELECT cat.id.id, count(distinct link.objectReference.objectID) as num"
             + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
             + "  WHERE cattree.internalID = link.category"
             + "    AND cattree.id.rootID=:classID"
             + "    AND cat.id.rootID=:classID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right"
-            + "  GROUP BY cat.id.ID"),
+            + "  GROUP BY cat.id.id"),
     @NamedQuery(name = "MCRCategoryLink.NumberPerChildOfParentID",
-        query = "SELECT cat.id.ID, count(distinct link.objectReference.objectID) as num"
+        query = "SELECT cat.id.id, count(distinct link.objectReference.objectID) as num"
             + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
             + "  WHERE cattree.internalID = link.category"
             + "    AND cattree.id.rootID=:classID"
             + "    AND cat.parent.internalID=:parentID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right"
-            + "  GROUP BY cat.id.ID"),
+            + "  GROUP BY cat.id.id"),
     @NamedQuery(name = "MCRCategoryLink.categoriesByObjectID",
-        query = "SELECT category.id FROM MCRCategoryLinkImpl WHERE objectReference.objectID=:id and objectReference.type=:type"),
+        query = "SELECT category.id FROM MCRCategoryLinkImpl WHERE "
+            + "objectReference.objectID=:id and objectReference.type=:type"),
     @NamedQuery(name = "MCRCategoryLink.ObjectIDByCategoryAndType",
-        query = "SELECT objectReference.objectID FROM MCRCategoryLinkImpl WHERE category.id=:id and objectReference.type=:type"),
+        query = "SELECT objectReference.objectID FROM MCRCategoryLinkImpl WHERE "
+            + "category.id=:id and objectReference.type=:type"),
     @NamedQuery(name = "MCRCategoryLink.NumberByTypePerClassID",
-        query = "SELECT cat.id.ID, count(distinct link.objectReference.objectID) as num"
+        query = "SELECT cat.id.id, count(distinct link.objectReference.objectID) as num"
             + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
             + "  WHERE cattree.internalID = link.category"
             + "    AND link.objectReference.type=:type"
             + "    AND cattree.id.rootID=:classID"
             + "    AND cat.id.rootID=:classID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right"
-            + "  GROUP BY cat.id.ID"),
+            + "  GROUP BY cat.id.id"),
     @NamedQuery(name = "MCRCategoryLink.NumberByTypePerChildOfParentID",
-        query = "SELECT cat.id.ID, count(distinct link.objectReference.objectID) as num"
+        query = "SELECT cat.id.id, count(distinct link.objectReference.objectID) as num"
             + "  FROM MCRCategoryLinkImpl link, MCRCategoryImpl cat, MCRCategoryImpl cattree"
             + "  WHERE cattree.internalID = link.category"
             + "    AND link.objectReference.type=:type"
             + "    AND cattree.id.rootID=:classID"
             + "    AND cat.parent.internalID=:parentID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right"
-            + "  GROUP BY cat.id.ID"),
+            + "  GROUP BY cat.id.id"),
     @NamedQuery(name = "MCRCategoryLink.deleteByObjectID",
         query = "DELETE FROM MCRCategoryLinkImpl WHERE objectReference.objectID=:id and objectReference.type=:type"),
     @NamedQuery(name = "MCRCategoryLink.CategoryAndObjectID",
@@ -100,11 +103,12 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
             + "    AND link.objectReference.type=:type"
             + "    AND cattree.id.rootID=:rootID"
             + "    AND cat.id.rootID=:rootID"
-            + "    AND cat.id.ID=:categID"
+            + "    AND cat.id.id=:categID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right",
         hints = { @QueryHint(name = QueryHints.READ_ONLY, value = "true") }),
     @NamedQuery(name = "MCRCategoryLink.linkedClassifications",
-        query = "SELECT distinct node.id.rootID from MCRCategoryImpl as node, MCRCategoryLinkImpl as link where node.internalID=link.category"),
+        query = "SELECT distinct node.id.rootID from MCRCategoryImpl as node, MCRCategoryLinkImpl as link "
+            + "where node.internalID = link.category"),
     @NamedQuery(name = "MCRCategoryLink.types",
         query = "SELECT DISTINCT(objectReference.type) FROM MCRCategoryLinkImpl"),
     @NamedQuery(name = "MCRCategoryLink.links",
