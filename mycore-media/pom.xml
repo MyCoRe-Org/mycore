@@ -9,21 +9,12 @@
   </parent>
   <artifactId>mycore-media</artifactId>
   <packaging>jar</packaging>
-
   <name>MyCoRe MediaInfo</name>
   <properties>
     <forbiddenapis.skip>true</forbiddenapis.skip>
     <maven.compiler.arg />
+    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
-
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
-  </build>
-
   <dependencies>
     <dependency>
       <groupId>com.google.code.gson</groupId>

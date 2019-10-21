@@ -9,6 +9,9 @@
   </parent>
   <artifactId>mycore-wfc</artifactId>
   <name>MyCoRe Workflow Components</name>
+  <properties>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>

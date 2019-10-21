@@ -14,6 +14,7 @@
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
     <jetty.port>9301</jetty.port>
     <manifest.priority>45</manifest.priority>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>

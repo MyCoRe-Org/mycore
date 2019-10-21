@@ -10,7 +10,4 @@
   <artifactId>mycore-coma</artifactId>
   <name>MyCoRe Content Manager</name>
   <description>Manages MyCoRe objects and derivates</description>
-  <properties>
-    <pmd.failOnViolation>true</pmd.failOnViolation>
-  </properties>
 </project>
