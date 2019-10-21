@@ -85,7 +85,7 @@ public class MCRXMLHelper {
         if (text == null || text.trim().length() == 0) {
             return text;
         }
-        if (org.jdom2.Verifier.checkCharacterData(text) == null) {
+        if (Verifier.checkCharacterData(text) == null) {
             return text;
         }
 

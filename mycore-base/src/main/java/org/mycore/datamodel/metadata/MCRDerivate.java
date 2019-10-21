@@ -123,7 +123,7 @@ public final class MCRDerivate extends MCRBase {
      * @return a JDOM Document with the XML data of the object as byte array
      */
     @Override
-    public org.jdom2.Document createXML() throws MCRException {
+    public Document createXML() throws MCRException {
         Document doc = super.createXML();
         Element elm = doc.getRootElement();
         elm.setAttribute("order", String.valueOf(order));

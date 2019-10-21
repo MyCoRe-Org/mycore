@@ -346,11 +346,11 @@ public class MCRObjectStructure {
 
     /**
      * <em>createXML</em> is the inverse of setFromDOM and converts the
-     * structure's memory copy into an XML string.
+     * structure's memory copy into XML.
      * 
      * @exception MCRException
      *                if the content of this class is not valid
-     * @return org.jdom2.Element the structure XML string
+     * @return the structure XML
      */
     public final Element createXML() throws MCRException {
         try {

@@ -71,7 +71,7 @@ public class MCRPathXML {
         LOGGER.debug("MCRDirectoryXML: start listing of directory {}", path);
 
         Element root = new Element("mcr_directory");
-        Document doc = new org.jdom2.Document(root);
+        Document doc = new Document(root);
 
         addString(root, "uri", path.toUri().toString(), false);
         addString(root, "ownerID", path.getOwner(), false);

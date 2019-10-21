@@ -129,7 +129,7 @@ public class MCRObjectService {
      */
     public final void setFromDOM(Element service) {
         // Date part
-        org.jdom2.Element servdates = service.getChild("servdates");
+        Element servdates = service.getChild("servdates");
         dates.clear();
 
         if (servdates != null) {
@@ -164,7 +164,7 @@ public class MCRObjectService {
         }
 
         // Flag part
-        org.jdom2.Element flagsElement = service.getChild("servflags");
+        Element flagsElement = service.getChild("servflags");
         if (flagsElement != null) {
             List<Element> flagList = flagsElement.getChildren();
             for (Element flagElement : flagList) {
@@ -177,7 +177,7 @@ public class MCRObjectService {
             }
         }
 
-        org.jdom2.Element statesElement = service.getChild("servstates");
+        Element statesElement = service.getChild("servstates");
         if (statesElement != null) {
             List<Element> flagList = statesElement.getChildren();
             for (Element stateElement : flagList) {
@@ -619,16 +619,16 @@ public class MCRObjectService {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the structure data part
      */
-    public final org.jdom2.Element createXML() throws MCRException {
+    public final Element createXML() throws MCRException {
         try {
             validate();
         } catch (MCRException exc) {
             throw new MCRException("The content is not valid.", exc);
         }
-        org.jdom2.Element elm = new org.jdom2.Element("service");
+        Element elm = new Element("service");
 
         if (dates.size() != 0) {
-            org.jdom2.Element elmm = new org.jdom2.Element("servdates");
+            Element elmm = new Element("servdates");
             elmm.setAttribute("class", "MCRMetaISO8601Date");
 
             for (MCRMetaISO8601Date date : dates) {
@@ -639,7 +639,7 @@ public class MCRObjectService {
         }
 
         if (rules.size() != 0) {
-            org.jdom2.Element elmm = new org.jdom2.Element("servacls");
+            Element elmm = new Element("servacls");
             elmm.setAttribute("class", "MCRMetaAccessRule");
 
             for (MCRMetaAccessRule rule : rules) {
@@ -650,7 +650,7 @@ public class MCRObjectService {
         }
 
         if (flags.size() != 0) {
-            org.jdom2.Element elmm = new org.jdom2.Element("servflags");
+            Element elmm = new Element("servflags");
             elmm.setAttribute("class", "MCRMetaLangText");
 
             for (MCRMetaLangText flag : flags) {
@@ -660,7 +660,7 @@ public class MCRObjectService {
             elm.addContent(elmm);
         }
         if (state != null) {
-            org.jdom2.Element elmm = new org.jdom2.Element("servstates");
+            Element elmm = new Element("servstates");
             elmm.setAttribute("class", "MCRMetaClassification");
             MCRMetaClassification stateClass = new MCRMetaClassification("servstate", 0, null, state);
             elmm.addContent(stateClass.createXML());

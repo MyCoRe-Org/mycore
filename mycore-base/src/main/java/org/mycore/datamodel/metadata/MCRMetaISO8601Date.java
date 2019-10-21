@@ -117,13 +117,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         return obj;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mycore.datamodel.metadata.MCRMetaDefault#setFromDOM(org.jdom2.Element)
-     */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
         setFormat(element.getAttributeValue("format"));
         setDate(element.getTextTrim());

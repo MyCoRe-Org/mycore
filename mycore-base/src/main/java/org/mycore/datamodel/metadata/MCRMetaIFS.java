@@ -152,7 +152,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      *                if the set_sourcepath value is null or empty
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public void setFromDOM(Element element) throws MCRException {
         super.setFromDOM(element);
         setSourcePath(element.getAttributeValue("sourcepath"));
         setMainDoc(element.getAttributeValue("maindoc"));

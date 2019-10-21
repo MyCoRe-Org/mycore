@@ -73,7 +73,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#addRule(java.lang.String,
      *      java.lang.String, org.jdom2.Element)
      */
-    public void addRule(String id, String permission, org.jdom2.Element rule, String description) throws MCRException {
+    public void addRule(String id, String permission, Element rule, String description) throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl addRule for ID {} for permission {}", id, permission);
     }
 
@@ -121,7 +121,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
      *      java.lang.String, org.jdom2.Element)
      */
-    public void updateRule(String id, String permission, org.jdom2.Element rule, String description)
+    public void updateRule(String id, String permission, Element rule, String description)
         throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl updateRule for ID {} for permission {}", id, permission);
     }

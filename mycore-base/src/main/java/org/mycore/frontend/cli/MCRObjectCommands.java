@@ -721,7 +721,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             FileOutputStream out = new FileOutputStream(xmlOutput);
             StreamResult sr = new StreamResult(out);
             Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(content);
-            trans.transform(new org.jdom2.transform.JDOMSource(doc), sr);
+            trans.transform(new JDOMSource(doc), sr);
         } else {
             content.sendTo(xmlOutput);
         }

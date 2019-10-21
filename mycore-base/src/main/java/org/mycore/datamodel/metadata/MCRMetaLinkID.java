@@ -20,6 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import java.util.Objects;
 
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
@@ -209,7 +210,7 @@ public class MCRMetaLinkID extends MCRMetaLink {
      *                and to are not a MCRObjectID
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
 
         if (linktype.equals("locator")) {

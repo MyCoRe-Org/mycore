@@ -33,7 +33,7 @@ import org.mycore.common.MCRException;
  */
 public class MCRMetaAccessRule extends MCRMetaDefault {
     // MCRMetaAccessRule data
-    protected org.jdom2.Element condition;
+    protected Element condition;
 
     protected String permission;
 

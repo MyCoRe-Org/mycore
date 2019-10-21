@@ -23,6 +23,7 @@ import java.util.function.BiConsumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
@@ -316,7 +317,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
         setFirstName(element.getChildTextTrim("firstname"));
         setCallName(element.getChildTextTrim("callname"));
@@ -339,7 +340,7 @@ public final class MCRMetaPersonName extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaPersonName part
      */
     @Override
-    public org.jdom2.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
         BiConsumer<String, String> addContent = (name, value) -> MCRUtils.filterTrimmedNotEmpty(value)
             .ifPresent(trimmedValue -> elm.addContent(new Element(name).addContent(trimmedValue)));

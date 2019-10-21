@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 import com.google.gson.JsonObject;
@@ -113,7 +114,7 @@ public interface MCRMetaInterface extends Cloneable {
      * @param element
      *            a relevant JDOM element for the metadata
      */
-    void setFromDOM(org.jdom2.Element element);
+    void setFromDOM(Element element);
 
     /**
      * This method create a XML stream for a metadata part.
@@ -122,7 +123,7 @@ public interface MCRMetaInterface extends Cloneable {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the metadata part
      */
-    org.jdom2.Element createXML() throws MCRException;
+    Element createXML() throws MCRException;
 
     /**
      * This method creates a JSON representation of the metadata part.
