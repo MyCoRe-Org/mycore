@@ -214,7 +214,7 @@ public class MCRXSLTransformation {
      * Method transform. Transforms a JDOM-Document to the given OutputStream
      * 
      */
-    public void transform(org.jdom2.Document in, TransformerHandler handler, OutputStream out) {
+    public void transform(Document in, TransformerHandler handler, OutputStream out) {
         handler.setResult(new StreamResult(out));
 
         try {
@@ -235,7 +235,7 @@ public class MCRXSLTransformation {
      *            the stylesheet.
      * @return Document The new document or null, if an exception was thrown.
      */
-    public static org.jdom2.Document transform(org.jdom2.Document in, String stylesheet) {
+    public static Document transform(Document in, String stylesheet) {
         return transform(in, stylesheet, EMPTY_PARAMETERS);
     }
 
@@ -252,7 +252,7 @@ public class MCRXSLTransformation {
      *            parameters used by the stylesheet for transformation
      * @return Document The new document or null, if an exception was thrown.
      */
-    public static org.jdom2.Document transform(org.jdom2.Document in, String stylesheet, Map parameters) {
+    public static Document transform(Document in, String stylesheet, Map parameters) {
         return transform(in, new StreamSource(new File(stylesheet)), parameters);
     }
 
@@ -269,7 +269,7 @@ public class MCRXSLTransformation {
      *            parameters used by the stylesheet for transformation
      * @return Document The new document or null, if an exception was thrown.
      */
-    public static org.jdom2.Document transform(org.jdom2.Document in, Source stylesheet, Map parameters) {
+    public static Document transform(Document in, Source stylesheet, Map parameters) {
         try {
             Transformer transformer = factory.newTransformer(stylesheet);
             setParameters(transformer, parameters);

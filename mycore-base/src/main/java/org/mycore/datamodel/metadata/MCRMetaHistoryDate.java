@@ -404,7 +404,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
         texts.clear(); // clear
 
@@ -439,7 +439,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaHistoryDate part
      */
     @Override
-    public org.jdom2.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
         for (MCRMetaHistoryDateText text : texts) {
             Element elmt = new Element("text");
@@ -447,13 +447,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             elmt.setAttribute("lang", text.getLang(), Namespace.XML_NAMESPACE);
             elm.addContent(elmt);
         }
-        elm.addContent(new org.jdom2.Element("calendar").addContent(calendar));
+        elm.addContent(new Element("calendar").addContent(calendar));
 
-        elm.addContent(new org.jdom2.Element("ivon").addContent(Integer.toString(ivon)));
-        elm.addContent(new org.jdom2.Element("von").addContent(getVonToString()));
+        elm.addContent(new Element("ivon").addContent(Integer.toString(ivon)));
+        elm.addContent(new Element("von").addContent(getVonToString()));
 
-        elm.addContent(new org.jdom2.Element("ibis").addContent(Integer.toString(ibis)));
-        elm.addContent(new org.jdom2.Element("bis").addContent(getBisToString()));
+        elm.addContent(new Element("ibis").addContent(Integer.toString(ibis)));
+        elm.addContent(new Element("bis").addContent(getBisToString()));
         return elm;
     }
 

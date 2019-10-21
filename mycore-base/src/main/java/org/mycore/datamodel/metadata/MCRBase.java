@@ -58,7 +58,7 @@ public abstract class MCRBase {
     protected static final String MCR_ENCODING;
 
     // the DOM document
-    protected org.jdom2.Document jdomDocument = null;
+    protected Document jdomDocument = null;
 
     // the object content
     protected MCRObjectID mcrId = null;
@@ -120,7 +120,7 @@ public abstract class MCRBase {
             throw new MCRException("The JDOM document is null or empty.");
         }
 
-        org.jdom2.Element rootElement = jdomDocument.getRootElement();
+        Element rootElement = jdomDocument.getRootElement();
         setId(MCRObjectID.getInstance(rootElement.getAttributeValue("ID")));
         setLabel(rootElement.getAttributeValue("label"));
         setVersion(rootElement.getAttributeValue("version"));

@@ -366,7 +366,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      * @exception MCRException
      *                if a problem occured
      */
-    public final void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public final void setFromDOM(Element element) throws MCRException {
         List<Element> elements = element.getChildren();
         metadataElements.clear();
         for (Element sub : elements) {
@@ -383,7 +383,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the metadata part
      */
-    public final org.jdom2.Element createXML() throws MCRException {
+    public final Element createXML() throws MCRException {
         try {
             validate();
         } catch (MCRException exc) {

@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -90,8 +91,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         }
         LOGGER.info("Reading file {} ...", filename);
 
-        org.jdom2.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(filename));
-        org.jdom2.Element rootelm = doc.getRootElement();
+        Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(filename));
+        Element rootelm = doc.getRootElement();
 
         if (!rootelm.getName().equals("mcrpermissions")) {
             throw new MCRException("The data are not for mcrpermissions.");
@@ -172,11 +173,11 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             if (description.equals("")) {
                 description = "No description";
             }
-            org.jdom2.Element rule = accessImpl.getRule(permission);
+            Element rule = accessImpl.getRule(permission);
             LOGGER.info("       {}", permission);
             LOGGER.info("           {}", description);
             if (rule != null) {
-                org.jdom2.output.XMLOutputter o = new org.jdom2.output.XMLOutputter();
+                XMLOutputter o = new XMLOutputter();
                 LOGGER.info("           {}", o.outputString(rule));
             }
         }

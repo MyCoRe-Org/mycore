@@ -201,7 +201,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             LOGGER.warn("The ACL conditions for this object are empty!");
         }
         while (0 < rulesize) {
-            org.jdom2.Element conditions = base.getService().getRule(0).getCondition();
+            Element conditions = base.getService().getRule(0).getCondition();
             String permission = base.getService().getRule(0).getPermission();
             if (storedrules.contains(permission)) {
                 MCRAccessManager.addRule(base.getId(), permission, conditions, "");
@@ -233,7 +233,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         }
         if (aclsize == 0) {
             while (0 < rulesize) {
-                org.jdom2.Element conditions = base.getService().getRule(0).getCondition();
+                Element conditions = base.getService().getRule(0).getCondition();
                 String permission = base.getService().getRule(0).getPermission();
                 if (storedrules.contains(permission)) {
                     MCRAccessManager.updateRule(base.getId(), permission, conditions, "");

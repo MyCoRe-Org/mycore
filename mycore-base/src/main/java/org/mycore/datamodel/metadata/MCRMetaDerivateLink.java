@@ -59,7 +59,7 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         super.href = owner + '/' + path;
     }
 
-    public void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public void setFromDOM(Element element) throws MCRException {
         super.setFromDOM(element);
         List<Element> childrenList = element.getChildren(MCRMetaDerivateLink.ANNOTATION);
         if (childrenList == null) {

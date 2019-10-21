@@ -289,7 +289,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      *                if the class can't loaded
      */
     @SuppressWarnings("unchecked")
-    public final void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public final void setFromDOM(Element element) throws MCRException {
 
         String fullname;
         Class<? extends MCRMetaInterface> forName;

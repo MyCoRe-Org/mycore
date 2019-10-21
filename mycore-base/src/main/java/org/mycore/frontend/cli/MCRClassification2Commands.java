@@ -45,6 +45,7 @@ import org.hibernate.Session;
 import org.jdom2.Document;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
@@ -266,7 +267,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         FileOutputStream out = new FileOutputStream(xmlOutput);
         if (trans != null) {
             StreamResult sr = new StreamResult(out);
-            trans.transform(new org.jdom2.transform.JDOMSource(classDoc), sr);
+            trans.transform(new JDOMSource(classDoc), sr);
         } else {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             xout.output(classDoc, out);
