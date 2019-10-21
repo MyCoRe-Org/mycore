@@ -11,6 +11,7 @@
   <name>MyCoRe MODS</name>
   <properties>
     <manifest.priority>50</manifest.priority>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>

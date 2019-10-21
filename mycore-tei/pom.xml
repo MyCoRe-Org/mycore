@@ -28,9 +28,6 @@
   </parent>
   <artifactId>mycore-tei</artifactId>
   <name>MyCoRe TEI</name>
-  <properties>
-    <pmd.failOnViolation>true</pmd.failOnViolation>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>

@@ -11,7 +11,6 @@
   <name>MyCoRe ACL editor2</name>
   <properties>
     <manifest.priority>70</manifest.priority>
-    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>

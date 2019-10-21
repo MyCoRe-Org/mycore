@@ -59,7 +59,7 @@
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <node.version>v6.9.1</node.version>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
+    <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
     <site.suffix />
     <swagger.version>2.0.6</swagger.version>

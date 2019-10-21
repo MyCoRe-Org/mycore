@@ -11,7 +11,6 @@
   <name>MyCoRe Sitemap Protocol support</name>
   <properties>
     <manifest.priority>30</manifest.priority>
-    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>

@@ -9,6 +9,9 @@
   </parent>
   <artifactId>mycore-sword</artifactId>
   <name>MyCoRe SWORD Interface</name>
+  <properties>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
+  </properties>
   <dependencies>
     <!-- additional dependencies for the sword-common code -->
     <dependency>

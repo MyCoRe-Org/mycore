@@ -18,6 +18,7 @@
     <HostName>127.0.0.1</HostName>
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
     <jetty.port>9201</jetty.port>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>
