@@ -118,14 +118,14 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     public final void delete(String from, String to, String type) {
         from = checkAttributeIsNotEmpty(from, "from");
         StringBuilder sb = new StringBuilder();
-        sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append("'");
+        sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append('\'');
         MCRUtils.filterTrimmedNotEmpty(to)
             .ifPresent(trimmedTo -> {
-                sb.append(" and MCRTO = '").append(trimmedTo).append("'");
+                sb.append(" and MCRTO = '").append(trimmedTo).append('\'');
             });
         MCRUtils.filterTrimmedNotEmpty(type)
             .ifPresent(trimmedType -> {
-                sb.append(" and MCRTYPE = '").append(trimmedType).append("'");
+                sb.append(" and MCRTYPE = '").append(trimmedType).append('\'');
             });
         LOGGER.debug("Deleting {} from database MCRLINKHREF", from);
         Session session = getSession();
