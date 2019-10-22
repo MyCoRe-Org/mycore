@@ -19,7 +19,6 @@
 package org.mycore.solr.search;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.Locale;
 
@@ -90,7 +89,7 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
     }
 
     @Override
-    public String getQueryAsString() throws UnsupportedEncodingException {
+    public String getQueryAsString() {
         configureSolrQuery();
         return solrQuery.toString();
     }

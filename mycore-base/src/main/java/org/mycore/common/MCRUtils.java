@@ -46,12 +46,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -67,6 +70,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
+import org.mycore.common.function.MCRThrowableTask;
 import org.mycore.datamodel.niofs.MCRPathUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -521,5 +525,36 @@ public class MCRUtils {
         return Optional.ofNullable(value)
             .map(String::trim)
             .filter(s -> !s.isEmpty());
+    }
+
+    /**
+     * Measures the time of a method call.
+     * timeHandler is guaranteed to be called even if exception is thrown.
+     * @param unit time unit for timeHandler
+     * @param timeHandler gets the duration in <code>unit</code>
+     * @param task method reference
+     * @throws T if task.run() throws Exception
+     */
+    public static <T extends Throwable> void measure(TimeUnit unit, Consumer<Long> timeHandler,
+        MCRThrowableTask<T> task) throws T {
+        long time = System.nanoTime();
+        try {
+            task.run();
+        } finally {
+            time = System.nanoTime() - time;
+            timeHandler.accept(unit.convert(time, TimeUnit.NANOSECONDS));
+        }
+    }
+
+    /**
+     * Measures and logs the time of a method call
+     * @param task method reference
+     * @throws T if task.run() throws Exception
+     */
+    public static <T extends Throwable> Duration measure(MCRThrowableTask<T> task) throws T {
+        long time = System.nanoTime();
+        task.run();
+        time = System.nanoTime() - time;
+        return Duration.of(time, TimeUnit.NANOSECONDS.toChronoUnit());
     }
 }
