@@ -263,7 +263,7 @@ public class MCRIFS2Commands {
         boolean checkOnly) throws IOException {
         if (Files.isDirectory(node)) {
             LOGGER.debug("fixMCRFSNODESForNode (directory) : {}", node.toAbsolutePath().toString());
-            fixDirectoryEntry(node, derivateId, storageBase, checkOnly);
+            fixDirectoryEntry(node, derivateId, checkOnly);
             try (Stream<Path> stream = Files.list(node)) {
                 Path[] nodes = stream.toArray(Path[]::new);
                 for (Path nextNode : nodes) {
@@ -280,7 +280,7 @@ public class MCRIFS2Commands {
 
     }
 
-    private static void fixDirectoryEntry(Path node, String derivateId, String storageBase, boolean checkOnly) {
+    private static void fixDirectoryEntry(Path node, String derivateId, boolean checkOnly) {
         String name = node.getFileName().toString();
         LOGGER.debug("fixDirectoryEntry : name = {}", name);
         Session session = MCRHIBConnection.instance().getSession();

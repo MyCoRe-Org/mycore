@@ -56,21 +56,7 @@ public abstract class MCRFilesystemNode {
 
     protected static MCRFileMetadataManager manager = MCRFileMetadataManager.instance();
 
-    public static MCRFilesystemNode getNode(String id) {
-        if (id == null || id.trim().length() == 0) {
-            throw new MCRUsageException("ID is an empty String or null");
-        }
-
-        return manager.retrieveNode(id);
-    }
-
-    public static MCRFilesystemNode getRootNode(String ownerID) {
-        if (ownerID == null || ownerID.trim().length() == 0) {
-            throw new MCRUsageException("owner ID is an empty String or null");
-        }
-
-        return manager.retrieveRootNode(ownerID);
-    }
+    protected static DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS", Locale.ROOT);
 
     protected String id;
 
@@ -89,11 +75,11 @@ public abstract class MCRFilesystemNode {
     /** The size in number of bytes */
     protected long size;
 
-    /** The date of last modification of this node */
-    private GregorianCalendar lastModified;
-
     /** A flag indicating if this node is deleted and therefore invalid */
     protected boolean deleted = false;
+
+    /** The date of last modification of this node */
+    private GregorianCalendar lastModified;
 
     protected MCRFilesystemNode(String name, String ownerID) {
         this(name, null, ownerID);
@@ -136,6 +122,53 @@ public abstract class MCRFilesystemNode {
         this.size = size;
         lastModified = date;
         deleted = false;
+    }
+
+    public static MCRFilesystemNode getNode(String id) {
+        if (id == null || id.trim().length() == 0) {
+            throw new MCRUsageException("ID is an empty String or null");
+        }
+
+        return manager.retrieveNode(id);
+    }
+
+    public static MCRFilesystemNode getRootNode(String ownerID) {
+        if (ownerID == null || ownerID.trim().length() == 0) {
+            throw new MCRUsageException("owner ID is an empty String or null");
+        }
+
+        return manager.retrieveRootNode(ownerID);
+    }
+
+    /**
+     * Takes a file size in bytes and formats it as a string for output. For
+     * values &lt; 5 KB the output format is for example "320 Byte". For values
+     * &gt; 5 KB the output format is for example "6,8 KB". For values &gt; 1 MB
+     * the output format is for example "3,45 MB".
+     */
+    public static String getSizeFormatted(long bytes) {
+        String sizeUnit;
+        String sizeText;
+        double sizeValue;
+
+        if (bytes >= 1024 * 1024) {// >= 1 MB
+            sizeUnit = "MB";
+            sizeValue = (double) Math.round(bytes / 10485.76) / 100;
+        } else if (bytes >= 5 * 1024) { // >= 5 KB
+            sizeUnit = "KB";
+            sizeValue = (double) Math.round(bytes / 102.4) / 10;
+        } else { // < 5 KB
+            sizeUnit = "Byte";
+            sizeValue = bytes;
+        }
+
+        sizeText = String.valueOf(sizeValue).replace('.', ',');
+
+        if (sizeText.endsWith(",0")) {
+            sizeText = sizeText.substring(0, sizeText.length() - 2);
+        }
+
+        return sizeText + " " + sizeUnit;
     }
 
     protected void storeNew() {
@@ -252,23 +285,6 @@ public abstract class MCRFilesystemNode {
         return deleted;
     }
 
-    /**
-     * Sets the name of this node
-     */
-    public void setName(String name) {
-        ensureNotDeleted();
-
-        if (this.name != null && this.name.equals(name)) {
-            return;
-        }
-
-        checkName(name, true);
-        this.name = name;
-
-        touch(true);
-        fireUpdateEvent();
-    }
-
     protected void touch(boolean recursive) {
         touch(null, recursive);
     }
@@ -309,6 +325,34 @@ public abstract class MCRFilesystemNode {
     }
 
     /**
+     * Sets the name of this node
+     */
+    public void setName(String name) {
+        ensureNotDeleted();
+
+        if (this.name != null && this.name.equals(name)) {
+            return;
+        }
+
+        checkName(name, true);
+        this.name = name;
+
+        touch(true);
+        fireUpdateEvent();
+    }
+
+    /**
+     * Returns the label of this node
+     *
+     * @return the label of this node, or null
+     */
+    public String getLabel() {
+        ensureNotDeleted();
+
+        return label;
+    }
+
+    /**
      * Sets the label of this node
      *
      * @param label
@@ -328,17 +372,6 @@ public abstract class MCRFilesystemNode {
         this.label = label;
         touch(true);
         fireUpdateEvent();
-    }
-
-    /**
-     * Returns the label of this node
-     *
-     * @return the label of this node, or null
-     */
-    public String getLabel() {
-        ensureNotDeleted();
-
-        return label;
     }
 
     /**
@@ -395,37 +428,6 @@ public abstract class MCRFilesystemNode {
         ensureNotDeleted();
 
         return getSizeFormatted(size);
-    }
-
-    /**
-     * Takes a file size in bytes and formats it as a string for output. For
-     * values &lt; 5 KB the output format is for example "320 Byte". For values
-     * &gt; 5 KB the output format is for example "6,8 KB". For values &gt; 1 MB
-     * the output format is for example "3,45 MB".
-     */
-    public static String getSizeFormatted(long bytes) {
-        String sizeUnit;
-        String sizeText;
-        double sizeValue;
-
-        if (bytes >= 1024 * 1024) {// >= 1 MB
-            sizeUnit = "MB";
-            sizeValue = (double) Math.round(bytes / 10485.76) / 100;
-        } else if (bytes >= 5 * 1024) { // >= 5 KB
-            sizeUnit = "KB";
-            sizeValue = (double) Math.round(bytes / 102.4) / 10;
-        } else { // < 5 KB
-            sizeUnit = "Byte";
-            sizeValue = bytes;
-        }
-
-        sizeText = String.valueOf(sizeValue).replace('.', ',');
-
-        if (sizeText.endsWith(",0")) {
-            sizeText = sizeText.substring(0, sizeText.length() - 2);
-        }
-
-        return sizeText + " " + sizeUnit;
     }
 
     /**
@@ -540,8 +542,6 @@ public abstract class MCRFilesystemNode {
             return dataFile.getContent();
         }
     }
-
-    protected static DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS", Locale.ROOT);
 
     @Override
     public String toString() {

@@ -35,8 +35,6 @@ package org.mycore.common;
  * @version $Revision$ $Date$
  */
 public class MCRCrypt {
-    private MCRCrypt() {
-    } // defined so class can't be instantiated.
 
     private static final int ITERATIONS = 16;
 
@@ -303,6 +301,9 @@ public class MCRCrypt {
             0x08200000, 0x08000020, 0x00208000, 0x00008020, 0x08008020, 0x08200000, 0x00000020, 0x08208000, 0x00208020,
             0x00000000,
             0x08000000, 0x08200020, 0x00008000, 0x00208020, }, };
+
+    private MCRCrypt() {
+    } // defined so class can't be instantiated.
 
     private static int byteToUnsigned(byte b) {
         return b >= 0 ? (int) b : b + 256;
