@@ -19,12 +19,13 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -68,116 +70,112 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
     @Override
     public void doGetPost(MCRServletJob job) throws Exception {
-        long time = System.nanoTime();
+        LOGGER.info("ClassificationBrowser finished in {} ms.", MCRUtils.measure(() -> processRequest(job)).toMillis());
+    }
 
+    private void processRequest(MCRServletJob job) throws IOException, TransformerException, SAXException {
         HttpServletRequest req = job.getRequest();
+        Settings settings = Settings.fromRequest(req);
 
-        String classifID = req.getParameter("classification");
-        String categID = req.getParameter("category");
+        LOGGER.info("ClassificationBrowser {} {}", settings.getClassifID(), settings.getCategID().orElse(""));
 
-        boolean countResults = Boolean.valueOf(req.getParameter("countresults"));
-        boolean addClassId = Boolean.valueOf(req.getParameter("addclassid"));
-        boolean uri = Boolean.valueOf(req.getParameter("adduri"));
-
-        String el = req.getParameter("emptyleaves");
-        boolean emptyLeaves = true;
-        if ((el != null) && (el.trim().length() > 0)) {
-            emptyLeaves = Boolean.valueOf(el);
-        }
-
-        LOGGER.info("ClassificationBrowser {} {}", classifID, categID == null ? "" : categID);
-
-        MCRCategoryID id = new MCRCategoryID(classifID, categID);
-        Element xml = new Element("classificationBrowserData");
-        xml.setAttribute("classification", classifID);
-        xml.setAttribute("webpage", req.getParameter("webpage"));
-
-        MCRQueryAdapter queryAdapter = null;
-
-        String field = req.getParameter("field");
-        if (countResults || (field != null && field.length() > 0)) {
-            queryAdapter = getQueryAdapter(field);
-
-            configureQueryAdapter(queryAdapter, req);
-            if (queryAdapter.getObjectType() != null) {
-                xml.setAttribute("objectType", queryAdapter.getObjectType());
-            }
-        }
-
-        String parameters = req.getParameter("parameters");
-        if (parameters != null) {
-            xml.setAttribute("parameters", parameters);
-        }
-
-        List<Element> data = new ArrayList<>();
+        MCRCategoryID id = settings.getCategID()
+            .map(categId -> new MCRCategoryID(settings.getClassifID(), categId))
+            .orElse(MCRCategoryID.rootID(settings.getClassifID()));
         MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 1);
         if (category == null) {
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, "Could not find category: " + id);
             return;
         }
+        Element xml = getClassificationBrowserData(req, settings, category);
+        renderToHTML(job, settings, xml);
+    }
+
+    private Element getClassificationBrowserData(HttpServletRequest req, Settings settings,
+        MCRCategory category) {
+        Element xml = new Element("classificationBrowserData");
+        xml.setAttribute("classification", settings.getClassifID());
+        xml.setAttribute("webpage", settings.getWebpage());
+        settings.getParameters().ifPresent(p -> xml.setAttribute("parameters", "p"));
+
+        Optional<MCRQueryAdapter> queryAdapter = configureQueryAdapter(req, settings, xml);
+
+        Function<MCRCategoryID, String> toIdSearchValue = settings.addClassId() ? MCRCategoryID::toString
+            : MCRCategoryID::getID;
+        List<Element> data = new ArrayList<>();
         for (MCRCategory child : category.getChildren()) {
-            String childID = child.getId().getID();
-            long numResults = 0;
-            if (queryAdapter != null) {
-                queryAdapter.setCategory(addClassId ? child.getId().toString() : childID);
-            }
-            if (countResults) {
-                numResults = queryAdapter.getResultCount();
-                if ((!emptyLeaves) && (numResults < 1)) {
-                    continue;
-                }
+            queryAdapter.ifPresent(qa -> qa.setCategory(toIdSearchValue.apply(child.getId())));
+            long numResults = queryAdapter
+                .filter(qa -> settings.countResults())
+                .map(MCRQueryAdapter::getResultCount)
+                .orElse(0L);
+            if ((settings.removeEmptyLeaves()) && (numResults < 1)) {
+                continue;
             }
 
-            Element categoryE = new Element("category");
+            Element categoryE = getCategoryElement(child, numResults, settings);
+            queryAdapter.ifPresent(qa -> categoryE.setAttribute("query", qa.getQueryAsString()));
             data.add(categoryE);
-            if (countResults) {
-                categoryE.setAttribute("numResults", String.valueOf(numResults));
-            }
-
-            categoryE.setAttribute("id", childID);
-            categoryE.setAttribute("children", Boolean.toString(child.hasChildren()));
-            if (queryAdapter != null) {
-                categoryE.setAttribute("query", queryAdapter.getQueryAsString());
-            }
-
-            if (uri && (child.getURI() != null)) {
-                categoryE.addContent(new Element("uri").setText(child.getURI().toString()));
-            }
-
-            addLabel(req, child, categoryE);
         }
 
-        String objectType = queryAdapter == null ? null : queryAdapter.getObjectType();
-        countLinks(req, emptyLeaves, objectType, category, data);
-        sortCategories(req, data);
+        String objectType = queryAdapter.map(MCRQueryAdapter::getObjectType).orElse(null);
+        countLinks(settings, objectType, category, data);
+        sortCategories(settings.getSortBy(), data);
         xml.addContent(data);
-        renderToHTML(job, req, xml);
+        return xml;
+    }
 
-        time = (System.nanoTime() - time) / 1000000;
-        LOGGER.info("ClassificationBrowser finished in {} ms", time);
+    private Element getCategoryElement(MCRCategory category, long numResults,
+        Settings settings) {
+        Element categoryE = new Element("category");
+        if (settings.countResults()) {
+            categoryE.setAttribute("numResults", String.valueOf(numResults));
+        }
+
+        categoryE.setAttribute("id", category.getId().getID());
+        categoryE.setAttribute("children", Boolean.toString(category.hasChildren()));
+
+        if (settings.addUri() && (category.getURI() != null)) {
+            categoryE.addContent(new Element("uri").setText(category.getURI().toString()));
+        }
+
+        addLabel(settings, category, categoryE);
+        return categoryE;
+    }
+
+    private Optional<MCRQueryAdapter> configureQueryAdapter(HttpServletRequest req, Settings settings, Element xml) {
+        if (settings.countResults() || settings.getField().isPresent()) {
+            MCRQueryAdapter queryAdapter = getQueryAdapter(settings.getField().orElse(null));
+
+            configureQueryAdapter(queryAdapter, req);
+            if (queryAdapter.getObjectType() != null) {
+                xml.setAttribute("objectType", queryAdapter.getObjectType());
+            }
+            return Optional.of(queryAdapter);
+        }
+        return Optional.empty();
     }
 
     /**
      * Add label in current lang, otherwise default lang, optional with
      * description
      */
-    private void addLabel(HttpServletRequest req, MCRCategory child, Element category) {
+    private void addLabel(Settings settings, MCRCategory child, Element category) {
         MCRLabel label = child.getCurrentLabel()
             .orElseThrow(() -> new MCRException("Category " + child.getId() + " has no labels."));
 
         category.addContent(new Element("label").setText(label.getText()));
 
         // if true, add description
-        boolean descr = Boolean.valueOf(req.getParameter("adddescription"));
-        if (descr && (label.getDescription() != null)) {
+        if (settings.addDescription() && (label.getDescription() != null)) {
             category.addContent(new Element("description").setText(label.getDescription()));
         }
     }
 
     /** Add link count to each category */
-    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategory category,
+    private void countLinks(Settings settings, String objectType, MCRCategory category,
         List<Element> data) {
-        if (!Boolean.valueOf(req.getParameter("countlinks"))) {
+        if (!settings.countLinks()) {
             return;
         }
         String objType = objectType;
@@ -193,15 +191,14 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
             int num = (count.containsKey(childID) ? count.get(childID).intValue() : 0);
             child.setAttribute("numLinks", String.valueOf(num));
-            if ((!emptyLeaves) && (num < 1)) {
+            if ((settings.removeEmptyLeaves()) && (num < 1)) {
                 it.remove();
             }
         }
     }
 
     /** Sorts by id, by label in current language, or keeps natural order */
-    private void sortCategories(HttpServletRequest req, List<Element> data) {
-        final String sortBy = req.getParameter("sortby");
+    private void sortCategories(String sortBy, List<Element> data) {
         switch (sortBy) {
             case "id":
                 data.sort(Comparator.comparing(e -> e.getAttributeValue("id")));
@@ -215,17 +212,13 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     }
 
     /** Sends output to client browser 
-     * @throws SAXException 
-     * @throws TransformerException */
-    private void renderToHTML(MCRServletJob job, HttpServletRequest req, Element xml)
+     */
+    private void renderToHTML(MCRServletJob job, Settings settings, Element xml)
         throws IOException, TransformerException,
         SAXException {
-        String style = req.getParameter("style"); // XSL.Style, optional
-        if ((style != null) && (style.length() > 0)) {
-            req.setAttribute("XSL.Style", style);
-        }
-
-        MCRServlet.getLayoutService().doLayout(req, job.getResponse(), new MCRJDOMContent(xml));
+        settings.getStyle()
+            .ifPresent(style -> job.getRequest().setAttribute("XSL.Style", style)); // XSL.Style, optional
+        MCRServlet.getLayoutService().doLayout(job.getRequest(), job.getResponse(), new MCRJDOMContent(xml));
     }
 
     @Override
@@ -240,14 +233,115 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         void setCategory(String text);
 
-        void setObjectType(String text);
-
         String getObjectType();
+
+        void setObjectType(String text);
 
         long getResultCount();
 
-        String getQueryAsString() throws UnsupportedEncodingException;
+        String getQueryAsString();
 
         void configure(HttpServletRequest request);
+    }
+
+    private static class Settings {
+        private String classifID;
+
+        private String categID;
+
+        private boolean countResults;
+
+        private boolean addClassId;
+
+        private boolean addUri;
+
+        private boolean removeEmptyLeaves;
+
+        private String webpage;
+
+        private String field;
+
+        private String parameters;
+
+        private boolean addDescription;
+
+        private boolean countLinks;
+
+        private String sortBy;
+
+        private String style;
+
+        static Settings fromRequest(HttpServletRequest req) {
+            Settings s = new Settings();
+            s.classifID = req.getParameter("classification");
+            s.categID = req.getParameter("category");
+            s.countResults = Boolean.parseBoolean(req.getParameter("countresults"));
+            s.addClassId = Boolean.parseBoolean(req.getParameter("addclassid"));
+            s.addUri = Boolean.parseBoolean(req.getParameter("adduri"));
+            s.removeEmptyLeaves = !Optional.ofNullable(req.getParameter("emptyleaves"))
+                .map(Boolean::valueOf)
+                .orElse(true);
+            s.webpage = req.getParameter("webpage");
+            s.field = req.getParameter("field");
+            s.parameters = req.getParameter("parameters");
+            s.addDescription = Boolean.parseBoolean(req.getParameter("adddescription"));
+            s.countLinks = Boolean.parseBoolean(req.getParameter("countlinks"));
+            s.sortBy = req.getParameter("sortby");
+            s.style = req.getParameter("style");
+            return s;
+        }
+
+        String getSortBy() {
+            return sortBy;
+        }
+
+        Optional<String> getStyle() {
+            return MCRUtils.filterTrimmedNotEmpty(style);
+        }
+
+        String getClassifID() {
+            return classifID;
+        }
+
+        Optional<String> getCategID() {
+            return MCRUtils.filterTrimmedNotEmpty(categID);
+        }
+
+        boolean countResults() {
+            return countResults;
+        }
+
+        boolean countLinks() {
+            return countLinks;
+        }
+
+        boolean addClassId() {
+            return addClassId;
+        }
+
+        boolean addUri() {
+            return addUri;
+        }
+
+        boolean removeEmptyLeaves() {
+            return removeEmptyLeaves;
+        }
+
+        boolean addDescription() {
+            return addDescription;
+        }
+
+        String getWebpage() {
+            return webpage;
+        }
+
+        Optional<String> getField() {
+            return MCRUtils.filterTrimmedNotEmpty(field);
+        }
+
+        Optional<String> getParameters() {
+            return MCRUtils.filterTrimmedNotEmpty(parameters);
+        }
+
     }
 }
