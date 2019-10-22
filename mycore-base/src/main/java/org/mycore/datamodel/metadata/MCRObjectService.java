@@ -138,7 +138,7 @@ public class MCRObjectService {
             for (Element dateElement : dateList) {
                 String dateElementName = dateElement.getName();
 
-                if (!dateElementName.equals("servdate")) {
+                if (!"servdate".equals(dateElementName)) {
                     continue;
                 }
 

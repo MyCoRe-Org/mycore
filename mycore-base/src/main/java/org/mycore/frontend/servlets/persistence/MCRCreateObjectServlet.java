@@ -26,8 +26,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
@@ -48,8 +46,6 @@ import org.xml.sax.SAXParseException;
 public class MCRCreateObjectServlet extends MCRPersistenceServlet {
 
     private static final long serialVersionUID = 4143057048219690238L;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private boolean appendDerivate = false;
 

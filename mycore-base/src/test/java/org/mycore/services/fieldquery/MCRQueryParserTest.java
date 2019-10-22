@@ -79,7 +79,9 @@ public class MCRQueryParserTest extends MCRTestCase {
         queryStringParsed = queryParser.parse(bool);
         System.out.println("XML query parser test 4 :" + queryStringParsed);
         assertEquals("Returned value is not",
-            "((title contains \"Amt\") AND (title contains \"und\") AND (title contains \"Würde\")) OR ((title contains \"Amt\") AND (title phrase \"und Würde\")) OR ((title contains \"Amt\") AND (title contains \"und\") AND (title contains \"(Würde)\"))",
+            "((title contains \"Amt\") AND (title contains \"und\") AND (title contains \"Würde\")) OR "
+                + "((title contains \"Amt\") AND (title phrase \"und Würde\")) OR ((title contains \"Amt\") AND "
+                + "(title contains \"und\") AND (title contains \"(Würde)\"))",
             queryStringParsed.toString());
     }
 

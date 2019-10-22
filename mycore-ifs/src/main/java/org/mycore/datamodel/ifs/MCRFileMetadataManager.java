@@ -54,32 +54,11 @@ public class MCRFileMetadataManager {
     /** The single instance of this class * */
     private static MCRFileMetadataManager manager;
 
-    /** Returns the single instance of this class to use * */
-    public static synchronized MCRFileMetadataManager instance() {
-        if (manager == null) {
-            manager = new MCRFileMetadataManager();
-        }
-
-        return manager;
-    }
-
     /** Cache containing the most recently used MCRFilesystemNode objects * */
     private MCRCache<String, MCRFilesystemNode> cache;
 
     /** The store that holds all saved MCRFilesystemNode metadata * */
     private MCRFileMetadataStore store;
-
-    /** Creates the single instance of this class * */
-    private MCRFileMetadataManager() {
-        MCRConfiguration config = MCRConfiguration.instance();
-
-        // The FileMetadataStore to use
-        store = config.getInstanceOf("MCR.Persistence.IFS.FileMetadataStore.Class");
-
-        // The cache size for the MCRFilesystemNode cache
-        int size = config.getInt("MCR.IFS.FileMetadataStore.CacheSize", 500);
-        cache = new MCRCache<>(size, "IFS FileSystemNodes");
-    }
 
     /**
      * Last number that was used for creating a unique ID for each
@@ -93,6 +72,27 @@ public class MCRFileMetadataManager {
      * IDs for each MCRFilesystemNode
      */
     private String prefix;
+
+    /** Creates the single instance of this class * */
+    private MCRFileMetadataManager() {
+        MCRConfiguration config = MCRConfiguration.instance();
+
+        // The FileMetadataStore to use
+        store = config.getInstanceOf("MCR.Persistence.IFS.FileMetadataStore.Class");
+
+        // The cache size for the MCRFilesystemNode cache
+        int size = config.getInt("MCR.IFS.FileMetadataStore.CacheSize", 500);
+        cache = new MCRCache<>(size, "IFS FileSystemNodes");
+    }
+
+    /** Returns the single instance of this class to use * */
+    public static synchronized MCRFileMetadataManager instance() {
+        if (manager == null) {
+            manager = new MCRFileMetadataManager();
+        }
+
+        return manager;
+    }
 
     /**
      * Creates a prefix for all generated IDs. This ID is derived from the
