@@ -127,7 +127,7 @@ public class MCRTextResolverTest extends MCRTestCase {
         assertFalse("No circular dependency occurred", true);
     }
 
-    private static class UppercaseTerm extends Term {
+    public static class UppercaseTerm extends Term {
 
         public UppercaseTerm(MCRTextResolver textResolver) {
             super(textResolver);

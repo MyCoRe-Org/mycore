@@ -28,8 +28,7 @@ import org.mycore.common.config.MCRConfiguration;
 public class MCRSystemUserInformation implements MCRUserInformation {
 
     private static MCRSystemUserInformation janitorInstance = new MCRSystemUserInformation(
-        new UserIdResolver("MCRJANITOR", null)
-        , true);
+        new UserIdResolver("MCRJANITOR", null), true);
 
     private static MCRSystemUserInformation systemInstance = new MCRSystemUserInformation(new UserIdResolver("SYSTEM",
         null), false);
@@ -103,7 +102,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
 
         private String property;
 
-        public UserIdResolver(String userId, String property) {
+        UserIdResolver(String userId, String property) {
             this.userId = userId;
             this.property = property;
         }

@@ -69,7 +69,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
  *  <li>if id=derivateID/directoryPath (delivers all files in the given directory of the derivate)</li>
  * </ol>
  * 
- * "id" maybe specified as {@link HttpServletRequest#getPathInfo()} or as {@link MCRServlet#getProperty(HttpServletRequest, String)}.
+ * "id" maybe specified as {@link HttpServletRequest#getPathInfo()} or as
+ * {@link MCRServlet#getProperty(HttpServletRequest, String)}.
  * @author Thomas Scheffler (yagee)
  *
  */
@@ -117,7 +118,8 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
             return;
         }
         boolean readPermission = id.getTypeId().equals("derivate") ? MCRAccessManager
-            .checkDerivateContentPermission(id, PERMISSION_READ) : MCRAccessManager.checkPermission(id, PERMISSION_READ);
+            .checkDerivateContentPermission(id, PERMISSION_READ)
+            : MCRAccessManager.checkPermission(id, PERMISSION_READ);
         if (!readPermission) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, "You may not read " + id);
             return;
@@ -262,7 +264,7 @@ public abstract class MCRCompressServlet<T extends AutoCloseable> extends MCRSer
 
         private T container;
 
-        public CompressVisitor(MCRCompressServlet<T> impl, T container) {
+        CompressVisitor(MCRCompressServlet<T> impl, T container) {
             this.impl = impl;
             this.container = container;
         }

@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
@@ -75,7 +75,7 @@ public class MetsResource {
         InputStream resourceAsStream = MCRClassTools.getClassLoader().getResourceAsStream("mets-editor.html");
         try {
             StringWriter writer = new StringWriter();
-            IOUtils.copy(resourceAsStream, writer, Charset.forName("UTF-8"));
+            IOUtils.copy(resourceAsStream, writer, StandardCharsets.UTF_8);
             String htmlTemplate = writer.toString();
             // add additional javascript code
             String js = MCRConfiguration.instance().getString("MCR.Mets.Editor.additional.javascript", null);

@@ -113,7 +113,8 @@ public class MCRErrorServlet extends HttpServlet {
                         }
                     }
                     if (quality > 0.5) {
-                        //firefox 18 accepts every media type when requesting images with 0.5 but closes stream immediately when detecting text/html
+                        //firefox 18 accepts every media type when requesting images with 0.5
+                        // but closes stream immediately when detecting text/html
                         return true;
                     }
                 }
@@ -228,8 +229,9 @@ public class MCRErrorServlet extends HttpServlet {
                     setWebAppBaseURL(session, request);
                     LAYOUT_SERVICE.doLayout(request, response, new MCRJDOMContent(errorDoc));
                 } finally {
-                    if (!openTransaction)
+                    if (!openTransaction) {
                         session.commitTransaction();
+                    }
                 }
             } finally {
                 if (exceptionThrown || !currentSessionActive) {

@@ -17,7 +17,8 @@
  */
 
 /**
- * Contains abstract classes and factories to build a {@link java.nio.file.FileSystem} on top of different implementations.
+ * Contains abstract classes and factories to build a {@link java.nio.file.FileSystem}
+ * on top of different implementations.
  * @author Thomas Scheffler (yagee)
  *
  */

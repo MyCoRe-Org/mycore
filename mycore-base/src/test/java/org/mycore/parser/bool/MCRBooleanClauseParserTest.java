@@ -45,10 +45,10 @@ public class MCRBooleanClauseParserTest {
     public void testSingleStrings() {
         MCROrCondition c01 = new MCROrCondition(new MCRTrueCondition(),
             new MCRFalseCondition(), new MCRTrueCondition());
-        System.out.println("Boolean claus test 1 --> " + c01.toString());
+        System.out.println("Boolean claus test 1 --> " + c01);
         assertEquals("Returned value is not", c01.toString(), p.parse("true or false or true").toString());
         assertEquals("Returned value is not", c01.toString(), p.parse("(true) or (false) or (true)").toString());
-        
+
         MCROrCondition c02 = new MCROrCondition(new MCRTrueCondition(),
             new MCROrCondition(new MCRFalseCondition(), new MCRTrueCondition()));
         assertEquals("Returned value is not", c02.toString(), p.parse("true or (false or true)").toString());
@@ -56,62 +56,62 @@ public class MCRBooleanClauseParserTest {
 
         MCRAndCondition c03 = new MCRAndCondition(new MCRTrueCondition(),
             new MCRFalseCondition(), new MCRTrueCondition());
-        System.out.println("Boolean claus test 3 --> " + c03.toString());
+        System.out.println("Boolean claus test 3 --> " + c03);
         assertEquals("Returned value is not", c03.toString(), p.parse("true and false and true").toString());
-        
-        MCROrCondition c04 = new MCROrCondition(new MCRTrueCondition(),new MCRAndCondition(
+
+        MCROrCondition c04 = new MCROrCondition(new MCRTrueCondition(), new MCRAndCondition(
             new MCRFalseCondition(), new MCRTrueCondition()));
-        System.out.println("Boolean claus test 4 --> " + c04.toString());
+        System.out.println("Boolean claus test 4 --> " + c04);
         assertEquals("Returned value is not", c04.toString(), p.parse("true or false and true").toString());
-        
+
         MCRCondition c05 = new MCRTrueCondition();
-        System.out.println("Boolean claus test 5 --> " + c05.toString());
+        System.out.println("Boolean claus test 5 --> " + c05);
         assertEquals("Returned value is not", c05.toString(), p.parse("true").toString());
         assertEquals("Returned value is not", c05.toString(), p.parse("(true)").toString());
         assertEquals("Returned value is not", c05.toString(), p.parse("(true )").toString());
-        
+
         try {
             p.parse("(true").toString();
             fail("Should have thrown MCRParseException but did not!");
         } catch (MCRParseException e) {
             final String msg = "Syntax error: missing bracket in \"(true\"";
-            assertEquals(msg, e.getMessage());            
+            assertEquals(msg, e.getMessage());
         }
         try {
             p.parse("(true) or false) or (true)").toString();
             fail("Should have thrown MCRParseException but did not!");
         } catch (MCRParseException e) {
             final String msg = "Syntax error: missing bracket in \"@<0>@ or false) or @<1>@\"";
-            assertEquals(msg, e.getMessage());            
+            assertEquals(msg, e.getMessage());
         }
         try {
             p.parse("true and (false and true").toString();
             fail("Should have thrown MCRParseException but did not!");
         } catch (MCRParseException e) {
             final String msg = "Syntax error: missing bracket in \"true and (false and true\"";
-            assertEquals(msg, e.getMessage());            
+            assertEquals(msg, e.getMessage());
         }
         try {
             p.parse("((((true or false))))) and true)").toString();
             fail("Should have thrown MCRParseException but did not!");
         } catch (MCRParseException e) {
             final String msg = "Syntax error: missing bracket in \"@<3>@) and true)\"";
-            assertEquals(msg, e.getMessage());            
+            assertEquals(msg, e.getMessage());
         }
         try {
             p.parse("true or true or (true or true))))").toString();
             fail("Should have thrown MCRParseException but did not!");
         } catch (MCRParseException e) {
             final String msg = "Syntax error: missing bracket in \"true or true or @<0>@)))\"";
-            assertEquals(msg, e.getMessage());            
+            assertEquals(msg, e.getMessage());
         }
         try {
             p.parse("(true ) or  ((((((((( ((false) or (true))").toString();
             fail("Should have thrown MCRParseException but did not!");
         } catch (MCRParseException e) {
-            System.out.println("##"+e.getMessage()+"##");
+            System.out.println("##" + e.getMessage() + "##");
             final String msg = "Syntax error: missing bracket in \"@<0>@ or  ((((((((( @<3>@\"";
-            assertEquals(msg, e.getMessage());            
+            assertEquals(msg, e.getMessage());
         }
     }
 
@@ -130,9 +130,9 @@ public class MCRBooleanClauseParserTest {
             p.parse(bool02);
             fail("Should have thrown MCRParseException but did not!");
         } catch (MCRParseException e) {
-            System.out.println("##"+e.getMessage()+"##");
+            System.out.println("##" + e.getMessage() + "##");
             final String msg = "Syntax error: <truhe>";
-            assertEquals(msg, e.getMessage());            
+            assertEquals(msg, e.getMessage());
         }
         Element bool03 = new Element("boolean");
         bool03.setAttribute("operators", "true");
@@ -140,9 +140,9 @@ public class MCRBooleanClauseParserTest {
             p.parse(bool03);
             fail("Should have thrown MCRParseException but did not!");
         } catch (MCRParseException e) {
-            System.out.println("##"+e.getMessage()+"##");
+            System.out.println("##" + e.getMessage() + "##");
             final String msg = "Syntax error: attribute operator not found";
-            assertEquals(msg, e.getMessage());            
+            assertEquals(msg, e.getMessage());
         }
     }
 }

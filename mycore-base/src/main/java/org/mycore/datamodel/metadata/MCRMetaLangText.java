@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 
 import com.google.gson.JsonObject;
 
@@ -56,86 +57,86 @@ public class MCRMetaLangText extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
+     * The language element was set. If the value of <em>lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * the value of <em>subtag</em>. If the value of <em>subtag</em>
      * is null or empty an exception was thrown. The type element was set to
-     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * the value of <em>type</em>, if it is null, an empty string was set
      * to the type element. The text element was set to the value of
-     * <em>set_text</em>, if it is null, an empty string was set
+     * <em>text</em>, if it is null, an empty string was set
      * to the text element.
-     * @param set_subtag       the name of the subtag
-     * @param default_lang     the default language
-     * @param set_type         the optional type string
-     * @param set_inherted     a value &gt;= 0
-     * @param set_form         the format string, if it is empty 'plain' is set.
-     * @param set_text         the text string
+     * @param subtag       the name of the subtag
+     * @param lang     the default language
+     * @param type         the optional type string
+     * @param inherted     a value &gt;= 0
+     * @param form         the format string, if it is empty 'plain' is set.
+     * @param text         the text string
      *
-     * @exception MCRException if the set_subtag value is null or empty
+     * @exception MCRException if the subtag value is null or empty
      */
-    public MCRMetaLangText(String set_subtag, String default_lang, String set_type, int set_inherted, String set_form,
-        String set_text) throws MCRException {
-        super(set_subtag, default_lang, set_type, set_inherted);
-        text = "";
+    public MCRMetaLangText(String subtag, String lang, String type, int inherted, String form, String text)
+        throws MCRException {
+        super(subtag, lang, type, inherted);
+        this.text = "";
 
-        if (set_text != null) {
-            text = set_text.trim();
+        if (text != null) {
+            this.text = text.trim();
         }
 
-        form = "plain";
+        this.form = "plain";
 
-        if (set_form != null) {
-            form = set_form.trim();
+        if (form != null) {
+            this.form = form.trim();
         }
     }
 
     /**
      * This method set the language, type and text.
      * 
-     * @param set_lang
+     * @param lang
      *            the new language string, if this is null or empty, nothing is
      *            to do
-     * @param set_type
+     * @param type
      *            the optional type string
-     * @param set_text
+     * @param text
      *            the new text string
      */
-    public final void set(String set_lang, String set_type, String set_form, String set_text) {
-        setLang(set_lang);
-        setType(set_type);
+    public final void set(String lang, String type, String form, String text) {
+        setLang(lang);
+        setType(type);
 
-        if (set_text != null) {
-            text = set_text.trim();
+        if (text != null) {
+            this.text = text.trim();
         }
 
-        form = "plain";
+        this.form = "plain";
 
-        if (set_form != null) {
-            form = set_form.trim();
+        if (form != null) {
+            this.form = form.trim();
         }
     }
 
     /**
      * This method set the text.
      * 
-     * @param set_text
+     * @param text
      *            the new text string
      */
-    public final void setText(String set_text) {
-        if (set_text != null) {
-            text = set_text.trim();
+    public final void setText(String text) {
+        if (text != null) {
+            this.text = text.trim();
         }
     }
 
     /**
      * This method set the form attribute.
      * 
-     * @param set_form
+     * @param form
      *            the new form string
      */
-    public final void setForm(String set_form) {
-        if (set_form != null) {
-            text = set_form.trim();
+    public final void setForm(String form) {
+        if (form != null) {
+            text = form.trim();
         }
     }
 
@@ -165,24 +166,24 @@ public class MCRMetaLangText extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
 
-        String temp_text = element.getText();
+        String tempText = element.getText();
 
-        if (temp_text == null) {
-            temp_text = "";
+        if (tempText == null) {
+            tempText = "";
         }
 
-        text = temp_text.trim();
+        text = tempText.trim();
 
-        String temp_form = element.getAttributeValue("form");
+        String tempForm = element.getAttributeValue("form");
 
-        if (temp_form == null) {
-            temp_form = "plain";
+        if (tempForm == null) {
+            tempForm = "plain";
         }
 
-        form = temp_form.trim();
+        form = tempForm.trim();
     }
 
     /**
@@ -194,11 +195,10 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaLangText part
      */
     @Override
-    public org.jdom2.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
-        if (form != null && (form = form.trim()).length() != 0) {
-            elm.setAttribute("form", form);
-        }
+        MCRUtils.filterTrimmedNotEmpty(form)
+            .ifPresent(s -> elm.setAttribute("form", s));
         elm.addContent(text);
 
         return elm;
@@ -239,12 +239,10 @@ public class MCRMetaLangText extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if (text == null || (text = text.trim()).length() == 0) {
-            throw new MCRException(getSubTag() + ": text is null or empty");
-        }
-        if (form == null || (form = form.trim()).length() == 0) {
-            form = "plain";
-        }
+        text = MCRUtils.filterTrimmedNotEmpty(text)
+            .orElseThrow(() -> new MCRException(getSubTag() + ": text is null or empty"));
+        form = MCRUtils.filterTrimmedNotEmpty(form)
+            .orElse("plain");
     }
 
     /**

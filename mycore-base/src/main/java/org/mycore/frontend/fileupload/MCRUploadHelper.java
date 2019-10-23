@@ -49,7 +49,7 @@ public abstract class MCRUploadHelper {
      * reserved URI characters should not be in uploaded filenames. See RFC3986,
      * Section 2.2
      */
-    private static final String reserverdCharacters = new String(
+    private static final String RESERVERD_CHARACTERS = new String(
         new char[] { ':', '?', '%', '#', '[', ']', '@', '!', '$', '&', '\'', '(',
             ')', '*', ',', ';', '=', '\'', '+' });
 
@@ -137,7 +137,7 @@ public abstract class MCRUploadHelper {
         return path
             .chars()
             .filter(
-                c -> c < '\u0020' || WINDOWS_RESERVED_CHARS.indexOf(c) != -1 || reserverdCharacters.indexOf(c) != -1);
+                c -> c < '\u0020' || WINDOWS_RESERVED_CHARS.indexOf(c) != -1 || RESERVERD_CHARACTERS.indexOf(c) != -1);
     }
 
     static String getFileName(String path) {

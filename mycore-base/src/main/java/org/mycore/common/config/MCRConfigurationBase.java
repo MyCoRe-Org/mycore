@@ -75,14 +75,14 @@ public final class MCRConfigurationBase {
      *
      * @see System#currentTimeMillis()
      */
-    public static final long getSystemLastModified() {
+    public static long getSystemLastModified() {
         return lastModifiedFile.lastModified();
     }
 
     /**
      * signalize that the system state has changed. Call this method when ever you changed the persistency layer.
      */
-    public static final void systemModified() {
+    public static void systemModified() {
         if (!lastModifiedFile.exists()) {
             try {
                 createLastModifiedFile();
@@ -127,7 +127,8 @@ public final class MCRConfigurationBase {
                 .filter(File::isDirectory).isPresent()) {
                 lastModifiedFile = dataDir.map(p -> new File(p, ".systemTime")).get();
             } else {
-                dataDir.ifPresent(d -> System.err.println("WARNING: MCR.dataDir does not exist: " + d.getAbsolutePath()));
+                dataDir
+                    .ifPresent(d -> System.err.println("WARNING: MCR.dataDir does not exist: " + d.getAbsolutePath()));
             }
         }
         if (lastModifiedFile == null) {
@@ -199,7 +200,8 @@ public final class MCRConfigurationBase {
             throw new MCRConfigurationException(
                 depUsedProps.entrySet().stream().map(e -> e.getKey() + " ==> " + e.getValue())
                     .collect(Collectors.joining("\n",
-                        "Found deprecated properties that are defined but will NOT BE USED. Please use the replacements:\n",
+                        "Found deprecated properties that are defined but will NOT BE USED. "
+                            + "Please use the replacements:\n",
                         "\n")));
         }
     }
@@ -296,7 +298,7 @@ public final class MCRConfigurationBase {
      * that existing mycore.properties files must not be migrated immediately.
      */
     private static synchronized void loadDeprecatedProperties() throws IOException {
-        try (InputStream in = MCRConfigurationBase.class.getResourceAsStream("/deprecated.properties")){
+        try (InputStream in = MCRConfigurationBase.class.getResourceAsStream("/deprecated.properties")) {
             if (in == null) {
                 return;
             }

@@ -23,6 +23,12 @@
  */
 package org.mycore.datamodel.classifications2.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -65,12 +71,6 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRStringTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.xml.sax.SAXParseException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class MCRCategoryDAOImplTest extends MCRJPATestCase {
 

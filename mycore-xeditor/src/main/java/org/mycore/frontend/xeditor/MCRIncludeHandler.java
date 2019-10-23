@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
 
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -80,14 +79,14 @@ public class MCRIncludeHandler {
      *               otherwise reload at each XEditor form transformation
      */
     public void preloadFromURIs(String uris, String sStatic)
-        throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerException, TransformerFactoryConfigurationError {
         for (String uri : uris.split(",")) {
             preloadFromURI(uri, sStatic);
         }
     }
 
     private void preloadFromURI(String uri, String sStatic)
-        throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerException, TransformerFactoryConfigurationError {
         if (uri.trim().isEmpty()) {
             return;
         }
@@ -234,7 +233,7 @@ public class MCRIncludeHandler {
     }
 
     private Element resolve(String uri, String sStatic)
-        throws TransformerConfigurationException, TransformerException, TransformerFactoryConfigurationError {
+        throws TransformerException, TransformerFactoryConfigurationError {
         Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
 
         if (cache.containsKey(uri)) {

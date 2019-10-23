@@ -62,7 +62,7 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     private static Logger LOGGER = LogManager.getLogger(MCRJobMaster.class);
 
-    private final MCRJobQueue JOB_QUEUE;
+    private final MCRJobQueue jobQueue;
 
     private Class<? extends MCRJobAction> action;
 
@@ -78,7 +78,7 @@ public class MCRJobMaster implements Runnable, Closeable {
         MCRShutdownHandler.getInstance().addCloseable(this);
         this.action = action;
         runLock = new ReentrantLock();
-        JOB_QUEUE = MCRJobQueue.getInstance(action);
+        jobQueue = MCRJobQueue.getInstance(action);
 
         MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
         processableCollection = new MCRProcessableDefaultCollection(getName());
@@ -129,7 +129,7 @@ public class MCRJobMaster implements Runnable, Closeable {
 
     /**
      * Starts local threads ({@link MCRJobThread}) and gives {@link MCRJob} instances to them.
-     * Use property <code>"MCR.QueuedJob.JobThreads"</code> to specify how many concurrent threads should be running.<br>
+     * Use property <code>"MCR.QueuedJob.JobThreads"</code> to specify how many concurrent threads should be running.
      * <code>"MCR.QueuedJob.activated"</code> can be used activate or deactivate general {@link MCRJob} running. 
      */
     @Override
@@ -142,14 +142,14 @@ public class MCRJobMaster implements Runnable, Closeable {
 
         boolean activated = CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated", true);
         activated = activated
-            && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "activated", true);
+            && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "activated", true);
 
         LOGGER.info("JobQueue{} is {}", MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"",
             activated ? "activated" : "deactivated");
         if (activated) {
             running = true;
             int jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads", 2);
-            jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + JOB_QUEUE.CONFIG_PREFIX_ADD + "JobThreads",
+            jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "JobThreads",
                 jobThreadCount);
 
             ThreadFactory slaveFactory = new ThreadFactory() {
@@ -190,8 +190,9 @@ public class MCRJobMaster implements Runnable, Closeable {
                     while (activeThreads.get() < jobThreadCount) {
                         runLock.lock();
                         try {
-                            if (!running)
+                            if (!running) {
                                 break;
+                            }
 
                             EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
                             EntityTransaction transaction = em.getTransaction();
@@ -201,8 +202,8 @@ public class MCRJobMaster implements Runnable, Closeable {
                             try {
                                 transaction.begin();
 
-                                job = JOB_QUEUE.poll();
-                                processableCollection.setProperty("queue size", JOB_QUEUE.size());
+                                job = jobQueue.poll();
+                                processableCollection.setProperty("queue size", jobQueue.size());
 
                                 if (job != null) {
                                     action = toMCRJobAction(job.getAction());
@@ -232,12 +233,12 @@ public class MCRJobMaster implements Runnable, Closeable {
                                 jobServe.submit(new MCRJobThread(job));
                             } else {
                                 try {
-                                    synchronized (JOB_QUEUE) {
+                                    synchronized (jobQueue) {
                                         if (running) {
                                             LOGGER.debug("No job in queue going to sleep");
                                             //fixes a race conditioned deadlock situation
                                             //do not wait longer than 60 sec. for a new MCRJob
-                                            JOB_QUEUE.wait(60000);
+                                            jobQueue.wait(60000);
                                         }
                                     }
                                 } catch (InterruptedException e) {
@@ -248,13 +249,14 @@ public class MCRJobMaster implements Runnable, Closeable {
                             runLock.unlock();
                         }
                     } // while(activeThreads.get() < jobThreadCount)
-                    if (activeThreads.get() < jobThreadCount)
+                    if (activeThreads.get() < jobThreadCount) {
                         try {
                             LOGGER.info("Waiting for a job to finish");
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             LOGGER.error("Job thread was interrupted.", e);
                         }
+                    }
                 } catch (PersistenceException e) {
                     LOGGER.warn("We have an database error, sleep and run later.", e);
                     try {
@@ -280,9 +282,9 @@ public class MCRJobMaster implements Runnable, Closeable {
         //signal master thread to stop now
         running = false;
         //Wake up, Neo!
-        synchronized (JOB_QUEUE) {
+        synchronized (jobQueue) {
             LOGGER.debug("Wake up queue");
-            JOB_QUEUE.notifyAll();
+            jobQueue.notifyAll();
         }
         runLock.lock();
         try {

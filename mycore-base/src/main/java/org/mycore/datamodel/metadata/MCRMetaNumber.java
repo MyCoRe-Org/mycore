@@ -82,16 +82,16 @@ public final class MCRMetaNumber extends MCRMetaDefault {
 
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    private int FRACTION_DIGITS;
+    private int fractionDigits;
 
-    private int DIMENSION_LENGTH;
+    private int dimensionLength;
 
-    private int MEASUREMENT_LENGTH;
+    private int measurementLength;
 
     private void loadProperties() {
-        FRACTION_DIGITS = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits", DEFAULT_FRACTION_DIGITS);
-        DIMENSION_LENGTH = CONFIG.getInt("MCR.Metadata.MetaNumber.DimensionLength", MAX_DIMENSION_LENGTH);
-        MEASUREMENT_LENGTH = CONFIG.getInt("MCR.Metadata.MetaNumber.MeasurementLength", MAX_MEASUREMENT_LENGTH);
+        fractionDigits = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits", DEFAULT_FRACTION_DIGITS);
+        dimensionLength = CONFIG.getInt("MCR.Metadata.MetaNumber.DimensionLength", MAX_DIMENSION_LENGTH);
+        measurementLength = CONFIG.getInt("MCR.Metadata.MetaNumber.MeasurementLength", MAX_MEASUREMENT_LENGTH);
     }
 
     /**
@@ -166,12 +166,12 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @param dimension
      *            the dimension string
      */
-    public final void setDimension(String dimension) {
+    public void setDimension(String dimension) {
         if (dimension == null) {
             this.dimension = "";
         } else {
-            if (dimension.length() > DIMENSION_LENGTH) {
-                this.dimension = dimension.substring(DIMENSION_LENGTH);
+            if (dimension.length() > dimensionLength) {
+                this.dimension = dimension.substring(dimensionLength);
                 LOGGER.warn("{}: dimension is too long: {}", getSubTag(), dimension.length());
             } else {
                 this.dimension = dimension;
@@ -186,12 +186,12 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @param measurement
      *            the measurement string
      */
-    public final void setMeasurement(String measurement) {
+    public void setMeasurement(String measurement) {
         if (measurement == null) {
             this.measurement = "";
         } else {
-            if (measurement.length() > MEASUREMENT_LENGTH) {
-                this.measurement = measurement.substring(MEASUREMENT_LENGTH);
+            if (measurement.length() > measurementLength) {
+                this.measurement = measurement.substring(measurementLength);
                 LOGGER.warn("{}: measurement is too long: {}", getSubTag(), measurement.length());
             } else {
                 this.measurement = measurement;
@@ -208,13 +208,13 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @exception MCRException
      *                if the number string is not in a number format
      */
-    public final void setNumber(String number) throws MCRException {
+    public void setNumber(String number) throws MCRException {
         try {
             if (number == null) {
                 throw new MCRException("Number cannot be null");
             }
-            String tmp_number = number.replace(',', '.');
-            this.number = new BigDecimal(tmp_number);
+            String tmpNumber = number.replace(',', '.');
+            this.number = new BigDecimal(tmpNumber);
         } catch (NumberFormatException e) {
             throw new MCRException("The format of a number is invalid.");
         }
@@ -228,7 +228,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @exception MCRException
      *                if the number string is null
      */
-    public final void setNumber(BigDecimal number) throws MCRException {
+    public void setNumber(BigDecimal number) throws MCRException {
         if (number == null) {
             throw new MCRException("Number cannot be null");
         }
@@ -240,7 +240,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *
      * @return the dimension String
      */
-    public final String getDimension() {
+    public String getDimension() {
         return dimension;
     }
 
@@ -249,7 +249,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *
      * @return the measurement String
      */
-    public final String getMeasurement() {
+    public String getMeasurement() {
         return measurement;
     }
 
@@ -258,7 +258,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *
      * @return the number as BigDecimal
      */
-    public final BigDecimal getNumberAsBigDecimal() {
+    public BigDecimal getNumberAsBigDecimal() {
         return number;
     }
 
@@ -269,11 +269,11 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *
      * @return the number as formatted String
      */
-    public final String getNumberAsString() {
+    public String getNumberAsString() {
         final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.ENGLISH);
         numberFormat.setGroupingUsed(false);
-        numberFormat.setMaximumFractionDigits(FRACTION_DIGITS);
-        numberFormat.setMinimumFractionDigits(FRACTION_DIGITS);
+        numberFormat.setMaximumFractionDigits(fractionDigits);
+        numberFormat.setMinimumFractionDigits(fractionDigits);
         return numberFormat.format(number);
     }
 
@@ -285,7 +285,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public final void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
         setMeasurement(element.getAttributeValue("measurement"));
         setDimension(element.getAttributeValue("dimension"));
@@ -301,7 +301,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRNumber part
      */
     @Override
-    public final org.jdom2.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
         if (dimension != null && dimension.length() != 0) {
             elm.setAttribute("dimension", dimension);
@@ -322,10 +322,10 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * @see java.lang.Object#clone()
      */
     @Override
-    public final MCRMetaNumber clone() {
+    public MCRMetaNumber clone() {
         MCRMetaNumber clone = (MCRMetaNumber) super.clone();
 
-        clone.dimension =this.dimension;
+        clone.dimension = this.dimension;
         clone.measurement = this.measurement;
         clone.number = this.number;
 
@@ -336,7 +336,7 @@ public final class MCRMetaNumber extends MCRMetaDefault {
      * Logs debug output.
      */
     @Override
-    public final void debug() {
+    public void debug() {
         if (LOGGER.isDebugEnabled()) {
             super.debugDefault();
             LOGGER.debug("Measurement        = {}", measurement);

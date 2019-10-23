@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,7 +69,7 @@ public class MCRServletContextResourceImporter implements Importer {
             Optional<URL> firstPossibleName = possibleNameForms.stream()
                 .map(form -> {
                     try {
-                        if(MCRDeveloperTools.overrideActive()){
+                        if (MCRDeveloperTools.overrideActive()) {
                             final Optional<Path> overriddenFilePath = MCRDeveloperTools
                                 .getOverriddenFilePath(form.startsWith("/") ? form.substring(1) : form, true);
 
@@ -124,7 +125,7 @@ public class MCRServletContextResourceImporter implements Importer {
 
     private String getStringContent(URL resource) throws IOException {
         try (InputStream resourceAsStream = resource.openStream()) {
-            InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream, "UTF-8");
+            InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream, StandardCharsets.UTF_8);
             return IOUtils.toString(inputStreamReader);
         }
     }

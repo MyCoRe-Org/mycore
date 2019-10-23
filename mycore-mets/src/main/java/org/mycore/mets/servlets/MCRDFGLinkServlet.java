@@ -24,6 +24,7 @@
 package org.mycore.mets.servlets;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
@@ -85,7 +86,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
         }
 
         String encodedMetsURL = URLEncoder.encode(MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivateID
-            + "?XSL.Style=dfg", "UTF-8");
+            + "?XSL.Style=dfg", StandardCharsets.UTF_8);
         LOGGER.info(request.getPathInfo());
 
         MCRPath rootPath = MCRPath.getPath(derivateID, "/");
@@ -145,7 +146,7 @@ public class MCRDFGLinkServlet extends MCRServlet {
                 List<File> fileList = fileGrp.getFileList();
                 for (File file : fileList) {
                     FLocat fLocat = file.getFLocat();
-                    if (fLocat.getHref().equals( MCRXMLFunctions.encodeURIPath(fileHref, true))) {
+                    if (fLocat.getHref().equals(MCRXMLFunctions.encodeURIPath(fileHref, true))) {
                         fileID = file.getId();
                     }
                 }

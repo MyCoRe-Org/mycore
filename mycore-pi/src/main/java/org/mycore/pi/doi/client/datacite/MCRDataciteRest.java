@@ -21,7 +21,7 @@ package org.mycore.pi.doi.client.datacite;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpEntity;
@@ -44,7 +44,8 @@ public class MCRDataciteRest {
         return HttpClientBuilder.create().build();
     }
 
-    public static MCRDataciteRestResponse get(MCRDigitalObjectIdentifier doi) throws MCRIdentifierUnresolvableException {
+    public static MCRDataciteRestResponse get(MCRDigitalObjectIdentifier doi)
+        throws MCRIdentifierUnresolvableException {
 
         HttpGet get = new HttpGet(URL_TEMPLATE.replaceAll("\\{doi\\}", doi.asString()));
         try (CloseableHttpClient httpClient = getHttpClient()) {
@@ -52,7 +53,7 @@ public class MCRDataciteRest {
             HttpEntity entity = response.getEntity();
 
             try (BufferedReader buffer = new BufferedReader(
-                new InputStreamReader(entity.getContent(), Charset.forName("UTF-8")))) {
+                new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8))) {
                 String json = buffer.lines().collect(Collectors.joining("\n"));
                 Gson gson = new GsonBuilder().registerTypeAdapter(MCRDataciteRestResponseEntryData.class,
                     new MCRDOIRestResponseEntryDataValueDeserializer()).create();
@@ -67,7 +68,7 @@ public class MCRDataciteRest {
     }
 
     public static void main(String[] args) throws MCRIdentifierUnresolvableException {
-        MCRDataciteRestResponse mcrdoiRestResponse = get(new MCRDOIParser().parse("10.1000/1").get());
+        get(new MCRDOIParser().parse("10.1000/1").get());
     }
 
 }

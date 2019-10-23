@@ -37,8 +37,9 @@ public class MCRDebuggingTransformer extends MCRContentTransformer {
     @Override
     public MCRContent transform(MCRContent source) throws IOException {
         if (LOGGER.isDebugEnabled()) {
-            if (!source.isReusable())
+            if (!source.isReusable()) {
                 source = source.getReusableCopy();
+            }
 
             LOGGER.debug(">>>>>>>>>>>>>>>>>>>>");
             LOGGER.debug(source.asString());

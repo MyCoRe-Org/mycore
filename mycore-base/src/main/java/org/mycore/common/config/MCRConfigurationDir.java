@@ -176,14 +176,15 @@ public class MCRConfigurationDir {
      * @return null if System property {@value #DISABLE_CONFIG_DIR_PROPERTY} is set.
      */
     public static File getConfigurationDirectory() {
-        if (!System.getProperties().keySet().contains(DISABLE_CONFIG_DIR_PROPERTY)) {
+        if (!System.getProperties().containsKey(DISABLE_CONFIG_DIR_PROPERTY)) {
             return new File(getMyCoReDirectory(), getPrefix() + getAppName());
         }
         return null;
     }
 
     /**
-     * Returns a File object, if {@link #getConfigurationDirectory()} does not return <code>null</code> and directory exists.
+     * Returns a File object, if {@link #getConfigurationDirectory()} does not return <code>null</code>
+     * and directory exists.
      * @param relativePath relative path to file or directory with configuration directory as base.
      * @return null if configuration directory does not exist or is disabled.
      */

@@ -37,7 +37,7 @@ class MCRDataSource {
 
     private String sourceID;
 
-    private List<MCRIdentifierResolver> resolvers = new ArrayList<MCRIdentifierResolver>();
+    private List<MCRIdentifierResolver> resolvers = new ArrayList<>();
 
     MCRDataSource(String sourceID) {
         this.sourceID = sourceID;

@@ -19,7 +19,7 @@
 package org.mycore.services.http;
 
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 import org.apache.http.HttpHost;
@@ -41,7 +41,7 @@ public class MCRHttpUtils {
 
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(30000).setSocketTimeout(30000).build();
 
-        ConnectionConfig connectionConfig = ConnectionConfig.custom().setCharset(Charset.forName("UTF-8")).build();
+        ConnectionConfig connectionConfig = ConnectionConfig.custom().setCharset(StandardCharsets.UTF_8).build();
         SocketConfig socketConfig = SocketConfig.custom().setTcpNoDelay(true).setSoKeepAlive(true)
             .setSoReuseAddress(true).build();
 
@@ -54,8 +54,8 @@ public class MCRHttpUtils {
 
     public static String getHttpUserAgent() {
         return String.format(Locale.ROOT, "MyCoRe/%s (%s; java %s)", MCRCoreVersion.getCompleteVersion(),
-                MCRConfiguration.instance().getString("MCR.NameOfProject", "undefined"),
-                System.getProperty("java.version"));
+            MCRConfiguration.instance().getString("MCR.NameOfProject", "undefined"),
+            System.getProperty("java.version"));
     }
 
     public static PoolingHttpClientConnectionManager getConnectionManager(int maxConnections) {

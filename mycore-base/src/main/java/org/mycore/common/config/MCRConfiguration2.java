@@ -45,6 +45,7 @@ import com.google.inject.ConfigurationException;
 public class MCRConfiguration2 {
 
     private static ConcurrentHashMap<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
+
     static ConcurrentHashMap<SingletonKey, Object> instanceHolder = new ConcurrentHashMap<>();
 
     public static Map<String, String> getPropertiesMap() {
@@ -77,7 +78,7 @@ public class MCRConfiguration2 {
     public static <T> Optional<T> getSingleInstanceOf(String name) {
         return getString(name)
             .map(className -> new SingletonKey(name, className))
-            .map(key -> (T)instanceHolder.computeIfAbsent(key, k -> getInstanceOf(name).orElse(null)));
+            .map(key -> (T) instanceHolder.computeIfAbsent(key, k -> getInstanceOf(name).orElse(null)));
     }
 
     /**
@@ -88,8 +89,8 @@ public class MCRConfiguration2 {
      * @throws MCRConfigurationException
      *             if the the class can not be loaded or instantiated
      */
-    public static <T> Optional<Class<? extends T>> getClass(String name) throws MCRConfigurationException{
-        return getString(name).map(MCRConfiguration2::<T>getClassObject);
+    public static <T> Optional<Class<? extends T>> getClass(String name) throws MCRConfigurationException {
+        return getString(name).map(MCRConfiguration2::<T> getClassObject);
     }
 
     /**
@@ -153,7 +154,7 @@ public class MCRConfiguration2 {
      * @param value a property value
      * @return a Stream of trimmed, non-empty Strings
      */
-    public static Stream<String> splitValue(String value){
+    public static Stream<String> splitValue(String value) {
         return MCRConfigurationBase.PROPERTY_SPLITTER.splitAsStream(value)
             .map(String::trim)
             .filter(s -> !s.isEmpty());
@@ -280,7 +281,6 @@ public class MCRConfiguration2 {
     public static <T> T instantiateClass(String classname) {
         LogManager.getLogger().debug("Loading Class: {}", classname);
 
-        T o = null;
         Class<? extends T> cl = getClassObject(classname);
         try {
             return MCRInjectorConfig.injector().getInstance(cl);
@@ -309,8 +309,6 @@ public class MCRConfiguration2 {
         }
     }
 
-
-
     private static class EventListener {
 
         private Predicate<String> keyPredicate;
@@ -319,7 +317,7 @@ public class MCRConfiguration2 {
 
         private UUID uuid;
 
-        public EventListener(Predicate<String> keyPredicate,
+        EventListener(Predicate<String> keyPredicate,
             MCRTriConsumer<String, Optional<String>, Optional<String>> listener) {
             this.keyPredicate = keyPredicate;
             this.listener = listener;
@@ -327,10 +325,11 @@ public class MCRConfiguration2 {
         }
 
     }
+
     static class SingletonKey {
         private String property, className;
 
-        public SingletonKey(String property, String className) {
+        SingletonKey(String property, String className) {
             super();
             this.property = property;
             this.className = className;
@@ -365,13 +364,10 @@ public class MCRConfiguration2 {
                 return false;
             }
             if (property == null) {
-                if (other.property != null) {
-                    return false;
-                }
-            } else if (!property.equals(other.property)) {
-                return false;
+                return other.property == null;
+            } else {
+                return property.equals(other.property);
             }
-            return true;
         }
     }
 

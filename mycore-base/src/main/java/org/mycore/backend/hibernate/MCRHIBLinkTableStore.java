@@ -33,6 +33,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.links.MCRLINKHREF;
 import org.mycore.backend.jpa.links.MCRLINKHREFPK;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRLinkTableInterface;
 
 /**
@@ -71,18 +72,10 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     @Override
     public final void create(String from, String to, String type, String attr) {
-        if (from == null || (from = from.trim()).length() == 0) {
-            throw new MCRPersistenceException("The from value is null or empty.");
-        }
-        if (to == null || (to = to.trim()).length() == 0) {
-            throw new MCRPersistenceException("The to value is null or empty.");
-        }
-        if (type == null || (type = type.trim()).length() == 0) {
-            throw new MCRPersistenceException("The type value is null or empty.");
-        }
-        if (attr == null || (attr = attr.trim()).length() == 0) {
-            attr = "";
-        }
+        from = checkAttributeIsNotEmpty(from, "from");
+        to = checkAttributeIsNotEmpty(to, "to");
+        type = checkAttributeIsNotEmpty(type, "type");
+        attr = MCRUtils.filterTrimmedNotEmpty(attr).orElse("");
         EntityManager entityMananger = MCREntityManagerProvider.getCurrentEntityManager();
         LOGGER.debug("Inserting {}/{}/{} into database MCRLINKHREF", from, to, type);
 
@@ -96,6 +89,11 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             linkHref.setMcrattr(attr);
             entityMananger.persist(linkHref);
         }
+    }
+
+    private static String checkAttributeIsNotEmpty(String attr, String name) {
+        return MCRUtils.filterTrimmedNotEmpty(attr)
+            .orElseThrow(() -> new MCRPersistenceException("The " + name + " value is null or empty."));
     }
 
     private static MCRLINKHREFPK getKey(String from, String to, String type) {
@@ -118,17 +116,17 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     @Override
     public final void delete(String from, String to, String type) {
-        if (from == null || (from = from.trim()).length() == 0) {
-            throw new MCRPersistenceException("The from value is null or empty.");
-        }
+        from = checkAttributeIsNotEmpty(from, "from");
         StringBuilder sb = new StringBuilder();
-        sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append("'");
-        if (to != null && (to = to.trim()).length() > 0) {
-            sb.append(" and MCRTO = '").append(to).append("'");
-        }
-        if (type != null && (type = type.trim()).length() > 0) {
-            sb.append(" and MCRTYPE = '").append(type).append("'");
-        }
+        sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append('\'');
+        MCRUtils.filterTrimmedNotEmpty(to)
+            .ifPresent(trimmedTo -> {
+                sb.append(" and MCRTO = '").append(trimmedTo).append('\'');
+            });
+        MCRUtils.filterTrimmedNotEmpty(type)
+            .ifPresent(trimmedType -> {
+                sb.append(" and MCRTYPE = '").append(trimmedType).append('\'');
+            });
         LOGGER.debug("Deleting {} from database MCRLINKHREF", from);
         Session session = getSession();
         for (MCRLINKHREF mcrlinkhref : session.createQuery(sb.toString(), MCRLINKHREF.class).getResultList()) {

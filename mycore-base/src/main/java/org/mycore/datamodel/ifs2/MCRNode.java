@@ -153,7 +153,7 @@ public abstract class MCRNode {
      * @return true if children exist
      */
     public boolean hasChildren() throws IOException {
-        return isFile() ? false : Files.list(path).findAny().isPresent();
+        return !isFile() && Files.list(path).findAny().isPresent();
     }
 
     /**

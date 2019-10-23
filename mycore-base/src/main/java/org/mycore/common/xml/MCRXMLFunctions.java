@@ -119,11 +119,13 @@ import com.ibm.icu.util.GregorianCalendar;
  * @author Ren\u00E9 Adler (eagle)
  */
 public class MCRXMLFunctions {
-    private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)\\>";
+    private static final String TAG_START = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+"
+        + "\\s*|\\s*)\\>";
 
     private static final String TAG_END = "\\</\\w+\\>";
 
-    private static final String TAG_SELF_CLOSING = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+\\s*|\\s*)/\\>";
+    private static final String TAG_SELF_CLOSING = "\\<\\w+((\\s+\\w+(\\s*\\=\\s*(?:\".*?\"|'.*?'|[^'\"\\>\\s]+))?)+"
+        + "\\s*|\\s*)/\\>";
 
     private static final String HTML_ENTITY = "&[a-zA-Z][a-zA-Z0-9]+;";
 
@@ -137,15 +139,6 @@ public class MCRXMLFunctions {
 
     private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000,
         "Derivate display value cache");
-
-    //use holder to not initialize MCRXMLMetadataManager to early (simplifies junit testing)
-    private static class MCRXMLMetaDataManagerHolder {
-        public static final MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
-    }
-
-    private static class MCRCategLinkServiceHolder {
-        public static final MCRCategLinkService instance = MCRCategLinkServiceFactory.getInstance();
-    }
 
     public static Node document(String uri) throws JDOMException, IOException, SAXException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
@@ -239,38 +232,39 @@ public class MCRXMLFunctions {
     /**
      * The method get a date String in format yyyy-MM-ddThh:mm:ssZ for ancient date values.
      *
-     * @param date_value the date string
-     * @param field_name the name of field of MCRMetaHistoryDate, it should be 'von' or 'bis'
-     * @param calendar_name the name if the calendar defined in MCRCalendar
+     * @param date the date string
+     * @param fieldName the name of field of MCRMetaHistoryDate, it should be 'von' or 'bis'
+     * @param calendarName the name if the calendar defined in MCRCalendar
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
-    public static String getISODateFromMCRHistoryDate(String date_value, String field_name, String calendar_name)
+    public static String getISODateFromMCRHistoryDate(String date, String fieldName, String calendarName)
         throws ParseException {
-        String formatted_date;
-        if (field_name == null || field_name.trim().length() == 0) {
+        String formattedDate;
+        if (fieldName == null || fieldName.trim().length() == 0) {
             return "";
         }
-        boolean use_last_value = false;
-        if ("bis".equals(field_name)) {
-            use_last_value = true;
+        boolean useLastValue = false;
+        if ("bis".equals(fieldName)) {
+            useLastValue = true;
         }
         try {
-            Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date_value, use_last_value, calendar_name);
-            GregorianCalendar g_calendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
-            formatted_date = MCRCalendar.getCalendarDateToFormattedString(g_calendar, "yyyy-MM-dd") + "T00:00:00.000Z";
-            if (g_calendar.get(GregorianCalendar.ERA) == GregorianCalendar.BC) {
-                formatted_date = "-" + formatted_date;
+            Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date, useLastValue, calendarName);
+            GregorianCalendar gregorianCalendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
+            formattedDate = MCRCalendar.getCalendarDateToFormattedString(gregorianCalendar, "yyyy-MM-dd")
+                + "T00:00:00.000Z";
+            if (gregorianCalendar.get(Calendar.ERA) == GregorianCalendar.BC) {
+                formattedDate = "-" + formattedDate;
             }
         } catch (Exception e) {
-            String errorMsg = "Error while converting date string : " + date_value + " - " + use_last_value +
-                " - " + calendar_name;
+            String errorMsg = "Error while converting date string : " + date + " - " + useLastValue +
+                " - " + calendarName;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(errorMsg, e);
             }
             LOGGER.warn(errorMsg);
             return "";
         }
-        return formatted_date;
+        return formattedDate;
     }
 
     /**
@@ -404,7 +398,7 @@ public class MCRXMLFunctions {
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
         MCRObjectID derId = MCRObjectID.getInstance(derivateId);
-        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.instance.getLastModifiedHandle(derId, 30,
+        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.INSTANCE.getLastModifiedHandle(derId, 30,
             TimeUnit.SECONDS);
         Boolean result;
         try {
@@ -418,7 +412,7 @@ public class MCRXMLFunctions {
         }
         MCRDerivate der;
         try {
-            org.jdom2.Document derDoc = MCRXMLMetaDataManagerHolder.instance.retrieveXML(derId);
+            org.jdom2.Document derDoc = MCRXMLMetaDataManagerHolder.INSTANCE.retrieveXML(derId);
             if (derDoc == null) {
                 LOGGER.error("Derivate \"{}\" does not exist", derId);
                 return false;
@@ -742,7 +736,7 @@ public class MCRXMLFunctions {
             MCRCategoryID categID = MCRCategoryID.fromString(categoryId);
             MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectId);
             MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
-            return MCRCategLinkServiceHolder.instance.isInCategory(reference, categID);
+            return MCRCategLinkServiceHolder.INSTANCE.isInCategory(reference, categID);
         } catch (Throwable e) {
             LOGGER.error("Error while checking if object is in category", e);
             return false;
@@ -753,8 +747,8 @@ public class MCRXMLFunctions {
      * Checks if the User-Agent is sent from a mobile device
      * @return true if the User-Agent is sent from a mobile device
      */
-    public static boolean isMobileDevice(String UserAgent) {
-        return UserAgent.toLowerCase(Locale.ROOT).contains("mobile");
+    public static boolean isMobileDevice(String userAgent) {
+        return userAgent.toLowerCase(Locale.ROOT).contains("mobile");
     }
 
     public static boolean hasParentCategory(String classificationId, String categoryId) {
@@ -946,8 +940,7 @@ public class MCRXMLFunctions {
      */
     public static String stripHtml(final String s) {
         StringBuilder res = new StringBuilder(s);
-        Matcher m;
-        while ((m = TAG_PATTERN.matcher(res.toString())).find()) {
+        for (Matcher m = TAG_PATTERN.matcher(res.toString()); m.find(); m = TAG_PATTERN.matcher(res.toString())) {
             res.delete(m.start(), m.end());
             res.insert(m.start(), stripHtml(m.group(m.groupCount() - 1)));
         }
@@ -1008,6 +1001,15 @@ public class MCRXMLFunctions {
         return new SetNodeList(distinctNodeSet);
     }
 
+    //use holder to not initialize MCRXMLMetadataManager to early (simplifies junit testing)
+    private static class MCRXMLMetaDataManagerHolder {
+        public static final MCRXMLMetadataManager INSTANCE = MCRXMLMetadataManager.instance();
+    }
+
+    private static class MCRCategLinkServiceHolder {
+        public static final MCRCategLinkService INSTANCE = MCRCategLinkServiceFactory.getInstance();
+    }
+
     private static class SetNodeList implements NodeList {
 
         private final Object[] objects;
@@ -1016,11 +1018,13 @@ public class MCRXMLFunctions {
             objects = set.toArray();
         }
 
-        @Override public Node item(int index) {
+        @Override
+        public Node item(int index) {
             return (Node) objects[index];
         }
 
-        @Override public int getLength() {
+        @Override
+        public int getLength() {
             return objects.length;
         }
     }

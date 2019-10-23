@@ -59,11 +59,12 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         super.href = owner + '/' + path;
     }
 
-    public void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public void setFromDOM(Element element) throws MCRException {
         super.setFromDOM(element);
         List<Element> childrenList = element.getChildren(MCRMetaDerivateLink.ANNOTATION);
-        if (childrenList == null)
+        if (childrenList == null) {
             return;
+        }
 
         for (Element anAnnotation : childrenList) {
             String key = anAnnotation.getAttributeValue(MCRMetaDerivateLink.ATTRIBUTE, Namespace.XML_NAMESPACE);
@@ -79,8 +80,9 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
             Element annotationElem = new Element(MCRMetaDerivateLink.ANNOTATION);
             annotationElem.setAttribute(MCRMetaDerivateLink.ATTRIBUTE, key, Namespace.XML_NAMESPACE);
             String content = map.get(key);
-            if (content == null || content.length() == 0)
+            if (content == null || content.length() == 0) {
                 continue;
+            }
             annotationElem.addContent(content);
             elm.addContent(annotationElem);
         }

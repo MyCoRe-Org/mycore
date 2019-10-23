@@ -279,7 +279,7 @@ public class MCRInfo {
     public static class GitId {
         String abbrev;
 
-        String describe_short;
+        String describeShort;
 
         String describe;
 
@@ -291,7 +291,7 @@ public class MCRInfo {
 
         private GitId(Map<String, String> props) {
             abbrev = props.get("git.commit.id.abbrev");
-            describe_short = props.get("git.commit.id.describe-short");
+            describeShort = props.get("git.commit.id.describe-short");
             describe = props.get("git.commit.id.describe");
             full = props.get("git.commit.id.full");
         }
@@ -305,7 +305,7 @@ public class MCRInfo {
         @JsonProperty(value = "describe-short", required = true)
         @XmlAttribute
         public String getDescribeShort() {
-            return describe_short;
+            return describeShort;
         }
 
         @JsonProperty(required = true)
@@ -325,15 +325,15 @@ public class MCRInfo {
     public static class GitCommitMessage {
         private String full;
 
-        private String short_;
+        private String shortMsg;
 
         private GitCommitMessage() {
             //JAXB
         }
 
-        GitCommitMessage(String full, String short_) {
+        GitCommitMessage(String full, String shortMsg) {
             this.full = full;
-            this.short_ = short_;
+            this.shortMsg = shortMsg;
         }
 
         @XmlValue
@@ -343,7 +343,7 @@ public class MCRInfo {
 
         @XmlAttribute
         public String getShort() {
-            return short_;
+            return shortMsg;
         }
     }
 

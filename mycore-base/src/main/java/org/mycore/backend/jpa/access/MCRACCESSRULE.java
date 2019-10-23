@@ -147,12 +147,9 @@ public class MCRACCESSRULE {
             return false;
         }
         if (rule == null) {
-            if (other.getRule() != null) {
-                return false;
-            }
-        } else if (!rule.equals(other.getRule())) {
-            return false;
+            return other.getRule() == null;
+        } else {
+            return rule.equals(other.getRule());
         }
-        return true;
     }
 }

@@ -37,7 +37,8 @@ public class MCRSwordSolrObjectIDSupplier extends MCRSwordObjectIDSupplier {
     private SolrQuery solrQuery;
 
     /**
-     * @param solrQuery the query which will be used to ask solr. (start and rows will be overwritten for pagination purposes)
+     * @param solrQuery 
+     * the query which will be used to ask solr. (start and rows will be overwritten for pagination purposes)
      */
     public MCRSwordSolrObjectIDSupplier(SolrQuery solrQuery) {
         this.solrQuery = solrQuery;

@@ -34,7 +34,7 @@ public class MCRPIServiceManager {
     public static final String REGISTRATION_SERVICE_CONFIG_PREFIX = "MCR.PI.Service.";
 
     public static MCRPIServiceManager getInstance() {
-        return InstanceHolder.instance;
+        return InstanceHolder.INSTANCE;
     }
 
     private Map<String, MCRPIService> serviceCache = new ConcurrentHashMap<>();
@@ -73,11 +73,11 @@ public class MCRPIServiceManager {
                 throw new MCRException("Cant initialize class the class defined in: " + propertyName, e);
             }
         });
-        return (MCRPIService<T>) mcrpiService;
+        return mcrpiService;
     }
 
     private static class InstanceHolder {
-        private static final MCRPIServiceManager instance = new MCRPIServiceManager();
+        private static final MCRPIServiceManager INSTANCE = new MCRPIServiceManager();
     }
 
 }

@@ -53,6 +53,7 @@ public enum MCRMODSDateFormat {
         "yyyy-MM-dd"),
     unknown_19("unknown-19", "yyyy-MM-dd'T'HH:mm:ss"),
     unknown_15("unknown-15", "yyyyMMdd'T'HHmmss");
+
     private static volatile Map<String, MCRMODSDateFormat> encodingToFormatMap;
 
     private String encoding, attributeValue;

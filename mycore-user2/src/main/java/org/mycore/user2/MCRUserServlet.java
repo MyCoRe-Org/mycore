@@ -22,6 +22,7 @@ import static org.mycore.user2.utils.MCRUserTransformer.JAXB_CONTEXT;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -94,20 +95,21 @@ public class MCRUserServlet extends MCRServlet {
             user = MCRUserManager.getUser(uid);
         }
 
-        if ("show".equals(action))
+        if ("show".equals(action)) {
             showUser(req, res, user, uid);
-        else if ("save".equals(action))
+        } else if ("save".equals(action)) {
             saveUser(req, res);
-        else if ("saveCurrentUser".equals(action))
+        } else if ("saveCurrentUser".equals(action)) {
             saveCurrentUser(req, res);
-        else if ("changeMyPassword".equals(action))
+        } else if ("changeMyPassword".equals(action)) {
             redirectToPasswordChangePage(req, res);
-        else if ("password".equals(action))
+        } else if ("password".equals(action)) {
             changePassword(req, res, user, uid);
-        else if ("delete".equals(action))
+        } else if ("delete".equals(action)) {
             deleteUser(req, res, user);
-        else
+        } else {
             listUsers(req, res);
+        }
     }
 
     private void redirectToPasswordChangePage(HttpServletRequest req, HttpServletResponse res) throws Exception {
@@ -344,7 +346,7 @@ public class MCRUserServlet extends MCRServlet {
         }
 
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&id="
-            + URLEncoder.encode(user.getUserID(), "UTF-8")));
+            + URLEncoder.encode(user.getUserID(), StandardCharsets.UTF_8)));
     }
 
     private String convertToUTC(String validUntilText, String format) throws ParseException {
@@ -410,7 +412,7 @@ public class MCRUserServlet extends MCRServlet {
         MCRUserManager.setPassword(user, password);
 
         res.sendRedirect(res.encodeRedirectURL("MCRUserServlet?action=show&XSL.step=changedPassword&id="
-            + URLEncoder.encode(user.getUserID(), "UTF-8")));
+            + URLEncoder.encode(user.getUserID(), StandardCharsets.UTF_8)));
     }
 
     /**
@@ -465,8 +467,9 @@ public class MCRUserServlet extends MCRServlet {
         List<MCRUser> results = null;
         if (hasAdminPermission) {
             String search = req.getParameter("search");
-            if ((search == null) || search.trim().length() == 0)
+            if ((search == null) || search.trim().length() == 0) {
                 search = null;
+            }
 
             if (search != null) {
                 users.setAttribute("search", search);
@@ -478,8 +481,9 @@ public class MCRUserServlet extends MCRServlet {
             int max = MCRConfiguration.instance().getInt(MCRUser2Constants.CONFIG_PREFIX + "Users.MaxResults", 100);
             int num = MCRUserManager.countUsers(search, null, search);
 
-            if ((num < max) && (num > 0))
+            if ((num < max) && (num > 0)) {
                 results = MCRUserManager.listUsers(search, null, search);
+            }
             users.setAttribute("num", String.valueOf(num));
             users.setAttribute("max", String.valueOf(max));
         } else {
@@ -487,19 +491,21 @@ public class MCRUserServlet extends MCRServlet {
             results = ownUsers;
         }
 
-        if (results != null)
+        if (results != null) {
             for (MCRUser user : results) {
                 Element u = MCRUserTransformer.buildBasicXML(user).detachRootElement();
                 addString(u, "realName", user.getRealName());
                 addString(u, "eMail", user.getEMailAddress());
                 users.addContent(u);
             }
+        }
 
         getLayoutService().doLayout(req, res, new MCRJDOMContent(users));
     }
 
     private void addString(Element parent, String name, String value) {
-        if ((value != null) && (value.trim().length() > 0))
+        if ((value != null) && (value.trim().length() > 0)) {
             parent.addContent(new Element(name).setText(value.trim()));
+        }
     }
 }

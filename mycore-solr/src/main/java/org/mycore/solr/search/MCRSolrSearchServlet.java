@@ -217,7 +217,8 @@ public class MCRSolrSearchServlet extends MCRServlet {
             sortBuilder.append(" ");
             if (order == null) {
                 order = "asc";
-                LOGGER.warn("No sort order found for field with number ''{}'' use default value : ''{}''", position, order);
+                LOGGER.warn("No sort order found for field with number ''{}'' use default value : ''{}''", position,
+                    order);
             }
             sortBuilder.append(order);
         }

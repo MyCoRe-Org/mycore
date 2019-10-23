@@ -107,7 +107,7 @@ public class MCRPropertiesToJSONTransformer implements MessageBodyWriter<Propert
 
             final String currentKey = firstKey(key);
             if (currentKey != null) {
-                final String subRightKey = key.substring(currentKey.length() + 1, key.length());
+                final String subRightKey = key.substring(currentKey.length() + 1);
                 final JsonObject childJson = getJsonIfExists(resultJson, currentKey);
 
                 resultJson.add(currentKey, createFromBundleKey(childJson, subRightKey, value));

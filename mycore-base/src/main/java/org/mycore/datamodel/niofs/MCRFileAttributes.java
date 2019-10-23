@@ -28,9 +28,10 @@ import java.util.regex.Pattern;
  *
  */
 public class MCRFileAttributes<T> implements BasicFileAttributes {
-    enum fileType {
+    enum FileType {
         file, directory, link, other;
-        public static fileType fromAttribute(BasicFileAttributes attrs) {
+
+        public static FileType fromAttribute(BasicFileAttributes attrs) {
             if (attrs.isRegularFile()) {
                 return file;
             }
@@ -56,9 +57,9 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
 
     String md5sum;
 
-    fileType type;
+    FileType type;
 
-    private MCRFileAttributes(final fileType type, final long size, final T filekey, final String md5sum,
+    private MCRFileAttributes(final FileType type, final long size, final T filekey, final String md5sum,
         final FileTime creationTime, final FileTime lastModified, final FileTime lastAccessTime) {
         super();
         this.type = type;
@@ -77,7 +78,7 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
      *
      */
     public static <T> MCRFileAttributes<T> directory(final T filekey, final long size, final FileTime lastModified) {
-        return new MCRFileAttributes<>(fileType.directory, size, filekey, null, null, lastModified, null);
+        return new MCRFileAttributes<>(FileType.directory, size, filekey, null, null, lastModified, null);
     }
 
     public static <T> MCRFileAttributes<T> file(final T filekey, final long size, final String md5sum,
@@ -87,12 +88,12 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
 
     public static <T> MCRFileAttributes<T> file(final T filekey, final long size, final String md5sum,
         final FileTime creationTime, final FileTime lastModified, final FileTime lastAccessTime) {
-        return new MCRFileAttributes<>(fileType.file, size, filekey, md5sum, creationTime, lastModified,
+        return new MCRFileAttributes<>(FileType.file, size, filekey, md5sum, creationTime, lastModified,
             lastAccessTime);
     }
 
     public static <T> MCRFileAttributes<T> fromAttributes(BasicFileAttributes attrs, String md5) {
-        return new MCRFileAttributes<>(fileType.fromAttribute(attrs), attrs.size(), (T) attrs.fileKey(), md5,
+        return new MCRFileAttributes<>(FileType.fromAttribute(attrs), attrs.size(), (T) attrs.fileKey(), md5,
             attrs.creationTime(), attrs.lastModifiedTime(), attrs.lastAccessTime());
     }
 
@@ -117,7 +118,7 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
      */
     @Override
     public boolean isDirectory() {
-        return type == fileType.directory;
+        return type == FileType.directory;
     }
 
     /* (non-Javadoc)
@@ -125,7 +126,7 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
      */
     @Override
     public boolean isOther() {
-        return type == fileType.other;
+        return type == FileType.other;
     }
 
     /* (non-Javadoc)
@@ -133,7 +134,7 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
      */
     @Override
     public boolean isRegularFile() {
-        return type == fileType.file;
+        return type == FileType.file;
     }
 
     /* (non-Javadoc)
@@ -141,7 +142,7 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
      */
     @Override
     public boolean isSymbolicLink() {
-        return type == fileType.link;
+        return type == FileType.link;
     }
 
     /* (non-Javadoc)
@@ -172,8 +173,8 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
         return size;
     }
 
-    private void setMd5sum(final fileType type, final String md5sum) {
-        if (type != fileType.file && md5sum == null) {
+    private void setMd5sum(final FileType type, final String md5sum) {
+        if (type != FileType.file && md5sum == null) {
             return;
         }
         Objects.requireNonNull(md5sum, "'md5sum' is required for files");

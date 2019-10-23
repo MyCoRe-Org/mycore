@@ -28,11 +28,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 
@@ -79,29 +80,29 @@ public class MCRCommandManager {
     /** Read internal and/or external commands */
     protected void initConfiguredCommands(String type) {
         String prefix = "MCR.CLI.Classes." + type;
-        Map<String, String> p = MCRConfiguration.instance().getPropertiesMap(prefix);
-        for (String propertyName : p.keySet()) {
-            List<String> classNames = MCRConfiguration.instance()
-                .getStrings(propertyName, MCRConfiguration.emptyList());
+        Stream<Map.Entry<String, String>> propsWithPrefix = MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(e -> e.getKey().startsWith(prefix));
+        Stream<String> classNames = propsWithPrefix
+            .map(Map.Entry::getValue)
+            .flatMap(MCRConfiguration2::splitValue)
+            .filter(s -> !s.isEmpty());
+        classNames.forEach(this::loadCommandClass);
+    }
 
-            for (String className : classNames) {
-                className = className.trim();
-                if (className.isEmpty()) {
-                    continue;
-                }
-                LOGGER.debug("Will load commands from the {} class {}", type, className);
-                try {
-                    Class<?> cliClass = MCRClassTools.forName(className);
-                    if (cliClass.isAnnotationPresent(MCRCommandGroup.class)) {
-                        addAnnotatedCLIClass(cliClass);
-                    } else {
-                        addDefaultCLIClass(className);
-                    }
-
-                } catch (ClassNotFoundException cnfe) {
-                    LOGGER.error("MyCoRe Command Class {} not found.", className);
-                }
+    private void loadCommandClass(String commandClassName) {
+        LOGGER.debug("Will load commands from the {} class {}", commandClassName, commandClassName);
+        try {
+            Class<?> cliClass = MCRClassTools.forName(commandClassName);
+            if (cliClass.isAnnotationPresent(MCRCommandGroup.class)) {
+                addAnnotatedCLIClass(cliClass);
+            } else {
+                addDefaultCLIClass(commandClassName);
             }
+
+        } catch (ClassNotFoundException cnfe) {
+            LOGGER.error("MyCoRe Command Class {} not found.", commandClassName);
         }
     }
 
@@ -109,7 +110,8 @@ public class MCRCommandManager {
         String groupName = Optional.ofNullable(cliClass.getAnnotation(MCRCommandGroup.class))
             .map(MCRCommandGroup::name)
             .orElse(cliClass.getSimpleName());
-        final Class<org.mycore.frontend.cli.annotation.MCRCommand> mcrCommandAnnotation = org.mycore.frontend.cli.annotation.MCRCommand.class;
+        final Class<org.mycore.frontend.cli.annotation.MCRCommand> mcrCommandAnnotation;
+        mcrCommandAnnotation = org.mycore.frontend.cli.annotation.MCRCommand.class;
         ArrayList<MCRCommand> commands = Arrays.stream(cliClass.getMethods())
             .filter(method -> method.getDeclaringClass().equals(cliClass))
             .filter(method -> Modifier.isStatic(method.getModifiers()) && Modifier.isPublic(method.getModifiers()))

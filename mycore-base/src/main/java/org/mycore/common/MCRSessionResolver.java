@@ -18,15 +18,16 @@
 
 package org.mycore.common;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.frontend.servlets.MCRServlet;
-
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
+
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionBindingListener;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * This Class will be stored in the a {@link javax.servlet.http.HttpSession} and can be used to resolve the
@@ -47,7 +48,7 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
         this(session.getID());
     }
 
-    public final String getSessionID() {
+    public String getSessionID() {
         return sessionID;
     }
 
@@ -56,7 +57,7 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
      *
      * @return if is already closed it will return a {@link Optional#empty()}
      */
-    public final Optional<MCRSession> resolveSession() {
+    public Optional<MCRSession> resolveSession() {
         return Optional.ofNullable(MCRSessionMgr.getSession(sessionID));
     }
 
@@ -64,7 +65,8 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
     public void valueBound(HttpSessionBindingEvent hsbe) {
         Object obj = hsbe.getValue();
         if (LOGGER.isDebugEnabled() && obj instanceof MCRSessionResolver) {
-            LOGGER.debug("Bound MCRSession {} to HttpSession {}", ((MCRSessionResolver) obj).getSessionID(), hsbe.getSession().getId());
+            LOGGER.debug("Bound MCRSession {} to HttpSession {}", ((MCRSessionResolver) obj).getSessionID(),
+                hsbe.getSession().getId());
         }
     }
 
@@ -72,12 +74,13 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
     public void valueUnbound(HttpSessionBindingEvent hsbe) {
         // hsbe.getValue() does not work right with tomcat
         Optional<MCRSessionResolver> newSessionResolver = Optional
-                .ofNullable(hsbe.getSession().getAttribute(MCRServlet.ATTR_MYCORE_SESSION))
-                .filter(o -> o instanceof MCRSessionResolver)
-                .map(MCRSessionResolver.class::cast);
+            .ofNullable(hsbe.getSession().getAttribute(MCRServlet.ATTR_MYCORE_SESSION))
+            .filter(o -> o instanceof MCRSessionResolver)
+            .map(MCRSessionResolver.class::cast);
         MCRSessionResolver oldResolver = this;
         if (newSessionResolver.isPresent() && !oldResolver.equals(newSessionResolver.get())) {
-            LOGGER.warn("Attribute {} is beeing unbound from session {} and replaced by {}!", hsbe.getName(), oldResolver.getSessionID(), newSessionResolver.get());
+            LOGGER.warn("Attribute {} is beeing unbound from session {} and replaced by {}!", hsbe.getName(),
+                oldResolver.getSessionID(), newSessionResolver.get());
             oldResolver.resolveSession().ifPresent(MCRSession::close);
         }
 
@@ -85,8 +88,12 @@ public final class MCRSessionResolver implements Serializable, HttpSessionBindin
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MCRSessionResolver that = (MCRSessionResolver) o;
         return Objects.equals(getSessionID(), that.getSessionID());
     }

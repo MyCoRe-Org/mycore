@@ -61,8 +61,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -384,10 +382,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 }
                 //TODO: handle StandardCopyOption.COPY_ATTRIBUTES
             } else {
-                //simply create directory
-                @SuppressWarnings("unused")
-                MCRDirectory tgtDir = new MCRDirectory(tgt.getFileName().toString(), tgtParentDir);
-                //TODO: handle StandardCopyOption.COPY_ATTRIBUTES
+                new MCRDirectory(tgt.getFileName().toString(), tgtParentDir);
             }
         }
     }
@@ -658,7 +653,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
 
         protected MCRPath path;
 
-        public BasicFileAttributeViewImpl(Path path) {
+        BasicFileAttributeViewImpl(Path path) {
             this.path = MCRPath.toMCRPath(path);
             if (!path.isAbsolute()) {
                 throw new InvalidPathException(path.toString(), "'path' must be absolute.");
@@ -766,7 +761,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         private static Set<String> allowedAttr = Sets.union(BasicFileAttributeViewImpl.allowedAttr,
             Sets.newHashSet(MD5_NAME));
 
-        public MD5FileAttributeViewImpl(Path path) {
+        MD5FileAttributeViewImpl(Path path) {
             super(path);
         }
 

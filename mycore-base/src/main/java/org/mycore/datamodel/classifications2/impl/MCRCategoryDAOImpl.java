@@ -141,7 +141,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         MCRCategoryImpl category = getByNaturalID(entityManager, id);
         try {
             entityManager.refresh(category); //for MCR-1863
-        } catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
             //required since hibernate 5.3 if category is deleted within same transaction.
             //junit: testLicenses()
         }
@@ -452,7 +452,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 .flatten(oldCategory, MCRCategory::getChildren, Collection::stream)
                 .filter(c -> newMap.containsKey(c.getId()))
                 .map(MCRCategoryImpl.class::cast)
-                .map(c -> new AbstractMap.SimpleEntry<>(c, newMap.get(c.getId()))) // key: category of old version, value: category of new version
+                .map(c -> new AbstractMap.SimpleEntry<>(c, newMap.get(c.getId())))
+                // key: category of old version, value: category of new version
                 .peek(e -> syncLabels(e.getValue(), e.getKey())) //sync from new to old version
                 .forEach(e -> e.getKey().setURI(e.getValue().getURI()));
             //detach all categories, we will rebuild tree structure later
@@ -504,7 +505,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             int parentPos = category.getPositionInParent();
             MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
             @SuppressWarnings("unchecked")
-            ArrayList<MCRCategoryImpl> copy = (ArrayList<MCRCategoryImpl>) new ArrayList(category.children);
+            ArrayList<MCRCategoryImpl> copy = new ArrayList(category.children);
             copy.forEach(MCRCategoryImpl::detachFromParent);
             parent.children.addAll(parentPos, copy);
             copy.forEach(c -> c.parent = parent); //fixes MCR-1963

@@ -28,10 +28,6 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
 
 abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
 
-    public MCRBasicFileAttributeViewImpl() {
-        super();
-    }
-
     static MCRFileAttributes<String> readAttributes(MCRStoredNode node) throws IOException {
         return node.getBasicFileAttributes();
     }

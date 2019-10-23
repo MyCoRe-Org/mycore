@@ -134,8 +134,8 @@ public class MCRFrontendUtil {
         }
         try {
             URL url = new URL(BASE_URL);
-            InetAddress BASE_HOST = InetAddress.getByName(url.getHost());
-            BASE_HOST_IP = BASE_HOST.getHostAddress();
+            InetAddress baseHost = InetAddress.getByName(url.getHost());
+            BASE_HOST_IP = baseHost.getHostAddress();
         } catch (MalformedURLException e) {
             LOGGER.error("Can't create URL from String {}", BASE_URL);
         } catch (UnknownHostException e) {
@@ -164,7 +164,8 @@ public class MCRFrontendUtil {
 
     /**
      * @param request current request to get property from
-     * @param name of request {@link HttpServletRequest#getAttribute(String) attribute} or {@link HttpServletRequest#getParameter(String) parameter}
+     * @param name of request {@link HttpServletRequest#getAttribute(String) attribute} or 
+     * {@link HttpServletRequest#getParameter(String) parameter}
      * @return an Optional that is either empty or contains a trimmed non-empty String that is either
      *  the value of the request attribute or a parameter (in that order) with the given <code>name</code>.
      */
@@ -190,8 +191,9 @@ public class MCRFrontendUtil {
         String remoteAddress = req.getRemoteAddr();
         if (TRUSTED_PROXIES.contains(remoteAddress)) {
             String xff = getXForwardedFor(req);
-            if (xff != null)
+            if (xff != null) {
                 remoteAddress = xff;
+            }
         }
         return remoteAddress;
     }
@@ -204,8 +206,9 @@ public class MCRFrontendUtil {
         if ((xff == null) || xff.trim().isEmpty()) {
             xff = req.getHeader(PROXY_HEADER_REMOTE_IP);
         }
-        if ((xff == null) || xff.trim().isEmpty())
+        if ((xff == null) || xff.trim().isEmpty()) {
             return null;
+        }
 
         // X_FORWARDED_FOR can be comma separated list of hosts,
         // if so, take last entry, all others are not reliable because
@@ -232,10 +235,9 @@ public class MCRFrontendUtil {
                     mcrSession.put(key, request.getParameter(name));
                     LOGGER.debug("Found HTTP-Req.-Parameter {}={} that should be saved in session, safed {}={}", name,
                         request.getParameter(name), key, request.getParameter(name));
-                }
-                // paramter is empty -> do not store and if contained in
-                // session, remove from it
-                else {
+                } else {
+                    // paramter is empty -> do not store and if contained in
+                    // session, remove from it
                     if (mcrSession.get(key) != null) {
                         mcrSession.deleteObject(key);
                     }
@@ -251,10 +253,9 @@ public class MCRFrontendUtil {
                     mcrSession.put(key, request.getAttribute(name));
                     LOGGER.debug("Found HTTP-Req.-Attribute {}={} that should be saved in session, safed {}={}", name,
                         request.getParameter(name), key, request.getParameter(name));
-                }
-                // attribute is empty -> do not store and if contained in
-                // session, remove from it
-                else {
+                } else {
+                    // attribute is empty -> do not store and if contained in
+                    // session, remove from it
                     if (mcrSession.get(key) != null) {
                         mcrSession.deleteObject(key);
                     }
@@ -294,16 +295,16 @@ public class MCRFrontendUtil {
      * Use this method when the client should cache the response data.
      * 
      * @param response the response data to cache
-     * @param CACHE_TIME how long to cache
+     * @param cacheTime how long to cache
      * @param lastModified when the data was last modified
      * @param useExpire true if 'Expire' header should be set
      */
-    public static void writeCacheHeaders(HttpServletResponse response, long CACHE_TIME, long lastModified,
+    public static void writeCacheHeaders(HttpServletResponse response, long cacheTime, long lastModified,
         boolean useExpire) {
-        response.setHeader("Cache-Control", "public, max-age=" + CACHE_TIME);
+        response.setHeader("Cache-Control", "public, max-age=" + cacheTime);
         response.setDateHeader("Last-Modified", lastModified);
         if (useExpire) {
-            Date expires = new Date(System.currentTimeMillis() + CACHE_TIME * 1000);
+            Date expires = new Date(System.currentTimeMillis() + cacheTime * 1000);
             LOGGER.debug("Last-Modified: {}, expire on: {}", new Date(lastModified), expires);
             response.setDateHeader("Expires", expires.getTime());
         }

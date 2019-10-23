@@ -18,7 +18,8 @@
 
 package org.mycore.datamodel.metadata;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.jdom2.Element;
 import org.junit.Test;
@@ -36,7 +37,7 @@ import com.ibm.icu.util.GregorianCalendar;
  *
  */
 public class MCRMetaHistoryDateTest extends MCRTestCase {
-    
+
     /**
      * check set date methods
      */
@@ -64,32 +65,32 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
      */
     @Test
     public void checkCreateParseEqualsClone() {
-        
-        MCRMetaHistoryDate julian_date = new MCRMetaHistoryDate("subtag","type",0);
+
+        MCRMetaHistoryDate julian_date = new MCRMetaHistoryDate("subtag", "type", 0);
         julian_date.setCalendar(MCRCalendar.TAG_JULIAN);
         julian_date.setVonDate("22.02.1964", julian_date.getCalendar());
         julian_date.setBisDate("22.02.1964", julian_date.getCalendar());
         julian_date.addText("mein Tag", "de");
         julian_date.setCalendar(MCRCalendar.TAG_GREGORIAN);
-        
-        MCRMetaHistoryDate gregorian_date = new MCRMetaHistoryDate("subtag","type",0);
+
+        MCRMetaHistoryDate gregorian_date = new MCRMetaHistoryDate("subtag", "type", 0);
         gregorian_date.setCalendar(MCRCalendar.TAG_GREGORIAN);
         gregorian_date.setVonDate("06.03.1964", gregorian_date.getCalendar());
         gregorian_date.setBisDate("06.03.1964", gregorian_date.getCalendar());
         gregorian_date.addText("mein Tag", "de");
-        
+
         Element julian_date_xml = julian_date.createXML();
         Element gregorian_date_xml = gregorian_date.createXML();
         assertTrue("XML elements should be equal", MCRXMLHelper.deepEqual(julian_date_xml, gregorian_date_xml));
-        
+
         MCRMetaHistoryDate julian_date_read = new MCRMetaHistoryDate();
         julian_date_read.setFromDOM(julian_date_xml);
         MCRMetaHistoryDate gregorian_date_read = new MCRMetaHistoryDate();
         gregorian_date_read.setFromDOM(gregorian_date_xml);
         assertEquals("read objects from XML should be equal", julian_date_read, gregorian_date_read);
-        
+
         MCRMetaHistoryDate gregorian_date_clone = gregorian_date_read.clone();
         assertEquals("cloned object should be equal with original", gregorian_date_read, gregorian_date_clone);
-   }
-    
+    }
+
 }

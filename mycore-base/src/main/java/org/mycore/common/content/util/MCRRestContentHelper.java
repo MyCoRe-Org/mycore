@@ -46,26 +46,10 @@ import com.google.common.collect.Iterables;
  */
 public abstract class MCRRestContentHelper {
 
-    private static Logger LOGGER = LogManager.getLogger();
-
     public static final RuntimeDelegate.HeaderDelegate<Date> DATE_HEADER_DELEGATE = RuntimeDelegate.getInstance()
         .createHeaderDelegate(Date.class);
 
-    public enum ContentDispositionType {
-        inline, attachment;
-    }
-
-    public static class Config {
-
-        public ContentDispositionType dispositionType = ContentDispositionType.attachment;
-
-        public boolean useAcceptRanges = true;
-
-        public int inputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
-
-        public int outputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
-
-    }
+    private static Logger LOGGER = LogManager.getLogger();
 
     public static Response serveContent(final MCRContent content, final UriInfo uriInfo,
         final HttpHeaders requestHeader)
@@ -209,6 +193,22 @@ public abstract class MCRRestContentHelper {
                 .header("Content-Range", "bytes */" + contentLength).build();
             throw new WebApplicationException(errResponse);
         }
+    }
+
+    public enum ContentDispositionType {
+        inline, attachment
+    }
+
+    public static class Config {
+
+        public ContentDispositionType dispositionType = ContentDispositionType.attachment;
+
+        public boolean useAcceptRanges = true;
+
+        public int inputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
+
+        public int outputBufferSize = ContentUtils.DEFAULT_BUFFER_SIZE;
+
     }
 
 }

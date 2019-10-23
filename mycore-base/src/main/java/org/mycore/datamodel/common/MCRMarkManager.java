@@ -141,7 +141,7 @@ public class MCRMarkManager {
      * @return true if its marked
      */
     public boolean isMarked(MCRBase base) {
-        if(base instanceof MCRDerivate) {
+        if (base instanceof MCRDerivate) {
             MCRDerivate derivate = (MCRDerivate) base;
             return isMarked(derivate.getId()) || isMarked(derivate.getOwnerID());
         }

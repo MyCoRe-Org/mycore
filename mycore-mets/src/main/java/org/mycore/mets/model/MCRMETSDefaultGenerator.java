@@ -163,7 +163,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
             if (isInExcludedRootFolder(directory.getKey())) {
                 structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, logicalDiv, structLink, lOrder);
             } else {
-                LogicalDiv section = new LogicalDiv("log_" + Integer.toString(++lOrder), "section", dirName);
+                LogicalDiv section = new LogicalDiv("log_" + ++lOrder, "section", dirName);
                 logicalDiv.add(section);
                 structureMets(directory.getKey(), ignoreNodes, fileSec, physicalDiv, section, structLink, lOrder);
             }
@@ -183,9 +183,8 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
             return;
         }
         int beginIndex = href.lastIndexOf("/") == -1 ? 0 : href.lastIndexOf("/") + 1;
-        int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ?
-                href.length() :
-                href.lastIndexOf(".");
+        int endIndex = (href.lastIndexOf(".") == -1 || href.lastIndexOf(".") <= beginIndex) ? href.length()
+            : href.lastIndexOf(".");
         String fileName = href.substring(beginIndex, endIndex);
         LOGGER.debug("Created fileName: {}", fileName);
 
@@ -254,7 +253,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
         this.createOrGetGroup(fileSec, fileUse).addFile(metsFile);
     }
 
-    private FileGrp createOrGetGroup(FileSec fileSec,String fileUse) {
+    private FileGrp createOrGetGroup(FileSec fileSec, String fileUse) {
         FileGrp fileGroup = fileSec.getFileGroup(fileUse);
         if (fileGroup == null) {
             fileGroup = new FileGrp(fileUse);

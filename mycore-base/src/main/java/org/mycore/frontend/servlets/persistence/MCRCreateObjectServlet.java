@@ -26,8 +26,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
@@ -47,12 +45,7 @@ import org.xml.sax.SAXParseException;
  */
 public class MCRCreateObjectServlet extends MCRPersistenceServlet {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 4143057048219690238L;
-
-    Logger LOGGER = LogManager.getLogger();
 
     private boolean appendDerivate = false;
 
@@ -133,8 +126,9 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
             if (objectId.getNumberAsInteger() == 0) {
                 String objId = mcrObject.getId().toString();
                 objectId = MCRObjectID.getNextFreeId(objectId.getBase());
-                if (mcrObject.getLabel().equals(objId))
+                if (mcrObject.getLabel().equals(objId)) {
                     mcrObject.setLabel(objectId.toString());
+                }
                 mcrObject.setId(objectId);
             }
         }
@@ -174,8 +168,8 @@ public class MCRCreateObjectServlet extends MCRPersistenceServlet {
         if (layout != null && layout.length() != 0) {
             sb.append('-').append(layout);
         }
-        String base_name = sb.toString();
-        String form = MCRPersistenceHelper.getWebPage(getServletContext(), base_name + ".xed", base_name + ".xml");
+        String baseName = sb.toString();
+        String form = MCRPersistenceHelper.getWebPage(getServletContext(), baseName + ".xed", baseName + ".xml");
         Properties params = new Properties();
         params.put("cancelUrl", MCRPersistenceHelper.getCancelUrl(request));
         params.put("mcrid", objectID.toString());

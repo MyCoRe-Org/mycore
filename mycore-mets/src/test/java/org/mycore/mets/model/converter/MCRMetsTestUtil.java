@@ -120,7 +120,7 @@ public class MCRMetsTestUtil {
         metsPage2.getFileList().add(new MCRMetsFile("2_A", "2.xml", "text/xml", MCRMetsModelHelper.ALTO_USE));
 
         MCRMetsPage metsPage3 = new MCRMetsPage("3_P", "3", "URN:special-urn3");
-        metsPage3.getFileList().add(new MCRMetsFile("3_M", "3.jpg", "image/jpeg",MCRMetsModelHelper.MASTER_USE));
+        metsPage3.getFileList().add(new MCRMetsFile("3_M", "3.jpg", "image/jpeg", MCRMetsModelHelper.MASTER_USE));
         metsPage3.getFileList().add(new MCRMetsFile("3_A", "3.xml", "text/xml", MCRMetsModelHelper.ALTO_USE));
 
         metsSimpleModel.getMetsPageList().add(metsPage1);

@@ -10,6 +10,7 @@
   <name>MyCoRe Persistent Identifier</name>
   <properties>
     <argLine>-Djdk.attach.allowAttachSelf</argLine>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>
@@ -27,7 +28,10 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine><!-- ${env.MAVEN_OPTS} --> @{argLine} -javaagent:${org.jmockit:jmockit:jar}</argLine>
+          <argLine>
+            <!-- ${env.MAVEN_OPTS} -->
+            @{argLine} -javaagent:${org.jmockit:jmockit:jar}
+          </argLine>
           <useSystemClassLoader>true</useSystemClassLoader>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
@@ -112,10 +116,6 @@
       <groupId>org.mycore</groupId>
       <artifactId>mycore-user2</artifactId>
       <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

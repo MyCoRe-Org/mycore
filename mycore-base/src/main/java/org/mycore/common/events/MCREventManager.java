@@ -42,14 +42,7 @@ import org.mycore.common.config.MCRConfigurationException;
  */
 public class MCREventManager {
 
-    private static Logger logger = LogManager.getLogger(MCREventManager.class);
-
-    private static MCREventManager instance;
-
     public static final String CONFIG_PREFIX = "MCR.EventHandler.";
-
-    /** Table of all configured event handlers * */
-    private Hashtable<String, List<MCREventHandler>> handlers;
 
     /** Call event handlers in forward direction (create, update) */
     public static final boolean FORWARD = true;
@@ -57,60 +50,12 @@ public class MCREventManager {
     /** Call event handlers in backward direction (delete) */
     public static final boolean BACKWARD = false;
 
-    /**
-     * Parse the property key of event handlers, extract type and mode.
-     * 
-     * @see MCREventHandler
-     * 
-     * @author Huu Chi Vu
-     *
-     */
-    private class EventHandlerProperty {
+    private static Logger logger = LogManager.getLogger(MCREventManager.class);
 
-        private String type;
+    private static MCREventManager instance;
 
-        private String mode;
-
-        public EventHandlerProperty(String propertyKey) {
-            String[] splitedKey = propertyKey.split("\\.");
-            if (splitedKey.length != 5) {
-                throw new MCRConfigurationException("Property key " + propertyKey + " for event handler not valid.");
-            }
-
-            this.setType(splitedKey[2]);
-            this.setMode(splitedKey[4]);
-        }
-
-        private void setType(String type) {
-            this.type = type;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        private void setMode(String mode) {
-            this.mode = mode;
-        }
-
-        public String getMode() {
-            return mode;
-        }
-
-    }
-
-    /**
-     * The singleton manager instance
-     * 
-     * @return the single event manager
-     */
-    public static synchronized MCREventManager instance() {
-        if (instance == null) {
-            instance = new MCREventManager();
-        }
-
-        return instance;
-    }
+    /** Table of all configured event handlers * */
+    private Hashtable<String, List<MCREventHandler>> handlers;
 
     private MCREventManager() {
         handlers = new Hashtable<>();
@@ -146,6 +91,19 @@ public class MCREventManager {
         }
     }
 
+    /**
+     * The singleton manager instance
+     * 
+     * @return the single event manager
+     */
+    public static synchronized MCREventManager instance() {
+        if (instance == null) {
+            instance = new MCREventManager();
+        }
+
+        return instance;
+    }
+
     private boolean propKeyIsSet(String propertyKey) {
         return MCRConfiguration.instance().getString(propertyKey).length() != 0;
     }
@@ -161,10 +119,10 @@ public class MCREventManager {
      * undoHandleEvent methods of all event handlers that are at a position
      * BEFORE the failed one, will be called in reversed order. The parameter
      * direction controls the order in which the event handlers are called.
-     * 
+     *
      * @see MCREventHandler#doHandleEvent
      * @see MCREventHandlerBase
-     * 
+     *
      * @param evt
      *            the event that happened
      * @param direction
@@ -226,7 +184,7 @@ public class MCREventManager {
 
     /**
      * Appends the event handler to the end of the list.
-     * 
+     *
      * @param type type of event e.g. MCRObject
      */
     public MCREventManager addEventHandler(String type, MCREventHandler handler) {
@@ -236,7 +194,7 @@ public class MCREventManager {
 
     /**
      * Inserts the event handler at the specified position.
-     * 
+     *
      * @param type type of event e.g. MCRObject
      * @param index index at which the specified element is to be inserted
      */
@@ -247,7 +205,7 @@ public class MCREventManager {
 
     /**
      * Removes the specified event handler.
-     * 
+     *
      * @param type type of event handler
      * @param handler the event handler to remove
      */
@@ -262,7 +220,7 @@ public class MCREventManager {
 
     /**
      * Removes all event handler of the specified type.
-     * 
+     *
      * @param type type to removed
      */
     public MCREventManager removeEventHandler(String type) {
@@ -290,5 +248,47 @@ public class MCREventManager {
 
     public interface MCREventHandlerInitializer {
         MCREventHandler getInstance(String propertyValue);
+    }
+
+    /**
+     * Parse the property key of event handlers, extract type and mode.
+     *
+     * @see MCREventHandler
+     *
+     * @author Huu Chi Vu
+     *
+     */
+    private class EventHandlerProperty {
+
+        private String type;
+
+        private String mode;
+
+        EventHandlerProperty(String propertyKey) {
+            String[] splitedKey = propertyKey.split("\\.");
+            if (splitedKey.length != 5) {
+                throw new MCRConfigurationException("Property key " + propertyKey + " for event handler not valid.");
+            }
+
+            this.setType(splitedKey[2]);
+            this.setMode(splitedKey[4]);
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        private void setType(String type) {
+            this.type = type;
+        }
+
+        public String getMode() {
+            return mode;
+        }
+
+        private void setMode(String mode) {
+            this.mode = mode;
+        }
+
     }
 }

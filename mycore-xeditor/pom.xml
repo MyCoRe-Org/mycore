@@ -10,9 +10,7 @@
   <artifactId>mycore-xeditor</artifactId>
   <name>MyCoRe XEditor</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>20</manifest.priority>
-    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>
@@ -55,10 +53,6 @@
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
   </dependencies>
 </project>

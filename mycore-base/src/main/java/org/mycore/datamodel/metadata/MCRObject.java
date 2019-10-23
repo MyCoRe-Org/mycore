@@ -49,10 +49,9 @@ public final class MCRObject extends MCRBase {
     public static final String ROOT_NAME = "mycoreobject";
 
     // the object content
-    private final MCRObjectStructure mcr_struct;
+    private final MCRObjectStructure structure;
 
-    private final MCRObjectMetadata mcr_metadata;
-
+    private final MCRObjectMetadata metadata;
 
     /**
      * This is the constructor of the MCRObject class. It creates an instance of
@@ -67,8 +66,8 @@ public final class MCRObject extends MCRBase {
      */
     public MCRObject() throws MCRException {
         super();
-        mcr_struct = new MCRObjectStructure();
-        mcr_metadata = new MCRObjectMetadata();
+        structure = new MCRObjectStructure();
+        metadata = new MCRObjectMetadata();
     }
 
     public MCRObject(byte[] bytes, boolean valid) throws SAXParseException {
@@ -92,8 +91,8 @@ public final class MCRObject extends MCRBase {
      * 
      * @return the instance of the MCRObjectMetadata class
      */
-    public final MCRObjectMetadata getMetadata() {
-        return mcr_metadata;
+    public MCRObjectMetadata getMetadata() {
+        return metadata;
     }
 
     /**
@@ -102,8 +101,8 @@ public final class MCRObject extends MCRBase {
      * 
      * @return the instance of the MCRObjectStructure class
      */
-    public final MCRObjectStructure getStructure() {
-        return mcr_struct;
+    public MCRObjectStructure getStructure() {
+        return structure;
     }
 
     /**
@@ -115,20 +114,20 @@ public final class MCRObject extends MCRBase {
      *                general Exception of MyCoRe
      */
     @Override
-    protected final void setUp() throws MCRException {
+    protected void setUp() throws MCRException {
         super.setUp();
 
         // get the structure data of the object
-        Element structureElement = jdom_document.getRootElement().getChild("structure");
+        Element structureElement = jdomDocument.getRootElement().getChild("structure");
         if (structureElement != null) {
-            mcr_struct.setFromDOM(structureElement);
+            structure.setFromDOM(structureElement);
         }
 
         // get the metadata of the object
-        Element metadataElement = jdom_document.getRootElement().getChild("metadata");
+        Element metadataElement = jdomDocument.getRootElement().getChild("metadata");
 
         if (metadataElement != null) {
-            mcr_metadata.setFromDOM(metadataElement);
+            metadata.setFromDOM(metadataElement);
         }
     }
 
@@ -140,16 +139,16 @@ public final class MCRObject extends MCRBase {
      * @return a JDOM Document with the XML data of the object as byte array
      */
     @Override
-    public final Document createXML() throws MCRException {
+    public Document createXML() throws MCRException {
         try {
             Document doc = super.createXML();
             Element elm = doc.getRootElement();
-            elm.addContent(mcr_struct.createXML());
-            elm.addContent(mcr_metadata.createXML());
-            elm.addContent(mcr_service.createXML());
+            elm.addContent(structure.createXML());
+            elm.addContent(metadata.createXML());
+            elm.addContent(mcrService.createXML());
             return doc;
         } catch (MCRException exc) {
-            throw new MCRException("The content of '" + mcr_id + "' is invalid.", exc);
+            throw new MCRException("The content of '" + mcrId + "' is invalid.", exc);
         }
     }
 
@@ -170,9 +169,9 @@ public final class MCRObject extends MCRBase {
     @Override
     public JsonObject createJSON() {
         JsonObject object = super.createJSON();
-        object.add("structure", mcr_struct.createJSON());
-        object.add("metadata", mcr_metadata.createJSON());
-        object.add("service", mcr_service.createJSON());
+        object.add("structure", structure.createJSON());
+        object.add("metadata", metadata.createJSON());
+        object.add("service", mcrService.createJSON());
         return object;
     }
 
@@ -184,19 +183,19 @@ public final class MCRObject extends MCRBase {
     /**
      * The method print all informations about this MCRObject.
      */
-    public final void debug() {
+    public void debug() {
         if (LOGGER.isDebugEnabled()) {
-            if (mcr_id == null) {
+            if (mcrId == null) {
                 LOGGER.debug("MCRObject ID : missing");
             } else {
-                LOGGER.debug("MCRObject ID : {}", mcr_id);
+                LOGGER.debug("MCRObject ID : {}", mcrId);
             }
-            LOGGER.debug("MCRObject Label : {}", mcr_label);
-            LOGGER.debug("MCRObject Schema : {}", mcr_schema);
+            LOGGER.debug("MCRObject Label : {}", mcrLabel);
+            LOGGER.debug("MCRObject Schema : {}", mcrSchema);
             LOGGER.debug("");
         }
-        mcr_struct.debug();
-        mcr_metadata.debug();
+        structure.debug();
+        metadata.debug();
     }
 
     /**

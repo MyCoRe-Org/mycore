@@ -63,67 +63,67 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     @Override
     public void storeNode(MCRFilesystemNode node) throws MCRPersistenceException {
 
-        String ID = node.getID();
-        String PID = node.getParentID();
-        String OWNER = node.getOwnerID();
-        String NAME = node.getName();
-        String LABEL = node.getLabel();
-        long SIZE = node.getSize();
+        String id = node.getID();
+        String pid = node.getParentID();
+        String owner = node.getOwnerID();
+        String name = node.getName();
+        String label = node.getLabel();
+        long size = node.getSize();
 
-        GregorianCalendar DATE = node.getLastModified();
+        GregorianCalendar date = node.getLastModified();
 
-        String TYPE = null;
-        String STOREID = null;
-        String STORAGEID = null;
-        String FCTID = null;
-        String MD5 = null;
+        String type = null;
+        String storeid = null;
+        String storageid = null;
+        String fctid = null;
+        String md5 = null;
 
-        int NUMCHDD = 0;
-        int NUMCHDF = 0;
-        int NUMCHTD = 0;
-        int NUMCHTF = 0;
+        int numchdd = 0;
+        int numchdf = 0;
+        int numchtd = 0;
+        int numchtf = 0;
 
         if (node instanceof MCRFile) {
             MCRFile file = (MCRFile) node;
 
-            TYPE = "F";
-            STOREID = file.getStoreID();
-            STORAGEID = file.getStorageID();
-            FCTID = file.getContentTypeID();
-            MD5 = file.getMD5();
+            type = "F";
+            storeid = file.getStoreID();
+            storageid = file.getStorageID();
+            fctid = file.getContentTypeID();
+            md5 = file.getMD5();
         } else if (node instanceof MCRDirectory) {
             MCRDirectory dir = (MCRDirectory) node;
 
-            TYPE = "D";
-            NUMCHDD = dir.getNumChildren(MCRDirectory.DIRECTORIES, MCRDirectory.HERE);
-            NUMCHDF = dir.getNumChildren(MCRDirectory.FILES, MCRDirectory.HERE);
-            NUMCHTD = dir.getNumChildren(MCRDirectory.DIRECTORIES, MCRDirectory.TOTAL);
-            NUMCHTF = dir.getNumChildren(MCRDirectory.FILES, MCRDirectory.TOTAL);
+            type = "D";
+            numchdd = dir.getNumChildren(MCRDirectory.DIRECTORIES, MCRDirectory.HERE);
+            numchdf = dir.getNumChildren(MCRDirectory.FILES, MCRDirectory.HERE);
+            numchtd = dir.getNumChildren(MCRDirectory.DIRECTORIES, MCRDirectory.TOTAL);
+            numchtf = dir.getNumChildren(MCRDirectory.FILES, MCRDirectory.TOTAL);
         } else {
             throw new MCRPersistenceException("MCRFilesystemNode must be either MCRFile or MCRDirectory");
         }
 
         Session session = getSession();
-        MCRFSNODES fs = session.get(MCRFSNODES.class, ID);
+        MCRFSNODES fs = session.get(MCRFSNODES.class, id);
         if (fs == null) {
             fs = new MCRFSNODES();
-            fs.setId(ID);
+            fs.setId(id);
         }
-        fs.setPid(PID);
-        fs.setType(TYPE);
-        fs.setOwner(OWNER);
-        fs.setName(NAME);
-        fs.setLabel(LABEL);
-        fs.setSize(SIZE);
-        fs.setDate(new Timestamp(DATE.getTime().getTime()));
-        fs.setStoreid(STOREID);
-        fs.setStorageid(STORAGEID);
-        fs.setFctid(FCTID);
-        fs.setMd5(MD5);
-        fs.setNumchdd(NUMCHDD);
-        fs.setNumchdf(NUMCHDF);
-        fs.setNumchtd(NUMCHTD);
-        fs.setNumchtf(NUMCHTF);
+        fs.setPid(pid);
+        fs.setType(type);
+        fs.setOwner(owner);
+        fs.setName(name);
+        fs.setLabel(label);
+        fs.setSize(size);
+        fs.setDate(new Timestamp(date.getTime().getTime()));
+        fs.setStoreid(storeid);
+        fs.setStorageid(storageid);
+        fs.setFctid(fctid);
+        fs.setMd5(md5);
+        fs.setNumchdd(numchdd);
+        fs.setNumchdf(numchdf);
+        fs.setNumchtd(numchtd);
+        fs.setNumchtf(numchtf);
         if (!session.contains(fs)) {
             session.saveOrUpdate(fs);
         }
@@ -168,20 +168,20 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     }
 
     @Override
-    public void deleteNode(String ID) throws MCRPersistenceException {
+    public void deleteNode(String id) throws MCRPersistenceException {
         Session session = getSession();
-        MCRFSNODES node = session.get(MCRFSNODES.class, ID);
+        MCRFSNODES node = session.get(MCRFSNODES.class, id);
         if (node != null) {
             session.delete(node); //MCR-1634
         }
     }
 
     @Override
-    public MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
+    public MCRFilesystemNode retrieveNode(String id) throws MCRPersistenceException {
         Session session = getSession();
-        MCRFSNODES node = session.get(MCRFSNODES.class, ID);
+        MCRFSNODES node = session.get(MCRFSNODES.class, id);
         if (node == null) {
-            LOGGER.warn("There is no FSNODE with ID = {}", ID);
+            LOGGER.warn("There is no FSNODE with ID = {}", id);
             return null;
         }
 

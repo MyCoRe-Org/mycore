@@ -57,7 +57,7 @@ public class MCRContentStoreFactory {
     private static boolean storeInitialized = false;
 
     public static synchronized Map<String, MCRContentStore> getAvailableStores() {
-        if(!storeInitialized) {
+        if (!storeInitialized) {
             Map<String, String> properties = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX);
             for (Map.Entry<String, String> prop : properties.entrySet()) {
                 String key = prop.getKey();
@@ -66,7 +66,7 @@ public class MCRContentStoreFactory {
                     initStore(storeID);
                 }
             }
-            storeInitialized =true;
+            storeInitialized = true;
         }
         return STORES;
     }
@@ -168,7 +168,7 @@ public class MCRContentStoreFactory {
 
         return EXTENDER_CLASSES.computeIfAbsent(storeID, key -> {
             String storeClass = "MCR.IFS.AVExtender." + key + CLASS_SUFFIX;
-            return MCRConfiguration.instance().<MCRAudioVideoExtender>getClass(storeClass, null);
+            return MCRConfiguration.instance().getClass(storeClass, null);
         });
     }
 

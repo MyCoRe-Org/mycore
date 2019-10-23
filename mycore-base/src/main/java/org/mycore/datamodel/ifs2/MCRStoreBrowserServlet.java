@@ -78,19 +78,22 @@ class MCRStoreBrowserRequest {
         String storeID = tokenizer.nextToken();
         getStore(storeID);
 
-        while (tokenizer.countTokens() > 1)
+        while (tokenizer.countTokens() > 1) {
             pathElements.add(tokenizer.nextToken());
+        }
     }
 
     /** Gets the MCRMetadataStore for the given storeID */
     private void getStore(String storeID) throws Exception {
-        if (storeID.contains("_"))
+        if (storeID.contains("_")) {
             store = MCRXMLMetadataManager.instance().getStore(storeID);
+        }
         // TODO: the store can never be null, instead an MCRPersistenceException is thrown
         if (store == null) {
             store = MCRStoreManager.getStore(storeID);
-            if (store == null)
+            if (store == null) {
                 store = MCRStoreManager.createStore(storeID, MCRMetadataStore.class);
+            }
         }
     }
 
@@ -100,10 +103,11 @@ class MCRStoreBrowserRequest {
 
         String[] children = dir.list();
         Element xml = new Element("storeBrowser");
-        if (children != null)
+        if (children != null) {
             for (String child : children) {
                 xml.addContent(buildXML(child));
             }
+        }
 
         return new Document(xml);
     }
@@ -160,12 +164,14 @@ class MCRStoreBrowserRequest {
     private String buildMinimumIDContained(String slot) {
         StringBuilder sb = new StringBuilder();
 
-        for (String token : pathElements)
+        for (String token : pathElements) {
             sb.append(token);
+        }
         sb.append(slot);
 
-        while (sb.length() < store.getIDLength())
+        while (sb.length() < store.getIDLength()) {
             sb.append("0");
+        }
 
         int id = Integer.parseInt(sb.toString());
         id = Math.max(id, 1); // Minimum possible ID is 1, not 0
@@ -184,8 +190,9 @@ class MCRStoreBrowserRequest {
     /** Returns the directory in filesystem the requested slot path is mapped to in the store */
     private File getRequestedDirectory() {
         File dir = getBaseDir();
-        for (String token : pathElements)
+        for (String token : pathElements) {
             dir = new File(dir, token);
+        }
         return dir;
     }
 

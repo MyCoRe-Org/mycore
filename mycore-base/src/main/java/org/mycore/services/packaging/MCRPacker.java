@@ -61,7 +61,8 @@ public abstract class MCRPacker {
     public abstract void rollback();
 
     /**
-     * @return a unmodifiable map with all properties (MCR.Packaging.Packer.MyPackerID. prefix will be removed from key) of this packer-id.
+     * @return a unmodifiable map with all properties (MCR.Packaging.Packer.MyPackerID. prefix will be removed from key)
+     * of this packer-id.
      */
     protected final Map<String, String> getConfiguration() {
         return Collections.unmodifiableMap(this.configuration);

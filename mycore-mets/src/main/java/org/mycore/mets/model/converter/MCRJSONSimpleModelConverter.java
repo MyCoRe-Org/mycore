@@ -26,6 +26,8 @@ import java.util.Map;
 
 import org.mycore.common.MCRException;
 import org.mycore.mets.model.MCRMetsModelHelper;
+import org.mycore.mets.model.converter.MCRAltoLinkTypeAdapter.MCRAltoLinkPlaceHolder;
+import org.mycore.mets.model.converter.MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder;
 import org.mycore.mets.model.simple.MCRMetsAltoLink;
 import org.mycore.mets.model.simple.MCRMetsFile;
 import org.mycore.mets.model.simple.MCRMetsLink;
@@ -62,9 +64,8 @@ public class MCRJSONSimpleModelConverter {
         List<MCRMetsLink> metsLinks = sectionPageLinkList
             .stream()
             .map((link) -> {
-                if (link instanceof MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder) {
-                    MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder placeholder
-                            = (MCRMetsLinkTypeAdapter.MCRMetsLinkPlaceholder) link;
+                if (link instanceof MCRMetsLinkPlaceholder) {
+                    MCRMetsLinkPlaceholder placeholder = (MCRMetsLinkPlaceholder) link;
                     MCRMetsSection metsSection = idSectionMap.get(placeholder.getFromString());
                     MCRMetsPage metsPage = idPageMap.get(placeholder.getToString());
                     return new MCRMetsLink(metsSection, metsPage);
@@ -95,9 +96,8 @@ public class MCRJSONSimpleModelConverter {
         idSectionTable.put(current.getId(), current);
 
         final List<MCRMetsAltoLink> altoLinks = current.getAltoLinks().stream().map(altoLink -> {
-            if (altoLink instanceof MCRAltoLinkTypeAdapter.MCRAltoLinkPlaceHolder) {
-                MCRAltoLinkTypeAdapter.MCRAltoLinkPlaceHolder ph
-                        = (MCRAltoLinkTypeAdapter.MCRAltoLinkPlaceHolder) altoLink;
+            if (altoLink instanceof MCRAltoLinkPlaceHolder) {
+                MCRAltoLinkPlaceHolder ph = (MCRAltoLinkPlaceHolder) altoLink;
                 if (!idFileMap.containsKey(ph.getFileID())) {
                     throw new MCRException(
                         "Could not parse link from section to alto! (FileID of alto not found in file list)");

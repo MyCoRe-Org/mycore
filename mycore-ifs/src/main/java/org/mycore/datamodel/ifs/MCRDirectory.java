@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
@@ -144,9 +144,9 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Internal constructor, do not use on your own.
      */
-    MCRDirectory(String ID, String parentID, String ownerID, String name, String label, long size,
+    MCRDirectory(String id, String parentID, String ownerID, String name, String label, long size,
         GregorianCalendar date, int numchdd, int numchdf, int numchtd, int numchtf) {
-        super(ID, parentID, ownerID, name, label, size, date);
+        super(id, parentID, ownerID, name, label, size, date);
 
         numChildDirsHere = numchdd;
         numChildFilesHere = numchdf;
@@ -157,13 +157,13 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Returns the MCRDirectory with the given ID.
      *
-     * @param ID
+     * @param id
      *            the unique ID of the MCRDirectory to return
      * @return the MCRDirectory with the given ID, or null if no such directory
      *         exists
      */
-    public static MCRDirectory getDirectory(String ID) {
-        return (MCRDirectory) MCRFilesystemNode.getNode(ID);
+    public static MCRDirectory getDirectory(String id) {
+        return (MCRDirectory) MCRFilesystemNode.getNode(id);
     }
 
     /**
@@ -186,7 +186,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      *            the new child
      */
     protected void addChild(MCRFilesystemNode child) {
-        if (child.parentID.equals(ID)) {
+        if (child.parentID.equals(id)) {
             if (child instanceof MCRFile) {
                 numChildFilesHere++;
             } else {
@@ -217,7 +217,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      *            the child to be removed from this directory
      */
     protected void removeChild(MCRFilesystemNode child) {
-        if (child.parentID.equals(ID)) {
+        if (child.parentID.equals(id)) {
             if (child instanceof MCRFile) {
                 numChildFilesHere--;
             } else {
@@ -251,7 +251,7 @@ public class MCRDirectory extends MCRFilesystemNode {
         ensureNotDeleted();
 
         if (children == null) {
-            children = manager.retrieveChildren(ID).stream()
+            children = manager.retrieveChildren(id).stream()
                 .collect(Collectors.toMap(MCRFilesystemNode::getName, f -> f, (u, v) -> {
                     throw new IllegalStateException(String.format(Locale.ROOT, "Duplicate key %s", u));
                 }, ConcurrentHashMap::new));
@@ -317,7 +317,7 @@ public class MCRDirectory extends MCRFilesystemNode {
             default:
                 return Optional.ofNullable(children)
                     .map(m -> m.get(name))
-                    .orElseGet(() -> manager.retrieveChild(ID, name));
+                    .orElseGet(() -> manager.retrieveChild(id, name));
         }
     }
 
@@ -511,11 +511,7 @@ public class MCRDirectory extends MCRFilesystemNode {
 
         String s = sb.toString();
 
-        try {
-            return s.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException shouldNeverBeThrown) {
-            return null;
-        }
+        return s.getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

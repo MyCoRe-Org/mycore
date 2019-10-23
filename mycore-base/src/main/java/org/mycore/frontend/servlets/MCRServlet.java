@@ -23,13 +23,15 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
+
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -63,8 +65,6 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.services.i18n.MCRTranslation;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-
-import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
 
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for logging and managing the current
@@ -287,24 +287,24 @@ public class MCRServlet extends HttpServlet {
         return session;
     }
 
-    private static byte[] filterIPByNetmask(final byte[] ip_array, final byte[] mask_array) {
-        for (int i = 0; i < ip_array.length; i++) {
-            ip_array[i] = (byte) (ip_array[i] & mask_array[i]);
+    private static byte[] filterIPByNetmask(final byte[] ip, final byte[] mask) {
+        for (int i = 0; i < ip.length; i++) {
+            ip[i] = (byte) (ip[i] & mask[i]);
         }
-        return ip_array;
+        return ip;
     }
 
-    private static byte[] decideNetmask(InetAddress IP) throws IOException {
-        if (hasIPVersion(IP, 4)) {
+    private static byte[] decideNetmask(InetAddress ip) throws IOException {
+        if (hasIPVersion(ip, 4)) {
             return SESSION_NETMASK_IPV4;
-        } else if (hasIPVersion(IP, 6)) {
+        } else if (hasIPVersion(ip, 6)) {
             return SESSION_NETMASK_IPV6;
         } else {
-            throw new IOException("Unknown or unidentifiable version of IP: " + IP.toString());
+            throw new IOException("Unknown or unidentifiable version of ip: " + ip);
         }
     }
 
-    private static Boolean hasIPVersion(InetAddress IP, int version) {
+    private static Boolean hasIPVersion(InetAddress ip, int version) {
         int byteLength;
         switch (version) {
             case 4:
@@ -314,9 +314,9 @@ public class MCRServlet extends HttpServlet {
                 byteLength = 16;
                 break;
             default:
-                throw new IndexOutOfBoundsException("Unknown IP version: " + version);
+                throw new IndexOutOfBoundsException("Unknown ip version: " + version);
         }
-        return IP.getAddress().length == byteLength;
+        return ip.getAddress().length == byteLength;
     }
 
     private static void bindSessionToRequest(HttpServletRequest req, String servletName, MCRSession session) {
@@ -545,8 +545,9 @@ public class MCRServlet extends HttpServlet {
      */
     protected void render(MCRServletJob job, Exception ex) throws Exception {
         // no info here how to handle
-        if (ex != null)
+        if (ex != null) {
             throw ex;
+        }
         if (job.getRequest().getMethod().equals("POST")) {
             doPost(job);
         } else {
@@ -601,11 +602,7 @@ public class MCRServlet extends HttpServlet {
 
             String name = (String) e.nextElement();
             String value = null;
-            try {
-                value = URLEncoder.encode(parameters.getProperty(name), "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                value = parameters.getProperty(name);
-            }
+            value = URLEncoder.encode(parameters.getProperty(name), StandardCharsets.UTF_8);
 
             redirectURL.append(name).append("=").append(value);
         }

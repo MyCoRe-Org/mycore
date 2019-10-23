@@ -19,7 +19,6 @@
 package org.mycore.orcid.oauth;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -94,7 +93,7 @@ public class MCROAuthServlet extends MCRServlet {
     }
 
     private void redirectToGetAuthorization(MCRServletJob job)
-        throws URISyntaxException, MalformedURLException, IOException {
+        throws URISyntaxException, IOException {
         String url = MCROAuthClient.instance().getCodeRequestURL(redirectURL, scopes);
         job.getResponse().sendRedirect(url);
     }

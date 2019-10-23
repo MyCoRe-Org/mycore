@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Locale;
 
@@ -95,8 +96,9 @@ public class MCRSolrURL {
         try {
             if (this.urlQuery == null) {
                 return new URL(
-                    solrClient.getBaseURL() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, "UTF-8") + "&start=" + start
-                        + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, "UTF-8")
+                    solrClient.getBaseURL() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, StandardCharsets.UTF_8)
+                        + "&start=" + start
+                        + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, StandardCharsets.UTF_8)
                         + (returnScore ? "&fl=*,score" : "")
                         + (wt != null ? "&wt=" + wt : ""));
             } else {

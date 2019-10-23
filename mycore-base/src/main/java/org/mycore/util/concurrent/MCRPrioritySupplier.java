@@ -18,7 +18,6 @@
 
 package org.mycore.util.concurrent;
 
-import java.time.Instant;
 import java.util.function.Supplier;
 
 /**

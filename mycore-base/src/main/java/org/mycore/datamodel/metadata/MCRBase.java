@@ -53,23 +53,23 @@ public abstract class MCRBase {
     public static final int MAX_LABEL_LENGTH = 256;
 
     // from configuration
-    protected static final MCRConfiguration mcr_conf;
+    protected static final MCRConfiguration CONFIGURATION;
 
-    protected static final String mcr_encoding;
+    protected static final String MCR_ENCODING;
 
     // the DOM document
-    protected org.jdom2.Document jdom_document = null;
+    protected Document jdomDocument = null;
 
     // the object content
-    protected MCRObjectID mcr_id = null;
+    protected MCRObjectID mcrId = null;
 
-    protected String mcr_label = null;
+    protected String mcrLabel = null;
 
-    protected String mcr_version = null;
+    protected String mcrVersion = null;
 
-    protected String mcr_schema = null;
+    protected String mcrSchema = null;
 
-    protected final MCRObjectService mcr_service;
+    protected final MCRObjectService mcrService;
 
     // other
     protected static final String NL;
@@ -85,12 +85,12 @@ public abstract class MCRBase {
         NL = System.getProperty("line.separator");
         SLASH = System.getProperty("file.separator");
         // Load the configuration
-        mcr_conf = MCRConfiguration.instance();
+        CONFIGURATION = MCRConfiguration.instance();
 
         // Default Encoding
-        mcr_encoding = mcr_conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
+        MCR_ENCODING = CONFIGURATION.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Encoding = {}", mcr_encoding);
+            LOGGER.debug("Encoding = {}", MCR_ENCODING);
         }
     }
 
@@ -102,25 +102,25 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      */
     public MCRBase() throws MCRException {
-        mcr_label = "";
-        mcr_version = MCRCoreVersion.getVersion();
-        mcr_schema = "";
+        mcrLabel = "";
+        mcrVersion = MCRCoreVersion.getVersion();
+        mcrSchema = "";
 
         // Service class
-        mcr_service = new MCRObjectService();
+        mcrService = new MCRObjectService();
     }
 
     protected void setFromJDOM(Document doc) {
-        jdom_document = doc;
+        jdomDocument = doc;
         setUp();
     }
 
     protected void setUp() {
-        if (jdom_document == null) {
+        if (jdomDocument == null) {
             throw new MCRException("The JDOM document is null or empty.");
         }
 
-        org.jdom2.Element rootElement = jdom_document.getRootElement();
+        Element rootElement = jdomDocument.getRootElement();
         setId(MCRObjectID.getInstance(rootElement.getAttributeValue("ID")));
         setLabel(rootElement.getAttributeValue("label"));
         setVersion(rootElement.getAttributeValue("version"));
@@ -129,7 +129,7 @@ public abstract class MCRBase {
         // get the service data of the object
         Element serviceElement = rootElement.getChild("service");
         if (serviceElement != null) {
-            mcr_service.setFromDOM(serviceElement);
+            mcrService.setFromDOM(serviceElement);
         }
     }
 
@@ -139,7 +139,7 @@ public abstract class MCRBase {
      * @return the id as MCRObjectID
      */
     public final MCRObjectID getId() {
-        return mcr_id;
+        return mcrId;
     }
 
     /**
@@ -149,7 +149,7 @@ public abstract class MCRBase {
      * @return the lable as a string
      */
     public final String getLabel() {
-        return mcr_label;
+        return mcrLabel;
     }
 
     /**
@@ -158,7 +158,7 @@ public abstract class MCRBase {
      * @return the version as a string
      */
     public final String getVersion() {
-        return mcr_version;
+        return mcrVersion;
     }
 
     /**
@@ -167,7 +167,7 @@ public abstract class MCRBase {
      * @return the schema as a string
      */
     public final String getSchema() {
-        return mcr_schema;
+        return mcrSchema;
     }
 
     /**
@@ -177,7 +177,7 @@ public abstract class MCRBase {
      * @return the instance of the MCRObjectService class
      */
     public final MCRObjectService getService() {
-        return mcr_service;
+        return mcrService;
     }
 
     /**
@@ -215,7 +215,7 @@ public abstract class MCRBase {
      *            the object ID
      */
     public void setId(MCRObjectID id) {
-        mcr_id = id;
+        mcrId = id;
     }
 
     /**
@@ -226,11 +226,11 @@ public abstract class MCRBase {
      */
     public final void setLabel(String label) {
         if (label == null) {
-            mcr_label = label;
+            mcrLabel = label;
         } else {
-            mcr_label = label.trim();
-            if (mcr_label.length() > MAX_LABEL_LENGTH) {
-                mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
+            mcrLabel = label.trim();
+            if (mcrLabel.length() > MAX_LABEL_LENGTH) {
+                mcrLabel = mcrLabel.substring(0, MAX_LABEL_LENGTH);
             }
         }
     }
@@ -239,7 +239,7 @@ public abstract class MCRBase {
      * This methods set the MyCoRe version to the string 'Version 1.3'.
      */
     public final void setVersion(String version) {
-        mcr_version = version != null ? version : MCRCoreVersion.getVersion();
+        mcrVersion = version != null ? version : MCRCoreVersion.getVersion();
     }
 
     /**
@@ -250,12 +250,12 @@ public abstract class MCRBase {
      */
     public final void setSchema(String schema) {
         if (schema == null) {
-            mcr_schema = "";
+            mcrSchema = "";
 
             return;
         }
 
-        mcr_schema = schema.trim();
+        mcrSchema = schema.trim();
     }
 
     /**
@@ -271,12 +271,12 @@ public abstract class MCRBase {
         Document doc = new Document(elm);
         elm.addNamespaceDeclaration(XSI_NAMESPACE);
         elm.addNamespaceDeclaration(XLINK_NAMESPACE);
-        elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
-        elm.setAttribute("ID", mcr_id.toString());
-        if (mcr_label != null) {
-            elm.setAttribute("label", mcr_label);
+        elm.setAttribute("noNamespaceSchemaLocation", mcrSchema, XSI_NAMESPACE);
+        elm.setAttribute("ID", mcrId.toString());
+        if (mcrLabel != null) {
+            elm.setAttribute("label", mcrLabel);
         }
-        elm.setAttribute("version", mcr_version);
+        elm.setAttribute("version", mcrVersion);
         return doc;
     }
 
@@ -294,11 +294,11 @@ public abstract class MCRBase {
      */
     public JsonObject createJSON() {
         JsonObject base = new JsonObject();
-        base.addProperty("id", mcr_id.toString());
-        if (mcr_label != null) {
-            base.addProperty("label", mcr_label);
+        base.addProperty("id", mcrId.toString());
+        if (mcrLabel != null) {
+            base.addProperty("label", mcrLabel);
         }
-        base.addProperty("version", mcr_version);
+        base.addProperty("version", mcrVersion);
         return base;
     }
 
@@ -320,7 +320,7 @@ public abstract class MCRBase {
             validate();
             return true;
         } catch (MCRException exc) {
-            LOGGER.warn("The content of this object '{}' is invalid.", mcr_id, exc);
+            LOGGER.warn("The content of this object '{}' is invalid.", mcrId, exc);
         }
         return false;
     }
@@ -336,20 +336,20 @@ public abstract class MCRBase {
      * @throws MCRException the content is invalid
      */
     public void validate() throws MCRException {
-        if (mcr_id == null) {
+        if (mcrId == null) {
             throw new MCRException("MCRObjectID is undefined.");
         }
         if (getSchema() == null || getSchema().length() == 0) {
-            throw new MCRException("XML Schema of '" + mcr_id + "' is undefined.");
+            throw new MCRException("XML Schema of '" + mcrId + "' is undefined.");
         }
         MCRObjectService service = getService();
         if (service == null) {
-            throw new MCRException("The <service> part of '" + mcr_id + "' is undefined.");
+            throw new MCRException("The <service> part of '" + mcrId + "' is undefined.");
         }
         try {
             service.validate();
         } catch (MCRException exc) {
-            throw new MCRException("The <service> part of '" + mcr_id + "' is invalid.", exc);
+            throw new MCRException("The <service> part of '" + mcrId + "' is invalid.", exc);
         }
     }
 
@@ -363,6 +363,6 @@ public abstract class MCRBase {
 
     @Override
     public String toString() {
-        return this.mcr_id.toString();
+        return this.mcrId.toString();
     }
 }

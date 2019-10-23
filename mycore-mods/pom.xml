@@ -10,8 +10,8 @@
   <artifactId>mycore-mods</artifactId>
   <name>MyCoRe MODS</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>50</manifest.priority>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>
@@ -105,10 +105,6 @@
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
     <dependency>
       <groupId>com.ibm.icu</groupId>

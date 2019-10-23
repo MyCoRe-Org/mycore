@@ -26,7 +26,7 @@ package org.mycore.datamodel.ifs;
  */
 public class MCRFileContentType {
     /** The unique ID of this file content type */
-    protected String ID;
+    protected String id;
 
     /** The label of this file content type */
     protected String label;
@@ -46,7 +46,7 @@ public class MCRFileContentType {
      * 
      * @see MCRFileContentTypeFactory
      * 
-     * @param ID
+     * @param id
      *            the unique content type ID
      * @param label
      *            the label of this content type
@@ -55,8 +55,8 @@ public class MCRFileContentType {
      * @param mimeType
      *            the MIME type used for this content type
      */
-    MCRFileContentType(String ID, String label, String url, String mimeType) {
-        this.ID = ID;
+    MCRFileContentType(String id, String label, String url, String mimeType) {
+        this.id = id;
         this.label = label;
         this.url = url;
         this.mimeType = mimeType;
@@ -68,7 +68,7 @@ public class MCRFileContentType {
      * @return the unique ID of this file content type
      */
     public String getID() {
-        return ID;
+        return id;
     }
 
     /**
@@ -111,14 +111,15 @@ public class MCRFileContentType {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof MCRFileContentType)
-            return ((MCRFileContentType) other).ID.equals(ID);
-        else
+        if (other instanceof MCRFileContentType) {
+            return ((MCRFileContentType) other).id.equals(id);
+        } else {
             return false;
+        }
     }
 
     @Override
     public int hashCode() {
-        return ID.hashCode();
+        return id.hashCode();
     }
 }

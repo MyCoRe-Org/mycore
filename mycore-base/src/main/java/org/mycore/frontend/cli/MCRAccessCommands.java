@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -84,14 +85,14 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      */
     public static void createPermissionsFromFile(String filename) throws Exception {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
         if (!checkFilename(filename)) {
             return;
         }
         LOGGER.info("Reading file {} ...", filename);
 
-        org.jdom2.Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(filename));
-        org.jdom2.Element rootelm = doc.getRootElement();
+        Document doc = MCRXMLParserFactory.getValidatingParser().parseXML(new MCRFileContent(filename));
+        Element rootelm = doc.getRootElement();
 
         if (!rootelm.getName().equals("mcrpermissions")) {
             throw new MCRException("The data are not for mcrpermissions.");
@@ -108,9 +109,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             Element rule = mcrpermission.getChild("condition").clone();
             String objectid = mcrpermission.getAttributeValue("objectid");
             if (objectid == null) {
-                AI.addRule(permissionName, rule, ruleDescription);
+                accessImpl.addRule(permissionName, rule, ruleDescription);
             } else {
-                AI.addRule(objectid, permissionName, rule, ruleDescription);
+                accessImpl.addRule(objectid, permissionName, rule, ruleDescription);
             }
         }
     }
@@ -137,9 +138,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "Remove all permission entries from the Access Control System.",
         order = 40)
     public static void deleteAllPermissions() throws Exception {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        for (String permission : AI.getPermissions()) {
-            AI.removeRule(permission);
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        for (String permission : accessImpl.getPermissions()) {
+            accessImpl.removeRule(permission);
         }
     }
 
@@ -153,8 +154,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "Remove a named permission entriy from the Access Control System.",
         order = 30)
     public static void deletePermission(String permission) throws Exception {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        AI.removeRule(permission);
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        accessImpl.removeRule(permission);
     }
 
     /**
@@ -163,20 +164,20 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "list all permissions", help = "List all permission entries.", order = 20)
     public static void listAllPermissions() throws MCRException {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        Collection<String> permissions = AI.getPermissions();
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        Collection<String> permissions = accessImpl.getPermissions();
         boolean noPermissionsDefined = true;
         for (String permission : permissions) {
             noPermissionsDefined = false;
-            String description = AI.getRuleDescription(permission);
+            String description = accessImpl.getRuleDescription(permission);
             if (description.equals("")) {
                 description = "No description";
             }
-            org.jdom2.Element rule = AI.getRule(permission);
+            Element rule = accessImpl.getRule(permission);
             LOGGER.info("       {}", permission);
             LOGGER.info("           {}", description);
             if (rule != null) {
-                org.jdom2.output.XMLOutputter o = new org.jdom2.output.XMLOutputter();
+                XMLOutputter o = new XMLOutputter();
                 LOGGER.info("           {}", o.outputString(rule));
             }
         }
@@ -196,22 +197,22 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "Export all permissions from the Access Control System to the file {0}.",
         order = 50)
     public static void exportAllPermissionsToFile(String filename) throws Exception {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
 
         Element mcrpermissions = new Element("mcrpermissions");
         mcrpermissions.addNamespaceDeclaration(XSI_NAMESPACE);
         mcrpermissions.addNamespaceDeclaration(XLINK_NAMESPACE);
         mcrpermissions.setAttribute("noNamespaceSchemaLocation", "MCRPermissions.xsd", XSI_NAMESPACE);
         Document doc = new Document(mcrpermissions);
-        Collection<String> permissions = AI.getPermissions();
+        Collection<String> permissions = accessImpl.getPermissions();
         for (String permission : permissions) {
             Element mcrpermission = new Element("mcrpermission");
             mcrpermission.setAttribute("name", permission);
-            String ruleDescription = AI.getRuleDescription(permission);
+            String ruleDescription = accessImpl.getRuleDescription(permission);
             if (!ruleDescription.equals("")) {
                 mcrpermission.setAttribute("ruledescription", ruleDescription);
             }
-            Element rule = AI.getRule(permission);
+            Element rule = accessImpl.getRule(permission);
             mcrpermission.addContent(rule);
             mcrpermissions.addContent(mcrpermission);
         }
@@ -221,8 +222,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         }
         FileOutputStream fos = new FileOutputStream(file);
         LOGGER.info("Writing to file {} ...", filename);
-        String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
-        XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));
+        String mcrEncoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
+        XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcrEncoding));
         out.output(doc, fos);
     }
 
@@ -278,12 +279,12 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         order = 60)
     public static void permissionUpdateForID(String permission, String id, String strFileRule, String description)
         throws Exception {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
         Element rule = getRuleFromFile(strFileRule);
         if (rule == null) {
             return;
         }
-        AI.addRule(id, permission, rule, description);
+        accessImpl.addRule(id, permission, rule, description);
     }
 
     /**
@@ -297,7 +298,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "update permission {0} for selected with rulefile {1}",
-        help = "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule",
+        help = "The command updates access rule for a given permission and all ids "
+            + "of a given MCRObject-Type with a given special rule",
         order = 90)
     public static void permissionUpdateForSelected(String permission, String strFileRule) throws Exception {
         permissionUpdateForSelected(permission, strFileRule, "");
@@ -318,17 +320,18 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "update permission {0} for selected with rulefile {1} described by {2}",
-        help = "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule",
+        help = "The command updates access rule for a given permission and all ids "
+            + "of a given MCRObject-Type with a given special rule",
         order = 80)
     public static void permissionUpdateForSelected(String permission, String strFileRule, String description)
         throws Exception {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
         Element rule = getRuleFromFile(strFileRule);
         if (rule == null) {
             return;
         }
         for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
-            AI.addRule(id, permission, rule, description);
+            accessImpl.addRule(id, permission, rule, description);
         }
     }
 
@@ -344,8 +347,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "The command delete access rule for a given id of a given permission",
         order = 110)
     public static void permissionDeleteForID(String permission, String id) {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        AI.removeRule(id, permission);
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        accessImpl.removeRule(id, permission);
     }
 
     /**
@@ -358,8 +361,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "The command delete all access rules for a given id",
         order = 120)
     public static void permissionDeleteAllForID(String id) {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        AI.removeAllRules(id);
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        accessImpl.removeAllRules(id);
     }
 
     /**
@@ -373,9 +376,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "The command delete access rule for a query selected set of object ids of a given permission",
         order = 130)
     public static void permissionDeleteForSelected(String permission) {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
         for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
-            AI.removeRule(id, permission);
+            accessImpl.removeRule(id, permission);
         }
     }
 
@@ -389,15 +392,17 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "The command delete all access rules for a query selected set of object ids",
         order = 140)
     public static void permissionDeleteAllForSelected() {
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
         for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
-            AI.removeAllRules(id);
+            accessImpl.removeAllRules(id);
         }
     }
 
     @MCRCommand(
         syntax = "set website read only {0}",
-        help = "This command set the whole website into read only mode and provides the given message to users. Nobody, except super user can write on system, using web frontend. Parameter {0} specifies a message to be displayed",
+        help = "This command set the whole website into read only mode and provides the given message to users. "
+            + "Nobody, except super user can write on system, using web frontend. Parameter {0} specifies a message "
+            + "to be displayed",
         order = 150)
     public static void setWebsiteReadOnly(String message) {
         MCRWebsiteWriteProtection.activate(message);
@@ -405,7 +410,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "set website read only",
-        help = "This command set the whole website into read only mode. An already configurated message will be displayed to users. Nobody, except super user can write on system, using web frontend",
+        help = "This command set the whole website into read only mode. "
+            + "An already configurated message will be displayed to users. "
+            + "Nobody, except super user can write on system, using web frontend",
         order = 160)
     public static void setWebsiteReadOnly() {
         MCRWebsiteWriteProtection.activate();
@@ -414,7 +421,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     @MCRCommand(
         syntax = "unset website read only",
-        help = "This command removes the write protection (read only) from website. After unsetting anybody can write as usual, using web frontend",
+        help = "This command removes the write protection (read only) from website. "
+            + "After unsetting anybody can write as usual, using web frontend",
         order = 170)
     public static void unsetWebsiteReadOnly() {
         MCRWebsiteWriteProtection.deactivate();

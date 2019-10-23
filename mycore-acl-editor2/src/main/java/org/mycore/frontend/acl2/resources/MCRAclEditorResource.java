@@ -69,8 +69,11 @@ public class MCRAclEditorResource {
     private static final MCRAccessStore ACCESS_STORE = MCRAccessStore.getInstance();
 
     private static final String JSON_ACCESSID = "accessID";
+
     private static final String JSON_ACCESSPOOL = "accessPool";
+
     private static final String JSON_RULE = "rule";
+
     private static final String JSON_SUCCESS = "success";
 
     @Context
@@ -345,7 +348,7 @@ public class MCRAclEditorResource {
 
     private MCRAccessRule createAccessRule(String ruleDesc, String ruleText) {
         int freeRuleID = RULE_STORE.getNextFreeRuleID("SYSTEMRULE");
-        String ruleID = "0000000000" + String.valueOf(freeRuleID);
+        String ruleID = "0000000000" + freeRuleID;
         ruleID = ruleID.substring(ruleID.length() - "0000000000".length());
         String newRuleID = "SYSTEMRULE" + ruleID;
         String uid = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();

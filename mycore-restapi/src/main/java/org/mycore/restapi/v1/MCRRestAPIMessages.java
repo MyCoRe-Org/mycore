@@ -21,6 +21,7 @@ package org.mycore.restapi.v1;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -104,7 +105,8 @@ public class MCRRestAPIMessages {
             if (FORMAT_XML.equals(format)) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 data.storeToXML(baos, "MyCoRe Messages");
-                return Response.ok(baos.toString("UTF-8")).type("application/xml; charset=UTF-8").build();
+                return Response.ok(baos.toString(StandardCharsets.UTF_8)).type("application/xml; charset=UTF-8")
+                    .build();
             }
             if (FORMAT_JSON.equals(format)) {
                 StringWriter sw = new StringWriter();

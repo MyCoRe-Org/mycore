@@ -86,7 +86,8 @@ public class MCRParameterCollector {
      * Next, HTTP request attributes are copied.
      * 
      * @param request the HttpRequest causing the XSL transformation, must NOT be null
-     * @param onlySetXSLParameters if true, only those parameters starting with "XSL." are copied from session and request
+     * @param onlySetXSLParameters if true, only those parameters starting with "XSL."
+     *                            are copied from session and request
      */
     public MCRParameterCollector(HttpServletRequest request, boolean onlySetXSLParameters) {
         this.onlySetXSLParameters = onlySetXSLParameters;
@@ -161,12 +162,14 @@ public class MCRParameterCollector {
      * Sets the parameter only if it is not empty and starts with "XSL." or onlySetXSLParameters is false
      */
     private void setXSLParameter(String name, String value) {
-        if ((value == null) || value.isEmpty())
+        if ((value == null) || value.isEmpty()) {
             return;
-        if (name.startsWith("XSL."))
+        }
+        if (name.startsWith("XSL.")) {
             parameters.put(name.substring(4), value);
-        else if (!onlySetXSLParameters)
+        } else if (!onlySetXSLParameters) {
             parameters.put(name, value);
+        }
     }
 
     /**
@@ -209,7 +212,7 @@ public class MCRParameterCollector {
      * others will be ignored. The "XSL." prefix is cut off from the name.
      */
     private void setFromSession(MCRSession session) {
-        Objects.requireNonNull(session,"Session needs to be not null!");
+        Objects.requireNonNull(session, "Session needs to be not null!");
         for (Map.Entry<Object, Object> entry : session.getMapEntries()) {
             String key = entry.getKey().toString();
             if (entry.getValue() != null) {
@@ -225,8 +228,9 @@ public class MCRParameterCollector {
     private void setFromRequestParameters(HttpServletRequest request) {
         for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
             String name = e.nextElement();
-            if (!(name.endsWith(".SESSION")))
+            if (!(name.endsWith(".SESSION"))) {
                 setXSLParameter(name, request.getParameter(name));
+            }
         }
     }
 

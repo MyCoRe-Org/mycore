@@ -138,9 +138,8 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
 
     private void send(Session session, MCRWebSocketMessage responseMessage) {
         String msg = new Gson().toJson(responseMessage);
-        AsyncSender.send(session, msg);
+        AsyncSenderHelper.send(session, msg);
     }
-
 
     /**
      * Tomcat does not support async sending of messages. We have to implement
@@ -148,7 +147,7 @@ public class MCRProcessableWebsocketSenderImpl implements MCRProcessableWebsocke
      *
      * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=56026">tomcat bug</a>
      */
-    private static class AsyncSender {
+    private static class AsyncSenderHelper {
 
         private static Logger LOGGER = LogManager.getLogger();
 

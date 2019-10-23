@@ -64,17 +64,9 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
-    private MCRCache<String, InputSourceProvider> bytesCache;
-
     XMLCatalogResolver catalogResolver;
 
-    private static class MCREntityResolverHolder {
-        public static MCREntityResolver instance = new MCREntityResolver();
-    }
-
-    public static MCREntityResolver instance() {
-        return MCREntityResolverHolder.instance;
-    }
+    private MCRCache<String, InputSourceProvider> bytesCache;
 
     private MCREntityResolver() {
         Enumeration<URL> systemResources;
@@ -93,6 +85,22 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         catalogResolver = new XMLCatalogResolver(catalogs);
         int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
         bytesCache = new MCRCache<>(cacheSize, "EntityResolver Resources");
+    }
+
+    public static MCREntityResolver instance() {
+        return MCREntityResolverHolder.instance;
+    }
+
+    private static boolean isAbsoluteURL(String url) {
+        try {
+            URL baseHttp = new URL("http://www.mycore.org");
+            URL baseFile = new URL("file:///");
+            URL relativeHttp = new URL(baseHttp, url);
+            URL relativeFile = new URL(baseFile, url);
+            return relativeFile.equals(relativeHttp);
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 
     /* (non-Javadoc)
@@ -246,16 +254,8 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         return entity;
     }
 
-    private static boolean isAbsoluteURL(String url) {
-        try {
-            URL baseHttp = new URL("http://www.mycore.org");
-            URL baseFile = new URL("file:///");
-            URL relativeHttp = new URL(baseHttp, url);
-            URL relativeFile = new URL(baseFile, url);
-            return relativeFile.equals(relativeHttp);
-        } catch (MalformedURLException e) {
-            return false;
-        }
+    private static class MCREntityResolverHolder {
+        public static MCREntityResolver instance = new MCREntityResolver();
     }
 
     private static class InputSourceProvider {
@@ -263,7 +263,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
 
         URL url;
 
-        public InputSourceProvider(byte[] bytes, URL url) {
+        InputSourceProvider(byte[] bytes, URL url) {
             this.bytes = bytes;
             this.url = url;
         }

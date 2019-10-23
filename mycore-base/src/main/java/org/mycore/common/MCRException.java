@@ -60,7 +60,8 @@ public class MCRException extends RuntimeException {
      * @param message
      *            the error message for this exception
      * @param cause
-     *            the cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the cause is nonexistent or unknown.)
+     *            the cause (which is saved for later retrieval by the {@link Throwable#getCause()} method).
+     *            (A null value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public MCRException(String message, Throwable cause) {
         super(message, cause);

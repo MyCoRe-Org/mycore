@@ -126,12 +126,12 @@ public class MCRObjectStructure {
     /**
      * This method set the parent value from a given MCRMetaLinkID.
      * 
-     * @param in_parent
+     * @param parent
      *            the MCRMetaLinkID to set
      *  
      */
-    public final void setParent(MCRMetaLinkID in_parent) {
-        parent = in_parent;
+    public final void setParent(MCRMetaLinkID parent) {
+        this.parent = parent;
     }
 
     public final void setParent(MCRObjectID parentID) {
@@ -219,11 +219,10 @@ public class MCRObjectStructure {
      * @return
      */
     private boolean removeMetaLink(List<? extends MCRMetaLinkID> list, MCRObjectID href) {
-        final List<MCRMetaLink> toRemove =
-            list.stream()
-                .filter(ml -> ml.getXLinkHrefID().equals(href))
-                .collect(Collectors.toList());
-        return  list.removeAll(toRemove);
+        final List<MCRMetaLink> toRemove = list.stream()
+            .filter(ml -> ml.getXLinkHrefID().equals(href))
+            .collect(Collectors.toList());
+        return list.removeAll(toRemove);
     }
 
     /**
@@ -238,18 +237,18 @@ public class MCRObjectStructure {
      * derivate vector. If the link could be added a "true" will be returned,
      * otherwise "false".
      * 
-     * @param add_derivate
+     * @param derivate
      *            the link to be added as MCRMetaLinkID
      */
-    public final boolean addDerivate(MCRMetaEnrichedLinkID add_derivate) {
-        MCRObjectID href = add_derivate.getXLinkHrefID();
+    public final boolean addDerivate(MCRMetaEnrichedLinkID derivate) {
+        MCRObjectID href = derivate.getXLinkHrefID();
         if (containsDerivate(href)) {
             return false;
         }
         if (!MCRMetadataManager.exists(href)) {
             LOGGER.warn("Cannot find derivate {}, will add it anyway.", href);
         }
-        derivates.add(add_derivate);
+        derivates.add(derivate);
         derivates.sort(Comparator.comparingInt(MCRMetaEnrichedLinkID::getOrder));
         return true;
     }
@@ -347,11 +346,11 @@ public class MCRObjectStructure {
 
     /**
      * <em>createXML</em> is the inverse of setFromDOM and converts the
-     * structure's memory copy into an XML string.
+     * structure's memory copy into XML.
      * 
      * @exception MCRException
      *                if the content of this class is not valid
-     * @return org.jdom2.Element the structure XML string
+     * @return the structure XML
      */
     public final Element createXML() throws MCRException {
         try {

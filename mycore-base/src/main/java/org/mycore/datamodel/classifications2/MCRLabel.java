@@ -152,11 +152,11 @@ public class MCRLabel implements Cloneable, Serializable {
      */
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = 1;
-        result = PRIME * result + getDescription().hashCode();
-        result = PRIME * result + (lang == null ? 0 : lang.hashCode());
-        result = PRIME * result + (text == null ? 0 : text.hashCode());
+        result = prime * result + getDescription().hashCode();
+        result = prime * result + (lang == null ? 0 : lang.hashCode());
+        result = prime * result + (text == null ? 0 : text.hashCode());
         return result;
     }
 

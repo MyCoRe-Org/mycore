@@ -17,7 +17,7 @@
  */
 
 namespace mycore.viewer.model {
-    import DropdownButtonController = mycore.viewer.widgets.toolbar.DropdownButtonController;
+    
     export class MyCoReDesktopToolbarModel extends model.MyCoReBasicToolbarModel {
 
         constructor(name = "MyCoReDesktopToolbar") {

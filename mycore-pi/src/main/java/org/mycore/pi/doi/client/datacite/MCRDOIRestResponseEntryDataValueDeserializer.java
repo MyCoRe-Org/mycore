@@ -26,7 +26,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-public class MCRDOIRestResponseEntryDataValueDeserializer implements JsonDeserializer<MCRDataciteRestResponseEntryData> {
+public class MCRDOIRestResponseEntryDataValueDeserializer
+    implements JsonDeserializer<MCRDataciteRestResponseEntryData> {
     @Override
     public MCRDataciteRestResponseEntryData deserialize(JsonElement jsonElement, Type type,
         JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {

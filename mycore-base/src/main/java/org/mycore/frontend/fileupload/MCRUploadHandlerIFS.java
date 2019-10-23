@@ -152,10 +152,11 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
         MCRObjectID derivateID = getOrCreateDerivateID();
 
-        if (MCRMetadataManager.exists(derivateID))
+        if (MCRMetadataManager.exists(derivateID)) {
             this.derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
-        else
+        } else {
             this.derivate = createDerivate(derivateID);
+        }
 
         getOrCreateRootDirectory();
 
@@ -168,8 +169,9 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             MCRObjectID oid = MCRObjectID.getNextFreeId(projectID + '_' + ID_TYPE);
             this.derivateID = oid.toString();
             return oid;
-        } else
+        } else {
             return MCRObjectID.getInstance(derivateID);
+        }
     }
 
     private MCRDerivate createDerivate(MCRObjectID derivateID)
@@ -202,8 +204,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     protected void setDefaultPermissions(MCRObjectID derivateID) {
         if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
-            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+            MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+            Collection<String> configuredPermissions = accessImpl.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
                     "default derivate rule");

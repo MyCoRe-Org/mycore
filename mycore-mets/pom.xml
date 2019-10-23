@@ -12,9 +12,9 @@
   <name>MyCoRe METS</name>
   <properties>
     <TestResultDir>${project.build.directory}/failsafe-reports/</TestResultDir>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <jetty.port>9301</jetty.port>
     <manifest.priority>45</manifest.priority>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>
@@ -125,10 +125,6 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-support</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
   </dependencies>
   <profiles>

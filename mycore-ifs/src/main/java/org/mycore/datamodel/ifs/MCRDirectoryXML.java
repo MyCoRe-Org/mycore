@@ -43,13 +43,13 @@ public class MCRDirectoryXML {
 
     static Logger LOGGER = LogManager.getLogger(MCRDirectoryXML.class);
 
-    private static final String dateFormat = "dd.MM.yyyy HH:mm:ss";
+    private static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
 
-    private static final DateFormat dateFormatter = new SimpleDateFormat(dateFormat, Locale.ROOT);
+    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT, Locale.ROOT);
 
-    private static final String timeFormat = "HH:mm:ss";
+    private static final String TIME_FORMAT = "HH:mm:ss";
 
-    private static final DateFormat timeFormatter = new SimpleDateFormat(timeFormat, Locale.ROOT);
+    private static final DateFormat TIME_FORMATTER = new SimpleDateFormat(TIME_FORMAT, Locale.ROOT);
 
     protected static MCRDirectoryXML SINGLETON = new MCRDirectoryXML();
 
@@ -183,9 +183,9 @@ public class MCRDirectoryXML {
 
         xDate.setAttribute("type", type);
 
-        String time = dateFormatter.format(date.getTime());
+        String time = DATE_FORMATTER.format(date.getTime());
 
-        xDate.setAttribute("format", dateFormat);
+        xDate.setAttribute("format", DATE_FORMAT);
         xDate.addContent(time);
     }
 
@@ -220,9 +220,9 @@ public class MCRDirectoryXML {
 
         GregorianCalendar date = new GregorianCalendar(TimeZone.getDefault(), Locale.ROOT);
         date.set(2002, Calendar.FEBRUARY, 1, hh, mm, ss);
-        String time = timeFormatter.format(date.getTime());
+        String time = TIME_FORMATTER.format(date.getTime());
 
-        xTime.setAttribute("format", timeFormat);
+        xTime.setAttribute("format", TIME_FORMAT);
         xTime.addContent(time);
     }
 

@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 
 import com.google.gson.JsonObject;
 
@@ -39,11 +40,11 @@ import com.google.gson.JsonObject;
  */
 public final class MCRMetaIFS extends MCRMetaDefault {
     // MCRMetaIFS data
-    private String sourcepath;
+    private String sourcePath;
 
     private String maindoc;
 
-    private String ifsid;
+    private String ifsId;
 
     /**
      * This is the constructor. <br>
@@ -52,28 +53,28 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      */
     public MCRMetaIFS() {
         super();
-        sourcepath = "";
+        sourcePath = "";
         maindoc = "";
-        ifsid = "";
+        ifsId = "";
     }
 
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the
-     * value of <em>set_subtag</em> is null or empty an exception was throwed.
+     * the value of <em>subtag</em>. If the
+     * value of <em>subtag</em> is null or empty an exception was throwed.
      * The type element was set empty.
      * The sourcepath must be NOT null or empty.
-     * @param set_subtag       the name of the subtag
-     * @param set_sourcepath   the sourcepath attribute
-     * @exception MCRException if the set_subtag value, the set_classid value or
+     * @param subtag       the name of the subtag
+     * @param sourcePath   the sourcepath attribute
+     * @exception MCRException if the subtag value, the set_classid value or
      * the set_categid are null, empty, too long or not a MCRObjectID
      */
-    public MCRMetaIFS(String set_subtag, String set_sourcepath) throws MCRException {
-        super(set_subtag, null, null, 0);
-        setSourcePath(set_sourcepath);
+    public MCRMetaIFS(String subtag, String sourcePath) throws MCRException {
+        super(subtag, null, null, 0);
+        setSourcePath(sourcePath);
         maindoc = "";
-        ifsid = "";
+        ifsId = "";
     }
 
     /**
@@ -81,8 +82,8 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * 
      * @return the sourcepath
      */
-    public final String getSourcePath() {
-        return sourcepath;
+    public String getSourcePath() {
+        return sourcePath;
     }
 
     /**
@@ -90,7 +91,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * 
      * @return the main document name.
      */
-    public final String getMainDoc() {
+    public String getMainDoc() {
         return maindoc;
     }
 
@@ -99,45 +100,45 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * 
      * @return the IFS ID.
      */
-    public final String getIFSID() {
-        return ifsid;
+    public String getIFSID() {
+        return ifsId;
     }
 
     /**
      * This method set the value of derivate source path.
      * 
-     * @param set_sourcepath
+     * @param sourcePath
      *            the derivate source path
      */
-    public final void setSourcePath(String set_sourcepath) {
-        sourcepath = set_sourcepath;
+    public void setSourcePath(String sourcePath) {
+        this.sourcePath = sourcePath;
     }
 
     /**
      * This method set the value of derivate main document.
      * 
-     * @param set_maindoc
+     * @param mainDoc
      *            the derivate main document name
      */
-    public final void setMainDoc(String set_maindoc) {
-        if (set_maindoc == null) {
+    public void setMainDoc(String mainDoc) {
+        if (mainDoc == null) {
             maindoc = "";
         } else {
-            maindoc = set_maindoc.startsWith("/") ? set_maindoc.substring(1) : set_maindoc;
+            maindoc = mainDoc.startsWith("/") ? mainDoc.substring(1) : mainDoc;
         }
     }
 
     /**
      * This method set the value of derivate IFS ID.
      * 
-     * @param set_ifsid
+     * @param ifsId
      *            the derivate IFS ID
      */
-    public final void setIFSID(String set_ifsid) {
-        if (set_ifsid == null) {
-            ifsid = "";
+    public void setIFSID(String ifsId) {
+        if (ifsId == null) {
+            this.ifsId = "";
         } else {
-            ifsid = set_ifsid;
+            this.ifsId = ifsId;
         }
     }
 
@@ -151,7 +152,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      *                if the set_sourcepath value is null or empty
      */
     @Override
-    public final void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public void setFromDOM(Element element) throws MCRException {
         super.setFromDOM(element);
         setSourcePath(element.getAttributeValue("sourcepath"));
         setMainDoc(element.getAttributeValue("maindoc"));
@@ -167,13 +168,13 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRClassification part
      */
     @Override
-    public final Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
-        if (sourcepath != null) {
-            elm.setAttribute("sourcepath", sourcepath);
+        if (sourcePath != null) {
+            elm.setAttribute("sourcepath", sourcePath);
         }
         elm.setAttribute("maindoc", maindoc);
-        elm.setAttribute("ifsid", ifsid);
+        elm.setAttribute("ifsid", ifsId);
 
         return elm;
     }
@@ -194,11 +195,11 @@ public final class MCRMetaIFS extends MCRMetaDefault {
     @Override
     public JsonObject createJSON() {
         JsonObject obj = super.createJSON();
-        if (sourcepath != null) {
-            obj.addProperty("sourcepath", sourcepath);
+        if (sourcePath != null) {
+            obj.addProperty("sourcepath", sourcePath);
         }
         obj.addProperty("maindoc", maindoc);
-        obj.addProperty("ifsid", ifsid);
+        obj.addProperty("ifsid", ifsId);
         return obj;
     }
 
@@ -215,18 +216,17 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        if (sourcepath != null && (sourcepath = sourcepath.trim()).length() == 0) {
-            throw new MCRException(getSubTag() + ": sourcepath is null or empty");
-        }
+        sourcePath = MCRUtils.filterTrimmedNotEmpty(sourcePath)
+            .orElseThrow(() -> new MCRException(getSubTag() + ": sourcepath is null or empty"));
     }
 
     @Override
-    public final MCRMetaIFS clone() {
+    public MCRMetaIFS clone() {
         MCRMetaIFS clone = (MCRMetaIFS) super.clone();
 
         clone.maindoc = this.maindoc;
-        clone.ifsid = this.ifsid;
-        clone.sourcepath = this.sourcepath;
+        clone.ifsId = this.ifsId;
+        clone.sourcePath = this.sourcePath;
 
         return clone;
     }
@@ -237,8 +237,8 @@ public final class MCRMetaIFS extends MCRMetaDefault {
             return false;
         }
         final MCRMetaIFS other = (MCRMetaIFS) obj;
-        return Objects.equals(sourcepath, other.sourcepath) && Objects.equals(maindoc, other.maindoc)
-            && Objects.equals(ifsid, other.ifsid);
+        return Objects.equals(sourcePath, other.sourcePath) && Objects.equals(maindoc, other.maindoc)
+            && Objects.equals(ifsId, other.ifsId);
     }
 
 }

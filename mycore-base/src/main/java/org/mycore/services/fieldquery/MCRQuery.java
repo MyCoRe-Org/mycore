@@ -33,7 +33,7 @@ import org.mycore.parsers.bool.MCRCondition;
 public class MCRQuery {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRQuery.class);
-    
+
     /** The query condition */
     private MCRCondition<Void> cond;
 
@@ -179,7 +179,7 @@ public class MCRQuery {
         doc = null;
     }
 
-   /**
+    /**
      * Returns the list of MCRSortBy criteria for sorting query results
      * 
      * @return a list of MCRSortBy objects, may be empty

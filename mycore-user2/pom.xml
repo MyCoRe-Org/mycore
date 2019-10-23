@@ -11,6 +11,7 @@
   <name>MyCoRe New User System</name>
   <properties>
     <manifest.priority>15</manifest.priority>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>
@@ -57,10 +58,6 @@
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
       <type>test-jar</type>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
   </dependencies>
 </project>

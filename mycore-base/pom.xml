@@ -9,6 +9,9 @@
   </parent>
   <artifactId>mycore-base</artifactId>
   <name>MyCoRe Base Components</name>
+  <properties>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -368,10 +371,6 @@
     <dependency>
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>

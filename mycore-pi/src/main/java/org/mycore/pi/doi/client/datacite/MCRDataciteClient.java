@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,8 +72,10 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 /**
  * Used for DOI registration.
  * <ol>
- * <li>use {@link #storeMetadata(Document)} to store a datacite document (should include a {@link MCRDigitalObjectIdentifier})</li>
- * <li>use {@link #mintDOI(MCRDigitalObjectIdentifier, URI)} to "register" the {@link MCRDigitalObjectIdentifier} with a URI</li>
+ * <li>use {@link #storeMetadata(Document)} to store a datacite document
+ * (should include a {@link MCRDigitalObjectIdentifier})</li>
+ * <li>use {@link #mintDOI(MCRDigitalObjectIdentifier, URI)} to "register"
+ * the {@link MCRDigitalObjectIdentifier} with a URI</li>
  * <li>use {@link #setMediaList(MCRDigitalObjectIdentifier, List)} to add a list of mime-type URI pairs to a DOI</li>
  * </ol>
  */
@@ -116,7 +119,7 @@ public class MCRDataciteClient {
         statusStringBuilder.append(statusLine.getStatusCode()).append(" - ").append(statusLine.getReasonPhrase())
             .append(" - ");
 
-        try (final Scanner scanner = new Scanner(resp.getEntity().getContent(), "UTF-8")) {
+        try (Scanner scanner = new Scanner(resp.getEntity().getContent(), "UTF-8")) {
             while (scanner.hasNextLine()) {
                 statusStringBuilder.append(scanner.nextLine());
             }
@@ -137,7 +140,7 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    try (final Scanner scanner = new Scanner(response.getEntity().getContent(), "UTF-8")) {
+                    try (Scanner scanner = new Scanner(response.getEntity().getContent(), "UTF-8")) {
                         while (scanner.hasNextLine()) {
                             String line = scanner.nextLine();
                             String[] parts = line.split("=", 2);
@@ -152,7 +155,7 @@ public class MCRDataciteClient {
                 case HttpStatus.SC_NOT_FOUND:
                     throw new MCRIdentifierUnresolvableException(doi.asString(),
                         doi.asString() + " is not resolvable! " + getStatusString(response));
-                    // return entries; // datacite says no media attached or doi does not exist (not sure what to do)
+                // return entries; // datacite says no media attached or doi does not exist (not sure what to do)
                 default:
                     throw new MCRDatacenterException(
                         String.format(Locale.ENGLISH, "Datacenter-Error while set media-list for doi: \"%s\" : %s",
@@ -245,7 +248,7 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    try (final Scanner scanner = new Scanner(entity.getContent(), "UTF-8")) {
+                    try (Scanner scanner = new Scanner(entity.getContent(), "UTF-8")) {
                         List<MCRDigitalObjectIdentifier> doiList = new ArrayList<>();
                         while (scanner.hasNextLine()) {
                             String line = scanner.nextLine();
@@ -278,7 +281,7 @@ public class MCRDataciteClient {
             StatusLine statusLine = response.getStatusLine();
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
-                    try(final Scanner scanner = new Scanner(entity.getContent(), "UTF-8")){
+                    try (Scanner scanner = new Scanner(entity.getContent(), "UTF-8")) {
                         String uriString = scanner.nextLine();
                         return new URI(uriString);
                     }
@@ -327,7 +330,8 @@ public class MCRDataciteClient {
      * @throws JDOMException if the metadata is empty or not a valid xml document
      * @throws MCRDatacenterException if there is something wrong with the communication with the datacenter
      */
-    public Document resolveMetadata(final MCRDigitalObjectIdentifier doi) throws MCRDatacenterAuthenticationException, MCRIdentifierUnresolvableException, JDOMException, MCRDatacenterException {
+    public Document resolveMetadata(final MCRDigitalObjectIdentifier doi) throws MCRDatacenterAuthenticationException,
+        MCRIdentifierUnresolvableException, JDOMException, MCRDatacenterException {
         URI requestURI = getRequestURI("/metadata/" + doi.asString());
         HttpGet get = new HttpGet(requestURI);
         try (CloseableHttpClient httpClient = getHttpClient()) {
@@ -371,7 +375,7 @@ public class MCRDataciteClient {
 
             StringBuilder sb = new StringBuilder();
             try (InputStream is = response.getEntity().getContent()) {
-                Scanner scanner = new Scanner(is, "UTF-8");
+                Scanner scanner = new Scanner(is, StandardCharsets.UTF_8);
                 while (scanner.hasNextLine()) {
                     sb.append(scanner.nextLine()).append(System.lineSeparator());
                 }

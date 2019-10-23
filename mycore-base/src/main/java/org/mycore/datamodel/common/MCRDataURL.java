@@ -576,13 +576,10 @@ public class MCRDataURL implements Serializable {
             return false;
         }
         if (parameters == null) {
-            if (other.parameters != null) {
-                return false;
-            }
-        } else if (!parameters.equals(other.parameters)) {
-            return false;
+            return other.parameters == null;
+        } else {
+            return parameters.equals(other.parameters);
         }
-        return true;
     }
 
     private static String encode(final String str, final Charset charset) throws UnsupportedEncodingException {

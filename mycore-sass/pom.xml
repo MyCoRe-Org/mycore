@@ -29,6 +29,9 @@
   <artifactId>mycore-sass</artifactId>
   <name>MyCoRe SASS</name>
   <description>SASS on-the-fly compiler resource</description>
+  <properties>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.yahoo.platform.yui</groupId>

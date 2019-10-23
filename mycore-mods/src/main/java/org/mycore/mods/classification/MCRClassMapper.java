@@ -303,13 +303,10 @@ public class MCRClassMapper {
                 return false;
             }
             if (categID == null) {
-                if (other.categID != null) {
-                    return false;
-                }
-            } else if (!categID.equals(other.categID)) {
-                return false;
+                return other.categID == null;
+            } else {
+                return categID.equals(other.categID);
             }
-            return true;
         }
 
     }

@@ -237,7 +237,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             throw new IOException(e);
         } catch (RuntimeException e) {
             if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
-                //typically if a RuntimeException has no cause, we can get the "real cause" from MCRErrorListener, yeah!!!
+                //typically if a RuntimeException has no cause,
+                //we can get the "real cause" from MCRErrorListener, yeah!!!
                 throw new IOException(el.getExceptionThrown());
             }
             throw e;
@@ -361,7 +362,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
 
         private MCRXSLTransformer instance;
 
-        public MCRTransformedContent(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
+        MCRTransformedContent(MCRContent source, XMLReader reader, TransformerHandler transformerHandler,
             long transformerLastModified, MCRParameterCollector parameter, String fileName, String mimeType,
             String encoding, MCRXSLTransformer instance) throws IOException {
             this.source = source;
@@ -415,7 +416,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
                 } catch (RuntimeException e) {
                     MCRErrorListener el = (MCRErrorListener) transformerHandler.getTransformer().getErrorListener();
                     if (el != null && e.getCause() == null && el.getExceptionThrown() != null) {
-                        //typically if a RuntimeException has no cause, we can get the "real cause" from MCRErrorListener, yeah!!!
+                        //typically if a RuntimeException has no cause,
+                        //we can get the "real cause" from MCRErrorListener, yeah!!!
                         throw new RuntimeException(MCRErrorListener.getMyMessageAndLocation(el.getExceptionThrown()),
                             el.getExceptionThrown());
                     }

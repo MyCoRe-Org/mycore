@@ -55,8 +55,6 @@ public class MCRPackerManagerTest extends MCRJPATestCase {
     public void testPackerConfigurationStart() throws Exception {
         MCRConfiguration mcrConfiguration = MCRConfiguration.instance();
 
-        String testPackerPrefix = MCRPacker.PACKER_CONFIGURATION_PREFIX + TEST_PACKER_ID + ".";
-
         Map<String, String> parameterMap = new Hashtable<>();
 
         // add packer parameter

@@ -69,11 +69,11 @@ public class MCRSessionResource {
 
         // get all sessions
         JsonArray rootJSON = new ArrayList<>(MCRSessionMgr.getAllSessions().values()).parallelStream()
-                                                                                     .map(s -> generateSessionJSON(s,
-                                                                                             resolveHostname))
-                                                                                     .collect(JsonArray::new,
-                                                                                             JsonArray::add,
-                                                                                             JsonArray::addAll);
+            .map(s -> generateSessionJSON(s,
+                resolveHostname))
+            .collect(JsonArray::new,
+                JsonArray::add,
+                JsonArray::addAll);
         return Response.status(Status.OK).entity(rootJSON.toString()).build();
     }
 

@@ -43,7 +43,7 @@ public class MCRCategoryJsonTest {
 
         Gson gson = MCRJSONManager.instance().createGson();
         try {
-            MCRCategoryImpl fromJson = gson.fromJson(json, MCRCategoryImpl.class);
+            gson.fromJson(json, MCRCategoryImpl.class);
             System.out.println("FOO");
         } catch (Exception e) {
             e.printStackTrace();

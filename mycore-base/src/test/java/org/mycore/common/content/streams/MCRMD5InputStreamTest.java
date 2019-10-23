@@ -44,8 +44,9 @@ public class MCRMD5InputStreamTest {
     public void smallStream() throws Exception {
         byte[] data = "data".getBytes();
         MCRMD5InputStream m = new MCRMD5InputStream(new ByteArrayInputStream(data));
-        for (byte aData : data)
+        for (byte aData : data) {
             assertEquals(aData, (byte) (m.read()));
+        }
         assertEquals(-1, m.read());
         m.close();
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(m.getMD5String()));

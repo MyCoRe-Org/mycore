@@ -187,14 +187,14 @@ public class MCRMODSCommands extends MCRAbstractCommands {
                 .map(rootPath::relativize)
                 .map(Path::toString)
                 .findFirst();
-            
+
             MCRMetaIFS ifs = new MCRMetaIFS();
             ifs.setSubTag("internal");
             ifs.setSourcePath(fileDir.getAbsolutePath());
             firstRegularFile.ifPresent(ifs::setMainDoc);
             derivate.getDerivate().setInternals(ifs);
         }
-        
+
         LOGGER.debug("Creating new derivate with ID {}", derivate.getId());
         MCRMetadataManager.create(derivate);
 

@@ -96,8 +96,9 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
             if (uid == null) {
                 presentLoginForm(req, res, null);
             }
-            if (!job.getResponse().isCommitted())
+            if (!job.getResponse().isCommitted()) {
                 super.render(job, ex);
+            }
         }
     }
 
@@ -126,7 +127,7 @@ public class MCRServlet3LoginServlet extends MCRContainerLoginServlet {
 
         private String realm;
 
-        public Servlet3ContainerUserInformation(MCRSession session, String realm) {
+        Servlet3ContainerUserInformation(MCRSession session, String realm) {
             super(session);
             this.realm = realm;
         }

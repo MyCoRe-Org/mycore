@@ -76,49 +76,9 @@ public class MCROAIIdentify extends SimpleIdentify {
     }
 
     private void addCustomDescriptions() {
-        for (final String descriptionURI : getDescriptionURIs())
+        for (final String descriptionURI : getDescriptionURIs()) {
             this.getDescriptionList().add(new CustomDescription(descriptionURI));
-    }
-
-    private Collection<String> getDescriptionURIs() {
-        String descriptionConfig = getConfigPrefix() + "DescriptionURI";
-        return MCRConfiguration.instance().getPropertiesMap(descriptionConfig).values();
-    }
-
-    class CustomDescription implements Description {
-
-        private Element description;
-
-        CustomDescription(String descriptionURI) {
-            description = MCRURIResolver.instance().resolve(descriptionURI);
         }
-
-        @Override
-        public Element toXML() {
-            return description.getChildren().get(0).clone();
-        }
-
-        @Override
-        public void fromXML(Element description) {
-            this.description = description;
-        }
-    }
-
-    public OAIIdentifierDescription getIdentifierDescription() {
-        String reposId = this.config.getString(this.configPrefix + "RepositoryIdentifier");
-        String sampleId = this.config.getString(this.configPrefix + "RecordSampleID");
-        return new OAIIdentifierDescription(reposId, sampleId);
-    }
-
-    public FriendsDescription getFriendsDescription() {
-        FriendsDescription desc = new FriendsDescription();
-        Map<String, String> friends = this.config.getPropertiesMap(this.configPrefix + "Friends.");
-        desc.getFriendsList().addAll(friends.values());
-        return desc;
-    }
-
-    public String getConfigPrefix() {
-        return configPrefix;
     }
 
     /**
@@ -130,6 +90,47 @@ public class MCROAIIdentify extends SimpleIdentify {
         MCROAISearcher searcher = MCROAISearchManager.getSearcher(this, null, 1, null, null);
         return searcher.getEarliestTimestamp().orElse(DateUtils
             .parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01")));
+    }
+
+    public String getConfigPrefix() {
+        return configPrefix;
+    }
+
+    private Collection<String> getDescriptionURIs() {
+        String descriptionConfig = getConfigPrefix() + "DescriptionURI";
+        return MCRConfiguration.instance().getPropertiesMap(descriptionConfig).values();
+    }
+
+    public FriendsDescription getFriendsDescription() {
+        FriendsDescription desc = new FriendsDescription();
+        Map<String, String> friends = this.config.getPropertiesMap(this.configPrefix + "Friends.");
+        desc.getFriendsList().addAll(friends.values());
+        return desc;
+    }
+
+    public OAIIdentifierDescription getIdentifierDescription() {
+        String reposId = this.config.getString(this.configPrefix + "RepositoryIdentifier");
+        String sampleId = this.config.getString(this.configPrefix + "RecordSampleID");
+        return new OAIIdentifierDescription(reposId, sampleId);
+    }
+
+    class CustomDescription implements Description {
+
+        private Element description;
+
+        CustomDescription(String descriptionURI) {
+            description = MCRURIResolver.instance().resolve(descriptionURI);
+        }
+
+        @Override
+        public void fromXML(Element description) {
+            this.description = description;
+        }
+
+        @Override
+        public Element toXML() {
+            return description.getChildren().get(0).clone();
+        }
     }
 
 }

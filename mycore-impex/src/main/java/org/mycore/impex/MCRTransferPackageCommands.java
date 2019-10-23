@@ -53,7 +53,7 @@ public class MCRTransferPackageCommands {
     private static final Logger LOGGER = LogManager.getLogger(MCRTransferPackageCommands.class);
 
     @MCRCommand(help = "Creates multiple transfer packages which matches the solr query in {0}.",
-                syntax = "create transfer package for objects matching {0}")
+        syntax = "create transfer package for objects matching {0}")
     public static void create(String query) throws Exception {
         List<String> ids = MCRSolrSearchUtils.listIDs(MCRSolrClientFactory.getMainSolrClient(), query);
         for (String objectId : ids) {
@@ -65,7 +65,7 @@ public class MCRTransferPackageCommands {
     }
 
     @MCRCommand(help = "Imports all transfer packages located in the directory {0}.",
-                syntax = "import transfer packages from directory {0}")
+        syntax = "import transfer packages from directory {0}")
     public static List<String> importTransferPackagesFromDirectory(String directory) throws Exception {
         Path dir = Paths.get(directory);
         if (!(Files.exists(dir) || Files.isDirectory(dir))) {
@@ -73,7 +73,7 @@ public class MCRTransferPackageCommands {
         }
         List<String> importStatements = new LinkedList<>();
         try (Stream<Path> stream = Files.find(dir, 0,
-                (path, attr) -> String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
+            (path, attr) -> String.valueOf(path).endsWith(".tar") && Files.isRegularFile(path))) {
             stream.map(Path::toAbsolutePath).map(Path::toString).forEach(path -> {
                 String subCommand = String.format(Locale.ROOT, "import transfer package from tar %s", path);
                 importStatements.add(subCommand);
@@ -83,9 +83,9 @@ public class MCRTransferPackageCommands {
     }
 
     @MCRCommand(help = "Imports a transfer package located at {0}. Where {0} is the absolute path to the tar file. "
-            + "The parameter {1} is optional and can be omitted. You can specify a mycore id where the first object of "
-            + "import.xml should be attached.",
-                syntax = "import transfer package from tar {0} to {1}")
+        + "The parameter {1} is optional and can be omitted. You can specify a mycore id where the first object of "
+        + "import.xml should be attached.",
+        syntax = "import transfer package from tar {0} to {1}")
     public static List<String> importTransferPackageFromTar(String pathToTar, String mycoreTargetId) throws Exception {
         Path tar = Paths.get(pathToTar);
         if (!Files.exists(tar)) {
@@ -128,7 +128,7 @@ public class MCRTransferPackageCommands {
             String rootId = mcrObjects.get(0);
             markManager.mark(MCRObjectID.getInstance(rootId), Operation.IMPORT);
             commands.add(
-                    "_import transfer package object " + rootId + " from " + sourceDirectory + " to " + mycoreTargetId);
+                "_import transfer package object " + rootId + " from " + sourceDirectory + " to " + mycoreTargetId);
             mcrObjects = mcrObjects.subList(1, mcrObjects.size());
         }
         for (String id : mcrObjects) {
@@ -145,12 +145,12 @@ public class MCRTransferPackageCommands {
 
     @MCRCommand(syntax = "_import transfer package object {0} from {1} to {2}")
     public static List<String> importObject(String objectId, String targetDirectoryPath, String parentId)
-            throws Exception {
+        throws Exception {
         Path targetDirectory = Paths.get(targetDirectoryPath);
         List<String> derivates = MCRTransferPackageUtil.importObjectCLI(targetDirectory, objectId, parentId);
         return derivates.stream()
-                        .map(derId -> "_import transfer package derivate " + derId + " from " + targetDirectoryPath)
-                        .collect(Collectors.toList());
+            .map(derId -> "_import transfer package derivate " + derId + " from " + targetDirectoryPath)
+            .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "_import transfer package derivate {0} from {1}")

@@ -39,7 +39,7 @@ class MCROAIParameterQuerySetResolver extends MCROAISetResolver<String, SolrDocu
 
     private Map<String, SolrDocument> resultMap;
 
-    public MCROAIParameterQuerySetResolver(String queryField) {
+    MCROAIParameterQuerySetResolver(String queryField) {
         super();
         this.queryField = queryField;
     }

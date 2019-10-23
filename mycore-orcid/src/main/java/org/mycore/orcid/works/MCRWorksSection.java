@@ -173,7 +173,7 @@ public class MCRWorksSection {
     }
 
     private Set<String> buildIdentifierKeys(List<Element> modsIdentifiers) {
-        Set<String> objectKeys = new HashSet<String>();
+        Set<String> objectKeys = new HashSet<>();
         for (Element modsIdentifier : modsIdentifiers) {
             objectKeys.add(buildIdentifierKey(modsIdentifier));
         }

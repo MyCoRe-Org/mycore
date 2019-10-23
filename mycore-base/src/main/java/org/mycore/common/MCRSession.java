@@ -71,7 +71,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  */
 public class MCRSession implements Cloneable {
 
-    private static final URI defaultURI = URI.create("");
+    private static final URI DEFAULT_URI = URI.create("");
 
     /** A map storing arbitrary session data * */
     private Map<Object, Object> map = new Hashtable<>();
@@ -386,7 +386,7 @@ public class MCRSession implements Cloneable {
             LOGGER.debug("deactivate currentThreadCount: {}", currentThreadCount.get().get());
         }
         if (!firstURI.isPresent()) {
-            firstURI = Optional.of(defaultURI);
+            firstURI = Optional.of(DEFAULT_URI);
         }
         onCommitTasks.remove();
         servletJob.remove();

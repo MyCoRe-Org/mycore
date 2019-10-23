@@ -22,10 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.CopyOption;
@@ -84,7 +80,7 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
     }
 
     @Override
-    public byte[] asByteArray() throws IOException {     
+    public byte[] asByteArray() throws IOException {
         return Files.readAllBytes(path);
     }
 
@@ -100,11 +96,11 @@ public class MCRPathContent extends MCRContent implements MCRSeekableChannelCont
 
     @Override
     public String getETag() throws IOException {
-        if (attrs instanceof MCRFileAttributes){
+        if (attrs instanceof MCRFileAttributes) {
             return ((MCRFileAttributes) attrs).md5sum();
         }
 
-        if(Files.getFileStore(path).supportsFileAttributeView("md5")){
+        if (Files.getFileStore(path).supportsFileAttributeView("md5")) {
             Object fileKey = Files.getAttribute(path, "md5:md5");
             if (fileKey instanceof String) {
                 return fileKey.toString();

@@ -88,7 +88,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
             Session session = MCRHIBConnection.instance().getSession();
             MCRACCESSRULE hibrule = new MCRACCESSRULE();
 
-            DateFormat df = new SimpleDateFormat(sqlDateformat, Locale.ROOT);
+            DateFormat df = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.ROOT);
             hibrule.setCreationdate(Timestamp.valueOf(df.format(rule.getCreationTime())));
             hibrule.setCreator(rule.getCreator());
             hibrule.setRid(rule.getId());
@@ -127,7 +127,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
         Session session = MCRHIBConnection.instance().getSession();
         MCRACCESSRULE hibrule = session.get(MCRACCESSRULE.class, rule.getId());
 
-        DateFormat df = new SimpleDateFormat(sqlDateformat, Locale.ROOT);
+        DateFormat df = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.ROOT);
         hibrule.setCreationdate(Timestamp.valueOf(df.format(rule.getCreationTime())));
         hibrule.setCreator(rule.getCreator());
         hibrule.setRule(rule.getRuleString());

@@ -10,9 +10,7 @@
   <artifactId>mycore-wcms2</artifactId>
   <name>MyCoRe WCMS 2</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>90</manifest.priority>
-    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <build>
     <plugins>
@@ -62,10 +60,6 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
   </dependencies>
 </project>

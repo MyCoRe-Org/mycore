@@ -101,10 +101,11 @@ public class MCRLanguage {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRLanguage)
+        if (obj instanceof MCRLanguage) {
             return this.toString().equals(obj.toString());
-        else
+        } else {
             return false;
+        }
     }
 
     @Override

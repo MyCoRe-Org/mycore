@@ -80,7 +80,7 @@ public class MCRStoreCenterTest {
     class FakeStoreConfig implements MCRStoreConfig {
         private final Path baseDir;
 
-        public FakeStoreConfig(String id) throws IOException {
+        FakeStoreConfig(String id) throws IOException {
             String fsName = MCRStoreCenterTest.class.getSimpleName() + "." + id;
             URI jimfsURI = URI.create("jimfs://" + fsName);
             FileSystem fileSystem;

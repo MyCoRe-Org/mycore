@@ -18,14 +18,13 @@
 
 package org.mycore.user2;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 
@@ -147,10 +146,11 @@ public class MCRRealm {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MCRRealm)
+        if (obj instanceof MCRRealm) {
             return ((MCRRealm) obj).id.equals(id);
-        else
+        } else {
             return false;
+        }
     }
 
     @Override
@@ -188,20 +188,17 @@ public class MCRRealm {
         }
         StringBuilder loginURL = new StringBuilder(getLoginURL());
         boolean firstParameter = !getLoginURL().contains("?");
-        try {
-            for (Entry<String, String> entry : parameter.entrySet()) {
-                if (firstParameter) {
-                    loginURL.append('?');
-                    firstParameter = false;
-                } else {
-                    loginURL.append('&');
-                }
-                loginURL.append(entry.getKey()).append('=').append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        for (Entry<String, String> entry : parameter.entrySet()) {
+            if (firstParameter) {
+                loginURL.append('?');
+                firstParameter = false;
+            } else {
+                loginURL.append('&');
             }
-            return loginURL.toString();
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException(e);
+            loginURL.append(entry.getKey()).append('=').append(URLEncoder.encode(entry.getValue(),
+                StandardCharsets.UTF_8));
         }
+        return loginURL.toString();
     }
 
     /**

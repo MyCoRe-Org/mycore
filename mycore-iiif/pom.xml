@@ -8,10 +8,6 @@
   </parent>
   <artifactId>mycore-iiif</artifactId>
   <name>MyCoRe IIIF</name>
-  <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
-    <pmd.failOnViolation>true</pmd.failOnViolation>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>com.google.code.gson</groupId>

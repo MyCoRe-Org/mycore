@@ -54,20 +54,24 @@ public class MCRFileMetadataManager {
     /** The single instance of this class * */
     private static MCRFileMetadataManager manager;
 
-    /** Returns the single instance of this class to use * */
-    public static synchronized MCRFileMetadataManager instance() {
-        if (manager == null) {
-            manager = new MCRFileMetadataManager();
-        }
-
-        return manager;
-    }
-
     /** Cache containing the most recently used MCRFilesystemNode objects * */
     private MCRCache<String, MCRFilesystemNode> cache;
 
     /** The store that holds all saved MCRFilesystemNode metadata * */
     private MCRFileMetadataStore store;
+
+    /**
+     * Last number that was used for creating a unique ID for each
+     * MCRFilesystemNode
+     */
+    private long lastNumber = System.currentTimeMillis();
+
+    /**
+     * Prefix for all generated IDs that is derived from the server's IP address
+     * to ensure that different MyCoRe instances will create different unique
+     * IDs for each MCRFilesystemNode
+     */
+    private String prefix;
 
     /** Creates the single instance of this class * */
     private MCRFileMetadataManager() {
@@ -81,18 +85,14 @@ public class MCRFileMetadataManager {
         cache = new MCRCache<>(size, "IFS FileSystemNodes");
     }
 
-    /**
-     * Last number that was used for creating a unique ID for each
-     * MCRFilesystemNode
-     */
-    private long last_number = System.currentTimeMillis();
+    /** Returns the single instance of this class to use * */
+    public static synchronized MCRFileMetadataManager instance() {
+        if (manager == null) {
+            manager = new MCRFileMetadataManager();
+        }
 
-    /**
-     * Prefix for all generated IDs that is derived from the server's IP address
-     * to ensure that different MyCoRe instances will create different unique
-     * IDs for each MCRFilesystemNode
-     */
-    private String prefix;
+        return manager;
+    }
 
     /**
      * Creates a prefix for all generated IDs. This ID is derived from the
@@ -128,7 +128,7 @@ public class MCRFileMetadataManager {
      * Creates a new, unique ID for each MCRFilesystemNode
      */
     public synchronized String createNodeID() {
-        String time = "0000000000" + Long.toString(last_number++, 36);
+        String time = "0000000000" + Long.toString(lastNumber++, 36);
 
         StringBuilder sb = new StringBuilder(getIDPrefix());
         sb.append(time.substring(time.length() - 10));
@@ -152,14 +152,14 @@ public class MCRFileMetadataManager {
      * Retrieves the MCRFilesystemNode with the given ID from the persistent
      * MCRFileMetadataStore.
      *
-     * @param ID
+     * @param id
      *            the unique ID of the MCRFilesystemNode
      * @return the MCRFilesystemNode with that ID, or null if no such node
      *         exists.
      */
-    MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
-        MCRFilesystemNode n = cache.get(ID);
-        return n != null ? n : store.retrieveNode(ID);
+    MCRFilesystemNode retrieveNode(String id) throws MCRPersistenceException {
+        MCRFilesystemNode n = cache.get(id);
+        return n != null ? n : store.retrieveNode(id);
     }
 
     /**
@@ -173,9 +173,9 @@ public class MCRFileMetadataManager {
      *         exists.
      */
     MCRFilesystemNode retrieveRootNode(String ownerID) throws MCRPersistenceException {
-        String ID = store.retrieveRootNodeID(ownerID);
+        String id = store.retrieveRootNodeID(ownerID);
 
-        return ID == null ? null : retrieveNode(ID);
+        return id == null ? null : retrieveNode(id);
     }
 
     /**
@@ -197,24 +197,24 @@ public class MCRFileMetadataManager {
      * raw data that is retrieved from the persistent store, or uses the
      * existing copy in the MCRCache instance.
      */
-    public MCRFilesystemNode buildNode(String type, String ID, String parentID, String ownerID, String name,
+    public MCRFilesystemNode buildNode(String type, String id, String parentID, String ownerID, String name,
         String label, long size,
         GregorianCalendar date, String storeID, String storageID, String fctID, String md5, int numchdd, int numchdf,
         int numchtd,
         int numchtf) throws MCRPersistenceException {
-        MCRFilesystemNode n = cache.get(ID);
+        MCRFilesystemNode n = cache.get(id);
 
         if (n != null) {
             return n;
         }
 
         if (type.equals("D")) {
-            n = new MCRDirectory(ID, parentID, ownerID, name, label, size, date, numchdd, numchdf, numchtd, numchtf);
+            n = new MCRDirectory(id, parentID, ownerID, name, label, size, date, numchdd, numchdf, numchtd, numchtf);
         } else {
-            n = new MCRFile(ID, parentID, ownerID, name, label, size, date, storeID, storageID, fctID, md5);
+            n = new MCRFile(id, parentID, ownerID, name, label, size, date, storeID, storageID, fctID, md5);
         }
 
-        cache.put(ID, n);
+        cache.put(id, n);
 
         return n;
     }
@@ -223,23 +223,23 @@ public class MCRFileMetadataManager {
      * Retrieves a list of all child MCRFilesystemNodes of a given
      * MCRDirectory.
      *
-     * @param ID
+     * @param id
      *            the ID of the parent MCRDirectory
      * @return a List of all children of that MCRDirectory
      */
-    List<MCRFilesystemNode> retrieveChildren(String ID) throws MCRPersistenceException {
-        return store.retrieveChildren(ID);
+    List<MCRFilesystemNode> retrieveChildren(String id) throws MCRPersistenceException {
+        return store.retrieveChildren(id);
     }
 
     /**
      * Deletes a MCRFilesystemNode in the persistent MCRFileMetadataStore.
      *
-     * @param ID
+     * @param id
      *            the ID of the node to delete from the store
      */
-    void deleteNode(String ID) throws MCRPersistenceException {
-        cache.remove(ID);
-        store.deleteNode(ID);
+    void deleteNode(String id) throws MCRPersistenceException {
+        cache.remove(id);
+        store.deleteNode(id);
     }
 
     void clearMetadataCache() {

@@ -207,7 +207,6 @@ public class MCRSolrIndexer {
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
         return solrClient.deleteByQuery("-({!join from=id to=_root_ score=none}_root_:*) +_root_:*", 0);
     }
-    
 
     /**
      * Deletes a list of documents by unique ID. Also removes any nested document of that ID.
@@ -316,7 +315,6 @@ public class MCRSolrIndexer {
         List<String> identfiersOfType = MCRXMLMetadataManager.instance().listIDsOfType(type);
         rebuildMetadataIndex(identfiersOfType, solrClient);
     }
-
 
     /**
      * Rebuilds solr's metadata index.
@@ -458,7 +456,6 @@ public class MCRSolrIndexer {
             }
         };
     }
-
 
     /**
      * Drops the current solr index.

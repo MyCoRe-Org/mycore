@@ -256,7 +256,7 @@ public abstract class MCRAudioVideoExtender {
 
         return formatter.format(durationHours) + ":" + formatter.format(durationMinutes) + ":"
             + formatter.format(
-            durationSeconds);
+                durationSeconds);
     }
 
     /**

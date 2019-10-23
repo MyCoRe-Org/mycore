@@ -17,6 +17,8 @@
  */
 package org.mycore.restapi.v1.utils;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -61,8 +63,6 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
@@ -122,7 +122,7 @@ public class MCRRestAPIUploadHelper {
         } catch (Exception e) {
             LOGGER.error("Unable to Upload file: {}", String.valueOf(fXML), e);
             throw new MCRRestAPIException(Status.BAD_REQUEST, new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
-                "Unable to Upload file: " + String.valueOf(fXML), e.getMessage()));
+                "Unable to Upload file: " + fXML, e.getMessage()));
         } finally {
             if (fXML != null) {
                 try {
@@ -352,8 +352,8 @@ public class MCRRestAPIUploadHelper {
     public static Response deleteDerivate(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID) throws MCRRestAPIException {
 
-            MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
-            MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
+        MCRObjectID objID = MCRObjectID.getInstance(pathParamMcrObjID);
+        MCRObjectID derID = MCRObjectID.getInstance(pathParamMcrDerID);
 
         try {
             MCRMetadataManager.deleteMCRDerivate(derID);

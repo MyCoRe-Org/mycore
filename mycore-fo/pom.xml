@@ -10,9 +10,7 @@
   <artifactId>mycore-fo</artifactId>
   <name>MyCoRe FO</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>31</manifest.priority>
-    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>
@@ -50,10 +48,6 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
   </dependencies>
 </project>

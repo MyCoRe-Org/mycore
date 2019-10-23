@@ -119,7 +119,7 @@ final class ContentUtils {
             }
         } else {
             try (InputStream contentIS = content.getInputStream();
-                final InputStream in = isInputStreamBuffered(contentIS, content) ? contentIS
+                InputStream in = isInputStreamBuffered(contentIS, content) ? contentIS
                     : new BufferedInputStream(
                         contentIS, inputBufferSize)) {
                 endCurrentTransaction();
@@ -151,8 +151,8 @@ final class ContentUtils {
         long lastByte = 0;
         final String endOfLine = "\r\n";
 
-        try (final InputStream resourceInputStream = content.getInputStream();
-            final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
+        try (InputStream resourceInputStream = content.getInputStream();
+            InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
                 : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
             endCurrentTransaction();
             while (exception == null && ranges.hasNext()) {
@@ -210,7 +210,7 @@ final class ContentUtils {
                     long bytesToCopy = range.end - range.start + 1;
                     while (bytesToCopy > 0) {
                         ByteBuffer byteBuffer;
-                        if (bytesToCopy > (long) DEFAULT_BUFFER_SIZE) {
+                        if (bytesToCopy > DEFAULT_BUFFER_SIZE) {
                             byteBuffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
                         } else {
                             byteBuffer = ByteBuffer.allocate((int) bytesToCopy);
@@ -225,8 +225,8 @@ final class ContentUtils {
             }
         }
 
-        try (final InputStream resourceInputStream = content.getInputStream();
-            final InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
+        try (InputStream resourceInputStream = content.getInputStream();
+            InputStream in = isInputStreamBuffered(resourceInputStream, content) ? resourceInputStream
                 : new BufferedInputStream(resourceInputStream, inputBufferSize)) {
             endCurrentTransaction();
             final IOException exception = copyRange(in, out, 0, range.start, range.end, outputBufferSize);
@@ -244,7 +244,8 @@ final class ContentUtils {
      * @param inPosition Current position of the input
      * @param start Start position to be copied
      * @param end End position to be copied
-     * @return Exception which occurred during processing or if less than <code>end - start + 1</code> bytes were read/written.
+     * @return Exception which occurred during processing or if less than <code>end - start + 1</code>
+     * bytes were read/written.
      */
     static IOException copyRange(final InputStream in, final OutputStream out, final long inPosition,
         final long start, final long end, final int outputBufferSize) {
@@ -283,18 +284,21 @@ final class ContentUtils {
         } else {
             int bufferLength = buffer.length;
             int bytesToRead = bufferLength;
-            if (length > 0L && length < (long) bufferLength) {
+            if (length > 0L && length < bufferLength) {
                 bytesToRead = (int) length;
             }
 
             long totalRead = 0L;
 
-            int read;
-            while (bytesToRead > 0 && -1 != (read = input.read(buffer, 0, bytesToRead))) {
+            while (bytesToRead > 0) {
+                int read = input.read(buffer, 0, bytesToRead);
+                if (read == -1) {
+                    break;
+                }
                 output.write(buffer, 0, read);
-                totalRead += (long) read;
+                totalRead += read;
                 if (length > 0L) {
-                    bytesToRead = (int) Math.min(length - totalRead, (long) bufferLength);
+                    bytesToRead = (int) Math.min(length - totalRead, bufferLength);
                 }
             }
 

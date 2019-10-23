@@ -68,7 +68,7 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
             addLocalScript("iview-client-tei.js", true, debugParameterSet);
             addLocalCSS("tei.css");
             MCRConfiguration2.getString("MCR.Viewer.TeiStyle")
-                .ifPresent((style)-> setProperty("teiStylesheet", style));
+                .ifPresent((style) -> setProperty("teiStylesheet", style));
         }
 
         return this;

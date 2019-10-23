@@ -90,7 +90,7 @@ public class MCRRestClassifications {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        GenericEntity<List<MCRClass>> entity = new GenericEntity<List<MCRClass>>(
+        GenericEntity<List<MCRClass>> entity = new GenericEntity<>(
             categoryDAO.getRootCategories()
                 .stream()
                 .map(MCRRestClassifications::convertToClass)
@@ -136,7 +136,8 @@ public class MCRRestClassifications {
             @Content(schema = @Schema(implementation = MCRClassCategory.class))
         },
             description = "If media type parameter " + MCRDetailLevel.MEDIA_TYPE_PARAMETER
-                + " is 'summary' an MCRClassCategory is returned. In other cases MCRClass with different detail level."),
+                + " is 'summary' an MCRClassCategory is returned. "
+                + "In other cases MCRClass with different detail level."),
         tags = MCRRestUtils.TAG_MYCORE_CLASSIFICATION)
 
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId,

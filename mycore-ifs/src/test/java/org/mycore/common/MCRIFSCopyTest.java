@@ -18,12 +18,8 @@
 
 package org.mycore.common;
 
-import org.junit.Test;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.util.concurrent.MCRFixedUserCallable;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,9 +32,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import org.junit.Test;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 public class MCRIFSCopyTest extends MCRIFSTest {
 
@@ -83,7 +82,7 @@ public class MCRIFSCopyTest extends MCRIFSTest {
     }
 
     private void throwException(Exception e) throws Exception {
-        if (e != null){
+        if (e != null) {
             throw e;
         }
     }

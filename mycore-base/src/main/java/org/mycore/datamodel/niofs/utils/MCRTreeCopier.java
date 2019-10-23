@@ -56,10 +56,11 @@ public class MCRTreeCopier implements FileVisitor<Path> {
     }
 
     public MCRTreeCopier(Path source, Path target, boolean renameOnExisting) throws NoSuchFileException {
-        this(source,target,renameOnExisting, false);
+        this(source, target, renameOnExisting, false);
     }
 
-    public MCRTreeCopier(Path source, Path target, boolean renameOnExisting, boolean restartTransaction) throws NoSuchFileException {
+    public MCRTreeCopier(Path source, Path target, boolean renameOnExisting, boolean restartTransaction)
+        throws NoSuchFileException {
         this.renameExisting = renameOnExisting;
         if (Files.notExists(target)) {
             throw new NoSuchFileException(target.toString(), null, "Target directory does not exist.");
@@ -91,12 +92,13 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 String fileName = target.getFileName().toString();
                 int numberPosition = fileName.lastIndexOf(".") == -1 ? fileName.length() : fileName.lastIndexOf(".");
                 String prefixString = fileName.substring(0, numberPosition);
-                String suffixString = fileName.substring(numberPosition, fileName.length());
+                String suffixString = fileName.substring(numberPosition);
                 String newName = null;
                 Path parent = target.getParent();
                 do {
                     newName = prefixString + nameTry++ + suffixString;
-                } while (Files.exists(target = parent.resolve(newName)));
+                    target = parent.resolve(newName);
+                } while (Files.exists(target));
             }
             if (restartTransaction && MCRSessionMgr.hasCurrentSession()) {
                 final MCRSession currentSession = MCRSessionMgr.getCurrentSession();

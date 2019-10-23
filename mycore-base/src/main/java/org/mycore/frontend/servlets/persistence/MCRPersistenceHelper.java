@@ -89,10 +89,11 @@ class MCRPersistenceHelper {
     static Document getEditorSubmission(HttpServletRequest request, boolean failOnMissing) throws ServletException {
         Document inDoc = (Document) request.getAttribute("MCRXEditorSubmission");
         if (inDoc == null) {
-            if (failOnMissing)
+            if (failOnMissing) {
                 throw new ServletException("No MCREditorSubmission");
-            else
+            } else {
                 return null;
+            }
         }
         if (inDoc.getRootElement().getAttribute("ID") == null) {
             String mcrID = MCRServlet.getProperty(request, "mcrid");
@@ -118,7 +119,7 @@ class MCRPersistenceHelper {
         String id = doc.getRootElement().getAttributeValue("ID");
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         MCREditorOutValidator ev = new MCREditorOutValidator(doc, objectID);
-        Document jdom_out = ev.generateValidMyCoReObject();
+        Document validMyCoReObject = ev.generateValidMyCoReObject();
         if (ev.getErrorLog().size() > 0 && LOGGER.isDebugEnabled()) {
             XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
             StringWriter swOrig = new StringWriter();
@@ -128,10 +129,10 @@ class MCRPersistenceHelper {
                 LOGGER.debug(logMsg);
             }
             StringWriter swClean = new StringWriter();
-            xout.output(jdom_out, swClean);
+            xout.output(validMyCoReObject, swClean);
             LOGGER.debug("Results in \n{}", swClean);
         }
-        return new MCRObject(jdom_out);
+        return new MCRObject(validMyCoReObject);
     }
 
     protected static String getWebPage(ServletContext context, String modernPage, String deprecatedPage)

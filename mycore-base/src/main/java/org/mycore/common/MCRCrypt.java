@@ -35,16 +35,14 @@ package org.mycore.common;
  * @version $Revision$ $Date$
  */
 public class MCRCrypt {
-    private MCRCrypt() {
-    } // defined so class can't be instantiated.
 
     private static final int ITERATIONS = 16;
 
-    private static final boolean[] shifts2 = { false, false, true, true, true, true, true, true, false, true, true,
+    private static final boolean[] SHIFTS_2 = { false, false, true, true, true, true, true, true, false, true, true,
         true, true, true, true,
         false };
 
-    private static final int[][] skb = {
+    private static final int[][] SKB = {
         {
 
             /* for C bits (numbered as per FIPS 46) 1 2 3 4 5 6 */
@@ -172,9 +170,9 @@ public class MCRCrypt {
             0x04000820,
             0x00040820, 0x04040820, 0x00000822, 0x04000822, 0x00040822, 0x04040822, 0x00002820, 0x04002820, 0x00042820,
             0x04042820,
-            0x00002822, 0x04002822, 0x00042822, 0x04042822, } };
+            0x00002822, 0x04002822, 0x00042822, 0x04042822, }, };
 
-    private static final int[][] SPtrans = {
+    private static final int[][] SPTRANS = {
         {
 
             /* nibble 0 */
@@ -302,10 +300,13 @@ public class MCRCrypt {
             0x00200000,
             0x08200000, 0x08000020, 0x00208000, 0x00008020, 0x08008020, 0x08200000, 0x00000020, 0x08208000, 0x00208020,
             0x00000000,
-            0x08000000, 0x08200020, 0x00008000, 0x00208020 } };
+            0x08000000, 0x08200020, 0x00008000, 0x00208020, }, };
+
+    private MCRCrypt() {
+    } // defined so class can't be instantiated.
 
     private static int byteToUnsigned(byte b) {
-        return b >= 0 ? (int) b : (int) b + 256;
+        return b >= 0 ? (int) b : b + 256;
     }
 
     private static int fourBytesToInt(byte[] b, int offset) {
@@ -320,7 +321,7 @@ public class MCRCrypt {
         b[offset] = (byte) (iValue >>> 24 & 0xff);
     }
 
-    private static void PERM_OP(int a, int b, int n, int m, int[] results) {
+    private static void permOp(int a, int b, int n, int m, int[] results) {
         int t;
 
         t = (a >>> n ^ b) & m;
@@ -331,7 +332,7 @@ public class MCRCrypt {
         results[1] = b;
     }
 
-    private static int HPERM_OP(int a, int n, int m) {
+    private static int hpermOp(int a, int n, int m) {
         int t;
 
         t = (a << 16 - n ^ a) & m;
@@ -340,7 +341,7 @@ public class MCRCrypt {
         return a;
     }
 
-    private static int[] des_set_key(byte[] key) {
+    private static int[] desSetKey(byte[] key) {
         int[] schedule = new int[ITERATIONS * 2];
 
         int c = fourBytesToInt(key, 0);
@@ -348,22 +349,22 @@ public class MCRCrypt {
 
         int[] results = new int[2];
 
-        PERM_OP(d, c, 4, 0x0f0f0f0f, results);
+        permOp(d, c, 4, 0x0f0f0f0f, results);
         d = results[0];
         c = results[1];
 
-        c = HPERM_OP(c, -2, 0xcccc0000);
-        d = HPERM_OP(d, -2, 0xcccc0000);
+        c = hpermOp(c, -2, 0xcccc0000);
+        d = hpermOp(d, -2, 0xcccc0000);
 
-        PERM_OP(d, c, 1, 0x55555555, results);
+        permOp(d, c, 1, 0x55555555, results);
         d = results[0];
         c = results[1];
 
-        PERM_OP(c, d, 8, 0x00ff00ff, results);
+        permOp(c, d, 8, 0x00ff00ff, results);
         c = results[0];
         d = results[1];
 
-        PERM_OP(d, c, 1, 0x55555555, results);
+        permOp(d, c, 1, 0x55555555, results);
         d = results[0];
         c = results[1];
 
@@ -375,7 +376,7 @@ public class MCRCrypt {
         int j = 0;
 
         for (int i = 0; i < ITERATIONS; i++) {
-            if (shifts2[i]) {
+            if (SHIFTS_2[i]) {
                 c = c >>> 2 | c << 26;
                 d = d >>> 2 | d << 26;
             } else {
@@ -386,11 +387,11 @@ public class MCRCrypt {
             c &= 0x0fffffff;
             d &= 0x0fffffff;
 
-            s = skb[0][c & 0x3f] | skb[1][c >>> 6 & 0x03 | c >>> 7 & 0x3c] | skb[2][c >>> 13 & 0x0f | c >>> 14 & 0x30]
-                | skb[3][c >>> 20 & 0x01 | c >>> 21 & 0x06 | c >>> 22 & 0x38];
+            s = SKB[0][c & 0x3f] | SKB[1][c >>> 6 & 0x03 | c >>> 7 & 0x3c] | SKB[2][c >>> 13 & 0x0f | c >>> 14 & 0x30]
+                | SKB[3][c >>> 20 & 0x01 | c >>> 21 & 0x06 | c >>> 22 & 0x38];
 
-            t = skb[4][d & 0x3f] | skb[5][d >>> 7 & 0x03 | d >>> 8 & 0x3c] | skb[6][d >>> 15 & 0x3f]
-                | skb[7][d >>> 21 & 0x0f | d >>> 22 & 0x30];
+            t = SKB[4][d & 0x3f] | SKB[5][d >>> 7 & 0x03 | d >>> 8 & 0x3c] | SKB[6][d >>> 15 & 0x3f]
+                | SKB[7][d >>> 21 & 0x0f | d >>> 22 & 0x30];
 
             schedule[j++] = (t << 16 | s & 0x0000ffff) & 0xffffffff;
             s = s >>> 16 | t & 0xffff0000;
@@ -402,35 +403,35 @@ public class MCRCrypt {
         return schedule;
     }
 
-    private static int D_ENCRYPT(int L, int R, int S, int E0, int E1, int[] s) {
+    private static int dEncrypt(int l, int r, int s, int e0, int e1, int[] ss) {
         int t;
         int u;
         int v;
 
-        v = R ^ R >>> 16;
-        u = v & E0;
-        v = v & E1;
-        u = u ^ u << 16 ^ R ^ s[S];
-        t = v ^ v << 16 ^ R ^ s[S + 1];
+        v = r ^ r >>> 16;
+        u = v & e0;
+        v = v & e1;
+        u = u ^ u << 16 ^ r ^ ss[s];
+        t = v ^ v << 16 ^ r ^ ss[s + 1];
         t = t >>> 4 | t << 28;
 
-        L ^= SPtrans[1][t & 0x3f] | SPtrans[3][t >>> 8 & 0x3f] | SPtrans[5][t >>> 16 & 0x3f]
-            | SPtrans[7][t >>> 24 & 0x3f]
-            | SPtrans[0][u & 0x3f] | SPtrans[2][u >>> 8 & 0x3f] | SPtrans[4][u >>> 16 & 0x3f]
-            | SPtrans[6][u >>> 24 & 0x3f];
+        l ^= SPTRANS[1][t & 0x3f] | SPTRANS[3][t >>> 8 & 0x3f] | SPTRANS[5][t >>> 16 & 0x3f]
+            | SPTRANS[7][t >>> 24 & 0x3f]
+            | SPTRANS[0][u & 0x3f] | SPTRANS[2][u >>> 8 & 0x3f] | SPTRANS[4][u >>> 16 & 0x3f]
+            | SPTRANS[6][u >>> 24 & 0x3f];
 
-        return L;
+        return l;
     }
 
-    private static int[] body(int[] schedule, int Eswap0, int Eswap1) {
+    private static int[] body(int[] schedule, int eswap0, int eswap1) {
         int left = 0;
         int right = 0;
         int t;
 
         for (int j = 0; j < 25; j++) {
             for (int i = 0; i < ITERATIONS * 2; i += 4) {
-                left = D_ENCRYPT(left, right, i, Eswap0, Eswap1, schedule);
-                right = D_ENCRYPT(right, left, i + 2, Eswap0, Eswap1, schedule);
+                left = dEncrypt(left, right, i, eswap0, eswap1, schedule);
+                right = dEncrypt(right, left, i + 2, eswap0, eswap1, schedule);
             }
 
             t = left;
@@ -448,23 +449,23 @@ public class MCRCrypt {
 
         int[] results = new int[2];
 
-        PERM_OP(right, left, 1, 0x55555555, results);
+        permOp(right, left, 1, 0x55555555, results);
         right = results[0];
         left = results[1];
 
-        PERM_OP(left, right, 8, 0x00ff00ff, results);
+        permOp(left, right, 8, 0x00ff00ff, results);
         left = results[0];
         right = results[1];
 
-        PERM_OP(right, left, 2, 0x33333333, results);
+        permOp(right, left, 2, 0x33333333, results);
         right = results[0];
         left = results[1];
 
-        PERM_OP(left, right, 16, 0x0000ffff, results);
+        permOp(left, right, 16, 0x0000ffff, results);
         left = results[0];
         right = results[1];
 
-        PERM_OP(right, left, 4, 0x0f0f0f0f, results);
+        permOp(right, left, 4, 0x0f0f0f0f, results);
         right = results[0];
         left = results[1];
 
@@ -476,9 +477,9 @@ public class MCRCrypt {
         return out;
     }
 
-    public static final String alphabet = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    public static final String ALPHABET = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-    private static final char[] chars = alphabet.toCharArray();
+    private static final char[] CHARS = ALPHABET.toCharArray();
 
     /**
      * This method encrypts a string given a cleartext string and a "salt".
@@ -506,8 +507,8 @@ public class MCRCrypt {
         buffer[0] = charZero;
         buffer[1] = charOne;
 
-        int Eswap0 = alphabet.indexOf(charZero);
-        int Eswap1 = alphabet.indexOf(charOne) << 4;
+        int eswap0 = ALPHABET.indexOf(charZero);
+        int eswap1 = ALPHABET.indexOf(charOne) << 4;
         byte[] key = new byte[8];
 
         for (int i = 0; i < key.length; i++) {
@@ -518,8 +519,8 @@ public class MCRCrypt {
             key[i] = (byte) (original.charAt(i) << 1);
         }
 
-        int[] schedule = des_set_key(key);
-        int[] out = body(schedule, Eswap0, Eswap1);
+        int[] schedule = desSetKey(key);
+        int[] out = body(schedule, eswap0, eswap1);
 
         byte[] b = new byte[9];
 
@@ -542,7 +543,7 @@ public class MCRCrypt {
                     u = 0x80;
                 }
 
-                buffer[i] = alphabet.charAt(c);
+                buffer[i] = ALPHABET.charAt(c);
             }
         }
 
@@ -560,11 +561,11 @@ public class MCRCrypt {
      */
     public static String crypt(String original) {
         java.util.Random randomGenerator = new java.util.Random();
-        int numSaltChars = chars.length;
+        int numSaltChars = CHARS.length;
         String salt;
 
-        salt = String.valueOf(chars[Math.abs(randomGenerator.nextInt()) % numSaltChars])
-            + chars[Math.abs(randomGenerator.nextInt()) % numSaltChars];
+        salt = String.valueOf(CHARS[Math.abs(randomGenerator.nextInt()) % numSaltChars])
+            + CHARS[Math.abs(randomGenerator.nextInt()) % numSaltChars];
 
         return crypt(salt, original);
     }

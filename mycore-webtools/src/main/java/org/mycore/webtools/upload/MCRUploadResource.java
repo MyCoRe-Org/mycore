@@ -191,7 +191,7 @@ public class MCRUploadResource {
         MCRObjectID derivateID = getNewCreateDerivateID(objectID);
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateID);
-        derivate.setLabel("data object from " + objectID.toString());
+        derivate.setLabel("data object from " + objectID);
 
         String schema = MCRConfiguration.instance().getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml")
             .replaceAll(".xml",
@@ -218,8 +218,8 @@ public class MCRUploadResource {
 
     private void setDefaultPermissions(MCRObjectID derivateID) {
         if (MCRConfiguration.instance().getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
-            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+            MCRAccessInterface aclImpl = MCRAccessManager.getAccessImpl();
+            Collection<String> configuredPermissions = aclImpl.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
                     "default derivate rule");
@@ -238,7 +238,7 @@ public class MCRUploadResource {
         MCRObjectID oid = MCRObjectID.getInstance(objectID);
         if (!MCRMetadataManager.exists(oid) || !MCRAccessManager
             .checkPermission(oid, MCRAccessManager.PERMISSION_WRITE)) {
-            throw new ForbiddenException("No write access to " + oid.toString());
+            throw new ForbiddenException("No write access to " + oid);
         }
 
         final MCRFileUploadBucket bucket = MCRFileUploadBucket.getOrCreateBucket(uploadID, objectID);

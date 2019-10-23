@@ -54,7 +54,7 @@ abstract class MCRPersistenceServlet extends MCRServlet {
 
     protected static final String OBJECT_ID_KEY = MCRPersistenceServlet.class.getCanonicalName() + ".MCRObjectID";
 
-    private Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String uploadPage;
 
@@ -69,8 +69,9 @@ abstract class MCRPersistenceServlet extends MCRServlet {
     protected void think(MCRServletJob job) throws Exception {
         //If admin mode, do not change any data
         if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(),
-            MCRFrontendUtil.getBaseURL()))
+            MCRFrontendUtil.getBaseURL())) {
             return;
+        }
         handlePersistenceOperation(job.getRequest(), job.getResponse());
     }
 

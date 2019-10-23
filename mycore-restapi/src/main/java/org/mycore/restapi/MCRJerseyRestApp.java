@@ -24,7 +24,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
-import org.mycore.frontend.jersey.access.MCRRequestScopeACLFactory;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFilter;
 import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;

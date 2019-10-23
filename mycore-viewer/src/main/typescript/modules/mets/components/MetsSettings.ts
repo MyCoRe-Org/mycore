@@ -20,6 +20,7 @@
 
 namespace mycore.viewer.components {
     import AltoChangeSet = mycore.viewer.widgets.alto.AltoChangeSet;
+
     export interface MetsSettings extends MyCoReViewerSettings {
         altoChangePID: string;
         metsURL: string;

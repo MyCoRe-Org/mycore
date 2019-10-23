@@ -27,6 +27,7 @@ package org.mycore.mods;
  */
 public enum MCRMODSRelationshipType {
     host, preceeding, original, series, references, reviewOf;
+
     static String xPathList() {
         StringBuilder sb = new StringBuilder();
         for (MCRMODSRelationshipType type : values()) {

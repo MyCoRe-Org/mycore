@@ -41,12 +41,13 @@ public class MCRXPathBuilder {
      * @return absolute XPath of that object. In case there is a root Document, it will begin with a "/".
      */
     public static String buildXPath(Object object) {
-        if (object instanceof Element)
+        if (object instanceof Element) {
             return buildXPath((Element) object);
-        else if (object instanceof Attribute)
+        } else if (object instanceof Attribute) {
             return buildXPath((Attribute) object);
-        else
+        } else {
             return "";
+        }
     }
 
     /**
@@ -59,8 +60,9 @@ public class MCRXPathBuilder {
      */
     public static String buildXPath(Attribute attribute) {
         String parentXPath = buildXPath(attribute.getParent());
-        if (!parentXPath.isEmpty())
+        if (!parentXPath.isEmpty()) {
             parentXPath += "/";
+        }
         return parentXPath + "@" + attribute.getQualifiedName();
     }
 
@@ -73,12 +75,14 @@ public class MCRXPathBuilder {
      * @return absolute XPath of that element. In case there is a root Document, it will begin with a "/".
      */
     public static String buildXPath(Element element) {
-        if (element == null)
+        if (element == null) {
             return "";
+        }
 
         String parentXPath = buildXPath(element.getParent());
-        if ((!parentXPath.isEmpty()) || (element.getParent() instanceof Document))
+        if ((!parentXPath.isEmpty()) || (element.getParent() instanceof Document)) {
             parentXPath += "/";
+        }
         return parentXPath + buildChildPath(element);
     }
 
@@ -90,25 +94,30 @@ public class MCRXPathBuilder {
     }
 
     /**
-     * Returns the namespace prefix for this element, followed by a ":", or the empty string if no namespace prefix known.
+     * Returns the namespace prefix for this element, followed by a ":",
+     * or the empty string if no namespace prefix known.
      */
     public static String getNamespacePrefix(Element element) {
         Namespace nsElement = element.getNamespace();
-        for (Namespace ns : MCRConstants.getStandardNamespaces())
-            if (ns.equals(nsElement))
+        for (Namespace ns : MCRConstants.getStandardNamespaces()) {
+            if (ns.equals(nsElement)) {
                 return ns.getPrefix() + ":";
+            }
+        }
 
         String prefix = nsElement.getPrefix();
-        if ((prefix != null) && !prefix.isEmpty())
+        if ((prefix != null) && !prefix.isEmpty()) {
             return prefix + ":";
-        else
+        } else {
             return "";
+        }
     }
 
     private static String buildPositionPredicate(Element element) {
         Parent parent = element.getParent();
-        if ((parent instanceof Document) || (parent == null))
+        if ((parent instanceof Document) || (parent == null)) {
             return "";
+        }
 
         Element parentElement = (Element) parent;
         int pos = parentElement.getChildren(element.getName(), element.getNamespace()).indexOf(element);

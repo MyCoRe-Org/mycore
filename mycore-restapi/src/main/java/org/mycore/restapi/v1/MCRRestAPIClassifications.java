@@ -120,8 +120,9 @@ public class MCRRestAPIClassifications {
      * @throws IOException
      */
     private static void writeChildrenAsJSON(Element eParent, JsonWriter writer, String lang) throws IOException {
-        if (eParent.getChildren("category").size() == 0)
+        if (eParent.getChildren("category").size() == 0) {
             return;
+        }
 
         writer.name("categories");
         writer.beginArray();
@@ -446,14 +447,15 @@ public class MCRRestAPIClassifications {
                 }
             }
             writer.name("items");
-
-            writeChildrenAsJSONCBTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("checked"));
+            eRoot = eRoot.getChild("categories");
+            writeChildrenAsJSONCBTree(eRoot, writer, lang, style.contains("checked"));
             writer.endObject();
         } else if (style.contains("jstree")) {
             if (lang == null) {
                 lang = "de";
             }
-            writeChildrenAsJSONJSTree(eRoot = eRoot.getChild("categories"), writer, lang, style.contains("opened"),
+            eRoot = eRoot.getChild("categories");
+            writeChildrenAsJSONJSTree(eRoot, writer, lang, style.contains("opened"),
                 style.contains("disabled"), style.contains("selected"));
         } else {
             writer.beginObject(); // {
@@ -487,9 +489,8 @@ public class MCRRestAPIClassifications {
 
     private void filterNonEmpty(String classId, Element e) {
         SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
-        for (int i = 0; i < e.getChildren("category").size(); i++) {
-            Element cat = e.getChildren("category").get(i);
-
+        Element[] categories = e.getChildren("category").toArray(Element[]::new);
+        for (Element cat : categories) {
             SolrQuery solrQquery = new SolrQuery();
             solrQquery.setQuery(
                 "category:\"" + MCRSolrUtils.escapeSearchValue(classId + ":" + cat.getAttributeValue("ID")) + "\"");
@@ -498,15 +499,14 @@ public class MCRRestAPIClassifications {
                 QueryResponse response = solrClient.query(solrQquery);
                 SolrDocumentList solrResults = response.getResults();
                 if (solrResults.getNumFound() == 0) {
-                    e.removeContent(cat);
-                    i--;
+                    cat.detach();
+                } else {
+                    filterNonEmpty(classId, cat);
                 }
             } catch (SolrServerException | IOException exc) {
                 LOGGER.error(exc);
             }
-        }
-        for (int i = 0; i < e.getChildren("category").size(); i++) {
-            filterNonEmpty(classId, e.getChildren("category").get(i));
+
         }
     }
 

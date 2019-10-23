@@ -17,7 +17,8 @@
  */
 
 /**
- * Contains classes to build a {@link java.nio.file.FileSystem} on top of {@link org.mycore.datamodel.ifs.MCRFilesystemNode}.
+ * Contains classes to build a {@link java.nio.file.FileSystem} on top of
+ * {@link org.mycore.datamodel.ifs.MCRFilesystemNode}.
  * @author Thomas Scheffler (yagee)
  *
  */

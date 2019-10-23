@@ -8,9 +8,9 @@ public class MCRThumbnailUtils {
         int colorType = 12;
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
-                int colorTypeTemp = getColorType(image.getRGB(x,y));
+                int colorTypeTemp = getColorType(image.getRGB(x, y));
                 if (colorTypeTemp == BufferedImage.TYPE_4BYTE_ABGR) {
-                    return colorTypeTemp;
+                    return BufferedImage.TYPE_4BYTE_ABGR;
                 }
                 colorType = colorTypeTemp < colorType ? colorTypeTemp : colorType;
             }

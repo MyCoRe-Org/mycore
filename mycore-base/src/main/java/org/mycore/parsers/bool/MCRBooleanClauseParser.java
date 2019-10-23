@@ -48,6 +48,7 @@ public class MCRBooleanClauseParser<T> {
      * in a text string in a condition like 'title contains "foo (and bar)".
      */
     private static String opening_bracket = "%%%%%%%%%%";
+
     private static String closing_bracket = "##########";
 
     private static String extendClauses(final String s, final List<String> l) {
@@ -57,7 +58,7 @@ public class MCRBooleanClauseParser<T> {
 
             if (m.find()) {
                 String c = m.group();
-                String clause = (String) l.get(Integer.parseInt(m.group(1)));
+                String clause = l.get(Integer.parseInt(m.group(1)));
                 sintern = sintern.replaceAll(c, clause);
             } else {
                 break;

@@ -39,10 +39,10 @@ import org.jdom2.Element;
 class MCRIdentifierPool {
 
     /** Set of already known identifiers resolved in the last round */
-    private Set<MCRIdentifier> oldIdentifiers = new HashSet<MCRIdentifier>();
+    private Set<MCRIdentifier> oldIdentifiers = new HashSet<>();
 
     /** Set of new identifiers returned with data from external sources in the current resolving round */
-    private Set<MCRIdentifier> newIdentifiers = new HashSet<MCRIdentifier>();
+    private Set<MCRIdentifier> newIdentifiers = new HashSet<>();
 
     MCRIdentifierPool() {
     }

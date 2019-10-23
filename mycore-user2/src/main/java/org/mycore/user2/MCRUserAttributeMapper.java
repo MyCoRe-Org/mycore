@@ -49,7 +49,8 @@ import org.mycore.user2.annotation.MCRUserAttribute;
 import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
 
 /**
- * This class is used to map attributes on {@link MCRUser} or {@link MCRUserInformation} to annotated properties or methods.
+ * This class is used to map attributes on {@link MCRUser} or {@link MCRUserInformation}
+ * to annotated properties or methods.
  * <br><br>
  * You can configure the mapping within <code>realms.xml</code> like this:
  * <br>
@@ -155,8 +156,9 @@ public class MCRUserAttributeMapper {
 
                             if (value != null || ((attrAnno.nullable() || attribute.nullable) && value == null)) {
                                 Object oldValue = getValue(object, annotated);
-                                if (oldValue != null && oldValue.equals(value))
+                                if (oldValue != null && oldValue.equals(value)) {
                                     continue;
+                                }
 
                                 if (annotated instanceof Field) {
                                     final Field field = (Field) annotated;
@@ -238,8 +240,9 @@ public class MCRUserAttributeMapper {
             return ((Field) annotated).getName();
         } else if (annotated instanceof Method) {
             String name = ((Method) annotated).getName();
-            if (name.startsWith("set"))
+            if (name.startsWith("set")) {
                 name = name.substring(3);
+            }
             return name.substring(0, 1).toLowerCase(Locale.ROOT) + name.substring(1);
         }
 
@@ -306,8 +309,9 @@ public class MCRUserAttributeMapper {
         List<ValueMapping> valueMapping;
 
         Map<String, String> getValueMap() {
-            if (valueMapping == null)
+            if (valueMapping == null) {
                 return null;
+            }
 
             Map<String, String> map = new HashMap<>();
             for (ValueMapping vm : valueMapping) {

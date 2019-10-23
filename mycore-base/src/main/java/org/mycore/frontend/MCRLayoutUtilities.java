@@ -18,6 +18,8 @@
 
 package org.mycore.frontend;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -74,20 +76,12 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
-
 /**
  *
  * Xalan extention for navigation.xsl
  *
  */
 public class MCRLayoutUtilities {
-    private static final int STANDARD_CACHE_SECONDS = 10;
-
-    private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
-
-    static final String OBJIDPREFIX_WEBPAGE = "webpage:";
-
     // strategies for access verification
     public static final int ALLTRUE = 1;
 
@@ -95,42 +89,23 @@ public class MCRLayoutUtilities {
 
     public static final int ALL2BLOCKER_TRUE = 3;
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
-
-    private static HashMap<String, Element> itemStore = new HashMap<>();
-
     public static final String NAV_RESOURCE = MCRConfiguration.instance().getString("MCR.NavigationFile",
         "/config/navigation.xml");
 
+    static final String OBJIDPREFIX_WEBPAGE = "webpage:";
+
+    private static final int STANDARD_CACHE_SECONDS = 10;
+
+    private static final XPathFactory XPATH_FACTORY = XPathFactory.instance();
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRLayoutUtilities.class);
+
     private static final ServletContext SERVLET_CONTEXT = MCRURIResolver.getServletContext();
 
-    private static class DocumentHolder {
-        URL docURL;
+    private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean(
+        "MCR.Website.ReadAccessVerification");
 
-        Document parsedDocument;
-
-        long lastModified;
-
-        public DocumentHolder(URL url) throws JDOMException, IOException {
-            docURL = url;
-            parseDocument();
-        }
-
-        public boolean isValid(URL url) throws IOException {
-            return docURL.equals(url) && lastModified == getLastModified();
-        }
-
-        private void parseDocument() throws JDOMException, IOException {
-            lastModified = getLastModified();
-            LOGGER.info("Parsing: {}", docURL);
-            parsedDocument = new SAXBuilder(XMLReaders.NONVALIDATING).build(docURL);
-        }
-
-        private long getLastModified() throws IOException {
-            URLConnection urlConnection = docURL.openConnection();
-            return urlConnection.getLastModified();
-        }
-    }
+    private static HashMap<String, Element> itemStore = new HashMap<>();
 
     private static final LoadingCache<String, DocumentHolder> NAV_DOCUMENT_CACHE = CacheBuilder.newBuilder()
         .refreshAfterWrite(STANDARD_CACHE_SECONDS, TimeUnit.SECONDS).build(new CacheLoader<String, DocumentHolder>() {
@@ -160,9 +135,6 @@ public class MCRLayoutUtilities {
                 return task;
             }
         });
-
-    private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean(
-        "MCR.Website.ReadAccessVerification");
 
     /**
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
@@ -347,7 +319,7 @@ public class MCRLayoutUtilities {
      * @param access
      *            initial value
      * @param userID a user id
-     * 
+     *
      * @deprecated userID as string is not enough - we need to pass the complete MCRUserInformation object
      */
     @Deprecated
@@ -458,7 +430,7 @@ public class MCRLayoutUtilities {
         return System.currentTimeMillis() - startTime;
     }
 
-    public static String getOBJIDPREFIX_WEBPAGE() {
+    public static String getWebpageObjIDPrefix() {
         return OBJIDPREFIX_WEBPAGE;
     }
 
@@ -489,6 +461,34 @@ public class MCRLayoutUtilities {
 
     public static String getPermission2ReadWebpage() {
         return PERMISSION_READ;
+    }
+
+    private static class DocumentHolder {
+        URL docURL;
+
+        Document parsedDocument;
+
+        long lastModified;
+
+        DocumentHolder(URL url) throws JDOMException, IOException {
+            docURL = url;
+            parseDocument();
+        }
+
+        public boolean isValid(URL url) throws IOException {
+            return docURL.equals(url) && lastModified == getLastModified();
+        }
+
+        private void parseDocument() throws JDOMException, IOException {
+            lastModified = getLastModified();
+            LOGGER.info("Parsing: {}", docURL);
+            parsedDocument = new SAXBuilder(XMLReaders.NONVALIDATING).build(docURL);
+        }
+
+        private long getLastModified() throws IOException {
+            URLConnection urlConnection = docURL.openConnection();
+            return urlConnection.getLastModified();
+        }
     }
 
     private static class AccessCleaningDOMOutputProcessor extends AbstractDOMOutputProcessor {

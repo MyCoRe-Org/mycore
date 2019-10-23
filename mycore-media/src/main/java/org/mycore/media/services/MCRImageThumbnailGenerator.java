@@ -1,12 +1,5 @@
 package org.mycore.media.services;
 
-import org.mycore.datamodel.niofs.MCRPath;
-
-import org.mycore.imagetiler.MCRImage;
-import org.mycore.imagetiler.MCRTiledPictureProps;
-import org.mycore.iview2.services.MCRIView2Tools;
-
-import javax.imageio.ImageReader;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -14,6 +7,13 @@ import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageReader;
+
+import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.imagetiler.MCRImage;
+import org.mycore.imagetiler.MCRTiledPictureProps;
+import org.mycore.iview2.services.MCRIView2Tools;
 
 public class MCRImageThumbnailGenerator implements MCRThumbnailGenerator {
 
@@ -26,8 +26,8 @@ public class MCRImageThumbnailGenerator implements MCRThumbnailGenerator {
 
     @Override
     public Optional<BufferedImage> getThumbnail(MCRPath path, int size) throws IOException {
-        Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), path.getOwner(), path.getOwnerRelativePath()
-            .toString());
+        Path iviewFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), path.getOwner(),
+            path.getOwnerRelativePath());
         MCRTiledPictureProps iviewFileProps = getIviewFileProps(iviewFile);
         final double width = iviewFileProps.getWidth();
         final double height = iviewFileProps.getHeight();

@@ -217,10 +217,10 @@ public class MCRWCMSFileBrowserResource {
         }
         if ("images".equals(type)) {
             return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'"
-                + path.substring(path.lastIndexOf("/") + 1, path.length()) + "', '');</script>";
+                + path.substring(path.lastIndexOf("/") + 1) + "', '');</script>";
         }
         return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction(" + funcNum + ",'" + basehref
-            + path.substring(path.lastIndexOf("/") + 1, path.length()) + "', '');</script>";
+            + path.substring(path.lastIndexOf("/") + 1) + "', '');</script>";
     }
 
     protected String saveFile(InputStream inputStream, String path) throws IOException {

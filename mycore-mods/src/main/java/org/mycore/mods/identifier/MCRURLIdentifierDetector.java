@@ -38,15 +38,11 @@ public class MCRURLIdentifierDetector implements MCRIdentifierDetector<URI> {
     }
 
     public void addDetector(MCRIdentifierDetector<URI> identifierDetector) {
-        if (!normalizers.contains(identifierDetector)) {
-            normalizers.add(identifierDetector);
-        }
+        normalizers.add(identifierDetector);
     }
 
     public void removeDetector(MCRIdentifierDetector<URI> identifierDetector) {
-        if (normalizers.contains(identifierDetector)) {
-            normalizers.remove(identifierDetector);
-        }
+        normalizers.remove(identifierDetector);
     }
 
     @Override

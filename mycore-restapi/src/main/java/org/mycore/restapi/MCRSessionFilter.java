@@ -77,7 +77,8 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     Application app;
 
     /**
-     * If request was authenticated via JSON Web Token add a new token if <code>aud</code> was {@link MCRRestAPIAuthentication#AUDIENCE}.
+     * If request was authenticated via JSON Web Token add a new token if <code>aud</code> was
+     * {@link MCRRestAPIAuthentication#AUDIENCE}.
      *
      * If the response has a status code that represents a client error (4xx), the JSON Web Token is ommited.
      * If the response already has a JSON Web Token no changes are made.
@@ -128,10 +129,10 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             return;
         }
         //2. Basic Authentification
-        String basic_prefix = "Basic ";
-        if (authorization.startsWith(basic_prefix)) {
+        String basicPrefix = "Basic ";
+        if (authorization.startsWith(basicPrefix)) {
             LOGGER.debug("Using 'Basic' authentication.");
-            byte[] encodedAuth = authorization.substring(basic_prefix.length()).trim()
+            byte[] encodedAuth = authorization.substring(basicPrefix.length()).trim()
                 .getBytes(StandardCharsets.ISO_8859_1);
             String userPwd = new String(Base64.getDecoder().decode(encodedAuth), StandardCharsets.ISO_8859_1);
             if (userPwd != null && userPwd.contains(":")) {
@@ -153,11 +154,11 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             }
         }
         //3. JWT
-        String bearer_prefix = "Bearer ";
-        if (authorization.startsWith(bearer_prefix)) {
+        String bearerPrefix = "Bearer ";
+        if (authorization.startsWith(bearerPrefix)) {
             LOGGER.debug("Using 'JSON Web Token' authentication.");
             //get JWT
-            String token = authorization.substring(bearer_prefix.length()).trim();
+            String token = authorization.substring(bearerPrefix.length()).trim();
             //validate against secret
             try {
                 DecodedJWT jwt = JWT.require(MCRJWTUtil.getJWTAlgorithm())
@@ -281,7 +282,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         private final DecodedJWT jwt;
 
-        public MCRJWTUserInformation(DecodedJWT token) {
+        MCRJWTUserInformation(DecodedJWT token) {
             this.jwt = token;
         }
 
@@ -315,7 +316,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         private final Principal principal;
 
-        public MCRRestSecurityContext(MCRUserInformation ui, boolean isSecure) {
+        MCRRestSecurityContext(MCRUserInformation ui, boolean isSecure) {
             this.principal = ui::getUserID;
             this.ui = ui;
             this.isSecure = isSecure;

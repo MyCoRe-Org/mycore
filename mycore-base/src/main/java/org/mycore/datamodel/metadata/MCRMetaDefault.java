@@ -18,8 +18,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +26,7 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.language.MCRLanguageFactory;
 
@@ -35,6 +34,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.JsonObject;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * This class implements any methods for handling the basic data for all
@@ -92,42 +93,42 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
+     * The language element was set. If the value of <em>lang</em> is
      * empty or false <b>en </b> was set. The datapart was set to default. All
      * other elemnts was set to an empty string. The inherited value is set to
      * 0!
      * 
-     * @param default_lang
+     * @param lang
      *            the default language
      */
-    public MCRMetaDefault(String default_lang) {
+    public MCRMetaDefault(String lang) {
         this();
-        lang = default_lang;
+        this.lang = lang;
     }
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
+     * The language element was set. If the value of <em>lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * the value of <em>subtag</em>. If the value of <em>subtag</em>
      * is null or empty an exception was throwed. The type element was set to
-     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * the value of <em>type</em>, if it is null, an empty string was set
      * to the type element. The datapart element was set. If the value of
-     * <em>set_datapart,</em> is null or empty the default was set.
-     * @param set_subtag       the name of the subtag
-     * @param default_lang     the default language
-     * @param set_type         the optional type string
-     * @param set_inherited     a int value , &gt; 0 if the data are inherited,
+     * <em>datapart,</em> is null or empty the default was set.
+     * @param subtag       the name of the subtag
+     * @param lang     the language
+     * @param type         the optional type string
+     * @param inherited     a int value , &gt; 0 if the data are inherited,
      *                         else = 0.
      *
-     * @exception MCRException if the set_subtag value is null or empty
+     * @exception MCRException if the subtag value is null or empty
      */
-    public MCRMetaDefault(String set_subtag, String default_lang, String set_type, int set_inherited)
+    public MCRMetaDefault(String subtag, String lang, String type, int inherited)
         throws MCRException {
-        this(default_lang);
-        setInherited(set_inherited);
-        subtag = set_subtag;
-        type = set_type;
+        this(lang);
+        setInherited(inherited);
+        this.subtag = subtag;
+        this.type = type;
     }
 
     /**
@@ -157,37 +158,37 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
     /**
      * This method set the language element. If the value of
-     * <em>default_lang</em> is null, empty or false nothing was changed.
+     * <em>lang</em> is null, empty or false nothing was changed.
      * 
-     * @param default_lang
-     *            the default language
+     * @param lang
+     *            the language
      */
-    public final void setLang(String default_lang) {
-        lang = default_lang;
+    public final void setLang(String lang) {
+        this.lang = lang;
     }
 
     /**
-     * This method set the subtag element. If the value of <em>set_subtag</em>
+     * This method set the subtag element. If the value of <em>subtag</em>
      * is null or empty an exception was throwed.
      * 
-     * @param set_subtag
+     * @param subtag
      *            the subtag
      * @exception MCRException
-     *                if the set_subtag value is null or empty
+     *                if the subtag value is null or empty
      */
-    public final void setSubTag(String set_subtag) throws MCRException {
-        subtag = set_subtag;
+    public final void setSubTag(String subtag) throws MCRException {
+        this.subtag = subtag;
     }
 
     /**
-     * This method set the type element. If the value of <em>set_type</em> is
+     * This method set the type element. If the value of <em>type</em> is
      * null or empty nothing was changed.
      * 
-     * @param set_type
+     * @param type
      *            the optional type
      */
-    public final void setType(String set_type) {
-        type = set_type;
+    public final void setType(String type) {
+        this.type = type;
     }
 
     /**
@@ -235,42 +236,22 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * @param element
      *            a relevant DOM element for the metadata
      * @exception MCRException
-     *                if the set_subtag value is null or empty
+     *                if the subtag value is null or empty
      */
-    public void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public void setFromDOM(Element element) throws MCRException {
         if (element == null) {
             return;
         }
 
-        String temp_subtag = element.getName();
+        subtag = element.getName();
 
-        if (temp_subtag == null || (temp_subtag = temp_subtag.trim()).length() == 0) {
-            throw new MCRException("The subtag is null or empty.");
-        }
-
-        subtag = temp_subtag;
-
-        String temp_lang = element.getAttributeValue("lang", org.jdom2.Namespace.XML_NAMESPACE);
-
-        if (temp_lang != null && (temp_lang = temp_lang.trim()).length() != 0) {
-            lang = temp_lang;
-        }
-
-        String temp_type = element.getAttributeValue("type");
-
-        if (temp_type != null && (temp_type = temp_type.trim()).length() != 0) {
-            type = temp_type;
-        }
-
-        String temp_herit = element.getAttributeValue("inherited");
-
-        if (temp_herit != null && (temp_herit = temp_herit.trim()).length() != 0) {
-            try {
-                inherited = Integer.parseInt(temp_herit);
-            } catch (NumberFormatException e) {
-                inherited = 0;
-            }
-        }
+        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue("lang", Namespace.XML_NAMESPACE))
+            .ifPresent(tempLang -> lang = tempLang);
+        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue("type"))
+            .ifPresent(tempType -> type = tempType);
+        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue("inherited"))
+            .map(Integer::parseInt)
+            .ifPresent(tempInherited -> inherited = tempInherited);
     }
 
     /**
@@ -289,8 +270,9 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             throw exc;
         }
         Element elm = new Element(subtag);
-        if (getLang() != null && getLang().length() > 0)
+        if (getLang() != null && getLang().length() > 0) {
             elm.setAttribute("lang", getLang(), Namespace.XML_NAMESPACE);
+        }
         if (getType() != null && getType().length() > 0) {
             elm.setAttribute("type", getType());
         }
@@ -354,7 +336,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * @throws MCRException the MCRMetaDefault is invalid
      */
     public void validate() throws MCRException {
-        if (subtag == null || (subtag = subtag.trim()).length() == 0) {
+        subtag = MCRUtils.filterTrimmedNotEmpty(subtag).orElse(null);
+        if (subtag == null) {
             throw new MCRException("No tag name defined!");
         }
         if (lang != null && !MCRLanguageFactory.instance().isSupportedLanguage(lang)) {
@@ -372,10 +355,12 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null || getClass() != obj.getClass())
+        }
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
+        }
         MCRMetaDefault other = (MCRMetaDefault) obj;
         return Objects.equals(datapart, other.datapart) && Objects.equals(inherited, other.inherited)
             && Objects.equals(lang, other.lang) && Objects.equals(subtag, other.subtag)

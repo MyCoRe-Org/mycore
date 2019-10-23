@@ -22,6 +22,7 @@ import static org.mycore.mods.MCRMODSDateFormat.DATE_LOCALE;
 import static org.mycore.mods.MCRMODSDateFormat.MODS_TIMEZONE;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Objects;
@@ -93,9 +94,9 @@ public class MCRMODSDateHelper {
 
     private static Date adjustTimeOffset(GregorianCalendar cal) {
         GregorianCalendar clone = new GregorianCalendar(MODS_TIMEZONE, DATE_LOCALE);
-        clone.set(cal.get(GregorianCalendar.YEAR),
-            cal.get(GregorianCalendar.MONTH),
-            cal.get(GregorianCalendar.DAY_OF_MONTH));
+        clone.set(cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH));
         return clone.getTime();
     }
 

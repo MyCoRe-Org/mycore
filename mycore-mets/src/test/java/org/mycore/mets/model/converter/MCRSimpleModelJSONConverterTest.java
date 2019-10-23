@@ -33,6 +33,6 @@ public class MCRSimpleModelJSONConverterTest {
 
     @Test
     public void testToJSON() throws Exception {
-        String resultJson = MCRSimpleModelJSONConverter.toJSON(metsSimpleModel);
+        MCRSimpleModelJSONConverter.toJSON(metsSimpleModel);
     }
 }

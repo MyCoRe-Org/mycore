@@ -47,10 +47,10 @@ public class MCRURL {
     }
 
     public Map<String, List<String>> getParameterMap() {
-        if (this.parameterMap != null) {
-            return parameterMap;
+        if (this.parameterMap == null) {
+            this.parameterMap = buildParameterMap(this.url);
         }
-        return this.parameterMap = buildParameterMap(this.url);
+        return parameterMap;
     }
 
     private Map<String, List<String>> buildParameterMap(URL url) {

@@ -103,7 +103,7 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
                 throw new FileAlreadyExistsException(rootPath.toString());
             }
             try {
-                MCRDirectory rootDirectory = fileStore.create(derId.getNumberAsInteger());
+                fileStore.create(derId.getNumberAsInteger());
             } catch (RuntimeException e) {
                 LogManager.getLogger(getClass()).warn("Catched RuntimeException while creating new root directory.", e);
                 throw new FileSystemException(rootPath.toString(), null, e.getMessage());

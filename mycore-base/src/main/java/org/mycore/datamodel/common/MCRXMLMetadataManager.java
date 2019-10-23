@@ -100,6 +100,10 @@ import org.xml.sax.SAXException;
  */
 public class MCRXMLMetadataManager {
 
+    public static final int REV_LATEST = -1;
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRXMLMetadataManager.class);
+
     /** The singleton */
     private static MCRXMLMetadataManager SINGLETON;
 
@@ -132,29 +136,9 @@ public class MCRXMLMetadataManager {
      */
     private URI svnBase;
 
-    public static final int REV_LATEST = -1;
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRXMLMetadataManager.class);
-
-    private static final class StoreModifiedHandle implements MCRCache.ModifiedHandle {
-        private final long expire;
-
-        private final MCRObjectID id;
-
-        private StoreModifiedHandle(MCRObjectID id, long time, TimeUnit unit) {
-            this.expire = unit.toMillis(time);
-            this.id = id;
-        }
-
-        @Override
-        public long getCheckPeriod() {
-            return expire;
-        }
-
-        @Override
-        public long getLastModified() throws IOException {
-            return MCRXMLMetadataManager.instance().getLastModified(id);
-        }
+    protected MCRXMLMetadataManager() {
+        this.createdStores = new HashSet<>();
+        reload();
     }
 
     /** Returns the singleton */
@@ -163,11 +147,6 @@ public class MCRXMLMetadataManager {
             SINGLETON = new MCRXMLMetadataManager();
         }
         return SINGLETON;
-    }
-
-    protected MCRXMLMetadataManager() {
-        this.createdStores = new HashSet<>();
-        reload();
     }
 
     /**
@@ -230,7 +209,7 @@ public class MCRXMLMetadataManager {
             try {
                 if (!Files.exists(Files.createDirectories(path))) {
                     throw new MCRConfigurationException(
-                            "The metadata store " + type + " directory " + path.toAbsolutePath() + " does not exist.");
+                        "The metadata store " + type + " directory " + path.toAbsolutePath() + " does not exist.");
                 }
             } catch (Exception ex) {
                 String msg = "Exception while creating metadata store " + type + " directory " + path.toAbsolutePath();
@@ -239,15 +218,15 @@ public class MCRXMLMetadataManager {
         } else {
             if (!Files.isDirectory(path)) {
                 throw new MCRConfigurationException(
-                        "Metadata store " + type + " " + path.toAbsolutePath() + " is a file, not a directory");
+                    "Metadata store " + type + " " + path.toAbsolutePath() + " is a file, not a directory");
             }
             if (!Files.isReadable(path)) {
                 throw new MCRConfigurationException(
-                        "Metadata store " + type + " directory " + path.toAbsolutePath() + " is not readable");
+                    "Metadata store " + type + " directory " + path.toAbsolutePath() + " is not readable");
             }
             if (!Files.isWritable(path)) {
                 throw new MCRConfigurationException(
-                        "Metadata store " + type + " directory " + path.toAbsolutePath() + " is not writeable");
+                    "Metadata store " + type + " directory " + path.toAbsolutePath() + " is not writeable");
             }
         }
     }
@@ -329,7 +308,8 @@ public class MCRXMLMetadataManager {
                     } catch (ReflectiveOperationException e) {
                         throw new MCRPersistenceException(
                             new MessageFormat("Could not instantiate store for project {0} and object type {1}.",
-                                Locale.ROOT).format(new Object[] { project, type }), e);
+                                Locale.ROOT).format(new Object[] { project, type }),
+                            e);
                     }
                 }
             }
@@ -345,7 +325,7 @@ public class MCRXMLMetadataManager {
 
     @SuppressWarnings("unchecked")
     private void setupStore(String project, String objectType, String configPrefix, boolean readOnly)
-            throws ReflectiveOperationException {
+        throws ReflectiveOperationException {
         MCRConfiguration config = MCRConfiguration.instance();
         String baseID = getStoryKey(project, objectType);
         Class clazz = config.getClass(configPrefix + "Class", null);
@@ -381,7 +361,7 @@ public class MCRXMLMetadataManager {
     }
 
     private void checkAndCreateDirectory(Path path, String project, String objectType, String configPrefix,
-            boolean readOnly) {
+        boolean readOnly) {
         if (Files.exists(path)) {
             return;
         }
@@ -389,7 +369,7 @@ public class MCRXMLMetadataManager {
             throw new MCRPersistenceException(String.format(Locale.ENGLISH,
                 "Path does not exists ''%s'' to set up store for project ''%s'' and objectType ''%s'' "
                     + "and config prefix ''%s''. We are not willing to create it for an read only operation.",
-                    path.toAbsolutePath(), project, objectType, configPrefix));
+                path.toAbsolutePath(), project, objectType, configPrefix));
         }
         try {
             if (!Files.exists(Files.createDirectories(path))) {
@@ -443,7 +423,7 @@ public class MCRXMLMetadataManager {
      * @throws MCRPersistenceException the object couldn't be created due persistence problems
      */
     public MCRStoredMetadata create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
-            throws MCRPersistenceException {
+        throws MCRPersistenceException {
         try {
             MCRStoredMetadata sm = getStore(mcrid, false).create(xml, mcrid.getNumberAsInteger());
             sm.setLastModified(lastModified);
@@ -490,7 +470,7 @@ public class MCRXMLMetadataManager {
      * @throws MCRPersistenceException the object couldn't be created or updated due persistence problems
      */
     public MCRStoredMetadata createOrUpdate(MCRObjectID mcrid, Document xml, Date lastModified)
-            throws MCRPersistenceException {
+        throws MCRPersistenceException {
         if (exists(mcrid)) {
             return update(mcrid, xml, lastModified);
         } else {
@@ -519,7 +499,7 @@ public class MCRXMLMetadataManager {
      * @return the stored metadata as IFS2 object
      */
     public MCRStoredMetadata update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
-            throws MCRPersistenceException {
+        throws MCRPersistenceException {
         if (!exists(mcrid)) {
             throw new MCRPersistenceException("Object to update does not exist: " + mcrid);
         }
@@ -668,8 +648,8 @@ public class MCRXMLMetadataManager {
         int highestStoredID = store.getHighestStoredID();
         //fixes MCR-1534 (IDs once deleted should never be used again)
         return Math.max(highestStoredID, MCRMetadataHistoryManager.getHighestStoredID(project, type)
-                                                                  .map(MCRObjectID::getNumberAsInteger)
-                                                                  .orElse(0));
+            .map(MCRObjectID::getNumberAsInteger)
+            .orElse(0));
     }
 
     /**
@@ -782,9 +762,9 @@ public class MCRXMLMetadataManager {
         try (Stream<Path> streamBasePath = list(basePath)) {
             return streamBasePath.flatMap(this::list)
                 .filter(p -> MCRObjectID.isValidType(p.getFileName().toString()))
-                .map(p -> p.getParent().getFileName().toString() + "_" + p.getFileName().toString())
-                .collect(Collectors.toSet()); 
-        } 
+                .map(p -> p.getParent().getFileName() + "_" + p.getFileName())
+                .collect(Collectors.toSet());
+        }
     }
 
     /**
@@ -797,7 +777,7 @@ public class MCRXMLMetadataManager {
             return Files.list(path);
         } catch (IOException ioException) {
             throw new MCRPersistenceException(
-                    "unable to list files of IFS2 metadata directory " + path.toAbsolutePath(), ioException);
+                "unable to list files of IFS2 metadata directory " + path.toAbsolutePath(), ioException);
         }
     }
 
@@ -853,5 +833,26 @@ public class MCRXMLMetadataManager {
 
     public MCRCache.ModifiedHandle getLastModifiedHandle(final MCRObjectID id, final long expire, TimeUnit unit) {
         return new StoreModifiedHandle(id, expire, unit);
+    }
+
+    private static final class StoreModifiedHandle implements MCRCache.ModifiedHandle {
+        private final long expire;
+
+        private final MCRObjectID id;
+
+        private StoreModifiedHandle(MCRObjectID id, long time, TimeUnit unit) {
+            this.expire = unit.toMillis(time);
+            this.id = id;
+        }
+
+        @Override
+        public long getCheckPeriod() {
+            return expire;
+        }
+
+        @Override
+        public long getLastModified() throws IOException {
+            return MCRXMLMetadataManager.instance().getLastModified(id);
+        }
     }
 }

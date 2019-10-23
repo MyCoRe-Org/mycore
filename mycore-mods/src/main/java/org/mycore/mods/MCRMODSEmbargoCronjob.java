@@ -85,7 +85,7 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
     }
 
     private void searchDocumentsToRelease(Consumer<MCRObjectID> objectReleaser) {
-        if(MCRConfiguration2.getString("MCR.Solr.ServerURL").isPresent()){
+        if (MCRConfiguration2.getString("MCR.Solr.ServerURL").isPresent()) {
             final SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
             final ModifiableSolrParams params = new ModifiableSolrParams();
             final LocalDate today = LocalDate.now(ZoneOffset.UTC);
@@ -136,4 +136,3 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
         searchDocumentsToRelease(this::releaseDocument);
     }
 }
-

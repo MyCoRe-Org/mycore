@@ -29,6 +29,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 
 import com.google.gson.JsonArray;
@@ -58,7 +59,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     public static final boolean DEFAULT_NOT_INHERIT = CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", true);
 
-    private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
+    private static final String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
     // logger
     static Logger LOGGER = LogManager.getLogger();
@@ -85,28 +86,27 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
 
     /**
      * This is the constructor of the MCRMetaElement class.
-     * @param set_tag
+     * @param tag
      *            the name of this tag
-     * @param set_heritable
+     * @param heritable
      *            set this flag to true if all child objects of this element can
      *            inherit this data
-     * @param set_notinherit
+     * @param notinherit
      *            set this flag to true if this element should not inherit from
      *            his parent object
-     * @param set_list
+     * @param list
      *            a list of MCRMeta... data lines to add in this element (can be null)
      */
-    public MCRMetaElement(Class<? extends MCRMetaInterface> clazz, String set_tag, boolean set_heritable,
-        boolean set_notinherit,
-        List<? extends MCRMetaInterface> set_list) {
+    public MCRMetaElement(Class<? extends MCRMetaInterface> clazz, String tag, boolean heritable, boolean notinherit,
+        List<? extends MCRMetaInterface> list) {
         this();
         this.clazz = clazz;
-        setTag(set_tag);
-        heritable = set_heritable;
-        notinherit = set_notinherit;
+        setTag(tag);
+        this.heritable = heritable;
+        this.notinherit = notinherit;
 
-        if (set_list != null) {
-            list.addAll(set_list);
+        if (list != null) {
+            this.list.addAll(list);
         }
     }
 
@@ -201,11 +201,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      *            the tag for the metadata class
      */
     public void setTag(String tag) {
-        if (tag == null || (tag = tag.trim()).length() == 0) {
-            return;
-        }
-
-        this.tag = tag;
+        MCRUtils.filterTrimmedNotEmpty(tag)
+            .ifPresent(s -> this.tag = s);
     }
 
     /**
@@ -279,12 +276,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * The method removes all inherited metadata objects of this MCRMetaElement.
      */
     public final void removeInheritedMetadata() {
-        for (int i = 0; i < size(); i++) {
-            if ((list.get(i)).getInherited() > 0) {
-                list.remove(i);
-                i--;
-            }
-        }
+        list.removeIf(mi -> mi.getInherited() > 0);
     }
 
     /**
@@ -297,7 +289,7 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      *                if the class can't loaded
      */
     @SuppressWarnings("unchecked")
-    public final void setFromDOM(org.jdom2.Element element) throws MCRException {
+    public final void setFromDOM(Element element) throws MCRException {
 
         String fullname;
         Class<? extends MCRMetaInterface> forName;
@@ -314,15 +306,17 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
         }
         tag = element.getName();
         String heritable = element.getAttributeValue("heritable");
-        if (heritable != null)
+        if (heritable != null) {
             setHeritable(Boolean.valueOf(heritable));
+        }
 
         String notInherit = element.getAttributeValue("notinherit");
-        if (notInherit != null)
+        if (notInherit != null) {
             setNotInherit(Boolean.valueOf(notInherit));
+        }
 
-        List<Element> element_list = element.getChildren();
-        for (Element subtag : element_list) {
+        List<Element> elementList = element.getChildren();
+        for (Element subtag : elementList) {
             MCRMetaInterface obj;
             try {
                 obj = forName.getDeclaredConstructor().newInstance();
@@ -431,7 +425,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
      * @throws MCRException the MCRMetaElement is invalid
      */
     public void validate() throws MCRException {
-        if (tag == null || (tag = tag.trim()).length() == 0) {
+        tag = MCRUtils.filterTrimmedNotEmpty(tag).orElse(null);
+        if (tag == null) {
             throw new MCRException("No tag name defined!");
         }
         if (clazz == null) {

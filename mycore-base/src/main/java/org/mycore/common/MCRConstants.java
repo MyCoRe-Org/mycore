@@ -94,7 +94,8 @@ public final class MCRConstants {
 
     public static final Namespace PIDEF_NAMESPACE = Namespace.getNamespace("pidef", "http://nbn-resolving.org/pidef");
 
-    public static final Namespace CROSSREF_NAMESPACE = Namespace.getNamespace("cr","http://www.crossref.org/schema/4.4.1");
+    public static final Namespace CROSSREF_NAMESPACE = Namespace.getNamespace("cr",
+        "http://www.crossref.org/schema/4.4.1");
 
     public static final Namespace DIAG_NAMESPACE = Namespace.getNamespace("diag",
         "http://www.loc.gov/zing/srw/diagnostic");
@@ -107,13 +108,13 @@ public final class MCRConstants {
 
     public static final Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
 
-    private static final HashMap<String, Namespace> namespacesByPrefix;
+    private static final HashMap<String, Namespace> NAMESPACES_BY_PREFIX;
 
     public static final Namespace ALTO_NAMESPACE = Namespace
         .getNamespace("alto", "http://www.loc.gov/standards/alto/ns-v2#");
 
     static {
-        namespacesByPrefix = new HashMap<>();
+        NAMESPACES_BY_PREFIX = new HashMap<>();
 
         Field[] fields = MCRConstants.class.getFields();
         for (Field f : fields) {
@@ -130,9 +131,9 @@ public final class MCRConstants {
         }
 
         Map<String, String> p = MCRConfiguration.instance().getPropertiesMap("MCR.Namespace");
-        for (String prefix : p.keySet()) {
-            String uri = p.get(prefix);
-            prefix = prefix.substring(prefix.lastIndexOf(".") + 1);
+        for (String propertyName : p.keySet()) {
+            String uri = p.get(propertyName);
+            String prefix = propertyName.substring(propertyName.lastIndexOf(".") + 1);
             Namespace ns = Namespace.getNamespace(prefix, uri);
             registerNamespace(ns);
         }
@@ -146,7 +147,7 @@ public final class MCRConstants {
         String prefix = namespace.getPrefix();
 
         if ((prefix != null) && !prefix.isEmpty()) {
-            namespacesByPrefix.put(prefix, namespace);
+            NAMESPACES_BY_PREFIX.put(prefix, namespace);
         }
     }
 
@@ -156,7 +157,7 @@ public final class MCRConstants {
      * MCR.Namespace.&lt;prefix&gt;=&lt;uri&gt;
      */
     public static Collection<Namespace> getStandardNamespaces() {
-        return namespacesByPrefix.values();
+        return NAMESPACES_BY_PREFIX.values();
     }
 
     /**
@@ -165,7 +166,7 @@ public final class MCRConstants {
      * MCR.Namespace.&lt;prefix&gt;=&lt;uri&gt;
      */
     public static Namespace getStandardNamespace(String prefix) {
-        return namespacesByPrefix.get(prefix);
+        return NAMESPACES_BY_PREFIX.get(prefix);
     }
 
 }

@@ -94,7 +94,7 @@ public class MCRJWPlayerResource {
         @SuppressWarnings("unused")
         private String type;
 
-        public Source(String file, String type) {
+        Source(String file, String type) {
             LogManager.getLogger().info("file : {}", file);
             this.file = file;
             this.type = type;

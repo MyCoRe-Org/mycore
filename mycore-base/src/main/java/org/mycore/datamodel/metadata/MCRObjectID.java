@@ -68,19 +68,15 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     // configuration values
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    // counter for the next IDs per project base ID
-    private static HashMap<String, Integer> lastNumber = new HashMap<>();
-
-    // data of the ID
-    private String projectId, objectType, combinedId;
-
-    private int numberPart;
-
-    private static final MCRObjectIDFormat idFormat = new MCRObjectIDDefaultFormat();
+    private static final MCRObjectIDFormat ID_FORMAT = new MCRObjectIDDefaultFormat();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
 
+    // counter for the next IDs per project base ID
+    private static HashMap<String, Integer> lastNumber = new HashMap<>();
+
     private static HashSet<String> VALID_TYPE_LIST;
+
     static {
         VALID_TYPE_LIST = new HashSet<>();
         Map<String, String> properties = CONFIG.getPropertiesMap("MCR.Metadata.Type");
@@ -92,42 +88,10 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         }
     }
 
-    public interface MCRObjectIDFormat {
-        int numberDistance();
+    // data of the ID
+    private String projectId, objectType, combinedId;
 
-        NumberFormat numberFormat();
-    }
-
-    private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat {
-
-        private int numberDistance;
-
-        /**
-         * First invocation may return MCR.Metadata.ObjectID.InitialNumberDistance if set,
-         * following invocations will return MCR.Metadata.ObjectID.NumberDistance.
-         * The default for both is 1.
-         */
-        @Override
-        public int numberDistance() {
-            if (numberDistance == 0) {
-                MCRConfiguration config = MCRConfiguration.instance();
-                numberDistance = config.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
-                return config.getInt("MCR.Metadata.ObjectID.InitialNumberDistance", numberDistance);
-            }
-            return numberDistance;
-        }
-
-        @Override
-        public NumberFormat numberFormat() {
-            String numberPattern = MCRConfiguration.instance()
-                .getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000").trim();
-            NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
-            format.setGroupingUsed(false);
-            format.setMinimumIntegerDigits(numberPattern.length());
-            return format;
-        }
-
-    }
+    private int numberPart;
 
     /**
      * The constructor for MCRObjectID from a given string.
@@ -159,11 +123,11 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      *   last ID = 8, next ID = 10
      *   last ID = 10, next ID = 20
      *
-     * @param base_id
+     * @param baseId
      *            <em>project_id</em>_<em>type_id</em>
      */
-    public static synchronized MCRObjectID getNextFreeId(String base_id) {
-        return getNextFreeId(base_id, 0);
+    public static synchronized MCRObjectID getNextFreeId(String baseId) {
+        return getNextFreeId(baseId, 0);
     }
 
     public static synchronized MCRObjectID getNextFreeId(String base, String type) {
@@ -175,23 +139,24 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * {@link #getNextFreeId(String)} but the additional parameter acts as a
      * lower limit for integer part of the ID.
      *
-     * @param base_id
+     * @param baseId
      *            <em>project_id</em>_<em>type_id</em>
      * @param maxInWorkflow
      *            returned integer part of id will be at least
      *            <code>maxInWorkflow + 1</code>
      */
-    public static synchronized MCRObjectID getNextFreeId(String base_id, int maxInWorkflow) {
-        int last = Math.max(getLastIDNumber(base_id), maxInWorkflow);
-        int numberDistance = idFormat.numberDistance();
+    public static synchronized MCRObjectID getNextFreeId(String baseId, int maxInWorkflow) {
+        int last = Math.max(getLastIDNumber(baseId), maxInWorkflow);
+        int numberDistance = ID_FORMAT.numberDistance();
         int next = last + numberDistance;
 
         int rest = next % numberDistance;
-        if (rest != 0)
+        if (rest != 0) {
             next += numberDistance - rest;
+        }
 
-        lastNumber.put(base_id, next);
-        String[] idParts = getIDParts(base_id);
+        lastNumber.put(baseId, next);
+        String[] idParts = getIDParts(baseId);
         return getInstance(formatID(idParts[0], idParts[1], next));
     }
 
@@ -200,10 +165,10 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * type. This may return the value 0 when there is no ID last used or in the
      * store.
      */
-    private static int getLastIDNumber(String base_id) {
-        int lastIDKnown = lastNumber.getOrDefault(base_id, 0);
+    private static int getLastIDNumber(String baseId) {
+        int lastIDKnown = lastNumber.getOrDefault(baseId, 0);
 
-        String[] idParts = getIDParts(base_id);
+        String[] idParts = getIDParts(baseId);
         int highestStoredID = MCRXMLMetadataManager.instance().getHighestStoredID(idParts[0], idParts[1]);
 
         return Math.max(lastIDKnown, highestStoredID);
@@ -215,12 +180,13 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * @return a valid MCRObjectID, or null when there is no ID for the given
      *         type
      */
-    public static MCRObjectID getLastID(String base_id) {
-        int lastIDNumber = getLastIDNumber(base_id);
-        if (lastIDNumber == 0)
+    public static MCRObjectID getLastID(String baseId) {
+        int lastIDNumber = getLastIDNumber(baseId);
+        if (lastIDNumber == 0) {
             return null;
+        }
 
-        String[] idParts = getIDParts(base_id);
+        String[] idParts = getIDParts(baseId);
         return getInstance(formatID(idParts[0], idParts[1], lastIDNumber));
     }
 
@@ -238,57 +204,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     }
 
     /**
-     * This method get the string with <em>project_id</em>. If the ID is not
-     * valid, an empty string was returned.
-     *
-     * @return the string of the project id
-     */
-    public final String getProjectId() {
-        return projectId;
-    }
-
-    /**
-     * This method gets the string with <em>type_id</em>. If the ID is not
-     * valid, an empty string will be returned.
-     *
-     * @return the string of the type id
-     */
-    public final String getTypeId() {
-        return objectType;
-    }
-
-    /**
-     * This method gets the string with <em>number</em>. If the ID is not valid,
-     * an empty string will be returned.
-     *
-     * @return the string of the number
-     */
-    public final String getNumberAsString() {
-        return idFormat.numberFormat().format(numberPart);
-    }
-
-    /**
-     * This method gets the integer with <em>number</em>. If the ID is not
-     * valid, -1 will be returned.
-     *
-     * @return the number as integer
-     */
-    public final int getNumberAsInteger() {
-        return numberPart;
-    }
-
-    /**
-     * This method gets the basic string with <em>project_id</em>_
-     * <em>type_id</em>. If the Id is not valid, an empty string will be
-     * returned.
-     *
-     * @return the string of the schema name
-     */
-    public String getBase() {
-        return projectId + "_" + objectType;
-    }
-
-    /**
      * Normalizes to a object ID of form <em>project_id</em>_ <em>type_id</em>_
      * <em>number</em>, where number has leading zeros.
      * @return <em>project_id</em>_<em>type_id</em>_<em>number</em>
@@ -303,7 +218,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         if (number < 0) {
             throw new IllegalArgumentException("number must be non negative integer");
         }
-        return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + idFormat.numberFormat().format(number);
+        return projectID + '_' + type.toLowerCase(Locale.ROOT) + '_' + ID_FORMAT.numberFormat().format(number);
     }
 
     /**
@@ -329,6 +244,109 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      */
     public static String[] getIDParts(String id) {
         return id.split("_");
+    }
+
+    /**
+     * Returns a list of available mycore object types.
+     */
+    public static List<String> listTypes() {
+        return new ArrayList<>(VALID_TYPE_LIST);
+    }
+
+    /**
+     * Check whether the type passed is a valid type in the current mycore environment.
+     * That being said property <code>MCR.Metadata.Type.&#60;type&#62;</code> must be set to <code>true</code> in mycore.properties.
+     *
+     * @param type the type to check
+     * @return true if valid, false otherwise
+     */
+    public static boolean isValidType(String type) {
+        return VALID_TYPE_LIST.contains(type);
+    }
+
+    /**
+     * Checks if the given id is a valid mycore id in the form of {project}_{object_type}_{number}.
+     *
+     * @param id the id to check
+     * @return true if the id is valid, false otherwise
+     */
+    public static boolean isValid(String id) {
+        if (id == null) {
+            return false;
+        }
+        String mcrId = id.trim();
+        if (mcrId.length() > MAX_LENGTH) {
+            return false;
+        }
+        String[] idParts = getIDParts(mcrId);
+        if (idParts.length != 3) {
+            return false;
+        }
+        String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
+        if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
+            LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
+            return false;
+        }
+        try {
+            Integer numberPart = Integer.parseInt(idParts[2]);
+            if (numberPart < 0) {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * This method get the string with <em>project_id</em>. If the ID is not
+     * valid, an empty string was returned.
+     *
+     * @return the string of the project id
+     */
+    public String getProjectId() {
+        return projectId;
+    }
+
+    /**
+     * This method gets the string with <em>type_id</em>. If the ID is not
+     * valid, an empty string will be returned.
+     *
+     * @return the string of the type id
+     */
+    public String getTypeId() {
+        return objectType;
+    }
+
+    /**
+     * This method gets the string with <em>number</em>. If the ID is not valid,
+     * an empty string will be returned.
+     *
+     * @return the string of the number
+     */
+    public String getNumberAsString() {
+        return ID_FORMAT.numberFormat().format(numberPart);
+    }
+
+    /**
+     * This method gets the integer with <em>number</em>. If the ID is not
+     * valid, -1 will be returned.
+     *
+     * @return the number as integer
+     */
+    public int getNumberAsInteger() {
+        return numberPart;
+    }
+
+    /**
+     * This method gets the basic string with <em>project_id</em>_
+     * <em>type_id</em>. If the Id is not valid, an empty string will be
+     * returned.
+     *
+     * @return the string of the schema name
+     */
+    public String getBase() {
+        return projectId + "_" + objectType;
     }
 
     /**
@@ -420,56 +438,41 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return toString().hashCode();
     }
 
-    /**
-     * Returns a list of available mycore object types.
-     */
-    public static List<String> listTypes() {
-        return new ArrayList<>(VALID_TYPE_LIST);
+    public interface MCRObjectIDFormat {
+        int numberDistance();
+
+        NumberFormat numberFormat();
     }
 
-    /**
-     * Check whether the type passed is a valid type in the current mycore environment.
-     * That being said property <code>MCR.Metadata.Type.&#60;type&#62;</code> must be set to <code>true</code> in mycore.properties.
-     *
-     * @param type the type to check
-     * @return true if valid, false otherwise
-     */
-    public static boolean isValidType(String type) {
-        return VALID_TYPE_LIST.contains(type);
-    }
+    private static class MCRObjectIDDefaultFormat implements MCRObjectIDFormat {
 
-    /**
-     * Checks if the given id is a valid mycore id in the form of {project}_{object_type}_{number}.
-     * 
-     * @param id the id to check
-     * @return true if the id is valid, false otherwise
-     */
-    public static boolean isValid(String id) {
-        if (id == null) {
-            return false;
-        }
-        String mcr_id = id.trim();
-        if (mcr_id.length() > MAX_LENGTH) {
-            return false;
-        }
-        String[] idParts = getIDParts(mcr_id);
-        if (idParts.length != 3) {
-            return false;
-        }
-        String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
-        if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
-            LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
-            return false;
-        }
-        try {
-            Integer numberPart = Integer.parseInt(idParts[2]);
-            if (numberPart < 0) {
-                return false;
+        private int numberDistance;
+
+        /**
+         * First invocation may return MCR.Metadata.ObjectID.InitialNumberDistance if set,
+         * following invocations will return MCR.Metadata.ObjectID.NumberDistance.
+         * The default for both is 1.
+         */
+        @Override
+        public int numberDistance() {
+            if (numberDistance == 0) {
+                MCRConfiguration config = MCRConfiguration.instance();
+                numberDistance = config.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
+                return config.getInt("MCR.Metadata.ObjectID.InitialNumberDistance", numberDistance);
             }
-        } catch (NumberFormatException e) {
-            return false;
+            return numberDistance;
         }
-        return true;
+
+        @Override
+        public NumberFormat numberFormat() {
+            String numberPattern = MCRConfiguration.instance()
+                .getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000").trim();
+            NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
+            format.setGroupingUsed(false);
+            format.setMinimumIntegerDigits(numberPattern.length());
+            return format;
+        }
+
     }
 
 }

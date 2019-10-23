@@ -25,8 +25,6 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_PREFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CORE_SERVER_SUFFIX;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -34,9 +32,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;

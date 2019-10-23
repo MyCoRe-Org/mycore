@@ -53,8 +53,10 @@ public class MCRSword {
             LOGGER.info("--- INITIALIZE SWORD SERVER ---");
 
             propertiesMap.keySet().stream()
-                .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX)) // remove all which are not collections
-                .filter(prop -> !prop.trim().equals(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX)) // remove all which have no suffix
+                .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))
+                // remove all which are not collections
+                .filter(prop -> !prop.trim().equals(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))
+                // remove all which have no suffix
                 .map(prop -> prop.substring(lenghtOfPropertyPrefix)) // remove MCR_SWORD_COLLECTION_PREFIX
                 .map(prop -> prop.split(Pattern.quote("."), 2)) // split to workspace name and collection name
                 .filter(prop -> prop.length == 2) // remove all whith no workspace or collection name
@@ -72,7 +74,6 @@ public class MCRSword {
                         collection);
                     collectionProvider.init(lifecycleConfiguration);
 
-                    // This Map is needed to speed up the build of the {@link org.mycore.mir.sword2.manager.MCRServiceDocumentManager}
                     List<String> collectionsOfWorkspace;
                     if (workspaceCollectionTable.containsKey(workspace)) {
                         collectionsOfWorkspace = workspaceCollectionTable.get(workspace);

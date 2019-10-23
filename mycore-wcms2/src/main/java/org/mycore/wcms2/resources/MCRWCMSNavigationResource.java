@@ -46,8 +46,8 @@ import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.wcms2.access.MCRWCMSPermission;
 import org.mycore.wcms2.datamodel.MCRNavigation;
 import org.mycore.wcms2.navigation.MCRWCMSContentManager;
-import org.mycore.wcms2.navigation.MCRWCMSNavigationUtils;
 import org.mycore.wcms2.navigation.MCRWCMSNavigationProvider;
+import org.mycore.wcms2.navigation.MCRWCMSNavigationUtils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

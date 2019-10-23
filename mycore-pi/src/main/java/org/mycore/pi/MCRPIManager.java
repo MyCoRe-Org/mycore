@@ -18,7 +18,6 @@
 
 package org.mycore.pi;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,7 +40,6 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.backend.MCRPI_;
@@ -88,12 +86,9 @@ public class MCRPIManager {
         Stream.of(MCRConfiguration.instance().getString(RESOLVER_CONFIGURATION).split(","))
             .forEach(className -> {
                 try {
-                    @SuppressWarnings("unchecked")
-                    Class<MCRPIResolver<MCRPersistentIdentifier>> resolverClass = (Class<MCRPIResolver<MCRPersistentIdentifier>>) Class
-                        .forName(className);
-                    Constructor<MCRPIResolver<MCRPersistentIdentifier>> resolverClassConstructor = resolverClass
-                        .getConstructor();
-                    MCRPIResolver<MCRPersistentIdentifier> resolver = resolverClassConstructor
+                    MCRPIResolver<MCRPersistentIdentifier> resolver =
+                        ((Class<MCRPIResolver<MCRPersistentIdentifier>>) Class.forName(className))
+                        .getConstructor()
                         .newInstance();
                     resolverList.add(resolver);
                 } catch (ClassNotFoundException e) {
@@ -114,7 +109,7 @@ public class MCRPIManager {
 
     }
 
-    public synchronized static MCRPIManager getInstance() {
+    public static synchronized MCRPIManager getInstance() {
         if (instance == null) {
             instance = new MCRPIManager();
         }
@@ -243,8 +238,8 @@ public class MCRPIManager {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRPI> getQuery = cb.createQuery(MCRPI.class);
         Root<MCRPI> pi = getQuery.from(MCRPI.class);
-        Predicate additionalPredicate = additional == null ?
-            cb.isNull(pi.get(MCRPI_.additional)) : cb.equal(pi.get(MCRPI_.additional), additional);
+        Predicate additionalPredicate = additional == null ? cb.isNull(pi.get(MCRPI_.additional))
+            : cb.equal(pi.get(MCRPI_.additional), additional);
         em.remove(
             em.createQuery(
                 getQuery
@@ -355,11 +350,10 @@ public class MCRPIManager {
         final List<MCRPIRegistrationInfo> resultList = em.createQuery(
             getQuery
                 .select(pi)
-                .where(cb.equal(pi.get(MCRPI_.identifier), identifier),cb.equal(pi.get(MCRPI_.type), type)))
+                .where(cb.equal(pi.get(MCRPI_.identifier), identifier), cb.equal(pi.get(MCRPI_.type), type)))
             .getResultList();
-        return resultList.size()==0 ? Optional.empty():Optional.of(resultList.get(0));
+        return resultList.size() == 0 ? Optional.empty() : Optional.of(resultList.get(0));
     }
-
 
     /**
      * Returns a parser for a specific type of persistent identifier.

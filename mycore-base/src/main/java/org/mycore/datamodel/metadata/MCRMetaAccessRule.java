@@ -33,7 +33,7 @@ import org.mycore.common.MCRException;
  */
 public class MCRMetaAccessRule extends MCRMetaDefault {
     // MCRMetaAccessRule data
-    protected org.jdom2.Element condition;
+    protected Element condition;
 
     protected String permission;
 
@@ -55,64 +55,64 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en</b> was set. This is not use in other methods
      * of this class. The subtag element was set to the value of
-     * <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * <em>subtag</em>. If the value of <em>subtag</em>
      * is null or empty an exception will be throwed. The type element was set to
-     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * the value of <em>type</em>, if it is null, an empty string was set
      * to the type element. The condition element was set to the value of
-     * <em>set_condition</em>, if it is null, an exception will be throwed.
-     * @param set_subtag       the name of the subtag
-     * @param set_type         the optional type string
-     * @param set_inherted     a value &gt;= 0
-     * @param set_permission   permission
-     * @param set_condition    the JDOM Element included the condition tree
-     * @exception MCRException if the set_subtag value or set_condition is null or empty
+     * <em>condition</em>, if it is null, an exception will be throwed.
+     * @param subtag       the name of the subtag
+     * @param type         the optional type string
+     * @param inherted     a value &gt;= 0
+     * @param permission   permission
+     * @param condition    the JDOM Element included the condition tree
+     * @exception MCRException if the subtag value or condition is null or empty
      */
-    public MCRMetaAccessRule(String set_subtag, String set_type, int set_inherted, String set_permission,
-        org.jdom2.Element set_condition) throws MCRException {
-        super(set_subtag, null, set_type, set_inherted);
-        if (set_condition == null || !set_condition.getName().equals("condition")) {
+    public MCRMetaAccessRule(String subtag, String type, int inherted, String permission, Element condition)
+        throws MCRException {
+        super(subtag, null, type, inherted);
+        if (condition == null || !condition.getName().equals("condition")) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        set(set_permission, set_condition);
+        set(permission, condition);
     }
 
     /**
      * This method set the permission and the condition.
      * 
-     * @param set_permission the format string, if it is empty 'READ' will be set.
-     * @param set_condition
+     * @param permission the format string, if it is empty 'READ' will be set.
+     * @param condition
      *            the JDOM Element included the condition tree
      * @exception MCRException
-     *                if the set_condition is null or empty
+     *                if the condition is null or empty
      */
-    public final void set(String set_permission, org.jdom2.Element set_condition) throws MCRException {
-        setCondition(set_condition);
-        setPermission(set_permission);
+    public final void set(String permission, Element condition) throws MCRException {
+        setCondition(condition);
+        setPermission(permission);
     }
 
     /**
      * This method set the condition.
      * 
-     * @param set_condition
+     * @param condition
      *            the JDOM Element included the condition tree
      * @exception MCRException
-     *                if the set_condition is null or empty
+     *                if the condition is null or empty
      */
-    public final void setCondition(org.jdom2.Element set_condition) throws MCRException {
-        if (set_condition == null || !set_condition.getName().equals("condition")) {
+    public final void setCondition(Element condition) throws MCRException {
+        if (condition == null || !condition.getName().equals("condition")) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        condition = set_condition.clone();
+        this.condition = condition.clone();
     }
 
     /**
      * This method set the permission attribute.
      * 
-     * @param set_permission
+     * @param permission
      *            the new permission string.
      */
-    public final void setPermission(String set_permission) {
-        permission = set_permission;
+    public final void setPermission(String permission) {
+        this.permission = permission;
     }
 
     /**
@@ -120,7 +120,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * 
      * @return the condition as JDOM Element
      */
-    public final org.jdom2.Element getCondition() {
+    public final Element getCondition() {
         return condition;
     }
 
@@ -141,7 +141,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
 
         setCondition(element.getChild("condition"));
@@ -157,7 +157,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaAccessRule part
      */
     @Override
-    public org.jdom2.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
         elm.setAttribute("permission", permission);
         elm.addContent(condition.clone());

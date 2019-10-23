@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +86,7 @@ public class MCRXMLHelperTest extends MCRTestCase {
         String formattedXML = "<root>\n<child>Hallo Welt</child>\n" + "<child>hello world</child>"
             + "<child>Bonjour le monde</child>\n</root>";
         SAXBuilder b = new SAXBuilder();
-        Document doc = b.build(new ByteArrayInputStream(formattedXML.getBytes(Charset.forName("UTF-8"))));
+        Document doc = b.build(new ByteArrayInputStream(formattedXML.getBytes(StandardCharsets.UTF_8)));
 
         assertEquals("Elements should be equal", true, MCRXMLHelper.deepEqual(root, doc.getRootElement()));
     }

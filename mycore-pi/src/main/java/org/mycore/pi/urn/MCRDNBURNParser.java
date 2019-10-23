@@ -18,12 +18,12 @@
 
 package org.mycore.pi.urn;
 
+import static org.mycore.pi.urn.MCRDNBURN.URN_NID;
+import static org.mycore.pi.urn.MCRUniformResourceName.PREFIX;
+
 import java.util.Optional;
 
 import org.mycore.pi.MCRPIParser;
-
-import static org.mycore.pi.urn.MCRDNBURN.URN_NID;
-import static org.mycore.pi.urn.MCRUniformResourceName.PREFIX;
 
 public class MCRDNBURNParser implements MCRPIParser<MCRDNBURN> {
 

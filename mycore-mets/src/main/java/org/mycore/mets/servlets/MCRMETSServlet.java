@@ -102,7 +102,7 @@ public class MCRMETSServlet extends MCRServlet {
 
         long lastModified = Files.getLastModifiedTime(rootPath).toMillis();
 
-        MCRFrontendUtil.writeCacheHeaders(response, (long) CACHE_TIME, lastModified, useExpire);
+        MCRFrontendUtil.writeCacheHeaders(response, CACHE_TIME, lastModified, useExpire);
         long start = System.currentTimeMillis();
         MCRContent metsContent = getMetsSource(job, useExistingMets(request), derivate);
         MCRLayoutService.instance().doLayout(request, response, metsContent);

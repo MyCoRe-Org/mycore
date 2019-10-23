@@ -21,10 +21,10 @@ package org.mycore.iview2.iiif;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
@@ -106,12 +106,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     }
 
     private String buildURL(String identifier) {
-        try {
-            return MCRFrontendUtil.getBaseURL() + "rsc/iiif/image/" + getImplName() + "/"
-                + URLEncoder.encode(identifier, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException("UTF-8 is not supported!", e);
-        }
+        return MCRFrontendUtil.getBaseURL() + "rsc/iiif/image/" + getImplName() + "/"
+            + URLEncoder.encode(identifier, StandardCharsets.UTF_8);
     }
 
     @Override

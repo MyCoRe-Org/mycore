@@ -25,7 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -61,7 +61,7 @@ public class MCRXSLTransformationTest extends MCRTestCase {
      */
     private void initStylesheet() throws FileNotFoundException {
         FileOutputStream fout = new FileOutputStream(stylesheet);
-        OutputStreamWriter outw = new OutputStreamWriter(fout, Charset.forName("UTF-8"));
+        OutputStreamWriter outw = new OutputStreamWriter(fout, StandardCharsets.UTF_8);
         PrintWriter out = new PrintWriter(outw);
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println("<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">");

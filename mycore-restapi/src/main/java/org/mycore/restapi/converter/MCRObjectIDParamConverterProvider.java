@@ -41,7 +41,7 @@ public class MCRObjectIDParamConverterProvider implements ParamConverterProvider
     public <T> ParamConverter<T> getConverter(Class<T> rawType, Type genericType, Annotation[] annotations)
         throws BadRequestException {
         if (MCRObjectID.class.isAssignableFrom(rawType)) {
-            return new ParamConverter<T>() {
+            return new ParamConverter<>() {
                 @Override
                 public T fromString(String value) {
                     try {

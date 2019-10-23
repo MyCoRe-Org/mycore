@@ -71,8 +71,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * 
      * @see MCRMetaDefault#MCRMetaDefault(String, String, String, int)
      */
-    public MCRMetaISO8601Date(String set_subtag, String set_type, int set_inherted) {
-        super(set_subtag, null, set_type, set_inherted);
+    public MCRMetaISO8601Date(String subtag, String type, int inherted) {
+        super(subtag, null, type, inherted);
         this.isoDate = new MCRISO8601Date();
     }
 
@@ -117,13 +117,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         return obj;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mycore.datamodel.metadata.MCRMetaDefault#setFromDOM(org.jdom2.Element)
-     */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
         setFormat(element.getAttributeValue("format"));
         setDate(element.getTextTrim());
@@ -145,7 +140,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * @param isoString
      *            Date in any form that is a valid W3C dateTime
      */
-    public final void setDate(String isoString) {
+    public void setDate(String isoString) {
         isoDate.setDate(isoString);
     }
 
@@ -154,7 +149,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * 
      * @return a new Date instance of the time set in this element
      */
-    public final Date getDate() {
+    public Date getDate() {
         return isoDate.getDate();
     }
 
@@ -173,7 +168,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * 
      * @return date in ISO 8601 format, or null if date is unset.
      */
-    public final String getISOString() {
+    public String getISOString() {
         return isoDate.getISOString();
     }
 

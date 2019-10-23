@@ -56,27 +56,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 public class MCRDirectoryStream {
     static Logger LOGGER = LogManager.getLogger();
 
-    private static class AcceptAllFilter
-        implements DirectoryStream.Filter<Path> {
-        @Override
-        public boolean accept(Path entry) {
-            return true;
-        }
-
-        static final MCRDirectoryStream.AcceptAllFilter FILTER = new AcceptAllFilter();
-    }
-
-    private static class MCRFileCollectionFilter
-        implements DirectoryStream.Filter<Path> {
-        @Override
-        public boolean accept(Path entry) {
-            return !entry.getFileName().toString().equals(MCRFileCollection.DATA_FILE);
-        }
-
-        static final MCRDirectoryStream.MCRFileCollectionFilter FILTER = new MCRFileCollectionFilter();
-    }
-
-    public static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
+    static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
         DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER
             : AcceptAllFilter.FILTER;
         LOGGER.info("Dir {}, class {}, filter {}", path, dir.getClass(), filter.getClass());
@@ -90,6 +70,26 @@ public class MCRDirectoryStream {
         return new SimpleDirectoryStream(path, baseDirectoryStream);
     }
 
+    private static class AcceptAllFilter
+        implements DirectoryStream.Filter<Path> {
+        static final MCRDirectoryStream.AcceptAllFilter FILTER = new AcceptAllFilter();
+
+        @Override
+        public boolean accept(Path entry) {
+            return true;
+        }
+    }
+
+    private static class MCRFileCollectionFilter
+        implements DirectoryStream.Filter<Path> {
+        static final MCRDirectoryStream.MCRFileCollectionFilter FILTER = new MCRFileCollectionFilter();
+
+        @Override
+        public boolean accept(Path entry) {
+            return !entry.getFileName().toString().equals(MCRFileCollection.DATA_FILE);
+        }
+    }
+
     private static class SimpleDirectoryStream<T extends DirectoryStream<Path>> implements DirectoryStream<Path> {
         protected final MCRPath dirPath;
 
@@ -97,7 +97,7 @@ public class MCRDirectoryStream {
 
         boolean isClosed;
 
-        public SimpleDirectoryStream(MCRPath dirPath, T baseStream) {
+        SimpleDirectoryStream(MCRPath dirPath, T baseStream) {
             this.dirPath = dirPath;
             this.baseStream = baseStream;
         }
@@ -123,7 +123,7 @@ public class MCRDirectoryStream {
 
         private final MCRDirectory dir;
 
-        public SecureDirectoryStream(MCRDirectory dir, MCRPath dirPath,
+        SecureDirectoryStream(MCRDirectory dir, MCRPath dirPath,
             java.nio.file.SecureDirectoryStream<Path> baseStream) {
             super(dirPath, baseStream);
             this.dir = dir;
@@ -245,7 +245,7 @@ public class MCRDirectoryStream {
 
         private final MCRPath dir;
 
-        public SimpleDirectoryIterator(MCRPath dir, DirectoryStream<Path> baseStream) {
+        SimpleDirectoryIterator(MCRPath dir, DirectoryStream<Path> baseStream) {
             this.baseIterator = baseStream.iterator();
             this.dir = dir;
         }
@@ -269,7 +269,7 @@ public class MCRDirectoryStream {
 
         private final MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier;
 
-        public MD5FileAttributeViewImpl(BasicFileAttributeView baseAttrView,
+        MD5FileAttributeViewImpl(BasicFileAttributeView baseAttrView,
             MCRThrowFunction<Void, MCRStoredNode, IOException> nodeSupplier) {
             this.baseAttrView = baseAttrView;
             this.nodeSupplier = nodeSupplier;

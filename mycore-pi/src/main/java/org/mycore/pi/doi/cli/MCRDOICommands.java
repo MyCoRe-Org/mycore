@@ -62,8 +62,8 @@ import org.mycore.pi.MCRPIMetadataService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.doi.MCRDOIParser;
 import org.mycore.pi.doi.MCRDOIService;
-import org.mycore.pi.doi.client.datacite.MCRDataciteClient;
 import org.mycore.pi.doi.MCRDigitalObjectIdentifier;
+import org.mycore.pi.doi.client.datacite.MCRDataciteClient;
 import org.mycore.pi.doi.crossref.MCRCrossrefUtil;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -119,7 +119,8 @@ public class MCRDOICommands {
     }
 
     @MCRCommand(syntax = "repair registered dois {0}",
-        help = "Contacts the Registration Service and inserts all registered DOIs to the Database. It also updates all media files. The Service ID{0} is the id from the configuration.",
+        help = "Contacts the Registration Service and inserts all registered DOIs to the Database. "
+            + "It also updates all media files. The Service ID{0} is the id from the configuration.",
         order = 10)
     public static void synchronizeDatabase(String serviceID) {
         MCRDOIService registrationService = new MCRDOIService(serviceID);
@@ -283,7 +284,8 @@ public class MCRDOICommands {
         }
 
         final Element root = document.getRootElement();
-        MCRCrossrefUtil.insertBatchInformation(root.getChild("head",MCRConstants.CROSSREF_NAMESPACE), UUID.randomUUID().toString(), String.valueOf(new Date().getTime()),
+        MCRCrossrefUtil.insertBatchInformation(root.getChild("head", MCRConstants.CROSSREF_NAMESPACE),
+            UUID.randomUUID().toString(), String.valueOf(new Date().getTime()),
             "Test-Depositor", "email@mycore.de", "Test-Registrant");
 
         MCRCrossrefUtil.replaceDOIData(root, "DOI for "::concat, "http://baseURL.de/");
@@ -308,7 +310,7 @@ public class MCRDOICommands {
         try {
             schema.newValidator().validate(new JDOMSource(document));
             LOGGER.info("Check Complete!");
-        } catch (SAXException|IOException e) {
+        } catch (SAXException | IOException e) {
             LOGGER.error("Error while checking schema!", e);
         }
     }

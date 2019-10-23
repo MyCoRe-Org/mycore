@@ -148,7 +148,8 @@ public class MCRSolrConfigReloader {
         HttpPost post = new HttpPost(coreURL + "/config");
         post.setHeader("Content-type", "application/json");
         post.setEntity(new StringEntity(command));
-        String commandprefix = command.indexOf('-') != -1 ? command.substring(2,command.indexOf('-')) : "unknown command";
+        String commandprefix = command.indexOf('-') != -1 ? command.substring(2, command.indexOf('-'))
+            : "unknown command";
         HttpResponse response;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             response = httpClient.execute(post);
@@ -157,8 +158,9 @@ public class MCRSolrConfigReloader {
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 LOGGER.debug("SOLR config " + commandprefix + " command was successful \n" + respContent);
             } else {
-                LOGGER.error("SOLR config " + commandprefix + " error: " + response.getStatusLine().getStatusCode() + " "
-                    + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
+                LOGGER
+                    .error("SOLR config " + commandprefix + " error: " + response.getStatusLine().getStatusCode() + " "
+                        + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
             }
 
         } catch (IOException e) {
@@ -167,26 +169,26 @@ public class MCRSolrConfigReloader {
         }
     }
 
-//    /**
-//     * retrieves the current solr configuration for the given core
-//     * @param coreType - the name of the solr core
-//     * @return the config as JSON object
-//     */
-//    private static JsonObject retrieveCurrentSolrConfig(String coreID) {
-//        String coreURL = MCRSolrClientFactory.get(coreType)
-//            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType)).getV1CoreURL();
-//        HttpGet get = new HttpGet(coreURL + "/config");
-//        HttpResponse response;
-//        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-//            response = httpClient.execute(get);
-//            JsonParser jsonParser = new JsonParser();
-//            JsonElement jeResponse = jsonParser
-//                .parse(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
-//            return jeResponse.getAsJsonObject().get("config").getAsJsonObject();
-//        } catch (IOException e) {
-//            throw new MCRException("Could not read Solr configuration", e);
-//        }
-//    }
+    //    /**
+    //     * retrieves the current solr configuration for the given core
+    //     * @param coreType - the name of the solr core
+    //     * @return the config as JSON object
+    //     */
+    //    private static JsonObject retrieveCurrentSolrConfig(String coreID) {
+    //        String coreURL = MCRSolrClientFactory.get(coreType)
+    //            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreType)).getV1CoreURL();
+    //        HttpGet get = new HttpGet(coreURL + "/config");
+    //        HttpResponse response;
+    //        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    //            response = httpClient.execute(get);
+    //            JsonParser jsonParser = new JsonParser();
+    //            JsonElement jeResponse = jsonParser
+    //                .parse(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
+    //            return jeResponse.getAsJsonObject().get("config").getAsJsonObject();
+    //        } catch (IOException e) {
+    //            throw new MCRException("Could not read Solr configuration", e);
+    //        }
+    //    }
 
     /**
      *
@@ -197,7 +199,7 @@ public class MCRSolrConfigReloader {
     private static boolean isKnownSolrConfigCommmand(String cmd) {
         String cfgObjName = cmd.substring(cmd.indexOf("-") + 1).toLowerCase(Locale.ROOT);
         return ((cmd.startsWith("add-") || cmd.startsWith("update-") || cmd.startsWith("delete-"))
-            && (SOLR_CONFIG_OBJECT_NAMES.keySet().contains(cfgObjName)))
+            && (SOLR_CONFIG_OBJECT_NAMES.containsKey(cfgObjName)))
             || SOLR_CONFIG_PROPERTY_COMMANDS.contains(cmd);
     }
 

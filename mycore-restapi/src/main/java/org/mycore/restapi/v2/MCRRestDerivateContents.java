@@ -19,8 +19,8 @@
 package org.mycore.restapi.v2;
 
 import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
 import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DER_PATH;
+import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -117,6 +117,111 @@ public class MCRRestDerivateContents {
     @PathParam(PARAM_DER_PATH)
     @DefaultValue("")
     String path;
+
+    private static Response createDirectory(MCRPath mcrPath) {
+        try {
+            BasicFileAttributes directoryAttrs = Files.readAttributes(mcrPath, BasicFileAttributes.class);
+            if (!directoryAttrs.isDirectory()) {
+                throw new BadRequestException("Overwrite directory with file: " + mcrPath);
+            }
+            return Response.noContent().build();
+        } catch (IOException e) {
+            //does not exist
+            LogManager.getLogger().info("Creating directory: {}", mcrPath);
+            try {
+                doWithinTransaction(() -> Files.createDirectory(mcrPath));
+            } catch (IOException e2) {
+                throw new InternalServerErrorException(e2);
+            }
+            return Response.status(Response.Status.CREATED).build();
+        }
+    }
+
+    private static void doWithinTransaction(IOOperation op) throws IOException {
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        try {
+            mcrSession.beginTransaction();
+            op.run();
+        } finally {
+            if (mcrSession.transactionRequiresRollback()) {
+                mcrSession.rollbackTransaction();
+            } else {
+                mcrSession.commitTransaction();
+            }
+        }
+    }
+
+    private static Response updateFile(InputStream contents, MCRPath mcrPath) {
+        LogManager.getLogger().info("Updating file: {}", mcrPath);
+        int memBuf = getUploadMemThreshold();
+        java.io.File uploadDirectory = getUploadTempStorage();
+        try (DeferredFileOutputStream dfos = new DeferredFileOutputStream(memBuf, mcrPath.getOwner(),
+            mcrPath.getFileName().toString(), uploadDirectory);
+            MaxBytesOutputStream mbos = new MaxBytesOutputStream(dfos)) {
+            IOUtils.copy(contents, mbos);
+            mbos.close(); //required if temporary file was used
+            OutputStream out = Files.newOutputStream(mcrPath);
+            try {
+                if (dfos.isInMemory()) {
+                    out.write(dfos.getData());
+                } else {
+                    java.io.File tempFile = dfos.getFile();
+                    if (tempFile != null) {
+                        try {
+                            Files.copy(tempFile.toPath(), out);
+                        } finally {
+                            LogManager.getLogger().debug("Deleting file {} of size {}.", tempFile.getAbsolutePath(),
+                                tempFile.length());
+                            tempFile.delete();
+                        }
+                    }
+                }
+            } finally {
+                //close writes data to database
+                doWithinTransaction(out::close);
+            }
+        } catch (IOException e) {
+            throw new InternalServerErrorException(e);
+        }
+        return Response.noContent().build();
+    }
+
+    private static Response createFile(InputStream contents, MCRPath mcrPath) {
+        LogManager.getLogger().info("Creating file: {}", mcrPath);
+        try {
+            OutputStream out = Files.newOutputStream(mcrPath, StandardOpenOption.CREATE_NEW);
+            try {
+                IOUtils.copy(contents, out, BUFFER_SIZE);
+            } finally {
+                //close writes data to database
+                doWithinTransaction(out::close);
+            }
+        } catch (IOException e2) {
+            try {
+                doWithinTransaction(() -> Files.deleteIfExists(mcrPath));
+            } catch (IOException e3) {
+                LogManager.getLogger().warn("Error while deleting incomplete file.", e3);
+            }
+            throw new InternalServerErrorException(e2);
+        }
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    private static EntityTag getETag(MCRFileAttributes attrs) {
+        return new EntityTag(attrs.md5sum());
+    }
+
+    private static long getUploadMaxSize() {
+        return MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
+    }
+
+    private static java.io.File getUploadTempStorage() {
+        return MCRConfiguration2.getOrThrow("MCR.FileUpload.TempStoragePath", java.io.File::new);
+    }
+
+    private static int getUploadMemThreshold() {
+        return MCRConfiguration2.getOrThrow("MCR.FileUpload.MemoryThreshold", Integer::parseInt);
+    }
 
     @HEAD
     @MCRCacheControl(sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
@@ -249,39 +354,6 @@ public class MCRRestDerivateContents {
         throw new NotFoundException();
     }
 
-    private static Response createDirectory(MCRPath mcrPath) {
-        try {
-            BasicFileAttributes directoryAttrs = Files.readAttributes(mcrPath, BasicFileAttributes.class);
-            if (!directoryAttrs.isDirectory()) {
-                throw new BadRequestException("Overwrite directory with file: " + mcrPath);
-            }
-            return Response.noContent().build();
-        } catch (IOException e) {
-            //does not exist
-            LogManager.getLogger().info("Creating directory: {}", mcrPath);
-            try {
-                doWithinTransaction(() -> Files.createDirectory(mcrPath));
-            } catch (IOException e2) {
-                throw new InternalServerErrorException(e2);
-            }
-            return Response.status(Response.Status.CREATED).build();
-        }
-    }
-
-    private static void doWithinTransaction(IOOperation op) throws IOException {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        try {
-            mcrSession.beginTransaction();
-            op.run();
-        } finally {
-            if (mcrSession.transactionRequiresRollback()) {
-                mcrSession.rollbackTransaction();
-            } else {
-                mcrSession.commitTransaction();
-            }
-        }
-    }
-
     private Response updateOrCreateFile(InputStream contents, MCRPath mcrPath) {
         MCRFileAttributes fileAttributes;
         try {
@@ -302,62 +374,6 @@ public class MCRRestDerivateContents {
             return cachedResponse.get();
         }
         return updateFile(contents, mcrPath);
-    }
-
-    private static Response updateFile(InputStream contents, MCRPath mcrPath) {
-        LogManager.getLogger().info("Updating file: {}", mcrPath);
-        int memBuf = getUploadMemThreshold();
-        java.io.File uploadDirectory = getUploadTempStorage();
-        try (DeferredFileOutputStream dfos = new DeferredFileOutputStream(memBuf, mcrPath.getOwner(),
-            mcrPath.getFileName().toString(), uploadDirectory);
-            MaxBytesOutputStream mbos = new MaxBytesOutputStream(dfos)) {
-            IOUtils.copy(contents, mbos);
-            mbos.close(); //required if temporary file was used
-            OutputStream out = Files.newOutputStream(mcrPath);
-            try {
-                if (dfos.isInMemory()) {
-                    out.write(dfos.getData());
-                } else {
-                    java.io.File tempFile = dfos.getFile();
-                    if (tempFile != null) {
-                        try {
-                            Files.copy(tempFile.toPath(), out);
-                        } finally {
-                            LogManager.getLogger().debug("Deleting file {} of size {}.", tempFile.getAbsolutePath(),
-                                tempFile.length());
-                            tempFile.delete();
-                        }
-                    }
-                }
-            } finally {
-                //close writes data to database
-                doWithinTransaction(out::close);
-            }
-        } catch (IOException e) {
-            throw new InternalServerErrorException(e);
-        }
-        return Response.noContent().build();
-    }
-
-    private static Response createFile(InputStream contents, MCRPath mcrPath) {
-        LogManager.getLogger().info("Creating file: {}", mcrPath);
-        try {
-            OutputStream out = Files.newOutputStream(mcrPath, StandardOpenOption.CREATE_NEW);
-            try {
-                IOUtils.copy(contents, out, BUFFER_SIZE);
-            } finally {
-                //close writes data to database
-                doWithinTransaction(out::close);
-            }
-        } catch (IOException e2) {
-            try {
-                doWithinTransaction(() -> Files.deleteIfExists(mcrPath));
-            } catch (IOException e3) {
-                LogManager.getLogger().warn("Error while deleting incomplete file.", e3);
-            }
-            throw new InternalServerErrorException(e2);
-        }
-        return Response.status(Response.Status.CREATED).build();
     }
 
     private boolean isFile() {
@@ -400,8 +416,9 @@ public class MCRRestDerivateContents {
         return MCRPath.getPath(derid.toString(), path);
     }
 
-    private static EntityTag getETag(MCRFileAttributes attrs) {
-        return new EntityTag(attrs.md5sum());
+    @FunctionalInterface
+    private interface IOOperation {
+        void run() throws IOException;
     }
 
     @XmlRootElement(name = "directory")
@@ -415,6 +432,10 @@ public class MCRRestDerivateContents {
 
         Directory() {
             super();
+        }
+
+        Directory(MCRPath p, MCRFileAttributes attr) {
+            super(p, attr);
         }
 
         void setEntries(List<? extends DirectoryEntry> entries) {
@@ -431,10 +452,6 @@ public class MCRRestDerivateContents {
                     }
 
                 });
-        }
-
-        Directory(MCRPath p, MCRFileAttributes attr) {
-            super(p, attr);
         }
 
         @XmlElement(name = "directory")
@@ -554,23 +571,6 @@ public class MCRRestDerivateContents {
                 throw new BadRequestException("Maximum upload file size exceeded: " + maxSize);
             }
         }
-    }
-
-    private static long getUploadMaxSize() {
-        return MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
-    }
-
-    private static java.io.File getUploadTempStorage() {
-        return MCRConfiguration2.getOrThrow("MCR.FileUpload.TempStoragePath", java.io.File::new);
-    }
-
-    private static int getUploadMemThreshold() {
-        return MCRConfiguration2.getOrThrow("MCR.FileUpload.MemoryThreshold", Integer::parseInt);
-    }
-
-    @FunctionalInterface
-    private static interface IOOperation {
-        public void run() throws IOException;
     }
 
 }

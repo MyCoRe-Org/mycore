@@ -53,7 +53,7 @@ public class MCRCategoryID implements Serializable {
 
     private static final long serialVersionUID = -5672923571406252855L;
 
-    private static final Pattern validID = Pattern.compile("[^:$\\{\\}]+");
+    private static final Pattern VALID_ID = Pattern.compile("[^:$\\{\\}]+");
 
     private static final int ROOT_ID_LENGTH = 32;
 
@@ -65,7 +65,7 @@ public class MCRCategoryID implements Serializable {
 
     @Basic
     @Column(name = "CategID", length = CATEG_ID_LENGTH, updatable = false)
-    private String ID;
+    private String id;
 
     private MCRCategoryID() {
         super();
@@ -107,7 +107,7 @@ public class MCRCategoryID implements Serializable {
 
     @Transient
     public boolean isRootID() {
-        return ID == null || ID.equals("");
+        return id == null || id.equals("");
     }
 
     /*
@@ -117,10 +117,10 @@ public class MCRCategoryID implements Serializable {
      */
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = 1;
-        result = PRIME * result + (ID == null || ID.isEmpty() ? 0 : ID.hashCode());
-        result = PRIME * result + (rootID == null ? 0 : rootID.hashCode());
+        result = prime * result + (id == null || id.isEmpty() ? 0 : id.hashCode());
+        result = prime * result + (rootID == null ? 0 : rootID.hashCode());
         return result;
     }
 
@@ -141,28 +141,25 @@ public class MCRCategoryID implements Serializable {
             return false;
         }
         final MCRCategoryID other = (MCRCategoryID) obj;
-        if (ID == null) {
-            if (other.ID != null && other.ID.length() > 0) {
+        if (id == null) {
+            if (other.id != null && other.id.length() > 0) {
                 return false;
             }
-        } else if (!ID.equals(other.ID) && (ID.length() > 0 || other.ID != null && other.ID.length() >= 0)) {
+        } else if (!id.equals(other.id) && (id.length() > 0 || other.id != null && other.id.length() >= 0)) {
             return false;
         }
         if (rootID == null) {
-            if (other.rootID != null) {
-                return false;
-            }
-        } else if (!rootID.equals(other.rootID)) {
-            return false;
+            return other.rootID == null;
+        } else {
+            return rootID.equals(other.rootID);
         }
-        return true;
     }
 
     /**
      * @return the ID
      */
     public String getID() {
-        return ID == null ? "" : ID;
+        return id == null ? "" : id;
     }
 
     /**
@@ -171,8 +168,8 @@ public class MCRCategoryID implements Serializable {
      */
     private void setID(String id) {
         if (id != null && id.length() > 0) {
-            if (!validID.matcher(id).matches()) {
-                throw new MCRException("category ID '" + id + "' is invalid and does not match: " + validID);
+            if (!VALID_ID.matcher(id).matches()) {
+                throw new MCRException("category ID '" + id + "' is invalid and does not match: " + VALID_ID);
             }
             if (id.length() > CATEG_ID_LENGTH) {
                 throw new MCRException(
@@ -180,7 +177,7 @@ public class MCRCategoryID implements Serializable {
                         .format(new Object[] { id, CATEG_ID_LENGTH, id.length() }));
             }
         }
-        ID = id;
+        this.id = id;
     }
 
     /**
@@ -195,10 +192,10 @@ public class MCRCategoryID implements Serializable {
      *            the rootID to set
      */
     private void setRootID(String rootID) {
-        if (!validID.matcher(rootID).matches()) {
+        if (!VALID_ID.matcher(rootID).matches()) {
             throw new MCRException(
                 new MessageFormat("classification ID ''{0}'' is invalid and does not match: {1}", Locale.ROOT)
-                    .format(new Object[] { rootID, validID }));
+                    .format(new Object[] { rootID, VALID_ID }));
         }
         if (rootID.length() > ROOT_ID_LENGTH) {
             throw new MCRException(String.format(Locale.ENGLISH,
@@ -216,11 +213,10 @@ public class MCRCategoryID implements Serializable {
     @Override
     @JsonValue
     public String toString() {
-        if (ID == null || ID.length() == 0) {
+        if (id == null || id.length() == 0) {
             return rootID;
         }
-        return rootID + ':' + ID;
+        return rootID + ':' + id;
     }
-
 
 }

@@ -87,11 +87,11 @@ public class MCRMailer extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMailer.class);
 
-    private static final String delimiter = "\n--------------------------------------\n";
+    private static final String DELIMITER = "\n--------------------------------------\n";
 
     private static Session mailSession;
 
-    protected static final String encoding;
+    protected static final String ENCODING;
 
     /** How often should MCRMailer try to send mail? */
     protected static int numTries;
@@ -111,7 +111,7 @@ public class MCRMailer extends MCRServlet {
 
     static {
         MCRConfiguration config = MCRConfiguration.instance();
-        encoding = config.getString("MCR.Mail.Encoding");
+        ENCODING = config.getString("MCR.Mail.Encoding");
 
         Properties mailProperties = new Properties();
 
@@ -356,9 +356,8 @@ public class MCRMailer extends MCRServlet {
                 for (int i = numTries - 1; i > 0; i--) {
                     LOGGER.info("Retrying in 5 minutes...");
                     try {
-                        Thread.sleep(300000);
-                    } // wait 5 minutes
-                    catch (InterruptedException ignored) {
+                        Thread.sleep(300000); // wait 5 minutes
+                    } catch (InterruptedException ignored) {
                     }
 
                     try {
@@ -379,20 +378,23 @@ public class MCRMailer extends MCRServlet {
         msg.setFrom(EMail.buildAddress(mail.from));
 
         Optional<List<InternetAddress>> toList = EMail.buildAddressList(mail.to);
-        if (toList.isPresent())
+        if (toList.isPresent()) {
             msg.addRecipients(Message.RecipientType.TO, toList.get().toArray(new InternetAddress[toList.get().size()]));
+        }
 
         Optional<List<InternetAddress>> replyToList = EMail.buildAddressList(mail.replyTo);
-        if (replyToList.isPresent())
+        if (replyToList.isPresent()) {
             msg.setReplyTo((replyToList.get().toArray(new InternetAddress[replyToList.get().size()])));
+        }
 
         Optional<List<InternetAddress>> bccList = EMail.buildAddressList(mail.bcc);
-        if (bccList.isPresent())
+        if (bccList.isPresent()) {
             msg.addRecipients(Message.RecipientType.BCC,
                 bccList.get().toArray(new InternetAddress[bccList.get().size()]));
+        }
 
         msg.setSentDate(new Date());
-        msg.setSubject(mail.subject, encoding);
+        msg.setSubject(mail.subject, ENCODING);
 
         if (mail.parts != null && !mail.parts.isEmpty() || mail.msgParts != null && mail.msgParts.size() > 1) {
             Multipart multipart = new MimeMultipart();
@@ -405,7 +407,7 @@ public class MCRMailer extends MCRServlet {
 
                 for (MessagePart m : mail.msgParts) {
                     messagePart = new MimeBodyPart();
-                    messagePart.setText(m.message, encoding, m.type.value());
+                    messagePart.setText(m.message, ENCODING, m.type.value());
                     alternative.addBodyPart(messagePart);
                 }
 
@@ -415,7 +417,7 @@ public class MCRMailer extends MCRServlet {
             } else {
                 Optional<MessagePart> plainMsg = mail.getTextMessage();
                 if (plainMsg.isPresent()) {
-                    messagePart.setText(plainMsg.get().message, encoding);
+                    messagePart.setText(plainMsg.get().message, ENCODING);
                     multipart.addBodyPart(messagePart);
                 }
             }
@@ -444,7 +446,7 @@ public class MCRMailer extends MCRServlet {
         } else {
             Optional<MessagePart> plainMsg = mail.getTextMessage();
             if (plainMsg.isPresent()) {
-                msg.setText(plainMsg.get().message, encoding);
+                msg.setText(plainMsg.get().message, ENCODING);
             }
         }
 
@@ -465,16 +467,18 @@ public class MCRMailer extends MCRServlet {
      */
     public static Element sendMail(Document input, String stylesheet, Map<String, String> parameters) throws Exception {
         LOGGER.info("Generating e-mail from {} using {}.xsl", input.getRootElement().getName(), stylesheet);
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             debug(input.getRootElement());
+        }
 
         Element eMail = transform(input, stylesheet, parameters).getRootElement();
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             debug(eMail);
+        }
 
-        if (eMail.getChildren("to").isEmpty())
+        if (eMail.getChildren("to").isEmpty()) {
             LOGGER.warn("Will not send e-mail, no 'to' address specified");
-        else {
+        } else {
             LOGGER.info("Sending e-mail to {}: {}", eMail.getChildText("to"), eMail.getChildText("subject"));
             MCRMailer.send(eMail);
         }
@@ -517,7 +521,7 @@ public class MCRMailer extends MCRServlet {
     /** Outputs xml to the LOGGER for debugging */
     private static void debug(Element xml) {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        LOGGER.debug(delimiter + "{}" + delimiter, xout.outputString(xml));
+        LOGGER.debug(DELIMITER + "{}" + DELIMITER, xout.outputString(xml));
     }
 
     @XmlRootElement(name = "email")
@@ -726,7 +730,7 @@ public class MCRMailer extends MCRServlet {
                 }
                 if (message != null) {
                     builder.append("message=");
-                    builder.append(message.substring(0, Math.min(message.length(), maxLen)));
+                    builder.append(message, 0, Math.min(message.length(), maxLen));
                 }
                 builder.append("]");
                 return builder.toString();

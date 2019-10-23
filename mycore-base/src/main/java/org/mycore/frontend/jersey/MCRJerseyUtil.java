@@ -53,6 +53,7 @@ import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
 public abstract class MCRJerseyUtil {
 
     public static final String APPLICATION_JSON_UTF8 = MediaType.APPLICATION_JSON + ";charset=utf-8";
+
     public static final String APPLICATION_XML_UTF8 = MediaType.APPLICATION_XML + ";charset=utf-8";
 
     /**
@@ -111,8 +112,8 @@ public abstract class MCRJerseyUtil {
     }
 
     /**
-     * Checks if the current user has the read permission on the given derivate content. Throws an unauthorized exception
-     * otherwise.
+     * Checks if the current user has the read permission on the given derivate content.
+     * Throws an unauthorized exception otherwise.
      * 
      * @param id
      *            mycore object id

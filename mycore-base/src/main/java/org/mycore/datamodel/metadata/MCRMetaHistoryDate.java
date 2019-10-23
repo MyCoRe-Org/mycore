@@ -82,20 +82,20 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * This is the constructor. <br>
      * The language element was set. If the value of <em>default_lang</em> is
      * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag</em>. If the value of <em>set_subtag</em>
+     * the value of <em>subtag</em>. If the value of <em>subtag</em>
      * is null or empty an exception was thrown. The type element was set to
-     * the value of <em>set_type</em>, if it is null, an empty string was set
+     * the value of <em>type</em>, if it is null, an empty string was set
      * to the type element.<br>
      * The text element is set to an empty string. The calendar is set to 'Gregorian Calendar'. The von value 
      * is set to MIN_JULIAN_DAY_NUMBER, the bis value is set to MAX_JULIAN_DAY_NUMBER;
-     * @param set_subtag      the name of the subtag
-     * @param set_type        the optional type string
-     * @param set_inherted    a value &gt;= 0
+     * @param subtag      the name of the subtag
+     * @param type        the optional type string
+     * @param inherted    a value &gt;= 0
      *
      * @exception MCRException if the parameter values are invalid
      */
-    public MCRMetaHistoryDate(String set_subtag, String set_type, int set_inherted) throws MCRException {
-        super(set_subtag, null, set_type, set_inherted);
+    public MCRMetaHistoryDate(String subtag, String type, int inherted) throws MCRException {
+        super(subtag, null, type, inherted);
         texts = new ArrayList<>();
         calendar = MCRCalendar.CALENDARS_LIST.get(0);
         setDefaultVon();
@@ -106,37 +106,37 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * This method set the text field for the default language. If data exists,
      * it overwrites the value of text.
      * 
-     * @param set_text
+     * @param text
      *            the text string for a date or range
      */
     @Deprecated
-    public final void setText(String set_text) {
-        setText(set_text, lang);
+    public final void setText(String text) {
+        setText(text, lang);
     }
 
     /**
      * This method set the text field for the given language. If data exists, it
      * overwrites the value of text.
      * 
-     * @param set_text
+     * @param text
      *            the text string for a date or range
-     * @param set_lang
+     * @param lang
      *            the language of the text in the ISO format
      */
-    public final void setText(String set_text, String set_lang) {
-        if (set_text == null || set_text.length() == 0) {
+    public final void setText(String text, String lang) {
+        if (text == null || text.length() == 0) {
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
-        if (set_text.length() <= MCRHISTORYDATE_MAX_TEXT) {
-            set_text = set_text.trim();
+        if (text.length() <= MCRHISTORYDATE_MAX_TEXT) {
+            text = text.trim();
         } else {
-            set_text = set_text.substring(0, MCRHISTORYDATE_MAX_TEXT);
+            text = text.substring(0, MCRHISTORYDATE_MAX_TEXT);
         }
-        if (set_lang == null || set_lang.length() == 0) {
-            addText(set_text, lang);
+        if (lang == null || lang.length() == 0) {
+            addText(text, this.lang);
         } else {
-            addText(set_text, set_lang);
+            addText(text, lang);
         }
     }
 
@@ -144,44 +144,44 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * This method add a MCRMetaHistoryDateTexts instance to the ArrayList of
      * texts.
      * 
-     * @param set_text
+     * @param text
      *            the text- String
-     * @param set_lang
+     * @param lang
      *            the lang- String
      */
 
-    public final void addText(String set_text, String set_lang) {
-        if (set_text == null || set_text.length() == 0) {
+    public final void addText(String text, String lang) {
+        if (text == null || text.length() == 0) {
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
-        if (set_lang == null || set_lang.length() == 0) {
+        if (lang == null || lang.length() == 0) {
             LOGGER.warn("The lang field of MCRMeataHistoryDate is empty.");
             return;
         }
         for (int i = 0; i < texts.size(); i++) {
-            if (texts.get(i).getLang().equals(set_lang)) {
+            if (texts.get(i).getLang().equals(lang)) {
                 texts.remove(i);
                 break;
             }
         }
-        texts.add(new MCRMetaHistoryDateText(set_text, set_lang));
+        texts.add(new MCRMetaHistoryDateText(text, lang));
     }
 
     /**
      * This method return the MCRMetaHistoryDateTexts instance with the
      * corresponding language.
      * 
-     * @param set_lang
+     * @param lang
      *            the language String in ISO format
      * @return an instance of MCRMetaHistoryDateTexts or null
      */
-    public final MCRMetaHistoryDateText getText(String set_lang) {
-        if (set_lang == null) {
+    public final MCRMetaHistoryDateText getText(String lang) {
+        if (lang == null) {
             return null;
         }
         return texts.stream()
-            .filter(text -> text.getLang().equals(set_lang))
+            .filter(text -> text.getLang().equals(lang))
             .findFirst()
             .orElse(null);
     }
@@ -282,18 +282,18 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method set the von to the given date.
      * 
-     * @param date_string
+     * @param date
      *            a date string
-     * @param calendar_string
+     * @param calendar
      *            the calendar as String, one of CALENDARS.
      */
-    public final void setVonDate(String date_string, String calendar_string) {
+    public final void setVonDate(String date, String calendar) {
         try {
-            von = MCRCalendar.getHistoryDateAsCalendar(date_string, false, calendar_string);
+            von = MCRCalendar.getHistoryDateAsCalendar(date, false, calendar);
             ivon = von.get(Calendar.JULIAN_DAY);
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.warn("The von date {} for calendar {} is false. Set to default!", date_string, calendar_string);
+            LOGGER.warn("The von date {} for calendar {} is false. Set to default!", date, calendar);
             setDefaultVon();
         }
     }
@@ -317,17 +317,17 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method set the bis to the given date.
      * 
-     * @param set_date
+     * @param date
      *            a date string
-     * @param calstr
+     * @param calendar
      *            the calendar as String, one of CALENDARS.
      */
-    public final void setBisDate(String set_date, String calstr) {
+    public final void setBisDate(String date, String calendar) {
         Calendar c = bis;
         try {
-            c = MCRCalendar.getHistoryDateAsCalendar(set_date, true, calstr);
+            c = MCRCalendar.getHistoryDateAsCalendar(date, true, calendar);
         } catch (Exception e) {
-            LOGGER.warn("The bis date {} for calendar {} is false.", set_date, calstr);
+            LOGGER.warn("The bis date {} for calendar {} is false.", date, calendar);
             c = null;
         }
         setBisDate(c);
@@ -404,7 +404,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
         texts.clear(); // clear
 
@@ -439,7 +439,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaHistoryDate part
      */
     @Override
-    public org.jdom2.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
         for (MCRMetaHistoryDateText text : texts) {
             Element elmt = new Element("text");
@@ -447,13 +447,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             elmt.setAttribute("lang", text.getLang(), Namespace.XML_NAMESPACE);
             elm.addContent(elmt);
         }
-        elm.addContent(new org.jdom2.Element("calendar").addContent(calendar));
+        elm.addContent(new Element("calendar").addContent(calendar));
 
-        elm.addContent(new org.jdom2.Element("ivon").addContent(Integer.toString(ivon)));
-        elm.addContent(new org.jdom2.Element("von").addContent(getVonToString()));
+        elm.addContent(new Element("ivon").addContent(Integer.toString(ivon)));
+        elm.addContent(new Element("von").addContent(getVonToString()));
 
-        elm.addContent(new org.jdom2.Element("ibis").addContent(Integer.toString(ibis)));
-        elm.addContent(new org.jdom2.Element("bis").addContent(getBisToString()));
+        elm.addContent(new Element("ibis").addContent(Integer.toString(ibis)));
+        elm.addContent(new Element("bis").addContent(getBisToString()));
         return elm;
     }
 
@@ -472,13 +472,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     @Override
     public void validate() throws MCRException {
         super.validate();
-        for (int i = 0; i < texts.size(); i++) {
-            MCRMetaHistoryDateText textitem = texts.get(i);
-            if (!textitem.isValid()) {
-                texts.remove(i);
-                i--;
-            }
-        }
+        texts.removeIf(textItem -> !textItem.isValid());
         if (texts.size() == 0) {
             throw new MCRException(getSubTag() + ": no texts defined");
         }
@@ -542,16 +536,16 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             return false;
         }
         final MCRMetaHistoryDate other = (MCRMetaHistoryDate) obj;
-        boolean field_test = Objects.equals(this.calendar, other.calendar) && Objects.equals(this.ivon, other.ivon);
-        boolean text_test = equalText(other.getTexts());
-        return field_test && text_test;
+        boolean fieldTest = Objects.equals(this.calendar, other.calendar) && Objects.equals(this.ivon, other.ivon);
+        boolean textTest = equalText(other.getTexts());
+        return fieldTest && textTest;
     }
 
     private boolean equalText(ArrayList<MCRMetaHistoryDateText> objtexts) {
         boolean testflag = true;
         int size = texts.size() < objtexts.size() ? texts.size() : objtexts.size();
-        for (int i = 0 ; i < size; i++) {
-            testflag &= texts.get(i).equals(objtexts.get(i));  
+        for (int i = 0; i < size; i++) {
+            testflag &= texts.get(i).equals(objtexts.get(i));
         }
         return testflag;
     }
@@ -655,7 +649,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         }
 
         /**
-         * This method check the equivalence of lang and text between this object and a given MCRMetaHistoryDateText object.
+         * This method check the equivalence of lang and text between this object
+         * and a given MCRMetaHistoryDateText object.
          * 
          * @param obj a MCRMetaHistoryDateText instance
          * @return true if both parts are equal

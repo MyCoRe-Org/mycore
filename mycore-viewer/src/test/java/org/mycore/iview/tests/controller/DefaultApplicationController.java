@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +88,7 @@ public class DefaultApplicationController extends ApplicationController {
     protected String buildHTMLFile(String name, String startFile, String page) throws IOException {
         try (InputStream viewerHTMLFileStream = DefaultApplicationController.class.getClassLoader()
             .getResourceAsStream("testStub/" + page + ".html")) {
-            String content = IOUtils.toString(viewerHTMLFileStream, "UTF-8");
+            String content = IOUtils.toString(viewerHTMLFileStream, StandardCharsets.UTF_8);
             String result = content.replace("{$name}", name).replace("{$startFile}", startFile).replace("{$baseUrl}",
                 MCRSeleniumTestBase.getBaseUrl(System.getProperty("BaseUrlPort")) + "/test-classes/testFiles/");
             String fileName = buildFileName(name);

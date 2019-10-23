@@ -18,16 +18,17 @@
 
 package org.mycore.common.events;
 
+import java.util.Optional;
+
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionResolver;
 import org.mycore.frontend.servlets.MCRServlet;
-
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
-import java.util.Optional;
 
 /**
  * Handles different HttpSession events.
@@ -39,7 +40,7 @@ import java.util.Optional;
  */
 public class MCRHttpSessionListener implements HttpSessionListener {
 
-    private final static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /*
      * (non-Javadoc)

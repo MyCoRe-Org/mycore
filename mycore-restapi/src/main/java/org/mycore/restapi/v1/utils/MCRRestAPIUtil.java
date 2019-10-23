@@ -48,7 +48,7 @@ public class MCRRestAPIUtil {
         attrMap.entrySet().stream()
             .forEach(e -> appendFieldValue(b, e.getKey(), e.getValue()));
         b.insert(0, " ");
-        return Optional.ofNullable(s).orElse("Basic") + b.toString();
+        return Optional.ofNullable(s).orElse("Basic") + b;
     }
 
     private static void appendField(StringBuilder b, String field) {

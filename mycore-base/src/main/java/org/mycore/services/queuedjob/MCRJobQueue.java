@@ -63,13 +63,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     protected static boolean singleQueue = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "SingleQueue", true);
 
-    protected String CONFIG_PREFIX_ADD = "";
+    protected String configPrefixAdd = "";
 
     private Class<? extends MCRJobAction> action;
 
     private Queue<MCRJob> preFetch;
 
-    private ScheduledExecutorService StalledJobScheduler;
+    private ScheduledExecutorService stalledJobScheduler;
 
     private final ReentrantLock pollLock;
 
@@ -79,17 +79,17 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         int waitTime = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "TimeTillReset", 10);
         if (!singleQueue && action != null) {
             this.action = action;
-            CONFIG_PREFIX_ADD = action.getSimpleName();
-            if (CONFIG_PREFIX_ADD.length() > 0) {
-                CONFIG_PREFIX_ADD = CONFIG_PREFIX_ADD.concat(".");
+            configPrefixAdd = action.getSimpleName();
+            if (configPrefixAdd.length() > 0) {
+                configPrefixAdd = configPrefixAdd.concat(".");
             }
             waitTime = MCRConfiguration.instance()
-                .getInt(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "TimeTillReset", waitTime);
+                .getInt(CONFIG_PREFIX + configPrefixAdd + "TimeTillReset", waitTime);
         }
         waitTime = waitTime * 60;
 
-        StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
-        StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(this.action), waitTime, waitTime,
+        stalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
+        stalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(this.action), waitTime, waitTime,
             TimeUnit.SECONDS);
         preFetch = new ConcurrentLinkedQueue<>();
         running = true;
@@ -374,8 +374,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         Root<MCRJob> jobRoot = query.from(MCRJob.class);
         query.select(jobRoot);
 
-        params.keySet().forEach(key ->
-        {
+        params.keySet().forEach(key -> {
             MapJoin<MCRJob, String, String> parameterJoin = jobRoot.join(MCRJob_.parameters, JoinType.INNER);
             Path<String> keyPath = parameterJoin.key();
             Path<String> valuePath = parameterJoin.value();
@@ -474,7 +473,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
         this.notifyAll();
 
         boolean autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "autostart", true);
-        autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + CONFIG_PREFIX_ADD + "autostart", autostart);
+        autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + configPrefixAdd + "autostart", autostart);
 
         if (autostart) {
             MCRJobMaster.startMasterThread(action);
@@ -563,13 +562,13 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
      */
     @Override
     public void prepareClose() {
-        StalledJobScheduler.shutdownNow();
+        stalledJobScheduler.shutdownNow();
         running = false;
         try {
-            StalledJobScheduler.awaitTermination(60, TimeUnit.SECONDS);
+            stalledJobScheduler.awaitTermination(60, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             LOGGER.info("Could not wait for 60 seconds...");
-            StalledJobScheduler.shutdownNow();
+            stalledJobScheduler.shutdownNow();
         }
     }
 

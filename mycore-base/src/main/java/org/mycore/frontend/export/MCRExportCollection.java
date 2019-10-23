@@ -51,8 +51,9 @@ public class MCRExportCollection {
     /** Sets the name and namespace of the root element that wraps the collected data */
     public void setRootElement(String elementName, String namespaceURI) {
         collection.setName(elementName);
-        if ((namespaceURI != null) && (!namespaceURI.isEmpty()))
+        if ((namespaceURI != null) && (!namespaceURI.isEmpty())) {
             collection.setNamespace(Namespace.getNamespace(namespaceURI));
+        }
     }
 
     /**

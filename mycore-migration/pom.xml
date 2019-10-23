@@ -11,6 +11,7 @@
   <name>MyCoRe migration tools</name>
   <properties>
     <manifest.priority>35</manifest.priority>
+    <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>
@@ -32,10 +33,6 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-iview2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -120,11 +120,11 @@ public abstract class MCRProcessableFactory {
 
         private MCRProcessableCollection collection;
 
-        public MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate) {
+        MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate) {
             this(delegate, null);
         }
 
-        public MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate, MCRProcessableCollection collection) {
+        MCRProcessableThreadPoolExecutorHelper(ExecutorService delegate, MCRProcessableCollection collection) {
             this.executor = delegate;
             this.collection = collection;
         }
@@ -138,11 +138,11 @@ public abstract class MCRProcessableFactory {
             MCRProcessableSupplier<R> supplier = MCRProcessableSupplier.of(callable, this.executor, priority);
             if (this.collection != null) {
                 MCRProcessable processable = supplier;
-                if(callable instanceof MCRProcessable) {
+                if (callable instanceof MCRProcessable) {
                     processable = (MCRProcessable) callable;
-                } else if(callable instanceof RunnableProgressableAdapter) {
+                } else if (callable instanceof RunnableProgressableAdapter) {
                     Runnable task = ((RunnableProgressableAdapter) callable).get();
-                    if(task instanceof MCRProcessable) {
+                    if (task instanceof MCRProcessable) {
                         processable = (MCRProcessable) task;
                     }
                 }

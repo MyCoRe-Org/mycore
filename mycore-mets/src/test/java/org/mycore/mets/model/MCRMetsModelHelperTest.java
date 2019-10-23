@@ -43,7 +43,8 @@ public class MCRMetsModelHelperTest extends MCRTestCase {
         Assert.assertEquals(expected, MCRMetsModelHelper.getUseForHref(path));
     }
 
-    @Override protected Map<String, String> getTestProperties() {
+    @Override
+    protected Map<String, String> getTestProperties() {
         final Map<String, String> testProperties = super.getTestProperties();
 
         testProperties.put(MCRMetsModelHelper.ALLOWED_TRANSLATION_PROPERTY, "de,en");

@@ -22,6 +22,9 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,9 +64,6 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.xml.sax.SAXException;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 /**
  * Delivers persistence operations for {@link MCRObject} and {@link MCRDerivate} .
  * 
@@ -74,10 +74,10 @@ public final class MCRMetadataManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRCache<MCRObjectID, MCRObjectID> derivateObjectMap = new MCRCache<>(10000,
+    private static final MCRCache<MCRObjectID, MCRObjectID> DERIVATE_OBJECT_MAP = new MCRCache<>(10000,
         "derivate objectid cache");
 
-    private static final MCRCache<MCRObjectID, List<MCRObjectID>> objectDerivateMap = new MCRCache<>(10000,
+    private static final MCRCache<MCRObjectID, List<MCRObjectID>> OBJECT_DERIVATE_MAP = new MCRCache<>(10000,
         "derivate objectid cache");
 
     private static MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
@@ -100,7 +100,7 @@ public final class MCRMetadataManager {
         ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(derivateID, expire, unit);
         MCRObjectID mcrObjectID = null;
         try {
-            mcrObjectID = derivateObjectMap.getIfUpToDate(derivateID, modifiedHandle);
+            mcrObjectID = DERIVATE_OBJECT_MAP.getIfUpToDate(derivateID, modifiedHandle);
         } catch (IOException e) {
             LOGGER.warn("Could not determine last modified timestamp of derivate {}", derivateID);
         }
@@ -121,7 +121,7 @@ public final class MCRMetadataManager {
         if (mcrObjectID == null) {
             return null;
         }
-        derivateObjectMap.put(derivateID, mcrObjectID);
+        DERIVATE_OBJECT_MAP.put(derivateID, mcrObjectID);
         return mcrObjectID;
     }
 
@@ -139,7 +139,7 @@ public final class MCRMetadataManager {
         ModifiedHandle modifiedHandle = XML_MANAGER.getLastModifiedHandle(objectId, expire, unit);
         List<MCRObjectID> derivateIds = null;
         try {
-            derivateIds = objectDerivateMap.getIfUpToDate(objectId, modifiedHandle);
+            derivateIds = OBJECT_DERIVATE_MAP.getIfUpToDate(objectId, modifiedHandle);
         } catch (IOException e) {
             LOGGER.warn("Could not determine last modified timestamp of derivate {}", objectId);
         }
@@ -332,20 +332,20 @@ public final class MCRMetadataManager {
         // prepare this object with parent metadata
         receiveMetadata(mcrObject);
 
-        final MCRObjectID parent_id = mcrObject.getStructure().getParentID();
+        final MCRObjectID parentId = mcrObject.getStructure().getParentID();
         MCRObject parent = null;
-        if (parent_id != null) {
+        if (parentId != null) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Parent ID = {}", parent_id);
+                LOGGER.debug("Parent ID = {}", parentId);
             }
-            parent = MCRMetadataManager.retrieveMCRObject(parent_id);
+            parent = MCRMetadataManager.retrieveMCRObject(parentId);
         }
 
         // handle events
         fireEvent(mcrObject, null, MCREvent.CREATE_EVENT);
 
         // add the MCRObjectID to the child list in the parent object
-        if (parent_id != null) {
+        if (parentId != null) {
             parent.getStructure().addChild(new MCRMetaLinkID("child", mcrObject.getId(),
                 mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel()));
             MCRMetadataManager.fireUpdateEvent(parent);
@@ -443,14 +443,15 @@ public final class MCRMetadataManager {
         }
 
         // check for active links
-        final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcr_id,
+        final Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcrObject.mcrId,
             MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Sources size:{}", sources.size());
         }
         if (sources.size() > 0) {
             final MCRActiveLinkException activeLinks = new MCRActiveLinkException("Error while deleting object " + id
-                + ". This object is still referenced by other objects and can not be removed until all links are released.");
+                + ". This object is still referenced by other objects and "
+                + "can not be removed until all links are released.");
             for (final String curSource : sources) {
                 activeLinks.addLink(curSource, id.toString());
             }
@@ -639,10 +640,7 @@ public final class MCRMetadataManager {
             mcrObject.getService().setDate("modifydate");
         }
         // remove ACL if it is set from data source
-        for (int i = 0; i < mcrObject.getService().getRulesSize(); i++) {
-            mcrObject.getService().removeRule(i);
-            i--;
-        }
+        mcrObject.getService().getRules().clear();
         // handle events
         fireEvent(mcrObject, retrieveMCRObject(mcrObject.getId()), MCREvent.UPDATE_EVENT);
     }
@@ -771,7 +769,8 @@ public final class MCRMetadataManager {
             }
         }
         // add the link to metadata
-        final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+        final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance()
+            .getDerivateLink(mcrDerivate);
         addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink);
 
         // update the derivate
@@ -841,7 +840,7 @@ public final class MCRMetadataManager {
         MCRObjectID oldParentID = old.getStructure().getParentID();
         MCRObjectID newParentID = mcrObject.getStructure().getParentID();
 
-        if (oldParentID != null && exists(oldParentID) && (newParentID == null || !newParentID.equals(oldParentID))) {
+        if (oldParentID != null && exists(oldParentID) && (!oldParentID.equals(newParentID))) {
             // remove child from the old parent
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Parent ID = {}", oldParentID);

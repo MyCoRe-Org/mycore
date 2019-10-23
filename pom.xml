@@ -37,7 +37,8 @@
     <changelog.since>2019-05-28</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
     <changes.version>2019.08</changes.version>
-    <checkstyle.failOnViolation>false</checkstyle.failOnViolation>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <forbiddenapis.version>2.6</forbiddenapis.version>
     <frontend.maven.plugin.version>1.6</frontend.maven.plugin.version>
     <grizzly.version>2.3.35</grizzly.version>
@@ -58,7 +59,7 @@
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <node.version>v6.9.1</node.version>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
+    <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
     <site.suffix />
     <swagger.version>2.0.6</swagger.version>
@@ -229,7 +230,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
@@ -923,7 +924,7 @@
       <dependency>
         <groupId>jaxen</groupId>
         <artifactId>jaxen</artifactId>
-        <version>1.1.6</version>
+        <version>1.2.0</version>
         <exclusions>
           <exclusion>
             <groupId>jdom</groupId>
@@ -1412,12 +1413,12 @@
         <groupId>xerces</groupId>
         <artifactId>xercesImpl</artifactId>
         <version>2.12.0</version>
-      </dependency>
-      <dependency>
-        <!-- required by xerces 2.12.0 -->
-        <groupId>xml-apis</groupId>
-        <artifactId>xml-apis</artifactId>
-        <version>1.4.01</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>xml-resolver</groupId>

@@ -196,8 +196,9 @@ abstract class MCRFileSystemUtils {
         if (relativePath.isAbsolute()) {
             if (getOwnerID(baseDir).equals(relativePath.getOwner())) {
                 ifsPath = toPath(baseDir).relativize(relativePath);
-            } else
+            } else {
                 throw new IOException(relativePath + " is absolute does not fit to " + toPath(baseDir));
+            }
         }
         Deque<MCRStoredNode> created = new LinkedList<>();
         MCRFile file;
@@ -268,7 +269,7 @@ abstract class MCRFileSystemUtils {
         if (path.isAbsolute()) {
             throw new IllegalArgumentException("path is absolute");
         }
-        switch (path.getNameCount()){
+        switch (path.getNameCount()) {
             case 0:
                 return fs.getPath("");
             case 1:

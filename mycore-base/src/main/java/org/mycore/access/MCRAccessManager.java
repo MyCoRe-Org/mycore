@@ -84,9 +84,9 @@ public class MCRAccessManager {
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
      *             if an error was occurred
-     * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
+     * @see MCRAccessInterface#addRule(String, String, Element, String)
      */
-    public static void addRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
+    public static void addRule(MCRObjectID id, String permission, Element rule, String description)
         throws MCRException {
         getAccessImpl().addRule(id.toString(), permission, rule, description);
     }
@@ -104,9 +104,9 @@ public class MCRAccessManager {
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
      *             if an error was occurred
-     * @see MCRAccessInterface#addRule(String, String, org.jdom2.Element, String)
+     * @see MCRAccessInterface#addRule(String, String, Element, String)
      */
-    public static void addRule(String id, String permission, org.jdom2.Element rule, String description)
+    public static void addRule(String id, String permission, Element rule, String description)
         throws MCRException {
         getAccessImpl().addRule(id, permission, rule, description);
     }
@@ -169,7 +169,7 @@ public class MCRAccessManager {
      *             if an error was occurred
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
-    public static void updateRule(MCRObjectID id, String permission, org.jdom2.Element rule, String description)
+    public static void updateRule(MCRObjectID id, String permission, Element rule, String description)
         throws MCRException {
         getAccessImpl().updateRule(id.toString(), permission, rule, description);
     }
@@ -189,7 +189,7 @@ public class MCRAccessManager {
      *             if an error was occurred
      * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
-    public static void updateRule(String id, String permission, org.jdom2.Element rule, String description)
+    public static void updateRule(String id, String permission, Element rule, String description)
         throws MCRException {
         getAccessImpl().updateRule(id, permission, rule, description);
     }

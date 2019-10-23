@@ -61,11 +61,12 @@ public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
         MCRObjectID returnID = (MCRObjectID) request.getAttribute(OBJECT_ID_KEY);
         if (returnID == null) {
             throw new ServletException("No MCRObjectID given.");
-        } else
+        } else {
             response.sendRedirect(
                 response.encodeRedirectURL(buildRedirectURL(
                     MCRFrontendUtil.getBaseURL() + "receive/" + returnID,
                     MCRPersistenceHelper.getXSLProperties(request))));
+        }
     }
 
     /**

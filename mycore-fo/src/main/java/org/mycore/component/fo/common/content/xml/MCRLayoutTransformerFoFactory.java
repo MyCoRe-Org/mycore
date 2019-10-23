@@ -53,7 +53,7 @@ public class MCRLayoutTransformerFoFactory extends MCRLayoutTransformerFactory {
         return transformers.computeIfAbsent(id, (transformerId) -> {
             try {
                 MCRContentTransformer transformer = super.getTransformer(transformerId);
-                if (MCRLayoutTransformerFoFactory.NOOP_TRANSFORMER.equals(transformer) ||
+                if (MCRLayoutTransformerFactory.NOOP_TRANSFORMER.equals(transformer) ||
                     getConfiguredTransformer(id).isPresent()) {
                     return transformer;
                 }
@@ -68,7 +68,6 @@ public class MCRLayoutTransformerFoFactory extends MCRLayoutTransformerFactory {
             }
         });
     }
-
 
     @Override
     protected boolean isXMLOutput(String outputMethod, MCRXSLTransformer transformerTest)

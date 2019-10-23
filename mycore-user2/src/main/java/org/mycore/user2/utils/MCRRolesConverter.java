@@ -40,8 +40,9 @@ public class MCRRolesConverter implements MCRUserAttributeConverter<String, Coll
                 final String role = v.contains("@") ? v.substring(0, v.indexOf("@")) : v;
                 if (valueMapping != null) {
                     final String[] mapping = valueMapping.containsKey(role) ? valueMapping.get(role).split(",") : null;
-                    if (mapping != null)
+                    if (mapping != null) {
                         roles.addAll(Arrays.asList(mapping));
+                    }
                 }
             }
         }

@@ -40,37 +40,6 @@ import com.google.common.cache.CacheBuilder;
  * @version $Revision$ $Date$
  */
 public class MCRCache<K, V> {
-    /**
-     * @author Thomas Scheffler (yagee)
-     */
-    public interface ModifiedHandle {
-
-        /**
-         * check distance in ms. After this period of time use {@link #getLastModified()} to check if object is still
-         * up-to-date.
-         */
-        long getCheckPeriod();
-
-        /**
-         * returns timestamp when the cache value was last modified.
-         */
-        long getLastModified() throws IOException;
-
-    }
-
-    private static class MCRCacheEntry<V> {
-        public MCRCacheEntry(V value) {
-            this.value = value;
-            this.insertTime = System.currentTimeMillis();
-        }
-
-        V value;
-
-        long insertTime;
-
-        public long lookUpTime;
-    }
-
     /** Tch type string for the MCRCacheJMXBridge */
     protected String type;
 
@@ -80,7 +49,7 @@ public class MCRCache<K, V> {
 
     /**
      * Creates a new cache with a given capacity.
-     * 
+     *
      * @param capacity
      *            the maximum number of objects this cache will hold
      * @param type
@@ -95,10 +64,29 @@ public class MCRCache<K, V> {
     }
 
     /**
+     * A small sample program for testing this class.
+     */
+    public static void main(String[] args) {
+        MCRCache<String, String> cache = new MCRCache<>(4, "Small Sample Program");
+        System.out.println(cache);
+        cache.put("a", "Anton");
+        cache.put("b", "Bohnen");
+        cache.put("c", "Cache");
+        System.out.println(cache);
+        cache.get("d");
+        cache.get("c");
+        cache.put("d", "Dieter");
+        cache.put("e", "Egon");
+        cache.put("f", "Frank");
+        cache.get("c");
+        System.out.println(cache);
+    }
+
+    /**
      * Puts an object into the cache, storing it under the given key. If the cache is already full, the least recently
      * used object will be removed from the cache first. If the cache already contains an entry under the key provided,
      * this entry is replaced.
-     * 
+     *
      * @param key
      *            the non-null key to store the object under
      * @param value
@@ -119,13 +107,13 @@ public class MCRCache<K, V> {
      * Puts an object into the cache, storing it under the given key. If the cache is already full, the least recently
      * used object will be removed from the cache first. If the cache already contains an entry under the key provided,
      * this entry is replaced.
-     * 
+     *
      * @param key
      *            the non-null key to store the object under
      * @param value
      *            the non-null object to be put into the cache
      * @param insertTime
-     *            the given last modified time for this key           
+     *            the given last modified time for this key
      */
     public void put(K key, V value, long insertTime) {
         if (key == null) {
@@ -141,7 +129,7 @@ public class MCRCache<K, V> {
 
     /**
      * Removes an object from the cache for the given key.
-     * 
+     *
      * @param key
      *            the key for the object you want to remove from this cache
      */
@@ -155,7 +143,7 @@ public class MCRCache<K, V> {
     /**
      * Returns an object from the cache for the given key, or null if there currently is no object in the cache with
      * this key.
-     * 
+     *
      * @param key
      *            the key for the object you want to get from this cache
      * @return the cached object, or null
@@ -169,7 +157,7 @@ public class MCRCache<K, V> {
      * Returns an object from the cache for the given key, but only if the cache entry is not older than the given
      * timestamp. If there currently is no object in the cache with this key, null is returned. If the cache entry is
      * older than the timestamp, the entry is removed from the cache and null is returned.
-     * 
+     *
      * @param key
      *            the key for the object you want to get from this cache
      * @param time
@@ -196,7 +184,7 @@ public class MCRCache<K, V> {
      * timestamp of the {@link ModifiedHandle}. In contrast to {@link #getIfUpToDate(Object, long)} you can submit your
      * own handle that returns the last modified timestamp after a certain period is over. Use this method if
      * determining lastModified date is rather expensive and cache access is often.
-     * 
+     *
      * @param key
      *            the key for the object you want to get from this cache
      * @param handle
@@ -225,7 +213,7 @@ public class MCRCache<K, V> {
 
     /**
      * Returns the number of objects currently cached.
-     * 
+     *
      * @return the number of objects currently cached
      */
     public long getCurrentSize() {
@@ -235,7 +223,7 @@ public class MCRCache<K, V> {
 
     /**
      * Returns the capacity of this cache. This is the maximum number of objects this cache will hold at a time.
-     * 
+     *
      * @return the capacity of this cache
      */
     public long getCapacity() {
@@ -246,7 +234,7 @@ public class MCRCache<K, V> {
      * Changes the capacity of this cache. This is the maximum number of objects that will be cached at a time. If the
      * new capacity is smaller than the current number of objects in the cache, the least recently used objects will be
      * removed from the cache.
-     * 
+     *
      * @param capacity
      *            the maximum number of objects this cache will hold
      */
@@ -261,7 +249,7 @@ public class MCRCache<K, V> {
 
     /**
      * Returns true if this cache is full.
-     * 
+     *
      * @return true if this cache is full
      */
     public boolean isFull() {
@@ -271,7 +259,7 @@ public class MCRCache<K, V> {
 
     /**
      * Returns true if this cache is empty.
-     * 
+     *
      * @return true if this cache is empty
      */
     public boolean isEmpty() {
@@ -281,7 +269,7 @@ public class MCRCache<K, V> {
 
     /**
      * Returns the fill rate of this cache. This is the current number of objects in the cache diveded by its capacity.
-     * 
+     *
      * @return the fill rate of this cache as double value
      */
     public double getFillRate() {
@@ -291,7 +279,7 @@ public class MCRCache<K, V> {
     /**
      * Returns the hit rate of this cache. This is the number of successful hits divided by the total number of get
      * requests so far. Using this ratio can help finding the appropriate cache capacity.
-     * 
+     *
      * @return the hit rate of this cache as double value
      */
     public double getHitRate() {
@@ -316,25 +304,6 @@ public class MCRCache<K, V> {
             + "Cache fill rate: " + getFillRate() + "\n" + "Cache hit rate:  " + getHitRate();
     }
 
-    /**
-     * A small sample program for testing this class.
-     */
-    public static void main(String[] args) {
-        MCRCache<String, String> cache = new MCRCache<>(4, "Small Sample Program");
-        System.out.println(cache);
-        cache.put("a", "Anton");
-        cache.put("b", "Bohnen");
-        cache.put("c", "Cache");
-        System.out.println(cache);
-        cache.get("d");
-        cache.get("c");
-        cache.put("d", "Dieter");
-        cache.put("e", "Egon");
-        cache.put("f", "Frank");
-        cache.get("c");
-        System.out.println(cache);
-    }
-
     public void close() {
         MCRJMXBridge.unregister("MCRCache", type);
         clear();
@@ -345,5 +314,36 @@ public class MCRCache<K, V> {
      */
     public List<K> keys() {
         return Collections.list(Collections.enumeration(backingCache.asMap().keySet()));
+    }
+
+    /**
+     * @author Thomas Scheffler (yagee)
+     */
+    public interface ModifiedHandle {
+
+        /**
+         * check distance in ms. After this period of time use {@link #getLastModified()} to check if object is still
+         * up-to-date.
+         */
+        long getCheckPeriod();
+
+        /**
+         * returns timestamp when the cache value was last modified.
+         */
+        long getLastModified() throws IOException;
+
+    }
+
+    private static class MCRCacheEntry<V> {
+        public long lookUpTime;
+
+        V value;
+
+        long insertTime;
+
+        MCRCacheEntry(V value) {
+            this.value = value;
+            this.insertTime = System.currentTimeMillis();
+        }
     }
 }

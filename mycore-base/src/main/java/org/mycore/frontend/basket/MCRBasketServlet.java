@@ -42,9 +42,11 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * BasketServlet?type=objects&amp;action=clear
  *   to remove all entries in the objects basket.  
  * BasketServlet?type=objects&amp;action=add&amp;id=DocPortal_document_00774301&amp;uri=mcrobject:DocPortal_document_00774301
- *   to add a new entry with ID DocPortal_document_00774301 to the basket, reading its contents from URI mcrobject:DocPortal_document_00774301
+ *   to add a new entry with ID DocPortal_document_00774301 to the basket,
+ *   reading its contents from URI mcrobject:DocPortal_document_00774301
  * BasketServlet?type=objects&amp;action=add&amp;id=DocPortal_document_00774301&amp;uri=mcrobject:DocPortal_document_00774301&amp;resolve=true
- *   to add a new entry with ID DocPortal_document_00774301 to the basket, immediately resolving content from the given URI.
+ *   to add a new entry with ID DocPortal_document_00774301 to the basket,
+ *   immediately resolving content from the given URI.
  * BasketServlet?type=objects&amp;action=remove&amp;id=DocPortal_document_00774301
  *   to remove the entry with ID DocPortal_document_00774301 from the basket  
  * BasketServlet?type=objects&amp;action=up&amp;id=DocPortal_document_00774301
@@ -55,7 +57,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
  *   to change the comment stored in the basket. This is called
  *   using EditorServlet submission, see basket-edit.xml for an example.
  * BasketServlet?type=objects&amp;action=create&amp;ownerID=DocPortal_basket_01234567
- *    to store a basket in a new file "basket" in a new derivate that is owned by the metadata object with the given ownerID.
+ *    to store a basket in a new file "basket" in a new derivate that is owned by the metadata object
+ *    with the given ownerID.
  * BasketServlet?type=objects&amp;action=update
  *   to update a persistent basket in its derivate - that is the derivate the basket was loaded from.
  * BasketServlet?action=retrieve&amp;derivateID=DocPortal_derivate_12345678

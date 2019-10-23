@@ -18,8 +18,6 @@
 
 package org.mycore.viewer.configuration;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.access.MCRAccessManager;
@@ -43,16 +41,14 @@ public class MCRViewerAltoEditorConfiguration extends MCRViewerConfiguration {
         if (MCRAccessManager.checkPermission(derivate, MCRALTOUtil.EDIT_ALTO_PERMISSION)) {
             this.setProperty("altoEditorPostURL", MCRFrontendUtil.getBaseURL(request) + "rsc/viewer/alto");
 
-            Map<String, String[]> parameterMap = request.getParameterMap();
-            String[] altoChangeIDS;
-
             boolean isReviewer = MCRAccessManager.checkPermission(derivate, MCRALTOUtil.REVIEW_ALTO_PERMISSION);
             if (isReviewer) {
                 this.setProperty("altoReviewer", true);
             }
 
-            if (parameterMap.containsKey("altoChangeID")
-                && (altoChangeIDS = parameterMap.get("altoChangeID")).length > 0) {
+            String[] altoChangeIDS = request.getParameterMap().getOrDefault("altoChangeID", new String[0]);
+
+            if (altoChangeIDS.length > 0) {
                 String altoChangeID = altoChangeIDS[0];
                 MCRStoredChangeSet mcrStoredChangeSet = changeSetStore.get(altoChangeID);
                 if (isReviewer || mcrStoredChangeSet.getSessionID().equals(MCRSessionMgr.getCurrentSessionID())) {

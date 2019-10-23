@@ -128,7 +128,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH) + 1;
         int day = cal.get(Calendar.DAY_OF_MONTH);
-        return String.valueOf(day) + "." + String.valueOf(month) + "." + String.valueOf(year);
+        return day + "." + month + "." + year;
     }
 
     /** Pattern for MCRQueryConditions expressed as String */
@@ -190,14 +190,15 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
             List<MCRCondition<Void>> children = sc.getChildren();
             sc = sc instanceof MCRAndCondition ? new MCRAndCondition<>() : new MCROrCondition<>();
             for (MCRCondition<Void> child : children) {
-                child = normalizeCondition(child);
-                if (child == null) {
-                } else if (child instanceof MCRSetCondition
-                    && sc.getOperator().equals(((MCRSetCondition) child).getOperator())) {
-                    // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
-                    sc.addAll(((MCRSetCondition<Void>) child).getChildren());
-                } else {
-                    sc.addChild(child);
+                MCRCondition<Void> normalizedChild = normalizeCondition(child);
+                if (normalizedChild != null) {
+                    if (normalizedChild instanceof MCRSetCondition
+                        && sc.getOperator().equals(((MCRSetCondition) normalizedChild).getOperator())) {
+                        // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
+                        sc.addAll(((MCRSetCondition<Void>) normalizedChild).getChildren());
+                    } else {
+                        sc.addChild(normalizedChild);
+                    }
                 }
             }
             children = sc.getChildren();
@@ -232,29 +233,29 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
             StringTokenizer st = new StringTokenizer(qc.getValue(), " ");
             while (st.hasMoreTokens()) {
                 String value = st.nextToken();
-                if (phrase != null) // we are within phrase
-                {
-                    if (value.endsWith("'")) // end of phrase
-                    {
+                if (phrase != null) {
+                    // we are within phrase
+                    if (value.endsWith("'")) {
+                        // end of phrase
                         value = phrase + " " + value;
                         values.add(value);
                         phrase = null;
-                    } else // in middle of phrase
-                    {
+                    } else {
+                        // in middle of phrase
                         phrase.append(' ').append(value);
                     }
-                } else if (value.startsWith("'")) // begin of phrase
-                {
-                    if (value.endsWith("'")) // one-word phrase
-                    {
+                } else if (value.startsWith("'")) {
+                    // begin of phrase
+                    if (value.endsWith("'")) {
+                        // one-word phrase
                         values.add(value.substring(1, value.length() - 1));
                     } else {
                         phrase = new StringBuilder(value);
                     }
-                } else if (value.startsWith("-'")) // begin of NOT phrase
-                {
-                    if (value.endsWith("'")) // one-word phrase
-                    {
+                } else if (value.startsWith("-'")) {
+                    // begin of NOT phrase
+                    if (value.endsWith("'")) {
+                        // one-word phrase
                         values.add("-" + value.substring(2, value.length() - 1));
                     } else {
                         phrase = new StringBuilder(value);
@@ -274,8 +275,8 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
                         new MCRQueryCondition(qc.getFieldName(), "phrase", value.substring(2, value.length() - 1))));
                 } else if (value.contains("*") || value.contains("?")) {
                     ac.addChild(new MCRQueryCondition(qc.getFieldName(), "like", value));
-                } else if (value.startsWith("-")) // -word means "NOT word"
-                {
+                } else if (value.startsWith("-")) {
+                    // -word means "NOT word"
                     MCRCondition<Void> subCond = new MCRQueryCondition(qc.getFieldName(), "contains",
                         value.substring(1));
                     ac.addChild(new MCRNotCondition<>(subCond));

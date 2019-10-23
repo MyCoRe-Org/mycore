@@ -33,8 +33,9 @@ public class MCRLanguageXML {
      */
     public static void setLangAttribute(MCRLanguage lang, Element element) {
         String code = lang.getCode(MCRLanguageCodeType.biblCode);
-        if (code != null)
+        if (code != null) {
             element.setAttribute("lang", code);
+        }
     }
 
     /**
@@ -50,13 +51,15 @@ public class MCRLanguageXML {
      */
     public static MCRLanguage getLanguage(Element element) {
         String code = element.getAttributeValue("lang", Namespace.XML_NAMESPACE);
-        if ((code == null) || code.isEmpty())
+        if ((code == null) || code.isEmpty()) {
             code = element.getAttributeValue("lang");
+        }
 
-        if ((code == null) || code.isEmpty())
+        if ((code == null) || code.isEmpty()) {
             return MCRLanguageFactory.instance().getDefaultLanguage();
-        else
+        } else {
             return MCRLanguageFactory.instance().getLanguage(code);
+        }
 
     }
 }

@@ -151,8 +151,9 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
         try {
             MCRFileCollection slot = store.retrieve(slotID);
-            if (slot == null)
+            if (slot == null) {
                 return false;
+            }
 
             String path = fr.getAbsolutePath();
             MCRNode node = slot.getNodeByPath(path);
@@ -194,14 +195,16 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             String step = steps.nextToken();
             if (steps.hasMoreTokens()) {
                 MCRNode child = dir.getChild(step);
-                if (child == null)
+                if (child == null) {
                     dir = dir.createDir(step);
-                else
+                } else {
                     dir = (MCRDirectory) child;
+                }
             } else {
                 MCRFile file = (MCRFile) (dir.getChild(step));
-                if (file == null)
+                if (file == null) {
                     file = dir.createFile(step);
+                }
 
                 file.setContent(new MCRStreamContent(source));
             }
@@ -260,7 +263,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
             MCRPath path = MCRPath.getPath(owner, dir.getPath());
             LOGGER.debug("Checking {}", path);
             if (Files.isDirectory(path)) {
-                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path);) {
+                try (DirectoryStream<Path> ds = Files.newDirectoryStream(path)) {
                     Iterator<Path> pathIterator = ds.iterator();
                     if (pathIterator.hasNext()) {
                         //has children
@@ -335,7 +338,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
         private final Path baseDir;
 
-        public UpdateMetadataHandler(MCRCStoreIFS2 storeIFS2) {
+        UpdateMetadataHandler(MCRCStoreIFS2 storeIFS2) {
             myStore = storeIFS2;
             baseDir = Paths.get(myStore.baseDir);
         }

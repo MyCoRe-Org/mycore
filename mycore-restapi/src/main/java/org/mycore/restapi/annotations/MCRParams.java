@@ -22,9 +22,9 @@ import java.lang.annotation.Annotation;
 
 public @interface MCRParams {
 
-    public MCRParam[] values();
+    MCRParam[] values();
 
-    public static class Factory {
+    class Factory {
         public static MCRParams get(MCRParam... params) {
             return new MCRParams() {
                 @Override

@@ -69,8 +69,7 @@ public class MCRPURLJobService extends MCRPIJobService<MCRPURL> {
         doWithPURLManager(
             manager -> manager
                 .registerNewPURL(purl.getUrl().getPath(), buildTargetURL(idString), "302", getProperties().getOrDefault(
-                    PURL_MAINTAINER_CONFIG, "test"))
-        );
+                    PURL_MAINTAINER_CONFIG, "test")));
         this.updateStartRegistrationDate(MCRObjectID.getInstance(idString), "", new Date());
     }
 

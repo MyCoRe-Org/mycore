@@ -10,9 +10,7 @@
   <artifactId>mycore-impex</artifactId>
   <name>MyCoRe Import Export</name>
   <properties>
-    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <manifest.priority>95</manifest.priority>
-    <pmd.failOnViolation>true</pmd.failOnViolation>
   </properties>
   <dependencies>
     <dependency>
@@ -38,10 +36,6 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-solr</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
     </dependency>
   </dependencies>
 </project>

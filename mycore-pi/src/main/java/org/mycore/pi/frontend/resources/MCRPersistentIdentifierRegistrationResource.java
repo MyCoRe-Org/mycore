@@ -66,8 +66,9 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response listByType(@PathParam("type") String type, @DefaultValue("0") @QueryParam("from") int from,
         @DefaultValue("50") @QueryParam("size") int size) {
         Response errorResponse = validateParameters(from, size);
-        if (errorResponse != null)
+        if (errorResponse != null) {
             return errorResponse;
+        }
         List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.getInstance().getList(type,
             from, size);
         return Response.status(Response.Status.OK)
@@ -81,8 +82,9 @@ public class MCRPersistentIdentifierRegistrationResource {
     public Response list(@DefaultValue("0") @QueryParam("from") int from,
         @DefaultValue("50") @QueryParam("size") int size) {
         Response errorResponse = validateParameters(from, size);
-        if (errorResponse != null)
+        if (errorResponse != null) {
             return errorResponse;
+        }
         List<MCRPIRegistrationInfo> mcrpiRegistrationInfos = MCRPIManager.getInstance().getList(from,
             size);
         return Response.status(Response.Status.OK)
@@ -131,19 +133,19 @@ public class MCRPersistentIdentifierRegistrationResource {
         MCRBase object = MCRMetadataManager.retrieve(mycoreIDObject);
         try {
             identifier = registrationService.register(object, additional, true);
-        } catch (MCRPersistentIdentifierException | MCRActiveLinkException | ExecutionException | InterruptedException e) {
-            LOGGER.error("Error while registering PI:",e);
+        } catch (MCRPersistentIdentifierException | MCRActiveLinkException | ExecutionException
+            | InterruptedException e) {
+            LOGGER.error("Error while registering PI:", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(buildErrorJSON("Error while register new identifier!", e)).build();
         } catch (MCRAccessException e) {
-            LOGGER.error("Error while registering PI:",e);
+            LOGGER.error("Error while registering PI:", e);
             return Response.status(Response.Status.FORBIDDEN)
                 .entity(buildErrorJSON("Error while register new identifier!", e)).build();
-        } catch (Throwable t){
-            LOGGER.error("Error while registering PI:",t);
+        } catch (Throwable t) {
+            LOGGER.error("Error while registering PI:", t);
             throw t;
         }
-
 
         return Response.status(Response.Status.CREATED).entity(buildIdentifierObject(identifier)).build();
     }

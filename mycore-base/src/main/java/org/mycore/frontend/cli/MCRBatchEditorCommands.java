@@ -66,7 +66,7 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
 
     private static final String CFG_SUFFIX_ADD = ".Path2Add";
 
-    private static enum Action {
+    private enum Action {
         ADD, ADD_IF, REMOVE, REMOVE_IF, REPLACE
     }
 
@@ -79,7 +79,8 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "edit {0} at {1} if {2} {3} add {4} {5}",
-        help = "Edit XML elements in object {0} at level {1}, if there is a field {2} with value {3}, add field {4} with value {5}",
+        help = "Edit XML elements in object {0} at level {1}, if there is a field {2} with value {3}, "
+            + "add field {4} with value {5}",
         order = 1)
     public static void batchAddIf(String oid, String level, String fieldIf, String valueIf, String field2Add,
         String value2Add)
@@ -96,7 +97,8 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "edit {0} at {1} if {2} {3} remove {4} {5}",
-        help = "Edit XML elements in object {0} at level {1}, if there is a field {2} with value {3}, remove field {4} where value is {5}",
+        help = "Edit XML elements in object {0} at level {1}, if there is a field {2} with value {3}, "
+            + "remove field {4} where value is {5}",
         order = 1)
     public static void batchRemoveIf(String oid, String level, String fieldIf, String valueIf, String field2Rem,
         String value2Rem)

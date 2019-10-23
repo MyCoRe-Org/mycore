@@ -33,10 +33,6 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
 abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
     private static Logger LOGGER = LogManager.getLogger(MCRBasicFileAttributeViewImpl.class);
 
-    public MCRBasicFileAttributeViewImpl() {
-        super();
-    }
-
     static MCRFileAttributes<String> readAttributes(MCRFilesystemNode node) throws IOException {
         return node.getBasicFileAttributes();
     }

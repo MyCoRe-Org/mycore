@@ -137,7 +137,7 @@ public class MCRISO8601Date {
         }
         df = df.withZone(zone);
         if (LOGGER.isDebugEnabled()) {
-            Object[] parameter = new Object[] { dt, zone, dt != null ? df.format(dt) : null };
+            Object[] parameter = { dt, zone, dt != null ? df.format(dt) : null };
             String msg = new MessageFormat("DateTime ''{0}'', using time zone ''{1}'', formatted: {2}", Locale.ROOT)
                 .format(parameter);
             LOGGER.debug(msg);
@@ -275,19 +275,17 @@ public class MCRISO8601Date {
     }
 
     private void setInstant(final TemporalAccessor dt) {
-        if (dt == null) {
-            this.dt = null;
-        } else {
-            this.dt = dt;
-        }
+        this.dt = dt;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final MCRISO8601Date other = (MCRISO8601Date) obj;
         return Objects.equals(this.dt, other.dt);
     }

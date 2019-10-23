@@ -17,6 +17,8 @@
  */
 package org.mycore.pi;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -62,8 +64,6 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
@@ -189,7 +189,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException(
                 "Configurated class (" + (METADATA_SERVICE_CONFIG_PREFIX + metadataManager) + ") not found: "
-                    + className, e);
+                    + className,
+                e);
         } catch (NoSuchMethodException e) {
             throw new MCRConfigurationException(
                 "Configurated class (" + (METADATA_SERVICE_CONFIG_PREFIX + metadataManager)
@@ -246,13 +247,13 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     }
 
     protected void validatePermission(MCRBase obj) throws MCRAccessException {
-        String missingPermission;
-        if (!MCRAccessManager.checkPermission(obj.getId(), missingPermission = PERMISSION_WRITE) ||
-            !MCRAccessManager
-                .checkPermission(obj.getId(), missingPermission = "register-" + getServiceID())) {
+        Optional<String> missingPermission = Stream.of(PERMISSION_WRITE, "register-" + getServiceID())
+            .filter(permission -> !MCRAccessManager.checkPermission(obj.getId(), permission))
+            .findFirst();
+        if (missingPermission.isPresent()) {
             throw MCRAccessException
                 .missingPermission("Register a " + type + " & Update object.", obj.getId().toString(),
-                    missingPermission);
+                    missingPermission.get());
         }
     }
 
@@ -267,8 +268,10 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * Validates if an object can get an Identifier assigned from this service! <b>Better call super when overwrite!</b>
      *
      * @param obj
-     * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
-     * @throws MCRAccessException               if the user does not have the rights to assign a pi to the specific object
+     * @throws MCRPersistentIdentifierException
+     * see {@link org.mycore.pi.exceptions}
+     * @throws MCRAccessException
+     * if the user does not have the rights to assign a pi to the specific object
      */
     public void validateRegistration(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException, MCRAccessException {
@@ -292,9 +295,11 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      *
      * @param obj the object which has to be identified
      * @return the assigned Identifier
-     * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException           the {@link MCRPIMetadataService} lets
-     *                                          {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
+     * @throws MCRAccessException
+     * the current User doesn't have the rights to insert the Identifier to Metadata
+     * @throws MCRActiveLinkException
+     * the {@link MCRPIMetadataService} lets
+     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
      * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
      */
     public T register(MCRBase obj)
@@ -311,10 +316,13 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @param additional   additional information for the persistent identifier
      * @param updateObject if true this method calls {@link MCRMetadataManager#update(MCRBase)}
      * @return the assigned Identifier
-     * @throws MCRAccessException               the current User doesn't have the rights to insert the Identifier to Metadata
-     * @throws MCRActiveLinkException           the {@link MCRPIMetadataService} lets
-     *                                          {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
-     * @throws MCRPersistentIdentifierException see {@link org.mycore.pi.exceptions}
+     * @throws MCRAccessException
+     * the current User doesn't have the rights to insert the Identifier to Metadata
+     * @throws MCRActiveLinkException
+     * the {@link MCRPIMetadataService} lets
+     * {@link org.mycore.datamodel.metadata.MCRMetadataManager#update(MCRObject)} throw this
+     * @throws MCRPersistentIdentifierException
+     * see {@link org.mycore.pi.exceptions}
      */
     public synchronized T register(MCRBase obj, String additional, boolean updateObject)
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
@@ -322,7 +330,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
         // There are many querys that require the current database state.
         // So we start a new transaction within the synchronized block
-        final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<T>(() -> {
+        final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<>(() -> {
             this.validateRegistration(obj, additional);
             final T identifier = getNewIdentifier(obj, additional);
             this.registerIdentifier(obj, additional, identifier);
@@ -345,8 +353,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
         try {
             return REGISTER_POOL.submit(createPICallable).get();
-        } catch (ExecutionException e){
-            if(e.getCause()!=null && e.getCause() instanceof MCRPersistentIdentifierException){
+        } catch (ExecutionException e) {
+            if (e.getCause() != null && e.getCause() instanceof MCRPersistentIdentifierException) {
                 throw (MCRPersistentIdentifierException) e.getCause();
             }
             throw e;
@@ -390,8 +398,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @param identifier the Identifier
      * @param obj        the deleted object
      * @param additional
-     * @throws MCRPersistentIdentifierException to abort deletion of the object  or if something went wrong.
-     *                                          (E.G. {@link MCRDOIService} throws if not superuser tries to delete the object)
+     * @throws MCRPersistentIdentifierException
+     * to abort deletion of the object or if something went wrong, (e.g. {@link MCRDOIService} throws if not a superuser
+     * tries to delete the object)
      */
     protected abstract void delete(T identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException;
@@ -447,7 +456,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             final String presentObject = mayInfo.get().getMycoreID();
             throw new MCRPersistentIdentifierException(
                 "The Generated identifier " + generatedIdentifier + " is already present in database in object "
-                    + presentObject, MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_0_1),
+                    + presentObject,
+                MCRTranslation.translate(TRANSLATE_PREFIX + ERR_CODE_0_1),
                 ERR_CODE_0_1);
         }
         return generated;
@@ -486,11 +496,12 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      * @return the property
      * @throws MCRConfigurationException if property is not set or empty
      */
-    protected String requireNotEmptyProperty(String propertyName) throws MCRConfigurationException{
+    protected String requireNotEmptyProperty(String propertyName) throws MCRConfigurationException {
         final Map<String, String> properties = getProperties();
         if (!properties.containsKey(propertyName) && properties.get(propertyName).length() > 0) {
             throw new MCRConfigurationException(String
-                .format(Locale.ROOT,"The property %s%s.%s is empty or not set!", REGISTRATION_CONFIG_PREFIX, registrationServiceID,
+                .format(Locale.ROOT, "The property %s%s.%s is empty or not set!", REGISTRATION_CONFIG_PREFIX,
+                    registrationServiceID,
                     propertyName));
         }
         return properties.get(propertyName);

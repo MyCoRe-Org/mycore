@@ -57,9 +57,9 @@ public class MCRLayoutService {
     static final Logger LOGGER = LogManager.getLogger(MCRLayoutService.class);
 
     private static final MCRLayoutService SINGLETON = new MCRLayoutService();
-    
+
     private static final String TRANSFORMER_FACTORY_PROPERTY = "MCR.Layout.Transformer.Factory";
-    
+
     public static MCRLayoutService instance() {
         return SINGLETON;
     }

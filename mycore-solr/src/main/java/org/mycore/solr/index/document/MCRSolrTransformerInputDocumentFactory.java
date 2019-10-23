@@ -67,8 +67,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
             if (isJAXBTransformer) {
                 MCRParameterCollector param = new MCRParameterCollector();
                 @SuppressWarnings("unchecked")
-                MCRXSL2JAXBTransformer<MCRSolrInputDocumentList> jaxbTransformer = (MCRXSL2JAXBTransformer<MCRSolrInputDocumentList>) transformer;
-                MCRSolrInputDocumentList input = jaxbTransformer.getJAXBObject(content, param);
+                MCRSolrInputDocumentList input = ((MCRXSL2JAXBTransformer<MCRSolrInputDocumentList>) transformer)
+                    .getJAXBObject(content, param);
                 document = MCRSolrInputDocumentGenerator.getSolrInputDocument(input.getDoc().iterator().next());
             } else {
                 MCRContent result = transformer.transform(content);
@@ -99,8 +99,8 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
             if (isJAXBTransformer) {
                 MCRParameterCollector param = new MCRParameterCollector();
                 @SuppressWarnings("unchecked")
-                MCRXSL2JAXBTransformer<MCRSolrInputDocumentList> jaxbTransformer = (MCRXSL2JAXBTransformer<MCRSolrInputDocumentList>) transformer;
-                MCRSolrInputDocumentList input = jaxbTransformer.getJAXBObject(new MCRJDOMContent(doc), param);
+                MCRSolrInputDocumentList input = ((MCRXSL2JAXBTransformer<MCRSolrInputDocumentList>) transformer)
+                    .getJAXBObject(new MCRJDOMContent(doc), param);
                 return MCRSolrInputDocumentGenerator.getSolrInputDocuments(input.getDoc()).iterator();
             } else {
                 MCRContent result = transformer.transform(new MCRJDOMContent(doc));
@@ -115,7 +115,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
         JDOMException {
         final Iterator<Element> delegate;
         delegate = result.asXML().getRootElement().getChildren("doc").iterator();
-        return new Iterator<SolrInputDocument>() {
+        return new Iterator<>() {
 
             @Override
             public boolean hasNext() {

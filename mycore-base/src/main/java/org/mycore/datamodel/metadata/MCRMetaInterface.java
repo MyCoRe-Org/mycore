@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.metadata;
 
+import org.jdom2.Element;
 import org.mycore.common.MCRException;
 
 import com.google.gson.JsonObject;
@@ -81,30 +82,30 @@ public interface MCRMetaInterface extends Cloneable {
     /**
      * This methode set the default language to the class.
      * 
-     * @param default_lang
-     *            the default language
+     * @param lang
+     *            the language
      */
-    void setLang(String default_lang);
+    void setLang(String lang);
 
     /**
-     * This method set the subtag element. If the value of <em>set_subtag</em>
+     * This method set the subtag element. If the value of <em>subtag</em>
      * is null or empty an exception is throwed.
      * 
-     * @param set_subtag
+     * @param subtag
      *            the subtag
      * @exception MCRException
-     *                if the set_subtag value is null or empty
+     *                if the subtag value is null or empty
      */
-    void setSubTag(String set_subtag) throws MCRException;
+    void setSubTag(String subtag) throws MCRException;
 
     /**
-     * This method set the type element. If the value of <em>set_type</em> is
+     * This method set the type element. If the value of <em>type</em> is
      * null or empty nothing was changed.
      * 
-     * @param set_type
+     * @param type
      *            the optional type
      */
-    void setType(String set_type);
+    void setType(String type);
 
     /**
      * This method read the XML input stream part from a DOM part for the
@@ -113,7 +114,7 @@ public interface MCRMetaInterface extends Cloneable {
      * @param element
      *            a relevant JDOM element for the metadata
      */
-    void setFromDOM(org.jdom2.Element element);
+    void setFromDOM(Element element);
 
     /**
      * This method create a XML stream for a metadata part.
@@ -122,7 +123,7 @@ public interface MCRMetaInterface extends Cloneable {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML data of the metadata part
      */
-    org.jdom2.Element createXML() throws MCRException;
+    Element createXML() throws MCRException;
 
     /**
      * This method creates a JSON representation of the metadata part.
@@ -148,7 +149,7 @@ public interface MCRMetaInterface extends Cloneable {
     /**
      * This method make a clone of this class.
      */
-     MCRMetaInterface clone();
+    MCRMetaInterface clone();
 
     /**
      * This method put debug data to the logger (for the debug mode).

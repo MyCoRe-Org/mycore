@@ -232,7 +232,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
 
         private int pos;
 
-        public MCRDirectoryIterator(MCRDirectoryStream mcrDirectoryStream) {
+        MCRDirectoryIterator(MCRDirectoryStream mcrDirectoryStream) {
             this.mcrDirectoryStream = mcrDirectoryStream;
             children = mcrDirectoryStream.dir.getChildren();
             this.nextPath = null;
@@ -294,7 +294,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
 
         private Path fileName;
 
-        public BasicFileAttributeViewImpl(MCRDirectoryStream mcrDirectoryStream, Path path) {
+        BasicFileAttributeViewImpl(MCRDirectoryStream mcrDirectoryStream, Path path) {
             this.mcrDirectoryStream = mcrDirectoryStream;
             if (path.toString().length() <= 2 && (path.toString().equals(".") || path.toString().equals(".."))) {
                 throw new InvalidPathException(path.toString(), "'path' must be a valid file name.");
@@ -322,7 +322,7 @@ public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
     private static class MD5FileAttributeViewImpl extends BasicFileAttributeViewImpl implements
         MCRMD5AttributeView<String> {
 
-        public MD5FileAttributeViewImpl(MCRDirectoryStream mcrDirectoryStream, Path path) {
+        MD5FileAttributeViewImpl(MCRDirectoryStream mcrDirectoryStream, Path path) {
             super(mcrDirectoryStream, path);
             // TODO Auto-generated constructor stub
         }

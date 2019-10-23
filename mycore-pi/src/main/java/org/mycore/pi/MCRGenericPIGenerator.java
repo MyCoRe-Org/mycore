@@ -48,7 +48,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * You can also map the projectid
  *
- * Set a optional Count precision, if not set or set to -1 the pure number is used (1,2,.., 999). Count always relativ to type and date.
+ * Set a optional Count precision, if not set or set to -1 the pure number is used (1,2,.., 999).
+ * Count always relativ to type and date.
  *
  * MCR.PI.Generator.myGenerator.CountPrecision=3 # will produce 001, 002, ... , 999
  *
@@ -169,7 +170,6 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_PROJECT, mappedObjectProject);
         }
 
-
         if (resultingPI.contains(PLACE_HOLDER_OBJECT_NUMBER)) {
             resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_NUMBER, mcrBase.getId().getNumberAsString());
         }
@@ -200,9 +200,9 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             if (countPrecision == -1) {
                 regexpStr = "([0-9]+)";
             } else {
-                regexpStr =
-                    "(" + IntStream.range(0, countPrecision).mapToObj((i) -> "[0-9]").collect(Collectors.joining(""))
-                        + ")";
+                regexpStr = "("
+                    + IntStream.range(0, countPrecision).mapToObj((i) -> "[0-9]").collect(Collectors.joining(""))
+                    + ")";
             }
 
             String counterPattern = resultingPI.replace(PLACE_HOLDER_COUNT, regexpStr);
@@ -217,8 +217,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             final String pattern = IntStream.range(0, Math.abs(countPrecision)).mapToObj((i) -> "0")
                 .collect(Collectors.joining(""));
             DecimalFormat decimalFormat = new DecimalFormat(pattern, DecimalFormatSymbols.getInstance(Locale.ROOT));
-            final String countAsString =
-                countPrecision != -1 ? decimalFormat.format(count) : String.valueOf(count);
+            final String countAsString = countPrecision != -1 ? decimalFormat.format(count) : String.valueOf(count);
             result = resultingPI.replace(PLACE_HOLDER_COUNT, countAsString);
         } else {
             result = resultingPI;

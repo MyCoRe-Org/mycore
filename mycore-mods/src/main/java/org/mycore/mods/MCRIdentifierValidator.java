@@ -70,9 +70,7 @@ public class MCRIdentifierValidator {
                 }
                 checkSum += digit;
             }
-            if (checkSum % 10 == 0) {
-                return true;
-            }
+            return checkSum % 10 == 0;
         }
         return false;
     }

@@ -45,7 +45,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     private static MCRAccessInterface SINGLETON;
 
-    protected static final String AccessPermissions = MCRConfiguration.instance().getString(
+    protected static final String ACCESS_PERMISSIONS = MCRConfiguration.instance().getString(
         "MCR.Access.AccessPermissions", "read,write,delete");
 
     /** the logger */
@@ -73,7 +73,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#addRule(java.lang.String,
      *      java.lang.String, org.jdom2.Element)
      */
-    public void addRule(String id, String permission, org.jdom2.Element rule, String description) throws MCRException {
+    public void addRule(String id, String permission, Element rule, String description) throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl addRule for ID {} for permission {}", id, permission);
     }
 
@@ -121,7 +121,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#updateRule(java.lang.String,
      *      java.lang.String, org.jdom2.Element)
      */
-    public void updateRule(String id, String permission, org.jdom2.Element rule, String description)
+    public void updateRule(String id, String permission, Element rule, String description)
         throws MCRException {
         LOGGER.debug("Execute MCRAccessBaseImpl updateRule for ID {} for permission {}", id, permission);
     }
@@ -311,7 +311,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @return the permissions as List
      */
     public Collection<String> getAccessPermissionsFromConfiguration() {
-        String[] permissions = AccessPermissions.split(",");
+        String[] permissions = ACCESS_PERMISSIONS.split(",");
         return Arrays.asList(permissions);
     }
 

@@ -56,8 +56,8 @@ public class MCRMetaXML extends MCRMetaDefault {
         super();
     }
 
-    public MCRMetaXML(String set_subtag, String set_type, int set_inherited) throws MCRException {
-        super(set_subtag, null, set_type, set_inherited);
+    public MCRMetaXML(String subtag, String type, int inherited) throws MCRException {
+        super(subtag, null, type, inherited);
     }
 
     /**
@@ -68,7 +68,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      *            a relevant JDOM element for the metadata
      */
     @Override
-    public void setFromDOM(org.jdom2.Element element) {
+    public void setFromDOM(Element element) {
         super.setFromDOM(element);
         content = element.cloneContent();
     }
@@ -94,7 +94,7 @@ public class MCRMetaXML extends MCRMetaDefault {
      * @return a JDOM Element with the XML MCRMetaLangText part
      */
     @Override
-    public org.jdom2.Element createXML() throws MCRException {
+    public Element createXML() throws MCRException {
         Element elm = super.createXML();
         List<Content> addedContent = new ArrayList<>(content.size());
         cloneListContent(addedContent, content);

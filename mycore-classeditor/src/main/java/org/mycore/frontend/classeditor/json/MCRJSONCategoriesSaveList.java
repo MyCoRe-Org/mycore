@@ -20,10 +20,10 @@ package org.mycore.frontend.classeditor.json;
 
 import java.util.ArrayList;
 
+import javax.ws.rs.WebApplicationException;
+
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-
-import javax.ws.rs.WebApplicationException;
 
 public class MCRJSONCategoriesSaveList {
     ArrayList<CategorySaveElement> updateList = new ArrayList<>();
@@ -31,7 +31,7 @@ public class MCRJSONCategoriesSaveList {
     ArrayList<CategorySaveElement> deleteList = new ArrayList<>();
 
     public void add(MCRCategory categ, MCRCategoryID parentID, int index, String status)
-            throws WebApplicationException {
+        throws WebApplicationException {
         if ("updated".equals(status)) {
             updateList.add(new CategorySaveElement(categ, parentID, index));
         } else if ("deleted".equals(status)) {
@@ -43,7 +43,9 @@ public class MCRJSONCategoriesSaveList {
 
     private class CategorySaveElement {
         private MCRCategory categ;
+
         private MCRCategoryID parentID;
+
         private int index;
 
         CategorySaveElement(MCRCategory categ, MCRCategoryID parentID, int index) {

@@ -57,9 +57,8 @@ public class MCRShutdownServer {
             Statement statement = con.createStatement()) {
             statement.execute("SHUTDOWN");
         } catch (SQLException e) {
-            if (e.getErrorCode() == -1305 && "08006".equals(e.getSQLState())) {
-                //ignore EOF Exception on closing connection, database shutdown to fast
-            } else {
+            if (!(e.getErrorCode() == -1305 && "08006".equals(e.getSQLState()))) {
+                //ignore EOF Exception on closing connection, database shutdown to faster {
                 System.err.printf(Locale.ROOT, "Error while shutting down HSQLDB.%nCode: %d%nState: %s%nMessage: %s%n",
                     e.getErrorCode(), e.getSQLState(), e.getMessage());
             }
@@ -83,7 +82,7 @@ public class MCRShutdownServer {
 
         HashMap<String, String> properties;
 
-        public PropertyHandler(XMLReader parent) {
+        PropertyHandler(XMLReader parent) {
             super(parent);
             this.properties = new HashMap<>();
         }

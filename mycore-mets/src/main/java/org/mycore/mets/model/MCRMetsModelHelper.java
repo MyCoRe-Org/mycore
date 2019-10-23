@@ -55,7 +55,7 @@ public class MCRMetsModelHelper {
         if ("transcription".equals(teiType)) {
             return Optional.of(TRANSCRIPTION_USE);
         } else if (teiType.startsWith("translation.")) {
-            final String translation = teiType.split("[.]",2)[1];
+            final String translation = teiType.split("[.]", 2)[1];
             if (!ALLOWED_TRANSLATION.contains(translation)) {
                 LOGGER.warn(
                     "Can not detect file group because " + translation + " is not in list of allowed translations "

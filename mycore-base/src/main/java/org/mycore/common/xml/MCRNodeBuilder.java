@@ -74,18 +74,20 @@ public class MCRNodeBuilder {
 
     public Object buildNode(String xPath, String value, Parent parent) throws JaxenException {
         BaseXPath baseXPath = new BaseXPath(xPath, new DocumentNavigator());
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("start building {} relative to {}", simplify(xPath), MCRXPathBuilder.buildXPath(parent));
+        }
         return buildExpression(baseXPath.getRootExpr(), value, parent);
     }
 
     private Object buildExpression(Expr expression, String value, Parent parent) throws JaxenException {
-        if (expression instanceof EqualityExpr)
+        if (expression instanceof EqualityExpr) {
             return buildEqualityExpression((EqualityExpr) expression, parent);
-        else if (expression instanceof LocationPath)
+        } else if (expression instanceof LocationPath) {
             return buildLocationPath((LocationPath) expression, value, parent);
-        else
+        } else {
             return canNotBuild(expression);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -99,22 +101,26 @@ public class MCRNodeBuilder {
             existingNode = evaluateFirst(xPath, parent);
 
             if (existingNode instanceof Element) {
-                if (LOGGER.isDebugEnabled())
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("element already existing");
+                }
                 parent = (Element) existingNode;
                 break;
             } else if (existingNode instanceof Attribute) {
-                if (LOGGER.isDebugEnabled())
+                if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("attribute already existing");
+                }
                 break;
-            } else if (LOGGER.isDebugEnabled())
+            } else if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("{} does not exist or is not a node, will try to build it", xPath);
+            }
         }
 
-        if (i == indexOfLastStep)
+        if (i == indexOfLastStep) {
             return existingNode;
-        else
+        } else {
             return buildLocationSteps(steps.subList(i + 1, steps.size()), value, parent);
+        }
     }
 
     private Object evaluateFirst(String xPath, Parent parent) {
@@ -123,8 +129,9 @@ public class MCRNodeBuilder {
 
     private String buildXPath(List<Step> steps) {
         StringBuilder path = new StringBuilder();
-        for (Step step : steps)
+        for (Step step : steps) {
             path.append("/").append(step.getText());
+        }
         return simplify(path.substring(1));
     }
 
@@ -135,25 +142,28 @@ public class MCRNodeBuilder {
             Step step = iterator.next();
 
             built = buildStep(step, iterator.hasNext() ? null : value, parent);
-            if (built == null)
+            if (built == null) {
                 return parent;
-            else if (firstNodeBuilt == null)
+            } else if (firstNodeBuilt == null) {
                 firstNodeBuilt = built;
+            }
 
-            if (built instanceof Parent)
+            if (built instanceof Parent) {
                 parent = (Parent) built;
+            }
         }
 
         return built;
     }
 
     private Object buildStep(Step step, String value, Parent parent) throws JaxenException {
-        if (step instanceof NameStep)
+        if (step instanceof NameStep) {
             return buildNameStep((NameStep) step, value, parent);
-        else {
-            if (LOGGER.isDebugEnabled())
+        } else {
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("ignoring step, can not be built: {} {}", step.getClass().getName(),
                     simplify(step.getText()));
+            }
             return null;
         }
     }
@@ -165,36 +175,40 @@ public class MCRNodeBuilder {
         Namespace ns = prefix.isEmpty() ? Namespace.NO_NAMESPACE : MCRConstants.getStandardNamespace(prefix);
 
         if (nameStep.getAxis() == Axis.CHILD) {
-            if (parent instanceof Document)
+            if (parent instanceof Document) {
                 return buildPredicates(nameStep.getPredicates(), ((Document) parent).getRootElement());
-            else
+            } else {
                 return buildPredicates(nameStep.getPredicates(), buildElement(ns, name, value, (Element) parent));
+            }
         } else if (nameStep.getAxis() == Axis.ATTRIBUTE) {
             return buildAttribute(ns, name, value, (Element) parent);
         } else {
-            if (LOGGER.isDebugEnabled())
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("ignoring axis, can not be built: {} {}{}", nameStep.getAxis(),
                     prefix.isEmpty() ? "" : prefix + ":", name);
+            }
             return null;
         }
     }
 
     private Element buildPredicates(List<Predicate> predicates, Element parent) throws JaxenException {
-        for (Predicate predicate : predicates)
+        for (Predicate predicate : predicates) {
             new MCRNodeBuilder(variables).buildExpression(predicate.getExpr(), null, parent);
+        }
         return parent;
     }
 
     private Object buildEqualityExpression(EqualityExpr ee, Parent parent) throws JaxenException {
         if (ee.getOperator().equals("=")) {
-            if ((ee.getLHS() instanceof LocationPath) && (ee.getRHS() instanceof LiteralExpr))
+            if ((ee.getLHS() instanceof LocationPath) && (ee.getRHS() instanceof LiteralExpr)) {
                 return assignLiteral(ee.getLHS(), (LiteralExpr) (ee.getRHS()), parent);
-            else if ((ee.getRHS() instanceof LocationPath) && (ee.getLHS() instanceof LiteralExpr))
+            } else if ((ee.getRHS() instanceof LocationPath) && (ee.getLHS() instanceof LiteralExpr)) {
                 return assignLiteral(ee.getRHS(), (LiteralExpr) (ee.getLHS()), parent);
-            else if (ee.getLHS() instanceof LocationPath) {
+            } else if (ee.getLHS() instanceof LocationPath) {
                 String value = getValueOf(ee.getRHS().getText(), parent);
-                if (value != null)
+                if (value != null) {
                     return assignLiteral(ee.getLHS(), value, parent);
+                }
             }
         }
         return canNotBuild(ee);
@@ -210,14 +224,15 @@ public class MCRNodeBuilder {
     public String getValueOf(String xPath, Parent parent) {
         Object result = evaluateFirst(xPath, parent);
 
-        if (result instanceof String)
+        if (result instanceof String) {
             return (String) result;
-        else if (result instanceof Element)
+        } else if (result instanceof Element) {
             return ((Element) result).getText();
-        else if (result instanceof Attribute)
+        } else if (result instanceof Attribute) {
             return ((Attribute) result).getValue();
-        else
+        } else {
             return null;
+        }
     }
 
     private Object assignLiteral(Expr expression, LiteralExpr literal, Parent parent) throws JaxenException {
@@ -234,9 +249,9 @@ public class MCRNodeBuilder {
     private Object assignLiteral(Expr expression, String literal, Parent parent, String xPath) throws JaxenException {
         Object result = evaluateFirst(xPath, parent);
 
-        if ((result instanceof Element) || (result instanceof Attribute))
+        if ((result instanceof Element) || (result instanceof Attribute)) {
             return result;
-        else {
+        } else {
             xPath = simplify(expression.getText()) + "[9999]";
             return buildNode(xPath, literal, parent);
         }
@@ -244,21 +259,26 @@ public class MCRNodeBuilder {
 
     private Element buildElement(Namespace ns, String name, String value, Element parent) {
         Element element = new Element(name, ns);
-        if ((value != null) && !value.isEmpty())
+        if ((value != null) && !value.isEmpty()) {
             element.setText(value);
-        if (LOGGER.isDebugEnabled())
+        }
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("building new element {}", element.getName());
-        if (parent != null)
+        }
+        if (parent != null) {
             parent.addContent(element);
+        }
         return element;
     }
 
     private Attribute buildAttribute(Namespace ns, String name, String value, Element parent) {
         Attribute attribute = new Attribute(name, value == null ? "" : value, ns);
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("building new attribute {}", attribute.getName());
-        if (parent != null)
+        }
+        if (parent != null) {
             parent.setAttribute(attribute);
+        }
         return attribute;
     }
 
@@ -270,9 +290,10 @@ public class MCRNodeBuilder {
     }
 
     private Object canNotBuild(Expr expression) {
-        if (LOGGER.isDebugEnabled())
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("ignoring expression, can not be built: {} {}", expression.getClass().getName(),
                 simplify(expression.getText()));
+        }
         return null;
     }
 }

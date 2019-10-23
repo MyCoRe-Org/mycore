@@ -50,9 +50,6 @@ public class MCRPersistenceServletFilter implements Filter {
     public void destroy() {
     }
 
-    /* (non-Javadoc)
-     * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
-     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
@@ -89,7 +86,6 @@ public class MCRPersistenceServletFilter implements Filter {
     private String getURL(HttpServletRequest req) {
         String servletPath = req.getServletPath();
         String[] pathElements = servletPath.split("/");
-        String type = pathElements[2];
         String operation = pathElements[3];
         //get session for DB access
         MCRSession session = MCRServlet.getSession(req);

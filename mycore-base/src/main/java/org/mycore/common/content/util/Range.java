@@ -85,8 +85,7 @@ class Range {
                 try {
                     currentRange.start = Long.parseLong(rangeDefinition.substring(0, dashPos));
                     if (dashPos < rangeDefinition.length() - 1) {
-                        currentRange.end = Long.parseLong(rangeDefinition.substring(dashPos + 1,
-                            rangeDefinition.length()));
+                        currentRange.end = Long.parseLong(rangeDefinition.substring(dashPos + 1));
                     } else {
                         currentRange.end = fileLength - 1;
                     }

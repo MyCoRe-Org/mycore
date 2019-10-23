@@ -39,7 +39,6 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.condition.MCRPIObjectRegistrationConditionProvider;
-import org.mycore.pi.doi.MCRDOIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
@@ -201,8 +200,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * Tries to parse a identifier with a specific type.
      *
      * @param identifier the identifier to parse
-     * @return parsed identifier or {@link Optional#empty()} if there is no parser for the type or the parser can`t parse
-     * the identifier
+     * @return parsed identifier or {@link Optional#empty()} if there is no parser for the type
+     * or the parser can't parse the identifier
      * @throws ClassCastException when type does not match the type of T
      */
     protected Optional<T> parseIdentifier(String identifier) {
@@ -231,7 +230,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
      * Result of this will be passed to {@link MCRJobAction#name()}
      *
      * @param contextParameters the parameters of the job
-     * @return Some Information what this job will do or just {@link Optional#empty()}, then a default message is generated.
+     * @return Some Information what this job will do or just {@link Optional#empty()},
+     * then a default message is generated.
      */
     protected abstract Optional<String> getJobInformation(Map<String, String> contextParameters);
 
@@ -326,12 +326,11 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     }
 
     protected Predicate<MCRBase> getRegistrationCondition(String objectType) {
-        return Optional.ofNullable(getProperties().get(MCRDOIService.REGISTRATION_CONDITION_PROVIDER))
+        return Optional.ofNullable(getProperties().get(MCRPIJobService.REGISTRATION_CONDITION_PROVIDER))
             .map(clazz -> {
-                String errorMessageBegin =
-                    "Configured class " + clazz + "(" + MCRPIService.REGISTRATION_CONFIG_PREFIX
-                        + getServiceID() + "." + MCRDOIService.REGISTRATION_CONDITION_PROVIDER
-                        + ")";
+                String errorMessageBegin = "Configured class " + clazz + "(" + MCRPIService.REGISTRATION_CONFIG_PREFIX
+                    + getServiceID() + "." + MCRPIJobService.REGISTRATION_CONDITION_PROVIDER
+                    + ")";
                 try {
                     return MCRClassTools.forName(clazz)
                         .getConstructor()
@@ -354,7 +353,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
                 } catch (ClassCastException e) {
                     throw new MCRConfigurationException(
                         errorMessageBegin + " needs to extend " + MCRPIObjectRegistrationConditionProvider.class
-                            .getName(), e);
+                            .getName(),
+                        e);
                 }
             })
             .map(MCRPIObjectRegistrationConditionProvider.class::cast)

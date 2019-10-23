@@ -56,7 +56,7 @@ public final class MCRDerivate extends MCRBase {
     public static final String ROOT_NAME = "mycorederivate";
 
     // the object content
-    private MCRObjectDerivate mcr_derivate;
+    private MCRObjectDerivate mcrDerivate;
 
     private int order;
 
@@ -69,7 +69,7 @@ public final class MCRDerivate extends MCRBase {
      */
     public MCRDerivate() throws MCRException {
         super();
-        mcr_derivate = new MCRObjectDerivate(getId());
+        mcrDerivate = new MCRObjectDerivate(getId());
         order = 1;
     }
 
@@ -94,8 +94,8 @@ public final class MCRDerivate extends MCRBase {
      * 
      * @return the instance of the MCRObjectDerivate class
      */
-    public final MCRObjectDerivate getDerivate() {
-        return mcr_derivate;
+    public MCRObjectDerivate getDerivate() {
+        return mcrDerivate;
     }
 
     /**
@@ -107,12 +107,12 @@ public final class MCRDerivate extends MCRBase {
      *                general Exception of MyCoRe
      */
     @Override
-    protected final void setUp() throws MCRException {
+    protected void setUp() throws MCRException {
         super.setUp();
 
         // get the derivate data of the object
-        Element derivateElement = jdom_document.getRootElement().getChild("derivate");
-        mcr_derivate = new MCRObjectDerivate(mcr_id, derivateElement);
+        Element derivateElement = jdomDocument.getRootElement().getChild("derivate");
+        mcrDerivate = new MCRObjectDerivate(mcrId, derivateElement);
     }
 
     /**
@@ -123,12 +123,12 @@ public final class MCRDerivate extends MCRBase {
      * @return a JDOM Document with the XML data of the object as byte array
      */
     @Override
-    public final org.jdom2.Document createXML() throws MCRException {
+    public Document createXML() throws MCRException {
         Document doc = super.createXML();
         Element elm = doc.getRootElement();
         elm.setAttribute("order", String.valueOf(order));
-        elm.addContent(mcr_derivate.createXML());
-        elm.addContent(mcr_service.createXML());
+        elm.addContent(mcrDerivate.createXML());
+        elm.addContent(mcrService.createXML());
         return doc;
     }
 
@@ -140,7 +140,8 @@ public final class MCRDerivate extends MCRBase {
     /**
      * Reads all files and urns from the derivate.
      * 
-     * @return A {@link Map} which contains the files as key and the urns as value. If no URN assigned the map will be empty.
+     * @return A {@link Map} which contains the files as key and the urns as value.
+     * If no URN assigned the map will be empty.
      */
     public Map<String, String> getUrnMap() {
         Map<String, String> fileUrnMap = new HashMap<>();
@@ -172,11 +173,11 @@ public final class MCRDerivate extends MCRBase {
     /**
      * The method print all informations about this MCRObject.
      */
-    public final void debug() {
+    public void debug() {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("MCRDerivate ID : {}", mcr_id);
-            LOGGER.debug("MCRDerivate Label : {}", mcr_label);
-            LOGGER.debug("MCRDerivate Schema : {}", mcr_schema);
+            LOGGER.debug("MCRDerivate ID : {}", mcrId);
+            LOGGER.debug("MCRDerivate Label : {}", mcrLabel);
+            LOGGER.debug("MCRDerivate Schema : {}", mcrSchema);
             LOGGER.debug("");
         }
     }
@@ -216,7 +217,7 @@ public final class MCRDerivate extends MCRBase {
     @Override
     public void setId(MCRObjectID id) {
         super.setId(id);
-        this.mcr_derivate.setDerivateID(id);
+        this.mcrDerivate.setDerivateID(id);
     }
 
     public int getOrder() {

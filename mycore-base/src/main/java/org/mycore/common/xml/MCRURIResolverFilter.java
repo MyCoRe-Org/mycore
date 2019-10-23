@@ -89,10 +89,10 @@ public class MCRURIResolverFilter implements Filter {
                 try (ServletOutputStream out = response.getOutputStream()) {
                     out.write(origOutput.substring(0, pos).getBytes(characterEncoding));
                     out.write(insertBytes);
-                    out.write(origOutput.substring(pos, origOutput.length()).getBytes(characterEncoding));
+                    out.write(origOutput.substring(pos).getBytes(characterEncoding));
                     // delete debuglist
                     uriList.remove();
-                    LOGGER.debug("end filter: {}", origOutput.substring(origOutput.length() - 10, origOutput.length()));
+                    LOGGER.debug("end filter: {}", origOutput.substring(origOutput.length() - 10));
                 }
             } else {
                 LOGGER.debug("Sending original response");
@@ -183,7 +183,7 @@ public class MCRURIResolverFilter implements Filter {
             }
         }
 
-        public MyResponseWrapper(HttpServletResponse response) {
+        MyResponseWrapper(HttpServletResponse response) {
             super(response);
             output = new ByteArrayOutputStream(16 * 1024);
         }

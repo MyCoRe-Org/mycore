@@ -53,7 +53,7 @@ public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
     }
 
     @Test
-    public void testGetEmptyHistoryStart(){
+    public void testGetEmptyHistoryStart() {
         //MCR-1979
         assertFalse("No earliest timestamp should be present", MCRMetadataHistoryManager.getHistoryStart().isPresent());
     }

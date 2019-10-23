@@ -20,9 +20,6 @@ package org.mycore.frontend.jersey.access;
 
 import org.apache.logging.log4j.LogManager;
 import org.glassfish.hk2.api.Factory;
-import org.glassfish.hk2.utilities.Binder;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.process.internal.RequestScoped;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSystemUserInformation;
 
@@ -43,7 +40,7 @@ public class MCRRequestScopeACLFactory implements Factory<MCRRequestScopeACL> {
 
         private boolean isPrivate;
 
-        public MCRRequestScopeACLImpl() {
+        MCRRequestScopeACLImpl() {
             LogManager.getLogger().debug("Constructor called");
             this.isPrivate = false;
         }

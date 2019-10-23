@@ -20,7 +20,6 @@ package org.mycore.restapi.v1.utils;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
@@ -132,6 +131,7 @@ public class MCRRestAPIObjectsHelper {
             if (eDerObjects != null) {
                 for (Element eDer : eDerObjects.getChildren("derobject")) {
                     String derID = eDer.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+                    Element currentDerElement = eDer;
                     try {
                         MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID));
                         eDer.addContent(der.createXML().getRootElement().detach());
@@ -139,16 +139,17 @@ public class MCRRestAPIObjectsHelper {
                         //<mycorederivate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:noNamespaceSchemaLocation="datamodel-derivate.xsd" ID="cpr_derivate_00003760" label="display_image" version="1.3">
                         //  <derivate display="true">
 
-                        eDer = eDer.getChild("mycorederivate").getChild("derivate");
+                        currentDerElement = eDer.getChild("mycorederivate").getChild("derivate");
                         Document docContents = listDerivateContentAsXML(
                             MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID)), "/", -1, info, app);
                         if (docContents.hasRootElement()) {
                             eDer.addContent(docContents.getRootElement().detach());
                         }
                     } catch (MCRException e) {
-                        eDer.addContent(new Comment("Error: Derivate not found."));
+                        currentDerElement.addContent(new Comment("Error: Derivate not found."));
                     } catch (IOException e) {
-                        eDer.addContent(new Comment("Error: Derivate content could not be listed: " + e.getMessage()));
+                        currentDerElement
+                            .addContent(new Comment("Error: Derivate content could not be listed: " + e.getMessage()));
                     }
                 }
             }
@@ -157,11 +158,11 @@ public class MCRRestAPIObjectsHelper {
         StringWriter sw = new StringWriter();
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         try {
-            String filter_id = MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.XML","");
-            if (filter_id.length() > 0) {
-                MCRContentTransformer trans = MCRContentTransformerFactory.getTransformer(filter_id);
-                Document filtered_doc = trans.transform(new MCRJDOMContent(doc)).asXML();
-                outputter.output(filtered_doc, sw);
+            String filterId = MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.XML", "");
+            if (filterId.length() > 0) {
+                MCRContentTransformer trans = MCRContentTransformerFactory.getTransformer(filterId);
+                Document filteredDoc = trans.transform(new MCRJDOMContent(doc)).asXML();
+                outputter.output(filteredDoc, sw);
             } else {
                 outputter.output(doc, sw);
             }
@@ -196,7 +197,7 @@ public class MCRRestAPIObjectsHelper {
             StringWriter sw = new StringWriter();
             XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
             outputter.output(doc, sw);
-            
+
             return Response.ok(sw.toString())
                 .type("application/xml")
                 .build();
@@ -323,9 +324,7 @@ public class MCRRestAPIObjectsHelper {
 
         //analyze format
 
-        if (format.equals(MCRRestAPIObjects.FORMAT_JSON) || format.equals(MCRRestAPIObjects.FORMAT_XML)) {
-            //ok
-        } else {
+        if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
             errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The parameter 'format' is wrong.",
                 "Allowed values for format are 'json' or 'xml'."));
         }
@@ -349,7 +348,8 @@ public class MCRRestAPIObjectsHelper {
                     if (!validateDateInput(s.substring(19))) {
                         errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
                             "The parameter 'filter' is wrong.",
-                            "The value of lastModifiedBefore could not be parsed. Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
+                            "The value of lastModifiedBefore could not be parsed. "
+                                + "Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
                         continue;
                     }
                     if (lastModifiedBefore == null) {
@@ -364,7 +364,8 @@ public class MCRRestAPIObjectsHelper {
                     if (!validateDateInput(s.substring(18))) {
                         errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER,
                             "The parameter 'filter' is wrong.",
-                            "The value of lastModifiedAfter could not be parsed. Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
+                            "The value of lastModifiedAfter could not be parsed. "
+                                + "Please use UTC syntax: yyyy-MM-dd'T'HH:mm:ss'Z'."));
                         continue;
                     }
                     if (lastModifiedAfter == null) {
@@ -377,7 +378,8 @@ public class MCRRestAPIObjectsHelper {
 
                 errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The parameter 'filter' is wrong.",
                     "The syntax of the filter '" + s
-                        + "'could not be parsed. The syntax should be [filterName]:[value]. Allowed filterNames are 'project', 'type', 'lastModifiedBefore' and 'lastModifiedAfter'."));
+                        + "'could not be parsed. The syntax should be [filterName]:[value]. "
+                        + "Allowed filterNames are 'project', 'type', 'lastModifiedBefore' and 'lastModifiedAfter'."));
             }
         }
 
@@ -429,11 +431,13 @@ public class MCRRestAPIObjectsHelper {
             objIdDates = new ArrayList<>();
             for (MCRObjectIDDate oid : testObjIdDates) {
                 String test = SDF_UTC.format(oid.getLastModified());
-                if (lastModifiedAfter != null && test.compareTo(lastModifiedAfter) < 0)
+                if (lastModifiedAfter != null && test.compareTo(lastModifiedAfter) < 0) {
                     continue;
+                }
                 if (lastModifiedBefore != null
-                    && lastModifiedBefore.compareTo(test.substring(0, lastModifiedBefore.length())) < 0)
+                    && lastModifiedBefore.compareTo(test.substring(0, lastModifiedBefore.length())) < 0) {
                     continue;
+                }
                 objIdDates.add(oid);
             }
         }
@@ -529,9 +533,7 @@ public class MCRRestAPIObjectsHelper {
 
         //analyze format
 
-        if (format.equals(MCRRestAPIObjects.FORMAT_JSON) || format.equals(MCRRestAPIObjects.FORMAT_XML)) {
-            //ok
-        } else {
+        if (!format.equals(MCRRestAPIObjects.FORMAT_JSON) && !format.equals(MCRRestAPIObjects.FORMAT_XML)) {
             errors.add(new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The Parameter format is wrong.",
                 "Allowed values for format are 'json' or 'xml'."));
         }
@@ -747,8 +749,9 @@ public class MCRRestAPIObjectsHelper {
      */
     private static boolean validateDateInput(String test) {
         String base = "0000-00-00T00:00:00Z";
-        if (test.length() > base.length())
+        if (test.length() > base.length()) {
             return false;
+        }
         test = test + base.substring(test.length());
         try {
             SDF_UTC.parse(test);
@@ -802,11 +805,7 @@ public class MCRRestAPIObjectsHelper {
             key = idString.substring(0, pos);
             idString = idString.substring(pos + 1);
             if (!key.equals("mcr")) {
-                try {
-                    idString = URLDecoder.decode(idString, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    //will not happen
-                }
+                idString = URLDecoder.decode(idString, StandardCharsets.UTF_8);
                 //ToDo - Shall we restrict the key set with a property?
 
                 //throw new MCRRestAPIException(MCRRestAPIError.create(Response.Status.BAD_REQUEST,
@@ -922,7 +921,7 @@ public class MCRRestAPIObjectsHelper {
     public static boolean hasChildren(Path p) {
         try {
             if (Files.isDirectory(p)) {
-                try(DirectoryStream<Path> ds = Files.newDirectoryStream(p)){
+                try (DirectoryStream<Path> ds = Files.newDirectoryStream(p)) {
                     return ds.iterator().hasNext();
                 }
             }

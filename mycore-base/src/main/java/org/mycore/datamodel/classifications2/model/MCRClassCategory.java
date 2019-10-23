@@ -65,7 +65,7 @@ public class MCRClassCategory {
 
     public List<MCRLabel> getLabel() {
         if (label == null) {
-            label = new ArrayList<MCRLabel>();
+            label = new ArrayList<>();
         }
         return this.label;
     }
@@ -81,7 +81,7 @@ public class MCRClassCategory {
     @JsonProperty("categories")
     public List<MCRClassCategory> getCategory() {
         if (category == null) {
-            category = new ArrayList<MCRClassCategory>();
+            category = new ArrayList<>();
         }
         return this.category;
     }

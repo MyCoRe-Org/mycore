@@ -85,6 +85,24 @@ class MCREventHandler {
         jEvent.addProperty("user", userID);
     }
 
+    private static void copyServiceDateToProperty(MCRBase obj, JsonObject jsonObj, String dateType,
+        String propertyName) {
+        Optional.ofNullable(obj.getService().getDate(dateType))
+            .map(Date::toInstant)
+            .map(Instant::toString)
+            .ifPresent(d -> jsonObj.addProperty(propertyName, d));
+    }
+
+    private static void copyFlagToProperty(MCRBase obj, JsonObject json, String flagName, String propertyName) {
+        obj.getService()
+            .getFlags(flagName)
+            .stream()
+            .findFirst()
+            .ifPresent(c -> {
+                json.addProperty(propertyName, c);
+            });
+    }
+
     public static class MCRObjectHandler implements org.mycore.common.events.MCREventHandler {
         private final SseBroadcaster sseBroadcaster;
 
@@ -92,7 +110,7 @@ class MCREventHandler {
 
         private final Function<URI, URI> uriResolver;
 
-        public MCRObjectHandler(SseBroadcaster sseBroadcaster, Sse sse,
+        MCRObjectHandler(SseBroadcaster sseBroadcaster, Sse sse,
             Function<URI, URI> uriResolver) {
             this.sseBroadcaster = sseBroadcaster;
             this.sse = sse;
@@ -148,24 +166,6 @@ class MCREventHandler {
         }
     }
 
-    private static void copyServiceDateToProperty(MCRBase obj, JsonObject jsonObj, String dateType,
-        String propertyName) {
-        Optional.ofNullable(obj.getService().getDate(dateType))
-            .map(Date::toInstant)
-            .map(Instant::toString)
-            .ifPresent(d -> jsonObj.addProperty(propertyName, d));
-    }
-
-    private static void copyFlagToProperty(MCRBase obj, JsonObject json, String flagName, String propertyName) {
-        obj.getService()
-            .getFlags(flagName)
-            .stream()
-            .findFirst()
-            .ifPresent(c -> {
-                json.addProperty(propertyName, c);
-            });
-    }
-
     public static class MCRDerivateHandler implements org.mycore.common.events.MCREventHandler {
         private final SseBroadcaster sseBroadcaster;
 
@@ -173,8 +173,7 @@ class MCREventHandler {
 
         private final Function<URI, URI> uriResolver;
 
-        public MCRDerivateHandler(SseBroadcaster sseBroadcaster, Sse sse,
-            Function<URI, URI> uriResolver) {
+        MCRDerivateHandler(SseBroadcaster sseBroadcaster, Sse sse, Function<URI, URI> uriResolver) {
             this.sseBroadcaster = sseBroadcaster;
             this.sse = sse;
             this.uriResolver = uriResolver;
@@ -208,7 +207,7 @@ class MCREventHandler {
             JsonObject event = new JsonObject();
             event.addProperty("id", der.getId().toString());
             event.addProperty("uri",
-                uriResolver.apply(getPathURI("objects/" + der.getOwnerID())).toString() + "/derivates/" + der.getId());
+                uriResolver.apply(getPathURI("objects/" + der.getOwnerID())) + "/derivates/" + der.getId());
             event.addProperty("object", der.getOwnerID().toString());
             event.addProperty("objectUri", uriResolver.apply(getPathURI("objects/" + der.getOwnerID())).toString());
             copyFlagToProperty(der, event, "createdby", "createdBy");
@@ -233,8 +232,7 @@ class MCREventHandler {
 
         private final Function<URI, URI> uriResolver;
 
-        public MCRPathHandler(SseBroadcaster sseBroadcaster, Sse sse,
-            Function<URI, URI> uriResolver, ServletContext context) {
+        MCRPathHandler(SseBroadcaster sseBroadcaster, Sse sse, Function<URI, URI> uriResolver, ServletContext context) {
             this.sseBroadcaster = sseBroadcaster;
             this.sse = sse;
             this.context = context;

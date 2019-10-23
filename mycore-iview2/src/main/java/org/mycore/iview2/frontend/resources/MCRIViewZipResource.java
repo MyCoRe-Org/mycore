@@ -95,7 +95,7 @@ public class MCRIViewZipResource {
             try {
                 final ZipArchiveOutputStream zipStream = new ZipArchiveOutputStream(new BufferedOutputStream(out));
                 zipStream.setLevel(Deflater.BEST_SPEED);
-                SimpleFileVisitor<java.nio.file.Path> zipper = new SimpleFileVisitor<java.nio.file.Path>() {
+                SimpleFileVisitor<java.nio.file.Path> zipper = new SimpleFileVisitor<>() {
                     @Override
                     public FileVisitResult visitFile(java.nio.file.Path file, BasicFileAttributes attrs)
                         throws IOException {

@@ -57,7 +57,7 @@ public class MCRConfigurationInputStream extends InputStream {
     private static final String MYCORE_PROPERTIES = "mycore.properties";
 
     // latin1 for properties
-    private static final byte[] lbr = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] LINE_BREAK = System.getProperty("line.separator").getBytes(StandardCharsets.ISO_8859_1);
 
     InputStream in;
 
@@ -97,7 +97,7 @@ public class MCRConfigurationInputStream extends InputStream {
         InputStream initStream = null;
         if (configurationDirectory != null) {
             LogManager.getLogger().info("Current configuration directory: {}",
-                    configurationDirectory.getAbsolutePath());
+                configurationDirectory.getAbsolutePath());
             // set MCR.basedir, is normally overwritten later
             if (configurationDirectory.isDirectory()) {
                 initStream = getBaseDirInputStream(configurationDirectory);
@@ -125,25 +125,25 @@ public class MCRConfigurationInputStream extends InputStream {
                 cList.add(new ByteArrayInputStream(comment.getBytes(StandardCharsets.ISO_8859_1)));
                 cList.add(is);
                 //workaround if last property is not terminated with line break
-                cList.add(new ByteArrayInputStream(lbr));
+                cList.add(new ByteArrayInputStream(LINE_BREAK));
             } else {
                 cList.add(new ByteArrayInputStream(
-                        ("# Unable to find " + filename + " in " + component.getResourceBase() + "\n")
-                                .getBytes(StandardCharsets.ISO_8859_1)));
+                    ("# Unable to find " + filename + " in " + component.getResourceBase() + "\n")
+                        .getBytes(StandardCharsets.ISO_8859_1)));
             }
         }
         InputStream propertyStream = getConfigFileStream(filename);
         if (propertyStream != null) {
             empty = false;
             cList.add(propertyStream);
-            cList.add(new ByteArrayInputStream(lbr));
+            cList.add(new ByteArrayInputStream(LINE_BREAK));
         }
         File localProperties = MCRConfigurationDir.getConfigFile(filename);
         if (localProperties != null && localProperties.canRead()) {
             empty = false;
             LogManager.getLogger().info("Loading additional properties from {}", localProperties.getAbsolutePath());
             cList.add(new FileInputStream(localProperties));
-            cList.add(new ByteArrayInputStream(lbr));
+            cList.add(new ByteArrayInputStream(LINE_BREAK));
         }
         return Collections.enumeration(cList);
     }
@@ -191,7 +191,7 @@ public class MCRConfigurationInputStream extends InputStream {
                 cList.add(IOUtils.toByteArray(configStream));
             }
         }
-        
+
         //load config file from app config dir
         File localConfigFile = MCRConfigurationDir.getConfigFile(filename);
         if (localConfigFile != null && localConfigFile.canRead()) {
@@ -244,7 +244,7 @@ public class MCRConfigurationInputStream extends InputStream {
     }
 
     @Override
-    public int read(byte b[], int off, int len) throws IOException {
+    public int read(byte[] b, int off, int len) throws IOException {
         if (in == null) {
             return -1;
         }

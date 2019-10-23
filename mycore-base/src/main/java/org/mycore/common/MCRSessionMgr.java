@@ -66,7 +66,7 @@ public class MCRSessionMgr {
 
     private static ThreadLocal<Boolean> isSessionAttached = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
-    private static ThreadLocal<Boolean> isSessionCreationLocked = new ThreadLocal<Boolean>() {
+    private static ThreadLocal<Boolean> isSessionCreationLocked = new ThreadLocal<>() {
         @Override
         protected Boolean initialValue() {
             return Boolean.TRUE;
@@ -105,7 +105,7 @@ public class MCRSessionMgr {
         if (hasCurrentSession()) {
             MCRSession currentSession = getCurrentSession();
             if (currentSession != theSession && currentSession.getID() != null) {
-                LOGGER.error("Current session will be released: " + currentSession.toString(),
+                LOGGER.error("Current session will be released: " + currentSession,
                     new MCRException("Current thread already has a session attached!"));
                 releaseCurrentSession();
             }

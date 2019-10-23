@@ -29,10 +29,10 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -46,11 +46,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -66,6 +70,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.streams.MCRDevNull;
 import org.mycore.common.content.streams.MCRMD5InputStream;
+import org.mycore.common.function.MCRThrowableTask;
 import org.mycore.datamodel.niofs.MCRPathUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -327,18 +332,14 @@ public class MCRUtils {
             iterations = 0;
         }
         byte[] data;
-        try {
-            digest = MessageDigest.getInstance(algorithm);
-            text = Normalizer.normalize(text, Form.NFC);
-            if (salt != null) {
-                digest.update(salt);
-            }
-            data = digest.digest(text.getBytes("UTF-8"));
-            for (int i = 0; i < iterations; i++) {
-                data = digest.digest(data);
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException("Could not get " + algorithm + " checksum", e);
+        digest = MessageDigest.getInstance(algorithm);
+        text = Normalizer.normalize(text, Form.NFC);
+        if (salt != null) {
+            digest.update(salt);
+        }
+        data = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+        for (int i = 0; i < iterations; i++) {
+            data = digest.digest(data);
         }
         return toHexString(data);
     }
@@ -455,16 +456,16 @@ public class MCRUtils {
         String sizeText;
         double sizeValue;
 
-        if (bytes >= 1024 * 1024) // >= 1 MB
-        {
+        if (bytes >= 1024 * 1024) {
+            // >= 1 MB
             sizeUnit = "MB";
             sizeValue = (double) Math.round(bytes / 10485.76) / 100;
-        } else if (bytes >= 5 * 1024) // >= 5 KB
-        {
+        } else if (bytes >= 5 * 1024) {
+            // >= 5 KB
             sizeUnit = "KB";
             sizeValue = (double) Math.round(bytes / 102.4) / 10;
-        } else // < 5 KB
-        {
+        } else {
+            // < 5 KB
             sizeUnit = "Byte";
             sizeValue = bytes;
         }
@@ -513,5 +514,47 @@ public class MCRUtils {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw)); // closing string writer has no effect
         return sw.toString();
+    }
+
+    /**
+     * Checks is trimmed <code>value</code> is not empty.
+     * @param value String to test
+     * @return <em>empty</em> if value is <code>null</code> or empty after trimming.
+     */
+    public static Optional<String> filterTrimmedNotEmpty(String value) {
+        return Optional.ofNullable(value)
+            .map(String::trim)
+            .filter(s -> !s.isEmpty());
+    }
+
+    /**
+     * Measures the time of a method call.
+     * timeHandler is guaranteed to be called even if exception is thrown.
+     * @param unit time unit for timeHandler
+     * @param timeHandler gets the duration in <code>unit</code>
+     * @param task method reference
+     * @throws T if task.run() throws Exception
+     */
+    public static <T extends Throwable> void measure(TimeUnit unit, Consumer<Long> timeHandler,
+        MCRThrowableTask<T> task) throws T {
+        long time = System.nanoTime();
+        try {
+            task.run();
+        } finally {
+            time = System.nanoTime() - time;
+            timeHandler.accept(unit.convert(time, TimeUnit.NANOSECONDS));
+        }
+    }
+
+    /**
+     * Measures and logs the time of a method call
+     * @param task method reference
+     * @throws T if task.run() throws Exception
+     */
+    public static <T extends Throwable> Duration measure(MCRThrowableTask<T> task) throws T {
+        long time = System.nanoTime();
+        task.run();
+        time = System.nanoTime() - time;
+        return Duration.of(time, TimeUnit.NANOSECONDS.toChronoUnit());
     }
 }
