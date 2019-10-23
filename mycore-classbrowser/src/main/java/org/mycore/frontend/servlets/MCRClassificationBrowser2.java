@@ -77,7 +77,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         HttpServletRequest req = job.getRequest();
         Settings settings = Settings.fromRequest(req);
 
-        LOGGER.info("ClassificationBrowser {} {}", settings.getClassifID(), settings.getCategID().orElse(""));
+        LOGGER.info("ClassificationBrowser {}", settings);
 
         MCRCategoryID id = settings.getCategID()
             .map(categId -> new MCRCategoryID(settings.getClassifID(), categId))
@@ -278,7 +278,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             s.countResults = Boolean.parseBoolean(req.getParameter("countresults"));
             s.addClassId = Boolean.parseBoolean(req.getParameter("addclassid"));
             s.addUri = Boolean.parseBoolean(req.getParameter("adduri"));
-            s.removeEmptyLeaves = !Optional.ofNullable(req.getParameter("emptyleaves"))
+            s.removeEmptyLeaves = !MCRUtils.filterTrimmedNotEmpty(req.getParameter("emptyleaves"))
                 .map(Boolean::valueOf)
                 .orElse(true);
             s.webpage = req.getParameter("webpage");
@@ -343,5 +343,22 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             return MCRUtils.filterTrimmedNotEmpty(parameters);
         }
 
+        @Override public String toString() {
+            return "Settings{" +
+                "classifID='" + classifID + '\'' +
+                ", categID='" + categID + '\'' +
+                ", countResults=" + countResults +
+                ", addClassId=" + addClassId +
+                ", addUri=" + addUri +
+                ", removeEmptyLeaves=" + removeEmptyLeaves +
+                ", webpage='" + webpage + '\'' +
+                ", field='" + field + '\'' +
+                ", parameters='" + parameters + '\'' +
+                ", addDescription=" + addDescription +
+                ", countLinks=" + countLinks +
+                ", sortBy='" + sortBy + '\'' +
+                ", style='" + style + '\'' +
+                '}';
+        }
     }
 }
