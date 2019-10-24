@@ -19,10 +19,10 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 
 import com.google.gson.JsonObject;
 
@@ -216,8 +216,12 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      */
     public void validate() throws MCRException {
         super.validate();
-        sourcePath = MCRUtils.filterTrimmedNotEmpty(sourcePath)
-            .orElseThrow(() -> new MCRException(getSubTag() + ": sourcepath is null or empty"));
+        if (sourcePath == null) {
+            return;
+        }
+        sourcePath = Optional.of(sourcePath)
+            .map(String::trim)
+            .orElseThrow(() -> new MCRException(getSubTag() + ": sourcepath is empty"));
     }
 
     @Override
