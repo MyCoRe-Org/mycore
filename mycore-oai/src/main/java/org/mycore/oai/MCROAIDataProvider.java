@@ -28,7 +28,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
@@ -41,6 +43,7 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.output.support.AbstractXMLOutputProcessor;
 import org.jdom2.output.support.FormatStack;
 import org.jdom2.util.NamespaceStack;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -50,7 +53,6 @@ import org.mycore.oai.pmh.dataprovider.OAIAdapter;
 import org.mycore.oai.pmh.dataprovider.OAIProvider;
 import org.mycore.oai.pmh.dataprovider.OAIRequest;
 import org.mycore.oai.pmh.dataprovider.OAIResponse;
-import org.mycore.oai.pmh.dataprovider.jaxb.JAXBOAIProvider;
 
 /**
  * Implements an OAI-PMH 2.0 Data Provider as a servlet.
@@ -76,6 +78,14 @@ public class MCROAIDataProvider extends MCRServlet {
 
     private String myBaseURL;
 
+    private ServiceLoader<OAIProvider> oaiAdapterServiceLoader;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        oaiAdapterServiceLoader = ServiceLoader.load(OAIProvider.class, MCRClassTools.getClassLoader());
+    }
+
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
@@ -87,7 +97,10 @@ public class MCROAIDataProvider extends MCRServlet {
         // create new oai request
         OAIRequest oaiRequest = new OAIRequest(fixParameterMap(request.getParameterMap()));
         // create new oai provider
-        OAIProvider oaiProvider = new JAXBOAIProvider(getOAIAdapter());
+        OAIProvider oaiProvider = oaiAdapterServiceLoader
+            .findFirst()
+            .orElseThrow(() -> new ServletException("No implementation of " + OAIProvider.class + " found."));
+        oaiProvider.setAdapter(getOAIAdapter());
         // handle request
         OAIResponse oaiResponse = oaiProvider.handleRequest(oaiRequest);
         // build response

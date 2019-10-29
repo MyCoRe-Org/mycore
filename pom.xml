@@ -59,6 +59,7 @@
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <node.version>v6.9.1</node.version>
+    <oaipmh.version>2.0-SNAPSHOT</oaipmh.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
     <site.suffix />
@@ -1331,12 +1332,12 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh</artifactId>
-        <version>1.0</version>
+        <version>${oaipmh.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>oaipmh-dataprovider</artifactId>
-        <version>1.0</version>
+        <version>${oaipmh.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.iview2</groupId>
@@ -1553,6 +1554,12 @@
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
         <version>3.24.1-GA</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>oaipmh-dataprovider-impl</artifactId>
+        <version>${oaipmh.version}</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
