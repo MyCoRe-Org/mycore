@@ -44,8 +44,6 @@ public final class MCRMetaIFS extends MCRMetaDefault {
 
     private String maindoc;
 
-    private String ifsId;
-
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. All other data was set to
@@ -55,7 +53,6 @@ public final class MCRMetaIFS extends MCRMetaDefault {
         super();
         sourcePath = "";
         maindoc = "";
-        ifsId = "";
     }
 
     /**
@@ -74,7 +71,6 @@ public final class MCRMetaIFS extends MCRMetaDefault {
         super(subtag, null, null, 0);
         setSourcePath(sourcePath);
         maindoc = "";
-        ifsId = "";
     }
 
     /**
@@ -99,9 +95,11 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * The method return the derivate IFS ID.
      * 
      * @return the IFS ID.
+     * @deprecated will always return empty String
      */
+    @Deprecated
     public String getIFSID() {
-        return ifsId;
+        return "";
     }
 
     /**
@@ -133,13 +131,10 @@ public final class MCRMetaIFS extends MCRMetaDefault {
      * 
      * @param ifsId
      *            the derivate IFS ID
+     * @deprecated out of use
      */
+    @Deprecated
     public void setIFSID(String ifsId) {
-        if (ifsId == null) {
-            this.ifsId = "";
-        } else {
-            this.ifsId = ifsId;
-        }
     }
 
     /**
@@ -156,7 +151,6 @@ public final class MCRMetaIFS extends MCRMetaDefault {
         super.setFromDOM(element);
         setSourcePath(element.getAttributeValue("sourcepath"));
         setMainDoc(element.getAttributeValue("maindoc"));
-        setIFSID(element.getAttributeValue("ifsid"));
     }
 
     /**
@@ -174,7 +168,6 @@ public final class MCRMetaIFS extends MCRMetaDefault {
             elm.setAttribute("sourcepath", sourcePath);
         }
         elm.setAttribute("maindoc", maindoc);
-        elm.setAttribute("ifsid", ifsId);
 
         return elm;
     }
@@ -199,7 +192,6 @@ public final class MCRMetaIFS extends MCRMetaDefault {
             obj.addProperty("sourcepath", sourcePath);
         }
         obj.addProperty("maindoc", maindoc);
-        obj.addProperty("ifsid", ifsId);
         return obj;
     }
 
@@ -229,7 +221,6 @@ public final class MCRMetaIFS extends MCRMetaDefault {
         MCRMetaIFS clone = (MCRMetaIFS) super.clone();
 
         clone.maindoc = this.maindoc;
-        clone.ifsId = this.ifsId;
         clone.sourcePath = this.sourcePath;
 
         return clone;
@@ -241,8 +232,7 @@ public final class MCRMetaIFS extends MCRMetaDefault {
             return false;
         }
         final MCRMetaIFS other = (MCRMetaIFS) obj;
-        return Objects.equals(sourcePath, other.sourcePath) && Objects.equals(maindoc, other.maindoc)
-            && Objects.equals(ifsId, other.ifsId);
+        return Objects.equals(sourcePath, other.sourcePath) && Objects.equals(maindoc, other.maindoc);
     }
 
 }
