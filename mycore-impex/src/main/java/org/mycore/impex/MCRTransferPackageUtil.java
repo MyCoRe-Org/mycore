@@ -259,9 +259,7 @@ public abstract class MCRTransferPackageUtil {
         MCRDirectory dir = MCRDirectory.getRootDirectory(der.getId().toString());
         if (dir == null) {
             LOGGER.info("Creating missing {} {}", MCRFilesystemNode.class.getSimpleName(), der.getId());
-            final MCRDirectory difs = new MCRDirectory(der.getId().toString());
-            der.getDerivate().getInternals().setIFSID(difs.getID());
-            MCRMetadataManager.update(der);
+            dir = new MCRDirectory(der.getId().toString());
         }
         try (Stream<Path> stream = Files.find(derivateDirectory, 5,
             (path, attr) -> !path.toString().endsWith(".md5") && Files.isRegularFile(path) && !path.equals(
