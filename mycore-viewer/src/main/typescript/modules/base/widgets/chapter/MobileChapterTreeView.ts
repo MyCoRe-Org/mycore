@@ -38,6 +38,9 @@ namespace mycore.viewer.widgets.chaptertree {
         private static LEVEL_MARGIN = 15;
 
         addNode(parentId:string, id:string, label:string, childLabel: string, expandable:boolean) {
+            if(label === childLabel) {
+                childLabel = '';
+            }
             var newElement = jQuery("<li></li>");
             var labelElement = jQuery("<a></a>");
 

@@ -127,7 +127,7 @@ namespace mycore.viewer.components {
 
         private buildPermalink(state:ViewerParameterMap) {
             var file;
-            if (this._settings.doctype === 'mets' ) {
+            if (this._settings.doctype === 'mets' || this._settings.doctype === 'manifest') {
                 file = state.get('page');
                 state.remove('page');
             } else {
@@ -140,10 +140,10 @@ namespace mycore.viewer.components {
 
         private getBaseURL(file) {
             let iiif = (location.href.indexOf("/iiif/") > 0) ? "iiif/" : "";
-            var pattern = Utils.getVar<string>(this._settings, 'permalink.viewerLocationPattern', '{baseURL}/rsc/viewer/' + iiif + '{derivate}/{file}', (p) => p != null);
+            var pattern = Utils.getVar<string>(this._settings, 'permalink.viewerLocationPattern', '{baseURL}/rsc/viewer/' + iiif + '{derivate}{file}', (p) => p != null);
             return ViewerFormatString(pattern, {
                 baseURL : this._settings.webApplicationBaseURL,
-                derivate : this._settings.derivate,
+                derivate : (file.indexOf('_derivate_') > 0) ? '' : this._settings.derivate + '/',
                 file : file
             });
         }

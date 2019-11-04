@@ -48,7 +48,8 @@ namespace mycore.viewer.components {
                         + Math.floor(height / scaleFactor) + '/0/default.jpg';
                 };
 
-                const manifestPromise = mycore.viewer.widgets.iiif.IviewIIIFProvider.loadModel(this.settings.manifestURL, tilePathBuilder);
+                const manifestPromise = mycore.viewer.widgets.iiif.IviewIIIFProvider
+                    .loadModel(this.settings.manifestURL, this.settings.imageAPIURL, tilePathBuilder);
                 manifestPromise.then((resolved: { model: model.StructureModel; document: Document }) => {
                     const model = resolved.model;
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
