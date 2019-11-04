@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -231,15 +230,9 @@ public final class MCRMetadataManager {
             if (mcrDerivate.getDerivate().getInternals().getSourcePath() == null) {
                 try {
                     rootPath.getFileSystem().createRoot(rootPath.getOwner());
-                    BasicFileAttributes attrs = Files.readAttributes(rootPath, BasicFileAttributes.class);
-                    if (!(attrs.fileKey() instanceof String)) {
-                        throw new MCRPersistenceException(
-                            "Cannot get ID from newely created directory, as it is not a String." + rootPath);
-                    }
-                    mcrDerivate.getDerivate().getInternals().setIFSID(attrs.fileKey().toString());
                 } catch (IOException ioExc) {
                     throw new MCRPersistenceException(
-                        "Cannot create root of '" + rootPath.getOwner() + "' or read the file attributes.", ioExc);
+                        "Cannot create root of '" + rootPath.getOwner() + "'.", ioExc);
                 }
             } else {
                 final String sourcepath = mcrDerivate.getDerivate().getInternals().getSourcePath();
@@ -250,12 +243,6 @@ public final class MCRMetadataManager {
                             LOGGER.debug("Starting File-Import");
                         }
                         importDerivate(derId.toString(), f.toPath());
-                        BasicFileAttributes attrs = Files.readAttributes(rootPath, BasicFileAttributes.class);
-                        if (!(attrs.fileKey() instanceof String)) {
-                            throw new MCRPersistenceException(
-                                "Cannot get ID from newely created directory, as it is not a String." + rootPath);
-                        }
-                        mcrDerivate.getDerivate().getInternals().setIFSID(attrs.fileKey().toString());
                     } catch (final Exception e) {
                         if (Files.exists(rootPath)) {
                             deleteDerivate(derId.toString());

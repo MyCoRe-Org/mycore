@@ -250,7 +250,6 @@ public class MCRRestAPIUploadHelper {
                 difs = new MCRDirectory(derID.toString());
             }
 
-            der.getDerivate().getInternals().setIFSID(difs.getID());
             der.getDerivate().getInternals().setSourcePath(derDir.toString());
 
             if (formParamUnzip) {

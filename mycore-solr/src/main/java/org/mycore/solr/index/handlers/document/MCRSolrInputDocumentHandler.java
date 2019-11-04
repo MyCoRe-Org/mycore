@@ -27,6 +27,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.solr.MCRSolrConstants;
+import org.mycore.solr.MCRSolrUtils;
+import org.mycore.solr.index.MCRSolrIndexer;
 import org.mycore.solr.index.handlers.MCRSolrAbstractIndexHandler;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatistic;
 import org.mycore.solr.index.statistic.MCRSolrIndexStatisticCollector;
@@ -56,10 +58,19 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
      */
     @Override
     public void index() throws IOException, SolrServerException {
-        LOGGER.info("Sending {} to SOLR...", document.getFieldValue("id"));
+        String id = String.valueOf(document.getFieldValue("id"));
+        SolrClient solrClient = getSolrClient();
+        LOGGER.info("Sending {} to SOLR...", id);
+        if (MCRSolrUtils.useNestedDocuments()) {
+            if (id.contains("_derivate_")) {
+                MCRSolrIndexer.deleteDerivate(solrClient, id);
+            } else {
+                MCRSolrIndexer.deleteById(solrClient, id);
+            }
+        }
         UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
         updateRequest.add(document);
-        updateRequest.process(getSolrClient());
+        updateRequest.process(solrClient);
     }
 
     /* (non-Javadoc)
