@@ -21,13 +21,14 @@
             <id>analyze</id>
             <configuration>
               <usedDependencies>
+                <!-- missed by runtime implementation -->
+                <useDepdendency>jakarta.activation:jakarta.activation-api</useDepdendency>
                 <!-- used by commons-vfs -->
                 <useDependency>com.jcraft:jsch</useDependency>
                 <!-- used by svnkit -->
                 <useDependency>net.java.dev.jna:jna</useDependency>
                 <!-- used in hibernate tests -->
                 <useDependency>org.hsqldb:hsqldb</useDependency>
-                <!-- used by hibernate -->
                 <!-- used by hibernate -->
                 <useDependency>org.javassist:javassist</useDependency>
                 <!-- used for XML catalog resolving -->
@@ -202,7 +203,7 @@
     </dependency>
     <dependency>
       <groupId>com.sun.activation</groupId>
-      <artifactId>javax.activation</artifactId>
+      <artifactId>jakarta.activation</artifactId>
     </dependency>
     <dependency>
       <groupId>com.sun.mail</groupId>
@@ -229,6 +230,14 @@
       <artifactId>swagger-annotations</artifactId>
     </dependency>
     <dependency>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.annotation</groupId>
       <artifactId>javax.annotation-api</artifactId>
     </dependency>
@@ -251,10 +260,6 @@
     <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>javax.ws.rs-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
     </dependency>
     <dependency>
       <groupId>jaxen</groupId>
