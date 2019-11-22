@@ -133,6 +133,17 @@ public class MCRNameMergerTest extends MCRTestCase {
         MCRMergerTest.test(a, b, b);
     }
 
+    @Test
+    public void testEmptyGiven() throws JaxenException {
+        Element a = new MCRNodeBuilder().buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
+        Element b = new MCRNodeBuilder().buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']='T.']]", null, null);
+        try{
+            MCRMergeTool.merge(a, b);
+        } catch (NullPointerException|ArrayIndexOutOfBoundsException e){
+            Assert.fail("NPE or AIOOBE thrown!");
+        }
+    }
+
     private MCRNameMerger buildNameEntry(String predicates) throws JaxenException {
         Element modsName = new MCRNodeBuilder().buildElement("mods:name[@type='personal']" + predicates, null, null);
         MCRNameMerger ne = new MCRNameMerger();
