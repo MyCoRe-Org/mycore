@@ -75,7 +75,7 @@ namespace mycore.viewer.components {
             }
         }
 
-        public handle(e: mycore.viewer.widgets.events.ViewerEvent):void {
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
 
             if (e.type === events.LanguageModelLoadedEvent.TYPE) {
                 const languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
@@ -88,7 +88,7 @@ namespace mycore.viewer.components {
         }
 
         private getScaleFactor(width: number, height: number) {
-            let largestScaling = Math.min(256 / width , 256 / height); //TODO make smallest size dynamic
+            const largestScaling = Math.min(256 / width , 256 / height); //TODO make smallest size dynamic
             return Math.pow(2, Math.ceil(Math.log(largestScaling) / Math.log(1 / 2)));
         }
 

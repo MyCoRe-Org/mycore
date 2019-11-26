@@ -52,8 +52,8 @@ namespace mycore.viewer {
                 settings.filePath = settings.filePath.replace('/', '%2F');
             }
 
-            if(settings.webApplicationBaseURL !== undefined
-                && settings.webApplicationBaseURL.lastIndexOf("/") == settings.webApplicationBaseURL.length - 1){
+            if(settings.webApplicationBaseURL != "undefined"
+                && settings.webApplicationBaseURL.lastIndexOf("/") === settings.webApplicationBaseURL.length - 1){
                 settings.webApplicationBaseURL = settings.webApplicationBaseURL.substring(0, settings.webApplicationBaseURL.length-1);
             }
 

@@ -113,7 +113,7 @@ namespace mycore.viewer.widgets.iiif {
             const map = new MyCoReMap<string, IAnnotation>();
             this.manifestDocument.getSequences()[0].getCanvases().forEach((canvas: ICanvas) => {
                 canvas.getImages().forEach((image: IAnnotation) => {
-                    if (image.id === undefined) {
+                    if (image.id == 'undefined') {
                         map.set(image.getResource().id, image);
                     }
                     else {
