@@ -155,12 +155,9 @@ public class MCRNameMerger extends MCRMerger {
 
         MCRNameMerger other = (MCRNameMerger) e;
 
-        if (isEmpty() || other.isEmpty()) {
-            return true;
-        }
         if (!Objects.equals(familyName, other.familyName)) {
             return false;
-        } else if (initials.isEmpty()) {
+        } else if (initials.isEmpty() && other.initials.isEmpty()) {
             return true; // same family name, no given name, no initals, then assumed same
         } else if (!haveAtLeaseOneCommon(this.initials, other.initials)) {
             return false;
@@ -169,10 +166,6 @@ public class MCRNameMerger extends MCRMerger {
         } else {
             return haveAtLeaseOneCommon(this.givenNames, other.givenNames);
         }
-    }
-
-    private boolean isEmpty() {
-        return familyName == null && givenNames.isEmpty() && initials.isEmpty();
     }
 
     private boolean haveAtLeaseOneCommon(Set<String> a, Set<String> b) {
@@ -206,12 +199,6 @@ public class MCRNameMerger extends MCRMerger {
     @Override
     public void mergeFrom(MCRMerger other) {
         super.mergeFrom(other);
-        if (isEmpty()) {
-            Element oldE = element;
-            Element newE = other.element.clone();
-            ((Element) element.getParent()).getChildren().replaceAll(t -> (t == oldE) ? newE : t);
-            this.setElement(newE);
-        }
         // if there is family name after merge, prefer that and remove untyped name part
         if (!getNodes("mods:namePart[@type='family']").isEmpty()) {
             List<Element> namePartsWithoutType = getNodes("mods:namePart[not(@type)]");
