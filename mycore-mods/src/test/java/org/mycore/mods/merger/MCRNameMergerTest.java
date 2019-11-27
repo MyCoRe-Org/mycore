@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
-import org.mycore.common.xml.MCRXMLHelper;
 
 public class MCRNameMergerTest extends MCRTestCase {
 
@@ -71,7 +70,7 @@ public class MCRNameMergerTest extends MCRTestCase {
 
         try {
             new MCRNameMerger().setElement(null);
-        Assert.fail("No name should result in NPE while creating a MCRNameMerger");
+            Assert.fail("No name should result in NPE while creating a MCRNameMerger");
         } catch (NullPointerException ex) {
             // exception excepted
         }
@@ -138,10 +137,12 @@ public class MCRNameMergerTest extends MCRTestCase {
 
     @Test
     public void testEmptyGiven() throws JaxenException {
-        Element a = new MCRNodeBuilder().buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
+        Element a = new MCRNodeBuilder()
+            .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
         Element a2 = new MCRNodeBuilder()
             .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
-        Element b = new MCRNodeBuilder().buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']='T.']]", null, null);
+        Element b = new MCRNodeBuilder()
+            .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']='T.']]", null, null);
         MCRMergeTool.merge(a, b);
         assertEquals("Exactly two mods:name element expected", 2,
             a.getChildren("name", MCRConstants.MODS_NAMESPACE).size());
