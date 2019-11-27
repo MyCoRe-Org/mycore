@@ -18,17 +18,20 @@
 
 package org.mycore.mods.merger;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.mycore.common.xml.MCRXMLHelper;
 
 public class MCRNameMergerTest extends MCRTestCase {
 
@@ -136,12 +139,17 @@ public class MCRNameMergerTest extends MCRTestCase {
     @Test
     public void testEmptyGiven() throws JaxenException {
         Element a = new MCRNodeBuilder().buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
+        Element a2 = new MCRNodeBuilder()
+            .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
         Element b = new MCRNodeBuilder().buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']='T.']]", null, null);
-        try{
-            MCRMergeTool.merge(a, b);
-        } catch (NullPointerException|ArrayIndexOutOfBoundsException e){
-            Assert.fail("NPE or AIOOBE thrown!");
-        }
+        MCRMergeTool.merge(a, b);
+        assertEquals("Exactly one mods:name element expected", 1,
+            a.getChildren("name", MCRConstants.MODS_NAMESPACE).size());
+        assertTrue("Empty element should contain data of merger", MCRXMLHelper.deepEqual(a, b));
+        MCRMergeTool.merge(b, a2);
+        assertEquals("Exactly one mods:name element expected", 1,
+            b.getChildren("name", MCRConstants.MODS_NAMESPACE).size());
+        assertTrue("Empty element should contain data of merger", MCRXMLHelper.deepEqual(a, b));
     }
 
     private MCRNameMerger buildNameEntry(String predicates) throws JaxenException {
