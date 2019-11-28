@@ -18,15 +18,22 @@
 package org.mycore.frontend.support;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
@@ -83,39 +90,55 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
         }
     }
 
+    private Path toNativePath(ZipEntry entry) {
+        String nativePath;
+        if (File.separatorChar != '/') {
+            nativePath = entry.getName().replace('/', File.separatorChar);
+        } else {
+            nativePath = entry.getName();
+        }
+        return Paths.get(nativePath);
+    }
+
+    private boolean isUnzipRequired(ZipEntry entry, Path target) {
+        try {
+            BasicFileAttributes fileAttributes = Files.readAttributes(target, BasicFileAttributes.class);
+            return !entry.isDirectory() && entry.getSize() == fileAttributes.size() && entry.getLastModifiedTime().to(
+                TimeUnit.SECONDS) == fileAttributes.lastModifiedTime().to(TimeUnit.SECONDS)
+                && entry.getLastModifiedTime().to(TimeUnit.DAYS) == fileAttributes.lastModifiedTime().to(TimeUnit.DAYS);
+        } catch (IOException e) {
+            return true;
+        }
+    }
+
     private void deployWebResources(final ServletContext servletContext, final MCRComponent comp) {
-        final String webRoot = servletContext.getRealPath("/");
+        final Path webRoot = Optional.ofNullable(servletContext.getRealPath("/")).map(Paths::get).orElse(null);
         if (webRoot != null) {
-            try {
-                final JarFile jar = new JarFile(comp.getJarFile());
-
+            int resourceDirPathComponents = RESOURCE_DIR.split("/").length;
+            try (InputStream fin = Files.newInputStream(comp.getJarFile().toPath());
+                ZipInputStream zin = new ZipInputStream(fin)) {
                 LOGGER.info("Deploy web resources to {}...", webRoot);
-                Collections.list(jar.entries()).stream().filter(file -> file.getName().startsWith(RESOURCE_DIR))
-                    .forEach(file -> {
-                        final String fileName = file.getName().substring(RESOURCE_DIR.length());
-                        LOGGER.debug("...deploy {}", fileName);
-
-                        final File f = new File(webRoot + File.separator + fileName);
-                        if (file.isDirectory()) {
-                            f.mkdir();
-                        } else {
-                            try {
-                                final InputStream is = jar.getInputStream(file);
-                                final FileOutputStream fos = new FileOutputStream(f);
-                                while (is.available() > 0) {
-                                    fos.write(is.read());
-                                }
-                                fos.close();
-                            } catch (IOException e) {
-                                LOGGER.error("Couldn't deploy file {}.", fileName, e);
+                for (ZipEntry zipEntry = zin.getNextEntry(); zipEntry != null; zipEntry = zin.getNextEntry()) {
+                    if (zipEntry.getName().startsWith(RESOURCE_DIR)) {
+                        Path relativePath = toNativePath(zipEntry);
+                        if (relativePath.getNameCount() > resourceDirPathComponents) {
+                            //strip RESOURCE_DIR:
+                            relativePath = relativePath.subpath(resourceDirPathComponents, relativePath.getNameCount());
+                            Path target = webRoot.resolve(relativePath);
+                            if (zipEntry.isDirectory()) {
+                                Files.createDirectories(target);
+                            } else if (isUnzipRequired(zipEntry, target)) {
+                                LOGGER.debug("...deploy {}", zipEntry.getName());
+                                Files.copy(zin, target, StandardCopyOption.REPLACE_EXISTING);
+                                Files.setLastModifiedTime(target, zipEntry.getLastModifiedTime());
                             }
                         }
-                    });
+                    }
+                    zin.closeEntry();
+                }
                 LOGGER.info("...done.");
-
-                jar.close();
             } catch (final IOException e) {
-                LOGGER.error("Couldn't parse JAR!", e);
+                LOGGER.error("Could not deploy web resources of " + comp.getJarFile() + "!", e);
             }
         }
     }

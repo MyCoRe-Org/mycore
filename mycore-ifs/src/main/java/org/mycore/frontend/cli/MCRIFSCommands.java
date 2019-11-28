@@ -88,6 +88,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.ifs2.MCRCStoreIFS2;
 import org.mycore.datamodel.ifs2.MCRFileCollection;
+import org.mycore.datamodel.ifs2.MCRNode;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -780,8 +781,22 @@ public class MCRIFSCommands {
 
     private static org.mycore.datamodel.ifs2.MCRFile toFile(MCRCStoreIFS2 store, MCRFSNODES node) throws IOException {
         MCRFileCollection derivateRoot = store.getIFS2FileCollection(MCRObjectID.getInstance(node.getOwner()));
-        String path = toPath(node.getStorageid());
-        return (org.mycore.datamodel.ifs2.MCRFile) derivateRoot.getNodeByPath(path);
+        String storageid = node.getStorageid();
+        if (node.getSize() == 0) {
+            //no storageId in IFS1
+            storageid = MCRFile.getFile(node.getId()).getPath();
+        }
+        String path = toPath(storageid);
+        MCRNode nodeByPath = derivateRoot.getNodeByPath(path);
+        if (nodeByPath == null) {
+            throw new FileNotFoundException(node.getOwner() + ":" + path);
+        }
+        if (nodeByPath instanceof org.mycore.datamodel.ifs2.MCRFile) {
+            return (org.mycore.datamodel.ifs2.MCRFile) nodeByPath;
+        }
+        throw new IOException(
+            node.getName() + " is not a file (" + node.getOwner() + ":" + path + "): "
+                + nodeByPath.getClass().getName());
     }
 
     private static String toPath(String storageID) {
