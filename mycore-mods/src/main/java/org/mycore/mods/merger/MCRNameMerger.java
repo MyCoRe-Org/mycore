@@ -23,6 +23,7 @@ import java.text.Normalizer.Form;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 import org.jdom2.Element;
@@ -81,6 +82,9 @@ public class MCRNameMerger extends MCRMerger {
     }
 
     private void setFromCombinedName(String nameFragment) {
+        if (isEmptyOrNull(nameFragment)) {
+            return;
+        }
         if (nameFragment.contains(",")) {
             String[] parts = nameFragment.split(",");
             setFamilyNameAndRest(parts[0].trim(), parts[1].trim());
@@ -99,10 +103,16 @@ public class MCRNameMerger extends MCRMerger {
     }
 
     private void setFamilyName(String nameFragment) {
+        if (isEmptyOrNull(nameFragment)) {
+            return;
+        }
         this.familyName = normalize(nameFragment);
     }
 
     private void addGivenNames(String nameFragment) {
+        if (isEmptyOrNull(nameFragment)) {
+            return;
+        }
         for (String token : nameFragment.split("\\s")) {
             String normalizedToken = normalize(token.trim());
             if (normalizedToken.length() > 1) {
@@ -112,10 +122,17 @@ public class MCRNameMerger extends MCRMerger {
     }
 
     private void addInitials(String nameFragment) {
+        if (isEmptyOrNull(nameFragment)) {
+            return;
+        }
         for (String token : nameFragment.split("\\s")) {
             String normalizedToken = normalize(token.trim());
             initials.add(normalizedToken.substring(0, 1));
         }
+    }
+
+    private boolean isEmptyOrNull(String nameFragment) {
+        return nameFragment == null || nameFragment.trim().isEmpty();
     }
 
     private String normalize(String nameFragment) {
@@ -138,9 +155,9 @@ public class MCRNameMerger extends MCRMerger {
 
         MCRNameMerger other = (MCRNameMerger) e;
 
-        if (!familyName.equals(other.familyName)) {
+        if (!Objects.equals(familyName, other.familyName)) {
             return false;
-        } else if (initials.isEmpty()) {
+        } else if (initials.isEmpty() && other.initials.isEmpty()) {
             return true; // same family name, no given name, no initals, then assumed same
         } else if (!haveAtLeaseOneCommon(this.initials, other.initials)) {
             return false;
@@ -182,7 +199,6 @@ public class MCRNameMerger extends MCRMerger {
     @Override
     public void mergeFrom(MCRMerger other) {
         super.mergeFrom(other);
-
         // if there is family name after merge, prefer that and remove untyped name part
         if (!getNodes("mods:namePart[@type='family']").isEmpty()) {
             List<Element> namePartsWithoutType = getNodes("mods:namePart[not(@type)]");

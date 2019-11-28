@@ -18,17 +18,19 @@
 
 package org.mycore.mods.merger;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class MCRNameMergerTest extends MCRTestCase {
 
@@ -68,7 +70,7 @@ public class MCRNameMergerTest extends MCRTestCase {
 
         try {
             new MCRNameMerger().setElement(null);
-        Assert.fail("No name should result in NPE while creating a MCRNameMerger");
+            Assert.fail("No name should result in NPE while creating a MCRNameMerger");
         } catch (NullPointerException ex) {
             // exception excepted
         }
@@ -131,6 +133,22 @@ public class MCRNameMergerTest extends MCRTestCase {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']]";
         String b = "[mods:name[@type='personal'][mods:namePart[@type='family']='Müller'][mods:namePart[@type='given']='T.']]";
         MCRMergerTest.test(a, b, b);
+    }
+
+    @Test
+    public void testEmptyGiven() throws JaxenException {
+        Element a = new MCRNodeBuilder()
+            .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
+        Element a2 = new MCRNodeBuilder()
+            .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
+        Element b = new MCRNodeBuilder()
+            .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']='T.']]", null, null);
+        MCRMergeTool.merge(a, b);
+        assertEquals("Exactly two mods:name element expected", 2,
+            a.getChildren("name", MCRConstants.MODS_NAMESPACE).size());
+        MCRMergeTool.merge(b, a2);
+        assertEquals("Exactly two mods:name element expected", 2,
+            b.getChildren("name", MCRConstants.MODS_NAMESPACE).size());
     }
 
     private MCRNameMerger buildNameEntry(String predicates) throws JaxenException {
