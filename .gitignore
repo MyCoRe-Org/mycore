@@ -25,6 +25,10 @@ hs_err_pid*
 # IntelliJ
 /out/
 
+#Visual Studio Code https://github.com/github/gitignore/blob/master/Global/VisualStudioCode.gitignore
+.vscode/
+*.code-workspace
+
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
