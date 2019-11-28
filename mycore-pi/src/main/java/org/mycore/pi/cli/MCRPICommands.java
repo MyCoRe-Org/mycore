@@ -203,8 +203,10 @@ public class MCRPICommands {
         MCRPersistentIdentifierEventHandler.updateObject(object);
     }
 
-    @MCRCommand(syntax = "create pi with {0} for object {1} with additional ({2})", help = "Creates a persistent identifier with the pi "
-        + "service with the id {0} for the object {1} with additional ({2}). Does nothing if the object already has a pi from the service {0}.", order = 90)
+    @MCRCommand(syntax = "create pi with {0} for object {1} with additional ({2})",
+        help = "Creates a persistent identifier with the pi service with the id {0} for the object {1}"
+            + " with additional ({2}). Does nothing if the object already has a pi from the service {0}.",
+        order = 90)
     public static void createPIForObjectIfNotExist(String serviceID, String objectIDString, String additional)
         throws MCRAccessException, ExecutionException, MCRActiveLinkException, MCRPersistentIdentifierException,
         InterruptedException {
@@ -226,8 +228,10 @@ public class MCRPICommands {
         LOGGER.info("Registered pi with {}: {} for object {}", serviceID, doi.asString(), objectID);
     }
 
-    @MCRCommand(syntax = "create pi with {0} for object {1}", help = "Creates a persistent identifier with the pi "
-        + "service with the id {0} for the object {1}. Does nothing if the object already has a pi from the service {0}.", order = 100)
+    @MCRCommand(syntax = "create pi with {0} for object {1}",
+        help = "Creates a persistent identifier with the pi service with the id {0} for the object {1}."
+            + " Does nothing if the object already has a pi from the service {0}.",
+        order = 100)
     public static void createPIForObjectIfNotExist(String serviceID, String objectIDString)
         throws MCRAccessException, ExecutionException, MCRActiveLinkException, MCRPersistentIdentifierException,
         InterruptedException {
