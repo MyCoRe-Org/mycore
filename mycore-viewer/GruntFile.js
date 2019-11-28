@@ -36,13 +36,15 @@ module.exports = function (grunt) {
             npmcopy: {
                 deps: {
                     options: {
-                        destPrefix: '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/'
+                        destPrefix: '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/'
                     },
                     files: {
-                        'epubjs': 'epubjs/dist',
-                        'jszip': 'jszip/dist',
-                        'es6-promise': 'es6-promise/dist',
-						'manifesto': 'manifesto.js/dist/client'
+                        'js/lib/epubjs': 'epubjs/dist',
+                        'js/lib/jszip': 'jszip/dist',
+                        'js/lib/es6-promise': 'es6-promise/dist',
+						'js/lib/manifesto': 'manifesto.js/dist/client',
+                        'cmaps': 'pdfjs-dist/cmaps',
+                        'js/lib/': 'pdfjs-dist/build'
                     }
                 }
             },
@@ -50,8 +52,8 @@ module.exports = function (grunt) {
                 pdfjs: {
                     mangle: false,
                     files: {
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.min.js': '<%= globalConfig.projectBase %>src/main/resources/META-INF/resources/modules/iview2/js/lib/pdf.js',
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.min.worker.js': '<%= globalConfig.projectBase %>src/main/resources/META-INF/resources/modules/iview2/js/lib/pdf.worker.js'
+                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.js',
+                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.min.worker.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.worker.js'
                     }
                 },
                 viewer: {
@@ -217,7 +219,7 @@ module.exports = function (grunt) {
         });
 
 
-    grunt.registerTask('default', ['ts', 'less', 'npmcopy', 'uglify']);
+    grunt.registerTask('default', ['npmcopy', 'ts', 'less', 'uglify']);
 
 };
 

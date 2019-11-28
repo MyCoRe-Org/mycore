@@ -18,6 +18,7 @@
 
 package org.mycore.mods.merger;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -27,6 +28,7 @@ import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRNodeBuilder;
 
@@ -72,6 +74,22 @@ public class MCRNameMergerTest extends MCRTestCase {
         } catch (NullPointerException ex) {
             // exception excepted
         }
+    }
+
+    @Test
+    public void testEmptyGiven() throws JaxenException {
+        Element a = new MCRNodeBuilder()
+            .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
+        Element a2 = new MCRNodeBuilder()
+            .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']]]", null, null);
+        Element b = new MCRNodeBuilder()
+            .buildElement("mods:mods[mods:name[@type='personal'][mods:namePart[@type='given']='T.']]", null, null);
+        MCRMergeTool.merge(a, b);
+        assertEquals("Exactly two mods:name element expected", 2,
+            a.getChildren("name", MCRConstants.MODS_NAMESPACE).size());
+        MCRMergeTool.merge(b, a2);
+        assertEquals("Exactly two mods:name element expected", 2,
+            b.getChildren("name", MCRConstants.MODS_NAMESPACE).size());
     }
 
     @Test
