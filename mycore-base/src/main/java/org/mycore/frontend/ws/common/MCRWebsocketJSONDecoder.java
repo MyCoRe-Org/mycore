@@ -34,7 +34,7 @@ public class MCRWebsocketJSONDecoder implements Decoder.Text<JsonObject> {
 
     @Override
     public JsonObject decode(String request) throws DecodeException {
-        return new JsonParser().parse(request).getAsJsonObject();
+        return JsonParser.parseString(request).getAsJsonObject();
     }
 
     @Override

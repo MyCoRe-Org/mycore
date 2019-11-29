@@ -155,8 +155,7 @@ public class MCRAclEditorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @MCRRestrictedAccess(MCRAclEditorPermission.class)
     public Response add(String data) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         String accessID = jsonObject.get(JSON_ACCESSID).getAsString();
         String accessPool = jsonObject.get(JSON_ACCESSPOOL).getAsString();
         String rule = jsonObject.get(JSON_RULE).getAsString();
@@ -179,8 +178,7 @@ public class MCRAclEditorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @MCRRestrictedAccess(MCRAclEditorPermission.class)
     public String remove(String data) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         JsonArray jsonArray = jsonObject.getAsJsonArray("access");
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject accessAsJsonObject = jsonArray.get(i).getAsJsonObject();
@@ -207,8 +205,7 @@ public class MCRAclEditorResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @MCRRestrictedAccess(MCRAclEditorPermission.class)
     public Response edit(String data) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         String accessIDOld = jsonObject.get("accessIDOld").getAsString();
         String accessPoolOld = jsonObject.get("accessPoolOld").getAsString();
         String mode = jsonObject.get("mode").getAsString();
@@ -246,8 +243,7 @@ public class MCRAclEditorResource {
     @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Consumes(MediaType.APPLICATION_JSON)
     public String addRule(String data) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         String ruleDesc = jsonObject.get("ruleDesc").getAsString();
         String ruleText = jsonObject.get("ruleText").getAsString();
         MCRAccessRule accessRule;
@@ -266,8 +262,7 @@ public class MCRAclEditorResource {
     @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response removeRule(String data) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         String ruleID = jsonObject.get("ruleID").getAsString();
 
         if (!ACCESS_STORE.isRuleInUse(ruleID)) {
@@ -283,8 +278,7 @@ public class MCRAclEditorResource {
     @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response editRule(String data) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         String ruleID = jsonObject.get("ruleID").getAsString();
         String ruleDesc = jsonObject.get("ruleDesc").getAsString();
         String ruleText = jsonObject.get("ruleText").getAsString();
@@ -308,8 +302,7 @@ public class MCRAclEditorResource {
     @MCRRestrictedAccess(MCRAclEditorPermission.class)
     @Consumes(MediaType.APPLICATION_JSON)
     public String editMulti(String data) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(data).getAsJsonObject();
+        JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
         JsonArray jsonArray = jsonObject.getAsJsonArray("access");
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject accessAsJsonObject = jsonArray.get(i).getAsJsonObject();

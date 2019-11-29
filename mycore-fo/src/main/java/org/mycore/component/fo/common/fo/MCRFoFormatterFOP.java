@@ -19,9 +19,11 @@
 package org.mycore.component.fo.common.fo;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,9 +39,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXResult;
 
-import org.apache.avalon.framework.configuration.Configuration;
-import org.apache.avalon.framework.configuration.ConfigurationException;
-import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.fop.apps.EnvironmentalProfileFactory;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
@@ -47,6 +46,9 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.MimeConstants;
+import org.apache.fop.configuration.Configuration;
+import org.apache.fop.configuration.ConfigurationException;
+import org.apache.fop.configuration.DefaultConfigurationBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlgraphics.io.Resource;
@@ -58,7 +60,6 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xsl.MCRErrorListener;
-import org.xml.sax.SAXException;
 
 /**
  * This class implements the interface to use configured XSL-FO formatters for the layout service.
@@ -103,8 +104,13 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         final String foCfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
         if (!foCfg.isEmpty()) {
             try {
+                URL configResource = MCRConfigurationDir.getConfigResource(foCfg);
+                URLConnection con = configResource.openConnection();
                 final DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
-                final Configuration cfg = cfgBuilder.build(MCRConfigurationDir.getConfigResource(foCfg).toString());
+                final Configuration cfg;
+                try (InputStream is = con.getInputStream();) {
+                    cfg = cfgBuilder.build(is);
+                }
                 fopFactoryBuilder.setConfiguration(cfg);
 
                 // FIXME Workaround to get hyphenation work in FOP.
@@ -126,7 +132,7 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
                     fopFactoryBuilder.setHyphPatNames(hyphPatMap);
                 });
 
-            } catch (ConfigurationException | SAXException | IOException e) {
+            } catch (ConfigurationException | IOException e) {
                 LOGGER.error("Exception while loading FOP configuration from {}.", foCfg, e);
             }
         }

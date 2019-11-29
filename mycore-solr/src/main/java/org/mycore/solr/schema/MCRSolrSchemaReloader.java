@@ -165,11 +165,10 @@ public class MCRSolrSchemaReloader {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             List<byte[]> schemaFileContents = MCRConfigurationInputStream.getConfigFileContents(
                 "solr/" + configType + "/" + SOLR_SCHEMA_UPDATE_FILE_NAME);
-            JsonParser parser = new JsonParser();
             for (byte[] schemaFileData : schemaFileContents) {
                 InputStreamReader schemaReader = new InputStreamReader(new ByteArrayInputStream(schemaFileData),
                     StandardCharsets.UTF_8);
-                JsonElement json = parser.parse(schemaReader);
+                JsonElement json = JsonParser.parseReader(schemaReader);
                 if (!json.isJsonArray()) {
                     JsonElement e = json;
                     json = new JsonArray();

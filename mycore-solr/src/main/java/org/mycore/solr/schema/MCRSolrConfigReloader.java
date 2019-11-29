@@ -94,8 +94,7 @@ public class MCRSolrConfigReloader {
                 "solr/" + configType + "/" + SOLR_CONFIG_UPDATE_FILE_NAME);
             for (byte[] configFileData : configFileContents) {
                 String content = new String(configFileData, StandardCharsets.UTF_8);
-                JsonParser parser = new JsonParser();
-                JsonElement json = parser.parse(content);
+                JsonElement json = JsonParser.parseString(content);
                 if (!json.isJsonArray()) {
                     JsonElement e = json;
                     json = new JsonArray();
@@ -117,7 +116,6 @@ public class MCRSolrConfigReloader {
      * processes a single SOLR config update command
      * @param coreID - then name of the core
      * @param command - the command in JSON syntax
-     * @param currentSolrConfig - the current Solr configuration as JSONObject
      */
     private static void processConfigCommand(String coreID, JsonElement command) {
         if (command.isJsonObject()) {

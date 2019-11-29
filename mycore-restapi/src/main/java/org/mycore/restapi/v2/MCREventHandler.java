@@ -142,7 +142,6 @@ class MCREventHandler {
         }
 
         private JsonObject getData(MCRObject obj) {
-            JsonParser parser = new JsonParser();
             JsonObject event = new JsonObject();
             event.addProperty("id", obj.getId().toString());
             event.addProperty("uri", uriResolver.apply(getPathURI("objects/" + obj.getId())).toString());
@@ -154,7 +153,7 @@ class MCREventHandler {
             copyServiceDateToProperty(obj, event, "modifydate", "modified");
             JsonArray pi = new JsonArray();
             obj.getService().getFlags("MyCoRe-PI").stream()
-                .map(parser::parse)
+                .map(JsonParser::parseString)
                 .forEach(pi::add);
             event.add("pi", pi);
             return event;
