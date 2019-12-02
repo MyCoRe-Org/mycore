@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -103,12 +104,23 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
     private boolean isUnzipRequired(ZipEntry entry, Path target) {
         try {
             BasicFileAttributes fileAttributes = Files.readAttributes(target, BasicFileAttributes.class);
-            return !entry.isDirectory() && entry.getSize() == fileAttributes.size() && entry.getLastModifiedTime().to(
-                TimeUnit.SECONDS) == fileAttributes.lastModifiedTime().to(TimeUnit.SECONDS)
-                && entry.getLastModifiedTime().to(TimeUnit.DAYS) == fileAttributes.lastModifiedTime().to(TimeUnit.DAYS);
+            //entry does not contain size when read by ZipInputStream, assume equal size and just compare last modified
+            return !entry.isDirectory()
+                && !(fileTimeEquals(entry.getLastModifiedTime(), fileAttributes.lastModifiedTime())
+                    && (entry.getSize() == -1 || entry.getSize() == fileAttributes.size()));
         } catch (IOException e) {
+            LOGGER.warn("Target path {} does not exist.", target);
             return true;
         }
+    }
+
+    /**
+     * compares if two file times are equal.
+     *
+     * Uses seconds only instead of finer granularity to compare file times of different file systems.
+     */
+    private boolean fileTimeEquals(FileTime a, FileTime b) {
+        return a.to(TimeUnit.SECONDS) == b.to(TimeUnit.SECONDS) && a.to(TimeUnit.DAYS) == b.to(TimeUnit.DAYS);
     }
 
     private void deployWebResources(final ServletContext servletContext, final MCRComponent comp) {
@@ -117,7 +129,7 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
             int resourceDirPathComponents = RESOURCE_DIR.split("/").length;
             try (InputStream fin = Files.newInputStream(comp.getJarFile().toPath());
                 ZipInputStream zin = new ZipInputStream(fin)) {
-                LOGGER.info("Deploy web resources to {}...", webRoot);
+                LOGGER.info("Deploy web resources from {} to {}...", comp.getName(), webRoot);
                 for (ZipEntry zipEntry = zin.getNextEntry(); zipEntry != null; zipEntry = zin.getNextEntry()) {
                     if (zipEntry.getName().startsWith(RESOURCE_DIR)) {
                         Path relativePath = toNativePath(zipEntry);
@@ -134,7 +146,6 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                             }
                         }
                     }
-                    zin.closeEntry();
                 }
                 LOGGER.info("...done.");
             } catch (final IOException e) {
