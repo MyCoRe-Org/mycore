@@ -185,12 +185,12 @@
             </groups>
             <links>
               <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
-              <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
+              <link>https://javaee.github.io/javaee-spec/javadocs/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
               <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-              <link>http://lucene.apache.org/solr/8_3_0/solr-solrj/</link>
+              <link>http://lucene.apache.org/solr/8_3_1/solr-solrj/</link>
             </links>
           </configuration>
         </plugin>
@@ -429,6 +429,35 @@
             </dependencies>
             <executions>
               <execution>
+                <id>enforce up2date libraries or built-in support</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <bannedDependencies>
+                      <searchTransitive>true</searchTransitive>
+                      <excludes>
+                        <exclude>javax.ws.rs:javax.ws.rs-api</exclude>
+                        <exclude>javax.inject:javax.inject</exclude>
+                        <exclude>javax.servlet:javax.servlet-api</exclude>
+                        <exclude>javax.servlet:servlet-api</exclude>
+                        <exclude>javax.annotation:javax.annotation-api</exclude>
+                        <exclude>javax.validation:validation-api</exclude>
+                        <exclude>com.sun.mail:javax.mail</exclude>
+                        <exclude>org.apache.geronimo.specs:geronimo-javamail_1.4_spec</exclude>
+                        <exclude>org.codehaus.woodstox:woodstox-core-asl</exclude>
+                        <exclude>org.codehaus.woodstox:wstx-asl</exclude>
+                        <exclude>xml-apis:xml-apis</exclude>
+                        <exclude>xml-apis:xml-apis-ext</exclude>
+                      </excludes>
+                      <message>Use Jakarta libraries instead of javax or com.sun</message>
+                    </bannedDependencies>
+                  </rules>
+                  <fail>true</fail>
+                </configuration>
+              </execution>
+              <execution>
                 <id>enforce LOG4J-2.x API</id>
                 <goals>
                   <goal>enforce</goal>
@@ -457,7 +486,7 @@
                       <searchTransitive>true</searchTransitive>
                       <excludes>
                         <exclude>org.glassfish.hk2.external:aopalliance-repackaged</exclude>
-                        <exclude>org.glassfish.hk2.external:javax.inject</exclude>
+                        <exclude>org.glassfish.hk2.external:jakarta.inject</exclude>
                         <exclude>org.apache.geronimo.specs:geronimo-activation_1.1_spec</exclude>
                       </excludes>
                       <message>Do not use OSGI repacked libraries from jersey</message>
@@ -480,6 +509,35 @@
                   </rules>
                   <fail>true</fail>
                 </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.basepom.maven</groupId>
+            <artifactId>duplicate-finder-maven-plugin</artifactId>
+            <configuration>
+              <checkTestClasspath>false</checkTestClasspath>
+              <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
+              <ignoredDependencies>
+                <dependency>
+                  <!-- includes jakarta.activation-api -->
+                  <groupId>com.sun.activation</groupId>
+                  <artifactId>jakarta.activation</artifactId>
+                </dependency>
+              </ignoredDependencies>
+              <ignoredResourcePatterns>
+                <ignoredResourcePattern>/?\.gitkeep$</ignoredResourcePattern>
+                <ignoredResourcePattern>/?about.html$</ignoredResourcePattern>
+                <ignoredResourcePattern>/?catalog.xml$</ignoredResourcePattern>
+              </ignoredResourcePatterns>
+            </configuration>
+            <executions>
+              <execution>
+                <id>default</id>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+                <phase>verify</phase>
               </execution>
             </executions>
           </plugin>
@@ -652,12 +710,12 @@
               </groups>
               <links>
                 <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
-                <link>http://tomcat.apache.org/tomcat-8.0-doc/servletapi/</link>
+                <link>https://javaee.github.io/javaee-spec/javadocs/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
                 <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-                <link>http://lucene.apache.org/solr/8_3_0/solr-solrj/</link>
+                <link>http://lucene.apache.org/solr/8_3_1/solr-solrj/</link>
               </links>
             </configuration>
             <reportSets>
@@ -796,6 +854,12 @@
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
         <version>${guice.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.google.inject.extensions</groupId>
@@ -816,18 +880,6 @@
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
         <version>1.12.2</version>
-      </dependency>
-      <dependency>
-        <groupId>com.sun.mail</groupId>
-        <artifactId>javax.mail</artifactId>
-        <version>1.6.2</version>
-        <exclusions>
-          <exclusion>
-            <!-- provided by direct dependency -->
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.yahoo.platform.yui</groupId>
@@ -876,6 +928,10 @@
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -894,20 +950,35 @@
         <version>1.2.1</version>
       </dependency>
       <dependency>
-        <groupId>jakarta.xml.bind</groupId>
-        <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>${jaxb.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>javax.annotation-api</artifactId>
-        <version>1.3.2</version>
+        <groupId>jakarta.annotation</groupId>
+        <artifactId>jakarta.annotation-api</artifactId>
+        <version>1.3.5</version>
         <type>jar</type>
       </dependency>
       <dependency>
-        <groupId>javax.inject</groupId>
-        <artifactId>javax.inject</artifactId>
-        <version>1</version>
+        <groupId>jakarta.inject</groupId>
+        <artifactId>jakarta.inject-api</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.mail</groupId>
+        <artifactId>jakarta.mail-api</artifactId>
+        <version>1.6.4</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.validation</groupId>
+        <artifactId>jakarta.validation-api</artifactId>
+        <version>2.0.2</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.ws.rs</groupId>
+        <artifactId>jakarta.ws.rs-api</artifactId>
+        <version>2.1.6</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>${jaxb.version}</version>
       </dependency>
       <dependency>
         <groupId>javax.persistence</groupId>
@@ -915,19 +986,9 @@
         <version>2.2</version>
       </dependency>
       <dependency>
-        <groupId>javax.validation</groupId>
-        <artifactId>validation-api</artifactId>
-        <version>2.0.1.Final</version>
-      </dependency>
-      <dependency>
         <groupId>javax.websocket</groupId>
         <artifactId>javax.websocket-api</artifactId>
         <version>1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>javax.ws.rs-api</artifactId>
-        <version>2.1.1</version>
       </dependency>
       <dependency>
         <groupId>jaxen</groupId>
@@ -971,16 +1032,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.apache.avalon.framework</groupId>
-        <artifactId>avalon-framework-api</artifactId>
-        <version>4.3.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.avalon.framework</groupId>
-        <artifactId>avalon-framework-impl</artifactId>
-        <version>4.3.1</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
         <version>1.19</version>
@@ -1018,17 +1069,26 @@
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>8.3.0</version>
+        <version>8.3.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>stax2-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <!-- if required use https://github.com/FasterXML/woodstox -->
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
-        <artifactId>fop</artifactId>
+        <artifactId>fop-core</artifactId>
         <version>2.4</version>
         <exclusions>
           <exclusion>
@@ -1040,12 +1100,8 @@
             <artifactId>xml-apis</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>org.apache.avalon.framework</groupId>
-            <artifactId>avalon-framework-impl</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.apache.avalon.framework</groupId>
-            <artifactId>avalon-framework-api</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1083,6 +1139,12 @@
         <groupId>org.glassfish.hk2</groupId>
         <artifactId>guice-bridge</artifactId>
         <version>${hk2.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.glassfish.hk2</groupId>
@@ -1093,6 +1155,10 @@
             <groupId>org.glassfish.hk2.external</groupId>
             <artifactId>aopalliance-repackaged</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -1102,7 +1168,7 @@
         <exclusions>
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
+            <artifactId>jakarta.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1117,7 +1183,7 @@
           </exclusion>
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
+            <artifactId>jakarta.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1128,7 +1194,7 @@
         <exclusions>
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
+            <artifactId>jakarta.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1143,7 +1209,7 @@
           </exclusion>
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
+            <artifactId>jakarta.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1375,6 +1441,12 @@
         <groupId>org.mycore.sword</groupId>
         <artifactId>easy-sword2-lib</artifactId>
         <version>1.0.4</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
@@ -1449,16 +1521,22 @@
         <version>1.3.2</version>
       </dependency>
       <dependency>
-        <groupId>com.google.code.findbugs</groupId>
-        <artifactId>annotations</artifactId>
-        <version>3.0.1u2</version>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-annotations</artifactId>
+        <version>3.1.12</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.1.0</version>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>4.0.3</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.woodstox</groupId>
+        <artifactId>woodstox-core</artifactId>
+        <version>6.0.2</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <!-- required for commons-vfs -->
@@ -1495,6 +1573,18 @@
           <exclusion>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-activation_1.1_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-javamail_1.4_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>wstx-asl</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1541,7 +1631,7 @@
           </exclusion>
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
+            <artifactId>jakarta.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1569,7 +1659,7 @@
           </exclusion>
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
+            <artifactId>jakarta.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1638,7 +1728,7 @@
         <exclusions>
           <exclusion>
             <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>javax.inject</artifactId>
+            <artifactId>jakarta.inject</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
