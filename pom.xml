@@ -188,9 +188,9 @@
               <link>https://javaee.github.io/javaee-spec/javadocs/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-              <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
-              <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-              <link>http://lucene.apache.org/solr/8_3_1/solr-solrj/</link>
+              <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
+              <link>http://docs.jboss.org/hibernate/jpa/2.2/api/</link>
+              <link>http://lucene.apache.org/solr/8_3_0/solr-solrj/</link>
             </links>
           </configuration>
         </plugin>
@@ -447,6 +447,8 @@
                         <exclude>javax.persistence:javax.persistence-api</exclude>
                         <exclude>javax.websocket:javax.websocket-api</exclude>
                         <exclude>com.sun.mail:javax.mail</exclude>
+                        <exclude>com.sun.media:jai-codec</exclude>
+                        <exclude>javax.media:jai-core</exclude>
                         <exclude>org.apache.geronimo.specs:geronimo-javamail_1.4_spec</exclude>
                         <exclude>org.codehaus.woodstox:woodstox-core-asl</exclude>
                         <exclude>org.codehaus.woodstox:wstx-asl</exclude>
@@ -708,9 +710,9 @@
                 <link>https://javaee.github.io/javaee-spec/javadocs/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-                <link>http://docs.jboss.org/hibernate/orm/5.2/javadocs/</link>
-                <link>http://docs.jboss.org/hibernate/jpa/2.1/api/</link>
-                <link>http://lucene.apache.org/solr/8_3_1/solr-solrj/</link>
+                <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
+                <link>http://docs.jboss.org/hibernate/jpa/2.2/api/</link>
+                <link>http://lucene.apache.org/solr/8_3_0/solr-solrj/</link>
               </links>
             </configuration>
             <reportSets>
@@ -1074,6 +1076,22 @@
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>woodstox-core-asl</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>io.netty</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty.http2</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -1092,6 +1110,14 @@
           <exclusion>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.media</groupId>
+            <artifactId>jai-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.media</groupId>
+            <artifactId>jai-codec</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
