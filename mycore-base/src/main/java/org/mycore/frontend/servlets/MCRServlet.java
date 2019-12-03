@@ -275,11 +275,19 @@ public class MCRServlet extends HttpServlet {
         // store the HttpSession ID in MCRSession
         if (session.put("http.session", theSession.getId()) == null) {
             //first request
-            MCRStreamUtils.asStream(req.getLocales())
-                .map(Locale::toString)
-                .filter(MCRTranslation.getAvailableLanguages()::contains)
-                .findFirst()
-                .ifPresent(session::setCurrentLanguage);
+            session.beginTransaction(); //for MCRTranslation.getAvailableLanguages()
+            try {
+                MCRStreamUtils.asStream(req.getLocales())
+                    .map(Locale::toString)
+                    .filter(MCRTranslation.getAvailableLanguages()::contains)
+                    .findFirst()
+                    .ifPresent(session::setCurrentLanguage);
+            } finally {
+                if (session.transactionRequiresRollback()) {
+                    session.rollbackTransaction();
+                }
+                session.commitTransaction();
+            }
         }
         // Forward MCRSessionID to XSL Stylesheets
         req.setAttribute("XSL.MCRSessionID", session.getID());
