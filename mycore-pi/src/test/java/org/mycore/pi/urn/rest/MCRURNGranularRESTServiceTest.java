@@ -163,11 +163,6 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         }
 
         @Mock
-        private TreeSet<String> getTrustedProxies() {
-            return new TreeSet<>();
-        }
-
-        @Mock
         public String getBaseURL() {
             return "http://localhost:8291/";
         }

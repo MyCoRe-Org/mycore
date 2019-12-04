@@ -13,10 +13,14 @@
     <pmd.failOnViolation>false</pmd.failOnViolation>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+    </dependency>
     <!-- additional dependencies for the sword-common code -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.abdera</groupId>
@@ -67,7 +71,7 @@
       <artifactId>easy-sword2-lib</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>javax.servlet</groupId>
+          <groupId>jakarta.servlet</groupId>
           <artifactId>servlet-api</artifactId>
         </exclusion>
         <exclusion>

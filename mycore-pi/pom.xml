@@ -28,10 +28,7 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>
-            <!-- ${env.MAVEN_OPTS} -->
-            @{argLine} -javaagent:${org.jmockit:jmockit:jar}
-          </argLine>
+          <argLine>@{argLine} -javaagent:${org.jmockit:jmockit:jar}</argLine>
           <useSystemClassLoader>true</useSystemClassLoader>
           <trimStackTrace>false</trimStackTrace>
         </configuration>
@@ -56,20 +53,20 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>javax.persistence-api</artifactId>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

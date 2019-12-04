@@ -55,7 +55,7 @@ public class MCRLocaleResourceTest extends MCRJerseyTest {
     @Test
     public void languages() {
         final String languagesString = target("locale/languages").request().get(String.class);
-        JsonArray languages = new JsonParser().parse(languagesString).getAsJsonArray();
+        JsonArray languages = JsonParser.parseString(languagesString).getAsJsonArray();
         assertTrue(languages.size() == 3);
     }
 
