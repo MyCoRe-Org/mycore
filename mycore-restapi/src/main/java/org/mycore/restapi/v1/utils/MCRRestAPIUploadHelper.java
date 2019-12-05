@@ -41,7 +41,9 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.jdom2.Content;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -49,9 +51,13 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -145,7 +151,7 @@ public class MCRRestAPIUploadHelper {
      * @throws MCRRestAPIException
      */
     public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID, String label,
-        boolean overwriteOnExistingLabel) throws MCRRestAPIException {
+        String classification, boolean overwriteOnExisting) throws MCRRestAPIException {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
         //  File fXML = null;
@@ -154,10 +160,28 @@ public class MCRRestAPIUploadHelper {
         try {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjIDObj);
             MCRObjectID derID = null;
-            if (overwriteOnExistingLabel) {
-                for (MCRMetaLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                    if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
-                        derID = derLink.getXLinkHrefID();
+            if (overwriteOnExisting) {
+                if (label != null && label.length() > 0) {
+                    for (MCRMetaLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                        if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
+                            derID = derLink.getXLinkHrefID();
+                        }
+                    }
+                }
+                if (classification != null && classification.length() > 0) {
+                    MCRCategoryID categid = MCRCategoryID.fromString(classification);
+                    if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
+                        for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                            for (Content c : derLink.getContentList()) {
+                                if (c instanceof Element && ((Element) c).getName().equals("classification")) {
+                                    Element e = (Element) c;
+                                    if (categid.getRootID().equals(e.getAttributeValue("classid"))
+                                            && categid.getRootID().equals(e.getAttributeValue("categid"))) {
+                                        derID = derLink.getXLinkHrefID();
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -165,16 +189,26 @@ public class MCRRestAPIUploadHelper {
             if (derID == null) {
                 derID = MCRObjectID.getNextFreeId(mcrObjIDObj.getProjectId() + "_derivate");
                 MCRDerivate mcrDerivate = new MCRDerivate();
-                mcrDerivate.setLabel(label);
+                if (label != null && label.length() > 0) {
+                    mcrDerivate.setLabel(label);
+                }
                 mcrDerivate.setId(derID);
                 mcrDerivate.setSchema("datamodel-derivate.xsd");
                 mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
                 mcrDerivate.getDerivate()
-                    .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
+                        .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
+
+                if (classification != null && classification.length() > 0) {
+                    MCRCategoryID categid = MCRCategoryID.fromString(classification);
+                    if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
+                        mcrDerivate.getDerivate().getClassifications()
+                                .add(new MCRMetaClassification("classification", 0, null, categid));
+                    }
+                }
 
                 MCRMetadataManager.create(mcrDerivate);
                 MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-                    MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
+                        MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
             }
 
             response = Response

@@ -72,6 +72,7 @@ import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -580,8 +581,19 @@ public class MCRRestAPIObjectsHelper {
                 MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
                 String mcrID = der.getDerivate().getMetaLink().getXLinkHref();
                 eDerObject.setAttribute("metadata", mcrID);
-                if (der.getLabel() != null) {
+                if (der.getLabel() != null && der.getLabel().length() > 0) {
                     eDerObject.setAttribute("label", der.getLabel());
+                }
+                if (der.getDerivate().getClassifications().size() > 0) {
+                    StringBuffer c = new StringBuffer();
+                    for (int i = 0; i < der.getDerivate().getClassifications().size(); i++) {
+                        if (i > 0) {
+                            c.append(" ");
+                        }
+                        MCRMetaClassification cl = der.getDerivate().getClassifications().get(i);
+                        c.append(cl.getClassId()).append(":").append(cl.getCategId());
+                    }
+                    eDerObject.setAttribute("classifications", c.toString());
                 }
                 eDerObject.setAttribute("lastModified", SDF_UTC.format(oid.getLastModified()));
                 eDerObject.setAttribute("href", info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
