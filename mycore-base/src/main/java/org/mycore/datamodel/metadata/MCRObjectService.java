@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
@@ -245,10 +246,10 @@ public class MCRObjectService {
         }
 
         return IntStream.range(0, dates.size())
-            .mapToObj(dates::get)
-            .filter(d -> d.getType().equals(type))
-            .findAny()
-            .orElse(null);
+                .mapToObj(dates::get)
+                .filter(d -> d.getType().equals(type))
+                .findAny()
+                .orElse(null);
     }
 
     /**
@@ -263,22 +264,6 @@ public class MCRObjectService {
     }
 
     /**
-     * This method sets the status classification
-     */
-    public final void setState(MCRCategoryID state) {
-        if (state == null) {
-            this.state = state;
-        } else {
-            if (MCRCategoryDAOFactory.getInstance().exist(state)) {
-                this.state = state;
-            } else {
-                LOGGER.error("Error at setting servstate classification.",
-                    new MCRException("The category " + state + " does not exist."));
-            }
-        }
-    }
-
-    /**
      * This method set a date element in the dates list to a given date value.
      * If the given type exists, the date was update.
      * 
@@ -286,6 +271,7 @@ public class MCRObjectService {
      *            the type of the date
      * @param date
      *            set time to this Calendar
+     *            null means the actual date
      */
     public final void setDate(String type, Date date) {
         MCRMetaISO8601Date d = getISO8601Date(type); //search date in ArrayList
@@ -315,6 +301,67 @@ public class MCRObjectService {
         }
     }
 
+    /**
+     * This method removes the date of the specified type from
+     * the date list.
+     * 
+     * @param type
+     *            a type as string
+     */
+    public final void removeDate(String type) {
+        if (DATE_TYPE_CREATEDATE.equals(type) || DATE_TYPE_MODIFYDATE.equals(type)) {
+            LOGGER.error("Cannot delete built-in date: " + type);
+        } else {
+            MCRMetaISO8601Date d = getISO8601Date(type);
+            if (d != null) {
+                dates.remove(d);
+            }
+        }
+    }
+
+    /**
+     * This method sets the status classification
+     */
+    public final void setState(MCRCategoryID state) {
+        if (state == null) {
+            this.state = state;
+        } else {
+            if (MCRCategoryDAOFactory.getInstance().exist(state)) {
+                this.state = state;
+            } else {
+                LOGGER.error("Error at setting servstate classification.",
+                        new MCRException("The category " + state + " does not exist."));
+            }
+        }
+    }
+
+    /**
+     * This method sets the status classification with the given string as categid
+     * and the default classid ('state')
+     */
+    public final void setState(String state) {
+        if (state == null) {
+            this.state = null;
+        } else {
+            MCRCategoryID categState = new MCRCategoryID(
+                    MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID", "state"),
+                    state);
+            if (MCRCategoryDAOFactory.getInstance().exist(categState)) {
+                this.state = categState;
+            } else {
+                LOGGER.error("Error at setting servstate classification.",
+                        new MCRException("The category " + categState + " does not exist."));
+            }
+        }
+    }
+
+    /**
+     * This method removes the current state
+     */
+    public final void removeState() {
+        this.state = null;
+    }
+    
     /**
      * This method add a flag to the flag list.
      * 
