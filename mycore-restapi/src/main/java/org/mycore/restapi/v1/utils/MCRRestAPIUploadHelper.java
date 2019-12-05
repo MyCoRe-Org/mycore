@@ -116,7 +116,7 @@ public class MCRRestAPIUploadHelper {
 
             MCRObjectCommands.updateFromFile(fXML.toString(), false); // handles "create" as well
 
-            return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID).build())
+            return Response.created(info.getBaseUriBuilder().path("objects/" + mcrID).build())
                 .type("application/xml; charset=UTF-8")
                 .build();
         } catch (Exception e) {
@@ -178,7 +178,7 @@ public class MCRRestAPIUploadHelper {
             }
 
             response = Response
-                .created(info.getBaseUriBuilder().path("v1/objects/" + mcrObjID + "/derivates/" + derID).build())
+                .created(info.getBaseUriBuilder().path("objects/" + mcrObjID + "/derivates/" + derID).build())
                 .type("application/xml; charset=UTF-8")
                 .build();
         } catch (Exception e) {
@@ -294,7 +294,7 @@ public class MCRRestAPIUploadHelper {
                 MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
         }
         return Response
-            .created(info.getBaseUriBuilder().path("v1/objects/" + objID + "/derivates/" + derID + "/contents").build())
+            .created(info.getBaseUriBuilder().path("objects/" + objID + "/derivates/" + derID + "/contents").build())
             .type("application/xml; charset=UTF-8").build();
     }
 
@@ -333,7 +333,7 @@ public class MCRRestAPIUploadHelper {
 
         return Response
             .created(info.getBaseUriBuilder()
-                .path("v1/objects/" + objID + "/derivates/" + derID + "/contents")
+                .path("objects/" + objID + "/derivates/" + derID + "/contents")
                 .build())
             .type("application/xml; charset=UTF-8")
             .build();
@@ -357,7 +357,7 @@ public class MCRRestAPIUploadHelper {
         try {
             MCRMetadataManager.deleteMCRDerivate(derID);
             return Response
-                .created(info.getBaseUriBuilder().path("v1/objects/" + objID + "/derivates").build())
+                .created(info.getBaseUriBuilder().path("objects/" + objID + "/derivates").build())
                 .type("application/xml; charset=UTF-8")
                 .build();
         } catch (MCRAccessException e) {
