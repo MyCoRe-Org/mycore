@@ -69,7 +69,7 @@ public class MCRXMLParserImpl implements MCRXMLParser {
         builder.setFeature(FEATURE_SCHEMA_SUPPORT, validate);
         builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
         builder.setErrorHandler(new MCRXMLParserErrorHandler(silent));
-        builder.setEntityResolver(new XercesBugFixResolver(MCREntityResolver.instance()));
+        builder.setEntityResolver(new AbsoluteToRelativeResolver(MCREntityResolver.instance()));
     }
 
     public boolean isValidating() {
@@ -117,14 +117,14 @@ public class MCRXMLParserImpl implements MCRXMLParser {
      * 
      * @author Thomas Scheffler (yagee)
      */
-    private static class XercesBugFixResolver implements EntityResolver2 {
+    private static class AbsoluteToRelativeResolver implements EntityResolver2 {
         private EntityResolver2 fallback;
 
         private static Logger LOGGER = LogManager.getLogger(MCRXMLParserImpl.class);
 
         private static URI baseDirURI = Paths.get("").toAbsolutePath().toUri();
 
-        XercesBugFixResolver(EntityResolver2 fallback) {
+        AbsoluteToRelativeResolver(EntityResolver2 fallback) {
             this.fallback = fallback;
         }
 

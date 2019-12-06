@@ -21,8 +21,6 @@
             <id>analyze</id>
             <configuration>
               <usedDependencies>
-                <!-- missed by runtime implementation -->
-                <useDepdendency>jakarta.activation:jakarta.activation-api</useDepdendency>
                 <!-- used by commons-vfs -->
                 <useDependency>com.jcraft:jsch</useDependency>
                 <!-- used by svnkit -->
@@ -31,8 +29,6 @@
                 <useDependency>org.hsqldb:hsqldb</useDependency>
                 <!-- used by hibernate -->
                 <useDependency>org.javassist:javassist</useDependency>
-                <!-- used for XML catalog resolving -->
-                <useDependency>xml-resolver:xml-resolver</useDependency>
               </usedDependencies>
             </configuration>
           </execution>
@@ -382,17 +378,8 @@
       <artifactId>xalan</artifactId>
     </dependency>
     <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>xml-resolver</groupId>
-      <artifactId>xml-resolver</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>

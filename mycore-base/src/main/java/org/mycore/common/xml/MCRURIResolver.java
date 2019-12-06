@@ -280,7 +280,7 @@ public final class MCRURIResolver implements URIResolver {
                     LOGGER.debug("Resolved via EntityResolver: {}", entity.getSystemId());
                     return new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
                 }
-            } catch (SAXException | IOException e) {
+            } catch (IOException e) {
                 LOGGER.debug("Error while resolving uri: {}", href);
             }
             // http://

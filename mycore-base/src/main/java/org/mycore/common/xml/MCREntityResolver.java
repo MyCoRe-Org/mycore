@@ -32,39 +32,40 @@ import java.nio.file.Paths;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Enumeration;
 import java.util.Objects;
-import java.util.Vector;
+
+import javax.xml.catalog.CatalogException;
+import javax.xml.catalog.CatalogFeatures;
+import javax.xml.catalog.CatalogManager;
+import javax.xml.catalog.CatalogResolver;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xerces.util.XMLCatalogResolver;
-import org.apache.xerces.xni.XMLResourceIdentifier;
-import org.apache.xerces.xni.XNIException;
-import org.apache.xerces.xni.parser.XMLEntityResolver;
-import org.apache.xerces.xni.parser.XMLInputSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRStreamUtils;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.function.MCRThrowFunction;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
- * MCREntityResolver uses {@link XMLCatalogResolver} for resolving entities or - for compatibility reasons - looks in
+ * MCREntityResolver uses {@link CatalogResolver} for resolving entities or - for compatibility reasons - looks in
  * classpath to resolve XSD and DTD files.
  * 
  * @author Thomas Scheffler (yagee)
  * @since 2013.10
  */
-public class MCREntityResolver implements EntityResolver2, LSResourceResolver, XMLEntityResolver {
+public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
 
     public static final Logger LOGGER = LogManager.getLogger(MCREntityResolver.class);
 
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
-    XMLCatalogResolver catalogResolver;
+    CatalogResolver catalogResolver;
 
     private MCRCache<String, InputSourceProvider> bytesCache;
 
@@ -75,14 +76,12 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
-        Vector<String> catalogURIs = new Vector<>();
-        while (systemResources.hasMoreElements()) {
-            URL catalogURL = systemResources.nextElement();
-            LOGGER.info("Using XML catalog: {}", catalogURL);
-            catalogURIs.add(catalogURL.toString());
-        }
-        String[] catalogs = catalogURIs.toArray(new String[catalogURIs.size()]);
-        catalogResolver = new XMLCatalogResolver(catalogs);
+        URI[] catalogURIs = MCRStreamUtils.asStream(systemResources)
+            .map(URL::toString)
+            .peek(c -> LOGGER.info("Using XML catalog: {}", c))
+            .map(URI::create)
+            .toArray(URI[]::new);
+        catalogResolver = CatalogManager.catalogResolver(CatalogFeatures.defaults(), catalogURIs);
         int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
         bytesCache = new MCRCache<>(cacheSize, "EntityResolver Resources");
     }
@@ -103,30 +102,35 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         }
     }
 
+    private InputSource resolveEntity(String publicId, String systemId,
+        MCRThrowFunction<CatalogEntityIdentifier, InputSource, IOException> alternative) throws IOException {
+        try {
+            InputSource entity = catalogResolver.resolveEntity(publicId, systemId);
+            if (entity != null) {
+                return resolvedEntity(entity);
+            }
+        } catch (CatalogException e) {
+            LOGGER.debug(e.getMessage());
+        }
+        return alternative.apply(new CatalogEntityIdentifier(publicId, systemId));
+    }
+
     /* (non-Javadoc)
      * @see org.xml.sax.EntityResolver#resolveEntity(java.lang.String, java.lang.String)
      */
     @Override
-    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+    public InputSource resolveEntity(String publicId, String systemId) throws IOException {
         LOGGER.debug("Resolving: \npublicId: {}\nsystemId: {}", publicId, systemId);
-        InputSource entity = catalogResolver.resolveEntity(publicId, systemId);
-        if (entity != null) {
-            return resolvedEntity(entity);
-        }
-        return resolveEntity(null, publicId, null, systemId);
+        return resolveEntity(publicId, systemId, id -> resolveClassRessource(id.publicId, id.systemId));
     }
 
     /* (non-Javadoc)
      * @see org.xml.sax.ext.EntityResolver2#getExternalSubset(java.lang.String, java.lang.String)
      */
     @Override
-    public InputSource getExternalSubset(String name, String baseURI) throws SAXException, IOException {
+    public InputSource getExternalSubset(String name, String baseURI) {
         LOGGER.debug("External Subset: \nname: {}\nbaseURI: {}", name, baseURI);
-        InputSource externalSubset = catalogResolver.getExternalSubset(name, baseURI);
-        if (externalSubset != null) {
-            return resolvedEntity(externalSubset);
-        }
-        return resolveEntity(name, null, baseURI, null);
+        return null;
     }
 
     /* (non-Javadoc)
@@ -134,28 +138,41 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
      */
     @Override
     public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId)
-        throws SAXException, IOException {
+        throws IOException {
         LOGGER.debug("Resolving: \nname: {}\npublicId: {}\nbaseURI: {}\nsystemId: {}", name, publicId, baseURI,
             systemId);
-        InputSource entity = catalogResolver.resolveEntity(name, publicId, baseURI, systemId);
-        if (entity != null) {
-            return resolvedEntity(entity);
-        }
-        if (systemId == null) {
+        return resolveEntity(publicId, systemId, id -> resolveRelativeEntity(baseURI, id));
+    }
+
+    private InputSource resolveRelativeEntity(String baseURI, CatalogEntityIdentifier id)
+        throws IOException {
+        if (id.systemId == null) {
             return null; // Use default resolver
         }
 
-        if (systemId.length() == 0) {
+        if (id.systemId.length() == 0) {
             // if you overwrite SYSTEM by empty String in XSL
             return new InputSource(new StringReader(""));
         }
 
         //resolve against base:
-        URI absoluteSystemId = resolveRelativeURI(baseURI, systemId);
-        if (absoluteSystemId.isAbsolute() && uriExists(absoluteSystemId)) {
-            InputSource inputSource = new InputSource(absoluteSystemId.toString());
-            inputSource.setPublicId(publicId);
-            return resolvedEntity(inputSource);
+        URI absoluteSystemId = resolveRelativeURI(baseURI, id.systemId);
+        if (absoluteSystemId.isAbsolute()) {
+            if (uriExists(absoluteSystemId)) {
+                InputSource inputSource = new InputSource(absoluteSystemId.toString());
+                inputSource.setPublicId(id.publicId);
+                return resolvedEntity(inputSource);
+            }
+            //resolve absolute URI against catalog first
+            return resolveEntity(id.publicId, absoluteSystemId.toString(),
+                id2 -> resolveClassRessource(id.publicId, id.systemId));
+        }
+        return resolveClassRessource(id.publicId, id.systemId);
+    }
+
+    private InputSource resolveClassRessource(String publicId, String systemId) throws IOException {
+        if (MCRUtils.filterTrimmedNotEmpty(systemId).isEmpty()) {
+            return null;
         }
         //required for XSD files that are usually classpath resources
         InputSource is = getCachedResource("/" + systemId);
@@ -216,7 +233,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
     }
 
     private InputSource resolvedEntity(InputSource entity) {
-        String msg = "Resolved  to: " + entity.getSystemId() + ".";
+        String msg = "Resolved to: " + entity.getSystemId() + ".";
         LOGGER.debug(msg);
         return entity;
     }
@@ -242,18 +259,6 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
         return is.newInputSource();
     }
 
-    @Override
-    public XMLInputSource resolveEntity(XMLResourceIdentifier resourceIdentifier) throws XNIException, IOException {
-        XMLInputSource entity = catalogResolver.resolveEntity(resourceIdentifier);
-        if (entity == null) {
-            LOGGER.debug("Could not resolve entity: {}", resourceIdentifier.getBaseSystemId());
-            LOGGER.debug("Identifer: {}", catalogResolver.resolveIdentifier(resourceIdentifier));
-            return null;
-        }
-        LOGGER.debug("Resolve entity: {} --> {}", resourceIdentifier.getBaseSystemId(), entity.getBaseSystemId());
-        return entity;
-    }
-
     private static class MCREntityResolverHolder {
         public static MCREntityResolver instance = new MCREntityResolver();
     }
@@ -272,6 +277,17 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver, X
             InputSource is = new InputSource(url.toString());
             is.setByteStream(new ByteArrayInputStream(bytes));
             return is;
+        }
+    }
+
+    private static class CatalogEntityIdentifier {
+        private String publicId;
+
+        private String systemId;
+
+        private CatalogEntityIdentifier(String publicId, String systemId) {
+            this.publicId = publicId;
+            this.systemId = systemId;
         }
     }
 }
