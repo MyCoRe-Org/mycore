@@ -329,7 +329,7 @@ public class MCRObjectService {
             if (MCRCategoryDAOFactory.getInstance().exist(state)) {
                 this.state = state;
             } else {
-                LOGGER.error("Error at setting servstate classification.",
+                LOGGER.warn("Error at setting servstate classification.",
                         new MCRException("The category " + state + " does not exist."));
             }
         }
@@ -346,12 +346,7 @@ public class MCRObjectService {
             MCRCategoryID categState = new MCRCategoryID(
                     MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID", "state"),
                     state);
-            if (MCRCategoryDAOFactory.getInstance().exist(categState)) {
-                this.state = categState;
-            } else {
-                LOGGER.error("Error at setting servstate classification.",
-                        new MCRException("The category " + categState + " does not exist."));
-            }
+            setState(categState);
         }
     }
 
