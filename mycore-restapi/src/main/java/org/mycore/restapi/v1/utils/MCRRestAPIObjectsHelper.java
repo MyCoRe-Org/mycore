@@ -588,10 +588,10 @@ public class MCRRestAPIObjectsHelper {
                     StringBuffer c = new StringBuffer();
                     for (int i = 0; i < der.getDerivate().getClassifications().size(); i++) {
                         if (i > 0) {
-                            c.append(" ");
+                            c.append(' ');
                         }
                         MCRMetaClassification cl = der.getDerivate().getClassifications().get(i);
-                        c.append(cl.getClassId()).append(":").append(cl.getCategId());
+                        c.append(cl.getClassId()).append(':').append(cl.getCategId());
                     }
                     eDerObject.setAttribute("classifications", c.toString());
                 }
