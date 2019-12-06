@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
@@ -151,7 +152,7 @@ public class MCRRestAPIUploadHelper {
      * @throws MCRRestAPIException
      */
     public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID, String label,
-        String classification, boolean overwriteOnExisting) throws MCRRestAPIException {
+        String classifications, boolean overwriteOnExisting) throws MCRRestAPIException {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
         //  File fXML = null;
@@ -168,19 +169,27 @@ public class MCRRestAPIUploadHelper {
                         }
                     }
                 }
-                if (classification != null && classification.length() > 0) {
-                    MCRCategoryID categid = MCRCategoryID.fromString(classification);
-                    if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
-                        for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                            for (Content c : derLink.getContentList()) {
-                                if (c instanceof Element && ((Element) c).getName().equals("classification")) {
-                                    Element e = (Element) c;
-                                    if (categid.getRootID().equals(e.getAttributeValue("classid"))
-                                            && categid.getRootID().equals(e.getAttributeValue("categid"))) {
-                                        derID = derLink.getXLinkHrefID();
+                if (derID == null && classifications != null && classifications.length() > 0) {
+                    for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                        for (String cl : Arrays.asList(classifications.split(" "))) {
+                            MCRCategoryID categid = MCRCategoryID.fromString(cl);
+                            if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
+                                for (Content c : derLink.getContentList()) {
+                                    if (c instanceof Element && ((Element) c).getName().equals("classification")) {
+                                        Element e = (Element) c;
+                                        if (categid.getRootID().equals(e.getAttributeValue("classid"))
+                                                && categid.getID().equals(e.getAttributeValue("categid"))) {
+                                            derID = derLink.getXLinkHrefID();
+                                        } else {
+                                            derID = null;
+                                            break;
+                                        }
                                     }
                                 }
                             }
+                        }
+                        if (derID != null) {
+                            break;
                         }
                     }
                 }
@@ -198,11 +207,13 @@ public class MCRRestAPIUploadHelper {
                 mcrDerivate.getDerivate()
                         .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
 
-                if (classification != null && classification.length() > 0) {
-                    MCRCategoryID categid = MCRCategoryID.fromString(classification);
-                    if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
-                        mcrDerivate.getDerivate().getClassifications()
+                if (classifications != null && classifications.length() > 0) {
+                    for (String cl : Arrays.asList(classifications.split(" "))) {
+                        MCRCategoryID categid = MCRCategoryID.fromString(cl);
+                        if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
+                            mcrDerivate.getDerivate().getClassifications()
                                 .add(new MCRMetaClassification("classification", 0, null, categid));
+                        }
                     }
                 }
 
@@ -239,8 +250,8 @@ public class MCRRestAPIUploadHelper {
      */
     public static Response uploadFile(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID, InputStream uploadedInputStream, FormDataContentDisposition fileDetails,
-        String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5, Long formParamSize)
-        throws MCRRestAPIException {
+        String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5, 
+        Long formParamSize) throws MCRRestAPIException {
 
         SortedMap<String, String> parameter = new TreeMap<>();
         parameter.put("mcrObjectID", pathParamMcrObjID);
@@ -288,8 +299,7 @@ public class MCRRestAPIUploadHelper {
 
             if (formParamUnzip) {
                 String maindoc = null;
-                try (ZipInputStream zis = new ZipInputStream(
-                    new BufferedInputStream(uploadedInputStream))) {
+                try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(uploadedInputStream))) {
                     ZipEntry entry;
                     while ((entry = zis.getNextEntry()) != null) {
                         LOGGER.debug("Unzipping: {}", entry.getName());
@@ -324,8 +334,8 @@ public class MCRRestAPIUploadHelper {
             Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
         } catch (IOException | MCRPersistenceException | MCRAccessException e) {
             LOGGER.error(e);
-            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
-                MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
+            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
         }
         return Response
             .created(info.getBaseUriBuilder().path("objects/" + objID + "/derivates/" + derID + "/contents").build())
