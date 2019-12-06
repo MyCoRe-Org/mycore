@@ -147,7 +147,8 @@ public class MCRRestAPIUploadHelper {
      * @param request - the HTTPServletRequest object 
      * @param mcrObjID - the MyCoRe Object ID
      * @param label - the label of the new derivate
-     * @param overwriteOnExistingLabel, if true an existing MyCoRe derivate with the given label will be returned 
+     * @param overwriteOnExisting, if true, an existing MyCoRe derivate
+     *        with the given label or classification will be returned 
      * @return a Jersey Response object
      * @throws MCRRestAPIException
      */
