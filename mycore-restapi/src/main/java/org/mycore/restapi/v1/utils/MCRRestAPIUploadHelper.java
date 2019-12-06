@@ -188,8 +188,9 @@ public class MCRRestAPIUploadHelper {
                                     }
                                 }
                             } else {
-                                throw new MCRRestAPIException(Status.NOT_FOUND, new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, 
-                                        "Classification not found.", "There is no classification with the ID "+cl));
+                                throw new MCRRestAPIException(Status.NOT_FOUND,
+                                        new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
+                                                "There is no classification with the ID " + cl));
                             }
                         }
                         if (derID != null) {
