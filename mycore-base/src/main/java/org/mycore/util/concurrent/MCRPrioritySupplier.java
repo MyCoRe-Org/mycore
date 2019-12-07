@@ -18,6 +18,7 @@
 
 package org.mycore.util.concurrent;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 /**
@@ -31,6 +32,8 @@ import java.util.function.Supplier;
  */
 public class MCRPrioritySupplier<T> implements Supplier<T>, MCRPrioritizable {
 
+    private static AtomicLong CREATION_COUNTER = new AtomicLong(0);
+    
     private Supplier<T> delegate;
 
     private int priority;
@@ -40,7 +43,7 @@ public class MCRPrioritySupplier<T> implements Supplier<T>, MCRPrioritizable {
     public MCRPrioritySupplier(Supplier<T> delegate, int priority) {
         this.delegate = delegate;
         this.priority = priority;
-        this.created = System.nanoTime();
+        this.created = CREATION_COUNTER.incrementAndGet();
     }
 
     @Override
