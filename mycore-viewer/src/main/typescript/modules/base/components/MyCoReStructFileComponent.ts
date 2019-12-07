@@ -32,7 +32,7 @@ namespace mycore.viewer.components {
             new mycore.viewer.widgets.modal.ViewerErrorModal(
                 this.settings.mobile,
                 context.lm.getTranslation('noStructFileShort'),
-                context.lm.getFormatedTranslation('noStructFile', '<a href="ailto:"'
+                context.lm.getFormatedTranslation('noStructFile', '<a href="mailto:"'
                     + this.settings.adminMail + '>' + this.settings.adminMail + '</a>'),
                 this.settings.webApplicationBaseURL + '/modules/iview2/img/sad-emotion-egg.jpg',
                 this.container[ 0 ]).show();
