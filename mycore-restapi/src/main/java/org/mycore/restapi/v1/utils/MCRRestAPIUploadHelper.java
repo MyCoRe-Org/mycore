@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.zip.ZipEntry;
@@ -41,7 +42,9 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.jdom2.Content;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -49,9 +52,13 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -116,7 +123,7 @@ public class MCRRestAPIUploadHelper {
 
             MCRObjectCommands.updateFromFile(fXML.toString(), false); // handles "create" as well
 
-            return Response.created(info.getBaseUriBuilder().path("v1/objects/" + mcrID).build())
+            return Response.created(info.getBaseUriBuilder().path("objects/" + mcrID).build())
                 .type("application/xml; charset=UTF-8")
                 .build();
         } catch (Exception e) {
@@ -140,12 +147,13 @@ public class MCRRestAPIUploadHelper {
      * @param request - the HTTPServletRequest object 
      * @param mcrObjID - the MyCoRe Object ID
      * @param label - the label of the new derivate
-     * @param overwriteOnExistingLabel, if true an existing MyCoRe derivate with the given label will be returned 
+     * @param overwriteOnExisting, if true, an existing MyCoRe derivate
+     *        with the given label or classification will be returned 
      * @return a Jersey Response object
      * @throws MCRRestAPIException
      */
     public static Response uploadDerivate(UriInfo info, HttpServletRequest request, String mcrObjID, String label,
-        boolean overwriteOnExistingLabel) throws MCRRestAPIException {
+        String classifications, boolean overwriteOnExisting) throws MCRRestAPIException {
         Response response = Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
         //  File fXML = null;
@@ -154,10 +162,40 @@ public class MCRRestAPIUploadHelper {
         try {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjIDObj);
             MCRObjectID derID = null;
-            if (overwriteOnExistingLabel) {
-                for (MCRMetaLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                    if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
-                        derID = derLink.getXLinkHrefID();
+            if (overwriteOnExisting) {
+                if (label != null && label.length() > 0) {
+                    for (MCRMetaLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                        if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
+                            derID = derLink.getXLinkHrefID();
+                        }
+                    }
+                }
+                if (derID == null && classifications != null && classifications.length() > 0) {
+                    for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                        for (String cl : Arrays.asList(classifications.split(" "))) {
+                            MCRCategoryID categid = MCRCategoryID.fromString(cl);
+                            if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
+                                for (Content c : derLink.getContentList()) {
+                                    if (c instanceof Element && ((Element) c).getName().equals("classification")) {
+                                        Element e = (Element) c;
+                                        if (categid.getRootID().equals(e.getAttributeValue("classid"))
+                                                && categid.getID().equals(e.getAttributeValue("categid"))) {
+                                            derID = derLink.getXLinkHrefID();
+                                        } else {
+                                            derID = null;
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                throw new MCRRestAPIException(Status.NOT_FOUND,
+                                        new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
+                                                "There is no classification with the ID " + cl));
+                            }
+                        }
+                        if (derID != null) {
+                            break;
+                        }
                     }
                 }
             }
@@ -165,20 +203,32 @@ public class MCRRestAPIUploadHelper {
             if (derID == null) {
                 derID = MCRObjectID.getNextFreeId(mcrObjIDObj.getProjectId() + "_derivate");
                 MCRDerivate mcrDerivate = new MCRDerivate();
-                mcrDerivate.setLabel(label);
+                if (label != null && label.length() > 0) {
+                    mcrDerivate.setLabel(label);
+                }
                 mcrDerivate.setId(derID);
                 mcrDerivate.setSchema("datamodel-derivate.xsd");
                 mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
                 mcrDerivate.getDerivate()
-                    .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
+                        .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
+
+                if (classifications != null && classifications.length() > 0) {
+                    for (String cl : Arrays.asList(classifications.split(" "))) {
+                        MCRCategoryID categid = MCRCategoryID.fromString(cl);
+                        if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
+                            mcrDerivate.getDerivate().getClassifications()
+                                .add(new MCRMetaClassification("classification", 0, null, categid));
+                        }
+                    }
+                }
 
                 MCRMetadataManager.create(mcrDerivate);
                 MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-                    MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
+                        MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
             }
 
             response = Response
-                .created(info.getBaseUriBuilder().path("v1/objects/" + mcrObjID + "/derivates/" + derID).build())
+                .created(info.getBaseUriBuilder().path("objects/" + mcrObjID + "/derivates/" + derID).build())
                 .type("application/xml; charset=UTF-8")
                 .build();
         } catch (Exception e) {
@@ -205,8 +255,8 @@ public class MCRRestAPIUploadHelper {
      */
     public static Response uploadFile(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID, InputStream uploadedInputStream, FormDataContentDisposition fileDetails,
-        String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5, Long formParamSize)
-        throws MCRRestAPIException {
+        String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5, 
+        Long formParamSize) throws MCRRestAPIException {
 
         SortedMap<String, String> parameter = new TreeMap<>();
         parameter.put("mcrObjectID", pathParamMcrObjID);
@@ -254,8 +304,7 @@ public class MCRRestAPIUploadHelper {
 
             if (formParamUnzip) {
                 String maindoc = null;
-                try (ZipInputStream zis = new ZipInputStream(
-                    new BufferedInputStream(uploadedInputStream))) {
+                try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(uploadedInputStream))) {
                     ZipEntry entry;
                     while ((entry = zis.getNextEntry()) != null) {
                         LOGGER.debug("Unzipping: {}", entry.getName());
@@ -290,11 +339,11 @@ public class MCRRestAPIUploadHelper {
             Files.walkFileTree(derDir, MCRRecursiveDeleter.instance());
         } catch (IOException | MCRPersistenceException | MCRAccessException e) {
             LOGGER.error(e);
-            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR, new MCRRestAPIError(
-                MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
+            throw new MCRRestAPIException(Status.INTERNAL_SERVER_ERROR,
+                new MCRRestAPIError(MCRRestAPIError.CODE_INTERNAL_ERROR, "Internal error", e.getMessage()));
         }
         return Response
-            .created(info.getBaseUriBuilder().path("v1/objects/" + objID + "/derivates/" + derID + "/contents").build())
+            .created(info.getBaseUriBuilder().path("objects/" + objID + "/derivates/" + derID + "/contents").build())
             .type("application/xml; charset=UTF-8").build();
     }
 
@@ -333,7 +382,7 @@ public class MCRRestAPIUploadHelper {
 
         return Response
             .created(info.getBaseUriBuilder()
-                .path("v1/objects/" + objID + "/derivates/" + derID + "/contents")
+                .path("objects/" + objID + "/derivates/" + derID + "/contents")
                 .build())
             .type("application/xml; charset=UTF-8")
             .build();
@@ -357,7 +406,7 @@ public class MCRRestAPIUploadHelper {
         try {
             MCRMetadataManager.deleteMCRDerivate(derID);
             return Response
-                .created(info.getBaseUriBuilder().path("v1/objects/" + objID + "/derivates").build())
+                .created(info.getBaseUriBuilder().path("objects/" + objID + "/derivates").build())
                 .type("application/xml; charset=UTF-8")
                 .build();
         } catch (MCRAccessException e) {
