@@ -48,7 +48,8 @@ namespace mycore.viewer.components {
                         + Math.floor(height / scaleFactor) + '/0/default.jpg';
                 };
 
-                const manifestPromise = mycore.viewer.widgets.iiif.IviewIIIFProvider.loadModel(this.settings.manifestURL, tilePathBuilder);
+                const manifestPromise = mycore.viewer.widgets.iiif.IviewIIIFProvider
+                    .loadModel(this.settings.manifestURL, this.settings.imageAPIURL, tilePathBuilder);
                 manifestPromise.then((resolved: { model: model.StructureModel; document: Document }) => {
                     const model = resolved.model;
                     this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
@@ -74,7 +75,7 @@ namespace mycore.viewer.components {
             }
         }
 
-        public handle(e: mycore.viewer.widgets.events.ViewerEvent):void {
+        public handle(e: mycore.viewer.widgets.events.ViewerEvent): void {
 
             if (e.type === events.LanguageModelLoadedEvent.TYPE) {
                 const languageModelLoadedEvent = <events.LanguageModelLoadedEvent>e;
@@ -87,7 +88,7 @@ namespace mycore.viewer.components {
         }
 
         private getScaleFactor(width: number, height: number) {
-            let largestScaling = Math.min(256 / width , 256 / height); //TODO make smallest size dynamic
+            const largestScaling = Math.min(256 / width , 256 / height); //TODO make smallest size dynamic
             return Math.pow(2, Math.ceil(Math.log(largestScaling) / Math.log(1 / 2)));
         }
 

@@ -27,6 +27,7 @@ namespace mycore.viewer.widgets.iiif {
     export class IviewIIIFProvider {
 
         public static loadModel(manifestDocumentLocation: string,
+                                imageAPIURL: string,
                                 tilePathBuilder: (href: string,
                                                   width: number,
                                                   height: number)
@@ -37,7 +38,7 @@ namespace mycore.viewer.widgets.iiif {
                 url: manifestDocumentLocation,
                 success: (response: any) => {
                     const manifest = <Manifest> manifesto.create(response);
-                    const builder = new IIIFStructureBuilder(<Manifest> manifest, tilePathBuilder);
+                    const builder = new IIIFStructureBuilder(<Manifest> manifest, tilePathBuilder, imageAPIURL);
                     promise.resolve({model : builder.processManifest(), document : response});
                 },
                 error: (request: any, status: string, exception: string) => {

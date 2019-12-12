@@ -48,7 +48,12 @@ namespace mycore.viewer {
 
             settings.filePath = encodeURI(settings.filePath);
 
-            if(settings.webApplicationBaseURL.lastIndexOf("/")==settings.webApplicationBaseURL.length-1){
+            if (settings.filePath.indexOf('_derivate_') > 0) {
+                settings.filePath = settings.filePath.replace('/', '%2F');
+            }
+
+            if(settings.webApplicationBaseURL !== "undefined"
+                && settings.webApplicationBaseURL.lastIndexOf("/") === settings.webApplicationBaseURL.length - 1){
                 settings.webApplicationBaseURL = settings.webApplicationBaseURL.substring(0, settings.webApplicationBaseURL.length-1);
             }
 

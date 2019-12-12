@@ -45,7 +45,8 @@ namespace mycore.viewer.widgets.iiif {
         private vImageHrefImageMap: MyCoReMap<string, model.StructureImage>;
 
         constructor(private manifestDocument: Manifest,
-                    private tilePathBuilder: (href: string, width: number, height: number) => string) {
+                    private tilePathBuilder: (href: string, width: number, height: number) => string,
+                    private imageAPIURL) {
 
         }
 
@@ -60,7 +61,8 @@ namespace mycore.viewer.widgets.iiif {
             this.vChapterImageMap = new MyCoReMap<string, model.StructureImage>();
             this.vImageChapterMap = new MyCoReMap<string, model.StructureChapter>();
             this.vImprovisationMap = new MyCoReMap<string, boolean>(); // see makeLink
-            this.vManifestChapter = this.processChapter(null, this.manifestDocument.getTopRanges()[0]);
+            this.vManifestChapter = this.processChapter(null, this.manifestDocument.getTopRanges()[0],
+                this.manifestDocument.getSequences()[0].getCanvases());
             this.vImageHrefImageMap = new MyCoReMap<string, model.StructureImage>();
             this.vImageList = [];
 
@@ -78,20 +80,32 @@ namespace mycore.viewer.widgets.iiif {
             return this.vStructureModel;
         }
 
-        private processChapter(parent: model.StructureChapter, chapter: IRange): model.StructureChapter {
+        private processChapter(parent: model.StructureChapter, chapter: IRange, cans: ICanvas[]): model.StructureChapter {
             // if (chapter.nodeName.toString() == "mets:mptr") {
             //     return;
             // }
             //TODO Chaptertype currently not in Manifest
-            const chapterObject = new model.StructureChapter(parent,
-                '', this.getIDFromURL(chapter.id), chapter.getDefaultLabel());
-            // let chapterChildren = chapter.getRanges();
+            let chapterObject;
+            if (chapter === undefined || (chapter.getCanvasIds().length === 0 && chapter.getRanges().length === 0)) {
+                chapterObject = new model.StructureChapter(parent,
+                    '', 'LOG_0', this.manifestDocument.getDefaultLabel());
+                this.vChapterIdMap.set(chapterObject.id, chapterObject);
+                cans.forEach((can: ICanvas) => {
+                    const childChap = new model.StructureChapter(chapterObject,
+                        chapterObject, this.getIDFromURL(can.id), can.getDefaultLabel());
+                    chapterObject.chapter.push(childChap);
+                    this.vChapterIdMap.set(childChap.id, childChap);
+                });
+            }
+            else {
+                chapterObject = new model.StructureChapter(parent,
+                    '', this.getIDFromURL(chapter.id), chapter.getDefaultLabel());
+                this.vChapterIdMap.set(chapterObject.id, chapterObject);
+                chapter.getRanges().forEach((childChap: IRange) => {
+                    chapterObject.chapter.push(this.processChapter(chapterObject, childChap, []));
+                });
+            }
 
-            this.vChapterIdMap.set(chapterObject.id, chapterObject);
-
-            chapter.getRanges().forEach((childChap: IRange) => {
-                chapterObject.chapter.push(this.processChapter(chapterObject, childChap));
-            });
             return chapterObject;
         }
 
@@ -99,7 +113,12 @@ namespace mycore.viewer.widgets.iiif {
             const map = new MyCoReMap<string, IAnnotation>();
             this.manifestDocument.getSequences()[0].getCanvases().forEach((canvas: ICanvas) => {
                 canvas.getImages().forEach((image: IAnnotation) => {
+                    if (image.id === 'undefined') {
+                        map.set(image.getResource().id, image);
+                    }
+                    else {
                         map.set(image.id, image);
+                    }
                 });
             });
             return map;
@@ -117,7 +136,12 @@ namespace mycore.viewer.widgets.iiif {
 
             this.vImageList = this.vImageList.sort((x, y) => x.order - y.order);
 
-            this.makeLinks(this.manifestDocument.getTopRanges()[0]);
+            if (this.manifestDocument.getTopRanges().length > 0) {
+                this.makeLinks(this.manifestDocument.getTopRanges()[0]);
+            }
+            else {
+                this.makeLinksWithoutStructures(this.manifestDocument.getSequences()[0].getCanvases());
+            }
 
             this.vImageList = this.vImageList.filter((el) => this.vImageChapterMap.has(el.id));
             this.vImageList.forEach((image, i) => {
@@ -130,12 +154,22 @@ namespace mycore.viewer.widgets.iiif {
 
         private makeLinks(elem: IRange) {
             const chapter = elem;
+            if(elem.getCanvasIds().length === 0  && elem.getRanges().length === 0) {
+                this.makeLinksWithoutStructures(this.manifestDocument.getSequences()[0].getCanvases());
+            }
             elem.getCanvasIds().forEach((can: string) => {
                 this.makeLink(this.vChapterIdMap.get(this.getIDFromURL(chapter.id)),
                     this.vIdImageMap.get(this.getIDFromURL(can)));
             });
             elem.getRanges().forEach((range: IRange) => {
                 this.makeLinks(range);
+            });
+        }
+
+        private makeLinksWithoutStructures(cans: ICanvas[]) {
+            cans.forEach((can: ICanvas) => {
+                this.makeLink(this.vChapterIdMap.get(this.getIDFromURL(can.id)),
+                    this.vIdImageMap.get(this.getIDFromURL(can.id)));
             });
         }
 
@@ -176,12 +210,12 @@ namespace mycore.viewer.widgets.iiif {
             let imgMimeType: string = null;
 
             canvas.getImages().forEach((image: IAnnotation) => {
-                let href: string = image.getResource().id;
+                let href: string = image.getResource().getServices()[0].id;
                 const mimetype: string = image.getResource().getFormat() ? image.getResource().getFormat().toString() : null;
                 width = image.getResource().getWidth();
                 height = image.getResource().getHeight();
 
-                imgHref = this.getHrefFromID(this.getIDFromURL(href));
+                imgHref = href.substr(href.indexOf(this.imageAPIURL) + this.imageAPIURL.length);
                 imgMimeType = mimetype; //TODO multiple Images?
 
             });
@@ -196,12 +230,15 @@ namespace mycore.viewer.widgets.iiif {
             }, additionalHrefs, contentIds, width, height);
         }
 
-        private getIDFromURL(url: String) {
+        private getIDFromURL(url: string) {
             return url.substr(url.lastIndexOf('/') + 1);
         }
 
-        private getHrefFromID(url: String) {
-            return url.substr(url.indexOf('%2F') + 3);
+        private getHrefFromID(url: string) {
+            if (url.indexOf('%2F') > -1) {
+                return url.substr(url.indexOf('%2F') + 3);
+            }
+            return url;
         }
     }
 }

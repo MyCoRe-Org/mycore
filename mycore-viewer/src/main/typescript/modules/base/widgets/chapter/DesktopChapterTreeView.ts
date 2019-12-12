@@ -40,6 +40,9 @@ namespace mycore.viewer.widgets.chaptertree {
             var parentElement = this.getParent(parentId);
 
             // Creates the Node
+            if(label === childLabel) {
+                childLabel = '';
+            }
             var nodeToAdd = this.createNode(id, label, childLabel, expandable);
 
             parentElement.append(nodeToAdd);

@@ -37,6 +37,7 @@ public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
             + derivate + "/manifest");
         setProperty("imageAPIURL", MCRFrontendUtil.getBaseURL()
             + MCRConfiguration.instance().getString("MCR.Viewer.IIIF.URL.Image", "rsc/iiif/image/Iview/"));
+        setProperty("filePath", getDerivate(request) + getFilePath(request));
 
         // script
         final boolean debugParameterSet = isDebugMode(request);

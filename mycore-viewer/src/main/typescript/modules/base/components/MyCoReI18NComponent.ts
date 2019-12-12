@@ -41,6 +41,7 @@ namespace mycore.viewer.components {
         public getLanguage(href:string, callback:(model:model.LanguageModel)=>void, errorCallback:(err) => void = MyCoReI18NProvider.DEFAULT_ERROR_CALLBACK) {
             var settings = {
                 url: href,
+                dataType: 'json',
                 success: function (response) {
                     var newResponse = [];
                     for(var keyIndex in response){
