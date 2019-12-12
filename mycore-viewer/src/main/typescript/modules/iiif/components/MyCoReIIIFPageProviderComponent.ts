@@ -82,10 +82,7 @@ namespace mycore.viewer.components {
             if (this.vImageInformationMap.has(image)) {
                 resolve(this.vImageInformationMap.get(image));
             } else {
-                let path = image;
-                if (path.indexOf(this.settings.derivate) === -1) {
-                    path = this.settings.imageAPIURL + this.settings.derivate + '%2F' + path;
-                }
+                let path = this.settings.imageAPIURL + image;
                 mycore.viewer.widgets.image.IIIFImageInformationProvider.getInformation(path,
                     (info: widgets.image.IIIFImageInformation) => {
                         this.vImageInformationMap.set(image, info);

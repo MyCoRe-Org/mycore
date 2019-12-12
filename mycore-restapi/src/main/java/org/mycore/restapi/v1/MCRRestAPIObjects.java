@@ -307,9 +307,10 @@ public class MCRRestAPIObjects {
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
     public Response uploadDerivate(@Context UriInfo info, @Context HttpServletRequest request,
         @PathParam(PARAM_MCRID) String mcrObjID, @FormDataParam("label") String label,
+        @FormDataParam("classifications") String classifications,
         @FormDataParam("overwriteOnExistingLabel") @DefaultValue("false") boolean overwrite)
         throws MCRRestAPIException {
-        return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label, overwrite);
+        return MCRRestAPIUploadHelper.uploadDerivate(info, request, mcrObjID, label, classifications, overwrite);
     }
 
     /**
