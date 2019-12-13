@@ -511,7 +511,7 @@
               <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
               <smtpPort implementation="java.lang.Integer">25</smtpPort>
               <toAddresses>
-                <toAddress implementation="java.lang.String">developer@mycore.de</toAddress>
+                <toAddress implementation="java.lang.String">user@mycore.de</toAddress>
               </toAddresses>
               <mailSender>
                 <name>${changes.mailSender.name}</name>
