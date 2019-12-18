@@ -32,7 +32,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.imagetiler.MCRImage;
+import org.mycore.access.MCRAccessException;
+import org.mycore.common.config.MCRConfiguration;
+import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
+import org.mycore.iview2.iiif.MCRDefaultTileFileProvider;
+import org.mycore.iview2.iiif.MCRTileFileProvider;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 /**
@@ -49,6 +53,9 @@ public class MCRTileServlet extends HttpServlet {
     private static final long serialVersionUID = 3805114872438336791L;
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTileServlet.class);
+
+    private static MCRTileFileProvider TFP = MCRConfiguration.instance()
+            .getInstanceOf("MCR.IIIFImage.Iview.TileFileProvider", new MCRDefaultTileFileProvider());
 
     /**
      * Extracts tile or image properties from iview2 file and transmits it.
@@ -153,8 +160,13 @@ public class MCRTileServlet extends HttpServlet {
         return new TileInfo(derivate, imagePath, tile);
     }
 
-    private static Path getTileFile(TileInfo tileInfo) {
-        return MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), tileInfo.derivate, tileInfo.imagePath);
+    private Path getTileFile(TileInfo tileInfo) {
+        try {
+            return TFP.getTiledFile(tileInfo.derivate + "/" + tileInfo.imagePath);
+        } catch (MCRAccessException | MCRIIIFImageNotFoundException e) {
+            LOGGER.info(e);
+        }
+        return null;
     }
 
     /**
