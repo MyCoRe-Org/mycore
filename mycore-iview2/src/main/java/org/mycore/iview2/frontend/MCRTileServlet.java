@@ -165,7 +165,6 @@ public class MCRTileServlet extends HttpServlet {
             return TFP.getTiledFile(tileInfo.derivate + "/" + tileInfo.imagePath);
         } catch (MCRAccessException | MCRIIIFImageNotFoundException e) {
             LOGGER.info(e);
-            throw new MCREx
         }
         return null;
     }
