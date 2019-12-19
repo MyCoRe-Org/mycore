@@ -157,26 +157,19 @@ public class MCRClassMapper {
             if (elementLocalName.equals(TYPE_OF_RESOURCE)
                 && categID.getRootID().equals(MCRTypeOfResource.TYPE_OF_RESOURCE)) {
                 authInfo = new MCRTypeOfResource(categID.getID().replace('_', ' '));
-            }
-            if (authInfo == null) {
-                boolean supportCode = SUPPORTED.contains(elementLocalName);
-                boolean supportURI = SUPPORTED.contains(elementLocalName);
-                if (supportCode) {
-                    String authority = getAuthority(categID.getRootID());
-                    if (authority != null) {
-                        authInfo = new MCRAuthorityAndCode(authority, categID.getID());
-                    }
-                }
-                if (authInfo == null && supportURI) {
+            } else if (elementLocalName.equals(ACCESS_CONDITION)) {
+                String authURI = getAuthorityURI(categID.getRootID());
+                String valueURI = MCRAuthorityWithURI.getValueURI(DAO.getCategory(categID, 0), authURI);
+                authInfo = new MCRAccessCondition(valueURI);
+            } else if (SUPPORTED.contains(elementLocalName)) {
+                String authority = getAuthority(categID.getRootID());
+                if (authority != null) {
+                    authInfo = new MCRAuthorityAndCode(authority, categID.getID());
+                } else {
                     String authURI = getAuthorityURI(categID.getRootID());
                     String valueURI = MCRAuthorityWithURI.getValueURI(DAO.getCategory(categID, 0), authURI);
                     authInfo = new MCRAuthorityWithURI(authURI, valueURI);
                 }
-            }
-            if (authInfo == null && elementLocalName.equals(ACCESS_CONDITION)) {
-                String authURI = getAuthorityURI(categID.getRootID());
-                String valueURI = MCRAuthorityWithURI.getValueURI(DAO.getCategory(categID, 0), authURI);
-                authInfo = new MCRAccessCondition(valueURI);
             }
             if (authInfo == null) {
                 authInfo = new MCRNullAuthInfo();
