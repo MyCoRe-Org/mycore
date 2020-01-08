@@ -18,33 +18,17 @@
 
 package org.mycore.mods.classification;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.xerces.impl.xs.XMLSchemaLoader;
-import org.apache.xerces.xs.XSAttributeDeclaration;
-import org.apache.xerces.xs.XSAttributeUse;
-import org.apache.xerces.xs.XSComplexTypeDefinition;
-import org.apache.xerces.xs.XSConstants;
-import org.apache.xerces.xs.XSElementDeclaration;
-import org.apache.xerces.xs.XSModel;
-import org.apache.xerces.xs.XSNamedMap;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.mods.MCRMODSCommands;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -55,7 +39,13 @@ public class MCRClassMapper {
 
     private static final String ACCESS_CONDITION = "accessCondition";
 
-    private static final Set<String> AUTHORITY_ELEMENTS, AUTHORITY_URI_ELEMENTS, SUPPORTED;
+    //as of MODS 3.7 with addition of accessCondition
+    private static final Set<String> SUPPORTED = Set.of("accessCondition", "area", "cartographics", "city",
+        "citySection", "classification", "continent", "country", "county", "descriptionStandard",
+        "extraTerrestrialArea", "form", "frequency", "genre", "geographic", "geographicCode", "hierarchicalGeographic",
+        "island", "languageTerm", "name", "occupation", "physicalLocation", "placeTerm", "publisher",
+        "recordContentSource", "region", "roleTerm", "scriptTerm", "state", "subject", "targetAudience", "temporal",
+        "territory", "titleInfo", "topic", "typeOfResource");
 
     private static final String NS_MODS_URI = MCRConstants.MODS_NAMESPACE.getURI();
 
@@ -67,52 +57,6 @@ public class MCRClassMapper {
 
     private static final MCRCache<MCRAuthKey, MCRAuthorityInfo> AUTHORITY_INFO_CACHE = new MCRCache<>(1000,
         "MCRAuthorityInfo cache");
-
-    static {
-        //check which MODS elements support authority or authorityURI
-        XMLSchemaLoader loader = new XMLSchemaLoader();
-        loader.setEntityResolver(MCREntityResolver.instance());
-        InputSource resolveEntity;
-        try {
-            //use catalog to resolve MODS schema
-            resolveEntity = MCREntityResolver.instance().resolveEntity(null, MCRMODSCommands.MODS_V3_XSD_URI);
-        } catch (SAXException | IOException e) {
-            resolveEntity = new InputSource(MCRMODSCommands.MODS_V3_XSD_URI);
-        }
-        XSModel model = loader.loadURI(resolveEntity.getSystemId());
-        XSNamedMap map = model.getComponents(XSConstants.ELEMENT_DECLARATION);
-        HashSet<String> authority = new HashSet<>();
-        HashSet<String> authorityURI = new HashSet<>();
-        for (int j = 0; j < map.getLength(); j++) {
-            XSElementDeclaration o = (XSElementDeclaration) map.item(j);
-            if (o.getTypeDefinition() instanceof XSComplexTypeDefinition) {
-                //only complex type may contain attributes
-                XSComplexTypeDefinition typeDef = (XSComplexTypeDefinition) o.getTypeDefinition();
-                @SuppressWarnings("unchecked")
-                List<XSAttributeUse> attributeUses = typeDef.getAttributeUses();
-                for (XSAttributeUse attrUse : attributeUses) {
-                    XSAttributeDeclaration attrDeclaration = attrUse.getAttrDeclaration();
-                    switch (attrDeclaration.getName()) {
-                        case "authority":
-                            authority.add(o.getName());
-                            break;
-                        case "authorityURI":
-                            authorityURI.add(o.getName());
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-        AUTHORITY_ELEMENTS = Collections.unmodifiableSet(authority);
-        AUTHORITY_URI_ELEMENTS = Collections.unmodifiableSet(authorityURI);
-        HashSet<String> merged = new HashSet<>(authorityURI);
-        merged.addAll(authority);
-        merged.add(ACCESS_CONDITION);
-        merged.add(TYPE_OF_RESOURCE);
-        SUPPORTED = Collections.unmodifiableSet(merged);
-    }
 
     private MCRClassMapper() {
     }
@@ -213,26 +157,19 @@ public class MCRClassMapper {
             if (elementLocalName.equals(TYPE_OF_RESOURCE)
                 && categID.getRootID().equals(MCRTypeOfResource.TYPE_OF_RESOURCE)) {
                 authInfo = new MCRTypeOfResource(categID.getID().replace('_', ' '));
-            }
-            if (authInfo == null) {
-                boolean supportCode = AUTHORITY_ELEMENTS.contains(elementLocalName);
-                boolean supportURI = AUTHORITY_URI_ELEMENTS.contains(elementLocalName);
-                if (supportCode) {
-                    String authority = getAuthority(categID.getRootID());
-                    if (authority != null) {
-                        authInfo = new MCRAuthorityAndCode(authority, categID.getID());
-                    }
-                }
-                if (authInfo == null && supportURI) {
+            } else if (elementLocalName.equals(ACCESS_CONDITION)) {
+                String authURI = getAuthorityURI(categID.getRootID());
+                String valueURI = MCRAuthorityWithURI.getValueURI(DAO.getCategory(categID, 0), authURI);
+                authInfo = new MCRAccessCondition(valueURI);
+            } else if (SUPPORTED.contains(elementLocalName)) {
+                String authority = getAuthority(categID.getRootID());
+                if (authority != null) {
+                    authInfo = new MCRAuthorityAndCode(authority, categID.getID());
+                } else {
                     String authURI = getAuthorityURI(categID.getRootID());
                     String valueURI = MCRAuthorityWithURI.getValueURI(DAO.getCategory(categID, 0), authURI);
                     authInfo = new MCRAuthorityWithURI(authURI, valueURI);
                 }
-            }
-            if (authInfo == null && elementLocalName.equals(ACCESS_CONDITION)) {
-                String authURI = getAuthorityURI(categID.getRootID());
-                String valueURI = MCRAuthorityWithURI.getValueURI(DAO.getCategory(categID, 0), authURI);
-                authInfo = new MCRAccessCondition(valueURI);
             }
             if (authInfo == null) {
                 authInfo = new MCRNullAuthInfo();

@@ -22,7 +22,9 @@ import static org.jdom2.JDOMConstants.SAX_FEATURE_NAMESPACES;
 import static org.jdom2.JDOMConstants.SAX_FEATURE_NAMESPACE_PREFIXES;
 import static org.jdom2.JDOMConstants.SAX_FEATURE_VALIDATION;
 
-import org.apache.xerces.parsers.SAXParser;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.jdom2.JDOMException;
 import org.jdom2.input.sax.XMLReaderJDOMFactory;
 import org.jdom2.input.sax.XMLReaderSAX2Factory;
@@ -110,12 +112,12 @@ public class MCRXMLParserFactory {
         @Override
         public XMLReader createXMLReader() throws JDOMException {
             try {
-                XMLReader reader = new SAXParser();
+                XMLReader reader = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader();
                 reader.setFeature(SAX_FEATURE_VALIDATION, isValidating());
                 reader.setFeature(SAX_FEATURE_NAMESPACES, true);
                 reader.setFeature(SAX_FEATURE_NAMESPACE_PREFIXES, true);
                 return reader;
-            } catch (SAXException e) {
+            } catch (SAXException | ParserConfigurationException e) {
                 throw new JDOMException("Unable to create SAX2 XMLReader.", e);
             }
         }

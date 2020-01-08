@@ -24,7 +24,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.xerces.jaxp.DocumentBuilderFactoryImpl;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
@@ -41,8 +40,7 @@ public class MCRDOMUtils implements Closeable {
 
     private MCRDOMUtils() {
         builderQueue = new ConcurrentLinkedQueue<>();
-        docBuilderFactory = DocumentBuilderFactory.newInstance(DocumentBuilderFactoryImpl.class.getName(), getClass()
-            .getClassLoader());
+        docBuilderFactory = DocumentBuilderFactory.newDefaultInstance();
         docBuilderFactory.setNamespaceAware(true);
         MCRShutdownHandler.getInstance().addCloseable(this);
     }
