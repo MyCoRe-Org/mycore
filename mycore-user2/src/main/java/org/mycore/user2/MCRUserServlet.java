@@ -29,7 +29,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -375,12 +377,12 @@ public class MCRUserServlet extends MCRServlet {
         Element attributes = u.getChild("attributes");
         if (attributes != null) {
             List<Element> attributeList = attributes.getChildren("attribute");
-            user.getAttributes().clear();
-            for (Element attribute : attributeList) {
-                String key = attribute.getAttributeValue("name");
-                String value = attribute.getAttributeValue("value");
-                user.getAttributes().put(key, value);
-            }
+            Set<MCRUserAttribute> newAttrs = attributeList.stream()
+                .map(a -> new MCRUserAttribute(a.getAttributeValue("name"), a.getAttributeValue("value")))
+                .collect(Collectors.toSet());
+            user.getAttributes().retainAll(newAttrs);
+            newAttrs.removeAll(user.getAttributes());
+            user.getAttributes().addAll(newAttrs);
         }
     }
 

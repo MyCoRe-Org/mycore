@@ -34,6 +34,7 @@ import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid.MCRORCIDProfile;
 import org.mycore.orcid.oauth.MCRTokenResponse;
 import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserAttribute;
 import org.mycore.user2.MCRUserManager;
 import org.xml.sax.SAXException;
 
@@ -71,8 +72,8 @@ public class MCRORCIDUser {
 
     /** Called from MCROAuthServlet to store the user's ORCID iD and token after successful OAuth authorization */
     public void store(MCRTokenResponse token) {
-        user.getAttributes().put(ATTR_ORCID_ID, token.getORCID());
-        user.getAttributes().put(ATTR_ORCID_TOKEN, token.getAccessToken());
+        user.setUserAttribute(ATTR_ORCID_ID, token.getORCID());
+        user.setUserAttribute(ATTR_ORCID_TOKEN, token.getAccessToken());
         MCRUserManager.updateUser(user);
     }
 
@@ -119,10 +120,10 @@ public class MCRORCIDUser {
 
     private Set<String> getUserIdentifierKeys() {
         Set<String> identifierKeys = new HashSet<>();
-        for (String attribute : user.getAttributes().keySet()) {
-            if (attribute.startsWith("id_")) {
-                String idType = attribute.substring(3);
-                String key = buildNameIdentifierKey(idType, user.getUserAttribute(attribute));
+        for (MCRUserAttribute attribute : user.getAttributes()) {
+            if (attribute.getName().startsWith("id_")) {
+                String idType = attribute.getName().substring(3);
+                String key = buildNameIdentifierKey(idType, user.getUserAttribute(attribute.getName()));
                 LOGGER.info("user has name identifier: " + key);
                 identifierKeys.add(key);
             }

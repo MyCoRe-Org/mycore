@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,7 +47,6 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -61,9 +62,9 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.SortNatural;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.user2.annotation.MCRUserAttribute;
 import org.mycore.user2.annotation.MCRUserAttributeJavaConverter;
 import org.mycore.user2.utils.MCRRolesConverter;
 import org.mycore.user2.utils.MCRUserNameConverter;
@@ -82,12 +83,12 @@ import org.mycore.user2.utils.MCRUserNameConverter;
 @Access(AccessType.PROPERTY)
 @Table(name = "MCRUser", uniqueConstraints = @UniqueConstraint(columnNames = { "userName", "realmID" }))
 @NamedQueries(@NamedQuery(name = "MCRUser.byPropertyValue",
-    query = "SELECT u FROM MCRUser u JOIN FETCH u.attributes ua WHERE KEY(ua) = :name  AND :value IN (VALUE(ua))"))
+    query = "SELECT u FROM MCRUser u JOIN FETCH u.attributes ua WHERE ua.name = :name  AND ua.value = :value"))
 // TODO use @Cacheable instead
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @XmlRootElement(name = "user")
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributesMap",
+@XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributes",
     "password" })
 public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     private static final long serialVersionUID = 3378645055646901800L;
@@ -103,7 +104,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     private boolean disabled;
 
     /** The login user name */
-    @MCRUserAttribute
+    @org.mycore.user2.annotation.MCRUserAttribute
     @MCRUserAttributeJavaConverter(MCRUserNameConverter.class)
     @XmlAttribute(name = "name")
     private String userName;
@@ -119,12 +120,12 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     private MCRUser owner;
 
     /** The name of the person that this login user represents */
-    @MCRUserAttribute
+    @org.mycore.user2.annotation.MCRUserAttribute
     @XmlElement
     private String realName;
 
     /** The E-Mail address of the person that this login user represents */
-    @MCRUserAttribute
+    @org.mycore.user2.annotation.MCRUserAttribute
     @XmlElement
     private String eMail;
 
@@ -135,10 +136,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @XmlElement
     private Date validUntil;
 
-    /**
-     *
-     */
-    private Map<String, String> attributes;
+    private SortedSet<MCRUserAttribute> attributes;
 
     @Transient
     private Collection<String> systemRoles;
@@ -171,7 +169,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         this.realmID = realmID;
         this.systemRoles = new HashSet<>();
         this.externalRoles = new HashSet<>();
-        this.attributes = new HashMap<>();
+        this.attributes = new TreeSet<>();
         this.password = new Password();
     }
 
@@ -529,7 +527,15 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             case MCRUserInformation.ATT_EMAIL:
                 return getEMailAddress();
             default:
-                return getAttributes().get(attribute);
+                Set<MCRUserAttribute> attrs = attributes.stream()
+                    .filter(a -> a.getName().equals(attribute))
+                    .collect(Collectors.toSet());
+                if (attrs.size() > 1) {
+                    throw new MCRException(getUserID() + ": user attribute " + attribute + " is not unique");
+                }
+                return attrs.stream()
+                    .map(MCRUserAttribute::getValue)
+                    .findAny().orElse(null);
         }
     }
 
@@ -543,24 +549,22 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     /**
-     * @return the attributes
+     * @param attributes the attributes to set
      */
+    public void setAttributes(SortedSet<MCRUserAttribute> attributes) {
+        this.attributes = attributes;
+    }
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "MCRUserAttr",
         joinColumns = @JoinColumn(name = "id"),
         indexes = { @Index(name = "MCRUserAttributes", columnList = "name, value"),
             @Index(name = "MCRUserValues", columnList = "value") })
-    @MapKeyColumn(name = "name", length = 128)
-    @Column(name = "value", length = 255)
-    public Map<String, String> getAttributes() {
-        return attributes;
-    }
-
-    /**
-     * @param attributes the attributes to set
-     */
-    public void setAttributes(Map<String, String> attributes) {
-        this.attributes = attributes;
+    @SortNatural
+    @XmlElementWrapper(name = "attributes")
+    @XmlElement(name = "attribute")
+    public SortedSet<MCRUserAttribute> getAttributes() {
+        return this.attributes;
     }
 
     /**
@@ -664,7 +668,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         return Arrays.stream(getRoles()).map(MCRRole::getName).collect(Collectors.toSet());
     }
 
-    @MCRUserAttribute(name = "roles", separator = ";")
+    @org.mycore.user2.annotation.MCRUserAttribute(name = "roles", separator = ";")
     @MCRUserAttributeJavaConverter(MCRRolesConverter.class)
     void setRolesCollection(Collection<String> roles) {
         for (String role : roles) {
@@ -710,27 +714,16 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             .forEach(this::assignRole);
     }
 
-    @Transient
-    @XmlElementWrapper(name = "attributes")
-    @XmlElement(name = "attribute")
-    private MapEntry[] getAttributesMap() {
-        if (attributes == null) {
-            return null;
-        }
-        ArrayList<MapEntry> list = new ArrayList<>(attributes.size());
-        for (Entry<String, String> entry : attributes.entrySet()) {
-            MapEntry mapEntry = new MapEntry();
-            mapEntry.name = entry.getKey();
-            mapEntry.value = entry.getValue();
-            list.add(mapEntry);
-        }
-        return list.toArray(new MapEntry[list.size()]);
-    }
-
-    @SuppressWarnings("unused")
-    private void setAttributesMap(MapEntry[] entries) {
-        for (MapEntry entry : entries) {
-            attributes.put(entry.name, entry.value);
+    public void setUserAttribute(String name, String value) {
+        Optional<MCRUserAttribute> anyMatch = getAttributes().stream()
+            .filter(a -> a.getName().equals(Objects.requireNonNull(name)))
+            .findAny();
+        if (anyMatch.isPresent()) {
+            MCRUserAttribute attr = anyMatch.get();
+            attr.setValue(value);
+            getAttributes().removeIf(a -> a.getName().equals(name) && a != attr);
+        } else {
+            getAttributes().add(new MCRUserAttribute(name, value));
         }
     }
 
@@ -813,14 +806,14 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
             copy.password = new Password();
             copy.password.hint = getHint();
         }
-        copy.setAttributes(new HashMap<>());
+        copy.setAttributes(new TreeSet<>());
         copy.eMail = this.eMail;
         copy.lastLogin = this.lastLogin;
         copy.validUntil = this.validUntil;
         copy.realName = this.realName;
         copy.systemRoles.addAll(this.systemRoles);
         copy.externalRoles.addAll(this.externalRoles);
-        copy.attributes.putAll(this.attributes);
+        copy.attributes.addAll(this.attributes);
         return copy;
     }
 
@@ -842,17 +835,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         @XmlAttribute
         private String hint;
 
-    }
-
-    private static class MapEntry implements Serializable {
-
-        private static final long serialVersionUID = 5974260806892613120L;
-
-        @XmlAttribute
-        public String name;
-
-        @XmlAttribute
-        public String value;
     }
 
     private static class UserIdentifier implements Serializable {
