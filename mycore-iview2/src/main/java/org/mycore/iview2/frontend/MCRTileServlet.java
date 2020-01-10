@@ -67,7 +67,7 @@ public class MCRTileServlet extends HttpServlet {
         final MCRTileInfo tileInfo = getTileInfo(getPathInfo(req));
         Path iviewFile = TFP.getTileFile(tileInfo).orElse(null);
         if(iviewFile==null) {
-            LOGGER.info("TileFile not found: TileInfo [derivate=" + tileInfo.getDerivate() + ", imagePath=" + tileInfo.getImagePath());
+            LOGGER.info("TileFile not found: " + tileInfo);
             return;
         }
         if (!Files.exists(iviewFile)) {
@@ -112,7 +112,10 @@ public class MCRTileServlet extends HttpServlet {
     protected long getLastModified(final HttpServletRequest req) {
         final MCRTileInfo tileInfo = getTileInfo(getPathInfo(req));
         try {
-            return Files.getLastModifiedTime(TFP.getTileFile(tileInfo).orElseThrow(() -> new IOException("Could not get file for " + tileInfo))).toMillis();
+            return Files
+                .getLastModifiedTime(
+                    TFP.getTileFile(tileInfo).orElseThrow(() -> new IOException("Could not get file for " + tileInfo)))
+                .toMillis();
         } catch (IOException e) {
             LOGGER.warn("Could not get lastmodified time.", e);
             return -1;
