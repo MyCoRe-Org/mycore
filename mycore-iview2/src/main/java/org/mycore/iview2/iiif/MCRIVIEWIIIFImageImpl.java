@@ -327,13 +327,12 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         if (!Files.exists(tileFilePath)) {
             throw new MCRIIIFImageNotFoundException(identifier);
         }
-        if (tileInfo.getDerivate() != null) {
-            if (!MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ)
-                && !MCRAccessManager.checkPermission(tileInfo.getDerivate(), "view-derivate")) {
-                throw MCRAccessException.missingPermission(
-                    "View the file " + tileInfo.getImagePath() + " in " + tileInfo.getDerivate(),
-                    tileInfo.getDerivate(), "view-derivate");
-            }
+        if (tileInfo.getDerivate() != null
+            && !MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ)
+            && !MCRAccessManager.checkPermission(tileInfo.getDerivate(), "view-derivate")) {
+            throw MCRAccessException.missingPermission(
+                "View the file " + tileInfo.getImagePath() + " in " + tileInfo.getDerivate(), tileInfo.getDerivate(),
+                "view-derivate");
         }
     }
 

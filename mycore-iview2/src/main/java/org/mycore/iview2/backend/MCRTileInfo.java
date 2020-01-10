@@ -25,7 +25,9 @@ package org.mycore.iview2.backend;
  */
 public class MCRTileInfo {
 
-    String derivate, imagePath, tile;
+    private String derivate;
+    private String imagePath;
+    private String tile;
 
     public MCRTileInfo(final String derivate, final String imagePath, final String tile) {
         this.derivate = derivate;
