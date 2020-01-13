@@ -25,7 +25,7 @@
   <xsl:variable name="owns" select="document(concat('user:getOwnedUsers:',$uid))/owns" />
 
   <xsl:template match="user" mode="actions">
-    <xsl:variable name="isCurrentUser" select="$CurrentUser = $uid" />
+    <xsl:variable name="isCurrentUser" select="$CurrentUser = /user/@name" />
     <xsl:if test="(string-length($step) = 0) or ($step = 'changedPassword')">
       <xsl:variable name="isUserAdmin" select="acl:checkPermission(const:getUserAdminPermission())" />
       <xsl:choose>
