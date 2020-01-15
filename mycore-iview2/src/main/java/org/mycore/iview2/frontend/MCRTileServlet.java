@@ -32,11 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessException;
 import org.mycore.common.config.MCRConfiguration;
-import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
-import org.mycore.iview2.iiif.MCRDefaultTileFileProvider;
-import org.mycore.iview2.iiif.MCRTileFileProvider;
+import org.mycore.iview2.backend.MCRDefaultTileFileProvider;
+import org.mycore.iview2.backend.MCRTileFileProvider;
+import org.mycore.iview2.backend.MCRTileInfo;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 /**
@@ -65,15 +64,19 @@ public class MCRTileServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final TileInfo tileInfo = getTileInfo(getPathInfo(req));
-        Path iviewFile = getTileFile(tileInfo);
+        final MCRTileInfo tileInfo = getTileInfo(getPathInfo(req));
+        Path iviewFile = TFP.getTileFile(tileInfo).orElse(null);
+        if(iviewFile==null) {
+            LOGGER.info("TileFile not found: " + tileInfo);
+            return;
+        }
         if (!Files.exists(iviewFile)) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "File does not exist: " + iviewFile);
             return;
         }
         try (FileSystem iviewFS = MCRIView2Tools.getFileSystem(iviewFile)) {
             Path root = iviewFS.getRootDirectories().iterator().next();
-            Path tilePath = root.resolve(tileInfo.tile);
+            Path tilePath = root.resolve(tileInfo.getTile());
             BasicFileAttributes fileAttributes;
             try {
                 fileAttributes = Files.readAttributes(tilePath, BasicFileAttributes.class);
@@ -83,7 +86,7 @@ public class MCRTileServlet extends HttpServlet {
             }
             resp.setHeader("Cache-Control", "max-age=" + MAX_AGE);
             resp.setDateHeader("Last-Modified", fileAttributes.lastModifiedTime().toMillis());
-            if (tileInfo.tile.endsWith("xml")) {
+            if (tileInfo.getTile().endsWith("xml")) {
                 resp.setContentType("text/xml");
             } else {
                 resp.setContentType("image/jpeg");
@@ -107,9 +110,12 @@ public class MCRTileServlet extends HttpServlet {
      */
     @Override
     protected long getLastModified(final HttpServletRequest req) {
-        final TileInfo tileInfo = getTileInfo(getPathInfo(req));
+        final MCRTileInfo tileInfo = getTileInfo(getPathInfo(req));
         try {
-            return Files.getLastModifiedTime(getTileFile(tileInfo)).toMillis();
+            return Files
+                .getLastModifiedTime(
+                    TFP.getTileFile(tileInfo).orElseThrow(() -> new IOException("Could not get file for " + tileInfo)))
+                .toMillis();
         } catch (IOException e) {
             LOGGER.warn("Could not get lastmodified time.", e);
             return -1;
@@ -134,10 +140,10 @@ public class MCRTileServlet extends HttpServlet {
      * @param pathInfo of the described format
      * @return a {@link TileInfo} instance for <code>pathInfo</code>
      */
-    static TileInfo getTileInfo(final String pathInfo) {
+    static MCRTileInfo getTileInfo(final String pathInfo) {
         LOGGER.debug("Starting MCRTileServlet: {}", pathInfo);
         String path = pathInfo.startsWith("/") ? pathInfo.substring(1) : pathInfo;
-        final String derivate = path.substring(0, path.indexOf('/'));
+        final String derivate = path.contains("/") ? path.substring(0, path.indexOf('/')) : null;
         String imagePath = path.substring(derivate.length());
         String tile;
         if (imagePath.endsWith(".xml")) {
@@ -157,39 +163,6 @@ public class MCRTileServlet extends HttpServlet {
             tile = imagePath.substring(pos + 2);
             imagePath = imagePath.substring(0, ++pos);
         }
-        return new TileInfo(derivate, imagePath, tile);
+        return new MCRTileInfo(derivate, imagePath, tile);
     }
-
-    private Path getTileFile(TileInfo tileInfo) {
-        try {
-            return TFP.getTiledFile(tileInfo.derivate + "/" + tileInfo.imagePath);
-        } catch (MCRAccessException | MCRIIIFImageNotFoundException e) {
-            LOGGER.info(e);
-        }
-        return null;
-    }
-
-    /**
-     * Holds all attributes for a specific tile.
-     * @author Thomas Scheffler (yagee)
-     *
-     */
-    static class TileInfo {
-        String derivate, imagePath, tile;
-
-        TileInfo(final String derivate, final String imagePath, final String tile) {
-            this.derivate = derivate;
-            this.imagePath = imagePath;
-            this.tile = tile;
-        }
-
-        /**
-         * returns "TileInfo [derivate=" + derivate + ", imagePath=" + imagePath + ", tile=" + tile + "]"
-         */
-        @Override
-        public String toString() {
-            return "TileInfo [derivate=" + derivate + ", imagePath=" + imagePath + ", tile=" + tile + "]";
-        }
-    }
-
 }

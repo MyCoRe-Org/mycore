@@ -27,10 +27,12 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -39,6 +41,7 @@ import javax.imageio.ImageReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
@@ -57,6 +60,9 @@ import org.mycore.iiif.image.model.MCRIIIFImageTargetSize;
 import org.mycore.iiif.image.model.MCRIIIFImageTileInformation;
 import org.mycore.iiif.model.MCRIIIFBase;
 import org.mycore.imagetiler.MCRTiledPictureProps;
+import org.mycore.iview2.backend.MCRDefaultTileFileProvider;
+import org.mycore.iview2.backend.MCRTileFileProvider;
+import org.mycore.iview2.backend.MCRTileInfo;
 import org.mycore.iview2.services.MCRIView2Tools;
 
 public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
@@ -132,8 +138,13 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             throw new MCRIIIFUnsupportedFormatException(format);
         }
 
-        Path tiledFile = tileFileProvider.getTiledFile(identifier);
-        MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
+        MCRTileInfo tileInfo = createTileInfo(identifier);
+        Optional<Path> oTileFile = tileFileProvider.getTileFile(tileInfo);
+        if (oTileFile.isEmpty()) {
+            throw new MCRIIIFImageNotFoundException(identifier);
+        }
+        checkTileFile(identifier, tileInfo, oTileFile.get());
+        MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(oTileFile.get());
 
         int sourceWidth = region.getX2() - region.getX1();
         int sourceHeight = region.getY2() - region.getY1();
@@ -192,7 +203,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             x2Tile = (int) Math.ceil(x2 / 256),
             y2Tile = (int) Math.ceil(y2 / 256);
 
-        try (FileSystem zipFileSystem = MCRIView2Tools.getFileSystem(tileFileProvider.getTiledFile(identifier))) {
+        try (FileSystem zipFileSystem = MCRIView2Tools.getFileSystem(oTileFile.get())) {
             Path rootPath = zipFileSystem.getPath("/");
 
             Graphics2D graphics = targetImage.createGraphics();
@@ -233,8 +244,13 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     public MCRIIIFImageInformation getInformation(String identifier)
         throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException, MCRAccessException {
         try {
-            Path tiledFile = tileFileProvider.getTiledFile(identifier);
-            MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tiledFile);
+            MCRTileInfo tileInfo = createTileInfo(identifier);
+            Optional<Path> oTiledFile = tileFileProvider.getTileFile(tileInfo);
+            if (oTiledFile.isEmpty()) {
+                throw new MCRIIIFImageNotFoundException(identifier);
+            }
+            checkTileFile(identifier, tileInfo, oTiledFile.get());
+            MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(oTiledFile.get());
 
             MCRIIIFImageInformation imageInformation = new MCRIIIFImageInformation(MCRIIIFBase.API_IMAGE_2,
                 buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight());
@@ -288,6 +304,36 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             throw new MCRIIIFImageProvidingException("Could not provide image information!", e);
         }
         return tiledPictureProps;
+    }
+    
+    private MCRTileInfo createTileInfo(String identifier) throws MCRIIIFImageNotFoundException {
+        MCRTileInfo tileInfo = null;
+        String[] splittedIdentifier = identifier.split("/", 2);
+        switch (splittedIdentifier.length) {
+        case 1:
+            tileInfo = new MCRTileInfo(null, identifier, null);
+            break;
+        case 2:
+            tileInfo = new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
+            break;
+        default:
+            throw new MCRIIIFImageNotFoundException(identifier);
+        }
+        return tileInfo;
+    }
+
+    private void checkTileFile(String identifier, MCRTileInfo tileInfo, Path tileFilePath)
+        throws MCRAccessException, MCRIIIFImageNotFoundException {
+        if (!Files.exists(tileFilePath)) {
+            throw new MCRIIIFImageNotFoundException(identifier);
+        }
+        if (tileInfo.getDerivate() != null
+            && !MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ)
+            && !MCRAccessManager.checkPermission(tileInfo.getDerivate(), "view-derivate")) {
+            throw MCRAccessException.missingPermission(
+                "View the file " + tileInfo.getImagePath() + " in " + tileInfo.getDerivate(), tileInfo.getDerivate(),
+                "view-derivate");
+        }
     }
 
 }
