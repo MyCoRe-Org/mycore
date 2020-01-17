@@ -123,7 +123,7 @@ public class MCRORCIDUser {
         for (MCRUserAttribute attribute : user.getAttributes()) {
             if (attribute.getName().startsWith("id_")) {
                 String idType = attribute.getName().substring(3);
-                String key = buildNameIdentifierKey(idType, user.getUserAttribute(attribute.getName()));
+                String key = buildNameIdentifierKey(idType, attribute.getValue());
                 LOGGER.info("user has name identifier: " + key);
                 identifierKeys.add(key);
             }
