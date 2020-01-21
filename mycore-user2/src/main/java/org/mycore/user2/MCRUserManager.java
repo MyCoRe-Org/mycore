@@ -130,9 +130,10 @@ public class MCRUserManager {
         TypedQuery<MCRUser> propertyQuery = em.createNamedQuery("MCRUser.byPropertyValue", MCRUser.class);
         propertyQuery.setParameter("name", attrName);
         propertyQuery.setParameter("value", attrValue);
+        MCRUserAttribute attr = new MCRUserAttribute(attrName, attrValue);
         return propertyQuery.getResultList()
             .stream()
-            .filter(u -> u.getAttributes().get(attrName).equals(attrValue))
+            .filter(u -> u.getAttributes().contains(attr))
             .peek(em::refresh); //fixes MCR-1885
     }
 

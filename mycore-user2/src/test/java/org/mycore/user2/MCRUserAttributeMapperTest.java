@@ -113,7 +113,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Map<String, String> extraAttribs = new HashMap<>();
         extraAttribs.put("attrib1", "test123");
         extraAttribs.put("attrib2", "test321");
-        user.setAttributes(extraAttribs);
+        extraAttribs.entrySet().forEach(e -> user.setUserAttribute(e.getKey(), e.getValue()));
 
         MCRUserManager.createUser(user);
 
@@ -123,8 +123,8 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
 
         assertEquals(mcrUser.getEMailAddress(), storedUser.getEMailAddress());
 
-        assertEquals(extraAttribs.get("attrib1"), storedUser.getAttributes().get("attrib1"));
-        assertEquals(extraAttribs.get("attrib2"), storedUser.getAttributes().get("attrib2"));
+        assertEquals(extraAttribs.get("attrib1"), storedUser.getUserAttribute("attrib1"));
+        assertEquals(extraAttribs.get("attrib2"), storedUser.getUserAttribute("attrib2"));
 
         Document exportableXML = MCRUserTransformer.buildExportableXML(storedUser);
         new XMLOutputter(Format.getPrettyFormat()).output(exportableXML, System.out);
@@ -149,7 +149,7 @@ public class MCRUserAttributeMapperTest extends MCRUserTestCase {
         Map<String, String> extraAttribs = new HashMap<>();
         extraAttribs.put("attrib1", "test123");
         extraAttribs.put("attrib2", "test321");
-        user.setAttributes(extraAttribs);
+        extraAttribs.entrySet().forEach(e -> user.setUserAttribute(e.getKey(), e.getValue()));
 
         MCRUserManager.createUser(user);
 
