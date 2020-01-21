@@ -16,13 +16,18 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.iview2.iiif;
+package org.mycore.iview2.backend;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
-import org.mycore.access.MCRAccessException;
-import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
+import org.mycore.imagetiler.MCRImage;
+import org.mycore.iview2.services.MCRIView2Tools;
 
-public interface MCRTileFileProvider {
-    Path getTiledFile(String identifier) throws MCRIIIFImageNotFoundException, MCRAccessException;
+public class MCRDefaultTileFileProvider implements MCRTileFileProvider {
+
+    public Optional<Path> getTileFile(MCRTileInfo tileInfo) {
+        return Optional
+            .of(MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), tileInfo.getDerivate(), tileInfo.getImagePath()));
+    }
 }
