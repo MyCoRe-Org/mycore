@@ -115,7 +115,7 @@ form .optional.expanded .fieldset{
                           </xed:bind>
                           <xed:bind xpath="param[@name='rows']">
                             <div class="col-6">
-			      <input class="form-control" type="text" title="Number of documents to return after 'start'. (Integer)"
+                              <input class="form-control" type="text" title="Number of documents to return after 'start'. (Integer)"
                                 pattern="[0-9]+" placeholder="10" id="rows" />
                             </div>
                           </xed:bind>
@@ -210,7 +210,7 @@ form .optional.expanded .fieldset{
                   <mcrsolr:textfield name="ps2" id="edismax_ps2" title="phrase slop for bigram phrases" />
                   <mcrsolr:textfield name="ps3" id="edismax_ps3" title="phrase slop for trigram phrases" />
                   <mcrsolr:textfield name="boost" id="edismax_boost" title="multiplicative boost function" />
-		  <mcrsolr:checkbox name="stopwords" id="edismax_stopwords" title="remove stopwords from mandatory 'matching' component" />
+                  <mcrsolr:checkbox name="stopwords" id="edismax_stopwords" title="remove stopwords from mandatory 'matching' component" />
                   <mcrsolr:checkbox name="lowercaseOperators" id="edismax_lowercaseOperators" title="Enable lower-case 'and' and 'or' as operators" />
                 </mcrsolr:fieldset>
 
