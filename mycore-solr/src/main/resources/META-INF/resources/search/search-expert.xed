@@ -192,8 +192,7 @@ form .optional.expanded .fieldset{
 
                 <mcrsolr:fieldset name="edismax" param="defType">
                   <mcrsolr:label>
-                    <strong>e</strong>
-                    dismax
+                    <strong> e</strong>dismax
                   </mcrsolr:label>
                   <mcrsolr:textfield name="q.alt" id="edismax_q_alt" title="Alternate query when 'q' is absent." />
                   <mcrsolr:textfield name="qf" id="edismax_qf" title="Query fields with optional boosts." />
