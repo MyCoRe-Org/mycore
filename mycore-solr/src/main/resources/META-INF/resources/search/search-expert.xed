@@ -56,9 +56,6 @@
     .find('*[type="submit"]').on('click', function(){
       $(this).parents('form').data('button', this.name);
     });
-    $('[data-toggle=offcanvas]').click(function() {
-      $('.row-offcanvas').toggleClass('active');
-    });
   });
 })(jQuery);
     ]]>
@@ -71,43 +68,15 @@ form .optional .fieldset{
 form .optional.expanded .fieldset{
   display:block;
 }
-@media screen and (max-width: 767px) {
-  .row-offcanvas {
-    position: relative;
-    -webkit-transition: all 0.25s ease-out;
-    -moz-transition: all 0.25s ease-out;
-    transition: all 0.25s ease-out 0s;
-  }
-  .row-offcanvas-right .sidebar-offcanvas {
-    right: -50%;
-  }
-  .row-offcanvas-left .sidebar-offcanvas {
-    left: -50%;
-  }
-  .row-offcanvas-right.active {
-    right: 50%;
-  }
-  .row-offcanvas-left.active {
-    left: 50%;
-  }
-  .sidebar-offcanvas {
-    position: absolute;
-    top: 0;
-    width: 50%;
-  }
-}
     ]]>
     </style>
-    <div class="row row-offcanvas row-offcanvas-right">
+    <div class="row">
 
-      <div class="col-xs-12 col-sm-7 col-md-8">
-        <p class="pull-right visible-xs">
-          <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle fields</button>
-        </p>
+      <div class="col-12">
         <xed:form class="form-horizontal" role="form">
           <xed:cleanup-rule xpath="/solr-query/*" relevant-if="string-length(.)&gt;0" />
           <xed:bind xpath="solr-query">
-            <xed:bind name="label-width" xpath="@labelWidth" default="3">
+            <xed:bind name="label-width" xpath="@labelWidth" default="9">
               <xed:cleanup-rule xpath="/solr-query/@labelWidth" relevant-if="false()" />
             </xed:bind>
             <xed:bind name="input-width" xpath="@inputWidth" default="9">
@@ -133,19 +102,19 @@ form .optional.expanded .fieldset{
                     <mcrsolr:textfield name="sort" title="Sort field or function with asc|desc." />
 
                     <div class="form-group">
-                      <label class="col-md-{$label-width} control-label" for="start">
+                      <label class="col-{$label-width} control-label" for="start">
                         start, rows
                       </label>
-                      <div class="col-md-{$input-width}">
+                      <div class="col-{$input-width}">
                         <div class="row">
                           <xed:bind xpath="param[@name='start']">
-                            <div class="col-xs-6">
+                            <div class="col-6">
                               <input class="form-control" type="text" title="Number of leading documents to skip. (Integer)" pattern="[0-9]+"
                                 placeholder="0" id="start" />
                             </div>
                           </xed:bind>
                           <xed:bind xpath="param[@name='rows']">
-                            <div class="col-xs-6">
+                            <div class="col-6">
                               <input class="form-control" type="text" title="Number of documents to return after 'start'. (Integer)"
                                 pattern="[0-9]+" placeholder="10" id="rows" />
                             </div>
@@ -158,21 +127,21 @@ form .optional.expanded .fieldset{
                     <mcrsolr:textfield name="df" title="Default search field" />
 
                     <div class="form-group">
-                      <label class="col-md-{$label-width} control-label" for="custom_parameters">
+                      <label class="col-{$label-width} control-label" for="custom_parameters">
                         Raw Query Parameters
                       </label>
-                      <div class="col-md-{$input-width}">
+                      <div class="col-{$input-width}">
                         <xed:repeat xpath="cparam">
                           <div class="row clearfix">
-                            <div class="col-md-4">
+                            <div class="col-4">
                               <xed:bind xpath="@name">
                                 <input class="form-control" type="text" placeholder="key" id="custom_parameters" />
                               </xed:bind>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-5">
                               <input class="form-control" type="text" placeholder="value" />
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-3">
                               <span class="pull-right">
                                 <div class="btn-group">
                                   <xed:controls>insert remove</xed:controls>
@@ -186,10 +155,10 @@ form .optional.expanded .fieldset{
 
                     <xed:bind xpath="param[@name='wt']" default="xml">
                       <div class="form-group">
-                        <label class="col-md-{$label-width} control-label" for="wt">
+                        <label class="col-{$label-width} control-label" for="wt">
                           wt
                         </label>
-                        <div class="col-md-{$input-width}">
+                        <div class="col-{$input-width}">
                           <select title="The writer type (response format)." class="form-control" id="wt">
                             <option>json</option>
                             <option>xml</option>
@@ -223,8 +192,7 @@ form .optional.expanded .fieldset{
 
                 <mcrsolr:fieldset name="edismax" param="defType">
                   <mcrsolr:label>
-                    <strong>e</strong>
-                    dismax
+                    <strong> e</strong>dismax
                   </mcrsolr:label>
                   <mcrsolr:textfield name="q.alt" id="edismax_q_alt" title="Alternate query when 'q' is absent." />
                   <mcrsolr:textfield name="qf" id="edismax_qf" title="Query fields with optional boosts." />
@@ -279,11 +247,11 @@ form .optional.expanded .fieldset{
                   <mcrsolr:textfield name="spellcheck.accuracy" />
                 </mcrsolr:fieldset>
 
-                <div class="col-md-offset-{$label-width} col-md-{$input-width}">
+                <div class="col-{$input-width}">
                   <button type="submit" xed:target="servlet" xed:href="MCRSolrSelectProxyServlet" class="btn btn-primary">
                     <xed:output i18n="editor.search.search" />
                   </button>
-                  <button type="submit" xed:target="debug" class="btn btn-default">
+                  <button type="submit" xed:target="debug" class="btn btn-secondary">
                     Debug
                   </button>
                 </div>
@@ -293,8 +261,8 @@ form .optional.expanded .fieldset{
         </xed:form>
       </div>
     </div>
-    <div class="row">
-      <div class="col-xs-12 col-sm-7 col-md-8" id="sidebar">
+    <div class="row mt-5">
+      <div class="col-12">
         <mcrsolr:fieldsHelp />
     </div>
     </div>
