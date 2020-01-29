@@ -114,7 +114,7 @@ public class MCRNameMerger extends MCRMerger {
             return;
         }
         for (String token : nameFragment.split("\\s")) {
-            String normalizedToken = normalize(token.trim());
+            String normalizedToken = normalize(token);
             if (normalizedToken.length() > 1) {
                 givenNames.add(normalizedToken);
             }
@@ -126,13 +126,13 @@ public class MCRNameMerger extends MCRMerger {
             return;
         }
         for (String token : nameFragment.split("\\s")) {
-            String normalizedToken = normalize(token.trim());
+            String normalizedToken = normalize(token);
             initials.add(normalizedToken.substring(0, 1));
         }
     }
 
     private boolean isEmptyOrNull(String nameFragment) {
-        return nameFragment == null || nameFragment.trim().isEmpty();
+        return nameFragment == null || normalize(nameFragment).isEmpty();
     }
 
     private String normalize(String nameFragment) {
