@@ -62,7 +62,7 @@ public class MCRGeoUtilities {
     }
 
     /**
-     * Converts decimal degree to ordinary coordinates.
+     * Converts decimal degree coordinates to degree minutes seconds coordinates.
      * 
      */
     public static String toDegreeMinuteSecond(double inDecimalDegree) {
@@ -71,7 +71,7 @@ public class MCRGeoUtilities {
         double seconds = ((inDecimalDegree - degree) * 60 - minutes) * 60;
 
         return new MessageFormat("{0}° {1}'' {2}", Locale.ROOT).format(
-            new Object[] { degree, minutes, Math.round(seconds * 100d) / 100d });
+            new Object[] { degree, minutes, Math.round(seconds * 100d / 100d) });
     }
 
     /**
@@ -95,7 +95,7 @@ public class MCRGeoUtilities {
         }
 
         return new MessageFormat("{0}° {1}'' {2} {3}", Locale.ROOT).format(
-            new Object[] { Integer.valueOf(strings[1]), Integer.valueOf(strings[2]), Math.round(seconds * 100d) / 100d,
+            new Object[] { Integer.valueOf(strings[1]), Integer.valueOf(strings[2]), Math.round(seconds * 100d / 100d),
                 strings[0] });
     }
 
