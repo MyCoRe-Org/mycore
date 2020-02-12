@@ -287,7 +287,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
                 String flagStr = flagsIter.next();
                 MCRPI currentPi = gson.fromJson(flagStr, MCRPI.class);
 
-                if (currentPi.getAdditional().equals("")
+                if ("".equals(currentPi.getAdditional())
                         && currentPi.getIdentifier().equals(mcrpi.getIdentifier())){
                     //remove flag for update
                     flagsIter.remove();
