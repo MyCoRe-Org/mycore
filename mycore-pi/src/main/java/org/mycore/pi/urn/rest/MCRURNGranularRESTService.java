@@ -183,7 +183,7 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
             MCRDNBURN derivURN = getNewIdentifier(deriv, "");
             deriv.getDerivate().setURN(derivURN.asString());
 
-            persistURNStr(deriv, new Date()).accept(derivURN::asString, "");
+            persistURNStr(deriv, null).accept(derivURN::asString, "");
 
             if (Boolean.valueOf(getProperties().getOrDefault("supportDfgViewerURN", "false"))) {
                 String suffix = "dfg";
