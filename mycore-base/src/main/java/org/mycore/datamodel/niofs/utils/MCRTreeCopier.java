@@ -19,6 +19,7 @@
 package org.mycore.datamodel.niofs.utils;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemLoopException;
 import java.nio.file.FileVisitResult;
@@ -27,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
@@ -105,7 +107,19 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 currentSession.commitTransaction();
                 currentSession.beginTransaction();
             }
-            Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
+            BasicFileAttributes srcAttrs = Files.readAttributes(source, BasicFileAttributes.class);
+            if (Files.exists(target)) {
+                //MCR-2131: do not delete target and fire delete event
+                try (OutputStream fout = Files.newOutputStream(target)) {
+                    Files.copy(source, fout);
+                    Files.getFileAttributeView(target, BasicFileAttributeView.class)
+                            .setTimes(srcAttrs.lastModifiedTime(),
+                                    srcAttrs.lastAccessTime(),
+                                    srcAttrs.creationTime());
+                }
+            } else {
+                Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES);
+            }
         } catch (IOException x) {
             LOGGER.error("Unable to copy: {}", source, x);
         }
