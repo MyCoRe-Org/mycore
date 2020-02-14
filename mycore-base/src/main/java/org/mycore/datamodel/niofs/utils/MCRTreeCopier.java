@@ -107,19 +107,7 @@ public class MCRTreeCopier implements FileVisitor<Path> {
                 currentSession.commitTransaction();
                 currentSession.beginTransaction();
             }
-            BasicFileAttributes srcAttrs = Files.readAttributes(source, BasicFileAttributes.class);
-            if (Files.exists(target)) {
-                //MCR-2131: do not delete target and fire delete event
-                try (OutputStream fout = Files.newOutputStream(target)) {
-                    Files.copy(source, fout);
-                    Files.getFileAttributeView(target, BasicFileAttributeView.class)
-                            .setTimes(srcAttrs.lastModifiedTime(),
-                                    srcAttrs.lastAccessTime(),
-                                    srcAttrs.creationTime());
-                }
-            } else {
-                Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES);
-            }
+            Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {
             LOGGER.error("Unable to copy: {}", source, x);
         }
