@@ -6,8 +6,8 @@
   <xsl:param name="MCR.Solr.Core.main.ServerURL" />
   <xsl:param name="MCR.Solr.Core.classification.Name" />
   <xsl:param name="MCR.Solr.Core.classification.ServerURL" />
-  <xsl:variable name="mcrsolr:label-width" select="3" />
-  <xsl:variable name="mcrsolr:input-width" select="12 - $mcrsolr:label-width" />
+  <xsl:variable name="mcrsolr:label-width" select="9" />
+  <xsl:variable name="mcrsolr:input-width" select="9" />
 
   <xsl:template match="mcrsolr:fieldset">
     <xsl:variable name="paraname">
@@ -30,7 +30,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <fieldset class="{@name} optional">
+    <fieldset class="optional col-9">
       <xed:bind xpath="param[@name='{$paraname}']">
         <label class="checkbox-inline" for="{@name}">
           <input type="checkbox" value="{$value}" id="{@name}">
@@ -59,22 +59,22 @@
     <xsl:choose>
       <xsl:when test="@repeatable='true'">
         <div class="form-group">
-          <label class="col-md-{$mcrsolr:label-width} control-label" for="{id}">
+          <label class="col-{$mcrsolr:label-width} control-label" for="{id}">
             <xsl:value-of select="@name" />
           </label>
-          <div class="col-md-{$mcrsolr:input-width}">
+          <div class="col-{$mcrsolr:input-width}">
             <div class="multiple">
               <div class="row clearfix">
                 <xed:repeat xpath="param[@name='{@name}']">
                   <xsl:copy-of select="@initially" />
                   <xsl:copy-of select="@default" />
-                  <div class="col-sm-8 col-md-9">
+                  <div class="col-9">
                     <input class="form-control" type="text" id="{$id}">
                       <xsl:copy-of select="@title" />
                       <xsl:copy-of select="@placeholder" />
                     </input>
                   </div>
-                  <div class="col-sm-4 col-md-3">
+                  <div class="col-3">
                     <span class="pull-right">
                       <div class="btn-group">
                         <xed:controls>insert remove</xed:controls>
@@ -92,10 +92,10 @@
           <xsl:copy-of select="@initially" />
           <xsl:copy-of select="@default" />
           <div class="form-group">
-            <label class="col-md-{$mcrsolr:label-width} control-label" for="{$id}">
+            <label class="col-{$mcrsolr:label-width} control-label" for="{$id}">
               <xsl:value-of select="@name" />
             </label>
-            <div class="col-md-{$mcrsolr:input-width}">
+            <div class="col-{$mcrsolr:input-width}">
               <input class="form-control" type="text" id="{$id}">
                 <xsl:copy-of select="@title" />
                 <xsl:copy-of select="@placeholder" />
@@ -145,7 +145,7 @@
       <xsl:copy-of select="@initially" />
       <xsl:copy-of select="@default" />
       <div class="form-group">
-        <div class="offset-md-{$mcrsolr:label-width} col-md-{$mcrsolr:input-width}">
+        <div class="col-{$mcrsolr:input-width}">
           <div class="checkbox">
             <label for="{$id}">
               <input type="checkbox" value="{$value}" id="{$id}">
@@ -167,10 +167,10 @@
       <xsl:copy-of select="@initially" />
       <xsl:copy-of select="@default" />
       <div class="form-group">
-        <label class="col-md-{$mcrsolr:label-width} control-label" for="{$id}">
+        <label class="col-{$mcrsolr:label-width} control-label" for="{$id}">
           <xsl:value-of select="@name" />
         </label>
-        <div class="col-md-{$mcrsolr:input-width}">
+        <div class="col-{$mcrsolr:input-width}">
           <textarea class="form-control" id="{$id}">
             <xsl:copy-of select="@title" />
             <xsl:copy-of select="@placeholder" />
@@ -228,11 +228,12 @@
     <xsl:param name="core" />
     <xsl:param name="type" />
     <xsl:param name="solrUrl" />
+    <xsl:if test="string-length($core) &gt; 0">
     <div class="table-responsive">
-      <table class="table table-striped table-hover table-condensed">
+      <table class="table table-striped table-hover table-sm">
         <xsl:variable name="url" select="concat($solrUrl, '/solr/', $core, '/admin/luke?wt=xml')" />
         <xsl:variable name="availableFields" select="document($url)" />
-        <caption><xsl:value-of select="concat('Fields of core ',$type,'(',$core,')')" /></caption>
+        <thead><tr><th colspan="3"><xsl:value-of select="concat('Fields of core ',$type,' (',$core,')')" /></th></tr></thead>
         <tr>
           <th>field</th>
           <th>static/dynamic</th>
@@ -249,8 +250,8 @@
               <xsl:variable name="count" select="count(preceding-sibling::lst[str[@name='dynamicBase']=$dynamicBase])"/>
               <xsl:if test="$count = 0">
                 <tr data-toggle="collapse" data-target="#{$genId}" class="clickable">
-                  <td>
-                    <xsl:value-of select="$dynamicBase" /><span class="caret"></span>
+                  <td class="dropdown-toggle">
+                    <xsl:value-of select="$dynamicBase" />
                   </td>
                   <td>
                     <xsl:value-of select="'dynamic'" />
@@ -291,5 +292,6 @@
         </xsl:for-each>
       </table>
     </div>
+    </xsl:if>
   </xsl:template>
 </xsl:stylesheet>

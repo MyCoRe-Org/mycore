@@ -25,6 +25,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -113,7 +114,14 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         }
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         MCRObjectDerivate objectDerivate = derivate.getDerivate();
-        if (objectDerivate.deleteFileMetaData('/' + path.subpath(0, path.getNameCount()).toString())) {
+        String filePath = '/' + path.subpath(0, path.getNameCount()).toString();
+        Optional<MCRFileMetadata> fileMetaWithoutURN = objectDerivate.getFileMetadata()
+                .stream()
+                .filter(m -> filePath.equals(m.getName()))
+                .filter(m -> m.getUrn() == null && m.getHandle() == null)
+                .findAny();
+
+        if (fileMetaWithoutURN.isPresent() && objectDerivate.deleteFileMetaData(filePath)) {
             try {
                 MCRMetadataManager.update(derivate);
             } catch (MCRPersistenceException | MCRAccessException e) {

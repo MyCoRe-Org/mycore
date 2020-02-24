@@ -62,11 +62,7 @@ public class MCRSolrInputDocumentHandler extends MCRSolrAbstractIndexHandler {
         SolrClient solrClient = getSolrClient();
         LOGGER.info("Sending {} to SOLR...", id);
         if (MCRSolrUtils.useNestedDocuments()) {
-            if (id.contains("_derivate_")) {
-                MCRSolrIndexer.deleteDerivate(solrClient, id);
-            } else {
-                MCRSolrIndexer.deleteById(solrClient, id);
-            }
+            MCRSolrIndexer.deleteById(solrClient, id);
         }
         UpdateRequest updateRequest = getUpdateRequest(MCRSolrConstants.SOLR_UPDATE_PATH);
         updateRequest.add(document);
