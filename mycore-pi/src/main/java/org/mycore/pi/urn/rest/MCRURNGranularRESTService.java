@@ -25,6 +25,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -39,10 +40,12 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityTransaction;
 
+import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -50,6 +53,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIService;
@@ -267,6 +271,36 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         throws MCRPersistentIdentifierException {
         //TODO: improve API, don't override method to do nothing
         LOGGER.info("No update in this implementation");
+    }
+
+    @Override
+    public void updateFlag(MCRObjectID id, String additional, MCRPI mcrpi) {
+        MCRBase obj = MCRMetadataManager.retrieve(id);
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        Gson gson = getGson();
+
+        //just update flag for derivate, where additional is ""
+        if("".equals(additional)){
+            Iterator<String> flagsIter = flags.iterator();
+            while (flagsIter.hasNext()){
+                String flagStr = flagsIter.next();
+                MCRPI currentPi = gson.fromJson(flagStr, MCRPI.class);
+
+                if ("".equals(currentPi.getAdditional())
+                        && currentPi.getIdentifier().equals(mcrpi.getIdentifier())){
+                    //remove flag for update
+                    flagsIter.remove();
+                }
+            }
+
+            addFlagToObject(obj, mcrpi);
+            try {
+                MCRMetadataManager.update(obj);
+            } catch (Exception e) {
+                throw new MCRException("Could not update flags of object " + id, e);
+            }
+        }
     }
 
     private static class GranularURNGenerator {
