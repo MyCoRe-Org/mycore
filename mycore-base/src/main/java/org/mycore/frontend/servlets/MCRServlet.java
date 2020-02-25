@@ -37,6 +37,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
@@ -55,7 +56,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
-import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.config.MCRConfigurationException;
@@ -277,11 +277,18 @@ public class MCRServlet extends HttpServlet {
             //first request
             session.beginTransaction(); //for MCRTranslation.getAvailableLanguages()
             try {
-                MCRStreamUtils.asStream(req.getLocales())
-                    .map(Locale::toString)
-                    .filter(MCRTranslation.getAvailableLanguages()::contains)
-                    .findFirst()
-                    .ifPresent(session::setCurrentLanguage);
+                String acceptLanguage = req.getHeader("Accept-Language");
+                if (acceptLanguage != null) {
+                    List<Locale.LanguageRange> languageRanges = Locale.LanguageRange.parse(acceptLanguage);
+                    LOGGER.debug("accept languages: {}", languageRanges);
+                    MCRSession finalSession = session;
+                    Optional
+                        .ofNullable(Locale.lookupTag(languageRanges, MCRTranslation.getAvailableLanguages()))
+                        .ifPresent(selectedLanguage -> {
+                            LOGGER.debug("selected language: {}", selectedLanguage);
+                            finalSession.setCurrentLanguage(selectedLanguage);
+                        });
+                }
             } finally {
                 if (session.transactionRequiresRollback()) {
                     session.rollbackTransaction();
