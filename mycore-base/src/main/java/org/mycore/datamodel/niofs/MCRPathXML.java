@@ -27,7 +27,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SecureDirectoryStream;
-import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
@@ -106,9 +105,9 @@ public class MCRPathXML {
                 LOGGER.debug(() -> "Using SecureDirectoryStream code path for " + path);
                 attrResolver = p -> {
                     try {
-                        BasicFileAttributeView attributeView = ((SecureDirectoryStream<Path>) dirStream)
-                            .getFileAttributeView(p.getFileName(), BasicFileAttributeView.class);
-                        return (MCRFileAttributes<?>) attributeView.readAttributes();
+                        MCRMD5AttributeView attributeView = ((SecureDirectoryStream<Path>) dirStream)
+                            .getFileAttributeView(p.getFileName(), MCRMD5AttributeView.class);
+                        return attributeView.readAllAttributes();
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }
