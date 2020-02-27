@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.BeforeClass;
@@ -42,14 +43,14 @@ public class MCRLocaleResourceTest extends MCRJerseyTest {
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> map = new HashMap<>();
-        map.put("MCR.Metadata.Languages", "de,en,ru");
+        map.put("MCR.Metadata.Languages", "de,en,it");
         return map;
     }
 
     @Test
     public void language() {
-        final String language = target("locale/language").request().get(String.class);
-        assertEquals("de", language);
+        final String language = target("locale/language").request().acceptLanguage(Locale.ITALY).get(String.class);
+        assertEquals("it", language);
     }
 
     @Test
