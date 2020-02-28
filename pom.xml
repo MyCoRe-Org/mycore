@@ -192,7 +192,9 @@
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
               <link>http://docs.jboss.org/hibernate/jpa/2.2/api/</link>
+              <!--
               <link>http://lucene.apache.org/solr/8_3_0/solr-solrj/</link>
+-->
             </links>
           </configuration>
         </plugin>
@@ -714,7 +716,9 @@
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
                 <link>http://docs.jboss.org/hibernate/jpa/2.2/api/</link>
+                <!--
                 <link>http://lucene.apache.org/solr/8_3_0/solr-solrj/</link>
+-->
               </links>
             </configuration>
             <reportSets>
