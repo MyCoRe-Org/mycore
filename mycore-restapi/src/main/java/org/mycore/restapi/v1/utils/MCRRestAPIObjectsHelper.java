@@ -819,11 +819,12 @@ public class MCRRestAPIObjectsHelper {
     }
 
     //TODO move into generic package for v1 and v2 REST-API
-    public static MCRObjectID retrieveMCRObjectID(String idString) throws MCRRestAPIException {
-        if(idString == null) {
+    public static MCRObjectID retrieveMCRObjectID(String paramID) throws MCRRestAPIException {
+        if(paramID == null) {
             return null;
         }
         String key = "mcr"; // the default value for the key
+        String idString = paramID;
         if (idString.contains(":")) {
             int pos = idString.indexOf(":");
             key = idString.substring(0, pos);
@@ -888,18 +889,19 @@ public class MCRRestAPIObjectsHelper {
     }
 
     //TODO move into generic package for v1 and v2 REST-API
-    public static MCRObjectID retrieveMCRDerivateID(MCRObjectID parentObjId, String derIDString)
+    public static MCRObjectID retrieveMCRDerivateID(MCRObjectID parentObjId, String paramDerID)
         throws MCRRestAPIException {
-        if(parentObjId == null || derIDString == null) {
+        if(parentObjId == null || paramDerID == null) {
             return null;
         }
 
+        String derIDString = paramDerID;
         String derKey = "mcr"; // the default value for the key
         if (derIDString.contains(":")) {
             int pos = derIDString.indexOf(":");
             derKey = derIDString.substring(0, pos);
             derIDString = derIDString.substring(pos + 1);
-            if (!derKey.equals("mcr") && !derKey.equals("label") && !derKey.equals("classification")) {
+            if (!"mcr".equals(derKey) && !"label".equals(derKey) && !"classification".equals(derKey)) {
                 throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
                     new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_ID, "The ID is not valid.",
                         "The prefix is unkown. Only 'mcr' or 'label' or 'classification' are allowed."));
