@@ -515,7 +515,7 @@ public class MCRRestAPIObjectsHelper {
      * returns a list of derivate objects
      * @param info - the injected Jersey URIInfo object
      *
-     * @param mcrObjID - the MyCoRe Object ID
+     * @param mcrId - the MyCoRe Object ID or other valid REST-API id
      * @param format - the output format ('xml'|'json')
      * @param sort - the sort criteria
      *
