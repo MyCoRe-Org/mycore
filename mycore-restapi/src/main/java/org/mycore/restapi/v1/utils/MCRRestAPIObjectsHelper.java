@@ -55,6 +55,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.jdom2.Comment;
+import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -73,6 +74,7 @@ import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
+import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -116,7 +118,8 @@ public class MCRRestAPIObjectsHelper {
     public static Response showMCRObject(String pathParamId, String queryParamStyle, UriInfo info, Application app)
         throws MCRRestAPIException {
 
-        MCRObject mcrObj = retrieveMCRObject(pathParamId);
+        MCRObjectID mcrObjID = retrieveMCRObjectID(pathParamId);
+        MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjID);
         Document doc = mcrObj.createXML();
         Element eStructure = doc.getRootElement().getChild("structure");
 
@@ -183,8 +186,9 @@ public class MCRRestAPIObjectsHelper {
     public static Response showMCRDerivate(String pathParamMcrID, String pathParamDerID, UriInfo info, Application app,
         boolean withDetails) throws MCRRestAPIException {
 
-        MCRObjectID mcrObj = MCRObjectID.getInstance(pathParamMcrID);
-        MCRDerivate derObj = retrieveMCRDerivate(mcrObj, pathParamDerID);
+        MCRObjectID mcrObj = retrieveMCRObjectID(pathParamMcrID);
+        MCRObjectID mcrDer = retrieveMCRDerivateID(mcrObj, pathParamDerID);
+        MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(mcrDer);
 
         try {
             Document doc = derObj.createXML();
@@ -521,7 +525,7 @@ public class MCRRestAPIObjectsHelper {
      * 
      * @see MCRRestAPIObjects#listDerivates(UriInfo, String, String, String)
      */
-    public static Response listDerivates(UriInfo info, String mcrObjID, String format,
+    public static Response listDerivates(UriInfo info, String mcrId, String format,
         String sort) throws MCRRestAPIException {
         List<MCRRestAPIError> errors = new ArrayList<>();
 
@@ -543,10 +547,12 @@ public class MCRRestAPIObjectsHelper {
             throw new MCRRestAPIException(Status.BAD_REQUEST, errors);
         }
 
+        MCRObjectID mcrObjID = retrieveMCRObjectID(mcrId);
+        
         //Parameters are checked - continue to retrieve data
-
-        List<MCRObjectIDDate> objIdDates = retrieveMCRObject(mcrObjID).getStructure().getDerivates().stream()
-            .map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists).map(id -> new MCRObjectIDDate() {
+        List<MCRObjectIDDate> objIdDates = MCRMetadataManager.retrieveMCRObject(mcrObjID).getStructure()
+            .getDerivates().stream().map(MCRMetaLinkID::getXLinkHrefID).filter(MCRMetadataManager::exists)
+            .map(id -> new MCRObjectIDDate() {
                 long lastModified;
                 {
                     try {
@@ -675,9 +681,10 @@ public class MCRRestAPIObjectsHelper {
                 new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_PARAMETER, "The syntax of format parameter is wrong.",
                     "Allowed values for format are 'json' or 'xml'."));
         }
-        MCRObjectID mcrObj = MCRObjectID.getInstance(mcrObjID);
-        MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
-
+        MCRObjectID mcrObj = retrieveMCRObjectID(mcrObjID);
+        MCRObjectID mcrDer = retrieveMCRDerivateID(mcrObj, mcrDerID);
+        MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(mcrDer);
+        
         try {
             MCRPath root = MCRPath.getPath(derObj.getId().toString(), "/");
             BasicFileAttributes readAttributes = Files.readAttributes(root, BasicFileAttributes.class);
@@ -728,8 +735,9 @@ public class MCRRestAPIObjectsHelper {
     public static String retrieveMaindocURL(UriInfo info, String mcrObjID, String mcrDerID, Application app)
         throws IOException {
         try {
-            MCRObjectID mcrObj = MCRObjectID.getInstance(mcrObjID);
-            MCRDerivate derObj = retrieveMCRDerivate(mcrObj, mcrDerID);
+            MCRObjectID mcrObj = retrieveMCRObjectID(mcrObjID);
+            MCRObjectID mcrDer = retrieveMCRDerivateID(mcrObj, mcrDerID);
+            MCRDerivate derObj = MCRMetadataManager.retrieveMCRDerivate(mcrDer);
             String maindoc = derObj.getDerivate().getInternals().getMainDoc();
 
             String baseURL = MCRJerseyUtil.getBaseURL(info, app)
@@ -810,7 +818,11 @@ public class MCRRestAPIObjectsHelper {
         return result;
     }
 
-    private static MCRObject retrieveMCRObject(String idString) throws MCRRestAPIException {
+    //TODO move into generic package for v1 and v2 REST-API
+    public static MCRObjectID retrieveMCRObjectID(String idString) throws MCRRestAPIException {
+        if(idString == null) {
+            return null;
+        }
         String key = "mcr"; // the default value for the key
         if (idString.contains(":")) {
             int pos = idString.indexOf(":");
@@ -843,7 +855,7 @@ public class MCRRestAPIObjectsHelper {
                         "There is no object with the given MyCoRe ID '" + idString + "'.", null));
             }
 
-            return MCRMetadataManager.retrieveMCRObject(mcrID);
+            return mcrID;
         } else {
             SolrClient solrClient = MCRSolrClientFactory.getMainSolrClient();
             SolrQuery query = new SolrQuery();
@@ -853,7 +865,7 @@ public class MCRRestAPIObjectsHelper {
                 SolrDocumentList solrResults = response.getResults();
                 if (solrResults.getNumFound() == 1) {
                     String id = solrResults.get(0).getFieldValue("returnId").toString();
-                    return retrieveMCRObject(id);
+                    return retrieveMCRObjectID(id);
                 } else {
                     if (solrResults.getNumFound() == 0) {
                         throw new MCRRestAPIException(Response.Status.NOT_FOUND,
@@ -875,18 +887,22 @@ public class MCRRestAPIObjectsHelper {
         }
     }
 
-    private static MCRDerivate retrieveMCRDerivate(MCRObjectID parentObjId, String derIDString)
+    //TODO move into generic package for v1 and v2 REST-API
+    public static MCRObjectID retrieveMCRDerivateID(MCRObjectID parentObjId, String derIDString)
         throws MCRRestAPIException {
+        if(parentObjId == null || derIDString == null) {
+            return null;
+        }
 
         String derKey = "mcr"; // the default value for the key
         if (derIDString.contains(":")) {
             int pos = derIDString.indexOf(":");
             derKey = derIDString.substring(0, pos);
             derIDString = derIDString.substring(pos + 1);
-            if (!derKey.equals("mcr") && !derKey.equals("label")) {
+            if (!derKey.equals("mcr") && !derKey.equals("label") && !derKey.equals("classification")) {
                 throw new MCRRestAPIException(Response.Status.BAD_REQUEST,
                     new MCRRestAPIError(MCRRestAPIError.CODE_WRONG_ID, "The ID is not valid.",
-                        "The prefix is unkown. Only 'mcr' or 'label' are allowed."));
+                        "The prefix is unkown. Only 'mcr' or 'label' or 'classification' are allowed."));
             }
         }
 
@@ -898,12 +914,28 @@ public class MCRRestAPIObjectsHelper {
                 .anyMatch(derIDString::equals)) {
             matchedDerID = derIDString;
         }
-        if (derKey.equals("label")) {
+        if ("label".equals(derKey)) {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(parentObjId);
             for (MCRMetaLinkID check : mcrObj.getStructure().getDerivates()) {
                 if (derIDString.equals(check.getXLinkLabel()) || derIDString.equals(check.getXLinkTitle())) {
                     matchedDerID = check.getXLinkHref();
                     break;
+                }
+            }
+        }
+        if ("classification".equals(derKey) && derIDString.contains(":")) {
+            int pos = derIDString.indexOf(":");
+            String classid = derIDString.substring(0, pos);
+            String categid = derIDString.substring(pos + 1);
+            MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(parentObjId);
+            for (MCRMetaEnrichedLinkID der : mcrObj.getStructure().getDerivates()) {
+                for (Content c : der.getContentList()) {
+                    if (c instanceof Element && ((Element) c).getName().equals("classification")
+                        && classid.equals(((Element) c).getAttributeValue("classid"))
+                        && categid.equals(((Element) c).getAttributeValue("categid"))) {
+                        matchedDerID = der.getXLinkHref();
+                        break;
+                    }
                 }
             }
         }
@@ -920,7 +952,7 @@ public class MCRRestAPIObjectsHelper {
             throw new MCRRestAPIException(Response.Status.NOT_FOUND, new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND,
                 "There is no derivate with the id '" + matchedDerID + "'.", null));
         }
-        return MCRMetadataManager.retrieveMCRDerivate(derID);
+        return derID;
     }
 
     /**

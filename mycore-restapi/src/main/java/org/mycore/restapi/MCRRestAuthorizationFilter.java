@@ -39,11 +39,13 @@ import org.apache.logging.log4j.LogManager;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
 import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
+import org.mycore.restapi.v1.utils.MCRRestAPIObjectsHelper;
 
 @Priority(Priorities.AUTHORIZATION)
 public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
@@ -93,14 +95,20 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     }
 
     private void checkBaseAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
-        String objectId, String derId, String path)
-        throws MCRRestAPIException {
-        LogManager.getLogger().debug("Permission: {}, Object: {}, Derivate: {}, Path: {}", permission, objectId, derId,
-            path);
-        Optional<String> checkable = Optional.ofNullable(derId)
-            .filter(d -> path != null) //only check for derId if path is given
-            .map(Optional::of)
-            .orElseGet(() -> Optional.ofNullable(objectId));
+        String objectId, String derId, String path) throws MCRRestAPIException {
+        Optional<String> optObjId = Optional.ofNullable(MCRRestAPIObjectsHelper.retrieveMCRObjectID(objectId))
+            .map(MCRObjectID::toString);
+        Optional<String> optDerId = Optional.empty();
+        if (optObjId.isPresent()) {
+            optDerId = Optional
+                .ofNullable(
+                    MCRRestAPIObjectsHelper.retrieveMCRDerivateID(MCRObjectID.getInstance(optObjId.get()), derId))
+                .map(MCRObjectID::toString);
+        }
+
+        LogManager.getLogger().debug("Permission: {}, Object: {}, Derivate: {}, Path: {}", permission,
+            optObjId.orElse("null"), optDerId.orElse("null"), path);
+        Optional<String> checkable = path != null ? optDerId : optObjId;
         checkable.ifPresent(id -> LogManager.getLogger().info("Checking " + permission + " access on " + id));
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         boolean allowed = checkable
