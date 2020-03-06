@@ -51,7 +51,7 @@
       Start - match="doc" mode="iview"
     </xsl:comment>
 
-    <xsl:for-each select="$derivates/str[@name='maindoc']">
+    <xsl:for-each select="$derivates/str[@name='derivateMaindoc']">
       <xsl:call-template name="iViewLinkPrev">
         <xsl:with-param name="mcrid" select="$mcrid" />
         <xsl:with-param name="derivate" select="../str[@name='id']" />
