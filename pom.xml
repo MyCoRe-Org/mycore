@@ -2132,6 +2132,7 @@
   </developers>
   <modules>
     <module>mycore-base</module>
+    <module>mycore-application-starter</module>
     <module>mycore-acl-editor2</module>
     <module>mycore-classbrowser</module>
     <module>mycore-classeditor</module>
