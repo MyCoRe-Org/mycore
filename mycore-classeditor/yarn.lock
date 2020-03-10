@@ -121,6 +121,11 @@ dijit@1.9.8:
   dependencies:
     dojo "1.9.8"
 
+dojo@1.11.10:
+  version "1.11.10"
+  resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.11.10.tgz#dfa91df517cdc0447eb0839b25bb6e1539f4bf14"
+  integrity sha512-o2tHdzRDQqkUUchGLwSDHhuWU5K9NbZFDjBUb1VrGoPkjrCuYFtp9rtKHCtI6+oK6MKrWQ+DHlPHXiegtzPBsw==
+
 dojo@1.9.8:
   version "1.9.8"
   resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.9.8.tgz#28deca8a221ff54284d4de383831cc43b63424af"
