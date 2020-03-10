@@ -296,7 +296,7 @@ public class MCRDirectoryStream {
             MCRStoredNode node = nodeSupplier.apply(null);
             if (node instanceof MCRFile) {
                 return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(),
-                    ((MCRFile) nodeSupplier).getMD5());
+                    ((MCRFile) node).getMD5());
             }
             return MCRFileAttributes.fromAttributes(baseAttrView.readAttributes(), null);
         }
