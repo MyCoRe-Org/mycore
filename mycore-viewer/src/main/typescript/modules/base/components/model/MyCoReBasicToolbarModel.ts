@@ -101,7 +101,7 @@ namespace mycore.viewer.model {
             this._zoomOutButton = new widgets.toolbar.ToolbarButton('ZoomOutButton', '', 'zoom-out', 'search-minus');
             this._zoomWidthButton = new widgets.toolbar.ToolbarButton('ZoomWidthButton', '', 'zoom-width', 'arrows-alt-h');
             this._zoomFitButton = new widgets.toolbar.ToolbarButton('ZoomFitButton', '', 'zoom-fit-in', 'expand-arrows-alt');
-            this._rotateButton = new widgets.toolbar.ToolbarButton('RotateButton', '', 'Rotate', 'undo');
+            this._rotateButton = new widgets.toolbar.ToolbarButton('RotateButton', '', 'Rotate', 'redo');
 
             this._zoomControllGroup.addComponent(this._zoomInButton);
             this._zoomControllGroup.addComponent(this._zoomOutButton);
