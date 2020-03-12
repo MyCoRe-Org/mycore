@@ -59,11 +59,11 @@ public class MCRDirectoryStream {
     static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
         DirectoryStream.Filter<Path> filter = (dir instanceof MCRFileCollection) ? MCRFileCollectionFilter.FILTER
             : AcceptAllFilter.FILTER;
-        LOGGER.info("Dir {}, class {}, filter {}", path, dir.getClass(), filter.getClass());
+        LOGGER.debug("Dir {}, class {}, filter {}", path, dir.getClass(), filter.getClass());
         DirectoryStream<Path> baseDirectoryStream = Files.newDirectoryStream(dir.getLocalPath(), filter);
-        LOGGER.info("baseStream {}", baseDirectoryStream.getClass());
+        LOGGER.debug("baseStream {}", baseDirectoryStream.getClass());
         if (baseDirectoryStream instanceof java.nio.file.SecureDirectoryStream) {
-            LOGGER.info("Returning SecureDirectoryStream");
+            LOGGER.debug("Returning SecureDirectoryStream");
             return new SecureDirectoryStream(dir, path,
                 (java.nio.file.SecureDirectoryStream<Path>) baseDirectoryStream);
         }
@@ -207,16 +207,17 @@ public class MCRDirectoryStream {
 
         @Override
         public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
-            Path localRelativePath = MCRFileSystemUtils.toNativePath(dir.getLocalPath().getFileSystem(), path);
-            V fileAttributeView = baseStream.getFileAttributeView(localRelativePath, type, options);
-            if (fileAttributeView != null) {
-                return fileAttributeView;
-            }
+            Path localRelativePath = toLocalPath(path);
             if (type == MCRMD5AttributeView.class) {
-                BasicFileAttributeView baseView = baseStream.getFileAttributeView(BasicFileAttributeView.class);
+                BasicFileAttributeView baseView = baseStream.getFileAttributeView(localRelativePath,
+                    BasicFileAttributeView.class, options);
                 return (V) new MD5FileAttributeViewImpl(baseView, (v) -> resolve(path));
             }
-            return null;
+            return baseStream.getFileAttributeView(localRelativePath, type, options);
+        }
+
+        private Path toLocalPath(Path path) {
+            return MCRFileSystemUtils.toNativePath(dir.getLocalPath().getFileSystem(), path);
         }
 
         void checkClosed() {
