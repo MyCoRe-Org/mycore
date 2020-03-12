@@ -18,15 +18,21 @@
 
 package org.mycore.datamodel.niofs.ifs2;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.ClosedDirectoryStreamException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
@@ -189,7 +195,56 @@ public class MCRDirectoryStream {
         @Override
         public void move(Path srcpath, java.nio.file.SecureDirectoryStream<Path> targetdir, Path targetpath)
             throws IOException {
+            checkClosed();
+            MCRPath src = checkFileSystem(srcpath);
+            MCRFile srcFile = srcpath.isAbsolute() ? MCRFileSystemUtils.getMCRFile(src, false, false)
+                : (MCRFile) resolve(srcpath);
+            if (srcFile == null) {
+                throw new NoSuchFileException(this.dirPath.toString(), srcpath.toString(), null);
+            }
+            if (!targetpath.isAbsolute() && targetdir instanceof SecureDirectoryStream) {
+                SecureDirectoryStream that = (SecureDirectoryStream) targetdir;
+                MCRFile file = getMCRFile(that, targetpath);
+                Files.delete(file.getLocalPath()); //delete for move
+                if (!srcpath.isAbsolute()) {
+                    baseStream.move(toLocalPath(src), that.baseStream, toLocalPath(targetpath));
+                }
+                file.setMD5(srcFile.getMD5()); //restore md5
+            } else {
+                if (targetpath.isAbsolute()) {
+                    Files.move(srcFile.getLocalPath(), targetpath, StandardCopyOption.COPY_ATTRIBUTES);
+                } else {
+                    try (FileInputStream fis = new FileInputStream(srcFile.getLocalPath().toFile());
+                        FileChannel inChannel = fis.getChannel();
+                        SeekableByteChannel targetChannel = targetdir.newByteChannel(targetpath,
+                            Set.of(StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE))) {
+                        long bytesTransferred = 0;
+                        while (bytesTransferred < inChannel.size()) {
+                            bytesTransferred += inChannel.transferTo(bytesTransferred, inChannel.size(), targetChannel);
+                        }
+                    }
+                }
+            }
+            srcFile.delete();
+        }
 
+        private static MCRFile getMCRFile(SecureDirectoryStream ds, Path relativePath) throws IOException {
+            MCRStoredNode storedNode = ds.resolve(relativePath);
+            if (storedNode != null) {
+                throw new FileAlreadyExistsException(ds.dirPath.resolve(relativePath).toString());
+            }
+            //does not exist, have to create
+            MCRStoredNode parent = ds.dir;
+            if (relativePath.getNameCount() > 1) {
+                parent = (MCRStoredNode) parent.getNodeByPath(relativePath.getParent().toString());
+                if (parent == null) {
+                    throw new NoSuchFileException(ds.dirPath.resolve(relativePath.getParent()).toString());
+                }
+                if (!(parent instanceof MCRDirectory)) {
+                    throw new NotDirectoryException(ds.dirPath.resolve(relativePath.getParent()).toString());
+                }
+            }
+            return ((MCRDirectory) parent).createFile(relativePath.getFileName().toString());
         }
 
         @Override
