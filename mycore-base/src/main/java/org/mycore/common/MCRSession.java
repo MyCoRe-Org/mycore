@@ -21,7 +21,9 @@ package org.mycore.common;
 import static org.mycore.common.events.MCRSessionEvent.Type.activated;
 import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -271,37 +273,16 @@ public class MCRSession implements Cloneable {
 
     /** Set the ip to the given IP */
     public final void setCurrentIP(String newip) {
-        java.util.StringTokenizer st = new java.util.StringTokenizer(newip, ".");
-        if (st.countTokens() == 4) {
-            try {
-                while (st.hasMoreTokens()) {
-                    int i = Integer.parseInt(st.nextToken());
-                    if (i < 0 || i > 255) {
-                        return;
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.debug("Exception while parsing new ip {} using old value.", newip, e);
-                return;
-            }
-            ip = newip;
+        //a necessary condition for an IP address is to start with an hexadecimal value or ':'
+        if (Character.digit(newip.charAt(0), 16) == -1 && newip.charAt(0) != ':') {
+            LOGGER.error("Is not a valid IP address: " + newip);
+            return;
         }
-
-        //IPV6,z.B: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
-        st = new java.util.StringTokenizer(newip, ":");
-        if (st.countTokens() == 8) {
-            try {
-                while (st.hasMoreTokens()) {
-                    long l = Long.parseLong(st.nextToken(), 16);
-                    if (l < 0 || l > 65535) {
-                        return;
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.debug("Exception while parsing new ip {} using old value.", newip, e);
-                return;
-            }
-            ip = newip;
+        try {
+            InetAddress inetAddress = InetAddress.getByName(newip);
+            ip = inetAddress.getHostAddress();
+        } catch (UnknownHostException e) {
+            LOGGER.error("Exception while parsing new ip {} using old value.", newip, e);
         }
     }
 
