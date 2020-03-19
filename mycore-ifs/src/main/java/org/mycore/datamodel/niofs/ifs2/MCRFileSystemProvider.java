@@ -175,13 +175,14 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 checkOpenOption(option);
             }
         }
-        MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(ifsPath, create, createNew);
+        boolean channelCreateEvent = createNew || Files.notExists(ifsPath);
+        MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(ifsPath, create, createNew, !channelCreateEvent);
         if (mcrFile == null) {
             throw new NoSuchFileException(path.toString());
         }
         boolean write = options.contains(StandardOpenOption.WRITE) || options.contains(StandardOpenOption.APPEND);
         FileChannel baseChannel = (FileChannel) Files.newByteChannel(mcrFile.getLocalPath(), fileOpenOptions);
-        return new MCRFileChannel(mcrFile, baseChannel, write);
+        return new MCRFileChannel(ifsPath, mcrFile, baseChannel, write, channelCreateEvent);
     }
 
     static void checkOpenOption(OpenOption option) {
@@ -264,6 +265,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
         try {
             child.delete();
+            MCRPathEventHelper.fireFileDeleteEvent(path, null);
         } catch (RuntimeException e) {
             throw new IOException("Could not delete: " + mcrPath, e);
         }
@@ -328,10 +330,16 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         MCRDirectory tgtParentDir = MCRFileSystemUtils.resolvePath(tgt.getParent());
         if (srcNode instanceof MCRFile) {
             MCRFile srcFile = (MCRFile) srcNode;
-            MCRFile targetFile = MCRFileSystemUtils.getMCRFile(tgt, true, createNew);
+            boolean fireCreateEvent = createNew || Files.notExists(tgt);
+            MCRFile targetFile = MCRFileSystemUtils.getMCRFile(tgt, true, createNew, !fireCreateEvent);
             targetFile.setContent(srcFile.getContent());
             if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
                 copyFileAttributes(srcFile, targetFile);
+            }
+            if (fireCreateEvent) {
+                MCRPathEventHelper.fireFileCreateEvent(tgt, targetFile.getBasicFileAttributes());
+            } else {
+                MCRPathEventHelper.fireFileUpdateEvent(tgt, targetFile.getBasicFileAttributes());
             }
         } else if (srcNode instanceof MCRDirectory) {
             MCRStoredNode child = (MCRStoredNode) tgtParentDir.getChild(tgt.getFileName().toString());
@@ -360,7 +368,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
     }
 
-    public static void copyFileAttributes(MCRFile source, MCRFile target)
+    private static void copyFileAttributes(MCRFile source, MCRFile target)
         throws IOException {
         Path targetLocalFile = target.getLocalPath();
         BasicFileAttributeView targetBasicFileAttributeView = Files.getFileAttributeView(targetLocalFile,
@@ -371,7 +379,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             srcAttr.creationTime());
     }
 
-    public static void copyDirectoryAttributes(MCRDirectory source, MCRDirectory target)
+    private static void copyDirectoryAttributes(MCRDirectory source, MCRDirectory target)
         throws IOException {
         Path tgtLocalPath = target.getLocalPath();
         Path srcLocalPath = source.getLocalPath();

@@ -184,12 +184,19 @@ public class MCRDirectoryStream {
             if (path.isAbsolute()) {
                 Files.delete(path);
             }
-            resolve(path).delete();
+            final MCRStoredNode storedNode = resolve(path);
+            final MCRPath mcrPath = getCurrentSecurePath(storedNode);
+            storedNode.delete();
+            MCRPathEventHelper.fireFileDeleteEvent(mcrPath, null);
         }
 
         @Override
         public void deleteDirectory(Path path) throws IOException {
-            deleteFile(path);
+            checkClosed();
+            if (path.isAbsolute()) {
+                Files.delete(path);
+            }
+            resolve(path).delete();
         }
 
         @Override
@@ -197,7 +204,7 @@ public class MCRDirectoryStream {
             throws IOException {
             checkClosed();
             MCRPath src = checkFileSystem(srcpath);
-            MCRFile srcFile = srcpath.isAbsolute() ? MCRFileSystemUtils.getMCRFile(src, false, false)
+            MCRFile srcFile = srcpath.isAbsolute() ? MCRFileSystemUtils.getMCRFile(src, false, false, true)
                 : (MCRFile) resolve(srcpath);
             if (srcFile == null) {
                 throw new NoSuchFileException(this.dirPath.toString(), srcpath.toString(), null);
@@ -210,9 +217,14 @@ public class MCRDirectoryStream {
                     baseStream.move(toLocalPath(src), that.baseStream, toLocalPath(targetpath));
                 }
                 file.setMD5(srcFile.getMD5()); //restore md5
+                final MCRPath targetAbsolutePath = that.getCurrentSecurePath(file);
+                final BasicFileAttributes attrs = that.getFileAttributeView(targetpath, BasicFileAttributeView.class)
+                    .readAttributes();
+                MCRPathEventHelper.fireFileUpdateEvent(targetAbsolutePath, attrs);
             } else {
                 if (targetpath.isAbsolute()) {
                     Files.move(srcFile.getLocalPath(), targetpath, StandardCopyOption.COPY_ATTRIBUTES);
+                    srcFile.delete();
                 } else {
                     try (FileInputStream fis = new FileInputStream(srcFile.getLocalPath().toFile());
                         FileChannel inChannel = fis.getChannel();
