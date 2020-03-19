@@ -14,12 +14,13 @@
     <mapping-file>META-INF/mycore-user2-mappings.xml</mapping-file>
     <mapping-file>META-INF/mycore-viewer-mappings.xml</mapping-file>
     <properties>
+      <!-- H2 -->
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
       <property name="javax.persistence.jdbc.url" value="jdbc:h2:file:/path/to/.mycore/myapp/data/h2/mycore;AUTO_SERVER=TRUE" />
-      <!--  PostgreSQL -->
+      <!-- PostgreSQL -->
       <!--
       <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
-      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1/mycore" />
+      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1/mycore?currentSchema=mycore" />
       -->
       <!-- MySQL -->
       <!--
@@ -33,6 +34,7 @@
       -->
       <property name="javax.persistence.jdbc.user" value="sa" />
       <property name="javax.persistence.jdbc.password" value="" />
+      
       <!-- any jpa provider properties (still require hibernate) -->
       <property name="hibernate.cache.use_second_level_cache" value="false" />
       <property name="hibernate.hbm2ddl.auto" value="update" />
