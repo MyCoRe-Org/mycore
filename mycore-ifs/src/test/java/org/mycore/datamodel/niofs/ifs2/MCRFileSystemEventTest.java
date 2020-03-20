@@ -19,20 +19,30 @@
 package org.mycore.datamodel.niofs.ifs2;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.channels.FileChannel;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SecureDirectoryStream;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,6 +61,9 @@ public class MCRFileSystemEventTest extends MCRTestCase {
 
     @Rule
     public TemporaryFolder storeFolder = new TemporaryFolder();
+
+    @Rule
+    public TemporaryFolder exportFolder = new TemporaryFolder();
 
     private Path derivateRoot;
 
@@ -149,6 +162,99 @@ public class MCRFileSystemEventTest extends MCRTestCase {
         Assert.assertEquals(1, register.getEntries().size());
         Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
         register.clear();
+        try (DirectoryStream<Path> dir1Stream = Files.newDirectoryStream(dir1);
+            DirectoryStream<Path> dir2Stream = Files.newDirectoryStream(dir2)) {
+            if (!(dir1Stream instanceof SecureDirectoryStream)) {
+                LogManager.getLogger().warn("Current OS ({}) does not provide SecureDirectoryStream.",
+                    System.getProperty("os.name"));
+                return;
+            }
+            //further testing
+            SecureDirectoryStream<Path> sDir1Stream = (SecureDirectoryStream<Path>) dir1Stream;
+            SecureDirectoryStream<Path> sDir2Stream = (SecureDirectoryStream<Path>) dir2Stream;
+            //relative -> relative
+            sDir1Stream.move(file.getFileName(), sDir2Stream, file.getFileName());
+            Assert.assertEquals(2, register.getEntries().size());
+            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            sDir2Stream.move(file.getFileName(), sDir1Stream, file.getFileName());
+            register.clear();
+            //absolute -> relative
+            sDir1Stream.move(file, sDir2Stream, file.getFileName());
+            Assert.assertEquals(2, register.getEntries().size());
+            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            sDir2Stream.move(file.getFileName(), sDir1Stream, file.getFileName());
+            register.clear();
+            //relative -> absolute
+            sDir1Stream.move(file.getFileName(), sDir2Stream, dir2.resolve(file.getFileName()));
+            Assert.assertEquals(2, register.getEntries().size());
+            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            sDir2Stream.move(file.getFileName(), sDir1Stream, file.getFileName());
+            register.clear();
+            //absolute -> absolute
+            sDir1Stream.move(file, sDir2Stream, dir2.resolve(file.getFileName()));
+            Assert.assertEquals(2, register.getEntries().size());
+            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            sDir2Stream.move(file.getFileName(), sDir1Stream, file.getFileName());
+            register.clear();
+            //rename
+            sDir1Stream.move(file.getFileName(), sDir1Stream, dir1.resolve("Junit.txt").getFileName());
+            Assert.assertEquals(2, register.getEntries().size());
+            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            sDir1Stream.move(dir1.resolve("Junit.txt").getFileName(), sDir1Stream, file.getFileName());
+            register.clear();
+            //move to local dir
+            final Path exportDir = exportFolder.getRoot().toPath();
+            try (DirectoryStream<Path> exportDirStream = Files.newDirectoryStream(exportDir)) {
+                if (exportDirStream instanceof SecureDirectoryStream) {
+                    final SecureDirectoryStream<Path> sExportDirStream = (SecureDirectoryStream<Path>) exportDirStream;
+                    final Path localFilePath = MCRFileSystemUtils.toNativePath(exportDir.getFileSystem(),
+                        file.getFileName());
+                    sDir1Stream.move(file.getFileName(), sExportDirStream, localFilePath);
+                    Assert.assertEquals(1, register.getEntries().size());
+                    Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+                    register.clear();
+                    try (
+                        SeekableByteChannel targetChannel = sDir1Stream.newByteChannel(file.getFileName(), Set.of(
+                            StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE));
+                        FileInputStream fis = new FileInputStream(exportDir.resolve(localFilePath).toFile());
+                        FileChannel inChannel = fis.getChannel()) {
+                        long bytesTransferred = 0;
+                        while (bytesTransferred < inChannel.size()) {
+                            bytesTransferred += inChannel.transferTo(bytesTransferred, inChannel.size(), targetChannel);
+                        }
+                    }
+                    Assert.assertEquals(1, register.getEntries().size());
+                    Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+                    register.clear();
+                }
+            }
+        }
+    }
+
+    private void debugEvents() {
+        register.getEntries().forEach(System.out::println);
+    }
+
+    private void debugDir(Path path) throws IOException {
+        SimpleFileVisitor<Path> printFiles = new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                System.out.format("Directory: %s\t%s%n", dir, attrs.lastModifiedTime());
+                return super.preVisitDirectory(dir, attrs);
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                System.out.format("File: %s\t%s%n", file, attrs.lastModifiedTime());
+                return super.visitFile(file, attrs);
+            }
+        };
+        Files.walkFileTree(path, printFiles);
     }
 
     private static class EventRegister extends MCREventHandlerBase {

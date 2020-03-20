@@ -210,22 +210,29 @@ public class MCRDirectoryStream {
                 throw new NoSuchFileException(this.dirPath.toString(), srcpath.toString(), null);
             }
             if (!targetpath.isAbsolute() && targetdir instanceof SecureDirectoryStream) {
+                LOGGER.debug("Move Case #1");
                 SecureDirectoryStream that = (SecureDirectoryStream) targetdir;
                 MCRFile file = getMCRFile(that, targetpath);
                 Files.delete(file.getLocalPath()); //delete for move
                 if (!srcpath.isAbsolute()) {
+                    LOGGER.debug("Move Case #1.1");
                     baseStream.move(toLocalPath(src), that.baseStream, toLocalPath(targetpath));
+                } else {
+                    LOGGER.debug("Move Case #1.2");
+                    baseStream.move(srcFile.getLocalPath(), that.baseStream, toLocalPath(targetpath));
                 }
                 file.setMD5(srcFile.getMD5()); //restore md5
                 final MCRPath targetAbsolutePath = that.getCurrentSecurePath(file);
                 final BasicFileAttributes attrs = that.getFileAttributeView(targetpath, BasicFileAttributeView.class)
                     .readAttributes();
-                MCRPathEventHelper.fireFileUpdateEvent(targetAbsolutePath, attrs);
+                MCRPathEventHelper.fireFileCreateEvent(targetAbsolutePath, attrs);
             } else {
+                LOGGER.debug("Move Case #2");
                 if (targetpath.isAbsolute()) {
+                    LOGGER.debug("Move Case #2.1");
                     Files.move(srcFile.getLocalPath(), targetpath, StandardCopyOption.COPY_ATTRIBUTES);
-                    srcFile.delete();
                 } else {
+                    LOGGER.debug("Move Case #2.2");
                     try (FileInputStream fis = new FileInputStream(srcFile.getLocalPath().toFile());
                         FileChannel inChannel = fis.getChannel();
                         SeekableByteChannel targetChannel = targetdir.newByteChannel(targetpath,
@@ -238,6 +245,7 @@ public class MCRDirectoryStream {
                 }
             }
             srcFile.delete();
+            MCRPathEventHelper.fireFileDeleteEvent(this.dirPath.resolve(src), null);
         }
 
         private static MCRFile getMCRFile(SecureDirectoryStream ds, Path relativePath) throws IOException {
