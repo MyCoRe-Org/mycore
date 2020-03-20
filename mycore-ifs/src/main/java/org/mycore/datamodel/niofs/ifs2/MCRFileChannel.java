@@ -46,7 +46,11 @@ public class MCRFileChannel extends FileChannel {
 
     private MCRFile file;
 
-    private boolean write, modified, create;
+    private boolean write;
+
+    private boolean modified;
+
+    private boolean create;
 
     public MCRFileChannel(MCRPath path, MCRFile file, FileChannel baseChannel, boolean write, boolean create) {
         this.path = path;
