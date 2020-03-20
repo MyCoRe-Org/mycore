@@ -118,7 +118,11 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     public void delete() throws IOException {
         writeData(Element::detach);
-        Files.walkFileTree(path, MCRRecursiveDeleter.instance());
+        if (Files.isDirectory(path)) {
+            Files.walkFileTree(path, MCRRecursiveDeleter.instance());
+        } else {
+            Files.deleteIfExists(path);
+        }
         getRoot().saveAdditionalData();
     }
 

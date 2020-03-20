@@ -155,7 +155,8 @@ abstract class MCRFileSystemUtils {
         return MCRAbstractFileSystem.getPath(ownerID, path, MCRFileSystemProvider.getMCRIFSFileSystem());
     }
 
-    static MCRFile getMCRFile(MCRPath ifsPath, boolean create, boolean createNew) throws IOException {
+    static MCRFile getMCRFile(MCRPath ifsPath, boolean create, boolean createNew, boolean fireCreateEvent)
+        throws IOException {
         if (!ifsPath.isAbsolute()) {
             throw new IllegalArgumentException("'path' needs to be absolute.");
         }
@@ -175,7 +176,7 @@ abstract class MCRFileSystemUtils {
                 }
             }
             MCRPath relativePath = toPath(root).relativize(ifsPath);
-            file = getMCRFile(root, relativePath, create, createNew);
+            file = getMCRFile(root, relativePath, create, createNew, fireCreateEvent);
         } catch (Exception e) {
             if (rootCreated) {
                 LOGGER.error("Exception while getting MCRFile {}. Removing created filesystem nodes.", ifsPath);
@@ -190,7 +191,8 @@ abstract class MCRFileSystemUtils {
         return file;
     }
 
-    static MCRFile getMCRFile(MCRDirectory baseDir, MCRPath relativePath, boolean create, boolean createNew)
+    private static MCRFile getMCRFile(MCRDirectory baseDir, MCRPath relativePath, boolean create, boolean createNew,
+        boolean fireEvent)
         throws IOException {
         MCRPath ifsPath = relativePath;
         if (relativePath.isAbsolute()) {
@@ -226,6 +228,10 @@ abstract class MCRFileSystemUtils {
                 String fileName = normalized.getFileName().toString();
                 file = parent.createFile(fileName);
                 created.addFirst(file);
+                if (fireEvent) {
+                    MCRPathEventHelper.fireFileCreateEvent(toPath(baseDir).resolve(relativePath),
+                        file.getBasicFileAttributes());
+                }
             }
         } catch (Exception e) {
             if (create || createNew) {
