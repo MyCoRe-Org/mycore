@@ -22,14 +22,10 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 
 class MCRPathEventHelper {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private static void fireFileEvent(String event, Path file, BasicFileAttributes attrs) {
         MCREvent fileEvent = new MCREvent(MCREvent.PATH_TYPE, event);

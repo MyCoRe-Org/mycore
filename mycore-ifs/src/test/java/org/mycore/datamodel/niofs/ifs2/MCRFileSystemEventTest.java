@@ -26,12 +26,10 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SecureDirectoryStream;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
@@ -234,27 +232,6 @@ public class MCRFileSystemEventTest extends MCRTestCase {
                 }
             }
         }
-    }
-
-    private void debugEvents() {
-        register.getEntries().forEach(System.out::println);
-    }
-
-    private void debugDir(Path path) throws IOException {
-        SimpleFileVisitor<Path> printFiles = new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                System.out.format("Directory: %s\t%s%n", dir, attrs.lastModifiedTime());
-                return super.preVisitDirectory(dir, attrs);
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                System.out.format("File: %s\t%s%n", file, attrs.lastModifiedTime());
-                return super.visitFile(file, attrs);
-            }
-        };
-        Files.walkFileTree(path, printFiles);
     }
 
     private static class EventRegister extends MCREventHandlerBase {
