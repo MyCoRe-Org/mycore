@@ -157,7 +157,7 @@ public class MCRFileStore extends MCRAbstractFileStore {
             return null;
         }
         try {
-            MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(path, false, false);
+            MCRFile mcrFile = MCRFileSystemUtils.getMCRFile(path, false, false, true);
             return mcrFile.getLocalPath();
         } catch (IOException e) {
             LogManager.getLogger(getClass()).info(e.getMessage());

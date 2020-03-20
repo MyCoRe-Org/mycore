@@ -32,11 +32,15 @@ import java.security.MessageDigest;
 import org.mycore.common.content.streams.MCRMD5InputStream;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs2.MCRFile;
+import org.mycore.datamodel.niofs.MCRFileAttributes;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * @author Thomas Scheffler (yagee)
  */
 public class MCRFileChannel extends FileChannel {
+
+    private final MCRPath path;
 
     private FileChannel baseChannel;
 
@@ -44,10 +48,20 @@ public class MCRFileChannel extends FileChannel {
 
     private boolean write;
 
-    public MCRFileChannel(MCRFile file, FileChannel baseChannel, boolean write) {
+    private boolean modified;
+
+    private boolean create;
+
+    public MCRFileChannel(MCRPath path, MCRFile file, FileChannel baseChannel, boolean write, boolean create) {
+        this.path = path;
         this.file = file;
         this.baseChannel = baseChannel;
         this.write = write;
+        this.modified = false;
+        this.create = create;
+        if (write && !path.isAbsolute()) {
+            throw new IllegalArgumentException("Path must be absolute with write operations");
+        }
     }
 
     public void implCloseChannel() throws IOException {
@@ -56,7 +70,10 @@ public class MCRFileChannel extends FileChannel {
     }
 
     private void updateMetadata() throws IOException {
-        if (!write) {
+        if (!write || !modified) {
+            if (create) {
+                MCRPathEventHelper.fireFileCreateEvent(path, file.getBasicFileAttributes());
+            }
             return;
         }
         MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
@@ -79,6 +96,12 @@ public class MCRFileChannel extends FileChannel {
         }
         String md5 = MCRContentInputStream.getMD5String(md5Digest.digest());
         file.setMD5(md5);
+        final MCRFileAttributes<String> basicFileAttributes = file.getBasicFileAttributes();
+        if (create) {
+            MCRPathEventHelper.fireFileCreateEvent(path, basicFileAttributes);
+        } else {
+            MCRPathEventHelper.fireFileUpdateEvent(path, basicFileAttributes);
+        }
     }
 
     //Delegate to baseChannel
@@ -92,10 +115,12 @@ public class MCRFileChannel extends FileChannel {
     }
 
     public int write(ByteBuffer src) throws IOException {
+        modified = true;
         return baseChannel.write(src);
     }
 
     public long write(ByteBuffer[] srcs, int offset, int length) throws IOException {
+        modified = true;
         return baseChannel.write(srcs, offset, length);
     }
 
@@ -112,6 +137,7 @@ public class MCRFileChannel extends FileChannel {
     }
 
     public FileChannel truncate(long size) throws IOException {
+        modified = true;
         return baseChannel.truncate(size);
     }
 
@@ -124,6 +150,7 @@ public class MCRFileChannel extends FileChannel {
     }
 
     public long transferFrom(ReadableByteChannel src, long position, long count) throws IOException {
+        modified = true;
         return baseChannel.transferFrom(src, position, count);
     }
 
@@ -132,10 +159,14 @@ public class MCRFileChannel extends FileChannel {
     }
 
     public int write(ByteBuffer src, long position) throws IOException {
+        modified = true;
         return baseChannel.write(src, position);
     }
 
     public MappedByteBuffer map(MapMode mode, long position, long size) throws IOException {
+        if (write) {
+            modified = true;
+        }
         return baseChannel.map(mode, position, size);
     }
 
