@@ -187,7 +187,7 @@ public class MCRDirectoryStream {
             final MCRStoredNode storedNode = resolve(path);
             final MCRPath mcrPath = getCurrentSecurePath(storedNode);
             storedNode.delete();
-            MCRPathEventHelper.fireFileDeleteEvent(mcrPath, null);
+            MCRPathEventHelper.fireFileDeleteEvent(mcrPath);
         }
 
         @Override
@@ -245,7 +245,7 @@ public class MCRDirectoryStream {
                 }
             }
             srcFile.delete();
-            MCRPathEventHelper.fireFileDeleteEvent(this.dirPath.resolve(src), null);
+            MCRPathEventHelper.fireFileDeleteEvent(this.dirPath.resolve(src));
         }
 
         private static MCRFile getMCRFile(SecureDirectoryStream ds, Path relativePath) throws IOException {

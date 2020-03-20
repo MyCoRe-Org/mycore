@@ -44,8 +44,8 @@ class MCRPathEventHelper {
         fireFileEvent(MCREvent.UPDATE_EVENT, file, Objects.requireNonNull(attrs));
     }
 
-    static void fireFileDeleteEvent(Path file, BasicFileAttributes attrs) {
-        fireFileEvent(MCREvent.DELETE_EVENT, file, attrs);
+    static void fireFileDeleteEvent(Path file) {
+        fireFileEvent(MCREvent.DELETE_EVENT, file, null);
     }
 
 }

@@ -265,7 +265,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
         try {
             child.delete();
-            MCRPathEventHelper.fireFileDeleteEvent(path, null);
+            MCRPathEventHelper.fireFileDeleteEvent(path);
         } catch (RuntimeException e) {
             throw new IOException("Could not delete: " + mcrPath, e);
         }
