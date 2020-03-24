@@ -42,10 +42,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
@@ -65,13 +67,35 @@ public class MCRFrontendUtil {
 
     public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
 
+    public static final String SESSION_NETMASK_IPV4_STRING = MCRConfiguration2
+        .getString("MCR.Servlet.Session.NetMask.IPv4").orElse("255.255.255.255");
+
+    public static final String SESSION_NETMASK_IPV6_STRING = MCRConfiguration2
+        .getString("MCR.Servlet.Session.NetMask.IPv6").orElse("FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF");
+
     private static String BASE_URL;
 
     private static String BASE_HOST_IP;
 
     private static Logger LOGGER = LogManager.getLogger();
 
+    public static byte[] SESSION_NETMASK_IPV4;
+
+    public static byte[] SESSION_NETMASK_IPV6;
+
     static {
+        try {
+            SESSION_NETMASK_IPV4 = InetAddress.getByName(MCRFrontendUtil.SESSION_NETMASK_IPV4_STRING).getAddress();
+        } catch (UnknownHostException e) {
+            throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv4 is not a correct IPv4 network mask.",
+                e);
+        }
+        try {
+            SESSION_NETMASK_IPV6 = InetAddress.getByName(MCRFrontendUtil.SESSION_NETMASK_IPV6_STRING).getAddress();
+        } catch (UnknownHostException e) {
+            throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv6 is not a correct IPv6 network mask.",
+                e);
+        }
         prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
     }
 
@@ -314,4 +338,68 @@ public class MCRFrontendUtil {
         return Optional.ofNullable(ctx.getRealPath("/")).map(File::new);
     }
 
+    /**
+     * Checks if the <code>newIP</code> address matches the session of <code>lastIP</code> address.
+     *
+     * Usually this is only <code>true</code> if both addresses are equal by {@link InetAddress#equals(Object)}.
+     * This method is called to detect if a session is stolen by a 3rd party.
+     * There are two properties (with their default value) to modify this behavior and specify netmasks:
+     * <pre>
+     * MCR.Servlet.Session.NetMask.IPv4=255.255.255.255
+     * MCR.Servlet.Session.NetMask.IPv6=FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF
+     * </pre>
+     *
+     * @param lastIP IP address from former request
+     * @param newIP IP address from current request
+     * @return
+     * @throws UnknownHostException if <code>lastIP</code> or <code>newIP</code> are not valid IP addresses.
+     */
+    public static boolean isIPAddrAllowed(String lastIP, String newIP) throws UnknownHostException {
+        InetAddress lastIPAddress = InetAddress.getByName(lastIP);
+        InetAddress newIPAddress = InetAddress.getByName(newIP);
+        byte[] lastIPMask = decideNetmask(lastIPAddress);
+        byte[] newIPMask = decideNetmask(newIPAddress);
+        lastIPAddress = InetAddress.getByAddress(filterIPByNetmask(lastIPAddress.getAddress(), lastIPMask));
+        newIPAddress = InetAddress.getByAddress(filterIPByNetmask(newIPAddress.getAddress(), newIPMask));
+        if (lastIPAddress.equals(newIPAddress)) {
+            return true;
+        }
+        String hostIP = getHostIP();
+        InetAddress hostIPAddress = InetAddress.getByName(hostIP);
+        byte[] hostIPMask = decideNetmask(hostIPAddress);
+        hostIPAddress = InetAddress.getByAddress(filterIPByNetmask(hostIPAddress.getAddress(), hostIPMask));
+        return newIPAddress.equals(hostIPAddress);
+    }
+
+    private static byte[] filterIPByNetmask(final byte[] ip, final byte[] mask) {
+        for (int i = 0; i < ip.length; i++) {
+            ip[i] = (byte) (ip[i] & mask[i]);
+        }
+        return ip;
+    }
+
+    private static byte[] decideNetmask(InetAddress ip) throws MCRException {
+        if (hasIPVersion(ip, 4)) {
+            return SESSION_NETMASK_IPV4;
+        } else if (hasIPVersion(ip, 6)) {
+            return SESSION_NETMASK_IPV6;
+        } else {
+            throw new MCRException("Unknown or unidentifiable version of ip: " + ip);
+        }
+    }
+
+    private static Boolean hasIPVersion(InetAddress ip, int version) {
+        int byteLength;
+        switch (version) {
+            case 4:
+                byteLength = 4;
+                break;
+            case 6:
+                byteLength = 16;
+                break;
+            default:
+                throw new IndexOutOfBoundsException("Unknown ip version: " + version);
+        }
+        return ip.getAddress().length == byteLength;
+    }
 }
