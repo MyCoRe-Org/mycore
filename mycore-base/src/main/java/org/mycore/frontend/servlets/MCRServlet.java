@@ -211,7 +211,7 @@ public class MCRServlet extends HttpServlet {
             String newIP = MCRFrontendUtil.getRemoteAddr(req);
 
             try {
-                if (MCRFrontendUtil.isIPAddrAllowed(lastIP, newIP)) {
+                if (!MCRFrontendUtil.isIPAddrAllowed(lastIP, newIP)) {
                     LOGGER.warn("Session steal attempt from IP {}, previous IP was {}. Session: {}", newIP, lastIP,
                         session);
                     MCRSessionMgr.releaseCurrentSession();
