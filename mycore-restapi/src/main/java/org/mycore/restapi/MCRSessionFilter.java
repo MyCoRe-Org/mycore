@@ -19,6 +19,7 @@
 package org.mycore.restapi;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Base64;
@@ -60,6 +61,7 @@ import org.mycore.user2.MCRUserManager;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 @Provider
@@ -162,9 +164,10 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             //validate against secret
             try {
                 DecodedJWT jwt = JWT.require(MCRJWTUtil.getJWTAlgorithm())
-                    .withClaim(MCRJWTUtil.JWT_CLAIM_IP, MCRFrontendUtil.getRemoteAddr(httpServletRequest))
                     .build()
                     .verify(token);
+                //validate ip
+                checkIPClaim(jwt.getClaim(MCRJWTUtil.JWT_CLAIM_IP), MCRFrontendUtil.getRemoteAddr(httpServletRequest));
                 //validate in audience
                 Optional<String> audience = jwt.getAudience().stream()
                     .filter(s -> MCRJWTResource.AUDIENCE.equals(s) || MCRRestAPIAuthentication.AUDIENCE.equals(s))
@@ -203,6 +206,18 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 requestContext.setSecurityContext(new MCRRestSecurityContext(ui, isSecure));
             });
         LOGGER.info("user detected: " + currentSession.getUserInformation().getUserID());
+    }
+
+    private static void checkIPClaim(Claim ipClaim, String remoteAddr) {
+        try {
+            if (ipClaim.isNull() || !MCRFrontendUtil.isIPAddrAllowed(ipClaim.asString(), remoteAddr)) {
+                throw new JWTVerificationException(
+                    "The Claim '" + MCRJWTUtil.JWT_CLAIM_IP + "' value doesn't match the required one.");
+            }
+        } catch (UnknownHostException e) {
+            throw new JWTVerificationException(
+                "The Claim '" + MCRJWTUtil.JWT_CLAIM_IP + "' value doesn't match the required one.", e);
+        }
     }
 
     @Override
