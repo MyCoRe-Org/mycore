@@ -226,6 +226,9 @@ public final class MCRObject extends MCRBase {
         } catch (MCRException exc) {
             throw new MCRException("The <structure> part of '" + getId() + "' is invalid.", exc);
         }
+        if (getId().equals(getParent())) {
+            throw new MCRException("This object '" + getId() + "' cannot be parent/child of itself.");
+        }
         try {
             metadata.validate();
         } catch (MCRException exc) {
