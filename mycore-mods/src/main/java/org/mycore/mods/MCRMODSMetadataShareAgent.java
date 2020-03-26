@@ -19,10 +19,14 @@
 package org.mycore.mods;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.filter.Filter;
@@ -82,6 +86,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                     inheritToChild(holderWrapper, childWrapper);
                     LOGGER.info("Saving: {}", childIdRef);
                     try {
+                        checkHierarchy(childWrapper);
                         MCRMetadataManager.update(child);
                     } catch (MCRPersistenceException | MCRAccessException e) {
                         throw new MCRPersistenceException("Error while updating inherited metadata", e);
@@ -107,6 +112,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                         relatedItem.addContent(holderWrapper.getMODS().cloneContent());
                         LOGGER.info("Saving: {}", recipientId);
                         try {
+                            checkHierarchy(recipientWrapper);
                             MCRMetadataManager.update(recipient);
                         } catch (MCRPersistenceException | MCRAccessException e) {
                             throw new MCRPersistenceException("Error while updating shared metadata", e);
@@ -148,6 +154,7 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
                 relatedItem.addContent(targetWrapper.getMODS().cloneContent());
             }
         }
+        checkHierarchy(childWrapper);
     }
 
     private void inheritToChild(MCRMODSWrapper parentWrapper, MCRMODSWrapper childWrapper) {
@@ -161,6 +168,43 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
             childWrapper.addElement(hostContainer);
         }
         hostContainer.addContent(parentWrapper.getMODS().cloneContent());
+    }
+
+    private void checkHierarchy(MCRMODSWrapper mods) throws MCRPersistenceException {
+        final MCRObjectID modsId = Objects.requireNonNull(mods.getMCRObject().getId());
+        LOGGER.info("Checking relatedItem hierarchy of {}.", modsId);
+        final List<Element> relatedItemLeaves = mods.getElements(".//mods:relatedItem[not(mods:relatedItem)]");
+        try {
+            relatedItemLeaves.forEach(e -> checkHierarchy(e, new HashSet<>(Set.of(modsId))));
+        } catch (MCRPersistenceException e) {
+            throw new MCRPersistenceException("Hierarchy of mods:relatedItem in " + modsId + " contains circuits.", e);
+        }
+    }
+
+    /**
+     * Recursivly checks <code>relatedItem</code> and parent &lt;mods:relatedItem&gt; elements for multiple {@link MCRObjectID}s.
+     * @param relatedItem &lt;mods:relatedItem&gt;
+     * @param idCollected of IDs collected so far
+     * @throws MCRPersistenceException if {@link MCRObjectID} of <code>relatedItem</code> is in <code>idCollected</code>
+     */
+    private void checkHierarchy(Element relatedItem, Set<MCRObjectID> idCollected) throws MCRPersistenceException {
+        final Attribute href = relatedItem.getAttribute("href", MCRConstants.XLINK_NAMESPACE);
+        if (href != null) {
+            final String testId = href.getValue();
+            LOGGER.debug("Checking relatedItem {}.", testId);
+            if (MCRObjectID.isValid(testId)) {
+                final MCRObjectID relatedItemId = MCRObjectID.getInstance(testId);
+                LOGGER.debug("Checking if {} is in {}.", relatedItemId, idCollected);
+                if (!idCollected.add(relatedItemId)) {
+                    throw new MCRPersistenceException(
+                        "Hierarchy of mods:relatedItem contains ciruit by object " + relatedItemId);
+                }
+            }
+        }
+        final Element parentElement = relatedItem.getParentElement();
+        if (parentElement.getName().equals("relatedItem")) {
+            checkHierarchy(parentElement, idCollected);
+        }
     }
 
 }
