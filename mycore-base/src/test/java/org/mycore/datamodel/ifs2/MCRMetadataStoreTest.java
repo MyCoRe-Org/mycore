@@ -58,6 +58,16 @@ public class MCRMetadataStoreTest extends MCRIFS2MetadataTestCase {
     }
 
     @Test
+    public void isEmpty() throws Exception {
+        assertTrue(getMetaDataStore().isEmpty());
+        Document xml1 = new Document(new Element("root"));
+        MCRStoredMetadata sm = getMetaDataStore().create(new MCRJDOMContent(xml1));
+        assertFalse(getMetaDataStore().isEmpty());
+        getMetaDataStore().delete(sm.id);
+        assertTrue(getMetaDataStore().isEmpty());
+    }
+
+    @Test
     public void createDocumentInt() throws Exception {
         Document xml1 = new Document(new Element("root"));
         try {
