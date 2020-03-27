@@ -179,6 +179,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         return defaultname == null ? MCRConfiguration2.getOrThrow(name, MCRConfiguration2::instantiateClass)
             : MCRConfiguration2.<T> getInstanceOf(name)
@@ -232,6 +233,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getInstanceOf(String name) throws MCRConfigurationException {
         return MCRConfiguration2.getOrThrow(name, MCRConfiguration2::instantiateClass);
     }

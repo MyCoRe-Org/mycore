@@ -32,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.index.handlers.MCRSolrIndexHandlerFactory;
@@ -47,8 +48,8 @@ public class MCRSolrPathDocumentFactory {
 
     private static Logger LOGGER = LogManager.getLogger(MCRSolrPathDocumentFactory.class);
 
-    private static MCRSolrPathDocumentFactory instance = MCRConfiguration.instance()
-        .getInstanceOf(SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory");
+    private static MCRSolrPathDocumentFactory instance = MCRConfiguration2
+        .getOrThrow(SOLR_CONFIG_PREFIX + "SolrInputDocument.Path.Factory", MCRConfiguration2::instantiateClass);
 
     private static final List<MCRSolrFileIndexAccumulator> ACCUMULATOR_LIST = resolveAccumulators();
 

@@ -445,7 +445,7 @@ public final class MCRURIResolver implements URIResolver {
                     String scheme = entry.getKey();
                     scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
                     LOGGER.debug("Adding Resolver {} for URI scheme {}", entry.getValue(), scheme);
-                    map.put(scheme, MCRConfiguration.instance().getInstanceOf(entry.getKey()));
+                    map.put(scheme, MCRConfiguration2.getOrThrow(entry.getKey(), MCRConfiguration2::instantiateClass));
                 } catch (Exception e) {
                     LOGGER.error("Cannot instantiate {} for URI scheme {}", entry.getValue(), entry.getKey());
                     throw new MCRException(
@@ -1308,8 +1308,8 @@ public final class MCRURIResolver implements URIResolver {
             String propertyName = "MCR.URIResolver.xslIncludes." + includePart;
             List<String> propValue = Collections.emptyList();
             if (includePart.startsWith("class.")) {
-                MCRXslIncludeHrefs incHrefClass = MCRConfiguration.instance()
-                    .getInstanceOf(propertyName);
+                MCRXslIncludeHrefs incHrefClass = MCRConfiguration2
+                    .getOrThrow(propertyName, MCRConfiguration2::instantiateClass);
                 propValue = incHrefClass.getHrefs();
             } else {
                 propValue = MCRConfiguration.instance().getStrings(propertyName, propValue);

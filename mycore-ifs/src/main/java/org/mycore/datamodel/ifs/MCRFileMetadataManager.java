@@ -24,6 +24,7 @@ import java.util.List;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * The single instance of this class is used by the other IFS classes to create,
@@ -78,7 +79,8 @@ public class MCRFileMetadataManager {
         MCRConfiguration config = MCRConfiguration.instance();
 
         // The FileMetadataStore to use
-        store = config.getInstanceOf("MCR.Persistence.IFS.FileMetadataStore.Class");
+        store = MCRConfiguration2
+            .getOrThrow("MCR.Persistence.IFS.FileMetadataStore.Class", MCRConfiguration2::instantiateClass);
 
         // The cache size for the MCRFilesystemNode cache
         int size = config.getInt("MCR.IFS.FileMetadataStore.CacheSize", 500);

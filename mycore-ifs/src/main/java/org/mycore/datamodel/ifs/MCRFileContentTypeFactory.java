@@ -29,6 +29,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 
@@ -63,7 +64,8 @@ public class MCRFileContentTypeFactory {
     static {
         MCRConfiguration config = MCRConfiguration.instance();
 
-        detector = config.getInstanceOf("MCR.IFS.FileContentTypes.DetectorClass");
+        detector = MCRConfiguration2
+            .getOrThrow("MCR.IFS.FileContentTypes.DetectorClass", MCRConfiguration2::instantiateClass);
 
         String file = config.getString("MCR.IFS.FileContentTypes.DefinitionFile");
 

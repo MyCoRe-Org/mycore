@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.target.MCREditorTarget;
@@ -84,6 +84,6 @@ public class MCRXEditorServlet extends MCRServlet {
 
     private MCREditorTarget getTarget(String targetID) {
         String property = "MCR.XEditor.Target." + targetID + ".Class";
-        return MCRConfiguration.instance().getInstanceOf(property);
+        return MCRConfiguration2.getOrThrow(property, MCRConfiguration2::instantiateClass);
     }
 }

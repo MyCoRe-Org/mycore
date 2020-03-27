@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -92,7 +92,8 @@ public class MCRLinkTableManager {
      */
     protected MCRLinkTableManager() {
         // Load the persistence class
-        linkTableInstance = MCRConfiguration.instance().getInstanceOf("MCR.Persistence.LinkTable.Store.Class");
+        linkTableInstance = MCRConfiguration2
+            .getOrThrow("MCR.Persistence.LinkTable.Store.Class", MCRConfiguration2::instantiateClass);
     }
 
     /**

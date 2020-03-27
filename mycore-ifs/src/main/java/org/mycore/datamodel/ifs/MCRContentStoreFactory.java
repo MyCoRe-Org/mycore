@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
@@ -111,7 +112,7 @@ public class MCRContentStoreFactory {
             String storeClass = CONFIG_PREFIX + storeID + CLASS_SUFFIX;
             LOGGER.debug("getting StoreClass: {}", storeClass);
 
-            MCRContentStore s = MCRConfiguration.instance().getInstanceOf(storeClass);
+            MCRContentStore s = MCRConfiguration2.getOrThrow(storeClass, MCRConfiguration2::instantiateClass);
             s.init(storeID);
             STORES.put(storeID, s);
 
@@ -141,7 +142,7 @@ public class MCRContentStoreFactory {
 
     private static void initStoreSelector() {
         String property = "MCR.IFS.ContentStoreSelector.Class";
-        STORE_SELECTOR = MCRConfiguration.instance().getInstanceOf(property);
+        STORE_SELECTOR = MCRConfiguration2.getOrThrow(property, MCRConfiguration2::instantiateClass);
     }
 
     /**

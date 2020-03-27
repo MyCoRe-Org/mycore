@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.sword.application.MCRSwordCollectionProvider;
 import org.mycore.sword.application.MCRSwordLifecycleConfiguration;
 
@@ -68,7 +69,8 @@ public class MCRSword {
                     String name = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX + workspace + "." + collection;
 
                     LOGGER.info("Try to init : {}", name);
-                    MCRSwordCollectionProvider collectionProvider = mcrConfiguration.getInstanceOf(name);
+                    MCRSwordCollectionProvider collectionProvider = MCRConfiguration2
+                        .getOrThrow(name, MCRConfiguration2::instantiateClass);
                     collections.put(collection, collectionProvider);
                     final MCRSwordLifecycleConfiguration lifecycleConfiguration = new MCRSwordLifecycleConfiguration(
                         collection);

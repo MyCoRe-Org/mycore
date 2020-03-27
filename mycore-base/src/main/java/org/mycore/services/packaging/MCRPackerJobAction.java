@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
 
@@ -68,8 +69,8 @@ public class MCRPackerJobAction extends MCRJobAction {
     public final void execute() throws ExecutionException {
         String packerId = getPackerId();
         Map<String, String> packerConfiguration = getConfiguration(packerId);
-        packerInstance = MCRConfiguration.instance()
-            .getInstanceOf(MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".Class");
+        packerInstance = MCRConfiguration2.getOrThrow(MCRPacker.PACKER_CONFIGURATION_PREFIX + packerId + ".Class",
+            MCRConfiguration2::instantiateClass);
 
         Map<String, String> parameters = getParameters();
 
