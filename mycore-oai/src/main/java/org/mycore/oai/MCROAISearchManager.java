@@ -38,6 +38,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.DefaultResumptionToken;
@@ -252,8 +253,8 @@ public class MCROAISearchManager {
     public static MCROAISearcher getSearcher(MCROAIIdentify identify, MetadataFormat format, int partitionSize,
         MCROAISetManager setManager, MCROAIObjectManager objectManager) {
         String className = identify.getConfigPrefix() + "Searcher";
-        String defaultClass = MCROAICombinedSearcher.class.getName();
-        MCROAISearcher searcher = getConfig().getInstanceOf(className, defaultClass);
+        MCROAISearcher searcher = MCRConfiguration2.<MCROAISearcher>getInstanceOf(className)
+            .orElseGet(MCROAICombinedSearcher::new);
         searcher.init(identify, format, MAX_AGE, partitionSize, setManager, objectManager);
         return searcher;
     }

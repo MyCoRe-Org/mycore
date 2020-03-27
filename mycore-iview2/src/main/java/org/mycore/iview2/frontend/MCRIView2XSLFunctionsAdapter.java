@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -44,8 +45,9 @@ public class MCRIView2XSLFunctionsAdapter {
     private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.instance();
 
     public static MCRIView2XSLFunctionsAdapter getInstance() {
-        return MCRConfiguration.instance().getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter",
-            MCRIView2XSLFunctionsAdapter.class.getName());
+        return MCRConfiguration2
+            .<MCRIView2XSLFunctionsAdapter> getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter")
+            .orElseGet(MCRIView2XSLFunctionsAdapter::new);
     }
 
     public boolean hasMETSFile(String derivateID) {

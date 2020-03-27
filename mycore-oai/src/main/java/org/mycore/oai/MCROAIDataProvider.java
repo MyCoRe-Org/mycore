@@ -45,6 +45,7 @@ import org.jdom2.output.support.FormatStack;
 import org.jdom2.util.NamespaceStack;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -163,9 +164,9 @@ public class MCROAIDataProvider extends MCRServlet {
                 // double check because of synchronize block
                 oaiAdapter = ADAPTER_MAP.get(oaiAdapterKey);
                 if (oaiAdapter == null) {
-                    MCRConfiguration config = MCRConfiguration.instance();
                     String adapter = MCROAIAdapter.PREFIX + oaiAdapterKey + ".Adapter";
-                    oaiAdapter = config.getInstanceOf(adapter, MCROAIAdapter.class.getName());
+                    oaiAdapter = MCRConfiguration2.<MCROAIAdapter> getInstanceOf(adapter)
+                        .orElseGet(MCROAIAdapter::new);
                     oaiAdapter.init(this.myBaseURL, oaiAdapterKey);
                     ADAPTER_MAP.put(oaiAdapterKey, oaiAdapter);
                 }

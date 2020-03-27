@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
@@ -41,29 +42,28 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
     private MCROAISetHandler<SolrQuery, SolrDocument, String> handler;
 
     public MCROAISolrSetConfiguration(String configPrefix, String setId) {
-        MCRConfiguration config = MCRConfiguration.instance();
         String setConfigPrefix = configPrefix + SETS_PREFIX + setId;
-        MCROAISetHandler<SolrQuery, SolrDocument, String> handler = config.getInstanceOf(
-            setConfigPrefix + ".Handler",
-            getFallbackHandler(configPrefix, setId));
+        String defaultname = getFallbackHandler(configPrefix, setId);
+        MCROAISetHandler<SolrQuery, SolrDocument, String> handler = defaultname == null
+            ? MCRConfiguration2.getOrThrow(setConfigPrefix + ".Handler", MCRConfiguration2::instantiateClass)
+            : MCRConfiguration2.<MCROAISetHandler<SolrQuery, SolrDocument, String>> getInstanceOf(
+                setConfigPrefix + ".Handler")
+                .orElseGet(() -> MCRConfiguration2.instantiateClass(defaultname));
         handler.init(configPrefix, setId);
         this.id = setId;
-        this.uri = getURI(config, setConfigPrefix);
+        this.uri = getURI(setConfigPrefix);
         this.handler = handler;
     }
 
-    private String getURI(MCRConfiguration config, String setConfigPrefix) {
+    private String getURI(String setConfigPrefix) {
         String uriProperty = setConfigPrefix + ".URI";
         try {
-            return config.getString(uriProperty).trim();
+            return MCRConfiguration2.getStringOrThrow(uriProperty);
         } catch (MCRConfigurationException e) {
-            String legacy = config.getString(setConfigPrefix, null);
-            if (legacy == null) {
-                throw e;
-            }
+            String legacy = MCRConfiguration2.getString(setConfigPrefix).orElseThrow(() -> e);
             LogManager.getLogger().warn("Please rename deprecated property '{}' to '{}'.", setConfigPrefix,
                 uriProperty);
-            return legacy.trim();
+            return legacy;
         }
     }
 

@@ -1,6 +1,6 @@
 package org.mycore.datamodel.metadata;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Handles andle which information is present in the {@link MCRMetaEnrichedLinkID} for Derivates.
@@ -12,9 +12,9 @@ public abstract class MCRMetaEnrichedLinkIDFactory {
     }
 
     public static MCRMetaEnrichedLinkIDFactory getInstance() {
-        return MCRConfiguration.instance()
-            .getInstanceOf("MCR.Metadata.EnrichedDerivateLinkIDFactory.Class",
-                MCRDefaultEnrichedDerivateLinkIDFactory.class.getName());
+        return MCRConfiguration2
+            .<MCRMetaEnrichedLinkIDFactory> getInstanceOf("MCR.Metadata.EnrichedDerivateLinkIDFactory.Class")
+            .orElseGet(MCRDefaultEnrichedDerivateLinkIDFactory::new);
     }
 
     public abstract MCRMetaEnrichedLinkID getDerivateLink(MCRDerivate der);

@@ -20,6 +20,7 @@ package org.mycore.mods.merger;
 
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Builds appropriate MCRMerger instances for a given MODS XML element.
@@ -39,7 +40,8 @@ public class MCRMergerFactory {
     private static MCRMerger getEntryInstance(String name) {
         String prefix = "MCR.MODS.Merger.";
         String defaultClass = MCRConfiguration.instance().getString(prefix + "default");
-        return (MCRMerger) (MCRConfiguration.instance().getInstanceOf(prefix + name, defaultClass));
+        return (MCRMerger) (MCRConfiguration2.<Object>getInstanceOf(prefix + name)
+            .orElseGet(() -> MCRConfiguration2.instantiateClass(defaultClass)));
     }
 
     /**

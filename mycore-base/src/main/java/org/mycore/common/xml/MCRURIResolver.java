@@ -83,6 +83,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -1244,8 +1245,9 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 if (resolved != null) {
                     MCRSourceContent content = new MCRSourceContent(resolved);
-                    MCRLayoutTransformerFactory factory = MCRConfiguration.instance()
-                        .getInstanceOf(TRANSFORMER_FACTORY_PROPERTY, MCRLayoutTransformerFactory.class.getName());
+                    MCRLayoutTransformerFactory factory = MCRConfiguration2
+                        .<MCRLayoutTransformerFactory> getInstanceOf(TRANSFORMER_FACTORY_PROPERTY)
+                        .orElseGet(MCRLayoutTransformerFactory::new);
                     MCRContentTransformer transformer = factory.getTransformer(transformerId);
                     MCRContent result;
                     if (transformer instanceof MCRParameterizedTransformer) {

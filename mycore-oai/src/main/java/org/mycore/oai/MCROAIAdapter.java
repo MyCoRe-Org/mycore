@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.CannotDisseminateFormatException;
 import org.mycore.oai.pmh.Header;
@@ -100,8 +101,8 @@ public class MCROAIAdapter implements OAIAdapter {
 
     public MCROAISetManager getSetManager() {
         if (this.setManager == null) {
-            this.setManager = MCRConfiguration.instance().getInstanceOf(getConfigPrefix() + "SetManager",
-                MCROAISetManager.class.getName());
+            this.setManager = MCRConfiguration2.<MCROAISetManager> getInstanceOf(getConfigPrefix() + "SetManager")
+                .orElseGet(MCROAISetManager::new);
             int cacheMaxAge = MCRConfiguration.instance().getInt(this.configPrefix + "SetCache.MaxAge", 0);
             this.setManager.init(getConfigPrefix(), cacheMaxAge);
         }

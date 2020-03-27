@@ -36,7 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
@@ -140,8 +140,9 @@ public class MCRLayoutService {
             String style = parameter.getParameter("Style", "default");
             transformerId = new MessageFormat("{0}-{1}", Locale.ROOT).format(new Object[] { docType, style });
         }
-        MCRLayoutTransformerFactory factory = MCRConfiguration.instance()
-            .getInstanceOf(TRANSFORMER_FACTORY_PROPERTY, MCRLayoutTransformerFactory.class.getName());
+        MCRLayoutTransformerFactory factory = MCRConfiguration2.<MCRLayoutTransformerFactory> getInstanceOf(
+            TRANSFORMER_FACTORY_PROPERTY)
+            .orElseGet(MCRLayoutTransformerFactory::new);
         return factory.getTransformer(transformerId);
     }
 

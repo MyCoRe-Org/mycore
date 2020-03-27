@@ -53,8 +53,9 @@ import java.util.stream.Collectors;
  * @see #list(PrintStream)
  * @see #store
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
+ * @deprecated Please do use {@link MCRConfiguration2} instead
  */
+@Deprecated
 public class MCRConfiguration {
 
     /**
@@ -141,19 +142,8 @@ public class MCRConfiguration {
     protected MCRConfiguration() throws IOException {
     }
 
-    /**
-     * Substitute all %properties%.
-     */
-    protected synchronized void resolveProperties() {
-        MCRConfigurationBase.resolveProperties();
-    }
-
     private MCRProperties getResolvedProperties() {
         return MCRConfigurationBase.getResolvedProperties();
-    }
-
-    private MCRProperties getBaseProperties() {
-        return MCRConfigurationBase.getBaseProperties();
     }
 
     public MCRProperties getDeprecatedProperties() {
@@ -243,7 +233,7 @@ public class MCRConfiguration {
      *             if the property is not set or the class can not be loaded or instantiated
      */
     public <T> T getInstanceOf(String name) throws MCRConfigurationException {
-        return getInstanceOf(name, null);
+        return MCRConfiguration2.getOrThrow(name, MCRConfiguration2::instantiateClass);
     }
 
     /**

@@ -35,7 +35,7 @@ public class MCRSolrIndexStrategyManager {
 
     static {
         FILE_STRATEGY = MCRConfiguration.instance().getInstanceOf(
-            SOLR_CONFIG_PREFIX + "FileIndexStrategy", null);
+            SOLR_CONFIG_PREFIX + "FileIndexStrategy");
     }
 
     public static boolean checkFile(Path file, BasicFileAttributes attrs) {
