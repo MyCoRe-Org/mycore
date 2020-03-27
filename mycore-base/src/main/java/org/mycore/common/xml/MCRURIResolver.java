@@ -957,7 +957,7 @@ public final class MCRURIResolver implements URIResolver {
         }
 
         private static boolean shouldSortCategories(String classId) {
-            return MCRConfiguration.instance().getBoolean(SORT_CONFIG_PREFIX + classId, true);
+            return MCRConfiguration2.getBoolean(SORT_CONFIG_PREFIX + classId).orElse(true);
         }
 
         private static long getSystemLastModified() {

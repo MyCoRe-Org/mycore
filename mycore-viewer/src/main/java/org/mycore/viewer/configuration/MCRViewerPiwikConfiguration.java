@@ -21,13 +21,14 @@ package org.mycore.viewer.configuration;
 import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRViewerPiwikConfiguration extends MCRViewerConfiguration {
 
     @Override
     public MCRViewerConfiguration setup(HttpServletRequest request) {
         super.setup(request);
-        if (MCRConfiguration.instance().getBoolean("MCR.Piwik.enable", false)) {
+        if (MCRConfiguration2.getBoolean("MCR.Piwik.enable").orElse(false)) {
             this.addLocalScript("iview-client-piwik.js", true, isDebugMode(request));
             this.setProperty("MCR.Piwik.baseurl", MCRConfiguration.instance().getString("MCR.Piwik.baseurl"));
             this.setProperty("MCR.Piwik.id", MCRConfiguration.instance().getString("MCR.Piwik.id"));

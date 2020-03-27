@@ -40,6 +40,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.inject.MCRInjectorConfig;
@@ -140,9 +141,10 @@ public class MCRJobMaster implements Runnable, Closeable {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
 
-        boolean activated = CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated", true);
+        boolean activated = MCRConfiguration2.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated").orElse(true);
         activated = activated
-            && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "activated", true);
+            && MCRConfiguration2.getBoolean(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "activated")
+            .orElse(true);
 
         LOGGER.info("JobQueue{} is {}", MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"",
             activated ? "activated" : "deactivated");

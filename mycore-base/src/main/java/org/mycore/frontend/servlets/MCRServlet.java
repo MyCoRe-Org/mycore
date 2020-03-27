@@ -56,6 +56,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xsl.MCRErrorListener;
@@ -86,8 +87,8 @@ public class MCRServlet extends HttpServlet {
 
     private static String SERVLET_URL;
 
-    private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration.instance().getBoolean(
-        "MCR.Servlet.BrowserCache.enable", false);
+    private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration2.getBoolean("MCR.Servlet.BrowserCache.enable")
+        .orElse(false);
 
     private static MCRLayoutService LAYOUT_SERVICE;
 

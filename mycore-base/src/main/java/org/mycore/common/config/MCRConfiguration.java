@@ -478,6 +478,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public boolean getBoolean(String name) {
         return MCRConfiguration2.getOrThrow(name, Boolean::parseBoolean);
     }
@@ -494,6 +495,7 @@ public class MCRConfiguration {
      * @param defaultValue
      *            the value to return if the configuration property is not set
      */
+    @Deprecated
     public boolean getBoolean(String name, boolean defaultValue) {
         return MCRConfiguration2.getBoolean(name).orElse(defaultValue);
     }

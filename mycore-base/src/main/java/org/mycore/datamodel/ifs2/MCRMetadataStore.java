@@ -87,7 +87,7 @@ public class MCRMetadataStore extends MCRStore {
         super.init(config);
         prefix = Optional.ofNullable(config.getPrefix()).orElseGet(() -> config.getID() + "_");
         suffix = ".xml";
-        forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML", true);
+        forceXML = MCRConfiguration2.getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML").orElse(true);
         if (forceXML) {
             forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType",
                 null);

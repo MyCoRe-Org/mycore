@@ -27,7 +27,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Class for hibernate connection to selected database
@@ -47,7 +47,7 @@ public class MCRHIBConnection {
     }
 
     public static boolean isEnabled() {
-        return MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true)
+        return MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
             && MCREntityManagerProvider.getEntityManagerFactory() != null;
     }
 

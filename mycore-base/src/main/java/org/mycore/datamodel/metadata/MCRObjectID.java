@@ -38,6 +38,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
@@ -283,7 +284,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
             return false;
         }
         String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
-        if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
+        if (!MCRConfiguration2.getBoolean("MCR.Metadata.Type." + objectType).orElse(false)) {
             LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
             return false;
         }

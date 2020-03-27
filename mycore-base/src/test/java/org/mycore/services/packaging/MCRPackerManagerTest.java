@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.services.queuedjob.MCRJob;
 
 public class MCRPackerManagerTest extends MCRJPATestCase {
@@ -72,8 +73,8 @@ public class MCRPackerManagerTest extends MCRJPATestCase {
         startNewTransaction();
 
         int waitTime = 10;
-        while (waitTime > 0 && !mcrConfiguration.getBoolean(MCRPackerMock.FINISHED_PROPERTY, false)
-            && !mcrConfiguration.getBoolean(MCRPackerMock.SETUP_CHECKED_PROPERTY, false)) {
+        while (waitTime > 0 && !MCRConfiguration2.getBoolean(MCRPackerMock.FINISHED_PROPERTY).orElse(false)
+            && !MCRConfiguration2.getBoolean(MCRPackerMock.SETUP_CHECKED_PROPERTY).orElse(false)) {
             Thread.sleep(1000);
             waitTime -= 1;
         }

@@ -28,7 +28,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.jdom2.JDOMException;
 import org.jdom2.input.sax.XMLReaderJDOMFactory;
 import org.jdom2.input.sax.XMLReaderSAX2Factory;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -39,8 +39,8 @@ import org.xml.sax.XMLReader;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserFactory {
-    private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.XMLParser.ValidateSchema",
-        true);
+    private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration2.getBoolean("MCR.XMLParser.ValidateSchema")
+        .orElse(true);
 
     private static XMLReaderJDOMFactory nonValidatingFactory = new MCRXMLReaderSAX2Factory(false);
 

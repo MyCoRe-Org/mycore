@@ -76,6 +76,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -131,7 +132,7 @@ public class MCRSwordUtil {
         LOGGER.debug("Creating new derivate with ID {}", derivateID);
         MCRMetadataManager.create(derivate);
 
-        if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
+        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
             MCRAccessInterface aclImpl = MCRAccessManager.getAccessImpl();
             Collection<String> configuredPermissions = aclImpl.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {

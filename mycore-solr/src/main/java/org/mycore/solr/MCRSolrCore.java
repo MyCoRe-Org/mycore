@@ -30,6 +30,7 @@ import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 
 /**
@@ -52,8 +53,8 @@ public class MCRSolrCore {
     protected ConcurrentUpdateSolrClient concurrentClient;
 
     static {
-        USE_CONCURRENT_SERVER = MCRConfiguration.instance()
-            .getBoolean(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled");
+        USE_CONCURRENT_SERVER = MCRConfiguration2
+            .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled", Boolean::parseBoolean);
     }
 
     /**

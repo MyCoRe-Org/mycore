@@ -63,6 +63,7 @@ import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRMailer.EMail.MessagePart;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
@@ -127,7 +128,7 @@ public class MCRMailer extends MCRServlet {
             mailProperties.setProperty("mail.transport.protocol", config.getString("MCR.Mail.Protocol"));
             mailProperties.setProperty("mail.smtp.port", config.getString("MCR.Mail.Port", "25"));
             mailSession = Session.getDefaultInstance(mailProperties, auth);
-            mailSession.setDebug(config.getBoolean("MCR.Mail.Debug"));
+            mailSession.setDebug(MCRConfiguration2.getOrThrow("MCR.Mail.Debug", Boolean::parseBoolean));
         } catch (MCRConfigurationException mcrx) {
             String msg = "Missing e-mail configuration data.";
             LOGGER.fatal(msg, mcrx);

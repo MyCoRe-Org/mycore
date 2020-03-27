@@ -34,6 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -82,7 +83,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         slotLayout = config.getString(storeConfigPrefix + "SlotLayout", slotLayout);
         LOGGER.debug("Default slot layout for store {} is {}", storeID, slotLayout);
 
-        ignoreOwnerBase = config.getBoolean(storeConfigPrefix + "IgnoreOwnerBase", false);
+        ignoreOwnerBase = MCRConfiguration2.getBoolean(storeConfigPrefix + "IgnoreOwnerBase").orElse(false);
         MCREventManager.instance().addEventHandler(MCREvent.PATH_TYPE, new UpdateMetadataHandler(this));
     }
 

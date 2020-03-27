@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 /**
@@ -125,7 +126,7 @@ public abstract class MCRAccessStore {
             Collection<String> elements;
             MCRAccessDefinition def = null;
 
-            if (MCRConfiguration.instance().getBoolean("MCR.Metadata.Type." + type)) {
+            if (MCRConfiguration2.getOrThrow("MCR.Metadata.Type." + type, Boolean::parseBoolean)) {
                 elements = MCRXMLMetadataManager.instance().listIDsOfType(type);
             } else {
                 return Collections.emptySet();

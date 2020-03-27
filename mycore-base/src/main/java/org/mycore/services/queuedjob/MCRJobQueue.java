@@ -51,6 +51,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
@@ -61,7 +62,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
 
-    protected static boolean singleQueue = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "SingleQueue", true);
+    protected static boolean singleQueue = MCRConfiguration2.getBoolean(CONFIG_PREFIX + "SingleQueue").orElse(true);
 
     protected String configPrefixAdd = "";
 
@@ -472,8 +473,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     public synchronized void notifyListener() {
         this.notifyAll();
 
-        boolean autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "autostart", true);
-        autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + configPrefixAdd + "autostart", autostart);
+        boolean autostart = MCRConfiguration2.getBoolean(CONFIG_PREFIX + "autostart").orElse(true);
+        autostart = MCRConfiguration2.getBoolean(CONFIG_PREFIX + configPrefixAdd + "autostart").orElse(autostart);
 
         if (autostart) {
             MCRJobMaster.startMasterThread(action);

@@ -46,6 +46,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.processing.MCRProcessableStatus;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -203,7 +204,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     protected void setDefaultPermissions(MCRObjectID derivateID) {
-        if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
+        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
             MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
             Collection<String> configuredPermissions = accessImpl.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {

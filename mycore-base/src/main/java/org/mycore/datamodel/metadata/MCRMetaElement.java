@@ -31,6 +31,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -55,9 +56,11 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     public static final String DEFAULT_LANGUAGE = CONFIG.getString("MCR.Metadata.DefaultLang",
         MCRConstants.DEFAULT_LANG);
 
-    public static final boolean DEFAULT_HERITABLE = CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", false);
+    public static final boolean DEFAULT_HERITABLE = MCRConfiguration2.getBoolean("MCR.MetaElement.defaults.heritable")
+        .orElse(false);
 
-    public static final boolean DEFAULT_NOT_INHERIT = CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", true);
+    public static final boolean DEFAULT_NOT_INHERIT = MCRConfiguration2
+        .getBoolean("MCR.MetaElement.defaults.notinherit").orElse(true);
 
     private static final String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 

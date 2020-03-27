@@ -50,6 +50,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
@@ -403,7 +404,7 @@ public class MCREditorOutValidator {
      * @throws JDOMException
      */
     private void setDefaultObjectACLs(Element service) throws JDOMException, IOException {
-        if (!MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true)) {
+        if (!MCRConfiguration2.getBoolean("MCR.Access.AddObjectDefaultRule").orElse(true)) {
             LOGGER.info("Adding object default acl rule is disabled.");
             return;
         }

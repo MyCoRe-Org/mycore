@@ -31,7 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 import com.google.gson.JsonObject;
@@ -63,8 +63,7 @@ public class MCRObjectMetadata implements Iterable<MCRMetaElement> {
      *                a special exception for configuartion data
      */
     public MCRObjectMetadata() throws MCRConfigurationException {
-        heritedXML = MCRConfiguration.instance()
-            .getBoolean("MCR.Metadata.HeritedForXML", true);
+        heritedXML = MCRConfiguration2.getBoolean("MCR.Metadata.HeritedForXML").orElse(true);
         metadataElements = new ArrayList<>();
     }
 

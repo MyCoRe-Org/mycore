@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -84,7 +85,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        handleBaseCreated(obj, MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true));
+        handleBaseCreated(obj, MCRConfiguration2.getBoolean("MCR.Access.AddObjectDefaultRule").orElse(true));
     }
 
     /**
@@ -98,7 +99,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        handleBaseUpdated(obj, MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true));
+        handleBaseUpdated(obj, MCRConfiguration2.getBoolean("MCR.Access.AddObjectDefaultRule").orElse(true));
     }
 
     /**
@@ -140,7 +141,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        handleBaseCreated(der, MCRConfiguration.instance().getBoolean("MCR.Access.AddDerivateDefaultRule", true));
+        handleBaseCreated(der, MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true));
     }
 
     /**
@@ -154,7 +155,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        handleBaseUpdated(der, MCRConfiguration.instance().getBoolean("MCR.Access.AddDerivateDefaultRule", true));
+        handleBaseUpdated(der, MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true));
     }
 
     /**

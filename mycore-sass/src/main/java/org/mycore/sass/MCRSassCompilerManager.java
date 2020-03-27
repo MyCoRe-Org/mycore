@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
@@ -170,7 +171,7 @@ public class MCRSassCompilerManager {
     }
 
     public boolean isDeveloperMode() {
-        return MCR_CONFIGURATION.getBoolean(DEVELOPER_MODE_CONFIG_KEY, false);
+        return MCRConfiguration2.getBoolean(DEVELOPER_MODE_CONFIG_KEY).orElse(false);
     }
 
     private static final class MCRSASSCompilerManagerHolder {

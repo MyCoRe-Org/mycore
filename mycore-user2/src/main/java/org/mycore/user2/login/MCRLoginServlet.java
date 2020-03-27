@@ -38,7 +38,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -73,8 +73,8 @@ public class MCRLoginServlet extends MCRServlet {
 
     private static final String LOGIN_REDIRECT_URL_KEY = "loginRedirectURL";
 
-    protected static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration.instance()
-        .getBoolean(HTTPS_ONLY_PROPERTY);
+    protected static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration2
+        .getOrThrow(HTTPS_ONLY_PROPERTY, Boolean::parseBoolean);
 
     private static Logger LOGGER = LogManager.getLogger();
 

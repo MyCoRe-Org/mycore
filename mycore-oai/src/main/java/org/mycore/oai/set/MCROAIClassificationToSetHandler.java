@@ -30,6 +30,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.MCROAIUtils;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.solr.MCRSolrClientFactory;
@@ -94,7 +95,7 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
     }
 
     private boolean filterEmptySets() {
-        return MCRConfiguration.instance().getBoolean(getConfigPrefix() + "FilterEmptySets", true);
+        return MCRConfiguration2.getBoolean(getConfigPrefix() + "FilterEmptySets").orElse(true);
     }
 
     @Override

@@ -106,7 +106,8 @@ public class MCROAISearchManager {
             }
         };
         new Timer().schedule(tt, new Date(System.currentTimeMillis() + MAX_AGE), MAX_AGE);
-        runListRecordsParallel = getConfig().getBoolean(MCROAIAdapter.PREFIX + "RunListRecordsParallel");
+        runListRecordsParallel = MCRConfiguration2
+            .getOrThrow(MCROAIAdapter.PREFIX + "RunListRecordsParallel", Boolean::parseBoolean);
         if (runListRecordsParallel) {
             executorService = Executors.newWorkStealingPool();
             MCRShutdownHandler.getInstance().addCloseable(executorService::shutdownNow);
@@ -166,7 +167,7 @@ public class MCROAISearchManager {
         OAIDataList<Record> recordList = runListRecordsParallel ? getRecordListParallel(searcher, result)
             : getRecordListSequential(searcher, result);
         if (recordList.contains(null)) {
-            if (getConfig().getBoolean("MCR.OAIDataProvider.FailOnErrorRecords", false)) {
+            if (MCRConfiguration2.getBoolean("MCR.OAIDataProvider.FailOnErrorRecords").orElse(false)) {
                 throw new MCRException(
                     "An internal error occur. Some of the following records are invalid and cannot be processed."
                         + " Please inform the system administrator. " + result.list());

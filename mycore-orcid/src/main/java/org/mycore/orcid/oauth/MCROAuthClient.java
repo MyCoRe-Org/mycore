@@ -29,6 +29,7 @@ import javax.ws.rs.client.ClientBuilder;
 import org.apache.http.client.utils.URIBuilder;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.streams.MCRMD5InputStream;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
@@ -105,7 +106,7 @@ public class MCROAuthClient {
         builder.addParameter("state", buildStateParam());
         builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
 
-        if (MCRConfiguration.instance().getBoolean("MCR.ORCID.PreFillRegistrationForm")) {
+        if (MCRConfiguration2.getOrThrow("MCR.ORCID.PreFillRegistrationForm", Boolean::parseBoolean)) {
             preFillRegistrationForm(builder);
         }
 

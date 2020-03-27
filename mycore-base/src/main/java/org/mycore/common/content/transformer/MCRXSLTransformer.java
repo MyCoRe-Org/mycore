@@ -51,6 +51,7 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -170,7 +171,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private void checkTemplateUptodate()
         throws TransformerConfigurationException, SAXException, ParserConfigurationException {
         boolean check = System.currentTimeMillis() - modifiedChecked > CHECK_PERIOD;
-        boolean useCache = MCRConfiguration.instance().getBoolean("MCR.UseXSLTemplateCache", true);
+        boolean useCache = MCRConfiguration2.getBoolean("MCR.UseXSLTemplateCache").orElse(true);
 
         if (check || !useCache) {
             for (int i = 0; i < templateSources.length; i++) {
