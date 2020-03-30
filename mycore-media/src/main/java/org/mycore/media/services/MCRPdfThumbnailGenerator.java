@@ -1,9 +1,5 @@
 package org.mycore.media.services;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
-import org.mycore.datamodel.niofs.MCRPath;
-
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -11,6 +7,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
 
@@ -23,8 +23,7 @@ public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
 
     @Override
     public Optional<BufferedImage> getThumbnail(MCRPath path, int size) throws IOException {
-        InputStream fileIS = Files.newInputStream(path.toPhysicalPath());
-        try (PDDocument pdf = PDDocument.load(fileIS)) {
+        try (InputStream fileIS = Files.newInputStream(path.toPhysicalPath()); PDDocument pdf = PDDocument.load(fileIS)) {
             float pdfWidth =  pdf.getPage(0).getCropBox().getWidth();
             float pdfHeight =  pdf.getPage(0).getCropBox().getHeight();
             final int newWidth = pdfWidth > pdfHeight ? (int) Math.ceil(size * pdfWidth / pdfHeight) : size;
