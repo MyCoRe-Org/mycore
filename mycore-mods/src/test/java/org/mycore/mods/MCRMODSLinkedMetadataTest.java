@@ -49,6 +49,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Tests for MCR-910 (Link MODS documents to other MODS documents)
@@ -73,9 +74,18 @@ public class MCRMODSLinkedMetadataTest extends MCRJPATestCase {
 
     @After
     public void tearDown() throws Exception {
-        MCRMetadataManager.deleteMCRObject(bookID);
-        MCRMetadataManager.deleteMCRObject(seriesID);
         MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(seriesID);
+        while (metadataStore.listIDs(true).hasNext()) {
+            metadataStore.listIDs(true).forEachRemaining(i -> {
+                final MCRObjectID currentId = MCRObjectID.getInstance(MCRObjectID.formatID(seriesID.getBase(), i));
+                System.err.println("Delete " + currentId);
+                try {
+                    MCRMetadataManager.deleteMCRObject(currentId);
+                } catch (MCRActiveLinkException | MCRAccessException e) {
+                    System.err.println("Cannot delete " + currentId + " at this moment.");
+                }
+            });
+        }
         MCRStoreManager.removeStore(metadataStore.getID());
         super.tearDown();
     }
@@ -103,5 +113,23 @@ public class MCRMODSLinkedMetadataTest extends MCRJPATestCase {
             titleElement);
         Assert.assertEquals("Title update from series was not promoted to book of series.",
             "Updated series title", titleElement.getText());
+    }
+
+    @Test(expected = MCRPersistenceException.class)
+    public void testHierarchyDirect() throws URISyntaxException, SAXParseException, IOException, MCRAccessException {
+        MCRObjectID book2ID = MCRObjectID.getInstance("junit_mods_00000003");
+        MCRObject book2 = new MCRObject(getResourceAsURL(book2ID + ".xml").toURI());
+        MCRMetadataManager.create(book2);
+        book2 = new MCRObject(getResourceAsURL(book2ID + "-updated.xml").toURI());
+        MCRMetadataManager.update(book2);
+    }
+
+    @Test(expected = MCRPersistenceException.class)
+    public void testHierarchyIndirect() throws URISyntaxException, SAXParseException, IOException, MCRAccessException {
+        MCRObjectID book2ID = MCRObjectID.getInstance("junit_mods_00000003");
+        MCRObject book2 = new MCRObject(getResourceAsURL(book2ID + ".xml").toURI());
+        MCRMetadataManager.create(book2);
+        MCRObject series = new MCRObject(getResourceAsURL(seriesID + "-updated2.xml").toURI());
+        MCRMetadataManager.update(series);
     }
 }

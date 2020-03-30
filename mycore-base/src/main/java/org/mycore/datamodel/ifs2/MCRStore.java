@@ -191,9 +191,9 @@ public abstract class MCRStore {
 
     public boolean isEmpty() {
         try (Stream<Path> streamBaseDirectory = Files.list(baseDirectory)) {
-            return streamBaseDirectory.findAny().isPresent();
+            return streamBaseDirectory.findAny().isEmpty();
         } catch (final IOException e) {
-            LOGGER.error("Error whil checking if base directory is empty: " + baseDirectory, e);
+            LOGGER.error("Error while checking if base directory is empty: " + baseDirectory, e);
             return false;
         }
     }
