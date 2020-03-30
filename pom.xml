@@ -10,10 +10,9 @@
   <version>2020.05-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
-  <description>MyCoRe is a system for the development of institutional content repositories, publication servers, image collections,
-    archives, or similar repositories.
-    Applications based on MyCoRe use a common core, which provides the functionality typically required for such
-    applications, for example metadata management, querying, OAI harvesting interface, or an image viewer module.</description>
+  <description xml:space="preserve">
+MyCoRe is a system for the development of institutional content repositories, publication servers, image collections, archives, or similar repositories.
+Applications based on MyCoRe use a common core, which provides the functionality typically required for such applications, for example metadata management, querying, OAI harvesting interface, or an image viewer module.</description>
   <url>http://www.mycore.de/generated/mycore${site.suffix}</url>
   <licenses>
     <license>
