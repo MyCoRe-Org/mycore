@@ -25,7 +25,7 @@ import org.jdom2.Element;
 import org.jdom2.ProcessingInstruction;
 import org.jdom2.filter.Filters;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRChangeTracker implements Cloneable {
 
@@ -71,7 +71,8 @@ public class MCRChangeTracker implements Cloneable {
         counter--;
 
         String property = CONFIG_PREFIX + data.getType() + ".Class";
-        MCRChange change = MCRConfiguration.instance().getSingleInstanceOf(property);
+        MCRChange change = MCRConfiguration2.<MCRChange>getSingleInstanceOf(property)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(property));
         change.undo(data);
         return data;
     }

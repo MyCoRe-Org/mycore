@@ -32,7 +32,6 @@ import org.mycore.access.strategies.MCRDerivateIDStrategy;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -63,8 +62,7 @@ public class MCRAccessManager {
     }
 
     public static MCRAccessInterface getAccessImpl() {
-        return MCRConfiguration.instance().getSingleInstanceOf("MCR.Access.Class",
-            MCRAccessBaseImpl.class.getName());
+        return MCRConfiguration2.getSingleInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class).get();
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {

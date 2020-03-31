@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
@@ -237,12 +238,14 @@ public class MCREventManager {
     }
 
     public MCREventHandler getEventHandler(String mode, String propertyValue) {
-        MCRConfiguration configuration = MCRConfiguration.instance();
         if ("Class".equals(mode)) {
-            return configuration.getSingleInstanceOf(propertyValue);
+            return MCRConfiguration2.<MCREventHandler> getSingleInstanceOf(propertyValue)
+                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(propertyValue));
         }
         String className = CONFIG_PREFIX + "Mode." + mode;
-        MCREventHandlerInitializer configuredInitializer = configuration.getSingleInstanceOf(className);
+        MCREventHandlerInitializer configuredInitializer = MCRConfiguration2
+            .<MCREventHandlerInitializer> getSingleInstanceOf(className)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(className));
         return configuredInitializer.getInstance(propertyValue);
     }
 

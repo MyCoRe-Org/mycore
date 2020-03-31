@@ -26,10 +26,11 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import org.mycore.common.MCRClassTools;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
@@ -251,13 +252,14 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        return MCRConfiguration2.<T> getSingleInstanceOf(name).map(Optional::of)
-            .orElseGet(() -> Optional.ofNullable(defaultname)
-                .map(className -> new MCRConfiguration2.SingletonKey(name, className))
-                .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
-                    k -> MCRConfiguration2.instantiateClass(defaultname))))
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
+        try {
+            return MCRConfiguration2.<T> getSingleInstanceOf(name, MCRClassTools.<T> forName(defaultname))
+                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
+        } catch (ClassNotFoundException e) {
+            throw MCRConfiguration2.createConfigurationException(name);
+        }
     }
 
     /**
@@ -270,8 +272,10 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getSingleInstanceOf(String name) {
-        return getSingleInstanceOf(name, null);
+        return MCRConfiguration2.<T> getSingleInstanceOf(name)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 
     /**

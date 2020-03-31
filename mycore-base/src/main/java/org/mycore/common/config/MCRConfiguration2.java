@@ -68,7 +68,7 @@ public class MCRConfiguration2 {
     /**
      * Returns a instance of the class specified in the configuration property with the given name. If the class was
      * previously instantiated by this method this instance is returned.
-     * 
+     *
      * @param name
      *            non-null and non-empty name of the configuration property
      * @return the instance of the class named by the value of the configuration property
@@ -79,6 +79,26 @@ public class MCRConfiguration2 {
         return getString(name)
             .map(className -> new SingletonKey(name, className))
             .map(key -> (T) instanceHolder.computeIfAbsent(key, k -> getInstanceOf(name).orElse(null)));
+    }
+
+    /**
+     * Returns a instance of the class specified in the configuration property with the given name. If the class was
+     * previously instantiated by this method this instance is returned.
+     *
+     * @param name
+     *            non-null and non-empty name of the configuration property
+     * @param alternative
+     *            alternative class if property is undefined
+     * @return the instance of the class named by the value of the configuration property
+     * @throws MCRConfigurationException
+     *             if the class can not be loaded or instantiated
+     */
+    public static <T> Optional<T> getSingleInstanceOf(String name, Class<? extends T> alternative) {
+        return MCRConfiguration2.<T> getSingleInstanceOf(name)
+            .or(() -> Optional.ofNullable(alternative)
+                .map(className -> new MCRConfiguration2.SingletonKey(name, className.getName()))
+                .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
+                    k -> instantiateClass(alternative))));
     }
 
     /**
@@ -282,6 +302,10 @@ public class MCRConfiguration2 {
         LogManager.getLogger().debug("Loading Class: {}", classname);
 
         Class<? extends T> cl = getClassObject(classname);
+        return instantiateClass(cl);
+    }
+
+    private static <T> T instantiateClass(Class<? extends T> cl) {
         try {
             return MCRInjectorConfig.injector().getInstance(cl);
         } catch (ConfigurationException e) {
@@ -293,10 +317,10 @@ public class MCRConfiguration2 {
                     .filter(m -> Modifier.isPublic(m.getModifiers()))
                     .filter(m -> m.getName().toLowerCase(Locale.ROOT).contains("instance"))
                     .findAny()
-                    .orElseThrow(() -> new MCRConfigurationException("Could not instantiate class " + classname, e))
+                    .orElseThrow(() -> new MCRConfigurationException("Could not instantiate class " + cl.getName(), e))
                     .invoke(cl, (Object[]) null);
             } catch (ReflectiveOperationException r) {
-                throw new MCRConfigurationException("Could not instantiate class " + classname, r);
+                throw new MCRConfigurationException("Could not instantiate class " + cl.getName(), r);
             }
         }
     }

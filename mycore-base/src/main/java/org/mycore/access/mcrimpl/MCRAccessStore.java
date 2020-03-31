@@ -26,6 +26,7 @@ import java.util.LinkedList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.access.MCRJPAAccessStore;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -87,9 +88,8 @@ public abstract class MCRAccessStore {
     public static MCRAccessStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = MCRConfiguration.instance().getSingleInstanceOf(
-                    "MCR.Persistence.Access.Store.Class",
-                    "org.mycore.backend.hibernate.MCRHIBAccessStore");
+                implementation = MCRConfiguration2
+                    .getSingleInstanceOf("MCR.Persistence.Access.Store.Class", MCRJPAAccessStore.class).get();
             }
         } catch (Exception e) {
             LOGGER.error(e);
