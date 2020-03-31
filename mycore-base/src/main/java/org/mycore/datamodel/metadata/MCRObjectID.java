@@ -458,8 +458,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         public int numberDistance() {
             if (numberDistance == 0) {
                 MCRConfiguration config = MCRConfiguration.instance();
-                numberDistance = config.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
-                return config.getInt("MCR.Metadata.ObjectID.InitialNumberDistance", numberDistance);
+                numberDistance = MCRConfiguration2.getInt("MCR.Metadata.ObjectID.NumberDistance").orElse(1);
+                return MCRConfiguration2.getInt("MCR.Metadata.ObjectID.InitialNumberDistance").orElse(numberDistance);
             }
             return numberDistance;
         }

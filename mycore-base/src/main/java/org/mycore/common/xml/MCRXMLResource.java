@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
@@ -47,7 +47,7 @@ import org.mycore.common.content.MCRURLContent;
 public class MCRXMLResource {
 
     private static final MCRCache<String, CacheEntry> RESOURCE_CACHE = new MCRCache<>(
-        MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100),
+        MCRConfiguration2.getInt("MCR.MCRXMLResource.Cache.Size").orElse(100),
         "XML resources");
 
     private static MCRXMLResource instance = new MCRXMLResource();

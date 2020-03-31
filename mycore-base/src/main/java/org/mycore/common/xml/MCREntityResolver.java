@@ -45,7 +45,7 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.function.MCRThrowFunction;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -82,7 +82,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
             .map(URI::create)
             .toArray(URI[]::new);
         catalogResolver = CatalogManager.catalogResolver(CatalogFeatures.defaults(), catalogURIs);
-        int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
+        int cacheSize = MCRConfiguration2.getInt(CONFIG_PREFIX + "StaticFiles.CacheSize").orElse(100);
         bytesCache = new MCRCache<>(cacheSize, "EntityResolver Resources");
     }
 

@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * <p>
@@ -89,9 +90,12 @@ public final class MCRMetaNumber extends MCRMetaDefault {
     private int measurementLength;
 
     private void loadProperties() {
-        fractionDigits = CONFIG.getInt("MCR.Metadata.MetaNumber.FractionDigits", DEFAULT_FRACTION_DIGITS);
-        dimensionLength = CONFIG.getInt("MCR.Metadata.MetaNumber.DimensionLength", MAX_DIMENSION_LENGTH);
-        measurementLength = CONFIG.getInt("MCR.Metadata.MetaNumber.MeasurementLength", MAX_MEASUREMENT_LENGTH);
+        fractionDigits = MCRConfiguration2.getInt("MCR.Metadata.MetaNumber.FractionDigits")
+            .orElse(DEFAULT_FRACTION_DIGITS);
+        dimensionLength = MCRConfiguration2.getInt("MCR.Metadata.MetaNumber.DimensionLength")
+            .orElse(MAX_DIMENSION_LENGTH);
+        measurementLength = MCRConfiguration2.getInt("MCR.Metadata.MetaNumber.MeasurementLength")
+            .orElse(MAX_MEASUREMENT_LENGTH);
     }
 
     /**

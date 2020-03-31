@@ -81,7 +81,7 @@ public class MCROAIAdapter implements OAIAdapter {
 
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
-        DEFAULT_PARTITION_SIZE = MCRConfiguration.instance().getInt(prefix + "PartitionSize", 50);
+        DEFAULT_PARTITION_SIZE = MCRConfiguration2.getInt(prefix + "PartitionSize").orElse(50);
         LOGGER.info(MCROAIAdapter.PREFIX + "ResumptionTokens.PartitionSize is set to {}", DEFAULT_PARTITION_SIZE);
     }
 
@@ -103,7 +103,7 @@ public class MCROAIAdapter implements OAIAdapter {
         if (this.setManager == null) {
             this.setManager = MCRConfiguration2.<MCROAISetManager> getInstanceOf(getConfigPrefix() + "SetManager")
                 .orElseGet(MCROAISetManager::new);
-            int cacheMaxAge = MCRConfiguration.instance().getInt(this.configPrefix + "SetCache.MaxAge", 0);
+            int cacheMaxAge = MCRConfiguration2.getInt(this.configPrefix + "SetCache.MaxAge").orElse(0);
             this.setManager.init(getConfigPrefix(), cacheMaxAge);
         }
         return this.setManager;
@@ -120,8 +120,8 @@ public class MCROAIAdapter implements OAIAdapter {
     public MCROAISearchManager getSearchManager() {
         if (this.searchManager == null) {
             this.searchManager = new MCROAISearchManager();
-            int partitionSize = MCRConfiguration.instance().getInt(getConfigPrefix() + "ResumptionTokens.PartitionSize",
-                DEFAULT_PARTITION_SIZE);
+            int partitionSize = MCRConfiguration2.getInt(getConfigPrefix() + "ResumptionTokens.PartitionSize")
+                .orElse(DEFAULT_PARTITION_SIZE);
             this.searchManager.init(getIdentify(), getObjectManager(), getSetManager(), partitionSize);
         }
         return this.searchManager;

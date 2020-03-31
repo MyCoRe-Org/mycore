@@ -42,7 +42,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -83,7 +82,7 @@ public class MCRSolrIndexer {
      * Specify how many documents will be submitted to solr at a time when rebuilding the metadata index. Default is
      * 100.
      */
-    static final int BULK_SIZE = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "Indexer.BulkSize", 100);
+    static final int BULK_SIZE = MCRConfiguration2.getInt(SOLR_CONFIG_PREFIX + "Indexer.BulkSize").orElse(100);
 
     static final MCRProcessableExecutor SOLR_EXECUTOR;
 
@@ -96,7 +95,7 @@ public class MCRSolrIndexer {
     static {
         MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
 
-        int poolSize = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "Indexer.ThreadCount", 4);
+        int poolSize = MCRConfiguration2.getInt(SOLR_CONFIG_PREFIX + "Indexer.ThreadCount").orElse(4);
         final ExecutorService threadPool = new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS,
             MCRProcessableFactory.newPriorityBlockingQueue(),
             new ThreadFactoryBuilder().setNameFormat("SOLR-Indexer-#%d").build());

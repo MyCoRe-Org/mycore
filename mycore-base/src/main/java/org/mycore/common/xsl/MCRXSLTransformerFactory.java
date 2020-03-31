@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerConfigurationException;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Returns a Transformer for a given XSL source, providing caching of
@@ -42,7 +43,7 @@ public class MCRXSLTransformerFactory {
     private static long checkPeriod;
 
     static {
-        int cacheSize = MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 200);
+        int cacheSize = MCRConfiguration2.getInt("MCR.LayoutService.XSLCacheSize").orElse(200);
         checkPeriod = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod", 10000);
         cache = new MCRCache<>(cacheSize, MCRXSLTransformerFactory.class.getName());
     }

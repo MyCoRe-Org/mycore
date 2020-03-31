@@ -60,6 +60,7 @@ import org.apache.solr.common.util.NamedList;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -92,8 +93,8 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
     public static final String QUERY_CORE_PARAMETER = "core";
 
-    private static int MAX_CONNECTIONS = MCRConfiguration.instance()
-        .getInt(SOLR_CONFIG_PREFIX + "SelectProxy.MaxConnections");
+    private static int MAX_CONNECTIONS = MCRConfiguration2
+        .getOrThrow(SOLR_CONFIG_PREFIX + "SelectProxy.MaxConnections", Integer::parseInt);
 
     private CloseableHttpClient httpClient;
 

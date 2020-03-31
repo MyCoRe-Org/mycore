@@ -18,7 +18,7 @@
 
 package org.mycore.sword;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Sebastian Hofmann (mcrshofm)
@@ -34,7 +34,8 @@ public class MCRSwordConstants {
 
     public static final String SWORD2_EDIT_REL = "edit";
 
-    public static final Integer MAX_ENTRYS_PER_PAGE = MCRConfiguration.instance().getInt("MCR.SWORD.Page.Object.Count");
+    public static final Integer MAX_ENTRYS_PER_PAGE = MCRConfiguration2
+        .getOrThrow("MCR.SWORD.Page.Object.Count", Integer::parseInt);
 
     public static final String MCR_SWORD_COLLECTION_PREFIX = "MCR.Sword.Collection.";
 

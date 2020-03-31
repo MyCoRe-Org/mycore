@@ -348,6 +348,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public int getInt(String name) throws NumberFormatException {
         return MCRConfiguration2.getOrThrow(name, Integer::parseInt);
     }
@@ -367,6 +368,7 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not an <CODE>int
      *             </CODE> value
      */
+    @Deprecated
     public int getInt(String name, int defaultValue) throws NumberFormatException {
         return MCRConfiguration2.getInt(name).orElse(defaultValue);
     }

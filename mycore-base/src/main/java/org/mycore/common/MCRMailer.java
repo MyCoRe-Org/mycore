@@ -119,7 +119,7 @@ public class MCRMailer extends MCRServlet {
         try {
             Authenticator auth = null;
 
-            numTries = config.getInt("MCR.Mail.NumTries");
+            numTries = MCRConfiguration2.getOrThrow("MCR.Mail.NumTries", Integer::parseInt);
             if (config.getString("MCR.Mail.User").length() > 0 && config.getString("MCR.Mail.Password").length() > 0) {
                 auth = new SMTPAuthenticator();
                 mailProperties.setProperty("mail.smtp.auth", "true");

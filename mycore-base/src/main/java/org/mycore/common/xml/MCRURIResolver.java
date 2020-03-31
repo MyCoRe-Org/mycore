@@ -481,11 +481,11 @@ public final class MCRURIResolver implements URIResolver {
         private static final long MAX_OBJECT_SIZE = MCRConfiguration.instance()
             .getLong(CONFIG_PREFIX + "REST.MaxObjectSize", 128 * 1024);
 
-        private static final int MAX_CACHE_ENTRIES = MCRConfiguration.instance()
-            .getInt(CONFIG_PREFIX + "REST.MaxCacheEntries", 1000);
+        private static final int MAX_CACHE_ENTRIES = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.MaxCacheEntries")
+            .orElse(1000);
 
-        private static final int REQUEST_TIMEOUT = MCRConfiguration.instance()
-            .getInt(CONFIG_PREFIX + "REST.RequestTimeout", 30000);
+        private static final int REQUEST_TIMEOUT = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.RequestTimeout")
+            .orElse(30000);
 
         private CloseableHttpClient restClient;
 
@@ -937,7 +937,7 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 DAO = MCRCategoryDAOFactory.getInstance();
                 categoryCache = new MCRCache<>(
-                    MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
+                    MCRConfiguration2.getInt(CONFIG_PREFIX + "Classification.CacheSize").orElse(1000),
                     "URIResolver categories");
             } catch (Exception exc) {
                 LOGGER.error("Unable to initialize classification resolver", exc);

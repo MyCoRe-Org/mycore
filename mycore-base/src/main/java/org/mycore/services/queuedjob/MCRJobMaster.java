@@ -150,9 +150,9 @@ public class MCRJobMaster implements Runnable, Closeable {
             activated ? "activated" : "deactivated");
         if (activated) {
             running = true;
-            int jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads", 2);
-            jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "JobThreads",
-                jobThreadCount);
+            int jobThreadCount = MCRConfiguration2.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads").orElse(2);
+            jobThreadCount = MCRConfiguration2
+                .getInt(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "JobThreads").orElse(jobThreadCount);
 
             ThreadFactory slaveFactory = new ThreadFactory() {
                 AtomicInteger tNum = new AtomicInteger();

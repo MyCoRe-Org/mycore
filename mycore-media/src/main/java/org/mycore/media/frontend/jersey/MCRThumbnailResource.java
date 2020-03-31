@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -56,7 +57,7 @@ public class MCRThumbnailResource {
     @Path("{documentId}.{ext}")
     @Produces({ "image/png", "image/jpeg" })
     public Response getThumbnailFromDocument(@PathParam("documentId") String documentId, @PathParam("ext") String ext) {
-        int defaultSize = MCRConfiguration.instance().getInt("MCR.Media.Thumbnail.DefaultSize");
+        int defaultSize = MCRConfiguration2.getOrThrow("MCR.Media.Thumbnail.DefaultSize", Integer::parseInt);
         return getThumbnail(documentId, defaultSize, ext);
     }
 

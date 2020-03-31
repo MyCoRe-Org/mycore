@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRStringContent;
@@ -58,7 +58,8 @@ public class MCRWorksFetcher {
     private static final Logger LOGGER = LogManager.getLogger(MCRWorksFetcher.class);
 
     /** The maximum number of works to fetch at once in a bulk request */
-    private static final int BULK_FETCH_SIZE = MCRConfiguration.instance().getInt("MCR.ORCID.Works.BulkFetchSize");
+    private static final int BULK_FETCH_SIZE = MCRConfiguration2
+        .getOrThrow("MCR.ORCID.Works.BulkFetchSize", Integer::parseInt);
 
     /** Transformer used to convert ORCID's work XML schema to MODS and a representation we use here */
     private static final MCRContentTransformer T_WORK2MCR = MCRContentTransformerFactory.getTransformer("Work2MyCoRe");

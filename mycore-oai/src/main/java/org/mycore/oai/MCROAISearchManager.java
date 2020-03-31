@@ -87,7 +87,7 @@ public class MCROAISearchManager {
 
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
-        MAX_AGE = getConfig().getInt(prefix + "MaxAge", 30) * 60 * 1000;
+        MAX_AGE = MCRConfiguration2.getInt(prefix + "MaxAge").orElse(30) * 60 * 1000;
     }
 
     public MCROAISearchManager() {

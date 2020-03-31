@@ -21,7 +21,7 @@ package org.mycore.mods.merger;
 import org.apache.commons.lang.StringUtils;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Compares and merges mods:abstract elements. The abstract text is normalized before comparing.
@@ -36,12 +36,12 @@ import org.mycore.common.config.MCRConfiguration;
 public class MCRAbstractMerger extends MCRMerger {
 
     /** Maximum Levenshtein distance to accept two abstracts as equal, in percent */
-    private static final int MAX_DISTANCE_PERCENT = MCRConfiguration.instance()
-        .getInt("MCR.MODS.Merger.AbstractMerger.MaxDistancePercent");
+    private static final int MAX_DISTANCE_PERCENT = MCRConfiguration2
+        .getOrThrow("MCR.MODS.Merger.AbstractMerger.MaxDistancePercent", Integer::parseInt);
 
     /** Maximum number of characters to compare from two abstracts */
-    private static final int MAX_COMPARE_LENGTH = MCRConfiguration.instance()
-        .getInt("MCR.MODS.Merger.AbstractMerger.MaxCompareLength");
+    private static final int MAX_COMPARE_LENGTH = MCRConfiguration2
+        .getOrThrow("MCR.MODS.Merger.AbstractMerger.MaxCompareLength", Integer::parseInt);
 
     private String text;
 

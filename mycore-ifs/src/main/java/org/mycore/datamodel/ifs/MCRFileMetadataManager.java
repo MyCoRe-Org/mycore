@@ -83,7 +83,7 @@ public class MCRFileMetadataManager {
             .getOrThrow("MCR.Persistence.IFS.FileMetadataStore.Class", MCRConfiguration2::instantiateClass);
 
         // The cache size for the MCRFilesystemNode cache
-        int size = config.getInt("MCR.IFS.FileMetadataStore.CacheSize", 500);
+        int size = MCRConfiguration2.getInt("MCR.IFS.FileMetadataStore.CacheSize").orElse(500);
         cache = new MCRCache<>(size, "IFS FileSystemNodes");
     }
 

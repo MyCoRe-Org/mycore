@@ -29,7 +29,7 @@ import javax.persistence.TypedQuery;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Resets jobs that took to long to perform action.
@@ -43,15 +43,15 @@ public class MCRStalledJobResetter implements Runnable {
 
     private static Logger LOGGER = LogManager.getLogger(MCRStalledJobResetter.class);
 
-    private int maxTimeDiff = MCRConfiguration.instance().getInt(MCRJobQueue.CONFIG_PREFIX + "TimeTillReset", 10);
+    private int maxTimeDiff = MCRConfiguration2.getInt(MCRJobQueue.CONFIG_PREFIX + "TimeTillReset").orElse(10);
 
     private Class<? extends MCRJobAction> action = null;
 
     private MCRStalledJobResetter(Class<? extends MCRJobAction> action) {
         if (action != null) {
             this.action = action;
-            maxTimeDiff = MCRConfiguration.instance()
-                .getInt(MCRJobQueue.CONFIG_PREFIX + action.getSimpleName() + ".TimeTillReset", maxTimeDiff);
+            maxTimeDiff = MCRConfiguration2
+                .getInt(MCRJobQueue.CONFIG_PREFIX + action.getSimpleName() + ".TimeTillReset").orElse(maxTimeDiff);
         }
     }
 

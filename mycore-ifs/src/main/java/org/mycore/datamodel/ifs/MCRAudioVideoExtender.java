@@ -33,7 +33,7 @@ import java.util.Locale;
 import org.apache.commons.io.IOUtils;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 
@@ -444,6 +444,6 @@ public abstract class MCRAudioVideoExtender {
     }
 
     protected int getConnectTimeout() {
-        return MCRConfiguration.instance().getInt("MCR.IFS.AVExtender.ConnectTimeout", 0);
+        return MCRConfiguration2.getInt("MCR.IFS.AVExtender.ConnectTimeout").orElse(0);
     }
 }

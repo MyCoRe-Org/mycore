@@ -148,7 +148,8 @@ public class MCRSassCompilerManager {
         if (compress) {
             try {
                 CssCompressor cssCompressor = new CssCompressor(new StringReader(css));
-                int lineBreaks = MCR_CONFIGURATION.getInt(LINE_BREAK_CONFIG_KEY, DEFAULT_LINE_BREAK_CONFIG_VALUE);
+                int lineBreaks = MCRConfiguration2.getInt(LINE_BREAK_CONFIG_KEY)
+                    .orElse(DEFAULT_LINE_BREAK_CONFIG_VALUE);
                 StringWriter out = new StringWriter(css.length());
                 cssCompressor.compress(out, lineBreaks);
                 css = out.toString();

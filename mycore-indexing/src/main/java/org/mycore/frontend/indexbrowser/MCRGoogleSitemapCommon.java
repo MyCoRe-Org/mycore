@@ -41,6 +41,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.solr.MCRSolrClientFactory;
@@ -108,7 +109,7 @@ public final class MCRGoogleSitemapCommon {
     private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
 
     /** Number of URLs in one sitemap */
-    private int numberOfURLs = MCRConfiguration.instance().getInt("MCR.GoogleSitemap.NumberOfURLs", 10000);
+    private int numberOfURLs = MCRConfiguration2.getInt("MCR.GoogleSitemap.NumberOfURLs").orElse(10000);
 
     /** number format for parts */
     private static NumberFormat number_format = getNumberFormat();
