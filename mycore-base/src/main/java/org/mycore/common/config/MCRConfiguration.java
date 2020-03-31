@@ -415,6 +415,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public float getFloat(String name) throws NumberFormatException {
         return MCRConfiguration2.getOrThrow(name, Float::parseFloat);
     }
@@ -432,6 +433,7 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not a <CODE>
      *             float</CODE> value
      */
+    @Deprecated
     public float getFloat(String name, float defaultValue) throws NumberFormatException {
         return MCRConfiguration2.getFloat(name).orElse(defaultValue);
     }
