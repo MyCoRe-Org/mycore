@@ -385,6 +385,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public long getLong(String name) throws NumberFormatException {
         return MCRConfiguration2.getOrThrow(name, Long::parseLong);
     }
@@ -402,6 +403,7 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not a <CODE>long
      *             </CODE> value
      */
+    @Deprecated
     public long getLong(String name, long defaultValue) throws NumberFormatException {
         return MCRConfiguration2.getLong(name).orElse(defaultValue);
     }

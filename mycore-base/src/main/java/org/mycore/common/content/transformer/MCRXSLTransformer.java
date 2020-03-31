@@ -93,8 +93,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<>(100,
         "MCRXSLTransformer instance cache");
 
-    private static long CHECK_PERIOD = MCRConfiguration.instance().getLong("MCR.LayoutService.LastModifiedCheckPeriod",
-        60000);
+    private static long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
+        .orElse(60000l);
 
     private static final String DEFAULT_FACTORY_CLASS = MCRConfiguration.instance()
         .getString("MCR.LayoutService.TransformerFactoryClass", null);

@@ -43,7 +43,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
@@ -128,7 +128,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         long resultingSize = (long) targetSize.getHeight() * targetSize.getWidth()
             * (imageQuality.equals(MCRIIIFImageQuality.color) ? 3 : 1);
 
-        long maxImageSize = MCRConfiguration.instance().getLong(MAX_BYTES);
+        long maxImageSize = MCRConfiguration2.getOrThrow(MAX_BYTES, Long::parseLong);
         if (resultingSize > maxImageSize) {
             throw new MCRIIIFImageProvidingException("Maximal image size is " + (maxImageSize / 1024 / 1024) + "MB. ["
                 + resultingSize + "/" + maxImageSize + "]");

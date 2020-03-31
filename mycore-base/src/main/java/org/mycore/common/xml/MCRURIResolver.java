@@ -478,8 +478,8 @@ public final class MCRURIResolver implements URIResolver {
 
     private static class MCRRESTResolver implements MCRCacheableURIResolver {
 
-        private static final long MAX_OBJECT_SIZE = MCRConfiguration.instance()
-            .getLong(CONFIG_PREFIX + "REST.MaxObjectSize", 128 * 1024);
+        private static final long MAX_OBJECT_SIZE = MCRConfiguration2.getLong(CONFIG_PREFIX + "REST.MaxObjectSize")
+            .orElse(128 * 1024l);
 
         private static final int MAX_CACHE_ENTRIES = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.MaxCacheEntries")
             .orElse(1000);

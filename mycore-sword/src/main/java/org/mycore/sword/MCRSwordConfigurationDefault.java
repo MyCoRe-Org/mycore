@@ -19,6 +19,7 @@
 package org.mycore.sword;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.swordapp.server.SwordConfiguration;
 
 /**
@@ -72,7 +73,7 @@ public class MCRSwordConfigurationDefault implements SwordConfiguration {
 
     @Override
     public long getMaxUploadSize() {
-        return MCRConfiguration.instance().getLong("MCR.SWORD.Max.Uploaded.File.Size");
+        return MCRConfiguration2.getOrThrow("MCR.SWORD.Max.Uploaded.File.Size", Long::parseLong);
     }
 
     @Override
