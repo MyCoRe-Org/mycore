@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
 
@@ -46,7 +47,9 @@ public abstract class MCRIIIFPresentationImpl {
         }
 
         String classPropertyName = MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName;
-        Class<? extends MCRIIIFPresentationImpl> classObject = MCRConfiguration.instance().getClass(classPropertyName);
+        Class<? extends MCRIIIFPresentationImpl> classObject = MCRConfiguration2.<MCRIIIFPresentationImpl>getClass(
+            classPropertyName)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(classPropertyName));
 
         try {
             Constructor<? extends MCRIIIFPresentationImpl> constructor = classObject.getConstructor(String.class);

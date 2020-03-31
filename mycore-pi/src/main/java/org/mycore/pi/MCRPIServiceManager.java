@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 public class MCRPIServiceManager {
@@ -61,7 +62,8 @@ public class MCRPIServiceManager {
 
         final MCRPIService mcrpiService = serviceCache.computeIfAbsent(id, (registrationServiceID) -> {
             String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
-            Class<? extends MCRPIService<T>> piClass = MCRConfiguration.instance().getClass(propertyName);
+            Class<? extends MCRPIService<T>> piClass = MCRConfiguration2.<MCRPIService<T>>getClass(propertyName)
+                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(propertyName));
 
             try {
                 Constructor<? extends MCRPIService<T>> constructor = piClass.getConstructor(String.class);

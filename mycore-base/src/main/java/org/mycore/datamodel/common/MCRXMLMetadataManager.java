@@ -46,6 +46,7 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -162,7 +163,8 @@ public class MCRXMLMetadataManager {
         basePath = Paths.get(base);
         checkPath(basePath, "base");
 
-        defaultClass = config.getClass("MCR.Metadata.Store.DefaultClass", MCRVersioningMetadataStore.class);
+        defaultClass = MCRConfiguration2.<MCRVersioningMetadataStore>getClass("MCR.Metadata.Store.DefaultClass")
+            .orElse(MCRVersioningMetadataStore.class);
         if (MCRVersioningMetadataStore.class.isAssignableFrom(defaultClass)) {
             try {
                 String svnBaseValue = config.getString("MCR.Metadata.Store.SVNBase");
@@ -328,11 +330,11 @@ public class MCRXMLMetadataManager {
         throws ReflectiveOperationException {
         MCRConfiguration config = MCRConfiguration.instance();
         String baseID = getStoryKey(project, objectType);
-        Class clazz = config.getClass(configPrefix + "Class", null);
-        if (clazz == null) {
-            config.set(configPrefix + "Class", defaultClass.getName());
-            clazz = defaultClass;
-        }
+        Class<? extends MCRStore> clazz = MCRConfiguration2.<MCRStore> getClass(configPrefix + "Class")
+            .orElseGet(() -> {
+                config.set(configPrefix + "Class", defaultClass.getName());
+                return defaultClass;
+            });
         if (MCRVersioningMetadataStore.class.isAssignableFrom(clazz)) {
             String property = configPrefix + "SVNRepositoryURL";
             String svnURL = config.getString(property, null);

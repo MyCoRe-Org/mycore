@@ -161,7 +161,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static MCRResolverProvider getExternalResolverProvider() {
-        return Optional.ofNullable(MCRConfiguration.instance().getClass(CONFIG_PREFIX + "ExternalResolver.Class", null))
+        return MCRConfiguration2.getClass(CONFIG_PREFIX + "ExternalResolver.Class")
             .map(c -> {
                 try {
                     return (MCRResolverProvider) c.getDeclaredConstructor().newInstance();

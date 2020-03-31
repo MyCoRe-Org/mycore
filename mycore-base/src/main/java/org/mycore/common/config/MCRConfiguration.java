@@ -208,6 +208,7 @@ public class MCRConfiguration {
      * @return non null Class asignable to <code>&lt;T&gt;</code>
      * @throws MCRConfigurationException if property is not defined or class could not be loaded
      */
+    @Deprecated
     public <T> Class<? extends T> getClass(String name) throws MCRConfigurationException {
         return MCRConfiguration2.<T> getClass(name)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
@@ -220,6 +221,7 @@ public class MCRConfiguration {
      * @param <T> Supertype of class defined in <code>name</code>
      * @return non null Class asignable to <code>&lt;T&gt;</code>
      */
+    @Deprecated
     public <T> Class<? extends T> getClass(String name, Class<? extends T> defaultClass) {
         return MCRConfiguration2.<T> getClass(name).orElse(defaultClass);
     }

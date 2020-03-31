@@ -33,6 +33,7 @@ import org.jdom2.input.SAXBuilder;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRPath;
 
 /**
@@ -53,8 +54,8 @@ public abstract class MCRMETSGeneratorFactory {
         IGNORE_METS_XML = true;
 
         // get selector
-        Class<? extends MCRMETSGeneratorSelector> cn = MCRConfiguration.instance()
-            .getClass("MCR.Component.MetsMods.Generator.Selector", MCRMETSPropertyGeneratorSelector.class);
+        Class<? extends MCRMETSGeneratorSelector> cn = MCRConfiguration2.<MCRMETSPropertyGeneratorSelector>getClass(
+            "MCR.Component.MetsMods.Generator.Selector").orElse(MCRMETSPropertyGeneratorSelector.class);
         try {
             GENERATOR_SELECTOR = cn.getDeclaredConstructor().newInstance();
         } catch (Exception cause) {
