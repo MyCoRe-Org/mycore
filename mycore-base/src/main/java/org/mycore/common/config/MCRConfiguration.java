@@ -449,6 +449,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public double getDouble(String name) throws NumberFormatException {
         return MCRConfiguration2.getOrThrow(name, Double::parseDouble);
     }
@@ -466,6 +467,7 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not a <CODE>
      *             double</CODE> value
      */
+    @Deprecated
     public double getDouble(String name, double defaultValue) throws NumberFormatException {
         return MCRConfiguration2.getDouble(name).orElse(defaultValue);
     }
