@@ -39,7 +39,6 @@ import javax.xml.bind.JAXBException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -147,8 +146,10 @@ public class MCRViewerResource {
             MCRJerseyUtil.throwException(Status.UNAUTHORIZED, errorMessage);
         }
         // build configuration object
-        MCRViewerConfigurationStrategy configurationStrategy = MCRConfiguration.instance()
-            .getInstanceOf("MCR.Viewer.configuration.strategy", new MCRViewerDefaultConfigurationStrategy());
+        MCRViewerConfigurationStrategy configurationStrategy = MCRConfiguration2
+            .<MCRViewerDefaultConfigurationStrategy> getInstanceOf(
+                "MCR.Viewer.configuration.strategy")
+            .orElseGet(MCRViewerDefaultConfigurationStrategy::new);
         MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(configurationStrategy.get(req)));
         MCRParameterCollector parameter = new MCRParameterCollector(req);
         MCRContentTransformer transformer = getContentTransformer(source.getDocType(), parameter);

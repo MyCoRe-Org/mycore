@@ -197,6 +197,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getInstanceOf(String name, T defaultObj) {
         return MCRConfiguration2.<T> getInstanceOf(name).orElse(defaultObj);
     }

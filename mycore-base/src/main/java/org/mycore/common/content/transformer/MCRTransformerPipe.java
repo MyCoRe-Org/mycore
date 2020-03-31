@@ -47,7 +47,7 @@ public class MCRTransformerPipe extends MCRParameterizedTransformer {
         this.transformers.addAll(Arrays.asList(transformers));
     }
 
-    /* needed for MCRConfiguration.getInstanceOf() to work */
+    /* needed for MCRConfiguration2.getInstanceOf() to work */
     public MCRTransformerPipe() {
         super();
     }
