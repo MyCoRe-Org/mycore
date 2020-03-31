@@ -9,6 +9,11 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDDestinationOrAction;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionGoTo;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDDestination;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageDestination;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mycore.datamodel.niofs.MCRPath;
 
@@ -24,13 +29,14 @@ public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
     @Override
     public Optional<BufferedImage> getThumbnail(MCRPath path, int size) throws IOException {
         try (InputStream fileIS = Files.newInputStream(path); PDDocument pdf = PDDocument.load(fileIS)) {
-            float pdfWidth = pdf.getPage(0).getCropBox().getWidth();
-            float pdfHeight = pdf.getPage(0).getCropBox().getHeight();
+            final PDPage page = resolveFirstPage(pdf);
+            float pdfWidth = page.getCropBox().getWidth();
+            float pdfHeight = page.getCropBox().getHeight();
             final int newWidth = pdfWidth > pdfHeight ? (int) Math.ceil(size * pdfWidth / pdfHeight) : size;
             final float scale = newWidth / pdfWidth;
 
             PDFRenderer pdfRenderer = new PDFRenderer(pdf);
-            BufferedImage pdfRender = pdfRenderer.renderImage(0, scale);
+            BufferedImage pdfRender = pdfRenderer.renderImage(pdf.getPages().indexOf(page), scale);
             int imageType = MCRThumbnailUtils.getImageType(pdfRender);
             if (imageType == BufferedImage.TYPE_BYTE_BINARY || imageType == BufferedImage.TYPE_BYTE_GRAY) {
                 BufferedImage thumbnail = new BufferedImage(pdfRender.getWidth(), pdfRender.getHeight(),
@@ -42,5 +48,31 @@ public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
             }
             return Optional.of(pdfRender);
         }
+    }
+
+    private PDPage resolveFirstPage(PDDocument pdf) throws IOException {
+        PDDestinationOrAction openAction = pdf.getDocumentCatalog().getOpenAction();
+
+        if( openAction instanceof PDActionGoTo){
+            final PDDestination destination = ((PDActionGoTo) openAction).getDestination();
+            if(destination instanceof PDPageDestination) {
+                openAction = destination;
+            }
+        }
+
+        if (openAction instanceof PDPageDestination) {
+            final PDPageDestination namedDestination = (PDPageDestination) openAction;
+            final PDPage pdPage = namedDestination.getPage();
+            if (pdPage != null) {
+                return pdPage;
+            } else {
+                int pageNumber = namedDestination.getPageNumber();
+                if (pageNumber != -1) {
+                    return pdf.getPage(pageNumber);
+                }
+            }
+        }
+
+        return pdf.getPage(0);
     }
 }
