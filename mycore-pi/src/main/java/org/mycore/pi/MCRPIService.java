@@ -23,7 +23,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -45,6 +44,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -431,19 +431,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     }
 
     protected final Map<String, String> getProperties() {
-        Map<String, String> propertiesMap = MCRConfiguration.instance()
-            .getPropertiesMap(
-                REGISTRATION_CONFIG_PREFIX + registrationServiceID
-                    + ".");
-
-        Map<String, String> shortened = new HashMap<>();
-
-        propertiesMap.keySet().forEach(key -> {
-            String newKey = key.substring(REGISTRATION_CONFIG_PREFIX.length() + registrationServiceID.length() + 1);
-            shortened.put(newKey, propertiesMap.get(key));
-        });
-
-        return shortened;
+        final String configPrefix = REGISTRATION_CONFIG_PREFIX + registrationServiceID + ".";
+        return MCRConfiguration2.getSubPropertiesMap(configPrefix);
     }
 
     protected T getNewIdentifier(MCRBase id, String additional) throws MCRPersistentIdentifierException {

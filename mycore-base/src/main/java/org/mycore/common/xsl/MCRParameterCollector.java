@@ -34,6 +34,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -191,7 +192,7 @@ public class MCRParameterCollector {
      * Copies all MCRConfiguration properties as XSL parameters.
      */
     private void setFromConfiguration() {
-        for (Map.Entry<String, String> property : MCRConfiguration.instance().getPropertiesMap().entrySet()) {
+        for (Map.Entry<String, String> property : MCRConfiguration2.getPropertiesMap().entrySet()) {
             parameters.put(property.getKey(), property.getValue());
         }
     }

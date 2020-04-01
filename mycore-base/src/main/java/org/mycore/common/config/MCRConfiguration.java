@@ -151,8 +151,9 @@ public class MCRConfiguration {
         return MCRConfigurationBase.getDeprecatedProperties();
     }
 
+    @Deprecated
     public Map<String, String> getPropertiesMap() {
-        return Collections.unmodifiableMap(getResolvedProperties().getAsMap());
+        return MCRConfiguration2.getPropertiesMap();
     }
 
     /**
@@ -162,8 +163,10 @@ public class MCRConfiguration {
      *            the string all the returned properties start with
      * @return the list of properties
      */
+    @Deprecated
     public Map<String, String> getPropertiesMap(final String startsWith) {
-        return getPropertiesMap().entrySet()
+        return MCRConfiguration2.getPropertiesMap()
+            .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(startsWith))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

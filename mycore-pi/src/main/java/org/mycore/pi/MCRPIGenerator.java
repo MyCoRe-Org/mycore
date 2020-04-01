@@ -20,10 +20,9 @@ package org.mycore.pi;
 
 import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -37,17 +36,8 @@ public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
     }
 
     protected final Map<String, String> getProperties() {
-        Map<String, String> propertiesMap = MCRConfiguration.instance().getPropertiesMap(
-            GENERATOR_CONFIG_PREFIX + generatorID + ".");
-
-        Map<String, String> shortened = new HashMap<>();
-
-        propertiesMap.keySet().forEach(key -> {
-            String newKey = key.substring(GENERATOR_CONFIG_PREFIX.length() + generatorID.length() + 1);
-            shortened.put(newKey, propertiesMap.get(key));
-        });
-
-        return shortened;
+        final String configPrefix = GENERATOR_CONFIG_PREFIX + generatorID + ".";
+        return MCRConfiguration2.getSubPropertiesMap(configPrefix);
     }
 
     /**

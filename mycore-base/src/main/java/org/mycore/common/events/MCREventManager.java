@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,13 +62,11 @@ public class MCREventManager {
     private MCREventManager() {
         handlers = new Hashtable<>();
 
-        MCRConfiguration config = MCRConfiguration.instance();
-
-        Map<String, String> props = config.getPropertiesMap(CONFIG_PREFIX);
-
-        if (props == null) {
-            return;
-        }
+        Map<String, String> props = MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(CONFIG_PREFIX))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         List<String> propertyKeyList = new ArrayList<>(props.size());
         for (Object name : props.keySet()) {
@@ -84,7 +83,7 @@ public class MCREventManager {
             String type = eventHandlerProperty.getType();
             String mode = eventHandlerProperty.getMode();
 
-            logger.debug("EventManager instantiating handler {} for type {}", config.getString(propertyKey), type);
+            logger.debug("EventManager instantiating handler {} for type {}", props.get(propertyKey), type);
 
             if (propKeyIsSet(propertyKey)) {
                 addEventHandler(type, getEventHandler(mode, propertyKey));

@@ -24,11 +24,13 @@ package org.mycore.oai;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.Description;
@@ -98,13 +100,22 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     private Collection<String> getDescriptionURIs() {
         String descriptionConfig = getConfigPrefix() + "DescriptionURI";
-        return MCRConfiguration.instance().getPropertiesMap(descriptionConfig).values();
+        return MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(descriptionConfig))
+            .map(Map.Entry::getValue)
+            .collect(Collectors.toSet());
     }
 
     public FriendsDescription getFriendsDescription() {
         FriendsDescription desc = new FriendsDescription();
-        Map<String, String> friends = this.config.getPropertiesMap(this.configPrefix + "Friends.");
-        desc.getFriendsList().addAll(friends.values());
+        MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(this.configPrefix + "Friends."))
+            .map(Map.Entry::getValue)
+            .forEach(desc.getFriendsList()::add);
         return desc;
     }
 

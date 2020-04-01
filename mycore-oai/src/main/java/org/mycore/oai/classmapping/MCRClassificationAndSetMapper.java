@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
@@ -55,25 +56,31 @@ public class MCRClassificationAndSetMapper {
      */
     public static String mapClassificationToSet(String prefix, String classid) {
         String propPrefix = prefix + PROP_SETS_PREFIX;
-        Map<String, String> props = config.getPropertiesMap(propPrefix);
-        return props.entrySet().stream()
+        return MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(propPrefix))
             .filter(e -> e.getKey().endsWith(PROP_CLASS_SUFFIX))
             .filter(e -> e.getValue().equals(classid))
             .findFirst()
-            .map(entry -> entry.getKey().substring(propPrefix.length(),
-                entry.getKey().length() - PROP_CLASS_SUFFIX.length()))
-            .orElseGet(() -> {
-                Map<String, String> propsLegacy = config.getPropertiesMap(prefix + PROP_SUFFIX);
-                return propsLegacy.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getValue().equals(classid))
-                    .peek(e -> LogManager.getLogger()
-                        .warn("Please rename deprecated property '{}' and use '{}' suffix.", e.getKey(),
-                            PROP_CLASS_SUFFIX))
-                    .findFirst()
-                    .map(entry -> entry.getKey().substring(entry.getKey().lastIndexOf(".") + 1))
-                    .orElse(classid);
-            });
+            .map(Map.Entry::getKey)
+            .map(key -> key.substring(propPrefix.length(), key.length() - PROP_CLASS_SUFFIX.length()))
+            .orElseGet(() -> getSetNameFromDeprecatedProperty(prefix, classid));
+    }
+
+    private static String getSetNameFromDeprecatedProperty(String prefix, String classid) {
+        return MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(prefix + PROP_SUFFIX))
+            .filter(entry -> entry.getValue().equals(classid))
+            .peek(e -> LogManager.getLogger()
+                .warn("Please rename deprecated property '{}' and use '{}' suffix.", e.getKey(),
+                    PROP_CLASS_SUFFIX))
+            .findFirst()
+            .map(Map.Entry::getKey)
+            .map(key -> key.substring(key.lastIndexOf(".") + 1))
+            .orElse(classid);
     }
 
     /**

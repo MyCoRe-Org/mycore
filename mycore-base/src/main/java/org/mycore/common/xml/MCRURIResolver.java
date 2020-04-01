@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -433,26 +432,23 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static class MCRModuleResolverProvider implements MCRResolverProvider {
+        private final Map<String, URIResolver> resolverMap = new HashMap<>();
+
+        MCRModuleResolverProvider() {
+            MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX + "ModuleResolver.")
+                .forEach(this::registerUriResolver);
+        }
 
         public Map<String, URIResolver> getURIResolverMapping() {
-            Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX + "ModuleResolver.");
-            if (props.isEmpty()) {
-                return new HashMap<>();
+            return resolverMap;
+        }
+
+        private void registerUriResolver(String scheme, String className) {
+            try {
+                resolverMap.put(scheme, MCRConfiguration2.instantiateClass(className));
+            } catch (RuntimeException re) {
+                throw new MCRException("Cannot instantiate " + className + " for URI scheme " + scheme, re);
             }
-            Map<String, URIResolver> map = new HashMap<>();
-            for (Entry<String, String> entry : props.entrySet()) {
-                try {
-                    String scheme = entry.getKey();
-                    scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
-                    LOGGER.debug("Adding Resolver {} for URI scheme {}", entry.getValue(), scheme);
-                    map.put(scheme, MCRConfiguration2.getOrThrow(entry.getKey(), MCRConfiguration2::instantiateClass));
-                } catch (Exception e) {
-                    LOGGER.error("Cannot instantiate {} for URI scheme {}", entry.getValue(), entry.getKey());
-                    throw new MCRException(
-                        "Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey(), e);
-                }
-            }
-            return map;
         }
 
     }

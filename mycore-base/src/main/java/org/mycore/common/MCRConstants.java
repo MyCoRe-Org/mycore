@@ -21,12 +21,11 @@ package org.mycore.common;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.Namespace;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * This class replaces the deprecated MCRDefaults interface and provides some
@@ -129,14 +128,12 @@ public final class MCRConstants {
                 }
             }
         }
+        MCRConfiguration2.getSubPropertiesMap("MCR.Namespace.")
+            .forEach(MCRConstants::registerNamespace);
+    }
 
-        Map<String, String> p = MCRConfiguration.instance().getPropertiesMap("MCR.Namespace");
-        for (String propertyName : p.keySet()) {
-            String uri = p.get(propertyName);
-            String prefix = propertyName.substring(propertyName.lastIndexOf(".") + 1);
-            Namespace ns = Namespace.getNamespace(prefix, uri);
-            registerNamespace(ns);
-        }
+    private static void registerNamespace(String prefix, String uri) {
+        registerNamespace(Namespace.getNamespace(prefix, uri));
     }
 
     /**

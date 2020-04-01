@@ -29,9 +29,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,14 +78,14 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     private static HashSet<String> VALID_TYPE_LIST;
 
     static {
-        VALID_TYPE_LIST = new HashSet<>();
-        Map<String, String> properties = CONFIG.getPropertiesMap("MCR.Metadata.Type");
-        for (Entry<String, String> prop : properties.entrySet()) {
-            if (!prop.getValue().equalsIgnoreCase("true")) {
-                continue;
-            }
-            VALID_TYPE_LIST.add(prop.getKey().substring(prop.getKey().lastIndexOf('.') + 1).trim());
-        }
+        final String confPrefix = "MCR.Metadata.Type.";
+        VALID_TYPE_LIST = MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(confPrefix))
+            .filter(p -> Boolean.parseBoolean(p.getValue()))
+            .map(prop -> prop.getKey().substring(confPrefix.length()))
+            .collect(Collectors.toCollection(HashSet::new));
     }
 
     // data of the ID

@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -41,10 +40,11 @@ public class MCRPIServiceManager {
     private Map<String, MCRPIService> serviceCache = new ConcurrentHashMap<>();
 
     public List<String> getServiceIDList() {
-        return MCRConfiguration.instance()
-            .getPropertiesMap(REGISTRATION_SERVICE_CONFIG_PREFIX)
-            .keySet()
+        return MCRConfiguration2.getPropertiesMap()
+            .entrySet()
             .stream()
+            .filter(p -> p.getKey().startsWith(REGISTRATION_SERVICE_CONFIG_PREFIX))
+            .map(Map.Entry::getKey)
             .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
             .filter(s -> !s.contains("."))
             .collect(Collectors.toList());

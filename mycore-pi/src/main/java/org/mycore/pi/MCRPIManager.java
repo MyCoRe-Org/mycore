@@ -37,7 +37,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -70,18 +72,16 @@ public class MCRPIManager {
         parserList = new ArrayList<>();
         typeParserMap = new ConcurrentHashMap<>();
 
-        Map<String, String> parserPropertiesMap = MCRConfiguration.instance().getPropertiesMap(PARSER_CONFIGURATION);
-        parserPropertiesMap.forEach((k, v) -> {
-            String type = k.substring(PARSER_CONFIGURATION.length());
-            try {
-                @SuppressWarnings("unchecked")
-                Class<? extends MCRPIParser<?>> parserClass = (Class<? extends MCRPIParser<?>>) Class
-                    .forName(v);
-                registerParser(type, parserClass);
-            } catch (ClassNotFoundException e) {
-                throw new MCRConfigurationException("Could not load class " + v + " defined in " + k);
-            }
-        });
+        MCRConfiguration2.getSubPropertiesMap(PARSER_CONFIGURATION)
+            .forEach((type, className) -> {
+                try {
+                    Class<? extends MCRPIParser<?>> parserClass = MCRClassTools.forName(className);
+                    registerParser(type, parserClass);
+                } catch (ClassNotFoundException e) {
+                    throw new MCRConfigurationException(
+                        "Could not load class " + className + " defined in " + PARSER_CONFIGURATION + type);
+                }
+            });
 
         Stream.of(MCRConfiguration.instance().getString(RESOLVER_CONFIGURATION).split(","))
             .forEach(className -> {

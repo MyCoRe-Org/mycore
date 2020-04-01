@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
@@ -69,17 +68,11 @@ public abstract class MCRIIIFPresentationImpl {
     }
 
     protected final Map<String, String> getProperties() {
-        Map<String, String> propertiesMap = MCRConfiguration.instance()
-            .getPropertiesMap(MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName + ".");
+        return MCRConfiguration2.getSubPropertiesMap(getConfigPrefix());
+    }
 
-        Map<String, String> shortened = new HashMap<>();
-
-        propertiesMap.keySet().stream().forEach(key -> {
-            String newKey = key.substring(MCR_IIIF_PRESENTATION_CONFIG_PREFIX.length() + implName.length() + 1);
-            shortened.put(newKey, propertiesMap.get(key));
-        });
-
-        return shortened;
+    private String getConfigPrefix() {
+        return MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName + ".";
     }
 
     public abstract MCRIIIFManifest getManifest(String id);

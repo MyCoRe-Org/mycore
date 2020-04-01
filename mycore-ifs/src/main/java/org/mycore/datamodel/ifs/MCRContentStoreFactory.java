@@ -24,7 +24,6 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -59,14 +58,13 @@ public class MCRContentStoreFactory {
 
     public static synchronized Map<String, MCRContentStore> getAvailableStores() {
         if (!storeInitialized) {
-            Map<String, String> properties = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX);
-            for (Map.Entry<String, String> prop : properties.entrySet()) {
-                String key = prop.getKey();
-                if (key.endsWith(CLASS_SUFFIX)) {
-                    String storeID = key.replace(CONFIG_PREFIX, "").replace(CLASS_SUFFIX, "");
-                    initStore(storeID);
-                }
-            }
+            MCRConfiguration2.getPropertiesMap()
+                .keySet()
+                .stream()
+                .filter(key -> key.startsWith(CONFIG_PREFIX))
+                .filter(key -> key.endsWith(CLASS_SUFFIX))
+                .map(key -> key.replace(CONFIG_PREFIX, "").replace(CLASS_SUFFIX, ""))
+                .forEach(MCRContentStoreFactory::initStore);
             storeInitialized = true;
         }
         return STORES;

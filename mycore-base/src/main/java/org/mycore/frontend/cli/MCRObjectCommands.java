@@ -64,7 +64,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRStreamUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCREntityResolver;
@@ -931,7 +931,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         xmlReader.setEntityResolver(MCREntityResolver.instance());
         SAXSource styleSource = new SAXSource(xmlReader, style.getInputSource());
         Transformer transformer = transformerFactory.newTransformer(styleSource);
-        for (Entry<String, String> property : MCRConfiguration.instance().getPropertiesMap().entrySet()) {
+        for (Entry<String, String> property : MCRConfiguration2.getPropertiesMap().entrySet()) {
             transformer.setParameter(property.getKey(), property.getValue());
         }
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
