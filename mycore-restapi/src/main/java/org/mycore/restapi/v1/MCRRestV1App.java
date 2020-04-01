@@ -39,10 +39,10 @@ import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 @ApplicationPath("/api/v1")
 public class MCRRestV1App extends MCRJerseyRestApp {
 
-	public MCRRestV1App() {
-		super();
+    public MCRRestV1App() {
+        super();
         register(MCRNormalizeMCRObjectIDsFilter.class);
-	}
+    }
 	
     @Override
     protected String getVersion() {
