@@ -52,16 +52,16 @@ namespace mycore.viewer.widgets.toolbar {
             var first = true;
             for (var childIndex in childs) {
                 var current: { id: string; label: string; isHeader?: boolean; icon?:string } = childs[childIndex];
-                
+
                 var newChild : JQuery = jQuery("");
                 if ("isHeader" in current && current.isHeader) {
                     if (!first) {
                         newChild = newChild.add(jQuery("<li class='divider' value='divider-" + current.id + "' data-id=\"divider-" + current.id + "\"></li>"));
                     }
-                    newChild = newChild.add("<li class='dropdown-header disabled' value='divider-" + current.id + "' data-id=\"divider-" + current.id + "\"><a>" + current.label + "</a></li>");
+                    newChild = newChild.add("<li class='disabled' value='divider-" + current.id + "' data-id=\"divider-" + current.id + "\"><a class='dropdown-item'>" + current.label + "</a></li>");
                 } else {
-                    var anchor = jQuery("<a>" + current.label + "</a>");
-                    newChild = jQuery(jQuery("<li class='dropdown-item' value='" + current.id + "' data-id=\"" + current.id + "\"></li>"));
+                    var anchor = jQuery("<a class='dropdown-item'>" + current.label + "</a>");
+                    newChild = jQuery(jQuery("<li value='" + current.id + "' data-id=\"" + current.id + "\"></li>"));
 
 
                     if("icon" in current){
@@ -71,7 +71,7 @@ namespace mycore.viewer.widgets.toolbar {
                     newChild.append(anchor);
                 }
 
-                
+
                 this._childMap.set(current.id, newChild);
                 newChild.appendTo(this._dropdownMenu);
 
