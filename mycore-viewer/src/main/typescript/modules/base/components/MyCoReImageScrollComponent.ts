@@ -587,15 +587,17 @@ namespace mycore.viewer.components {
 
             if (e.type == events.StructureModelLoadedEvent.TYPE) {
                 var structureModelLodedEvent = <events.StructureModelLoadedEvent>e;
-                this._structureImages = structureModelLodedEvent.structureModel.imageList;
+                const sm = structureModelLodedEvent.structureModel;
+                this._structureImages = sm.imageList;
 
-                if ("defaultPageDimension" in structureModelLodedEvent.structureModel) {
-                    this.pageWidth = structureModelLodedEvent.structureModel.defaultPageDimension.width;
-                    this.pageHeight = structureModelLodedEvent.structureModel.defaultPageDimension.height;
+                if ("defaultPageDimension" in sm) {
+                    this.pageWidth = sm.defaultPageDimension.width;
+                    this.pageHeight = sm.defaultPageDimension.height;
                 }
 
                 this._structureModelLoaded();
-                this.changeImage(this._currentImage, false);
+                const modelStartPage = "startPage" in sm;
+                this.changeImage(modelStartPage ? (<any>sm).startPage+"" : this._currentImage, modelStartPage);
                 this.update();
             }
 

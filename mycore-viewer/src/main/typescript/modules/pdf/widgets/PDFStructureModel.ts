@@ -40,6 +40,8 @@ namespace mycore.viewer.widgets.pdf {
             super( _rootChapter, _imageList, _chapterToImageMap, _imageToChapterMap, _imageHrefImageMap, true );
         }
 
+        public startPage?:number;
+
     }
 
 }

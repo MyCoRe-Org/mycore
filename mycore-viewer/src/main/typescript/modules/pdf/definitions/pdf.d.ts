@@ -139,12 +139,12 @@ interface PDFRef {
 }
 
 interface PDFPageViewportOptions {
-    viewBox: any;
-    scale: number;
-    rotation: number;
-    offsetX: number;
-    offsetY: number;
-    dontFlip: boolean;
+    viewBox?: any;
+    scale?: number;
+    rotation?: number;
+    offsetX?: number;
+    offsetY?: number;
+    dontFlip?: boolean;
 }
 
 interface PDFPageViewport {
@@ -203,29 +203,24 @@ interface PDFPageProxy {
     /**
      * Page number of the page.  First page is 1.
      **/
-    pageNumber(): number;
+    pageNumber: number;
 
     /**
      * The number of degrees the page is rotated clockwise.
      **/
-    rotate(): number;
+    rotate: number;
 
     /**
      * The reference that points to this page.
      **/
-    ref(): PDFRef;
+    ref: PDFRef;
 
     /**
      * @return An array of the visible portion of the PDF page in the user space units - [x1, y1, x2, y2].
      **/
     view(): number[];
 
-    /**
-     * @param scale The desired scale of the viewport.
-     * @param rotate Degrees to rotate the viewport.  If omitted this defaults to the page rotation.
-     * @return
-     **/
-    getViewport(scale:number, rotate?:number): PDFPageViewport;
+    getViewport(options:PDFPageViewportOptions): PDFPageViewport;
 
     /**
      * A promise that is resolved with an array of the annotation objects.
@@ -371,8 +366,8 @@ interface PDFJSStatic {
         : PDFPromise<PDFDocumentProxy>;
 }
 
-declare var PDFJS:PDFJSStatic;
+declare var pdfjsLib:PDFJSStatic;
 
 declare module "PDFJS" {
-export = PDFJS;
+export = pdfjsLib;
 }

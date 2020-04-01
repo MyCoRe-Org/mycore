@@ -24,6 +24,7 @@ namespace mycore.viewer.widgets.pdf {
     import StructureChapter = mycore.viewer.model.StructureChapter;
 
     export class PDFStructureBuilder {
+        private _startPage: number = -1;
 
         constructor(private _document:PDFDocumentProxy, private _name:string) {
             this._pageCount = <any>(this._document.numPages);
@@ -46,7 +47,25 @@ namespace mycore.viewer.widgets.pdf {
         public resolve() {
             this._resolvePages();
             this._resolveOutline();
+            this._resolveStartPage();
             return <GivenViewerPromise<PDFStructureModel, any>>this._promise;
+        }
+
+        private _resolveStartPage() {
+            try {
+                (<any>this._document).getOpenActionDestination().then((dest: Array<{ num?: number, gen: number }>) => {
+                    this._document.getPageIndex(dest[0]).then((page) => {
+                        this._startPage = page + 1;
+                        this.checkResolvable();
+                    }, () => {
+                        this._startPage = 1;
+                        this.checkResolvable();
+                    });
+                });
+            } catch (e) {
+                this._startPage = 1;
+                this.checkResolvable();
+            }
         }
 
         private _resolvePages() {
@@ -55,7 +74,7 @@ namespace mycore.viewer.widgets.pdf {
 
             for (var i = 1; i <= that._pageCount; i++) {
                 var callback = this._createThumbnailDrawer(i);
-                var additionalHref = new MyCoReMap<string,string>();
+                var additionalHref = new MyCoReMap<string, string>();
                 additionalHref.set(PDFStructureBuilder.PDF_TEXT_HREF, i + "");
                 var structureImage = new model.StructureImage("pdfPage", i + "", i, null, i + "", "pdfPage", callback, additionalHref);
                 that._pages.push(structureImage);
@@ -90,7 +109,7 @@ namespace mycore.viewer.widgets.pdf {
             var originalSize =  new Size2D(page.view[2] - page.view[0], page.view[3] - page.view[1]);//IviewPDFCanvas.getPageSize(page);
             var largest = Math.max(originalSize.width, originalSize.height);
             var vpScale = 256 / largest;
-            var vp = page.getViewport(vpScale);
+            var vp = page.getViewport({scale: vpScale});
             var thumbnailDrawCanvas = document.createElement("canvas");
             var thumbnailCanvasCtx = thumbnailDrawCanvas.getContext("2d");
             thumbnailDrawCanvas.width = (originalSize.width) * vpScale;
@@ -162,8 +181,10 @@ namespace mycore.viewer.widgets.pdf {
         }
 
         private checkResolvable() {
-            if (this._structureModel != null && this._outlineTodoCount == 0)
+            if (this._structureModel !== null && this._outlineTodoCount === 0 && this._startPage !== -1) {
+                this._structureModel.startPage = this._startPage;
                 this._promise.resolve(this._structureModel);
+            }
         }
 
         /**

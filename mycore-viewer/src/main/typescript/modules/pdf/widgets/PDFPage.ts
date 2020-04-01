@@ -26,7 +26,7 @@ namespace mycore.viewer.widgets.canvas {
             let width = (this.pdfPage.view[ 2 ] - this.pdfPage.view[ 0 ]) * PDFPage.CSS_UNITS;
             let height = (this.pdfPage.view[ 3 ] - this.pdfPage.view[ 1 ]) * PDFPage.CSS_UNITS;
 
-            const pageRotation = (<any>pdfPage).pageInfo.rotate;
+            const pageRotation = pdfPage.rotate;
             if (pageRotation == 90 || pageRotation == 270) {
                 width = width ^ height;
                 height = height ^ width;
@@ -98,8 +98,8 @@ namespace mycore.viewer.widgets.canvas {
                     contentReady = true;
                     textData.items.forEach((e)=> {
 
-                        var vp = (<any>this.pdfPage.getViewport(1));
-                        var transform = (<any>PDFJS).Util.transform(vp.transform, e.transform);
+                        var vp = (<any>this.pdfPage.getViewport({scale: 1}));
+                        var transform = (<any>pdfjsLib).Util.transform(vp.transform, e.transform);
 
                         var style = textData.styles[ e.fontName ];
                         var angle = Math.atan2(transform[ 1 ], transform[ 0 ]) + ((style.vertical == true ) ? Math.PI / 2 : 0);
@@ -174,7 +174,7 @@ namespace mycore.viewer.widgets.canvas {
         }
 
         private _updateBackBuffer(newScale) {
-            var vp = this.pdfPage.getViewport(newScale * PDFPage.CSS_UNITS, this._rotation);
+            var vp = this.pdfPage.getViewport({scale: newScale * PDFPage.CSS_UNITS, rotation: this._rotation});
             var task = <any> this.pdfPage.render(<PDFRenderParams>{
                 canvasContext : <CanvasRenderingContext2D>this._backBuffer.getContext('2d'),
                 viewport : vp

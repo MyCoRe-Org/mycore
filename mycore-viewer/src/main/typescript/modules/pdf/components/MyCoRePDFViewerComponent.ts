@@ -29,9 +29,10 @@ namespace mycore.viewer.components {
             var that = this;
 
             // see MV-53
-            (<any>PDFJS).disableAutoFetch=true;
-            (<any> PDFJS).cMapUrl=this._settings.webApplicationBaseURL + "/modules/iview2/cmaps/";
-            (<any> PDFJS).cMapPacked = true;
+            (<any>pdfjsLib).disableAutoFetch=true;
+            (<any>pdfjsLib).cMapUrl=this._settings.webApplicationBaseURL + "/modules/iview2/cmaps/";
+            (<any>pdfjsLib).cMapPacked = true;
+            (<any>pdfjsLib).disableOpenActionDestination = false;
         }
 
         private _structureBuilder:widgets.pdf.PDFStructureBuilder;
@@ -66,11 +67,11 @@ namespace mycore.viewer.components {
             if (this._settings.doctype == "pdf") {
                 this._pdfUrl = ViewerFormatString(this._settings.pdfProviderURL, { filePath: this._settings.filePath, derivate: this._settings.derivate });
                 var workerURL = this._settings.pdfWorkerURL;
-                PDFJS.workerSrc = workerURL;
+                pdfjsLib.workerSrc = workerURL;
                 var that = this;
                 var pdfLocation = this._pdfUrl;
-                PDFJS.getDocument(pdfLocation).then((pdfDoc) => {
-                    this._pdfDocument = <PDFDocumentProxy>pdfDoc;
+                (<any> pdfjsLib.getDocument(pdfLocation)).promise.then((pdfDoc:PDFDocumentProxy) => {
+                    this._pdfDocument = pdfDoc;
                     that._structureBuilder = new mycore.viewer.widgets.pdf.PDFStructureBuilder(that._pdfDocument, this._settings.filePath);
                     var promise = that._structureBuilder.resolve();
                     promise.then((structure:widgets.pdf.PDFStructureModel) => {
