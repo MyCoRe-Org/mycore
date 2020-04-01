@@ -32,6 +32,7 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.MCRDropSessionFilter;
 import org.mycore.restapi.MCRJerseyRestApp;
 import org.mycore.restapi.MCRNoFormDataPutFilter;
+import org.mycore.restapi.MCRNormalizeMCRObjectIDsFilter;
 import org.mycore.restapi.MCRRemoveMsgBodyFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
@@ -50,6 +51,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
 
     public MCRRestV2App() {
         super();
+        register(MCRNormalizeMCRObjectIDsFilter.class);
         register(MCRRestAPIAuthentication.class); //keep 'unchanged' in v2
         register(MCRRemoveMsgBodyFilter.class);
         register(MCRNoFormDataPutFilter.class);
