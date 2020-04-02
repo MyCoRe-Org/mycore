@@ -42,7 +42,6 @@ import org.jdom2.Element;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCRStartupHandler;
@@ -94,16 +93,6 @@ public class MCRCommandLineInterface {
             Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[0]));
         }
         MCRStartupHandler.startUp(null/*no servlet context here*/);
-        //BUG: try to track down https://bamboo.mycore.de/browse/DP-TEST-234
-        if (MCRConfiguration2.getString("MCR.CommandLineInterface.SystemName").orElse(null) == null) {
-            try {
-                MCRConfiguration.instance().store(System.err,
-                    "I'm going die soon, this should be my gravestone quote:");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        //BUG DEBUG END
         system = MCRConfiguration2.getStringOrThrow("MCR.CommandLineInterface.SystemName") + ":";
 
         initSession();

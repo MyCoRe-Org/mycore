@@ -623,8 +623,9 @@ public class MCRConfiguration {
      * @param out
      *            the PrintStream to list the configuration properties on
      */
+    @Deprecated
     public void list(PrintStream out) {
-        getResolvedProperties().list(out);
+        MCRConfigurationBase.getResolvedProperties().list(out);
     }
 
     /**
@@ -634,8 +635,9 @@ public class MCRConfiguration {
      * @param out
      *            the PrintWriter to list the configuration properties on
      */
+    @Deprecated
     public void list(PrintWriter out) {
-        getResolvedProperties().list(out);
+        MCRConfigurationBase.getResolvedProperties().list(out);
     }
 
     /**
@@ -650,8 +652,9 @@ public class MCRConfiguration {
      *             if writing to the OutputStream throws an <CODE>IOException
      *             </CODE>
      */
+    @Deprecated
     public void store(OutputStream out, String header) throws IOException {
-        getResolvedProperties().store(out, header);
+        MCRConfigurationBase.getResolvedProperties().store(out, header);
     }
 
     /**
@@ -664,7 +667,7 @@ public class MCRConfiguration {
      */
     @Override
     public String toString() {
-        return getResolvedProperties().toString();
+        return MCRConfigurationBase.getResolvedProperties().toString();
     }
 
 }
