@@ -36,7 +36,7 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRISO8601Format;
 
@@ -93,8 +93,8 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         ts.setFormat(null);
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
-        MCRConfiguration.instance().set("MCR.Metadata.SimpleDateFormat.StrictParsing", "false");
-        MCRConfiguration.instance().set("MCR.Metadata.SimpleDateFormat.Locales", "de_DE,en_US");
+        MCRConfiguration2.set("MCR.Metadata.SimpleDateFormat.StrictParsing", "false");
+        MCRConfiguration2.set("MCR.Metadata.SimpleDateFormat.Locales", "de_DE,en_US");
         ts.setFormat(null);
         ts.setDate(timeString);
         LOGGER.debug(ts.getISOString());

@@ -130,7 +130,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
 
     private void configureIfNotSet(String property, String value) {
         value = MCRConfiguration2.getString(property).orElse(value);
-        MCRConfiguration.instance().set(property, value);
+        MCRConfiguration2.set(property, value);
         LOGGER.info("Configured {}={}", property, value);
     }
 

@@ -35,7 +35,6 @@ import javax.servlet.ServletContext;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
@@ -67,7 +66,7 @@ public class MCRJPABootstrapper implements AutoExecutable {
             if (MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)) {
                 LogManager.getLogger()
                     .error(() -> "Could not initialize JPA. Database access is disabled in this session.", e);
-                MCRConfiguration.instance().set("MCR.Persistence.Database.Enable", false);
+                MCRConfiguration2.set("MCR.Persistence.Database.Enable", String.valueOf(false));
             }
             MCREntityManagerProvider.init(e);
             return;

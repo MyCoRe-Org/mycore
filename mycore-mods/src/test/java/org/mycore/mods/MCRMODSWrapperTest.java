@@ -38,7 +38,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.junit.Test;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -123,7 +123,7 @@ public class MCRMODSWrapperTest extends MCRTestCase {
 
     @Test
     public void testIsSupported() {
-        MCRConfiguration.instance().set("MCR.Metadata.Type.sthelse", true);
+        MCRConfiguration2.set("MCR.Metadata.Type.sthelse", String.valueOf(true));
         MCRObjectID mycoreMods = MCRObjectID.getInstance("mycore_mods_00000011");
         MCRObjectID mycoreSthelse = MCRObjectID.getInstance("mycore_sthelse_00000011");
 

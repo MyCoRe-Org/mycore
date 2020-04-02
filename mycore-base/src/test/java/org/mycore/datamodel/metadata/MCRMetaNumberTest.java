@@ -35,7 +35,7 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLHelper;
 
 /**
@@ -70,7 +70,7 @@ public class MCRMetaNumberTest extends MCRTestCase {
         number_string = meta_number.getNumberAsString();
         assertEquals("datamodel", "12345.679", number_string);
         // geo data
-        MCRConfiguration.instance().set("MCR.Metadata.MetaNumber.FractionDigits", 8);
+        MCRConfiguration2.set("MCR.Metadata.MetaNumber.FractionDigits", String.valueOf(8));
         meta_number = new MCRMetaNumber("number", 0, null, null, "123.45678999");
         number_string = meta_number.getNumberAsString();
         assertEquals("datamodel", "123.45678999", number_string);

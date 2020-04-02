@@ -26,7 +26,6 @@ import javax.xml.parsers.DocumentBuilder;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.frontend.MCRLayoutUtilities;
@@ -99,7 +98,7 @@ public class MCRWCMSNavigationUtils {
                     }
                 }
             } else {
-                MCRConfiguration.instance().set("MCR.NavigationFile.SaveInOldFormat", false);
+                MCRConfiguration2.set("MCR.NavigationFile.SaveInOldFormat", String.valueOf(false));
             }
             return MCRWCMSUtil.load(doc);
         } finally {

@@ -23,16 +23,15 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import org.junit.Test;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRPropertiesResolverTest {
 
     @Test
     public void resolve() {
-        MCRConfiguration.instance().set("Sample.basedir", "/home/user/base");
-        MCRConfiguration.instance().set("Sample.subdir", "%Sample.basedir%/subdir");
-        MCRConfiguration.instance().set("Sample.file", "%Sample.subdir%/file.txt");
+        MCRConfiguration2.set("Sample.basedir", "/home/user/base");
+        MCRConfiguration2.set("Sample.subdir", "%Sample.basedir%/subdir");
+        MCRConfiguration2.set("Sample.file", "%Sample.subdir%/file.txt");
         MCRPropertiesResolver resolver = new MCRPropertiesResolver(MCRConfiguration2.getPropertiesMap());
         assertEquals("/home/user/base", resolver.resolve("%Sample.basedir%"));
         assertEquals("/home/user/base/subdir", resolver.resolve("%Sample.subdir%"));
@@ -41,9 +40,9 @@ public class MCRPropertiesResolverTest {
 
     @Test
     public void resolveAll() {
-        MCRConfiguration.instance().set("Sample.basedir", "/home/user/base");
-        MCRConfiguration.instance().set("Sample.subdir", "%Sample.basedir%/subdir");
-        MCRConfiguration.instance().set("Sample.file", "%Sample.subdir%/file.txt");
+        MCRConfiguration2.set("Sample.basedir", "/home/user/base");
+        MCRConfiguration2.set("Sample.subdir", "%Sample.basedir%/subdir");
+        MCRConfiguration2.set("Sample.file", "%Sample.subdir%/file.txt");
         Map<String, String> p = MCRConfiguration2.getPropertiesMap();
         MCRPropertiesResolver resolver = new MCRPropertiesResolver(p);
         Map<String, String> resolvedProperties = resolver.resolveAll(p);
@@ -53,9 +52,9 @@ public class MCRPropertiesResolverTest {
 
     @Test
     public void selfReference() {
-        MCRConfiguration.instance().set("a", "%a%,hallo");
-        MCRConfiguration.instance().set("b", "hallo,%b%,welt");
-        MCRConfiguration.instance().set("c", "%b%,%a%");
+        MCRConfiguration2.set("a", "%a%,hallo");
+        MCRConfiguration2.set("b", "hallo,%b%,welt");
+        MCRConfiguration2.set("c", "%b%,%a%");
         Map<String, String> p = MCRConfiguration2.getPropertiesMap();
         MCRPropertiesResolver resolver = new MCRPropertiesResolver(p);
         assertEquals("hallo", resolver.resolve("%a%"));

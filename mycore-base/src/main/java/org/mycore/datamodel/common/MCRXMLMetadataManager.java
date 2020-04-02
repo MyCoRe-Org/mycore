@@ -333,7 +333,7 @@ public class MCRXMLMetadataManager {
         String baseID = getStoryKey(project, objectType);
         Class<? extends MCRStore> clazz = MCRConfiguration2.<MCRStore> getClass(configPrefix + "Class")
             .orElseGet(() -> {
-                config.set(configPrefix + "Class", defaultClass.getName());
+                MCRConfiguration2.set(configPrefix + "Class", defaultClass.getName());
                 return defaultClass;
             });
         if (MCRVersioningMetadataStore.class.isAssignableFrom(clazz)) {
@@ -344,7 +344,7 @@ public class MCRXMLMetadataManager {
                     .format(new Object[] { project, objectType });
                 URI repURI = svnBase.resolve(relativeURI);
                 LOGGER.info("Resolved {} to {} for {}", relativeURI, repURI.toASCIIString(), property);
-                config.set(property, repURI.toASCIIString());
+                MCRConfiguration2.set(property, repURI.toASCIIString());
                 checkAndCreateDirectory(svnPath.resolve(project), project, objectType, configPrefix, readOnly);
             }
         }
@@ -354,11 +354,12 @@ public class MCRXMLMetadataManager {
 
         String slotLayout = MCRConfiguration2.getString(configPrefix + "SlotLayout").orElse(null);
         if (slotLayout == null) {
-            config.set(configPrefix + "SlotLayout", defaultLayout);
+            MCRConfiguration2.set(configPrefix + "SlotLayout", defaultLayout);
         }
-        config.set(configPrefix + "BaseDir", typePath.toAbsolutePath().toString());
-        config.set(configPrefix + "ForceXML", true);
-        config.set(configPrefix + "ForceDocType", objectType.equals("derivate") ? "mycorederivate" : "mycoreobject");
+        MCRConfiguration2.set(configPrefix + "BaseDir", typePath.toAbsolutePath().toString());
+        MCRConfiguration2.set(configPrefix + "ForceXML", String.valueOf(true));
+        String value = objectType.equals("derivate") ? "mycorederivate" : "mycoreobject";
+        MCRConfiguration2.set(configPrefix + "ForceDocType", value);
         createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, clazz);
     }

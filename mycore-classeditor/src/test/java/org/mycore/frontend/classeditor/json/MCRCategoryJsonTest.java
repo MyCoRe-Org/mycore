@@ -23,6 +23,7 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
@@ -35,8 +36,8 @@ public class MCRCategoryJsonTest {
     public void deserialize() throws Exception {
         MCRConfiguration mcrProperties = MCRConfiguration.instance();
         MCRConfigurationBase.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
-        mcrProperties.set("MCR.Metadata.DefaultLang", "de");
-        mcrProperties.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
+        MCRConfiguration2.set("MCR.Metadata.DefaultLang", "de");
+        MCRConfiguration2.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
 
         SAXBuilder saxBuilder = new SAXBuilder();
         Document doc = saxBuilder.build(getClass().getResourceAsStream("/classi/categoryJsonErr.xml"));

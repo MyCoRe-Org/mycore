@@ -536,6 +536,7 @@ public class MCRConfiguration {
      *            the new value of the configuration property, possibly <CODE>
      *            null</CODE>
      */
+    @Deprecated
     public void set(String name, String value) {
         MCRConfiguration2.set(name, value);
     }
@@ -557,8 +558,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, int value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
@@ -570,8 +572,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, long value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
@@ -583,8 +586,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, float value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
@@ -596,8 +600,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, double value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
@@ -609,8 +614,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, boolean value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
