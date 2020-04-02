@@ -27,7 +27,7 @@ import java.util.Map;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.wcms2.navigation.MCRWCMSDefaultSectionProvider;
 
 import com.google.gson.JsonArray;
@@ -39,7 +39,7 @@ public class JSONSectionProviderTest {
     public void toJSON() throws Exception {
         Map<String, String> properties = new HashMap<>();
         properties.put("MCR.WCMS2.mycoreTagList", "");
-        MCRConfiguration.instance().initialize(properties, true);
+        MCRConfigurationBase.initialize(properties, true);
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(new File("src/test/resources/navigation/content.xml"));
         MCRWCMSDefaultSectionProvider prov = new MCRWCMSDefaultSectionProvider();

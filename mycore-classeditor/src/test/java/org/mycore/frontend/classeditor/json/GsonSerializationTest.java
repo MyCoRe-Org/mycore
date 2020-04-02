@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -33,7 +34,7 @@ public class GsonSerializationTest {
     @Before
     public void init() {
         MCRConfiguration mcrProperties = MCRConfiguration.instance();
-        mcrProperties.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
+        MCRConfigurationBase.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
         mcrProperties.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
     }
 

@@ -23,6 +23,7 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRJSONManager;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
@@ -33,7 +34,7 @@ public class MCRCategoryJsonTest {
     @Test
     public void deserialize() throws Exception {
         MCRConfiguration mcrProperties = MCRConfiguration.instance();
-        mcrProperties.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
+        MCRConfigurationBase.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
         mcrProperties.set("MCR.Metadata.DefaultLang", "de");
         mcrProperties.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
 

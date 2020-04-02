@@ -27,7 +27,7 @@ import java.util.Map;
 public interface MCRConfigurationLoader {
 
     /**
-     * Returns a Map that should be used with {@link MCRConfiguration#initialize(Map, boolean)}
+     * Returns a Map that should be used with {@link MCRConfigurationBase#initialize(Map, boolean)}
      */
     Map<String, String> load();
 }
