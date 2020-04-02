@@ -50,8 +50,8 @@ import org.apache.xalan.transformer.TransformerImpl;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -394,7 +394,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         private String generateETag(MCRContent content, final long lastModified, final int parameterHashCode)
             throws IOException {
             //parameterHashCode is stable for this session and current request URL
-            long systemLastModified = MCRConfiguration.instance().getSystemLastModified();
+            long systemLastModified = MCRConfigurationBase.getSystemLastModified();
             StringBuilder b = new StringBuilder("\"");
             byte[] unencodedETag = ByteBuffer.allocate(Long.SIZE / 4).putLong(lastModified ^ parameterHashCode)
                 .putLong(systemLastModified ^ parameterHashCode).array();

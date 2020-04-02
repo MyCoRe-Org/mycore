@@ -57,6 +57,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xsl.MCRErrorListener;
@@ -560,10 +561,9 @@ public class MCRServlet extends HttpServlet {
     protected long getLastModified(HttpServletRequest request) {
         if (ENABLE_BROWSER_CACHE) {
             // we can cache every (local) request
-            long lastModified = MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfiguration.instance()
+            long lastModified = MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfigurationBase
                 .getSystemLastModified() ? MCRSessionMgr.getCurrentSession().getLoginTime()
-                    : MCRConfiguration
-                        .instance().getSystemLastModified();
+                    : MCRConfigurationBase.getSystemLastModified();
             LOGGER.info("LastModified: {}", lastModified);
             return lastModified;
         }

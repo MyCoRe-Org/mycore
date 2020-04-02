@@ -47,6 +47,7 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -429,7 +430,7 @@ public class MCRXMLMetadataManager {
         try {
             MCRStoredMetadata sm = getStore(mcrid, false).create(xml, mcrid.getNumberAsInteger());
             sm.setLastModified(lastModified);
-            MCRConfiguration.instance().systemModified();
+            MCRConfigurationBase.systemModified();
             return sm;
         } catch (Exception exc) {
             throw new MCRPersistenceException("Error while storing object: " + mcrid, exc);
@@ -443,7 +444,7 @@ public class MCRXMLMetadataManager {
     public void delete(MCRObjectID mcrid) throws MCRPersistenceException {
         try {
             getStore(mcrid, true).delete(mcrid.getNumberAsInteger());
-            MCRConfiguration.instance().systemModified();
+            MCRConfigurationBase.systemModified();
         } catch (Exception exc) {
             throw new MCRPersistenceException("Error while deleting object: " + mcrid, exc);
         }
@@ -509,7 +510,7 @@ public class MCRXMLMetadataManager {
             MCRStoredMetadata sm = getStore(mcrid, false).retrieve(mcrid.getNumberAsInteger());
             sm.update(xml);
             sm.setLastModified(lastModified);
-            MCRConfiguration.instance().systemModified();
+            MCRConfigurationBase.systemModified();
             return sm;
         } catch (Exception exc) {
             throw new MCRPersistenceException("Unable to update object " + mcrid, exc);
@@ -816,7 +817,7 @@ public class MCRXMLMetadataManager {
      * Returns the time the store's content was last modified
      */
     public long getLastModified() {
-        return MCRConfiguration.instance().getSystemLastModified();
+        return MCRConfigurationBase.getSystemLastModified();
     }
 
     /**

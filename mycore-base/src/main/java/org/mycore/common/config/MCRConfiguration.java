@@ -96,7 +96,7 @@ public class MCRConfiguration {
         } catch (IOException e) {
             throw new MCRConfigurationException("Could not instantiate MCRConfiguration.", e);
         }
-        singleton.systemModified();
+        MCRConfigurationBase.systemModified();
     }
 
     /**
@@ -126,6 +126,7 @@ public class MCRConfiguration {
      *
      * @see System#currentTimeMillis()
      */
+    @Deprecated
     public final long getSystemLastModified() {
         return MCRConfigurationBase.getSystemLastModified();
     }
@@ -133,6 +134,7 @@ public class MCRConfiguration {
     /**
      * signalize that the system state has changed. Call this method when ever you changed the persistency layer.
      */
+    @Deprecated
     public final void systemModified() {
         MCRConfigurationBase.systemModified();
     }
