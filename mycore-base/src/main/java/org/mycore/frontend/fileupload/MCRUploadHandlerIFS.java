@@ -21,8 +21,6 @@ package org.mycore.frontend.fileupload;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystemException;
 import java.nio.file.FileVisitResult;
@@ -32,12 +30,12 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +45,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.processing.MCRProcessableStatus;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
@@ -101,39 +98,11 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     private static List<MCRPostUploadFileProcessor> initProcessorList() {
-        List<String> fileProcessorList = MCRConfiguration.instance().getStrings(FILE_PROCESSOR_PROPERTY,
-            Collections.emptyList());
-        return fileProcessorList.stream().map(fpClassName -> {
-            try {
-                @SuppressWarnings("unchecked")
-                Class<MCRPostUploadFileProcessor> aClass = (Class<MCRPostUploadFileProcessor>) Class
-                    .forName(fpClassName);
-                Constructor<MCRPostUploadFileProcessor> constructor = aClass.getConstructor();
-
-                return constructor.newInstance();
-            } catch (ClassNotFoundException e) {
-                throw new MCRConfigurationException(
-                    "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY + " was not found!", e);
-            } catch (NoSuchMethodException e) {
-                throw new MCRConfigurationException(
-                    "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY
-                        + " has no default constructor!",
-                    e);
-            } catch (IllegalAccessException e) {
-                throw new MCRConfigurationException(
-                    "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY
-                        + " has a private/protected constructor!",
-                    e);
-            } catch (InstantiationException e) {
-                throw new MCRConfigurationException(
-                    "The class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY + " is abstract!", e);
-            } catch (InvocationTargetException e) {
-                throw new MCRConfigurationException(
-                    "The constrcutor of class " + fpClassName + " defined in " + FILE_PROCESSOR_PROPERTY
-                        + " threw a exception on invoke!",
-                    e);
-            }
-        }).collect(Collectors.toList());
+        return MCRConfiguration2.getString(FILE_PROCESSOR_PROPERTY)
+            .map(MCRConfiguration2::splitValue)
+            .orElseGet(Stream::empty)
+            .map(MCRConfiguration2::<MCRPostUploadFileProcessor> instantiateClass)
+            .collect(Collectors.toList());
     }
 
     @Override

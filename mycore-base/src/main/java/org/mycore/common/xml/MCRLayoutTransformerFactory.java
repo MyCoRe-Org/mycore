@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -33,7 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.content.transformer.MCRIdentityTransformer;
@@ -95,15 +96,19 @@ public class MCRLayoutTransformerFactory {
 
     protected String[] getStylesheets(String id, String stylesheet)
         throws TransformerException, SAXException, ParserConfigurationException {
-        List<String> ignore = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Ignore",
-            Collections.emptyList());
+        List<String> ignore = MCRConfiguration2.getString("MCR.LayoutTransformerFactory.Default.Ignore")
+            .map(MCRConfiguration2::splitValue)
+            .map(s1 -> s1.collect(Collectors.toList()))
+            .orElseGet(Collections::emptyList);
         List<String> defaults = Collections.emptyList();
         if (!ignore.contains(id)) {
             MCRXSLTransformer transformerTest = MCRXSLTransformer.getInstance(stylesheet);
             String outputMethod = transformerTest.getOutputProperties().getProperty(OutputKeys.METHOD, "xml");
             if (isXMLOutput(outputMethod, transformerTest)) {
-                defaults = MCRConfiguration.instance().getStrings("MCR.LayoutTransformerFactory.Default.Stylesheets",
-                    Collections.emptyList());
+                defaults = MCRConfiguration2.getString("MCR.LayoutTransformerFactory.Default.Stylesheets")
+                    .map(MCRConfiguration2::splitValue)
+                    .map(s -> s.collect(Collectors.toList()))
+                    .orElseGet(Collections::emptyList);
             }
         }
         String[] stylesheets = new String[1 + defaults.size()];

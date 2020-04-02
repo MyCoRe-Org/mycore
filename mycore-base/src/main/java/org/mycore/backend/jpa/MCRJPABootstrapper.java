@@ -18,12 +18,12 @@
 
 package org.mycore.backend.jpa;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -110,10 +110,9 @@ public class MCRJPABootstrapper implements AutoExecutable {
             .map(EntityType::getJavaType)
             .map(Class::getName)
             .collect(Collectors.toSet());
-        List<String> unMappedEntities = MCRConfiguration
-            .instance()
-            .getStrings("MCR.Hibernate.Mappings", Collections.emptyList())
-            .stream()
+        List<String> unMappedEntities = MCRConfiguration2.getString("MCR.Hibernate.Mappings")
+            .map(MCRConfiguration2::splitValue)
+            .orElseGet(Stream::empty)
             .filter(cName -> !mappedEntities.contains(cName))
             .collect(Collectors.toList());
         if (!unMappedEntities.isEmpty()) {

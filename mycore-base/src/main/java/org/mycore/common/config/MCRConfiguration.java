@@ -326,6 +326,7 @@ public class MCRConfiguration {
      *            the value to return if the configuration property is not set
      * @return the value of the configuration property as a unmodifiable list of strings or <code>defaultValue</code>.
      */
+    @Deprecated
     public List<String> getStrings(String name, List<String> defaultValue) {
         return MCRConfigurationBase.getString(name)
             .map(MCRConfiguration2::splitValue)

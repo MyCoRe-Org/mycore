@@ -47,6 +47,7 @@ import java.util.StringTokenizer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.xml.parsers.ParserConfigurationException;
@@ -81,7 +82,6 @@ import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRByteContent;
@@ -1302,14 +1302,16 @@ public final class MCRURIResolver implements URIResolver {
 
             // get the parameters from mycore.properties
             String propertyName = "MCR.URIResolver.xslIncludes." + includePart;
-            List<String> propValue = Collections.emptyList();
+            List<String> propValue;
             if (includePart.startsWith("class.")) {
                 MCRXslIncludeHrefs incHrefClass = MCRConfiguration2
                     .getOrThrow(propertyName, MCRConfiguration2::instantiateClass);
                 propValue = incHrefClass.getHrefs();
             } else {
-                propValue = MCRConfiguration.instance().getStrings(propertyName, propValue);
-
+                propValue = MCRConfiguration2.getString(propertyName)
+                    .map(MCRConfiguration2::splitValue)
+                    .map(s -> s.collect(Collectors.toList()))
+                    .orElseGet(Collections::emptyList);
             }
 
             for (String include : propValue) {

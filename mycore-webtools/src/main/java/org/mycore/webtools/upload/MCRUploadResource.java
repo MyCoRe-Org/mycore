@@ -47,7 +47,6 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -73,8 +72,10 @@ public class MCRUploadResource {
     ContainerRequestContext request;
 
     private static List<MCRPostUploadFileProcessor> initProcessorList() {
-        List<String> fileProcessorList = MCRConfiguration.instance().getStrings(FILE_PROCESSOR_PROPERTY,
-            Collections.emptyList());
+        List<String> fileProcessorList = MCRConfiguration2.getString(FILE_PROCESSOR_PROPERTY)
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(Collections::emptyList);
         return fileProcessorList.stream().map(fpClassName -> {
             try {
                 @SuppressWarnings("unchecked")

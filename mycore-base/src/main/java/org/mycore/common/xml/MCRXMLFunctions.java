@@ -82,7 +82,6 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRSourceContent;
@@ -867,8 +866,10 @@ public class MCRXMLFunctions {
             LOGGER.debug("get next import step for {}", includePart);
         }
         // get the parameters from mycore.properties
-        List<String> importList = Collections.emptyList();
-        importList = MCRConfiguration.instance().getStrings("MCR.URIResolver.xslImports." + includePart, importList);
+        List<String> importList = MCRConfiguration2.getString("MCR.URIResolver.xslImports." + includePart)
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(Collections::emptyList);
         if (importList.isEmpty()) {
             LOGGER.info("MCR.URIResolver.xslImports.{} has no Stylesheets defined", includePart);
         } else {

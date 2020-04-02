@@ -36,6 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +60,6 @@ import org.apache.solr.common.params.MultiMapSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRLayoutService;
@@ -250,9 +250,10 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     private void updateQueryHandlerMap() {
-        List<String> whitelistPropertyList = MCRConfiguration.instance().getStrings(
-            SOLR_CONFIG_PREFIX + "Proxy.WhiteList",
-            Collections.singletonList("/select"));
+        List<String> whitelistPropertyList = MCRConfiguration2.getString(SOLR_CONFIG_PREFIX + "Proxy.WhiteList")
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(() -> Collections.singletonList("/select"));
         this.queryHandlerWhitelist = new HashSet<>(whitelistPropertyList);
     }
 
