@@ -45,7 +45,7 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -78,7 +78,7 @@ public class MetsResource {
             IOUtils.copy(resourceAsStream, writer, StandardCharsets.UTF_8);
             String htmlTemplate = writer.toString();
             // add additional javascript code
-            String js = MCRConfiguration.instance().getString("MCR.Mets.Editor.additional.javascript", null);
+            String js = MCRConfiguration2.getString("MCR.Mets.Editor.additional.javascript").orElse(null);
             if (js != null && !js.isEmpty()) {
                 htmlTemplate = htmlTemplate.replace("<link rel=\"additionalJS\" />", js);
             }

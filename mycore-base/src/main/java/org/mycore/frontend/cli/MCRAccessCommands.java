@@ -37,6 +37,7 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
@@ -222,7 +223,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         }
         FileOutputStream fos = new FileOutputStream(file);
         LOGGER.info("Writing to file {} ...", filename);
-        String mcrEncoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
+        String mcrEncoding = MCRConfiguration2.getString("MCR.Metadata.DefaultEncoding").orElse(DEFAULT_ENCODING);
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcrEncoding));
         out.output(doc, fos);
     }

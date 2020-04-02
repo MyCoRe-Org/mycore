@@ -35,7 +35,7 @@ import org.apache.commons.io.output.TeeOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
@@ -95,7 +95,7 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
     }
 
     public static File getWCMSDataDir() {
-        return new File(MCRConfiguration.instance().getString("MCR.WCMS2.DataDir"));
+        return new File(MCRConfiguration2.getStringOrThrow("MCR.WCMS2.DataDir"));
     }
 
     public static File getWebAppBaseDir() throws IOException {

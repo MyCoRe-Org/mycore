@@ -25,7 +25,7 @@ import org.jdom2.Document;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
@@ -110,7 +110,7 @@ public class MCRBasketPersistence {
         derivate.setId(derivateOID);
         derivate.setLabel("Saved basket data for " + ownerID);
 
-        String schema = MCRConfiguration.instance().getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml");
+        String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate").orElse("datamodel-derivate.xml");
         derivate.setSchema(schema.replaceAll(".xml", ".xsd"));
 
         MCRMetaIFS ifs = new MCRMetaIFS();

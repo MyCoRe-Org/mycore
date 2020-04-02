@@ -67,16 +67,16 @@ public class MCRIView2XSLFunctionsAdapter {
         options.append("\"derivateId\":").append('\"').append(derivateID).append("\",");
         options.append("\"objectId\":").append('\"').append(objectID).append("\",");
         options.append("\"webappBaseUri\":").append('\"').append(MCRFrontendUtil.getBaseURL()).append("\",");
-        String baseUris = config.getString("MCR.Module-iview2.BaseURL", "");
+        String baseUris = MCRConfiguration2.getString("MCR.Module-iview2.BaseURL").orElse("");
         if (baseUris.length() < 10) {
             baseUris = MCRServlet.getServletBaseURL() + "MCRTileServlet";
         }
         options.append("\"baseUri\":").append('\"').append(baseUris).append("\".split(\",\")");
         if (MCRAccessManager.checkPermission(derivateID, "create-pdf")) {
             options.append(",\"pdfCreatorURI\":").append('\"')
-                .append(config.getString("MCR.Module-iview2.PDFCreatorURI", "")).append("\",");
+                .append(MCRConfiguration2.getString("MCR.Module-iview2.PDFCreatorURI").orElse("")).append("\",");
             options.append("\"pdfCreatorStyle\":").append('\"')
-                .append(config.getString("MCR.Module-iview2.PDFCreatorStyle", "")).append('\"');
+                .append(MCRConfiguration2.getString("MCR.Module-iview2.PDFCreatorStyle").orElse("")).append('\"');
         }
 
         if (extensions != null && !extensions.equals("")) {

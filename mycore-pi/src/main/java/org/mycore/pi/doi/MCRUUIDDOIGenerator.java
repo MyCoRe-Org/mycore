@@ -21,7 +21,7 @@ package org.mycore.pi.doi;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.MCRPersistentIdentifier;
@@ -30,7 +30,7 @@ public class MCRUUIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifi
 
     private final MCRDOIParser mcrdoiParser;
 
-    private String prefix = MCRConfiguration.instance().getString("MCR.DOI.Prefix");
+    private String prefix = MCRConfiguration2.getStringOrThrow("MCR.DOI.Prefix");
 
     public MCRUUIDDOIGenerator(String generatorString) {
         super(generatorString);

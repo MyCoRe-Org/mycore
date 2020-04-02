@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -57,7 +57,7 @@ public class MCROAuthServlet extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCROAuthServlet.class);
 
-    private String scopes = MCRConfiguration.instance().getString("MCR.ORCID.OAuth.Scopes");
+    private String scopes = MCRConfiguration2.getStringOrThrow("MCR.ORCID.OAuth.Scopes");
 
     private String redirectURL;
 

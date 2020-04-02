@@ -53,8 +53,8 @@ public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     // common data
     protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-    public static final String DEFAULT_LANGUAGE = CONFIG.getString("MCR.Metadata.DefaultLang",
-        MCRConstants.DEFAULT_LANG);
+    public static final String DEFAULT_LANGUAGE = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
+        .orElse(MCRConstants.DEFAULT_LANG);
 
     public static final boolean DEFAULT_HERITABLE = MCRConfiguration2.getBoolean("MCR.MetaElement.defaults.heritable")
         .orElse(false);

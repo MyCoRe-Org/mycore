@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -66,7 +67,8 @@ public class MCRRoleServlet extends MCRServlet {
         roleCategories = new ArrayList<>();
         roleCategories.add(MCRUser2Constants.ROLE_CLASSID);
         MCRConfiguration config = MCRConfiguration.instance();
-        String roleCategoriesValue = config.getString(MCRUser2Constants.CONFIG_PREFIX + "RoleCategories", null);
+        String roleCategoriesValue = MCRConfiguration2.getString(MCRUser2Constants.CONFIG_PREFIX + "RoleCategories")
+            .orElse(null);
         if (roleCategoriesValue == null) {
             return;
         }

@@ -35,7 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -55,9 +55,8 @@ public class MCRTransferPackagePacker extends MCRPacker {
     private static Path SAVE_DIRECTORY_PATH;
 
     static {
-        String alternative = MCRConfiguration.instance().getString("MCR.datadir") + File.separator + "transferPackages";
-        String directoryPath = MCRConfiguration.instance()
-            .getString("MCR.TransferPackage.Save.to.Directory", alternative);
+        String alternative = MCRConfiguration2.getStringOrThrow("MCR.datadir") + File.separator + "transferPackages";
+        String directoryPath = MCRConfiguration2.getString("MCR.TransferPackage.Save.to.Directory").orElse(alternative);
         SAVE_DIRECTORY_PATH = Paths.get(directoryPath);
     }
 

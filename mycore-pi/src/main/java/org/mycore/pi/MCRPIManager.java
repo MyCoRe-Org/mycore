@@ -18,7 +18,6 @@
 
 package org.mycore.pi;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
@@ -38,7 +38,6 @@ import javax.persistence.criteria.Root;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -68,7 +67,6 @@ public class MCRPIManager {
     private Map<String, Class<? extends MCRPIParser>> typeParserMap;
 
     private MCRPIManager() {
-        resolverList = new ArrayList<>();
         parserList = new ArrayList<>();
         typeParserMap = new ConcurrentHashMap<>();
 
@@ -83,29 +81,9 @@ public class MCRPIManager {
                 }
             });
 
-        Stream.of(MCRConfiguration.instance().getString(RESOLVER_CONFIGURATION).split(","))
-            .forEach(className -> {
-                try {
-                    MCRPIResolver<MCRPersistentIdentifier> resolver =
-                        ((Class<MCRPIResolver<MCRPersistentIdentifier>>) Class.forName(className))
-                        .getConstructor()
-                        .newInstance();
-                    resolverList.add(resolver);
-                } catch (ClassNotFoundException e) {
-                    throw new MCRConfigurationException(
-                        RESOLVER_CONFIGURATION + " contains " + className + " but the class could not be found!",
-                        e);
-                } catch (NoSuchMethodException e) {
-                    throw new MCRConfigurationException("The class " + className + " has no default constructor!", e);
-                } catch (IllegalAccessException e) {
-                    throw new MCRConfigurationException("Cannot invoke default constructor of " + className + "!", e);
-                } catch (InstantiationException e) {
-                    throw new MCRConfigurationException("The class " + className + " seems to be abstract!", e);
-                } catch (InvocationTargetException e) {
-                    throw new MCRConfigurationException(
-                        "The default constructor of class " + className + " throws a exception!", e);
-                }
-            });
+        resolverList = MCRConfiguration2.getOrThrow(RESOLVER_CONFIGURATION, MCRConfiguration2::splitValue)
+            .map(MCRConfiguration2::<MCRPIResolver<MCRPersistentIdentifier>> instantiateClass)
+            .collect(Collectors.toList());
 
     }
 

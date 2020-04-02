@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xsl.MCRParameterCollector;
@@ -54,7 +54,7 @@ public class MCRTransformerPipe extends MCRParameterizedTransformer {
 
     @Override
     public void init(String id) {
-        String steps = MCRConfiguration.instance().getString("MCR.ContentTransformer." + id + ".Steps");
+        String steps = MCRConfiguration2.getStringOrThrow("MCR.ContentTransformer." + id + ".Steps");
         StringTokenizer tokens = new StringTokenizer(steps, " ;,");
         while (tokens.hasMoreTokens()) {
             String transformerID = tokens.nextToken();

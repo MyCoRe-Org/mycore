@@ -30,7 +30,7 @@ public class MCRConfigurationTest extends MCRTestCase {
     public final void testDeprecatedProperties() {
         String deprecatedProperty = "MCR.nameOfProject";
         MCRConfiguration config = MCRConfiguration.instance();
-        config.getString(deprecatedProperty, "MyCoRe");
+        MCRConfiguration2.getString(deprecatedProperty);
     }
 
 }

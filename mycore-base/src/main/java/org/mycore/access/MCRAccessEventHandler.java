@@ -24,7 +24,6 @@ import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.events.MCREvent;
@@ -47,18 +46,18 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
     private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-    private static String storedrules = MCRConfiguration.instance().getString("MCR.Access.StorePermissions",
-        "read,write,delete");
+    private static String storedrules = MCRConfiguration2.getString("MCR.Access.StorePermissions")
+        .orElse("read,write,delete");
 
     // get the standard read rule from config or it's the true rule
-    private static String strReadRule = MCRConfiguration.instance().getString("MCR.Access.Rule.STANDARD-READ-RULE",
-        "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
+    private static String strReadRule = MCRConfiguration2.getString("MCR.Access.Rule.STANDARD-READ-RULE")
+        .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element readrule;
 
     // get the standard edit rule from config or it's the true rule
-    private static String strEditRule = MCRConfiguration.instance().getString("MCR.Access.Rule.STANDARD-EDIT-RULE",
-        "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
+    private static String strEditRule = MCRConfiguration2.getString("MCR.Access.Rule.STANDARD-EDIT-RULE")
+        .orElse("<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element editrule;
     static {

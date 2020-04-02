@@ -21,7 +21,7 @@ package org.mycore.frontend.jersey;
 import org.apache.logging.log4j.LogManager;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFilter;
 import org.mycore.frontend.jersey.feature.MCRGuiceBridgeFeature;
 
@@ -56,8 +56,8 @@ public class MCRJerseyDefaultConfiguration implements MCRJerseyConfiguration {
      * @param resourceConfig the jersey resource configuration
      */
     protected void setupResources(ResourceConfig resourceConfig) {
-        String propertyString = MCRConfiguration.instance().getString("MCR.Jersey.Resource.Packages",
-            "org.mycore.frontend.jersey.resources");
+        String propertyString = MCRConfiguration2.getString("MCR.Jersey.Resource.Packages")
+            .orElse("org.mycore.frontend.jersey.resources");
         resourceConfig.packages(propertyString.split(","));
         LogManager.getLogger().info("Scanning jersey resource packages {}", propertyString);
     }

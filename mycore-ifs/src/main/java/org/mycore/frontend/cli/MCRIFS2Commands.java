@@ -54,6 +54,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -485,12 +486,14 @@ public class MCRIFS2Commands {
         ArrayList<String> derivates = new ArrayList<>();
         // get the IFS1.5
         MCRConfiguration config = MCRConfiguration.instance();
-        String contentStoreBasePath = config.getString("MCR.IFS.ContentStore." + contentStore + ".BaseDir", "");
+        String contentStoreBasePath = MCRConfiguration2.getString("MCR.IFS.ContentStore." + contentStore + ".BaseDir")
+            .orElse("");
         if (contentStoreBasePath.length() == 0) {
             LOGGER.error("Cant find base directory property in form MCR.IFS.ContentStore.{}.BaseDir", contentStore);
             return derivates;
         }
-        String slotLayout = config.getString("MCR.IFS.ContentStore." + contentStore + ".SlotLayout", "");
+        String slotLayout = MCRConfiguration2.getString("MCR.IFS.ContentStore." + contentStore + ".SlotLayout")
+            .orElse("");
         if (slotLayout.length() == 0) {
             LOGGER.error("Cant find slot layout property in form MCR.IFS.ContentStore.{}.SlotLayout", contentStore);
             return derivates;
@@ -509,7 +512,8 @@ public class MCRIFS2Commands {
     private static ArrayList<String> getDerivatesOfObject(String contentStore, String objectId) {
         ArrayList<String> derivates = new ArrayList<>();
         MCRConfiguration config = MCRConfiguration.instance();
-        String contentStoreBasePath = config.getString("MCR.IFS.ContentStore." + contentStore + ".BaseDir", "");
+        String contentStoreBasePath = MCRConfiguration2.getString("MCR.IFS.ContentStore." + contentStore + ".BaseDir")
+            .orElse("");
         if (contentStoreBasePath.length() == 0) {
             LOGGER.error("Cant find base directory property in form MCR.IFS.ContentStore.{}.BaseDir", contentStore);
             return derivates;

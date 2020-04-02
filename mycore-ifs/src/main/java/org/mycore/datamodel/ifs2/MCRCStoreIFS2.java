@@ -75,12 +75,12 @@ public class MCRCStoreIFS2 extends MCRContentStore {
         super.init(storeID);
 
         MCRConfiguration config = MCRConfiguration.instance();
-        baseDir = config.getString(storeConfigPrefix + "BaseDir");
+        baseDir = MCRConfiguration2.getStringOrThrow(storeConfigPrefix + "BaseDir");
         LOGGER.debug("Base directory for store {} is {}", storeID, baseDir);
 
-        String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
+        String pattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern").orElse("0000000000");
         slotLayout = pattern.length() - 4 + "-2-2";
-        slotLayout = config.getString(storeConfigPrefix + "SlotLayout", slotLayout);
+        slotLayout = MCRConfiguration2.getString(storeConfigPrefix + "SlotLayout").orElse(slotLayout);
         LOGGER.debug("Default slot layout for store {} is {}", storeID, slotLayout);
 
         ignoreOwnerBase = MCRConfiguration2.getBoolean(storeConfigPrefix + "IgnoreOwnerBase").orElse(false);
@@ -129,7 +129,7 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     }
 
     private void configureIfNotSet(String property, String value) {
-        value = MCRConfiguration.instance().getString(property, value);
+        value = MCRConfiguration2.getString(property).orElse(value);
         MCRConfiguration.instance().set(property, value);
         LOGGER.info("Configured {}={}", property, value);
     }

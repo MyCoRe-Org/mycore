@@ -27,7 +27,7 @@ import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.language.MCRLanguageFactory;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -59,8 +59,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     // common data
     protected static final String NL = System.getProperties().getProperty("line.separator");
 
-    protected static final String DEFAULT_LANGUAGE = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
-        MCRConstants.DEFAULT_LANG);
+    protected static final String DEFAULT_LANGUAGE = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
+        .orElse(MCRConstants.DEFAULT_LANG);
 
     protected static final String DEFAULT_DATAPART = "metadata";
 

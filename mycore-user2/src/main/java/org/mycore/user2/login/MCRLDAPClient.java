@@ -38,6 +38,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.user2.MCRRole;
 import org.mycore.user2.MCRRoleManager;
@@ -114,21 +115,21 @@ public class MCRLDAPClient {
 
         String prefix = "MCR.user2.LDAP.";
         /* Timeout when connecting to LDAP server */
-        String readTimeout = config.getString(prefix + "ReadTimeout", "10000");
+        String readTimeout = MCRConfiguration2.getString(prefix + "ReadTimeout").orElse("10000");
         /* LDAP server */
-        String providerURL = config.getString(prefix + "ProviderURL");
+        String providerURL = MCRConfiguration2.getStringOrThrow(prefix + "ProviderURL");
         /* Security principal for logging in at LDAP server */
-        String securityPrincipal = config.getString(prefix + "SecurityPrincipal");
+        String securityPrincipal = MCRConfiguration2.getStringOrThrow(prefix + "SecurityPrincipal");
         /* Security credentials for logging in at LDAP server */
-        String securityCredentials = config.getString(prefix + "SecurityCredentials");
-        baseDN = config.getString(prefix + "BaseDN");
-        uidFilter = config.getString(prefix + "UIDFilter");
+        String securityCredentials = MCRConfiguration2.getStringOrThrow(prefix + "SecurityCredentials");
+        baseDN = MCRConfiguration2.getStringOrThrow(prefix + "BaseDN");
+        uidFilter = MCRConfiguration2.getStringOrThrow(prefix + "UIDFilter");
 
         prefix += "Mapping.";
-        mapName = config.getString(prefix + "Name");
-        mapEMail = config.getString(prefix + "E-Mail");
+        mapName = MCRConfiguration2.getStringOrThrow(prefix + "Name");
+        mapEMail = MCRConfiguration2.getStringOrThrow(prefix + "E-Mail");
 
-        String group = config.getString(prefix + "Group.DefaultGroup", null);
+        String group = MCRConfiguration2.getString(prefix + "Group.DefaultGroup").orElse(null);
         if (group != null) {
             defaultGroup = MCRRoleManager.getRole(group);
         }
@@ -185,7 +186,7 @@ public class MCRLDAPClient {
                             userChanged = true;
                         }
                         String groupMapping = "MCR.user2.LDAP.Mapping.Group." + attributeID + "." + attributeValue;
-                        String group = MCRConfiguration.instance().getString(groupMapping, null);
+                        String group = MCRConfiguration2.getString(groupMapping).orElse(null);
                         if ((group != null) && (!user.isUserInRole((group)))) {
                             LOGGER.info("User {} add to group {}", userName, group);
                             user.assignRole(group);

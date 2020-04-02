@@ -32,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
@@ -61,7 +61,7 @@ abstract class MCRPersistenceServlet extends MCRServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        String configuredPage = MCRConfiguration.instance().getString("MCR.FileUpload.WebPage");
+        String configuredPage = MCRConfiguration2.getStringOrThrow("MCR.FileUpload.WebPage");
         uploadPage = MCRPersistenceHelper.getWebPage(getServletContext(), configuredPage, "fileupload_commit.xml");
     }
 

@@ -362,7 +362,7 @@ public class MCRServlet extends HttpServlet {
 
         if (reqCharEncoding == null) {
             // Set default to UTF-8
-            reqCharEncoding = MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8");
+            reqCharEncoding = MCRConfiguration2.getString("MCR.Request.CharEncoding").orElse("UTF-8");
             req.setCharacterEncoding(reqCharEncoding);
             LOGGER.debug("Setting ReqCharEncoding to: {}", reqCharEncoding);
         }

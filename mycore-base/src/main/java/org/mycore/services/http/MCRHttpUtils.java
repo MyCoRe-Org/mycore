@@ -33,7 +33,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.mycore.common.MCRCoreVersion;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRHttpUtils {
 
@@ -54,7 +54,7 @@ public class MCRHttpUtils {
 
     public static String getHttpUserAgent() {
         return String.format(Locale.ROOT, "MyCoRe/%s (%s; java %s)", MCRCoreVersion.getCompleteVersion(),
-            MCRConfiguration.instance().getString("MCR.NameOfProject", "undefined"),
+            MCRConfiguration2.getString("MCR.NameOfProject").orElse("undefined"),
             System.getProperty("java.version"));
     }
 

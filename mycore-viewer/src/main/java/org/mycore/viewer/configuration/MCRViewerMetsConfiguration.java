@@ -38,7 +38,7 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
 
         setProperty("metsURL", MCRServlet.getServletBaseURL() + "MCRMETSServlet/" + derivate);
         // Parameter can be used to provide multiple urls
-        String imageXmlPath = MCRConfiguration.instance().getString("MCR.Viewer.BaseURL", null);
+        String imageXmlPath = MCRConfiguration2.getString("MCR.Viewer.BaseURL").orElse(null);
 
         if (imageXmlPath == null || imageXmlPath.isEmpty()) {
             imageXmlPath = MCRServlet.getServletBaseURL() + "MCRTileServlet/";
@@ -49,15 +49,15 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
         }
         setProperty("imageXmlPath", imageXmlPath);
 
-        setProperty("pdfCreatorStyle", MCRConfiguration.instance().getString("MCR.Viewer.PDFCreatorStyle", null));
-        setProperty("pdfCreatorURI", MCRConfiguration.instance().getString("MCR.Viewer.PDFCreatorURI", null));
-        setProperty("text.enabled", MCRConfiguration.instance().getString("MCR.Viewer.text.enabled", "false"));
+        setProperty("pdfCreatorStyle", MCRConfiguration2.getString("MCR.Viewer.PDFCreatorStyle").orElse(null));
+        setProperty("pdfCreatorURI", MCRConfiguration2.getString("MCR.Viewer.PDFCreatorURI").orElse(null));
+        setProperty("text.enabled", MCRConfiguration2.getString("MCR.Viewer.text.enabled").orElse("false"));
 
         MCRConfiguration configuration = MCRConfiguration.instance();
         setProperty("pdfCreatorFormatString",
-            configuration.getString("MCR.Viewer.PDFCreatorFormatString", null));
-        setProperty("pdfCreatorRestrictionFormatString", configuration
-            .getString("MCR.Viewer.PDFCreatorRestrictionFormatString", null));
+            MCRConfiguration2.getString("MCR.Viewer.PDFCreatorFormatString").orElse(null));
+        setProperty("pdfCreatorRestrictionFormatString",
+            MCRConfiguration2.getString("MCR.Viewer.PDFCreatorRestrictionFormatString").orElse(null));
 
         // script
         final boolean debugParameterSet = isDebugMode(request);

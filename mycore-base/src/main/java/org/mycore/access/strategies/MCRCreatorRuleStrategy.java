@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -54,11 +54,11 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Logger LOGGER = LogManager.getLogger(MCRCreatorRuleStrategy.class);
 
-    private static final String SUBMITTED_CATEGORY = MCRConfiguration.instance()
-        .getString("MCR.Access.Strategy.SubmittedCategory", "state:submitted");
+    private static final String SUBMITTED_CATEGORY = MCRConfiguration2
+        .getString("MCR.Access.Strategy.SubmittedCategory").orElse("state:submitted");
 
-    private static final String CREATOR_ROLE = MCRConfiguration.instance().getString("MCR.Access.Strategy.CreatorRole",
-        "submitter");
+    private static final String CREATOR_ROLE = MCRConfiguration2.getString("MCR.Access.Strategy.CreatorRole")
+        .orElse("submitter");
 
     private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 

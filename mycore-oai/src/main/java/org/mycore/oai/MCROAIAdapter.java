@@ -221,12 +221,13 @@ public class MCROAIAdapter implements OAIAdapter {
 
     protected Map<String, MetadataFormat> getMetadataFormatMap() {
         Map<String, MetadataFormat> metdataFormatMap = new HashMap<>();
-        String formats = this.config.getString(getConfigPrefix() + "MetadataFormats", "");
+        String formats = MCRConfiguration2.getString(getConfigPrefix() + "MetadataFormats").orElse("");
         StringTokenizer st = new StringTokenizer(formats, ", ");
         while (st.hasMoreTokens()) {
             String format = st.nextToken();
-            String namespaceURI = this.config.getString(PREFIX + "MetadataFormat." + format + ".Namespace");
-            String schema = this.config.getString(PREFIX + "MetadataFormat." + format + ".Schema");
+            String namespaceURI = MCRConfiguration2
+                .getStringOrThrow(PREFIX + "MetadataFormat." + format + ".Namespace");
+            String schema = MCRConfiguration2.getStringOrThrow(PREFIX + "MetadataFormat." + format + ".Schema");
             metdataFormatMap.put(format, new MetadataFormat(format, namespaceURI, schema));
         }
         return metdataFormatMap;

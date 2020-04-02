@@ -173,8 +173,9 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         derivate.setId(MCRObjectID.getNextFreeId(documentID.getProjectId(), "derivate"));
         derivate.setLabel("data object from " + documentID);
 
-        String schema = CONFIG.getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml").replaceAll(".xml",
-            ".xsd");
+        String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
+            .orElse("datamodel-derivate.xml")
+            .replaceAll(".xml", ".xsd");
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();

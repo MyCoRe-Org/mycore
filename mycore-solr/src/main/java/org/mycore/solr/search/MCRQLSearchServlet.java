@@ -35,6 +35,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.jdom2.Document;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -55,7 +56,7 @@ public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
         super.init();
         MCRConfiguration config = MCRConfiguration.instance();
         String prefix = "MCR.SearchServlet.";
-        defaultSearchField = config.getString(prefix + "DefaultSearchField", "allMeta");
+        defaultSearchField = MCRConfiguration2.getString(prefix + "DefaultSearchField").orElse("allMeta");
     }
 
     @Override

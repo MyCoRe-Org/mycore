@@ -1089,7 +1089,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 170)
     public static List<String> repairMetadataSearch(String type) {
         LOGGER.info("Start the repair for type {}", type);
-        String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
+        String typetest = MCRConfiguration2.getString("MCR.Metadata.Type." + type).orElse("");
 
         if (typetest.length() == 0) {
             LOGGER.error("The type {} was not found.", type);

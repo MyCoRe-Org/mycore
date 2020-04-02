@@ -20,6 +20,7 @@ package org.mycore.mods.enrichment;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Builds and caches all data sources as configured in mycore.properties.
@@ -53,11 +54,11 @@ class MCRDataSourceFactory {
         MCRConfiguration config = MCRConfiguration.instance();
         MCRDataSource dataSource = new MCRDataSource(sourceID);
 
-        String[] identifierTypes = config
-            .getString("MCR.MODS.EnrichmentResolver.DataSource." + sourceID + ".IdentifierTypes").split("\\s");
+        String[] identifierTypes = MCRConfiguration2
+            .getStringOrThrow("MCR.MODS.EnrichmentResolver.DataSource." + sourceID + ".IdentifierTypes").split("\\s");
         for (String typeID : identifierTypes) {
             String prefix = "MCR.MODS.EnrichmentResolver.DataSource." + sourceID + "." + typeID + ".";
-            String uri = config.getString(prefix + "URI");
+            String uri = MCRConfiguration2.getStringOrThrow(prefix + "URI");
 
             MCRIdentifierType idType = MCRIdentifierTypeFactory.instance().getType(typeID);
             MCRIdentifierResolver resolver = new MCRIdentifierResolver(idType, uri);

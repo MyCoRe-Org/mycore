@@ -37,6 +37,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaXML;
@@ -64,7 +65,7 @@ public class MCRMODSWrapper {
 
     private static final String DEF_MODS_CONTAINER = "def.modsContainer";
 
-    public static final String MODS_OBJECT_TYPE = MCRConfiguration.instance().getString("MCR.MODS.NewObjectType");
+    public static final String MODS_OBJECT_TYPE = MCRConfiguration2.getStringOrThrow("MCR.MODS.NewObjectType");
 
     private static final String MODS_DATAMODEL = "datamodel-mods.xsd";
 

@@ -32,7 +32,7 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
@@ -52,8 +52,8 @@ import org.mycore.pi.MCRPIRegistrationInfo;
 public class MCRDerivateURNUtils {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String SUPPORTED_CONTENT_TYPE = MCRConfiguration.instance().getString(
-        "MCR.URN.URNGranular.SupportedContentTypes", "");
+    private static final String SUPPORTED_CONTENT_TYPE = MCRConfiguration2
+        .getString("MCR.URN.URNGranular.SupportedContentTypes").orElse("");
 
     public static URL getURL(MCRPIRegistrationInfo piInfo) {
         String derivateID = piInfo.getMycoreID();

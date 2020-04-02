@@ -20,7 +20,6 @@ package org.mycore.common.content.transformer;
 
 import java.util.HashMap;
 
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -50,14 +49,10 @@ public class MCRContentTransformerFactory {
      */
     private static synchronized MCRContentTransformer buildTransformer(String id) {
         String property = "MCR.ContentTransformer." + id + ".Class";
-        MCRConfiguration config = MCRConfiguration.instance();
-
-        if (config.getString(property, null) == null) {
+        if (MCRConfiguration2.getString(property).isEmpty()
+            && MCRConfiguration2.getString("MCR.ContentTransformer." + id + ".Stylesheet").isEmpty()) {
             //check for reasonable default:
-            String stylesheets = config.getString("MCR.ContentTransformer." + id + ".Stylesheet", null);
-            if (stylesheets == null) {
-                return null;
-            }
+            return null;
         }
         MCRContentTransformer transformer = MCRConfiguration2.<MCRContentTransformer>getInstanceOf(property)
             .orElseGet(MCRXSLTransformer::new);

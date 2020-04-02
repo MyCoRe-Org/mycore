@@ -20,7 +20,6 @@ package org.mycore.viewer.configuration;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRViewerPiwikConfiguration extends MCRViewerConfiguration {
@@ -30,8 +29,8 @@ public class MCRViewerPiwikConfiguration extends MCRViewerConfiguration {
         super.setup(request);
         if (MCRConfiguration2.getBoolean("MCR.Piwik.enable").orElse(false)) {
             this.addLocalScript("iview-client-piwik.js", true, isDebugMode(request));
-            this.setProperty("MCR.Piwik.baseurl", MCRConfiguration.instance().getString("MCR.Piwik.baseurl"));
-            this.setProperty("MCR.Piwik.id", MCRConfiguration.instance().getString("MCR.Piwik.id"));
+            this.setProperty("MCR.Piwik.baseurl", MCRConfiguration2.getStringOrThrow("MCR.Piwik.baseurl"));
+            this.setProperty("MCR.Piwik.id", MCRConfiguration2.getStringOrThrow("MCR.Piwik.id"));
         }
         return this;
     }

@@ -43,7 +43,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRXMLContent;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -83,7 +83,7 @@ public class MCRViewerConfiguration {
     private static Pattern REQUEST_PATH_PATTERN;
 
     static {
-        DEBUG_MODE = Boolean.parseBoolean(MCRConfiguration.instance().getString("MCR.Viewer.DeveloperMode", "false"));
+        DEBUG_MODE = Boolean.parseBoolean(MCRConfiguration2.getString("MCR.Viewer.DeveloperMode").orElse("false"));
         REQUEST_PATH_PATTERN = Pattern.compile("/(\\w+_derivate_\\d+)(/.*)?");
     }
 

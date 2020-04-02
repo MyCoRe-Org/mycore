@@ -35,7 +35,7 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 
@@ -228,8 +228,7 @@ public abstract class MCRStoredNode extends MCRNode {
             return label;
         }
 
-        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
-            MCRConstants.DEFAULT_LANG);
+        String defaultLang = MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG);
         label = getLabel(defaultLang);
         if (label != null) {
             return label;

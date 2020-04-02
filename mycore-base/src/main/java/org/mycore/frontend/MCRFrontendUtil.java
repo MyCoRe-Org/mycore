@@ -45,7 +45,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -152,7 +151,7 @@ public class MCRFrontendUtil {
     }
 
     public static synchronized void prepareBaseURLs(String baseURL) {
-        BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl", baseURL);
+        BASE_URL = MCRConfiguration2.getString("MCR.baseurl").orElse(baseURL);
         if (!BASE_URL.endsWith("/")) {
             BASE_URL = BASE_URL + "/";
         }

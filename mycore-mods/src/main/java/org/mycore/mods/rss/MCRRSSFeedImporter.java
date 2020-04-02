@@ -43,6 +43,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -120,10 +121,10 @@ public class MCRRSSFeedImporter {
         String prefix = "MCR.MODS.RSSFeedImporter." + sourceSystemID + ".";
         MCRConfiguration config = MCRConfiguration.instance();
 
-        feedURL = config.getString(prefix + "FeedURL");
-        importURI = config.getString(prefix + "PublicationURI");
-        field2queryID = config.getString(prefix + "Field2QueryID");
-        xsl2BuildNotificationMail = config.getString(prefix + "XSL2BuildNotificationMail", null);
+        feedURL = MCRConfiguration2.getStringOrThrow(prefix + "FeedURL");
+        importURI = MCRConfiguration2.getStringOrThrow(prefix + "PublicationURI");
+        field2queryID = MCRConfiguration2.getStringOrThrow(prefix + "Field2QueryID");
+        xsl2BuildNotificationMail = MCRConfiguration2.getString(prefix + "XSL2BuildNotificationMail").orElse(null);
 
         getPattern2FindID(prefix);
     }
@@ -131,7 +132,7 @@ public class MCRRSSFeedImporter {
     private void getPattern2FindID(String prefix) {
         String patternProperty = prefix + "Pattern2FindID";
         try {
-            String pattern = MCRConfiguration.instance().getString(patternProperty);
+            String pattern = MCRConfiguration2.getStringOrThrow(patternProperty);
             pattern2findID = Pattern.compile(pattern);
         } catch (PatternSyntaxException ex) {
             String msg = "Regular expression syntax error: " + patternProperty;
@@ -245,7 +246,7 @@ public class MCRRSSFeedImporter {
         }
 
         HashMap<String, String> parameters = new HashMap<>();
-        parameters.put(PROPERTY_MAIL_ADDRESS, MCRConfiguration.instance().getString(PROPERTY_MAIL_ADDRESS));
+        parameters.put(PROPERTY_MAIL_ADDRESS, MCRConfiguration2.getStringOrThrow(PROPERTY_MAIL_ADDRESS));
         MCRMailer.sendMail(new Document(xml), xsl2BuildNotificationMail, parameters);
     }
 }

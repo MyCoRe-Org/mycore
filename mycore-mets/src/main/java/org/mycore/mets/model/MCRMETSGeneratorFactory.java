@@ -32,7 +32,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRPath;
 
@@ -173,8 +172,8 @@ public abstract class MCRMETSGeneratorFactory {
 
         @Override
         public MCRMETSGenerator get(MCRPath derivatePath) {
-            String cn = MCRConfiguration.instance().getString("MCR.Component.MetsMods.Generator",
-                MCRMETSDefaultGenerator.class.getName());
+            String cn = MCRConfiguration2.getString("MCR.Component.MetsMods.Generator")
+                .orElse(MCRMETSDefaultGenerator.class.getName());
             try {
                 if (METS_GENERATOR_CLASS == null || !cn.equals(METS_GENERATOR_CLASS.getName())) {
                     METS_GENERATOR_CLASS = MCRClassTools.forName(cn);

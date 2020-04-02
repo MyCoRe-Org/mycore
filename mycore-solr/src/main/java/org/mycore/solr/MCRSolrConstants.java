@@ -18,7 +18,7 @@
 
 package org.mycore.solr;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -30,8 +30,8 @@ public class MCRSolrConstants {
 
     // public static final String SOLR_SERVER_URL;
 
-    public static final String DEFAULT_SOLR_SERVER_URL = MCRConfiguration.instance().getString(
-        SOLR_CONFIG_PREFIX + "ServerURL");
+    public static final String DEFAULT_SOLR_SERVER_URL = MCRConfiguration2
+        .getStringOrThrow(SOLR_CONFIG_PREFIX + "ServerURL");
 
     public static final String SOLR_CORE_PREFIX = SOLR_CONFIG_PREFIX + "Core.";
 
@@ -39,17 +39,15 @@ public class MCRSolrConstants {
 
     public static final String SOLR_CORE_SERVER_SUFFIX = ".ServerURL";
 
-    public static final String SOLR_QUERY_XML_PROTOCOL_VERSION = MCRConfiguration.instance().getString(
-        SOLR_CONFIG_PREFIX + "XMLProtocolVersion");
+    public static final String SOLR_QUERY_XML_PROTOCOL_VERSION = MCRConfiguration2
+        .getStringOrThrow(SOLR_CONFIG_PREFIX + "XMLProtocolVersion");
 
-    public static final String SOLR_QUERY_PATH = MCRConfiguration.instance()
-        .getString(SOLR_CONFIG_PREFIX + "SelectPath");
+    public static final String SOLR_QUERY_PATH = MCRConfiguration2.getStringOrThrow(SOLR_CONFIG_PREFIX + "SelectPath");
 
-    public static final String SOLR_EXTRACT_PATH = MCRConfiguration.instance()
-        .getString(SOLR_CONFIG_PREFIX + "ExtractPath");
+    public static final String SOLR_EXTRACT_PATH = MCRConfiguration2
+        .getStringOrThrow(SOLR_CONFIG_PREFIX + "ExtractPath");
 
-    public static final String SOLR_UPDATE_PATH = MCRConfiguration.instance()
-        .getString(SOLR_CONFIG_PREFIX + "UpdatePath");
+    public static final String SOLR_UPDATE_PATH = MCRConfiguration2.getStringOrThrow(SOLR_CONFIG_PREFIX + "UpdatePath");
 
     public static final String SOLR_JOIN_PATTERN = "{!join from=returnId to=id}";
 

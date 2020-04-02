@@ -176,15 +176,12 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
                 getServiceID() + " has no " + METADATA_SERVICE_PROPERTY_KEY + "!");
         }
 
-        final String className = configuration.getString(METADATA_SERVICE_CONFIG_PREFIX
+        final String className = MCRConfiguration2.getStringOrThrow(METADATA_SERVICE_CONFIG_PREFIX
             + metadataManager);
 
         try {
-            @SuppressWarnings("unchecked")
-            Class<MCRPIMetadataService<T>> classObject = (Class<MCRPIMetadataService<T>>) Class
-                .forName(className);
-            Constructor<MCRPIMetadataService<T>> constructor = classObject
-                .getConstructor(String.class);
+            Class<? extends MCRPIMetadataService<T>> classObject = MCRClassTools.forName(className);
+            Constructor<? extends MCRPIMetadataService<T>> constructor = classObject.getConstructor(String.class);
             return constructor.newInstance(metadataManager);
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException(
@@ -209,7 +206,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             .orElseThrow(generatorPropertiesNotSetError);
 
         String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
-        String className = MCRConfiguration.instance().getString(generatorPropertyKey);
+        String className = MCRConfiguration2.getStringOrThrow(generatorPropertyKey);
 
         try {
             Class<? extends MCRPIGenerator<T>> classObject = MCRClassTools.forName(className);

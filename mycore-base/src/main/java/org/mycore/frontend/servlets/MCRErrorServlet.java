@@ -39,7 +39,7 @@ import org.jdom2.Namespace;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -159,7 +159,7 @@ public class MCRErrorServlet extends HttpServlet {
      */
     public static Document buildErrorPage(String msg, Integer statusCode, String requestURI,
         Class<? extends Throwable> exceptionType, String source, Throwable ex) {
-        String rootname = MCRConfiguration.instance().getString("MCR.Frontend.ErrorPage", "mcr_error");
+        String rootname = MCRConfiguration2.getString("MCR.Frontend.ErrorPage").orElse("mcr_error");
         Element root = new Element(rootname);
         root.setAttribute("errorServlet", Boolean.TRUE.toString());
         root.setAttribute("space", "preserve", Namespace.XML_NAMESPACE);

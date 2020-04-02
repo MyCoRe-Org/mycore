@@ -44,7 +44,6 @@ import org.jdom2.output.support.AbstractXMLOutputProcessor;
 import org.jdom2.output.support.FormatStack;
 import org.jdom2.util.NamespaceStack;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -146,7 +145,7 @@ public class MCROAIDataProvider extends MCRServlet {
      */
     private Document addXSLStyle(Document doc) {
         String styleSheet = MCROAIAdapter.PREFIX + getServletName() + ".ResponseStylesheet";
-        String xsl = MCRConfiguration.instance().getString(styleSheet, "oai/oai2.xsl");
+        String xsl = MCRConfiguration2.getString(styleSheet).orElse("oai/oai2.xsl");
         if (!xsl.isEmpty()) {
             Map<String, String> pairs = new HashMap<>();
             pairs.put("type", "text/xsl");

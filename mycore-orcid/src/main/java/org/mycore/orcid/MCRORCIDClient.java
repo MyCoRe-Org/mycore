@@ -22,7 +22,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Utility class to work with the REST API of orcid.org.
@@ -42,7 +42,7 @@ public class MCRORCIDClient {
     }
 
     private MCRORCIDClient() {
-        String baseURL = MCRConfiguration.instance().getString("MCR.ORCID.BaseURL");
+        String baseURL = MCRConfiguration2.getStringOrThrow("MCR.ORCID.BaseURL");
         Client client = ClientBuilder.newClient();
         baseTarget = client.target(baseURL);
     }

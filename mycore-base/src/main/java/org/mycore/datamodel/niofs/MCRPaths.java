@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -46,7 +46,7 @@ final class MCRPaths {
     }
 
     static URI getURI(String owner, String path) throws URISyntaxException {
-        String scheme = MCRConfiguration.instance().getString(DEFAULT_SCHEME_PROPERTY, "ifs");
+        String scheme = MCRConfiguration2.getString(DEFAULT_SCHEME_PROPERTY).orElse("ifs");
         return getURI(scheme, owner, path);
     }
 
@@ -60,7 +60,7 @@ final class MCRPaths {
     }
 
     static Path getPath(String owner, String path) {
-        String scheme = MCRConfiguration.instance().getString(DEFAULT_SCHEME_PROPERTY, "ifs");
+        String scheme = MCRConfiguration2.getString(DEFAULT_SCHEME_PROPERTY).orElse("ifs");
         return getPath(scheme, owner, path);
     }
 

@@ -64,9 +64,9 @@ public class MCROAuthClient {
         String prefix = "MCR.ORCID.OAuth.";
         MCRConfiguration config = MCRConfiguration.instance();
 
-        baseURL = config.getString(prefix + "BaseURL");
-        clientID = config.getString(prefix + "ClientID");
-        clientSecret = config.getString(prefix + "ClientSecret");
+        baseURL = MCRConfiguration2.getStringOrThrow(prefix + "BaseURL");
+        clientID = MCRConfiguration2.getStringOrThrow(prefix + "ClientID");
+        clientSecret = MCRConfiguration2.getStringOrThrow(prefix + "ClientSecret");
 
         client = ClientBuilder.newClient();
     }

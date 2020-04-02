@@ -67,7 +67,7 @@ public class MCRFileContentTypeFactory {
         detector = MCRConfiguration2
             .getOrThrow("MCR.IFS.FileContentTypes.DetectorClass", MCRConfiguration2::instantiateClass);
 
-        String file = config.getString("MCR.IFS.FileContentTypes.DefinitionFile");
+        String file = MCRConfiguration2.getStringOrThrow("MCR.IFS.FileContentTypes.DefinitionFile");
 
         Element xml = MCRURIResolver.instance().resolve("resource:" + file);
         if (xml == null) {

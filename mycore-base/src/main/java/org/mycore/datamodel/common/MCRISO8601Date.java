@@ -40,7 +40,7 @@ import java.util.TimeZone;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * holds info about a specific point in time. This class is used for handling ISO 8601 like date and dateTime formatted
@@ -253,7 +253,7 @@ public class MCRISO8601Date {
     }
 
     private TemporalAccessor guessDateTime(final String date) {
-        final String locales = MCRConfiguration.instance().getString("MCR.Metadata.SimpleDateFormat.Locales", "de_DE");
+        final String locales = MCRConfiguration2.getString("MCR.Metadata.SimpleDateFormat.Locales").orElse("de_DE");
         final StringTokenizer tok = new StringTokenizer(locales, ",");
         while (tok.hasMoreTokens()) {
             final Locale locale = getLocale(tok.nextToken());

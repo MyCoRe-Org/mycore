@@ -91,11 +91,11 @@ public class MCRClassificationAndSetMapper {
     public static String mapSetToClassification(String prefix, String setid) {
         String classProperty = prefix + PROP_SETS_PREFIX + setid + PROP_CLASS_SUFFIX;
         try {
-            return config.getString(classProperty);
+            return MCRConfiguration2.getStringOrThrow(classProperty);
         } catch (MCRConfigurationException mce) {
             try {
                 String legacyProperty = prefix + PROP_SUFFIX + setid;
-                String legacy = config.getString(legacyProperty);
+                String legacy = MCRConfiguration2.getStringOrThrow(legacyProperty);
                 LogManager.getLogger().warn("Please rename deprecated property '{}' to '{}'.", legacyProperty,
                     classProperty);
                 return legacy;

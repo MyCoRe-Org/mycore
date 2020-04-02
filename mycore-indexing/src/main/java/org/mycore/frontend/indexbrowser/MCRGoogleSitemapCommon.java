@@ -40,7 +40,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
@@ -90,20 +89,20 @@ public final class MCRGoogleSitemapCommon {
     private static final String SITEMAP_SCHEMA = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd";
 
     /** The directory path to store sitemaps relative to MCR.WebApplication.basedir */
-    private static final String CDIR = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");
+    private static final String CDIR = MCRConfiguration2.getString("MCR.GoogleSitemap.Directory").orElse("");
 
     /** The frequence of crawle by Google */
-    private static final String FREQ = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Freq", "monthly");
+    private static final String FREQ = MCRConfiguration2.getString("MCR.GoogleSitemap.Freq").orElse("monthly");
 
     /** The style for by Google link */
-    private static final String STYLE = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Style", "");
+    private static final String STYLE = MCRConfiguration2.getString("MCR.GoogleSitemap.Style").orElse("");
 
     /** The url path for retrieving object metadata */
-    private static final String OBJECT_PATH = MCRConfiguration.instance().getString("MCR.GoogleSitemap.ObjectPath",
-        "receive/");
+    private static final String OBJECT_PATH = MCRConfiguration2.getString("MCR.GoogleSitemap.ObjectPath")
+        .orElse("receive/");
 
     /** The filter query for selecting objects to present in google sitemap */
-    private static final String SOLR_QUERY = MCRConfiguration.instance().getString("MCR.GoogleSitemap.SolrQuery");
+    private static final String SOLR_QUERY = MCRConfiguration2.getStringOrThrow("MCR.GoogleSitemap.SolrQuery");
 
     /** The logger */
     private static Logger LOGGER = LogManager.getLogger(MCRGoogleSitemapCommon.class.getName());
@@ -121,7 +120,7 @@ public final class MCRGoogleSitemapCommon {
     private final File webappBaseDir;
 
     /** The base URL */
-    private String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
+    private String baseurl = MCRConfiguration2.getString("MCR.baseurl").orElse("");
 
     /** local data */
     private List<MCRObjectIDDate> objidlist = null;

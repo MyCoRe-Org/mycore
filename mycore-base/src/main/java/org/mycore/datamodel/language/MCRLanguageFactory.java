@@ -30,6 +30,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -62,7 +63,7 @@ public class MCRLanguageFactory {
     /**
      * The ID of the classification containing the language codes and labels
      */
-    private MCRCategoryID classification = null;
+    private MCRCategoryID classification;
 
     private MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
 
@@ -78,13 +79,13 @@ public class MCRLanguageFactory {
 
     private MCRLanguageFactory() {
         MCRConfiguration config = MCRConfiguration.instance();
-        codeOfDefaultLanguage = config.getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+        codeOfDefaultLanguage = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
+            .orElse(MCRConstants.DEFAULT_LANG);
         initDefaultLanguages();
 
-        String classificationID = config.getString("MCR.LanguageClassification", null);
-        if (classificationID != null) {
-            classification = new MCRCategoryID(classificationID, null);
-        }
+        classification = MCRConfiguration2.getString("MCR.LanguageClassification")
+            .map(MCRCategoryID::rootID)
+            .orElse(null);
     }
 
     /**

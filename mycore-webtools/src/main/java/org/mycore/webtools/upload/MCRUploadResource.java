@@ -193,7 +193,7 @@ public class MCRUploadResource {
         derivate.setId(derivateID);
         derivate.setLabel("data object from " + objectID);
 
-        String schema = MCRConfiguration.instance().getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml")
+        String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate").orElse("datamodel-derivate.xml")
             .replaceAll(".xml",
                 ".xsd");
         derivate.setSchema(schema);

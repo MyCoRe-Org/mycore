@@ -947,7 +947,7 @@ public final class MCRURIResolver implements URIResolver {
             Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
             if (m.find() && m.groupCount() == 3) {
                 String formatDef = m.group(2);
-                return MCRConfiguration.instance().getString(FORMAT_CONFIG_PREFIX + formatDef);
+                return MCRConfiguration2.getStringOrThrow(FORMAT_CONFIG_PREFIX + formatDef);
             }
             return null;
         }
@@ -1561,7 +1561,7 @@ public final class MCRURIResolver implements URIResolver {
 
             // get the parameters from mycore.properties
             String propertyName = "MCR.URIResolver.redirect." + configsuffix;
-            String propValue = MCRConfiguration.instance().getString(propertyName);
+            String propValue = MCRConfiguration2.getStringOrThrow(propertyName);
             LOGGER.info("Redirect {} to {}", href, propValue);
             return singleton.resolve(propValue, base);
         }

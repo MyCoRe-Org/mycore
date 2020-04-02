@@ -465,8 +465,8 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
 
         @Override
         public NumberFormat numberFormat() {
-            String numberPattern = MCRConfiguration.instance()
-                .getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000").trim();
+            String numberPattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern")
+                .orElse("0000000000").trim();
             NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
             format.setGroupingUsed(false);
             format.setMinimumIntegerDigits(numberPattern.length());

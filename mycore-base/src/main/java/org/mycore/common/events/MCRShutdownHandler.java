@@ -30,7 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
@@ -112,7 +112,7 @@ public class MCRShutdownHandler {
         Logger logger = LogManager.getLogger(MCRShutdownHandler.class);
         String cfgSystemName = "MyCoRe:";
         try {
-            cfgSystemName = MCRConfiguration.instance().getString(PROPERTY_SYSTEM_NAME) + ":";
+            cfgSystemName = MCRConfiguration2.getStringOrThrow(PROPERTY_SYSTEM_NAME) + ":";
         } catch (MCRConfigurationException e) {
             //may occur early if there is an error starting mycore up or in JUnit tests
             logger.warn("Error getting '" + PROPERTY_SYSTEM_NAME + "': {}", e.getMessage());

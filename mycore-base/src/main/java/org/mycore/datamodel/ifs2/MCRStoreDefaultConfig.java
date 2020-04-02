@@ -18,7 +18,6 @@
 
 package org.mycore.datamodel.ifs2;
 
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs2.MCRStore.MCRStoreConfig;
 
@@ -34,7 +33,7 @@ class MCRStoreDefaultConfig implements MCRStoreConfig {
 
     @Override
     public String getBaseDir() {
-        return MCRConfiguration.instance().getString(storeConfigPrefix + "BaseDir");
+        return MCRConfiguration2.getStringOrThrow(storeConfigPrefix + "BaseDir");
     }
 
     @Override
@@ -44,7 +43,7 @@ class MCRStoreDefaultConfig implements MCRStoreConfig {
 
     @Override
     public String getSlotLayout() {
-        return MCRConfiguration.instance().getString(storeConfigPrefix + "SlotLayout");
+        return MCRConfiguration2.getStringOrThrow(storeConfigPrefix + "SlotLayout");
     }
 
     @Override

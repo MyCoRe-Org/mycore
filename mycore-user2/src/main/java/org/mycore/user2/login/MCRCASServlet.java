@@ -29,6 +29,7 @@ import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.Cas20ProxyTicketValidator;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRUser;
@@ -82,13 +83,14 @@ public class MCRCASServlet extends MCRServlet {
         super.init();
 
         MCRConfiguration config = MCRConfiguration.instance();
-        clientURL = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.ClientURL");
-        serverURL = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.ServerURL");
-        realmID = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.RealmID");
+        clientURL = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.ClientURL");
+        serverURL = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.ServerURL");
+        realmID = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.RealmID");
 
         // Set properties to enable SSL connection to CAS and accept certificates  
-        String trustStore = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.SSL.TrustStore");
-        String trustStorePassword = config.getString(MCRUser2Constants.CONFIG_PREFIX + "CAS.SSL.TrustStore.Password");
+        String trustStore = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.SSL.TrustStore");
+        String trustStorePassword = MCRConfiguration2
+            .getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.SSL.TrustStore.Password");
 
         System.setProperty("javax.net.ssl.trustStore", trustStore);
         System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);

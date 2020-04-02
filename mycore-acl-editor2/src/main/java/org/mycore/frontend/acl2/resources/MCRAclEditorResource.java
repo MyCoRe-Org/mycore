@@ -49,7 +49,7 @@ import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
@@ -61,8 +61,6 @@ import com.google.gson.JsonParser;
 
 @Path("ACLE")
 public class MCRAclEditorResource {
-
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static final MCRRuleStore RULE_STORE = MCRRuleStore.getInstance();
 
@@ -108,7 +106,7 @@ public class MCRAclEditorResource {
         if (node != null) {
             Element mainDiv = (Element) node;
             mainDiv.setAttribute("lang", lang);
-            String bsPath = CONFIG.getString("MCR.bootstrap.path", "");
+            String bsPath = MCRConfiguration2.getString("MCR.bootstrap.path").orElse("");
             if (!"".equals(bsPath)) {
                 bsPath = MCRFrontendUtil.getBaseURL() + bsPath;
                 Element item = new Element("link").setAttribute("href", bsPath).setAttribute("rel", "stylesheet")

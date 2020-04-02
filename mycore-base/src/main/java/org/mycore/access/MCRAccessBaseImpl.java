@@ -29,7 +29,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * This class is a base implementation of the <code>MCRAccessInterface</code>.
@@ -45,8 +45,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     private static MCRAccessInterface SINGLETON;
 
-    protected static final String ACCESS_PERMISSIONS = MCRConfiguration.instance().getString(
-        "MCR.Access.AccessPermissions", "read,write,delete");
+    protected static final String ACCESS_PERMISSIONS = MCRConfiguration2.getString("MCR.Access.AccessPermissions")
+        .orElse("read,write,delete");
 
     /** the logger */
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessBaseImpl.class);

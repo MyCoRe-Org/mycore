@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Builds identifiers types as configured in mycore.properties.
@@ -54,7 +55,8 @@ class MCRIdentifierTypeFactory {
     private MCRIdentifierType buildIdentifierType(String typeID) {
         MCRConfiguration config = MCRConfiguration.instance();
         String defaultXPath = String.format(Locale.ROOT, DEFAULT_XPATH, typeID);
-        String xPath = config.getString("MCR.MODS.EnrichmentResolver.IdentifierType." + typeID, defaultXPath);
+        String xPath = MCRConfiguration2.getString("MCR.MODS.EnrichmentResolver.IdentifierType." + typeID)
+            .orElse(defaultXPath);
         return new MCRIdentifierType(typeID, xPath);
     }
 

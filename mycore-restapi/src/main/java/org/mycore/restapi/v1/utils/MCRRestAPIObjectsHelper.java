@@ -65,7 +65,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -159,7 +159,7 @@ public class MCRRestAPIObjectsHelper {
         StringWriter sw = new StringWriter();
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         try {
-            String filterId = MCRConfiguration.instance().getString("MCR.RestAPI.v1.Filter.XML", "");
+            String filterId = MCRConfiguration2.getString("MCR.RestAPI.v1.Filter.XML").orElse("");
             if (filterId.length() > 0) {
                 MCRContentTransformer trans = MCRContentTransformerFactory.getTransformer(filterId);
                 Document filteredDoc = trans.transform(new MCRJDOMContent(doc)).asXML();
@@ -256,7 +256,7 @@ public class MCRRestAPIObjectsHelper {
 
             //add href Attributes
             String baseURL = MCRJerseyUtil.getBaseURL(info, app)
-                + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
+                + MCRConfiguration2.getStringOrThrow("MCR.RestAPI.v1.Files.URL.path");
             baseURL = baseURL.replace("${mcrid}", derObj.getOwnerID().toString()).replace("${derid}",
                 derObj.getId().toString());
             XPathExpression<Element> xp = XPathFactory.instance().compile(".//child[@type='file']", Filters.element());
@@ -733,7 +733,7 @@ public class MCRRestAPIObjectsHelper {
             String maindoc = derObj.getDerivate().getInternals().getMainDoc();
 
             String baseURL = MCRJerseyUtil.getBaseURL(info, app)
-                + MCRConfiguration.instance().getString("MCR.RestAPI.v1.Files.URL.path");
+                + MCRConfiguration2.getStringOrThrow("MCR.RestAPI.v1.Files.URL.path");
             baseURL = baseURL.replace("${mcrid}", mcrObj.toString()).replace("${derid}",
                 derObj.getId().toString());
 

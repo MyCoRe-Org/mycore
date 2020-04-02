@@ -54,7 +54,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.xmlgraphics.io.Resource;
 import org.apache.xmlgraphics.io.ResourceResolver;
 import org.mycore.common.MCRCoreVersion;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSourceContent;
@@ -95,13 +95,11 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
     };
 
     public MCRFoFormatterFOP() {
-        final MCRConfiguration mcrcfg = MCRConfiguration.instance();
-
         FopFactoryBuilder fopFactoryBuilder;
         // use restricted io to prevent issues with font caching on some systems
         fopFactoryBuilder = new FopFactoryBuilder(
             EnvironmentalProfileFactory.createRestrictedIO(URI.create("resource:/"), resolver));
-        final String foCfg = mcrcfg.getString("MCR.LayoutService.FoFormatter.FOP.config", "");
+        final String foCfg = MCRConfiguration2.getString("MCR.LayoutService.FoFormatter.FOP.config").orElse("");
         if (!foCfg.isEmpty()) {
             try {
                 URL configResource = MCRConfigurationDir.getConfigResource(foCfg);

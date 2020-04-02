@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -105,7 +104,7 @@ public class MCREventManager {
     }
 
     private boolean propKeyIsSet(String propertyKey) {
-        return MCRConfiguration.instance().getString(propertyKey).length() != 0;
+        return MCRConfiguration2.getString(propertyKey).isPresent();
     }
 
     private List<MCREventHandler> getOrCreateEventHandlerListOfType(String type) {

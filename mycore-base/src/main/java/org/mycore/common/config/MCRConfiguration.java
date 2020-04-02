@@ -290,8 +290,10 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public String getString(String name) {
-        return MCRConfigurationBase.getString(name).map(String::trim)
+        return MCRConfigurationBase.getString(name)
+            .map(String::trim)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 
@@ -339,6 +341,7 @@ public class MCRConfiguration {
      *            the value to return if the configuration property is not set
      * @return the value of the configuration property as a String
      */
+    @Deprecated
     public String getString(String name, String defaultValue) {
         return MCRConfiguration2.getString(name).orElse(defaultValue);
     }

@@ -156,10 +156,10 @@ public class MCRXMLMetadataManager {
     public synchronized void reload() {
         MCRConfiguration config = MCRConfiguration.instance();
 
-        String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
+        String pattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern").orElse("0000000000");
         defaultLayout = pattern.length() - 4 + "-2-2";
 
-        String base = config.getString("MCR.Metadata.Store.BaseDir");
+        String base = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Store.BaseDir");
         basePath = Paths.get(base);
         checkPath(basePath, "base");
 
@@ -167,7 +167,7 @@ public class MCRXMLMetadataManager {
             .orElse(MCRVersioningMetadataStore.class);
         if (MCRVersioningMetadataStore.class.isAssignableFrom(defaultClass)) {
             try {
-                String svnBaseValue = config.getString("MCR.Metadata.Store.SVNBase");
+                String svnBaseValue = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Store.SVNBase");
                 if (!svnBaseValue.endsWith("/")) {
                     svnBaseValue += '/';
                 }
@@ -175,7 +175,7 @@ public class MCRXMLMetadataManager {
                 LOGGER.info("SVN Base: {}", svnBase);
                 if (svnBase.getScheme() == null) {
                     String workingDirectory = (new File(".")).getAbsolutePath();
-                    URI root = new File(MCRConfiguration.instance().getString("MCR.datadir", workingDirectory)).toURI();
+                    URI root = new File(MCRConfiguration2.getString("MCR.datadir").orElse(workingDirectory)).toURI();
                     URI resolved = root.resolve(svnBase);
                     LOGGER.warn("Resolved {} to {}", svnBase, resolved);
                     svnBase = resolved;
@@ -300,10 +300,10 @@ public class MCRXMLMetadataManager {
     public MCRMetadataStore getStore(String project, String type, boolean readOnly) {
         String projectType = getStoryKey(project, type);
         String prefix = "MCR.IFS2.Store." + projectType + ".";
-        String forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
+        String forceXML = MCRConfiguration2.getString(prefix + "ForceXML").orElse(null);
         if (forceXML == null) {
             synchronized (this) {
-                forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
+                forceXML = MCRConfiguration2.getString(prefix + "ForceXML").orElse(null);
                 if (forceXML == null) {
                     try {
                         setupStore(project, type, prefix, readOnly);
@@ -337,7 +337,7 @@ public class MCRXMLMetadataManager {
             });
         if (MCRVersioningMetadataStore.class.isAssignableFrom(clazz)) {
             String property = configPrefix + "SVNRepositoryURL";
-            String svnURL = config.getString(property, null);
+            String svnURL = MCRConfiguration2.getString(property).orElse(null);
             if (svnURL == null) {
                 String relativeURI = new MessageFormat("{0}/{1}/", Locale.ROOT)
                     .format(new Object[] { project, objectType });
@@ -351,7 +351,7 @@ public class MCRXMLMetadataManager {
         Path typePath = basePath.resolve(project).resolve(objectType);
         checkAndCreateDirectory(typePath, project, objectType, configPrefix, readOnly);
 
-        String slotLayout = config.getString(configPrefix + "SlotLayout", null);
+        String slotLayout = MCRConfiguration2.getString(configPrefix + "SlotLayout").orElse(null);
         if (slotLayout == null) {
             config.set(configPrefix + "SlotLayout", defaultLayout);
         }

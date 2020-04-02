@@ -33,7 +33,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mods.MCRMODSSorter;
 import org.mycore.util.concurrent.MCRTransactionableCallable;
 
@@ -94,7 +94,7 @@ class MCREnricher {
         xPath2FindNestedObjects = XPathFactory.instance().compile(XPATH_HOST_SERIES, Filters.element(), null,
             MCRConstants.getStandardNamespaces());
 
-        dsConfig = MCRConfiguration.instance().getString("MCR.MODS.EnrichmentResolver.DataSources." + configID);
+        dsConfig = MCRConfiguration2.getStringOrThrow("MCR.MODS.EnrichmentResolver.DataSources." + configID);
 
         idPool = new MCRIdentifierPool();
         prepareDataSourceCalls(dsConfig);

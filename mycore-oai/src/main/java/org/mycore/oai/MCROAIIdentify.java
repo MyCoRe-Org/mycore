@@ -61,13 +61,16 @@ public class MCROAIIdentify extends SimpleIdentify {
         this.configPrefix = configPrefix;
 
         this.setBaseURL(baseURL);
-        this.setRepositoryName(this.config.getString(configPrefix + "RepositoryName", "Undefined repository name"));
-        String deletedRecordPolicy = this.config.getString(configPrefix + "DeletedRecord",
-            DeletedRecordPolicy.Transient.name());
+        this.setRepositoryName(
+            MCRConfiguration2.getString(configPrefix + "RepositoryName").orElse("Undefined repository name"));
+        String deletedRecordPolicy = MCRConfiguration2.getString(configPrefix + "DeletedRecord")
+            .orElse(DeletedRecordPolicy.Transient.name());
         this.setDeletedRecordPolicy(DeletedRecordPolicy.get(deletedRecordPolicy));
-        String granularity = this.config.getString(configPrefix + "Granularity", Granularity.YYYY_MM_DD.name());
+        String granularity = MCRConfiguration2.getString(configPrefix + "Granularity")
+            .orElse(Granularity.YYYY_MM_DD.name());
         this.setGranularity(Granularity.valueOf(granularity));
-        String adminMail = this.config.getString(configPrefix + "AdminEmail", config.getString("MCR.Mail.Sender"));
+        String adminMail = MCRConfiguration2.getString(configPrefix + "AdminEmail")
+            .orElseGet(() -> MCRConfiguration2.getStringOrThrow("MCR.Mail.Sender"));
 
         this.setEarliestDatestamp(calculateEarliestTimestamp());
         this.getAdminEmailList().add(adminMail);
@@ -91,7 +94,7 @@ public class MCROAIIdentify extends SimpleIdentify {
     protected Instant calculateEarliestTimestamp() {
         MCROAISearcher searcher = MCROAISearchManager.getSearcher(this, null, 1, null, null);
         return searcher.getEarliestTimestamp().orElse(DateUtils
-            .parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01")));
+            .parse(MCRConfiguration2.getString(this.configPrefix + "EarliestDatestamp").orElse("1970-01-01")));
     }
 
     public String getConfigPrefix() {
@@ -120,8 +123,8 @@ public class MCROAIIdentify extends SimpleIdentify {
     }
 
     public OAIIdentifierDescription getIdentifierDescription() {
-        String reposId = this.config.getString(this.configPrefix + "RepositoryIdentifier");
-        String sampleId = this.config.getString(this.configPrefix + "RecordSampleID");
+        String reposId = MCRConfiguration2.getStringOrThrow(this.configPrefix + "RepositoryIdentifier");
+        String sampleId = MCRConfiguration2.getStringOrThrow(this.configPrefix + "RecordSampleID");
         return new OAIIdentifierDescription(reposId, sampleId);
     }
 
