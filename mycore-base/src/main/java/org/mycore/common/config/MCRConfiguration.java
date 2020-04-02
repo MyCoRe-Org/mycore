@@ -309,6 +309,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public List<String> getStrings(String name) {
         return MCRConfigurationBase.getString(name)
             .map(MCRConfiguration2::splitValue)

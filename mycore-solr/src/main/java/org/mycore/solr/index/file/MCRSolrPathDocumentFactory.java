@@ -31,7 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -57,10 +56,9 @@ public class MCRSolrPathDocumentFactory {
      * @return a list of instances of class listet in {@link #ACCUMULATOR_LIST_PROPERTY_NAME}
      */
     private static List<MCRSolrFileIndexAccumulator> resolveAccumulators() {
-        return MCRConfiguration
-            .instance()
-            .getStrings(ACCUMULATOR_LIST_PROPERTY_NAME)
+        return MCRConfiguration2.getString(ACCUMULATOR_LIST_PROPERTY_NAME)
             .stream()
+            .flatMap(MCRConfiguration2::splitValue)
             .map((accumulatorClassRef) -> {
                 try {
                     Class<? extends MCRSolrFileIndexAccumulator> accumulatorClass = Class

@@ -20,6 +20,7 @@ package org.mycore.frontend.jersey;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.ApplicationPath;
@@ -34,7 +35,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.jdom2.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -184,8 +185,9 @@ public abstract class MCRJerseyUtil {
      */
     public static String getBaseURL(UriInfo info, Application app) {
         String baseURL = info.getBaseUri().toString();
-        List<String> applicationPaths = MCRConfiguration.instance()
-            .getStrings("MCR.Jersey.Resource.ApplicationPaths");
+        List<String> applicationPaths = MCRConfiguration2
+            .getOrThrow("MCR.Jersey.Resource.ApplicationPaths", MCRConfiguration2::splitValue)
+            .collect(Collectors.toList());
         for (String path : applicationPaths) {
             baseURL = removeAppPath(baseURL, path);
         }

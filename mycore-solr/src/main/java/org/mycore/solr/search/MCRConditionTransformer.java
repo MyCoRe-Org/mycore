@@ -35,7 +35,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
@@ -351,7 +351,10 @@ public class MCRConditionTransformer {
 
     private static HashSet<String> getJoinFields() {
         if (joinFields == null) {
-            joinFields = new HashSet<>(MCRConfiguration.instance().getStrings(SOLR_CONFIG_PREFIX + "JoinQueryFields"));
+            joinFields = MCRConfiguration2.getString(SOLR_CONFIG_PREFIX + "JoinQueryFields")
+                .stream()
+                .flatMap(MCRConfiguration2::splitValue)
+                .collect(Collectors.toCollection(HashSet::new));
         }
         return joinFields;
     }

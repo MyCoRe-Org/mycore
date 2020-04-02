@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.ApplicationPath;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.restapi.MCRJerseyRestApp;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 
@@ -49,7 +49,7 @@ public class MCRRestV1App extends MCRJerseyRestApp {
             .concat(
                 Stream.of(MCRWrappedXMLWriter.class.getPackage().getName(),
                     OpenApiResource.class.getPackage().getName()),
-                MCRConfiguration.instance().getStrings("MCR.RestAPI.Resource.Packages").stream())
+                MCRConfiguration2.getOrThrow("MCR.RestAPI.Resource.Packages", MCRConfiguration2::splitValue))
             .toArray(String[]::new);
     }
 }

@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -35,9 +34,8 @@ public class MCRDeveloperTools {
         if (overrideActive()) {
             final String[] pathParts = path.split("/");
 
-            return MCRConfiguration.instance()
-                .getStrings("MCR.Developer.Resource.Override")
-                .stream()
+            return MCRConfiguration2
+                .getOrThrow("MCR.Developer.Resource.Override", MCRConfiguration2::splitValue)
                 .map(Paths::get)
                 .map(p -> webResource ? p.resolve("META-INF").resolve("resources") : p)
                 .map(p -> {

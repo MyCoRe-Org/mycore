@@ -36,7 +36,6 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -71,7 +70,8 @@ public class MCRMODSWrapper {
 
     private static List<String> topLevelElementOrder = new ArrayList<>();
 
-    private static Set<String> SUPPORTED_TYPES = MCRConfiguration.instance().getStrings("MCR.MODS.Types").stream()
+    private static Set<String> SUPPORTED_TYPES = MCRConfiguration2
+        .getOrThrow("MCR.MODS.Types", MCRConfiguration2::splitValue)
         .collect(Collectors.toSet());
 
     private MCRObject object;
