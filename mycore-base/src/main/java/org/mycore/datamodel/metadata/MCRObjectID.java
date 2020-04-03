@@ -36,7 +36,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
@@ -64,9 +63,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * public constant value for the MCRObjectID length
      */
     public static final int MAX_LENGTH = 64;
-
-    // configuration values
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static final MCRObjectIDFormat ID_FORMAT = new MCRObjectIDDefaultFormat();
 
@@ -456,7 +452,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         @Override
         public int numberDistance() {
             if (numberDistance == 0) {
-                MCRConfiguration config = MCRConfiguration.instance();
                 numberDistance = MCRConfiguration2.getInt("MCR.Metadata.ObjectID.NumberDistance").orElse(1);
                 return MCRConfiguration2.getInt("MCR.Metadata.ObjectID.InitialNumberDistance").orElse(numberDistance);
             }

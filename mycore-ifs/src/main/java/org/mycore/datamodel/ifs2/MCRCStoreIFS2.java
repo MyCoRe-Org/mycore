@@ -33,7 +33,6 @@ import java.util.StringTokenizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
@@ -74,7 +73,6 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     public void init(String storeID) {
         super.init(storeID);
 
-        MCRConfiguration config = MCRConfiguration.instance();
         baseDir = MCRConfiguration2.getStringOrThrow(storeConfigPrefix + "BaseDir");
         LOGGER.debug("Base directory for store {} is {}", storeID, baseDir);
 

@@ -43,7 +43,6 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -166,7 +165,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     public MCRPIMetadataService<T> getMetadataService() {
         Map<String, String> properties = getProperties();
-        MCRConfiguration configuration = MCRConfiguration.instance();
 
         final String metadataManager;
         if (properties.containsKey(METADATA_SERVICE_PROPERTY_KEY)) {

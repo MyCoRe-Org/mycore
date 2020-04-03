@@ -28,7 +28,6 @@ import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.Cas20ProxyTicketValidator;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -82,7 +81,6 @@ public class MCRCASServlet extends MCRServlet {
     public void init() throws ServletException {
         super.init();
 
-        MCRConfiguration config = MCRConfiguration.instance();
         clientURL = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.ClientURL");
         serverURL = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.ServerURL");
         realmID = MCRConfiguration2.getStringOrThrow(MCRUser2Constants.CONFIG_PREFIX + "CAS.RealmID");

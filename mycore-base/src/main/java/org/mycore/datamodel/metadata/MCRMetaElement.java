@@ -30,7 +30,6 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 import com.google.gson.JsonArray;
@@ -51,8 +50,6 @@ import com.google.gson.JsonObject;
  */
 public class MCRMetaElement implements Iterable<MCRMetaInterface>, Cloneable {
     // common data
-    protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
     public static final String DEFAULT_LANGUAGE = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
         .orElse(MCRConstants.DEFAULT_LANG);
 

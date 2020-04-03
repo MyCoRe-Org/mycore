@@ -25,7 +25,6 @@ package org.mycore.oai.classmapping;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
@@ -44,8 +43,6 @@ public class MCRClassificationAndSetMapper {
     private static final String PROP_CLASS_SUFFIX = ".Classification";
 
     private static final String PROP_SETS_PREFIX = "Sets.";
-
-    private static MCRConfiguration config = MCRConfiguration.instance();
 
     private static String PROP_SUFFIX = "MapSetToClassification.";
 

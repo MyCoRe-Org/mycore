@@ -42,7 +42,6 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
@@ -119,7 +118,6 @@ public class MCRRSSFeedImporter {
         this.sourceSystemID = sourceSystemID;
 
         String prefix = "MCR.MODS.RSSFeedImporter." + sourceSystemID + ".";
-        MCRConfiguration config = MCRConfiguration.instance();
 
         feedURL = MCRConfiguration2.getStringOrThrow(prefix + "FeedURL");
         importURI = MCRConfiguration2.getStringOrThrow(prefix + "PublicationURI");

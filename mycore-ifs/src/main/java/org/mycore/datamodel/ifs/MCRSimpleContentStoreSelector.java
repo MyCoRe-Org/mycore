@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
@@ -50,7 +49,6 @@ public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
     protected String[] storeIDs;
 
     public MCRSimpleContentStoreSelector() {
-        MCRConfiguration config = MCRConfiguration.instance();
         String file = MCRConfiguration2.getStringOrThrow("MCR.IFS.ContentStoreSelector.ConfigFile");
         Element xml = MCRURIResolver.instance().resolve("resource:" + file);
         if (xml == null) {

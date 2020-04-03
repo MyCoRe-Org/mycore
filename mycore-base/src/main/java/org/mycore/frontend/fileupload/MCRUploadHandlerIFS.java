@@ -43,7 +43,6 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.MCRProcessableStatus;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -66,8 +65,6 @@ import org.mycore.datamodel.niofs.MCRPath;
 public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRUploadHandlerIFS.class);
-
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static final String ID_TYPE = "derivate";
 

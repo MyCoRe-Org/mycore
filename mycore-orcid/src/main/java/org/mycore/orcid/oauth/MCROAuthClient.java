@@ -28,7 +28,6 @@ import javax.ws.rs.client.ClientBuilder;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.streams.MCRMD5InputStream;
 import org.mycore.user2.MCRUser;
@@ -62,7 +61,6 @@ public class MCROAuthClient {
 
     private MCROAuthClient() {
         String prefix = "MCR.ORCID.OAuth.";
-        MCRConfiguration config = MCRConfiguration.instance();
 
         baseURL = MCRConfiguration2.getStringOrThrow(prefix + "BaseURL");
         clientID = MCRConfiguration2.getStringOrThrow(prefix + "ClientID");

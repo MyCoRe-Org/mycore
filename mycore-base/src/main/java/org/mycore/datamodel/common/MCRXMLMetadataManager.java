@@ -45,7 +45,6 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
@@ -155,8 +154,6 @@ public class MCRXMLMetadataManager {
      * Reads configuration properties, checks and creates base directories and builds the singleton
      */
     public synchronized void reload() {
-        MCRConfiguration config = MCRConfiguration.instance();
-
         String pattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern").orElse("0000000000");
         defaultLayout = pattern.length() - 4 + "-2-2";
 
@@ -329,7 +326,6 @@ public class MCRXMLMetadataManager {
     @SuppressWarnings("unchecked")
     private void setupStore(String project, String objectType, String configPrefix, boolean readOnly)
         throws ReflectiveOperationException {
-        MCRConfiguration config = MCRConfiguration.instance();
         String baseID = getStoryKey(project, objectType);
         Class<? extends MCRStore> clazz = MCRConfiguration2.<MCRStore> getClass(configPrefix + "Class")
             .orElseGet(() -> {

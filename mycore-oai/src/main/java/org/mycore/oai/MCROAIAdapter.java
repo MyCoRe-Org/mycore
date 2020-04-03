@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.CannotDisseminateFormatException;
@@ -71,8 +70,6 @@ public class MCROAIAdapter implements OAIAdapter {
 
     protected String configPrefix;
 
-    protected MCRConfiguration config;
-
     protected MCROAISearchManager searchManager;
 
     protected MCROAIObjectManager objectManager;
@@ -96,7 +93,6 @@ public class MCROAIAdapter implements OAIAdapter {
     public void init(String baseURL, String oaiConfiguration) {
         this.baseURL = baseURL;
         this.configPrefix = PREFIX + oaiConfiguration + ".";
-        this.config = MCRConfiguration.instance();
     }
 
     public MCROAISetManager getSetManager() {

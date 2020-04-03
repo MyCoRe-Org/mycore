@@ -39,7 +39,6 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
@@ -56,8 +55,6 @@ import org.mycore.util.concurrent.processing.MCRProcessableFactory;
  * @author Ren\u00E9 Adler
  */
 public class MCRJobMaster implements Runnable, Closeable {
-
-    private static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static Map<String, MCRJobMaster> INSTANCES = new HashMap<>();
 

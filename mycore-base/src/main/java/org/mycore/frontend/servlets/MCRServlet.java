@@ -55,7 +55,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationDirSetup;
@@ -292,11 +291,6 @@ public class MCRServlet extends HttpServlet {
      */
     private void doGetPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException,
         SAXException, TransformerException {
-        if (MCRConfiguration.instance() == null) {
-            // removes NullPointerException below, if somehow Servlet is not yet
-            // intialized
-            init();
-        }
         initializeMCRSession(req, getServletName());
 
         if (SERVLET_URL == null) {

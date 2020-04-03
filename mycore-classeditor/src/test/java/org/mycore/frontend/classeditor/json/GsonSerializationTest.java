@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
@@ -34,7 +33,6 @@ import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
 public class GsonSerializationTest {
     @Before
     public void init() {
-        MCRConfiguration mcrProperties = MCRConfiguration.instance();
         MCRConfigurationBase.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
         MCRConfiguration2.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
     }

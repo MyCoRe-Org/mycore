@@ -32,16 +32,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
-import org.mycore.common.config.MCRConfiguration;
 
 public class MCRTestCase {
 
-    String oldProperties;
-
     @ClassRule
     public static TemporaryFolder junitFolder = new TemporaryFolder();
-
-    protected MCRConfiguration config;
 
     @BeforeClass
     public static void initBaseDir() throws IOException {
@@ -59,7 +54,6 @@ public class MCRTestCase {
     public void setUp() throws Exception {
         initProperties();
         MCRTestCaseHelper.before(getTestProperties());
-        config = MCRConfiguration.instance();
     }
 
     @After

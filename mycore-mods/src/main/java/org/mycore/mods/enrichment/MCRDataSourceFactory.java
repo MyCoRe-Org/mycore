@@ -19,7 +19,6 @@
 package org.mycore.mods.enrichment;
 
 import org.mycore.common.MCRCache;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -51,7 +50,6 @@ class MCRDataSourceFactory {
     }
 
     private MCRDataSource buildDataSource(String sourceID) {
-        MCRConfiguration config = MCRConfiguration.instance();
         MCRDataSource dataSource = new MCRDataSource(sourceID);
 
         String[] identifierTypes = MCRConfiguration2

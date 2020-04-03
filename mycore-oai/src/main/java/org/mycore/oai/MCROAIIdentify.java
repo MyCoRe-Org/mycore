@@ -52,12 +52,9 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     protected static final Logger LOGGER = LogManager.getLogger(MCROAIIdentify.class);
 
-    private MCRConfiguration config;
-
     protected String configPrefix;
 
     public MCROAIIdentify(String baseURL, String configPrefix) {
-        this.config = MCRConfiguration.instance();
         this.configPrefix = configPrefix;
 
         this.setBaseURL(baseURL);

@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -53,7 +52,6 @@ class MCRIdentifierTypeFactory {
     }
 
     private MCRIdentifierType buildIdentifierType(String typeID) {
-        MCRConfiguration config = MCRConfiguration.instance();
         String defaultXPath = String.format(Locale.ROOT, DEFAULT_XPATH, typeID);
         String xPath = MCRConfiguration2.getString("MCR.MODS.EnrichmentResolver.IdentifierType." + typeID)
             .orElse(defaultXPath);

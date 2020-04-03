@@ -37,7 +37,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRSourceContent;
@@ -84,7 +83,6 @@ public class MCRRealmFactory {
     private static Document realmsDocument;
 
     static {
-        MCRConfiguration config = MCRConfiguration.instance();
         String dataDirProperty = "MCR.datadir";
         String dataDir = MCRConfiguration2.getString(dataDirProperty).orElse(null);
         if (dataDir == null) {

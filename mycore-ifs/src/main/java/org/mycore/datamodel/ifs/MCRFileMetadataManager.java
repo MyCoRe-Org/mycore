@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -76,8 +75,6 @@ public class MCRFileMetadataManager {
 
     /** Creates the single instance of this class * */
     private MCRFileMetadataManager() {
-        MCRConfiguration config = MCRConfiguration.instance();
-
         // The FileMetadataStore to use
         store = MCRConfiguration2
             .getOrThrow("MCR.Persistence.IFS.FileMetadataStore.Class", MCRConfiguration2::instantiateClass);

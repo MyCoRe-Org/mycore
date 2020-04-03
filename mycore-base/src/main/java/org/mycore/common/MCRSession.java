@@ -53,7 +53,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -163,7 +162,6 @@ public class MCRSession implements Cloneable {
      * 'MCR.Users.Guestuser.UserName'.
      */
     MCRSession() {
-        MCRConfiguration config = MCRConfiguration.instance();
         userInformation = guestUserInformation;
         setCurrentLanguage(MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG));
         dataBaseAccess = MCRHIBConnection.isEnabled();

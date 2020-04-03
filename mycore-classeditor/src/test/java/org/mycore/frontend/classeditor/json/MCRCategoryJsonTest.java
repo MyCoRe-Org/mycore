@@ -22,7 +22,6 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRJSONManager;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
@@ -34,7 +33,6 @@ import com.google.gson.Gson;
 public class MCRCategoryJsonTest {
     @Test
     public void deserialize() throws Exception {
-        MCRConfiguration mcrProperties = MCRConfiguration.instance();
         MCRConfigurationBase.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
         MCRConfiguration2.set("MCR.Metadata.DefaultLang", "de");
         MCRConfiguration2.set("MCR.Category.DAO", CategoryDAOMock.class.getName());

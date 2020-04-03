@@ -29,7 +29,6 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -78,7 +77,6 @@ public class MCRLanguageFactory {
     private String codeOfDefaultLanguage;
 
     private MCRLanguageFactory() {
-        MCRConfiguration config = MCRConfiguration.instance();
         codeOfDefaultLanguage = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
             .orElse(MCRConstants.DEFAULT_LANG);
         initDefaultLanguages();

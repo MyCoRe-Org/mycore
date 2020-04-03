@@ -37,7 +37,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.oai.pmh.BadResumptionTokenException;
@@ -245,10 +244,6 @@ public class MCROAISearchManager {
 
     public int getPartitionSize() {
         return partitionSize;
-    }
-
-    protected static MCRConfiguration getConfig() {
-        return MCRConfiguration.instance();
     }
 
     public static MCROAISearcher getSearcher(MCROAIIdentify identify, MetadataFormat format, int partitionSize,

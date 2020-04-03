@@ -25,7 +25,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.services.queuedjob.MCRJob;
 
@@ -54,8 +53,6 @@ public class MCRPackerManagerTest extends MCRJPATestCase {
 
     @Test
     public void testPackerConfigurationStart() throws Exception {
-        MCRConfiguration mcrConfiguration = MCRConfiguration.instance();
-
         Map<String, String> parameterMap = new Hashtable<>();
 
         // add packer parameter

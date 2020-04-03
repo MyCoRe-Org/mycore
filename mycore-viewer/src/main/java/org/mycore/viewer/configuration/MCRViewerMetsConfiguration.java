@@ -22,7 +22,6 @@ import java.nio.file.Files;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -53,7 +52,6 @@ public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
         setProperty("pdfCreatorURI", MCRConfiguration2.getString("MCR.Viewer.PDFCreatorURI").orElse(null));
         setProperty("text.enabled", MCRConfiguration2.getString("MCR.Viewer.text.enabled").orElse("false"));
 
-        MCRConfiguration configuration = MCRConfiguration.instance();
         setProperty("pdfCreatorFormatString",
             MCRConfiguration2.getString("MCR.Viewer.PDFCreatorFormatString").orElse(null));
         setProperty("pdfCreatorRestrictionFormatString",

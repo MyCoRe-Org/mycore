@@ -30,11 +30,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
@@ -59,10 +56,6 @@ public class MCRSassCompilerManager {
     private static final String DEVELOPER_MODE_CONFIG_KEY = "MCR.SASS.DeveloperMode";
 
     private static final String LINE_BREAK_CONFIG_KEY = "MCR.SASS.Compress.LineBreak";
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final MCRConfiguration MCR_CONFIGURATION = MCRConfiguration.instance();
 
     private static final int DEFAULT_LINE_BREAK_CONFIG_VALUE = 7999;
 

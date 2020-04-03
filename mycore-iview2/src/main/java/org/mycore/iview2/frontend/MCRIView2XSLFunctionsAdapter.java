@@ -24,7 +24,6 @@ import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -59,7 +58,6 @@ public class MCRIView2XSLFunctionsAdapter {
     }
 
     public String getOptions(String derivateID, String extensions) {
-        MCRConfiguration config = MCRConfiguration.instance();
         final Collection<String> sources = LINK_TABLE_MANAGER.getSourceOf(derivateID, "derivate");
         String objectID = (sources != null && !sources.isEmpty()) ? sources.iterator().next() : "";
         StringBuilder options = new StringBuilder();

@@ -31,7 +31,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRURLContent;
@@ -52,9 +51,6 @@ public abstract class MCRBase {
      * constant value for the object id length
      */
     public static final int MAX_LABEL_LENGTH = 256;
-
-    // from configuration
-    protected static final MCRConfiguration CONFIGURATION;
 
     protected static final String MCR_ENCODING;
 
@@ -85,9 +81,6 @@ public abstract class MCRBase {
     static {
         NL = System.getProperty("line.separator");
         SLASH = System.getProperty("file.separator");
-        // Load the configuration
-        CONFIGURATION = MCRConfiguration.instance();
-
         // Default Encoding
         MCR_ENCODING = MCRConfiguration2.getString("MCR.Metadata.DefaultEncoding").orElse(DEFAULT_ENCODING);
         if (LOGGER.isDebugEnabled()) {

@@ -105,6 +105,7 @@ public class MCRConfiguration {
      *                if props is null - an empty properties object that supports sorting by key will be created
      * @return a new properties object sorted by keys
      */
+    @Deprecated
     public static Properties sortProperties(Properties props) {
         Properties sortedProps = new Properties() {
             private static final long serialVersionUID = 1L;

@@ -24,7 +24,6 @@ import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.MetadataFormat;
 import org.mycore.oai.set.MCRSet;
@@ -126,10 +125,6 @@ public abstract class MCROAISearcher {
      */
     protected void updateRunningExpirationTimer() {
         this.runningExpirationTimer = System.currentTimeMillis() + this.expire;
-    }
-
-    protected MCRConfiguration getConfig() {
-        return MCRConfiguration.instance();
     }
 
     public int getPartitionSize() {

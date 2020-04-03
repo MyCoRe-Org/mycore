@@ -75,7 +75,6 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -97,8 +96,6 @@ import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
 
 public class MCRSwordUtil {
-
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static final int COPY_BUFFER_SIZE = 32 * 1024;
 

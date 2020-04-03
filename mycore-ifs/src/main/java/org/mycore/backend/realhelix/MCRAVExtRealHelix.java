@@ -26,7 +26,6 @@ import java.util.StringTokenizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
@@ -63,7 +62,6 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
     public void init(MCRFile file) throws MCRPersistenceException {
         super.init(file);
 
-        MCRConfiguration config = MCRConfiguration.instance();
         String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
 
         baseMetadata = MCRConfiguration2.getStringOrThrow(prefix + "ViewSourceBaseURL");

@@ -21,14 +21,12 @@
  */
 package org.mycore.oai;
 
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 
 public abstract class MCROAIUtils {
 
     public static String getDefaultRestriction(String configPrefix) {
-        MCRConfiguration config = MCRConfiguration.instance();
         return MCRConfiguration2.getString(configPrefix + "Search.Restriction").orElse(null);
     }
 

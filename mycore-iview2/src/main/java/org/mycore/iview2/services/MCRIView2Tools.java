@@ -49,7 +49,6 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -66,8 +65,6 @@ import org.mycore.imagetiler.MCRTiledPictureProps;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRIView2Tools {
-
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     public static final String CONFIG_PREFIX = "MCR.Module-iview2.";
 

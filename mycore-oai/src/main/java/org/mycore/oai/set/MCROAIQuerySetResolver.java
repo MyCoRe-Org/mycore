@@ -31,7 +31,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.Set;
 import org.mycore.solr.MCRSolrClientFactory;
@@ -81,7 +80,6 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
 
     private SolrQuery getQuery() {
         SolrQuery solrQuery = new SolrQuery();
-        MCRConfiguration config = MCRConfiguration.instance();
         // query
         String idQuery = getResult().stream()
             .map(getIdentifier())
