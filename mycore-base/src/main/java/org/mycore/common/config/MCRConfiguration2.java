@@ -129,7 +129,7 @@ public class MCRConfiguration2 {
      * If you call a method on the returned Optional directly you need to set the type like this:
      * <pre>
      * MCRConfiguration.&lt;MCRMyType&gt; getInstanceOf(name)
-     *     .ifPresent(myTypeObj -> myTypeObj.method());
+     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
      * </pre>
      * 
      * @param name
@@ -148,7 +148,7 @@ public class MCRConfiguration2 {
      * If you call a method on the returned Optional directly you need to set the type like this:
      * <pre>
      * MCRConfiguration.&lt;MCRMyType&gt; getSingleInstanceOf(name)
-     *     .ifPresent(myTypeObj -> myTypeObj.method());
+     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
      * </pre>
      *
      * @param name
@@ -169,7 +169,7 @@ public class MCRConfiguration2 {
      * If you call a method on the returned Optional directly you need to set the type like this:
      * <pre>
      * MCRConfiguration.&lt;MCRMyType&gt; getSingleInstanceOf(name, alternative)
-     *     .ifPresent(myTypeObj -> myTypeObj.method());
+     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
      * </pre>
      *
      * @param name
