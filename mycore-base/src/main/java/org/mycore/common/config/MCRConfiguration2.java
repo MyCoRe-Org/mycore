@@ -39,10 +39,50 @@ import org.mycore.common.inject.MCRInjectorConfig;
 import com.google.inject.ConfigurationException;
 
 /**
- * DO NOT USE! Work in progress to discuss future development.
+ * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
+ * The Properties used by this class are used from {@link MCRConfigurationBase}.
+ * <h2>NOTE</h2>
+ * <p><strong>All {@link Optional} values returned by this class are {@link Optional#empty() empty} if the property
+ * is not set OR the trimmed value {@link String#isEmpty() is empty}. If you want to distinguish between
+ * empty properties and unset properties use {@link MCRConfigurationBase#getString(String)} instead.</strong>
+ * </p>
+ * <p>
+ * Using this class is very easy, here is an example:
+ * </p>
+ * <PRE>
+ * // Get a configuration property as a String:
+ * String sValue = MCRConfiguration2.getString("MCR.String.Value").orElse(defaultValue);
+ *
+ * // Get a configuration property as a List of String (values are seperated by ","):
+ * List&lt;String&gt; lValue = MCRConfiguration2.getString("MCR.StringList.Value").stream()
+ *     .flatMap(MCRConfiguration2::splitValue)
+ *     .collect(Collectors.toList());
+ *
+ * // Get a configuration property as a long array (values are seperated by ","):
+ * long[] la = MCRConfiguration2.getString("MCR.LongList.Value").stream()
+ *     .flatMap(MCRConfiguration2::splitValue)
+ *     .mapToLong(Long::parseLong)
+ *     .toArray();
+ *
+ * // Get a configuration property as an int, use 500 as default if not set:
+ * int max = MCRConfiguration2.getInt("MCR.Cache.Size").orElse(500);
+ * </PRE>
+ *
+ * There are some helper methods to help you with converting values
+ * <ul>
+ *     <li>{@link #getOrThrow(String, Function)}</li>
+ *     <li>{@link #splitValue(String)}</li>
+ *     <li>{@link #instantiateClass(String)}</li>
+ * </ul>
+ *
+ * As you see, the class provides methods to get configuration properties as different data types and allows you to
+ * specify defaults. All MyCoRe configuration properties should start with "<CODE>MCR.</CODE>"
+ *
+ * Using the <CODE>set</CODE> methods allows client code to set new configuration properties or
+ * overwrite existing ones with new values.
  * 
  * @author Thomas Scheffler (yagee)
- * @see <a href="https://mycore.atlassian.net/browse/MCR-1082">MCR-1082</a>
+ * @since 2018.05
  */
 public class MCRConfiguration2 {
 
@@ -86,6 +126,11 @@ public class MCRConfiguration2 {
 
     /**
      * Returns a new instance of the class specified in the configuration property with the given name.
+     * If you call a method on the returned Optional directly you need to set the type like this:
+     * <pre>
+     * MCRConfiguration.&lt;MCRMyType&gt; getInstanceOf(name)
+     *     .ifPresent(myTypeObj -> myTypeObj.method());
+     * </pre>
      * 
      * @param name
      *            the non-null and non-empty name of the configuration property
@@ -100,6 +145,11 @@ public class MCRConfiguration2 {
     /**
      * Returns a instance of the class specified in the configuration property with the given name. If the class was
      * previously instantiated by this method this instance is returned.
+     * If you call a method on the returned Optional directly you need to set the type like this:
+     * <pre>
+     * MCRConfiguration.&lt;MCRMyType&gt; getSingleInstanceOf(name)
+     *     .ifPresent(myTypeObj -> myTypeObj.method());
+     * </pre>
      *
      * @param name
      *            non-null and non-empty name of the configuration property
@@ -116,6 +166,11 @@ public class MCRConfiguration2 {
     /**
      * Returns a instance of the class specified in the configuration property with the given name. If the class was
      * previously instantiated by this method this instance is returned.
+     * If you call a method on the returned Optional directly you need to set the type like this:
+     * <pre>
+     * MCRConfiguration.&lt;MCRMyType&gt; getSingleInstanceOf(name, alternative)
+     *     .ifPresent(myTypeObj -> myTypeObj.method());
+     * </pre>
      *
      * @param name
      *            non-null and non-empty name of the configuration property
