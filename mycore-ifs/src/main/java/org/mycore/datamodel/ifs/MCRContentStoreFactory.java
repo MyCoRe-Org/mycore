@@ -167,7 +167,7 @@ public class MCRContentStoreFactory {
 
         return EXTENDER_CLASSES.computeIfAbsent(storeID, key -> {
             String storeClass = "MCR.IFS.AVExtender." + key + CLASS_SUFFIX;
-            return MCRConfiguration2.<org.mycore.datamodel.ifs.MCRAudioVideoExtender> getClass(storeClass).orElse(null);
+            return MCRConfiguration2.<MCRAudioVideoExtender> getClass(storeClass).orElse(null);
         });
     }
 
