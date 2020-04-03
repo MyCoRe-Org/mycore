@@ -152,7 +152,8 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
             }
             String newPath = StringUtils.join(pathParts, "/");
             if (!newPath.equals(path)) {
-                URI uri = uriInfo.getBaseUri().resolve(newPath);
+                String queryString = uriInfo.getRequestUri().getQuery();
+                URI uri = uriInfo.getBaseUri().resolve(queryString == null ? newPath : newPath + "?" + queryString);
                 response.sendRedirect(uri.toString());
                 // without server sent redirect:
                 //requestContext.setRequestUri(uri);
