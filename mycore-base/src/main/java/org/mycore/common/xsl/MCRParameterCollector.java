@@ -98,9 +98,12 @@ public class MCRParameterCollector {
         if (session != null) {
             setFromSession(session);
         }
-
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        setFromSession(mcrSession);
+        
+        if(!MCRSessionMgr.isLocked()) {
+            MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+            setFromSession(mcrSession);
+            setUnmodifyableParameters(mcrSession, request);
+        }
         setFromRequestParameters(request);
         setFromRequestAttributes(request);
         setFromRequestHeader(request);
@@ -109,7 +112,6 @@ public class MCRParameterCollector {
             setSessionID(session, request.isRequestedSessionIdFromCookie());
         }
 
-        setUnmodifyableParameters(mcrSession, request);
         debugSessionParameters();
     }
 
