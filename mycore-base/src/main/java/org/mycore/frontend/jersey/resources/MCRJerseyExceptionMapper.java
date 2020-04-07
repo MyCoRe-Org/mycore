@@ -78,7 +78,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         }
         if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
             // try to return a html error page
-            if (!MCRSessionMgr.getCurrentSession().isTransactionActive()) {
+            if (!MCRSessionMgr.isLocked() && !MCRSessionMgr.getCurrentSession().isTransactionActive()) {
                 MCRSessionMgr.getCurrentSession().beginTransaction();
             }
             try {
@@ -95,7 +95,9 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
             } catch (Exception transformException) {
                 return Response.status(Status.INTERNAL_SERVER_ERROR).entity(transformException).build();
             } finally {
-                MCRSessionMgr.getCurrentSession().commitTransaction();
+                if(!MCRSessionMgr.isLocked()) { 
+                    MCRSessionMgr.getCurrentSession().commitTransaction();
+                }
             }
         }
         return response;
