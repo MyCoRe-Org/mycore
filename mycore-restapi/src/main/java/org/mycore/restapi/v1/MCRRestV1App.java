@@ -27,6 +27,7 @@ import javax.ws.rs.ApplicationPath;
 
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.restapi.MCRJerseyRestApp;
+import org.mycore.restapi.MCRNormalizeMCRObjectIDsFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -38,11 +39,16 @@ import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 @ApplicationPath("/api/v1")
 public class MCRRestV1App extends MCRJerseyRestApp {
 
+    public MCRRestV1App() {
+        super();
+        register(MCRNormalizeMCRObjectIDsFilter.class);
+    }
+	
     @Override
     protected String getVersion() {
         return "v1";
     }
-
+    
     @Override
     protected String[] getRestPackages() {
         return Stream
