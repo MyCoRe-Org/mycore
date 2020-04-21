@@ -31,7 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -55,7 +55,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrIndexEventHandler.class);
 
-    private static long DELAY_IN_MS = MCRConfiguration.instance().getLong("MCR.Solr.DelayIndexing_inMS", 2000);
+    private static long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000l);
 
     private static DelayQueue<MCRDelayedRunnable> SOLR_TASK_QUEUE = new DelayQueue<MCRDelayedRunnable>();
     private static ScheduledExecutorService SOLR_TASK_EXECUTOR = Executors.newSingleThreadScheduledExecutor();

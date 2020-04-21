@@ -75,7 +75,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -97,8 +97,6 @@ import org.swordapp.server.UriRegistry;
 
 public class MCRSwordUtil {
 
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
     private static final int COPY_BUFFER_SIZE = 32 * 1024;
 
     private static Logger LOGGER = LogManager.getLogger(MCRSwordUtil.class);
@@ -113,8 +111,9 @@ public class MCRSwordUtil {
         derivate.setId(oid);
         derivate.setLabel("data object from " + documentID);
 
-        String schema = CONFIG.getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml").replaceAll(".xml",
-            ".xsd");
+        String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
+            .orElse("datamodel-derivate.xml")
+            .replaceAll(".xml", ".xsd");
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();
@@ -131,7 +130,7 @@ public class MCRSwordUtil {
         LOGGER.debug("Creating new derivate with ID {}", derivateID);
         MCRMetadataManager.create(derivate);
 
-        if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
+        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
             MCRAccessInterface aclImpl = MCRAccessManager.getAccessImpl();
             Collection<String> configuredPermissions = aclImpl.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {

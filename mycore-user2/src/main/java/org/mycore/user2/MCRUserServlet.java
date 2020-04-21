@@ -47,7 +47,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.common.MCRISO8601Date;
@@ -480,7 +480,7 @@ public class MCRUserServlet extends MCRServlet {
 
             LOGGER.info("search users like {}", search);
 
-            int max = MCRConfiguration.instance().getInt(MCRUser2Constants.CONFIG_PREFIX + "Users.MaxResults", 100);
+            int max = MCRConfiguration2.getInt(MCRUser2Constants.CONFIG_PREFIX + "Users.MaxResults").orElse(100);
             int num = MCRUserManager.countUsers(search, null, search);
 
             if ((num < max) && (num > 0)) {

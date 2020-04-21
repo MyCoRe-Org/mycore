@@ -26,7 +26,7 @@ import java.util.StringTokenizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
@@ -62,10 +62,9 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
     public void init(MCRFile file) throws MCRPersistenceException {
         super.init(file);
 
-        MCRConfiguration config = MCRConfiguration.instance();
         String prefix = "MCR.IFS.AVExtender." + file.getStoreID() + ".";
 
-        baseMetadata = config.getString(prefix + "ViewSourceBaseURL");
+        baseMetadata = MCRConfiguration2.getStringOrThrow(prefix + "ViewSourceBaseURL");
 
         try {
             String data = getMetadata(baseMetadata + file.getStorageID());
@@ -139,11 +138,11 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             }
 
             if (" wma wmv asf asx ".contains(" " + contentTypeID + " ")) {
-                basePlayerStarter = config.getString(prefix + "AsxGenBaseURL");
-                playerDownloadURL = config.getString(prefix + "MediaPlayerURL");
+                basePlayerStarter = MCRConfiguration2.getStringOrThrow(prefix + "AsxGenBaseURL");
+                playerDownloadURL = MCRConfiguration2.getStringOrThrow(prefix + "MediaPlayerURL");
             } else {
-                basePlayerStarter = config.getString(prefix + "RamGenBaseURL");
-                playerDownloadURL = config.getString(prefix + "RealPlayerURL");
+                basePlayerStarter = MCRConfiguration2.getStringOrThrow(prefix + "RamGenBaseURL");
+                playerDownloadURL = MCRConfiguration2.getStringOrThrow(prefix + "RealPlayerURL");
             }
 
             URLConnection con = getConnection(basePlayerStarter + file.getStorageID());

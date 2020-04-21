@@ -23,7 +23,7 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 
@@ -56,26 +56,26 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
             MCRFrontendUtil.getBaseURL(request) + "rsc/locale/translate/{lang}/component.mets.*,component.viewer.*");
         setProperty("derivateURL", MCRServlet.getServletBaseURL() + "MCRFileNodeServlet/" + getDerivate(request) + "/");
         setProperty("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
-        setProperty("adminMail", MCRConfiguration.instance().getString("MCR.Mail.Recipients"));
+        setProperty("adminMail", MCRConfiguration2.getStringOrThrow("MCR.Mail.Recipients"));
 
-        final String canvasOverviewEnabled = MCRConfiguration.instance().getString("canvas.overview.enabled", "true");
+        final String canvasOverviewEnabled = MCRConfiguration2.getString("canvas.overview.enabled").orElse("true");
         if (canvasOverviewEnabled != null) {
             setProperty("canvas.overview.enabled", Boolean.valueOf(canvasOverviewEnabled));
         }
 
-        final String canvasOverviewCanvasOverviewMinVisibleSize = MCRConfiguration.instance()
-            .getString("MCR.Viewer.canvas.overview.minVisibleSize", null);
+        final String canvasOverviewCanvasOverviewMinVisibleSize = MCRConfiguration2
+            .getString("MCR.Viewer.canvas.overview.minVisibleSize").orElse(null);
         if (canvasOverviewCanvasOverviewMinVisibleSize != null) {
             setProperty("canvas.overview.minVisibleSize", canvasOverviewCanvasOverviewMinVisibleSize);
         }
 
-        final String canvasStartupFitWidth = MCRConfiguration.instance().getString("MCR.Viewer.canvas.startup.fitWidth",
-            null);
+        final String canvasStartupFitWidth = MCRConfiguration2.getString("MCR.Viewer.canvas.startup.fitWidth")
+            .orElse(null);
         if (canvasStartupFitWidth != null && canvasStartupFitWidth.toLowerCase(Locale.ROOT).equals("true")) {
             setProperty("canvas.startup.fitWidth", true);
         }
 
-        String leftShowOnStart = MCRConfiguration.instance().getString("MCR.Viewer.leftShowOnStart", null);
+        String leftShowOnStart = MCRConfiguration2.getString("MCR.Viewer.leftShowOnStart").orElse(null);
         if (leftShowOnStart != null) {
             setProperty("leftShowOnStart", leftShowOnStart);
         }
@@ -103,7 +103,7 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
             addLocalCSS("default.css");
         }
 
-        String maximalScale = MCRConfiguration.instance().getString("MCR.Viewer.Canvas.Startup.MaximalPageScale", "");
+        String maximalScale = MCRConfiguration2.getString("MCR.Viewer.Canvas.Startup.MaximalPageScale").orElse("");
         if (!maximalScale.isEmpty()) {
             setProperty("maximalPageScale", maximalScale);
         }

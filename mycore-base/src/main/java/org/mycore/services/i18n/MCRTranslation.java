@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,14 +38,16 @@ import java.util.ResourceBundle.Control;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.common.config.MCRProperties;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -366,12 +367,10 @@ public class MCRTranslation {
 
     static Set<String> loadAvailableLanguages() {
         // try to load application relevant languages
-        String languagesString = MCRConfiguration.instance().getString("MCR.Metadata.Languages", null);
-        if (languagesString == null) {
-            // just load all languages by available messages_*.properties
-            return loadLanguagesByMessagesBundle();
-        }
-        return new HashSet<>(Arrays.asList(languagesString.trim().split(",")));
+        return MCRConfiguration2.getString("MCR.Metadata.Languages")
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toSet()))
+            .orElseGet(() -> loadLanguagesByMessagesBundle()); //all languages by available messages_*.properties
     }
 
     static Set<String> loadLanguagesByMessagesBundle() {
@@ -400,12 +399,8 @@ public class MCRTranslation {
     private static void debug() {
         for (String lang : MCRTranslation.getAvailableLanguages()) {
             ResourceBundle rb = MCRTranslation.getResourceBundle("messages", MCRTranslation.getLocale(lang));
-            Properties props = MCRConfiguration.sortProperties(null);
-            Enumeration<String> keys = rb.getKeys();
-            while (keys.hasMoreElements()) {
-                String key = keys.nextElement();
-                props.put(key, rb.getString(key));
-            }
+            Properties props = new MCRProperties();
+            rb.keySet().forEach(key -> props.put(key, rb.getString(key)));
             File resolvedMsgFile = MCRConfigurationDir.getConfigFile("messages_" + lang + ".resolved.properties");
             if (resolvedMsgFile != null) {
                 try (OutputStream os = new FileOutputStream(resolvedMsgFile)) {

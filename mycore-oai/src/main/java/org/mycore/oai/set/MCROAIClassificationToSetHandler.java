@@ -29,7 +29,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.MCROAIUtils;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.solr.MCRSolrClientFactory;
@@ -49,7 +49,7 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
     @Override
     public void init(String configPrefix, String handlerPrefix) {
         super.init(configPrefix, handlerPrefix);
-        classField = MCRConfiguration.instance().getString(getConfigPrefix() + "SetSolrField", "category.top");
+        classField = MCRConfiguration2.getString(getConfigPrefix() + "SetSolrField").orElse("category.top");
     }
 
     public void apply(MCRSet set, SolrQuery query) {
@@ -94,7 +94,7 @@ public class MCROAIClassificationToSetHandler extends MCROAISolrSetHandler {
     }
 
     private boolean filterEmptySets() {
-        return MCRConfiguration.instance().getBoolean(getConfigPrefix() + "FilterEmptySets", true);
+        return MCRConfiguration2.getBoolean(getConfigPrefix() + "FilterEmptySets").orElse(true);
     }
 
     @Override

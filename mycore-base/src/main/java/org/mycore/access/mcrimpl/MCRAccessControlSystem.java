@@ -35,7 +35,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * MyCoRe-Standard Implementation of the MCRAccessInterface Maps object ids to rules
@@ -64,8 +64,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessControlSystem.class);
 
     private MCRAccessControlSystem() {
-        MCRConfiguration config = MCRConfiguration.instance();
-        String pools = config.getString("MCR.Access.AccessPermissions", "read,write,delete");
+        String pools = MCRConfiguration2.getString("MCR.Access.AccessPermissions").orElse("read,write,delete");
 
         if (pools.trim().length() == 0) {
             disabled = true;

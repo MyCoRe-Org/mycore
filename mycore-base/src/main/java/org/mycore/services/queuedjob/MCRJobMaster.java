@@ -39,7 +39,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.inject.MCRInjectorConfig;
@@ -55,8 +55,6 @@ import org.mycore.util.concurrent.processing.MCRProcessableFactory;
  * @author Ren\u00E9 Adler
  */
 public class MCRJobMaster implements Runnable, Closeable {
-
-    private static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static Map<String, MCRJobMaster> INSTANCES = new HashMap<>();
 
@@ -140,17 +138,18 @@ public class MCRJobMaster implements Runnable, Closeable {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
 
-        boolean activated = CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated", true);
+        boolean activated = MCRConfiguration2.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated").orElse(true);
         activated = activated
-            && CONFIG.getBoolean(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "activated", true);
+            && MCRConfiguration2.getBoolean(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "activated")
+            .orElse(true);
 
         LOGGER.info("JobQueue{} is {}", MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"",
             activated ? "activated" : "deactivated");
         if (activated) {
             running = true;
-            int jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads", 2);
-            jobThreadCount = CONFIG.getInt(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "JobThreads",
-                jobThreadCount);
+            int jobThreadCount = MCRConfiguration2.getInt(MCRJobQueue.CONFIG_PREFIX + "JobThreads").orElse(2);
+            jobThreadCount = MCRConfiguration2
+                .getInt(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "JobThreads").orElse(jobThreadCount);
 
             ThreadFactory slaveFactory = new ThreadFactory() {
                 AtomicInteger tNum = new AtomicInteger();

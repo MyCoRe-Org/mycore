@@ -28,7 +28,7 @@ import org.jaxen.expr.LocationPath;
 import org.jaxen.expr.Step;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.tracker.MCRAddedElement;
 import org.mycore.frontend.xeditor.tracker.MCRSwapElements;
@@ -39,8 +39,8 @@ public class MCRRepeatBinding extends MCRBinding {
 
     private int maxRepeats;
 
-    private static final String DEFAULT_METHOD = MCRConfiguration.instance()
-        .getString("MCR.XEditor.InsertTarget.DefaultMethod", "build");
+    private static final String DEFAULT_METHOD = MCRConfiguration2.getString("MCR.XEditor.InsertTarget.DefaultMethod")
+        .orElse("build");
 
     private String method = DEFAULT_METHOD; // build|clone
 

@@ -34,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.Transaction;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -125,7 +125,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
     }
 
     private boolean requireDecompressZip(String path) {
-        return MCRConfiguration.instance().getBoolean("MCR.FileUpload.DecompressZip", true)
+        return MCRConfiguration2.getBoolean("MCR.FileUpload.DecompressZip").orElse(true)
             && path.toLowerCase(Locale.ROOT).endsWith(".zip");
     }
 

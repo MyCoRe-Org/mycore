@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.solr.common.SolrInputDocument;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -39,8 +39,8 @@ import org.xml.sax.SAXException;
  */
 public abstract class MCRSolrInputDocumentFactory {
 
-    private static MCRSolrInputDocumentFactory instance = MCRConfiguration.instance()
-        .getInstanceOf(SOLR_CONFIG_PREFIX + "SolrInputDocument.Factory", null);
+    private static MCRSolrInputDocumentFactory instance = MCRConfiguration2
+        .getOrThrow(SOLR_CONFIG_PREFIX + "SolrInputDocument.Factory", MCRConfiguration2::instantiateClass);
 
     public static MCRSolrInputDocumentFactory getInstance() {
         return instance;

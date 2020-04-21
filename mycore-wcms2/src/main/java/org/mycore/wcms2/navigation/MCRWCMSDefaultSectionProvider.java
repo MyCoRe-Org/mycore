@@ -37,7 +37,7 @@ import org.jdom2.Text;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.xml.sax.SAXParseException;
 
@@ -65,12 +65,10 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
         "optgroup", "option", "textarea", "keygen", "output", "progress", "meter", "details", "summary", "menuitem",
         "menu", "font");
 
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
     private List<String> mycoreTagList = new ArrayList<>();
 
     public MCRWCMSDefaultSectionProvider() {
-        String mycoreTagListString = CONFIG.getString("MCR.WCMS2.mycoreTagList", "");
+        String mycoreTagListString = MCRConfiguration2.getString("MCR.WCMS2.mycoreTagList").orElse("");
         for (String tag : mycoreTagListString.split(",")) {
             mycoreTagList.add(tag.trim());
         }

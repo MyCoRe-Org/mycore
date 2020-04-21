@@ -58,6 +58,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.xml.parsers.DocumentBuilder;
@@ -81,7 +82,7 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -518,22 +519,22 @@ public class MCRXMLFunctions {
         }
 
         String propertyName = "MCR.URN.Enabled.Objects";
-        String propertyValue = MCRConfiguration.instance().getString(propertyName, null);
-        if (propertyValue == null || propertyValue.length() == 0) {
-            LOGGER.info("URN assignment disabled as the property \"{}\" is not set", propertyName);
-            return false;
+        boolean allowed = MCRConfiguration2.getString(propertyName)
+            .map(MCRConfiguration2::splitValue)
+            .orElseGet(() -> {
+                LOGGER.info("URN assignment disabled as the property \"{}\" is not set", propertyName);
+                return Stream.empty();
+            })
+            .filter(s -> s.equals(givenType))
+            .findAny()
+            .isPresent();
+        if (!allowed) {
+            LOGGER.info(
+                "URN assignment disabled as the object type {} is not in the list of allowed objects."
+                    + " See property \"{}\"",
+                givenType, propertyName);
         }
-
-        String[] allowedTypes = propertyValue.split(",");
-        for (String current : allowedTypes) {
-            if (current.trim().equals(givenType.trim())) {
-                return true;
-            }
-        }
-        LOGGER.info(
-            "URN assignment disabled as the object type {} is not in the list of allowed objects. See property \"{}\"",
-            givenType, propertyName);
-        return false;
+        return allowed;
     }
 
     /**
@@ -865,8 +866,10 @@ public class MCRXMLFunctions {
             LOGGER.debug("get next import step for {}", includePart);
         }
         // get the parameters from mycore.properties
-        List<String> importList = Collections.emptyList();
-        importList = MCRConfiguration.instance().getStrings("MCR.URIResolver.xslImports." + includePart, importList);
+        List<String> importList = MCRConfiguration2.getString("MCR.URIResolver.xslImports." + includePart)
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(Collections::emptyList);
         if (importList.isEmpty()) {
             LOGGER.info("MCR.URIResolver.xslImports.{} has no Stylesheets defined", includePart);
         } else {

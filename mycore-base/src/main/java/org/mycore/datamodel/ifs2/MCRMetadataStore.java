@@ -27,7 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 
@@ -87,10 +86,10 @@ public class MCRMetadataStore extends MCRStore {
         super.init(config);
         prefix = Optional.ofNullable(config.getPrefix()).orElseGet(() -> config.getID() + "_");
         suffix = ".xml";
-        forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML", true);
+        forceXML = MCRConfiguration2.getBoolean("MCR.IFS2.Store." + config.getID() + ".ForceXML").orElse(true);
         if (forceXML) {
-            forceDocType = MCRConfiguration.instance().getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType",
-                null);
+            forceDocType = MCRConfiguration2.getString("MCR.IFS2.Store." + config.getID() + ".ForceDocType")
+                .orElse(null);
             LOGGER.debug("Set doctype for {} to {}", config.getID(), forceDocType);
         }
     }

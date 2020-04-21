@@ -31,7 +31,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.Set;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrUtils;
@@ -80,7 +80,6 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
 
     private SolrQuery getQuery() {
         SolrQuery solrQuery = new SolrQuery();
-        MCRConfiguration config = MCRConfiguration.instance();
         // query
         String idQuery = getResult().stream()
             .map(getIdentifier())
@@ -91,7 +90,8 @@ class MCROAIQuerySetResolver extends MCROAISetResolver<String, SolrDocument> {
         solrQuery.setFields("id");
         solrQuery.setRows(getResult().size());
         // request handler
-        solrQuery.setRequestHandler(config.getString(getConfigPrefix() + "Search.RequestHandler", "/select"));
+        solrQuery.setRequestHandler(
+            MCRConfiguration2.getString(getConfigPrefix() + "Search.RequestHandler").orElse("/select"));
         return solrQuery;
     }
 

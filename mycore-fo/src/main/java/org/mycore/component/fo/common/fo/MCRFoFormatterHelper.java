@@ -18,7 +18,7 @@
 
 package org.mycore.component.fo.common.fo;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Returns the XSL-FO formatter instance configured via PROPERTY, for example
@@ -42,7 +42,8 @@ public class MCRFoFormatterHelper {
     /** Returns the XSL-FO formatter instance configured */
     public static synchronized MCRFoFormatterInterface getFoFormatter() {
         if (formatter == null) {
-            formatter = MCRConfiguration.instance().getInstanceOf(PROPERTY, MCRFoFormatterFOP.class.getName());
+            formatter = MCRConfiguration2.<MCRFoFormatterInterface>getInstanceOf(PROPERTY)
+                .orElseGet(MCRFoFormatterFOP::new);
         }
         return formatter;
     }

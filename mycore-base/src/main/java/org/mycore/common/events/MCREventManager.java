@@ -23,11 +23,12 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
@@ -60,13 +61,11 @@ public class MCREventManager {
     private MCREventManager() {
         handlers = new Hashtable<>();
 
-        MCRConfiguration config = MCRConfiguration.instance();
-
-        Map<String, String> props = config.getPropertiesMap(CONFIG_PREFIX);
-
-        if (props == null) {
-            return;
-        }
+        Map<String, String> props = MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(CONFIG_PREFIX))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         List<String> propertyKeyList = new ArrayList<>(props.size());
         for (Object name : props.keySet()) {
@@ -83,7 +82,7 @@ public class MCREventManager {
             String type = eventHandlerProperty.getType();
             String mode = eventHandlerProperty.getMode();
 
-            logger.debug("EventManager instantiating handler {} for type {}", config.getString(propertyKey), type);
+            logger.debug("EventManager instantiating handler {} for type {}", props.get(propertyKey), type);
 
             if (propKeyIsSet(propertyKey)) {
                 addEventHandler(type, getEventHandler(mode, propertyKey));
@@ -105,7 +104,7 @@ public class MCREventManager {
     }
 
     private boolean propKeyIsSet(String propertyKey) {
-        return MCRConfiguration.instance().getString(propertyKey).length() != 0;
+        return MCRConfiguration2.getString(propertyKey).isPresent();
     }
 
     private List<MCREventHandler> getOrCreateEventHandlerListOfType(String type) {
@@ -237,12 +236,14 @@ public class MCREventManager {
     }
 
     public MCREventHandler getEventHandler(String mode, String propertyValue) {
-        MCRConfiguration configuration = MCRConfiguration.instance();
         if ("Class".equals(mode)) {
-            return configuration.getSingleInstanceOf(propertyValue);
+            return MCRConfiguration2.<MCREventHandler> getSingleInstanceOf(propertyValue)
+                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(propertyValue));
         }
         String className = CONFIG_PREFIX + "Mode." + mode;
-        MCREventHandlerInitializer configuredInitializer = configuration.getSingleInstanceOf(className);
+        MCREventHandlerInitializer configuredInitializer = MCRConfiguration2
+            .<MCREventHandlerInitializer> getSingleInstanceOf(className)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(className));
         return configuredInitializer.getInstance(propertyValue);
     }
 

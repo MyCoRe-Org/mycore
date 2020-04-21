@@ -33,7 +33,7 @@ import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -44,16 +44,13 @@ public class MCRXPathEvaluator {
 
     private static final Pattern PATTERN_XPATH = Pattern.compile("\\{([^\\}]+)\\}");
 
-    private static final XPathFactory XPATH_FACTORY;
+    private static final XPathFactory XPATH_FACTORY = MCRConfiguration2.getString("MCR.XPathFactory.Class")
+        .map(XPathFactory::newInstance)
+        .orElseGet(XPathFactory::instance);
 
     private Map<String, Object> variables;
 
     private List<Object> context;
-
-    static {
-        String factoryClass = MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null);
-        XPATH_FACTORY = factoryClass == null ? XPathFactory.instance() : XPathFactory.newInstance(factoryClass);
-    }
 
     public MCRXPathEvaluator(Map<String, Object> variables, List<Object> context) {
         this.variables = variables;
@@ -125,7 +122,7 @@ public class MCRXPathEvaluator {
         } catch (Exception ex) {
             LOGGER.warn("unable to evaluate XPath: {}", xPathExpression);
             LOGGER.warn("XPath factory used is {} {}", XPATH_FACTORY.getClass().getCanonicalName(),
-                MCRConfiguration.instance().getString("MCR.XPathFactory.Class", null));
+                MCRConfiguration2.getString("MCR.XPathFactory.Class").orElse(null));
             LOGGER.warn(ex);
             return null;
         }

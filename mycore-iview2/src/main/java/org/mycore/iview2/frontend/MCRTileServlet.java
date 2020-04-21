@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.iview2.backend.MCRDefaultTileFileProvider;
 import org.mycore.iview2.backend.MCRTileFileProvider;
 import org.mycore.iview2.backend.MCRTileInfo;
@@ -53,8 +53,8 @@ public class MCRTileServlet extends HttpServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTileServlet.class);
 
-    private static MCRTileFileProvider TFP = MCRConfiguration.instance()
-            .getInstanceOf("MCR.IIIFImage.Iview.TileFileProvider", new MCRDefaultTileFileProvider());
+    private static MCRTileFileProvider TFP = MCRConfiguration2.<MCRDefaultTileFileProvider> getInstanceOf(
+        "MCR.IIIFImage.Iview.TileFileProvider").orElseGet(MCRDefaultTileFileProvider::new);
 
     /**
      * Extracts tile or image properties from iview2 file and transmits it.

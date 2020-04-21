@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
@@ -41,7 +41,7 @@ public class MCRReadPublicTokenFactory {
 
     private static final String CONFIG_PROPERTY = "MCR.ORCID.OAuth.ReadPublicToken";
 
-    private static String token = MCRConfiguration.instance().getString(CONFIG_PROPERTY, null);
+    private static String token = MCRConfiguration2.getString(CONFIG_PROPERTY).orElse(null);
 
     /**
      * Returns the read-public access token

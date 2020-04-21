@@ -30,7 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -48,9 +48,10 @@ public class MCRSecureTokenV2FilterConfig {
     private static Logger LOGGER = LogManager.getLogger();
 
     static {
-        MCRConfiguration configuration = MCRConfiguration.instance();
-        List<String> propertyValues = configuration.getStrings("MCR.SecureTokenV2.Extensions",
-            Collections.emptyList());
+        List<String> propertyValues = MCRConfiguration2.getString("MCR.SecureTokenV2.Extensions")
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(Collections::emptyList);
         if (propertyValues.isEmpty()) {
             enabled = false;
             LOGGER.info("Local MCRSecureToken2 support is disabled.");
@@ -58,8 +59,8 @@ public class MCRSecureTokenV2FilterConfig {
             enabled = true;
             securedExtensions = getExtensionPattern(propertyValues);
             LOGGER.info("SecureTokenV2 extension pattern: {}", securedExtensions);
-            hashParameter = configuration.getString("MCR.SecureTokenV2.ParameterName");
-            sharedSecret = configuration.getString("MCR.SecureTokenV2.SharedSecret").trim();
+            hashParameter = MCRConfiguration2.getStringOrThrow("MCR.SecureTokenV2.ParameterName");
+            sharedSecret = MCRConfiguration2.getStringOrThrow("MCR.SecureTokenV2.SharedSecret");
         }
     }
 

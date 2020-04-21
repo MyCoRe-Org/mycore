@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.tmatesoft.svn.core.SVNCancelException;
@@ -65,8 +65,8 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
     protected SVNURL repURL;
 
-    protected static final boolean SYNC_LAST_MODIFIED_ON_SVN_COMMIT = MCRConfiguration.instance().getBoolean(
-        "MCR.IFS2.SyncLastModifiedOnSVNCommit", true);
+    protected static final boolean SYNC_LAST_MODIFIED_ON_SVN_COMMIT = MCRConfiguration2
+        .getBoolean("MCR.IFS2.SyncLastModifiedOnSVNCommit").orElse(true);
 
     static {
         FSRepositoryFactory.setup();
@@ -86,8 +86,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
     private void setupSVN(String type) {
         URI repositoryURI;
-        String repositoryURIString = MCRConfiguration.instance()
-            .getString("MCR.IFS2.Store." + type + ".SVNRepositoryURL");
+        String repositoryURIString = MCRConfiguration2.getStringOrThrow("MCR.IFS2.Store." + type + ".SVNRepositoryURL");
         try {
             repositoryURI = new URI(repositoryURIString);
         } catch (URISyntaxException e) {

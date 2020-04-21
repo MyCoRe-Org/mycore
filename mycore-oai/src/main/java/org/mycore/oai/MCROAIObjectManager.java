@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -62,7 +62,7 @@ public class MCROAIObjectManager {
     public void init(MCROAIIdentify identify) {
         this.identify = identify;
         String configPrefix = this.identify.getConfigPrefix();
-        this.recordUriPattern = MCRConfiguration.instance().getString(configPrefix + "Adapter.RecordURIPattern");
+        this.recordUriPattern = MCRConfiguration2.getStringOrThrow(configPrefix + "Adapter.RecordURIPattern");
     }
 
     /**

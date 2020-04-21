@@ -22,6 +22,7 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.lookup.StrLookup;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Lookup a value in {@link MCRConfiguration}. Uses <code>key</code> as property key.
@@ -35,7 +36,7 @@ public class MCRConfigurationLookup implements StrLookup {
 
     @Override
     public String lookup(String key) {
-        return MCRConfiguration.instance().getString(key, null);
+        return MCRConfiguration2.getString(key).orElse(null);
     }
 
     @Override

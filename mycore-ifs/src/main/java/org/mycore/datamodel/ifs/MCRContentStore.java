@@ -30,7 +30,7 @@ import java.util.Random;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 
 /**
@@ -105,7 +105,7 @@ public abstract class MCRContentStore {
     public void init(String storeID) {
         this.storeID = storeID;
         storeConfigPrefix = "MCR.IFS.ContentStore." + storeID + ".";
-        slotDirDepth = MCRConfiguration.instance().getInt(storeConfigPrefix + "SlotDirDepth", 2);
+        slotDirDepth = MCRConfiguration2.getInt(storeConfigPrefix + "SlotDirDepth").orElse(2);
     }
 
     /**

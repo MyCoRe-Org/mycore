@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Represents a realm of users. Each user belongs to a realm. Realms are configured 
@@ -56,8 +56,8 @@ public class MCRRealm {
 
     private String realmParameter;
 
-    private static String DEFAULT_LANG = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
-        MCRConstants.DEFAULT_LANG);
+    private static String DEFAULT_LANG = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
+        .orElse(MCRConstants.DEFAULT_LANG);
 
     public static final String USER_INFORMATION_ATTR = "realmId";
 

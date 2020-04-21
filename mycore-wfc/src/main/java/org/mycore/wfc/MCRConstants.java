@@ -22,7 +22,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.wfc.actionmapping.MCRAction;
 import org.mycore.wfc.actionmapping.MCRActionMappings;
@@ -55,13 +55,13 @@ public abstract class MCRConstants {
     }
 
     private static MCRCategoryID getStatusClassID() {
-        final String classID = MCRConfiguration.instance().getString(CONFIG_PREFIX + "StatusClassID", "objectStatus");
+        final String classID = MCRConfiguration2.getString(CONFIG_PREFIX + "StatusClassID").orElse("objectStatus");
         return MCRCategoryID.rootID(classID);
     }
 
     private static MCRCategoryID getCollectionClassID() {
-        final String classID = MCRConfiguration.instance().getString(CONFIG_PREFIX + "CollectionClassID",
-            "objectCollection");
+        final String classID = MCRConfiguration2.getString(CONFIG_PREFIX + "CollectionClassID")
+            .orElse("objectCollection");
         return MCRCategoryID.rootID(classID);
     }
 }

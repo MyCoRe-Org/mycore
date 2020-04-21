@@ -58,7 +58,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRJSONManager;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -295,7 +295,7 @@ public class MCRClassificationEditorResource {
         params.set("start", start != null ? start : 0);
         params.set("rows", rows != null ? rows : 50);
         params.set("fl", "id");
-        String configQuery = MCRConfiguration.instance().getString("MCR.Solr.linkQuery", "category.top:{0}");
+        String configQuery = MCRConfiguration2.getString("MCR.Solr.linkQuery").orElse("category.top:{0}");
         String query = new MessageFormat(configQuery, Locale.ROOT).format(new String[] { id.replaceAll(":", "\\\\:") });
         params.set("q", query);
         QueryResponse solrResponse = solrClient.query(params);

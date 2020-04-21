@@ -36,7 +36,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -59,7 +59,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     private static final Logger LOGGER = LogManager.getLogger(MCRClassificationBrowser2.class);
 
     protected MCRQueryAdapter getQueryAdapter(final String fieldName) {
-        MCRQueryAdapter adapter = MCRConfiguration.instance().getInstanceOf("MCR.Module-classbrowser.QueryAdapter");
+        MCRQueryAdapter adapter = MCRConfiguration2
+            .getOrThrow("MCR.Module-classbrowser.QueryAdapter", MCRConfiguration2::instantiateClass);
         adapter.setFieldName(fieldName);
         return adapter;
     }

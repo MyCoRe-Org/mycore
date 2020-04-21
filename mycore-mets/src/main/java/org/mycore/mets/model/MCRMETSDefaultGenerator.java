@@ -36,7 +36,7 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -280,8 +280,9 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
     private MCRILogicalStructMapTypeProvider getTypeProvider() {
         try {
-            return MCRConfiguration.instance().getClass("MCR.Component.MetsMods.LogicalStructMapTypeProvider",
-                MCRDefaultLogicalStructMapTypeProvider.class).getDeclaredConstructor().newInstance();
+            return MCRConfiguration2.<MCRDefaultLogicalStructMapTypeProvider>getClass(
+                "MCR.Component.MetsMods.LogicalStructMapTypeProvider")
+                .orElse(MCRDefaultLogicalStructMapTypeProvider.class).getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             LOGGER.warn("Could not load class", e);
             return new MCRDefaultLogicalStructMapTypeProvider();

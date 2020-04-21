@@ -1,7 +1,5 @@
 package org.mycore.pi;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,7 +9,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.events.MCRStartupHandler;
 
@@ -38,12 +36,14 @@ public class MCRPIConfigurationChecker implements MCRStartupHandler.AutoExecutab
     @Override
     public void startUp(ServletContext servletContext) {
         LOGGER.info("Check persistent identifier configuration!");
-        final List<String> deprecatedPropertyList = Collections.synchronizedList(new ArrayList<>());
-        DEPRECATED_PROPERTY_PREFIXES
-            .forEach(propPrefix -> {
-                Map<String, String> map = MCRConfiguration.instance().getPropertiesMap(propPrefix);
-                deprecatedPropertyList.addAll(map.keySet());
-            });
+        final List<String> deprecatedPropertyList = DEPRECATED_PROPERTY_PREFIXES
+            .stream()
+            .flatMap(propPrefix -> MCRConfiguration2.getPropertiesMap()
+                .entrySet()
+                .stream()
+                .filter(p -> p.getKey().startsWith(propPrefix))
+                .map(Map.Entry::getKey))
+            .collect(Collectors.toList());
 
         if (deprecatedPropertyList.size() > 0) {
             throw new MCRConfigurationException("Deprecated properties found: " + deprecatedPropertyList

@@ -44,7 +44,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStreamUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference_;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
@@ -72,7 +72,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     private static final String NAMED_QUERY_NAMESPACE = "MCRCategoryLink.";
 
     private static MCRCache<MCRCategoryID, MCRCategory> categCache = new MCRCache<>(
-        MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
+        MCRConfiguration2.getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size").orElse(1000),
         "MCRCategLinkService category cache");
 
     private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();

@@ -32,7 +32,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Automatically closes HttpSession of certain user agents.
@@ -50,8 +50,8 @@ public class MCRUserAgentFilter implements Filter {
 
     @Override
     public void init(final FilterConfig arg0) throws ServletException {
-        final String agentRegEx = MCRConfiguration.instance().getString("MCR.Filter.UserAgent",
-            "(bot|spider|crawler|mercator|slurp|seek|nagios|Java)");
+        final String agentRegEx = MCRConfiguration2.getString("MCR.Filter.UserAgent")
+            .orElse("(bot|spider|crawler|mercator|slurp|seek|nagios|Java)");
         agentPattern = Pattern.compile(agentRegEx);
     }
 

@@ -33,7 +33,7 @@ import java.util.StringTokenizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -73,16 +73,15 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     public void init(String storeID) {
         super.init(storeID);
 
-        MCRConfiguration config = MCRConfiguration.instance();
-        baseDir = config.getString(storeConfigPrefix + "BaseDir");
+        baseDir = MCRConfiguration2.getStringOrThrow(storeConfigPrefix + "BaseDir");
         LOGGER.debug("Base directory for store {} is {}", storeID, baseDir);
 
-        String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
+        String pattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern").orElse("0000000000");
         slotLayout = pattern.length() - 4 + "-2-2";
-        slotLayout = config.getString(storeConfigPrefix + "SlotLayout", slotLayout);
+        slotLayout = MCRConfiguration2.getString(storeConfigPrefix + "SlotLayout").orElse(slotLayout);
         LOGGER.debug("Default slot layout for store {} is {}", storeID, slotLayout);
 
-        ignoreOwnerBase = config.getBoolean(storeConfigPrefix + "IgnoreOwnerBase", false);
+        ignoreOwnerBase = MCRConfiguration2.getBoolean(storeConfigPrefix + "IgnoreOwnerBase").orElse(false);
         MCREventManager.instance().addEventHandler(MCREvent.PATH_TYPE, new UpdateMetadataHandler(this));
     }
 
@@ -128,8 +127,8 @@ public class MCRCStoreIFS2 extends MCRContentStore {
     }
 
     private void configureIfNotSet(String property, String value) {
-        value = MCRConfiguration.instance().getString(property, value);
-        MCRConfiguration.instance().set(property, value);
+        value = MCRConfiguration2.getString(property).orElse(value);
+        MCRConfiguration2.set(property, value);
         LOGGER.info("Configured {}={}", property, value);
     }
 

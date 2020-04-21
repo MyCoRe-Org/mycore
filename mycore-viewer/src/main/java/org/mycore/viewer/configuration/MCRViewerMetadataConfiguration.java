@@ -26,7 +26,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -53,8 +53,7 @@ public class MCRViewerMetadataConfiguration extends MCRViewerConfiguration {
         // properties
         setProperty("objId", objectID.toString());
         String urlFormat = "%sreceive/%s?XSL.Transformer=%s";
-        MCRConfiguration mcrConfiguration = MCRConfiguration.instance();
-        String transformer = mcrConfiguration.getString("MCR.Viewer.metadata.transformer", null);
+        String transformer = MCRConfiguration2.getString("MCR.Viewer.metadata.transformer").orElse(null);
         if (transformer != null) {
             setProperty(
                 "metadataURL",

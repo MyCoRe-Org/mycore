@@ -26,7 +26,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.wcms2.MCRWCMSUtil;
@@ -43,13 +43,9 @@ import com.google.gson.JsonObject;
 
 public class MCRWCMSNavigationUtils {
 
-    private static MCRWCMSNavigationProvider NAVIGATION_PROVIDER;
-
-    static {
-        MCRConfiguration conf = MCRConfiguration.instance();
-        NAVIGATION_PROVIDER = conf.getInstanceOf("MCR.WCMS2.navigationProvider",
-            MCRWCMSDefaultNavigationProvider.class.getName());
-    }
+    private static MCRWCMSNavigationProvider NAVIGATION_PROVIDER = MCRConfiguration2
+        .<MCRWCMSNavigationProvider> getInstanceOf("MCR.WCMS2.navigationProvider")
+        .orElseGet(MCRWCMSDefaultNavigationProvider::new);
 
     /**
      * @see MCRWCMSNavigationProvider#toJSON(MCRNavigation)
@@ -102,7 +98,7 @@ public class MCRWCMSNavigationUtils {
                     }
                 }
             } else {
-                MCRConfiguration.instance().set("MCR.NavigationFile.SaveInOldFormat", false);
+                MCRConfiguration2.set("MCR.NavigationFile.SaveInOldFormat", String.valueOf(false));
             }
             return MCRWCMSUtil.load(doc);
         } finally {

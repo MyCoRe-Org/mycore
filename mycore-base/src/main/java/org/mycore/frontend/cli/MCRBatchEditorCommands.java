@@ -35,7 +35,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -162,19 +162,19 @@ public class MCRBatchEditorCommands extends MCRAbstractCommands {
     }
 
     private static List<Element> getlevelElements(Document xml, String level) {
-        String path = MCRConfiguration.instance().getString(CFG_PREFIX_BASE + level);
+        String path = MCRConfiguration2.getStringOrThrow(CFG_PREFIX_BASE + level);
         XPathExpression<Element> xPath = XPathFactory.instance().compile(path, FE, null, NS);
         return xPath.evaluate(xml);
     }
 
     private static void add(Element base, String field, String value) throws JaxenException {
-        String path = MCRConfiguration.instance().getString(CFG_PREFIX + field + CFG_SUFFIX_ADD);
+        String path = MCRConfiguration2.getStringOrThrow(CFG_PREFIX + field + CFG_SUFFIX_ADD);
         path = new MessageFormat(path, Locale.ROOT).format(new String[] { value });
         new MCRNodeBuilder().buildNode(path, null, base);
     }
 
     private static List<Element> find(Element base, String field, String value) {
-        String path = MCRConfiguration.instance().getString(CFG_PREFIX + field + CFG_SUFFIX_REMOVE);
+        String path = MCRConfiguration2.getStringOrThrow(CFG_PREFIX + field + CFG_SUFFIX_REMOVE);
         path = new MessageFormat(path, Locale.ROOT).format(new String[] { value });
         XPathExpression<Element> fPath = XPathFactory.instance().compile(path, FE, null, NS);
         List<Element> selected = fPath.evaluate(base);

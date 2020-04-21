@@ -26,7 +26,6 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.InternalServerErrorException;
 
 import org.mycore.common.MCRCoreVersion;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.restapi.MCRDropSessionFilter;
@@ -70,7 +69,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
             .concat(
                 Stream.of(MCRWrappedXMLWriter.class.getPackage().getName(),
                     OpenApiResource.class.getPackage().getName()),
-                MCRConfiguration.instance().getStrings("MCR.RestAPI.V2.Resource.Packages").stream())
+                MCRConfiguration2.getOrThrow("MCR.RestAPI.V2.Resource.Packages", MCRConfiguration2::splitValue))
             .toArray(String[]::new);
     }
 

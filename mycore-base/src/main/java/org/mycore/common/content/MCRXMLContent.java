@@ -26,7 +26,7 @@ import java.security.MessageDigest;
 
 import org.jdom2.output.Format;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.streams.MCRMD5InputStream;
 
 /**
@@ -45,7 +45,7 @@ public abstract class MCRXMLContent extends MCRContent {
     protected static Format defaultFormat;
 
     static {
-        boolean prettyXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.PrettyXML", true);
+        boolean prettyXML = MCRConfiguration2.getBoolean("MCR.IFS2.PrettyXML").orElse(true);
         defaultFormat = prettyXML ? Format.getPrettyFormat().setIndent("  ") : Format.getRawFormat();
         defaultFormat.setEncoding(MCRConstants.DEFAULT_ENCODING);
     }

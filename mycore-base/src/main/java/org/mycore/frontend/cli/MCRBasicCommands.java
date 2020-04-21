@@ -32,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
@@ -164,7 +164,7 @@ public class MCRBasicCommands {
         File configurationDirectory = MCRConfigurationDir.getConfigurationDirectory();
         ArrayList<File> directories = new ArrayList<>(3);
         directories.add(configurationDirectory);
-        for (String dir : MCRConfiguration.instance().getString("MCR.ConfigurationDirectory.template.directories", "")
+        for (String dir : MCRConfiguration2.getString("MCR.ConfigurationDirectory.template.directories").orElse("")
             .split(",")) {
             if (!dir.trim().isEmpty()) {
                 directories.add(new File(configurationDirectory, dir.trim()));
@@ -176,7 +176,7 @@ public class MCRBasicCommands {
             }
         }
 
-        for (String f : MCRConfiguration.instance().getString("MCR.ConfigurationDirectory.template.files", "")
+        for (String f : MCRConfiguration2.getString("MCR.ConfigurationDirectory.template.files").orElse("")
             .split(",")) {
             if (!f.trim().isEmpty()) {
                 createSampleConfigFile(f.trim());

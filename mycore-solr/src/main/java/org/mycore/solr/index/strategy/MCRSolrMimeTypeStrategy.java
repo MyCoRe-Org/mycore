@@ -24,7 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLFunctions;
 
 /**
@@ -42,7 +42,7 @@ public class MCRSolrMimeTypeStrategy implements MCRSolrFileStrategy {
     private static final Pattern IGNORE_PATTERN;
 
     static {
-        String acceptPattern = MCRConfiguration.instance().getString(SOLR_CONFIG_PREFIX + "MimeTypeStrategy.Pattern");
+        String acceptPattern = MCRConfiguration2.getStringOrThrow(SOLR_CONFIG_PREFIX + "MimeTypeStrategy.Pattern");
         IGNORE_PATTERN = Pattern.compile(acceptPattern);
     }
 

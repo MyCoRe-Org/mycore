@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.servlets.MCRStaticXMLFileServlet;
@@ -53,8 +54,10 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        List<String> defaults = Collections.singletonList("MyCoReWebPage");
-        List<String> docTypes = MCRConfiguration.instance().getStrings("MCR.XEditor.DocTypes", defaults);
+        List<String> docTypes = MCRConfiguration2.getString("MCR.XEditor.DocTypes")
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(() -> Collections.singletonList("MyCoReWebPage"));
         docTypesIncludingEditors.addAll(docTypes);
     }
 

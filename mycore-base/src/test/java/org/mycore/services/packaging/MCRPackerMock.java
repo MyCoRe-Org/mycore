@@ -21,7 +21,7 @@ package org.mycore.services.packaging;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRPackerMock extends MCRPacker {
 
@@ -37,7 +37,7 @@ public class MCRPackerMock extends MCRPacker {
 
     @Override
     public void checkSetup() {
-        MCRConfiguration.instance().set(SETUP_CHECKED_PROPERTY, true);
+        MCRConfiguration2.set(SETUP_CHECKED_PROPERTY, String.valueOf(true));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class MCRPackerMock extends MCRPacker {
             throw new ExecutionException(new Exception(TEST_PARAMETER_KEY + " is invalid!"));
         }
 
-        MCRConfiguration.instance().set(FINISHED_PROPERTY, true);
+        MCRConfiguration2.set(FINISHED_PROPERTY, String.valueOf(true));
     }
 
     @Override

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRBaseContent;
@@ -59,7 +58,10 @@ public class MCRObjectStaticContentGenerator {
     }
 
     public static List<String> getContentGenerators() {
-        return MCRConfiguration.instance().getPropertiesMap(CONFIG_ID_PREFIX).keySet().stream()
+        return MCRConfiguration2.getPropertiesMap()
+            .keySet()
+            .stream()
+            .filter(k -> k.startsWith(CONFIG_ID_PREFIX))
             .map(wholeProperty -> {
                 String propertySuffix = wholeProperty.substring(CONFIG_ID_PREFIX.length());
                 final int i = propertySuffix.indexOf('.');
@@ -67,7 +69,8 @@ public class MCRObjectStaticContentGenerator {
                     return propertySuffix.substring(0, i);
                 }
                 return propertySuffix;
-            }).distinct()
+            })
+            .distinct()
             .collect(Collectors.toList());
     }
 

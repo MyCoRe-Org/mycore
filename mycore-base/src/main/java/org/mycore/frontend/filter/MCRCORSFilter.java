@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
@@ -69,7 +69,7 @@ public class MCRCORSFilter implements Filter {
             LOGGER.info(String.format(Locale.ROOT, "%s is %s", CORS_FILTER_NAME, filterName));
             String propertyName = String.format(Locale.ROOT, "%s.%s", CONFIGURATION_PREFIX, filterName);
 
-            this.allowOriginValue = MCRConfiguration.instance().getString(propertyName);
+            this.allowOriginValue = MCRConfiguration2.getStringOrThrow(propertyName);
         } else {
             throw new MCRConfigurationException(String.format(Locale.ROOT, "No %s is set!", CORS_FILTER_NAME));
         }

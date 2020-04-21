@@ -55,7 +55,8 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xsl.MCRErrorListener;
@@ -86,8 +87,8 @@ public class MCRServlet extends HttpServlet {
 
     private static String SERVLET_URL;
 
-    private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration.instance().getBoolean(
-        "MCR.Servlet.BrowserCache.enable", false);
+    private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration2.getBoolean("MCR.Servlet.BrowserCache.enable")
+        .orElse(false);
 
     private static MCRLayoutService LAYOUT_SERVICE;
 
@@ -290,11 +291,6 @@ public class MCRServlet extends HttpServlet {
      */
     private void doGetPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException,
         SAXException, TransformerException {
-        if (MCRConfiguration.instance() == null) {
-            // removes NullPointerException below, if somehow Servlet is not yet
-            // intialized
-            init();
-        }
         initializeMCRSession(req, getServletName());
 
         if (SERVLET_URL == null) {
@@ -361,7 +357,7 @@ public class MCRServlet extends HttpServlet {
 
         if (reqCharEncoding == null) {
             // Set default to UTF-8
-            reqCharEncoding = MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8");
+            reqCharEncoding = MCRConfiguration2.getString("MCR.Request.CharEncoding").orElse("UTF-8");
             req.setCharacterEncoding(reqCharEncoding);
             LOGGER.debug("Setting ReqCharEncoding to: {}", reqCharEncoding);
         }
@@ -559,10 +555,9 @@ public class MCRServlet extends HttpServlet {
     protected long getLastModified(HttpServletRequest request) {
         if (ENABLE_BROWSER_CACHE) {
             // we can cache every (local) request
-            long lastModified = MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfiguration.instance()
+            long lastModified = MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfigurationBase
                 .getSystemLastModified() ? MCRSessionMgr.getCurrentSession().getLoginTime()
-                    : MCRConfiguration
-                        .instance().getSystemLastModified();
+                    : MCRConfigurationBase.getSystemLastModified();
             LOGGER.info("LastModified: {}", lastModified);
             return lastModified;
         }

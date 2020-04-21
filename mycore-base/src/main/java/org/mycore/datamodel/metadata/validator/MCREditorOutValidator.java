@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,7 +50,7 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
@@ -133,7 +134,11 @@ public class MCREditorOutValidator {
         map.put(MCRMetaAccessRule.class.getSimpleName(), getObjectCheckInstance(MCRMetaAccessRule.class));
         map.put(MCRMetaClassification.class.getSimpleName(), new MCRMetaClassificationCheck());
         map.put(MCRMetaHistoryDate.class.getSimpleName(), new MCRMetaHistoryDateCheck());
-        Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX + "class.");
+        Map<String, String> props = MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(CONFIG_PREFIX + "class."))
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         for (Entry<String, String> entry : props.entrySet()) {
             try {
                 String className = entry.getKey();
@@ -403,7 +408,7 @@ public class MCREditorOutValidator {
      * @throws JDOMException
      */
     private void setDefaultObjectACLs(Element service) throws JDOMException, IOException {
-        if (!MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true)) {
+        if (!MCRConfiguration2.getBoolean("MCR.Access.AddObjectDefaultRule").orElse(true)) {
             LOGGER.info("Adding object default acl rule is disabled.");
             return;
         }

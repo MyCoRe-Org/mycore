@@ -37,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -156,7 +156,10 @@ public class MCROAISetManager {
     }
 
     public List<String> getDefinedSetIds() {
-        return MCRConfiguration.instance().getStrings(this.configPrefix + "Sets", Collections.emptyList());
+        return MCRConfiguration2.getString(this.configPrefix + "Sets")
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(Collections::emptyList);
     }
 
     /**

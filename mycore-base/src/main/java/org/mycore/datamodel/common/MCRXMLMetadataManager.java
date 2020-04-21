@@ -45,7 +45,8 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -153,19 +154,18 @@ public class MCRXMLMetadataManager {
      * Reads configuration properties, checks and creates base directories and builds the singleton
      */
     public synchronized void reload() {
-        MCRConfiguration config = MCRConfiguration.instance();
-
-        String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
+        String pattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern").orElse("0000000000");
         defaultLayout = pattern.length() - 4 + "-2-2";
 
-        String base = config.getString("MCR.Metadata.Store.BaseDir");
+        String base = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Store.BaseDir");
         basePath = Paths.get(base);
         checkPath(basePath, "base");
 
-        defaultClass = config.getClass("MCR.Metadata.Store.DefaultClass", MCRVersioningMetadataStore.class);
+        defaultClass = MCRConfiguration2.<MCRVersioningMetadataStore>getClass("MCR.Metadata.Store.DefaultClass")
+            .orElse(MCRVersioningMetadataStore.class);
         if (MCRVersioningMetadataStore.class.isAssignableFrom(defaultClass)) {
             try {
-                String svnBaseValue = config.getString("MCR.Metadata.Store.SVNBase");
+                String svnBaseValue = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Store.SVNBase");
                 if (!svnBaseValue.endsWith("/")) {
                     svnBaseValue += '/';
                 }
@@ -173,7 +173,7 @@ public class MCRXMLMetadataManager {
                 LOGGER.info("SVN Base: {}", svnBase);
                 if (svnBase.getScheme() == null) {
                     String workingDirectory = (new File(".")).getAbsolutePath();
-                    URI root = new File(MCRConfiguration.instance().getString("MCR.datadir", workingDirectory)).toURI();
+                    URI root = new File(MCRConfiguration2.getString("MCR.datadir").orElse(workingDirectory)).toURI();
                     URI resolved = root.resolve(svnBase);
                     LOGGER.warn("Resolved {} to {}", svnBase, resolved);
                     svnBase = resolved;
@@ -298,10 +298,10 @@ public class MCRXMLMetadataManager {
     public MCRMetadataStore getStore(String project, String type, boolean readOnly) {
         String projectType = getStoryKey(project, type);
         String prefix = "MCR.IFS2.Store." + projectType + ".";
-        String forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
+        String forceXML = MCRConfiguration2.getString(prefix + "ForceXML").orElse(null);
         if (forceXML == null) {
             synchronized (this) {
-                forceXML = MCRConfiguration.instance().getString(prefix + "ForceXML", null);
+                forceXML = MCRConfiguration2.getString(prefix + "ForceXML").orElse(null);
                 if (forceXML == null) {
                     try {
                         setupStore(project, type, prefix, readOnly);
@@ -326,22 +326,21 @@ public class MCRXMLMetadataManager {
     @SuppressWarnings("unchecked")
     private void setupStore(String project, String objectType, String configPrefix, boolean readOnly)
         throws ReflectiveOperationException {
-        MCRConfiguration config = MCRConfiguration.instance();
         String baseID = getStoryKey(project, objectType);
-        Class clazz = config.getClass(configPrefix + "Class", null);
-        if (clazz == null) {
-            config.set(configPrefix + "Class", defaultClass.getName());
-            clazz = defaultClass;
-        }
+        Class<? extends MCRStore> clazz = MCRConfiguration2.<MCRStore> getClass(configPrefix + "Class")
+            .orElseGet(() -> {
+                MCRConfiguration2.set(configPrefix + "Class", defaultClass.getName());
+                return defaultClass;
+            });
         if (MCRVersioningMetadataStore.class.isAssignableFrom(clazz)) {
             String property = configPrefix + "SVNRepositoryURL";
-            String svnURL = config.getString(property, null);
+            String svnURL = MCRConfiguration2.getString(property).orElse(null);
             if (svnURL == null) {
                 String relativeURI = new MessageFormat("{0}/{1}/", Locale.ROOT)
                     .format(new Object[] { project, objectType });
                 URI repURI = svnBase.resolve(relativeURI);
                 LOGGER.info("Resolved {} to {} for {}", relativeURI, repURI.toASCIIString(), property);
-                config.set(property, repURI.toASCIIString());
+                MCRConfiguration2.set(property, repURI.toASCIIString());
                 checkAndCreateDirectory(svnPath.resolve(project), project, objectType, configPrefix, readOnly);
             }
         }
@@ -349,13 +348,14 @@ public class MCRXMLMetadataManager {
         Path typePath = basePath.resolve(project).resolve(objectType);
         checkAndCreateDirectory(typePath, project, objectType, configPrefix, readOnly);
 
-        String slotLayout = config.getString(configPrefix + "SlotLayout", null);
+        String slotLayout = MCRConfiguration2.getString(configPrefix + "SlotLayout").orElse(null);
         if (slotLayout == null) {
-            config.set(configPrefix + "SlotLayout", defaultLayout);
+            MCRConfiguration2.set(configPrefix + "SlotLayout", defaultLayout);
         }
-        config.set(configPrefix + "BaseDir", typePath.toAbsolutePath().toString());
-        config.set(configPrefix + "ForceXML", true);
-        config.set(configPrefix + "ForceDocType", objectType.equals("derivate") ? "mycorederivate" : "mycoreobject");
+        MCRConfiguration2.set(configPrefix + "BaseDir", typePath.toAbsolutePath().toString());
+        MCRConfiguration2.set(configPrefix + "ForceXML", String.valueOf(true));
+        String value = "derivate".equals(objectType) ? "mycorederivate" : "mycoreobject";
+        MCRConfiguration2.set(configPrefix + "ForceDocType", value);
         createdStores.add(baseID);
         MCRStoreManager.createStore(baseID, clazz);
     }
@@ -427,7 +427,7 @@ public class MCRXMLMetadataManager {
         try {
             MCRStoredMetadata sm = getStore(mcrid, false).create(xml, mcrid.getNumberAsInteger());
             sm.setLastModified(lastModified);
-            MCRConfiguration.instance().systemModified();
+            MCRConfigurationBase.systemModified();
             return sm;
         } catch (Exception exc) {
             throw new MCRPersistenceException("Error while storing object: " + mcrid, exc);
@@ -441,7 +441,7 @@ public class MCRXMLMetadataManager {
     public void delete(MCRObjectID mcrid) throws MCRPersistenceException {
         try {
             getStore(mcrid, true).delete(mcrid.getNumberAsInteger());
-            MCRConfiguration.instance().systemModified();
+            MCRConfigurationBase.systemModified();
         } catch (Exception exc) {
             throw new MCRPersistenceException("Error while deleting object: " + mcrid, exc);
         }
@@ -507,7 +507,7 @@ public class MCRXMLMetadataManager {
             MCRStoredMetadata sm = getStore(mcrid, false).retrieve(mcrid.getNumberAsInteger());
             sm.update(xml);
             sm.setLastModified(lastModified);
-            MCRConfiguration.instance().systemModified();
+            MCRConfigurationBase.systemModified();
             return sm;
         } catch (Exception exc) {
             throw new MCRPersistenceException("Unable to update object " + mcrid, exc);
@@ -814,7 +814,7 @@ public class MCRXMLMetadataManager {
      * Returns the time the store's content was last modified
      */
     public long getLastModified() {
-        return MCRConfiguration.instance().getSystemLastModified();
+        return MCRConfigurationBase.getSystemLastModified();
     }
 
     /**

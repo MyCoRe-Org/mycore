@@ -26,10 +26,11 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import org.mycore.common.MCRClassTools;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
@@ -53,8 +54,9 @@ import java.util.stream.Collectors;
  * @see #list(PrintStream)
  * @see #store
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
+ * @deprecated Please do use {@link MCRConfiguration2} instead
  */
+@Deprecated
 public class MCRConfiguration {
 
     /**
@@ -94,7 +96,7 @@ public class MCRConfiguration {
         } catch (IOException e) {
             throw new MCRConfigurationException("Could not instantiate MCRConfiguration.", e);
         }
-        singleton.systemModified();
+        MCRConfigurationBase.systemModified();
     }
 
     /**
@@ -103,6 +105,7 @@ public class MCRConfiguration {
      *                if props is null - an empty properties object that supports sorting by key will be created
      * @return a new properties object sorted by keys
      */
+    @Deprecated
     public static Properties sortProperties(Properties props) {
         Properties sortedProps = new Properties() {
             private static final long serialVersionUID = 1L;
@@ -124,6 +127,7 @@ public class MCRConfiguration {
      *
      * @see System#currentTimeMillis()
      */
+    @Deprecated
     public final long getSystemLastModified() {
         return MCRConfigurationBase.getSystemLastModified();
     }
@@ -131,6 +135,7 @@ public class MCRConfiguration {
     /**
      * signalize that the system state has changed. Call this method when ever you changed the persistency layer.
      */
+    @Deprecated
     public final void systemModified() {
         MCRConfigurationBase.systemModified();
     }
@@ -141,27 +146,17 @@ public class MCRConfiguration {
     protected MCRConfiguration() throws IOException {
     }
 
-    /**
-     * Substitute all %properties%.
-     */
-    protected synchronized void resolveProperties() {
-        MCRConfigurationBase.resolveProperties();
-    }
-
     private MCRProperties getResolvedProperties() {
         return MCRConfigurationBase.getResolvedProperties();
-    }
-
-    private MCRProperties getBaseProperties() {
-        return MCRConfigurationBase.getBaseProperties();
     }
 
     public MCRProperties getDeprecatedProperties() {
         return MCRConfigurationBase.getDeprecatedProperties();
     }
 
+    @Deprecated
     public Map<String, String> getPropertiesMap() {
-        return Collections.unmodifiableMap(getResolvedProperties().getAsMap());
+        return MCRConfiguration2.getPropertiesMap();
     }
 
     /**
@@ -171,8 +166,10 @@ public class MCRConfiguration {
      *            the string all the returned properties start with
      * @return the list of properties
      */
+    @Deprecated
     public Map<String, String> getPropertiesMap(final String startsWith) {
-        return getPropertiesMap().entrySet()
+        return MCRConfiguration2.getPropertiesMap()
+            .entrySet()
             .stream()
             .filter(p -> p.getKey().startsWith(startsWith))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -189,6 +186,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         return defaultname == null ? MCRConfiguration2.getOrThrow(name, MCRConfiguration2::instantiateClass)
             : MCRConfiguration2.<T> getInstanceOf(name)
@@ -206,6 +204,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getInstanceOf(String name, T defaultObj) {
         return MCRConfiguration2.<T> getInstanceOf(name).orElse(defaultObj);
     }
@@ -217,6 +216,7 @@ public class MCRConfiguration {
      * @return non null Class asignable to <code>&lt;T&gt;</code>
      * @throws MCRConfigurationException if property is not defined or class could not be loaded
      */
+    @Deprecated
     public <T> Class<? extends T> getClass(String name) throws MCRConfigurationException {
         return MCRConfiguration2.<T> getClass(name)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
@@ -229,6 +229,7 @@ public class MCRConfiguration {
      * @param <T> Supertype of class defined in <code>name</code>
      * @return non null Class asignable to <code>&lt;T&gt;</code>
      */
+    @Deprecated
     public <T> Class<? extends T> getClass(String name, Class<? extends T> defaultClass) {
         return MCRConfiguration2.<T> getClass(name).orElse(defaultClass);
     }
@@ -242,8 +243,9 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getInstanceOf(String name) throws MCRConfigurationException {
-        return getInstanceOf(name, null);
+        return MCRConfiguration2.getOrThrow(name, MCRConfiguration2::instantiateClass);
     }
 
     /**
@@ -256,13 +258,14 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        return MCRConfiguration2.<T> getSingleInstanceOf(name).map(Optional::of)
-            .orElseGet(() -> Optional.ofNullable(defaultname)
-                .map(className -> new MCRConfiguration2.SingletonKey(name, className))
-                .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
-                    k -> MCRConfiguration2.instantiateClass(defaultname))))
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
+        try {
+            return MCRConfiguration2.<T> getSingleInstanceOf(name, MCRClassTools.<T> forName(defaultname))
+                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
+        } catch (ClassNotFoundException e) {
+            throw MCRConfiguration2.createConfigurationException(name);
+        }
     }
 
     /**
@@ -275,8 +278,10 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property is not set or the class can not be loaded or instantiated
      */
+    @Deprecated
     public <T> T getSingleInstanceOf(String name) {
-        return getSingleInstanceOf(name, null);
+        return MCRConfiguration2.<T> getSingleInstanceOf(name)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 
     /**
@@ -288,8 +293,10 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public String getString(String name) {
-        return MCRConfigurationBase.getString(name).map(String::trim)
+        return MCRConfigurationBase.getString(name)
+            .map(String::trim)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 
@@ -303,6 +310,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public List<String> getStrings(String name) {
         return MCRConfigurationBase.getString(name)
             .map(MCRConfiguration2::splitValue)
@@ -320,6 +328,7 @@ public class MCRConfiguration {
      *            the value to return if the configuration property is not set
      * @return the value of the configuration property as a unmodifiable list of strings or <code>defaultValue</code>.
      */
+    @Deprecated
     public List<String> getStrings(String name, List<String> defaultValue) {
         return MCRConfigurationBase.getString(name)
             .map(MCRConfiguration2::splitValue)
@@ -337,6 +346,7 @@ public class MCRConfiguration {
      *            the value to return if the configuration property is not set
      * @return the value of the configuration property as a String
      */
+    @Deprecated
     public String getString(String name, String defaultValue) {
         return MCRConfiguration2.getString(name).orElse(defaultValue);
     }
@@ -353,6 +363,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public int getInt(String name) throws NumberFormatException {
         return MCRConfiguration2.getOrThrow(name, Integer::parseInt);
     }
@@ -372,6 +383,7 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not an <CODE>int
      *             </CODE> value
      */
+    @Deprecated
     public int getInt(String name, int defaultValue) throws NumberFormatException {
         return MCRConfiguration2.getInt(name).orElse(defaultValue);
     }
@@ -388,6 +400,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public long getLong(String name) throws NumberFormatException {
         return MCRConfiguration2.getOrThrow(name, Long::parseLong);
     }
@@ -405,6 +418,7 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not a <CODE>long
      *             </CODE> value
      */
+    @Deprecated
     public long getLong(String name, long defaultValue) throws NumberFormatException {
         return MCRConfiguration2.getLong(name).orElse(defaultValue);
     }
@@ -421,6 +435,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public float getFloat(String name) throws NumberFormatException {
         return MCRConfiguration2.getOrThrow(name, Float::parseFloat);
     }
@@ -438,6 +453,7 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not a <CODE>
      *             float</CODE> value
      */
+    @Deprecated
     public float getFloat(String name, float defaultValue) throws NumberFormatException {
         return MCRConfiguration2.getFloat(name).orElse(defaultValue);
     }
@@ -455,6 +471,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public double getDouble(String name) throws NumberFormatException {
         return MCRConfiguration2.getOrThrow(name, Double::parseDouble);
     }
@@ -472,6 +489,7 @@ public class MCRConfiguration {
      *             if the configuration property is set but is not a <CODE>
      *             double</CODE> value
      */
+    @Deprecated
     public double getDouble(String name, double defaultValue) throws NumberFormatException {
         return MCRConfiguration2.getDouble(name).orElse(defaultValue);
     }
@@ -486,6 +504,7 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the property with this name is not set
      */
+    @Deprecated
     public boolean getBoolean(String name) {
         return MCRConfiguration2.getOrThrow(name, Boolean::parseBoolean);
     }
@@ -502,6 +521,7 @@ public class MCRConfiguration {
      * @param defaultValue
      *            the value to return if the configuration property is not set
      */
+    @Deprecated
     public boolean getBoolean(String name, boolean defaultValue) {
         return MCRConfiguration2.getBoolean(name).orElse(defaultValue);
     }
@@ -517,6 +537,7 @@ public class MCRConfiguration {
      *            the new value of the configuration property, possibly <CODE>
      *            null</CODE>
      */
+    @Deprecated
     public void set(String name, String value) {
         MCRConfiguration2.set(name, value);
     }
@@ -524,6 +545,7 @@ public class MCRConfiguration {
     /**
      *  use {@link MCRConfigurationBase#initialize(Map, boolean)}
      */
+    @Deprecated
     public synchronized void initialize(Map<String, String> props, boolean clear) {
         MCRConfigurationBase.initialize(props, clear);
     }
@@ -537,8 +559,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, int value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
@@ -550,8 +573,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, long value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
@@ -563,8 +587,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, float value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
@@ -576,8 +601,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, double value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
@@ -589,8 +615,9 @@ public class MCRConfiguration {
      * @param value
      *            the new value of the configuration property
      */
+    @Deprecated
     public void set(String name, boolean value) {
-        set(name, String.valueOf(value));
+        MCRConfiguration2.set(name, String.valueOf(value));
     }
 
     /**
@@ -603,8 +630,9 @@ public class MCRConfiguration {
      * @param out
      *            the PrintStream to list the configuration properties on
      */
+    @Deprecated
     public void list(PrintStream out) {
-        getResolvedProperties().list(out);
+        MCRConfigurationBase.getResolvedProperties().list(out);
     }
 
     /**
@@ -614,8 +642,9 @@ public class MCRConfiguration {
      * @param out
      *            the PrintWriter to list the configuration properties on
      */
+    @Deprecated
     public void list(PrintWriter out) {
-        getResolvedProperties().list(out);
+        MCRConfigurationBase.getResolvedProperties().list(out);
     }
 
     /**
@@ -630,8 +659,9 @@ public class MCRConfiguration {
      *             if writing to the OutputStream throws an <CODE>IOException
      *             </CODE>
      */
+    @Deprecated
     public void store(OutputStream out, String header) throws IOException {
-        getResolvedProperties().store(out, header);
+        MCRConfigurationBase.getResolvedProperties().store(out, header);
     }
 
     /**
@@ -644,7 +674,7 @@ public class MCRConfiguration {
      */
     @Override
     public String toString() {
-        return getResolvedProperties().toString();
+        return MCRConfigurationBase.getResolvedProperties().toString();
     }
 
 }

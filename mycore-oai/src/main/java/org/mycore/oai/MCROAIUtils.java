@@ -21,14 +21,13 @@
  */
 package org.mycore.oai;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 
 public abstract class MCROAIUtils {
 
     public static String getDefaultRestriction(String configPrefix) {
-        MCRConfiguration config = MCRConfiguration.instance();
-        return config.getString(configPrefix + "Search.Restriction", null);
+        return MCRConfiguration2.getString(configPrefix + "Search.Restriction").orElse(null);
     }
 
     public static String getDefaultSetQuery(String setSpec, String configPrefix) {
@@ -39,8 +38,8 @@ public abstract class MCROAIUtils {
             return "category:" + classID + "\\:" + categID;
         } else {
             String id = setSpec;
-            String query = MCRConfiguration.instance().getString(configPrefix + "MapSetToQuery." + id.replace(":", "_"),
-                "");
+            String query = MCRConfiguration2.getString(configPrefix + "MapSetToQuery." + id.replace(":", "_"))
+                .orElse("");
             if (!query.equals("")) {
                 return query;
             } else {

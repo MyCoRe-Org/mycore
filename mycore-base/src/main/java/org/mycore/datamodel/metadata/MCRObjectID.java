@@ -29,15 +29,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
@@ -65,9 +64,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      */
     public static final int MAX_LENGTH = 64;
 
-    // configuration values
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
     private static final MCRObjectIDFormat ID_FORMAT = new MCRObjectIDDefaultFormat();
 
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectID.class);
@@ -78,14 +74,14 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
     private static HashSet<String> VALID_TYPE_LIST;
 
     static {
-        VALID_TYPE_LIST = new HashSet<>();
-        Map<String, String> properties = CONFIG.getPropertiesMap("MCR.Metadata.Type");
-        for (Entry<String, String> prop : properties.entrySet()) {
-            if (!prop.getValue().equalsIgnoreCase("true")) {
-                continue;
-            }
-            VALID_TYPE_LIST.add(prop.getKey().substring(prop.getKey().lastIndexOf('.') + 1).trim());
-        }
+        final String confPrefix = "MCR.Metadata.Type.";
+        VALID_TYPE_LIST = MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(confPrefix))
+            .filter(p -> Boolean.parseBoolean(p.getValue()))
+            .map(prop -> prop.getKey().substring(confPrefix.length()))
+            .collect(Collectors.toCollection(HashSet::new));
     }
 
     // data of the ID
@@ -283,7 +279,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
             return false;
         }
         String objectType = idParts[1].toLowerCase(Locale.ROOT).intern();
-        if (!CONFIG.getBoolean("MCR.Metadata.Type." + objectType, false)) {
+        if (!MCRConfiguration2.getBoolean("MCR.Metadata.Type." + objectType).orElse(false)) {
             LOGGER.warn("Property MCR.Metadata.Type.{} is not set. Thus {} cannot be a valid id", objectType, id);
             return false;
         }
@@ -456,17 +452,16 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         @Override
         public int numberDistance() {
             if (numberDistance == 0) {
-                MCRConfiguration config = MCRConfiguration.instance();
-                numberDistance = config.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
-                return config.getInt("MCR.Metadata.ObjectID.InitialNumberDistance", numberDistance);
+                numberDistance = MCRConfiguration2.getInt("MCR.Metadata.ObjectID.NumberDistance").orElse(1);
+                return MCRConfiguration2.getInt("MCR.Metadata.ObjectID.InitialNumberDistance").orElse(numberDistance);
             }
             return numberDistance;
         }
 
         @Override
         public NumberFormat numberFormat() {
-            String numberPattern = MCRConfiguration.instance()
-                .getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000").trim();
+            String numberPattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern")
+                .orElse("0000000000").trim();
             NumberFormat format = NumberFormat.getIntegerInstance(Locale.ROOT);
             format.setGroupingUsed(false);
             format.setMinimumIntegerDigits(numberPattern.length());

@@ -22,7 +22,8 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 import org.mycore.common.MCRJSONManager;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.frontend.classeditor.mocks.CategoryDAOMock;
@@ -32,10 +33,9 @@ import com.google.gson.Gson;
 public class MCRCategoryJsonTest {
     @Test
     public void deserialize() throws Exception {
-        MCRConfiguration mcrProperties = MCRConfiguration.instance();
-        mcrProperties.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
-        mcrProperties.set("MCR.Metadata.DefaultLang", "de");
-        mcrProperties.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
+        MCRConfigurationBase.initialize(MCRConfigurationLoaderFactory.getConfigurationLoader().load(), true);
+        MCRConfiguration2.set("MCR.Metadata.DefaultLang", "de");
+        MCRConfiguration2.set("MCR.Category.DAO", CategoryDAOMock.class.getName());
 
         SAXBuilder saxBuilder = new SAXBuilder();
         Document doc = saxBuilder.build(getClass().getResourceAsStream("/classi/categoryJsonErr.xml"));

@@ -19,6 +19,7 @@
 package org.mycore.common.config;
 
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,10 +39,50 @@ import org.mycore.common.inject.MCRInjectorConfig;
 import com.google.inject.ConfigurationException;
 
 /**
- * DO NOT USE! Work in progress to discuss future development.
+ * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
+ * The Properties used by this class are used from {@link MCRConfigurationBase}.
+ * <h2>NOTE</h2>
+ * <p><strong>All {@link Optional} values returned by this class are {@link Optional#empty() empty} if the property
+ * is not set OR the trimmed value {@link String#isEmpty() is empty}. If you want to distinguish between
+ * empty properties and unset properties use {@link MCRConfigurationBase#getString(String)} instead.</strong>
+ * </p>
+ * <p>
+ * Using this class is very easy, here is an example:
+ * </p>
+ * <PRE>
+ * // Get a configuration property as a String:
+ * String sValue = MCRConfiguration2.getString("MCR.String.Value").orElse(defaultValue);
+ *
+ * // Get a configuration property as a List of String (values are seperated by ","):
+ * List&lt;String&gt; lValue = MCRConfiguration2.getString("MCR.StringList.Value").stream()
+ *     .flatMap(MCRConfiguration2::splitValue)
+ *     .collect(Collectors.toList());
+ *
+ * // Get a configuration property as a long array (values are seperated by ","):
+ * long[] la = MCRConfiguration2.getString("MCR.LongList.Value").stream()
+ *     .flatMap(MCRConfiguration2::splitValue)
+ *     .mapToLong(Long::parseLong)
+ *     .toArray();
+ *
+ * // Get a configuration property as an int, use 500 as default if not set:
+ * int max = MCRConfiguration2.getInt("MCR.Cache.Size").orElse(500);
+ * </PRE>
+ *
+ * There are some helper methods to help you with converting values
+ * <ul>
+ *     <li>{@link #getOrThrow(String, Function)}</li>
+ *     <li>{@link #splitValue(String)}</li>
+ *     <li>{@link #instantiateClass(String)}</li>
+ * </ul>
+ *
+ * As you see, the class provides methods to get configuration properties as different data types and allows you to
+ * specify defaults. All MyCoRe configuration properties should start with "<CODE>MCR.</CODE>"
+ *
+ * Using the <CODE>set</CODE> methods allows client code to set new configuration properties or
+ * overwrite existing ones with new values.
  * 
  * @author Thomas Scheffler (yagee)
- * @see <a href="https://mycore.atlassian.net/browse/MCR-1082">MCR-1082</a>
+ * @since 2018.05
  */
 public class MCRConfiguration2 {
 
@@ -49,11 +91,46 @@ public class MCRConfiguration2 {
     static ConcurrentHashMap<SingletonKey, Object> instanceHolder = new ConcurrentHashMap<>();
 
     public static Map<String, String> getPropertiesMap() {
-        return MCRConfiguration.instance().getPropertiesMap();
+        return Collections.unmodifiableMap(MCRConfigurationBase.getResolvedProperties().getAsMap());
+    }
+
+    /**
+     * Returns a sub map of properties where key is transformed.
+     *
+     * <ol>
+     *     <li>if property starts with <code>propertyPrefix</code>, the property is in the result map</li>
+     *     <li>the key of the target map is the name of the property without <code>propertPrefix</code></li>
+     * </ol>
+     * Example for <code>propertyPrefix="MCR.Foo."</code>:
+     * <pre>
+     *     MCR.Foo.Bar=Baz
+     *     MCR.Foo.Hello=World
+     *     MCR.Other.Prop=Value
+     * </pre>
+     * will result in
+     * <pre>
+     *     Bar=Baz
+     *     Hello=World
+     * </pre>
+     * @param propertyPrefix prefix of the property name
+     * @return a map of the properties as stated above
+     */
+    public static Map<String, String> getSubPropertiesMap(String propertyPrefix) {
+        return MCRConfigurationBase.getResolvedProperties()
+            .getAsMap()
+            .entrySet()
+            .stream()
+            .filter(e -> e.getKey().startsWith(propertyPrefix))
+            .collect(Collectors.toMap(e -> e.getKey().substring(propertyPrefix.length()), Map.Entry::getValue));
     }
 
     /**
      * Returns a new instance of the class specified in the configuration property with the given name.
+     * If you call a method on the returned Optional directly you need to set the type like this:
+     * <pre>
+     * MCRConfiguration.&lt;MCRMyType&gt; getInstanceOf(name)
+     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
+     * </pre>
      * 
      * @param name
      *            the non-null and non-empty name of the configuration property
@@ -68,7 +145,12 @@ public class MCRConfiguration2 {
     /**
      * Returns a instance of the class specified in the configuration property with the given name. If the class was
      * previously instantiated by this method this instance is returned.
-     * 
+     * If you call a method on the returned Optional directly you need to set the type like this:
+     * <pre>
+     * MCRConfiguration.&lt;MCRMyType&gt; getSingleInstanceOf(name)
+     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
+     * </pre>
+     *
      * @param name
      *            non-null and non-empty name of the configuration property
      * @return the instance of the class named by the value of the configuration property
@@ -79,6 +161,31 @@ public class MCRConfiguration2 {
         return getString(name)
             .map(className -> new SingletonKey(name, className))
             .map(key -> (T) instanceHolder.computeIfAbsent(key, k -> getInstanceOf(name).orElse(null)));
+    }
+
+    /**
+     * Returns a instance of the class specified in the configuration property with the given name. If the class was
+     * previously instantiated by this method this instance is returned.
+     * If you call a method on the returned Optional directly you need to set the type like this:
+     * <pre>
+     * MCRConfiguration.&lt;MCRMyType&gt; getSingleInstanceOf(name, alternative)
+     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
+     * </pre>
+     *
+     * @param name
+     *            non-null and non-empty name of the configuration property
+     * @param alternative
+     *            alternative class if property is undefined
+     * @return the instance of the class named by the value of the configuration property
+     * @throws MCRConfigurationException
+     *             if the class can not be loaded or instantiated
+     */
+    public static <T> Optional<T> getSingleInstanceOf(String name, Class<? extends T> alternative) {
+        return MCRConfiguration2.<T> getSingleInstanceOf(name)
+            .or(() -> Optional.ofNullable(alternative)
+                .map(className -> new MCRConfiguration2.SingletonKey(name, className.getName()))
+                .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
+                    k -> instantiateClass(alternative))));
     }
 
     /**
@@ -282,6 +389,10 @@ public class MCRConfiguration2 {
         LogManager.getLogger().debug("Loading Class: {}", classname);
 
         Class<? extends T> cl = getClassObject(classname);
+        return instantiateClass(cl);
+    }
+
+    private static <T> T instantiateClass(Class<? extends T> cl) {
         try {
             return MCRInjectorConfig.injector().getInstance(cl);
         } catch (ConfigurationException e) {
@@ -293,10 +404,10 @@ public class MCRConfiguration2 {
                     .filter(m -> Modifier.isPublic(m.getModifiers()))
                     .filter(m -> m.getName().toLowerCase(Locale.ROOT).contains("instance"))
                     .findAny()
-                    .orElseThrow(() -> new MCRConfigurationException("Could not instantiate class " + classname, e))
+                    .orElseThrow(() -> new MCRConfigurationException("Could not instantiate class " + cl.getName(), e))
                     .invoke(cl, (Object[]) null);
             } catch (ReflectiveOperationException r) {
-                throw new MCRConfigurationException("Could not instantiate class " + classname, r);
+                throw new MCRConfigurationException("Could not instantiate class " + cl.getName(), r);
             }
         }
     }

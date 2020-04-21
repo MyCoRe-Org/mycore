@@ -25,8 +25,6 @@ package org.mycore.frontend.cli;
 
 import java.util.ArrayList;
 
-import org.mycore.common.config.MCRConfiguration;
-
 /**
  * This class is an abstract for the implementation of command classes for the
  * MyCoRe commandline system.
@@ -36,9 +34,6 @@ import org.mycore.common.config.MCRConfiguration;
  *          2009) $
  */
 public abstract class MCRAbstractCommands implements MCRExternalCommandInterface {
-    /** The configuration instance */
-    protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
     /** The array holding all known commands */
     protected ArrayList<MCRCommand> command = null;
 

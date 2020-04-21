@@ -21,7 +21,7 @@ package org.mycore.frontend.xeditor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.mycore.common.MCRCache;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -35,7 +35,7 @@ public class MCREditorSessionStore {
     private AtomicInteger idGenerator = new AtomicInteger(0);
 
     MCREditorSessionStore() {
-        int maxEditorsInSession = MCRConfiguration.instance().getInt("MCR.XEditor.MaxEditorsInSession", 50);
+        int maxEditorsInSession = MCRConfiguration2.getInt("MCR.XEditor.MaxEditorsInSession").orElse(50);
         cachedSessions = new MCRCache<>(maxEditorsInSession, "Stored XEditor Sessions");
     }
 

@@ -43,6 +43,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -172,8 +173,9 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         derivate.setId(MCRObjectID.getNextFreeId(documentID.getProjectId(), "derivate"));
         derivate.setLabel("data object from " + documentID);
 
-        String schema = CONFIG.getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml").replaceAll(".xml",
-            ".xsd");
+        String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
+            .orElse("datamodel-derivate.xml")
+            .replaceAll(".xml", ".xsd");
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();
@@ -204,7 +206,7 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     }
 
     protected static void setDefaultPermissions(MCRObjectID derivateID) {
-        if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
+        if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
             MCRAccessInterface ai = MCRAccessManager.getAccessImpl();
             Collection<String> configuredPermissions = ai.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {

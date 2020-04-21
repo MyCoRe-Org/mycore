@@ -37,7 +37,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -83,19 +83,19 @@ public class MCRRealmFactory {
     private static Document realmsDocument;
 
     static {
-        MCRConfiguration config = MCRConfiguration.instance();
         String dataDirProperty = "MCR.datadir";
-        String dataDir = config.getString(dataDirProperty, null);
+        String dataDir = MCRConfiguration2.getString(dataDirProperty).orElse(null);
         if (dataDir == null) {
             LOGGER.warn("{} is undefined.", dataDirProperty);
             try {
-                realmsURI = new URI(config.getString(REALMS_URI_CFG_KEY, RESOURCE_REALMS_URI));
+                realmsURI = new URI(MCRConfiguration2.getString(REALMS_URI_CFG_KEY).orElse(RESOURCE_REALMS_URI));
             } catch (URISyntaxException e) {
                 throw new MCRException(e);
             }
         } else {
             File dataDirFile = new File(dataDir);
-            String realmsCfg = config.getString(REALMS_URI_CFG_KEY, dataDirFile.toURI() + "realms.xml");
+            String realmsCfg = MCRConfiguration2.getString(REALMS_URI_CFG_KEY)
+                .orElse(dataDirFile.toURI() + "realms.xml");
             try {
                 realmsURI = new URI(realmsCfg);
                 LOGGER.info("Using realms defined in {}", realmsURI);

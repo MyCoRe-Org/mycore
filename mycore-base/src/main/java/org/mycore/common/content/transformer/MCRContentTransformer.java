@@ -21,7 +21,7 @@ package org.mycore.common.content.transformer;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 
 /**
@@ -52,8 +52,8 @@ public abstract class MCRContentTransformer {
     public void init(String id) {
         String mimeProperty = "MCR.ContentTransformer." + id + ".MIMEType";
         String extensionProperty = "MCR.ContentTransformer." + id + ".FileExtension";
-        this.mimeType = MCRConfiguration.instance().getString(mimeProperty, getDefaultMimeType());
-        this.fileExtension = MCRConfiguration.instance().getString(extensionProperty, getDefaultExtension());
+        this.mimeType = MCRConfiguration2.getString(mimeProperty).orElseGet(this::getDefaultMimeType);
+        this.fileExtension = MCRConfiguration2.getString(extensionProperty).orElseGet(this::getDefaultExtension);
     }
 
     /** Transforms MCRContent. Subclasses implement different transformation methods */

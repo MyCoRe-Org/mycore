@@ -23,7 +23,7 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Matthias Eichner
@@ -34,8 +34,8 @@ public class MCRSolrIndexStrategyManager {
     private static final MCRSolrFileStrategy FILE_STRATEGY;
 
     static {
-        FILE_STRATEGY = MCRConfiguration.instance().getInstanceOf(
-            SOLR_CONFIG_PREFIX + "FileIndexStrategy", null);
+        FILE_STRATEGY = MCRConfiguration2
+            .getOrThrow(SOLR_CONFIG_PREFIX + "FileIndexStrategy", MCRConfiguration2::instantiateClass);
     }
 
     public static boolean checkFile(Path file, BasicFileAttributes attrs) {

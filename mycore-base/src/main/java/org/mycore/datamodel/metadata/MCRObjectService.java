@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
@@ -344,7 +344,7 @@ public class MCRObjectService {
             this.state = null;
         } else {
             MCRCategoryID categState = new MCRCategoryID(
-                    MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID", "state"),
+                MCRConfiguration2.getString("MCR.Metadata.Service.State.Classification.ID").orElse("state"),
                     state);
             setState(categState);
         }

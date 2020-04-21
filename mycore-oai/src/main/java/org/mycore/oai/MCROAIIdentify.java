@@ -24,11 +24,13 @@ package org.mycore.oai;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.oai.pmh.DateUtils;
 import org.mycore.oai.pmh.Description;
@@ -50,22 +52,22 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     protected static final Logger LOGGER = LogManager.getLogger(MCROAIIdentify.class);
 
-    private MCRConfiguration config;
-
     protected String configPrefix;
 
     public MCROAIIdentify(String baseURL, String configPrefix) {
-        this.config = MCRConfiguration.instance();
         this.configPrefix = configPrefix;
 
         this.setBaseURL(baseURL);
-        this.setRepositoryName(this.config.getString(configPrefix + "RepositoryName", "Undefined repository name"));
-        String deletedRecordPolicy = this.config.getString(configPrefix + "DeletedRecord",
-            DeletedRecordPolicy.Transient.name());
+        this.setRepositoryName(
+            MCRConfiguration2.getString(configPrefix + "RepositoryName").orElse("Undefined repository name"));
+        String deletedRecordPolicy = MCRConfiguration2.getString(configPrefix + "DeletedRecord")
+            .orElse(DeletedRecordPolicy.Transient.name());
         this.setDeletedRecordPolicy(DeletedRecordPolicy.get(deletedRecordPolicy));
-        String granularity = this.config.getString(configPrefix + "Granularity", Granularity.YYYY_MM_DD.name());
+        String granularity = MCRConfiguration2.getString(configPrefix + "Granularity")
+            .orElse(Granularity.YYYY_MM_DD.name());
         this.setGranularity(Granularity.valueOf(granularity));
-        String adminMail = this.config.getString(configPrefix + "AdminEmail", config.getString("MCR.Mail.Sender"));
+        String adminMail = MCRConfiguration2.getString(configPrefix + "AdminEmail")
+            .orElseGet(() -> MCRConfiguration2.getStringOrThrow("MCR.Mail.Sender"));
 
         this.setEarliestDatestamp(calculateEarliestTimestamp());
         this.getAdminEmailList().add(adminMail);
@@ -89,7 +91,7 @@ public class MCROAIIdentify extends SimpleIdentify {
     protected Instant calculateEarliestTimestamp() {
         MCROAISearcher searcher = MCROAISearchManager.getSearcher(this, null, 1, null, null);
         return searcher.getEarliestTimestamp().orElse(DateUtils
-            .parse(config.getString(this.configPrefix + "EarliestDatestamp", "1970-01-01")));
+            .parse(MCRConfiguration2.getString(this.configPrefix + "EarliestDatestamp").orElse("1970-01-01")));
     }
 
     public String getConfigPrefix() {
@@ -98,19 +100,28 @@ public class MCROAIIdentify extends SimpleIdentify {
 
     private Collection<String> getDescriptionURIs() {
         String descriptionConfig = getConfigPrefix() + "DescriptionURI";
-        return MCRConfiguration.instance().getPropertiesMap(descriptionConfig).values();
+        return MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(descriptionConfig))
+            .map(Map.Entry::getValue)
+            .collect(Collectors.toSet());
     }
 
     public FriendsDescription getFriendsDescription() {
         FriendsDescription desc = new FriendsDescription();
-        Map<String, String> friends = this.config.getPropertiesMap(this.configPrefix + "Friends.");
-        desc.getFriendsList().addAll(friends.values());
+        MCRConfiguration2.getPropertiesMap()
+            .entrySet()
+            .stream()
+            .filter(p -> p.getKey().startsWith(this.configPrefix + "Friends."))
+            .map(Map.Entry::getValue)
+            .forEach(desc.getFriendsList()::add);
         return desc;
     }
 
     public OAIIdentifierDescription getIdentifierDescription() {
-        String reposId = this.config.getString(this.configPrefix + "RepositoryIdentifier");
-        String sampleId = this.config.getString(this.configPrefix + "RecordSampleID");
+        String reposId = MCRConfiguration2.getStringOrThrow(this.configPrefix + "RepositoryIdentifier");
+        String sampleId = MCRConfiguration2.getStringOrThrow(this.configPrefix + "RecordSampleID");
         return new OAIIdentifierDescription(reposId, sampleId);
     }
 

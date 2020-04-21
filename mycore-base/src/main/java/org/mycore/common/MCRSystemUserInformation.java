@@ -18,7 +18,7 @@
 
 package org.mycore.common;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * A {@link MCRUserInformation} implementation with no roles attached.
@@ -111,7 +111,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
             if (property == null) {
                 return userId;
             }
-            return MCRConfiguration.instance().getString(property, userId);
+            return MCRConfiguration2.getString(property).orElse(userId);
         }
     }
 

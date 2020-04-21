@@ -27,7 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.params.CommonParams;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
@@ -75,14 +75,13 @@ public class MCROAIQueryToSetHandler extends MCROAISolrSetHandler {
     }
 
     private String getSetFilterQuery(String setId) {
-        MCRConfiguration config = MCRConfiguration.instance();
         String queryProperty = getConfigPrefix() + "Sets." + setId + ".Query";
         String configQuery;
         try {
-            configQuery = config.getString(queryProperty);
+            configQuery = MCRConfiguration2.getStringOrThrow(queryProperty);
         } catch (MCRConfigurationException e) {
             String deprecatedProperty = getConfigPrefix() + "MapSetToQuery." + setId;
-            configQuery = config.getString(deprecatedProperty, null);
+            configQuery = MCRConfiguration2.getString(deprecatedProperty).orElse(null);
             if (configQuery == null) {
                 throw e;
             }

@@ -22,13 +22,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.sword.application.MCRSwordCollectionProvider;
 import org.mycore.sword.application.MCRSwordLifecycleConfiguration;
 
@@ -47,46 +46,41 @@ public class MCRSword {
         if (collections == null) {
             collections = new Hashtable<>();
             workspaceCollectionTable = new Hashtable<>();
-            final MCRConfiguration mcrConfiguration = MCRConfiguration.instance();
-            Map<String, String> propertiesMap = mcrConfiguration.getPropertiesMap();
-            final int lenghtOfPropertyPrefix = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX.length();
             LOGGER.info("--- INITIALIZE SWORD SERVER ---");
-
-            propertiesMap.keySet().stream()
+            final int lenghtOfPropertyPrefix = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX.length();
+            MCRConfiguration2.getPropertiesMap()
+                .keySet()
+                .stream()
                 .filter(prop -> prop.startsWith(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))
-                // remove all which are not collections
-                .filter(prop -> !prop.trim().equals(MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX))
-                // remove all which have no suffix
                 .map(prop -> prop.substring(lenghtOfPropertyPrefix)) // remove MCR_SWORD_COLLECTION_PREFIX
                 .map(prop -> prop.split(Pattern.quote("."), 2)) // split to workspace name and collection name
-                .filter(prop -> prop.length == 2) // remove all whith no workspace or collection name
-                .forEach(workspaceCollectionEntry -> {
-                    final String collection = workspaceCollectionEntry[1];
-                    final String workspace = workspaceCollectionEntry[0];
-
-                    LOGGER.info("Found collection: {} in workspace {}", collection, workspace);
-                    String name = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX + workspace + "." + collection;
-
-                    LOGGER.info("Try to init : {}", name);
-                    MCRSwordCollectionProvider collectionProvider = mcrConfiguration.getInstanceOf(name);
-                    collections.put(collection, collectionProvider);
-                    final MCRSwordLifecycleConfiguration lifecycleConfiguration = new MCRSwordLifecycleConfiguration(
-                        collection);
-                    collectionProvider.init(lifecycleConfiguration);
-
-                    List<String> collectionsOfWorkspace;
-                    if (workspaceCollectionTable.containsKey(workspace)) {
-                        collectionsOfWorkspace = workspaceCollectionTable.get(workspace);
-                    } else {
-                        collectionsOfWorkspace = new ArrayList<>();
-                        workspaceCollectionTable.put(workspace, collectionsOfWorkspace);
-                    }
-                    collectionsOfWorkspace.add(collection);
-                });
+                .filter(array -> array.length == 2) // remove all whith no workspace or collection name
+                .forEach(wsCol -> initWorkspaceCollection(wsCol[0], wsCol[1]));
 
             addCollectionShutdownHook();
         }
 
+    }
+
+    private static void initWorkspaceCollection(String workspace, String collection) {
+        LOGGER.info("Found collection: {} in workspace {}", collection, workspace);
+        String name = MCRSwordConstants.MCR_SWORD_COLLECTION_PREFIX + workspace + "." + collection;
+
+        LOGGER.info("Try to init : {}", name);
+        MCRSwordCollectionProvider collectionProvider = MCRConfiguration2
+            .getOrThrow(name, MCRConfiguration2::instantiateClass);
+        collections.put(collection, collectionProvider);
+        final MCRSwordLifecycleConfiguration lifecycleConfiguration = new MCRSwordLifecycleConfiguration(collection);
+        collectionProvider.init(lifecycleConfiguration);
+
+        List<String> collectionsOfWorkspace;
+        if (workspaceCollectionTable.containsKey(workspace)) {
+            collectionsOfWorkspace = workspaceCollectionTable.get(workspace);
+        } else {
+            collectionsOfWorkspace = new ArrayList<>();
+            workspaceCollectionTable.put(workspace, collectionsOfWorkspace);
+        }
+        collectionsOfWorkspace.add(collection);
     }
 
     private static void addCollectionShutdownHook() {

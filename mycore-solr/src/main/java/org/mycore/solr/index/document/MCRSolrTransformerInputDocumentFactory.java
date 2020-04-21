@@ -33,7 +33,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -82,7 +82,7 @@ public class MCRSolrTransformerInputDocumentFactory extends MCRSolrInputDocument
 
     private static MCRContentTransformer getTransformer() {
         String property = SOLR_CONFIG_PREFIX + "SolrInputDocument.Transformer";
-        String transformerId = MCRConfiguration.instance().getString(property);
+        String transformerId = MCRConfiguration2.getStringOrThrow(property);
         MCRContentTransformer contentTransformer = MCRContentTransformerFactory.getTransformer(transformerId);
         isJAXBTransformer = contentTransformer instanceof MCRXSL2JAXBTransformer;
         return contentTransformer;

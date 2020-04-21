@@ -33,12 +33,12 @@ import org.jdom2.output.DOMOutputter;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 public final class MCRWebsiteWriteProtection {
     private static final String FS = System.getProperty("file.separator");
 
-    private static final String CONFIG_FOLDER_PATH = MCRConfiguration.instance().getString("MCR.datadir") + FS
+    private static final String CONFIG_FOLDER_PATH = MCRConfiguration2.getStringOrThrow("MCR.datadir") + FS
         + "config";
 
     private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH + FS + "config-writeProtectionWebsite.xml";
@@ -176,7 +176,7 @@ public final class MCRWebsiteWriteProtection {
         String baseURL) throws IOException {
         if (MCRWebsiteWriteProtection.isActive()) {
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-            String pageURL = baseURL + MCRConfiguration.instance().getString("MCR.WriteProtectionWebsite.ErrorPage");
+            String pageURL = baseURL + MCRConfiguration2.getStringOrThrow("MCR.WriteProtectionWebsite.ErrorPage");
             response.sendRedirect(response.encodeRedirectURL(pageURL));
             return true;
         }

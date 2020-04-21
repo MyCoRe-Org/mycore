@@ -41,7 +41,7 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.wcms2.access.MCRWCMSPermission;
 import org.mycore.wcms2.datamodel.MCRNavigation;
@@ -118,7 +118,7 @@ public class MCRWCMSNavigationResource {
             .collect(Collectors.toCollection(HashSet::new));
 
         // templates by folder
-        String templatePath = MCRConfiguration.instance().getString("MCR.WCMS2.templatePath", "/templates/master/");
+        String templatePath = MCRConfiguration2.getString("MCR.WCMS2.templatePath").orElse("/templates/master/");
         Set<String> resourcePaths = servletContext.getResourcePaths(templatePath);
         if (resourcePaths != null) {
             for (String resourcepath : resourcePaths) {

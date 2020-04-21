@@ -40,6 +40,7 @@ import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRISO8601FormatChooser;
 import org.mycore.oai.pmh.Header;
 import org.mycore.oai.pmh.Set;
@@ -159,15 +160,13 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         String configPrefix = this.identify.getConfigPrefix();
         SolrQuery query = new SolrQuery();
         // query
-        String restriction = getConfig().getString(configPrefix + "Search.Restriction", null);
-        if (restriction != null) {
-            query.set(restrictionField, restriction);
-        }
+        MCRConfiguration2.getString(configPrefix + "Search.Restriction")
+            .ifPresent(restriction -> query.set(restrictionField, restriction));
         String[] requiredFields = Stream.concat(Stream.of("id", getModifiedField()), getRequiredFieldNames().stream())
             .toArray(String[]::new);
         query.setFields(requiredFields);
         // request handler
-        query.setRequestHandler(getConfig().getString(configPrefix + "Search.RequestHandler", "/select"));
+        query.setRequestHandler(MCRConfiguration2.getString(configPrefix + "Search.RequestHandler").orElse("/select"));
         return query;
     }
 
@@ -230,14 +229,16 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     }
 
     private String getModifiedField() {
-        return getConfig().getString(getConfigPrefix() + "Search.FromUntil", "modified");
+        return MCRConfiguration2.getString(getConfigPrefix() + "Search.FromUntil").orElse("modified");
     }
 
     @Override
     public Optional<Instant> getEarliestTimestamp() {
-        String sortBy = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.SortBy", "modified asc");
-        String fieldName = getConfig().getString(getConfigPrefix() + "EarliestDatestamp.FieldName", "modified");
-        String restriction = getConfig().getString(getConfigPrefix() + "Search.Restriction", null);
+        String sortBy = MCRConfiguration2.getString(getConfigPrefix() + "EarliestDatestamp.SortBy")
+            .orElse("modified asc");
+        String fieldName = MCRConfiguration2.getString(getConfigPrefix() + "EarliestDatestamp.FieldName")
+            .orElse("modified");
+        String restriction = MCRConfiguration2.getString(getConfigPrefix() + "Search.Restriction").orElse(null);
         ModifiableSolrParams params = new ModifiableSolrParams();
         params.add(CommonParams.SORT, sortBy);
         params.add(CommonParams.Q, restriction);

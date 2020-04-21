@@ -79,7 +79,7 @@ import org.mycore.backend.jpa.MCRStreamQuery;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRContentStoreFactory;
@@ -125,7 +125,7 @@ public class MCRIFSCommands {
         MCRContentStore currentStore = null;
         File currentStoreBaseDir = null;
         BufferedWriter bw = null;
-        String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
+        String nameOfProject = MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe");
         try {
             Iterator<MCRFSNODES> fsnodes = streamQuery.getResultStream().iterator();
             while (fsnodes.hasNext()) {
@@ -200,7 +200,7 @@ public class MCRIFSCommands {
         MCRContentStore currentStore = null;
         File currentStoreBaseDir = null;
         StreamResult streamResult = null;
-        String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
+        String nameOfProject = MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe");
         SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
         TransformerHandler th = null;
         Attributes2Impl atts = new Attributes2Impl();
@@ -323,7 +323,7 @@ public class MCRIFSCommands {
                 String.class).setParameter("storeid", currentStore.getID());
 
             boolean endOfList = false;
-            String nameOfProject = MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe");
+            String nameOfProject = MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe");
             String storeID = currentStore.getID();
             File outputFile = new File(targetDir, new MessageFormat("{0}-{1}-{2}.xml", Locale.ROOT)
                 .format(new Object[] { nameOfProject, storeID, rootName }));

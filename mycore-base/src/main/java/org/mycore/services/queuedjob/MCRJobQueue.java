@@ -50,7 +50,7 @@ import javax.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
@@ -61,7 +61,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
 
     protected static String CONFIG_PREFIX = "MCR.QueuedJob.";
 
-    protected static boolean singleQueue = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "SingleQueue", true);
+    protected static boolean singleQueue = MCRConfiguration2.getBoolean(CONFIG_PREFIX + "SingleQueue").orElse(true);
 
     protected String configPrefixAdd = "";
 
@@ -76,15 +76,14 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     private boolean running;
 
     private MCRJobQueue(Class<? extends MCRJobAction> action) {
-        int waitTime = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "TimeTillReset", 10);
+        int waitTime = MCRConfiguration2.getInt(CONFIG_PREFIX + "TimeTillReset").orElse(10);
         if (!singleQueue && action != null) {
             this.action = action;
             configPrefixAdd = action.getSimpleName();
             if (configPrefixAdd.length() > 0) {
                 configPrefixAdd = configPrefixAdd.concat(".");
             }
-            waitTime = MCRConfiguration.instance()
-                .getInt(CONFIG_PREFIX + configPrefixAdd + "TimeTillReset", waitTime);
+            waitTime = MCRConfiguration2.getInt(CONFIG_PREFIX + configPrefixAdd + "TimeTillReset").orElse(waitTime);
         }
         waitTime = waitTime * 60;
 
@@ -396,7 +395,7 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
             return job;
         }
         LOGGER.debug("No prefetched jobs available");
-        if (preFetch(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "preFetchAmount", 50)) == 0) {
+        if (preFetch(MCRConfiguration2.getInt(CONFIG_PREFIX + "preFetchAmount").orElse(50)) == 0) {
             return null;
         }
         return getNextPrefetchedElement();
@@ -472,8 +471,8 @@ public class MCRJobQueue extends AbstractQueue<MCRJob> implements Closeable {
     public synchronized void notifyListener() {
         this.notifyAll();
 
-        boolean autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + "autostart", true);
-        autostart = MCRConfiguration.instance().getBoolean(CONFIG_PREFIX + configPrefixAdd + "autostart", autostart);
+        boolean autostart = MCRConfiguration2.getBoolean(CONFIG_PREFIX + "autostart").orElse(true);
+        autostart = MCRConfiguration2.getBoolean(CONFIG_PREFIX + configPrefixAdd + "autostart").orElse(autostart);
 
         if (autostart) {
             MCRJobMaster.startMasterThread(action);

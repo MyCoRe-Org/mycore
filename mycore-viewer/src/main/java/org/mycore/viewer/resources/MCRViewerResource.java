@@ -39,7 +39,7 @@ import javax.xml.bind.JAXBException;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -64,9 +64,9 @@ import org.xml.sax.SAXException;
 @Path("/viewer")
 public class MCRViewerResource {
 
-    private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration.instance()
-        .getInstanceOf("MCR.Viewer.MCRIviewACLProvider",
-            MCRIviewDefaultACLProvider.class.getName());
+    private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration2
+        .<MCRIviewACLProvider> getInstanceOf("MCR.Viewer.MCRIviewACLProvider")
+        .orElseGet(MCRIviewDefaultACLProvider::new);
 
     private static final String JSON_CONFIG_ELEMENT_NAME = "json";
 
@@ -146,8 +146,10 @@ public class MCRViewerResource {
             MCRJerseyUtil.throwException(Status.UNAUTHORIZED, errorMessage);
         }
         // build configuration object
-        MCRViewerConfigurationStrategy configurationStrategy = MCRConfiguration.instance()
-            .getInstanceOf("MCR.Viewer.configuration.strategy", new MCRViewerDefaultConfigurationStrategy());
+        MCRViewerConfigurationStrategy configurationStrategy = MCRConfiguration2
+            .<MCRViewerDefaultConfigurationStrategy> getInstanceOf(
+                "MCR.Viewer.configuration.strategy")
+            .orElseGet(MCRViewerDefaultConfigurationStrategy::new);
         MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(configurationStrategy.get(req)));
         MCRParameterCollector parameter = new MCRParameterCollector(req);
         MCRContentTransformer transformer = getContentTransformer(source.getDocType(), parameter);

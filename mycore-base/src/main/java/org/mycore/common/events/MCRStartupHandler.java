@@ -18,14 +18,14 @@
 
 package org.mycore.common.events;
 
-import java.util.Collections;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
@@ -65,7 +65,9 @@ public class MCRStartupHandler {
             LOGGER.info("Library order: {}", servletContext.getAttribute(ServletContext.ORDERED_LIBS));
         }
 
-        MCRConfiguration.instance().getStrings("MCR.Startup.Class", Collections.emptyList()).stream()
+        MCRConfiguration2.getString("MCR.Startup.Class")
+            .map(MCRConfiguration2::splitValue)
+            .orElseGet(Stream::empty)
             .map(MCRStartupHandler::getAutoExecutable)
             //reverse ordering: highest priority first
             .sorted((o1, o2) -> Integer.compare(o2.getPriority(), o1.getPriority()))

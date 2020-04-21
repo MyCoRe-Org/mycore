@@ -18,7 +18,6 @@
 
 package org.mycore.pi;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
@@ -37,7 +37,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -66,46 +67,23 @@ public class MCRPIManager {
     private Map<String, Class<? extends MCRPIParser>> typeParserMap;
 
     private MCRPIManager() {
-        resolverList = new ArrayList<>();
         parserList = new ArrayList<>();
         typeParserMap = new ConcurrentHashMap<>();
 
-        Map<String, String> parserPropertiesMap = MCRConfiguration.instance().getPropertiesMap(PARSER_CONFIGURATION);
-        parserPropertiesMap.forEach((k, v) -> {
-            String type = k.substring(PARSER_CONFIGURATION.length());
-            try {
-                @SuppressWarnings("unchecked")
-                Class<? extends MCRPIParser<?>> parserClass = (Class<? extends MCRPIParser<?>>) Class
-                    .forName(v);
-                registerParser(type, parserClass);
-            } catch (ClassNotFoundException e) {
-                throw new MCRConfigurationException("Could not load class " + v + " defined in " + k);
-            }
-        });
-
-        Stream.of(MCRConfiguration.instance().getString(RESOLVER_CONFIGURATION).split(","))
-            .forEach(className -> {
+        MCRConfiguration2.getSubPropertiesMap(PARSER_CONFIGURATION)
+            .forEach((type, className) -> {
                 try {
-                    MCRPIResolver<MCRPersistentIdentifier> resolver =
-                        ((Class<MCRPIResolver<MCRPersistentIdentifier>>) Class.forName(className))
-                        .getConstructor()
-                        .newInstance();
-                    resolverList.add(resolver);
+                    Class<? extends MCRPIParser<?>> parserClass = MCRClassTools.forName(className);
+                    registerParser(type, parserClass);
                 } catch (ClassNotFoundException e) {
                     throw new MCRConfigurationException(
-                        RESOLVER_CONFIGURATION + " contains " + className + " but the class could not be found!",
-                        e);
-                } catch (NoSuchMethodException e) {
-                    throw new MCRConfigurationException("The class " + className + " has no default constructor!", e);
-                } catch (IllegalAccessException e) {
-                    throw new MCRConfigurationException("Cannot invoke default constructor of " + className + "!", e);
-                } catch (InstantiationException e) {
-                    throw new MCRConfigurationException("The class " + className + " seems to be abstract!", e);
-                } catch (InvocationTargetException e) {
-                    throw new MCRConfigurationException(
-                        "The default constructor of class " + className + " throws a exception!", e);
+                        "Could not load class " + className + " defined in " + PARSER_CONFIGURATION + type);
                 }
             });
+
+        resolverList = MCRConfiguration2.getOrThrow(RESOLVER_CONFIGURATION, MCRConfiguration2::splitValue)
+            .map(MCRConfiguration2::<MCRPIResolver<MCRPersistentIdentifier>> instantiateClass)
+            .collect(Collectors.toList());
 
     }
 

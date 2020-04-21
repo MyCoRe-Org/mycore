@@ -24,7 +24,7 @@ import java.util.Collection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -44,8 +44,9 @@ public class MCRIView2XSLFunctionsAdapter {
     private static final MCRLinkTableManager LINK_TABLE_MANAGER = MCRLinkTableManager.instance();
 
     public static MCRIView2XSLFunctionsAdapter getInstance() {
-        return MCRConfiguration.instance().getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter",
-            MCRIView2XSLFunctionsAdapter.class.getName());
+        return MCRConfiguration2
+            .<MCRIView2XSLFunctionsAdapter> getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter")
+            .orElseGet(MCRIView2XSLFunctionsAdapter::new);
     }
 
     public boolean hasMETSFile(String derivateID) {
@@ -57,7 +58,6 @@ public class MCRIView2XSLFunctionsAdapter {
     }
 
     public String getOptions(String derivateID, String extensions) {
-        MCRConfiguration config = MCRConfiguration.instance();
         final Collection<String> sources = LINK_TABLE_MANAGER.getSourceOf(derivateID, "derivate");
         String objectID = (sources != null && !sources.isEmpty()) ? sources.iterator().next() : "";
         StringBuilder options = new StringBuilder();
@@ -65,16 +65,16 @@ public class MCRIView2XSLFunctionsAdapter {
         options.append("\"derivateId\":").append('\"').append(derivateID).append("\",");
         options.append("\"objectId\":").append('\"').append(objectID).append("\",");
         options.append("\"webappBaseUri\":").append('\"').append(MCRFrontendUtil.getBaseURL()).append("\",");
-        String baseUris = config.getString("MCR.Module-iview2.BaseURL", "");
+        String baseUris = MCRConfiguration2.getString("MCR.Module-iview2.BaseURL").orElse("");
         if (baseUris.length() < 10) {
             baseUris = MCRServlet.getServletBaseURL() + "MCRTileServlet";
         }
         options.append("\"baseUri\":").append('\"').append(baseUris).append("\".split(\",\")");
         if (MCRAccessManager.checkPermission(derivateID, "create-pdf")) {
             options.append(",\"pdfCreatorURI\":").append('\"')
-                .append(config.getString("MCR.Module-iview2.PDFCreatorURI", "")).append("\",");
+                .append(MCRConfiguration2.getString("MCR.Module-iview2.PDFCreatorURI").orElse("")).append("\",");
             options.append("\"pdfCreatorStyle\":").append('\"')
-                .append(config.getString("MCR.Module-iview2.PDFCreatorStyle", "")).append('\"');
+                .append(MCRConfiguration2.getString("MCR.Module-iview2.PDFCreatorStyle").orElse("")).append('\"');
         }
 
         if (extensions != null && !extensions.equals("")) {

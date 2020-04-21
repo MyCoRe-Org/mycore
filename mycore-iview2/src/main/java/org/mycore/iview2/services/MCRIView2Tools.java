@@ -49,7 +49,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -66,11 +66,10 @@ import org.mycore.imagetiler.MCRTiledPictureProps;
  */
 public class MCRIView2Tools {
 
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
     public static final String CONFIG_PREFIX = "MCR.Module-iview2.";
 
-    private static String SUPPORTED_CONTENT_TYPE = CONFIG.getString(CONFIG_PREFIX + "SupportedContentTypes", "");
+    private static String SUPPORTED_CONTENT_TYPE = MCRConfiguration2.getString(CONFIG_PREFIX + "SupportedContentTypes")
+        .orElse("");
 
     private static Path TILE_DIR = Paths.get(MCRIView2Tools.getIView2Property("DirectoryForTiles"));
 
@@ -309,14 +308,14 @@ public class MCRIView2Tools {
     }
 
     /**
-     * short for <code>MCRConfiguration.instance().getString("MCR.Module-iview2." + propName, defaultProp);</code>
+     * short for <code>MCRConfiguration2.getString("MCR.Module-iview2." + propName).orElse(defaultProp);</code>
      *
      * @param propName
      *            any suffix
      * @return null or property value
      */
     public static String getIView2Property(String propName, String defaultProp) {
-        return MCRConfiguration.instance().getString(CONFIG_PREFIX + propName, defaultProp);
+        return MCRConfiguration2.getString(CONFIG_PREFIX + propName).orElse(defaultProp);
     }
 
     public static String getFilePath(String derID, String derPath) throws IOException {

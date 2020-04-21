@@ -43,7 +43,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -66,7 +66,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = LogManager.getLogger(MCRUserCommands.class.getName());
 
-    private static final String SYSTEM = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName")
+    private static final String SYSTEM = MCRConfiguration2.getStringOrThrow("MCR.CommandLineInterface.SystemName")
         + ":";
 
     /**
@@ -120,9 +120,9 @@ public class MCRUserCommands extends MCRAbstractCommands {
         help = "Initializes the user system. This command runs only if the user database does not exist.",
         order = 30)
     public static List<String> initSuperuser() {
-        final String suser = CONFIG.getString("MCR.Users.Superuser.UserName");
-        final String spasswd = CONFIG.getString("MCR.Users.Superuser.UserPasswd");
-        final String srole = CONFIG.getString("MCR.Users.Superuser.GroupName");
+        final String suser = MCRConfiguration2.getStringOrThrow("MCR.Users.Superuser.UserName");
+        final String spasswd = MCRConfiguration2.getStringOrThrow("MCR.Users.Superuser.UserPasswd");
+        final String srole = MCRConfiguration2.getStringOrThrow("MCR.Users.Superuser.GroupName");
 
         if (MCRUserManager.exists(suser)) {
             LOGGER.error("The superuser already exists!");

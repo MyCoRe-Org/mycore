@@ -21,7 +21,7 @@ package org.mycore.datamodel.common;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -86,8 +86,8 @@ public class MCRServiceFlagEventHandler extends MCREventHandlerBase {
     protected static void setDefaultState(MCRObjectService objService) {
         if (objService.getState() == null) {
             MCRCategoryID defaultState = new MCRCategoryID(
-                MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Classification.ID"),
-                MCRConfiguration.instance().getString("MCR.Metadata.Service.State.Category.Default"));
+                MCRConfiguration2.getStringOrThrow("MCR.Metadata.Service.State.Classification.ID"),
+                MCRConfiguration2.getStringOrThrow("MCR.Metadata.Service.State.Category.Default"));
             objService.setState(defaultState);
         }
     }

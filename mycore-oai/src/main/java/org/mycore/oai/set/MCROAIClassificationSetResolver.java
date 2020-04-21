@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 import org.apache.solr.common.SolrDocument;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.classmapping.MCRClassificationAndSetMapper;
 import org.mycore.oai.pmh.Set;
 
@@ -52,8 +52,8 @@ class MCROAIClassificationSetResolver extends MCROAISetResolver<String, SolrDocu
         super.init(configPrefix, setId, setMap, result, identifier);
         this.setMap = result.stream().collect(Collectors.toMap(getIdentifier(), d -> d));
         String classId = MCRClassificationAndSetMapper.mapSetToClassification(configPrefix, setId);
-        classField = MCRConfiguration.instance().getString(getConfigPrefix() + "Sets." + setId + "SetSolrField",
-            "category.top");
+        classField = MCRConfiguration2.getString(getConfigPrefix() + "Sets." + setId + "SetSolrField")
+            .orElse("category.top");
         classPrefix = classId + ":";
     }
 

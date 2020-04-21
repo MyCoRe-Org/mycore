@@ -37,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRPathContent;
@@ -62,8 +62,8 @@ public class MCRMETSServlet extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRMETSServlet.class);
 
-    public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration.instance()
-        .getBoolean("MCR.Mets.storeMetsOnGenerate");
+    public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration2
+        .getOrThrow("MCR.Mets.storeMetsOnGenerate", Boolean::parseBoolean);
 
     private boolean useExpire;
 
@@ -156,7 +156,7 @@ public class MCRMETSServlet extends MCRServlet {
         String cacheParam = getInitParameter("cacheTime");
         /* default is one day */
         CACHE_TIME = cacheParam != null ? Integer.parseInt(cacheParam) : (60 * 60 * 24);
-        useExpire = MCRConfiguration.instance().getBoolean("MCR.Component.MetsMods.Servlet.UseExpire", true);
+        useExpire = MCRConfiguration2.getBoolean("MCR.Component.MetsMods.Servlet.UseExpire").orElse(true);
     }
 
     private boolean useExistingMets(HttpServletRequest request) {

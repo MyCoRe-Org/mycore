@@ -31,7 +31,7 @@ import javax.servlet.ServletContext;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.pi.MCRPIRegistrationInfo;
@@ -107,8 +107,8 @@ public class MCRURNGranularRESTRegistrationStarter
     }
 
     public Optional<UsernamePasswordCredentials> getUsernamePassword() {
-        String username = MCRConfiguration.instance().getString("MCR.URN.DNB.Credentials.Login", null);
-        String password = MCRConfiguration.instance().getString("MCR.URN.DNB.Credentials.Password", null);
+        String username = MCRConfiguration2.getString("MCR.URN.DNB.Credentials.Login").orElse(null);
+        String password = MCRConfiguration2.getString("MCR.URN.DNB.Credentials.Password").orElse(null);
 
         if (username == null || password == null || username.length() == 0 || password.length() == 0) {
             LOGGER.warn("Could not instantiate {} as required credentials are unset", this.getClass().getName());

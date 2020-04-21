@@ -23,7 +23,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -44,7 +43,7 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -166,7 +165,6 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     public MCRPIMetadataService<T> getMetadataService() {
         Map<String, String> properties = getProperties();
-        MCRConfiguration configuration = MCRConfiguration.instance();
 
         final String metadataManager;
         if (properties.containsKey(METADATA_SERVICE_PROPERTY_KEY)) {
@@ -176,15 +174,12 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
                 getServiceID() + " has no " + METADATA_SERVICE_PROPERTY_KEY + "!");
         }
 
-        final String className = configuration.getString(METADATA_SERVICE_CONFIG_PREFIX
+        final String className = MCRConfiguration2.getStringOrThrow(METADATA_SERVICE_CONFIG_PREFIX
             + metadataManager);
 
         try {
-            @SuppressWarnings("unchecked")
-            Class<MCRPIMetadataService<T>> classObject = (Class<MCRPIMetadataService<T>>) Class
-                .forName(className);
-            Constructor<MCRPIMetadataService<T>> constructor = classObject
-                .getConstructor(String.class);
+            Class<? extends MCRPIMetadataService<T>> classObject = MCRClassTools.forName(className);
+            Constructor<? extends MCRPIMetadataService<T>> constructor = classObject.getConstructor(String.class);
             return constructor.newInstance(metadataManager);
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException(
@@ -209,7 +204,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             .orElseThrow(generatorPropertiesNotSetError);
 
         String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
-        String className = MCRConfiguration.instance().getString(generatorPropertyKey);
+        String className = MCRConfiguration2.getStringOrThrow(generatorPropertyKey);
 
         try {
             Class<? extends MCRPIGenerator<T>> classObject = MCRClassTools.forName(className);
@@ -431,19 +426,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     }
 
     protected final Map<String, String> getProperties() {
-        Map<String, String> propertiesMap = MCRConfiguration.instance()
-            .getPropertiesMap(
-                REGISTRATION_CONFIG_PREFIX + registrationServiceID
-                    + ".");
-
-        Map<String, String> shortened = new HashMap<>();
-
-        propertiesMap.keySet().forEach(key -> {
-            String newKey = key.substring(REGISTRATION_CONFIG_PREFIX.length() + registrationServiceID.length() + 1);
-            shortened.put(newKey, propertiesMap.get(key));
-        });
-
-        return shortened;
+        final String configPrefix = REGISTRATION_CONFIG_PREFIX + registrationServiceID + ".";
+        return MCRConfiguration2.getSubPropertiesMap(configPrefix);
     }
 
     protected T getNewIdentifier(MCRBase id, String additional) throws MCRPersistentIdentifierException {

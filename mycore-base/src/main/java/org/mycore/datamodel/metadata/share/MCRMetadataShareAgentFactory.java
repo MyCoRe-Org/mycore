@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.metadata.share;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -37,14 +37,8 @@ public class MCRMetadataShareAgentFactory {
 
     public static MCRMetadataShareAgent getAgent(MCRObjectID objectId) {
         String propertyName = CONFIG_PREFIX + objectId.getTypeId();
-        String propertyValue = MCRConfiguration.instance().getString(propertyName, null);
-        if (propertyValue != null) {
-            //we will not get undefined problems here
-            return MCRConfiguration.instance()
-                .getSingleInstanceOf(propertyName, null);
-        }
-        return getDefaultAgent();
-
+        return MCRConfiguration2.<MCRMetadataShareAgent> getSingleInstanceOf(propertyName)
+            .orElseGet(MCRMetadataShareAgentFactory::getDefaultAgent);
     }
 
     /**

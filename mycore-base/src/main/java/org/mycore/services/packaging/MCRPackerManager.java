@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobQueue;
 
@@ -84,7 +84,8 @@ public class MCRPackerManager {
 
     private static void checkPacker(String packer, Map<String, String> jobParameters)
         throws MCRUsageException, MCRAccessException {
-        MCRPacker instance = MCRConfiguration.instance().getInstanceOf("MCR.Packaging.Packer." + packer + ".Class");
+        MCRPacker instance = MCRConfiguration2
+            .getOrThrow("MCR.Packaging.Packer." + packer + ".Class", MCRConfiguration2::instantiateClass);
         instance.setParameter(jobParameters);
         instance.setConfiguration(MCRPackerJobAction.getConfiguration(packer));
         instance.checkSetup();

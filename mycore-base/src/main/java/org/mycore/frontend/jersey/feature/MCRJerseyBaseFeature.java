@@ -27,7 +27,7 @@ import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.Response;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.MCRStaticContent;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessCheckerFactory;
@@ -54,8 +54,8 @@ public abstract class MCRJerseyBaseFeature implements DynamicFeature {
      * @return a list of java package names
      */
     protected List<String> getPackages() {
-        String propertyString = MCRConfiguration.instance().getString("MCR.Jersey.Resource.Packages",
-            "org.mycore.frontend.jersey.resources");
+        String propertyString = MCRConfiguration2.getString("MCR.Jersey.Resource.Packages")
+            .orElse("org.mycore.frontend.jersey.resources");
         return Arrays.asList(propertyString.split(","));
     }
 

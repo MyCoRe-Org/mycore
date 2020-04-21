@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -85,7 +85,7 @@ public class MCRIView2XSLFunctions {
     }
 
     public static String getThumbnailURL(String derivate, String imagePath) {
-        String[] baseURLs = MCRConfiguration.instance().getString("MCR.Module-iview2.BaseURL").split(",");
+        String[] baseURLs = MCRConfiguration2.getStringOrThrow("MCR.Module-iview2.BaseURL").split(",");
         int index = imagePath.hashCode() % baseURLs.length;
         StringBuilder baseURL = new StringBuilder(baseURLs[index]);
         baseURL.append('/').append(derivate);

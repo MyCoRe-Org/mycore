@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.oai.pmh.Header;
@@ -125,8 +126,11 @@ public class MCROAIDeletedSearcher extends MCROAISearcher {
         LOGGER.info("Getting identifiers of deleted items");
         Map<MCRObjectID, Instant> deletedItems = MCRMetadataHistoryManager.getDeletedItems(from,
             Optional.ofNullable(until));
-        List<String> types = getConfig().getStrings(getConfigPrefix() + "DeletedRecordTypes", null);
-        if (types == null || types.isEmpty()) {
+        List<String> types = MCRConfiguration2.getString(getConfigPrefix() + "DeletedRecordTypes")
+            .stream()
+            .flatMap(MCRConfiguration2::splitValue)
+            .collect(Collectors.toList());
+        if (types.isEmpty()) {
             return deletedItems.entrySet().stream()
                 .map(this::toHeader)
                 .collect(Collectors.toList());

@@ -30,7 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 
 /**
@@ -62,8 +62,8 @@ public class MCRDirectoryXML {
     protected static final boolean WITH_ADDITIONAL_DATA_DEFAULT;
 
     static {
-        WITH_ADDITIONAL_DATA_DEFAULT = MCRConfiguration.instance().getBoolean("MCR.IFS.IncludeAdditionalDataByDefault",
-            false);
+        WITH_ADDITIONAL_DATA_DEFAULT = MCRConfiguration2.getBoolean("MCR.IFS.IncludeAdditionalDataByDefault")
+            .orElse(false);
     }
 
     /**

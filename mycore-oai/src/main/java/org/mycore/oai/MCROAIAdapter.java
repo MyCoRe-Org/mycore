@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.oai.pmh.BadResumptionTokenException;
 import org.mycore.oai.pmh.CannotDisseminateFormatException;
 import org.mycore.oai.pmh.Header;
@@ -70,8 +70,6 @@ public class MCROAIAdapter implements OAIAdapter {
 
     protected String configPrefix;
 
-    protected MCRConfiguration config;
-
     protected MCROAISearchManager searchManager;
 
     protected MCROAIObjectManager objectManager;
@@ -80,7 +78,7 @@ public class MCROAIAdapter implements OAIAdapter {
 
     static {
         String prefix = MCROAIAdapter.PREFIX + "ResumptionTokens.";
-        DEFAULT_PARTITION_SIZE = MCRConfiguration.instance().getInt(prefix + "PartitionSize", 50);
+        DEFAULT_PARTITION_SIZE = MCRConfiguration2.getInt(prefix + "PartitionSize").orElse(50);
         LOGGER.info(MCROAIAdapter.PREFIX + "ResumptionTokens.PartitionSize is set to {}", DEFAULT_PARTITION_SIZE);
     }
 
@@ -95,14 +93,13 @@ public class MCROAIAdapter implements OAIAdapter {
     public void init(String baseURL, String oaiConfiguration) {
         this.baseURL = baseURL;
         this.configPrefix = PREFIX + oaiConfiguration + ".";
-        this.config = MCRConfiguration.instance();
     }
 
     public MCROAISetManager getSetManager() {
         if (this.setManager == null) {
-            this.setManager = MCRConfiguration.instance().getInstanceOf(getConfigPrefix() + "SetManager",
-                MCROAISetManager.class.getName());
-            int cacheMaxAge = MCRConfiguration.instance().getInt(this.configPrefix + "SetCache.MaxAge", 0);
+            this.setManager = MCRConfiguration2.<MCROAISetManager> getInstanceOf(getConfigPrefix() + "SetManager")
+                .orElseGet(MCROAISetManager::new);
+            int cacheMaxAge = MCRConfiguration2.getInt(this.configPrefix + "SetCache.MaxAge").orElse(0);
             this.setManager.init(getConfigPrefix(), cacheMaxAge);
         }
         return this.setManager;
@@ -119,8 +116,8 @@ public class MCROAIAdapter implements OAIAdapter {
     public MCROAISearchManager getSearchManager() {
         if (this.searchManager == null) {
             this.searchManager = new MCROAISearchManager();
-            int partitionSize = MCRConfiguration.instance().getInt(getConfigPrefix() + "ResumptionTokens.PartitionSize",
-                DEFAULT_PARTITION_SIZE);
+            int partitionSize = MCRConfiguration2.getInt(getConfigPrefix() + "ResumptionTokens.PartitionSize")
+                .orElse(DEFAULT_PARTITION_SIZE);
             this.searchManager.init(getIdentify(), getObjectManager(), getSetManager(), partitionSize);
         }
         return this.searchManager;
@@ -220,12 +217,13 @@ public class MCROAIAdapter implements OAIAdapter {
 
     protected Map<String, MetadataFormat> getMetadataFormatMap() {
         Map<String, MetadataFormat> metdataFormatMap = new HashMap<>();
-        String formats = this.config.getString(getConfigPrefix() + "MetadataFormats", "");
+        String formats = MCRConfiguration2.getString(getConfigPrefix() + "MetadataFormats").orElse("");
         StringTokenizer st = new StringTokenizer(formats, ", ");
         while (st.hasMoreTokens()) {
             String format = st.nextToken();
-            String namespaceURI = this.config.getString(PREFIX + "MetadataFormat." + format + ".Namespace");
-            String schema = this.config.getString(PREFIX + "MetadataFormat." + format + ".Schema");
+            String namespaceURI = MCRConfiguration2
+                .getStringOrThrow(PREFIX + "MetadataFormat." + format + ".Namespace");
+            String schema = MCRConfiguration2.getStringOrThrow(PREFIX + "MetadataFormat." + format + ".Schema");
             metdataFormatMap.put(format, new MetadataFormat(format, namespaceURI, schema));
         }
         return metdataFormatMap;

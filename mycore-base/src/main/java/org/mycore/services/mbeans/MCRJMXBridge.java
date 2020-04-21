@@ -32,7 +32,7 @@ import javax.management.ObjectName;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
@@ -101,7 +101,7 @@ public class MCRJMXBridge implements Closeable {
 
     private static ObjectName getObjectName(String type, String component) throws MalformedObjectNameException {
         return new ObjectName(
-            MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ')
+            MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe-Application").replace(':', ' ')
                 + ":type="
                 + type + ",component=" + component);
     }

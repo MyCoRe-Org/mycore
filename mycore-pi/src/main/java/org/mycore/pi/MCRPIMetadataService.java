@@ -20,13 +20,12 @@ package org.mycore.pi;
 
 import static org.mycore.pi.MCRPIService.METADATA_SERVICE_CONFIG_PREFIX;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -51,17 +50,8 @@ public abstract class MCRPIMetadataService<T extends MCRPersistentIdentifier> {
     }
 
     protected final Map<String, String> getPropertiesWithPrefix(String configPrefix) {
-        Map<String, String> propertiesMap = MCRConfiguration.instance()
-            .getPropertiesMap(configPrefix + metadataManagerID + ".");
-
-        Map<String, String> shortened = new HashMap<>();
-
-        propertiesMap.keySet().forEach(key -> {
-            String newKey = key.substring(configPrefix.length() + metadataManagerID.length() + 1);
-            shortened.put(newKey, propertiesMap.get(key));
-        });
-
-        return shortened;
+        final String myConfigPrefix = configPrefix + metadataManagerID + ".";
+        return MCRConfiguration2.getSubPropertiesMap(myConfigPrefix);
     }
 
     public abstract void insertIdentifier(T identifier, MCRBase obj, String additional)

@@ -29,7 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.TransformerHandler;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
@@ -126,7 +126,7 @@ public class MCRXSL2JAXBTransformer<T> extends MCRXSLTransformer {
     public void init(String id) {
         super.init(id);
         String property = "MCR.ContentTransformer." + id + ".Context";
-        String contextPath = MCRConfiguration.instance().getString(property);
+        String contextPath = MCRConfiguration2.getStringOrThrow(property);
         try {
             JAXBContext context = JAXBContext.newInstance(contextPath, getClass().getClassLoader());
             setContext(context);

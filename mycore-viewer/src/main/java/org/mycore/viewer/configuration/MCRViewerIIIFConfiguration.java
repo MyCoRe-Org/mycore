@@ -20,7 +20,7 @@ package org.mycore.viewer.configuration;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 
 public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
@@ -33,10 +33,10 @@ public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
         final String derivate = getDerivate(request);
 
         setProperty("manifestURL", MCRFrontendUtil.getBaseURL()
-            + MCRConfiguration.instance().getString("MCR.Viewer.IIIF.URL.Presentation", "rsc/iiif/presentation/mets/")
+            + MCRConfiguration2.getString("MCR.Viewer.IIIF.URL.Presentation").orElse("rsc/iiif/presentation/mets/")
             + derivate + "/manifest");
         setProperty("imageAPIURL", MCRFrontendUtil.getBaseURL()
-            + MCRConfiguration.instance().getString("MCR.Viewer.IIIF.URL.Image", "rsc/iiif/image/Iview/"));
+            + MCRConfiguration2.getString("MCR.Viewer.IIIF.URL.Image").orElse("rsc/iiif/image/Iview/"));
         setProperty("filePath", getDerivate(request) + getFilePath(request));
 
         // script

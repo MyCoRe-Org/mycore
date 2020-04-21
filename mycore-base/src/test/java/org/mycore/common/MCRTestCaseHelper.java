@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 import org.junit.rules.TemporaryFolder;
 import org.mycore.common.config.MCRComponent;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationLoader;
 import org.mycore.common.config.MCRConfigurationLoaderFactory;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
@@ -61,16 +61,15 @@ public class MCRTestCaseHelper {
             .collect(Collectors.joining(", "));
         System.out.printf("MyCoRe components detected: %s\nApplications modules detected: %s\n",
             mcrComp.isEmpty() ? "'none'" : mcrComp, appMod.isEmpty() ? "'none'" : appMod);
-        MCRConfiguration config = MCRConfiguration.instance();
         MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         HashMap<String, String> baseProperties = new HashMap<>(configurationLoader.load());
         baseProperties.putAll(testProperties);
-        config.initialize(baseProperties, true);
+        MCRConfigurationBase.initialize(baseProperties, true);
         MCRSessionMgr.unlock();
     }
 
     public static void after() {
-        MCRConfiguration.instance().initialize(Collections.emptyMap(), true);
+        MCRConfigurationBase.initialize(Collections.emptyMap(), true);
         MCRSessionMgr.releaseCurrentSession();
     }
 

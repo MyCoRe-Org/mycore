@@ -54,7 +54,7 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.inject.MCRInjectorConfig;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
@@ -385,8 +385,7 @@ public class MCRWebCLIContainer {
             if (!commands.isEmpty()) {
                 LOGGER.printf(Level.INFO, "There are %d other commands still unprocessed.", commands.size());
             }
-            String unprocessedCommandsFile = MCRConfiguration.instance()
-                .getString("MCR.WebCLI.UnprocessedCommandsFile");
+            String unprocessedCommandsFile = MCRConfiguration2.getStringOrThrow("MCR.WebCLI.UnprocessedCommandsFile");
             File file = new File(unprocessedCommandsFile);
             LOGGER.info("Writing unprocessed commands to file {}", file.getAbsolutePath());
 

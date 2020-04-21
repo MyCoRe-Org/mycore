@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 
@@ -61,11 +61,10 @@ public class MCRFileContentTypeFactory {
     protected static MCRFileContentTypeDetector detector;
 
     static {
-        MCRConfiguration config = MCRConfiguration.instance();
+        detector = MCRConfiguration2
+            .getOrThrow("MCR.IFS.FileContentTypes.DetectorClass", MCRConfiguration2::instantiateClass);
 
-        detector = config.getInstanceOf("MCR.IFS.FileContentTypes.DetectorClass");
-
-        String file = config.getString("MCR.IFS.FileContentTypes.DefinitionFile");
+        String file = MCRConfiguration2.getStringOrThrow("MCR.IFS.FileContentTypes.DefinitionFile");
 
         Element xml = MCRURIResolver.instance().resolve("resource:" + file);
         if (xml == null) {

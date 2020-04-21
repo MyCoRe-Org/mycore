@@ -41,13 +41,13 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.xml.parsers.ParserConfigurationException;
@@ -82,7 +82,7 @@ import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
@@ -160,7 +160,7 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static MCRResolverProvider getExternalResolverProvider() {
-        return Optional.ofNullable(MCRConfiguration.instance().getClass(CONFIG_PREFIX + "ExternalResolver.Class", null))
+        return MCRConfiguration2.getClass(CONFIG_PREFIX + "ExternalResolver.Class")
             .map(c -> {
                 try {
                     return (MCRResolverProvider) c.getDeclaredConstructor().newInstance();
@@ -432,26 +432,23 @@ public final class MCRURIResolver implements URIResolver {
     }
 
     private static class MCRModuleResolverProvider implements MCRResolverProvider {
+        private final Map<String, URIResolver> resolverMap = new HashMap<>();
+
+        MCRModuleResolverProvider() {
+            MCRConfiguration2.getSubPropertiesMap(CONFIG_PREFIX + "ModuleResolver.")
+                .forEach(this::registerUriResolver);
+        }
 
         public Map<String, URIResolver> getURIResolverMapping() {
-            Map<String, String> props = MCRConfiguration.instance().getPropertiesMap(CONFIG_PREFIX + "ModuleResolver.");
-            if (props.isEmpty()) {
-                return new HashMap<>();
+            return resolverMap;
+        }
+
+        private void registerUriResolver(String scheme, String className) {
+            try {
+                resolverMap.put(scheme, MCRConfiguration2.instantiateClass(className));
+            } catch (RuntimeException re) {
+                throw new MCRException("Cannot instantiate " + className + " for URI scheme " + scheme, re);
             }
-            Map<String, URIResolver> map = new HashMap<>();
-            for (Entry<String, String> entry : props.entrySet()) {
-                try {
-                    String scheme = entry.getKey();
-                    scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
-                    LOGGER.debug("Adding Resolver {} for URI scheme {}", entry.getValue(), scheme);
-                    map.put(scheme, MCRConfiguration.instance().getInstanceOf(entry.getKey()));
-                } catch (Exception e) {
-                    LOGGER.error("Cannot instantiate {} for URI scheme {}", entry.getValue(), entry.getKey());
-                    throw new MCRException(
-                        "Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey(), e);
-                }
-            }
-            return map;
         }
 
     }
@@ -477,14 +474,14 @@ public final class MCRURIResolver implements URIResolver {
 
     private static class MCRRESTResolver implements MCRCacheableURIResolver {
 
-        private static final long MAX_OBJECT_SIZE = MCRConfiguration.instance()
-            .getLong(CONFIG_PREFIX + "REST.MaxObjectSize", 128 * 1024);
+        private static final long MAX_OBJECT_SIZE = MCRConfiguration2.getLong(CONFIG_PREFIX + "REST.MaxObjectSize")
+            .orElse(128 * 1024l);
 
-        private static final int MAX_CACHE_ENTRIES = MCRConfiguration.instance()
-            .getInt(CONFIG_PREFIX + "REST.MaxCacheEntries", 1000);
+        private static final int MAX_CACHE_ENTRIES = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.MaxCacheEntries")
+            .orElse(1000);
 
-        private static final int REQUEST_TIMEOUT = MCRConfiguration.instance()
-            .getInt(CONFIG_PREFIX + "REST.RequestTimeout", 30000);
+        private static final int REQUEST_TIMEOUT = MCRConfiguration2.getInt(CONFIG_PREFIX + "REST.RequestTimeout")
+            .orElse(30000);
 
         private CloseableHttpClient restClient;
 
@@ -936,7 +933,7 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 DAO = MCRCategoryDAOFactory.getInstance();
                 categoryCache = new MCRCache<>(
-                    MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
+                    MCRConfiguration2.getInt(CONFIG_PREFIX + "Classification.CacheSize").orElse(1000),
                     "URIResolver categories");
             } catch (Exception exc) {
                 LOGGER.error("Unable to initialize classification resolver", exc);
@@ -950,13 +947,13 @@ public final class MCRURIResolver implements URIResolver {
             Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
             if (m.find() && m.groupCount() == 3) {
                 String formatDef = m.group(2);
-                return MCRConfiguration.instance().getString(FORMAT_CONFIG_PREFIX + formatDef);
+                return MCRConfiguration2.getStringOrThrow(FORMAT_CONFIG_PREFIX + formatDef);
             }
             return null;
         }
 
         private static boolean shouldSortCategories(String classId) {
-            return MCRConfiguration.instance().getBoolean(SORT_CONFIG_PREFIX + classId, true);
+            return MCRConfiguration2.getBoolean(SORT_CONFIG_PREFIX + classId).orElse(true);
         }
 
         private static long getSystemLastModified() {
@@ -1244,8 +1241,9 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 if (resolved != null) {
                     MCRSourceContent content = new MCRSourceContent(resolved);
-                    MCRLayoutTransformerFactory factory = MCRConfiguration.instance()
-                        .getInstanceOf(TRANSFORMER_FACTORY_PROPERTY, MCRLayoutTransformerFactory.class.getName());
+                    MCRLayoutTransformerFactory factory = MCRConfiguration2
+                        .<MCRLayoutTransformerFactory> getInstanceOf(TRANSFORMER_FACTORY_PROPERTY)
+                        .orElseGet(MCRLayoutTransformerFactory::new);
                     MCRContentTransformer transformer = factory.getTransformer(transformerId);
                     MCRContent result;
                     if (transformer instanceof MCRParameterizedTransformer) {
@@ -1304,14 +1302,16 @@ public final class MCRURIResolver implements URIResolver {
 
             // get the parameters from mycore.properties
             String propertyName = "MCR.URIResolver.xslIncludes." + includePart;
-            List<String> propValue = Collections.emptyList();
+            List<String> propValue;
             if (includePart.startsWith("class.")) {
-                MCRXslIncludeHrefs incHrefClass = MCRConfiguration.instance()
-                    .getInstanceOf(propertyName);
+                MCRXslIncludeHrefs incHrefClass = MCRConfiguration2
+                    .getOrThrow(propertyName, MCRConfiguration2::instantiateClass);
                 propValue = incHrefClass.getHrefs();
             } else {
-                propValue = MCRConfiguration.instance().getStrings(propertyName, propValue);
-
+                propValue = MCRConfiguration2.getString(propertyName)
+                    .map(MCRConfiguration2::splitValue)
+                    .map(s -> s.collect(Collectors.toList()))
+                    .orElseGet(Collections::emptyList);
             }
 
             for (String include : propValue) {
@@ -1563,7 +1563,7 @@ public final class MCRURIResolver implements URIResolver {
 
             // get the parameters from mycore.properties
             String propertyName = "MCR.URIResolver.redirect." + configsuffix;
-            String propValue = MCRConfiguration.instance().getString(propertyName);
+            String propValue = MCRConfiguration2.getStringOrThrow(propertyName);
             LOGGER.info("Redirect {} to {}", href, propValue);
             return singleton.resolve(propValue, base);
         }

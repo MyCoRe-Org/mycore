@@ -64,7 +64,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -89,8 +89,8 @@ public class MCRLayoutUtilities {
 
     public static final int ALL2BLOCKER_TRUE = 3;
 
-    public static final String NAV_RESOURCE = MCRConfiguration.instance().getString("MCR.NavigationFile",
-        "/config/navigation.xml");
+    public static final String NAV_RESOURCE = MCRConfiguration2.getString("MCR.NavigationFile")
+        .orElse("/config/navigation.xml");
 
     static final String OBJIDPREFIX_WEBPAGE = "webpage:";
 
@@ -102,8 +102,8 @@ public class MCRLayoutUtilities {
 
     private static final ServletContext SERVLET_CONTEXT = MCRURIResolver.getServletContext();
 
-    private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean(
-        "MCR.Website.ReadAccessVerification");
+    private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration2
+        .getOrThrow("MCR.Website.ReadAccessVerification", Boolean::parseBoolean);
 
     private static HashMap<String, Element> itemStore = new HashMap<>();
 

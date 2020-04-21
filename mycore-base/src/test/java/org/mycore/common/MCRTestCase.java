@@ -32,16 +32,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
-import org.mycore.common.config.MCRConfiguration;
 
 public class MCRTestCase {
 
-    String oldProperties;
-
     @ClassRule
     public static TemporaryFolder junitFolder = new TemporaryFolder();
-
-    protected MCRConfiguration config;
 
     @BeforeClass
     public static void initBaseDir() throws IOException {
@@ -51,15 +46,14 @@ public class MCRTestCase {
     /**
      * initializes MCRConfiguration with an empty property file. This can be used to test MyCoRe classes without any
      * propties set, using default. You may want to set Properties per TestCase with the set() method of
-     * <code>MCRConfiguration</code>
+     * <code>MCRConfiguration2</code>
      *
-     * @see MCRConfiguration#set(String, String)
+     * @see org.mycore.common.config.MCRConfiguration2#set(String, String)
      */
     @Before
     public void setUp() throws Exception {
         initProperties();
         MCRTestCaseHelper.before(getTestProperties());
-        config = MCRConfiguration.instance();
     }
 
     @After

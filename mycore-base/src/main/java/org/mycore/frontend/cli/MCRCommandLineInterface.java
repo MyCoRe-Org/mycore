@@ -42,7 +42,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.xml.MCRURIResolver;
@@ -93,17 +93,7 @@ public class MCRCommandLineInterface {
             Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[0]));
         }
         MCRStartupHandler.startUp(null/*no servlet context here*/);
-        //BUG: try to track down https://bamboo.mycore.de/browse/DP-TEST-234
-        if (MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", null) == null) {
-            try {
-                MCRConfiguration.instance().store(System.err,
-                    "I'm going die soon, this should be my gravestone quote:");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        //BUG DEBUG END
-        system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName") + ":";
+        system = MCRConfiguration2.getStringOrThrow("MCR.CommandLineInterface.SystemName") + ":";
 
         initSession();
         output("");
@@ -126,7 +116,7 @@ public class MCRCommandLineInterface {
             if (commandQueue.isEmpty()) {
                 if (interactiveMode) {
                     command = prompt.readCommand();
-                } else if (MCRConfiguration.instance().getString("MCR.CommandLineInterface.unitTest", "false")
+                } else if (MCRConfiguration2.getString("MCR.CommandLineInterface.unitTest").orElse("false")
                     .equals("true")) {
                     break;
                 } else {
@@ -213,13 +203,13 @@ public class MCRCommandLineInterface {
     /**
      * Expands variables in a command.
      * Replaces any variables in form ${propertyName} to the value defined by
-     * {@link MCRConfiguration#getString(String)}.
-     * If the property is not defined not variable replacement takes place.
+     * {@link MCRConfiguration2#getString(String)}.
+     * If the property is not defined no variable replacement takes place.
      * @param command a CLI command that should be expanded
      * @return expanded command
      */
     public static String expandCommand(final String command) {
-        StrSubstitutor strSubstitutor = new StrSubstitutor(MCRConfiguration.instance().getPropertiesMap());
+        StrSubstitutor strSubstitutor = new StrSubstitutor(MCRConfiguration2.getPropertiesMap());
         String expandedCommand = strSubstitutor.replace(command);
         if (!expandedCommand.equals(command)) {
             LOGGER.info("{} --> {}", command, expandedCommand);

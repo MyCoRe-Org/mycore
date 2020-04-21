@@ -51,7 +51,7 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -75,7 +75,8 @@ public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
 
     private static java.nio.file.Path UPLOAD_DIR = Paths
-        .get(MCRConfiguration.instance().getString("MCR.RestAPI.v1.Upload.Directory"));
+        .get(MCRConfiguration2.getStringOrThrow("MCR.RestAPI.v1.Upload.Directory"));
+
     static {
         if (!Files.exists(UPLOAD_DIR)) {
             try {

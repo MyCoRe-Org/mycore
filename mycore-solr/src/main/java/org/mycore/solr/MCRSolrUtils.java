@@ -22,7 +22,7 @@ import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 
 import java.util.regex.Pattern;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
@@ -56,7 +56,7 @@ public class MCRSolrUtils {
      * @return true if nested documents are used, otherwise false
      */
     public static boolean useNestedDocuments() {
-        return MCRConfiguration.instance().getBoolean(SOLR_CONFIG_PREFIX + "NestedDocuments", true);
+        return MCRConfiguration2.getBoolean(SOLR_CONFIG_PREFIX + "NestedDocuments").orElse(true);
     }
 
     public static MCRConfigurationException getCoreConfigMissingException(String coreID) {

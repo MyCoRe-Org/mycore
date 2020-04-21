@@ -26,7 +26,8 @@ import java.util.LinkedList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.backend.jpa.access.MCRJPAAccessStore;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 
 /**
@@ -44,16 +45,8 @@ public abstract class MCRAccessStore {
 
     protected static final String SQL_DATEFORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    protected static final String SQL_ACCESS_CTRL_RULE = MCRConfiguration.instance().getString(
-        "MCR.Persistence.Access.Store.Table.Rule",
-        "MCRACCESSRULE");
-
-    protected static final String SQL_ACCESS_CTRL_MAPPING = MCRConfiguration.instance().getString(
-        "MCR.Persistence.Access.Store.Table.Map",
-        "MCRACCESS");
-
-    protected static final String ACCESS_POOLS = MCRConfiguration.instance().getString("MCR.AccessPools",
-        "read,write,delete");
+    protected static final String ACCESS_POOLS = MCRConfiguration2.getString("MCR.AccessPools")
+        .orElse("read,write,delete");
 
     private static MCRAccessStore implementation;
 
@@ -86,9 +79,8 @@ public abstract class MCRAccessStore {
     public static MCRAccessStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = MCRConfiguration.instance().getSingleInstanceOf(
-                    "MCR.Persistence.Access.Store.Class",
-                    "org.mycore.backend.hibernate.MCRHIBAccessStore");
+                implementation = MCRConfiguration2
+                    .getSingleInstanceOf("MCR.Persistence.Access.Store.Class", MCRJPAAccessStore.class).get();
             }
         } catch (Exception e) {
             LOGGER.error(e);
@@ -125,7 +117,7 @@ public abstract class MCRAccessStore {
             Collection<String> elements;
             MCRAccessDefinition def = null;
 
-            if (MCRConfiguration.instance().getBoolean("MCR.Metadata.Type." + type)) {
+            if (MCRConfiguration2.getOrThrow("MCR.Metadata.Type." + type, Boolean::parseBoolean)) {
                 elements = MCRXMLMetadataManager.instance().listIDsOfType(type);
             } else {
                 return Collections.emptySet();

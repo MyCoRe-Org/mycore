@@ -36,7 +36,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.util.MCRServletContentHelper;
 import org.mycore.wcms2.datamodel.MCRNavigation;
 
@@ -102,7 +102,7 @@ public abstract class MCRWCMSUtil {
     }
 
     private static boolean saveInOldFormat() {
-        return MCRConfiguration.instance().getBoolean("MCR.NavigationFile.SaveInOldFormat");
+        return MCRConfiguration2.getOrThrow("MCR.NavigationFile.SaveInOldFormat", Boolean::parseBoolean);
     }
 
 }

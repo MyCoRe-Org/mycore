@@ -59,7 +59,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStreamUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRMarkManager;
@@ -160,7 +160,7 @@ public class MCRMetsSave {
     }
 
     public static String getMetsFileName() {
-        return MCRConfiguration.instance().getString("MCR.Mets.Filename", "mets.xml");
+        return MCRConfiguration2.getString("MCR.Mets.Filename").orElse("mets.xml");
     }
 
     /**

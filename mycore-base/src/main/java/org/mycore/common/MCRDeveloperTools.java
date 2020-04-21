@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * @author Sebastian Hofmann
@@ -20,7 +20,7 @@ public class MCRDeveloperTools {
      * @return true if any override is defined
      */
     public static boolean overrideActive() {
-        return MCRConfiguration.instance().getString("MCR.Developer.Resource.Override", null) != null;
+        return MCRConfiguration2.getString("MCR.Developer.Resource.Override").isPresent();
     }
 
     /**
@@ -34,9 +34,8 @@ public class MCRDeveloperTools {
         if (overrideActive()) {
             final String[] pathParts = path.split("/");
 
-            return MCRConfiguration.instance()
-                .getStrings("MCR.Developer.Resource.Override")
-                .stream()
+            return MCRConfiguration2
+                .getOrThrow("MCR.Developer.Resource.Override", MCRConfiguration2::splitValue)
                 .map(Paths::get)
                 .map(p -> webResource ? p.resolve("META-INF").resolve("resources") : p)
                 .map(p -> {

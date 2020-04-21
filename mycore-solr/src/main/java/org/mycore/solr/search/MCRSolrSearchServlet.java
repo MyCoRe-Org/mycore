@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -371,14 +371,17 @@ public class MCRSolrSearchServlet extends MCRServlet {
      * @return true if the parameter is a solr parameter
      */
     private boolean isSolrParameter(String parameterName) {
-        boolean reservedCostumKey;
+        boolean reservedCustomKey;
         try {
-            reservedCostumKey = MCRConfiguration.instance().getStrings(SOLR_CONFIG_PREFIX + "ReservedParameterKeys")
-                .contains(parameterName);
+            reservedCustomKey = MCRConfiguration2
+                .getOrThrow(SOLR_CONFIG_PREFIX + "ReservedParameterKeys", MCRConfiguration2::splitValue)
+                .filter(parameterName::equals)
+                .findAny()
+                .isPresent();
         } catch (MCRConfigurationException e) {
-            reservedCostumKey = false;
+            reservedCustomKey = false;
         }
-        return parameterName.startsWith("XSL.") || RESERVED_PARAMETER_KEYS.contains(parameterName) || reservedCostumKey;
+        return parameterName.startsWith("XSL.") || RESERVED_PARAMETER_KEYS.contains(parameterName) || reservedCustomKey;
     }
 
     /**

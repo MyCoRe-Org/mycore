@@ -38,7 +38,7 @@ import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -53,7 +53,7 @@ import com.google.common.cache.LoadingCache;
 public class MCRJPARuleStore extends MCRRuleStore {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static int CACHE_SIZE = MCRConfiguration.instance().getInt("MCR.AccessPool.CacheSize", 2048);
+    private static int CACHE_SIZE = MCRConfiguration2.getInt("MCR.AccessPool.CacheSize").orElse(2048);
 
     private static LoadingCache<String, MCRAccessRule> ruleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE)
         .build(new CacheLoader<String, MCRAccessRule>() {

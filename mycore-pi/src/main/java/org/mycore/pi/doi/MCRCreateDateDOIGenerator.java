@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIGenerator;
@@ -54,7 +54,7 @@ public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectId
 
     private final MCRDOIParser mcrdoiParser;
 
-    private String prefix = MCRConfiguration.instance().getString("MCR.DOI.Prefix");
+    private String prefix = MCRConfiguration2.getStringOrThrow("MCR.DOI.Prefix");
 
     public MCRCreateDateDOIGenerator(String generatorID) {
         super(generatorID);

@@ -29,7 +29,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.BinaryRequestWriter;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 
 /**
@@ -52,8 +52,8 @@ public class MCRSolrCore {
     protected ConcurrentUpdateSolrClient concurrentClient;
 
     static {
-        USE_CONCURRENT_SERVER = MCRConfiguration.instance()
-            .getBoolean(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled");
+        USE_CONCURRENT_SERVER = MCRConfiguration2
+            .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.Enabled", Boolean::parseBoolean);
     }
 
     /**
@@ -91,8 +91,10 @@ public class MCRSolrCore {
         this.serverURL = serverURL;
         this.name = name;
         String coreURL = getV1CoreURL();
-        int connectionTimeout = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout");
-        int socketTimeout = MCRConfiguration.instance().getInt(SOLR_CONFIG_PREFIX + "SolrClient.SocketTimeout");
+        int connectionTimeout = MCRConfiguration2
+            .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.ConnectionTimeout", Integer::parseInt);
+        int socketTimeout = MCRConfiguration2
+            .getOrThrow(SOLR_CONFIG_PREFIX + "SolrClient.SocketTimeout", Integer::parseInt);
 
         // default server
         solrClient = new HttpSolrClient.Builder(coreURL)
@@ -102,10 +104,10 @@ public class MCRSolrCore {
         solrClient.setRequestWriter(new BinaryRequestWriter());
         // concurrent server
         if (USE_CONCURRENT_SERVER) {
-            int queueSize = MCRConfiguration.instance()
-                .getInt(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize");
-            int threadCount = MCRConfiguration.instance()
-                .getInt(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount");
+            int queueSize = MCRConfiguration2
+                .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.QueueSize", Integer::parseInt);
+            int threadCount = MCRConfiguration2
+                .getOrThrow(SOLR_CONFIG_PREFIX + "ConcurrentUpdateSolrClient.ThreadCount", Integer::parseInt);
             concurrentClient = new ConcurrentUpdateSolrClient.Builder(coreURL)
                 .withQueueSize(queueSize)
                 .withConnectionTimeout(connectionTimeout)

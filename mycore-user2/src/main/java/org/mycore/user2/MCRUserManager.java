@@ -46,7 +46,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRISO8601Format;
@@ -59,8 +59,8 @@ import org.mycore.datamodel.common.MCRISO8601Format;
  */
 public class MCRUserManager {
 
-    private static final int HASH_ITERATIONS = MCRConfiguration.instance()
-        .getInt(MCRUser2Constants.CONFIG_PREFIX + "HashIterations", 1000);
+    private static final int HASH_ITERATIONS = MCRConfiguration2
+        .getInt(MCRUser2Constants.CONFIG_PREFIX + "HashIterations").orElse(1000);
 
     private static final Logger LOGGER = LogManager.getLogger();
 

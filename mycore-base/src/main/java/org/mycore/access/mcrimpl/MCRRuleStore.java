@@ -22,7 +22,8 @@ import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.backend.jpa.access.MCRJPARuleStore;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer
@@ -61,9 +62,8 @@ public abstract class MCRRuleStore {
     public static MCRRuleStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = MCRConfiguration.instance().getSingleInstanceOf(
-                    "MCR.Persistence.Rule.Store_Class",
-                    "org.mycore.backend.hibernate.MCRHIBRuleStore");
+                implementation = MCRConfiguration2
+                    .getSingleInstanceOf("MCR.Persistence.Rule.Store_Class", MCRJPARuleStore.class).get();
             }
         } catch (Exception e) {
             LOGGER.error(e);

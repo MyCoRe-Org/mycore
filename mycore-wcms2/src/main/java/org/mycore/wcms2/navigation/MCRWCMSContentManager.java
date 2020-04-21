@@ -39,7 +39,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.mycore.wcms2.MCRWebPagesSynchronizer;
@@ -65,9 +65,8 @@ public class MCRWCMSContentManager {
     }
 
     public MCRWCMSContentManager() {
-        MCRConfiguration conf = MCRConfiguration.instance();
-        this.sectionProvider = conf.getInstanceOf("MCR.WCMS2.sectionProvider",
-            MCRWCMSDefaultSectionProvider.class.getName());
+        this.sectionProvider = MCRConfiguration2.<MCRWCMSSectionProvider> getInstanceOf("MCR.WCMS2.sectionProvider")
+            .orElseGet(MCRWCMSDefaultSectionProvider::new);
     }
 
     /**

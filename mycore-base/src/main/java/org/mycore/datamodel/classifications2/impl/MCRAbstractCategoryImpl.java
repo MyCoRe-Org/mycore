@@ -25,10 +25,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -62,14 +63,16 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     private static HashSet<String> LANGUAGES;
 
     static {
-        LANGUAGES = new HashSet<>(MCRConfiguration.instance().getStrings("MCR.Metadata.Languages",
-            Collections.emptyList()));
+        LANGUAGES = new HashSet<>(MCRConfiguration2.getString("MCR.Metadata.Languages")
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(Collections::emptyList));
     }
 
     public MCRAbstractCategoryImpl() {
         super();
         if (defaultLang == null) {
-            defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", MCRConstants.DEFAULT_LANG);
+            defaultLang = MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG);
         }
         labels = new HashSet<>();
     }

@@ -33,7 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -193,7 +193,7 @@ public class MCRParameterCollector {
      * Copies all MCRConfiguration properties as XSL parameters.
      */
     private void setFromConfiguration() {
-        for (Map.Entry<String, String> property : MCRConfiguration.instance().getPropertiesMap().entrySet()) {
+        for (Map.Entry<String, String> property : MCRConfiguration2.getPropertiesMap().entrySet()) {
             parameters.put(property.getKey(), property.getValue());
         }
     }
@@ -256,7 +256,7 @@ public class MCRParameterCollector {
      * Sets the ID of the current session as parameter
      */
     private void setSessionID(HttpSession session, boolean isFromCookie) {
-        String sessionParam = MCRConfiguration.instance().getString("MCR.Session.Param", ";jsessionid=");
+        String sessionParam = MCRConfiguration2.getString("MCR.Session.Param").orElse(";jsessionid=");
         String jSessionID = sessionParam + session.getId();
         parameters.put("JSessionID", jSessionID);
         if (!isFromCookie) {
@@ -276,8 +276,7 @@ public class MCRParameterCollector {
         parameters.put("CurrentLang", session.getCurrentLanguage());
         parameters.put("WebApplicationBaseURL", MCRFrontendUtil.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
-        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang",
-            MCRConstants.DEFAULT_LANG);
+        String defaultLang = MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG);
         parameters.put("DefaultLang", defaultLang);
 
         String userAgent = request != null ? request.getHeader("User-Agent") : null;

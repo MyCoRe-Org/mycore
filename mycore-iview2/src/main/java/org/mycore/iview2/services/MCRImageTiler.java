@@ -40,7 +40,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.common.inject.MCRInjectorConfig;
@@ -76,8 +76,8 @@ public class MCRImageTiler implements Runnable, Closeable {
         MCRShutdownHandler.getInstance().addCloseable(this);
         runLock = new ReentrantLock();
         try {
-            Class<? extends MCRTilingAction> tilingActionImpl = MCRConfiguration.instance()
-                .getClass(MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl", MCRTilingAction.class);
+            Class<? extends MCRTilingAction> tilingActionImpl = MCRConfiguration2.<MCRTilingAction>getClass(
+                MCRIView2Tools.CONFIG_PREFIX + "MCRTilingActionImpl").orElse(MCRTilingAction.class);
             tilingActionConstructor = tilingActionImpl.getConstructor(MCRTileJob.class);
         } catch (Exception e) {
             LOGGER.error("Error while initializing", e);
@@ -113,8 +113,8 @@ public class MCRImageTiler implements Runnable, Closeable {
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        boolean activated = MCRConfiguration.instance().getBoolean(
-            MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated", true) && MCRHIBConnection.isEnabled();
+        boolean activated = MCRConfiguration2.getBoolean(MCRIView2Tools.CONFIG_PREFIX + "LocalTiler.activated")
+            .orElse(true) && MCRHIBConnection.isEnabled();
         LOGGER.info("Local Tiling is {}", activated ? "activated" : "deactivated");
         ImageIO.scanForPlugins();
         LOGGER.info("Supported image file types for reading: {}", Arrays.toString(ImageIO.getReaderFormatNames()));

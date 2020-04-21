@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 
 public class MCRValidationResults {
 
@@ -35,9 +35,9 @@ public class MCRValidationResults {
 
     static {
         String prefix = "MCR.XEditor.Validation.Marker.";
-        MARKER_DEFAULT = MCRConfiguration.instance().getString(prefix + "default", "");
-        MARKER_SUCCESS = MCRConfiguration.instance().getString(prefix + "success", "mcr-valid");
-        MARKER_ERROR = MCRConfiguration.instance().getString(prefix + "error", "mcr-invalid");
+        MARKER_DEFAULT = MCRConfiguration2.getString(prefix + "default").orElse("");
+        MARKER_SUCCESS = MCRConfiguration2.getString(prefix + "success").orElse("mcr-valid");
+        MARKER_ERROR = MCRConfiguration2.getString(prefix + "error").orElse("mcr-invalid");
     }
 
     private Map<String, String> xPath2Marker = new HashMap<>();
