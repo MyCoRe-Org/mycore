@@ -75,12 +75,15 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.media.services.MCRThumbnailGenerator;
 import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
+import org.mycore.restapi.v2.model.MCRRestResponse;
+import org.mycore.restapi.v2.model.objects.MCRRestObjectListItem;
 import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -143,7 +146,15 @@ public class MCRRestObjects {
             .map(MCRObjectIDDate::getClass)
             .orElse((Class) MCRObjectIDDate.class);
         Type type = TypeUtils.parameterize(idDates.getClass(), t);
-        return Response.ok(new GenericEntity<List<? extends MCRObjectIDDate>>(idDates, type))
+        
+        MCRRestResponse response = new MCRRestResponse();
+        for(MCRObjectIDDate objIDDate: idDates) {
+            response.getData().add(new MCRRestObjectListItem(objIDDate));
+        }
+
+        response.getHeader().setStatus(200);
+        response.getHeader().addLink("self", MCRFrontendUtil.getBaseURL()+"api/v2/objects");
+        return Response.ok(response)
             .lastModified(lastModified)
             .build();
     }
