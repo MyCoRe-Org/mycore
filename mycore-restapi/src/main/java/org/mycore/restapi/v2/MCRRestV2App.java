@@ -24,7 +24,9 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.server.ServerProperties;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
@@ -50,7 +52,10 @@ public class MCRRestV2App extends MCRJerseyRestApp {
 
     public MCRRestV2App() {
         super();
-        register(MCRRestAPIAuthentication.class); //keep 'unchanged' in v2
+        property(ServerProperties.MEDIA_TYPE_MAPPINGS,
+                "json : " + MediaType.APPLICATION_JSON + ", xml : " + MediaType.APPLICATION_XML);
+
+        register(MCRRestAPIAuthentication.class); // keep 'unchanged' in v2
         register(MCRRemoveMsgBodyFilter.class);
         register(MCRNoFormDataPutFilter.class);
         register(MCRDropSessionFilter.class);
