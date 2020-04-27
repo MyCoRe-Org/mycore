@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -84,7 +85,7 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
         if (isQualifyingDerivate(der)) {
             MCRTileInfo tileInfo = new MCRTileInfo(der.getId().toString(),
                     der.getDerivate().getInternals().getMainDoc(), null);
-            if (tileInfo.getImagePath().toLowerCase().endsWith(".pdf")) {
+            if (tileInfo.getImagePath().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
                 try {
                     Path p = MCRPath.getPath(tileInfo.getDerivate(), tileInfo.getImagePath());
                     BufferedImage bImage = MCRPDFTools.getThumbnail(1024, p, false);
@@ -109,7 +110,7 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
 
     private void deleteThumbnail(MCRDerivate der) {
         String mainDoc = der.getDerivate().getInternals().getMainDoc();
-        if (mainDoc != null && mainDoc.toLowerCase().endsWith(".pdf")) {
+        if (mainDoc != null && mainDoc.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
             MCRDefaultTileFileProvider tileFileProvider = new MCRDefaultTileFileProvider();
             MCRTileInfo tileInfo = new MCRTileInfo(der.getId().toString(), mainDoc, null);
             Optional<Path> oPIview2File = tileFileProvider.getTileFile(tileInfo);
@@ -128,7 +129,7 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
             String classid = c.getClassId() + ":" + c.getCategId();
             if (derivateTypesForContent.contains(classid)) {
                 String mainDoc = der.getDerivate().getInternals().getMainDoc();
-                return (mainDoc != null && mainDoc.toLowerCase().endsWith(".pdf"));
+                return (mainDoc != null && mainDoc.toLowerCase(Locale.ROOT).endsWith(".pdf"));
             }
         }
         return false;
