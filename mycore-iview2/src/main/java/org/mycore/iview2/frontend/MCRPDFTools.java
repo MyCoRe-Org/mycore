@@ -57,6 +57,8 @@ public class MCRPDFTools implements AutoCloseable {
     /**
      * The old method did not take the thumbnail size into account, if centered =
      * false;
+     * 
+     * @see getThumbnail(int thumbnailSize, Path pdfFile, boolean centered)
      */
     @Deprecated
     public static BufferedImage getThumbnail(Path pdfFile, int thumbnailSize, boolean centered) throws IOException {
@@ -67,9 +69,8 @@ public class MCRPDFTools implements AutoCloseable {
      * This method returns a Buffered Image as thumbnail if an initial page was set,
      * it will be return - if not the first page
      * 
-     * @param thumbnailSize - the size: size = max(width, height) a size < 0 will
-     *                      return the original size and centered parameter will be
-     *                      ignored
+     * @param thumbnailSize - the size: size = max(width, height) 
+     *                        a size &lt; 0 will return the original size and centered parameter will be ignored
      * @param pdfFile       - the file from which the thumbnail will be taken
      * @param centered      - if true, a square (thumbnail with same width and
      *                      height) will be returned
