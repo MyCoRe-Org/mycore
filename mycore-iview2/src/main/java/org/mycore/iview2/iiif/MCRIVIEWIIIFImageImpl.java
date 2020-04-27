@@ -79,6 +79,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     private static Logger LOGGER = LogManager.getLogger(MCRIVIEWIIIFImageImpl.class);
 
+    private static final String THUMBNAIL_PREFIX = "thumbnail:";
+    
     private java.util.List<String> transparentFormats;
 
     private MCRTileFileProvider tileFileProvider;
@@ -138,7 +140,9 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             throw new MCRIIIFUnsupportedFormatException(format);
         }
 
-        MCRTileInfo tileInfo = createTileInfo(identifier);
+        MCRTileInfo tileInfo = identifier.startsWith(THUMBNAIL_PREFIX) 
+                ? createTileInfoForThumbnail(identifier)
+                : createTileInfo(identifier);
         Optional<Path> oTileFile = tileFileProvider.getTileFile(tileInfo);
         if (oTileFile.isEmpty()) {
             throw new MCRIIIFImageNotFoundException(identifier);
@@ -244,7 +248,9 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     public MCRIIIFImageInformation getInformation(String identifier)
         throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException, MCRAccessException {
         try {
-            MCRTileInfo tileInfo = createTileInfo(identifier);
+            MCRTileInfo tileInfo = identifier.startsWith(THUMBNAIL_PREFIX) 
+                    ? createTileInfoForThumbnail(identifier)
+                    : createTileInfo(identifier);
             Optional<Path> oTiledFile = tileFileProvider.getTileFile(tileInfo);
             if (oTiledFile.isEmpty()) {
                 throw new MCRIIIFImageNotFoundException(identifier);
@@ -322,6 +328,36 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         return tileInfo;
     }
 
+    private MCRTileInfo createTileInfoForThumbnail(String identifier) throws MCRIIIFImageNotFoundException {
+        String id = identifier.substring(THUMBNAIL_PREFIX.length());
+        MCRTileInfo tileInfo = tileFileProvider.getThumbnailFileInfo(id)
+                .orElseThrow(() -> new MCRIIIFImageNotFoundException(identifier));
+        /* RS: The following code creates the thumbnail on demand (first call)
+         * This currently done by event handler
+         * May be removed later.
+        Optional<Path> oTiledFile = tileFileProvider.getTileFile(tileInfo);
+
+        if (!Files.exists(oTiledFile.get()) && tileInfo.getImagePath().toLowerCase().endsWith(".pdf")) {
+            try {
+                Path p = MCRPath.getPath(tileInfo.getDerivate(), tileInfo.getImagePath());
+                BufferedImage bImage = MCRPDFTools.getThumbnail(p, 1024, false);
+                Path pImg = Files.createTempFile("MyCoRe-Thumbnail-", ".png");
+                try(OutputStream os = Files.newOutputStream(pImg)){
+                    ImageIO.write(bImage, "png", os);
+                }
+                MCRImage mcrImage = MCRImage.getInstance(pImg, tileInfo.getDerivate(), tileInfo.getImagePath());
+                mcrImage.setTileDir(MCRIView2Tools.getTileDir());
+                mcrImage.tile();
+                Files.deleteIfExists(pImg);
+                
+            } catch (IOException e) {
+               LOGGER.error(e);
+            }
+        }
+        */
+        return tileInfo;
+    }
+
     private void checkTileFile(String identifier, MCRTileInfo tileInfo, Path tileFilePath)
         throws MCRAccessException, MCRIIIFImageNotFoundException {
         if (!Files.exists(tileFilePath)) {
@@ -335,5 +371,4 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
                 "view-derivate");
         }
     }
-
 }
