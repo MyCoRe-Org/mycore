@@ -54,6 +54,11 @@ namespace mycore.viewer.widgets.pdf {
         private _resolveStartPage() {
             try {
                 (<any>this._document).getOpenActionDestination().then((dest: Array<{ num?: number, gen: number }>) => {
+                    if(dest===null){
+                        this._startPage = 1;
+                        this.checkResolvable();
+                        return;
+                    }
                     this._document.getPageIndex(dest[0]).then((page) => {
                         this._startPage = page + 1;
                         this.checkResolvable();
