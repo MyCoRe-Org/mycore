@@ -18,17 +18,8 @@
 
 package org.mycore.iview2.backend;
 
-import java.nio.file.Path;
 import java.util.Optional;
 
-import org.mycore.imagetiler.MCRImage;
-import org.mycore.iview2.services.MCRIView2Tools;
-
-public class MCRDefaultTileFileProvider implements MCRTileFileProvider {
-
-    @Override
-    public Optional<Path> getTileFile(MCRTileInfo tileInfo) {
-        return Optional.of(
-                MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), tileInfo.getDerivate(), tileInfo.getImagePath()));
-    }
+public interface MCRThumbnailTileInfoProvider {
+    Optional<MCRTileInfo> getThumbnailFileInfo(String id);
 }

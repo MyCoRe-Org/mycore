@@ -23,8 +23,4 @@ import java.util.Optional;
 
 public interface MCRTileFileProvider {
     Optional<Path> getTileFile(MCRTileInfo tileInfo);
-    
-    default Optional<MCRTileInfo> getThumbnailFileInfo(String id){
-        return Optional.empty();
-    }
 }
