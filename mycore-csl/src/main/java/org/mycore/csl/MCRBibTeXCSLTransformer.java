@@ -22,6 +22,7 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
     public static final String DEFAULT_STYLE = "nature";
 
     private final Map<String, Stack<MCRCSLTransformerInstance>> transformerInstances;
+
     {
         transformerInstances = new HashMap<>();
     }
@@ -75,8 +76,8 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
     }
 
     @Override public MCRContent transform(MCRContent bibtext, MCRParameterCollector parameter) throws IOException {
-        final String format = parameter!=null? parameter.getParameter("format", DEFAULT_FORMAT): DEFAULT_FORMAT;
-        final String style =  parameter!=null? parameter.getParameter("style", DEFAULT_STYLE): DEFAULT_STYLE;
+        final String format = parameter != null ? parameter.getParameter("format", DEFAULT_FORMAT) : DEFAULT_FORMAT;
+        final String style = parameter != null ? parameter.getParameter("style", DEFAULT_STYLE) : DEFAULT_STYLE;
         try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format)) {
             final MCRItemDataProvider dataProvider = transformerInstance.getDataProvider();
             final CSL citationProcessor = transformerInstance.getCitationProcessor();
