@@ -18,18 +18,13 @@
 
 package org.mycore.iview2.events;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.imageio.ImageIO;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,12 +33,11 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
-import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.imagetiler.MCRImage;
 import org.mycore.iview2.backend.MCRDefaultTileFileProvider;
+import org.mycore.iview2.backend.MCRPDFThumbnailJobAction;
 import org.mycore.iview2.backend.MCRTileInfo;
-import org.mycore.iview2.frontend.MCRPDFTools;
-import org.mycore.iview2.services.MCRIView2Tools;
+import org.mycore.services.queuedjob.MCRJob;
+import org.mycore.services.queuedjob.MCRJobQueue;
 
 /**
  * This event handler creates iview2 files for title pages in PDFs which can be
@@ -53,7 +47,17 @@ import org.mycore.iview2.services.MCRIView2Tools;
  */
 public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
 
+    public static final MCRDefaultTileFileProvider TILE_FILE_PROVIDER = new MCRDefaultTileFileProvider();
+
     private static Logger LOGGER = LogManager.getLogger(MCRThumbnailForPdfEventHandler.class);
+
+    private static final MCRJobQueue PDF_THUMBNAIL_JOB_QUEUE = initializeJobQueue();
+
+
+    private static MCRJobQueue initializeJobQueue() {
+        LOGGER.info("Initializing jobQueue for PDF Thumbnail generation!");
+        return MCRJobQueue.getInstance(MCRPDFThumbnailJobAction.class);
+    }
 
     private static List<String> derivateTypesForContent = MCRConfiguration2
             .getOrThrow("MCRIIIFImage.Iview.ThumbnailForPdfEventHandler.Derivate.Types",
@@ -83,37 +87,17 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
     private void updateThumbnail(MCRDerivate der) {
         deleteThumbnail(der);
         if (isQualifyingDerivate(der)) {
-            MCRTileInfo tileInfo = new MCRTileInfo(der.getId().toString(),
-                    der.getDerivate().getInternals().getMainDoc(), null);
-            if (tileInfo.getImagePath().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-                try {
-                    Path p = MCRPath.getPath(tileInfo.getDerivate(), tileInfo.getImagePath());
-                    BufferedImage bImage = MCRPDFTools.getThumbnail(1024, p, false);
-                    Path pImg = Files.createTempFile("MyCoRe-Thumbnail-", ".png");
-                    try (OutputStream os = Files.newOutputStream(pImg, StandardOpenOption.DELETE_ON_CLOSE)) {
-                        ImageIO.write(bImage, "png", os);
-
-                        MCRImage mcrImage = MCRImage.getInstance(pImg, tileInfo.getDerivate(), tileInfo.getImagePath());
-                        mcrImage.setTileDir(MCRIView2Tools.getTileDir());
-                        mcrImage.tile();
-                    }
-                    // RS: throws java.nio.file.AccessDeniedException, when immediately called after
-                    // tile()
-                    // used OpenOption.DELETE_ON_CLOSE
-                    // Files.deleteIfExists(pImg);
-                } catch (IOException e) {
-                    LOGGER.error("Error creating thumbnail for PDF", e);
-                }
-            }
+            final MCRJob job = new MCRJob(MCRPDFThumbnailJobAction.class);
+            job.setParameter(MCRPDFThumbnailJobAction.DERIVATE_PARAMETER, der.getId().toString());
+            PDF_THUMBNAIL_JOB_QUEUE.add(job);
         }
     }
 
     private void deleteThumbnail(MCRDerivate der) {
         String mainDoc = der.getDerivate().getInternals().getMainDoc();
         if (mainDoc != null && mainDoc.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            MCRDefaultTileFileProvider tileFileProvider = new MCRDefaultTileFileProvider();
             MCRTileInfo tileInfo = new MCRTileInfo(der.getId().toString(), mainDoc, null);
-            Optional<Path> oPIview2File = tileFileProvider.getTileFile(tileInfo);
+            Optional<Path> oPIview2File = TILE_FILE_PROVIDER.getTileFile(tileInfo);
             if (oPIview2File.isPresent()) {
                 try {
                     Files.deleteIfExists(oPIview2File.get());
