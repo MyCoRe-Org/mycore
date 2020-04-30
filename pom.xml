@@ -911,6 +911,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>2.6</version>
       </dependency>
       <dependency>
+        <groupId>de.undercouch</groupId>
+        <artifactId>citeproc-java</artifactId>
+        <version>2.0.0</version>
+      </dependency>
+      <dependency>
         <groupId>io.bit3</groupId>
         <artifactId>jsass</artifactId>
         <version>5.10.3</version>
@@ -1276,6 +1281,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.jbibtex</groupId>
+        <artifactId>jbibtex</artifactId>
+        <version>1.0.17</version>
+      </dependency>
+      <dependency>
         <groupId>org.jdom</groupId>
         <artifactId>jdom2</artifactId>
         <version>2.0.6</version>
@@ -1303,6 +1313,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-coma</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-csl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -1627,6 +1642,18 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-jdk16</artifactId>
         <version>1.46</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.citationstyles</groupId>
+        <artifactId>locales</artifactId>
+        <version>2.0.0</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.citationstyles</groupId>
+        <artifactId>styles</artifactId>
+        <version>2.0.0</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -2245,6 +2272,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-acl-editor2</module>
     <module>mycore-classbrowser</module>
     <module>mycore-classeditor</module>
+    <module>mycore-csl</module>
     <module>mycore-fo</module>
     <module>mycore-indexing</module>
     <module>mycore-ifs</module>
