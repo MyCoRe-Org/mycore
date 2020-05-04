@@ -63,18 +63,18 @@
       <div class="form-actions">
         <xsl:choose>
           <xsl:when test="$direction = 'rtl' ">
-            <button id="login_button" class="btn btn-secondary" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
+            <button class="btn btn-secondary" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
-            <button id="cancel_button" class="btn btn-primary ml-3" type="submit" name="LoginSubmit">
+            <button class="btn btn-primary ml-3" type="submit" name="LoginSubmit">
               <xsl:value-of select="i18n:translate('component.user2.button.login')" />
             </button>
           </xsl:when>
           <xsl:otherwise>
-            <button id="login_button" class="btn btn-primary" type="submit" name="LoginSubmit">
+            <button class="btn btn-primary" type="submit" name="LoginSubmit">
               <xsl:value-of select="i18n:translate('component.user2.button.login')" />
             </button>
-            <button id="cancel_button" class="btn btn-secondary ml-3" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
+            <button class="btn btn-secondary ml-3" type="button" onClick="self.location.href='{../returnURL}'" tabindex="999">
               <xsl:value-of select="i18n:translate('component.user2.button.cancel')" />
             </button>
           </xsl:otherwise>
