@@ -19,6 +19,7 @@
 package org.mycore.common.config;
 
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -49,7 +51,37 @@ public class MCRConfiguration2 {
     static ConcurrentHashMap<SingletonKey, Object> instanceHolder = new ConcurrentHashMap<>();
 
     public static Map<String, String> getPropertiesMap() {
-        return MCRConfiguration.instance().getPropertiesMap();
+        return Collections.unmodifiableMap(MCRConfigurationBase.getResolvedProperties().getAsMap());
+    }
+
+    /**
+     * Returns a sub map of properties where key is transformed.
+     *
+     * <ol>
+     *     <li>if property starts with <code>propertyPrefix</code>, the property is in the result map</li>
+     *     <li>the key of the target map is the name of the property without <code>propertPrefix</code></li>
+     * </ol>
+     * Example for <code>propertyPrefix="MCR.Foo."</code>:
+     * <pre>
+     *     MCR.Foo.Bar=Baz
+     *     MCR.Foo.Hello=World
+     *     MCR.Other.Prop=Value
+     * </pre>
+     * will result in
+     * <pre>
+     *     Bar=Baz
+     *     Hello=World
+     * </pre>
+     * @param propertyPrefix prefix of the property name
+     * @return a map of the properties as stated above
+     */
+    public static Map<String, String> getSubPropertiesMap(String propertyPrefix) {
+        return MCRConfigurationBase.getResolvedProperties()
+            .getAsMap()
+            .entrySet()
+            .stream()
+            .filter(e -> e.getKey().startsWith(propertyPrefix))
+            .collect(Collectors.toMap(e -> e.getKey().substring(propertyPrefix.length()), Map.Entry::getValue));
     }
 
     /**
