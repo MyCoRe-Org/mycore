@@ -77,6 +77,6 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
 
     @Override
     public void rollback() {
-
+        // do need to rollback
     }
 }
