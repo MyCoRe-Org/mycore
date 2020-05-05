@@ -46,9 +46,9 @@ public class MCRPDFTools implements AutoCloseable {
 
     static final int PDF_DEFAULT_DPI = 72; // from private org.apache.pdfbox.pdmodel.PDPage.DEFAULT_USER_SPACE_UNIT_DPI
 
-    private static Logger LOGGER = LogManager.getLogger(MCRPDFTools.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRPDFTools.class);
 
-    private MCRPNGTools pngTools;
+    private final MCRPNGTools pngTools;
 
     MCRPDFTools() {
         this.pngTools = new MCRPNGTools();
@@ -57,8 +57,8 @@ public class MCRPDFTools implements AutoCloseable {
     /**
      * The old method did not take the thumbnail size into account, if centered =
      * false;
-     * 
-     * @see getThumbnail(int thumbnailSize, Path pdfFile, boolean centered)
+     *
+     * @see #getThumbnail(int, Path, boolean)
      */
     @Deprecated
     public static BufferedImage getThumbnail(Path pdfFile, int thumbnailSize, boolean centered) throws IOException {
@@ -68,14 +68,14 @@ public class MCRPDFTools implements AutoCloseable {
     /**
      * This method returns a Buffered Image as thumbnail if an initial page was set,
      * it will be return - if not the first page
-     * 
+     *
      * @param thumbnailSize - the size: size = max(width, height) 
      *                        a size &lt; 0 will return the original size and centered parameter will be ignored
      * @param pdfFile       - the file from which the thumbnail will be taken
      * @param centered      - if true, a square (thumbnail with same width and
      *                      height) will be returned
      * @return a BufferedImage as thumbnail
-     * 
+     *
      * @throws IOException
      */
     public static BufferedImage getThumbnail(int thumbnailSize, Path pdfFile, boolean centered) throws IOException {
@@ -116,21 +116,12 @@ public class MCRPDFTools implements AutoCloseable {
         }
     }
 
-    MCRContent getThumnail(Path pdfFile, BasicFileAttributes attrs, int thumbnailSize, boolean centered)
-        throws IOException {
-        BufferedImage thumbnail = MCRPDFTools.getThumbnail(pdfFile, thumbnailSize, centered);
-        MCRContent pngContent = pngTools.toPNGContent(thumbnail);
-        BasicFileAttributes fattrs = attrs != null ? attrs : Files.readAttributes(pdfFile, BasicFileAttributes.class);
-        pngContent.setLastModified(fattrs.lastModifiedTime().toMillis());
-        return pngContent;
-    }
-
     /**
-     * 
+     *
      * @param pdf - the pdf document
      * @return
      * @throws IOException
-     * 
+     *
      * @see org.mycore.media.services.MCRPdfThumbnailGenerator
      */
     private static PDPage resolveOpenActionPage(PDDocument pdf) throws IOException {
@@ -157,6 +148,15 @@ public class MCRPDFTools implements AutoCloseable {
         }
 
         return pdf.getPage(0);
+    }
+
+    MCRContent getThumnail(Path pdfFile, BasicFileAttributes attrs, int thumbnailSize, boolean centered)
+        throws IOException {
+        BufferedImage thumbnail = MCRPDFTools.getThumbnail(pdfFile, thumbnailSize, centered);
+        MCRContent pngContent = pngTools.toPNGContent(thumbnail);
+        BasicFileAttributes fattrs = attrs != null ? attrs : Files.readAttributes(pdfFile, BasicFileAttributes.class);
+        pngContent.setLastModified(fattrs.lastModifiedTime().toMillis());
+        return pngContent;
     }
 
     @Override

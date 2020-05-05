@@ -42,27 +42,26 @@ import org.mycore.services.queuedjob.MCRJobQueue;
 /**
  * This event handler creates iview2 files for title pages in PDFs which can be
  * used as thumbnails in IIIF API
- * 
+ *
  * @author Robert Stephan
  */
 public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
 
     public static final MCRDefaultTileFileProvider TILE_FILE_PROVIDER = new MCRDefaultTileFileProvider();
 
-    private static Logger LOGGER = LogManager.getLogger(MCRThumbnailForPdfEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRThumbnailForPdfEventHandler.class);
 
     private static final MCRJobQueue PDF_THUMBNAIL_JOB_QUEUE = initializeJobQueue();
 
+    private static final List<String> derivateTypesForContent = MCRConfiguration2
+        .getOrThrow("MCRIIIFImage.Iview.ThumbnailForPdfEventHandler.Derivate.Types",
+            MCRConfiguration2::splitValue)
+        .collect(Collectors.toList());
 
     private static MCRJobQueue initializeJobQueue() {
         LOGGER.info("Initializing jobQueue for PDF Thumbnail generation!");
         return MCRJobQueue.getInstance(MCRPDFThumbnailJobAction.class);
     }
-
-    private static List<String> derivateTypesForContent = MCRConfiguration2
-            .getOrThrow("MCRIIIFImage.Iview.ThumbnailForPdfEventHandler.Derivate.Types",
-                    MCRConfiguration2::splitValue)
-            .collect(Collectors.toList());
 
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {

@@ -23,16 +23,16 @@ import org.mycore.services.queuedjob.MCRJobAction;
 
 public class MCRPDFThumbnailJobAction extends MCRJobAction {
 
+    public static final String DERIVATE_PARAMETER = "derivate";
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     public MCRPDFThumbnailJobAction() {
     }
 
     public MCRPDFThumbnailJobAction(MCRJob job) {
         super(job);
     }
-
-    public static final String DERIVATE_PARAMETER = "derivate";
-
-    private static Logger LOGGER = LogManager.getLogger();
 
     @Override
     public boolean isActivated() {
