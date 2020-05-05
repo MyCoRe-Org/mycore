@@ -34,11 +34,11 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
-import org.mycore.pi.condition.MCRPIObjectRegistrationConditionProvider;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.services.queuedjob.MCRJob;
 import org.mycore.services.queuedjob.MCRJobAction;
@@ -57,7 +57,9 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     public static final String JOB_API_USER_PROPERTY = "JobApiUser";
 
-    protected static final String REGISTRATION_CONDITION_PROVIDER = "RegistrationConditionProvider";
+    protected static final String REGISTRATION_PREDICATE = "RegistrationPredicate";
+
+    protected static final String CREATION_PREDICATE = "CreationPredicate";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -325,43 +327,61 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         return PiJobAction.valueOf(contextParameters.get("action"));
     }
 
-    protected Predicate<MCRBase> getRegistrationCondition(String objectType) {
-        return Optional.ofNullable(getProperties().get(MCRPIJobService.REGISTRATION_CONDITION_PROVIDER))
-            .map(clazz -> {
-                String errorMessageBegin = "Configured class " + clazz + "(" + MCRPIService.REGISTRATION_CONFIG_PREFIX
-                    + getServiceID() + "." + MCRPIJobService.REGISTRATION_CONDITION_PROVIDER
-                    + ")";
-                try {
-                    return MCRClassTools.forName(clazz)
-                        .getConstructor()
-                        .newInstance();
-                } catch (ClassNotFoundException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " was not found!", e);
-                } catch (IllegalAccessException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " has no public constructor!", e);
-                } catch (InstantiationException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " seems to be abstract!", e);
-                } catch (NoSuchMethodException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " has no default constructor!", e);
-                } catch (InvocationTargetException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " could not be initialized", e);
-                } catch (ClassCastException e) {
-                    throw new MCRConfigurationException(
-                        errorMessageBegin + " needs to extend " + MCRPIObjectRegistrationConditionProvider.class
-                            .getName(),
-                        e);
-                }
-            })
-            .map(MCRPIObjectRegistrationConditionProvider.class::cast)
-            .map(instance -> instance.provideRegistrationCondition(objectType))
-            .orElseGet(() -> MCRPIObjectRegistrationConditionProvider.ALWAYS_REGISTER_CONDITION_PROVIDER
-                .provideRegistrationCondition(objectType));
+    protected Predicate<MCRBase> getCreationPredicate() {
+        final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
+            getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE;
+        if(MCRConfiguration2.getString(predicateProperty).isEmpty()){
+            return (o)->false;
+        }
+        return getPredicateInstance(predicateProperty);
+    }
 
+    protected Predicate<MCRBase> getRegistrationCondition() {
+        final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
+            getServiceID() + "." + MCRPIJobService.REGISTRATION_PREDICATE;
+        if(MCRConfiguration2.getString(predicateProperty).isEmpty()){
+            return (o)->true;
+        }
+        return getPredicateInstance(predicateProperty);
+    }
+
+    public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
+        final String clazz = MCRConfiguration2.getStringOrThrow(predicateProperty);
+        final String errorMessageBegin = String.format(Locale.ROOT, "Configured class %s(%s)", clazz,
+            predicateProperty);
+        try {
+            return (Predicate<MCRBase>) MCRClassTools.forName(clazz)
+                .getConstructor(String.class)
+                .newInstance(predicateProperty+".");
+        } catch (ClassNotFoundException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " was not found!", e);
+        } catch (IllegalAccessException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " has no public constructor!", e);
+        } catch (InstantiationException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " seems to be abstract!", e);
+        } catch (NoSuchMethodException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " has no default constructor!", e);
+        } catch (InvocationTargetException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " could not be initialized", e);
+        } catch (ClassCastException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " needs to extend the right parent class",
+                e);
+        }
+    }
+
+    @Override
+    protected void checkConfiguration() throws MCRConfigurationException {
+        super.checkConfiguration();
+        if (getProperties().containsKey("RegistrationConditionProvider")) {
+            throw new MCRConfigurationException("The MCRPIService " + getServiceID() +
+                " uses old property key RegistrationConditionProvider");
+        }
     }
 
     public enum PiJobAction {

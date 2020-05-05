@@ -18,22 +18,25 @@
 
 package org.mycore.pi.condition;
 
-import java.util.function.Predicate;
+import java.util.Optional;
 
 import org.mycore.datamodel.metadata.MCRBase;
 
-public abstract class MCRPIObjectRegistrationConditionProvider {
+public class MCRPIStatePredicate extends MCRPIPredicateBase implements MCRPIObjectRegistrationPredicate,
+    MCRPICreationPredicate {
 
-    public static final MCRPIObjectRegistrationConditionProvider ALWAYS_REGISTER_CONDITION_PROVIDER = alwaysRegister();
-
-    private static MCRPIObjectRegistrationConditionProvider alwaysRegister() {
-        return new MCRPIObjectRegistrationConditionProvider() {
-            @Override
-            public Predicate<MCRBase> provideRegistrationCondition(String type) {
-                return (obj) -> true;
-            }
-        };
+    public MCRPIStatePredicate(String propertyPrefix) {
+        super(propertyPrefix);
     }
 
-    public abstract Predicate<MCRBase> provideRegistrationCondition(String type);
+    protected String getRequiredState() {
+        return requireProperty("State");
+    }
+
+    @Override
+    public boolean test(MCRBase base) {
+        return Optional.ofNullable(base.getService().getState())
+            .map(state -> state.getID().equals(getRequiredState()))
+            .orElse(false);
+    }
 }
