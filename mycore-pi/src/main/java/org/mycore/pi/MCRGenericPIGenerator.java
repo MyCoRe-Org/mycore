@@ -24,8 +24,10 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Text;
+import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -212,7 +214,8 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
                 final String xpathString = this.xpath[xpathNumber];
                 XPathFactory factory = XPathFactory.instance();
-                XPathExpression<Object> expr = factory.compile(xpathString);
+                XPathExpression<Object> expr = factory.compile(xpathString, Filters.fpassthrough(), null,
+                    MCRConstants.getStandardNamespaces());
                 final Object content = expr.evaluateFirst(mcrBase.createXML());
 
                 if(content instanceof Text){
