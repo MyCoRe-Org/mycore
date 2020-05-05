@@ -9,7 +9,7 @@ public class MCRPIPublishedPredicate extends MCRPIStatePredicate {
     }
 
     @Override
-    protected String getRequiredState(){
+    protected String getRequiredState() {
         return "published";
     }
 }

@@ -8,14 +8,14 @@ import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRPIXPathPredicate extends MCRPIPredicateBase
     implements MCRPICreationPredicate, MCRPIObjectRegistrationPredicate {
+    final private XPathExpression<Object> expr;
+
     public MCRPIXPathPredicate(String propertyPrefix) {
         super(propertyPrefix);
         final String xPath = requireProperty("XPath");
         XPathFactory factory = XPathFactory.instance();
         expr = factory.compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
     }
-
-    final private XPathExpression<Object> expr;
 
     @Override
     public boolean test(MCRBase mcrBase) {

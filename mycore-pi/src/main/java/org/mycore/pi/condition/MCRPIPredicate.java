@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import org.mycore.datamodel.metadata.MCRBase;
 
 public interface MCRPIPredicate extends Predicate<MCRBase> {
-    default Map<String, String > getProperties(){
+    default Map<String, String> getProperties() {
         return Collections.emptyMap();
     }
 }

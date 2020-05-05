@@ -13,12 +13,12 @@ public abstract class MCRPICombinedPredicate extends MCRPIPredicateBase {
         super(propertyPrefix);
     }
 
-    protected Stream<Predicate<MCRBase>> getCombinedPredicates(){
+    protected Stream<Predicate<MCRBase>> getCombinedPredicates() {
         final Map<String, String> properties = getProperties();
         return properties
             .keySet()
             .stream()
-            .filter(p-> {
+            .filter(p -> {
                 return !p.contains("."); // do not handle sub properties
             })
             .map(Integer::parseInt)
@@ -26,6 +26,6 @@ public abstract class MCRPICombinedPredicate extends MCRPIPredicateBase {
             .map(Object::toString)
             .map((subProperty) -> {
                 return MCRPIJobService.getPredicateInstance(getPropertyPrefix() + subProperty);
-            } );
+            });
     }
 }

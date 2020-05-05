@@ -7,11 +7,11 @@ import org.mycore.common.config.MCRConfigurationException;
 
 public abstract class MCRPIPredicateBase implements MCRPIPredicate {
 
-    public MCRPIPredicateBase(String propertyPrefix){
+    private final String propertyPrefix;
+
+    public MCRPIPredicateBase(String propertyPrefix) {
         this.propertyPrefix = propertyPrefix;
     }
-
-    private final String propertyPrefix;
 
     public String getPropertyPrefix() {
         return propertyPrefix;
@@ -25,7 +25,7 @@ public abstract class MCRPIPredicateBase implements MCRPIPredicate {
     protected String requireProperty(String key) {
         final Map<String, String> properties = getProperties();
         if (!properties.containsKey(key)) {
-            throw new MCRConfigurationException(getPropertyPrefix() + key+" ist not defined!");
+            throw new MCRConfigurationException(getPropertyPrefix() + key + " ist not defined!");
         }
         return properties.get(key);
     }

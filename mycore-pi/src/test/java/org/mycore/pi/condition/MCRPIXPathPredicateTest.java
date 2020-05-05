@@ -66,7 +66,6 @@ public class MCRPIXPathPredicateTest extends MCRTestCase {
 
         testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
 
-
         return testProperties;
     }
 }
