@@ -84,36 +84,39 @@ public class MCRPDFTools implements AutoCloseable {
             PDFRenderer pdfRenderer = new PDFRenderer(pdf);
             final PDPage page = resolveOpenActionPage(pdf);
             BufferedImage level1Image = pdfRenderer.renderImage(pdf.getPages().indexOf(page));
-            int imageType = BufferedImage.TYPE_INT_ARGB;
-
             if (thumbnailSize < 0) {
                 return level1Image;
             }
-            final double width = level1Image.getWidth();
-            final double height = level1Image.getHeight();
-            LOGGER.info("new PDFBox: {}x{}", width, height);
-            LOGGER.info("temporary image dimensions: {}x{}", width, height);
-            final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
-            final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
-            // if centered make thumbnailSize x thumbnailSize image
-            final BufferedImage bicubic = new BufferedImage(centered ? thumbnailSize : newWidth,
-                centered ? thumbnailSize : newHeight, imageType);
-            LOGGER.info("target image dimensions: {}x{}", bicubic.getWidth(), bicubic.getHeight());
-            final Graphics2D bg = bicubic.createGraphics();
-            try {
-                bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-                int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
-                int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
-                if (x != 0 && y != 0) {
-                    LOGGER.warn("Writing at position {},{}", x, y);
-                }
-                bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
-                    (int) Math.ceil(height), null);
-            } finally {
-                bg.dispose();
-            }
-            return bicubic;
+            return scalePage(thumbnailSize, centered, level1Image);
         }
+    }
+
+    private static BufferedImage scalePage(int thumbnailSize, boolean centered, BufferedImage level1Image) {
+        int imageType = BufferedImage.TYPE_INT_ARGB;
+        final double width = level1Image.getWidth();
+        final double height = level1Image.getHeight();
+        LOGGER.info("new PDFBox: {}x{}", width, height);
+        LOGGER.info("temporary image dimensions: {}x{}", width, height);
+        final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
+        final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
+        // if centered make thumbnailSize x thumbnailSize image
+        final BufferedImage bicubicScaledPage = new BufferedImage(centered ? thumbnailSize : newWidth,
+            centered ? thumbnailSize : newHeight, imageType);
+        LOGGER.info("target image dimensions: {}x{}", bicubicScaledPage.getWidth(), bicubicScaledPage.getHeight());
+        final Graphics2D bg = bicubicScaledPage.createGraphics();
+        try {
+            bg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            int x = centered ? (thumbnailSize - newWidth) / 2 : 0;
+            int y = centered ? (thumbnailSize - newHeight) / 2 : 0;
+            if (x != 0 && y != 0) {
+                LOGGER.warn("Writing at position {},{}", x, y);
+            }
+            bg.drawImage(level1Image, x, y, x + newWidth, y + newHeight, 0, 0, (int) Math.ceil(width),
+                (int) Math.ceil(height), null);
+        } finally {
+            bg.dispose();
+        }
+        return bicubicScaledPage;
     }
 
     /**
