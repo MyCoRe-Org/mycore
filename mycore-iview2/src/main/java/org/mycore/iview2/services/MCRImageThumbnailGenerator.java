@@ -1,4 +1,4 @@
-package org.mycore.media.services;
+package org.mycore.iview2.services;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -13,7 +13,7 @@ import javax.imageio.ImageReader;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTiledPictureProps;
-import org.mycore.iview2.services.MCRIView2Tools;
+import org.mycore.media.services.MCRThumbnailGenerator;
 
 public class MCRImageThumbnailGenerator implements MCRThumbnailGenerator {
 

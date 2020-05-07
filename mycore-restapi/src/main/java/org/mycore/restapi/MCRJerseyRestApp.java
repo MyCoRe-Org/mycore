@@ -34,9 +34,7 @@ public abstract class MCRJerseyRestApp extends ResourceConfig {
 
     protected MCRJerseyRestApp() {
         super();
-        setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API "
-            + getVersion());
-        LogManager.getLogger().info("Initiialize {}", getApplicationName());
+        initAppName();
         property(ServerProperties.APPLICATION_NAME, getApplicationName());
         MCRJerseyDefaultConfiguration.setupGuiceBridge(this);
         String[] restPackages = getRestPackages();
@@ -53,6 +51,12 @@ public abstract class MCRJerseyRestApp extends ResourceConfig {
         register(MCRCORSResponseFilter.class);
         register(MCRRequestScopeACLFilter.class);
         register(MCRIgnoreClientAbortInterceptor.class);
+    }
+
+    protected void initAppName() {
+        setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " REST-API "
+            + getVersion());
+        LogManager.getLogger().info("Initiialize {}", getApplicationName());
     }
 
     protected abstract String getVersion();

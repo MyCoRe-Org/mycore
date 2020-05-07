@@ -18,8 +18,6 @@
 
 package org.mycore.iiif.image;
 
-import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_API_2_LEVEL2;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +25,8 @@ import java.nio.charset.StandardCharsets;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.model.MCRIIIFImageProfile;
+
+import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_API_2_LEVEL2;
 
 public class MCRIIIFImageUtil {
     public static void completeProfile(MCRIIIFImageImpl impl, MCRIIIFImageProfile profile) {
@@ -44,7 +44,7 @@ public class MCRIIIFImageUtil {
     }
 
     public static String getIIIFURL(MCRIIIFImageImpl impl) {
-        return MCRFrontendUtil.getBaseURL() + "rsc/iiif/image/" + impl.getImplName() + "/";
+        return MCRFrontendUtil.getBaseURL() + "api/iiif/v2/image/" + impl.getImplName() + "/";
     }
 
     public static String getProfileLink(MCRIIIFImageImpl impl) {

@@ -18,18 +18,13 @@
 
 package org.mycore.iiif.image.resources;
 
-import static org.mycore.iiif.image.MCRIIIFImageUtil.buildCanonicalURL;
-import static org.mycore.iiif.image.MCRIIIFImageUtil.buildProfileURL;
-import static org.mycore.iiif.image.MCRIIIFImageUtil.completeProfile;
-import static org.mycore.iiif.image.MCRIIIFImageUtil.getIIIFURL;
-import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
-
 import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.GET;
@@ -42,6 +37,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
+import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.iiif.common.MCRIIIFMediaTypeHelper;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
@@ -61,7 +57,13 @@ import org.mycore.iiif.model.MCRIIIFBase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@Path("/iiif/image/{impl}")
+import static org.mycore.iiif.image.MCRIIIFImageUtil.buildCanonicalURL;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.buildProfileURL;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.completeProfile;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.getIIIFURL;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
+
+@Path("/image/{impl}")
 public class MCRIIIFImageResource {
     public static final String IIIF_IMAGE_API_2_LEVEL2 = "http://iiif.io/api/image/2/level2.json";
 
@@ -74,6 +76,8 @@ public class MCRIIIFImageResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/info.json")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response getInfo(@PathParam(IMPL_PARAM) String implString, @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
             MCRIIIFImageImpl impl = getImpl(implString);
@@ -101,6 +105,8 @@ public class MCRIIIFImageResource {
 
     @GET
     @Path("{" + IDENTIFIER_PARAM + "}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response getInfoRedirect(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
@@ -114,6 +120,8 @@ public class MCRIIIFImageResource {
 
     @GET
     @Path("{" + IDENTIFIER_PARAM + "}/{region}/{size}/{rotation}/{quality}.{format}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response getImage(@PathParam(IMPL_PARAM) String implStr, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam("region") String region,
         @PathParam("size") String size,
@@ -164,6 +172,8 @@ public class MCRIIIFImageResource {
     @GET
     @Path("profile.json")
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 7, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 7, unit = TimeUnit.DAYS))
     public Response getDereferencedProfile(@PathParam(IMPL_PARAM) String implStr) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         MCRIIIFImageProfile profile = getProfile(getImpl(implStr));

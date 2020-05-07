@@ -42,7 +42,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.iiif.image.MCRIIIFImageUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
 import org.mycore.iiif.image.impl.MCRIIIFImageProvidingException;
@@ -125,8 +125,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     }
 
     private String buildURL(String identifier) {
-        return MCRFrontendUtil.getBaseURL() + "rsc/iiif/image/" + getImplName() + "/"
-            + URLEncoder.encode(identifier, StandardCharsets.UTF_8);
+        return MCRIIIFImageUtil.getIIIFURL(this) + URLEncoder.encode(identifier, StandardCharsets.UTF_8);
     }
 
     @Override
