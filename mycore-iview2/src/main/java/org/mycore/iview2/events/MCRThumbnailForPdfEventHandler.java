@@ -53,7 +53,7 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
 
     private static final MCRJobQueue PDF_THUMBNAIL_JOB_QUEUE = initializeJobQueue();
 
-    private static final List<String> derivateTypesForContent = MCRConfiguration2
+    private static final List<String> DERIVATE_TYPES_FOR_CONTENT = MCRConfiguration2
         .getOrThrow("MCRIIIFImage.Iview.ThumbnailForPdfEventHandler.Derivate.Types",
             MCRConfiguration2::splitValue)
         .collect(Collectors.toList());
@@ -110,7 +110,7 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
     private boolean isQualifyingDerivate(MCRDerivate der) {
         for (MCRMetaClassification c : der.getDerivate().getClassifications()) {
             String classid = c.getClassId() + ":" + c.getCategId();
-            if (derivateTypesForContent.contains(classid)) {
+            if (DERIVATE_TYPES_FOR_CONTENT.contains(classid)) {
                 String mainDoc = der.getDerivate().getInternals().getMainDoc();
                 return (mainDoc != null && mainDoc.toLowerCase(Locale.ROOT).endsWith(".pdf"));
             }
