@@ -103,5 +103,10 @@
       <artifactId>hibernate-core</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>
