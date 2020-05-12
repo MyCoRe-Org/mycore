@@ -97,8 +97,8 @@ public class MCRPDFTools implements AutoCloseable {
         final double height = level1Image.getHeight();
         LOGGER.info("new PDFBox: {}x{}", width, height);
         LOGGER.info("temporary image dimensions: {}x{}", width, height);
-        final int newWidth = width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
-        final int newHeight = width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
+        final int newWidth = calculateNewWidth(thumbnailSize, width, height);
+        final int newHeight = calculateNewHeight(thumbnailSize, width, height);
         // if centered make thumbnailSize x thumbnailSize image
         final BufferedImage bicubicScaledPage = new BufferedImage(centered ? thumbnailSize : newWidth,
             centered ? thumbnailSize : newHeight, imageType);
@@ -117,6 +117,14 @@ public class MCRPDFTools implements AutoCloseable {
             bg.dispose();
         }
         return bicubicScaledPage;
+    }
+
+    private static int calculateNewHeight(int thumbnailSize, double width, double height) {
+        return width < height ? thumbnailSize : (int) Math.ceil(thumbnailSize * height / width);
+    }
+
+    private static int calculateNewWidth(int thumbnailSize, double width, double height) {
+        return width < height ? (int) Math.ceil(thumbnailSize * width / height) : thumbnailSize;
     }
 
     /**
