@@ -30,11 +30,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
@@ -61,8 +63,10 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -310,6 +314,12 @@ public class MCRRestDerivates {
         derivate.setId(derId);
         derivate.setLabel(Optional.ofNullable(der.getLabel()).orElse("data object from " + mcrId));
         derivate.getDerivate().setDisplayEnabled(der.isDisplayEnabled());
+        derivate.setOrder(der.getOrder());
+
+        derivate.getDerivate().getClassifications()
+            .addAll(der.getClassifications().stream()
+                .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
+                .collect(Collectors.toList()));
 
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
             .orElse("datamodel-derivate.xml")
@@ -381,6 +391,10 @@ public class MCRRestDerivates {
 
         private String mainDoc;
 
+        private int order = 1;
+
+        private List<MCRCategoryID> classifications = List.of();
+
         String getLabel() {
             return label;
         }
@@ -394,10 +408,15 @@ public class MCRRestDerivates {
             return displayEnabled;
         }
 
-        @FormDataParam("display-enabled")
         @JsonProperty("display-enabled")
         public void setDisplayEnabled(boolean displayEnabled) {
             this.displayEnabled = displayEnabled;
+        }
+
+        @FormDataParam("display-enabled")
+        @DefaultValue("true")
+        public void setDisplayEnabled(String displayEnabled) {
+            this.displayEnabled = Boolean.parseBoolean(displayEnabled);
         }
 
         String getMainDoc() {
@@ -410,13 +429,30 @@ public class MCRRestDerivates {
             this.mainDoc = mainDoc;
         }
 
-        @Override
-        public String toString() {
-            return "DerivateMetadata{" +
-                "label='" + label + '\'' +
-                ", displayEnabled=" + displayEnabled +
-                ", mainDoc='" + mainDoc + '\'' +
-                '}';
+        public int getOrder() {
+            return order;
         }
+
+        @JsonProperty
+        public void setOrder(int order) {
+            this.order = order;
+        }
+
+        @FormDataParam("order")
+        @DefaultValue("1")
+        public void setOrder(String order) {
+            this.order = Integer.parseInt(order);
+        }
+
+        public List<MCRCategoryID> getClassifications() {
+            return classifications;
+        }
+
+        @JsonProperty
+        @FormDataParam("classifications")
+        public void setClassifications(List<MCRCategoryID> classifications) {
+            this.classifications = classifications;
+        }
+
     }
 }
