@@ -52,12 +52,11 @@ public class MCRDefaultThumbnailTileInfoProvider implements MCRThumbnailTileInfo
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrID);
             for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
                 final Element derLinkXML = derLink.createXML();
-                final boolean typeMatching = Optional.ofNullable(derLinkXML.getChild("classification"))
-                    .map(c -> c.getAttributeValue("classid") + ":" + c.getAttributeValue("categid"))
-                    .filter(DERIVATE_TYPES_THUMBNAILS::contains)
-                    .isPresent();
+                final boolean typeMatch = derLink.getClassifications().stream()
+                    .map(clazz -> clazz.getClassId() + ":" + clazz.getCategId())
+                    .anyMatch(DERIVATE_TYPES_THUMBNAILS::contains);
 
-                if (typeMatching) {
+                if (typeMatch) {
                     final String maindoc = derLinkXML.getChildTextTrim("maindoc");
                     if (maindoc != null) {
                         return Optional.of(new MCRTileInfo(derLink.getXLinkHref(), maindoc, null));
