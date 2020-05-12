@@ -21,8 +21,6 @@ package org.mycore.iview2.iiif;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
@@ -42,7 +40,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -60,7 +57,9 @@ import org.mycore.iiif.image.model.MCRIIIFImageTargetSize;
 import org.mycore.iiif.image.model.MCRIIIFImageTileInformation;
 import org.mycore.iiif.model.MCRIIIFBase;
 import org.mycore.imagetiler.MCRTiledPictureProps;
+import org.mycore.iview2.backend.MCRDefaultThumbnailTileInfoProvider;
 import org.mycore.iview2.backend.MCRDefaultTileFileProvider;
+import org.mycore.iview2.backend.MCRThumbnailTileInfoProvider;
 import org.mycore.iview2.backend.MCRTileFileProvider;
 import org.mycore.iview2.backend.MCRTileInfo;
 import org.mycore.iview2.services.MCRIView2Tools;
@@ -76,38 +75,52 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     public static final String MAX_BYTES = "MCR.IIIFImage.Iview.MaxImageBytes";
 
     private static final String TILE_FILE_PROVIDER_PROPERTY = "TileFileProvider";
+    
+    private static final String THUMBNAIL_TILE_INFO_PROVIDER_PROPERTY = "ThumbnailTileInfoProvider";
 
     private static Logger LOGGER = LogManager.getLogger(MCRIVIEWIIIFImageImpl.class);
 
+    private static final String THUMBNAIL_PREFIX = "thumbnail:";
+    
     private java.util.List<String> transparentFormats;
 
     private MCRTileFileProvider tileFileProvider;
+    
+    private MCRThumbnailTileInfoProvider thumbnailTileInfoProvider;
 
     public MCRIVIEWIIIFImageImpl(String implName) {
         super(implName);
         Map<String, String> properties = getProperties();
 
         String tileFileProviderClassName = properties.get(TILE_FILE_PROVIDER_PROPERTY);
-
         if (tileFileProviderClassName == null) {
-            tileFileProviderClassName = MCRDefaultTileFileProvider.class.getName();
+            tileFileProvider = new MCRDefaultTileFileProvider();
+        } else {
+            Optional<MCRTileFileProvider> optTFP = MCRConfiguration2.instantiateClass(tileFileProviderClassName);
+            if (optTFP.isPresent()) {
+                tileFileProvider = optTFP.get();
+            } else {
+                throw new MCRConfigurationException(
+                        "Configurated class (" + TILE_FILE_PROVIDER_PROPERTY + ") not found: "
+                                + tileFileProviderClassName);
+            }
         }
 
-        try {
-            @SuppressWarnings("unchecked")
-            Class<MCRTileFileProvider> classObject = (Class<MCRTileFileProvider>) Class
-                .forName(tileFileProviderClassName);
-            Constructor<MCRTileFileProvider> constructor = classObject.getConstructor();
-            tileFileProvider = constructor.newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + TILE_FILE_PROVIDER_PROPERTY + ") not found: " + tileFileProviderClassName, e);
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException("Configurated class (" + TILE_FILE_PROVIDER_PROPERTY
-                + ") needs a default constructor: " + tileFileProviderClassName);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new MCRException(e);
+        String thumbnailTileInfoProviderClassName = properties.get(THUMBNAIL_TILE_INFO_PROVIDER_PROPERTY);
+        if (thumbnailTileInfoProviderClassName == null) {
+            thumbnailTileInfoProvider = new MCRDefaultThumbnailTileInfoProvider();
+        } else {
+            Optional<MCRThumbnailTileInfoProvider> optTTFIP = MCRConfiguration2
+                    .instantiateClass(thumbnailTileInfoProviderClassName);
+            if (optTTFIP.isPresent()) {
+                thumbnailTileInfoProvider = optTTFIP.get();
+            } else {
+                throw new MCRConfigurationException(
+                        "Configurated class (" + THUMBNAIL_TILE_INFO_PROVIDER_PROPERTY + ") not found: "
+                                + thumbnailTileInfoProviderClassName);
+            }
         }
+
         transparentFormats = Arrays.asList(properties.get("TransparentFormats").split(","));
     }
 
@@ -138,7 +151,9 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             throw new MCRIIIFUnsupportedFormatException(format);
         }
 
-        MCRTileInfo tileInfo = createTileInfo(identifier);
+        MCRTileInfo tileInfo = identifier.startsWith(THUMBNAIL_PREFIX) 
+                ? createTileInfoForThumbnail(identifier)
+                : createTileInfo(identifier);
         Optional<Path> oTileFile = tileFileProvider.getTileFile(tileInfo);
         if (oTileFile.isEmpty()) {
             throw new MCRIIIFImageNotFoundException(identifier);
@@ -244,7 +259,9 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     public MCRIIIFImageInformation getInformation(String identifier)
         throws MCRIIIFImageNotFoundException, MCRIIIFImageProvidingException, MCRAccessException {
         try {
-            MCRTileInfo tileInfo = createTileInfo(identifier);
+            MCRTileInfo tileInfo = identifier.startsWith(THUMBNAIL_PREFIX) 
+                    ? createTileInfoForThumbnail(identifier)
+                    : createTileInfo(identifier);
             Optional<Path> oTiledFile = tileFileProvider.getTileFile(tileInfo);
             if (oTiledFile.isEmpty()) {
                 throw new MCRIIIFImageNotFoundException(identifier);
@@ -322,6 +339,13 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         return tileInfo;
     }
 
+    private MCRTileInfo createTileInfoForThumbnail(String identifier) throws MCRIIIFImageNotFoundException {
+        String id = identifier.substring(THUMBNAIL_PREFIX.length());
+        MCRTileInfo tileInfo = thumbnailTileInfoProvider.getThumbnailFileInfo(id)
+                .orElseThrow(() -> new MCRIIIFImageNotFoundException(identifier));
+        return tileInfo;
+    }
+
     private void checkTileFile(String identifier, MCRTileInfo tileInfo, Path tileFilePath)
         throws MCRAccessException, MCRIIIFImageNotFoundException {
         if (!Files.exists(tileFilePath)) {
@@ -335,5 +359,4 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
                 "view-derivate");
         }
     }
-
 }
