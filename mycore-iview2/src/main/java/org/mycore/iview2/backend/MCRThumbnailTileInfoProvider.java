@@ -20,6 +20,9 @@ package org.mycore.iview2.backend;
 
 import java.util.Optional;
 
+/**
+ * This interface tells mycore-iview where to find the tiles.
+ */
 public interface MCRThumbnailTileInfoProvider {
     Optional<MCRTileInfo> getThumbnailFileInfo(String id);
 }

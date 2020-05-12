@@ -65,10 +65,6 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
                 } finally {
                     Files.deleteIfExists(pImg);
                 }
-                // RS: throws java.nio.file.AccessDeniedException, when immediately called after
-                // tile()
-                // used OpenOption.DELETE_ON_CLOSE
-                // Files.deleteIfExists(pImg);
             } catch (IOException e) {
                 LOGGER.error("Error creating thumbnail for PDF", e);
             }

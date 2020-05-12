@@ -54,7 +54,7 @@ public class MCRThumbnailForPdfEventHandler extends MCREventHandlerBase {
     private static final MCRJobQueue PDF_THUMBNAIL_JOB_QUEUE = initializeJobQueue();
 
     private static final List<String> DERIVATE_TYPES_FOR_CONTENT = MCRConfiguration2
-        .getOrThrow("MCRIIIFImage.Iview.ThumbnailForPdfEventHandler.Derivate.Types",
+        .getOrThrow("MCR.IIIFImage.Iview.ThumbnailForPdfEventHandler.Derivate.Types",
             MCRConfiguration2::splitValue)
         .collect(Collectors.toList());
 

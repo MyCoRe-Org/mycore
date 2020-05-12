@@ -96,7 +96,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         if (tileFileProviderClassName == null) {
             tileFileProvider = new MCRDefaultTileFileProvider();
         } else {
-            Optional<MCRTileFileProvider> optTFP = MCRConfiguration2.getInstanceOf(tileFileProviderClassName);
+            Optional<MCRTileFileProvider> optTFP = MCRConfiguration2.instantiateClass(tileFileProviderClassName);
             if (optTFP.isPresent()) {
                 tileFileProvider = optTFP.get();
             } else {
@@ -111,7 +111,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             thumbnailTileInfoProvider = new MCRDefaultThumbnailTileInfoProvider();
         } else {
             Optional<MCRThumbnailTileInfoProvider> optTTFIP = MCRConfiguration2
-                    .getInstanceOf(thumbnailTileInfoProviderClassName);
+                    .instantiateClass(thumbnailTileInfoProviderClassName);
             if (optTTFIP.isPresent()) {
                 thumbnailTileInfoProvider = optTTFIP.get();
             } else {

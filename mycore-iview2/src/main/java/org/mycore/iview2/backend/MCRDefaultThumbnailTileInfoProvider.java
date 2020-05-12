@@ -32,46 +32,40 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 public class MCRDefaultThumbnailTileInfoProvider implements MCRThumbnailTileInfoProvider {
 
-    private static List<String> derivateTypesForThumbnails = MCRConfiguration2
-            .getOrThrow("MCRIIIFImage.Iview.Thumbnail.Derivate.Types", MCRConfiguration2::splitValue)
-            .collect(Collectors.toList());
+    private static final List<String> DERIVATE_TYPES_THUMBNAILS = MCRConfiguration2
+        .getOrThrow("MCR.IIIFImage.Iview.Thumbnail.Derivate.Types", MCRConfiguration2::splitValue)
+        .collect(Collectors.toList());
 
     @Override
     public Optional<MCRTileInfo> getThumbnailFileInfo(String id) {
-        if (MCRObjectID.isValid(id)) {
-            MCRObjectID mcrID = MCRObjectID.getInstance(id);
-            MCRDerivate mcrDer = null;
-            if (mcrID.getTypeId().equals("derivate")) {
-                mcrDer = MCRMetadataManager.retrieveMCRDerivate(mcrID);
-                return Optional.of(new MCRTileInfo(mcrDer.getId().toString(),
-                        mcrDer.getDerivate().getInternals().getMainDoc(), null));
-            } else {
-                MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrID);
-                for (String derivateType : derivateTypesForThumbnails) {
-                    for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                        Optional<String> derType = derLink.getContentList().stream()
-                                .filter(x -> (x instanceof Element))
-                                .map(x -> (Element) x)
-                                .filter(e -> e.getName().equals("classification"))
-                                .map(c -> {
-                                    return c.getAttributeValue("classid") + ":" + c.getAttributeValue("categid");
-                                })
-                                .filter(c -> c.equals(derivateType))
-                                .findFirst();
-                        if (derType.isPresent()) {
-                            Optional<String> oMainDoc = derLink.getContentList().stream()
-                                    .filter(x -> (x instanceof Element))
-                                    .map(x -> (Element) x)
-                                    .filter(e -> e.getName().equals("maindoc"))
-                                    .map(e -> e.getTextTrim()).findFirst();
-                            if (oMainDoc.isPresent()) {
-                                return Optional.of(new MCRTileInfo(derLink.getXLinkHref(), oMainDoc.get(), null));
-                            }
-                        }
+        if (!MCRObjectID.isValid(id)) {
+            return Optional.empty();
+        }
+
+        MCRObjectID mcrID = MCRObjectID.getInstance(id);
+        MCRDerivate mcrDer = null;
+        if (mcrID.getTypeId().equals("derivate")) {
+            mcrDer = MCRMetadataManager.retrieveMCRDerivate(mcrID);
+            return Optional.of(new MCRTileInfo(mcrDer.getId().toString(),
+                mcrDer.getDerivate().getInternals().getMainDoc(), null));
+        } else {
+            MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrID);
+            for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                final Element derLinkXML = derLink.createXML();
+                final boolean typeMatching = Optional.ofNullable(derLinkXML.getChild("classification"))
+                    .map(c -> c.getAttributeValue("classid") + ":" + c.getAttributeValue("categid"))
+                    .filter(DERIVATE_TYPES_THUMBNAILS::contains)
+                    .isPresent();
+
+                if (typeMatching) {
+                    final String maindoc = derLinkXML.getChildTextTrim("maindoc");
+                    if (maindoc != null) {
+                        return Optional.of(new MCRTileInfo(derLink.getXLinkHref(), maindoc, null));
                     }
                 }
             }
+
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }
