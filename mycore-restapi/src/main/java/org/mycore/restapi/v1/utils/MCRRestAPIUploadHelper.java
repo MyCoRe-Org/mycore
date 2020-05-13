@@ -17,6 +17,8 @@
  */
 package org.mycore.restapi.v1.utils;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -26,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -72,8 +75,6 @@ import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
-
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
 public class MCRRestAPIUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRRestAPIUploadHelper.class);
@@ -194,12 +195,8 @@ public class MCRRestAPIUploadHelper {
                     }
                     final Optional<MCRMetaEnrichedLinkID> matchingDerivate = currentDerivates.stream()
                         .filter(derLink -> {
-                            final Set<String> clazzSet = derLink.getClassifications().stream()
-                                .map(clazz -> clazz.getClassId() + ":" + clazz.getCategId())
-                                .collect(Collectors.toSet());
-                            return categories.stream()
-                                .map(clazz -> clazz.getRootID() + ":" + clazz.getID())
-                                .allMatch(clazzSet::contains);
+                            final Set<MCRCategoryID> clazzSet = new HashSet<>(derLink.getClassifications());
+                            return categories.stream().allMatch(clazzSet::contains);
                         }).findFirst();
                     if(matchingDerivate.isPresent()){
                         derID = matchingDerivate.get().getXLinkHrefID();

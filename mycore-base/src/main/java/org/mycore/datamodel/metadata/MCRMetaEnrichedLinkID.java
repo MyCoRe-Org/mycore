@@ -1,7 +1,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -10,9 +10,13 @@ import java.util.stream.Stream;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * A Link to a {@link MCRDerivate}. In addition to {@link MCRMetaLink} this class contains information about the
@@ -36,14 +40,8 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
 
     protected static final String LANG_ATTRIBUTE_NAME = "lang";
 
-    private static final List<String> ORDER;
-
-    static {
-        ORDER =Stream.of(ORDER_ELEMENT_NAME,
-            MAIN_DOC_ELEMENT_NAME, TITLE_ELEMENT_NAME, CLASSIFICATION_ELEMENT_NAME)
-            .collect(Collectors.toList());
-        Collections.reverse(ORDER);
-    }
+    private static final List<String> ORDER = List.of(ORDER_ELEMENT_NAME, MAIN_DOC_ELEMENT_NAME, TITLE_ELEMENT_NAME,
+        CLASSIFICATION_ELEMENT_NAME);
 
     private List<Content> contentList;
 
@@ -57,8 +55,9 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
         return mcrMetaEnrichedLinkID;
     }
 
-    private static int compareChildren(Element el1, Element el2) {
-        return ORDER.indexOf(el2.getName()) - ORDER.indexOf(el1.getName());
+    private static int getElementPosition(Element e) {
+        final int index = ORDER.indexOf(e.getName());
+        return index < 0 ? ORDER.size() : index;
     }
 
     @Override
@@ -72,11 +71,11 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
     public Element createXML() throws MCRException {
         final Element xml = super.createXML();
 
-        if (contentList != null) {
-            contentList.stream().map(Content::clone).forEach(xml::addContent);
-        }
+        contentList.stream().map(Content::clone).forEach(xml::addContent);
 
-        xml.sortChildren(MCRMetaEnrichedLinkID::compareChildren);
+        xml.sortChildren(
+            Comparator.comparingInt(MCRMetaEnrichedLinkID::getElementPosition)
+                .thenComparing(contentList::indexOf));
 
         return xml;
     }
@@ -87,7 +86,7 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
     }
 
     public void setContentList(List<Content> contentList) {
-        this.contentList = contentList;
+        this.contentList = Objects.requireNonNull(contentList);
     }
 
     public int getOrder() {
@@ -98,12 +97,16 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
             .orElse(1);
     }
 
-    public List<MCRMetaClassification> getClassifications() {
-        return elementsWithNameFromContentList(ORDER_ELEMENT_NAME)
-            .map(el -> new MCRMetaClassification("classification",
-                0,
-                null,
-                el.getAttributeValue(CLASSID_ATTRIBUTE_NAME),
+    public String getMainDoc() {
+        return elementsWithNameFromContentList(MAIN_DOC_ELEMENT_NAME)
+            .findFirst()
+            .map(Element::getTextTrim)
+            .orElse(null);
+    }
+
+    public List<MCRCategoryID> getClassifications() {
+        return elementsWithNameFromContentList(CLASSIFICATION_ELEMENT_NAME)
+            .map(el -> new MCRCategoryID(el.getAttributeValue(CLASSID_ATTRIBUTE_NAME),
                 el.getAttributeValue(CATEGID_ATTRIBUTE_NAME)))
             .collect(Collectors.toList());
     }
@@ -123,14 +126,43 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
     }
 
     @Override
+    public JsonObject createJSON() {
+        final JsonObject json = super.createJSON();
+        json.addProperty(ORDER_ELEMENT_NAME, getOrder());
+        json.addProperty(MAIN_DOC_ELEMENT_NAME, getMainDoc());
+        final List<MCRMetaLangText> title = getTitle();
+        JsonArray titles = new JsonArray(title.size());
+        title.stream().forEach(t -> titles.add(t.createJSON()));
+        json.add("titles", titles);
+        final List<MCRCategoryID> categories = getClassifications();
+        JsonArray classifications = new JsonArray(categories.size());
+        categories.stream().map(MCRCategoryID::toString).forEach(classifications::add);
+        json.add("classifiations", classifications);
+        return json;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (!super.equals(o)) {
             return false;
         }
 
         MCRMetaEnrichedLinkID that = (MCRMetaEnrichedLinkID) o;
-
-        return Objects.equals(getContentList(), that.getContentList());
+        final List<Content> myContentList = getContentList();
+        final List<Content> theirContentList = that.getContentList();
+        final int listSize = myContentList.size();
+        if (listSize != theirContentList.size()) {
+            return false;
+        }
+        for (int i = 0; i < listSize; i++) {
+            Content myContent = myContentList.get(i);
+            Content theirContent = theirContentList.get(i);
+            if (!myContent.equals(theirContent) || (myContent instanceof Element && theirContent instanceof Element
+                && !MCRXMLHelper.deepEqual((Element) myContent, (Element) theirContent))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

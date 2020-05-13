@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.jdom2.Element;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -53,7 +54,7 @@ public class MCRDefaultThumbnailTileInfoProvider implements MCRThumbnailTileInfo
             for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
                 final Element derLinkXML = derLink.createXML();
                 final boolean typeMatch = derLink.getClassifications().stream()
-                    .map(clazz -> clazz.getClassId() + ":" + clazz.getCategId())
+                    .map(MCRCategoryID::toString)
                     .anyMatch(DERIVATE_TYPES_THUMBNAILS::contains);
 
                 if (typeMatch) {
