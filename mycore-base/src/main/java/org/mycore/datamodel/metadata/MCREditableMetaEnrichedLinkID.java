@@ -5,6 +5,7 @@ import java.util.List;
 import org.jdom2.Content;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
 
@@ -16,12 +17,12 @@ public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
         setOrCreateElement(MAIN_DOC_ELEMENT_NAME, mainDoc);
     }
 
-    public void setClassifications(List<MCRMetaClassification> list){
+    public void setClassifications(List<MCRCategoryID> list){
         elementsWithNameFromContentList(CLASSIFICATION_ELEMENT_NAME).forEach(getContentList()::remove);
         list.stream().map(clazz-> {
             final Element classElement = new Element(CLASSIFICATION_ELEMENT_NAME);
-            classElement.setAttribute(CLASSID_ATTRIBUTE_NAME, clazz.getClassId());
-            classElement.setAttribute(CATEGID_ATTRIBUTE_NAME, clazz.getCategId());
+            classElement.setAttribute(CLASSID_ATTRIBUTE_NAME, clazz.getRootID());
+            classElement.setAttribute(CATEGID_ATTRIBUTE_NAME, clazz.getID());
             return classElement;
         }).forEach(getContentList()::add);
     }

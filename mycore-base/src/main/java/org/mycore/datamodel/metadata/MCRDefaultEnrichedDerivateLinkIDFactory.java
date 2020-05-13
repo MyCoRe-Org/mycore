@@ -1,6 +1,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import org.jdom2.Content;
 
@@ -24,7 +25,10 @@ public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLink
         }
 
         derivateLinkID.setTitles(der.getDerivate().getTitles());
-        derivateLinkID.setClassifications(der.getDerivate().getClassifications());
+        derivateLinkID.setClassifications(
+            der.getDerivate().getClassifications().stream()
+                .map(metaClass -> metaClass.category)
+                .collect(Collectors.toList()));
         derivateLinkID.setContentList(contentList);
 
         return derivateLinkID;
