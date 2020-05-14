@@ -231,16 +231,14 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
             // set all headers
             for (Header header : response.getAllHeaders()) {
-                LOGGER.debug("SOLR response header: " + header.getName() + " - " +header.getValue());
+                LOGGER.debug("SOLR response header: {} - {}", header.getName(), header.getValue());
                 String headerName = header.getName();
                 if (NEW_HTTP_RESPONSE_HEADER.containsKey(headerName)) {
                     String headerValue = NEW_HTTP_RESPONSE_HEADER.get(headerName);
                     if (headerValue != null && headerValue.length() > 0) {
                         resp.setHeader(headerName, headerValue);
                     }
-                    continue;
-                }
-                if (!HTTP.TRANSFER_ENCODING.equals(header.getName())) {
+                } else {
                     resp.setHeader(header.getName(), header.getValue());
                 }
             }
