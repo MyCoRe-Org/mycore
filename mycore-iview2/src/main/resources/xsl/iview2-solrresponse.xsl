@@ -44,11 +44,13 @@
   </xsl:template>
 
   <xsl:template match="doc" mode="iview">
+    <xsl:param name="imageSize" select="'THUMBNAIL'"/>
+
     <xsl:variable name="mcrid" select="@id" />
     <xsl:variable name="derivates" select="key('derivate', $mcrid)" />
 
     <xsl:comment>
-      Start - match="doc" mode="iview"
+      Start - match="doc" mode="iview" (iview2-solrresponse.xsl)
     </xsl:comment>
 
     <xsl:for-each select="$derivates/str[@name='derivateMaindoc']">
@@ -56,6 +58,7 @@
         <xsl:with-param name="mcrid" select="$mcrid" />
         <xsl:with-param name="derivate" select="../str[@name='id']" />
         <xsl:with-param name="fileName" select="." />
+        <xsl:with-param name="imageSize" select="$imageSize" />
       </xsl:call-template>
     </xsl:for-each>
 
@@ -63,11 +66,12 @@
       <xsl:call-template name="iViewLinkPrev">
         <xsl:with-param name="mcrid" select="$mcrid" />
         <xsl:with-param name="derivateLink" select="." />
+        <xsl:with-param name="imageSize" select="$imageSize" />
       </xsl:call-template>
     </xsl:for-each>
 
     <xsl:comment>
-      End - match="doc" mode="iview"
+      End - match="doc" mode="iview" (iview2-solrresponse.xsl)
     </xsl:comment>
   </xsl:template>
 
@@ -81,6 +85,7 @@
     <xsl:param name="mcrid" />
     <xsl:param name="fileName" />
     <xsl:param name="class" select="'resultListPreviewImage'" />
+    <xsl:param name="imageSize" select="'THUMBNAIL'" />
 
     <xsl:comment>
       Start - iViewLinkPrev (iview2-solrresponse.xsl)
@@ -128,6 +133,7 @@
                 <xsl:with-param select="$derivate" name="derivate" />
                 <xsl:with-param select="$pageToDisplay" name="imagePath" />
                 <xsl:with-param select="$class" name="class" />
+                <xsl:with-param select="$imageSize" name="imageSize" />
               </xsl:call-template>
             </a>
           </xsl:when>

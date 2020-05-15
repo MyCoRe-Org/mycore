@@ -71,7 +71,7 @@
     <xsl:param name="class" select="''" />
 
     <xsl:comment>
-      Begin - iview2.getImageElement (mcr-module-iview2.xsl)
+      Begin - iview2.getImageElement (mcr-module-startIview2.xsl)
     </xsl:comment>
 
     <xsl:variable name="file">
@@ -88,7 +88,7 @@
     <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/',$imageSize,'/',$derivate,'/',$file)}" style="{$style}" class="{$class}" />
 
     <xsl:comment>
-      End - iview2.getImageElement (mcr-module-iview2.xsl)
+      End - iview2.getImageElement (mcr-module-startIview2.xsl)
     </xsl:comment>
   </xsl:template>
 </xsl:stylesheet>
