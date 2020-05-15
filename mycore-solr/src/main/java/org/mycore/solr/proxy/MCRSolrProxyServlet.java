@@ -72,15 +72,15 @@ import org.mycore.solr.MCRSolrConstants;
 import org.xml.sax.SAXException;
 
 /**
- * This class implements a proxy for access to the SOLR backend.<br/><br/>
+ * This class implements a proxy for access to the SOLR backend.<br><br>
  * 
  * With the following configuration properties 
  * you can manipulate the response header. The entries will be replace the attributes of the incomming header.
- * If the new attribute text is empty, it will be remove the attribute.<br></br><br></br>
+ * If the new attribute text is empty, it will be remove the attribute.<br><br>
  * MCR.Solr.HTTPResponseHeader.{response_header_attribute_name}={new_response_header_attribute}
- * MCR.Solr.HTTPResponseHeader....=<br></br><br></br>
+ * MCR.Solr.HTTPResponseHeader....=<br><br>
  * 
- * You can set the maximum of connections to the SOLR server with the property<br></br><br></br>
+ * You can set the maximum of connections to the SOLR server with the property<br><br>
  * MCR.Solr.SelectProxy.MaxConnections={number}
  */
 public class MCRSolrProxyServlet extends MCRServlet {
