@@ -26,9 +26,13 @@ import java.util.stream.Stream;
 import javax.ws.rs.ApplicationPath;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
 import org.mycore.restapi.MCRJerseyRestApp;
 import org.mycore.restapi.MCRNormalizeMCRObjectIDsFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
+import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
+import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
+import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 
@@ -41,6 +45,10 @@ public class MCRRestV1App extends MCRJerseyRestApp {
 
     public MCRRestV1App() {
         super();
+        register(MCRJerseyExceptionMapper.class);
+        register(MCRRestAPIExceptionMapper.class);
+        register(MCRForbiddenExceptionMapper.class);
+        register(MCRNotAuthorizedExceptionMapper.class);
         register(MCRNormalizeMCRObjectIDsFilter.class);
     }
 	

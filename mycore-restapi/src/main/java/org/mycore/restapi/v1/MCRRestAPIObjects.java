@@ -18,8 +18,8 @@
 
 package org.mycore.restapi.v1;
 
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
+import static org.mycore.restapi.v1.MCRRestAuthorizationFilter.PARAM_DERID;
+import static org.mycore.restapi.v1.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import java.io.IOException;
 import java.io.InputStream;

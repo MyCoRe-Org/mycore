@@ -86,7 +86,11 @@ public class MCRRestFeature extends MCRJerseyDefaultFeature {
 
     @Override
     protected void registerAccessFilter(FeatureContext context, Class<?> resourceClass, Method resourceMethod) {
-        context.register(MCRRestAuthorizationFilter.class);
+        if (resourceClass.getPackageName().contains(".v1")) {
+            context.register(org.mycore.restapi.v1.MCRRestAuthorizationFilter.class);
+        } else {
+            context.register(org.mycore.restapi.v2.MCRRestAuthorizationFilter.class);
+        }
         super.registerAccessFilter(context, resourceClass, resourceMethod);
     }
 

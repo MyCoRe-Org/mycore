@@ -18,7 +18,7 @@
 
 package org.mycore.restapi.v2;
 
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
@@ -40,10 +40,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
@@ -274,7 +272,10 @@ public class MCRRestObjects {
         throws IOException {
         long modified = MCRXMLMetadataManager.instance().getLastModified(id);
         if (modified < 0) {
-            throw new NotFoundException("MCRObject " + id + " not found");
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode("MCROBJECT_NOT_FOUND")
+                .withMessage("MCRObject " + id + " not found")
+                .toException();
         }
         Date lastModified = new Date(modified);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
@@ -302,8 +303,10 @@ public class MCRRestObjects {
         throws IOException {
         MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id, revision);
         if (mcrContent == null) {
-            throw new NotFoundException(
-                Response.status(Response.Status.NOT_FOUND).entity("revision_not_found").build());
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode("MCROBJECT_REVISION_NOT_FOUND")
+                .withMessage("MCRObject " + id + " has no revision " + revision + ".")
+                .toException();
         }
         long modified = mcrContent.lastModified();
         Date lastModified = new Date(modified);
@@ -357,14 +360,18 @@ public class MCRRestObjects {
             updatedObject = new MCRObject(inputContent.asXML());
             updatedObject.validate();
         } catch (JDOMException | SAXException | MCRException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST)
-                .entity("Invalid body content")
-                .build(), e);
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode("MCROBJECT_INVALID")
+                .withMessage("MCRObject " + id + " is not valid")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
         if (!id.equals(updatedObject.getId())) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST)
-                .entity("MCRObjectID mismatch")
-                .build());
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode("MCROBJECT_ID_MISMATCH")
+                .withMessage("MCRObject " + id + " cannot be overwritten by " + updatedObject.getId() + ".")
+                .toException();
         }
         try {
             if (MCRMetadataManager.exists(id)) {
@@ -375,7 +382,12 @@ public class MCRRestObjects {
                 return Response.status(Response.Status.CREATED).build();
             }
         } catch (MCRAccessException e) {
-            throw new ForbiddenException(e);
+            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                .withErrorCode("MCROBJECT_NO_PERMISSION")
+                .withMessage("You may not modify or create MCRObject " + id + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
     }
 
@@ -395,15 +407,29 @@ public class MCRRestObjects {
     public Response deleteObject(@PathParam(PARAM_MCRID) MCRObjectID id) {
         //check preconditions
         if (!MCRMetadataManager.exists(id)) {
-            throw new NotFoundException();
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode("MCROBJECT_NOT_FOUND")
+                .withMessage("MCRObject " + id + " not found")
+                .toException();
         }
         try {
             MCRMetadataManager.deleteMCRObject(id);
         } catch (MCRActiveLinkException e) {
             Map<String, Collection<String>> activeLinks = e.getActiveLinks();
-            return Response.status(Response.Status.CONFLICT).entity(activeLinks).build();
+            throw MCRErrorResponse.fromStatus(Response.Status.CONFLICT.getStatusCode())
+                .withErrorCode("MCROBJECT_STILL_LINKED")
+                .withMessage("MCRObject " + id + " is still linked by other objects.")
+                .withDetail(activeLinks.toString())
+                .withCause(e)
+                .toException();
         } catch (MCRAccessException e) {
-            throw new ForbiddenException(); //usually handled before
+            //usually handled before
+            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                .withErrorCode("MCROBJECT_NO_PERMISSION")
+                .withMessage("You may not delete MCRObject " + id + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
         return Response.noContent().build();
     }
