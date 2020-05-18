@@ -17,9 +17,9 @@ public abstract class MCRMetaEnrichedLinkIDFactory {
             .orElseGet(MCRDefaultEnrichedDerivateLinkIDFactory::new);
     }
 
-    public abstract MCRMetaEnrichedLinkID getDerivateLink(MCRDerivate der);
+    public abstract MCREditableMetaEnrichedLinkID getDerivateLink(MCRDerivate der);
 
-    public MCRMetaEnrichedLinkID getEmptyLinkID() {
-        return new MCRMetaEnrichedLinkID();
+    public MCREditableMetaEnrichedLinkID getEmptyLinkID() {
+        return new MCREditableMetaEnrichedLinkID();
     }
 }

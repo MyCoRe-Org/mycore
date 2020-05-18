@@ -28,9 +28,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -42,9 +48,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.jdom2.Content;
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -52,6 +56,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -163,40 +168,38 @@ public class MCRRestAPIUploadHelper {
         try {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrObjIDObj);
             MCRObjectID derID = null;
+            final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             if (overwriteOnExisting) {
+                final List<MCRMetaEnrichedLinkID> currentDerivates = mcrObj.getStructure().getDerivates();
                 if (label != null && label.length() > 0) {
-                    for (MCRMetaLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                    for (MCRMetaLinkID derLink : currentDerivates) {
                         if (label.equals(derLink.getXLinkLabel()) || label.equals(derLink.getXLinkTitle())) {
                             derID = derLink.getXLinkHrefID();
                         }
                     }
                 }
                 if (derID == null && classifications != null && classifications.length() > 0) {
-                    for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                        for (String cl : Arrays.asList(classifications.split(" "))) {
-                            MCRCategoryID categid = MCRCategoryID.fromString(cl);
-                            if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
-                                for (Content c : derLink.getContentList()) {
-                                    if (c instanceof Element && ((Element) c).getName().equals("classification")) {
-                                        Element e = (Element) c;
-                                        if (categid.getRootID().equals(e.getAttributeValue("classid"))
-                                                && categid.getID().equals(e.getAttributeValue("categid"))) {
-                                            derID = derLink.getXLinkHrefID();
-                                        } else {
-                                            derID = null;
-                                            break;
-                                        }
-                                    }
-                                }
-                            } else {
-                                throw new MCRRestAPIException(Status.NOT_FOUND,
-                                        new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
-                                                "There is no classification with the ID " + cl));
-                            }
-                        }
-                        if (derID != null) {
-                            break;
-                        }
+                    final List<MCRCategoryID> categories = Stream.of(classifications.split(" "))
+                        .map(MCRCategoryID::fromString)
+                        .collect(Collectors.toList());
+
+                    final List<MCRCategoryID> notExisting = categories.stream().filter(Predicate.not(dao::exist))
+                        .collect(Collectors.toList());
+
+                    if(notExisting.size() > 0){
+                        final String missingIDS = notExisting.stream()
+                            .map(MCRCategoryID::toString).collect(Collectors.joining(", "));
+                        throw new MCRRestAPIException(Status.NOT_FOUND,
+                            new MCRRestAPIError(MCRRestAPIError.CODE_NOT_FOUND, "Classification not found.",
+                                "There are no classification with the IDs: " + missingIDS));
+                    }
+                    final Optional<MCRMetaEnrichedLinkID> matchingDerivate = currentDerivates.stream()
+                        .filter(derLink -> {
+                            final Set<MCRCategoryID> clazzSet = new HashSet<>(derLink.getClassifications());
+                            return categories.stream().allMatch(clazzSet::contains);
+                        }).findFirst();
+                    if(matchingDerivate.isPresent()){
+                        derID = matchingDerivate.get().getXLinkHrefID();
                     }
                 }
             }
@@ -214,13 +217,13 @@ public class MCRRestAPIUploadHelper {
                         .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
 
                 if (classifications != null && classifications.length() > 0) {
-                    for (String cl : Arrays.asList(classifications.split(" "))) {
-                        MCRCategoryID categid = MCRCategoryID.fromString(cl);
-                        if (MCRCategoryDAOFactory.getInstance().exist(categid)) {
-                            mcrDerivate.getDerivate().getClassifications()
-                                .add(new MCRMetaClassification("classification", 0, null, categid));
-                        }
-                    }
+                    final List<MCRMetaClassification> currentClassifications;
+                    currentClassifications = mcrDerivate.getDerivate().getClassifications();
+                    Stream.of(classifications.split(" "))
+                        .map(MCRCategoryID::fromString)
+                        .filter(dao::exist)
+                        .map(categoryID -> new MCRMetaClassification("classification", 0, null, categoryID))
+                        .forEach(currentClassifications::add);
                 }
 
                 MCRMetadataManager.create(mcrDerivate);
