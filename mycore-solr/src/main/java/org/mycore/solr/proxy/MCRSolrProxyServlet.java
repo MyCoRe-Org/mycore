@@ -71,6 +71,18 @@ import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
 import org.xml.sax.SAXException;
 
+/**
+ * This class implements a proxy for access to the SOLR backend.<br><br>
+ * 
+ * With the following configuration properties 
+ * you can manipulate the response header. The entries will be replace the attributes of the incomming header.
+ * If the new attribute text is empty, it will be remove the attribute.<br><br>
+ * MCR.Solr.HTTPResponseHeader.{response_header_attribute_name}={new_response_header_attribute}
+ * MCR.Solr.HTTPResponseHeader....=<br><br>
+ * 
+ * You can set the maximum of connections to the SOLR server with the property<br><br>
+ * MCR.Solr.SelectProxy.MaxConnections={number}
+ */
 public class MCRSolrProxyServlet extends MCRServlet {
 
     static final Logger LOGGER = LogManager.getLogger(MCRSolrProxyServlet.class);
@@ -96,6 +108,9 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static int MAX_CONNECTIONS = MCRConfiguration2
         .getOrThrow(SOLR_CONFIG_PREFIX + "SelectProxy.MaxConnections", Integer::parseInt);
 
+    private static Map<String,String> NEW_HTTP_RESPONSE_HEADER = MCRConfiguration2
+        .getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader.");
+    
     private CloseableHttpClient httpClient;
 
     private MCRIdleConnectionMonitorThread idleConnectionMonitorThread;
@@ -216,7 +231,14 @@ public class MCRSolrProxyServlet extends MCRServlet {
 
             // set all headers
             for (Header header : response.getAllHeaders()) {
-                if (!HTTP.TRANSFER_ENCODING.equals(header.getName())) {
+                LOGGER.debug("SOLR response header: {} - {}", header.getName(), header.getValue());
+                String headerName = header.getName();
+                if (NEW_HTTP_RESPONSE_HEADER.containsKey(headerName)) {
+                    String headerValue = NEW_HTTP_RESPONSE_HEADER.get(headerName);
+                    if (headerValue != null && headerValue.length() > 0) {
+                        resp.setHeader(headerName, headerValue);
+                    }
+                } else {
                     resp.setHeader(header.getName(), header.getValue());
                 }
             }
