@@ -42,11 +42,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.restapi.converter.MCRInstantXMLAdapter;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 @XmlRootElement(name = "error")
 @XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
@@ -181,10 +182,10 @@ public class MCRErrorResponse {
         this.detail = detail;
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = MCRRestUtils.JSON_DATE_FORMAT)
     @XmlAttribute
-    public Date getTimestamp() {
-        return Date.from(timestamp);
+    @XmlJavaTypeAdapter(MCRInstantXMLAdapter.class)
+    public Instant getTimestamp() {
+        return timestamp;
     }
 
     public void setTimestamp(Date timestamp) {
