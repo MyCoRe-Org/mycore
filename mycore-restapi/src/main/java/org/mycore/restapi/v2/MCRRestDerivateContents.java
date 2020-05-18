@@ -95,6 +95,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{" + PARAM_DER_PATH + ":(/[^/]+)*}")
 public class MCRRestDerivateContents {
+
     private static final int BUFFER_SIZE = 8192;
 
     @Context
@@ -120,7 +121,7 @@ public class MCRRestDerivateContents {
             BasicFileAttributes directoryAttrs = Files.readAttributes(mcrPath, BasicFileAttributes.class);
             if (!directoryAttrs.isDirectory()) {
                 throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                    .withErrorCode("MCRDERIVATE_CREATE_DIRECTORY_ON_FILE")
+                    .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_CREATE_DIRECTORY_ON_FILE)
                     .withMessage("Could not create directory " + mcrPath + ". A file allready exist!")
                     .toException();
             }
@@ -132,7 +133,7 @@ public class MCRRestDerivateContents {
                 doWithinTransaction(() -> Files.createDirectory(mcrPath));
             } catch (IOException e2) {
                 throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
-                    .withErrorCode("MCRDERIVATE_CREATE_DIRECTORY")
+                    .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_CREATE_DIRECTORY)
                     .withMessage("Could not create directory " + mcrPath + ".")
                     .withDetail(e.getMessage())
                     .withCause(e)
@@ -187,7 +188,7 @@ public class MCRRestDerivateContents {
             }
         } catch (IOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
-                .withErrorCode("MCRDERIVATE_UPDATE_FILE")
+                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_UPDATE_FILE)
                 .withMessage("Could not update file " + mcrPath + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
@@ -213,7 +214,7 @@ public class MCRRestDerivateContents {
                 LogManager.getLogger().warn("Error while deleting incomplete file.", e2);
             }
             throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
-                .withErrorCode("MCRDERIVATE_CREATE_DIRECTORY")
+                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_CREATE_DIRECTORY)
                 .withMessage("Could not create file " + mcrPath + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
@@ -257,7 +258,7 @@ public class MCRRestDerivateContents {
             fileAttributes = Files.readAttributes(mcrPath, MCRFileAttributes.class);
         } catch (IOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-                .withErrorCode("MCRDERIVATE_FILE_NOT_FOUND")
+                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_FILE_NOT_FOUND)
                 .withMessage("Could not find file or directory " + mcrPath + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
@@ -297,7 +298,7 @@ public class MCRRestDerivateContents {
             fileAttributes = Files.readAttributes(mcrPath, MCRFileAttributes.class);
         } catch (IOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-                .withErrorCode("MCRDERIVATE_FILE_NOT_FOUND")
+                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_FILE_NOT_FOUND)
                 .withMessage("Could not find file or directory " + mcrPath + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
@@ -318,7 +319,7 @@ public class MCRRestDerivateContents {
                     return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader);
                 } catch (IOException e) {
                     throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
-                        .withErrorCode("MCRDERIVATE_FILE_IO_ERROR")
+                        .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_FILE_IO_ERROR)
                         .withMessage("Could not send file " + mcrPath + ".")
                         .withDetail(e.getMessage())
                         .withCause(e)
@@ -345,13 +346,13 @@ public class MCRRestDerivateContents {
                 BasicFileAttributes parentAttrs = Files.readAttributes(parentDirectory, BasicFileAttributes.class);
                 if (!parentAttrs.isDirectory()) {
                     throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                        .withErrorCode("MCRDERIVATE_NOT_DIRECTORY")
+                        .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_NOT_DIRECTORY)
                         .withMessage(parentDirectory + " is not a directory.")
                         .toException();
                 }
             } catch (IOException e) {
                 throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-                    .withErrorCode("MCRDERIVATE_FILE_NOT_FOUND")
+                    .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_FILE_NOT_FOUND)
                     .withMessage("Could not find directory " + parentDirectory + ".")
                     .withDetail(e.getMessage())
                     .withCause(e)
@@ -363,7 +364,7 @@ public class MCRRestDerivateContents {
             String contentLength = request.getHeaderString(HttpHeaders.CONTENT_LENGTH);
             if (contentLength != null && Long.parseLong(contentLength) > maxSize) {
                 throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                    .withErrorCode("MCRDERIVATE_FILE_SIZE")
+                    .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_FILE_SIZE)
                     .withMessage("Maximum file size (" + maxSize + " bytes) exceeded.")
                     .withDetail(contentLength)
                     .toException();
@@ -390,21 +391,21 @@ public class MCRRestDerivateContents {
             }
         } catch (DirectoryNotEmptyException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                .withErrorCode("MCRDERIVATE_DIRECTORY_NOT_EMPTY")
+                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_DIRECTORY_NOT_EMPTY)
                 .withMessage("Directory " + mcrPath + " is not empty.")
                 .withDetail(e.getMessage())
                 .withCause(e)
                 .toException();
         } catch (IOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
-                .withErrorCode("MCRDERIVATE_FILE_DELETE")
+                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_FILE_DELETE)
                 .withMessage("Could not delete file or directory " + mcrPath + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
                 .toException();
         }
         throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-            .withErrorCode("MCRDERIVATE_FILE_NOT_FOUND")
+            .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_FILE_NOT_FOUND)
             .withMessage("Could not find file or directory " + mcrPath + ".")
             .toException();
     }
@@ -415,7 +416,7 @@ public class MCRRestDerivateContents {
             fileAttributes = Files.readAttributes(mcrPath, MCRFileAttributes.class);
             if (!fileAttributes.isRegularFile()) {
                 throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                    .withErrorCode("MCRDERIVATE_NOT_FILE")
+                    .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_NOT_FILE)
                     .withMessage(mcrPath + " is not a file.")
                     .toException();
             }
@@ -466,7 +467,7 @@ public class MCRRestDerivateContents {
             dir.setEntries(entries);
         } catch (IOException | UncheckedIOException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
-                .withErrorCode("MCRDERIVATE_FILE_IO_ERROR")
+                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_FILE_IO_ERROR)
                 .withMessage("Could not send directory " + mcrPath + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
@@ -632,7 +633,7 @@ public class MCRRestDerivateContents {
             super.beforeWrite(n);
             if (getByteCount() > maxSize) {
                 throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                    .withErrorCode("MCRDERIVATE_FILE_SIZE")
+                    .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_FILE_SIZE)
                     .withMessage("Maximum file size (" + maxSize + " bytes) exceeded.")
                     .toException();
             }

@@ -85,7 +85,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             }
         }
         throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-            .withErrorCode("API_NO_PERMISSION")
+            .withErrorCode(MCRRestErrorCodes.API_NO_PERMISSION)
             .withMessage("REST-API action is not allowed.")
             .withDetail("Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!")
             .toException();
@@ -110,12 +110,12 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         }
         if (checkable.get().equals(objectId)) {
             throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-                .withErrorCode("MCROBJECT_NO_PERMISSION")
+                .withErrorCode(MCRRestErrorCodes.MCROBJECT_NO_PERMISSION)
                 .withMessage("You do not have " + permission + " permission on MCRObject " + objectId + ".")
                 .toException();
         }
         throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-            .withErrorCode("MCRDERIVATE_NO_PERMISSION")
+            .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_NO_PERMISSION)
             .withMessage("You do not have " + permission + " permission on MCRDerivate " + derId + ".")
             .toException();
     }
@@ -129,7 +129,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .collect(Collectors.toList());
         if (!missedPermissions.isEmpty()) {
             throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-                .withErrorCode("API_NO_PERMISSION")
+                .withErrorCode(MCRRestErrorCodes.API_NO_PERMISSION)
                 .withMessage("REST-API action is not allowed.")
                 .withDetail("Check access right(s) '" + missedPermissions + "' on "
                     + MCRAccessControlSystem.POOL_PRIVILEGE_ID + "'!")

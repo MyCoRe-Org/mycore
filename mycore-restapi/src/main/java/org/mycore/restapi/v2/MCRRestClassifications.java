@@ -171,7 +171,7 @@ public class MCRRestClassifications {
         MCRCategory classification = categorySupplier.apply(categoryDAO);
         if (classification == null) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-                .withErrorCode("MCRCLASS_NOT_FOUND")
+                .withErrorCode(MCRRestErrorCodes.MCRCLASS_NOT_FOUND)
                 .withMessage("Could not find classification or category in " + classId + ".")
                 .toException();
         }
@@ -205,7 +205,7 @@ public class MCRRestClassifications {
     public Response createClassification(@PathParam(PARAM_CLASSID) String classId, MCRClass mcrClass) {
         if (!classId.equals(mcrClass.getID())) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                .withErrorCode("MCRCLASS_ID_MISMATCH")
+                .withErrorCode(MCRRestErrorCodes.MCRCLASS_ID_MISMATCH)
                 .withMessage("Classification " + classId + " cannot be overwritten by " + mcrClass.getID() + ".")
                 .toException();
         }
