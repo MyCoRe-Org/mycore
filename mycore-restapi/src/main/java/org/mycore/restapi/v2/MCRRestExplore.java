@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -75,13 +76,8 @@ public class MCRRestExplore {
 
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
-    @MCRCacheControl(
-            maxAge = @MCRCacheControl.Age(
-                    time = 1,
-                    unit = TimeUnit.HOURS),
-            sMaxAge = @MCRCacheControl.Age(
-                    time = 1,
-                    unit = TimeUnit.HOURS))
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
+                     sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     /*
      * @Operation( summary = "Explore objects in this repository", responses
      * = @ApiResponse( content = @Content(array = @ArraySchema(schema
@@ -186,7 +182,7 @@ public class MCRRestExplore {
             }
 
         } catch (SolrServerException | IOException e) {
-            // TODO Auto-generated catch block
+            throw new InternalServerErrorException(e);
         }
 
         return Response.ok(response)
