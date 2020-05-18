@@ -19,8 +19,8 @@
 package org.mycore.restapi;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -29,14 +29,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 
 import org.glassfish.jersey.server.filter.UriConnegFilter;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * This filter uses Jersey's default implementation of UriConnectFilter
- * to set the content headers by file extension.
- *  
- * It is preconfigured for the extensions (*.json, *.xml)
- * and ignores ressources behind REST-API path /contents/ since there is the possibility
- * that a valid file extension (*.xml) will be removed through this filter by mistake
+ * This filter uses Jersey's default implementation of UriConnectFilter to set
+ * the content headers by file extension.
+ * 
+ * It is preconfigured for the extensions (*.json, *.xml) and ignores ressources
+ * behind REST-API path /contents/ since there is the possibility that a valid
+ * file extension (*.xml) will be removed through this filter by mistake
  * 
  * @author Robert Stephan
  * 
@@ -46,15 +47,17 @@ import org.glassfish.jersey.server.filter.UriConnegFilter;
 @PreMatching
 public class MCRContentNegotiationViaExtensionFilter implements ContainerRequestFilter {
 
+    private static Pattern P_URI = Pattern.compile(MCRConfiguration2.getStringOrThrow(
+            "MCR.RestAPI.V2.ContentNegotiationViaExtensionFilter.RegEx"));
     private static final Map<String, MediaType> MEDIA_TYPE_MAPPINGS = Map.ofEntries(
-            new AbstractMap.SimpleEntry<String, MediaType>("json", MediaType.APPLICATION_JSON_TYPE),
-            new AbstractMap.SimpleEntry<String, MediaType>("xml", MediaType.APPLICATION_XML_TYPE));
+            Map.entry("json", MediaType.APPLICATION_JSON_TYPE),
+            Map.entry("xml", MediaType.APPLICATION_XML_TYPE));
 
     private UriConnegFilter uriConnegFilter = new UriConnegFilter(MEDIA_TYPE_MAPPINGS, Map.of());
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        if(!requestContext.getUriInfo().getPath().contains("/contents/")) {
+        if (P_URI.matcher(requestContext.getUriInfo().getPath()).matches()) {
             uriConnegFilter.filter(requestContext);
         }
     }

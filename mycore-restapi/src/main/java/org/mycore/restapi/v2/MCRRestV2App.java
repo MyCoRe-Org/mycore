@@ -51,9 +51,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
 
     public MCRRestV2App() {
         super();
-        if (MCRConfiguration2.getBoolean("MCR.RestAPI.V2.EnableContentNegotiationViaFileExtension").orElse(false)) {
-            register(MCRContentNegotiationViaExtensionFilter.class);
-        }
+        register(MCRContentNegotiationViaExtensionFilter.class);
         register(MCRNormalizeMCRObjectIDsFilter.class);
         register(MCRRestAPIAuthentication.class); // keep 'unchanged' in v2
         register(MCRRemoveMsgBodyFilter.class);
