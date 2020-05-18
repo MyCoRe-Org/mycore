@@ -100,50 +100,10 @@ public class MCRRestExplore {
         MCRConfiguration2.getString("MCR.RestAPI.V2.Explore.FilterQuery").ifPresent(fq -> {
             q.addFilterQuery(fq);
         });
-        if (start != null) {
-            int s = 0;
-            try {
-                s = Integer.parseInt(start);
-                if (s < 0) {
-                    s = 0;
-                }
-            } catch (NumberFormatException nfe) {
-                // ignore
-            }
-            q.setStart(s);
-        }
-        if (rows != null) {
-            int r = 0;
-            try {
-                r = Integer.parseInt(rows);
-                if (r < 0) {
-                    r = 0;
-                }
-                if (r > MAX_ROWS) {
-                    r = MAX_ROWS;
-                }
-            } catch (NumberFormatException nfe) {
-                // ignore
-            }
-            q.setRows(r);
-        }
-        if (sort != null) {
-            Arrays.stream(sort.split(",")).map(String::trim).forEach(s -> {
-                if (s.toLowerCase().endsWith(" asc")) {
-                    q.addSort(s.substring(0, s.length() - 4).trim(), SolrQuery.ORDER.asc);
-
-                } else if (s.toLowerCase().endsWith(" desc")) {
-                    q.addSort(s.substring(0, s.length() - 5).trim(), SolrQuery.ORDER.desc);
-                } else {
-                    q.addSort(s.trim(), SolrQuery.ORDER.asc);
-                }
-            });
-        }
-        if (filter != null) {
-            for (String f : filter) {
-                q.addFilterQuery(f.trim());
-            }
-        }
+        processStartParam(start, q);
+        processRowsParam(rows, q);
+        processSortParam(sort, q);
+        processFiltersParam(filter, q);
 
         try {
             QueryResponse solrResponse = solrClient.query(q);
@@ -159,26 +119,7 @@ public class MCRRestExplore {
             }
             for (int i = 0; i < solrResults.size(); ++i) {
                 SolrDocument solrDoc = solrResults.get(i);
-                Date dModified = (Date) solrDoc.getFieldValue("modified");
-                MCRRestExploreResponseObject responseObj = new MCRRestExploreResponseObject(
-                        String.valueOf(solrDoc.getFieldValue("id")),
-                        dModified.toInstant());
-
-                MCRConfiguration2.getString("MCR.RestAPI.V2.Explore.PayloadFields").ifPresent(fields -> {
-                    for (String field : fields.split(",")) {
-                        Object value = solrDoc.getFieldValue(field);
-                        if (value != null) {
-                            if (value instanceof List) {
-                                for (Object o : (List<?>) value) {
-                                    responseObj.addPayload(field, o);
-                                }
-                            } else {
-                                responseObj.addPayload(field, value);
-                            }
-                        }
-                    }
-                });
-                response.getData().add(responseObj);
+                response.getData().add(createResponseObject(solrDoc));
             }
 
         } catch (SolrServerException | IOException e) {
@@ -188,5 +129,84 @@ public class MCRRestExplore {
         return Response.ok(response)
                 .lastModified(lastModified)
                 .build();
+    }
+
+    private MCRRestExploreResponseObject createResponseObject(SolrDocument solrDoc) {
+        Date dModified = (Date) solrDoc.getFieldValue("modified");
+        MCRRestExploreResponseObject responseObj = new MCRRestExploreResponseObject(
+                String.valueOf(solrDoc.getFieldValue("id")),
+                dModified.toInstant());
+
+        MCRConfiguration2.getString("MCR.RestAPI.V2.Explore.PayloadFields").ifPresent(fields -> {
+            for (String field : fields.split(",")) {
+                Object value = solrDoc.getFieldValue(field);
+                if (value != null) {
+                    if (value instanceof List) {
+                        for (Object o : (List<?>) value) {
+                            responseObj.addPayload(field, o);
+                        }
+                    } else {
+                        responseObj.addPayload(field, value);
+                    }
+                }
+            }
+        });
+        return responseObj;
+    }
+
+    private void processFiltersParam(List<String> filter, SolrQuery q) {
+        if (filter != null) {
+            for (String f : filter) {
+                q.addFilterQuery(f.trim());
+            }
+        }
+    }
+
+    private void processSortParam(String sort, SolrQuery q) {
+        if (sort != null) {
+            Arrays.stream(sort.split(",")).map(String::trim).forEach(s -> {
+                if (s.toLowerCase().endsWith(" asc")) {
+                    q.addSort(s.substring(0, s.length() - 4).trim(), SolrQuery.ORDER.asc);
+
+                } else if (s.toLowerCase().endsWith(" desc")) {
+                    q.addSort(s.substring(0, s.length() - 5).trim(), SolrQuery.ORDER.desc);
+                } else {
+                    q.addSort(s.trim(), SolrQuery.ORDER.asc);
+                }
+            });
+        }
+    }
+
+    private void processRowsParam(String rows, SolrQuery q) {
+        if (rows != null) {
+            int r = 0;
+            try {
+                r = Integer.parseInt(rows);
+                if (r < 0) {
+                    r = 0;
+                }
+                if (r > MAX_ROWS) {
+                    r = MAX_ROWS;
+                }
+            } catch (NumberFormatException nfe) {
+                // ignore
+            }
+            q.setRows(r);
+        }
+    }
+
+    private void processStartParam(String start, SolrQuery q) {
+        if (start != null) {
+            int s = 0;
+            try {
+                s = Integer.parseInt(start);
+                if (s < 0) {
+                    s = 0;
+                }
+            } catch (NumberFormatException nfe) {
+                // ignore
+            }
+            q.setStart(s);
+        }
     }
 }
