@@ -47,23 +47,29 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -77,6 +83,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.media.services.MCRThumbnailGenerator;
+import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
@@ -89,10 +96,12 @@ import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -104,6 +113,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     @Tag(name = MCRRestUtils.TAG_MYCORE_FILE, description = "Operations on files in derivates"),
 })
 public class MCRRestObjects {
+    
+    private static Logger LOGGER = LogManager.getLogger();
 
     @Context
     Request request;
@@ -111,6 +122,9 @@ public class MCRRestObjects {
     @Context
     ServletContext context;
 
+    @Context
+    UriInfo uriInfo;
+    
     public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
         .unmodifiableList(MCRConfiguration2
             .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
@@ -138,6 +152,7 @@ public class MCRRestObjects {
         List<? extends MCRObjectIDDate> idDates = MCRXMLMetadataManager.instance().listObjectDates().stream()
             .filter(oid -> !oid.getId().contains("_derivate_"))
             .collect(Collectors.toList());
+        @SuppressWarnings({ "unchecked", "rawtypes" })
         Class<?> t = idDates.stream()
             .findAny()
             .map(MCRObjectIDDate::getClass)
@@ -147,7 +162,34 @@ public class MCRRestObjects {
             .lastModified(lastModified)
             .build();
     }
-
+    @POST
+    @Operation(
+        summary = "Create a new empty MyCoRe Object",
+        responses = @ApiResponse(responseCode = "201",
+            headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new MyCoRe Object")),
+        tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @RequestBody(required = true,
+            content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA))
+    @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
+    public Response createObject(@FormDataParam("project") String projectID, @FormDataParam("type") String typeID) {
+        LOGGER.debug("Create new MyCoRe Object with base {}_{}", projectID, typeID);
+        try {
+            MCRObjectID objID = MCRObjectID.getNextFreeId(projectID + "_" + typeID);
+            MCRObject mcrObj = new MCRObject();
+            mcrObj.setId(objID);
+            mcrObj.setLabel(objID.toString());
+            mcrObj.setSchema("datamodel-" + objID.getTypeId());
+            MCRMetadataManager.create(mcrObj);
+            return Response.created(uriInfo.getAbsolutePathBuilder().path(objID.toString()).build()).build();
+        } catch (MCRPersistenceException e) {
+            throw new InternalServerErrorException(e);
+        } catch (MCRAccessException e) {
+            throw new ForbiddenException(e);
+        }
+    }
+    
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
