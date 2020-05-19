@@ -457,23 +457,19 @@ public class MCRRestDerivates {
             return displayEnabled;
         }
 
-        @JsonProperty("display-enabled")
+        @JsonProperty("display")
+        @FormParam("display")
+        @DefaultValue("true")
         public void setDisplayEnabled(boolean displayEnabled) {
             this.displayEnabled = displayEnabled;
-        }
-
-        @FormParam("display-enabled")
-        @DefaultValue("true")
-        public void setDisplayEnabled(String displayEnabled) {
-            this.displayEnabled = Boolean.parseBoolean(displayEnabled);
         }
 
         String getMainDoc() {
             return mainDoc;
         }
 
-        @FormParam("main-doc")
-        @JsonProperty("main-doc")
+        @FormParam("maindoc")
+        @JsonProperty("maindoc")
         public void setMainDoc(String mainDoc) {
             this.mainDoc = mainDoc;
         }
@@ -483,14 +479,10 @@ public class MCRRestDerivates {
         }
 
         @JsonProperty
-        public void setOrder(int order) {
-            this.order = order;
-        }
-
         @FormParam("order")
         @DefaultValue("1")
-        public void setOrder(String order) {
-            this.order = Integer.parseInt(order);
+        public void setOrder(int order) {
+            this.order = order;
         }
 
         public List<MCRCategoryID> getClassifications() {
