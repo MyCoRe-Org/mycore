@@ -38,6 +38,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
@@ -56,7 +57,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
@@ -296,9 +296,9 @@ public class MCRRestDerivates {
         responses = @ApiResponse(responseCode = "201",
             headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new derivate")),
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @RequestBody(required = true,
-        content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA,
+        content = @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED,
             schema = @Schema(implementation = DerivateMetadata.class)))
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
@@ -399,7 +399,7 @@ public class MCRRestDerivates {
             return label;
         }
 
-        @FormDataParam("label")
+        @FormParam("label")
         public void setLabel(String label) {
             this.label = label;
         }
@@ -413,7 +413,7 @@ public class MCRRestDerivates {
             this.displayEnabled = displayEnabled;
         }
 
-        @FormDataParam("display-enabled")
+        @FormParam("display-enabled")
         @DefaultValue("true")
         public void setDisplayEnabled(String displayEnabled) {
             this.displayEnabled = Boolean.parseBoolean(displayEnabled);
@@ -423,7 +423,7 @@ public class MCRRestDerivates {
             return mainDoc;
         }
 
-        @FormDataParam("main-doc")
+        @FormParam("main-doc")
         @JsonProperty("main-doc")
         public void setMainDoc(String mainDoc) {
             this.mainDoc = mainDoc;
@@ -438,7 +438,7 @@ public class MCRRestDerivates {
             this.order = order;
         }
 
-        @FormDataParam("order")
+        @FormParam("order")
         @DefaultValue("1")
         public void setOrder(String order) {
             this.order = Integer.parseInt(order);
@@ -449,7 +449,7 @@ public class MCRRestDerivates {
         }
 
         @JsonProperty
-        @FormDataParam("classifications")
+        @FormParam("classifications")
         public void setClassifications(List<MCRCategoryID> classifications) {
             this.classifications = classifications;
         }
