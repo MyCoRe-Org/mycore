@@ -69,6 +69,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -321,6 +322,11 @@ public class MCRRestDerivates {
                 .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
                 .collect(Collectors.toList()));
 
+        derivate.getDerivate().getTitles()
+            .addAll(der.getTitles().stream()
+                .map(DerivateTitle::toMetaLangText)
+                .collect(Collectors.toList()));
+
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
             .orElse("datamodel-derivate.xml")
             .replaceAll(".xml", ".xsd");
@@ -384,7 +390,48 @@ public class MCRRestDerivates {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    static class DerivateMetadata {
+    public static class DerivateTitle {
+        private String lang;
+
+        private String text;
+
+        //Jersey can use this method without further configuration
+        public static DerivateTitle fromString(String value) {
+            final DerivateTitle derivateTitle = new DerivateTitle();
+            if (value.length() >= 4 && value.charAt(0) == '(') {
+                int pos = value.indexOf(')');
+                if (pos > 1) {
+                    derivateTitle.setLang(value.substring(1, pos));
+                    derivateTitle.setText(value.substring(pos + 1));
+                    return derivateTitle;
+                }
+            }
+            derivateTitle.setText(value);
+            return derivateTitle;
+        }
+
+        public String getLang() {
+            return lang;
+        }
+
+        public void setLang(String lang) {
+            this.lang = lang;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        public MCRMetaLangText toMetaLangText() {
+            return new MCRMetaLangText("title", getLang(), null, 0, null, getText());
+        }
+    }
+
+    public static class DerivateMetadata {
         private String label;
 
         private boolean displayEnabled = true;
@@ -394,6 +441,8 @@ public class MCRRestDerivates {
         private int order = 1;
 
         private List<MCRCategoryID> classifications = List.of();
+
+        private List<DerivateTitle> titles = List.of();
 
         String getLabel() {
             return label;
@@ -449,9 +498,18 @@ public class MCRRestDerivates {
         }
 
         @JsonProperty
-        @FormParam("classifications")
+        @FormParam("classification")
         public void setClassifications(List<MCRCategoryID> classifications) {
             this.classifications = classifications;
+        }
+
+        public List<DerivateTitle> getTitles() {
+            return titles;
+        }
+
+        @FormParam("title")
+        public void setTitles(List<DerivateTitle> titles) {
+            this.titles = titles;
         }
 
     }

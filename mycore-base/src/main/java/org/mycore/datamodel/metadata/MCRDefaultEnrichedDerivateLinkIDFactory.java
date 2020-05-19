@@ -1,6 +1,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -31,7 +32,8 @@ public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLink
 
         der.getDerivate().getTitles().forEach(title -> {
             final Element titleElement = new Element("title");
-            titleElement.setAttribute("lang", title.getLang(), MCRConstants.XML_NAMESPACE);
+            Optional.ofNullable(title.getLang())
+                .ifPresent(lang -> titleElement.setAttribute("lang", lang, MCRConstants.XML_NAMESPACE));
             titleElement.setText(title.getText());
             contentList.add(titleElement);
         });
