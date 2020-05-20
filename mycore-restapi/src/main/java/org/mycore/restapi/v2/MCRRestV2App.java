@@ -28,6 +28,7 @@ import javax.ws.rs.InternalServerErrorException;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.restapi.MCRContentNegotiationViaExtensionFilter;
 import org.mycore.restapi.MCRDropSessionFilter;
 import org.mycore.restapi.MCRJerseyRestApp;
 import org.mycore.restapi.MCRNoFormDataPutFilter;
@@ -50,8 +51,9 @@ public class MCRRestV2App extends MCRJerseyRestApp {
 
     public MCRRestV2App() {
         super();
+        register(MCRContentNegotiationViaExtensionFilter.class);
         register(MCRNormalizeMCRObjectIDsFilter.class);
-        register(MCRRestAPIAuthentication.class); //keep 'unchanged' in v2
+        register(MCRRestAPIAuthentication.class); // keep 'unchanged' in v2
         register(MCRRemoveMsgBodyFilter.class);
         register(MCRNoFormDataPutFilter.class);
         register(MCRDropSessionFilter.class);
