@@ -19,8 +19,11 @@
 package org.mycore.restapi.converter;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -29,11 +32,17 @@ public class MCRInstantXMLAdapter extends XmlAdapter<String, Instant> {
 
     @Override
     public Instant unmarshal(String v) throws Exception {
-        return LocalDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(v)).toInstant(ZoneOffset.UTC);
+        return Instant
+            .from(DateTimeFormatter.ISO_INSTANT.parseBest(v,
+                ZonedDateTime::from,
+                LocalDateTime::from,
+                LocalDate::from,
+                YearMonth::from,
+                Year::from));
     }
 
     @Override
     public String marshal(Instant v) throws Exception {
-        return DateTimeFormatter.ISO_DATE_TIME.format(v.atOffset(ZoneOffset.UTC));
+        return v.toString();
     }
 }
