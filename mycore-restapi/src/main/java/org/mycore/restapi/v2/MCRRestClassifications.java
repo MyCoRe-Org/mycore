@@ -18,7 +18,7 @@
 
 package org.mycore.restapi.v2;
 
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_CLASSID;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_CLASSID;
 
 import java.util.Date;
 import java.util.List;
@@ -28,10 +28,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -172,7 +170,10 @@ public class MCRRestClassifications {
         }
         MCRCategory classification = categorySupplier.apply(categoryDAO);
         if (classification == null) {
-            throw new NotFoundException();
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRCLASS_NOT_FOUND)
+                .withMessage("Could not find classification or category in " + classId + ".")
+                .toException();
         }
         return Response.ok()
             .entity(classification.isClassification() ? MCRClass.getClassification(classification)
@@ -203,10 +204,10 @@ public class MCRRestClassifications {
     @MCRRequireTransaction
     public Response createClassification(@PathParam(PARAM_CLASSID) String classId, MCRClass mcrClass) {
         if (!classId.equals(mcrClass.getID())) {
-            throw new BadRequestException("classId mismatch: " + classId + "!=" + mcrClass.getID(),
-                Response.status(Response.Status.BAD_REQUEST)
-                    .entity("MCRCategoryID mismatch")
-                    .build());
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRCLASS_ID_MISMATCH)
+                .withMessage("Classification " + classId + " cannot be overwritten by " + mcrClass.getID() + ".")
+                .toException();
         }
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         Response.Status status;

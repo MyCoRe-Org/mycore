@@ -39,11 +39,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.mycore.common.MCRCoreVersion;
+import org.mycore.restapi.converter.MCRInstantXMLAdapter;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -179,10 +180,10 @@ public class MCRInfo {
             version = props.get("git.build.version");
         }
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = MCRRestUtils.JSON_DATE_FORMAT)
         @XmlAttribute
-        public Date getTime() {
-            return Date.from(time);
+        @XmlJavaTypeAdapter(MCRInstantXMLAdapter.class)
+        public Instant getTime() {
+            return time;
         }
 
         @XmlElement
@@ -235,10 +236,10 @@ public class MCRInfo {
         }
 
         @JsonProperty(required = true)
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = MCRRestUtils.JSON_DATE_FORMAT)
         @XmlAttribute
-        public Date getTime() {
-            return Date.from(time);
+        @XmlJavaTypeAdapter(MCRInstantXMLAdapter.class)
+        public Instant getTime() {
+            return time;
         }
 
         @XmlElement

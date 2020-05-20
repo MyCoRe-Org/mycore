@@ -25,10 +25,6 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFilter;
-import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
-import org.mycore.restapi.v1.errors.MCRForbiddenExceptionMapper;
-import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
-import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
 
 public abstract class MCRJerseyRestApp extends ResourceConfig {
 
@@ -46,10 +42,6 @@ public abstract class MCRJerseyRestApp extends ResourceConfig {
         register(MCRTransactionFilter.class);
         register(MultiPartFeature.class);
         register(MCRRestFeature.class);
-        register(MCRJerseyExceptionMapper.class);
-        register(MCRRestAPIExceptionMapper.class);
-        register(MCRForbiddenExceptionMapper.class);
-        register(MCRNotAuthorizedExceptionMapper.class);
         register(MCRCORSResponseFilter.class);
         register(MCRRequestScopeACLFilter.class);
         register(MCRIgnoreClientAbortInterceptor.class);

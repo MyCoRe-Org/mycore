@@ -18,8 +18,8 @@
 
 package org.mycore.restapi.v2;
 
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DERID;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,16 +32,12 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -112,6 +108,26 @@ public class MCRRestDerivates {
     @PathParam(PARAM_MCRID)
     MCRObjectID mcrId;
 
+    private static void validateDerivateRelation(MCRObjectID mcrId, MCRObjectID derId) {
+        MCRObjectID objectId = MCRMetadataManager.getObjectId(derId, 1, TimeUnit.DAYS);
+        if (objectId != null && !mcrId.equals(objectId)) {
+            objectId = MCRMetadataManager.getObjectId(derId, 0, TimeUnit.SECONDS);
+        }
+        if (mcrId.equals(objectId)) {
+            return;
+        }
+        if (objectId == null) {
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND)
+                .withMessage("MCRDerivate " + derId + " not found")
+                .toException();
+        }
+        throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND_IN_OBJECT)
+            .withMessage("MCRDerivate " + derId + " not found in object " + mcrId + ".")
+            .toException();
+    }
+
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
@@ -130,7 +146,10 @@ public class MCRRestDerivates {
         throws IOException {
         long modified = MCRXMLMetadataManager.instance().getLastModified(mcrId);
         if (modified < 0) {
-            throw new NotFoundException("MCRObject " + mcrId + " not found");
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
+                .withMessage("MCRObject " + mcrId + " not found")
+                .toException();
         }
         Date lastModified = new Date(modified);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
@@ -149,18 +168,6 @@ public class MCRRestDerivates {
                 })
             .lastModified(lastModified)
             .build();
-    }
-
-    private static void validateDerivateRelation(MCRObjectID mcrId, MCRObjectID derId) {
-        MCRObjectID objectId = MCRMetadataManager.getObjectId(derId, 1, TimeUnit.DAYS);
-        if (objectId != null && !mcrId.equals(objectId)) {
-            objectId = MCRMetadataManager.getObjectId(derId, 0, TimeUnit.SECONDS);
-        }
-        if (mcrId.equals(objectId)) {
-            return;
-        }
-        throw new NotFoundException(objectId == null ? "MCRDerivate " + derId + " not found"
-            : "MCRDerivate " + derId + " not found in MCRObject " + mcrId);
     }
 
     @GET
@@ -232,14 +239,18 @@ public class MCRRestDerivates {
             derivate = new MCRDerivate(inputContent.asXML());
             derivate.validate();
         } catch (JDOMException | SAXException | MCRException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST)
-                .entity("Invalid body content")
-                .build(), e);
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_INVALID)
+                .withMessage("MCRDerivate " + derid + " is not valid")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
         if (!derid.equals(derivate.getId())) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST)
-                .entity("MCRObjectID mismatch")
-                .build());
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_ID_MISMATCH)
+                .withMessage("MCRDerivate " + derid + " cannot be overwritten by " + derivate.getId() + ".")
+                .toException();
         }
         try {
             if (create) {
@@ -254,7 +265,12 @@ public class MCRRestDerivates {
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
         } catch (MCRAccessException e) {
-            throw new ForbiddenException(e);
+            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+                .withMessage("You may not modify or create MCRDerivate " + derid + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
     }
 
@@ -269,13 +285,21 @@ public class MCRRestDerivates {
     public Response deleteDerivate(
         @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
         if (!MCRMetadataManager.exists(derid)) {
-            throw new NotFoundException();
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND)
+                .withMessage("MCRDerivate " + derid + " not found")
+                .toException();
         }
         try {
             MCRMetadataManager.deleteMCRDerivate(derid);
             return Response.noContent().build();
         } catch (MCRAccessException e) {
-            throw new ForbiddenException();
+            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+                .withMessage("You may not delete MCRDerivate " + derid + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
     }
 
@@ -347,14 +371,24 @@ public class MCRRestDerivates {
         try {
             MCRMetadataManager.create(derivate);
         } catch (MCRAccessException e) {
-            throw new ForbiddenException(e);
+            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+                .withMessage("You may not create MCRDerivate " + derId + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
         MCRPath rootDir = MCRPath.getPath(derId.toString(), "/");
         if (Files.notExists(rootDir)) {
             try {
                 rootDir.getFileSystem().createRoot(derId.toString());
             } catch (FileSystemException e) {
-                throw new InternalServerErrorException(e);
+                throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_CREATE_DIRECTORY)
+                    .withMessage("Could not create root directory for MCRDerivate " + derId + ".")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
             }
         }
         return Response.created(uriInfo.getAbsolutePathBuilder().path(derId.toString()).build()).build();

@@ -18,9 +18,9 @@
 
 package org.mycore.restapi.v2;
 
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DERID;
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_DER_PATH;
-import static org.mycore.restapi.MCRRestAuthorizationFilter.PARAM_MCRID;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DERID;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DER_PATH;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,14 +42,11 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -98,6 +95,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{" + PARAM_DER_PATH + ":(/[^/]+)*}")
 public class MCRRestDerivateContents {
+
     private static final int BUFFER_SIZE = 8192;
 
     @Context
@@ -122,7 +120,10 @@ public class MCRRestDerivateContents {
         try {
             BasicFileAttributes directoryAttrs = Files.readAttributes(mcrPath, BasicFileAttributes.class);
             if (!directoryAttrs.isDirectory()) {
-                throw new BadRequestException("Overwrite directory with file: " + mcrPath);
+                throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_CREATE_DIRECTORY_ON_FILE)
+                    .withMessage("Could not create directory " + mcrPath + ". A file allready exist!")
+                    .toException();
             }
             return Response.noContent().build();
         } catch (IOException e) {
@@ -131,7 +132,12 @@ public class MCRRestDerivateContents {
             try {
                 doWithinTransaction(() -> Files.createDirectory(mcrPath));
             } catch (IOException e2) {
-                throw new InternalServerErrorException(e2);
+                throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_CREATE_DIRECTORY)
+                    .withMessage("Could not create directory " + mcrPath + ".")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
             }
             return Response.status(Response.Status.CREATED).build();
         }
@@ -181,7 +187,12 @@ public class MCRRestDerivateContents {
                 doWithinTransaction(out::close);
             }
         } catch (IOException e) {
-            throw new InternalServerErrorException(e);
+            throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_UPDATE_FILE)
+                .withMessage("Could not update file " + mcrPath + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
         return Response.noContent().build();
     }
@@ -196,13 +207,18 @@ public class MCRRestDerivateContents {
                 //close writes data to database
                 doWithinTransaction(out::close);
             }
-        } catch (IOException e2) {
+        } catch (IOException e) {
             try {
                 doWithinTransaction(() -> Files.deleteIfExists(mcrPath));
-            } catch (IOException e3) {
-                LogManager.getLogger().warn("Error while deleting incomplete file.", e3);
+            } catch (IOException e2) {
+                LogManager.getLogger().warn("Error while deleting incomplete file.", e2);
             }
-            throw new InternalServerErrorException(e2);
+            throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_CREATE_DIRECTORY)
+                .withMessage("Could not create file " + mcrPath + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
         return Response.status(Response.Status.CREATED).build();
     }
@@ -241,7 +257,12 @@ public class MCRRestDerivateContents {
         try {
             fileAttributes = Files.readAttributes(mcrPath, MCRFileAttributes.class);
         } catch (IOException e) {
-            throw new NotFoundException(e);
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_NOT_FOUND)
+                .withMessage("Could not find file or directory " + mcrPath + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
         if (fileAttributes.isDirectory()) {
             return Response.ok()
@@ -276,7 +297,12 @@ public class MCRRestDerivateContents {
         try {
             fileAttributes = Files.readAttributes(mcrPath, MCRFileAttributes.class);
         } catch (IOException e) {
-            throw new NotFoundException(e);
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_NOT_FOUND)
+                .withMessage("Could not find file or directory " + mcrPath + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
         Date lastModified = new Date(fileAttributes.lastModifiedTime().toMillis());
         if (fileAttributes.isDirectory()) {
@@ -292,7 +318,12 @@ public class MCRRestDerivateContents {
                 try {
                     return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader);
                 } catch (IOException e) {
-                    throw new InternalServerErrorException(e);
+                    throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                        .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_IO_ERROR)
+                        .withMessage("Could not send file " + mcrPath + ".")
+                        .withDetail(e.getMessage())
+                        .withCause(e)
+                        .toException();
                 }
             });
     }
@@ -314,17 +345,29 @@ public class MCRRestDerivateContents {
             try {
                 BasicFileAttributes parentAttrs = Files.readAttributes(parentDirectory, BasicFileAttributes.class);
                 if (!parentAttrs.isDirectory()) {
-                    throw new BadRequestException();
+                    throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                        .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_DIRECTORY)
+                        .withMessage(parentDirectory + " is not a directory.")
+                        .toException();
                 }
             } catch (IOException e) {
-                throw new NotFoundException();
+                throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_NOT_FOUND)
+                    .withMessage("Could not find directory " + parentDirectory + ".")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
             }
         }
         if (isFile()) {
             long maxSize = getUploadMaxSize();
             String contentLength = request.getHeaderString(HttpHeaders.CONTENT_LENGTH);
             if (contentLength != null && Long.parseLong(contentLength) > maxSize) {
-                throw new BadRequestException("File is to big. " + mcrPath);
+                throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_SIZE)
+                    .withMessage("Maximum file size (" + maxSize + " bytes) exceeded.")
+                    .withDetail(contentLength)
+                    .toException();
             }
             return updateOrCreateFile(contents, mcrPath);
         } else {
@@ -347,11 +390,24 @@ public class MCRRestDerivateContents {
                 return Response.noContent().build();
             }
         } catch (DirectoryNotEmptyException e) {
-            throw new BadRequestException("Directory is not empty: " + mcrPath);
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_DIRECTORY_NOT_EMPTY)
+                .withMessage("Directory " + mcrPath + " is not empty.")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         } catch (IOException e) {
-            throw new InternalServerErrorException(e);
+            throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_DELETE)
+                .withMessage("Could not delete file or directory " + mcrPath + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
-        throw new NotFoundException();
+        throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_NOT_FOUND)
+            .withMessage("Could not find file or directory " + mcrPath + ".")
+            .toException();
     }
 
     private Response updateOrCreateFile(InputStream contents, MCRPath mcrPath) {
@@ -359,7 +415,10 @@ public class MCRRestDerivateContents {
         try {
             fileAttributes = Files.readAttributes(mcrPath, MCRFileAttributes.class);
             if (!fileAttributes.isRegularFile()) {
-                throw new BadRequestException("Overwrite directory with file: " + mcrPath);
+                throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FILE)
+                    .withMessage(mcrPath + " is not a file.")
+                    .toException();
             }
         } catch (IOException e) {
             //does not exist
@@ -407,7 +466,12 @@ public class MCRRestDerivateContents {
                 .collect(Collectors.toList());
             dir.setEntries(entries);
         } catch (IOException | UncheckedIOException e) {
-            throw new InternalServerErrorException(e);
+            throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_IO_ERROR)
+                .withMessage("Could not send directory " + mcrPath + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
         }
         return Response.ok(dir).lastModified(new Date(dirAttrs.lastModifiedTime().toMillis())).build();
     }
@@ -568,7 +632,10 @@ public class MCRRestDerivateContents {
         protected synchronized void beforeWrite(int n) {
             super.beforeWrite(n);
             if (getByteCount() > maxSize) {
-                throw new BadRequestException("Maximum upload file size exceeded: " + maxSize);
+                throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_SIZE)
+                    .withMessage("Maximum file size (" + maxSize + " bytes) exceeded.")
+                    .toException();
             }
         }
     }

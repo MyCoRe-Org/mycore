@@ -16,15 +16,15 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.restapi;
+package org.mycore.restapi.v2;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Priority;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Path;
 import javax.ws.rs.Priorities;
@@ -41,9 +41,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
-import org.mycore.restapi.v1.errors.MCRRestAPIError;
-import org.mycore.restapi.v1.errors.MCRRestAPIException;
-import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
 
 @Priority(Priorities.AUTHORIZATION)
 public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
@@ -64,11 +61,11 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
      * @param permission "read" or "write"
      * @param path - the REST API path, e.g. /v1/messages
      *
-     * @throws MCRRestAPIException if access is restricted
+     * @throws javax.ws.rs.ForbiddenException if access is restricted
      */
     private void checkRestAPIAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
         String path)
-        throws MCRRestAPIException {
+        throws ForbiddenException {
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         LogManager.getLogger().warn(path + ": Checking API access: " + permission);
         String thePath = path.startsWith("/") ? path : "/" + path;
@@ -87,14 +84,16 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 return;
             }
         }
-        throw new MCRRestAPIException(Response.Status.FORBIDDEN,
-            new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
-                "Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!"));
+        throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            .withErrorCode(MCRErrorCodeConstants.API_NO_PERMISSION)
+            .withMessage("REST-API action is not allowed.")
+            .withDetail("Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!")
+            .toException();
     }
 
     private void checkBaseAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
         String objectId, String derId, String path)
-        throws MCRRestAPIException {
+        throws ForbiddenException {
         LogManager.getLogger().debug("Permission: {}, Object: {}, Derivate: {}, Path: {}", permission, objectId, derId,
             path);
         Optional<String> checkable = Optional.ofNullable(derId)
@@ -109,12 +108,19 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         if (allowed) {
             return;
         }
-        throw new MCRRestAPIException(Response.Status.FORBIDDEN,
-            new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
-                "Check access right '" + permission + "' on '" + checkable.orElse(null) + "'!"));
+        if (checkable.get().equals(objectId)) {
+            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)
+                .withMessage("You do not have " + permission + " permission on MCRObject " + objectId + ".")
+                .toException();
+        }
+        throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+            .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+            .withMessage("You do not have " + permission + " permission on MCRDerivate " + derId + ".")
+            .toException();
     }
 
-    private void checkDetailLevel(ContainerRequestContext requestContext, String... detail) throws MCRRestAPIException {
+    private void checkDetailLevel(ContainerRequestContext requestContext, String... detail) throws ForbiddenException {
         MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
         List<String> missedPermissions = Stream.of(detail)
             .map(d -> "rest-detail-" + d)
@@ -122,14 +128,17 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .filter(d -> !aclProvider.checkPermission(d))
             .collect(Collectors.toList());
         if (!missedPermissions.isEmpty()) {
-            throw new MCRRestAPIException(Response.Status.FORBIDDEN,
-                new MCRRestAPIError(MCRRestAPIError.CODE_ACCESS_DENIED, "REST-API action is not allowed.",
-                    "Check permission(s) " + missedPermissions + "!"));
+            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.API_NO_PERMISSION)
+                .withMessage("REST-API action is not allowed.")
+                .withDetail("Check access right(s) '" + missedPermissions + "' on "
+                    + MCRAccessControlSystem.POOL_PRIVILEGE_ID + "'!")
+                .toException();
         }
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         MCRRestAPIACLPermission permission;
         switch (requestContext.getMethod()) {
             case HttpMethod.OPTIONS:
@@ -147,27 +156,16 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)
             .ifPresent(path -> {
-                try {
-                    checkRestAPIAccess(requestContext, permission, path);
-                    MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
-                    checkBaseAccess(requestContext, permission, pathParameters.getFirst(PARAM_MCRID),
-                        pathParameters.getFirst(PARAM_DERID), pathParameters.getFirst(PARAM_DER_PATH));
-                } catch (MCRRestAPIException e) {
-                    LogManager.getLogger().warn("API Access denied!");
-                    requestContext.abortWith(new MCRRestAPIExceptionMapper().toResponse(e));
-                }
+                checkRestAPIAccess(requestContext, permission, path);
+                MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
+                checkBaseAccess(requestContext, permission, pathParameters.getFirst(PARAM_MCRID),
+                    pathParameters.getFirst(PARAM_DERID), pathParameters.getFirst(PARAM_DER_PATH));
             });
-        try {
-            checkDetailLevel(requestContext,
-                requestContext.getAcceptableMediaTypes()
-                    .stream()
-                    .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
-                    .toArray(String[]::new));
-        } catch (MCRRestAPIException e) {
-            LogManager.getLogger().warn("API Access denied!");
-            requestContext.abortWith(new MCRRestAPIExceptionMapper().toResponse(e));
-        }
-
+        checkDetailLevel(requestContext,
+            requestContext.getAcceptableMediaTypes()
+                .stream()
+                .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
+                .toArray(String[]::new));
     }
 
     /**

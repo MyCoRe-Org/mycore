@@ -57,6 +57,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         register(MCRRemoveMsgBodyFilter.class);
         register(MCRNoFormDataPutFilter.class);
         register(MCRDropSessionFilter.class);
+        register(MCRExceptionMapper.class);
         setupOAS();
     }
 
