@@ -193,10 +193,8 @@ public class MCRRestObjects {
                 if (eMCRObj.getAttribute("version") == null) {
                     eMCRObj.setAttribute("version", MCRCoreVersion.getVersion());
                 }
-                if (eMCRObj.getAttribute("noNamespaceSchemaLocation", XSI_NAMESPACE) == null) {
-                    eMCRObj.setAttribute("noNamespaceSchemaLocation", "datamodel-" + newID.getTypeId() + ".xsd",
-                        XSI_NAMESPACE);
-                }
+                eMCRObj.setAttribute("noNamespaceSchemaLocation", "datamodel-" + newID.getTypeId() + ".xsd",
+                    XSI_NAMESPACE);
             } else {
                 //TODO error handling
                 throw new BadRequestException("Please provide an object with ID");
@@ -206,9 +204,13 @@ public class MCRRestObjects {
             LOGGER.debug("Create new MyCoRe Object");
             MCRMetadataManager.create(mcrObj);
             return Response.created(uriInfo.getAbsolutePathBuilder().path(mcrObj.getId().toString()).build()).build();
-        } catch (MCRPersistenceException | SAXParseException | IOException e) {
+        } catch (MCRPersistenceException | SAXParseException |
+
+            IOException e) {
             throw new InternalServerErrorException(e);
-        } catch (MCRAccessException e) {
+        } catch (
+
+        MCRAccessException e) {
             throw new ForbiddenException(e);
         }
     }
