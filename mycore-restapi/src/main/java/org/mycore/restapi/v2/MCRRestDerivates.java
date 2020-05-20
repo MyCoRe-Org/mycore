@@ -118,12 +118,12 @@ public class MCRRestDerivates {
         }
         if (objectId == null) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_NOT_FOUND)
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND)
                 .withMessage("MCRDerivate " + derId + " not found")
                 .toException();
         }
         throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-            .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_NOT_FOUND_IN_OBJECT)
+            .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND_IN_OBJECT)
             .withMessage("MCRDerivate " + derId + " not found in object " + mcrId + ".")
             .toException();
     }
@@ -147,7 +147,7 @@ public class MCRRestDerivates {
         long modified = MCRXMLMetadataManager.instance().getLastModified(mcrId);
         if (modified < 0) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-                .withErrorCode(MCRRestErrorCodes.MCROBJECT_NOT_FOUND)
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
                 .withMessage("MCRObject " + mcrId + " not found")
                 .toException();
         }
@@ -240,7 +240,7 @@ public class MCRRestDerivates {
             derivate.validate();
         } catch (JDOMException | SAXException | MCRException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_INVALID)
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_INVALID)
                 .withMessage("MCRDerivate " + derid + " is not valid")
                 .withDetail(e.getMessage())
                 .withCause(e)
@@ -248,7 +248,7 @@ public class MCRRestDerivates {
         }
         if (!derid.equals(derivate.getId())) {
             throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_ID_MISMATCH)
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_ID_MISMATCH)
                 .withMessage("MCRDerivate " + derid + " cannot be overwritten by " + derivate.getId() + ".")
                 .toException();
         }
@@ -266,7 +266,7 @@ public class MCRRestDerivates {
             }
         } catch (MCRAccessException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_NO_PERMISSION)
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
                 .withMessage("You may not modify or create MCRDerivate " + derid + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
@@ -286,7 +286,7 @@ public class MCRRestDerivates {
         @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
         if (!MCRMetadataManager.exists(derid)) {
             throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_NOT_FOUND)
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_FOUND)
                 .withMessage("MCRDerivate " + derid + " not found")
                 .toException();
         }
@@ -295,7 +295,7 @@ public class MCRRestDerivates {
             return Response.noContent().build();
         } catch (MCRAccessException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_NO_PERMISSION)
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
                 .withMessage("You may not delete MCRDerivate " + derid + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
@@ -372,7 +372,7 @@ public class MCRRestDerivates {
             MCRMetadataManager.create(derivate);
         } catch (MCRAccessException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-                .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_NO_PERMISSION)
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
                 .withMessage("You may not create MCRDerivate " + derId + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
@@ -384,7 +384,7 @@ public class MCRRestDerivates {
                 rootDir.getFileSystem().createRoot(derId.toString());
             } catch (FileSystemException e) {
                 throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
-                    .withErrorCode(MCRRestErrorCodes.MCRDERIVATE_CREATE_DIRECTORY)
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_CREATE_DIRECTORY)
                     .withMessage("Could not create root directory for MCRDerivate " + derId + ".")
                     .withDetail(e.getMessage())
                     .withCause(e)

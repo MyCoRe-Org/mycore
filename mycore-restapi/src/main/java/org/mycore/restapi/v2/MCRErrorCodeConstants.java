@@ -18,7 +18,7 @@
 
 package org.mycore.restapi.v2;
 
-final class MCRRestErrorCodes {
+final class MCRErrorCodeConstants {
 
     public static final String API_NO_PERMISSION = "API_NO_PERMISSION";
 
@@ -72,6 +72,6 @@ final class MCRRestErrorCodes {
 
     public static final String MCRDERIVATE_NOT_FILE = "MCRDERIVATE_NOT_FILE";
 
-    private MCRRestErrorCodes() {
+    private MCRErrorCodeConstants() {
     }
 }
