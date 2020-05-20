@@ -18,6 +18,7 @@
 
 package org.mycore.restapi.v2;
 
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import java.awt.image.BufferedImage;
@@ -62,15 +63,20 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.common.content.MCRStringContent;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -87,6 +93,7 @@ import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
@@ -111,7 +118,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
     @Tag(name = MCRRestUtils.TAG_MYCORE_FILE, description = "Operations on files in derivates"),
 })
 public class MCRRestObjects {
-    
+
     private static Logger LOGGER = LogManager.getLogger();
 
     @Context
@@ -122,7 +129,7 @@ public class MCRRestObjects {
 
     @Context
     UriInfo uriInfo;
-    
+
     public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
         .unmodifiableList(MCRConfiguration2
             .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
@@ -160,34 +167,52 @@ public class MCRRestObjects {
             .lastModified(lastModified)
             .build();
     }
+
     @POST
     @Operation(
-        summary = "Create a new empty MyCoRe Object",
+        summary = "Create a new MyCoRe Object",
         responses = @ApiResponse(responseCode = "201",
             headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new MyCoRe Object")),
-        tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT)
+    @Consumes(MediaType.APPLICATION_XML)
     @RequestBody(required = true,
-            content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA))
+        content = @Content(mediaType = MediaType.APPLICATION_XML))
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
-    public Response createObject(@FormDataParam("project") String projectID, @FormDataParam("type") String typeID) {
-        LOGGER.debug("Create new MyCoRe Object with base {}_{}", projectID, typeID);
+    public Response createObject(String xml) {
         try {
-            MCRObjectID objID = MCRObjectID.getNextFreeId(projectID + "_" + typeID);
-            MCRObject mcrObj = new MCRObject();
-            mcrObj.setId(objID);
-            mcrObj.setLabel(objID.toString());
-            mcrObj.setSchema("datamodel-" + objID.getTypeId());
+            Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRStringContent(xml));
+            Element eMCRObj = doc.getRootElement();
+            if (eMCRObj.getAttributeValue("ID") != null) {
+                MCRObjectID id = MCRObjectID.getInstance(eMCRObj.getAttributeValue("ID"));
+                MCRObjectID newID = MCRObjectID.getNextFreeId(id.getBase());
+                eMCRObj.setAttribute("ID", newID.toString());
+                if (eMCRObj.getAttribute("label") == null) {
+                    eMCRObj.setAttribute("label", newID.toString());
+                }
+                if (eMCRObj.getAttribute("version") == null) {
+                    eMCRObj.setAttribute("version", MCRCoreVersion.getVersion());
+                }
+                if (eMCRObj.getAttribute("noNamespaceSchemaLocation", XSI_NAMESPACE) == null) {
+                    eMCRObj.setAttribute("noNamespaceSchemaLocation", "datamodel-" + newID.getTypeId() + ".xsd",
+                        XSI_NAMESPACE);
+                }
+            } else {
+                //TODO error handling
+                throw new BadRequestException("Please provide an object with ID");
+            }
+
+            MCRObject mcrObj = new MCRObject(new MCRJDOMContent(doc).asByteArray(), true);
+            LOGGER.debug("Create new MyCoRe Object");
             MCRMetadataManager.create(mcrObj);
-            return Response.created(uriInfo.getAbsolutePathBuilder().path(objID.toString()).build()).build();
-        } catch (MCRPersistenceException e) {
+            return Response.created(uriInfo.getAbsolutePathBuilder().path(mcrObj.getId().toString()).build()).build();
+        } catch (MCRPersistenceException | SAXParseException | IOException e) {
             throw new InternalServerErrorException(e);
         } catch (MCRAccessException e) {
             throw new ForbiddenException(e);
         }
     }
-    
+
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
