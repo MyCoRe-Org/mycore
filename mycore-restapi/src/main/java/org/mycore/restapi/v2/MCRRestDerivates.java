@@ -30,12 +30,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
@@ -54,17 +57,19 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -292,9 +297,9 @@ public class MCRRestDerivates {
         responses = @ApiResponse(responseCode = "201",
             headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new derivate")),
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @RequestBody(required = true,
-        content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA,
+        content = @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED,
             schema = @Schema(implementation = DerivateMetadata.class)))
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
@@ -310,6 +315,17 @@ public class MCRRestDerivates {
         derivate.setId(derId);
         derivate.setLabel(Optional.ofNullable(der.getLabel()).orElse("data object from " + mcrId));
         derivate.getDerivate().setDisplayEnabled(der.isDisplayEnabled());
+        derivate.setOrder(der.getOrder());
+
+        derivate.getDerivate().getClassifications()
+            .addAll(der.getClassifications().stream()
+                .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
+                .collect(Collectors.toList()));
+
+        derivate.getDerivate().getTitles()
+            .addAll(der.getTitles().stream()
+                .map(DerivateTitle::toMetaLangText)
+                .collect(Collectors.toList()));
 
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
             .orElse("datamodel-derivate.xml")
@@ -374,18 +390,65 @@ public class MCRRestDerivates {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    static class DerivateMetadata {
+    public static class DerivateTitle {
+        private String lang;
+
+        private String text;
+
+        //Jersey can use this method without further configuration
+        public static DerivateTitle fromString(String value) {
+            final DerivateTitle derivateTitle = new DerivateTitle();
+            if (value.length() >= 4 && value.charAt(0) == '(') {
+                int pos = value.indexOf(')');
+                if (pos > 1) {
+                    derivateTitle.setLang(value.substring(1, pos));
+                    derivateTitle.setText(value.substring(pos + 1));
+                    return derivateTitle;
+                }
+            }
+            derivateTitle.setText(value);
+            return derivateTitle;
+        }
+
+        public String getLang() {
+            return lang;
+        }
+
+        public void setLang(String lang) {
+            this.lang = lang;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        public MCRMetaLangText toMetaLangText() {
+            return new MCRMetaLangText("title", getLang(), null, 0, null, getText());
+        }
+    }
+
+    public static class DerivateMetadata {
         private String label;
 
         private boolean displayEnabled = true;
 
         private String mainDoc;
 
+        private int order = 1;
+
+        private List<MCRCategoryID> classifications = List.of();
+
+        private List<DerivateTitle> titles = List.of();
+
         String getLabel() {
             return label;
         }
 
-        @FormDataParam("label")
+        @FormParam("label")
         public void setLabel(String label) {
             this.label = label;
         }
@@ -394,8 +457,9 @@ public class MCRRestDerivates {
             return displayEnabled;
         }
 
-        @FormDataParam("display-enabled")
-        @JsonProperty("display-enabled")
+        @JsonProperty("display")
+        @FormParam("display")
+        @DefaultValue("true")
         public void setDisplayEnabled(boolean displayEnabled) {
             this.displayEnabled = displayEnabled;
         }
@@ -404,19 +468,41 @@ public class MCRRestDerivates {
             return mainDoc;
         }
 
-        @FormDataParam("main-doc")
-        @JsonProperty("main-doc")
+        @FormParam("maindoc")
+        @JsonProperty("maindoc")
         public void setMainDoc(String mainDoc) {
             this.mainDoc = mainDoc;
         }
 
-        @Override
-        public String toString() {
-            return "DerivateMetadata{" +
-                "label='" + label + '\'' +
-                ", displayEnabled=" + displayEnabled +
-                ", mainDoc='" + mainDoc + '\'' +
-                '}';
+        public int getOrder() {
+            return order;
         }
+
+        @JsonProperty
+        @FormParam("order")
+        @DefaultValue("1")
+        public void setOrder(int order) {
+            this.order = order;
+        }
+
+        public List<MCRCategoryID> getClassifications() {
+            return classifications;
+        }
+
+        @JsonProperty
+        @FormParam("classification")
+        public void setClassifications(List<MCRCategoryID> classifications) {
+            this.classifications = classifications;
+        }
+
+        public List<DerivateTitle> getTitles() {
+            return titles;
+        }
+
+        @FormParam("title")
+        public void setTitles(List<DerivateTitle> titles) {
+            this.titles = titles;
+        }
+
     }
 }
