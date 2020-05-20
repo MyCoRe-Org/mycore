@@ -23,14 +23,17 @@ import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 
@@ -55,16 +58,18 @@ import org.mycore.solr.MCRSolrClientFactory;
  */
 @Provider
 @PreMatching
+@Priority(Priorities.AUTHORIZATION - 10)
 public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static Set<String> SEARCHKEYS_FOR_OBJECTS = MCRConfiguration2
-            .getString("MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys").stream()
-            .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+        .getString("MCR.RestAPI.V2.AlternativeIdentifier.Objects.Keys").stream()
+        .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+
     private static Set<String> SEARCHKEYS_FOR_DERIVATES = MCRConfiguration2
-            .getString("MCR.RestAPI.V2.AlternativeIdentifier.Derivates.Keys").stream()
-            .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
+        .getString("MCR.RestAPI.V2.AlternativeIdentifier.Derivates.Keys").stream()
+        .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toSet());
 
     @Context
     ResourceInfo resourceInfo;
@@ -79,13 +84,23 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
         String[] pathParts = path.split("/");
         if (pathParts.length >= 2 && "objects".equals(pathParts[0])) {
             String mcrid = pathParts[1];
+
+            String mcridExtension = "";
+            if (mcrid.endsWith(".xml")) {
+                mcridExtension = ".xml";
+                mcrid = mcrid.substring(0, mcrid.length() - 4);
+            }
+            if (mcrid.endsWith(".json")) {
+                mcridExtension = ".json";
+                mcrid = mcrid.substring(0, mcrid.length() - 5);
+            }
             try {
                 if (!SEARCHKEYS_FOR_OBJECTS.isEmpty() && mcrid.contains(":")) {
-                    pathParts[1] = retrieveMCRObjIDfromSOLR(mcrid);
+                    pathParts[1] = retrieveMCRObjIDfromSOLR(mcrid) + mcridExtension;
                 } else {
                     MCRObjectID mcrObjID = MCRObjectID.getInstance(mcrid);
                     // set the properly formated mcrObjID back to URL
-                    pathParts[1] = mcrObjID.toString();
+                    pathParts[1] = mcrObjID.toString() + mcridExtension;
                 }
             } catch (MCRException ex) {
                 // ignore
@@ -94,13 +109,23 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
 
             if (pathParts.length >= 4 && pathParts[2].equals("derivates")) {
                 String derid = pathParts[3];
+
+                String deridExtension = "";
+                if (derid.endsWith(".xml")) {
+                    deridExtension = ".xml";
+                    derid = derid.substring(0, mcrid.length() - 4);
+                }
+                if (derid.endsWith(".json")) {
+                    deridExtension = ".json";
+                    derid = derid.substring(0, mcrid.length() - 5);
+                }
                 try {
                     if (!SEARCHKEYS_FOR_DERIVATES.isEmpty() && derid.contains(":")) {
-                        pathParts[3] = retrieveMCRDerIDfromSOLR(mcrid, derid);
+                        pathParts[3] = retrieveMCRDerIDfromSOLR(mcrid, derid) + deridExtension;
                     } else {
                         MCRObjectID mcrDerID = MCRObjectID.getInstance(derid);
                         // set the properly formated mcrObjID back to URL
-                        pathParts[3] = mcrDerID.toString();
+                        pathParts[3] = mcrDerID.toString() + deridExtension;
                     }
                 } catch (MCRException ex) {
                     // ignore
@@ -110,9 +135,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
             if (!newPath.equals(path)) {
                 String queryString = uriInfo.getRequestUri().getQuery();
                 URI uri = uriInfo.getBaseUri().resolve(queryString == null ? newPath : newPath + "?" + queryString);
-                response.sendRedirect(uri.toString());
-                // without server sent redirect:
-                //requestContext.setRequestUri(uri);
+                requestContext.abortWith(Response.temporaryRedirect(uri).build());
             }
         }
     }
@@ -145,10 +168,9 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
                 }
                 if (solrResults.getNumFound() > 1) {
                     throw new BadRequestException(
-                            "The query " + derid + " does not return a unique MyCoRe Derivate ID");
+                        "The query " + derid + " does not return a unique MyCoRe Derivate ID");
                 }
             }
-
         }
         return derid;
     }

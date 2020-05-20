@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -45,13 +47,15 @@ import org.mycore.common.config.MCRConfiguration2;
 
 @Provider
 @PreMatching
+@Priority(Priorities.HEADER_DECORATOR - 10)
 public class MCRContentNegotiationViaExtensionFilter implements ContainerRequestFilter {
 
     private static Pattern P_URI = Pattern.compile(MCRConfiguration2.getStringOrThrow(
-            "MCR.RestAPI.V2.ContentNegotiationViaExtensionFilter.RegEx"));
+        "MCR.RestAPI.V2.ContentNegotiationViaExtensionFilter.RegEx"));
+
     private static final Map<String, MediaType> MEDIA_TYPE_MAPPINGS = Map.ofEntries(
-            Map.entry("json", MediaType.APPLICATION_JSON_TYPE),
-            Map.entry("xml", MediaType.APPLICATION_XML_TYPE));
+        Map.entry("json", MediaType.APPLICATION_JSON_TYPE),
+        Map.entry("xml", MediaType.APPLICATION_XML_TYPE));
 
     private UriConnegFilter uriConnegFilter = new UriConnegFilter(MEDIA_TYPE_MAPPINGS, Map.of());
 
