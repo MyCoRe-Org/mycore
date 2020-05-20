@@ -1,6 +1,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jdom2.Content;
 import org.jdom2.Element;
@@ -31,7 +32,8 @@ public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
         elementsWithNameFromContentList(TITLE_ELEMENT_NAME).forEach(getContentList()::remove);
         titles.stream().map(title-> {
             final Element titleElement = new Element(TITLE_ELEMENT_NAME);
-            titleElement.setAttribute(LANG_ATTRIBUTE_NAME, title.getLang(), MCRConstants.XML_NAMESPACE);
+            Optional.ofNullable(title.getLang())
+                .ifPresent(lang -> titleElement.setAttribute(LANG_ATTRIBUTE_NAME, lang, MCRConstants.XML_NAMESPACE));
             titleElement.setText(title.getText());
             return titleElement;
         }).forEach(getContentList()::add);
