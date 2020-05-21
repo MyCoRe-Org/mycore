@@ -18,9 +18,6 @@
 
 package org.mycore.restapi.v2;
 
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
-
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,8 +38,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
@@ -109,6 +108,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 @Path("/objects")
 @OpenAPIDefinition(tags = {
@@ -204,13 +205,9 @@ public class MCRRestObjects {
             LOGGER.debug("Create new MyCoRe Object");
             MCRMetadataManager.create(mcrObj);
             return Response.created(uriInfo.getAbsolutePathBuilder().path(mcrObj.getId().toString()).build()).build();
-        } catch (MCRPersistenceException | SAXParseException |
-
-            IOException e) {
+        } catch (MCRPersistenceException | SAXParseException | IOException e) {
             throw new InternalServerErrorException(e);
-        } catch (
-
-        MCRAccessException e) {
+        } catch (MCRAccessException e) {
             throw new ForbiddenException(e);
         }
     }
