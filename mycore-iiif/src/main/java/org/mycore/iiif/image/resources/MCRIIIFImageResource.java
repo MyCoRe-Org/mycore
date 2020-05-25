@@ -76,8 +76,8 @@ public class MCRIIIFImageResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/info.json")
-    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
-        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getInfo(@PathParam(IMPL_PARAM) String implString, @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
             MCRIIIFImageImpl impl = getImpl(implString);
@@ -105,8 +105,8 @@ public class MCRIIIFImageResource {
 
     @GET
     @Path("{" + IDENTIFIER_PARAM + "}")
-    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
-        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getInfoRedirect(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
@@ -120,8 +120,8 @@ public class MCRIIIFImageResource {
 
     @GET
     @Path("{" + IDENTIFIER_PARAM + "}/{region}/{size}/{rotation}/{quality}.{format}")
-    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
-        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getImage(@PathParam(IMPL_PARAM) String implStr, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam("region") String region,
         @PathParam("size") String size,
