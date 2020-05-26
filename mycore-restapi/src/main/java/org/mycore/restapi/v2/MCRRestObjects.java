@@ -18,8 +18,6 @@
 
 package org.mycore.restapi.v2;
 
-import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
-
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,31 +38,44 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
+import org.mycore.common.content.MCRStringContent;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -75,11 +86,13 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.media.services.MCRThumbnailGenerator;
+import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
 import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
@@ -87,12 +100,16 @@ import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 @Path("/objects")
 @OpenAPIDefinition(tags = {
@@ -103,11 +120,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 })
 public class MCRRestObjects {
 
+    private static Logger LOGGER = LogManager.getLogger();
+
     @Context
     Request request;
 
     @Context
     ServletContext context;
+
+    @Context
+    UriInfo uriInfo;
 
     public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
         .unmodifiableList(MCRConfiguration2
@@ -136,6 +158,7 @@ public class MCRRestObjects {
         List<? extends MCRObjectIDDate> idDates = MCRXMLMetadataManager.instance().listObjectDates().stream()
             .filter(oid -> !oid.getId().contains("_derivate_"))
             .collect(Collectors.toList());
+        @SuppressWarnings({ "unchecked", "rawtypes" })
         Class<?> t = idDates.stream()
             .findAny()
             .map(MCRObjectIDDate::getClass)
@@ -144,6 +167,49 @@ public class MCRRestObjects {
         return Response.ok(new GenericEntity<List<? extends MCRObjectIDDate>>(idDates, type))
             .lastModified(lastModified)
             .build();
+    }
+
+    @POST
+    @Operation(
+        summary = "Create a new MyCoRe Object",
+        responses = @ApiResponse(responseCode = "201",
+            headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new MyCoRe Object")),
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT)
+    @Consumes(MediaType.APPLICATION_XML)
+    @RequestBody(required = true,
+        content = @Content(mediaType = MediaType.APPLICATION_XML))
+    @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
+    public Response createObject(String xml) {
+        try {
+            Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(new MCRStringContent(xml));
+            Element eMCRObj = doc.getRootElement();
+            if (eMCRObj.getAttributeValue("ID") != null) {
+                MCRObjectID id = MCRObjectID.getInstance(eMCRObj.getAttributeValue("ID"));
+                MCRObjectID newID = MCRObjectID.getNextFreeId(id.getBase());
+                eMCRObj.setAttribute("ID", newID.toString());
+                if (eMCRObj.getAttribute("label") == null) {
+                    eMCRObj.setAttribute("label", newID.toString());
+                }
+                if (eMCRObj.getAttribute("version") == null) {
+                    eMCRObj.setAttribute("version", MCRCoreVersion.getVersion());
+                }
+                eMCRObj.setAttribute("noNamespaceSchemaLocation", "datamodel-" + newID.getTypeId() + ".xsd",
+                    XSI_NAMESPACE);
+            } else {
+                //TODO error handling
+                throw new BadRequestException("Please provide an object with ID");
+            }
+
+            MCRObject mcrObj = new MCRObject(new MCRJDOMContent(doc).asByteArray(), true);
+            LOGGER.debug("Create new MyCoRe Object");
+            MCRMetadataManager.create(mcrObj);
+            return Response.created(uriInfo.getAbsolutePathBuilder().path(mcrObj.getId().toString()).build()).build();
+        } catch (MCRPersistenceException | SAXParseException | IOException e) {
+            throw new InternalServerErrorException(e);
+        } catch (MCRAccessException e) {
+            throw new ForbiddenException(e);
+        }
     }
 
     @GET
