@@ -20,9 +20,6 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement(name = "mycoreobject")
 public class MCRObjectIDFileSystemDate extends MCRObjectIDDateImpl {
 
     private MCRObjectIDFileSystemDate() {

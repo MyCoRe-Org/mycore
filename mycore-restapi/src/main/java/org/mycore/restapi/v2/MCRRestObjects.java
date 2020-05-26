@@ -18,13 +18,15 @@
 
 package org.mycore.restapi.v2;
 
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
+
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
@@ -91,6 +93,7 @@ import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
+import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -108,8 +111,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 @Path("/objects")
 @OpenAPIDefinition(tags = {
@@ -155,16 +156,12 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        List<? extends MCRObjectIDDate> idDates = MCRXMLMetadataManager.instance().listObjectDates().stream()
+        List<MCRRestObjectIDDate> idDates = MCRXMLMetadataManager.instance().listObjectDates().stream()
             .filter(oid -> !oid.getId().contains("_derivate_"))
+            .map(x -> new MCRRestObjectIDDate(x))
             .collect(Collectors.toList());
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        Class<?> t = idDates.stream()
-            .findAny()
-            .map(MCRObjectIDDate::getClass)
-            .orElse((Class) MCRObjectIDDate.class);
-        Type type = TypeUtils.parameterize(idDates.getClass(), t);
-        return Response.ok(new GenericEntity<List<? extends MCRObjectIDDate>>(idDates, type))
+        return Response.ok(new GenericEntity<List<MCRRestObjectIDDate>>(idDates) {
+        })
             .lastModified(lastModified)
             .build();
     }
