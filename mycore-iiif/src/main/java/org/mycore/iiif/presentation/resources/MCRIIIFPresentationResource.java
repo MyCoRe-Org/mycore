@@ -18,8 +18,6 @@
 
 package org.mycore.iiif.presentation.resources;
 
-import static org.mycore.iiif.presentation.MCRIIIFPresentationUtil.correctIDs;
-
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -32,6 +30,7 @@ import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
+import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.iiif.common.MCRIIIFMediaTypeHelper;
 import org.mycore.iiif.presentation.MCRIIIFPresentationManifestQuickAccess;
 import org.mycore.iiif.presentation.impl.MCRIIIFPresentationImpl;
@@ -40,7 +39,9 @@ import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@Path("/iiif/presentation/{impl}")
+import static org.mycore.iiif.presentation.MCRIIIFPresentationUtil.correctIDs;
+
+@Path("/presentation/{impl}")
 public class MCRIIIFPresentationResource {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -57,6 +58,8 @@ public class MCRIIIFPresentationResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("collection/{" + NAME_PARAM + "}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getCollection(@PathParam(IMPL_PARAM) String impl, @PathParam(NAME_PARAM) String name) {
         return null;
     }
@@ -64,6 +67,8 @@ public class MCRIIIFPresentationResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/manifest")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getManifest(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier)
         throws CloneNotSupportedException {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
@@ -107,6 +112,8 @@ public class MCRIIIFPresentationResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/sequence/{" + NAME_PARAM + "}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getSequence(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
@@ -117,6 +124,8 @@ public class MCRIIIFPresentationResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/canvas/{" + NAME_PARAM + "}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response getCanvas(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
@@ -127,6 +136,8 @@ public class MCRIIIFPresentationResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/annotation/{" + NAME_PARAM + "}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getAnnotation(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
@@ -137,6 +148,8 @@ public class MCRIIIFPresentationResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/list/{" + NAME_PARAM + "}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getAnnotationList(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier, @PathParam(NAME_PARAM) String name) {
         return getAnnotation(impl, identifier, name);
@@ -145,6 +158,8 @@ public class MCRIIIFPresentationResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/range/{" + NAME_PARAM + "}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getRange(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
@@ -157,6 +172,8 @@ public class MCRIIIFPresentationResource {
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/layer/{" + NAME_PARAM + "}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response getLayer(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name) {
         return null;
@@ -164,6 +181,8 @@ public class MCRIIIFPresentationResource {
 
     @GET
     @Path("{" + IDENTIFIER_PARAM + "}/res/{" + NAME_PARAM + "}[.]{format}")
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response getContent(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name, @PathParam("format") String format) {
         return null;
