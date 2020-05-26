@@ -33,7 +33,7 @@ public class MCRIIIFRegionParser {
 
     private final int h;
 
-    private String sourceRegion;
+    private final String sourceRegion;
 
     private boolean completeValid = true;
 
@@ -51,6 +51,10 @@ public class MCRIIIFRegionParser {
             return;
         }
 
+        if (isSquare()) {
+            return;
+        }
+
         if (parseNumbers().size() != 4) {
             completeValid = false;
             throw new IllegalArgumentException("sourceRegion must have 4 numbers!");
@@ -58,17 +62,28 @@ public class MCRIIIFRegionParser {
     }
 
     public MCRIIIFImageSourceRegion parseImageRegion() throws NumberFormatException {
-        return isPercent() ? parsePercentImageRegion()
-            : isFull() ? new MCRIIIFImageSourceRegion(0, 0, w - 1, h - 1) : parseAbsoluteImageRegion();
+        if (isPercent()) {
+            return parsePercentImageRegion();
+        } else if (isFull()) {
+            return new MCRIIIFImageSourceRegion(0, 0, w - 1, h - 1);
+        } else if (isSquare()) {
+            final int shorterDimension = Math.min(w, h);
+            return new MCRIIIFImageSourceRegion(
+                (int) Math.floor(w / 2.0 - shorterDimension / 2.0),
+                (int) Math.floor(h / 2.0 - shorterDimension / 2.0),
+                shorterDimension, shorterDimension);
+        }
+
+        return parseAbsoluteImageRegion();
     }
 
     private MCRIIIFImageSourceRegion parsePercentImageRegion() {
         List<Double> doubles = parseNumbers();
 
-        double x = Math.floor(doubles.get(0) * (w / 100));
-        double y = Math.floor(doubles.get(1) * (h / 100));
-        double x2 = Math.ceil(x + (doubles.get(2) * (w / 100)));
-        double y2 = Math.ceil(y + (doubles.get(3) * (w / 100)));
+        double x = Math.floor(doubles.get(0) * (w / 100.0));
+        double y = Math.floor(doubles.get(1) * (h / 100.0));
+        double x2 = Math.ceil(x + (doubles.get(2) * (w / 100.0)));
+        double y2 = Math.ceil(y + (doubles.get(3) * (w / 100.0)));
 
         return parseImageRegion((int) x, (int) y, (int) x2, (int) y2);
     }
@@ -110,6 +125,10 @@ public class MCRIIIFRegionParser {
 
     private boolean isFull() {
         return "full".equals(sourceRegion);
+    }
+
+    private boolean isSquare() {
+        return "square".equals(sourceRegion);
     }
 
     private List<Double> parseNumbers() {

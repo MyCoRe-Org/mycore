@@ -35,7 +35,7 @@ public class MCRIIIFScaleParser {
     }
 
     private boolean isFull() {
-        return "full".equals(targetScale);
+        return "full".equals(targetScale) || "max".equals(targetScale);
     }
 
     private boolean isPercent() {
