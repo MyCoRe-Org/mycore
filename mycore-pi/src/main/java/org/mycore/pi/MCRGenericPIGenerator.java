@@ -21,6 +21,14 @@ import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Attribute;
+import org.jdom2.Element;
+import org.jdom2.Text;
+import org.jdom2.filter.Filters;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
+import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -33,10 +41,11 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * Set a generic pattern.
  *
- * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$ObjectType-$objectProject-$ObjectNumber-$Count-
+ * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$1-$2-$ObjectType-$objectProject-$ObjectNumber-$Count-
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$ObjectType-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectType-$Count
+ * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$0-$1-$Count
  *
  * Set a optional DateFormat, if not set the ddMMyyyy is just used as value. (SimpleDateFormat)
  *
@@ -57,6 +66,10 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * MCR.PI.Generator.myGenerator.Type=dnbURN
  *
+ *
+ * Set the Xpaths
+ *
+ * MCR.PI.Generator.myGenerator.XPath=/mycoreobject/metadata/def.shelf/shelf/, /mycoreobject/metadata/def.path2/path2/
  *
  * @author Sebastian Hofmann
  */
@@ -86,9 +99,13 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
     private static final String PROPERTY_KEY_COUNT_PRECISION = "CountPrecision";
 
+    private static final String PROPERTY_KEY_XPATH = "XPath";
+
     private static final String PROPERTY_KEY_TYPE = "Type";
 
     private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
+
+    private static final Pattern XPATH_PATTERN = Pattern.compile("\\$([0-9]+)", Pattern.DOTALL);
 
     private String generalPattern;
 
@@ -101,6 +118,8 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
     private int countPrecision;
 
     private String type;
+
+    private String[] xpath;
 
     public MCRGenericPIGenerator(String generatorID) {
         super(generatorID);
@@ -121,13 +140,18 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
             .orElse(-1));
 
         setType(properties.get(PROPERTY_KEY_TYPE));
+
+        if(properties.containsKey(PROPERTY_KEY_XPATH)){
+            setXpath(properties.get(PROPERTY_KEY_XPATH).split(","));
+        }
+
         validateProperties();
     }
 
     // for testing purposes
     MCRGenericPIGenerator(String id, String generalPattern, SimpleDateFormat dateFormat,
         String objectTypeMapping, String objectProjectMapping,
-        int countPrecision, String type) {
+        int countPrecision, String type, String... xpaths) {
         super(id);
         setObjectProjectMapping(objectProjectMapping);
         setGeneralPattern(generalPattern);
@@ -136,6 +160,11 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         setCountPrecision(countPrecision);
         setType(type);
         validateProperties();
+        setXpath(xpaths);
+    }
+
+    private void setXpath(String... xpaths) {
+        this.xpath = xpaths;
     }
 
     private void validateProperties() {
@@ -172,6 +201,34 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
         if (resultingPI.contains(PLACE_HOLDER_OBJECT_NUMBER)) {
             resultingPI = resultingPI.replace(PLACE_HOLDER_OBJECT_NUMBER, mcrBase.getId().getNumberAsString());
+        }
+
+        if (XPATH_PATTERN.asPredicate().test(resultingPI)) {
+            resultingPI = XPATH_PATTERN.matcher(resultingPI).replaceAll((mr) -> {
+                final String xpathNumberString = mr.group(1);
+                final int xpathNumber = Integer.parseInt(xpathNumberString, 10);
+                if (this.xpath.length <= xpathNumber || xpathNumber < 0) {
+                    throw new MCRException(
+                        "The index of " + xpathNumber + " is out of bounds of xpath array (" + xpath.length + ")");
+                }
+
+                final String xpathString = this.xpath[xpathNumber];
+                XPathFactory factory = XPathFactory.instance();
+                XPathExpression<Object> expr = factory.compile(xpathString, Filters.fpassthrough(), null,
+                    MCRConstants.getStandardNamespaces());
+                final Object content = expr.evaluateFirst(mcrBase.createXML());
+
+                if(content instanceof Text){
+                    return ((Text) content).getTextNormalize();
+                } else if (content instanceof Attribute){
+                    return ((Attribute) content).getValue();
+                } else if (content instanceof Element){
+                    return ((Element) content).getTextNormalize();
+                } else {
+                    return content.toString();
+                }
+            });
+            System.out.println(resultingPI);
         }
 
         final MCRPIParser<MCRPersistentIdentifier> parser = MCRPIManager.getInstance()
