@@ -18,8 +18,6 @@
 
 package org.mycore.iiif.image;
 
-import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_API_2_LEVEL2;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -28,14 +26,26 @@ import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.model.MCRIIIFImageProfile;
 
+import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_API_2_LEVEL2;
+
 public class MCRIIIFImageUtil {
     public static void completeProfile(MCRIIIFImageImpl impl, MCRIIIFImageProfile profile) {
         profile.setId(getProfileLink(impl));
     }
 
+    public static String encodeURIComponent(String component) {
+        return URLEncoder.encode(component, StandardCharsets.UTF_8)
+            .replaceAll("\\+", "%20")
+            .replaceAll("\\%21", "!")
+            .replaceAll("\\%27", "'")
+            .replaceAll("\\%28", "(")
+            .replaceAll("\\%29", ")")
+            .replaceAll("\\%7E", "~");
+    }
+
     public static String buildCanonicalURL(MCRIIIFImageImpl impl, String identifier)
         throws UnsupportedEncodingException {
-        return "<" + getIIIFURL(impl) + URLEncoder.encode(identifier, StandardCharsets.UTF_8)
+        return "<" + getIIIFURL(impl) + encodeURIComponent(identifier)
             + "/full/full/0/color.jpg>;rel=\"canonical\"";
     }
 
