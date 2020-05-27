@@ -21,6 +21,7 @@ package org.mycore.iiif.image.resources;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.buildCanonicalURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.buildProfileURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.completeProfile;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.encodeURIComponent;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getIIIFURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
 
@@ -28,8 +29,6 @@ import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.GET;
@@ -104,8 +103,7 @@ public class MCRIIIFImageResource {
     public Response getInfoRedirect(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
-            String uriString = getIIIFURL(getImpl(impl)) + URLEncoder.encode(identifier, StandardCharsets.UTF_8)
-                + "/info.json";
+            String uriString = getIIIFURL(getImpl(impl)) + encodeURIComponent(identifier) + "/info.json";
             return Response.temporaryRedirect(new URI(uriString)).build();
         } catch (URISyntaxException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
