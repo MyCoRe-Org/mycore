@@ -1,9 +1,6 @@
 package org.mycore.datamodel.metadata;
 
-import java.util.ArrayList;
 import java.util.stream.Collectors;
-
-import org.jdom2.Content;
 
 public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLinkIDFactory {
 
@@ -15,7 +12,6 @@ public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLink
 
         derivateLinkID.setReference(der.getId().toString(), null, label);
         derivateLinkID.setSubTag("derobject");
-        final ArrayList<Content> contentList = new ArrayList<>();
 
         final int order = der.getOrder();
         derivateLinkID.setOrder(order);
@@ -29,7 +25,6 @@ public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLink
             der.getDerivate().getClassifications().stream()
                 .map(metaClass -> metaClass.category)
                 .collect(Collectors.toList()));
-        derivateLinkID.setContentList(contentList);
 
         return derivateLinkID;
     }
