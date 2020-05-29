@@ -115,7 +115,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
             contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
             this.addUpdateJob(contextParameters);
         } else if (!hasRegistrationStarted(obj.getId(), additional)) {
-            Predicate<MCRBase> registrationCondition = getRegistrationCondition(obj.getId().getTypeId());
+            Predicate<MCRBase> registrationCondition = getRegistrationCondition();
             if (registrationCondition.test(obj)) {
                 this.updateStartRegistrationDate(obj.getId(), "", new Date());
                 startRegisterJob(obj, doi);
@@ -126,7 +126,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
     @Override
     public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, MCRDigitalObjectIdentifier identifier) {
         Date registrationStarted = null;
-        if (getRegistrationCondition(obj.getId().getTypeId()).test(obj)) {
+        if (getRegistrationCondition().test(obj)) {
             registrationStarted = new Date();
             startRegisterJob(obj, identifier);
         }

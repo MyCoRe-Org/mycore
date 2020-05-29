@@ -29,15 +29,17 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
+import static org.mycore.pi.MCRPIJobService.CREATION_PREDICATE;
+
 public class MCRPIServiceManager {
 
     public static final String REGISTRATION_SERVICE_CONFIG_PREFIX = "MCR.PI.Service.";
 
+    private final Map<String, MCRPIService> serviceCache = new ConcurrentHashMap<>();
+
     public static MCRPIServiceManager getInstance() {
         return InstanceHolder.INSTANCE;
     }
-
-    private Map<String, MCRPIService> serviceCache = new ConcurrentHashMap<>();
 
     public List<String> getServiceIDList() {
         return MCRConfiguration2.getPropertiesMap()
@@ -54,6 +56,18 @@ public class MCRPIServiceManager {
         return getServiceIDList()
             .stream()
             .map(this::getRegistrationService)
+            .collect(Collectors.toList());
+    }
+
+    public List<MCRPIJobService> getAutoCreationList() {
+        return getServiceList()
+            .stream()
+            .filter(service -> service instanceof MCRPIJobService)
+            .map(MCRPIJobService.class::cast)
+            .filter(service -> MCRConfiguration2
+                .getString(REGISTRATION_SERVICE_CONFIG_PREFIX + service.getServiceID() + "." +
+                    CREATION_PREDICATE)
+                .isPresent())
             .collect(Collectors.toList());
     }
 
