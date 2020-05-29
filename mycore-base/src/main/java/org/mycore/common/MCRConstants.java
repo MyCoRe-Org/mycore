@@ -78,6 +78,11 @@ public final class MCRConstants {
 
     public static final Namespace DV_NAMESPACE = Namespace.getNamespace("dv", DV_URL);
 
+    /** The URL of the LIDO */
+    private static final String LIDO_URL = "http://www.lido-schema.org";
+
+    public static final Namespace LIDO_NAMESPACE = Namespace.getNamespace("lido", LIDO_URL);
+
     /** The URL of the MODS */
     private static final String MODS_URL = "http://www.loc.gov/mods/v3";
 
