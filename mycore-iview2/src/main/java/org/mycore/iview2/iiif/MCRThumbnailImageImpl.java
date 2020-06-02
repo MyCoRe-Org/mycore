@@ -16,56 +16,66 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.iview2.backend;
+package org.mycore.iview2.iiif;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.jdom2.Element;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
+import org.mycore.iview2.backend.MCRTileInfo;
 
-public class MCRDefaultThumbnailTileInfoProvider implements MCRThumbnailTileInfoProvider {
+public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
-    private static final List<String> DERIVATE_TYPES_THUMBNAILS = MCRConfiguration2
-        .getOrThrow("MCR.IIIFImage.Iview.Thumbnail.Derivate.Types", MCRConfiguration2::splitValue)
-        .collect(Collectors.toList());
+    protected static final String DERIVATE_TYPES = "Derivate.Types";
+
+    private static Set<String> derivateTypes;
+
+    public MCRThumbnailImageImpl(String implName) {
+        super(implName);
+        derivateTypes = new HashSet<String>();
+        derivateTypes.addAll(Arrays.asList(getProperties().get(DERIVATE_TYPES).split(",")));
+    }
 
     @Override
-    public Optional<MCRTileInfo> getThumbnailFileInfo(String id) {
+    protected MCRTileInfo createTileInfo(String id) throws MCRIIIFImageNotFoundException {
         if (!MCRObjectID.isValid(id)) {
-            return Optional.empty();
+            throw new MCRIIIFImageNotFoundException(id);
         }
 
         MCRObjectID mcrID = MCRObjectID.getInstance(id);
-        MCRDerivate mcrDer = null;
         if (mcrID.getTypeId().equals("derivate")) {
-            mcrDer = MCRMetadataManager.retrieveMCRDerivate(mcrID);
-            return Optional.of(new MCRTileInfo(mcrDer.getId().toString(),
-                mcrDer.getDerivate().getInternals().getMainDoc(), null));
+            MCRDerivate mcrDer = MCRMetadataManager.retrieveMCRDerivate(mcrID);
+            return new MCRTileInfo(mcrID.toString(), mcrDer.getDerivate().getInternals().getMainDoc(), null);
         } else {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrID);
             for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                final Element derLinkXML = derLink.createXML();
                 final boolean typeMatch = derLink.getClassifications().stream()
                     .map(MCRCategoryID::toString)
-                    .anyMatch(DERIVATE_TYPES_THUMBNAILS::contains);
-
+                    .anyMatch(derivateTypes::contains);
                 if (typeMatch) {
-                    final String maindoc = derLinkXML.getChildTextTrim("maindoc");
+                    final String maindoc = derLink.getMainDoc();
                     if (maindoc != null) {
-                        return Optional.of(new MCRTileInfo(derLink.getXLinkHref(), maindoc, null));
+                        return new MCRTileInfo(derLink.getXLinkHref(), maindoc, null);
                     }
                 }
             }
-
-            return Optional.empty();
         }
+
+        throw new MCRIIIFImageNotFoundException(id);
+    }
+
+    @Override
+    protected boolean checkPermission(String identifier, MCRTileInfo tileInfo) {
+        return MCRAccessManager
+            .checkPermission(identifier, MCRAccessManager.PERMISSION_PREVIEW) || MCRAccessManager
+            .checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ) ;
     }
 }

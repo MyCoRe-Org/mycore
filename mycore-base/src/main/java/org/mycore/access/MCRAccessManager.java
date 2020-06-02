@@ -54,6 +54,8 @@ public class MCRAccessManager {
 
     public static final String PERMISSION_DELETE = "deletedb";
 
+    public static final String PERMISSION_PREVIEW = "preview";
+
     private static final ExecutorService EXECUTOR_SERVICE;
 
     static {

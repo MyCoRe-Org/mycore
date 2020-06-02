@@ -47,7 +47,11 @@ public abstract class MCRIIIFImageImpl {
         this.implName = implName;
     }
 
-    public static synchronized MCRIIIFImageImpl getInstance(String implName) {
+    public static synchronized MCRIIIFImageImpl getInstance(String implNameParameter) {
+        String implName = (implNameParameter == null || implNameParameter.isBlank()) ?
+            MCRConfiguration2.getStringOrThrow("MCR.IIIFImage.Default") :
+            implNameParameter;
+
         if (IMPLHOLDER.containsKey(implName)) {
             return IMPLHOLDER.get(implName);
         }
@@ -77,7 +81,7 @@ public abstract class MCRIIIFImageImpl {
         return MCRConfiguration2.getSubPropertiesMap(getConfigPrefix());
     }
 
-    private String getConfigPrefix() {
+    protected String getConfigPrefix() {
         return MCR_IIIF_IMAGE_CONFIG_PREFIX + implName + ".";
     }
 
