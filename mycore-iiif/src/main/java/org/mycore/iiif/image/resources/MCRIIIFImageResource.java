@@ -63,15 +63,15 @@ import static org.mycore.iiif.image.MCRIIIFImageUtil.completeProfile;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getIIIFURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
 
-@Path("/image/{impl}")
+@Path("/image{noop: /?}{impl: ([a-zA-Z0-9]+)?}")
 public class MCRIIIFImageResource {
     public static final String IIIF_IMAGE_API_2_LEVEL2 = "http://iiif.io/api/image/2/level2.json";
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String IMPL_PARAM = "impl";
 
     public static final String IDENTIFIER_PARAM = "identifier";
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
