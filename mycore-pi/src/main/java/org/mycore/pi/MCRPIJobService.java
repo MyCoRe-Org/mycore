@@ -380,7 +380,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         super.checkConfiguration();
         if (getProperties().containsKey("RegistrationConditionProvider")) {
             throw new MCRConfigurationException("The MCRPIService " + getServiceID() +
-                " uses old property key RegistrationConditionProvider");
+                " uses old property key RegistrationConditionProvider, use " + REGISTRATION_PREDICATE + " instead.");
         }
     }
 
