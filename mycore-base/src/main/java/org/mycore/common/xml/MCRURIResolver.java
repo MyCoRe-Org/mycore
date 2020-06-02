@@ -113,6 +113,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.services.http.MCRHttpUtils;
+import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -123,7 +124,7 @@ import org.xml.sax.XMLReader;
  * usages, xsl:include usages and MyCoRe Editor include declarations. DTDs and Schema files are read from the CLASSPATH
  * of the application when XML is parsed. XML document() calls and xsl:include calls within XSL stylesheets can be read
  * from URIs of type resource, webapp, file, session, query or mcrobject. MyCoRe editor include declarations can read
- * XML files from resource, webapp, file, session, http or https, query, or mcrobject URIs.
+ * XML files from resource, webapp, file, session, i18n, http or https, query, or mcrobject URIs.
  *
  * @author Frank L\u00FCtzenkirchen
  * @author Thomas Scheffler (yagee)
@@ -242,6 +243,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("chooseTemplate", new MCRChooseTemplateResolver());
         supportedSchemes.put("redirect", new MCRRedirectResolver());
         supportedSchemes.put("data", new MCRDataURLResolver());
+        supportedSchemes.put("i18n", new MCRI18NResolver());
         MCRRESTResolver restResolver = new MCRRESTResolver();
         supportedSchemes.put("http", restResolver);
         supportedSchemes.put("https", restResolver);
@@ -1593,4 +1595,35 @@ public final class MCRURIResolver implements URIResolver {
         }
 
     }
+    
+    private static class MCRI18NResolver implements URIResolver {
+        /**
+         * Resolves the I18N String value for the given property.<br><br>
+         * 
+         * Syntax: <code>i18n:{i18n-property}</code>
+         * 
+         * @param href
+         *            URI in the syntax above
+         * @param base
+         *            not used
+         * 
+         * @return the root element of the XML document
+         * @see javax.xml.transform.URIResolver
+         */
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
+            LOGGER.debug("start resolving " + href);
+            StringTokenizer pst = new StringTokenizer(href, ":", true);
+            if (pst.countTokens() != 3) {
+                throw new IllegalArgumentException("Invalid format of uri for retrieval of i18n: " + href);
+            }
+            pst.nextToken(); // "i18n"
+            pst.nextToken(); // :
+            String property = pst.nextToken();
+            Element root = new Element("i18n");
+            root.setText(MCRTranslation.translate(property, MCRTranslation.getCurrentLocale()));
+            return new JDOMSource(root);
+        }
+    }
+    
 }
