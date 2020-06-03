@@ -236,6 +236,35 @@ public class MCRRestObjects {
             .lastModified(lastModified)
             .build();
     }
+    
+    @GET
+    @Produces({ MediaType.APPLICATION_XML})
+    @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
+        sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
+    @Path("/{" + PARAM_MCRID + "}/metadata")
+    @Operation(
+        summary = "Returns metadata section MCRObject with the given " + PARAM_MCRID + ".",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT)
+    public Response getObjectMetadata(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
+        throws IOException {
+        long modified = MCRXMLMetadataManager.instance().getLastModified(id);
+        if (modified < 0) {
+            throw new NotFoundException("MCRObject " + id + " not found");
+        }
+        Date lastModified = new Date(modified);
+        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
+        if (cachedResponse.isPresent()) {
+            return cachedResponse.get();
+        }
+        MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(id);
+        MCRContent mcrContent = new MCRJDOMContent(mcrObj.getMetadata().createXML());
+        return Response.ok()
+            .entity(mcrContent,
+                new Annotation[] { MCRParams.Factory
+                    .get(MCRParam.Factory.get(MCRContentAbstractWriter.PARAM_OBJECTTYPE, id.getTypeId())) })
+            .lastModified(lastModified)
+            .build();
+    }
 
     @GET
     @Path("{" + PARAM_MCRID + "}/thumb-{size}.{ext : (jpg|jpeg|png)}")
@@ -448,6 +477,63 @@ public class MCRRestObjects {
             throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)
                 .withMessage("You may not modify or create MCRObject " + id + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
+        }
+    }
+    
+    @PUT
+    @Consumes(MediaType.APPLICATION_XML)
+    @Path("/{" + PARAM_MCRID + "}/metadata")
+    @Operation(summary = "Updates the metadata section of a MCRObject with the body of this request",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        responses = {
+            @ApiResponse(responseCode = "400",
+                content = { @Content(mediaType = MediaType.TEXT_PLAIN) },
+                description = "'Invalid body content' or 'MCRObjectID mismatch'"),
+            @ApiResponse(responseCode = "204", description = "MCRObject metadata successfully updated"),
+        })
+    @MCRRequireTransaction
+    public Response updateObjectMetadata(@PathParam(PARAM_MCRID) MCRObjectID id,
+        @Parameter(required = true,
+            description = "MCRObject XML",
+            examples = @ExampleObject("<metadata>\n...\n</metadata>")) InputStream xmlSource)
+        throws IOException {
+        //check preconditions
+        try {
+            long lastModified = MCRXMLMetadataManager.instance().getLastModified(id);
+            if (lastModified >= 0) {
+                Date lmDate = new Date(lastModified);
+                Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lmDate);
+                if (cachedResponse.isPresent()) {
+                    return cachedResponse.get();
+                }
+            }
+        } catch (Exception e) {
+            //ignore errors as PUT is idempotent
+        }
+        MCRStreamContent inputContent = new MCRStreamContent(xmlSource, null);
+        MCRObject updatedObject;
+        try {
+            updatedObject = MCRMetadataManager.retrieveMCRObject(id);
+            updatedObject.getMetadata().setFromDOM(inputContent.asXML().getRootElement().detach());
+            updatedObject.validate();
+        } catch (JDOMException | SAXException | MCRException e) {
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID)
+                .withMessage("MCRObject " + id + " is not valid")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
+        }
+        try {
+                MCRMetadataManager.update(updatedObject);
+                return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (MCRAccessException e) {
+            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)
+                .withMessage("You may not modify or create metadata of MCRObject " + id + ".")
                 .withDetail(e.getMessage())
                 .withCause(e)
                 .toException();
