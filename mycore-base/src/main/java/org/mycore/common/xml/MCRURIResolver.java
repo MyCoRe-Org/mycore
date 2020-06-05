@@ -113,6 +113,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.services.http.MCRHttpUtils;
+import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.tools.MCRObjectFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -242,6 +243,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("chooseTemplate", new MCRChooseTemplateResolver());
         supportedSchemes.put("redirect", new MCRRedirectResolver());
         supportedSchemes.put("data", new MCRDataURLResolver());
+        supportedSchemes.put("i18n", new MCRI18NResolver());
         MCRRESTResolver restResolver = new MCRRESTResolver();
         supportedSchemes.put("http", restResolver);
         supportedSchemes.put("https", restResolver);
@@ -1555,7 +1557,7 @@ public final class MCRURIResolver implements URIResolver {
      * no variable substitution takes place Example: MCR.URIResolver.redirect.alias=webapp:path/to/alias.xml
      */
     private static class MCRRedirectResolver implements URIResolver {
-        private static Logger LOGGER = LogManager.getLogger(MCRRedirectResolver.class);
+        private static final Logger LOGGER = LogManager.getLogger(MCRRedirectResolver.class);
 
         @Override
         public Source resolve(String href, String base) throws TransformerException {
@@ -1592,5 +1594,51 @@ public final class MCRURIResolver implements URIResolver {
             }
         }
 
+    }
+
+    private static class MCRI18NResolver implements URIResolver {
+
+        /**
+         * Resolves the I18N String value for the given property.<br><br>
+         * <br>
+         * Syntax: <code>i18n:{i18n-prefix1},{i18n-prefix},{i18n-prefix}...</code>
+         * <br>
+         * Result: <code> <br>
+         *     &lt;i18n&gt; <br>
+         *   &lt;translation key=&quot;key1&quot;&gt;translation1&lt;/translation&gt; <br>
+         *   &lt;translation key=&quot;key2&quot;&gt;translation2&lt;/translation&gt; <br>
+         *   &lt;translation key=&quot;key3&quot;&gt;translation3&lt;/translation&gt; <br>
+         * &lt;/i18n&gt; <br>
+         * </code>
+         * @param href
+         *            URI in the syntax above
+         * @param base
+         *            not used
+         *
+         * @return the element with result format above
+         * @see javax.xml.transform.URIResolver
+         */
+        @Override
+        public Source resolve(String href, String base) {
+            String target = href.substring(href.indexOf(":") + 1);
+
+            final Element i18nElement = new Element("i18n");
+            final String[] translationKeys = target.split(",");
+
+            // Combine translations to prevent duplicates
+            HashMap<String, String> translations = new HashMap<>();
+            for (String translationKey : translationKeys) {
+                translations.putAll(MCRTranslation.translatePrefix(translationKey));
+            }
+
+            translations.forEach((key, value) -> {
+                final Element translation = new Element("translation");
+                translation.setAttribute("key", key);
+                translation.setText(value);
+                i18nElement.addContent(translation);
+            });
+
+            return new JDOMSource(i18nElement);
+        }
     }
 }
