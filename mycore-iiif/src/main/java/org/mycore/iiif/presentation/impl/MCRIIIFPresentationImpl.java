@@ -40,7 +40,15 @@ public abstract class MCRIIIFPresentationImpl {
         this.implName = implName;
     }
 
-    public static synchronized MCRIIIFPresentationImpl getInstance(String implName) {
+    public static synchronized MCRIIIFPresentationImpl getInstance(String implNameParameter) {
+        String implName = (implNameParameter == null || implNameParameter.isBlank()) ?
+            MCRConfiguration2.getStringOrThrow("MCR.IIIFPresentation.Default") :
+            implNameParameter;
+
+        if (IMPLHOLDER.containsKey(implName)) {
+            return IMPLHOLDER.get(implName);
+        }
+
         if (IMPLHOLDER.containsKey(implName)) {
             return IMPLHOLDER.get(implName);
         }
