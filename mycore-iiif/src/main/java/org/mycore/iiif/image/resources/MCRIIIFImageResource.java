@@ -61,7 +61,7 @@ import org.mycore.iiif.model.MCRIIIFBase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@Path("/image{noop: /?}{impl: ([a-zA-Z0-9]+)?}")
+@Path("/image/v2{noop: /?}{impl: ([a-zA-Z0-9]+)?}")
 public class MCRIIIFImageResource {
     public static final String IIIF_IMAGE_API_2_LEVEL2 = "http://iiif.io/api/image/2/level2.json";
 

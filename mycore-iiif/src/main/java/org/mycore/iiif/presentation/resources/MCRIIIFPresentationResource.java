@@ -41,7 +41,7 @@ import com.google.gson.GsonBuilder;
 
 import static org.mycore.iiif.presentation.MCRIIIFPresentationUtil.correctIDs;
 
-@Path("/presentation/{impl}")
+@Path("/presentation/v2/{impl}")
 public class MCRIIIFPresentationResource {
 
     private static final Logger LOGGER = LogManager.getLogger();

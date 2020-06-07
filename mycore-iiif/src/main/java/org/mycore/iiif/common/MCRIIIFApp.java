@@ -9,7 +9,7 @@ import org.mycore.restapi.MCRJerseyRestApp;
 /**
  * @author Sebastian Hofmann
  */
-@ApplicationPath("/api/iiif/v2")
+@ApplicationPath("/api/iiif")
 public class MCRIIIFApp extends MCRJerseyRestApp {
 
     public MCRIIIFApp() {
