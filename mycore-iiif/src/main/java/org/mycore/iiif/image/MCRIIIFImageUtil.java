@@ -18,15 +18,15 @@
 
 package org.mycore.iiif.image;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_API_2_LEVEL2;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.model.MCRIIIFImageProfile;
-
-import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_API_2_LEVEL2;
 
 public class MCRIIIFImageUtil {
     public static void completeProfile(MCRIIIFImageImpl impl, MCRIIIFImageProfile profile) {
@@ -34,22 +34,20 @@ public class MCRIIIFImageUtil {
     }
 
     public static String encodeURIComponent(String component) {
-        return URLEncoder.encode(component, StandardCharsets.UTF_8)
-            .replaceAll("\\+", "%20")
-            .replaceAll("\\%21", "!")
-            .replaceAll("\\%27", "'")
-            .replaceAll("\\%28", "(")
-            .replaceAll("\\%29", ")")
-            .replaceAll("\\%7E", "~");
+        try {
+            return new URI(null, null, component, null, null).getRawPath();
+        } catch (URISyntaxException e) {
+            //99.99% this won't happen
+            throw new MCRException("Could not encode URI component: " + component, e);
+        }
     }
 
-    public static String buildCanonicalURL(MCRIIIFImageImpl impl, String identifier)
-        throws UnsupportedEncodingException {
+    public static String buildCanonicalURL(MCRIIIFImageImpl impl, String identifier) {
         return "<" + getIIIFURL(impl) + encodeURIComponent(identifier)
             + "/full/full/0/color.jpg>;rel=\"canonical\"";
     }
 
-    public static String buildProfileURL() throws UnsupportedEncodingException {
+    public static String buildProfileURL() {
         return "<" + IIIF_IMAGE_API_2_LEVEL2 + ">;rel=\"profile\"";
     }
 

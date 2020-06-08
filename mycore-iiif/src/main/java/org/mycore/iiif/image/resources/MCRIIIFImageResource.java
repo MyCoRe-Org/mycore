@@ -26,7 +26,6 @@ import static org.mycore.iiif.image.MCRIIIFImageUtil.getIIIFURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
 
 import java.awt.image.BufferedImage;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -91,10 +90,10 @@ public class MCRIIIFImageResource {
                 .build();
         } catch (MCRIIIFImageNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (MCRIIIFImageProvidingException | UnsupportedEncodingException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         } catch (MCRAccessException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        } catch (MCRIIIFImageProvidingException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
 
