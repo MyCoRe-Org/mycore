@@ -21,12 +21,11 @@ package org.mycore.iiif.image.resources;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.buildCanonicalURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.buildProfileURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.completeProfile;
-import static org.mycore.iiif.image.MCRIIIFImageUtil.encodeURIComponent;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.encodeImageIdentifier;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getIIIFURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
 
 import java.awt.image.BufferedImage;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -91,10 +90,10 @@ public class MCRIIIFImageResource {
                 .build();
         } catch (MCRIIIFImageNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (MCRIIIFImageProvidingException | UnsupportedEncodingException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         } catch (MCRAccessException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        } catch (MCRIIIFImageProvidingException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
 
@@ -103,7 +102,7 @@ public class MCRIIIFImageResource {
     public Response getInfoRedirect(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
-            String uriString = getIIIFURL(getImpl(impl)) + encodeURIComponent(identifier) + "/info.json";
+            String uriString = getIIIFURL(getImpl(impl)) + encodeImageIdentifier(identifier) + "/info.json";
             return Response.temporaryRedirect(new URI(uriString)).build();
         } catch (URISyntaxException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
