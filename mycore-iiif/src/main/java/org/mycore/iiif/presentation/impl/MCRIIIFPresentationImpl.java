@@ -49,10 +49,6 @@ public abstract class MCRIIIFPresentationImpl {
             return IMPLHOLDER.get(implName);
         }
 
-        if (IMPLHOLDER.containsKey(implName)) {
-            return IMPLHOLDER.get(implName);
-        }
-
         String classPropertyName = MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName;
         Class<? extends MCRIIIFPresentationImpl> classObject = MCRConfiguration2.<MCRIIIFPresentationImpl>getClass(
             classPropertyName)
