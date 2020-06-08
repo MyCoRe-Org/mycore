@@ -33,17 +33,24 @@ public class MCRIIIFImageUtil {
         profile.setId(getProfileLink(impl));
     }
 
-    public static String encodeURIComponent(String component) {
+    /**
+     * Encodes image identidier so it can be used in an URI
+     * @param imageIdentifier
+     * @see <a href="https://iiif.io/api/image/2.1/#uri-encoding-and-decoding">URI encoding of image identifier</a>
+     */
+    public static String encodeImageIdentifier(String imageIdentifier) {
+
         try {
-            return new URI(null, null, component, null, null).getRawPath();
+            final URI uri = new URI(null, null, imageIdentifier, null, null);
+            return uri.toASCIIString().replace("/", "%2F");
         } catch (URISyntaxException e) {
             //99.99% this won't happen
-            throw new MCRException("Could not encode URI component: " + component, e);
+            throw new MCRException("Could not encode image identifier: " + imageIdentifier, e);
         }
     }
 
     public static String buildCanonicalURL(MCRIIIFImageImpl impl, String identifier) {
-        return "<" + getIIIFURL(impl) + encodeURIComponent(identifier)
+        return "<" + getIIIFURL(impl) + encodeImageIdentifier(identifier)
             + "/full/full/0/color.jpg>;rel=\"canonical\"";
     }
 

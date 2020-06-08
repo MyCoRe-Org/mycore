@@ -21,7 +21,7 @@ package org.mycore.iiif.image.resources;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.buildCanonicalURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.buildProfileURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.completeProfile;
-import static org.mycore.iiif.image.MCRIIIFImageUtil.encodeURIComponent;
+import static org.mycore.iiif.image.MCRIIIFImageUtil.encodeImageIdentifier;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getIIIFURL;
 import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
 
@@ -102,7 +102,7 @@ public class MCRIIIFImageResource {
     public Response getInfoRedirect(@PathParam(IMPL_PARAM) String impl,
         @PathParam(IDENTIFIER_PARAM) String identifier) {
         try {
-            String uriString = getIIIFURL(getImpl(impl)) + encodeURIComponent(identifier) + "/info.json";
+            String uriString = getIIIFURL(getImpl(impl)) + encodeImageIdentifier(identifier) + "/info.json";
             return Response.temporaryRedirect(new URI(uriString)).build();
         } catch (URISyntaxException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
