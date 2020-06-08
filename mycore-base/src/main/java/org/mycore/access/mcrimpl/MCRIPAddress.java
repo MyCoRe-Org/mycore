@@ -20,7 +20,10 @@ package org.mycore.access.mcrimpl;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.stream.IntStream;
+
+import org.mycore.common.MCRException;
 
 /**
  * A class for representing an IP Address, or a range of IP addresses
@@ -61,13 +64,9 @@ public class MCRIPAddress {
     }
 
     public void init(InetAddress address) {
-        int t;
         this.address = address.getAddress();
         mask = new byte[this.address.length];
-
-        for (t = 0; t < this.address.length; t++) {
-            mask[t] = (byte) 255;
-        }
+        Arrays.fill(mask, (byte) 255);
     }
 
     public boolean contains(MCRIPAddress other) {
@@ -85,21 +84,17 @@ public class MCRIPAddress {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < address.length; i++) {
-            if (i > 0) {
-                sb.append(".");
-            }
-            sb.append((address[i] & 255));
+        try {
+            InetAddress inetAddress = InetAddress.getByAddress(address);
+            InetAddress maskAddress = InetAddress.getByAddress(mask);
+            StringBuilder sb = new StringBuilder();
+            sb.append(inetAddress.getHostAddress());
+            sb.append('/');
+            sb.append(maskAddress.getHostAddress());
+            return sb.toString();
+        } catch (UnknownHostException e) {
+            throw new MCRException(e); //should never happen
         }
-        sb.append("/");
-        for (int i = 0; i < mask.length; i++) {
-            if (i > 0) {
-                sb.append(".");
-            }
-            sb.append((mask[i] & 255));
-        }
-        return sb.toString();
 
     }
 }
