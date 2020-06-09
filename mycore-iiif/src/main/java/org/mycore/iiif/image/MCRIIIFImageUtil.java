@@ -20,10 +20,10 @@ package org.mycore.iiif.image;
 
 import static org.mycore.iiif.image.resources.MCRIIIFImageResource.IIIF_IMAGE_API_2_LEVEL2;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
-import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.model.MCRIIIFImageProfile;
@@ -39,14 +39,7 @@ public class MCRIIIFImageUtil {
      * @see <a href="https://iiif.io/api/image/2.1/#uri-encoding-and-decoding">URI encoding of image identifier</a>
      */
     public static String encodeImageIdentifier(String imageIdentifier) {
-
-        try {
-            final URI uri = new URI(null, null, imageIdentifier, null, null);
-            return uri.toASCIIString().replace("/", "%2F");
-        } catch (URISyntaxException e) {
-            //99.99% this won't happen
-            throw new MCRException("Could not encode image identifier: " + imageIdentifier, e);
-        }
+        return URLEncoder.encode(imageIdentifier, StandardCharsets.UTF_8);
     }
 
     public static String buildCanonicalURL(MCRIIIFImageImpl impl, String identifier) {
