@@ -52,7 +52,14 @@ public class MCRIIIFImageUtil {
     }
 
     public static String getIIIFURL(MCRIIIFImageImpl impl) {
-        return MCRFrontendUtil.getBaseURL() + "api/iiif/v2/image/" + impl.getImplName() + "/";
+        StringBuffer sb = new StringBuffer(MCRFrontendUtil.getBaseURL());
+        sb.append("api/iiif/image/v2/");
+        MCRConfiguration2.getString("MCR.IIIFImage.Default").ifPresent(s -> {
+            if(!s.equals(impl.getImplName())) {
+                sb.append(impl.getImplName()).append('/');
+            }
+        });
+        return sb.toString();
     }
 
     public static String getProfileLink(MCRIIIFImageImpl impl) {
