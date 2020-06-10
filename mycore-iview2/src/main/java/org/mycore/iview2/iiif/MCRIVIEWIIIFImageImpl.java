@@ -325,6 +325,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     }
 
     protected boolean checkPermission(String identifier, MCRTileInfo tileInfo) {
-        return MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ);
+        return MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_SHOW) ||
+            MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ);
     }
 }
