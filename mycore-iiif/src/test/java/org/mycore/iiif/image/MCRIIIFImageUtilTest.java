@@ -32,6 +32,7 @@ public class MCRIIIFImageUtilTest {
         Assert.assertEquals("urn:foo:a123,456", MCRIIIFImageUtil.encodeImageIdentifier("urn:foo:a123,456"));
         Assert.assertEquals("http:%2F%2Fexample.com%2F%3F54%23a", MCRIIIFImageUtil.encodeImageIdentifier("http://example.com/?54#a"));
         Assert.assertEquals("Mot%C3%B6rhead", MCRIIIFImageUtil.encodeImageIdentifier("Motörhead"));
+        Assert.assertEquals("mycore_derivate_00000001:%2Ftest.tiff", MCRIIIFImageUtil.encodeImageIdentifier("mycore_derivate_00000001:/test.tiff"));
     }
 
 }

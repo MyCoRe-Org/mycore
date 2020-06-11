@@ -41,8 +41,9 @@ public class MCRIIIFImageUtil {
     public static String encodeImageIdentifier(String imageIdentifier) {
 
         try {
-            final URI uri = new URI(null, null, imageIdentifier, null, null);
-            return uri.toASCIIString().replace("/", "%2F");
+            //add '/' before path for URI to handle it as a path, removed in return statement
+            final URI uri = new URI(null, null, '/' + imageIdentifier, null, null);
+            return uri.toASCIIString().substring(1).replace("/", "%2F");
         } catch (URISyntaxException e) {
             //99.99% this won't happen
             throw new MCRException("Could not encode image identifier: " + imageIdentifier, e);
