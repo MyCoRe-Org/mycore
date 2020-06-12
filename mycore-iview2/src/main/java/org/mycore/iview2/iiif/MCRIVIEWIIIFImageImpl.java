@@ -87,7 +87,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         if (tileFileProviderClassName == null) {
             tileFileProvider = new MCRDefaultTileFileProvider();
         } else {
-            Optional<MCRTileFileProvider> optTFP = MCRConfiguration2.instantiateClass(tileFileProviderClassName);
+            Optional<MCRTileFileProvider> optTFP = MCRConfiguration2
+                    .getInstanceOf(getConfigPrefix() + TILE_FILE_PROVIDER_PROPERTY);
             if (optTFP.isPresent()) {
                 tileFileProvider = optTFP.get();
             } else {
