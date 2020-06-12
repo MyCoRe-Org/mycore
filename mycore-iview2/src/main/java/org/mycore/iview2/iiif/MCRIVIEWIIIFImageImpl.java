@@ -297,7 +297,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     protected MCRTileInfo createTileInfo(String identifier) throws MCRIIIFImageNotFoundException {
         MCRTileInfo tileInfo = null;
-        String[] splittedIdentifier = identifier.split("/", 2);
+        String id = identifier.contains(":/") ? identifier.replaceFirst(":/",  "/") : identifier; 
+        String[] splittedIdentifier = id.split("/", 2);
         switch (splittedIdentifier.length) {
             case 1:
                 tileInfo = new MCRTileInfo(null, identifier, null);
