@@ -368,6 +368,12 @@
   },
   {
     "add-field": {
+      "name": "derivateType",
+      "type": "string"
+    }
+  },
+  {
+    "add-field": {
       "name": "derivateID",
       "type": "string"
     }
