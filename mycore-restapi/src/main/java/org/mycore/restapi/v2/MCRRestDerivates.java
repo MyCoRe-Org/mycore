@@ -142,6 +142,7 @@ public class MCRRestDerivates {
 
         },
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
+    @MCRParams(values = {@MCRParam(name = MCRMetaDefaultListXMLWriter.PARAM_XMLWRAPPER, value = "derobjects")})
     public Response listDerivates()
         throws IOException {
         long modified = MCRXMLMetadataManager.instance().getLastModified(mcrId);
@@ -161,11 +162,7 @@ public class MCRRestDerivates {
         GenericEntity<List<MCRMetaEnrichedLinkID>> entity = new GenericEntity<>(derivates) {
         };
         return Response.ok()
-            .entity(entity,
-                new Annotation[] { MCRParams.Factory.get(
-                    MCRParam.Factory.get(
-                        MCRMetaDefaultListXMLWriter.PARAM_XMLWRAPPER, "derobjects"))
-                })
+            .entity(entity)
             .lastModified(lastModified)
             .build();
     }
