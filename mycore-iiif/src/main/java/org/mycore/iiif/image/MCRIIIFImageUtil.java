@@ -1,5 +1,4 @@
 /*
-
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
