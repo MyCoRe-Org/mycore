@@ -1,4 +1,5 @@
 /*
+
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
@@ -62,11 +63,10 @@ public class MCRIIIFImageUtil {
     public static String getIIIFURL(MCRIIIFImageImpl impl) {
         StringBuffer sb = new StringBuffer(MCRFrontendUtil.getBaseURL());
         sb.append("api/iiif/image/v2/");
-        MCRConfiguration2.getString("MCR.IIIFImage.Default").ifPresent(s -> {
-            if(!s.equals(impl.getImplName())) {
-                sb.append(impl.getImplName()).append('/');
-            }
-        });
+        String defaultImpl = MCRConfiguration2.getString("MCR.IIIFImage.Default").orElse("");
+        if (!defaultImpl.equals(impl.getImplName())) {
+            sb.append(impl.getImplName()).append('/');
+        }
         return sb.toString();
     }
 
