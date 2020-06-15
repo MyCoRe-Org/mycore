@@ -21,7 +21,7 @@ public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
     @Test
     public void testGenerate() throws MCRPersistentIdentifierException {
         final MCRGenericPIGenerator generator = new MCRGenericPIGenerator("test1",
-            "urn:nbn:de:gbv:$CurrentDate-$0-$1-$ObjectType-$ObjectProject-$ObjectNumber-$Count-",
+            "urn:nbn:de:gbv:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-",
             new SimpleDateFormat("yyyy", Locale.ROOT), null, null, 3,
             "dnbUrn", "/mycoreobject/metadata/test1/test2/text()", "/mycoreobject/metadata/test1/test3/text()");
 
