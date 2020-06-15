@@ -50,6 +50,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,7 +78,6 @@ import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
-import org.mycore.restapi.converter.MCRMetaDefaultListXMLWriter;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 import org.xml.sax.SAXException;
 
@@ -142,6 +142,7 @@ public class MCRRestDerivates {
 
         },
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
+    @XmlElementWrapper(name = "derobjects")
     public Response listDerivates()
         throws IOException {
         long modified = MCRXMLMetadataManager.instance().getLastModified(mcrId);
@@ -158,14 +159,8 @@ public class MCRRestDerivates {
         }
         MCRObject obj = MCRMetadataManager.retrieveMCRObject(mcrId);
         List<MCRMetaEnrichedLinkID> derivates = obj.getStructure().getDerivates();
-        GenericEntity<List<MCRMetaEnrichedLinkID>> entity = new GenericEntity<>(derivates) {
-        };
         return Response.ok()
-            .entity(entity,
-                new Annotation[] { MCRParams.Factory.get(
-                    MCRParam.Factory.get(
-                        MCRMetaDefaultListXMLWriter.PARAM_XMLWRAPPER, "derobjects"))
-                })
+            .entity(new GenericEntity<List<MCRMetaEnrichedLinkID>>(derivates){})
             .lastModified(lastModified)
             .build();
     }
