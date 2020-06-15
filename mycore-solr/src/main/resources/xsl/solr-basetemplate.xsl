@@ -57,6 +57,11 @@
     <field name="derivateOrder">
       <xsl:value-of select="@order"/>
     </field>
+    <xsl:for-each select="derivate/classifications/classification[@classid='derivate_types']">
+      <field name="derivateType">
+        <xsl:value-of select="./@categid" />
+      </field>
+    </xsl:for-each>
     <xsl:for-each select="derivate/titles/title">
       <field name="derivateTitle">
         <xsl:value-of select="text()"/>
