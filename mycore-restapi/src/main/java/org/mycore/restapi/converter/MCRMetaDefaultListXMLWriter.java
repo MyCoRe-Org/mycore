@@ -35,13 +35,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.datamodel.metadata.MCRMetaDefault;
-import org.mycore.restapi.annotations.MCRParam;
-import org.mycore.restapi.annotations.MCRParams;
 
 @Provider
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML + ";charset=UTF-8" })
@@ -58,12 +57,10 @@ public class MCRMetaDefaultListXMLWriter implements MessageBodyWriter<List<? ext
 
     private static Optional<String> getWrapper(Annotation... annotations) {
         return Stream.of(annotations)
-            .filter(a -> MCRParams.class.isAssignableFrom(a.annotationType()))
-            .map(MCRParams.class::cast)
-            .flatMap(p -> Stream.of(p.values()))
-            .filter(p -> p.name().equals(PARAM_XMLWRAPPER))
+            .filter(a -> XmlElementWrapper.class.isAssignableFrom(a.annotationType()))
             .findAny()
-            .map(MCRParam::value);
+            .map(XmlElementWrapper.class::cast)
+            .map(XmlElementWrapper::name);
     }
 
     @Override
