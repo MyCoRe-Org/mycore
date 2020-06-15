@@ -3,6 +3,7 @@ package org.mycore.pi;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
@@ -69,7 +70,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * Set the Xpaths
  *
- * MCR.PI.Generator.myGenerator.XPath=/mycoreobject/metadata/def.shelf/shelf/, /mycoreobject/metadata/def.path2/path2/
+ * MCR.PI.Generator.myGenerator.XPath.1=/mycoreobject/metadata/def.shelf/shelf/
+ * MCR.PI.Generator.myGenerator.XPath.2=/mycoreobject/metadata/def.path2/path2/
  *
  * @author Sebastian Hofmann
  */
@@ -141,10 +143,14 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
         setType(properties.get(PROPERTY_KEY_TYPE));
 
-        if(properties.containsKey(PROPERTY_KEY_XPATH)){
-            setXpath(properties.get(PROPERTY_KEY_XPATH).split(","));
+        List<String> xpaths = new ArrayList<>();
+        int count = 1;
+        while (properties.containsKey(PROPERTY_KEY_XPATH + "." + count)) {
+            xpaths.add(properties.get(PROPERTY_KEY_XPATH + "." + count));
+            count++;
         }
 
+        setXpath(xpaths.toArray(new String[0]));
         validateProperties();
     }
 
@@ -206,7 +212,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         if (XPATH_PATTERN.asPredicate().test(resultingPI)) {
             resultingPI = XPATH_PATTERN.matcher(resultingPI).replaceAll((mr) -> {
                 final String xpathNumberString = mr.group(1);
-                final int xpathNumber = Integer.parseInt(xpathNumberString, 10);
+                final int xpathNumber = Integer.parseInt(xpathNumberString, 10)-1;
                 if (this.xpath.length <= xpathNumber || xpathNumber < 0) {
                     throw new MCRException(
                         "The index of " + xpathNumber + " is out of bounds of xpath array (" + xpath.length + ")");
