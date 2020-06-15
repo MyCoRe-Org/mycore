@@ -19,6 +19,7 @@
 package org.mycore.restapi.annotations;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 
 public @interface MCRParams {
 
@@ -35,6 +36,11 @@ public @interface MCRParams {
                 @Override
                 public Class<? extends Annotation> annotationType() {
                     return MCRParams.class;
+                }
+
+                @Override
+                public String toString() {
+                    return "@" + MCRParams.class.getName() + Arrays.toString(values());
                 }
             };
         }

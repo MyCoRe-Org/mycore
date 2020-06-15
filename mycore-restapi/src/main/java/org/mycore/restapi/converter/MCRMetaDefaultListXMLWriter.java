@@ -41,8 +41,6 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.datamodel.metadata.MCRMetaDefault;
-import org.mycore.restapi.annotations.MCRParam;
-import org.mycore.restapi.annotations.MCRParams;
 
 @Provider
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML + ";charset=UTF-8" })
@@ -62,14 +60,7 @@ public class MCRMetaDefaultListXMLWriter implements MessageBodyWriter<List<? ext
             .filter(a -> XmlElementWrapper.class.isAssignableFrom(a.annotationType()))
             .findAny()
             .map(XmlElementWrapper.class::cast)
-            .map(XmlElementWrapper::name)
-            .or(() -> Stream.of(annotations)
-                .filter(a -> MCRParams.class.isAssignableFrom(a.annotationType()))
-                .map(MCRParams.class::cast)
-                .flatMap(p -> Stream.of(p.values()))
-                .filter(p -> p.name().equals(PARAM_XMLWRAPPER))
-                .findAny()
-                .map(MCRParam::value));
+            .map(XmlElementWrapper::name);
     }
 
     @Override

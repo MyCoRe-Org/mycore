@@ -42,6 +42,11 @@ public @interface MCRParam {
                 public Class<? extends Annotation> annotationType() {
                     return MCRParam.class;
                 }
+
+                @Override
+                public String toString() {
+                    return "@" + MCRParam.class.getName() + "(" + name + "=" + value + ")";
+                }
             };
         }
     }
