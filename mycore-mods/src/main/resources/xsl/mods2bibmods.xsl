@@ -37,4 +37,8 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+  
+  <xsl:template match="mods:url[@access='preview']">
+  </xsl:template>
+
 </xsl:stylesheet>
