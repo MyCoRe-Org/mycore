@@ -10,7 +10,7 @@
     "grunt-newer": "^0.7.0",
     "grunt-svninfo": "^0.1.4",
     "dojo": "1.6.5",
-    "dijit": "1.6.5",
+    "dijit": "1.11.11",
     "ckeditor": "https://github.com/MyCoRe-Org/ckeditor-releases.git#full/4.3.x"
   }
 }

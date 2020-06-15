@@ -37,9 +37,15 @@ dateformat@1.0.2-1.2.3:
   version "1.0.2-1.2.3"
   resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-1.0.2-1.2.3.tgz#b0220c02de98617433b72851cf47de3df2cdbee9"
 
-dijit@1.6.5:
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.6.5.tgz#d4163896a75031cbcf3b857a5367daa3dd9b45e2"
+dijit@1.11.11:
+  version "1.11.11"
+  resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.11.11.tgz#34200a5a890a861fd60731401ee9dd69c2fce3c4"
+  dependencies:
+    dojo "1.11.11"
+
+dojo@1.11.11:
+  version "1.11.11"
+  resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.11.11.tgz#f690b539e0f8474425ad2cfc20f312f208037637"
 
 dojo@1.6.5:
   version "1.6.5"
