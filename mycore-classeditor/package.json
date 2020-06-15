@@ -10,7 +10,7 @@
     "grunt-newer": "^0.7.0",
     "grunt-svninfo": "^0.1.4",
     "dojo": "1.9.8",
-    "dijit": "1.9.8",
+    "dijit": "1.11.11",
     "font-awesome": "4.0.3"
   }
 }

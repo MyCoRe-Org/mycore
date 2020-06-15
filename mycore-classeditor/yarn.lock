@@ -114,12 +114,17 @@ delayed-stream@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/delayed-stream/-/delayed-stream-1.0.0.tgz#df3ae199acadfb7d440aaae0b29e2272b24ec619"
 
-dijit@1.9.8:
-  version "1.9.8"
-  resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.9.8.tgz#2d905f5d5032d968dee27c80995b7865b43e537a"
-  integrity sha1-LZBfXVAy2Wje4nyAmVt4ZbQ+U3o=
+dijit@1.11.11:
+  version "1.11.11"
+  resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.11.11.tgz#34200a5a890a861fd60731401ee9dd69c2fce3c4"
+  integrity sha512-K32uEPoG3Gq/zbxZJbWze5Gk+8BuPLKFcFkCGO+1JL74CZaodKnAtNK5qBT7lIsc7npNlQYvYJE60taCz4pkdg==
   dependencies:
-    dojo "1.9.8"
+    dojo "1.11.11"
+
+dojo@1.11.11:
+  version "1.11.11"
+  resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.11.11.tgz#f690b539e0f8474425ad2cfc20f312f208037637"
+  integrity sha512-Xg3SqDYwarF2OTGHtP/SOysSJ4S6dA5hJi+Xe8btZDiERvEWqfkvbaNTpjh+RaOHy1jcDhz6qOFs67K9QMX7MQ==
 
 dojo@1.9.8:
   version "1.9.8"
