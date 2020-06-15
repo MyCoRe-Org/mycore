@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.model.MCRIIIFImageProfile;
@@ -60,7 +61,13 @@ public class MCRIIIFImageUtil {
     }
 
     public static String getIIIFURL(MCRIIIFImageImpl impl) {
-        return MCRFrontendUtil.getBaseURL() + "api/iiif/v2/image/" + impl.getImplName() + "/";
+        StringBuffer sb = new StringBuffer(MCRFrontendUtil.getBaseURL());
+        sb.append("api/iiif/image/v2/");
+        String defaultImpl = MCRConfiguration2.getString("MCR.IIIFImage.Default").orElse("");
+        if (!defaultImpl.equals(impl.getImplName())) {
+            sb.append(impl.getImplName()).append('/');
+        }
+        return sb.toString();
     }
 
     public static String getProfileLink(MCRIIIFImageImpl impl) {
