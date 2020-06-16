@@ -99,12 +99,18 @@ public class MCRObjectStaticContentGenerator {
         return getSlotDirPath(id).resolve(id.toString().concat(".xml"));
     }
 
-    private Path getSlotDirPath(MCRObjectID id) {
+    protected Path getSlotDirPath(MCRObjectID id) {
         final String numberAsString = id.getNumberAsString();
 
-        Path result = getStaticFileRootPath().resolve(numberAsString.substring(0, 3))
-            .resolve(numberAsString.substring(3, 6));
-        LOGGER.debug(() -> "Resolved slot path is" + result.toString());
+        final int folderSize = 3;
+        final int folders = (int) Math.ceil(numberAsString.length() / (double) folderSize);
+        Path result = getStaticFileRootPath();
+        for (int i = 0; i < folders; i++) {
+            result = result.resolve(
+                numberAsString.substring(folderSize * i, Math.min(folderSize * i + 3, numberAsString.length())));
+        }
+        final Path finalResult = result;
+        LOGGER.debug(() -> "Resolved slot path is" + finalResult.toString());
         return result;
     }
 
