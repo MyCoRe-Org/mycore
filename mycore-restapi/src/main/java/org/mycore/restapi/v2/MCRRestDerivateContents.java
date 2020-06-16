@@ -33,8 +33,10 @@ import java.nio.file.SecureDirectoryStream;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -239,6 +241,32 @@ public class MCRRestDerivateContents {
         return MCRConfiguration2.getOrThrow("MCR.FileUpload.MemoryThreshold", Integer::parseInt);
     }
 
+    /**
+     * Generate Digest header value.
+     * @see <a href="https://tools.ietf.org/html/rfc3230">RFC 3230</a>
+     * @see <a href="https://tools.ietf.org/html/rfc5843">RFC 45843</a>
+     */
+    private static String getDigestHeader(String md5sum) {
+        final String md5Base64 = Base64.getEncoder().encodeToString(getMD5Digest(md5sum));
+        return "MD5=" + md5Base64;
+    }
+
+    private static byte[] getMD5Digest(String md5sum) {
+        final char[] data = md5sum.toCharArray();
+        final int len = data.length;
+
+        // two characters form the hex value.
+        final byte[] md5Bytes = new byte[len >> 1];
+        for (int i = 0, j = 0; j < len; i++) {
+            int f = Character.digit(data[j], 16) << 4;
+            j++;
+            f = f | Character.digit(data[j], 16);
+            j++;
+            md5Bytes[i] = (byte) (f & 0xFF);
+        }
+        return md5Bytes;
+    }
+
     @HEAD
     @MCRCacheControl(sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Operation(description = "get information about mime-type(s), last modified, ETag (md5sum) and ranges support",
@@ -279,6 +307,7 @@ public class MCRRestDerivateContents {
             .lastModified(Date.from(fileAttributes.lastModifiedTime().toInstant()))
             .header(HttpHeaders.CONTENT_LENGTH, fileAttributes.size())
             .tag(getETag(fileAttributes))
+            .header("Digest", getDigestHeader(fileAttributes.md5sum()))
             .build();
     }
 
@@ -316,7 +345,9 @@ public class MCRRestDerivateContents {
                 MCRPathContent content = new MCRPathContent(mcrPath, fileAttributes);
                 content.setMimeType(context.getMimeType(mcrPath.getFileName().toString()));
                 try {
-                    return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader);
+                    final List<Map.Entry<String, String>> responseHeader = List
+                        .of(Map.entry("Digest", getDigestHeader(fileAttributes.md5sum())));
+                    return MCRRestContentHelper.serveContent(content, uriInfo, requestHeader, responseHeader);
                 } catch (IOException e) {
                     throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
                         .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_IO_ERROR)

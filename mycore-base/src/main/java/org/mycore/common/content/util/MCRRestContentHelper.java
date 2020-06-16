@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -52,13 +53,14 @@ public abstract class MCRRestContentHelper {
     private static Logger LOGGER = LogManager.getLogger();
 
     public static Response serveContent(final MCRContent content, final UriInfo uriInfo,
-        final HttpHeaders requestHeader)
+        final HttpHeaders requestHeader, List<Map.Entry<String, String>> responseHeader)
         throws IOException {
-        return serveContent(content, uriInfo, requestHeader, new Config());
+        return serveContent(content, uriInfo, requestHeader, responseHeader, new Config());
     }
 
     public static Response serveContent(final MCRContent content, final UriInfo uriInfo,
-        final HttpHeaders requestHeader, final Config config) throws IOException {
+        final HttpHeaders requestHeader, final List<Map.Entry<String, String>> responseHeader, final Config config)
+        throws IOException {
 
         if (content == null) {
             throw new NotFoundException();
@@ -71,7 +73,7 @@ public abstract class MCRRestContentHelper {
 
         String eTag = content.getETag();
         response.header(HttpHeaders.ETAG, eTag);
-
+        responseHeader.forEach(e -> response.header(e.getKey(), e.getValue()));
         final long contentLength = content.length();
         if (contentLength == 0) {
             //No Content to serve?
