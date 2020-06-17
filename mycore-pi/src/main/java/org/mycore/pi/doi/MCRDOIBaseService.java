@@ -117,6 +117,8 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
         } else if (!hasRegistrationStarted(obj.getId(), additional)) {
             Predicate<MCRBase> registrationCondition = getRegistrationCondition();
             if (registrationCondition.test(obj)) {
+                // validate
+                transform(obj, doi.asString());
                 this.updateStartRegistrationDate(obj.getId(), "", new Date());
                 startRegisterJob(obj, doi);
             }

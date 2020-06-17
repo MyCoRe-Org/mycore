@@ -237,9 +237,6 @@ public class MCRDOIService extends MCRDOIBaseService {
             throw new MCRPersistentIdentifierException(
                 getClass().getName() + " doesn't support additional information! (" + additional + ")");
         }
-
-        // just to check if valid
-        transform(obj, newDOI.asString());
     }
 
     public URI getRegisteredURI(MCRBase obj) throws URISyntaxException {
