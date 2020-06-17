@@ -1601,7 +1601,8 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * Resolves the I18N String value for the given property.<br><br>
          * <br>
-         * Syntax: <code>i18n:{i18n-prefix1},{i18n-prefix},{i18n-prefix}...</code>
+         * Syntax: <code>i18n:{i18n-code},{i18n-prefix}*,{i18n-prefix}*...</code> or <br>
+         *         <code>i18n:{i18n-code}</code>
          * <br>
          * Result: <code> <br>
          *     &lt;i18n&gt; <br>
@@ -1609,6 +1610,11 @@ public final class MCRURIResolver implements URIResolver {
          *   &lt;translation key=&quot;key2&quot;&gt;translation2&lt;/translation&gt; <br>
          *   &lt;translation key=&quot;key3&quot;&gt;translation3&lt;/translation&gt; <br>
          * &lt;/i18n&gt; <br>
+         * </code>
+         * <br/>
+         * If just one i18n-code is passed, then the translation element is skipped.
+         * <code>
+         *     &lt;i18n&gt; <br>translation&lt;/i18n&gt;<br>
          * </code>
          * @param href
          *            URI in the syntax above
@@ -1623,12 +1629,22 @@ public final class MCRURIResolver implements URIResolver {
             String target = href.substring(href.indexOf(":") + 1);
 
             final Element i18nElement = new Element("i18n");
+            if(!target.contains("*") && !target.contains(",")){
+                i18nElement.addContent(MCRTranslation.translate(target));
+                return new JDOMSource(i18nElement);
+            }
+
             final String[] translationKeys = target.split(",");
 
             // Combine translations to prevent duplicates
             HashMap<String, String> translations = new HashMap<>();
             for (String translationKey : translationKeys) {
-                translations.putAll(MCRTranslation.translatePrefix(translationKey));
+                if(translationKey.endsWith("*")){
+                    final String prefix = translationKey.substring(0, translationKey.length() - 1);
+                    translations.putAll(MCRTranslation.translatePrefix(prefix));
+                } else {
+                    translations.put(translationKey,MCRTranslation.translate(translationKey));
+                }
             }
 
             translations.forEach((key, value) -> {
