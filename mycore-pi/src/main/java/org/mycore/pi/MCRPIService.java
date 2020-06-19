@@ -23,6 +23,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -241,8 +242,13 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         });
     }
 
-    protected void validatePermission(MCRBase obj) throws MCRAccessException {
-        Optional<String> missingPermission = Stream.of(PERMISSION_WRITE, "register-" + getServiceID())
+    protected void validatePermission(MCRBase obj, boolean writePermission) throws MCRAccessException {
+        List<String> requiredPermissions = new ArrayList<>(writePermission ? 2 : 1);
+        requiredPermissions.add("register-" + getServiceID());
+        if (writePermission) {
+            requiredPermissions.add(PERMISSION_WRITE);
+        }
+        Optional<String> missingPermission = requiredPermissions.stream()
             .filter(permission -> !MCRAccessManager.checkPermission(obj.getId(), permission))
             .findFirst();
         if (missingPermission.isPresent()) {
@@ -270,8 +276,13 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
      */
     public void validateRegistration(MCRBase obj, String additional)
         throws MCRPersistentIdentifierException, MCRAccessException {
+        validateRegistration(obj, additional, true);
+    }
+
+    public void validateRegistration(MCRBase obj, String additional, boolean checkWritePermission)
+        throws MCRPersistentIdentifierException, MCRAccessException {
         validateAlreadyCreated(obj.getId(), additional);
-        validatePermission(obj);
+        validatePermission(obj, checkWritePermission);
     }
 
     /**
@@ -326,7 +337,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         // There are many querys that require the current database state.
         // So we start a new transaction within the synchronized block
         final MCRFixedUserCallable<T> createPICallable = new MCRFixedUserCallable<>(() -> {
-            this.validateRegistration(obj, additional);
+            this.validateRegistration(obj, additional, updateObject);
             final T identifier = getNewIdentifier(obj, additional);
             this.registerIdentifier(obj, additional, identifier);
             this.getMetadataService().insertIdentifier(identifier, obj, additional);
