@@ -37,11 +37,9 @@ namespace org.mycore.mets.model {
             if (lockURL !== null && typeof lockURL !== 'undefined') {
                 const promise = this.httpService.get(lockURL);
 
-                promise.success((data) => {
-                    callBack(data.success || false);
-                });
-
-                promise.error(() => {
+                promise.then((data) => {
+                    callBack(data.data.success || false);
+                }, () => {
                     callBack(false);
                 });
             } else {

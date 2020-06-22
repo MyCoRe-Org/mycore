@@ -28,7 +28,8 @@ namespace org.mycore.mets.model {
             }, messages : []
         };
 
-        (<any> $http.get(editorConfiguration.i18URL)).success((i18nData) => {
+        (<any> $http.get(editorConfiguration.i18URL)).then((data) => {
+            const i18nData = data.data;
             for (const index in i18nData) {
                 if (i18nData.hasOwnProperty(index)) {
                     let betterKey = index;
