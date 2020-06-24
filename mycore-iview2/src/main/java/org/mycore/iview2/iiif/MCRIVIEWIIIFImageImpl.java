@@ -23,8 +23,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
@@ -46,6 +44,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.iiif.image.MCRIIIFImageUtil;
 import org.mycore.iiif.image.impl.MCRIIIFImageImpl;
 import org.mycore.iiif.image.impl.MCRIIIFImageNotFoundException;
 import org.mycore.iiif.image.impl.MCRIIIFImageProvidingException;
@@ -113,7 +112,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     private String buildURL(String identifier) {
         return MCRFrontendUtil.getBaseURL() + "rsc/iiif/image/" + getImplName() + "/"
-            + URLEncoder.encode(identifier, StandardCharsets.UTF_8);
+            + MCRIIIFImageUtil.encodeImageIdentifier(identifier);
     }
 
     @Override
