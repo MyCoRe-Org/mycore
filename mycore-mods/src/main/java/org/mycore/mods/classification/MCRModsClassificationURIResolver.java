@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.xml.MCRURIResolver;
@@ -86,6 +87,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
  */
 public class MCRModsClassificationURIResolver implements URIResolver {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static Optional<MCRAuthorityInfo> getAuthorityInfo(String href) {
         final URI uri = URI.create(href);
         //keep any encoded '/' inside a path segment
@@ -95,24 +98,32 @@ public class MCRModsClassificationURIResolver implements URIResolver {
             .map(URI::getPath) //decode
             .map(p -> p.substring(1)) //strip '/' again
             .toArray(String[]::new);
-        MCRAuthorityInfo authInfo;
+        MCRAuthorityInfo authInfo = null;
         switch (decodedPathSegments[0]) {
             case "uri":
-                authInfo = new MCRAuthorityWithURI(decodedPathSegments[1], decodedPathSegments[2]);
+                if (decodedPathSegments.length == 3) {
+                    authInfo = new MCRAuthorityWithURI(decodedPathSegments[1], decodedPathSegments[2]);
+                }
                 break;
             case "authority":
-                authInfo = new MCRAuthorityAndCode(decodedPathSegments[1], decodedPathSegments[2]);
+                if (decodedPathSegments.length == 3) {
+                    authInfo = new MCRAuthorityAndCode(decodedPathSegments[1], decodedPathSegments[2]);
+                }
                 break;
             case "accessCondition":
-                authInfo = new MCRAccessCondition(decodedPathSegments[1]);
+                if (decodedPathSegments.length == 2) {
+                    authInfo = new MCRAccessCondition(decodedPathSegments[1]);
+                }
                 break;
             case "typeOfResource":
-                authInfo = new MCRTypeOfResource(decodedPathSegments[1]);
+                if (decodedPathSegments.length == 2) {
+                    authInfo = new MCRTypeOfResource(decodedPathSegments[1]);
+                }
                 break;
             default:
                 authInfo = null;
         }
-        LogManager.getLogger().debug("authinfo {}", authInfo);
+        LOGGER.debug("authinfo {}", authInfo);
         return Optional.ofNullable(authInfo);
     }
 
@@ -123,10 +134,10 @@ public class MCRModsClassificationURIResolver implements URIResolver {
             .map(category -> String.format(Locale.ROOT, "classification:metadata:0:parents:%s:%s", category.getRootID(),
                 category.getID()));
         if (categoryURI.isPresent()) {
-            LogManager.getLogger().debug("{} -> {}", href, categoryURI.get());
+            LOGGER.debug("{} -> {}", href, categoryURI.get());
             return MCRURIResolver.instance().resolve(categoryURI.get(), base);
         }
-        LogManager.getLogger().debug("no category found for {}", href);
+        LOGGER.debug("no category found for {}", href);
         return new JDOMSource(new Element("empty"));
     }
 }
