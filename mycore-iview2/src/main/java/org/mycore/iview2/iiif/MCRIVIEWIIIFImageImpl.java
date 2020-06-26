@@ -21,8 +21,6 @@ package org.mycore.iview2.iiif;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
@@ -102,7 +100,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     }
 
     private String buildURL(String identifier) {
-        return MCRIIIFImageUtil.getIIIFURL(this) + URLEncoder.encode(identifier, StandardCharsets.UTF_8);
+        return MCRIIIFImageUtil.getIIIFURL(this) + MCRIIIFImageUtil.encodeImageIdentifier(identifier);
     }
 
     @Override

@@ -35,10 +35,10 @@
         <li>
           <xsl:choose>
             <xsl:when test="@children = 'true'">
-              <a href="#" onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');"><i class="{$folder.closed}" id="cbButton_{$id}" /></a>
+              <a href="#" onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');"><i class="{$folder.closed}" id="cbButton_{$id}"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></i></a>
             </xsl:when>
             <xsl:otherwise>
-              <i class="{$folder.leaf}" id="cbButton_{$id}" />
+              <i class="{$folder.leaf}" id="cbButton_{$id}"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></i>
             </xsl:otherwise>
           </xsl:choose>
           <xsl:apply-templates select="@numResults" mode="formatCount">
@@ -62,7 +62,7 @@
             </p>
           </xsl:if>
           <xsl:if test="@children = 'true'">
-            <div id="cbChildren_{$id}" class="cbHidden" />
+            <div id="cbChildren_{$id}" class="cbHidden"><!-- WebKit bugfix: no empty divs please --><xsl:comment/></div>
           </xsl:if>
         </li>
       </xsl:for-each>
