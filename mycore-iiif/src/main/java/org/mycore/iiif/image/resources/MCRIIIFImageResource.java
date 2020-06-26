@@ -28,6 +28,8 @@ import static org.mycore.iiif.image.MCRIIIFImageUtil.getImpl;
 import java.awt.image.BufferedImage;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -35,6 +37,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -71,6 +75,15 @@ public class MCRIIIFImageResource {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    @Context
+    Request request;
+
+    Optional<Response> getCachedResponse(long lastModified) {
+        return Optional.ofNullable(request)
+            .map(r -> r.evaluatePreconditions(new Date(lastModified)))
+            .map(Response.ResponseBuilder::build);
+    }
+
     @GET
     @Produces(MCRIIIFMediaTypeHelper.APPLICATION_LD_JSON)
     @Path("{" + IDENTIFIER_PARAM + "}/info.json")
@@ -80,6 +93,12 @@ public class MCRIIIFImageResource {
         try {
             MCRIIIFImageImpl impl = getImpl(implString);
             MCRIIIFImageInformation information = impl.getInformation(identifier);
+
+            Optional<Response> cachedResponse = getCachedResponse(information.lastModified);
+            if (cachedResponse.isPresent()) {
+                return cachedResponse.get();
+            }
+
             MCRIIIFImageProfile profile = getProfile(impl);
 
             information.profile.add(IIIF_IMAGE_API_2_LEVEL2);
@@ -90,6 +109,7 @@ public class MCRIIIFImageResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Link", buildCanonicalURL(impl, identifier))
                 .header("Profile", buildProfileURL())
+                .lastModified(new Date(information.lastModified))
                 .entity(gson.toJson(information))
                 .build();
         } catch (MCRIIIFImageNotFoundException e) {
@@ -129,6 +149,11 @@ public class MCRIIIFImageResource {
             MCRIIIFImageImpl impl = getImpl(implStr);
             MCRIIIFImageInformation information = impl.getInformation(identifier);
 
+            Optional<Response> cachedResponse = getCachedResponse(information.lastModified);
+            if (cachedResponse.isPresent()) {
+                return cachedResponse.get();
+            }
+
             MCRIIIFRegionParser rp = new MCRIIIFRegionParser(region, information.width, information.height);
             MCRIIIFImageSourceRegion sourceRegion = rp.parseImageRegion();
 
@@ -151,6 +176,7 @@ public class MCRIIIFImageResource {
                 .header("Link", buildCanonicalURL(impl, identifier))
                 .header("Profile", buildProfileURL())
                 .type("image/" + format)
+                .lastModified(new Date(information.lastModified))
                 .entity((StreamingOutput) outputStream -> ImageIO.write(provide, format, outputStream)).build();
         } catch (MCRIIIFImageNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
