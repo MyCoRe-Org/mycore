@@ -44,6 +44,11 @@ public class MCRIIIFImageInformation extends MCRIIIFBase {
     public int height;
 
     /**
+     * Required for caching.
+     */
+    public transient long lastModified;
+
+    /**
      * Required!
      * A array of profiles, first entry is always a <i>compliance level URI</i> like http://iiif.io/api/image/2/level2.json.
      */
@@ -54,12 +59,14 @@ public class MCRIIIFImageInformation extends MCRIIIFBase {
      */
     public List<MCRIIIFImageTileInformation> tiles;
 
-    public MCRIIIFImageInformation(String context, String id, String protocol, int width, int height) {
+    public MCRIIIFImageInformation(String context, String id, String protocol, int width, int height,
+                                   long lastModified) {
         super(id, null, context);
         this.protocol = protocol;
         this.width = width;
         this.height = height;
         this.tiles = new ArrayList<>();
         this.profile = new ArrayList<>();
+        this.lastModified = lastModified;
     }
 }

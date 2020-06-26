@@ -237,11 +237,13 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             if (oTiledFile.isEmpty()) {
                 throw new MCRIIIFImageNotFoundException(identifier);
             }
-            checkTileFile(identifier, tileInfo, oTiledFile.get());
-            MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(oTiledFile.get());
+            final Path tileFilePath = oTiledFile.get();
+            checkTileFile(identifier, tileInfo, tileFilePath);
+            MCRTiledPictureProps tiledPictureProps = getTiledPictureProps(tileFilePath);
 
             MCRIIIFImageInformation imageInformation = new MCRIIIFImageInformation(MCRIIIFBase.API_IMAGE_2,
-                buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight());
+                buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight(),
+                    Files.getLastModifiedTime(tileFilePath).toMillis());
 
             MCRIIIFImageTileInformation tileInformation = new MCRIIIFImageTileInformation(256, 256);
             for (int i = 0; i < tiledPictureProps.getZoomlevel(); i++) {
@@ -251,7 +253,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             imageInformation.tiles.add(tileInformation);
 
             return imageInformation;
-        } catch (FileSystemNotFoundException e) {
+        } catch (FileSystemNotFoundException|IOException e) {
             LOGGER.error("Could not find Iview ZIP for {}", identifier, e);
             throw new MCRIIIFImageNotFoundException(identifier);
         }
