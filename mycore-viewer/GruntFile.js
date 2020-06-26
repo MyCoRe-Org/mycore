@@ -44,8 +44,7 @@ module.exports = function (grunt) {
                         'js/lib/es6-promise': 'es6-promise/dist',
 						'js/lib/manifesto': 'manifesto.js/dist/client',
                         'cmaps': 'pdfjs-dist/cmaps',
-                        'js/lib/': 'pdfjs-dist/build',
-                        'js/lib/': 'jquery/dist'
+                        'js/lib/': ['pdfjs-dist/build', 'jquery/dist']
                     }
                 }
             },
