@@ -17,11 +17,11 @@
     <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
     <html>
       <head>
-        <script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="{$WebApplicationBaseURL}modules/iview2/js/lib/jquery.min.js"></script>
         <xsl:choose>
           <xsl:when test="xml/properties/property[@name='mobile'] = 'true'">
             <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-            <link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet"
+            <link href="{$MCR.Viewer.FontaweSomeURL}" rel="stylesheet"
                   type="text/css" />
           </xsl:when>
           <xsl:otherwise>
