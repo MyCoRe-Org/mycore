@@ -7,6 +7,7 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.transformer.MCRParameterizedTransformer;
@@ -20,6 +21,11 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
     public static final String DEFAULT_FORMAT = "text";
 
     public static final String DEFAULT_STYLE = "nature";
+    private static final String CONFIG_PREFIX = "MCR.ContentTransformer.";
+
+    private String configuredFormat;
+
+    private String configuredStyle;
 
     private final Map<String, Stack<MCRCSLTransformerInstance>> transformerInstances;
 
@@ -30,6 +36,8 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
     @Override
     public void init(String id) {
         super.init(id);
+        configuredFormat = MCRConfiguration2.getString(CONFIG_PREFIX + id + ".format").orElse(DEFAULT_FORMAT);
+        configuredStyle = MCRConfiguration2.getString(CONFIG_PREFIX + id + ".style").orElse(DEFAULT_STYLE);
     }
 
     @Override public MCRContent transform(MCRContent source) throws IOException {
@@ -76,8 +84,8 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
     }
 
     @Override public MCRContent transform(MCRContent bibtext, MCRParameterCollector parameter) throws IOException {
-        final String format = parameter != null ? parameter.getParameter("format", DEFAULT_FORMAT) : DEFAULT_FORMAT;
-        final String style = parameter != null ? parameter.getParameter("style", DEFAULT_STYLE) : DEFAULT_STYLE;
+        final String format = parameter != null ? parameter.getParameter("format", configuredFormat) : configuredFormat;
+        final String style = parameter != null ? parameter.getParameter("style", configuredStyle) : configuredStyle;
         try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format)) {
             final MCRItemDataProvider dataProvider = transformerInstance.getDataProvider();
             final CSL citationProcessor = transformerInstance.getCitationProcessor();
