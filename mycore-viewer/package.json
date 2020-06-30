@@ -9,6 +9,7 @@
   "dependencies": {
     "epubjs": "0.3.84",
     "es6-promise": "^4.2.8",
+    "jquery": "^3.5.1",
     "jszip": "^3.2.1",
     "manifesto.js": "3.0.10",
     "pdfjs-dist": "^2.3.200"
