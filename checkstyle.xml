@@ -5,17 +5,18 @@
 
 <module name="Checker">
   <property name="charset" value="UTF-8"/>
-  <property name="fileExtensions" value="java, properties, xml"/>
+  <property name="fileExtensions" value="java, properties, xml, xsl"/>
   <module name="BeforeExecutionExclusionFileFilter">
     <property name="fileNamePattern" value="module\-info\.java$"/>
   </module>
   <module name="NewlineAtEndOfFile"/>
+  <module name="LineLength">
+    <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|@see|^\s*\* MCR.|^\s*\*.*?.*&amp;"/>
+    <property name="max" value="120"/>
+    <property name="fileExtensions" value="java, xml, xsl"/>
+  </module>
   <module name="TreeWalker">
     <property name="tabWidth" value="4"/>
-    <module name="LineLength">
-      <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|@see|^\s*\* MCR.|^\s*\*.*?.*&amp;"/>
-      <property name="max" value="120"/>
-    </module>
     <module name="ModifiedControlVariable" />
     <module name="InnerTypeLast" />
     <module name="AvoidStarImport"/>
