@@ -74,8 +74,8 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     @Override
     protected boolean checkPermission(String identifier, MCRTileInfo tileInfo) {
-        return MCRAccessManager
-            .checkPermission(identifier, MCRAccessManager.PERMISSION_PREVIEW) || MCRAccessManager
-            .checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ) ;
+        return MCRAccessManager.checkPermission(identifier, MCRAccessManager.PERMISSION_PREVIEW) ||
+            MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_VIEW) ||
+            MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ);
     }
 }

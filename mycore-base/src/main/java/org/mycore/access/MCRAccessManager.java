@@ -56,6 +56,8 @@ public class MCRAccessManager {
 
     public static final String PERMISSION_PREVIEW = "preview";
 
+    public static final String PERMISSION_VIEW = "view";
+
     private static final ExecutorService EXECUTOR_SERVICE;
 
     static {
