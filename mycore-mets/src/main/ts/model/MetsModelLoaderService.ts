@@ -30,13 +30,13 @@ namespace org.mycore.mets.model {
         public load(url: string, callBack: (model: MetsModel) => void) {
             const promise = this.httpService.get(url);
 
-            promise.success((metsData) => {
-                callBack(MetsModel.fromJson(metsData));
-            });
-
-            promise.error(() => {
+            promise.then((data) => {
+                callBack(MetsModel.fromJson(data.data));
+            }, () => {
                 // TODO: ERROR HANDLING
             });
+
+
         }
     }
 }

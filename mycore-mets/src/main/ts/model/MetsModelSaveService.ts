@@ -37,13 +37,11 @@ namespace org.mycore.mets.model {
             const jsonData = MetsModel.toJson(model);
             const promise = this.httpService.post(url, jsonData);
 
-            promise.success(() => {
-                callBack(true);
-            });
-
-            promise.error(() => {
-                callBack(false);
-            });
+            promise.then(() => {
+                    callBack(true);
+                }, () => {
+                    callBack(false);
+                });
         }
     }
 }
