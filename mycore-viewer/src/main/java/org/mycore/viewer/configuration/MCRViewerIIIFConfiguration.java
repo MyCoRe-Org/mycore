@@ -33,10 +33,10 @@ public class MCRViewerIIIFConfiguration extends MCRViewerBaseConfiguration {
         final String derivate = getDerivate(request);
 
         setProperty("manifestURL", MCRFrontendUtil.getBaseURL()
-            + MCRConfiguration2.getString("MCR.Viewer.IIIF.URL.Presentation").orElse("api/iiif/presentation/v2/mets/")
+            + MCRConfiguration2.getStringOrThrow("MCR.Viewer.IIIF.URL.Presentation")
             + derivate + "/manifest");
         setProperty("imageAPIURL", MCRFrontendUtil.getBaseURL()
-            + MCRConfiguration2.getString("MCR.Viewer.IIIF.URL.Image").orElse("api/iiif/image/v2/"));
+            + MCRConfiguration2.getStringOrThrow("MCR.Viewer.IIIF.URL.Image"));
         setProperty("filePath", getDerivate(request) + getFilePath(request));
 
         // script
