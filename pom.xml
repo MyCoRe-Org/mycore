@@ -40,21 +40,21 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <forbiddenapis.version>2.6</forbiddenapis.version>
     <frontend.maven.plugin.version>1.6</frontend.maven.plugin.version>
-    <grizzly.version>2.3.35</grizzly.version>
-    <guice.version>4.2.2</guice.version>
+    <grizzly.version>2.4.4</grizzly.version>
+    <guice.version>4.2.3</guice.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
-    <hibernate.version>5.4.9.Final</hibernate.version>
+    <hibernate.version>5.4.18.Final</hibernate.version>
     <hk2.version>2.6.1</hk2.version>
-    <httpcomponents.version>4.5.10</httpcomponents.version>
-    <httpcore.version>4.4.12</httpcore.version>
-    <jackson.version>2.10.1</jackson.version>
-    <jakarta.activation.version>1.2.1</jakarta.activation.version>
-    <jakarta.mail.version>1.6.4</jakarta.mail.version>
+    <httpcomponents.version>4.5.12</httpcomponents.version>
+    <httpcore.version>4.4.13</httpcore.version>
+    <jackson.version>2.11.1</jackson.version>
+    <jakarta.activation.version>1.2.2</jakarta.activation.version>
+    <jakarta.mail.version>1.6.5</jakarta.mail.version>
     <java.target.version>11</java.target.version>
-    <jaxb.version>2.3.2</jaxb.version>
-    <jersey.version>2.29.1</jersey.version>
+    <jaxb.version>2.3.3</jaxb.version>
+    <jersey.version>2.31</jersey.version>
     <jetty.version>9.4.14.v20181114</jetty.version>
-    <log4j.version>2.12.1</log4j.version>
+    <log4j.version>2.13.3</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
@@ -64,7 +64,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
     <site.suffix />
-    <swagger.version>2.1.0</swagger.version>
+    <swagger.version>2.1.3</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
     <yarn.version>v1.13.0</yarn.version>
@@ -815,7 +815,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
-        <version>3.8.3</version>
+        <version>3.10.3</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -850,7 +850,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>28.1-jre</version>
+        <version>29.0-jre</version>
       </dependency>
       <dependency>
         <groupId>com.google.inject</groupId>
@@ -876,12 +876,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
-        <version>65.1</version>
+        <version>67.1</version>
       </dependency>
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
-        <version>1.12.2</version>
+        <version>1.14.1</version>
       </dependency>
       <dependency>
         <groupId>com.yahoo.platform.yui</groupId>
@@ -903,7 +903,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.6</version>
+        <version>2.7</version>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
@@ -959,7 +959,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>jakarta.inject</groupId>
         <artifactId>jakarta.inject-api</artifactId>
-        <version>1.0</version>
+        <version>1.0.1</version>
       </dependency>
       <dependency>
         <groupId>jakarta.persistence</groupId>
@@ -1030,12 +1030,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
-        <version>1.19</version>
+        <version>1.20</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.9</version>
+        <version>3.10</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -1060,12 +1060,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>2.0.17</version>
+        <version>2.0.20</version>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>8.3.1</version>
+        <version>8.5.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
@@ -1101,7 +1101,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>fop-core</artifactId>
-        <version>2.4</version>
+        <version>2.5</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -1143,7 +1143,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.bibsonomy</groupId>
         <artifactId>bibsonomy-bibtex-parser</artifactId>
-        <version>3.9.0</version>
+        <version>3.9.2</version>
         <exclusions>
           <exclusion>
             <groupId>jtidy</groupId>
@@ -1485,7 +1485,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.2.9</version>
+        <version>42.2.14</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
@@ -1536,7 +1536,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-annotations</artifactId>
-        <version>3.1.12</version>
+        <version>4.0.6</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -1555,13 +1555,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>jakarta.servlet</groupId>
         <artifactId>jakarta.servlet-api</artifactId>
-        <version>4.0.3</version>
+        <version>4.0.4</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
-        <version>6.0.3</version>
+        <version>6.2.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1592,7 +1592,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
-        <version>3.4.1</version>
+        <version>3.4.5</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1635,13 +1635,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>fontbox</artifactId>
-        <version>2.0.17</version>
+        <version>2.0.20</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>jbig2-imageio</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.3</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1665,7 +1665,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.glassfish.jaxb</groupId>
         <artifactId>jaxb-runtime</artifactId>
-        <version>2.3.2</version>
+        <version>${jaxb.version}</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1722,7 +1722,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.26.0-GA</version>
+        <version>3.27.0-GA</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1741,7 +1741,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.5.2</version>
+        <version>5.6.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -1761,7 +1761,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>4.13</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1821,13 +1821,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.hsqldb</groupId>
         <artifactId>hsqldb</artifactId>
-        <version>2.5.0</version>
+        <version>2.5.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.jmockit</groupId>
         <artifactId>jmockit</artifactId>
-        <version>1.48</version>
+        <version>1.49</version>
         <scope>test</scope>
       </dependency>
       <dependency>
