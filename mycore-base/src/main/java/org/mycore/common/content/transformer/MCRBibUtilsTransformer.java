@@ -18,8 +18,8 @@
 
 package org.mycore.common.content.transformer;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,7 +42,7 @@ import org.mycore.frontend.cli.MCRExternalProcess;
  */
 public class MCRBibUtilsTransformer extends MCRContentTransformer {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRBibUtilsTransformer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The external Bibutils command to invoke */
     private String command;
@@ -55,31 +55,22 @@ public class MCRBibUtilsTransformer extends MCRContentTransformer {
 
     @Override
     public MCRContent transform(MCRContent source) throws IOException {
-        File modsFile = File.createTempFile("mods", ".xml");
-        source.sendTo(modsFile);
         try {
-            MCRContent export = export(modsFile);
+            MCRContent export = export(source);
             export.setLastModified(source.lastModified());
             export.setMimeType(getMimeType());
             return export;
+        } catch (RuntimeException | IOException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof IOException) {
-                throw (IOException) e;
-            }
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            }
             throw new IOException(e);
-        } finally {
-            modsFile.delete();
         }
     }
 
-    private MCRContent export(File modsFile) {
-        String[] arguments = buildCommandArguments(modsFile);
-        MCRExternalProcess ep = null;
-        try {
-            ep = new MCRExternalProcess(arguments);
+    private MCRContent export(MCRContent mods) {
+        String[] arguments = buildCommandArguments();
+        try (InputStream stdin = mods.getInputStream()) {
+            MCRExternalProcess ep = new MCRExternalProcess(stdin, arguments);
             ep.run();
             String errors = ep.getErrors();
             if (!errors.isEmpty()) {
@@ -95,15 +86,8 @@ public class MCRBibUtilsTransformer extends MCRContentTransformer {
     /**
      * Builds the command arguments to invoke the external BibUtils command 
      */
-    private String[] buildCommandArguments(File modsFile) {
-        String path = modsFile.getAbsolutePath();
-
-        String[] args1 = command.split(" ");
-        String[] args2 = new String[args1.length + 1];
-        System.arraycopy(args1, 0, args2, 0, args1.length);
-        args2[args1.length] = path;
-
-        LOGGER.info("{} {}", command, path);
-        return args2;
+    private String[] buildCommandArguments() {
+        LOGGER.info(command);
+        return command.split(" ");
     }
 }
