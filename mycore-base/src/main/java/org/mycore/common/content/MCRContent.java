@@ -21,7 +21,6 @@ package org.mycore.common.content;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,6 +35,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 
 import javax.xml.transform.Source;
@@ -209,7 +209,7 @@ public abstract class MCRContent {
      *            the file to write the content to
      */
     public void sendTo(File target) throws IOException {
-        sendTo(new FileOutputStream(target), true);
+        sendTo(target.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 
     /**

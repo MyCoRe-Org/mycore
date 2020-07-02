@@ -18,10 +18,15 @@
 
 package org.mycore.frontend.cli;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,53 +35,50 @@ import org.mycore.common.content.MCRContent;
 
 public class MCRExternalProcess {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRExternalProcess.class);
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private final InputStream stdin;
 
     private String[] command;
 
     private int exitValue;
 
-    private MCRStreamSucker output;
+    private CompletableFuture<MCRByteContent> output;
 
-    private MCRStreamSucker errors;
+    private CompletableFuture<MCRByteContent> errors;
 
     public MCRExternalProcess(String... command) {
-        this.command = command;
+        this(null, command);
     }
 
     public MCRExternalProcess(String command) {
-        this.command = command.split("\\s+");
+        this(command.split("\\s+"));
+    }
+
+    public MCRExternalProcess(InputStream stdin, String... command) {
+        this.stdin = stdin;
+        this.command = command;
     }
 
     public int run() throws IOException, InterruptedException {
 
-        if (LOGGER.isDebugEnabled()) {
-            debug(command);
-        }
+        LOGGER.debug(() -> Stream.of(command)
+            .collect(Collectors.joining(" ")));
 
         ProcessBuilder pb = new ProcessBuilder(command);
         Process p = pb.start();
-
-        output = new MCRStreamSucker(p.getInputStream());
-        output.start();
-
-        errors = new MCRStreamSucker(p.getErrorStream());
-        errors.start();
-
-        exitValue = p.waitFor();
-
-        output.join(); // wait for the stream suckers in case output is not read fully yet.
-        errors.join();
-
-        return exitValue;
-    }
-
-    private void debug(String... command) {
-        StringBuilder sb = new StringBuilder();
-        for (String arg : command) {
-            sb.append(arg).append(" ");
+        CompletableFuture<Void> input = MCRStreamSucker.writeAllBytes(stdin, p);
+        output = MCRStreamSucker.readAllBytesAsync(p.getInputStream()).thenApply(MCRStreamSucker::toContent);
+        errors = MCRStreamSucker.readAllBytesAsync(p.getErrorStream()).thenApply(MCRStreamSucker::toContent);
+        try {
+            exitValue = p.waitFor();
+        } catch (InterruptedException e) {
+            p.destroy();
+            throw e;
         }
-        LOGGER.debug(sb.toString().trim());
+        CompletableFuture.allOf(input, output, errors)
+            .whenComplete((Void, ex) -> MCRStreamSucker.destroyProcess(p, ex));
+        return exitValue;
     }
 
     public int getExitValue() {
@@ -84,49 +86,54 @@ public class MCRExternalProcess {
     }
 
     public String getErrors() {
-        return new String(errors.getOutput(), Charset.defaultCharset());
+        return new String(errors.join().asByteArray(), Charset.defaultCharset());
     }
 
     public MCRContent getOutput() throws IOException {
-        return new MCRByteContent(output.getOutput(), System.currentTimeMillis());
-    }
-}
-
-class MCRStreamSucker extends Thread {
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRStreamSucker.class);
-
-    /** The input stream to read from */
-    private InputStream in;
-
-    /** Collects the output read from the input stream */
-    private ByteArrayOutputStream out;
-
-    MCRStreamSucker(InputStream in) {
-        this.in = in;
-        this.out = new ByteArrayOutputStream();
+        return output.join();
     }
 
-    /**
-     * Reads from the input stream until end.
-     */
-    public void run() {
-        try {
-            byte[] buffer = new byte[1024];
-            int num;
-            while ((num = in.read(buffer, 0, buffer.length)) >= 0) {
-                out.write(buffer, 0, num);
+    private static class MCRStreamSucker {
+
+        private static final Logger LOGGER = LogManager.getLogger();
+
+        private static CompletableFuture<byte[]> readAllBytesAsync(InputStream is) {
+            return CompletableFuture.supplyAsync(() -> readAllBytes(is));
+        }
+
+        private static byte[] readAllBytes(InputStream is) throws UncheckedIOException {
+            try {
+                return is.readAllBytes();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
-            out.close();
-        } catch (IOException ex) {
-            LOGGER.warn(ex);
+        }
+
+        private static MCRByteContent toContent(byte[] data) {
+            return new MCRByteContent(data, System.currentTimeMillis());
+        }
+
+        private static void destroyProcess(Process p, Throwable ex) {
+            if (ex != null) {
+                LOGGER.warn("Error while sucking stdout or stderr streams.", ex);
+            }
+            LOGGER.debug("Destroy process {}", p.pid());
+            p.destroy();
+        }
+
+        public static CompletableFuture<Void> writeAllBytes(InputStream stdin, Process p) throws UncheckedIOException {
+            return Optional.ofNullable(stdin)
+                .map(in -> CompletableFuture.runAsync(() -> {
+                    try {
+                        try (OutputStream stdinPipe = p.getOutputStream()) {
+                            in.transferTo(stdinPipe);
+                        }
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }))
+                .orElseGet(CompletableFuture::allOf);
         }
     }
 
-    /**
-     * Returns the output read from the input stream
-     */
-    public byte[] getOutput() {
-        return out.toByteArray();
-    }
 }

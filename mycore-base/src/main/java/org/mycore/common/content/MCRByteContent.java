@@ -19,7 +19,6 @@
 package org.mycore.common.content;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -66,12 +65,12 @@ public class MCRByteContent extends MCRContent {
     }
 
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         return new ByteArrayInputStream(bytes, offset, length);
     }
 
     @Override
-    public byte[] asByteArray() throws IOException {
+    public byte[] asByteArray() {
         if (offset == 0 && length == 0) {
             return bytes;
         }
@@ -87,17 +86,17 @@ public class MCRByteContent extends MCRContent {
     }
 
     @Override
-    public long length() throws IOException {
+    public long length() {
         return length;
     }
 
     @Override
-    public long lastModified() throws IOException {
+    public long lastModified() {
         return lastModified;
     }
 
     @Override
-    public String getETag() throws IOException {
+    public String getETag() {
         MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
         md5Digest.update(bytes, offset, length);
         byte[] digest = md5Digest.digest();
