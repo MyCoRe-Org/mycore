@@ -271,6 +271,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         if (fileName == null) {
             return null;
         }
+        //MCR-2254, ':' in fileName causes problems on Windows
+        fileName = fileName.replace(':', '_');
         return FilenameUtils.removeExtension(fileName) + "." + getFileExtension();
     }
 
