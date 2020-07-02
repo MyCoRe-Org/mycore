@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<MyCoReWebPage class="home" xmlns:i="http://www.mycore.org/i18n">
+
+  <section xml:lang="all" title="I18N Test">
+    <h1>
+      <i:de>Willkommen! Dies ist eine i18n.xsl Testseite.</i:de>
+      <i:en>Welcome! This is a i18n.xsl test page.</i:en>
+    </h1>
+    <p>
+      <a href="https://www.mycore.de">
+        <span>MyCoRe: </span>
+        <i:de>Software für Dokumenten- und Publikationsserver</i:de>
+        <i:en>Institutional Repository Software</i:en>
+      </a>
+    </p>
+    <form>
+      <label class="mr-2">
+        <i:de>i18n kann auch in Attributen verwendet werden:</i:de>
+        <i:en>i18n can also be used in attributes:</i:en>
+      </label>
+      <input type="text" placeholder="|de:Hier tippen!|en:type here!|" />
+    </form>
+    <p>
+      <i:de>Es ist auch möglich, i18 Codes aus messages.properties zu verwenden:</i:de>
+      <i:en>It is also possible to use i18n codes from messages.properties:</i:en>
+    </p>
+    <p>
+      <i:code>editor.search.document.esample</i:code>
+    </p>
+    <form>
+      <label class="mr-2">
+        <i:code>metaData.createdAt</i:code>:
+      </label>
+      <input type="text" placeholder="|code:metaData.date|" />
+    </form>
+    <p>
+      <i:de>
+        <strong>Abschnitt 1:</strong>
+        Dieser einzigartige Text ist <i>nicht</i> übersetzt und erscheint
+        <ul>
+          <li>immer, wenn 'de' die Default-Sprache ist</li>
+          <li>oder auch wenn 'de' die aktuelle Sprache ist</li>
+        </ul>
+      </i:de>
+    </p>
+    <p>
+      <i:en>
+        <strong>Section 2:</strong>
+        This very different text is <i>not</i> translated and is displayed
+        <ul>
+          <li>always, if 'en' is the default language</li>
+          <li>or if 'en' is the current language</li>
+        </ul>
+      </i:en>
+    </p>
+    <p>
+      Default-Language und Attribute:<br/>
+      <img src="dummy-does-not-exist.png" alt="|de:Default: Sprechen Sie Deutsch?|fr:Vous parlez français?|" />
+    </p>
+  </section>
+
+</MyCoReWebPage>
