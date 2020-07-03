@@ -237,12 +237,12 @@ public class MCREventManager {
 
     public MCREventHandler getEventHandler(String mode, String propertyValue) {
         if ("Class".equals(mode)) {
-            return MCRConfiguration2.<MCREventHandler> getSingleInstanceOf(propertyValue)
+            return MCRConfiguration2.<MCREventHandler>getSingleInstanceOf(propertyValue)
                 .orElseThrow(() -> MCRConfiguration2.createConfigurationException(propertyValue));
         }
         String className = CONFIG_PREFIX + "Mode." + mode;
         MCREventHandlerInitializer configuredInitializer = MCRConfiguration2
-            .<MCREventHandlerInitializer> getSingleInstanceOf(className)
+            .<MCREventHandlerInitializer>getSingleInstanceOf(className)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(className));
         return configuredInitializer.getInstance(propertyValue);
     }

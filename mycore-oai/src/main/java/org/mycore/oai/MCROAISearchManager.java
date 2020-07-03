@@ -249,7 +249,7 @@ public class MCROAISearchManager {
     public static MCROAISearcher getSearcher(MCROAIIdentify identify, MetadataFormat format, int partitionSize,
         MCROAISetManager setManager, MCROAIObjectManager objectManager) {
         String className = identify.getConfigPrefix() + "Searcher";
-        MCROAISearcher searcher = MCRConfiguration2.<MCROAISearcher> getInstanceOf(className)
+        MCROAISearcher searcher = MCRConfiguration2.<MCROAISearcher>getInstanceOf(className)
             .orElseGet(MCROAICombinedSearcher::new);
         searcher.init(identify, format, MAX_AGE, partitionSize, setManager, objectManager);
         return searcher;

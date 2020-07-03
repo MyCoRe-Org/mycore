@@ -98,7 +98,7 @@ public class MCRThumbnailResource {
                         String mimeType = Files.probeContentType(mainFile);
                         List<MCRThumbnailGenerator> generators = MCRConfiguration2
                             .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
-                            .map(MCRConfiguration2::<MCRThumbnailGenerator> instantiateClass)
+                            .map(MCRConfiguration2::<MCRThumbnailGenerator>instantiateClass)
                             .filter(thumbnailGenerator -> thumbnailGenerator.matchesFileType(mimeType, mainFile))
                             .collect(Collectors.toList());
                         final Optional<BufferedImage> thumbnail = generators.stream()

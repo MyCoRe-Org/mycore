@@ -46,7 +46,7 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
         String defaultname = getFallbackHandler(configPrefix, setId);
         MCROAISetHandler<SolrQuery, SolrDocument, String> handler = defaultname == null
             ? MCRConfiguration2.getOrThrow(setConfigPrefix + ".Handler", MCRConfiguration2::instantiateClass)
-            : MCRConfiguration2.<MCROAISetHandler<SolrQuery, SolrDocument, String>> getInstanceOf(
+            : MCRConfiguration2.<MCROAISetHandler<SolrQuery, SolrDocument, String>>getInstanceOf(
                 setConfigPrefix + ".Handler")
                 .orElseGet(() -> MCRConfiguration2.instantiateClass(defaultname));
         handler.init(configPrefix, setId);

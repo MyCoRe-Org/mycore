@@ -37,7 +37,7 @@ public class MCRMetadataShareAgentFactory {
 
     public static MCRMetadataShareAgent getAgent(MCRObjectID objectId) {
         String propertyName = CONFIG_PREFIX + objectId.getTypeId();
-        return MCRConfiguration2.<MCRMetadataShareAgent> getSingleInstanceOf(propertyName)
+        return MCRConfiguration2.<MCRMetadataShareAgent>getSingleInstanceOf(propertyName)
             .orElseGet(MCRMetadataShareAgentFactory::getDefaultAgent);
     }
 

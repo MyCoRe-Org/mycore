@@ -65,7 +65,7 @@ import org.xml.sax.SAXException;
 public class MCRViewerResource {
 
     private static final MCRIviewACLProvider IVIEW_ACL_PROVDER = MCRConfiguration2
-        .<MCRIviewACLProvider> getInstanceOf("MCR.Viewer.MCRIviewACLProvider")
+        .<MCRIviewACLProvider>getInstanceOf("MCR.Viewer.MCRIviewACLProvider")
         .orElseGet(MCRIviewDefaultACLProvider::new);
 
     private static final String JSON_CONFIG_ELEMENT_NAME = "json";
@@ -147,7 +147,7 @@ public class MCRViewerResource {
         }
         // build configuration object
         MCRViewerConfigurationStrategy configurationStrategy = MCRConfiguration2
-            .<MCRViewerDefaultConfigurationStrategy> getInstanceOf(
+            .<MCRViewerDefaultConfigurationStrategy>getInstanceOf(
                 "MCR.Viewer.configuration.strategy")
             .orElseGet(MCRViewerDefaultConfigurationStrategy::new);
         MCRJDOMContent source = new MCRJDOMContent(buildResponseDocument(configurationStrategy.get(req)));

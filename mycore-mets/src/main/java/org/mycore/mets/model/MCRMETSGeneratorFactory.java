@@ -53,7 +53,7 @@ public abstract class MCRMETSGeneratorFactory {
         IGNORE_METS_XML = true;
 
         // get selector
-        Class<? extends MCRMETSGeneratorSelector> cn = MCRConfiguration2.<MCRMETSPropertyGeneratorSelector> getClass(
+        Class<? extends MCRMETSGeneratorSelector> cn = MCRConfiguration2.<MCRMETSPropertyGeneratorSelector>getClass(
             "MCR.Component.MetsMods.Generator.Selector").orElse(MCRMETSPropertyGeneratorSelector.class);
         try {
             GENERATOR_SELECTOR = cn.getDeclaredConstructor().newInstance();

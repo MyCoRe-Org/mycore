@@ -50,7 +50,7 @@ public abstract class MCRIIIFPresentationImpl {
         }
 
         String classPropertyName = MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName;
-        Class<? extends MCRIIIFPresentationImpl> classObject = MCRConfiguration2.<MCRIIIFPresentationImpl> getClass(
+        Class<? extends MCRIIIFPresentationImpl> classObject = MCRConfiguration2.<MCRIIIFPresentationImpl>getClass(
             classPropertyName)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(classPropertyName));
 

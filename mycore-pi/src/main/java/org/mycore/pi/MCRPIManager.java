@@ -82,7 +82,7 @@ public class MCRPIManager {
             });
 
         resolverList = MCRConfiguration2.getOrThrow(RESOLVER_CONFIGURATION, MCRConfiguration2::splitValue)
-            .map(MCRConfiguration2::<MCRPIResolver<MCRPersistentIdentifier>> instantiateClass)
+            .map(MCRConfiguration2::<MCRPIResolver<MCRPersistentIdentifier>>instantiateClass)
             .collect(Collectors.toList());
 
     }

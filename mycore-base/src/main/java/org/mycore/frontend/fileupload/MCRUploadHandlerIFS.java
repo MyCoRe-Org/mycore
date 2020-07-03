@@ -98,7 +98,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         return MCRConfiguration2.getString(FILE_PROCESSOR_PROPERTY)
             .map(MCRConfiguration2::splitValue)
             .orElseGet(Stream::empty)
-            .map(MCRConfiguration2::<MCRPostUploadFileProcessor> instantiateClass)
+            .map(MCRConfiguration2::<MCRPostUploadFileProcessor>instantiateClass)
             .collect(Collectors.toList());
     }
 

@@ -53,7 +53,7 @@ public class MCRTileServlet extends HttpServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTileServlet.class);
 
-    private static MCRTileFileProvider TFP = MCRConfiguration2.<MCRDefaultTileFileProvider> getInstanceOf(
+    private static MCRTileFileProvider TFP = MCRConfiguration2.<MCRDefaultTileFileProvider>getInstanceOf(
         "MCR.IIIFImage.Iview.TileFileProvider").orElseGet(MCRDefaultTileFileProvider::new);
 
     /**

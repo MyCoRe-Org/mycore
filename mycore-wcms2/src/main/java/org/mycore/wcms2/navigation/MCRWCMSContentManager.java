@@ -65,7 +65,7 @@ public class MCRWCMSContentManager {
     }
 
     public MCRWCMSContentManager() {
-        this.sectionProvider = MCRConfiguration2.<MCRWCMSSectionProvider> getInstanceOf("MCR.WCMS2.sectionProvider")
+        this.sectionProvider = MCRConfiguration2.<MCRWCMSSectionProvider>getInstanceOf("MCR.WCMS2.sectionProvider")
             .orElseGet(MCRWCMSDefaultSectionProvider::new);
     }
 

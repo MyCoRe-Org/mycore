@@ -1244,7 +1244,7 @@ public final class MCRURIResolver implements URIResolver {
                 if (resolved != null) {
                     MCRSourceContent content = new MCRSourceContent(resolved);
                     MCRLayoutTransformerFactory factory = MCRConfiguration2
-                        .<MCRLayoutTransformerFactory> getInstanceOf(TRANSFORMER_FACTORY_PROPERTY)
+                        .<MCRLayoutTransformerFactory>getInstanceOf(TRANSFORMER_FACTORY_PROPERTY)
                         .orElseGet(MCRLayoutTransformerFactory::new);
                     MCRContentTransformer transformer = factory.getTransformer(transformerId);
                     MCRContent result;

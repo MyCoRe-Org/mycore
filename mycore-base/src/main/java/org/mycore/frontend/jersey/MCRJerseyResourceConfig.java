@@ -36,7 +36,7 @@ public class MCRJerseyResourceConfig extends ResourceConfig {
         LogManager.getLogger().info("Loading jersey resource config...");
         MCRJerseyConfiguration configuration;
         try {
-            configuration = MCRConfiguration2.<MCRJerseyDefaultConfiguration> getInstanceOf("MCR.Jersey.Configuration")
+            configuration = MCRConfiguration2.<MCRJerseyDefaultConfiguration>getInstanceOf("MCR.Jersey.Configuration")
                 .orElseGet(MCRJerseyDefaultConfiguration::new);
         } catch (MCRConfigurationException exc) {
             LogManager.getLogger().error("Unable to initialize jersey.", exc);

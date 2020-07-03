@@ -193,7 +193,7 @@ public class MCRFrontendUtil {
      *  the value of the request attribute or a parameter (in that order) with the given <code>name</code>.
      */
     public static Optional<String> getProperty(HttpServletRequest request, String name) {
-        return Stream.<Supplier<Object>> of(
+        return Stream.<Supplier<Object>>of(
             () -> request.getAttribute(name),
             () -> request.getParameter(name))
             .map(Supplier::get)

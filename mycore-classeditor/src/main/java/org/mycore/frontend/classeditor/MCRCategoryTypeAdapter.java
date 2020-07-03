@@ -120,7 +120,7 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
 
     private MCRCategLinkService getLinkService() {
         if (linkService == null) {
-            linkService = MCRConfiguration2.<MCRCategLinkService> getInstanceOf("Category.Link.Service")
+            linkService = MCRConfiguration2.<MCRCategLinkService>getInstanceOf("Category.Link.Service")
                 .orElseGet(MCRCategLinkServiceFactory::getInstance);
         }
 

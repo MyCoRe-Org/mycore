@@ -140,7 +140,7 @@ public class MCRLayoutService {
             String style = parameter.getParameter("Style", "default");
             transformerId = new MessageFormat("{0}-{1}", Locale.ROOT).format(new Object[] { docType, style });
         }
-        MCRLayoutTransformerFactory factory = MCRConfiguration2.<MCRLayoutTransformerFactory> getInstanceOf(
+        MCRLayoutTransformerFactory factory = MCRConfiguration2.<MCRLayoutTransformerFactory>getInstanceOf(
             TRANSFORMER_FACTORY_PROPERTY)
             .orElseGet(MCRLayoutTransformerFactory::new);
         return factory.getTransformer(transformerId);

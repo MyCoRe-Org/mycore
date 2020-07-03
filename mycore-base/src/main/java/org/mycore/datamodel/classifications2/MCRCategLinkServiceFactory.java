@@ -29,7 +29,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
  */
 public class MCRCategLinkServiceFactory {
     private static MCRCategLinkService instance = MCRConfiguration2
-        .<MCRCategLinkService> getInstanceOf("MCR.Category.LinkService")
+        .<MCRCategLinkService>getInstanceOf("MCR.Category.LinkService")
         .orElseGet(MCRCategLinkServiceImpl::new);
 
     /**

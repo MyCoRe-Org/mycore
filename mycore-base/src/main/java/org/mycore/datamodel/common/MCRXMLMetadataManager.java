@@ -161,7 +161,7 @@ public class MCRXMLMetadataManager {
         basePath = Paths.get(base);
         checkPath(basePath, "base");
 
-        defaultClass = MCRConfiguration2.<MCRVersioningMetadataStore> getClass("MCR.Metadata.Store.DefaultClass")
+        defaultClass = MCRConfiguration2.<MCRVersioningMetadataStore>getClass("MCR.Metadata.Store.DefaultClass")
             .orElse(MCRVersioningMetadataStore.class);
         if (MCRVersioningMetadataStore.class.isAssignableFrom(defaultClass)) {
             try {
@@ -327,7 +327,7 @@ public class MCRXMLMetadataManager {
     private void setupStore(String project, String objectType, String configPrefix, boolean readOnly)
         throws ReflectiveOperationException {
         String baseID = getStoryKey(project, objectType);
-        Class<? extends MCRStore> clazz = MCRConfiguration2.<MCRStore> getClass(configPrefix + "Class")
+        Class<? extends MCRStore> clazz = MCRConfiguration2.<MCRStore>getClass(configPrefix + "Class")
             .orElseGet(() -> {
                 MCRConfiguration2.set(configPrefix + "Class", defaultClass.getName());
                 return defaultClass;
