@@ -8,8 +8,6 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-import static org.junit.Assert.*;
-
 public class MCRObjectStaticContentGeneratorTest extends MCRTestCase {
 
     @Test

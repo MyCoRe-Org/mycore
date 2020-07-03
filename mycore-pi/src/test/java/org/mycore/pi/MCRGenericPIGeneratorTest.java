@@ -1,5 +1,7 @@
 package org.mycore.pi;
 
+import static org.junit.Assert.assertEquals;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -11,8 +13,6 @@ import org.mycore.common.MCRStoreTestCase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import static org.junit.Assert.assertEquals;
 
 public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
 

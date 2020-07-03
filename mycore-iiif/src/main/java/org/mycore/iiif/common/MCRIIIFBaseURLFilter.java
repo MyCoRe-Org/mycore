@@ -1,5 +1,7 @@
 package org.mycore.iiif.common;
 
+import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
+
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,8 +11,6 @@ import javax.ws.rs.core.Context;
 
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-
-import static org.mycore.frontend.MCRFrontendUtil.BASE_URL_ATTRIBUTE;
 
 public class MCRIIIFBaseURLFilter implements ContainerRequestFilter {
 
