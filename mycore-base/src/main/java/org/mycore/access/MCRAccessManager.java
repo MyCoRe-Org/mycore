@@ -71,7 +71,7 @@ public class MCRAccessManager {
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
         return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
-                .orElseGet(MCRDerivateIDStrategy::new);
+            .orElseGet(MCRDerivateIDStrategy::new);
     }
 
     /**

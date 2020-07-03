@@ -39,7 +39,7 @@ public class MCRMergerFactory {
     private static MCRMerger getEntryInstance(String name) {
         String prefix = "MCR.MODS.Merger.";
         String defaultClass = MCRConfiguration2.getStringOrThrow(prefix + "default");
-        return MCRConfiguration2.<MCRMerger> getInstanceOf(prefix + name)
+        return MCRConfiguration2.<MCRMerger>getInstanceOf(prefix + name)
             .orElseGet(() -> MCRConfiguration2.instantiateClass(defaultClass));
     }
 

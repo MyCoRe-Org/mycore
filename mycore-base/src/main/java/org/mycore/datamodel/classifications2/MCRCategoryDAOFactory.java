@@ -29,7 +29,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
  */
 public class MCRCategoryDAOFactory {
 
-    private static MCRCategoryDAO INSTANCE = MCRConfiguration2.<MCRCategoryDAO> getInstanceOf("MCR.Category.DAO")
+    private static MCRCategoryDAO INSTANCE = MCRConfiguration2.<MCRCategoryDAO>getInstanceOf("MCR.Category.DAO")
         .orElseGet(MCRCategoryDAOImpl::new);
 
     /**

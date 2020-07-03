@@ -60,7 +60,7 @@ public class MCRIIIFImageInformation extends MCRIIIFBase {
     public List<MCRIIIFImageTileInformation> tiles;
 
     public MCRIIIFImageInformation(String context, String id, String protocol, int width, int height,
-                                   long lastModified) {
+        long lastModified) {
         super(id, null, context);
         this.protocol = protocol;
         this.width = width;

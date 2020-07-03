@@ -29,6 +29,6 @@ public class MCRDefaultTileFileProvider implements MCRTileFileProvider {
     @Override
     public Optional<Path> getTileFile(MCRTileInfo tileInfo) {
         return Optional.of(
-                MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), tileInfo.getDerivate(), tileInfo.getImagePath()));
+            MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), tileInfo.getDerivate(), tileInfo.getImagePath()));
     }
 }

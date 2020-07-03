@@ -636,7 +636,7 @@ public class MCRRestDerivateContents {
         @Override
         public int compareTo(DirectoryEntry o) {
             return Ordering
-                .<DirectoryEntry> from((de1, de2) -> {
+                .<DirectoryEntry>from((de1, de2) -> {
                     if (de1 instanceof Directory && !(de2 instanceof Directory)) {
                         return -1;
                     }

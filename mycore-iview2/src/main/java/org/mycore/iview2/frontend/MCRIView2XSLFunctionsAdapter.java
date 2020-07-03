@@ -45,7 +45,7 @@ public class MCRIView2XSLFunctionsAdapter {
 
     public static MCRIView2XSLFunctionsAdapter getInstance() {
         return MCRConfiguration2
-            .<MCRIView2XSLFunctionsAdapter> getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter")
+            .<MCRIView2XSLFunctionsAdapter>getInstanceOf(MCRIView2Tools.CONFIG_PREFIX + "MCRIView2XSLFunctionsAdapter")
             .orElseGet(MCRIView2XSLFunctionsAdapter::new);
     }
 

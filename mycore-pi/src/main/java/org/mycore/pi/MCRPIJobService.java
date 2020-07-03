@@ -330,8 +330,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     protected Predicate<MCRBase> getCreationPredicate() {
         final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
             getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE;
-        if(MCRConfiguration2.getString(predicateProperty).isEmpty()){
-            return (o)->false;
+        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
+            return (o) -> false;
         }
         return getPredicateInstance(predicateProperty);
     }
@@ -339,8 +339,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
     protected Predicate<MCRBase> getRegistrationCondition() {
         final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
             getServiceID() + "." + MCRPIJobService.REGISTRATION_PREDICATE;
-        if(MCRConfiguration2.getString(predicateProperty).isEmpty()){
-            return (o)->true;
+        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
+            return (o) -> true;
         }
         return getPredicateInstance(predicateProperty);
     }
@@ -352,7 +352,7 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
         try {
             return (Predicate<MCRBase>) MCRClassTools.forName(clazz)
                 .getConstructor(String.class)
-                .newInstance(predicateProperty+".");
+                .newInstance(predicateProperty + ".");
         } catch (ClassNotFoundException e) {
             throw new MCRConfigurationException(
                 errorMessageBegin + " was not found!", e);

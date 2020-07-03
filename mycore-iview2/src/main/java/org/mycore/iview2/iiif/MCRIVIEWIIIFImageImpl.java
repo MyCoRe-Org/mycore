@@ -86,7 +86,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             tileFileProvider = new MCRDefaultTileFileProvider();
         } else {
             Optional<MCRTileFileProvider> optTFP = MCRConfiguration2
-                    .getInstanceOf(getConfigPrefix() + TILE_FILE_PROVIDER_PROPERTY);
+                .getInstanceOf(getConfigPrefix() + TILE_FILE_PROVIDER_PROPERTY);
             if (optTFP.isPresent()) {
                 tileFileProvider = optTFP.get();
             } else {
@@ -243,7 +243,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
             MCRIIIFImageInformation imageInformation = new MCRIIIFImageInformation(MCRIIIFBase.API_IMAGE_2,
                 buildURL(identifier), DEFAULT_PROTOCOL, tiledPictureProps.getWidth(), tiledPictureProps.getHeight(),
-                    Files.getLastModifiedTime(tileFilePath).toMillis());
+                Files.getLastModifiedTime(tileFilePath).toMillis());
 
             MCRIIIFImageTileInformation tileInformation = new MCRIIIFImageTileInformation(256, 256);
             for (int i = 0; i < tiledPictureProps.getZoomlevel(); i++) {
@@ -253,7 +253,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             imageInformation.tiles.add(tileInformation);
 
             return imageInformation;
-        } catch (FileSystemNotFoundException|IOException e) {
+        } catch (FileSystemNotFoundException | IOException e) {
             LOGGER.error("Could not find Iview ZIP for {}", identifier, e);
             throw new MCRIIIFImageNotFoundException(identifier);
         }
@@ -298,7 +298,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     protected MCRTileInfo createTileInfo(String identifier) throws MCRIIIFImageNotFoundException {
         MCRTileInfo tileInfo = null;
-        String id = identifier.contains(":/") ? identifier.replaceFirst(":/",  "/") : identifier; 
+        String id = identifier.contains(":/") ? identifier.replaceFirst(":/", "/") : identifier;
         String[] splittedIdentifier = id.split("/", 2);
         switch (splittedIdentifier.length) {
             case 1:

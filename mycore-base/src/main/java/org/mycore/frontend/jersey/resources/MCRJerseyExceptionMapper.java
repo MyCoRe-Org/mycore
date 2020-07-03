@@ -95,7 +95,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
             } catch (Exception transformException) {
                 return Response.status(Status.INTERNAL_SERVER_ERROR).entity(transformException).build();
             } finally {
-                if(!MCRSessionMgr.isLocked()) { 
+                if (!MCRSessionMgr.isLocked()) {
                     MCRSessionMgr.getCurrentSession().commitTransaction();
                 }
             }

@@ -108,9 +108,9 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private static int MAX_CONNECTIONS = MCRConfiguration2
         .getOrThrow(SOLR_CONFIG_PREFIX + "SelectProxy.MaxConnections", Integer::parseInt);
 
-    private static Map<String,String> NEW_HTTP_RESPONSE_HEADER = MCRConfiguration2
+    private static Map<String, String> NEW_HTTP_RESPONSE_HEADER = MCRConfiguration2
         .getSubPropertiesMap(SOLR_CONFIG_PREFIX + "HTTPResponseHeader.");
-    
+
     private CloseableHttpClient httpClient;
 
     private MCRIdleConnectionMonitorThread idleConnectionMonitorThread;

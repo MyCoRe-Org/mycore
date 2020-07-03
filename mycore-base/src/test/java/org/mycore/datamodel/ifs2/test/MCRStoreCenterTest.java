@@ -65,7 +65,7 @@ public class MCRStoreCenterTest {
             .findAny().isPresent());
 
         assertTrue("Could not remove store with ID: " + storeID, storeHeap.removeStore(storeID));
-        assertNull("There should be no store with ID: " + storeID, storeHeap.<FakeStore> getStore(storeID));
+        assertNull("There should be no store with ID: " + storeID, storeHeap.<FakeStore>getStore(storeID));
     }
 
     @Test(expected = MCRStoreAlreadyExistsException.class)

@@ -48,9 +48,9 @@ public abstract class MCRIIIFImageImpl {
     }
 
     public static synchronized MCRIIIFImageImpl getInstance(String implNameParameter) {
-        String implName = (implNameParameter == null || implNameParameter.isBlank()) ?
-            MCRConfiguration2.getStringOrThrow("MCR.IIIFImage.Default") :
-            implNameParameter;
+        String implName = (implNameParameter == null || implNameParameter.isBlank())
+            ? MCRConfiguration2.getStringOrThrow("MCR.IIIFImage.Default")
+            : implNameParameter;
 
         if (IMPLHOLDER.containsKey(implName)) {
             return IMPLHOLDER.get(implName);

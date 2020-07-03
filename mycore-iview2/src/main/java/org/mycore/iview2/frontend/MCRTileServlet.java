@@ -53,7 +53,7 @@ public class MCRTileServlet extends HttpServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRTileServlet.class);
 
-    private static MCRTileFileProvider TFP = MCRConfiguration2.<MCRDefaultTileFileProvider> getInstanceOf(
+    private static MCRTileFileProvider TFP = MCRConfiguration2.<MCRDefaultTileFileProvider>getInstanceOf(
         "MCR.IIIFImage.Iview.TileFileProvider").orElseGet(MCRDefaultTileFileProvider::new);
 
     /**
@@ -66,7 +66,7 @@ public class MCRTileServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         final MCRTileInfo tileInfo = getTileInfo(getPathInfo(req));
         Path iviewFile = TFP.getTileFile(tileInfo).orElse(null);
-        if(iviewFile==null) {
+        if (iviewFile == null) {
             LOGGER.info("TileFile not found: " + tileInfo);
             return;
         }

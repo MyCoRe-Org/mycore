@@ -40,7 +40,6 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityTransaction;
 
-import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
@@ -61,6 +60,8 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRDNBURNParser;
+
+import com.google.gson.Gson;
 
 /**
  * Service for assigning granular URNs to Derivate. You can call it with a Derivate-ID and it will assign a Base-URN for
@@ -281,14 +282,14 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         Gson gson = getGson();
 
         //just update flag for derivate, where additional is ""
-        if("".equals(additional)){
+        if ("".equals(additional)) {
             Iterator<String> flagsIter = flags.iterator();
-            while (flagsIter.hasNext()){
+            while (flagsIter.hasNext()) {
                 String flagStr = flagsIter.next();
                 MCRPI currentPi = gson.fromJson(flagStr, MCRPI.class);
 
                 if ("".equals(currentPi.getAdditional())
-                        && currentPi.getIdentifier().equals(mcrpi.getIdentifier())){
+                    && currentPi.getIdentifier().equals(mcrpi.getIdentifier())) {
                     //remove flag for update
                     flagsIter.remove();
                 }

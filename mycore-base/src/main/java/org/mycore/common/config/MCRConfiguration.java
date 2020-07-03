@@ -189,7 +189,7 @@ public class MCRConfiguration {
     @Deprecated
     public <T> T getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         return defaultname == null ? MCRConfiguration2.getOrThrow(name, MCRConfiguration2::instantiateClass)
-            : MCRConfiguration2.<T> getInstanceOf(name)
+            : MCRConfiguration2.<T>getInstanceOf(name)
                 .orElseGet(() -> MCRConfiguration2.instantiateClass(defaultname));
     }
 
@@ -206,7 +206,7 @@ public class MCRConfiguration {
      */
     @Deprecated
     public <T> T getInstanceOf(String name, T defaultObj) {
-        return MCRConfiguration2.<T> getInstanceOf(name).orElse(defaultObj);
+        return MCRConfiguration2.<T>getInstanceOf(name).orElse(defaultObj);
     }
 
     /**
@@ -218,7 +218,7 @@ public class MCRConfiguration {
      */
     @Deprecated
     public <T> Class<? extends T> getClass(String name) throws MCRConfigurationException {
-        return MCRConfiguration2.<T> getClass(name)
+        return MCRConfiguration2.<T>getClass(name)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 
@@ -231,7 +231,7 @@ public class MCRConfiguration {
      */
     @Deprecated
     public <T> Class<? extends T> getClass(String name, Class<? extends T> defaultClass) {
-        return MCRConfiguration2.<T> getClass(name).orElse(defaultClass);
+        return MCRConfiguration2.<T>getClass(name).orElse(defaultClass);
     }
 
     /**
@@ -261,7 +261,7 @@ public class MCRConfiguration {
     @Deprecated
     public <T> T getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         try {
-            return MCRConfiguration2.<T> getSingleInstanceOf(name, MCRClassTools.<T> forName(defaultname))
+            return MCRConfiguration2.<T>getSingleInstanceOf(name, MCRClassTools.<T>forName(defaultname))
                 .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
         } catch (ClassNotFoundException e) {
             throw MCRConfiguration2.createConfigurationException(name);
@@ -280,7 +280,7 @@ public class MCRConfiguration {
      */
     @Deprecated
     public <T> T getSingleInstanceOf(String name) {
-        return MCRConfiguration2.<T> getSingleInstanceOf(name)
+        return MCRConfiguration2.<T>getSingleInstanceOf(name)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(name));
     }
 

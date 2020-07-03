@@ -98,8 +98,8 @@ public class MCRParameterCollector {
         if (session != null) {
             setFromSession(session);
         }
-        
-        if(!MCRSessionMgr.isLocked()) {
+
+        if (!MCRSessionMgr.isLocked()) {
             MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
             setFromSession(mcrSession);
             setUnmodifyableParameters(mcrSession, request);

@@ -18,6 +18,8 @@
 
 package org.mycore.pi;
 
+import static org.mycore.pi.MCRPIJobService.CREATION_PREDICATE;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -28,8 +30,6 @@ import java.util.stream.Collectors;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-
-import static org.mycore.pi.MCRPIJobService.CREATION_PREDICATE;
 
 public class MCRPIServiceManager {
 

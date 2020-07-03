@@ -327,7 +327,7 @@ public class MCRXMLMetadataManager {
     private void setupStore(String project, String objectType, String configPrefix, boolean readOnly)
         throws ReflectiveOperationException {
         String baseID = getStoryKey(project, objectType);
-        Class<? extends MCRStore> clazz = MCRConfiguration2.<MCRStore> getClass(configPrefix + "Class")
+        Class<? extends MCRStore> clazz = MCRConfiguration2.<MCRStore>getClass(configPrefix + "Class")
             .orElseGet(() -> {
                 MCRConfiguration2.set(configPrefix + "Class", defaultClass.getName());
                 return defaultClass;

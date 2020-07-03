@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 public class MCRPrioritySupplier<T> implements Supplier<T>, MCRPrioritizable {
 
     private static AtomicLong CREATION_COUNTER = new AtomicLong(0);
-    
+
     private Supplier<T> delegate;
 
     private int priority;

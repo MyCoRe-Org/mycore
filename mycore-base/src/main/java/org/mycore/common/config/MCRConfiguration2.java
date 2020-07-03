@@ -181,7 +181,7 @@ public class MCRConfiguration2 {
      *             if the class can not be loaded or instantiated
      */
     public static <T> Optional<T> getSingleInstanceOf(String name, Class<? extends T> alternative) {
-        return MCRConfiguration2.<T> getSingleInstanceOf(name)
+        return MCRConfiguration2.<T>getSingleInstanceOf(name)
             .or(() -> Optional.ofNullable(alternative)
                 .map(className -> new MCRConfiguration2.SingletonKey(name, className.getName()))
                 .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
@@ -197,7 +197,7 @@ public class MCRConfiguration2 {
      *             if the the class can not be loaded or instantiated
      */
     public static <T> Optional<Class<? extends T>> getClass(String name) throws MCRConfigurationException {
-        return getString(name).map(MCRConfiguration2::<T> getClassObject);
+        return getString(name).map(MCRConfiguration2::<T>getClassObject);
     }
 
     /**

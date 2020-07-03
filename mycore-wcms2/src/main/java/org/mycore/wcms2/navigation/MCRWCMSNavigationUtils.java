@@ -44,7 +44,7 @@ import com.google.gson.JsonObject;
 public class MCRWCMSNavigationUtils {
 
     private static MCRWCMSNavigationProvider NAVIGATION_PROVIDER = MCRConfiguration2
-        .<MCRWCMSNavigationProvider> getInstanceOf("MCR.WCMS2.navigationProvider")
+        .<MCRWCMSNavigationProvider>getInstanceOf("MCR.WCMS2.navigationProvider")
         .orElseGet(MCRWCMSDefaultNavigationProvider::new);
 
     /**
