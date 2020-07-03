@@ -344,7 +344,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             return MCRUtils.filterTrimmedNotEmpty(parameters);
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return "Settings{" +
                 "classifID='" + classifID + '\'' +
                 ", categID='" + categID + '\'' +

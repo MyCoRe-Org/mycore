@@ -42,7 +42,7 @@ public class MCRFoFormatterHelper {
     /** Returns the XSL-FO formatter instance configured */
     public static synchronized MCRFoFormatterInterface getFoFormatter() {
         if (formatter == null) {
-            formatter = MCRConfiguration2.<MCRFoFormatterInterface>getInstanceOf(PROPERTY)
+            formatter = MCRConfiguration2.<MCRFoFormatterInterface> getInstanceOf(PROPERTY)
                 .orElseGet(MCRFoFormatterFOP::new);
         }
         return formatter;

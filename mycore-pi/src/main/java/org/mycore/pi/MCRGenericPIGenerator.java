@@ -212,7 +212,7 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
         if (XPATH_PATTERN.asPredicate().test(resultingPI)) {
             resultingPI = XPATH_PATTERN.matcher(resultingPI).replaceAll((mr) -> {
                 final String xpathNumberString = mr.group(1);
-                final int xpathNumber = Integer.parseInt(xpathNumberString, 10)-1;
+                final int xpathNumber = Integer.parseInt(xpathNumberString, 10) - 1;
                 if (this.xpath.length <= xpathNumber || xpathNumber < 0) {
                     throw new MCRException(
                         "The index of " + xpathNumber + " is out of bounds of xpath array (" + xpath.length + ")");
@@ -224,11 +224,11 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
                     MCRConstants.getStandardNamespaces());
                 final Object content = expr.evaluateFirst(mcrBase.createXML());
 
-                if(content instanceof Text){
+                if (content instanceof Text) {
                     return ((Text) content).getTextNormalize();
-                } else if (content instanceof Attribute){
+                } else if (content instanceof Attribute) {
                     return ((Attribute) content).getValue();
-                } else if (content instanceof Element){
+                } else if (content instanceof Element) {
                     return ((Element) content).getTextNormalize();
                 } else {
                     return content.toString();

@@ -161,7 +161,7 @@ public class MCRXMLMetadataManager {
         basePath = Paths.get(base);
         checkPath(basePath, "base");
 
-        defaultClass = MCRConfiguration2.<MCRVersioningMetadataStore>getClass("MCR.Metadata.Store.DefaultClass")
+        defaultClass = MCRConfiguration2.<MCRVersioningMetadataStore> getClass("MCR.Metadata.Store.DefaultClass")
             .orElse(MCRVersioningMetadataStore.class);
         if (MCRVersioningMetadataStore.class.isAssignableFrom(defaultClass)) {
             try {

@@ -236,9 +236,9 @@ public class MCRRestObjects {
             .lastModified(lastModified)
             .build();
     }
-    
+
     @GET
-    @Produces({ MediaType.APPLICATION_XML})
+    @Produces({ MediaType.APPLICATION_XML })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_MCRID + "}/metadata")
@@ -482,7 +482,7 @@ public class MCRRestObjects {
                 .toException();
         }
     }
-    
+
     @PUT
     @Consumes(MediaType.APPLICATION_XML)
     @Path("/{" + PARAM_MCRID + "}/metadata")
@@ -528,8 +528,8 @@ public class MCRRestObjects {
                 .toException();
         }
         try {
-                MCRMetadataManager.update(updatedObject);
-                return Response.status(Response.Status.NO_CONTENT).build();
+            MCRMetadataManager.update(updatedObject);
+            return Response.status(Response.Status.NO_CONTENT).build();
         } catch (MCRAccessException e) {
             throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
                 .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)

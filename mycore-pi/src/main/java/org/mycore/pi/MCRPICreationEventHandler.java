@@ -20,7 +20,8 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
         this.handleObjectUpdated(evt, obj);
     }
 
-    @Override protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+    @Override
+    protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         List<MCRPIRegistrationInfo> registered = MCRPIManager.getInstance().getRegistered(obj);
 
         final List<String> services = registered.stream().map(MCRPIRegistrationInfo::getService)
@@ -28,12 +29,12 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
 
         MCRPIServiceManager.getInstance().getAutoCreationList().stream()
             .filter(Predicate.not(services::contains))
-            .filter(s-> s.getCreationPredicate().test(obj))
-            .forEach( (serviceToRegister) -> {
+            .filter(s -> s.getCreationPredicate().test(obj))
+            .forEach((serviceToRegister) -> {
                 try {
                     serviceToRegister.register(obj, "", false);
-                } catch (MCRAccessException | MCRActiveLinkException | MCRPersistentIdentifierException |
-                    ExecutionException | InterruptedException e) {
+                } catch (MCRAccessException | MCRActiveLinkException | MCRPersistentIdentifierException
+                    | ExecutionException | InterruptedException e) {
                     throw new MCRException("Error while register pi for object " + obj.getId().toString(), e);
                 }
             });

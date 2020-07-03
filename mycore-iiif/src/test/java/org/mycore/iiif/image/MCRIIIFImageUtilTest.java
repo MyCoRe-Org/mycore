@@ -30,9 +30,11 @@ public class MCRIIIFImageUtilTest {
         Assert.assertEquals("bb157hs6068", MCRIIIFImageUtil.encodeImageIdentifier("bb157hs6068"));
         Assert.assertEquals("ark:%2F12025%2F654xz321", MCRIIIFImageUtil.encodeImageIdentifier("ark:/12025/654xz321"));
         Assert.assertEquals("urn:foo:a123,456", MCRIIIFImageUtil.encodeImageIdentifier("urn:foo:a123,456"));
-        Assert.assertEquals("http:%2F%2Fexample.com%2F%3F54%23a", MCRIIIFImageUtil.encodeImageIdentifier("http://example.com/?54#a"));
+        Assert.assertEquals("http:%2F%2Fexample.com%2F%3F54%23a",
+            MCRIIIFImageUtil.encodeImageIdentifier("http://example.com/?54#a"));
         Assert.assertEquals("Mot%C3%B6rhead", MCRIIIFImageUtil.encodeImageIdentifier("Motörhead"));
-        Assert.assertEquals("mycore_derivate_00000001:%2Ftest.tiff", MCRIIIFImageUtil.encodeImageIdentifier("mycore_derivate_00000001:/test.tiff"));
+        Assert.assertEquals("mycore_derivate_00000001:%2Ftest.tiff",
+            MCRIIIFImageUtil.encodeImageIdentifier("mycore_derivate_00000001:/test.tiff"));
     }
 
 }

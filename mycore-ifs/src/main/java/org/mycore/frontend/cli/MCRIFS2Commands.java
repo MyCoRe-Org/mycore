@@ -502,7 +502,7 @@ public class MCRIFS2Commands {
             return derivates;
         }
         File derivateDir = new File(projectDir, "derivate");
-        int maxSlotDeep = (int) (slotLayout.chars().filter(ch -> ch == '-').count()+1);
+        int maxSlotDeep = (int) (slotLayout.chars().filter(ch -> ch == '-').count() + 1);
         searchRecurive(derivates, derivateDir, maxSlotDeep, 0, projectId);
         return derivates;
     }

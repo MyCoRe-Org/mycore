@@ -281,14 +281,14 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
         Gson gson = getGson();
 
         //just update flag for derivate, where additional is ""
-        if("".equals(additional)){
+        if ("".equals(additional)) {
             Iterator<String> flagsIter = flags.iterator();
-            while (flagsIter.hasNext()){
+            while (flagsIter.hasNext()) {
                 String flagStr = flagsIter.next();
                 MCRPI currentPi = gson.fromJson(flagStr, MCRPI.class);
 
                 if ("".equals(currentPi.getAdditional())
-                        && currentPi.getIdentifier().equals(mcrpi.getIdentifier())){
+                    && currentPi.getIdentifier().equals(mcrpi.getIdentifier())) {
                     //remove flag for update
                     flagsIter.remove();
                 }

@@ -41,16 +41,16 @@ public abstract class MCRIIIFPresentationImpl {
     }
 
     public static synchronized MCRIIIFPresentationImpl getInstance(String implNameParameter) {
-        String implName = (implNameParameter == null || implNameParameter.isBlank()) ?
-            MCRConfiguration2.getStringOrThrow("MCR.IIIFPresentation.Default") :
-            implNameParameter;
+        String implName = (implNameParameter == null || implNameParameter.isBlank())
+            ? MCRConfiguration2.getStringOrThrow("MCR.IIIFPresentation.Default")
+            : implNameParameter;
 
         if (IMPLHOLDER.containsKey(implName)) {
             return IMPLHOLDER.get(implName);
         }
 
         String classPropertyName = MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName;
-        Class<? extends MCRIIIFPresentationImpl> classObject = MCRConfiguration2.<MCRIIIFPresentationImpl>getClass(
+        Class<? extends MCRIIIFPresentationImpl> classObject = MCRConfiguration2.<MCRIIIFPresentationImpl> getClass(
             classPropertyName)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(classPropertyName));
 

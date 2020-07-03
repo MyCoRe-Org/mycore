@@ -1629,7 +1629,7 @@ public final class MCRURIResolver implements URIResolver {
             String target = href.substring(href.indexOf(":") + 1);
 
             final Element i18nElement = new Element("i18n");
-            if(!target.contains("*") && !target.contains(",")){
+            if (!target.contains("*") && !target.contains(",")) {
                 i18nElement.addContent(MCRTranslation.translate(target));
                 return new JDOMSource(i18nElement);
             }
@@ -1639,11 +1639,11 @@ public final class MCRURIResolver implements URIResolver {
             // Combine translations to prevent duplicates
             HashMap<String, String> translations = new HashMap<>();
             for (String translationKey : translationKeys) {
-                if(translationKey.endsWith("*")){
+                if (translationKey.endsWith("*")) {
                     final String prefix = translationKey.substring(0, translationKey.length() - 1);
                     translations.putAll(MCRTranslation.translatePrefix(prefix));
                 } else {
-                    translations.put(translationKey,MCRTranslation.translate(translationKey));
+                    translations.put(translationKey, MCRTranslation.translate(translationKey));
                 }
             }
 

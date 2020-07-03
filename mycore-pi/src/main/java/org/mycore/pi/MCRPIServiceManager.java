@@ -76,7 +76,7 @@ public class MCRPIServiceManager {
 
         final MCRPIService mcrpiService = serviceCache.computeIfAbsent(id, (registrationServiceID) -> {
             String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
-            Class<? extends MCRPIService<T>> piClass = MCRConfiguration2.<MCRPIService<T>>getClass(propertyName)
+            Class<? extends MCRPIService<T>> piClass = MCRConfiguration2.<MCRPIService<T>> getClass(propertyName)
                 .orElseThrow(() -> MCRConfiguration2.createConfigurationException(propertyName));
 
             try {

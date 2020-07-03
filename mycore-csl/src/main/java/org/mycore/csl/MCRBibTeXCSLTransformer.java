@@ -21,6 +21,7 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
     public static final String DEFAULT_FORMAT = "text";
 
     public static final String DEFAULT_STYLE = "nature";
+
     private static final String CONFIG_PREFIX = "MCR.ContentTransformer.";
 
     private String configuredFormat;
@@ -40,7 +41,8 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
         configuredStyle = MCRConfiguration2.getString(CONFIG_PREFIX + id + ".style").orElse(DEFAULT_STYLE);
     }
 
-    @Override public MCRContent transform(MCRContent source) throws IOException {
+    @Override
+    public MCRContent transform(MCRContent source) throws IOException {
         return null;
     }
 
@@ -83,7 +85,8 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
         }
     }
 
-    @Override public MCRContent transform(MCRContent bibtext, MCRParameterCollector parameter) throws IOException {
+    @Override
+    public MCRContent transform(MCRContent bibtext, MCRParameterCollector parameter) throws IOException {
         final String format = parameter != null ? parameter.getParameter("format", configuredFormat) : configuredFormat;
         final String style = parameter != null ? parameter.getParameter("style", configuredStyle) : configuredStyle;
         try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format)) {

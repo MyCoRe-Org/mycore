@@ -34,5 +34,3 @@ public class MCRIIIFApp extends MCRJerseyRestApp {
             .toArray(String[]::new);
     }
 }
-
-

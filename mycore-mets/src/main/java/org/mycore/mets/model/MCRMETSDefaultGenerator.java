@@ -280,7 +280,7 @@ public class MCRMETSDefaultGenerator extends MCRMETSAbstractGenerator {
 
     private MCRILogicalStructMapTypeProvider getTypeProvider() {
         try {
-            return MCRConfiguration2.<MCRDefaultLogicalStructMapTypeProvider>getClass(
+            return MCRConfiguration2.<MCRDefaultLogicalStructMapTypeProvider> getClass(
                 "MCR.Component.MetsMods.LogicalStructMapTypeProvider")
                 .orElse(MCRDefaultLogicalStructMapTypeProvider.class).getDeclaredConstructor().newInstance();
         } catch (Exception e) {

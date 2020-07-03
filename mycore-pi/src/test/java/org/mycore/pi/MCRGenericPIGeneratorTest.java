@@ -39,8 +39,10 @@ public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
 
         final String pi1 = generator.generate(mcrObject, "").asString();
         final String pi2 = generator.generate(mcrObject, "").asString();
-        assertEquals("urn:nbn:de:gbv:" + CURRENT_YEAR + "-result1-result2-test-my-00000001-000-", pi1.substring(0, pi1.length() - 1));
-        assertEquals("urn:nbn:de:gbv:" + CURRENT_YEAR + "-result1-result2-test-my-00000001-001-", pi2.substring(0, pi2.length() - 1));
+        assertEquals("urn:nbn:de:gbv:" + CURRENT_YEAR + "-result1-result2-test-my-00000001-000-",
+            pi1.substring(0, pi1.length() - 1));
+        assertEquals("urn:nbn:de:gbv:" + CURRENT_YEAR + "-result1-result2-test-my-00000001-001-",
+            pi2.substring(0, pi2.length() - 1));
     }
 
     @Override

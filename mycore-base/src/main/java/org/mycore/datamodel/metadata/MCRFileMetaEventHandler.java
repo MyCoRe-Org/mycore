@@ -116,10 +116,10 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
         MCRObjectDerivate objectDerivate = derivate.getDerivate();
         String filePath = '/' + path.subpath(0, path.getNameCount()).toString();
         Optional<MCRFileMetadata> fileMetaWithoutURN = objectDerivate.getFileMetadata()
-                .stream()
-                .filter(m -> filePath.equals(m.getName()))
-                .filter(m -> m.getUrn() == null && m.getHandle() == null)
-                .findAny();
+            .stream()
+            .filter(m -> filePath.equals(m.getName()))
+            .filter(m -> m.getUrn() == null && m.getHandle() == null)
+            .findAny();
 
         if (fileMetaWithoutURN.isPresent() && objectDerivate.deleteFileMetaData(filePath)) {
             try {

@@ -246,10 +246,10 @@ public class MCRObjectService {
         }
 
         return IntStream.range(0, dates.size())
-                .mapToObj(dates::get)
-                .filter(d -> d.getType().equals(type))
-                .findAny()
-                .orElse(null);
+            .mapToObj(dates::get)
+            .filter(d -> d.getType().equals(type))
+            .findAny()
+            .orElse(null);
     }
 
     /**
@@ -330,7 +330,7 @@ public class MCRObjectService {
                 this.state = state;
             } else {
                 LOGGER.warn("Error at setting servstate classification.",
-                        new MCRException("The category " + state + " does not exist."));
+                    new MCRException("The category " + state + " does not exist."));
             }
         }
     }
@@ -345,7 +345,7 @@ public class MCRObjectService {
         } else {
             MCRCategoryID categState = new MCRCategoryID(
                 MCRConfiguration2.getString("MCR.Metadata.Service.State.Classification.ID").orElse("state"),
-                    state);
+                state);
             setState(categState);
         }
     }
@@ -356,7 +356,7 @@ public class MCRObjectService {
     public final void removeState() {
         this.state = null;
     }
-    
+
     /**
      * This method add a flag to the flag list.
      * 

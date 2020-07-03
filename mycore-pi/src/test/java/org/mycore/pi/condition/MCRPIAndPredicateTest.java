@@ -21,7 +21,8 @@ public class MCRPIAndPredicateTest extends MCRTestCase {
     @Test
     public void test() {
         final MCRBase emptyBase = new MCRBase() {
-            @Override protected String getRootTagName() {
+            @Override
+            protected String getRootTagName() {
                 return "null";
             }
         };

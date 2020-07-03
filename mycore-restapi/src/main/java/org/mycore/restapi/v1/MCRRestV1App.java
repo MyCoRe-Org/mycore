@@ -51,12 +51,12 @@ public class MCRRestV1App extends MCRJerseyRestApp {
         register(MCRNotAuthorizedExceptionMapper.class);
         register(MCRNormalizeMCRObjectIDsFilter.class);
     }
-	
+
     @Override
     protected String getVersion() {
         return "v1";
     }
-    
+
     @Override
     protected String[] getRestPackages() {
         return Stream

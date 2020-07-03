@@ -17,8 +17,8 @@ public class MCRIIIFBaseURLFilter implements ContainerRequestFilter {
     @Context
     private HttpServletRequest httpRequest;
 
-
-    @Override public void filter(ContainerRequestContext requestContext) throws IOException {
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
         // set BASE_URL_ATTRIBUTE to MCRSession
         if (httpRequest.getAttribute(BASE_URL_ATTRIBUTE) != null) {
             final MCRSession currentSession = MCRSessionMgr.getCurrentSession();

@@ -141,7 +141,7 @@ public class MCRJobMaster implements Runnable, Closeable {
         boolean activated = MCRConfiguration2.getBoolean(MCRJobQueue.CONFIG_PREFIX + "activated").orElse(true);
         activated = activated
             && MCRConfiguration2.getBoolean(MCRJobQueue.CONFIG_PREFIX + jobQueue.configPrefixAdd + "activated")
-            .orElse(true);
+                .orElse(true);
 
         LOGGER.info("JobQueue{} is {}", MCRJobQueue.singleQueue ? "" : " for \"" + action.getName() + "\"",
             activated ? "activated" : "deactivated");

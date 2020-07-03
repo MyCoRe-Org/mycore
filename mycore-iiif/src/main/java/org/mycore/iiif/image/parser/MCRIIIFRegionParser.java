@@ -70,7 +70,7 @@ public class MCRIIIFRegionParser {
             final int shorterDimension = Math.min(w, h);
             final int x1 = (int) Math.floor(w / 2.0 - shorterDimension / 2.0);
             final int y1 = (int) Math.floor(h / 2.0 - shorterDimension / 2.0);
-            return new MCRIIIFImageSourceRegion(x1, y1, x1+shorterDimension, y1+shorterDimension);
+            return new MCRIIIFImageSourceRegion(x1, y1, x1 + shorterDimension, y1 + shorterDimension);
         }
 
         return parseAbsoluteImageRegion();

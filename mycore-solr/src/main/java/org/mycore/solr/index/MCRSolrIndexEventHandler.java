@@ -58,6 +58,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     private static long DELAY_IN_MS = MCRConfiguration2.getLong("MCR.Solr.DelayIndexing_inMS").orElse(2000l);
 
     private static DelayQueue<MCRDelayedRunnable> SOLR_TASK_QUEUE = new DelayQueue<MCRDelayedRunnable>();
+
     private static ScheduledExecutorService SOLR_TASK_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
     private static synchronized void putIntoTaskQueue(MCRDelayedRunnable task) {
@@ -170,10 +171,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             putIntoTaskQueue(new MCRDelayedRunnable("updateDerivateFileIndex_" + derivate.getId().toString(),
-                    DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
-                        MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
-                                MCRSolrClientFactory.getMainSolrClient(), MCRSolrIndexer.HIGH_PRIORITY);
-                    })));
+                DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
+                    MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
+                        MCRSolrClientFactory.getMainSolrClient(), MCRSolrIndexer.HIGH_PRIORITY);
+                })));
         });
     }
 
@@ -195,30 +196,30 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             }
 
             putIntoTaskQueue(new MCRDelayedRunnable(objectOrDerivate.getId().toString(), DELAY_IN_MS,
-                    new MCRTransactionableRunnable(() -> {
-                        try {
-                            /*RS: do not use old stuff, get it fresh ...
-                            MCRContent content = (MCRContent) evt.get("content");
-                            if (content == null) {
-                                content = new MCRBaseContent(objectOrDerivate);
-                            }*/
-                            MCRContent content = MCRXMLMetadataManager.instance()
-                                    .retrieveContent(objectOrDerivate.getId());
+                new MCRTransactionableRunnable(() -> {
+                    try {
+                        /*RS: do not use old stuff, get it fresh ...
+                        MCRContent content = (MCRContent) evt.get("content");
+                        if (content == null) {
+                            content = new MCRBaseContent(objectOrDerivate);
+                        }*/
+                        MCRContent content = MCRXMLMetadataManager.instance()
+                            .retrieveContent(objectOrDerivate.getId());
 
-                            MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance()
-                                    .getIndexHandler(content, objectOrDerivate.getId());
-                            indexHandler.setCommitWithin(1000);
-                            MCRSolrIndexer.submitIndexHandler(indexHandler, MCRSolrIndexer.HIGH_PRIORITY);
+                        MCRSolrIndexHandler indexHandler = MCRSolrIndexHandlerFactory.getInstance()
+                            .getIndexHandler(content, objectOrDerivate.getId());
+                        indexHandler.setCommitWithin(1000);
+                        MCRSolrIndexer.submitIndexHandler(indexHandler, MCRSolrIndexer.HIGH_PRIORITY);
 
-                            if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("Solr: submitting data of \"{}\" for indexing done in {}ms ",
-                                        objectOrDerivate.getId(), System.currentTimeMillis() - tStart);
-                            }
-
-                        } catch (Exception ex) {
-                            LOGGER.error("Error creating transfer thread for object {}", objectOrDerivate, ex);
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Solr: submitting data of \"{}\" for indexing done in {}ms ",
+                                objectOrDerivate.getId(), System.currentTimeMillis() - tStart);
                         }
-                    })));
+
+                    } catch (Exception ex) {
+                        LOGGER.error("Error creating transfer thread for object {}", objectOrDerivate, ex);
+                    }
+                })));
         });
     }
 
@@ -235,10 +236,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         LOGGER.debug("Solr: submitting data of \"{}\" for derivate", derivate.getId());
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             putIntoTaskQueue(new MCRDelayedRunnable(derivate.getId().toString(), DELAY_IN_MS,
-                    new MCRTransactionableRunnable(() -> {
-                        MCRSolrIndexer.deleteDerivate(MCRSolrClientFactory.getMainSolrClient(),
-                                derivate.getId().toString());
-                    })));
+                new MCRTransactionableRunnable(() -> {
+                    MCRSolrIndexer.deleteDerivate(MCRSolrClientFactory.getMainSolrClient(),
+                        derivate.getId().toString());
+                })));
         });
     }
 
@@ -256,17 +257,17 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             putIntoTaskQueue(
-                    new MCRDelayedRunnable(path.toUri().toString(), DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
-                        try {
-                            MCRSolrIndexer
-                                    .submitIndexHandler(
-                                            MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
-                                                    MCRSolrClientFactory.getMainSolrClient()),
-                                            MCRSolrIndexer.HIGH_PRIORITY);
-                        } catch (Exception ex) {
-                            LOGGER.error("Error creating transfer thread for file {}", path, ex);
-                        }
-                    })));
+                new MCRDelayedRunnable(path.toUri().toString(), DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
+                    try {
+                        MCRSolrIndexer
+                            .submitIndexHandler(
+                                MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
+                                    MCRSolrClientFactory.getMainSolrClient()),
+                                MCRSolrIndexer.HIGH_PRIORITY);
+                    } catch (Exception ex) {
+                        LOGGER.error("Error creating transfer thread for file {}", path, ex);
+                    }
+                })));
         });
     }
 
@@ -276,13 +277,13 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
         }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
             putIntoTaskQueue(
-                    new MCRDelayedRunnable(file.toUri().toString(), DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
-                        UpdateResponse updateResponse = MCRSolrIndexer
-                                .deleteById(MCRSolrClientFactory.getMainSolrClient(), file.toUri().toString());
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Deleted file {}. Response:{}", file, updateResponse);
-                        }
-                    })));
+                new MCRDelayedRunnable(file.toUri().toString(), DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
+                    UpdateResponse updateResponse = MCRSolrIndexer
+                        .deleteById(MCRSolrClientFactory.getMainSolrClient(), file.toUri().toString());
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Deleted file {}. Response:{}", file, updateResponse);
+                    }
+                })));
         });
     }
 

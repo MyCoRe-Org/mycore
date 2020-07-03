@@ -48,16 +48,16 @@ public abstract class MCRIIIFImageImpl {
     }
 
     public static synchronized MCRIIIFImageImpl getInstance(String implNameParameter) {
-        String implName = (implNameParameter == null || implNameParameter.isBlank()) ?
-            MCRConfiguration2.getStringOrThrow("MCR.IIIFImage.Default") :
-            implNameParameter;
+        String implName = (implNameParameter == null || implNameParameter.isBlank())
+            ? MCRConfiguration2.getStringOrThrow("MCR.IIIFImage.Default")
+            : implNameParameter;
 
         if (IMPLHOLDER.containsKey(implName)) {
             return IMPLHOLDER.get(implName);
         }
 
         String classPropertyName = MCR_IIIF_IMAGE_CONFIG_PREFIX + implName;
-        Class<? extends MCRIIIFImageImpl> classObject = MCRConfiguration2.<MCRIIIFImageImpl>getClass(classPropertyName)
+        Class<? extends MCRIIIFImageImpl> classObject = MCRConfiguration2.<MCRIIIFImageImpl> getClass(classPropertyName)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(classPropertyName));
 
         try {

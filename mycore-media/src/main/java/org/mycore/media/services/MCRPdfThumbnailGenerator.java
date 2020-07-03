@@ -53,9 +53,9 @@ public class MCRPdfThumbnailGenerator implements MCRThumbnailGenerator {
     private PDPage resolveOpenActionPage(PDDocument pdf) throws IOException {
         PDDestinationOrAction openAction = pdf.getDocumentCatalog().getOpenAction();
 
-        if( openAction instanceof PDActionGoTo){
+        if (openAction instanceof PDActionGoTo) {
             final PDDestination destination = ((PDActionGoTo) openAction).getDestination();
-            if(destination instanceof PDPageDestination) {
+            if (destination instanceof PDPageDestination) {
                 openAction = destination;
             }
         }

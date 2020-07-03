@@ -18,9 +18,9 @@ public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
         setOrCreateElement(MAIN_DOC_ELEMENT_NAME, mainDoc);
     }
 
-    public void setClassifications(List<MCRCategoryID> list){
+    public void setClassifications(List<MCRCategoryID> list) {
         elementsWithNameFromContentList(CLASSIFICATION_ELEMENT_NAME).forEach(getContentList()::remove);
-        list.stream().map(clazz-> {
+        list.stream().map(clazz -> {
             final Element classElement = new Element(CLASSIFICATION_ELEMENT_NAME);
             classElement.setAttribute(CLASSID_ATTRIBUTE_NAME, clazz.getRootID());
             classElement.setAttribute(CATEGID_ATTRIBUTE_NAME, clazz.getID());
@@ -28,9 +28,9 @@ public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
         }).forEach(getContentList()::add);
     }
 
-    public void setTitles(List<MCRMetaLangText> titles){
+    public void setTitles(List<MCRMetaLangText> titles) {
         elementsWithNameFromContentList(TITLE_ELEMENT_NAME).forEach(getContentList()::remove);
-        titles.stream().map(title-> {
+        titles.stream().map(title -> {
             final Element titleElement = new Element(TITLE_ELEMENT_NAME);
             Optional.ofNullable(title.getLang())
                 .ifPresent(lang -> titleElement.setAttribute(LANG_ATTRIBUTE_NAME, lang, MCRConstants.XML_NAMESPACE));

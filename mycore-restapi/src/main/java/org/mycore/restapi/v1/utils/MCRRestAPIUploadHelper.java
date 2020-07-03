@@ -186,7 +186,7 @@ public class MCRRestAPIUploadHelper {
                     final List<MCRCategoryID> notExisting = categories.stream().filter(Predicate.not(dao::exist))
                         .collect(Collectors.toList());
 
-                    if(notExisting.size() > 0){
+                    if (notExisting.size() > 0) {
                         final String missingIDS = notExisting.stream()
                             .map(MCRCategoryID::toString).collect(Collectors.joining(", "));
                         throw new MCRRestAPIException(Status.NOT_FOUND,
@@ -198,7 +198,7 @@ public class MCRRestAPIUploadHelper {
                             final Set<MCRCategoryID> clazzSet = new HashSet<>(derLink.getClassifications());
                             return categories.stream().allMatch(clazzSet::contains);
                         }).findFirst();
-                    if(matchingDerivate.isPresent()){
+                    if (matchingDerivate.isPresent()) {
                         derID = matchingDerivate.get().getXLinkHrefID();
                     }
                 }
@@ -214,7 +214,7 @@ public class MCRRestAPIUploadHelper {
                 mcrDerivate.setSchema("datamodel-derivate.xsd");
                 mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
                 mcrDerivate.getDerivate()
-                        .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
+                    .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
 
                 if (classifications != null && classifications.length() > 0) {
                     final List<MCRMetaClassification> currentClassifications;
@@ -228,7 +228,7 @@ public class MCRRestAPIUploadHelper {
 
                 MCRMetadataManager.create(mcrDerivate);
                 MCRMetadataManager.addOrUpdateDerivateToObject(mcrObjIDObj,
-                        MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
+                    MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate));
             }
 
             response = Response
@@ -259,7 +259,7 @@ public class MCRRestAPIUploadHelper {
      */
     public static Response uploadFile(UriInfo info, HttpServletRequest request, String pathParamMcrObjID,
         String pathParamMcrDerID, InputStream uploadedInputStream, FormDataContentDisposition fileDetails,
-        String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5, 
+        String formParamPath, boolean formParamMaindoc, boolean formParamUnzip, String formParamMD5,
         Long formParamSize) throws MCRRestAPIException {
 
         SortedMap<String, String> parameter = new TreeMap<>();
