@@ -292,7 +292,7 @@
       </xsl:when>
       <xsl:otherwise>
         <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
-          <img src="//licensebuttons.net/l/{$licenseString}/{$licenseVersion}/{$CurrentLang}/88x31.png" />
+          <img src="//licensebuttons.net/l/{$licenseString}/{$licenseVersion}/88x31.png" />
         </a>
       </xsl:otherwise>
     </xsl:choose>
