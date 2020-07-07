@@ -98,6 +98,46 @@ namespace mycore.viewer.components {
             this._search(this._toolbarTextInput.value);
         }
 
+        public init() {
+            this._container = jQuery("<div></div>");
+            this._container.css({overflowY: "scroll", "text-align": "center"});
+            this._container.bind("iviewResize", () => {
+                this.updateContainerSize();
+            });
+
+            this._panel = jQuery("<div class='card search'></div>");
+            this._container.append(this._panel);
+
+            this._initProgressbar();
+            this._panel.append(this._progressbar);
+
+
+            this._toolbarTextInput.getProperty("value").addObserver({
+                propertyChanged : (_old: ViewerProperty<string>, _new: ViewerProperty<string>)=> {
+
+                    this.openSearch();
+
+                    if (this._searchAreaReady) {
+                        if (this._searchTextTimeout != -1) {
+                            window.clearTimeout(this._searchTextTimeout);
+                            this._searchTextTimeout = -1;
+                        }
+
+                        this._searchTextTimeout = window.setTimeout(()=> {
+                            this._search(this._toolbarTextInput.value);
+                        }, 300);
+                    }
+
+                }
+            });
+
+            this.trigger(new events.WaitForEvent(this, events.ProvideViewerSearcherEvent.TYPE));
+            this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
+            this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
+            this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
+            this.trigger(new events.WaitForEvent(this, events.RestoreStateEvent.TYPE));
+        }
+
         private _search(str:string) {
             if(str==""){
                 let direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_EAST;
@@ -109,6 +149,12 @@ namespace mycore.viewer.components {
             let textContents = [];
 
             this._searcher.search(str, (searchResults)=> {
+                if(searchResults.length==0){
+                    if (<any>this._settings["embedded"] === "true") {
+                        this.hideContainer();
+                    }
+                }
+
                 searchResults.forEach((results)=> {
                     results.arr.forEach(p => textContents.push(p));
                 });
@@ -145,54 +191,19 @@ namespace mycore.viewer.components {
                     let page = jQuery("<span class='childLabel'>" + (image.orderLabel || image.order) + "</span>");
                     result.append(page);
                 });
-            }, ()=> {
+            }, () => {
                 this._searchResultCanvasPageLayer.clear();
                 textContents.forEach(tc => {
-                    let areaRect:Rect = Rect.fromXYWH(tc.pos.x, tc.pos.y, tc.size.width, tc.size.height);
+                    let areaRect: Rect = Rect.fromXYWH(tc.pos.x, tc.pos.y, tc.size.width, tc.size.height);
                     this._searchResultCanvasPageLayer.add(tc.pageHref, areaRect);
                 });
                 this.trigger(new events.RedrawEvent(this));
             });
         }
 
-        public init() {
-            this._container = jQuery("<div></div>");
-            this._container.css({ overflowY: "scroll", "text-align": "center" });
-            this._container.bind("iviewResize", ()=> {
-                this.updateContainerSize();
-            });
-
-            this._panel = jQuery("<div class='card search'></div>");
-            this._container.append(this._panel);
-
-            this._initProgressbar();
-            this._panel.append(this._progressbar);
-
-
-            this._toolbarTextInput.getProperty("value").addObserver({
-                propertyChanged : (_old: ViewerProperty<string>, _new: ViewerProperty<string>)=> {
-
-                    this.openSearch();
-
-                    if (this._searchAreaReady) {
-                        if (this._searchTextTimeout != -1) {
-                            window.clearTimeout(this._searchTextTimeout);
-                            this._searchTextTimeout = -1;
-                        }
-
-                        this._searchTextTimeout = window.setTimeout(()=> {
-                            this._search(this._toolbarTextInput.value);
-                        }, 300);
-                    }
-
-                }
-            });
-
-            this.trigger(new events.WaitForEvent(this, events.ProvideViewerSearcherEvent.TYPE));
-            this.trigger(new events.WaitForEvent(this, events.StructureModelLoadedEvent.TYPE));
-            this.trigger(new events.WaitForEvent(this, events.ProvideToolbarModelEvent.TYPE));
-            this.trigger(new events.WaitForEvent(this, events.LanguageModelLoadedEvent.TYPE));
-            this.trigger(new events.WaitForEvent(this, events.RestoreStateEvent.TYPE));
+        private hideContainer() {
+            const direction = (this._settings.mobile) ? events.ShowContentEvent.DIRECTION_CENTER : events.ShowContentEvent.DIRECTION_EAST;
+            this.trigger(new events.ShowContentEvent(this, this._container, direction, 0, this._sidebarLabel));
         }
 
         private updateContainerSize() {
