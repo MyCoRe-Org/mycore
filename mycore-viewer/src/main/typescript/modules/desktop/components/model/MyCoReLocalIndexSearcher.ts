@@ -39,9 +39,9 @@ namespace mycore.viewer.model {
             let count = 0;
             this.model.imageList.forEach((image, i)=> {
                 resolver(image.additionalHrefs.get(MyCoReLocalIndexSearcher.PDF_TEXT_HREF), (href, textContent)=> {
-                    count++;
                     this.indexPage(textContent);
                     processIndicator(count, this.model._imageList.length-1);
+                    count++;
                 });
             });
         }
