@@ -370,10 +370,6 @@ public class MCRDOIService extends MCRDOIBaseService {
         }
         if (oldDataciteMetadata == null || !MCRXMLHelper.deepEqual(newDataciteMetadata, oldDataciteMetadata)) {
             LOGGER.info("Sending new Metadata of {} to Datacite!", idString);
-            if (oldDataciteMetadata != null) {
-                dataciteClient.deleteMetadata(doi);
-            }
-
             dataciteClient.storeMetadata(newDataciteMetadata);
         }
     }
