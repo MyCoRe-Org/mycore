@@ -75,7 +75,7 @@ public class MCRSolrSchemaReloader {
      * @param configType the name of the configuration directory containg the Solr core configuration
      * @param coreID the ID of the core, which the configuration should be applied to
      */
-    public static void clearSchema(String configType, String coreID) {
+    public static void cleanSchema(String configType, String coreID) {
 
         LOGGER.info("Clear SOLR schema for core " + coreID + " using configuration " + configType);
         try {

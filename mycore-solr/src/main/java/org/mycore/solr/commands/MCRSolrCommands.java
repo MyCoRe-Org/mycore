@@ -131,7 +131,8 @@ public class MCRSolrCommands extends MCRAbstractCommands {
             + "by using the Solr schema api for core with the id {0}",
         order = 70)
     public static void reloadSolrConfiguration(String configType, String coreID) {
-        MCRSolrSchemaReloader.clearSchema(configType, coreID);
+        MCRSolrConfigReloader.cleanConfig(configType, coreID);
+        MCRSolrSchemaReloader.cleanSchema(configType, coreID);
         MCRSolrSchemaReloader.processSchemaFiles(configType, coreID);
         MCRSolrConfigReloader.processConfigFiles(configType, coreID);
     }

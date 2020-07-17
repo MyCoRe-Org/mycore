@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -55,8 +56,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 /**
- * This class provides methods to reload a SOLR config using the SOLR config API
- * see https://lucene.apache.org/solr/guide/7_3/config-api.html
+ * This class provides methods to reload a SOLR configuration using the SOLR configuration API
+ * see https://lucene.apache.org/solr/guide/8_6/config-api.html
  *
  * @author Robert Stephan
  * @author Jens Kupferschmidt
@@ -66,7 +67,7 @@ public class MCRSolrConfigReloader {
 
     private static final List<String> SOLR_CONFIG_PROPERTY_COMMANDS = Arrays.asList("set-property", "unset-property");
 
-    //from https://lucene.apache.org/solr/guide/7_3/config-api.html
+    //from https://lucene.apache.org/solr/guide/8_6/config-api.html
     //key = lowercase object name from config api command (add-*, update-* delete-*) 
     //value = keyName in SOLR config json (retrieved via URL ../core-name/config)
 
@@ -89,10 +90,53 @@ public class MCRSolrConfigReloader {
     }
 
     /**
-     * This method modified the SOLR config definition based on all solr/{coreType}/solr-config.json 
+     * Clean SOLR configuration for defined items. This cleaning works over all in the property
+     * MCR.Solr.ObserverConfigTypes defined SOLR configuration parts for all in the
+     * MCR.Solr.ObserverConfigTypes.{observedType}.toClean property defined entries. For each entry the 
+     * method will process a SOLR delete command via API.
+     *
+     * @param configType the name of the configuration directory containing the SOLR core configuration
+     * @param coreID the ID of the core, which the configuration should be applied to
+     */
+    public static void cleanConfig(String configType, String coreID) {
+        LOGGER.info("Clean config definitions for core " + coreID + " using configuration " + configType);
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            String coreURL = MCRSolrClientFactory.get(coreID)
+                .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID)).getV1CoreURL();
+            List<String> observedTypes = getObserverConfigTypes();
+            JsonObject currentSolrConfig = retrieveCurrentSolrConfig(coreURL);
+            JsonObject configPart = currentSolrConfig.getAsJsonObject("config");
+
+            for (String observedType : observedTypes) {
+                String ignoreListConfiguration = MCRConfiguration2
+                    .getString("MCR.Solr.ObserverConfigTypes." + observedType + ".toClean").orElse("");
+                List<String> cleanList = Arrays.asList(ignoreListConfiguration.split("\\s*,\\s*"));
+                if (cleanList.size() == 0) {
+                    continue;
+                }
+                JsonObject observedConfig = configPart.getAsJsonObject(observedType);
+                Set<Map.Entry<String, JsonElement>> entries = observedConfig.entrySet();
+                for (Map.Entry<String, JsonElement> entry : entries) {
+                    if (cleanList.contains(entry.getKey())) {
+                        final JsonObject cleanJsonObject = new JsonObject();
+                        final String commandName = "delete-" + observedType.toLowerCase(Locale.ROOT);
+                        if (isKnownSolrConfigCommmand(commandName)) {
+                            cleanJsonObject.addProperty(commandName, entry.getKey());
+                            executeSolrCommand(coreURL, cleanJsonObject.toString());
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error(e);
+        }
+    }
+
+    /**
+     * This method modified the SOLR configuration definition based on all solr/{coreType}/solr-config.json 
      * in the MyCoRe-Maven modules resource path.
      *
-     * @param configType the name of the configuration directory containg the Solr core configuration
+     * @param configType the name of the configuration directory containing the SOLR core configuration
      * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processConfigFiles(String configType, String coreID) {
@@ -100,8 +144,7 @@ public class MCRSolrConfigReloader {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String coreURL = MCRSolrClientFactory.get(coreID)
                 .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID)).getV1CoreURL();
-            String observedTypesConfiguration = MCRConfiguration2.getString("MCR.Solr.ObserverConfigTypes").orElse("");
-            List<String> observedTypes = Arrays.asList(observedTypesConfiguration.split("\\s*,\\s*"));
+            List<String> observedTypes = getObserverConfigTypes();
             JsonObject currentSolrConfig = retrieveCurrentSolrConfig(coreURL);
 
             List<byte[]> configFileContents = MCRConfigurationInputStream.getConfigFileContents(
@@ -120,14 +163,22 @@ public class MCRSolrConfigReloader {
                     processConfigCommand(coreURL, command, currentSolrConfig, observedTypes);
                 }
             }
-
         } catch (IOException e) {
             LOGGER.error(e);
         }
     }
 
     /**
-     * processes a single SOLR config update command
+     * get the content of property MCR.Solr.ObserverConfigTypes as List
+     * @return the list of observed SOLR configuration types
+     */
+    private static List<String> getObserverConfigTypes() {
+        String observedTypesConfiguration = MCRConfiguration2.getString("MCR.Solr.ObserverConfigTypes").orElse("");
+        return Arrays.asList(observedTypesConfiguration.split("\\s*,\\s*"));
+    }
+
+    /**
+     * processes a single SOLR configuration command
      * @param coreURL - the URL of the core
      * @param command - the command in JSON syntax
      */
@@ -165,7 +216,7 @@ public class MCRSolrConfigReloader {
     }
 
     /**
-     * Sends a command to solr
+     * Sends a command to SOLR server
      * @param coreURL to which the command will be send
      * @param command the command as string
      * @throws UnsupportedEncodingException if command encoding is not supported
@@ -196,11 +247,11 @@ public class MCRSolrConfigReloader {
     }
 
     /**
-     * Checks if a given configType with passed name already was added to current solr configuration
-     * @param configType - Type of localized solr component e.g. request handlers, search components
-     * @param name - identification of config type
-     * @param solrConfig - current solr configuration
-     * @return - Is there already an entry in current solr configuration
+     * Checks if a given configType with passed name already was added to current SORL configuration
+     * @param configType - Type of localized SOLR component e.g. request handlers, search components
+     * @param name - identification of configuration type
+     * @param solrConfig - current SOLR configuration
+     * @return - Is there already an entry in current SOLR configuration
      */
     private static boolean isConfigTypeAlreadyAdded(String configType, JsonElement name, JsonObject solrConfig) {
 
@@ -211,9 +262,9 @@ public class MCRSolrConfigReloader {
     }
 
     /**
-     * retrieves the current solr configuration for the given core 
-     * @param coreURL from which the current solr configuration will be load
-     * @return the config as JSON object
+     * retrieves the current SOLR configuration for the given core 
+     * @param coreURL from which the current SOLR configuration will be load
+     * @return the configuration as JSON object
      */
     private static JsonObject retrieveCurrentSolrConfig(String coreURL) {
         HttpGet getConfig = new HttpGet(coreURL + "/config");
@@ -239,8 +290,8 @@ public class MCRSolrConfigReloader {
 
     /**
      *
-     * @param cmd
-     * @return true, if the command is in the list of known solr commands.
+     * @param cmd the SOLR API command
+     * @return true, if the command is in the list of known SOLR commands.
      */
 
     private static boolean isKnownSolrConfigCommmand(String cmd) {
