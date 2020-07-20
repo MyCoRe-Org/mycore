@@ -122,7 +122,7 @@ public class MCRSolrConfigReloader {
                 for (Map.Entry<String, JsonElement> entry : entries) {
                     if (cleanList.contains(entry.getKey())) {
                         final JsonObject cleanJsonObject = new JsonObject();
-                        final String commandName = "delete-" + observedType.toLowerCase();
+                        final String commandName = "delete-" + observedType.toLowerCase(Locale.ROOT);
                         if (isKnownSolrConfigCommmand(commandName)) {
                             cleanJsonObject.addProperty(commandName, entry.getKey());
                             executeSolrCommand(coreURL, cleanJsonObject.toString());
