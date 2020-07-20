@@ -111,15 +111,18 @@ public class MCRSolrConfigReloader {
                 String ignoreListConfiguration = MCRConfiguration2
                     .getString("MCR.Solr.ObserverConfigTypes." + observedType + ".toClean").orElse("");
                 List<String> cleanList = Arrays.asList(ignoreListConfiguration.split("\\s*,\\s*"));
-                if (cleanList.size() == 0) {
+                if (cleanList.isEmpty()) {
                     continue;
                 }
                 JsonObject observedConfig = configPart.getAsJsonObject(observedType);
+                if (observedConfig == null) {
+                    continue;
+                }
                 Set<Map.Entry<String, JsonElement>> entries = observedConfig.entrySet();
                 for (Map.Entry<String, JsonElement> entry : entries) {
                     if (cleanList.contains(entry.getKey())) {
                         final JsonObject cleanJsonObject = new JsonObject();
-                        final String commandName = "delete-" + observedType.toLowerCase(Locale.ROOT);
+                        final String commandName = "delete-" + observedType.toLowerCase();
                         if (isKnownSolrConfigCommmand(commandName)) {
                             cleanJsonObject.addProperty(commandName, entry.getKey());
                             executeSolrCommand(coreURL, cleanJsonObject.toString());
