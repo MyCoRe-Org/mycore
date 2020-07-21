@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * <pre>
  *  solr:{optional core}:query
- *  solr:{optional core}:{optional requestHandler:<requestHandler>}:query
+ *  solr:{optional core}:{optional requestHandler:&lt;requestHandler&gt;}:query
  *  solr:q=%2BobjectType%3Ajpjournal
  * </pre>
  *
