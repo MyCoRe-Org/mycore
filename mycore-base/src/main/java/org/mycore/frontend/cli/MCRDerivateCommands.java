@@ -61,9 +61,13 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -936,13 +940,30 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDStr);
 
         if (!MCRMetadataManager.exists(derivateID)) {
-            throw new MCRException("The object " + derivateIDStr + "does not exist!");
+            throw new MCRException("The derivate " + derivateIDStr + " does not exist!");
         }
 
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         derivate.setOrder(order);
         MCRMetadataManager.update(derivate);
 
+    }
+
+    @MCRCommand(syntax = "set classification of derivate {0} to {1}",
+        help = "Sets the classification of derivate {0} to the category {1} of classification 'derivate_types',"
+            + " removing any previous definition.")
+    public static void setClassificationOfDerivate(String derivateIDStr, String category) throws MCRAccessException {
+        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryID categoryID = new MCRCategoryID("derivate_types", category);
+        if (!categoryDAO.exist(categoryID)) {
+            throw new MCRPersistenceException("Category does not exist: " + categoryID);
+        }
+        final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDStr);
+        final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+        derivate.getDerivate().getClassifications().clear();
+        derivate.getDerivate().getClassifications()
+            .add(new MCRMetaClassification("classification", 0, null, categoryID.getRootID(), categoryID.getID()));
+        MCRMetadataManager.update(derivate);
     }
 
 }
