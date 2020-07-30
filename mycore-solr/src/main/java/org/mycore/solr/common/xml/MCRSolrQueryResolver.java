@@ -18,23 +18,27 @@
 
 package org.mycore.solr.common.xml;
 
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.URIResolver;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.search.MCRSolrURL;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.URIResolver;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
-
 /**
  * <pre>
- *  solr:{optional core}:query
- *  solr:{optional core}:{optional requestHandler:&lt;requestHandler&gt;}:query
- *  solr:q=%2BobjectType%3Ajpjournal
+ *  Usage:   solr:{optional core}:query
+ *  Example: solr:q=%2BobjectType%3Ajpjournal
+ *
+ *  Usage:   solr:{optional core}:{optional requestHandler:&lt;requestHandler&gt;}:query
+ *  Example: solr:requestHandler:browse-inventory:q=%2BobjectType%3Ajpjournal
+ *           solr:mysolrcore:requestHandler:browse-inventory:q=%2BobjectType%3Ajpjournal
  * </pre>
  *
  * @author Matthias Eichner
