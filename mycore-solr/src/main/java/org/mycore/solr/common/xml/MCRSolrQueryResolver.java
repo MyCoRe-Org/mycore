@@ -54,7 +54,8 @@ public class MCRSolrQueryResolver implements URIResolver {
         AtomicReference<SolrClient> solrClient = new AtomicReference<>(MCRSolrClientFactory.getMainSolrClient());
 
         int clientIndex = urlQuery.get().indexOf(":");
-        if (clientIndex != -1 && !(urlQuery.get().substring(0, clientIndex + REQUEST_HANDLER_QUALIFIER.length()).contains(REQUEST_HANDLER_QUALIFIER))) {
+        if (clientIndex != -1 && !(urlQuery.get().substring(0, clientIndex + REQUEST_HANDLER_QUALIFIER.length())
+            .contains(REQUEST_HANDLER_QUALIFIER))) {
             String coreID = urlQuery.get().substring(0, clientIndex);
             MCRSolrClientFactory.get(coreID).ifPresent(core -> {
                 solrClient.set(core.getClient());

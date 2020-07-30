@@ -105,7 +105,8 @@ public class MCRSolrURL {
         try {
             if (this.urlQuery == null) {
                 return new URL(
-                    solrClient.getBaseURL() + getRequestHandler() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, StandardCharsets.UTF_8)
+                    solrClient.getBaseURL() + getRequestHandler() + FIXED_URL_PART + "&q=" + URLEncoder
+                        .encode(q, StandardCharsets.UTF_8)
                         + "&start=" + start
                         + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, StandardCharsets.UTF_8)
                         + (returnScore ? "&fl=*,score" : "")
