@@ -21,6 +21,7 @@ package org.mycore.iview2.services;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileStore;
@@ -35,6 +36,7 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.activation.FileTypeMap;
@@ -124,7 +126,21 @@ public class MCRIView2Tools {
      * @see MCRContentTypes#probeContentType(Path)
      */
     public static boolean isFileSupported(Path file) throws IOException {
-        return file != null && SUPPORTED_CONTENT_TYPE.contains(MCRContentTypes.probeContentType(file));
+        try {
+            return Optional.ofNullable(file)
+                .map(path -> {
+                    try {
+                        return MCRContentTypes.probeContentType(path);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                })
+                .or(() -> Optional.of("application/octet-stream"))
+                .map(SUPPORTED_CONTENT_TYPE::contains)
+                .orElse(Boolean.FALSE);
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
     /**
