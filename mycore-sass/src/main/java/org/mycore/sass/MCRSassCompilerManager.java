@@ -140,6 +140,7 @@ public class MCRSassCompilerManager {
             try {
                 GssParser parser = new GssParser(new SourceCode(null, css));
                 final CompactPrinter cp = new CompactPrinter(parser.parse(), new NullGssSourceMapGenerator());
+                cp.setPreserveMarkedComments(true);
                 cp.runPass();
                 css = cp.getCompactPrintedString();
             } catch (GssParserException e) {
