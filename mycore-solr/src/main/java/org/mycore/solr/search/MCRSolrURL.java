@@ -29,6 +29,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,14 +38,14 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
 /**
  * Convenience class for holding the parameters for the solr search url.
- * 
+ *
  * @author shermann
  */
 public class MCRSolrURL {
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrURL.class);
 
-    public static final String FIXED_URL_PART = new MessageFormat("{0}?version={1}", Locale.ROOT)
-        .format(new Object[] { SOLR_QUERY_PATH, SOLR_QUERY_XML_PROTOCOL_VERSION });
+    public static final String FIXED_URL_PART = new MessageFormat("?version={0}", Locale.ROOT)
+        .format(new Object[] { SOLR_QUERY_XML_PROTOCOL_VERSION });
 
     private HttpSolrClient solrClient;
 
@@ -54,10 +55,17 @@ public class MCRSolrURL {
 
     boolean returnScore;
 
+    private Optional<String> requestHandler;
+
+    private MCRSolrURL() {
+        requestHandler = Optional.empty();
+    }
+
     /**
      * @param solrClient the solr server connection to use
      */
     public MCRSolrURL(HttpSolrClient solrClient) {
+        this();
         this.solrClient = solrClient;
         start = 0;
         rows = 10;
@@ -71,11 +79,12 @@ public class MCRSolrURL {
      * Creates a new solr url using your own url query. Be aware that you cannot
      * use the MCRSolrURL setter methods to edit your request. Only the urlQuery is
      * used.
-     * 
+     *
      * @param solrClient the solr server connection to use
      * @param urlQuery e.g. q=allMeta:Hello&amp;rows=20&amp;defType=edismax
      */
     public MCRSolrURL(HttpSolrClient solrClient, String urlQuery) {
+        this();
         this.solrClient = solrClient;
         this.urlQuery = urlQuery;
     }
@@ -96,13 +105,14 @@ public class MCRSolrURL {
         try {
             if (this.urlQuery == null) {
                 return new URL(
-                    solrClient.getBaseURL() + FIXED_URL_PART + "&q=" + URLEncoder.encode(q, StandardCharsets.UTF_8)
+                    solrClient.getBaseURL() + getRequestHandler() + FIXED_URL_PART + "&q=" + URLEncoder
+                        .encode(q, StandardCharsets.UTF_8)
                         + "&start=" + start
                         + "&rows=" + rows + "&sort=" + URLEncoder.encode(sortOptions, StandardCharsets.UTF_8)
                         + (returnScore ? "&fl=*,score" : "")
                         + (wt != null ? "&wt=" + wt : ""));
             } else {
-                return new URL(solrClient.getBaseURL() + FIXED_URL_PART + "&" + urlQuery);
+                return new URL(solrClient.getBaseURL() + getRequestHandler() + FIXED_URL_PART + "&" + urlQuery);
             }
         } catch (Exception urlException) {
             LOGGER.error("Error building solr url", urlException);
@@ -114,7 +124,7 @@ public class MCRSolrURL {
     /**
      * Invoke this method to get a {@link URL} referring to the luke interface of a solr server. 
      * Under this URL one can find useful information about the solr schema. 
-     * 
+     *
      * @return a {@link URL} refering to the luke interface or null
      */
     public URL getLukeURL() {
@@ -137,9 +147,9 @@ public class MCRSolrURL {
 
     /**
      * Adds a sort option to the solr url.
-     * 
+     *
      * @param sortBy the name of the field to sort by
-     * @param order the sort order, one can use {@link ORDER#asc} or {@link ORDER#desc} 
+     * @param order the sort order, one can use {@link ORDER#asc} or {@link ORDER#desc}
      */
     public void addSortOption(String sortBy, String order) {
         if (sortOptions.length() > 0) {
@@ -150,7 +160,7 @@ public class MCRSolrURL {
 
     /**
      * Adds a sort option to the solr url
-     * 
+     *
      * @param sort the sort option e.g. 'maintitle desc'
      */
     public void addSortOption(String sort) {
@@ -224,5 +234,23 @@ public class MCRSolrURL {
      */
     public boolean returnsScore() {
         return this.returnScore;
+    }
+
+    /**
+     * Sets the solr request handler.
+     *
+     * @param requestHandler the name of the request handler to set e.g. /foo
+     * */
+    public void setRequestHandler(String requestHandler) {
+        this.requestHandler = Optional.ofNullable(requestHandler);
+    }
+
+    /**
+     * Returns the current request handler.
+     *
+     * @return the solr request handler
+     * */
+    public String getRequestHandler() {
+        return this.requestHandler.orElse(SOLR_QUERY_PATH);
     }
 }

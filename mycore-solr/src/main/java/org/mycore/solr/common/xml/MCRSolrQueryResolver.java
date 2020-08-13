@@ -32,26 +32,44 @@ import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.search.MCRSolrURL;
 
 /**
- * <p>solr:{optional core}:query</p>
- * <p>solr:main:q=%2BobjectType%3Ajpjournal</p>
+ * <pre>
+ *  Usage:   solr:{optional core}:query
+ *  Example: solr:q=%2BobjectType%3Ajpjournal
+ *
+ *  Usage:   solr:{optional core}:{optional requestHandler:&lt;requestHandler&gt;}:query
+ *  Example: solr:requestHandler:browse-inventory:q=%2BobjectType%3Ajpjournal
+ *           solr:mysolrcore:requestHandler:browse-inventory:q=%2BobjectType%3Ajpjournal
+ * </pre>
  *
  * @author Matthias Eichner
+ * @author mcrsherm
  */
 public class MCRSolrQueryResolver implements URIResolver {
+
+    private static final String REQUEST_HANDLER_QUALIFIER = "requestHandler";
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         AtomicReference<String> urlQuery = new AtomicReference<>(href.substring(href.indexOf(":") + 1));
         AtomicReference<SolrClient> solrClient = new AtomicReference<>(MCRSolrClientFactory.getMainSolrClient());
+
         int clientIndex = urlQuery.get().indexOf(":");
-        if (clientIndex != -1) {
+        if (clientIndex != -1 && !(urlQuery.get().substring(0, clientIndex + REQUEST_HANDLER_QUALIFIER.length())
+            .contains(REQUEST_HANDLER_QUALIFIER))) {
             String coreID = urlQuery.get().substring(0, clientIndex);
             MCRSolrClientFactory.get(coreID).ifPresent(core -> {
                 solrClient.set(core.getClient());
-                urlQuery.set(urlQuery.get().substring(clientIndex + 1));
             });
         }
+
+        urlQuery.set(href.substring(href.lastIndexOf(":") + 1));
         MCRSolrURL solrURL = new MCRSolrURL((HttpSolrClient) solrClient.get(), urlQuery.get());
+
+        int handlerIndex = href.indexOf(REQUEST_HANDLER_QUALIFIER);
+        if (handlerIndex > -1) {
+            solrURL.setRequestHandler("/" + href.substring(handlerIndex).split(":")[1]);
+        }
+
         try {
             MCRURLContent result = new MCRURLContent(solrURL.getUrl());
             return result.getSource();
@@ -59,5 +77,4 @@ public class MCRSolrQueryResolver implements URIResolver {
             throw new TransformerException("Unable to get input stream from solr: " + solrURL.getUrl(), e);
         }
     }
-
 }
