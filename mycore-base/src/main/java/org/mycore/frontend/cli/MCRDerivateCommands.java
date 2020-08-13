@@ -954,13 +954,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     @MCRCommand(syntax = "set classification of derivate {0} to {1}",
         help = "Sets the classification of derivate {0} to the categories {1} (comma separated) "
-            + "of classification 'derivate_types', removing any previous definition.")
+            + "of classification 'derivate_types' or any fully qualified category, removing any previous definition.")
     public static void setClassificationOfDerivate(String derivateIDStr, String categoriesCommaList)
         throws MCRAccessException {
         final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
         final List<MCRCategoryID> derivateTypes = Stream.of(categoriesCommaList.split(","))
             .map(String::trim)
-            .map(category -> new MCRCategoryID("derivate_types", category))
+            .map(category -> category.contains(":") ? MCRCategoryID.fromString(category)
+                : new MCRCategoryID("derivate_types", category))
             .collect(Collectors.toList());
 
         final String nonExistingCategoriesCommaList = derivateTypes.stream()
