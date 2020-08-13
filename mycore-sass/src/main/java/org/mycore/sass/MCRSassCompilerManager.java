@@ -19,8 +19,6 @@
 package org.mycore.sass;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Date;
@@ -34,7 +32,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 
-import com.yahoo.platform.yui.compressor.CssCompressor;
+import com.google.common.css.SourceCode;
+import com.google.common.css.compiler.ast.GssParser;
+import com.google.common.css.compiler.ast.GssParserException;
+import com.google.common.css.compiler.passes.CompactPrinter;
+import com.google.common.css.compiler.passes.NullGssSourceMapGenerator;
 
 import io.bit3.jsass.CompilationException;
 import io.bit3.jsass.Compiler;
@@ -54,10 +56,6 @@ import io.bit3.jsass.importer.Importer;
 public class MCRSassCompilerManager {
 
     private static final String DEVELOPER_MODE_CONFIG_KEY = "MCR.SASS.DeveloperMode";
-
-    private static final String LINE_BREAK_CONFIG_KEY = "MCR.SASS.Compress.LineBreak";
-
-    private static final int DEFAULT_LINE_BREAK_CONFIG_VALUE = 7999;
 
     private Map<String, String> fileCompiledContentMap = new ConcurrentHashMap<>();
 
@@ -140,14 +138,13 @@ public class MCRSassCompilerManager {
         boolean compress = name.endsWith(".min.css");
         if (compress) {
             try {
-                CssCompressor cssCompressor = new CssCompressor(new StringReader(css));
-                int lineBreaks = MCRConfiguration2.getInt(LINE_BREAK_CONFIG_KEY)
-                    .orElse(DEFAULT_LINE_BREAK_CONFIG_VALUE);
-                StringWriter out = new StringWriter(css.length());
-                cssCompressor.compress(out, lineBreaks);
-                css = out.toString();
-            } catch (IOException e) {
-                throw new MCRException("Read from StringReader produces IOException! (this should not happen)", e);
+                GssParser parser = new GssParser(new SourceCode(null, css));
+                final CompactPrinter cp = new CompactPrinter(parser.parse(), new NullGssSourceMapGenerator());
+                cp.setPreserveMarkedComments(true);
+                cp.runPass();
+                css = cp.getCompactPrintedString();
+            } catch (GssParserException e) {
+                throw new MCRException("Error while parsing result css with compressor (" + name + ")", e);
             }
         }
 
