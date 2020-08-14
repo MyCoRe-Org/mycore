@@ -35,11 +35,11 @@
           <xsl:choose>
             <xsl:when test="@children = 'true'">
               <a id="f{$id}" href="#" onclick="toggleClass('{@id}','{$folder.closed}','{$folder.open}');">
-                <i class="{$folder.closed}" id="cbButton_{$id}" />
+                <i class="{$folder.closed}" id="cbButton_{$id}"><xsl:comment> </xsl:comment></i>
               </a>
             </xsl:when>
             <xsl:otherwise>
-              <i class="{$folder.leaf}" id="cbButton_{$id}" />
+              <i class="{$folder.leaf}" id="cbButton_{$id}" ><xsl:comment> </xsl:comment></i>
             </xsl:otherwise>
           </xsl:choose>
           <a id="r{$id}">

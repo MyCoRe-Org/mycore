@@ -34,8 +34,8 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>com.yahoo.platform.yui</groupId>
-      <artifactId>yuicompressor</artifactId>
+      <groupId>com.google.closure-stylesheets</groupId>
+      <artifactId>closure-stylesheets</artifactId>
     </dependency>
     <dependency>
       <groupId>io.bit3</groupId>

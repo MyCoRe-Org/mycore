@@ -1,4 +1,3 @@
-
 /*
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -43,11 +42,32 @@ namespace mycore.upload {
         private target: string | null;
         private uploadHandler: string | null;
         private object: string | null;
+        private classifications: string | null;
+
+        private readonly uploadTargetAttribute = "data-upload-target";
+
+        private readonly uploadClassificationsAttribute = "data-upload-classifications";
 
         constructor(element: HTMLElement, manualToggle: HTMLElement) {
-            this.target = element.getAttribute("data-upload-target");
+            this.target = element.getAttribute(this.uploadTargetAttribute);
             this.object = element.getAttribute("data-upload-object");
             this.uploadHandler = element.getAttribute("data-upload-handler");
+            this.classifications = element.getAttribute(this.uploadClassificationsAttribute);
+
+            const observer = new MutationObserver((mutations => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === "attributes") {
+                        if (this.uploadTargetAttribute === mutation.attributeName) {
+                            this.target = element.getAttribute(this.uploadTargetAttribute);
+                        }
+                        if (this.uploadClassificationsAttribute === mutation.attributeName) {
+                            this.classifications = element.getAttribute(this.uploadClassificationsAttribute);
+                        }
+                    }
+                })
+            }));
+
+            observer.observe(element, {attributes: true});
 
             element.addEventListener('dragover', (e: DragEvent) => {
                 e.stopPropagation();
@@ -56,7 +76,7 @@ namespace mycore.upload {
                 element.classList.add("dragover");
             });
 
-            element.addEventListener('dragleave', (e :DragEvent)=>{
+            element.addEventListener('dragleave', (e: DragEvent) => {
                 element.classList.remove("dragover");
             });
 
@@ -84,7 +104,7 @@ namespace mycore.upload {
                     fileInput.addEventListener('change', () => {
                         for (let i = 0; i < fileInput.files.length; i++) {
                             let file = fileInput.files.item(i);
-                            const fileTransfer = new FileTransfer(file, this.target, uploadID, this.object, [], this.uploadHandler);
+                            const fileTransfer = new FileTransfer(file, this.target, uploadID, this.object, [], this.uploadHandler, this.classifications);
                             FileTransferQueue.getQueue().add(fileTransfer);
                         }
                     });
@@ -94,7 +114,7 @@ namespace mycore.upload {
         }
 
         private traverse(fileEntry: WebKitFileEntry, uploadID: string, object: string, parentTransfers: FileTransfer[] = []) {
-            const fileTransfer = new FileTransfer(fileEntry, this.target, uploadID, object, parentTransfers, this.uploadHandler);
+            const fileTransfer = new FileTransfer(fileEntry, this.target, uploadID, object, parentTransfers, this.uploadHandler, this.classifications);
             FileTransferQueue.getQueue().add(fileTransfer);
 
             if (fileEntry.isDirectory) {
@@ -122,25 +142,7 @@ namespace mycore.upload {
 
     export class FileTransferQueue {
 
-        private static _singleton:FileTransferQueue;
-
-        /**
-         * gets the file queue singleton
-         * @returns {any | mycore.upload.FileTransferQueue}
-         */
-        public static getQueue() {
-            return FileTransferQueue._singleton || (FileTransferQueue._singleton = new FileTransferQueue());
-        }
-
-        public getAllCount(){
-            return this.newFileTransferList.length + this.pendingFileTransferList.length;
-        }
-
-
-        public getPendingCount(){
-            return this.pendingFileTransferList.length;
-        }
-
+        private static _singleton: FileTransferQueue;
         /**
          * List of all completed file handlers.
          * @type {FileTransferHandler[]}
@@ -169,13 +171,13 @@ namespace mycore.upload {
          * List of all error event handler.
          * @type {FileTransferHandler[]}
          */
-        private errorHandlerList:Array<FileTransferHandler> = [];
+        private errorHandlerList: Array<FileTransferHandler> = [];
 
         /**
          * List of all progress event handler.
          * @type {FileTransferHandler[]}
          */
-        private progressHandlerList:Array<FileTransferHandler> = [];
+        private progressHandlerList: Array<FileTransferHandler> = [];
 
         /**
          * List of all abort event handler.
@@ -188,16 +190,15 @@ namespace mycore.upload {
          * @type {FileTransferHandler[]}
          */
         private newFileTransferList: Array<FileTransfer> = [];
-
         /**
          * List of all pending file transfers
          * @type {FileTransfer[]}
          */
         private pendingFileTransferList: Array<FileTransfer> = [];
 
-        private commitHandlerList: Array<(uploadID:string)=>void> = [];
+        private commitHandlerList: Array<(uploadID: string, error: boolean, err?: string) => void> = [];
 
-        private commitStartHandlerList: Array<(uploadID:string)=>void> = [];
+        private commitStartHandlerList: Array<(uploadID: string) => void> = [];
 
 
         /**
@@ -213,6 +214,22 @@ namespace mycore.upload {
         private uploadIDCount: {} = {};
 
         constructor() {
+        }
+
+        /**
+         * gets the file queue singleton
+         * @returns {any | mycore.upload.FileTransferQueue}
+         */
+        public static getQueue() {
+            return FileTransferQueue._singleton || (FileTransferQueue._singleton = new FileTransferQueue());
+        }
+
+        public getAllCount() {
+            return this.newFileTransferList.length + this.pendingFileTransferList.length;
+        }
+
+        public getPendingCount() {
+            return this.pendingFileTransferList.length;
         }
 
         public abort(transfer: FileTransfer) {
@@ -236,7 +253,7 @@ namespace mycore.upload {
             });
 
             // Abort also all transfers which depend of this (important for Folders)
-            [ this.newFileTransferList, this.pendingFileTransferList ].forEach(possibleList => {
+            [this.newFileTransferList, this.pendingFileTransferList].forEach(possibleList => {
                 possibleList.filter(otherTransfer => {
                     return otherTransfer.requires.indexOf(transfer) != -1;
                 }).forEach(otherTransferToAbort => {
@@ -255,22 +272,6 @@ namespace mycore.upload {
                 handler(transfer);
             });
             this.startTransfers();
-        }
-
-        private getCountForUploadID(id: string) {
-            if (!(id in this.uploadIDCount)) {
-                this.uploadIDCount[id] = 0;
-            }
-
-            return this.uploadIDCount[id];
-        }
-
-        private increaseCountForID(id: string) {
-            this.uploadIDCount[id] = this.getCountForUploadID(id) + 1;
-        }
-
-        private decreaseCountForID(id: string) {
-            this.uploadIDCount[id] = this.getCountForUploadID(id) - 1;
         }
 
         public addCompleteHandler(handler: FileTransferHandler) {
@@ -301,12 +302,37 @@ namespace mycore.upload {
             this.abortHandlerList.push(handler);
         }
 
-        public addStartCommitHandler(handler: (uploadID:string)=>void){
+        public addStartCommitHandler(handler: (uploadID: string) => void) {
             this.commitStartHandlerList.push(handler);
         }
 
-        public addCommitCompleteHandler(handler: (uploadID:string)=>void){
+        public addCommitCompleteHandler(handler: (uploadID: string, error: boolean, err?: string) => void) {
             this.commitHandlerList.push(handler);
+        }
+
+        public abortAll() {
+            this.newFileTransferList.forEach((tr) => {
+                this.abort(tr);
+            });
+            this.pendingFileTransferList.forEach((tr) => {
+                this.abort(tr);
+            })
+        }
+
+        private getCountForUploadID(id: string) {
+            if (!(id in this.uploadIDCount)) {
+                this.uploadIDCount[id] = 0;
+            }
+
+            return this.uploadIDCount[id];
+        }
+
+        private increaseCountForID(id: string) {
+            this.uploadIDCount[id] = this.getCountForUploadID(id) + 1;
+        }
+
+        private decreaseCountForID(id: string) {
+            this.uploadIDCount[id] = this.getCountForUploadID(id) - 1;
         }
 
         private getNextPossibleTransfer() {
@@ -322,7 +348,7 @@ namespace mycore.upload {
         private startTransfers() {
             let canStartCount = Math.max(0, Math.min(this.MAX_PENDING_SIZE - this.pendingFileTransferList.length, this.newFileTransferList.length));
 
-            for (let startedCount = 0; startedCount < canStartCount; ) {
+            for (let startedCount = 0; startedCount < canStartCount;) {
                 let newTransfer = this.getNextPossibleTransfer();
                 if (newTransfer != null) {
                     this.removeNew(newTransfer);
@@ -345,8 +371,8 @@ namespace mycore.upload {
                 this.completeHandlerList.forEach((handler) => {
                     handler(transfer);
                 });
-                if (this.getCountForUploadID(transfer.uploadID)==0) {
-                    this.commitTransfer(transfer.uploadID, transfer.uploadHandler);
+                if (this.getCountForUploadID(transfer.uploadID) == 0) {
+                    this.commitTransfer(transfer.uploadID, transfer.uploadHandler, transfer.classifications);
                 }
                 this.startTransfers();
             };
@@ -359,9 +385,9 @@ namespace mycore.upload {
             };
         }
 
-        private getTransferProgress(transfer: FileTransfer): ()=> void {
-            return ()=>{
-                this.progressHandlerList.forEach(handler=> handler(transfer));
+        private getTransferProgress(transfer: FileTransfer): () => void {
+            return () => {
+                this.progressHandlerList.forEach(handler => handler(transfer));
             };
         }
 
@@ -375,27 +401,37 @@ namespace mycore.upload {
             this.newFileTransferList.splice(transferIndex, 1);
         }
 
-        private commitTransfer(uploadID: string, uploadHandler: string = null) {
+        private commitTransfer(uploadID: string, uploadHandler: string = null, classifications: string = null) {
             const xhr = new XMLHttpRequest();
             const uploadHandlerParameter = (uploadHandler != null) ? "&uploadHandler=" + uploadHandler : "";
+            const classificationsParameter = (uploadHandler != null) ? "&classifications=" + classifications : "";
+            const basicURL = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/commit?uploadID=" + uploadID;
 
-            this.commitStartHandlerList.forEach(handler=>handler(uploadID));
+            this.commitStartHandlerList.forEach(handler => handler(uploadID));
 
-            xhr.open('PUT', Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/commit" + "?uploadID=" + uploadID + uploadHandlerParameter, true);
+            xhr.open('PUT', basicURL + uploadHandlerParameter + classificationsParameter, true);
             xhr.onload = (result) => {
-                this.commitHandlerList.forEach(handler=> handler(uploadID));
+                if (xhr.status === 204 || xhr.status === 201 || xhr.status == 200) {
+                    this.commitHandlerList.forEach(handler => handler(uploadID, false));
+                } else {
+                    let message;
+                    switch (xhr.responseType) {
+                        case "document":
+                            message = xhr.responseXML.querySelector("message").textContent
+                            break;
+                        case "text":
+                            message = xhr.responseText;
+                            break;
+                        default:
+                            message = xhr.statusText;
+                    }
+                    this.commitHandlerList.forEach(handler => handler(uploadID, true, message))
+                }
+
+
             };
 
             xhr.send();
-        }
-
-        public abortAll() {
-            this.newFileTransferList.forEach((tr)=>{
-                this.abort(tr);
-            });
-            this.pendingFileTransferList.forEach((tr)=>{
-                this.abort(tr);
-            })
         }
     }
 
@@ -405,16 +441,23 @@ namespace mycore.upload {
 
     export class FileTransfer {
 
+        private aborted: boolean = false;
+        private completeHandler: () => void;
+        private errorHandler: () => void;
+        private progressHandler: () => void;
+        private request: XMLHttpRequest;
+
         constructor(private _entry: WebKitFileEntry | File,
                     private _target: string,
                     private _uploadID: string,
                     private _targetObject: string,
                     public requires: Array<FileTransfer> = [],
-                    private _uploadHandler: string = null) {
-            this._transferID = (Math.random()*1000).toString();
+                    private _uploadHandler: string = null,
+                    private _classifications: string = null) {
+            this._transferID = (Math.random() * 1000).toString();
         }
 
-        get fileName():string {
+        get fileName(): string {
             return (this._entry instanceof File) ? this._entry.name : this._entry.fullPath;
         }
 
@@ -434,30 +477,48 @@ namespace mycore.upload {
             return this._target;
         }
 
+        get targetObject(): string {
+            return this._targetObject;
+        }
+
+        get classifications(): string {
+            return this._classifications;
+        }
+
+        private _error: boolean = false;
+
         get error(): boolean {
             return this._error;
         }
+
+        private _started: boolean = false;
 
         get started(): boolean {
             return this._started;
         }
 
+        private _complete: boolean = false;
+
         get complete(): boolean {
             return this._complete;
         }
 
-        get total(): number {
-            return this._total;
-        }
+        private _loaded: number = 0;
+
         get loaded(): number {
             return this._loaded;
         }
-        get transferID(): string {
-            return this._transferID;
+
+        private _total: number = 0;
+
+        get total(): number {
+            return this._total;
         }
 
-        get targetObject(): string {
-            return this._targetObject;
+        private _transferID: string;
+
+        get transferID(): string {
+            return this._transferID;
         }
 
         public abort() {
@@ -467,22 +528,7 @@ namespace mycore.upload {
             }
         }
 
-        private _error: boolean = false;
-        private _started: boolean = false;
-        private _complete: boolean = false;
-        private aborted: boolean = false;
-
-        private completeHandler: () => void;
-        private errorHandler: () => void;
-        private progressHandler: ()=>void;
-
-        private _loaded:number = 0;
-        private _total:number = 0;
-
-        private _transferID: string;
-
-
-        public start(completeHandler?: () => void, errorHandler?: () => void, progressHandler?:()=>void): void {
+        public start(completeHandler?: () => void, errorHandler?: () => void, progressHandler?: () => void): void {
             this.completeHandler = completeHandler;
             this.errorHandler = errorHandler;
             this.progressHandler = progressHandler;
@@ -515,8 +561,6 @@ namespace mycore.upload {
 
         }
 
-        private request: XMLHttpRequest;
-
         public send(file?: File): void {
             let uploadPath;
             if (this._entry instanceof File) {
@@ -540,12 +584,12 @@ namespace mycore.upload {
             };
 
             this.request.upload.onprogress = (ev) => {
-                if(ev.lengthComputable){
+                if (ev.lengthComputable) {
                     this._loaded = ev.loaded;
                     this._total = ev.total;
                 }
 
-                if(this.progressHandler){
+                if (this.progressHandler) {
                     this.progressHandler();
                 }
             };
@@ -558,13 +602,13 @@ namespace mycore.upload {
 
             try {
 
-            if(typeof file != "undefined"){
-                this.request.send(file);
-            } else {
-                this.request.send();
-            }
+                if (typeof file != "undefined") {
+                    this.request.send(file);
+                } else {
+                    this.request.send();
+                }
             } catch (e) {
-                if(this.errorHandler){
+                if (this.errorHandler) {
                     this.errorHandler();
                 }
             }

@@ -748,35 +748,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </reporting>
     </profile>
     <profile>
-      <id>bamboo</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <configuration>
-              <archive>
-                <manifest>
-                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                  <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                </manifest>
-                <manifestEntries>
-                  <Specification-Title>${project.name}</Specification-Title>
-                  <Specification-Version>${project.version}</Specification-Version>
-                  <Implementation-Version>${bambooPlanRepositoryBranchName}</Implementation-Version>
-                  <Implementation-Build>${bambooBuildNumber}</Implementation-Build>
-                  <Implementation-Revision>${bambooPlanRepositoryRevision}</Implementation-Revision>
-                  <Git-Repository>${bambooPlanRepositoryRepositoryUrl}</Git-Repository>
-                  <MCR-Artifact-Id>${project.artifactId}</MCR-Artifact-Id>
-                  <Priority>${manifest.priority}</Priority>
-                </manifestEntries>
-              </archive>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
       <id>keepNode</id>
       <build>
         <plugins>
@@ -843,6 +814,17 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.google.closure-stylesheets</groupId>
+        <artifactId>closure-stylesheets</artifactId>
+        <version>1.5.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.javascript</groupId>
+            <artifactId>closure-compiler-unshaded</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
         <version>2.8.6</version>
@@ -882,18 +864,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
         <version>1.14.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.yahoo.platform.yui</groupId>
-        <artifactId>yuicompressor</artifactId>
-        <version>2.4.8</version>
-        <exclusions>
-          <exclusion>
-            <!-- is also bundled in yuicompressor -->
-            <groupId>rhino</groupId>
-            <artifactId>js</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>

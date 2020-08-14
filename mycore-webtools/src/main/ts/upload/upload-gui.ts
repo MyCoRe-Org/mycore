@@ -22,19 +22,26 @@ namespace mycore.upload {
     export class FileTransferGUI {
 
 
+        private _uploadBox: HTMLElement = null;
+        private _idEntryMap: {} = {};
+        private completedCount: number = 0;
+        private tpMap = {};
+        private runningCommitList: Array<string> = [];
+
         constructor() {
             this.registerEventHandler();
         }
 
-        private _uploadBox: HTMLElement = null;
-        private _idEntryMap: {} = {};
+        static start() {
+            new FileTransferGUI();
+        }
 
         private inititalizeBox(): void {
             this._uploadBox = Helper.htmlToElement(FileTransferGUITemplates.boxTemplate);
             this.translateElements();
             window.document.body.appendChild(this._uploadBox);
 
-            (<HTMLElement>this._uploadBox.querySelector(".mcr-upload-transfer-all-abort")).addEventListener('click', ()=>{
+            (<HTMLElement>this._uploadBox.querySelector(".mcr-upload-transfer-all-abort")).addEventListener('click', () => {
                 FileTransferQueue.getQueue().abortAll();
             });
         }
@@ -42,8 +49,6 @@ namespace mycore.upload {
         private translateElements() {
             I18N.translateElements(this._uploadBox);
         }
-
-        private completedCount: number = 0;
 
         private registerEventHandler(): void {
             const queue = FileTransferQueue.getQueue();
@@ -72,20 +77,20 @@ namespace mycore.upload {
                 this.handleTransferAbort(ft);
             });
 
-            queue.addStartCommitHandler((uploadID:string)=>{
+            queue.addStartCommitHandler((uploadID: string) => {
                 this.handleCommitStartet(uploadID);
             });
 
-            queue.addCommitCompleteHandler((uploadID:string)=>{
-                this.handleCommitCompleted(uploadID);
+            queue.addCommitCompleteHandler((uploadID: string, error: boolean, message: string) => {
+                this.handleCommitCompleted(uploadID, error, message);
             });
 
-            queue.addProgressHandler((ft)=> this.handleTransferProgress(ft));
+            queue.addProgressHandler((ft) => this.handleTransferProgress(ft));
 
-            window.setInterval(()=>{
-                for(let id in this.tpMap){
+            window.setInterval(() => {
+                for (let id in this.tpMap) {
                     let progress = this.tpMap[id];
-                    this.setTransferProgress(this.getEntry(progress.transfer), progress.loaded, progress.total );
+                    this.setTransferProgress(this.getEntry(progress.transfer), progress.loaded, progress.total);
                 }
             }, 500);
 
@@ -93,13 +98,13 @@ namespace mycore.upload {
             window.setInterval(() => {
                 let allRate = 0;
                 for (let id in this.tpMap) {
-                    let progress = this.tpMap[ id ];
+                    let progress = this.tpMap[id];
                     if (id in lastLoaded) {
-                        let bytesInSecond = progress.loaded - lastLoaded[ id ];
+                        let bytesInSecond = progress.loaded - lastLoaded[id];
                         allRate += bytesInSecond;
                         this.setTransferRate(this.getEntry(progress.transfer), bytesInSecond);
                     }
-                    lastLoaded[ id ] = progress.loaded;
+                    lastLoaded[id] = progress.loaded;
                 }
 
                 this.setAllProgress(allRate);
@@ -145,7 +150,7 @@ namespace mycore.upload {
         private removeTransferEntry(transfer: mycore.upload.FileTransfer) {
             const entry = this.getEntry(transfer);
             entry.remove();
-            delete this.tpMap[ transfer.transferID ];
+            delete this.tpMap[transfer.transferID];
         }
 
         private handleTransferError(transfer: FileTransfer) {
@@ -158,20 +163,18 @@ namespace mycore.upload {
 
         private handleTransferAbort(transfer: FileTransfer) {
             if (transfer.transferID in this.tpMap) {
-                delete this.tpMap[ transfer.transferID ];
+                delete this.tpMap[transfer.transferID];
             }
             this.removeTransferEntry(transfer);
         }
 
-        private tpMap = {};
-
         private handleTransferProgress(transfer: FileTransfer) {
             const transID = transfer.transferID;
-            this.tpMap[ transID ] =
+            this.tpMap[transID] =
                 {
-                    transfer : transfer,
-                    loaded : transfer.loaded,
-                    total : transfer.total
+                    transfer: transfer,
+                    loaded: transfer.loaded,
+                    total: transfer.total
                 };
         }
 
@@ -190,7 +193,7 @@ namespace mycore.upload {
                 const percent = (current / all * 100).toPrecision(1);
 
                 (<HTMLElement>entry.querySelector(".mcr-upload-file-size")).innerText = currentStr + " / " + sizeStr;
-                const progressBarElement = (<HTMLElement> entry.querySelector(".mcr-upload-progressbar"));
+                const progressBarElement = (<HTMLElement>entry.querySelector(".mcr-upload-progressbar"));
                 progressBarElement.style.width = percent + "%";
                 progressBarElement.setAttribute("aria-valuenow", percent);
             } else if (Helper.isString(entry)) {
@@ -212,15 +215,11 @@ namespace mycore.upload {
             return newEntry;
         }
 
-        static start() {
-            new FileTransferGUI();
-        }
-
         private setTransferRate(entry: HTMLElement | string, bytesInSecond: number) {
             if (entry instanceof HTMLElement) {
                 (<HTMLElement>entry.querySelector(".mcr-upload-transfer-rate")).innerText = Helper.formatBytes(bytesInSecond, 1) + "/s";
             } else if (Helper.isString(entry)) {
-                this.setFileName(this._idEntryMap[ entry ], name);
+                this.setFileName(this._idEntryMap[entry], name);
             }
         }
 
@@ -231,27 +230,40 @@ namespace mycore.upload {
             }
         }
 
-        private runningCommitList:Array<string> = [];
-
         private handleCommitStartet(uploadID: string) {
             this.runningCommitList.push(uploadID);
             this.showCommitWarning(true);
         }
 
-        private handleCommitCompleted(uploadID: string) {
+        private handleCommitCompleted(uploadID: string, error: boolean, message: string) {
             this.runningCommitList.splice(this.runningCommitList.indexOf(uploadID), 1);
-            if(this.runningCommitList.length===0){
+            if (!error) {
+                if (this.runningCommitList.length === 0) {
+                    this.showCommitWarning(false);
+                    window.location.reload();
+                }
+            } else {
                 this.showCommitWarning(false);
-                window.location.reload();
+                this.showCommitError(message);
             }
         }
 
-        private showCommitWarning(show:boolean) {
+        private showCommitError(message: string) {
+            const error = this._uploadBox.querySelector(".mcr-commit-error");
+            if (error.classList.contains("d-none")) {
+                error.classList.remove("d-none");
+            }
+
+            const errorMessageElement = error.querySelector(".mcr-error-message");
+            errorMessageElement.textContent = message;
+        }
+
+        private showCommitWarning(show: boolean) {
             const warning = this._uploadBox.querySelector(".mcr-commit-warn");
 
-            if(show && warning.classList.contains("d-none")){
+            if (show && warning.classList.contains("d-none")) {
                 warning.classList.remove("d-none");
-            } else if(!show && !warning.classList.contains("d-none")){
+            } else if (!show && !warning.classList.contains("d-none")) {
                 warning.classList.add("d-none");
             }
         }
@@ -260,7 +272,7 @@ namespace mycore.upload {
     class Helper {
 
         static isString(s) {
-            return typeof(s) === 'string' || s instanceof String;
+            return typeof (s) === 'string' || s instanceof String;
         }
 
         static htmlToElement(html: string): HTMLElement {
@@ -275,24 +287,15 @@ namespace mycore.upload {
             if (bytes == 0) return '0 Bytes';
             const base = 1024;
             const dm = decimals || 2;
-            const sizes = [ 'Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
             const i = Math.floor(Math.log(bytes) / Math.log(base));
-            return parseFloat((bytes / Math.pow(base, i)).toFixed(dm)) + ' ' + sizes[ i ];
+            return parseFloat((bytes / Math.pow(base, i)).toFixed(dm)) + ' ' + sizes[i];
         }
 
 
     }
 
     class FileTransferGUITemplates {
-
-        public static get entryTemplate(): string {
-            return FileTransferGUITemplates._entryTemplate;
-        }
-
-        public static get boxTemplate(): string {
-            return FileTransferGUITemplates._boxTemplate;
-        }
-
 
         private static _boxTemplate =
             `<div class="mcr-upload">
@@ -302,6 +305,10 @@ namespace mycore.upload {
             <span class="fas fa-window-minimize float-right" style="font-size: 11px;line-height: 22px;"></span></div>
         <div class="card-body mcr-upload-entry-list" style="overflow-y:  scroll;">
             <div class="container-fluid">
+                <div class="row d-none mcr-commit-error bg-danger">
+                    <div class="col-12" data-i18n="component.webtools.upload.error"></div>
+                    <div class="col-12 mcr-error-message" style="overflow: hidden; max-height: 200px"></div>
+                </div>
                 <div class="row d-none mcr-commit-warn bg-info">
                     <div class="col-12" data-i18n="component.webtools.upload.processing"></div>
                 </div>
@@ -319,6 +326,9 @@ namespace mycore.upload {
     </div>
 </div>`;
 
+        public static get boxTemplate(): string {
+            return FileTransferGUITemplates._boxTemplate;
+        }
 
         private static _entryTemplate = `<div class="entry row">
     <span class="col mcr-upload-file-name"></span>
@@ -335,6 +345,10 @@ namespace mycore.upload {
         </div>
     </div>
 </div>`;
+
+        public static get entryTemplate(): string {
+            return FileTransferGUITemplates._entryTemplate;
+        }
 
     }
 

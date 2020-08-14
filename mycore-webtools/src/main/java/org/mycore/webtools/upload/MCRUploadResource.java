@@ -28,7 +28,11 @@ import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
@@ -49,7 +53,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -134,11 +142,14 @@ public class MCRUploadResource {
 
     @PUT
     @Path("commit")
-    public void commit(@QueryParam("uploadID") String uploadID) {
+    public void commit(@QueryParam("uploadID") String uploadID,
+        @QueryParam("classifications") String classificationValues) {
         final MCRFileUploadBucket bucket = MCRFileUploadBucket.getBucket(uploadID);
         if (bucket == null) {
             throw new BadRequestException("uploadID " + uploadID + " is invalid!");
         }
+
+        final List<MCRMetaClassification> classifications = getClassifications(classificationValues);
 
         final java.nio.file.Path root = bucket.getRoot();
 
@@ -151,7 +162,7 @@ public class MCRUploadResource {
             targetDerivateRoot = MCRPath.getPath(objOrDerivateID.toString(), "/");
         } else {
             try {
-                objOrDerivateID = createDerivate(objOrDerivateID).getId();
+                objOrDerivateID = createDerivate(objOrDerivateID, classifications).getId();
                 targetDerivateRoot = MCRPath.getPath(objOrDerivateID.toString(), "/");
             } catch (MCRAccessException e) {
                 throw new MCRUploadException("mcr.upload.create.derivate.failed", e);
@@ -181,18 +192,44 @@ public class MCRUploadResource {
         MCRFileUploadBucket.releaseBucket(uploadID);
     }
 
+    private List<MCRMetaClassification> getClassifications(String classifications) {
+        final MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        final List<MCRCategoryID> categoryIDS = Stream.of(classifications)
+            .filter(Objects::nonNull)
+            .filter(Predicate.not(String::isBlank))
+            .flatMap(c -> Stream.of(c.split(",")))
+            .filter(Predicate.not(String::isBlank))
+            .filter(cv -> cv.contains(":"))
+            .map(classValString -> {
+                final String[] split = classValString.split(":");
+                return new MCRCategoryID(split[0], split[1]);
+            }).collect(Collectors.toList());
+
+        if (!categoryIDS.stream().allMatch(dao::exist)) {
+            final String parsedIDS = categoryIDS.stream().map(Object::toString).collect(Collectors.joining(","));
+            throw new MCRException(String.format(Locale.ROOT, "One of the Categories \"%s\" was not found", parsedIDS));
+        }
+
+        return categoryIDS.stream()
+            .map(category -> new MCRMetaClassification("classification", 0, null, category.getRootID(),
+                category.getID()))
+            .collect(Collectors.toList());
+    }
+
     private MCRObjectID getNewCreateDerivateID(MCRObjectID objId) {
         String projectID = objId.getProjectId();
         return MCRObjectID.getNextFreeId(projectID + "_derivate");
 
     }
 
-    private MCRDerivate createDerivate(MCRObjectID objectID) throws MCRPersistenceException, MCRAccessException {
+    private MCRDerivate createDerivate(MCRObjectID objectID, List<MCRMetaClassification> classifications)
+        throws MCRPersistenceException, MCRAccessException {
 
         MCRObjectID derivateID = getNewCreateDerivateID(objectID);
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateID);
         derivate.setLabel("data object from " + objectID);
+        derivate.getDerivate().getClassifications().addAll(classifications);
 
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate").orElse("datamodel-derivate.xml")
             .replaceAll(".xml",
