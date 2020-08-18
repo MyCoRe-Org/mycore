@@ -34,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -61,9 +64,13 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -936,13 +943,45 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDStr);
 
         if (!MCRMetadataManager.exists(derivateID)) {
-            throw new MCRException("The object " + derivateIDStr + "does not exist!");
+            throw new MCRException("The derivate " + derivateIDStr + " does not exist!");
         }
 
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         derivate.setOrder(order);
         MCRMetadataManager.update(derivate);
 
+    }
+
+    @MCRCommand(syntax = "set classification of derivate {0} to {1}",
+        help = "Sets the classification of derivate {0} to the categories {1} (comma separated) "
+            + "of classification 'derivate_types' or any fully qualified category, removing any previous definition.")
+    public static void setClassificationOfDerivate(String derivateIDStr, String categoriesCommaList)
+        throws MCRAccessException {
+        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        final List<MCRCategoryID> derivateTypes = Stream.of(categoriesCommaList.split(","))
+            .map(String::trim)
+            .map(category -> category.contains(":") ? MCRCategoryID.fromString(category)
+                : new MCRCategoryID("derivate_types", category))
+            .collect(Collectors.toList());
+
+        final String nonExistingCategoriesCommaList = derivateTypes.stream()
+            .filter(Predicate.not(categoryDAO::exist))
+            .map(MCRCategoryID::getID)
+            .collect(Collectors.joining(", "));
+        if (!nonExistingCategoriesCommaList.isEmpty()) {
+            throw new MCRPersistenceException("Categories do not exist: " + nonExistingCategoriesCommaList);
+        }
+
+        final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDStr);
+        final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
+        derivate.getDerivate().getClassifications().clear();
+        derivate.getDerivate().getClassifications()
+            .addAll(
+                derivateTypes.stream()
+                    .map(categoryID -> new MCRMetaClassification("classification", 0, null, categoryID.getRootID(),
+                        categoryID.getID()))
+                    .collect(Collectors.toList()));
+        MCRMetadataManager.update(derivate);
     }
 
 }
