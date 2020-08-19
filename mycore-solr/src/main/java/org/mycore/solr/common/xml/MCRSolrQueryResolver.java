@@ -19,6 +19,7 @@
 package org.mycore.solr.common.xml;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.xml.transform.Source;
@@ -61,8 +62,11 @@ public class MCRSolrQueryResolver implements URIResolver {
                 solrClient.set(core.getClient());
             });
         }
-
-        urlQuery.set(href.substring(href.lastIndexOf(":") + 1));
+        String untilFirstParamValue = href.substring(0,
+            Optional.of(href.indexOf('=')) // first parameter
+                .filter(i -> i > 0)        // OR
+                .orElseGet(href::length)); // end of uri
+        urlQuery.set(href.substring(untilFirstParamValue.lastIndexOf(":") + 1));
         MCRSolrURL solrURL = new MCRSolrURL((HttpSolrClient) solrClient.get(), urlQuery.get());
 
         int handlerIndex = href.indexOf(REQUEST_HANDLER_QUALIFIER);
