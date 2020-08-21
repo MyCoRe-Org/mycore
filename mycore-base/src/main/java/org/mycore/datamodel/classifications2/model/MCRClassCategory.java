@@ -43,8 +43,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MCRClassCategory",
     propOrder = {
-        "url",
         "label",
+        "url",
         "category"
     })
 @XmlSeeAlso({ MCRLabel.class, MCRClassURL.class })
