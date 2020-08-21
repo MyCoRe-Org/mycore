@@ -36,8 +36,9 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MCRClassCategory",
@@ -49,10 +50,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @XmlSeeAlso({ MCRLabel.class, MCRClassURL.class })
 @XmlRootElement(name = "category")
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonPropertyOrder({ "ID", "url", "labels", "categories" })
 public class MCRClassCategory {
 
     @XmlElement(required = true)
-    @JsonProperty("labels")
     protected List<MCRLabel> label;
 
     protected MCRClassURL url;
@@ -63,6 +64,7 @@ public class MCRClassCategory {
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     protected String id;
 
+    @JsonGetter("labels")
     public List<MCRLabel> getLabel() {
         if (label == null) {
             label = new ArrayList<>();
@@ -78,7 +80,7 @@ public class MCRClassCategory {
         this.url = value;
     }
 
-    @JsonProperty("categories")
+    @JsonGetter("categories")
     public List<MCRClassCategory> getCategory() {
         if (category == null) {
             category = new ArrayList<>();
@@ -86,6 +88,7 @@ public class MCRClassCategory {
         return this.category;
     }
 
+    @JsonGetter
     public String getID() {
         return id;
     }
