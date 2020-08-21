@@ -37,6 +37,8 @@ import org.mycore.restapi.MCRRemoveMsgBodyFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -58,6 +60,8 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         register(MCRNoFormDataPutFilter.class);
         register(MCRDropSessionFilter.class);
         register(MCRExceptionMapper.class);
+        //after removing the following line, test if json output from MCRRestClassification is still OK
+        register(JacksonJaxbJsonProvider.class); //jetty >= 2.31, do not use DefaultJacksonJaxbJsonProvider
         setupOAS();
     }
 
