@@ -12,6 +12,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.sun.jna.platform.win32.WinNT;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -31,6 +34,8 @@ import de.undercouch.citeproc.csl.CSLNameBuilder;
 import de.undercouch.citeproc.csl.CSLType;
 
 public class MCRModsItemDataProvider extends MCRItemDataProvider {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private MCRMODSWrapper wrapper;
 
@@ -66,6 +71,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                             break;
                         case "volume":
                             idb.volume(number);
+                            break;
+                        default:
+                            LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
                             break;
                     }
                 }
@@ -301,6 +309,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 case "cmp":
                     idb.composer(cslNames);
                     break;
+                default:
+                    LOGGER.warn("Unknown person role " + role + " in " + this.id);
+                    break;
             }
         });
 
@@ -316,7 +327,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         titleBuilder.append(getModsElementTextStream(titleInfoElement, "title").collect(Collectors.joining(" ")));
         final String subTitle = getModsElementTextStream(titleInfoElement, "subTitle").collect(Collectors.joining(" "));
         if (subTitle.length() > 0) {
-            titleBuilder.append(":").append(subTitle);
+            titleBuilder.append(':').append(subTitle);
         }
 
         titleBuilder.append(Stream.of("partNumber", "partName")
