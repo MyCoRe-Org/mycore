@@ -39,6 +39,7 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.csl.MCRItemDataProvider;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.classification.MCRClassMapper;
 import org.xml.sax.SAXException;
@@ -68,6 +69,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public CSLItemData retrieveItem(String id) {
         final CSLItemDataBuilder idb = new CSLItemDataBuilder().id(id);
 
+        idb.URL(MCRFrontendUtil.getBaseURL()+"receive/" + id);
         processGenre(idb);
         processTitles(idb);
         processNames(idb);
@@ -106,10 +108,20 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             if (modsExtentElement != null) {
                 final String start = modsExtentElement.getChildTextNormalize("start", MODS_NAMESPACE);
                 final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
-                if (start != null) {
+                final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
+
+                if (list != null) {
+                    idb.page(list);
+                } else if (start != null && end != null) {
                     idb.pageFirst(start);
-                }
-                if (end != null) {
+                    idb.page(start);
+                    idb.numberOfPages(String.valueOf(Integer.parseInt(end)-Integer.parseInt(start)));
+                idb.page(start+"-"+end);
+                } else if(start != null){
+                    idb.pageFirst(start);
+                    idb.page(start);
+                } else if(end!=null){
+                    idb.pageFirst(end);
                     idb.page(end);
                 }
             }
@@ -166,7 +178,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             }
         } else if (genres.contains("thesis") || genres.contains("exam") || genres.contains("dissertation")
             || genres.contains("habilitation") || genres.contains("diploma_thesis") || genres.contains("master_thesis")
-            || genres.contains("bachelor_thesis") || genres.contains("student_resarch_project")
+            || genres.contains("bachelor_thesis") || genres.contains("student_research_project")
             || genres.contains("magister_thesis")) {
             idb.type(CSLType.THESIS);
         } else if (genres.contains("report") || genres.contains("research_results") || genres.contains("in_house")
@@ -179,7 +191,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
            // TODO: find right mapping
           } else if (genres.contains("collection")) {
            // TODO: find right mapping
-          } else if(genres.contains("lecure")){
+          } else if(genres.contains("lecture")){
            // TODO: find right mapping
           } else if (genres.contains("series")) {
            // TODO: find right mapping
