@@ -44,13 +44,13 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     private static final String CONFIG_PREFIX = "MCR.ContentTransformer.";
 
+    private final Map<String, Stack<MCRCSLTransformerInstance>> transformerInstances;
+
     private String configuredFormat;
 
     private String configuredStyle;
 
     private String configuredItemProviderProperty;
-
-    private final Map<String, Stack<MCRCSLTransformerInstance>> transformerInstances;
 
     {
         transformerInstances = new HashMap<>();
@@ -61,7 +61,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
         super.init(id);
         configuredFormat = MCRConfiguration2.getString(CONFIG_PREFIX + id + ".format").orElse(DEFAULT_FORMAT);
         configuredStyle = MCRConfiguration2.getString(CONFIG_PREFIX + id + ".style").orElse(DEFAULT_STYLE);
-        configuredItemProviderProperty =CONFIG_PREFIX + id + "." + ITEM_PROVIDER;
+        configuredItemProviderProperty = CONFIG_PREFIX + id + "." + ITEM_PROVIDER;
         createItemDataProvider();
     }
 

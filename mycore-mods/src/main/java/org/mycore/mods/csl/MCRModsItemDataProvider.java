@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.mods.csl;
 
 import static org.mycore.common.MCRConstants.MODS_NAMESPACE;
@@ -12,7 +30,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.sun.jna.platform.win32.WinNT;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -40,6 +57,12 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     private MCRMODSWrapper wrapper;
 
     private String id;
+
+    private static Stream<String> getModsElementTextStream(Element element, String elementName) {
+        return element.getChildren(elementName, MODS_NAMESPACE)
+            .stream()
+            .map(Element::getTextNormalize);
+    }
 
     @Override
     public CSLItemData retrieveItem(String id) {
@@ -169,7 +192,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
           } else if (genres.contains("poster")) {
            // TODO: find right mapping
           } else {
-          
+
           } */
     }
 
@@ -334,12 +357,6 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             .flatMap(n -> getModsElementTextStream(titleInfoElement, n))
             .collect(Collectors.joining(",")));
         return titleBuilder.toString();
-    }
-
-    private static Stream<String> getModsElementTextStream(Element element, String elementName) {
-        return element.getChildren(elementName, MODS_NAMESPACE)
-            .stream()
-            .map(Element::getTextNormalize);
     }
 
     @Override

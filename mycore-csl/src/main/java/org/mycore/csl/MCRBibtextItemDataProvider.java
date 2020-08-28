@@ -29,7 +29,9 @@ import de.undercouch.citeproc.bibtex.BibTeXConverter;
 import de.undercouch.citeproc.bibtex.BibTeXItemDataProvider;
 import de.undercouch.citeproc.csl.CSLItemData;
 
-/** Wrapper around BibTeXItemDataProvider to make it reusable */
+/**
+ * Wrapper around BibTeXItemDataProvider to make it reusable
+ */
 public class MCRBibtextItemDataProvider extends MCRItemDataProvider {
 
     private BibTeXItemDataProvider wrappedProvider = new BibTeXItemDataProvider();
