@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.csl.MCRItemDataProvider;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -55,9 +57,23 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String NON_DROPPING_PARTICLE = "nonDroppingParticle";
+
+    private static final String DROPPING_PARTICLE = "droppingParticle";
+
     private MCRMODSWrapper wrapper;
 
     private String id;
+
+    private final Set<String> nonDroppingParticles = MCRConfiguration2.getString("MCR.CSL.NonDroppingParticles")
+        .stream()
+        .flatMap(str -> Stream.of(str.split(",")))
+        .collect(Collectors.toSet());
+
+    private final Set<String> droppingParticles = MCRConfiguration2.getString("MCR.CSL.DroppingParticles")
+            .stream()
+            .flatMap(str -> Stream.of(str.split(",")))
+            .collect(Collectors.toSet());
 
     private static Stream<String> getModsElementTextStream(Element element, String elementName) {
         return element.getChildren(elementName, MODS_NAMESPACE)
@@ -69,7 +85,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public CSLItemData retrieveItem(String id) {
         final CSLItemDataBuilder idb = new CSLItemDataBuilder().id(id);
 
-        idb.URL(MCRFrontendUtil.getBaseURL()+"receive/" + id);
+        idb.URL(MCRFrontendUtil.getBaseURL() + "receive/" + id);
         processGenre(idb);
         processTitles(idb);
         processNames(idb);
@@ -81,7 +97,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         return idb.build();
     }
 
-    private void processModsPart(CSLItemDataBuilder idb) {
+    protected void processModsPart(CSLItemDataBuilder idb) {
         final Element modsPartElement = wrapper.getElement("mods:relatedItem[@type='host']/mods:part");
         if (modsPartElement != null) {
             final List<Element> detailElements = modsPartElement.getChildren("detail", MODS_NAMESPACE);
@@ -89,18 +105,33 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 final String type = detailElement.getAttributeValue("type");
                 final Element num = detailElement.getChild("number", MODS_NAMESPACE);
                 if (num != null) {
-                    final int number = Integer.parseInt(num.getTextNormalize());
+
+                    Consumer<String> strFN = null;
+                    Consumer<Integer> intFn = null;
                     switch (type) {
                         case "issue":
-                            idb.issue(number);
+                            strFN = idb::issue;
+                            intFn = idb::issue;
                             break;
                         case "volume":
-                            idb.volume(number);
+                            strFN = idb::volume;
+                            intFn = idb::volume;
                             break;
                         default:
                             LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
                             break;
                     }
+
+                    try {
+                        if (intFn != null) {
+                            intFn.accept(Integer.parseInt(num.getTextNormalize()));
+                        }
+                    } catch (NumberFormatException nfe) {
+                        /* if(strFN!=null){ java compiler: always true :O */
+                        strFN.accept(num.getTextNormalize());
+                        //}
+                    }
+
                 }
             }
             final Element modsExtentElement = wrapper
@@ -109,18 +140,29 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 final String start = modsExtentElement.getChildTextNormalize("start", MODS_NAMESPACE);
                 final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
                 final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
+                final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
 
                 if (list != null) {
                     idb.page(list);
                 } else if (start != null && end != null) {
                     idb.pageFirst(start);
-                    idb.page(start);
-                    idb.numberOfPages(String.valueOf(Integer.parseInt(end)-Integer.parseInt(start)));
-                idb.page(start+"-"+end);
-                } else if(start != null){
+                    idb.page(start + "-" + end);
+                } else if (start != null && total != null) {
+                    idb.pageFirst(start);
+
+                    try {
+                        final int totalI = Integer.parseInt(total);
+                        final int startI = Integer.parseInt(start);
+                        idb.page(start + "-" + (totalI - startI));
+                    } catch (NumberFormatException e) {
+                        idb.page(start);
+                    }
+
+                    idb.numberOfPages(total);
+                } else if (start != null) {
                     idb.pageFirst(start);
                     idb.page(start);
-                } else if(end!=null){
+                } else if (end != null) {
                     idb.pageFirst(end);
                     idb.page(end);
                 }
@@ -128,7 +170,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         }
     }
 
-    private void processGenre(CSLItemDataBuilder idb) {
+    protected void processGenre(CSLItemDataBuilder idb) {
         final List<Element> elements = wrapper.getElements("mods:genre");
         final Set<String> genres = elements.stream()
             .map(MCRClassMapper::getCategoryID)
@@ -204,17 +246,17 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
           } else if (genres.contains("poster")) {
            // TODO: find right mapping
           } else {
-
+          
           } */
     }
 
-    private void processAbstract(CSLItemDataBuilder idb) {
+    protected void processAbstract(CSLItemDataBuilder idb) {
         Optional.ofNullable(wrapper.getElement("mods:abstract[not(@altFormat)]")).ifPresent(abstr -> {
             idb.abstrct(abstr.getTextNormalize());
         });
     }
 
-    private void processPublicationData(CSLItemDataBuilder idb) {
+    protected void processPublicationData(CSLItemDataBuilder idb) {
         Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:place/mods:placeTerm"))
             .ifPresent(el -> {
                 idb.publisherPlace(el.getTextNormalize());
@@ -236,7 +278,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             });
     }
 
-    private void processIdentifier(CSLItemDataBuilder idb) {
+    protected void processIdentifier(CSLItemDataBuilder idb) {
         final List<Element> identifiers = wrapper.getElements("mods:identifier");
 
         identifiers.forEach(identifierElement -> {
@@ -263,7 +305,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     }
 
-    private void processTitles(CSLItemDataBuilder idb) {
+    protected void processTitles(CSLItemDataBuilder idb) {
         final Element titleInfoElement = wrapper.getElement("mods:titleInfo[not(@xlink:type) or @xlink:type='simple']");
         if (titleInfoElement != null) {
             idb.titleShort(buildShortTitle(titleInfoElement));
@@ -280,29 +322,52 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     }
 
-    private void processNames(CSLItemDataBuilder idb) {
+    protected void processNames(CSLItemDataBuilder idb) {
         final List<Element> modsNameElements = wrapper.getElements("mods:name");
         HashMap<String, List<CSLName>> roleNameMap = new HashMap<>();
         for (Element modsName : modsNameElements) {
             final CSLNameBuilder nameBuilder = new CSLNameBuilder();
 
-            nameBuilder.isInstitution("false".equals(modsName.getAttributeValue("personal")));
+            final boolean isInstitution = "corporate".equals(modsName.getAttributeValue("type"));
+            nameBuilder.isInstitution(isInstitution);
 
-            //todo: maybe better mapping here
-            HashMap<String, List<String>> typeContentsMap = new HashMap<>();
-            modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
-                final String type = namePart.getAttributeValue("type");
-                final String content = namePart.getTextNormalize();
-                final List<String> contents = typeContentsMap.computeIfAbsent(type, (t) -> new LinkedList<>());
-                contents.add(content);
-            });
+            if (!isInstitution) {
+                //todo: maybe better mapping here
+                HashMap<String, List<String>> typeContentsMap = new HashMap<>();
+                modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
+                    final String type = namePart.getAttributeValue("type");
+                    final String content = namePart.getTextNormalize();
+                    if (("family".equals(type) || "given".equals(type)) && nonDroppingParticles.contains(content)) {
+                        final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
+                            (t) -> new LinkedList<>());
+                        contents.add(content);
+                    } else if(("family".equals(type) || "given".equals(type)) && droppingParticles.contains(content)) {
+                        final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
+                                (t) -> new LinkedList<>());
+                        contents.add(content);
+                    }else {
+                        final List<String> contents = typeContentsMap.computeIfAbsent(type, (t) -> new LinkedList<>());
+                        contents.add(content);
+                    }
+                });
 
-            if (typeContentsMap.containsKey("family")) {
-                nameBuilder.family(String.join(" ", typeContentsMap.get("family")));
-            }
+                if (typeContentsMap.containsKey("family")) {
+                    nameBuilder.family(String.join(" ", typeContentsMap.get("family")));
+                }
 
-            if (typeContentsMap.containsKey("given")) {
-                nameBuilder.given(String.join(" ", typeContentsMap.get("given")));
+                if (typeContentsMap.containsKey("given")) {
+                    nameBuilder.given(String.join(" ", typeContentsMap.get("given")));
+                }
+
+                if (typeContentsMap.containsKey(NON_DROPPING_PARTICLE)) {
+                    nameBuilder.nonDroppingParticle(String.join(" ", typeContentsMap.get(NON_DROPPING_PARTICLE)));
+                }
+
+                if (typeContentsMap.containsKey(DROPPING_PARTICLE)) {
+                    nameBuilder.droppingParticle(String.join(" ", typeContentsMap.get(DROPPING_PARTICLE)));
+                }
+            } else {
+                nameBuilder.literal(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE));
             }
 
             final CSLName cslName = nameBuilder.build();
@@ -352,17 +417,20 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     }
 
-    private String buildShortTitle(Element titleInfoElement) {
+    protected String buildShortTitle(Element titleInfoElement) {
         return titleInfoElement.getChild("title", MODS_NAMESPACE).getText();
     }
 
-    private String buildTitle(Element titleInfoElement) {
+    protected String buildTitle(Element titleInfoElement) {
         StringBuilder titleBuilder = new StringBuilder();
-        titleBuilder.append(getModsElementTextStream(titleInfoElement, "nonSort").collect(Collectors.joining(" ")));
-        titleBuilder.append(getModsElementTextStream(titleInfoElement, "title").collect(Collectors.joining(" ")));
+
+        titleBuilder.append(Stream.of("nonSort", "title")
+                .flatMap(n -> getModsElementTextStream(titleInfoElement, n))
+                .collect(Collectors.joining(" ")));
+
         final String subTitle = getModsElementTextStream(titleInfoElement, "subTitle").collect(Collectors.joining(" "));
         if (subTitle.length() > 0) {
-            titleBuilder.append(':').append(subTitle);
+            titleBuilder.append(": ").append(subTitle);
         }
 
         titleBuilder.append(Stream.of("partNumber", "partName")
