@@ -68,16 +68,16 @@ public class MCRSolrSchemaReloader {
         "plong", "string", "text_general");
 
     /**
-     * Remove all fields, dynamicFields, copyFields and fieldTypes in the SOLR schema for the given core. The fields,
+     * Removes all fields, dynamicFields, copyFields and fieldTypes in the SOLR schema for the given core. The fields,
      * dynamicFields, and types in the lists SOLR_DEFAULT_FIELDS, SOLR_DEFAULT_DYNAMIC_FIELDS, 
      * SOLR_DEFAULT_DYNAMIC_FIELDS are excluded from remove.
      *
      * @param configType the name of the configuration directory containg the Solr core configuration
      * @param coreID the ID of the core, which the configuration should be applied to
      */
-    public static void clearSchema(String configType, String coreID) {
+    public static void reset(String configType, String coreID) {
 
-        LOGGER.info("Clear SOLR schema for core " + coreID + " using configuration " + configType);
+        LOGGER.info("Resetting SOLR schema for core " + coreID + " using configuration " + configType);
         try {
             SolrClient solrClient = MCRSolrClientFactory.get(coreID).map(MCRSolrCore::getClient)
                 .orElseThrow(() -> new MCRConfigurationException("The core " + coreID + " is not configured!"));
