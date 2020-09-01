@@ -18,15 +18,18 @@
 
 package org.mycore.solr.schema;
 
+import static java.util.Map.entry;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -44,6 +47,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationInputStream;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.MCRSolrUtils;
 
 import com.google.common.io.ByteStreams;
@@ -55,53 +59,90 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 /**
- * This class provides methods to reload a SOLR config using the SOLR config API
- * see https://lucene.apache.org/solr/guide/7_3/config-api.html
+ * This class provides methods to reload a SOLR configuration using the SOLR configuration API
+ * see https://lucene.apache.org/solr/guide/8_6/config-api.html
  *
  * @author Robert Stephan
  * @author Jens Kupferschmidt
  */
 public class MCRSolrConfigReloader {
-    private static final Map<String, String> SOLR_CONFIG_OBJECT_NAMES = new HashMap<>();
 
-    private static final List<String> SOLR_CONFIG_PROPERTY_COMMANDS = Arrays.asList("set-property", "unset-property");
+    /**
+    from https://lucene.apache.org/solr/guide/8_6/config-api.html
+    key = lowercase object name from config api command (add-*, update-* delete-*)
+    value = keyName in SOLR config json (retrieved via URL ../core-name/config)
+    */
+    private static final Map<String, String> SOLR_CONFIG_OBJECT_NAMES = Map.ofEntries(
+        entry("requesthandler", "requestHandler"), //checked -> id in subfield "name"
+        entry("searchcomponent", "searchComponent"), //checked  -> id in subfield "name"
+        entry("initparams", "initParams"), //checked - id in key (TODO special handling)
+        entry("queryresponsewriter", "queryResponseWriter"), //checked  -> id in subfield "name"
+        entry("queryparser", "queryParser"),
+        entry("valuesourceparser", "valueSourceParser"),
+        entry("transformer", "transformer"),
+        entry("updateprocessor", "updateProcessor"), //checked  -> id in subfield "name"
+        entry("queryconverter", "queryConverter"),
+        entry("listener", "listener"), //checked -> id in subfield "event" -> special handling
+        entry("runtimelib", "runtimeLib"));
 
-    //from https://lucene.apache.org/solr/guide/7_3/config-api.html
-    //key = lowercase object name from config api command (add-*, update-* delete-*) 
-    //value = keyName in SOLR config json (retrieved via URL ../core-name/config)
+    private static final List<String> SOLR_CONFIG_PROPERTY_COMMANDS = List.of("set-property", "unset-property");
 
-    private static Logger LOGGER = LogManager.getLogger(MCRSolrConfigReloader.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private static String SOLR_CONFIG_UPDATE_FILE_NAME = "solr-config.json";
+    private static final String SOLR_CONFIG_UPDATE_FILE_NAME = "solr-config.json";
 
-    static {
-        SOLR_CONFIG_OBJECT_NAMES.put("requesthandler", "requestHandler"); //checked -> id in subfield "name"
-        SOLR_CONFIG_OBJECT_NAMES.put("searchcomponent", "searchComponent"); //checked  -> id in subfield "name"
-        SOLR_CONFIG_OBJECT_NAMES.put("initparams", "initParams"); //checked - id in key (TODO special handling)
-        SOLR_CONFIG_OBJECT_NAMES.put("queryresponsewriter", "queryResponseWriter"); //checked  -> id in subfield "name"
-        SOLR_CONFIG_OBJECT_NAMES.put("queryparser", "queryParser");
-        SOLR_CONFIG_OBJECT_NAMES.put("valuesourceparser", "valueSourceParser");
-        SOLR_CONFIG_OBJECT_NAMES.put("transformer", "transformer");
-        SOLR_CONFIG_OBJECT_NAMES.put("updateprocessor", "updateProcessor"); //checked  -> id in subfield "name"
-        SOLR_CONFIG_OBJECT_NAMES.put("queryconverter", "queryConverter");
-        SOLR_CONFIG_OBJECT_NAMES.put("listener", "listener"); //checked -> id in subfield "event" -> special handling
-        SOLR_CONFIG_OBJECT_NAMES.put("runtimelib", "runtimeLib");
+    /**
+     * Removed items from SOLR configuration overlay. This removal works over all in the property
+     * MCR.Solr.ObserverConfigTypes defined SOLR configuration parts. For each entry the
+     * method will process a SOLR delete command via API.
+     *
+     * @param configType the name of the configuration directory containing the SOLR core configuration
+     * @param coreID the ID of the core, which the configuration should be applied to
+     */
+    public static void reset(String configType, String coreID) {
+        LOGGER.info(() -> "Resetting config definitions for core " + coreID + " using configuration " + configType);
+        String coreURL = MCRSolrClientFactory.get(coreID)
+            .map(MCRSolrCore::getV1CoreURL)
+            .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID));
+        JsonObject currentSolrConfig = retrieveCurrentSolrConfigOverlay(coreURL);
+        JsonObject configPart = currentSolrConfig.getAsJsonObject("overlay");
+
+        for (String observedType : getObserverConfigTypes()) {
+            JsonObject overlaySection = configPart.getAsJsonObject(observedType);
+            if (overlaySection == null) {
+                continue;
+            }
+            Set<Map.Entry<String, JsonElement>> configuredComponents = overlaySection.entrySet();
+            final String deleteSectionCommand = "delete-" + observedType.toLowerCase(Locale.ROOT);
+            if (configuredComponents.isEmpty() || !isKnownSolrConfigCommmand(deleteSectionCommand)) {
+                continue;
+            }
+            for (Map.Entry<String, JsonElement> configuredComponent : configuredComponents) {
+                final JsonObject deleteCommand = new JsonObject();
+                deleteCommand.addProperty(deleteSectionCommand, configuredComponent.getKey());
+                LOGGER.debug(deleteCommand);
+                try {
+                    executeSolrCommand(coreURL, deleteCommand);
+                } catch (IOException e) {
+                    LOGGER.error(() -> "Exception while executing '" + deleteCommand + "'.", e);
+                }
+            }
+        }
     }
 
     /**
-     * This method modified the SOLR config definition based on all solr/{coreType}/solr-config.json 
+     * This method modified the SOLR configuration definition based on all solr/{coreType}/solr-config.json 
      * in the MyCoRe-Maven modules resource path.
      *
-     * @param configType the name of the configuration directory containg the Solr core configuration
+     * @param configType the name of the configuration directory containing the SOLR core configuration
      * @param coreID the ID of the core, which the configuration should be applied to
      */
     public static void processConfigFiles(String configType, String coreID) {
-        LOGGER.info("Load config definitions for core " + coreID + " using configuration " + configType);
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        LOGGER.info(() -> "Load config definitions for core " + coreID + " using configuration " + configType);
+        try {
             String coreURL = MCRSolrClientFactory.get(coreID)
                 .orElseThrow(() -> MCRSolrUtils.getCoreConfigMissingException(coreID)).getV1CoreURL();
-            String observedTypesConfiguration = MCRConfiguration2.getString("MCR.Solr.ObserverConfigTypes").orElse("");
-            List<String> observedTypes = Arrays.asList(observedTypesConfiguration.split("\\s*,\\s*"));
+            List<String> observedTypes = getObserverConfigTypes();
             JsonObject currentSolrConfig = retrieveCurrentSolrConfig(coreURL);
 
             List<byte[]> configFileContents = MCRConfigurationInputStream.getConfigFileContents(
@@ -120,14 +161,25 @@ public class MCRSolrConfigReloader {
                     processConfigCommand(coreURL, command, currentSolrConfig, observedTypes);
                 }
             }
-
         } catch (IOException e) {
             LOGGER.error(e);
         }
     }
 
     /**
-     * processes a single SOLR config update command
+     * get the content of property MCR.Solr.ObserverConfigTypes as List
+     * @return the list of observed SOLR configuration types, a.k.a. top-level sections of config API
+     */
+    private static List<String> getObserverConfigTypes() {
+        return MCRConfiguration2
+            .getString("MCR.Solr.ObserverConfigTypes")
+            .map(MCRConfiguration2::splitValue)
+            .orElseGet(Stream::empty)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * processes a single SOLR configuration command
      * @param coreURL - the URL of the core
      * @param command - the command in JSON syntax
      */
@@ -147,15 +199,14 @@ public class MCRSolrConfigReloader {
                         commandObject.getValue() instanceof JsonObject) {
                         final JsonElement configCommandName = commandObject.getValue().getAsJsonObject().get("name");
                         if (isConfigTypeAlreadyAdded(configType, configCommandName, currentSolrConfig)) {
-                            LOGGER.info("Current configuration has already an " + configCommand
+                            LOGGER.info(() -> "Current configuration has already an " + configCommand
                                 + " with name " + configCommandName.getAsString()
-                                + ". Rewrite config command as update-"
-                                + configType);
+                                + ". Rewrite config command as update-" + configType);
                             commandJsonObject.add("update-" + configType, commandJsonObject.get(configCommand));
                             commandJsonObject.remove(configCommand);
                         }
                     }
-                    executeSolrCommand(coreURL, commandJsonObject.toString());
+                    executeSolrCommand(coreURL, commandJsonObject);
                 }
             } catch (IOException e) {
                 LOGGER.error(e);
@@ -165,42 +216,40 @@ public class MCRSolrConfigReloader {
     }
 
     /**
-     * Sends a command to solr
+     * Sends a command to SOLR server
      * @param coreURL to which the command will be send
-     * @param command the command as string
+     * @param command the command
      * @throws UnsupportedEncodingException if command encoding is not supported
      */
-    private static void executeSolrCommand(String coreURL, String command) throws UnsupportedEncodingException {
+    private static void executeSolrCommand(String coreURL, JsonObject command) throws UnsupportedEncodingException {
         HttpPost post = new HttpPost(coreURL + "/config");
         post.setHeader("Content-type", "application/json");
-        post.setEntity(new StringEntity(command));
-        String commandprefix = command.indexOf('-') != -1 ? command.substring(2, command.indexOf('-'))
-            : "unknown command";
+        post.setEntity(new StringEntity(command.toString()));
+        String commandprefix = command.keySet().stream().findFirst().orElse("unknown command");
         HttpResponse response;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             response = httpClient.execute(post);
             String respContent = new String(ByteStreams.toByteArray(response.getEntity().getContent()),
                 StandardCharsets.UTF_8);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                LOGGER.debug("SOLR config " + commandprefix + " command was successful \n" + respContent);
+                LOGGER.debug(() -> "SOLR config " + commandprefix + " command was successful \n" + respContent);
             } else {
                 LOGGER
-                    .error("SOLR config " + commandprefix + " error: " + response.getStatusLine().getStatusCode() + " "
-                        + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
+                    .error(() -> "SOLR config " + commandprefix + " error: " + response.getStatusLine().getStatusCode()
+                        + " " + response.getStatusLine().getReasonPhrase() + "\n" + respContent);
             }
 
         } catch (IOException e) {
-            LOGGER.error(
-                "Could not execute the following Solr config " + commandprefix + " command\n" + command, e);
+            LOGGER.error(() -> "Could not execute the following Solr config command:\n" + command, e);
         }
     }
 
     /**
-     * Checks if a given configType with passed name already was added to current solr configuration
-     * @param configType - Type of localized solr component e.g. request handlers, search components
-     * @param name - identification of config type
-     * @param solrConfig - current solr configuration
-     * @return - Is there already an entry in current solr configuration
+     * Checks if a given configType with passed name already was added to current SORL configuration
+     * @param configType - Type of localized SOLR component e.g. request handlers, search components
+     * @param name - identification of configuration type
+     * @param solrConfig - current SOLR configuration
+     * @return - Is there already an entry in current SOLR configuration
      */
     private static boolean isConfigTypeAlreadyAdded(String configType, JsonElement name, JsonObject solrConfig) {
 
@@ -211,12 +260,26 @@ public class MCRSolrConfigReloader {
     }
 
     /**
-     * retrieves the current solr configuration for the given core 
-     * @param coreURL from which the current solr configuration will be load
-     * @return the config as JSON object
+     * retrieves the current SOLR configuration for the given core 
+     * @param coreURL from which the current SOLR configuration will be load
+     * @return the configuration as JSON object
      */
     private static JsonObject retrieveCurrentSolrConfig(String coreURL) {
         HttpGet getConfig = new HttpGet(coreURL + "/config");
+        return getJSON(getConfig);
+    }
+
+    /**
+     * retrieves the current SOLR configuration overlay for the given core
+     * @param coreURL from which the current SOLR configuration will be load
+     * @return the configuration as JSON object
+     */
+    private static JsonObject retrieveCurrentSolrConfigOverlay(String coreURL) {
+        HttpGet getConfig = new HttpGet(coreURL + "/config/overlay");
+        return getJSON(getConfig);
+    }
+
+    private static JsonObject getJSON(HttpGet getConfig) {
         JsonObject convertedObject = null;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             CloseableHttpResponse response = httpClient.execute(getConfig);
@@ -225,8 +288,8 @@ public class MCRSolrConfigReloader {
                 String configAsString = EntityUtils.toString(response.getEntity(), "UTF-8");
                 convertedObject = new Gson().fromJson(configAsString, JsonObject.class);
             } else {
-                LOGGER.error("Could not retrieve current Solr configuration from solr server. Http Status: "
-                    + statusLine.getStatusCode(), statusLine.getReasonPhrase());
+                LOGGER.error(() -> "Could not retrieve current Solr configuration from solr server. Http Status: "
+                    + statusLine.getStatusCode() + " " + statusLine.getReasonPhrase());
             }
 
         } catch (IOException e) {
@@ -239,8 +302,8 @@ public class MCRSolrConfigReloader {
 
     /**
      *
-     * @param cmd
-     * @return true, if the command is in the list of known solr commands.
+     * @param cmd the SOLR API command
+     * @return true, if the command is in the list of known SOLR commands.
      */
 
     private static boolean isKnownSolrConfigCommmand(String cmd) {
