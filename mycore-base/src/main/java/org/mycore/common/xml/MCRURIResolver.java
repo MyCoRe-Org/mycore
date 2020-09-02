@@ -244,6 +244,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("redirect", new MCRRedirectResolver());
         supportedSchemes.put("data", new MCRDataURLResolver());
         supportedSchemes.put("i18n", new MCRI18NResolver());
+        supportedSchemes.put("checkPermission", new MCRCheckPermissionResolver());
         MCRRESTResolver restResolver = new MCRRESTResolver();
         supportedSchemes.put("http", restResolver);
         supportedSchemes.put("https", restResolver);
@@ -1657,4 +1658,37 @@ public final class MCRURIResolver implements URIResolver {
             return new JDOMSource(i18nElement);
         }
     }
+    
+    private static class MCRCheckPermissionResolver implements URIResolver {
+        /**
+         * returns the boolean value for the given ACL permission.
+         * 
+         * Syntax: <code>checkPermission:{id}:{permission}
+         * 
+         * @param href
+         *            URI in the syntax above
+         * @param base
+         *            not used
+         * 
+         * @return the root element boolean of the XML document with content string true of false
+         * @see javax.xml.transform.URIResolver
+         */
+        public Source resolve(String href, String base) throws TransformerException {
+            LOGGER.debug("start resolving " + href);
+            StringTokenizer pst = new StringTokenizer(href, ":", true);
+            if (pst.countTokens() != 5) {
+                throw new IllegalArgumentException("Invalid format of uri for retrieval of checkPermission: " + href);
+            }
+            pst.nextToken(); // "checkPermission"
+            pst.nextToken(); // :
+            String id = pst.nextToken();
+            pst.nextToken(); // :
+            String permission = pst.nextToken();
+            Element root = new Element("boolean");
+            final boolean permForId = MCRAccessManager.checkPermission(id, permission);
+            root.setText(Boolean.toString(permForId));
+            return new JDOMSource(root);
+        }
+    }
+    
 }
