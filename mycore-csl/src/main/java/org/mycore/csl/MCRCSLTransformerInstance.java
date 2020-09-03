@@ -32,9 +32,10 @@ public class MCRCSLTransformerInstance implements AutoCloseable {
 
     private final MCRItemDataProvider dataProvider;
 
-    public MCRCSLTransformerInstance(String style, String format, AutoCloseable closeable) {
+    public MCRCSLTransformerInstance(String style, String format, AutoCloseable closeable,
+        MCRItemDataProvider dataProvider) {
         this.closeable = closeable;
-        this.dataProvider = new MCRItemDataProvider();
+        this.dataProvider = dataProvider;
         try {
             this.citationProcessor = new CSL(this.dataProvider, style);
         } catch (IOException e) {

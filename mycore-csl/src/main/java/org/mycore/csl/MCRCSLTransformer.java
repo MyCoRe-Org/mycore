@@ -34,19 +34,23 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.output.Bibliography;
 
-public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
+public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     public static final String DEFAULT_FORMAT = "text";
 
     public static final String DEFAULT_STYLE = "nature";
 
+    public static final String ITEM_PROVIDER = "ItemProviderClass";
+
     private static final String CONFIG_PREFIX = "MCR.ContentTransformer.";
+
+    private final Map<String, Stack<MCRCSLTransformerInstance>> transformerInstances;
 
     private String configuredFormat;
 
     private String configuredStyle;
 
-    private final Map<String, Stack<MCRCSLTransformerInstance>> transformerInstances;
+    private String configuredItemProviderProperty;
 
     {
         transformerInstances = new HashMap<>();
@@ -57,6 +61,13 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
         super.init(id);
         configuredFormat = MCRConfiguration2.getString(CONFIG_PREFIX + id + ".format").orElse(DEFAULT_FORMAT);
         configuredStyle = MCRConfiguration2.getString(CONFIG_PREFIX + id + ".style").orElse(DEFAULT_STYLE);
+        configuredItemProviderProperty = CONFIG_PREFIX + id + "." + ITEM_PROVIDER;
+        createItemDataProvider();
+    }
+
+    private MCRItemDataProvider createItemDataProvider() {
+        return (MCRItemDataProvider) MCRConfiguration2.getInstanceOf(configuredItemProviderProperty)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(configuredItemProviderProperty));
     }
 
     @Override
@@ -73,7 +84,7 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
 
         AtomicReference<MCRCSLTransformerInstance> instance = new AtomicReference<>();
         final MCRCSLTransformerInstance newInstance = new MCRCSLTransformerInstance(style, format,
-            () -> returnTransformerInstance(instance.get(), style, format));
+            () -> returnTransformerInstance(instance.get(), style, format), createItemDataProvider());
         instance.set(newInstance);
         return newInstance;
     }
@@ -108,11 +119,11 @@ public class MCRBibTeXCSLTransformer extends MCRParameterizedTransformer {
         final String format = parameter != null ? parameter.getParameter("format", configuredFormat) : configuredFormat;
         final String style = parameter != null ? parameter.getParameter("style", configuredStyle) : configuredStyle;
         try (MCRCSLTransformerInstance transformerInstance = getTransformerInstance(style, format)) {
-            final MCRItemDataProvider dataProvider = transformerInstance.getDataProvider();
             final CSL citationProcessor = transformerInstance.getCitationProcessor();
+            final MCRItemDataProvider dataProvider = transformerInstance.getDataProvider();
 
-            dataProvider.addBibTeX(bibtext);
-            dataProvider.registerCitationItems(citationProcessor);
+            dataProvider.addContent(bibtext);
+            citationProcessor.registerCitationItems(dataProvider.getIds());
             Bibliography biblio = citationProcessor.makeBibliography();
             String result = biblio.makeString();
 
