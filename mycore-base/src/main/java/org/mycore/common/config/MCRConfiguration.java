@@ -543,11 +543,11 @@ public class MCRConfiguration {
     }
 
     /**
-     *  use {@link MCRConfigurationBase#initialize(Map, boolean)}
+     *  use {@link MCRConfigurationBase#initialize(Map, Map, boolean)}
      */
     @Deprecated
     public synchronized void initialize(Map<String, String> props, boolean clear) {
-        MCRConfigurationBase.initialize(props, clear);
+        throw new UnsupportedOperationException();
     }
 
     /**
