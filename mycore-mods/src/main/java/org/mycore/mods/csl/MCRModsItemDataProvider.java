@@ -306,15 +306,16 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processTitles(CSLItemDataBuilder idb) {
-        final Element titleInfoElement = wrapper.getElement("mods:titleInfo[not(@xlink:type) or @xlink:type='simple']");
+        final Element titleInfoElement = wrapper.getElement("mods:titleInfo[not(@altFormat) and (not(@xlink:type) " +
+                "or @xlink:type='simple')]");
         if (titleInfoElement != null) {
             idb.titleShort(buildShortTitle(titleInfoElement));
             idb.title(buildTitle(titleInfoElement));
         }
 
         final Element parentTitleInfoElement = wrapper
-            .getElement("mods:relatedItem[@type='host']/mods:titleInfo[not(@xlink:type)" +
-                " or @xlink:type='simple']");
+            .getElement("mods:relatedItem[@type='host']/mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
+                " or @xlink:type='simple')]");
         if (parentTitleInfoElement != null) {
             idb.containerTitleShort(buildShortTitle(parentTitleInfoElement));
             idb.containerTitle(buildTitle(parentTitleInfoElement));
