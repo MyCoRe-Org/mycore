@@ -27,7 +27,13 @@ import java.util.Map;
 public interface MCRConfigurationLoader {
 
     /**
-     * Returns a Map that should be used with {@link MCRConfigurationBase#initialize(Map, boolean)}
+     * Returns a Map that should be used with {@link MCRConfigurationBase#initialize(Map, Map, boolean)}
      */
     Map<String, String> load();
+
+    /**
+     * Returns a Map that contains deprecated properties as keys and ther updated name as value
+     * @since 2020.06
+     */
+    Map<String, String> loadDeprecated();
 }

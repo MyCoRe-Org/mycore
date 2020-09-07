@@ -39,7 +39,7 @@ import com.ibm.icu.util.StringTokenizer;
  */
 public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
 
-    MCRProperties properties;
+    MCRProperties properties, deprecated;
 
     public MCRDefaultConfigurationLoader() {
         properties = new MCRProperties();
@@ -47,6 +47,12 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
             loadFromContent(new MCRStreamContent(in));
         } catch (IOException e) {
             throw new MCRConfigurationException("Could not load MyCoRe properties.", e);
+        }
+        deprecated = new MCRProperties();
+        try (InputStream in = getDeprecatedConfigInputStream()) {
+            deprecated.load(in);
+        } catch (IOException e) {
+            throw new MCRConfigurationException("Could not load deprecated MyCoRe properties.", e);
         }
     }
 
@@ -61,9 +67,24 @@ public class MCRDefaultConfigurationLoader implements MCRConfigurationLoader {
         return configurationInputStream;
     }
 
+    private InputStream getDeprecatedConfigInputStream() throws IOException {
+        MCRConfigurationInputStream deprecatedInputStream = new MCRConfigurationInputStream("deprecated.properties");
+        File configFile = MCRConfigurationDir.getConfigFile("deprecated.active.properties");
+        if (configFile != null) {
+            FileOutputStream fout = new FileOutputStream(configFile);
+            return new TeeInputStream(deprecatedInputStream, fout, true);
+        }
+        return deprecatedInputStream;
+    }
+
     @Override
     public Map<String, String> load() {
         return properties.getAsMap();
+    }
+
+    @Override
+    public Map<String, String> loadDeprecated() {
+        return deprecated.getAsMap();
     }
 
     /**

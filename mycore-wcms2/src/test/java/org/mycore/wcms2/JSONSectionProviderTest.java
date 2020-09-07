@@ -21,6 +21,7 @@ package org.mycore.wcms2;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ public class JSONSectionProviderTest {
     public void toJSON() throws Exception {
         Map<String, String> properties = new HashMap<>();
         properties.put("MCR.WCMS2.mycoreTagList", "");
-        MCRConfigurationBase.initialize(properties, true);
+        MCRConfigurationBase.initialize(Collections.emptyMap(), properties, true);
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(new File("src/test/resources/navigation/content.xml"));
         MCRWCMSDefaultSectionProvider prov = new MCRWCMSDefaultSectionProvider();
