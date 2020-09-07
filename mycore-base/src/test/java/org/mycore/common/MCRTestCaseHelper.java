@@ -64,12 +64,12 @@ public class MCRTestCaseHelper {
         MCRConfigurationLoader configurationLoader = MCRConfigurationLoaderFactory.getConfigurationLoader();
         HashMap<String, String> baseProperties = new HashMap<>(configurationLoader.load());
         baseProperties.putAll(testProperties);
-        MCRConfigurationBase.initialize(baseProperties, true);
+        MCRConfigurationBase.initialize(configurationLoader.loadDeprecated(), baseProperties, true);
         MCRSessionMgr.unlock();
     }
 
     public static void after() {
-        MCRConfigurationBase.initialize(Collections.emptyMap(), true);
+        MCRConfigurationBase.initialize(Collections.emptyMap(), Collections.emptyMap(), true);
         MCRSessionMgr.releaseCurrentSession();
     }
 

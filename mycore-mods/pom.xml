@@ -46,6 +46,11 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.undercouch</groupId>
+      <artifactId>citeproc-java</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
     </dependency>
@@ -94,6 +99,11 @@
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
       <type>test-jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-csl</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>

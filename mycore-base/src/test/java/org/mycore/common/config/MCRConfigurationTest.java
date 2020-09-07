@@ -28,7 +28,7 @@ public class MCRConfigurationTest extends MCRTestCase {
 
     @Test(expected = MCRConfigurationException.class)
     public final void testDeprecatedProperties() {
-        String deprecatedProperty = "MCR.nameOfProject";
+        String deprecatedProperty = "MCR.Editor.FileUpload.MaxSize";
         MCRConfiguration2.getString(deprecatedProperty);
     }
 

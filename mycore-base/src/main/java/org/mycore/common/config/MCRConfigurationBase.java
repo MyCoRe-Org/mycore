@@ -21,7 +21,6 @@ package org.mycore.common.config;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
@@ -58,7 +57,6 @@ public final class MCRConfigurationBase {
 
     static {
         try {
-            loadDeprecatedProperties();
             createLastModifiedFile();
         } catch (IOException e) {
             throw new MCRConfigurationException("Could not initialize MyCoRe configuration", e);
@@ -270,7 +268,12 @@ public final class MCRConfigurationBase {
         resolveProperties();
     }
 
-    public static synchronized void initialize(Map<String, String> props, boolean clear) {
+    public static synchronized void initialize(Map<String, String> deprecated, Map<String, String> props,
+        boolean clear) {
+        if (clear) {
+            deprecatedProperties.clear();
+        }
+        deprecatedProperties.putAll(deprecated);
         checkForDeprecatedProperties(props);
         if (clear) {
             getBaseProperties().clear();
@@ -288,17 +291,4 @@ public final class MCRConfigurationBase {
         debug();
     }
 
-    /**
-     * Loads file deprecated.properties that can be used to rename old properties. The file contains a list of renamed
-     * properties: OldPropertyName=NewPropertyName. The old property is automatically replaced with the new name, so
-     * that existing mycore.properties files must not be migrated immediately.
-     */
-    private static synchronized void loadDeprecatedProperties() throws IOException {
-        try (InputStream in = MCRConfigurationBase.class.getResourceAsStream("/deprecated.properties")) {
-            if (in == null) {
-                return;
-            }
-            deprecatedProperties.load(in);
-        }
-    }
 }
