@@ -47,10 +47,6 @@ import com.google.gson.JsonObject;
  * @version $Revision$ $Date$
  */
 public abstract class MCRBase {
-    /**
-     * constant value for the object id length
-     */
-    public static final int MAX_LABEL_LENGTH = 256;
 
     protected static final String MCR_ENCODING;
 
@@ -59,8 +55,6 @@ public abstract class MCRBase {
 
     // the object content
     protected MCRObjectID mcrId = null;
-
-    protected String mcrLabel = null;
 
     protected String mcrVersion = null;
 
@@ -96,7 +90,6 @@ public abstract class MCRBase {
      *                general Exception of MyCoRe
      */
     public MCRBase() throws MCRException {
-        mcrLabel = "";
         mcrVersion = MCRCoreVersion.getVersion();
         mcrSchema = "";
 
@@ -116,7 +109,6 @@ public abstract class MCRBase {
 
         Element rootElement = jdomDocument.getRootElement();
         setId(MCRObjectID.getInstance(rootElement.getAttributeValue("ID")));
-        setLabel(rootElement.getAttributeValue("label"));
         setVersion(rootElement.getAttributeValue("version"));
         setSchema(rootElement.getAttribute("noNamespaceSchemaLocation", XSI_NAMESPACE).getValue());
 
@@ -134,16 +126,6 @@ public abstract class MCRBase {
      */
     public final MCRObjectID getId() {
         return mcrId;
-    }
-
-    /**
-     * This methode return the object label. If this is not set, null was
-     * returned.
-     * 
-     * @return the lable as a string
-     */
-    public final String getLabel() {
-        return mcrLabel;
     }
 
     /**
@@ -213,23 +195,6 @@ public abstract class MCRBase {
     }
 
     /**
-     * This method set the object label.
-     * 
-     * @param label
-     *            the object label
-     */
-    public final void setLabel(String label) {
-        if (label == null) {
-            mcrLabel = label;
-        } else {
-            mcrLabel = label.trim();
-            if (mcrLabel.length() > MAX_LABEL_LENGTH) {
-                mcrLabel = mcrLabel.substring(0, MAX_LABEL_LENGTH);
-            }
-        }
-    }
-
-    /**
      * This methods set the MyCoRe version to the string 'Version 1.3'.
      */
     public final void setVersion(String version) {
@@ -267,9 +232,6 @@ public abstract class MCRBase {
         elm.addNamespaceDeclaration(XLINK_NAMESPACE);
         elm.setAttribute("noNamespaceSchemaLocation", mcrSchema, XSI_NAMESPACE);
         elm.setAttribute("ID", mcrId.toString());
-        if (mcrLabel != null) {
-            elm.setAttribute("label", mcrLabel);
-        }
         elm.setAttribute("version", mcrVersion);
         return doc;
     }
@@ -280,20 +242,16 @@ public abstract class MCRBase {
      * <pre>
      *   {
      *     id: "mycore_project_00000001",
-     *     label: "my mycore base object",
      *     version: "3.0"
      *   }
      * </pre>
      * 
      */
     public JsonObject createJSON() {
-        JsonObject base = new JsonObject();
-        base.addProperty("id", mcrId.toString());
-        if (mcrLabel != null) {
-            base.addProperty("label", mcrLabel);
-        }
-        base.addProperty("version", mcrVersion);
-        return base;
+        JsonObject object = new JsonObject();
+        object.addProperty("id", mcrId.toString());
+        object.addProperty("version", mcrVersion);
+        return object;
     }
 
     protected abstract String getRootTagName();

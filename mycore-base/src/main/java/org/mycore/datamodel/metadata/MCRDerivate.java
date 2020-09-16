@@ -176,7 +176,6 @@ public final class MCRDerivate extends MCRBase {
     public void debug() {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("MCRDerivate ID : {}", mcrId);
-            LOGGER.debug("MCRDerivate Label : {}", mcrLabel);
             LOGGER.debug("MCRDerivate Schema : {}", mcrSchema);
             LOGGER.debug("");
         }
