@@ -1678,11 +1678,9 @@ public final class MCRURIResolver implements URIResolver {
             boolean permission;
             switch (split.length) {
                 case 2:
-                    System.out.println("check permission: " + split[1]);
                     permission = MCRAccessManager.checkPermission(split[1]);
                     break;
                 case 3:
-                    System.out.println("check permission: " + split[1] + " " + split[2]);
                     permission = MCRAccessManager.checkPermission(split[1], split[2]);
                     break;
                 default:
