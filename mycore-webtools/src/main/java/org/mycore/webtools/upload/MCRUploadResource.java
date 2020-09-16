@@ -59,6 +59,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -228,10 +229,12 @@ public class MCRUploadResource {
         MCRObjectID derivateID = getNewCreateDerivateID(objectID);
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateID);
+        derivate.getDerivate().getTitles()
+            .add(new MCRMetaLangText("title", null, null, 0, null, "data object from " + objectID));
         derivate.getDerivate().getClassifications().addAll(classifications);
 
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate").orElse("datamodel-derivate.xml")
-            .replaceAll(".xml",".xsd");
+            .replaceAll(".xml", ".xsd");
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();

@@ -76,7 +76,6 @@ import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSessionMgr;
@@ -96,7 +95,6 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -397,36 +395,7 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
-        MCRObjectID derId = MCRObjectID.getInstance(derivateId);
-        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.INSTANCE.getLastModifiedHandle(derId, 30,
-            TimeUnit.SECONDS);
-        Boolean result;
-        try {
-            result = DISPLAY_DERIVATE_CACHE.getIfUpToDate(derivateId, modifiedHandle);
-        } catch (IOException e) {
-            LOGGER.warn("Error while determining when {} was last modified.", derId, e);
-            return false;
-        }
-        if (result != null) {
-            return result;
-        }
-        MCRDerivate der;
-        try {
-            org.jdom2.Document derDoc = MCRXMLMetaDataManagerHolder.INSTANCE.retrieveXML(derId);
-            if (derDoc == null) {
-                LOGGER.error("Derivate \"{}\" does not exist", derId);
-                return false;
-            }
-            der = new MCRDerivate(derDoc);
-        } catch (SAXException | JDOMException | IOException | RuntimeException e) {
-            LOGGER.warn("Error while loading derivate: {}", derId, e);
-            return false;
-        }
-        org.jdom2.Element derivateElem = der.getDerivate().createXML();
-        String display = derivateElem.getAttributeValue("display", "true");
-        Boolean returnValue = Boolean.valueOf(display);
-        DISPLAY_DERIVATE_CACHE.put(derivateId, returnValue);
-        return returnValue;
+        return MCRAccessManager.checkPermission(derivateId,  MCRAccessManager.PERMISSION_VIEW);
     }
 
     /**

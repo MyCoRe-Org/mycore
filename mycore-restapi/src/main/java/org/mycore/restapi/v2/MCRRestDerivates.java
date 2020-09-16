@@ -333,6 +333,17 @@ public class MCRRestDerivates {
         MCRObjectID derId = MCRObjectID.getNextFreeId(projectID + "_derivate");
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derId);
+
+        if (der.getTitles().isEmpty()) {
+            derivate.getDerivate().getTitles()
+                .add(new MCRMetaLangText("title", null, null, 0, null, "data object from " + mcrId));
+        } else {
+            der.getTitles().forEach(derTitle -> {
+                derivate.getDerivate().getTitles()
+                    .add(new MCRMetaLangText("title", derTitle.getLang(), null, 0, null, derTitle.getText()));
+            });
+        }
+
         derivate.setOrder(der.getOrder());
 
         derivate.getDerivate().getClassifications()
