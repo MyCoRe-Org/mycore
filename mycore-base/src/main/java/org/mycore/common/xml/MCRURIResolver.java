@@ -1662,31 +1662,35 @@ public final class MCRURIResolver implements URIResolver {
     private static class MCRCheckPermissionResolver implements URIResolver {
         /**
          * returns the boolean value for the given ACL permission.
-         * 
-         * Syntax: <code>checkPermission:{id}:{permission}
+         *
+         * Syntax: <code>checkPermission:{id}:{permission}</code> or <code>checkPermission:{permission}</code>
          * 
          * @param href
          *            URI in the syntax above
          * @param base
          *            not used
          * 
-         * @return the root element boolean of the XML document with content string true of false
+         * @return the root element "boolean" of the XML document with content string true of false
          * @see javax.xml.transform.URIResolver
          */
         public Source resolve(String href, String base) throws TransformerException {
-            LOGGER.debug("start resolving " + href);
-            StringTokenizer pst = new StringTokenizer(href, ":", true);
-            if (pst.countTokens() != 5) {
-                throw new IllegalArgumentException("Invalid format of uri for retrieval of checkPermission: " + href);
+            final String[] split = href.split(":");
+            boolean permission;
+            switch (split.length) {
+                case 2:
+                    System.out.println("check permission: " + split[1]);
+                    permission = MCRAccessManager.checkPermission(split[1]);
+                    break;
+                case 3:
+                    System.out.println("check permission: " + split[1] + " " + split[2]);
+                    permission = MCRAccessManager.checkPermission(split[1], split[2]);
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                        "Invalid format of uri for retrieval of checkPermission: " + href);
             }
-            pst.nextToken(); // "checkPermission"
-            pst.nextToken(); // :
-            String id = pst.nextToken();
-            pst.nextToken(); // :
-            String permission = pst.nextToken();
             Element root = new Element("boolean");
-            final boolean permForId = MCRAccessManager.checkPermission(id, permission);
-            root.setText(Boolean.toString(permForId));
+            root.setText(Boolean.toString(permission));
             return new JDOMSource(root);
         }
     }
