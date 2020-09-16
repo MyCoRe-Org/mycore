@@ -109,7 +109,6 @@ public class MCRSwordUtil {
 
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(oid);
-        derivate.setLabel("data object from " + documentID);
 
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
             .orElse("datamodel-derivate.xml")

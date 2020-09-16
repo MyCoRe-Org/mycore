@@ -66,6 +66,7 @@ import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -208,7 +209,8 @@ public class MCRRestAPIUploadHelper {
                 derID = MCRObjectID.getNextFreeId(mcrObjIDObj.getProjectId() + "_derivate");
                 MCRDerivate mcrDerivate = new MCRDerivate();
                 if (label != null && label.length() > 0) {
-                    mcrDerivate.setLabel(label);
+                    mcrDerivate.getDerivate().getTitles()
+                        .add(new MCRMetaLangText("title", null, null, 0, null, label));
                 }
                 mcrDerivate.setId(derID);
                 mcrDerivate.setSchema("datamodel-derivate.xsd");

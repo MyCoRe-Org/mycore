@@ -60,8 +60,6 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -69,7 +67,6 @@ import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
@@ -264,8 +261,7 @@ public class MCRMigrationCommands {
     }
 
     private static MCRMetaLinkID toLinkId(MCRObjectID mcrObjectID) {
-        String objectLabel = MCRMetadataManager.retrieve(mcrObjectID).getLabel();
-        return new MCRMetaLinkID("child", mcrObjectID, null, objectLabel);
+        return new MCRMetaLinkID("child", mcrObjectID, null, null);
     }
 
     @MCRCommand(syntax = "add missing children",
@@ -356,8 +352,7 @@ public class MCRMigrationCommands {
     }
 
     @MCRCommand(syntax = "migrate derivate {0} using order {1}",
-        help = "Sets the order of derivate {0} to the number {1}"
-            + " and migrates label to classification (MCR-2003, MCR-2099)")
+        help = "Sets the order of derivate {0} to the number {1}")
     public static void setOrderOfDerivate(String derivateIDStr, String orderStr) throws MCRAccessException {
         final int order = Integer.parseInt(orderStr);
 
@@ -369,19 +364,6 @@ public class MCRMigrationCommands {
 
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         derivate.setOrder(order);
-
-        //migrate label to classification:
-        //(only if label looks like an identifier and exists in derivate_type classification)
-        String label = derivate.getLabel();
-        if (label != null && label.length() > 0 && !label.contains(" ")) {
-            if (MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID("derivate_types", label))) {
-                derivate.getDerivate().getClassifications()
-                    .add(new MCRMetaClassification("classification", 0, null, "derivate_types", label));
-                derivate.setLabel(null);
-            } else {
-                LOGGER.warn("Classification 'derivate_types' does not contain a category with ID: " + label);
-            }
-        }
 
         //migrate title:
         //in professorenkatalog we used a service flag to store the title -> should be moved to titles/tile
