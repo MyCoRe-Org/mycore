@@ -28,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -117,7 +118,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         createNow(der.getId());
-        if (!der.getDerivate().isDisplayEnabled()) {
+        if (!MCRAccessManager.checkPermission(der.getId(), MCRAccessManager.PERMISSION_VIEW)) {
             deleteNow(der.getId());
         }
     }
@@ -126,7 +127,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         MCRDerivate oldVersion = (MCRDerivate) evt.get(MCREvent.DERIVATE_OLD_KEY);
         if (updateRequired(oldVersion, der)) {
-            if (der.getDerivate().isDisplayEnabled()) {
+            if (MCRAccessManager.checkPermission(der.getId(), MCRAccessManager.PERMISSION_VIEW)) {
                 createNow(der.getId());
             } else {
                 deleteNow(der.getId());
@@ -155,7 +156,9 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     }
 
     private boolean updateRequired(MCRDerivate oldVersion, MCRDerivate newVersion) {
-        return oldVersion.getDerivate().isDisplayEnabled() != newVersion.getDerivate().isDisplayEnabled();
+        return MCRAccessManager.checkPermission(oldVersion.getId(),
+            MCRAccessManager.PERMISSION_VIEW) != MCRAccessManager.checkPermission(newVersion.getId(),
+                MCRAccessManager.PERMISSION_VIEW);
     }
 
 }

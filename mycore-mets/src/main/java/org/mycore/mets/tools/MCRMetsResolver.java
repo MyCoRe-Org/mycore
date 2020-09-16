@@ -35,6 +35,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -83,7 +84,7 @@ public class MCRMetsResolver implements URIResolver {
         Collection<String> derivates = MCRLinkTableManager.instance().getDestinationOf(id, "derivate");
         for (String derID : derivates) {
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derID));
-            if (der.getDerivate().isDisplayEnabled()) {
+            if (MCRAccessManager.checkPermission(der.getId(), MCRAccessManager.PERMISSION_VIEW)) {
                 return derID;
             }
         }

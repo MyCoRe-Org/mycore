@@ -100,7 +100,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -553,8 +552,7 @@ public class MCRXMLFunctions {
             .map(List::stream)
             .map(s -> s.map(MCRMetaLinkID::getXLinkHrefID)
                 .map(MCRMetadataManager::retrieveMCRDerivate)
-                .map(MCRDerivate::getDerivate)
-                .anyMatch(MCRObjectDerivate::isDisplayEnabled))
+                .anyMatch(d -> MCRAccessManager.checkPermission(d.getId(), MCRAccessManager.PERMISSION_VIEW)))
             .orElse(false);
     }
 

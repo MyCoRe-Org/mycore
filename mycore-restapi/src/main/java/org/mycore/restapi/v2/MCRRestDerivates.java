@@ -333,7 +333,6 @@ public class MCRRestDerivates {
         MCRObjectID derId = MCRObjectID.getNextFreeId(projectID + "_derivate");
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derId);
-        derivate.getDerivate().setDisplayEnabled(der.isDisplayEnabled());
         derivate.setOrder(der.getOrder());
 
         derivate.getDerivate().getClassifications()
