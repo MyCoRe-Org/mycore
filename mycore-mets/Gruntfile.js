@@ -124,6 +124,9 @@ module.exports = function (grunt) {
             MetsEditorClient: {
                 files: {
                     '<%= properties.outputPath %>/css/mets-editor.css': 'src/main/less/mets-editor.less'
+                },
+                options: {
+                    "javascriptEnabled": true
                 }
             }
         },
