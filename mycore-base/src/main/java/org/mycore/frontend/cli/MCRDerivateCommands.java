@@ -705,51 +705,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method sychronize the xlink:label of the mycorederivate with the
-     * xlink:label of the derivate reference of mycoreobject.
-     *
-     * @param id
-     *            the MCRObjectID as String
-     */
-    @MCRCommand(syntax = "synchronize derivate with ID {0}",
-        help = "The command read a derivate with the MCRObjectID {0} and synchronize the xlink:label "
-            + "with the derivate entry of the mycoreobject.",
-        order = 170)
-    public static void synchronizeDerivateForID(String id) {
-        MCRObjectID mid = null;
-        try {
-            mid = MCRObjectID.getInstance(id);
-        } catch (Exception e) {
-            LOGGER.error("The String {} is not a MCRObjectID.", id);
-            return;
-        }
-
-        // set mycoreobject
-        MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(mid);
-        String label = "";
-        String href = der.getDerivate().getMetaLink().getXLinkHref();
-        MCRObject obj = MCRMetadataManager.retrieveMCRObject(MCRObjectID.getInstance(href));
-        int size = obj.getStructure().getDerivates().size();
-        boolean isset = false;
-        for (int i = 0; i < size; i++) {
-            MCRMetaLinkID link = obj.getStructure().getDerivates().get(i);
-            if (link.getXLinkHref().equals(mid.toString())) {
-                String oldlabel = link.getXLinkLabel();
-                if (oldlabel != null && !oldlabel.trim().equals(label)) {
-                    obj.getStructure().getDerivates().get(i).setXLinkTitle(label);
-                    isset = true;
-                }
-                break;
-            }
-        }
-        // update mycoreobject
-        if (isset) {
-            MCRMetadataManager.fireUpdateEvent(obj);
-            LOGGER.info("Synchronized {}", mid);
-        }
-    }
-
-    /**
      * Links the given derivate to the given object.
      */
     @MCRCommand(syntax = "link derivate {0} to {1}",
