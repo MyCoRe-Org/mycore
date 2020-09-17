@@ -244,6 +244,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("redirect", new MCRRedirectResolver());
         supportedSchemes.put("data", new MCRDataURLResolver());
         supportedSchemes.put("i18n", new MCRI18NResolver());
+        supportedSchemes.put("checkPermission", new MCRCheckPermissionResolver());
         MCRRESTResolver restResolver = new MCRRESTResolver();
         supportedSchemes.put("http", restResolver);
         supportedSchemes.put("https", restResolver);
@@ -1657,4 +1658,39 @@ public final class MCRURIResolver implements URIResolver {
             return new JDOMSource(i18nElement);
         }
     }
+    
+    private static class MCRCheckPermissionResolver implements URIResolver {
+        /**
+         * returns the boolean value for the given ACL permission.
+         *
+         * Syntax: <code>checkPermission:{id}:{permission}</code> or <code>checkPermission:{permission}</code>
+         * 
+         * @param href
+         *            URI in the syntax above
+         * @param base
+         *            not used
+         * 
+         * @return the root element "boolean" of the XML document with content string true of false
+         * @see javax.xml.transform.URIResolver
+         */
+        public Source resolve(String href, String base) throws TransformerException {
+            final String[] split = href.split(":");
+            boolean permission;
+            switch (split.length) {
+                case 2:
+                    permission = MCRAccessManager.checkPermission(split[1]);
+                    break;
+                case 3:
+                    permission = MCRAccessManager.checkPermission(split[1], split[2]);
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                        "Invalid format of uri for retrieval of checkPermission: " + href);
+            }
+            Element root = new Element("boolean");
+            root.setText(Boolean.toString(permission));
+            return new JDOMSource(root);
+        }
+    }
+    
 }
