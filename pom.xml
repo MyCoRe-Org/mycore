@@ -64,7 +64,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
     <site.suffix />
-    <swagger.version>2.1.3</swagger.version>
+    <swagger.version>2.1.4</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
     <yarn.version>v1.13.0</yarn.version>
@@ -192,7 +192,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
               <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
               <link>http://docs.jboss.org/hibernate/jpa/2.2/api/</link>
               <!--
-              <link>http://lucene.apache.org/solr/8_3_0/solr-solrj/</link>
+              <link>http://lucene.apache.org/solr/8_6_0/solr-solrj/</link>
 -->
             </links>
           </configuration>
@@ -716,7 +716,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
                 <link>http://docs.jboss.org/hibernate/jpa/2.2/api/</link>
                 <!--
-                <link>http://lucene.apache.org/solr/8_3_0/solr-solrj/</link>
+                <link>http://lucene.apache.org/solr/8_6_0/solr-solrj/</link>
 -->
               </links>
             </configuration>
@@ -868,7 +868,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
-        <version>1.14.1</version>
+        <version>1.15.0</version>
       </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>
@@ -878,7 +878,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.7</version>
+        <version>2.8.0</version>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
@@ -1010,7 +1010,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.10</version>
+        <version>3.11</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -1035,12 +1035,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>2.0.20</version>
+        <version>2.0.21</version>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>8.5.2</version>
+        <version>8.6.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
@@ -1460,7 +1460,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.2.14</version>
+        <version>42.2.16</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
@@ -1511,7 +1511,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-annotations</artifactId>
-        <version>4.0.6</version>
+        <version>4.1.2</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -1573,14 +1573,14 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.5.0</version>
+        <version>5.6.0</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>net.sf.saxon</groupId>
         <artifactId>Saxon-HE</artifactId>
-        <version>10.1</version>
+        <version>10.2</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1610,7 +1610,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>fontbox</artifactId>
-        <version>2.0.20</version>
+        <version>2.0.21</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1716,7 +1716,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.6.2</version>
+        <version>5.7.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
