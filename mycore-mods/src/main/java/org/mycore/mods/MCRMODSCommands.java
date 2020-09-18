@@ -48,7 +48,6 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
-import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -172,8 +171,6 @@ public class MCRMODSCommands extends MCRAbstractCommands {
         throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(MCRObjectID.getNextFreeId(documentID.getProjectId(), "derivate"));
-        derivate.getDerivate().getTitles()
-            .add(new MCRMetaLangText("title", null, null, 0, null, "data object from " + documentID));
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate")
             .orElse("datamodel-derivate.xml")
             .replaceAll(".xml", ".xsd");

@@ -73,7 +73,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkIDFactory;
-import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -734,8 +733,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         LOGGER.info("Setting {} as parent for derivate {}", objID, derID);
         derObj.getDerivate().getMetaLink()
             .setReference(objID, oldDerivateToObjectLink.getXLinkLabel(), oldDerivateToObjectLink.getXLinkTitle());
-        derObj.getDerivate().getTitles().add(new MCRMetaLangText("title", null, null, 0, null,
-            "data object from " + objectId + " (prev. owner was " + oldOwnerId));
         MCRMetadataManager.update(derObj);
 
         /* set link to derivate in the new parent */
