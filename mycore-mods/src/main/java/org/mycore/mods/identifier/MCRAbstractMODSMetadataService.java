@@ -106,15 +106,19 @@ public class MCRAbstractMODSMetadataService
     }
 
     protected String getXPath() {
-        final String prefixCondition;
-
+        StringBuilder xPathBuilder = new StringBuilder();
+        xPathBuilder.append("mods:identifier[@type='").append(getIdentifierType()).append('\'');
         if (getProperties().containsKey(PREFIX_PROPERTY_KEY)) {
-            prefixCondition = " and starts-with(text(), '" + getProperties().get(PREFIX_PROPERTY_KEY) + "')";
-        } else {
-            prefixCondition = "";
+            String[] prefixes = getProperties().get(PREFIX_PROPERTY_KEY).split(",");
+            if(prefixes.length != 0) {
+                xPathBuilder.append(" and (starts-with(text(), '").append(prefixes[0]).append("')");
+                for (int i = 1; i < prefixes.length; i++) {
+                    xPathBuilder.append(" or starts-with(text(), '").append(prefixes[i]).append("')");
+                }
+                xPathBuilder.append(')');
+            }
         }
-
-        final String identifierType = getIdentifierType();
-        return "mods:identifier[@type='" + identifierType + "'" + prefixCondition + "]";
+        xPathBuilder.append(']');
+        return xPathBuilder.toString();
     }
 }
