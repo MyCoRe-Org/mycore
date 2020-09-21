@@ -239,9 +239,8 @@ public class MCROAISolrSearcher extends MCROAISearcher {
             .orElse("modified asc");
         params.add(CommonParams.SORT, sortBy);
 
-        MCRConfiguration2.getString(getConfigPrefix() + "Search.Restriction").ifPresent(restriction -> {
-            params.add(CommonParams.Q, restriction);
-        });
+        MCRConfiguration2.getString(getConfigPrefix() + "Search.Restriction")
+            .ifPresent(restriction -> params.add(CommonParams.Q, restriction));
         
         String fieldName = MCRConfiguration2.getString(getConfigPrefix() + "EarliestDatestamp.FieldName")
             .orElse("modified");
