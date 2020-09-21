@@ -20,10 +20,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-maven');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-npmcopy');
+    grunt.loadNpmTasks('grunt-terser');
 
     var globalConfig = {
         projectBase: grunt.option('projectBase') || ''
@@ -48,14 +48,16 @@ module.exports = function (grunt) {
                     }
                 }
             },
-            uglify: {
+            terser: {
                 pdfjs: {
                     mangle: false,
                     files: {
                         '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.js',
                         '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.min.worker.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.worker.js'
                     }
-                },
+                }
+            },
+            uglify: {
                 viewer: {
                     mangle: true,
                     files: {
@@ -219,7 +221,7 @@ module.exports = function (grunt) {
         });
 
 
-    grunt.registerTask('default', ['npmcopy', 'ts', 'less', 'uglify']);
+    grunt.registerTask('default', ['npmcopy', 'ts', 'less', 'uglify', 'terser']);
 
 };
 

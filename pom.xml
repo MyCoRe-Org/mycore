@@ -59,7 +59,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
-    <node.version>v6.9.1</node.version>
+    <node.version>v12.18.3</node.version>
     <oaipmh.version>2.1</oaipmh.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>

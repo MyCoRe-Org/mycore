@@ -17,7 +17,6 @@
  */
 
 module.exports = function (grunt) {
-    grunt.loadNpmTasks('grunt-maven');
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt

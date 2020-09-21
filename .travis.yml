@@ -1,13 +1,15 @@
 language: java
-dist: xenial
+dist: bionic
 jdk:
     - openjdk11
 install: true
 addons:
-  firefox: "latest-esr"
+  firefox: "78.2.0esr"
   apt:
     packages:
     - google-chrome-stable
+    - dbus-x11
+
 cache:
   directories:
     - $HOME/.m2/repository
@@ -15,7 +17,7 @@ cache:
 env:
   global:
     - MAVEN_OPTS="-Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC"
-    - GECKODRIVER_VERSION="0.24.0"
+    - GECKODRIVER_VERSION="0.27.0"
     - CHROMEDRIVER_VERSION=$(curl http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
     - FIREFOX_BIN=$(which firefox)
     - SELENIUM_BROWSER=firefox

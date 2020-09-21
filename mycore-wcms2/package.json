@@ -3,14 +3,11 @@
   "version": "1.0.0",
   "description": "mycore-wcms2",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-cli": "^0.1.13",
-    "grunt-contrib-copy": "^0.5.0",
-    "grunt-maven": "~1.1.0",
-    "grunt-newer": "^0.7.0",
-    "grunt-svninfo": "^0.1.4",
-    "dojo": "1.6.5",
-    "dijit": "1.6.5",
-    "ckeditor": "https://github.com/MyCoRe-Org/ckeditor-releases.git#full/4.3.x"
+    "ckeditor": "https://github.com/MyCoRe-Org/ckeditor-releases.git#full/4.3.x",
+    "dijit": "1.16.3",
+    "dojo": "1.16.3",
+    "grunt": "^1.3.0",
+    "grunt-cli": "^1.3.2",
+    "grunt-contrib-copy": "^1.0.0"
   }
 }
