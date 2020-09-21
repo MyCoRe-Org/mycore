@@ -1,5 +1,5 @@
 language: java
-dist: xenial
+dist: bionic
 jdk:
     - openjdk11
 install: true
@@ -8,6 +8,8 @@ addons:
   apt:
     packages:
     - google-chrome-stable
+    - dbus-x11
+
 cache:
   directories:
     - $HOME/.m2/repository
