@@ -275,14 +275,14 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
                 if (savedPermissions != null && savedPermissions.contains(permission)) {
                     if (overwrite) {
                         MCRAccessManager.removeRule(id, permission);
-                        if (permission.startsWith("read")) {
+                        if (permission.startsWith(MCRAccessManager.PERMISSION_READ)) {
                             MCRAccessManager.addRule(id, permission, readrule, "");
                         } else {
                             MCRAccessManager.addRule(id, permission, editrule, "");
                         }
                     }
                 } else {
-                    if (permission.startsWith("read")) {
+                    if (permission.startsWith(MCRAccessManager.PERMISSION_READ)) {
                         MCRAccessManager.addRule(id, permission, readrule, "");
                     } else {
                         MCRAccessManager.addRule(id, permission, editrule, "");
