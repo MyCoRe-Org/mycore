@@ -322,7 +322,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
             && !checkPermission(identifier, tileInfo)) {
             throw MCRAccessException.missingPermission(
                 "View the file " + tileInfo.getImagePath() + " in " + tileInfo.getDerivate(), tileInfo.getDerivate(),
-                "view-derivate");
+                MCRAccessManager.PERMISSION_VIEW);
         }
     }
 
