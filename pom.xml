@@ -1568,7 +1568,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
         <version>3.4.5</version>
-        <scope>runtime</scope>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>net.java.dev.jna</groupId>
