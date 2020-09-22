@@ -10,9 +10,14 @@
 
     <xsl:function name="mcri18n:translate" as="xs:string">
         <xsl:param name="key" as="xs:string"/>
-        <xsl:param name="arguments" as="xs:string*"/>
         <xsl:variable name="transDoc"  select="fn:document(concat('i18n:', $key))" />
-        <xsl:variable name="translation" select="$transDoc/i18n/text()" />
+        <xsl:value-of select="$transDoc/i18n/text()" />
+    </xsl:function>
+
+    <xsl:function name="mcri18n:translate-with-params" as="xs:string">
+        <xsl:param name="key" as="xs:string"/>
+        <xsl:param name="arguments" as="xs:string*"/>
+        <xsl:variable name="translation" select="mcri18n:translate($key)" />
         <xsl:choose>
             <xsl:when test="count($arguments) = 0">
                 <xsl:value-of select="$translation" />
