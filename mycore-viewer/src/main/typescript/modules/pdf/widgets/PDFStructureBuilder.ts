@@ -53,13 +53,14 @@ namespace mycore.viewer.widgets.pdf {
 
         private _resolveStartPage() {
             try {
-                (<any>this._document).getOpenActionDestination().then((dest: Array<{ num?: number, gen: number }>) => {
-                    if(dest===null){
+                (<any>this._document).getOpenAction().then((openAction:{dest: Array<{ num?: number, gen: number }>}) => {
+
+                    if(openAction=== null || openAction.dest===null){
                         this._startPage = 1;
                         this.checkResolvable();
                         return;
                     }
-                    this._document.getPageIndex(dest[0]).then((page) => {
+                    this._document.getPageIndex(openAction.dest[0]).then((page) => {
                         this._startPage = page + 1;
                         this.checkResolvable();
                     }, () => {
