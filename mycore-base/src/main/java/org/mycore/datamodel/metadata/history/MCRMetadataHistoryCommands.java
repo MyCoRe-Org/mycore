@@ -218,7 +218,7 @@ public class MCRMetadataHistoryCommands {
             MCRMetaHistoryItem create = create(derId,
                 user,
                 lastModified);
-            boolean objectIsHidden = !MCRAccessManager.checkPermission(derId, MCRAccessManager.PERMISSION_VIEW);
+            boolean objectIsHidden = !MCRAccessManager.checkDerivateDisplayPermission(derId.toString());
             if (objectIsHidden) {
                 return Stream.of(create, delete(derId, user, lastModified.plusMillis(1)));
             }
@@ -277,8 +277,8 @@ public class MCRMetadataHistoryCommands {
                 }
                 try {
                     MCRDerivate derivate = new MCRDerivate(version.retrieve().asXML());
-                    boolean derivateIsHidden = !MCRAccessManager.checkPermission(derivate.getId(),
-                        MCRAccessManager.PERMISSION_VIEW);
+                    boolean derivateIsHidden = !MCRAccessManager
+                        .checkDerivateDisplayPermission(derivate.getId().toString());
                     if (derivateIsHidden && exist) {
                         items.add(delete(derId, user, revDate.plusMillis(timeOffset)));
                         exist = false;

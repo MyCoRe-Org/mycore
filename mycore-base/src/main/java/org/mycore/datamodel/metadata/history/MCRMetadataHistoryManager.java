@@ -118,7 +118,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     @Override
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         createNow(der.getId());
-        if (!MCRAccessManager.checkPermission(der.getId(), MCRAccessManager.PERMISSION_VIEW)) {
+        if (!MCRAccessManager.checkDerivateDisplayPermission(der.getId().toString())) {
             deleteNow(der.getId());
         }
     }
@@ -127,7 +127,7 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         MCRDerivate oldVersion = (MCRDerivate) evt.get(MCREvent.DERIVATE_OLD_KEY);
         if (updateRequired(oldVersion, der)) {
-            if (MCRAccessManager.checkPermission(der.getId(), MCRAccessManager.PERMISSION_VIEW)) {
+            if (MCRAccessManager.checkDerivateDisplayPermission(der.getId().toString())) {
                 createNow(der.getId());
             } else {
                 deleteNow(der.getId());
@@ -156,9 +156,8 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
     }
 
     private boolean updateRequired(MCRDerivate oldVersion, MCRDerivate newVersion) {
-        return MCRAccessManager.checkPermission(oldVersion.getId(),
-            MCRAccessManager.PERMISSION_VIEW) != MCRAccessManager.checkPermission(newVersion.getId(),
-                MCRAccessManager.PERMISSION_VIEW);
+        return MCRAccessManager.checkDerivateDisplayPermission(oldVersion.getId().toString()) != MCRAccessManager
+            .checkDerivateDisplayPermission(newVersion.getId().toString());
     }
 
 }

@@ -75,7 +75,6 @@ import org.apache.xml.utils.XMLChar;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSessionMgr;
@@ -134,9 +133,6 @@ public class MCRXMLFunctions {
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
-
-    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000,
-        "Derivate display value cache");
 
     public static Node document(String uri) throws JDOMException, IOException, SAXException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
@@ -395,7 +391,7 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
-        return MCRAccessManager.checkPermission(derivateId,  MCRAccessManager.PERMISSION_VIEW);
+        return MCRAccessManager.checkDerivateDisplayPermission(derivateId);
     }
 
     /**
@@ -521,7 +517,7 @@ public class MCRXMLFunctions {
             .map(List::stream)
             .map(s -> s.map(MCRMetaLinkID::getXLinkHrefID)
                 .map(MCRMetadataManager::retrieveMCRDerivate)
-                .anyMatch(d -> MCRAccessManager.checkPermission(d.getId(), MCRAccessManager.PERMISSION_VIEW)))
+                .anyMatch(d -> MCRAccessManager.checkDerivateDisplayPermission(d.getId().toString())))
             .orElse(false);
     }
 
