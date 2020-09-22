@@ -236,6 +236,15 @@ public class MCRAccessManager {
     }
 
     /**
+     * checks if the current user has the permission to view the derivate content.
+     * @param derId the MCRObjectID of the derivate
+     * @return true, if the access is allowed
+     */
+    public static boolean checkDerivateDisplayPermission(String derId) {
+        return checkPermission(derId, PERMISSION_READ) || checkPermission(derId, PERMISSION_VIEW);
+    }
+
+    /**
      * determines whether the current user has the permission to perform a certain action.
      *
      * @param id
