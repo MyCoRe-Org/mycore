@@ -26,9 +26,8 @@ public class MCRDefaultEnrichedDerivateLinkIDFactory extends MCRMetaEnrichedLink
     public MCREditableMetaEnrichedLinkID getDerivateLink(MCRDerivate der) {
         final MCREditableMetaEnrichedLinkID derivateLinkID = getEmptyLinkID();
         final String mainDoc = der.getDerivate().getInternals().getMainDoc();
-        final String label = der.getLabel();
 
-        derivateLinkID.setReference(der.getId().toString(), null, label);
+        derivateLinkID.setReference(der.getId().toString(), null, null);
         derivateLinkID.setSubTag("derobject");
 
         final int order = der.getOrder();

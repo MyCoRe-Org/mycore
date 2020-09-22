@@ -182,8 +182,8 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         testProperties.put("MCR.PI.Service.TestService.supportDfgViewerURN", Boolean.TRUE.toString());
         testProperties.put("MCR.PI.Generator.UUID", MCRUUIDURNGenerator.class.getName());
         testProperties.put("MCR.PI.Generator.UUID.Namespace", "frontend-");
-        testProperties.put("MCR.URN.DNB.Credentials.Login", "test");
-        testProperties.put("MCR.URN.DNB.Credentials.Password", "test");
+        testProperties.put("MCR.PI.DNB.Credentials.Login", "test");
+        testProperties.put("MCR.PI.DNB.Credentials.Password", "test");
         return testProperties;
     }
 

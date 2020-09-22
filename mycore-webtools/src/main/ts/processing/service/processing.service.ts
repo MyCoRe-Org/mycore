@@ -41,7 +41,7 @@ export class ProcessingService {
         this.socketURL = protocol + loc.host + Util.getBasePath(loc.pathname) + this.path;
     }
 
-    public send(message: String) {
+    public send(message: string) {
         if (message === '') {
             return;
         }

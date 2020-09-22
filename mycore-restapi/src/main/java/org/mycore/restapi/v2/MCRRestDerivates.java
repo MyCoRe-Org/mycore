@@ -333,8 +333,7 @@ public class MCRRestDerivates {
         MCRObjectID derId = MCRObjectID.getNextFreeId(projectID + "_derivate");
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derId);
-        derivate.setLabel(Optional.ofNullable(der.getLabel()).orElse("data object from " + mcrId));
-        derivate.getDerivate().setDisplayEnabled(der.isDisplayEnabled());
+
         derivate.setOrder(der.getOrder());
 
         derivate.getDerivate().getClassifications()
@@ -462,8 +461,6 @@ public class MCRRestDerivates {
     }
 
     public static class DerivateMetadata {
-        private String label;
-
         private boolean displayEnabled = true;
 
         private String mainDoc;
@@ -473,15 +470,6 @@ public class MCRRestDerivates {
         private List<MCRCategoryID> classifications = List.of();
 
         private List<DerivateTitle> titles = List.of();
-
-        String getLabel() {
-            return label;
-        }
-
-        @FormParam("label")
-        public void setLabel(String label) {
-            this.label = label;
-        }
 
         boolean isDisplayEnabled() {
             return displayEnabled;

@@ -53,7 +53,7 @@ public class MCRDerivateURNUtils {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String SUPPORTED_CONTENT_TYPE = MCRConfiguration2
-        .getString("MCR.URN.URNGranular.SupportedContentTypes").orElse("");
+        .getString("MCR.PI.URNGranular.SupportedContentTypes").orElse("");
 
     public static URL getURL(MCRPIRegistrationInfo piInfo) {
         String derivateID = piInfo.getMycoreID();
@@ -138,7 +138,7 @@ public class MCRDerivateURNUtils {
 
     /**
      * @param file image file
-     * @return if content type is in property <code>MCR.URN.URNGranular.SupportedContentTypes</code>
+     * @return if content type is in property <code>MCR.PI.URNGranular.SupportedContentTypes</code>
      * @see MCRContentTypes#probeContentType(Path)
      */
     private static boolean isFileSupported(MCRPath file) {

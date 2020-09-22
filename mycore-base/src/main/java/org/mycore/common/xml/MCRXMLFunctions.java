@@ -58,7 +58,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.xml.parsers.DocumentBuilder;
@@ -75,8 +74,6 @@ import org.apache.xml.utils.XMLChar;
 import org.jdom2.JDOMException;
 import org.jdom2.output.DOMOutputter;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRCache;
-import org.mycore.common.MCRCache.ModifiedHandle;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSessionMgr;
@@ -96,11 +93,9 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -137,9 +132,6 @@ public class MCRXMLFunctions {
             Pattern.DOTALL);
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXMLFunctions.class);
-
-    private static MCRCache<String, Boolean> DISPLAY_DERIVATE_CACHE = new MCRCache<>(10000,
-        "Derivate display value cache");
 
     public static Node document(String uri) throws JDOMException, IOException, SAXException, TransformerException {
         MCRSourceContent sourceContent = MCRSourceContent.getInstance(uri);
@@ -398,36 +390,7 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isDisplayedEnabledDerivate(String derivateId) {
-        MCRObjectID derId = MCRObjectID.getInstance(derivateId);
-        ModifiedHandle modifiedHandle = MCRXMLMetaDataManagerHolder.INSTANCE.getLastModifiedHandle(derId, 30,
-            TimeUnit.SECONDS);
-        Boolean result;
-        try {
-            result = DISPLAY_DERIVATE_CACHE.getIfUpToDate(derivateId, modifiedHandle);
-        } catch (IOException e) {
-            LOGGER.warn("Error while determining when {} was last modified.", derId, e);
-            return false;
-        }
-        if (result != null) {
-            return result;
-        }
-        MCRDerivate der;
-        try {
-            org.jdom2.Document derDoc = MCRXMLMetaDataManagerHolder.INSTANCE.retrieveXML(derId);
-            if (derDoc == null) {
-                LOGGER.error("Derivate \"{}\" does not exist", derId);
-                return false;
-            }
-            der = new MCRDerivate(derDoc);
-        } catch (SAXException | JDOMException | IOException | RuntimeException e) {
-            LOGGER.warn("Error while loading derivate: {}", derId, e);
-            return false;
-        }
-        org.jdom2.Element derivateElem = der.getDerivate().createXML();
-        String display = derivateElem.getAttributeValue("display", "true");
-        Boolean returnValue = Boolean.valueOf(display);
-        DISPLAY_DERIVATE_CACHE.put(derivateId, returnValue);
-        return returnValue;
+        return MCRAccessManager.checkDerivateDisplayPermission(derivateId);
     }
 
     /**
@@ -488,56 +451,6 @@ public class MCRXMLFunctions {
     }
 
     /**
-     * @return true if the given object is allowed for urn assignment
-     */
-    public static boolean isAllowedObjectForURNAssignment(String objId) {
-        if (objId == null) {
-            return false;
-        }
-        try {
-            MCRObjectID obj = MCRObjectID.getInstance(objId);
-            String type = obj.getTypeId();
-            return isAllowedObject(type);
-
-        } catch (Exception ex) {
-            LOGGER.error("Error while checking object {} is allowed for urn assignment", objId);
-            return false;
-        }
-    }
-
-    /**
-     * Reads the property "URN.Enabled.Objects".
-     *
-     * @param givenType
-     *            the type of the mycore object to check
-     * @return <code>true</code> if the given type is in the list of allowed
-     *         objects, <code>false</code> otherwise
-     */
-    private static boolean isAllowedObject(String givenType) {
-        if (givenType == null) {
-            return false;
-        }
-
-        String propertyName = "MCR.URN.Enabled.Objects";
-        boolean allowed = MCRConfiguration2.getString(propertyName)
-            .map(MCRConfiguration2::splitValue)
-            .orElseGet(() -> {
-                LOGGER.info("URN assignment disabled as the property \"{}\" is not set", propertyName);
-                return Stream.empty();
-            })
-            .filter(s -> s.equals(givenType))
-            .findAny()
-            .isPresent();
-        if (!allowed) {
-            LOGGER.info(
-                "URN assignment disabled as the object type {} is not in the list of allowed objects."
-                    + " See property \"{}\"",
-                givenType, propertyName);
-        }
-        return allowed;
-    }
-
-    /**
      * @param objectId
      *            the id of the derivate owner
      * @return <code>true</code> if the derivate owner has a least one derivate
@@ -553,8 +466,7 @@ public class MCRXMLFunctions {
             .map(List::stream)
             .map(s -> s.map(MCRMetaLinkID::getXLinkHrefID)
                 .map(MCRMetadataManager::retrieveMCRDerivate)
-                .map(MCRDerivate::getDerivate)
-                .anyMatch(MCRObjectDerivate::isDisplayEnabled))
+                .anyMatch(d -> MCRAccessManager.checkDerivateDisplayPermission(d.getId().toString())))
             .orElse(false);
     }
 

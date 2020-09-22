@@ -40,6 +40,7 @@ import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.jdom2.JDOMException;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -200,7 +201,6 @@ public class MCRMetadataHistoryCommands {
     }
 
     private static Stream<MCRMetaHistoryItem> buildSimpleDerivateHistory(MCRObjectID derId) throws IOException {
-        boolean exist = false;
         LogManager.getLogger().debug("Store of {} has no old revisions. History rebuild is limited", derId);
         if (MCRMetadataManager.exists(derId)) {
             MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(derId);
@@ -218,9 +218,8 @@ public class MCRMetadataHistoryCommands {
             MCRMetaHistoryItem create = create(derId,
                 user,
                 lastModified);
-            exist = true;
-            boolean objectIsHidden = !der.getDerivate().isDisplayEnabled();
-            if (objectIsHidden && exist) {
+            boolean objectIsHidden = !MCRAccessManager.checkDerivateDisplayPermission(derId.toString());
+            if (objectIsHidden) {
                 return Stream.of(create, delete(derId, user, lastModified.plusMillis(1)));
             }
             return Stream.of(create);
@@ -230,7 +229,6 @@ public class MCRMetadataHistoryCommands {
     }
 
     private static Stream<MCRMetaHistoryItem> buildSimpleObjectHistory(MCRObjectID objId) throws IOException {
-        boolean exist = false;
         LogManager.getLogger().debug("Store of {} has no old revisions. History rebuild is limited", objId);
         if (MCRMetadataManager.exists(objId)) {
             MCRObject obj = MCRMetadataManager.retrieveMCRObject(objId);
@@ -246,9 +244,8 @@ public class MCRMetadataHistoryCommands {
             String user = Optional.ofNullable(creator)
                 .orElseGet(() -> MCRSystemUserInformation.getSystemUserInstance().getUserID());
             MCRMetaHistoryItem create = create(objId, user, lastModified);
-            exist = true;
             boolean objectIsHidden = MCRMetadataHistoryManager.objectIsHidden(obj);
-            if (objectIsHidden && exist) {
+            if (objectIsHidden) {
                 return Stream.of(create, delete(objId, user, lastModified.plusMillis(1)));
             }
             return Stream.of(create);
@@ -280,7 +277,8 @@ public class MCRMetadataHistoryCommands {
                 }
                 try {
                     MCRDerivate derivate = new MCRDerivate(version.retrieve().asXML());
-                    boolean derivateIsHidden = !derivate.getDerivate().isDisplayEnabled();
+                    boolean derivateIsHidden = !MCRAccessManager
+                        .checkDerivateDisplayPermission(derivate.getId().toString());
                     if (derivateIsHidden && exist) {
                         items.add(delete(derId, user, revDate.plusMillis(timeOffset)));
                         exist = false;

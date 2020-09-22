@@ -581,9 +581,6 @@ public class MCRRestAPIObjectsHelper {
                 MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
                 String mcrID = der.getDerivate().getMetaLink().getXLinkHref();
                 eDerObject.setAttribute("metadata", mcrID);
-                if (der.getLabel() != null && der.getLabel().length() > 0) {
-                    eDerObject.setAttribute("label", der.getLabel());
-                }
                 if (der.getDerivate().getClassifications().size() > 0) {
                     StringBuffer c = new StringBuffer();
                     for (int i = 0; i < der.getDerivate().getClassifications().size(); i++) {
@@ -629,9 +626,6 @@ public class MCRRestAPIObjectsHelper {
                     MCRDerivate der = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(oid.getId()));
                     String mcrID = der.getDerivate().getMetaLink().getXLinkHref();
                     writer.name("metadata").value(mcrID);
-                    if (der.getLabel() != null) {
-                        writer.name("label").value(der.getLabel());
-                    }
                     writer.name("lastModified").value(SDF_UTC.format(oid.getLastModified()));
                     writer.name("href").value(info.getAbsolutePathBuilder().path(oid.getId()).build().toString());
                     writer.endObject();

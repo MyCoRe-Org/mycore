@@ -20,7 +20,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-maven');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-npmcopy');
@@ -44,18 +43,11 @@ module.exports = function (grunt) {
                         'js/lib/es6-promise': 'es6-promise/dist',
 						'js/lib/manifesto': 'manifesto.js/dist/client',
                         'cmaps': 'pdfjs-dist/cmaps',
-                        'js/lib/': ['pdfjs-dist/build', 'jquery/dist']
+                        'js/lib/': ['pdfjs-dist/es5/build', 'jquery/dist']
                     }
                 }
             },
             uglify: {
-                pdfjs: {
-                    mangle: false,
-                    files: {
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.min.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.js',
-                        '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.min.worker.js': '<%= globalConfig.projectBase %>target/classes/META-INF/resources/modules/iview2/js/lib/pdf.worker.js'
-                    }
-                },
                 viewer: {
                     mangle: true,
                     files: {

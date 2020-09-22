@@ -56,8 +56,6 @@ public class MCRObjectDerivate {
 
     private String derivateURN;
 
-    private boolean display;
-
     private List<MCRFileMetadata> files;
 
     private MCRObjectID derivateID;
@@ -73,7 +71,6 @@ public class MCRObjectDerivate {
         titles = new ArrayList<>();
         classifications = new ArrayList<>();
         files = Collections.emptyList();
-        display = true;
         this.derivateID = derivateID;
     }
 
@@ -158,11 +155,6 @@ public class MCRObjectDerivate {
                     files.add(new MCRFileMetadata(file));
                 }
             }
-        }
-
-        String displayVal = derivate.getAttributeValue("display");
-        if (displayVal != null && displayVal.length() > 3) {
-            this.display = Boolean.valueOf(displayVal);
         }
     }
 
@@ -365,7 +357,6 @@ public class MCRObjectDerivate {
             throw new MCRException("The content is not valid.", exc);
         }
         Element elm = new Element("derivate");
-        elm.setAttribute("display", String.valueOf(display));
 
         Element linkmetas = new Element("linkmetas");
         linkmetas.setAttribute("class", "MCRMetaLinkID");
@@ -468,21 +459,6 @@ public class MCRObjectDerivate {
         if ((internals == null) && (externals.size() == 0)) {
             throw new MCRException("(internals == null) && (externals.size() == 0)");
         }
-    }
-
-    /**
-     * @return <code>true</code> if the display attribute is set to true, <code>false</code> otherwise 
-     */
-    public boolean isDisplayEnabled() {
-        return display;
-    }
-
-    /**
-     * Sets the display attribute of the derivate object
-     * @param display pass <code>true</code> if you want to have the derivate displayed or <code>false</code> if not  
-     */
-    public void setDisplayEnabled(boolean display) {
-        this.display = display;
     }
 
     public void setURN(String urn) {

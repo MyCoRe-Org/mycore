@@ -234,14 +234,16 @@ public class MCROAISolrSearcher extends MCROAISearcher {
 
     @Override
     public Optional<Instant> getEarliestTimestamp() {
+        ModifiableSolrParams params = new ModifiableSolrParams();
         String sortBy = MCRConfiguration2.getString(getConfigPrefix() + "EarliestDatestamp.SortBy")
             .orElse("modified asc");
+        params.add(CommonParams.SORT, sortBy);
+
+        MCRConfiguration2.getString(getConfigPrefix() + "Search.Restriction")
+            .ifPresent(restriction -> params.add(CommonParams.Q, restriction));
+        
         String fieldName = MCRConfiguration2.getString(getConfigPrefix() + "EarliestDatestamp.FieldName")
             .orElse("modified");
-        String restriction = MCRConfiguration2.getString(getConfigPrefix() + "Search.Restriction").orElse(null);
-        ModifiableSolrParams params = new ModifiableSolrParams();
-        params.add(CommonParams.SORT, sortBy);
-        params.add(CommonParams.Q, restriction);
         params.add(CommonParams.FQ, fieldName + ":[* TO *]");
         params.add(CommonParams.FL, fieldName);
         params.add(CommonParams.ROWS, "1");

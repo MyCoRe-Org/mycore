@@ -107,12 +107,12 @@ public class MCRURNGranularRESTRegistrationStarter
     }
 
     public Optional<UsernamePasswordCredentials> getUsernamePassword() {
-        String username = MCRConfiguration2.getString("MCR.URN.DNB.Credentials.Login").orElse(null);
-        String password = MCRConfiguration2.getString("MCR.URN.DNB.Credentials.Password").orElse(null);
+        String username = MCRConfiguration2.getString("MCR.PI.DNB.Credentials.Login").orElse(null);
+        String password = MCRConfiguration2.getString("MCR.PI.DNB.Credentials.Password").orElse(null);
 
         if (username == null || password == null || username.length() == 0 || password.length() == 0) {
             LOGGER.warn("Could not instantiate {} as required credentials are unset", this.getClass().getName());
-            LOGGER.warn("Please set MCR.URN.DNB.Credentials.Login and MCR.URN.DNB.Credentials.Password");
+            LOGGER.warn("Please set MCR.PI.DNB.Credentials.Login and MCR.PI.DNB.Credentials.Password");
             return Optional.empty();
         }
 

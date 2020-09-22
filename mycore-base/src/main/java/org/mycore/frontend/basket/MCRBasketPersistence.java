@@ -29,6 +29,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -108,7 +109,8 @@ public class MCRBasketPersistence {
         throws MCRPersistenceException, IOException, MCRAccessException {
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateOID);
-        derivate.setLabel("Saved basket data for " + ownerID);
+        derivate.getDerivate().getTitles()
+            .add(new MCRMetaLangText("title", null, null, 0, null, "Saved basket data for " + ownerID));
 
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate").orElse("datamodel-derivate.xml");
         derivate.setSchema(schema.replaceAll(".xml", ".xsd"));

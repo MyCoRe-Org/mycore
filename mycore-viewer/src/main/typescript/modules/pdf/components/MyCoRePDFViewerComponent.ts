@@ -66,8 +66,7 @@ namespace mycore.viewer.components {
         public init() {
             if (this._settings.doctype == "pdf") {
                 this._pdfUrl = ViewerFormatString(this._settings.pdfProviderURL, { filePath: this._settings.filePath, derivate: this._settings.derivate });
-                var workerURL = this._settings.pdfWorkerURL;
-                pdfjsLib.workerSrc = workerURL;
+                (<any>pdfjsLib).GlobalWorkerOptions.workerSrc = this._settings.pdfWorkerURL;
                 var that = this;
                 var pdfLocation = this._pdfUrl;
                 (<any> pdfjsLib.getDocument(pdfLocation)).promise.then((pdfDoc:PDFDocumentProxy) => {

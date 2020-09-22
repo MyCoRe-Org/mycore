@@ -5,7 +5,7 @@
 
   <xsl:import href="xslImport:solr-document:mycoreobject-dynamicfields.xsl" />
 
-  <xsl:param name="MCR.Solr.DynamicFields" select="'true'" />
+  <xsl:param name="MCR.Solr.DynamicFields" select="'false'" />
   <xsl:param name="MCR.Solr.DynamicFields.excludes" select="''" />
 
   <xsl:template name="check.excludes">

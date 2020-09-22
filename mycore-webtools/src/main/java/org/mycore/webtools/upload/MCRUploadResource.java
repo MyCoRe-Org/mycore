@@ -228,12 +228,10 @@ public class MCRUploadResource {
         MCRObjectID derivateID = getNewCreateDerivateID(objectID);
         MCRDerivate derivate = new MCRDerivate();
         derivate.setId(derivateID);
-        derivate.setLabel("data object from " + objectID);
         derivate.getDerivate().getClassifications().addAll(classifications);
 
         String schema = MCRConfiguration2.getString("MCR.Metadata.Config.derivate").orElse("datamodel-derivate.xml")
-            .replaceAll(".xml",
-                ".xsd");
+            .replaceAll(".xml", ".xsd");
         derivate.setSchema(schema);
 
         MCRMetaLinkID linkId = new MCRMetaLinkID();

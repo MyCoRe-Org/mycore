@@ -48,10 +48,19 @@ public final class MCRObject extends MCRBase {
 
     public static final String ROOT_NAME = "mycoreobject";
 
-    // the object content
+    /**
+     * constant value for the object id length
+     */
+    public static final int MAX_LABEL_LENGTH = 256;
+
+    /**
+     * the object content
+     */
     private final MCRObjectStructure structure;
 
     private final MCRObjectMetadata metadata;
+
+    protected String mcrLabel = null;
 
     /**
      * This is the constructor of the MCRObject class. It creates an instance of
@@ -68,6 +77,7 @@ public final class MCRObject extends MCRBase {
         super();
         structure = new MCRObjectStructure();
         metadata = new MCRObjectMetadata();
+        mcrLabel = "";
     }
 
     public MCRObject(byte[] bytes, boolean valid) throws SAXParseException {
@@ -106,6 +116,33 @@ public final class MCRObject extends MCRBase {
     }
 
     /**
+     * This methode return the object label. If this is not set, null was
+     * returned.
+     * 
+     * @return the lable as a string
+     */
+    public String getLabel() {
+        return mcrLabel;
+    }
+
+    /**
+     * This method set the object label.
+     * 
+     * @param label
+     *            the object label
+     */
+    public void setLabel(String label) {
+        if (label == null) {
+            mcrLabel = label;
+        } else {
+            mcrLabel = label.trim();
+            if (mcrLabel.length() > MAX_LABEL_LENGTH) {
+                mcrLabel = mcrLabel.substring(0, MAX_LABEL_LENGTH);
+            }
+        }
+    }
+
+    /**
      * The given DOM was convert into an internal view of metadata. This are the
      * object ID and the object label, also the blocks structure, flags and
      * metadata.
@@ -116,6 +153,8 @@ public final class MCRObject extends MCRBase {
     @Override
     protected void setUp() throws MCRException {
         super.setUp();
+
+        setLabel(jdomDocument.getRootElement().getAttributeValue("label"));
 
         // get the structure data of the object
         Element structureElement = jdomDocument.getRootElement().getChild("structure");
@@ -143,6 +182,9 @@ public final class MCRObject extends MCRBase {
         try {
             Document doc = super.createXML();
             Element elm = doc.getRootElement();
+            if (mcrLabel != null) {
+                elm.setAttribute("label", mcrLabel);
+            }
             elm.addContent(structure.createXML());
             elm.addContent(metadata.createXML());
             elm.addContent(mcrService.createXML());
@@ -158,6 +200,10 @@ public final class MCRObject extends MCRBase {
      * 
      * <pre>
      *   {
+     *     id: "mycore_project_00000001",
+     *     version: "3.0"
+     *     label: "my mycore object",
+     *     
      *     structure: {@link MCRObjectStructure#createJSON},
      *     metadata: {@link MCRObjectMetadata#createJSON},
      *     service: {@link MCRObjectService#createJSON},
@@ -169,6 +215,9 @@ public final class MCRObject extends MCRBase {
     @Override
     public JsonObject createJSON() {
         JsonObject object = super.createJSON();
+        if (mcrLabel != null) {
+            object.addProperty("label", mcrLabel);
+        }
         object.add("structure", structure.createJSON());
         object.add("metadata", metadata.createJSON());
         object.add("service", mcrService.createJSON());

@@ -366,7 +366,7 @@
           <xsl:for-each select="$files[count(.|key('files-by-derivate',str[@name='derivateID'])[1]) = 1]">
             <xsl:sort select="str[@name='derivateID']" />
             <xsl:variable name="derivateId" select="str[@name='derivateID']" />
-            <xsl:variable name="object-view-derivate" select="acl:checkPermission($mcrid,'view-derivate')" />
+            <xsl:variable name="object-view-derivate" select="acl:checkPermission($derivateId,'view')" />
             <xsl:variable name="isDisplayedEnabled" select="mcrxsl:isDisplayedEnabledDerivate($derivateId)" />
             <xsl:variable name="mayWriteDerivate" select="acl:checkPermission($derivateId,'writedb')" />
             <xsl:choose>

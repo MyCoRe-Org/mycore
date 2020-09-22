@@ -46,8 +46,12 @@ final class MCRPaths {
     }
 
     static URI getURI(String owner, String path) throws URISyntaxException {
-        String scheme = MCRConfiguration2.getString(DEFAULT_SCHEME_PROPERTY).orElse("ifs");
+        String scheme = getDefaultScheme();
         return getURI(scheme, owner, path);
+    }
+
+    private static String getDefaultScheme() {
+        return MCRConfiguration2.getString(DEFAULT_SCHEME_PROPERTY).orElse("ifs2");
     }
 
     static URI getURI(String scheme, String owner, String path) throws URISyntaxException {
@@ -60,7 +64,7 @@ final class MCRPaths {
     }
 
     static Path getPath(String owner, String path) {
-        String scheme = MCRConfiguration2.getString(DEFAULT_SCHEME_PROPERTY).orElse("ifs");
+        String scheme = getDefaultScheme();
         return getPath(scheme, owner, path);
     }
 
