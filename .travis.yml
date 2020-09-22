@@ -4,7 +4,7 @@ jdk:
     - openjdk11
 install: true
 addons:
-  firefox: "78.2.0esr"
+  firefox: "latest-esr"
   apt:
     packages:
     - google-chrome-stable
