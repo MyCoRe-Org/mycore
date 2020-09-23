@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2020.06.0-SNAPSHOT</version>
+    <version>2020.06.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-wfc</artifactId>
