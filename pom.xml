@@ -7,7 +7,7 @@
     <version>45</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2020.06.0</version>
+  <version>2020.06.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
@@ -29,13 +29,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>v2020.06.0</tag>
+    <tag>2020.06.x</tag>
   </scm>
   <properties>
     <argLine />
-    <changelog.since>2020-06-09</changelog.since>
+    <changelog.since>2020-09-23</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2020.06</changes.version>
+    <changes.version>2020.06.1</changes.version>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <forbiddenapis.version>2.6</forbiddenapis.version>
@@ -63,7 +63,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <oaipmh.version>2.1</oaipmh.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
-    <site.suffix />
+    <site.suffix>2020.06.x</site.suffix>
     <swagger.version>2.1.4</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
@@ -570,7 +570,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
               <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
               <smtpPort implementation="java.lang.Integer">25</smtpPort>
               <toAddresses>
-                <toAddress implementation="java.lang.String">developer@mycore.de</toAddress>
+                <toAddress implementation="java.lang.String">user@mycore.de</toAddress>
               </toAddresses>
               <mailSender>
                 <name>${changes.mailSender.name}</name>
