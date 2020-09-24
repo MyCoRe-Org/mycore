@@ -404,7 +404,7 @@ namespace mycore.upload {
         private commitTransfer(uploadID: string, uploadHandler: string = null, classifications: string = null) {
             const xhr = new XMLHttpRequest();
             const uploadHandlerParameter = (uploadHandler != null) ? "&uploadHandler=" + uploadHandler : "";
-            const classificationsParameter = (uploadHandler != null) ? "&classifications=" + classifications : "";
+            const classificationsParameter = (classifications != null) ? "&classifications=" + classifications : "";
             const basicURL = Utils.getUploadSettings().webAppBaseURL + "rsc/files/upload/commit?uploadID=" + uploadID;
 
             this.commitStartHandlerList.forEach(handler => handler(uploadID));
