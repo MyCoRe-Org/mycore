@@ -99,7 +99,7 @@ namespace mycore.viewer.widgets.thumbnail {
             var imageSpacer = jQuery("<div></div>");
             imageSpacer.addClass("imgSpacer");
             imageSpacer.append(thumbnailImage);
-            
+
             var thumbnailDiv = jQuery("<div/>");
             thumbnailDiv.attr("data-id", id);
             thumbnailDiv.toggleClass("iviewThumbnail");
@@ -119,11 +119,11 @@ namespace mycore.viewer.widgets.thumbnail {
         }
 
         public updateTileHref(id:string, href:string) {
-            this._container.find("div[data-id=" + id + "] img").attr("src", href);
+            this._container.find("div[data-id='" + id + "'] img").attr("src", href);
         }
 
         public removeTile(id:string) {
-            this._container.find("div[data-id=" + id + "]").remove();
+            this._container.find("div[data-id='" + id + "']").remove();
 
         }
 
