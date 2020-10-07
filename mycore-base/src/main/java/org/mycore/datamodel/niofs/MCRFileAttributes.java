@@ -67,7 +67,7 @@ public class MCRFileAttributes<T> implements BasicFileAttributes {
             throw new IllegalArgumentException("'size' cannot be negative");
         }
         this.size = size;
-        this.filekey = Objects.requireNonNull(filekey, "'fileKey' must not be null.");
+        this.filekey = filekey;
         setMd5sum(type, md5sum);
         this.creationTime = creationTime == null ? lastModified == null ? EPOCHE_TIME : lastModified : creationTime;
         this.lastModified = lastModified == null ? creationTime == null ? EPOCHE_TIME : creationTime : lastModified;
