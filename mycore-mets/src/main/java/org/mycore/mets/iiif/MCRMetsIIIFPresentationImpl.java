@@ -28,8 +28,10 @@ import org.jdom2.JDOMException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
@@ -42,6 +44,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.iiif.presentation.impl.MCRIIIFPresentationImpl;
 import org.mycore.iiif.presentation.model.basic.MCRIIIFManifest;
+import org.mycore.mets.model.MCRMETSGeneratorFactory;
+import org.mycore.mets.tools.MCRMetsSave;
 import org.xml.sax.SAXException;
 
 public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
@@ -49,6 +53,9 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
     private static final String TRANSFORMER_ID_CONFIGURATION_KEY = "Transformer";
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    public static final boolean STORE_METS_ON_GENERATE = MCRConfiguration2
+        .getOrThrow("MCR.Mets.storeMetsOnGenerate", Boolean::parseBoolean);
 
     public MCRMetsIIIFPresentationImpl(String implName) {
         super(implName);
@@ -58,7 +65,7 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
     public MCRIIIFManifest getManifest(String id) {
         try {
             Document metsDocument = getMets(id);
-            LOGGER.info(new XMLOutputter(Format.getPrettyFormat()).outputString(metsDocument));
+            LOGGER.debug(() -> new XMLOutputter(Format.getPrettyFormat()).outputString(metsDocument));
             return getConverter(id, metsDocument).convert();
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRException(e);
@@ -95,15 +102,19 @@ public class MCRMetsIIIFPresentationImpl extends MCRIIIFPresentationImpl {
             parameter.setParameter("derivateID", id);
         }
 
-        MCRPath metsPath = MCRPath.getPath(id, "mets.xml");
-        if (!Files.exists(metsPath)) {
-            throw new MCRException("File not found: " + id);
-        }
-
-        MCRPathContent source = new MCRPathContent(metsPath);
+        final MCRPath metsPath = MCRPath.getPath(id, "mets.xml");
+        MCRContent source = Files.exists(metsPath) ? new MCRPathContent(metsPath) : generateMets(id);
         MCRContent content = transformer instanceof MCRParameterizedTransformer
             ? ((MCRParameterizedTransformer) transformer).transform(source, parameter)
             : transformer.transform(source);
         return content.asXML();
+    }
+
+    private synchronized MCRJDOMContent generateMets(String id) {
+        final Document document = MCRMETSGeneratorFactory.create(MCRPath.getPath(id, "/")).generate().asDocument();
+        if (STORE_METS_ON_GENERATE) {
+            MCRMetsSave.saveMets(document, MCRObjectID.getInstance(id));
+        }
+        return new MCRJDOMContent(document);
     }
 }
