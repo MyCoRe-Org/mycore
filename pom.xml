@@ -1460,7 +1460,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.2.16</version>
+        <version>42.2.17</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
