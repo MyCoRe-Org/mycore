@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+  See MCR-2252,
+  can be used to i18n webpages, xeditor forms, xsl files
+  as a single, final transformation step
+-->
+
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:i="http://www.mycore.org/i18n"
