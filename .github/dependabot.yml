@@ -9,3 +9,5 @@ updates:
   assignees:
     - "yagee-de"
     - "sebhofmann"
+  commit-message:
+    prefix: "MCR-2297"
