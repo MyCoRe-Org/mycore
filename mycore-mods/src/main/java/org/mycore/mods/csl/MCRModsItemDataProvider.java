@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -368,10 +369,15 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                     nameBuilder.droppingParticle(String.join(" ", typeContentsMap.get(DROPPING_PARTICLE)));
                 }
             } else {
-                nameBuilder.literal(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE));
+                Optional.ofNullable(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE))
+                    .ifPresent((nameBuilder::literal));
             }
 
             final CSLName cslName = nameBuilder.build();
+            if(isNameEmpty(cslName)) {
+                continue;
+            }
+
             final Element roleElement = modsName.getChild("role", MODS_NAMESPACE);
             if (roleElement != null) {
                 final List<Element> roleTerms = roleElement.getChildren("roleTerm", MODS_NAMESPACE);
@@ -416,6 +422,16 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             }
         });
 
+    }
+
+    private boolean isNameEmpty(CSLName cslName) {
+        Predicate<String> isNullOrEmpty = (p) -> p == null || p.isEmpty();
+        return isNullOrEmpty.test(cslName.getFamily()) &&
+            isNullOrEmpty.test(cslName.getGiven()) &&
+            isNullOrEmpty.test(cslName.getDroppingParticle()) &&
+            isNullOrEmpty.test(cslName.getNonDroppingParticle()) &&
+            isNullOrEmpty.test(cslName.getSuffix()) &&
+            isNullOrEmpty.test(cslName.getLiteral());
     }
 
     protected String buildShortTitle(Element titleInfoElement) {
