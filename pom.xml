@@ -1736,7 +1736,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.13</version>
+        <version>4.13.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
