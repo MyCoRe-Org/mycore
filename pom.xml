@@ -52,7 +52,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <jakarta.mail.version>1.6.5</jakarta.mail.version>
     <java.target.version>11</java.target.version>
     <jaxb.version>2.3.3</jaxb.version>
-    <jersey.version>2.31</jersey.version>
+    <jersey.version>2.32</jersey.version>
     <jetty.version>9.4.14.v20181114</jetty.version>
     <log4j.version>2.13.3</log4j.version>
     <!-- lowest is 99, highest is 0 -->
