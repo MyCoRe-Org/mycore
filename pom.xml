@@ -64,7 +64,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
     <site.suffix>2020.06.x</site.suffix>
-    <swagger.version>2.1.4</swagger.version>
+    <swagger.version>2.1.5</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
     <yarn.version>v1.13.0</yarn.version>
