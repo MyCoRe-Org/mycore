@@ -19,6 +19,7 @@
 package org.mycore.common.function;
 
 import java.nio.file.FileSystem;
+import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
 import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
@@ -208,6 +209,10 @@ public class MCRFunctions {
         }
         regex.append("(?:(?:");
         return true;
+    }
+
+    public static <R, P, T extends Throwable> Function<R, P> getNonThrowing(MCRThrowFunction<R, P, T> function){
+        return function.toFunction();
     }
 
 }
