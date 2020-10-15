@@ -47,12 +47,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <hk2.version>2.6.1</hk2.version>
     <httpcomponents.version>4.5.12</httpcomponents.version>
     <httpcore.version>4.4.13</httpcore.version>
-    <jackson.version>2.11.2</jackson.version>
+    <jackson.version>2.11.3</jackson.version>
     <jakarta.activation.version>1.2.2</jakarta.activation.version>
     <jakarta.mail.version>1.6.5</jakarta.mail.version>
     <java.target.version>11</java.target.version>
     <jaxb.version>2.3.3</jaxb.version>
-    <jersey.version>2.31</jersey.version>
+    <jersey.version>2.32</jersey.version>
     <jetty.version>9.4.14.v20181114</jetty.version>
     <log4j.version>2.13.3</log4j.version>
     <!-- lowest is 99, highest is 0 -->
@@ -64,7 +64,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
     <site.suffix />
-    <swagger.version>2.1.4</swagger.version>
+    <swagger.version>2.1.5</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
     <yarn.version>v1.13.0</yarn.version>
@@ -1460,7 +1460,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.2.16</version>
+        <version>42.2.17</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
@@ -1736,7 +1736,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.13</version>
+        <version>4.13.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
