@@ -284,7 +284,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <plugin>
         <groupId>org.bsc.maven</groupId>
         <artifactId>maven-processor-plugin</artifactId>
-        <version>3.3.3</version>
+        <version>4.4</version>
         <dependencies>
           <dependency>
             <groupId>jakarta.xml.bind</groupId>
