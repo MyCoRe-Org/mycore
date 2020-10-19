@@ -1,17 +1,17 @@
 package org.mycore.common.events2;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObject;
 
 public class MCRObjectEvent extends MCREvent {
 
-    MCRObjectEvent(MCRObjectID mcrObjectID){
-        this.mcrObjectID = mcrObjectID;
+    MCRObjectEvent(MCRObject mcrObject){
+        this.mcrObject = mcrObject;
     }
 
-    protected MCRObjectID mcrObjectID;
+    protected MCRObject mcrObject;
 
-    public MCRObjectID getMcrObjectID() {
-        return mcrObjectID;
+    public MCRObject getMcrObject() {
+        return mcrObject;
     }
 
 }

@@ -9,7 +9,7 @@ public class MCRTestEventHandler2 {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRHandlerMethod()
-    public void handleCreate(MCRCreateObjectEvent event) {
+    public void handleCreate(MCRTestEvent1 event) {
         LOGGER.info("handleCreate: " + event.getId());
     }
 

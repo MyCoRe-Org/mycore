@@ -1,11 +1,9 @@
 package org.mycore.common.events2;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObject;
 
 public class MCRCreateObjectEvent extends MCRObjectEvent {
-
-    MCRCreateObjectEvent(MCRObjectID mcrObjectID) {
-        super(mcrObjectID);
+    public MCRCreateObjectEvent(MCRObject mcrObject) {
+        super(mcrObject);
     }
-
 }

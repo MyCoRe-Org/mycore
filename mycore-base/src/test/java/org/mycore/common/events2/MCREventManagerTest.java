@@ -14,8 +14,8 @@ public class MCREventManagerTest extends MCRTestCase {
     public void testMCREventHandler(){
         final MCREventManager manager = MCREventManager.getInstance();
 
-        manager.trigger(new MCRCreateObjectEvent(null));
-        manager.trigger(new MCRUpdateObjectEvent(null));
+        manager.trigger(new MCRTestEvent1());
+        manager.trigger(new MCRTestEvent2());
     }
 
     @Override

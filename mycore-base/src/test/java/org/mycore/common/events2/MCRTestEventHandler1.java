@@ -9,12 +9,12 @@ public class MCRTestEventHandler1 {
     private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRHandlerMethod()
-    public void handleCreate(MCRCreateObjectEvent event){
+    public void handleCreate(MCRTestEvent1 event){
        LOGGER.info("handleCreate: " + event.getId());
     }
 
     @MCRHandlerMethod
-    public void handleUpdate(MCRUpdateObjectEvent event){
+    public void handleUpdate(MCRTestEvent2 event){
         LOGGER.info("handleUpdate: " + event.getId());
     }
 }

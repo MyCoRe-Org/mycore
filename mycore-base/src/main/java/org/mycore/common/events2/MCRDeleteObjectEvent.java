@@ -1,10 +1,9 @@
 package org.mycore.common.events2;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObject;
 
 public class MCRDeleteObjectEvent extends MCRObjectEvent {
-
-    MCRDeleteObjectEvent(MCRObjectID mcrObjectID) {
-        super(mcrObjectID);
+    public MCRDeleteObjectEvent(MCRObject mcrObject) {
+        super(mcrObject);
     }
 }

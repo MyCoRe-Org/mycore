@@ -1,7 +1,6 @@
 package org.mycore.common.events2;
 
 import java.time.LocalDateTime;
-import java.time.temporal.Temporal;
 import java.util.UUID;
 
 public class MCREvent {

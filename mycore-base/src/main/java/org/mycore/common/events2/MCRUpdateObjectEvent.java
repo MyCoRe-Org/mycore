@@ -1,9 +1,18 @@
 package org.mycore.common.events2;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObject;
 
 public class MCRUpdateObjectEvent extends MCRObjectEvent {
-    MCRUpdateObjectEvent(MCRObjectID mcrObjectID) {
-        super(mcrObjectID);
+
+    public MCRUpdateObjectEvent(MCRObject oldObject, MCRObject newObject) {
+        super(newObject);
+        this.oldObject = oldObject;
     }
+
+    private final MCRObject oldObject;
+
+    public MCRObject getOldObject() {
+        return oldObject;
+    }
+
 }
