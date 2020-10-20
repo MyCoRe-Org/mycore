@@ -1434,7 +1434,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>2.1</version>
+        <version>2.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
