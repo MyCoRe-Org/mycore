@@ -38,7 +38,9 @@ import org.mycore.common.MCRDeveloperTools;
 
 /**
  * This helper class determines in which directory to look for addition configuration files.
- * 
+ *
+ * The configuration directory can be set with the system property or environment variable <code>MCR.ConfigDir</code>.
+ *
  * The directory path is build this way:
  * <ol>
  *  <li>System property <code>MCR.Home</code> defined
@@ -81,6 +83,8 @@ import org.mycore.common.MCRDeveloperTools;
 public class MCRConfigurationDir {
 
     public static final String DISABLE_CONFIG_DIR_PROPERTY = "MCR.DisableConfigDir";
+
+    public static final String CONFIGURATION_DIRECTORY_PROPERTY = "MCR.ConfigDir";
 
     private static ServletContext SERVLET_CONTEXT = null;
 
@@ -176,6 +180,12 @@ public class MCRConfigurationDir {
      * @return null if System property {@value #DISABLE_CONFIG_DIR_PROPERTY} is set.
      */
     public static File getConfigurationDirectory() {
+        if(System.getProperties().containsKey(CONFIGURATION_DIRECTORY_PROPERTY)){
+            return new File(System.getProperties().getProperty(CONFIGURATION_DIRECTORY_PROPERTY));
+        }
+        if(System.getenv().containsKey(CONFIGURATION_DIRECTORY_PROPERTY)){
+            return new File(System.getenv(CONFIGURATION_DIRECTORY_PROPERTY));
+        }
         if (!System.getProperties().containsKey(DISABLE_CONFIG_DIR_PROPERTY)) {
             return new File(getMyCoReDirectory(), getPrefix() + getAppName());
         }
