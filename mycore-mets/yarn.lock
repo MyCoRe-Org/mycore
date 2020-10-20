@@ -191,10 +191,10 @@ angular-resource@1.6.0:
   resolved "https://registry.yarnpkg.com/angular-resource/-/angular-resource-1.6.0.tgz#b8c162de7839c5e58fa6b55e901469ec654af0e6"
   integrity sha1-uMFi3ng5xeWPprVekBRp7GVK8OY=
 
-angular@1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.0.tgz#16c5edebd0a342046bd5281cca2decf04c40df76"
-  integrity sha1-FsXt69CjQgRr1Sgcyi3s8ExA33Y=
+angular@1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.0.tgz#b1ec179887869215cab6dfd0df2e42caa65b1b51"
+  integrity sha512-VdaMx+Qk0Skla7B5gw77a8hzlcOakwF8mjlW13DpIWIDlfqwAbSSLfd8N/qZnzEmQF4jC4iofInd3gE7vL8ZZg==
 
 ansi-escapes@^4.2.1:
   version "4.3.1"
