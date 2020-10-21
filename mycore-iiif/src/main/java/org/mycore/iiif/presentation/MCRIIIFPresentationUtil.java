@@ -93,7 +93,7 @@ public class MCRIIIFPresentationUtil {
     }
 
     private static String getImplBaseURL(String impl, String identifier) {
-        return MCRFrontendUtil.getBaseURL() + "rsc/iiif/presentation/" + impl + "/" + identifier + "/";
+        return MCRFrontendUtil.getBaseURL() + "api/iiif/presentation/v2/" + impl + "/" + identifier + "/";
     }
 
     private static String encodeUTF8(String c) {

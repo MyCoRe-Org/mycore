@@ -24,6 +24,5 @@ implementations with different behavior.
 + All the above also works with the Presentation API just the property prefix is MCR.IIIFPresentation. and the class to 
 extend is _MCRIIIFPresentationImpl_.
 
-+ The web service is now available under http://my.mycore.repository.org/mycore_context/rsc/iiif/image/impl_name/ 
-(Image API) and http://my.mycore.repository.org/mycore_context/rsc/iiif/presentation/impl_name/ (Presentation API)
-
++ The web service is now available under http://my.mycore.repository.org/mycore_context/api/iiif/image/v2/impl_name/ 
+(Image API) and http://my.mycore.repository.org/mycore_context/api/iiif/presentation/v2/impl_name/ (Presentation API)
