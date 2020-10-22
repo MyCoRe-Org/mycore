@@ -52,9 +52,11 @@ public class MCRJSONSubscriber implements Flow.Subscriber<JsonObject> {
     @Override
     public void onNext(JsonObject item) {
         if (!this.session.isOpen()) {
+            LogManager.getLogger().warn("Session {} closed, cancel further log event subscription!",
+                this.session.getId());
             subscription.cancel();
         }
-        LogManager.getLogger().info("Sending json: " + item.toString());
+        LogManager.getLogger().debug(() -> "Sending json: " + item.toString());
         lock.lock();
         try {
             session.getBasicRemote().sendText(item.toString());
@@ -80,7 +82,7 @@ public class MCRJSONSubscriber implements Flow.Subscriber<JsonObject> {
 
     @Override
     public void onComplete() {
-        //nothing to do, session handling is outside of this scope
+        LogManager.getLogger().info("Finished sending JSON.");
     }
 
     public void cancel() {

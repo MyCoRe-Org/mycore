@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.SubmissionPublisher;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.http.HttpSession;
@@ -536,6 +537,13 @@ public class MCRWebCLIContainer {
 
         @Override
         public void stop() {
+            while (publisher.estimateMaximumLag() > 0) {
+                if (publisher.getExecutor() instanceof ForkJoinPool) {
+                    ((ForkJoinPool) publisher.getExecutor()).awaitQuiescence(1, TimeUnit.SECONDS);
+                } else {
+                    Thread.yield();
+                }
+            }
             this.subscribers = publisher.getSubscribers();
             super.stop();
             this.publisher.close();
