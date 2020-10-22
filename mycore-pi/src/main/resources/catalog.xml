@@ -80,6 +80,9 @@
   <system systemId="http://schema.datacite.org/meta/kernel-4.1/include/datacite-nameType-v4.1.xsd"
           uri="xsd/datacite/v4.1/datacite-nameType-v4.1.xsd" />
 
+  <!-- Datacite 4.3 -->
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/metadata.xsd" uri="xsd/datacite/v4.3/metadata.xsd" />
+
   <!-- Crossref 4.4.1 -->
   <system systemId="http://data.crossref.org/schemas/crossref4.4.1.xsd" uri="xsd/crossref/4.4.1/crossref4.4.1.xsd" />
   <system systemId="http://data.crossref.org/schemas/common4.4.1.xsd" uri="xsd/crossref/4.4.1/common4.4.1.xsd" />
