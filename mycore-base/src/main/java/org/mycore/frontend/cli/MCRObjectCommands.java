@@ -66,6 +66,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
@@ -561,7 +562,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         int k = 0;
         try {
-            Transformer trans = getTransformer(style);
+            Transformer trans = getTransformer(style != null ? style + "-object" : null);
             for (int i = fid.getNumberAsInteger(); i < tid.getNumberAsInteger() + 1; i++) {
                 String id = MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i);
                 if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
@@ -637,7 +638,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method search for a stylesheet mcr_<em>style</em>_object.xsl and build the transformer. Default is
+     * The method search for a stylesheet mcr_<em>style</em>.xsl and build the transformer. Default is
      * <em>mcr_save-object.xsl</em>.
      *
      * @param style
@@ -647,13 +648,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static Transformer getTransformer(String style) {
         String xslfile = DEFAULT_TRANSFORMER;
         if (style != null && style.trim().length() != 0) {
-            xslfile = style + "-object.xsl";
+            xslfile = style + ".xsl";
         }
         Transformer trans = translist.get(xslfile);
         if (trans != null) {
             return trans;
         }
-        LOGGER.debug("Will load transformer stylesheet {}for export.", xslfile);
+        LOGGER.debug("Will load transformer stylesheet {} for export.", xslfile);
 
         URL xslURL = MCRObjectCommands.class.getResource("/" + xslfile);
         if (xslURL == null) {
@@ -1058,6 +1059,171 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             }
         }
         LOGGER.info("Check done for {} entries", Integer.toString(counter));
+    }
+
+    /**
+     * Checks objects of the specified base ID for validity against their specified schemas.
+     * 
+     * @param baseID
+     *            the base part of a MCRObjectID e.g. DocPortal_document
+     */
+    @MCRCommand(
+        syntax = "validate object schema for base {0}",
+        help = "Validates all objects of base {0} against their specified schema.",
+        order = 401)
+    public static List<String> validateObjectsOfBase(String baseID) {
+        if (baseID == null || baseID.length() == 0) {
+            throw new MCRException("Base ID of objects required to check their schema validity.");
+        }
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        List<String> idList;
+        try {
+            idList = mgr.listIDsForBase(baseID);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new MCRException("Requested base ID " + baseID + " not found in store.", e);
+        }
+        int maxresults = idList.size();
+        if (maxresults == 0) {
+            LOGGER.warn("No IDs found for base {}, nothing to check.", baseID);
+            return new ArrayList<>();
+        }
+        List<String> cmds = new ArrayList<>(maxresults);
+        for (String objID : idList) {
+            LOGGER.debug("Adding {} to list of objects to validate schema.", objID);
+            cmds.add("validate object schema for ID " + objID);
+        }
+        return cmds;
+    }
+
+    /**
+     * Checks objects of the specified type for validity against their specified schemas.
+     * 
+     * @param type
+     *            the type of a MCRObjectID e.g. document
+     */
+    @MCRCommand(
+        syntax = "validate object schema for type {0}",
+        help = "Validates all object of type {0} against their specified schema.",
+        order = 402)
+    public static List<String> validateObjectsOfType(String type) {
+        if (type == null || type.length() == 0) {
+            throw new MCRException("Type of objects required to check their schema validity.");
+        }
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        List<String> idList;
+        try {
+            idList = mgr.listIDsOfType(type);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new MCRException("Requested type " + type + " not found in store.", e);
+        }
+        int maxresults = idList.size();
+        if (maxresults == 0) {
+            LOGGER.warn("No IDs found for type {}, nothing to check.", type);
+            return new ArrayList<>();
+        }
+        List<String> cmds = new ArrayList<>(maxresults);
+        for (String objID : idList) {
+            LOGGER.debug("Adding {} to list of objects to validate schema.", objID);
+            cmds.add("validate object schema for ID " + objID);
+        }
+        return cmds;
+    }
+
+    /**
+     * Check if an object validates against its specified schema.
+     * 
+     * @param objectID
+     *            the ID of an object to check
+     */
+    @MCRCommand(
+        syntax = "validate object schema for ID {0}",
+        help = "Checks if object {0} validates against its specified schema.",
+        order = 404)
+    public static void validateObject(String objectID) {
+        validateObjectWithTransformer(objectID, null);
+    }
+
+    /**
+     * Check if an object validates against its specified schema.
+     * 
+     * @param objectID
+     *            the ID of an object to check
+     * @param transformerType
+     *            the name of a stylesheet that the object should be transformed with before validation
+     */
+    @MCRCommand(
+        syntax = "validate object schema for ID {0} after transformer {1}",
+        help = "Checks if object {0} validates against its specified schema, "
+            + "after being transformed through {1}.xsl.",
+        order = 403)
+    public static void validateObjectWithTransformer(String objectID, String transformerType) {
+        if (objectID == null || objectID.length() == 0) {
+            throw new MCRException("ID of an object required to check its schema validity.");
+        }
+        LOGGER.info("validate object schema for ID " + objectID);
+        Transformer trafo = null;
+        if (transformerType != null) {
+            // getTransformer with non-existent input successfully returns a working transformer
+            // that "successfully transforms", an error would be preferable 
+            trafo = getTransformer(transformerType);
+            LOGGER.debug("Transformer {} has been loaded.", transformerType);
+        }
+        MCRObjectID objID = MCRObjectID.getInstance(objectID);
+        try {
+            doValidateObjectAgainstSchema(objID, trafo);
+            LOGGER.info("Object {} successfully validated.", objectID);
+        } catch (MCRException e) {
+            LOGGER.error("Object {} failed its validation!", objectID);
+            throw e;
+        }
+    }
+
+    private static void doValidateObjectAgainstSchema(MCRObjectID objID, Transformer trans) {
+        // MCRMetadataManager -> retrieveMCRObject() -> MCRObject.createXML already validates the contents
+        // we need to offer transformation first though, so manual talking to MCRXMLMetadataManager
+        // for the object contents, then manually using a validating XML parser later
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        Document doc;
+        try {
+            doc = mgr.retrieveXML(objID);
+        } catch (IOException | JDOMException | SAXException e) {
+            throw new MCRException(
+                "Object " + objID.toString() + " could not be retrieved, unable to validate against schema!", e);
+        }
+        if (doc == null) {
+            throw new MCRException("Could not get object " + objID.toString() + " from XML store");
+        }
+        MCRObject object = new MCRObject(doc);
+        try {
+            object.validate();
+        } catch (MCRException e) {
+            throw new MCRException(
+                "Object " + objID.toString()
+                    + " does not pass basic self-validation, unable to validate against schema!",
+                e);
+        }
+        String schema = object.getSchema();
+        if (schema == null) {
+            throw new MCRException(
+                "Object " + objID.toString() + " has no assigned schema, unable to validate against it!");
+        }
+        if (trans != null) {
+            JDOMResult res = new JDOMResult();
+            try {
+                trans.transform(new JDOMSource(doc), res);
+                doc = Objects.requireNonNull(res.getDocument(), "Could not get transformation result");
+            } catch (TransformerException | MCRException | NullPointerException e) {
+                throw new MCRException("Object " + objID.toString()
+                    + " could not be transformed, unable to validate against schema!",
+                    e);
+            }
+            LOGGER.info("Object {} successfully transformed.", objID.toString());
+        }
+        try {
+            MCRXMLParserFactory.getValidatingParser().parseXML(new MCRJDOMContent(doc));
+        } catch (MCRException | SAXException e) {
+            throw new MCRException("Object " + objID.toString() + " failed to parse against its schema!", e);
+        }
     }
 
     @MCRCommand(
