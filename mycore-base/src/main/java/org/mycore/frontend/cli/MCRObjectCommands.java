@@ -1251,7 +1251,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "repair metadata search of type {0}",
-        help = "Scans the metadata store for MCRObjects of type {0} and restore them in the search store.",
+        help = "Scans the metadata store for MCRObjects of type {0} and restores them in the search store.",
         order = 170)
     public static List<String> repairMetadataSearch(String type) {
         LOGGER.info("Start the repair for type {}", type);
@@ -1263,7 +1263,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         List<String> ar = MCRXMLMetadataManager.instance().listIDsOfType(type);
         if (ar.size() == 0) {
-            LOGGER.warn("No ID's was found for type {}.", type);
+            LOGGER.warn("No IDs found for type {}.", type);
             return Collections.emptyList();
         }
 
@@ -1271,6 +1271,40 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         for (String stid : ar) {
             cmds.add("repair metadata search of ID " + stid);
+        }
+        return cmds;
+    }
+
+    /**
+     * The method start the repair of the metadata search for a given MCRObjectID base.
+     *
+     * @param baseID
+     *            the base part of a MCRObjectID e.g. DocPortal_document
+     */
+    @MCRCommand(
+        syntax = "repair metadata search of base {0}",
+        help = "Scans the metadata store for MCRObjects of base {0} and restores them in the search store.",
+        order = 171)
+    public static List<String> repairMetadataSearchForBase(String baseID) {
+        LOGGER.info("Start the repair for base {}", baseID);
+        if (baseID == null || baseID.length() == 0) {
+            throw new MCRException("Base ID of objects required to repair their search indexing.");
+        }
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        List<String> idList;
+        try {
+            idList = mgr.listIDsForBase(baseID);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new MCRException("Requested base ID " + baseID + " not found in store.", e);
+        }
+        int maxresults = idList.size();
+        if (maxresults == 0) {
+            LOGGER.warn("No IDs found for base {}, nothing to check.", baseID);
+            return Collections.emptyList();
+        }
+        List<String> cmds = new ArrayList<>(maxresults);
+        for (String id : idList) {
+            cmds.add("repair metadata search of ID " + id);
         }
         return cmds;
     }
