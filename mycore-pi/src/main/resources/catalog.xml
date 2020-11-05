@@ -66,8 +66,6 @@
           uri="xsd/datacite/v4/datacite-contributorType-v4.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-4.1/include/datacite-funderIdentifierType-v4.xsd"
           uri="xsd/datacite/v4/datacite-funderIdentifierType-v4.xsd" />
-  <system systemId="http://schema.datacite.org/meta/kernel-4.1/include/datacite-funderIdentifierType-v4.xsd"
-          uri="xsd/datacite/v4/datacite-funderIdentifierType-v4.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-4.1/include/datacite-descriptionType-v4.xsd"
           uri="xsd/datacite/v4/datacite-descriptionType-v4.xsd" />
   <!-- new -->
@@ -79,6 +77,29 @@
           uri="xsd/datacite/v4.1/datacite-relationType-v4.1.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-4.1/include/datacite-nameType-v4.1.xsd"
           uri="xsd/datacite/v4.1/datacite-nameType-v4.1.xsd" />
+
+  <!-- Datacite 4.3 -->
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/metadata.xsd" uri="xsd/datacite/v4.3/metadata.xsd" />
+  <!-- old -->
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-titleType-v4.xsd"
+          uri="xsd/datacite/v4/datacite-titleType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-contributorType-v4.xsd"
+          uri="xsd/datacite/v4/datacite-contributorType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-resourceType-v4.xsd"
+          uri="xsd/datacite/v4.1/datacite-resourceType-v4.1.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-descriptionType-v4.xsd"
+          uri="xsd/datacite/v4/datacite-descriptionType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-nameType-v4.xsd"
+          uri="xsd/datacite/v4.1/datacite-nameType-v4.1.xsd" />
+  <!-- new -->
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-dateType-v4.xsd"
+          uri="xsd/datacite/v4.3/datacite-dateType-v4.3.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-relationType-v4.xsd"
+          uri="xsd/datacite/v4.3/datacite-relationType-v4.3.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-relatedIdentifierType-v4.xsd"
+          uri="xsd/datacite/v4.3/datacite-relatedIdentifierType-v4.3.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.3/include/datacite-funderIdentifierType-v4.xsd"
+          uri="xsd/datacite/v4.3/datacite-funderIdentifierType-v4.3.xsd" />
 
   <!-- Crossref 4.4.1 -->
   <system systemId="http://data.crossref.org/schemas/crossref4.4.1.xsd" uri="xsd/crossref/4.4.1/crossref4.4.1.xsd" />

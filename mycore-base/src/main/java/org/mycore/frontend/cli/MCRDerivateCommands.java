@@ -635,11 +635,45 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         LOGGER.info("Start the repair for type derivate.");
         List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
         if (ids.size() == 0) {
-            LOGGER.warn("No ID's was found for type derivate.");
+            LOGGER.warn("No IDs found for type derivate.");
             return Collections.emptyList();
         }
         List<String> cmds = new ArrayList<>(ids.size());
         for (String id : ids) {
+            cmds.add("repair derivate search of ID " + id);
+        }
+        return cmds;
+    }
+
+    /**
+     * Repairing the content search index for all derivates in project {0}.
+     * 
+     * @param project
+     *            the project part of a MCRObjectID e.g. *DocPortal*_derivate
+     */
+    @MCRCommand(syntax = "repair derivate search of project {0}",
+        help = "Reads the Content store for project {0} and reindexes the derivate search stores.",
+        order = 141)
+    public static List<String> repairDerivateSearchForBase(String project) {
+        LOGGER.info("Start the repair for project {}.", project);
+        if (project == null || project.length() == 0) {
+            throw new MCRException("Project identifier required to repair its search indexing.");
+        }
+        String baseID = project + "_derivate";
+        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
+        List<String> idList;
+        try {
+            idList = mgr.listIDsForBase(baseID);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new MCRException("Requested base ID " + baseID + " not found in store.", e);
+        }
+        int maxresults = idList.size();
+        if (maxresults == 0) {
+            LOGGER.warn("No IDs found for base {}, nothing to check.", baseID);
+            return Collections.emptyList();
+        }
+        List<String> cmds = new ArrayList<>(maxresults);
+        for (String id : idList) {
             cmds.add("repair derivate search of ID " + id);
         }
         return cmds;
