@@ -95,6 +95,11 @@ public abstract class MCRSolrSearchUtils {
         boolean booleanAnd = !(condition instanceof MCROrCondition<?>);
         SolrQuery mergedSolrQuery = MCRConditionTransformer.buildMergedSolrQuery(query.getSortBy(), false, booleanAnd,
             table, rows, returnFields);
+        String qt = input.getRootElement().getAttributeValue("qt");
+        if (qt != null) {
+            mergedSolrQuery.setParam("qt", qt);
+        }
+
         String mask = input.getRootElement().getAttributeValue("mask");
         if (mask != null) {
             mergedSolrQuery.setParam("mask", mask);

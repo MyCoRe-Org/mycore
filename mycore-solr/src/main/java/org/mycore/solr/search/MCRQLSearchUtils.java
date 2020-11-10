@@ -48,7 +48,7 @@ public class MCRQLSearchUtils {
     private static final Logger LOGGER = LogManager.getLogger(MCRQLSearchUtils.class);
 
     private static HashSet<String> SEARCH_PARAMETER = new HashSet<>(Arrays.asList("search", "query", "maxResults",
-        "numPerPage", "page", "mask", "mode", "redirect"));
+        "numPerPage", "page", "mask", "mode", "redirect", "qt"));
 
     /**
      * Build MCRQuery from editor XML input
