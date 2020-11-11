@@ -147,6 +147,11 @@
         </xsl:if>
       </xsl:if>
     </xsl:for-each>
+    <xsl:for-each select="mods:originInfo/mods:edition">
+      <field name="mods.edition">
+        <xsl:value-of select="text()" />
+      </field>
+    </xsl:for-each>
     <!-- add allMeta from parent -->
     <xsl:for-each select="mods:relatedItem">
       <xsl:variable name="type" select="@type" />

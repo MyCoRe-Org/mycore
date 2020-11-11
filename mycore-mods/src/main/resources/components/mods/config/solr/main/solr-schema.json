@@ -240,6 +240,13 @@
   },
   {
     "add-field": {
+      "name": "mods.edition",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-field": {
       "name": "mods.embargo.date",
       "type": "mods.date_range",
       "multiValued": true
