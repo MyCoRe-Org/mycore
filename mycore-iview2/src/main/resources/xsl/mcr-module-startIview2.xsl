@@ -85,7 +85,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/',$imageSize,'/',$derivate,'/',$file)}" style="{$style}" class="{$class}" />
+    <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/',$imageSize,'/',$derivate,'/',encoder:encode($file))}" style="{$style}" class="{$class}" />
 
     <xsl:comment>
       End - iview2.getImageElement (mcr-module-startIview2.xsl)
