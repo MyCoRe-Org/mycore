@@ -1622,13 +1622,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.citationstyles</groupId>
         <artifactId>locales</artifactId>
-        <version>2.0.0</version>
+        <version>20.11</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.citationstyles</groupId>
         <artifactId>styles</artifactId>
-        <version>2.0.0</version>
+        <version>20.11</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
