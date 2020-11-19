@@ -40,6 +40,8 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRException;
 import org.xml.sax.SAXParseException;
 
+import com.google.gson.JsonObject;
+
 /**
  * This class holds all information of a derivate. For persistence operations
  * see methods of {@link MCRMetadataManager}.
@@ -55,10 +57,14 @@ public final class MCRDerivate extends MCRBase {
 
     public static final String ROOT_NAME = "mycorederivate";
 
+    public static final int MAX_LABEL_LENGTH = 256;
+
     // the object content
     private MCRObjectDerivate mcrDerivate;
 
     private int order;
+
+    protected String mcrLabel = null;
 
     /**
      * This is the constructor of the MCRDerivate class. It make an instance of
@@ -109,6 +115,7 @@ public final class MCRDerivate extends MCRBase {
     @Override
     protected void setUp() throws MCRException {
         super.setUp();
+        setLabel(jdomDocument.getRootElement().getAttributeValue("label"));
 
         // get the derivate data of the object
         Element derivateElement = jdomDocument.getRootElement().getChild("derivate");
@@ -127,6 +134,9 @@ public final class MCRDerivate extends MCRBase {
         Document doc = super.createXML();
         Element elm = doc.getRootElement();
         elm.setAttribute("order", String.valueOf(order));
+        if (mcrLabel != null) {
+            elm.setAttribute("label", mcrLabel);
+        }
         elm.addContent(mcrDerivate.createXML());
         elm.addContent(mcrService.createXML());
         return doc;
@@ -168,6 +178,15 @@ public final class MCRDerivate extends MCRBase {
             }
         }
         return fileUrnMap;
+    }
+
+    /**
+     * This methode return the label or null if it was not set. 
+     * 
+     * @return the label as a string
+     */
+    public final String getLabel() {
+        return mcrLabel;
     }
 
     /**
@@ -219,6 +238,22 @@ public final class MCRDerivate extends MCRBase {
         this.mcrDerivate.setDerivateID(id);
     }
 
+    /**
+     * This method set the derivate label.
+     * 
+     * @param label - the derivate label
+     */
+    public final void setLabel(String label) {
+        if (label == null) {
+            mcrLabel = label;
+        } else {
+            mcrLabel = label.trim();
+            if (mcrLabel.length() > MAX_LABEL_LENGTH) {
+                mcrLabel = mcrLabel.substring(0, MAX_LABEL_LENGTH);
+            }
+        }
+    }
+
     public int getOrder() {
         return order;
     }
@@ -233,5 +268,14 @@ public final class MCRDerivate extends MCRBase {
         this.order = Optional.ofNullable(doc.getRootElement().getAttributeValue("order"))
             .map(Integer::valueOf)
             .orElse(1);
+    }
+
+    @Override
+    public JsonObject createJSON() {
+        JsonObject base = super.createJSON();
+        if (mcrLabel != null) {
+            base.addProperty("label", mcrLabel);
+        }
+        return base;
     }
 }
