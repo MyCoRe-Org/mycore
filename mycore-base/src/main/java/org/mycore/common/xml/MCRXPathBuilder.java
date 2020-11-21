@@ -121,6 +121,6 @@ public class MCRXPathBuilder {
 
         Element parentElement = (Element) parent;
         int pos = parentElement.getChildren(element.getName(), element.getNamespace()).indexOf(element);
-        return (pos == 0 ? "" : "[" + ++pos + "]");
+        return "[" + ++pos + "]";
     }
 }
