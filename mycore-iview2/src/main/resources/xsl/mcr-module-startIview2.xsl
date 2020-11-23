@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:encoder="xalan://java.net.URLEncoder"
-  xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions" exclude-result-prefixes="iview2 encoder">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions"
+  xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions" exclude-result-prefixes="iview2 mcrxml">
 
   <xsl:param name="MCR.Module-iview2.useNewViewer" />
   <xsl:param name="WebApplicationBaseURL" />
@@ -41,7 +41,7 @@
     <xsl:param name="file" />
     <xsl:param name="derivateID" />
     <xsl:param name="imageSize" />
-    
+
     <xsl:variable name="linkedFile">
       <xsl:choose>
         <xsl:when test="starts-with($file, '/')">
@@ -85,7 +85,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/',$imageSize,'/',$derivate,'/',$file)}" style="{$style}" class="{$class}" />
+    <img src="{concat($WebApplicationBaseURL,'servlets/MCRTileCombineServlet/',$imageSize,'/',$derivate,'/', mcrxml:encodeURIPath($file))}" style="{$style}" class="{$class}" />
 
     <xsl:comment>
       End - iview2.getImageElement (mcr-module-startIview2.xsl)
