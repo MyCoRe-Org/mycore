@@ -293,6 +293,7 @@ namespace mycore.viewer.components {
         private _toolbarModel: mycore.viewer.model.MyCoReBasicToolbarModel;
         private _layouts = new Array<widgets.canvas.PageLayout>();
         private _rotation: number = 0;
+        private _startPage:number = null;
 
         private _layoutModel = {children : this._orderPageMap, hrefImageMap : this._hrefImageMap, pageCount : 1};
 
@@ -453,6 +454,7 @@ namespace mycore.viewer.components {
             if (state.has("page")) {
                 var page = <number>+state.get("page");
                 this._pageLayout.jumpToPage(page);
+                this._startPage = page;
             }
 
             if (state.has("rotation")) {
@@ -596,7 +598,7 @@ namespace mycore.viewer.components {
                 }
 
                 this._structureModelLoaded();
-                const modelStartPage = "startPage" in sm;
+                const modelStartPage = "startPage" in sm && this._startPage == null;
                 this.changeImage(modelStartPage ? (<any>sm).startPage+"" : this._currentImage, modelStartPage);
                 this.update();
             }
