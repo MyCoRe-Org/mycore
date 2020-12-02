@@ -51,7 +51,14 @@ public class MCRCommandPrompt {
         System.out.print(systemName + "> ");
 
         try {
-            return console.readLine().trim().replaceAll("\\s+", " ");
+            String input = console.readLine();
+            if (input != null) {
+                return input.trim().replaceAll("\\s+", " ");
+            } else {
+                /* input stream closed (EOF), shutdown */
+                System.out.println("quit");
+                return "quit";
+            }
         } catch (IOException ignored) {
             return "";
         }
