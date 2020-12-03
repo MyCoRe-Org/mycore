@@ -46,9 +46,18 @@
         </xsl:when>
       </xsl:choose>
       <xsl:if test="/user/@realm = 'local' and (not($isCurrentUser) or not(/user/@locked = 'true'))">
-        <a class="btn btn-primary" href="{$WebApplicationBaseURL}authorization/change-password.xed?action=password&amp;id={$uid}">
-          <xsl:value-of select="i18n:translate('component.user2.admin.changepw')" />
-        </a>
+        <xsl:choose>
+          <xsl:when test="$isCurrentUser">
+            <a class="btn btn-primary" href="{$WebApplicationBaseURL}authorization/change-password.xed?action=password">
+              <xsl:value-of select="i18n:translate('component.user2.admin.changepw')" />
+            </a>
+          </xsl:when>
+          <xsl:otherwise>
+            <a class="btn btn-primary" href="{$WebApplicationBaseURL}authorization/change-password.xed?action=password&amp;id={$uid}">
+              <xsl:value-of select="i18n:translate('component.user2.admin.changepw')" />
+            </a>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:if>
       <xsl:if test="$isUserAdmin and not($isCurrentUser)">
         <a class="btn btn-danger" href="{$ServletsBaseURL}MCRUserServlet?action=show&amp;id={$uid}&amp;XSL.step=confirmDelete">
