@@ -20,7 +20,6 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -28,110 +27,106 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
 /**
- * Provides information about a stored version of metadata and allows to
- * retrieve that version from SVN
+ * Provides information about the revision of a {@link MCRVersionedMetadata} object
+ * at the time of object instantiation. This includes the revision number, date,
+ * state ({@link MCRMetadataVersionState}), the committer and a reference to the metadata object itself.
  * 
  * @author Frank Lützenkirchen
+ * @author Christoph Neidahl (OPNA2608)
  */
 @XmlRootElement(name = "revision")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MCRMetadataVersion {
 
-    private enum Type {
-        created(MCRMetadataVersion.CREATED), modified(MCRMetadataVersion.UPDATED), deleted(MCRMetadataVersion.DELETED);
+    protected static final Logger LOGGER = LogManager.getLogger();
 
-        private final char charValue;
-
-        Type(char a) {
-            this.charValue = a;
-        }
-
-        public static Type fromValue(char a) {
-            return Stream.of(values()).filter(t -> t.charValue == a)
-                .findAny()
-                .orElseThrow(IllegalArgumentException::new);
-        }
+    /**
+     * The state of the metadata object as described by this version.
+     * 
+     * <ul>
+     *   <li><p>CREATED - Metadata has been created</p>
+     *       <p>(default if the parent {@link MCRMetadataStore} does not implement a version control system)</p></li>
+     *   <li>MODIFIED - Metadata has been revised</li>
+     *   <li>DELETED - Metadata was deleted</li>
+     * </ul>
+     * - 
+     * @author Christoph Neidahl (OPNA2608)
+     *
+     */
+    public enum MCRMetadataVersionState {
+        CREATED,
+        UPDATED,
+        DELETED
     }
 
     /**
-     * The metadata document this version belongs to
+     * The metadata object this version belongs to.
      */
     @XmlTransient
-    private MCRVersionedMetadata vm;
+    private final MCRVersionedMetadata vm;
 
     /**
-     * The revision number of this version
+     * The revision number of this version.
      */
     @XmlAttribute(name = "r")
-    private long revision;
+    private final long revision;
 
     /**
-     * The user that created this version
+     * The user that created this version.
      */
     @XmlAttribute
-    private String user;
+    private final String user;
 
     /**
-     * The date this version was created
+     * The date this version was created on.
      */
     @XmlAttribute
-    private Date date;
+    private final Date date;
 
     /**
-     * Was this version result of a create, update or delete?
+     * Was this version the result of a create, update or delete operation?
      */
     @XmlAttribute()
-    private Type type;
+    private final MCRMetadataVersionState state;
 
     /**
-     * A version that was created in store
-     */
-    public static final char CREATED = 'A';
-
-    /**
-     * A version that was updated in store
-     */
-    public static final char UPDATED = 'M';
-
-    /**
-     * A version that was deleted in store
-     */
-    public static final char DELETED = 'D';
-
-    private MCRMetadataVersion() {
-        //required for JAXB serialization
-    }
-
-    /**
-     * Creates a new metadata version info object
+     * Creates a new metadata version info object.
      * 
      * @param vm
      *            the metadata document this version belongs to
-     * @param logEntry
-     *            the log entry from SVN holding data on this version
-     * @param type
-     *            the type of commit
+     * @param revision
+     *            the version of the metadata document
+     * @param user
+     *            who committed this version
+     * @param date
+     *            when was this version created
+     * @param state
+     *            what object state does it represent ({@link MCRMetadataVersionState})
      */
-    MCRMetadataVersion(MCRVersionedMetadata vm, SVNLogEntry logEntry, char type) {
+    public MCRMetadataVersion(MCRVersionedMetadata vm, long revision, String user, Date date,
+        MCRMetadataVersionState state) {
+        LOGGER.debug("Instantiating version information for {}_{} in revision {}.", vm.getStore().id,
+            vm.getStore().createIDWithLeadingZeros(vm.getID()), revision);
         this.vm = vm;
-        revision = logEntry.getRevision();
-        user = logEntry.getAuthor();
-        date = logEntry.getDate();
-        this.type = Type.fromValue(type);
+        this.revision = revision;
+        this.user = user;
+        this.date = date;
+        this.state = state;
     }
 
     /**
-     * Returns the metadata object this version belongs to
+     * Returns the metadata object this version belongs to.
      * 
      * @return the metadata object this version belongs to
      */
@@ -140,27 +135,41 @@ public class MCRMetadataVersion {
     }
 
     /**
-     * Returns the type of operation this version comes from
+     * Returns the type of operation this version comes from.
+     * 
+     * This method is deprecated, please use the new enum-based method {@link getState} instead.
      * 
      * @see #CREATED
      * @see #UPDATED
      * @see #DELETED
+     * @return {@link #state} shortened to the first character
      */
+    @Deprecated
     public char getType() {
-        return type.charValue;
+        return state.toString().charAt(0);
     }
 
     /**
-     * Returns the SVN revision number of this version
+     * Returns the state represented by this version.
      * 
-     * @return the SVN revision number of this version
+     * @see MCRMetadataVersionState
+     * @return the state represented by this version
+     */
+    public MCRMetadataVersionState getState() {
+        return state;
+    }
+
+    /**
+     * Returns the revision number of this version.
+     * 
+     * @return the revision number of this version
      */
     public long getRevision() {
         return revision;
     }
 
     /**
-     * Returns the user that created this version
+     * Returns the user that created this version.
      * 
      * @return the user that created this version
      */
@@ -169,7 +178,7 @@ public class MCRMetadataVersion {
     }
 
     /**
-     * Returns the date and time this version was created
+     * Returns the date and time this version was created.
      * 
      * @return the date and time this version was created
      */
@@ -178,14 +187,14 @@ public class MCRMetadataVersion {
     }
 
     /**
-     * Retrieves this version of the metadata
+     * Retrieves this version of the metadata.
      * 
      * @return the metadata document as it was in this version
      * @throws MCRUsageException
      *             if this is a deleted version, which can not be retrieved
      */
     public MCRContent retrieve() throws IOException {
-        if (type == Type.deleted) {
+        if (state == MCRMetadataVersionState.DELETED) {
             String msg = "You can not retrieve a deleted version, retrieve a previous version instead";
             throw new MCRUsageException(msg);
         }

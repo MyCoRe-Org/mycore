@@ -1491,7 +1491,7 @@ public final class MCRURIResolver implements URIResolver {
                 v.setAttribute("user", version.getUser());
                 v.setAttribute("date", MCRXMLFunctions.getISODate(version.getDate(), null));
                 v.setAttribute("r", Long.toString(version.getRevision()));
-                v.setAttribute("action", Character.toString(version.getType()));
+                v.setAttribute("action", Character.toString(String.valueOf(version.getState()).charAt(0)));
                 e.addContent(v);
             }
             return new JDOMSource(e);

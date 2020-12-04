@@ -22,11 +22,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +39,7 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion.MCRMetadataVersionState;
 import org.tmatesoft.svn.core.ISVNLogEntryHandler;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
@@ -214,7 +219,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
     public boolean isDeletedInRepository() throws IOException {
         long rev = getRevision();
-        return rev >= 0 && getRevision(rev).getType() == MCRMetadataVersion.DELETED;
+        return rev >= 0 && getRevision(rev).getState() == MCRMetadataVersionState.DELETED;
     }
 
     /**
@@ -229,6 +234,13 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         baos.close();
         new MCRByteContent(baos.getBuffer(), 0, baos.size(), this.getLastModified().getTime()).sendTo(path);
     }
+
+    private static final Map<String, MCRMetadataVersionState> TYPE_STATE_MAPPING = Stream
+        .of(new AbstractMap.SimpleImmutableEntry<>("A", MCRMetadataVersionState.CREATED),
+            new AbstractMap.SimpleImmutableEntry<>("M", MCRMetadataVersionState.UPDATED),
+            new AbstractMap.SimpleImmutableEntry<>("R", MCRMetadataVersionState.UPDATED), /* should not occur */
+            new AbstractMap.SimpleImmutableEntry<>("D", MCRMetadataVersionState.DELETED))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     /**
      * Lists all versions of this metadata object available in the subversion
@@ -256,7 +268,9 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 SVNLogEntryPath svnLogEntryPath = entry.getChangedPaths().get(path);
                 if (svnLogEntryPath != null) {
                     char type = svnLogEntryPath.getType();
-                    versions.add(new MCRMetadataVersion(this, entry, type));
+                    versions.add(
+                        new MCRMetadataVersion(this, entry.getRevision(), entry.getAuthor(), entry.getDate(),
+                            TYPE_STATE_MAPPING.get(String.valueOf(type))));
                 }
             }
             return versions;
@@ -292,7 +306,9 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
                 if (svnLogEntryPath != null) {
                     char type = svnLogEntryPath.getType();
-                    return new MCRMetadataVersion(this, logEntry, type);
+                    return new MCRMetadataVersion(this, logEntry.getRevision(), logEntry.getAuthor(),
+                        logEntry.getDate(),
+                        TYPE_STATE_MAPPING.get(String.valueOf(type)));
                 }
             }
             LOGGER.warn("Metadata object {} in store {} has no revision ''{}''!", getID(), getStore().getID(),

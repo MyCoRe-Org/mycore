@@ -38,6 +38,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion.MCRMetadataVersionState;
 
 /**
  * JUnit test for MCRVersioningMetadataStore
@@ -129,7 +130,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         assertSame(mv.getMetadataObject(), vm);
         assertEquals(baseRev, mv.getRevision());
         assertEquals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), mv.getUser());
-        assertEquals(MCRMetadataVersion.CREATED, mv.getType());
+        assertEquals(MCRMetadataVersionState.CREATED, mv.getState());
 
         bzzz();
         Document xml2 = new Document(new Element("bango"));
@@ -143,7 +144,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         assertEquals(baseRev, mv.getRevision());
         mv = versions.get(1);
         assertEquals(vm.getRevision(), mv.getRevision());
-        assertEquals(MCRMetadataVersion.UPDATED, mv.getType());
+        assertEquals(MCRMetadataVersionState.UPDATED, mv.getState());
 
         bzzz();
         Document xml3 = new Document(new Element("bongo"));
@@ -190,10 +191,10 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         vm = getVersStore().create(new MCRJDOMContent(xml1), vm.getID());
         List<MCRMetadataVersion> versions = vm.listVersions();
         assertEquals(4, versions.size());
-        assertEquals(MCRMetadataVersion.CREATED, versions.get(0).getType());
-        assertEquals(MCRMetadataVersion.UPDATED, versions.get(1).getType());
-        assertEquals(MCRMetadataVersion.DELETED, versions.get(2).getType());
-        assertEquals(MCRMetadataVersion.CREATED, versions.get(3).getType());
+        assertEquals(MCRMetadataVersionState.CREATED, versions.get(0).getState());
+        assertEquals(MCRMetadataVersionState.UPDATED, versions.get(1).getState());
+        assertEquals(MCRMetadataVersionState.DELETED, versions.get(2).getState());
+        assertEquals(MCRMetadataVersionState.CREATED, versions.get(3).getState());
         versions.get(1).restore();
         assertEquals("bango", vm.getMetadata().asXML().getRootElement().getName());
     }
