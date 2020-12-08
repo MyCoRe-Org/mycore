@@ -185,7 +185,7 @@ public final class MCRDerivate extends MCRBase {
      * 
      * @return the label as a string
      */
-    public final String getLabel() {
+    public String getLabel() {
         return mcrLabel;
     }
 
@@ -243,7 +243,7 @@ public final class MCRDerivate extends MCRBase {
      * 
      * @param label - the derivate label
      */
-    public final void setLabel(String label) {
+    public void setLabel(String label) {
         if (label == null) {
             mcrLabel = label;
         } else {
