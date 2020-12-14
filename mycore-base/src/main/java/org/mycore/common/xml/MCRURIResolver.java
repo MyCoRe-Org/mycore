@@ -1603,7 +1603,7 @@ public final class MCRURIResolver implements URIResolver {
          * Resolves the I18N String value for the given property.<br><br>
          * <br>
          * Syntax: <code>i18n:{i18n-code},{i18n-prefix}*,{i18n-prefix}*...</code> or <br>
-         *         <code>i18n:{i18n-code}</code>
+         *         <code>i18n:{i18n-code}[:param1:param2:…paramN]</code>
          * <br>
          * Result: <code> <br>
          *     &lt;i18n&gt; <br>
@@ -1617,6 +1617,11 @@ public final class MCRURIResolver implements URIResolver {
          * <code>
          *     &lt;i18n&gt; <br>translation&lt;/i18n&gt;<br>
          * </code>
+         * Additionally, if the singular i18n-code is followed by a ":"-separated list of values,
+         * the translation result is interpreted to be in Java MessageFormat and will be formatted with those values.
+         * E.g.
+         * <code>i18n:module.dptbase.common.results.nResults:15</code> (<code>{0} objects found</code>)
+         *  -> "<code>15 objects found</code>"
          * @param href
          *            URI in the syntax above
          * @param base
@@ -1631,7 +1636,15 @@ public final class MCRURIResolver implements URIResolver {
 
             final Element i18nElement = new Element("i18n");
             if (!target.contains("*") && !target.contains(",")) {
-                i18nElement.addContent(MCRTranslation.translate(target));
+                String translation;
+                if (target.contains(":")) {
+                    final int i = target.indexOf(":");
+                    translation = MCRTranslation.translate(target.substring(0, i),
+                        (Object[]) target.substring(i + 1).split(":"));
+                } else {
+                    translation = MCRTranslation.translate(target);
+                }
+                i18nElement.addContent(translation);
                 return new JDOMSource(i18nElement);
             }
 
@@ -1644,7 +1657,8 @@ public final class MCRURIResolver implements URIResolver {
                     final String prefix = translationKey.substring(0, translationKey.length() - 1);
                     translations.putAll(MCRTranslation.translatePrefix(prefix));
                 } else {
-                    translations.put(translationKey, MCRTranslation.translate(translationKey));
+                    translations.put(translationKey,
+                        MCRTranslation.translate(translationKey));
                 }
             }
 
@@ -1658,7 +1672,7 @@ public final class MCRURIResolver implements URIResolver {
             return new JDOMSource(i18nElement);
         }
     }
-    
+
     private static class MCRCheckPermissionResolver implements URIResolver {
         /**
          * returns the boolean value for the given ACL permission.
@@ -1692,5 +1706,5 @@ public final class MCRURIResolver implements URIResolver {
             return new JDOMSource(root);
         }
     }
-    
+
 }

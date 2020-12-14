@@ -18,6 +18,7 @@
 
 package org.mycore.solr.proxy;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.solr.MCRSolrConstants.SOLR_CONFIG_PREFIX;
 import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_PATH;
 import static org.mycore.solr.MCRSolrConstants.SOLR_QUERY_XML_PROTOCOL_VERSION;
@@ -60,6 +61,7 @@ import org.apache.solr.common.params.MultiMapSolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.xml.MCRLayoutService;
@@ -150,6 +152,14 @@ public class MCRSolrProxyServlet extends MCRServlet {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "No access to " + queryHandlerPath);
             return;
         }
+
+        String ruleID = "solr:" + queryHandlerPath;
+        if (MCRAccessManager.hasRule(ruleID, PERMISSION_READ)
+            && !MCRAccessManager.checkPermission(ruleID, PERMISSION_READ)) {
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
         handleQuery(queryHandlerPath, request, resp);
     }
 
