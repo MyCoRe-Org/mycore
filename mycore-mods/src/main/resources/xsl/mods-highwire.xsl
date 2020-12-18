@@ -116,26 +116,18 @@
 
   <!-- ========== citation_publication_date ========== -->
 
-  <xsl:template match="mods:originInfo[mods:dateIssued or mods:dateCreated or mods:dateModified]" mode="highwire">
+  <xsl:template match="mods:originInfo[@eventType='publication' and mods:dateIssued]" mode="highwire">
+    <!-- MCR-2322: only use dateIssued on event 'publication' to generated 'citation_publication_date' and do not
+    generate metatag just to have it. Messes up relationship with Google Scholar! -->
     <meta name="citation_publication_date">
       <xsl:attribute name="content">
-        <xsl:choose>
-          <xsl:when test="mods:dateIssued">
-            <xsl:apply-templates select="mods:dateIssued" mode="highwire" />
-          </xsl:when>
-          <xsl:when test="mods:dateCreated">
-            <xsl:apply-templates select="mods:dateCreated" mode="highwire" />
-          </xsl:when>
-          <xsl:when test="mods:dateModified">
-            <xsl:apply-templates select="mods:dateModified" mode="highwire" />
-          </xsl:when>
-        </xsl:choose>
+        <xsl:apply-templates select="mods:dateIssued" mode="highwire" />
       </xsl:attribute>
     </meta>
   </xsl:template>
 
   <!-- FIXME: workaround while some mods applications have no encoding attribute -->
-  <xsl:template match="mods:dateIssued | mods:dateCreated | mods:dateModified" mode="highwire">
+  <xsl:template match="mods:dateIssued" mode="highwire">
     <xsl:value-of select="translate(text(),'-','/')" />
   </xsl:template>
 
