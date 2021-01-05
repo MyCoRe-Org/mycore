@@ -75,7 +75,6 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRFSNODES_;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.backend.jpa.MCRStreamQuery;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
@@ -118,8 +117,8 @@ public class MCRIFSCommands {
     public static void writeMD5SumFile(String targetDirectory) throws IOException {
         File targetDir = getDirectory(targetDirectory);
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRStreamQuery<MCRFSNODES> streamQuery = MCRStreamQuery.getInstance(em,
-            "from MCRFSNODES where type='F' order by storeid, storageid", MCRFSNODES.class);
+        TypedQuery<MCRFSNODES> streamQuery = em
+            .createQuery("from MCRFSNODES where type='F' order by storeid, storageid", MCRFSNODES.class);
         Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
         String currentStoreId = null;
         MCRContentStore currentStore = null;
@@ -192,8 +191,7 @@ public class MCRIFSCommands {
     private static void writeReport(File targetDir, FSNodeChecker checker) throws TransformerFactoryConfigurationError,
         SAXException, IOException, TransformerConfigurationException {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRStreamQuery<MCRFSNODES> query = MCRStreamQuery.getInstance(em,
-            "from MCRFSNODES where type='F' order by storeid, owner, name",
+        TypedQuery<MCRFSNODES> query = em.createQuery("from MCRFSNODES where type='F' order by storeid, owner, name",
             MCRFSNODES.class);
         Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
         String currentStoreId = null;
@@ -318,9 +316,10 @@ public class MCRIFSCommands {
                 LOGGER.warn("Could not get baseDir of store: {}", currentStore.getID(), e);
                 continue;
             }
-            MCRStreamQuery<String> streamQuery = MCRStreamQuery.getInstance(em,
-                "select storeageid from MCRFSNODES where type='F' and storeid=:storeid order by storageid",
-                String.class).setParameter("storeid", currentStore.getID());
+            TypedQuery<String> streamQuery = em
+                .createQuery("select storeageid from MCRFSNODES where type='F' and storeid=:storeid order by storageid",
+                    String.class)
+                .setParameter("storeid", currentStore.getID());
 
             boolean endOfList = false;
             String nameOfProject = MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe");
@@ -509,16 +508,14 @@ public class MCRIFSCommands {
         MCRContentStore toStore = MCRContentStoreFactory.getStore(targetStore);
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
-        MCRStreamQuery<MCRFSNODES> streamQuery = MCRStreamQuery
-            .getInstance(em,
-                "from MCRFSNODES where storeid=:storeid and " + selectKey + "=:selectValue order by owner",
-                MCRFSNODES.class)
+        TypedQuery<String> streamQuery = em
+            .createQuery(
+                "SELECT id from MCRFSNODES where storeid=:storeid and " + selectKey + "=:selectValue order by owner",
+                String.class)
             .setParameter("storeid", fromStore.getID())
             .setParameter("selectValue", selectValue);
-        try (Stream<MCRFSNODES> resultStream = streamQuery.getResultStream()) {
+        try (Stream<String> resultStream = streamQuery.getResultStream()) {
             return resultStream
-                .peek(em::detach)
-                .map(MCRFSNODES::getId)
                 .map(ifsId -> String.format(Locale.ROOT, "move ifs node %s to store %s", ifsId, targetStore))
                 .collect(Collectors.toList());
         }
