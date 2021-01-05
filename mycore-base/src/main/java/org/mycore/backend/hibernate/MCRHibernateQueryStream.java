@@ -31,8 +31,9 @@ import org.mycore.backend.jpa.MCRStreamQuery;
 /**
  * @author Thomas Scheffler (yagee)
  * @param <T> result type of query
- *
+ * @deprecated
  */
+@Deprecated
 public class MCRHibernateQueryStream<T> extends MCRStreamQuery<T> {
     private final Session session;
 

@@ -27,8 +27,9 @@ import org.mycore.backend.hibernate.MCRHibernateQueryStream;
 /**
  * Provides a read-only Stream of results.
  * @author Thomas Scheffler (yagee)
- *
+ * @deprecated Use {@link javax.persistence.TypedQuery}
  */
+@Deprecated
 public abstract class MCRStreamQuery<T> {
 
     public abstract Stream<T> getResultStream();
