@@ -261,7 +261,6 @@ public abstract class MCRBase {
      * returns <em>true</em> if
      * <ul>
      * <li>the mcr_id value is valid
-     * <li>the label value is not null or empty
      * </ul>
      * otherwise the method return <em>false</em>
      * 

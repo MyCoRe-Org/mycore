@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -59,7 +60,6 @@ import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.backend.jpa.MCRStreamQuery;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
@@ -1337,10 +1337,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 185)
     public static void repairMCRLinkHrefTable() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        MCRStreamQuery<String> fromQuery = MCRStreamQuery
-            .getInstance(em, "SELECT DISTINCT m.key.mcrfrom FROM MCRLINKHREF m", String.class);
-        MCRStreamQuery<String> toQuery = MCRStreamQuery
-            .getInstance(em, "SELECT DISTINCT m.key.mcrto FROM MCRLINKHREF m", String.class);
+        TypedQuery<String> fromQuery = em.createQuery("SELECT DISTINCT m.key.mcrfrom FROM MCRLINKHREF m", String.class);
+        TypedQuery<String> toQuery = em.createQuery("SELECT DISTINCT m.key.mcrto FROM MCRLINKHREF m", String.class);
         String query = "DELETE FROM MCRLINKHREF m WHERE m.key.mcrfrom IN (:invalidIds) or m.key.mcrto IN (:invalidIds)";
         // open streams
         try (Stream<String> fromStream = fromQuery.getResultStream()) {
