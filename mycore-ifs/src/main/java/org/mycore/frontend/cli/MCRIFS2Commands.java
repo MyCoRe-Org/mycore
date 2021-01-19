@@ -18,7 +18,6 @@
 
 package org.mycore.frontend.cli;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -30,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
@@ -76,20 +76,18 @@ public class MCRIFS2Commands {
 
     @MCRCommand(syntax = "repair mcrdata.xml for project id {0} in content store {1}",
         help = "repair the entries in mcrdata.xml with data from content store {1} for project ID {0}")
-    public static void repairMcrdataXmlForProject(String projectId, String contentStore) {
-        ArrayList<String> derivates = getDerivatesOfProject(contentStore, projectId);
-        for (String derivate : derivates) {
-            repairMcrdataXmlForDerivate(derivate, contentStore);
-        }
+    public static List<String> repairMcrdataXmlForProject(String projectId, String contentStore) {
+        return MCRCommandUtils.getIdsForProjectAndType(projectId, "derivate")
+            .map(id -> "repair mcrdata.xml for derivate " + id + " in content store " + contentStore)
+            .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "repair mcrdata.xml for object {0} in content store {1}",
         help = "repair the entries in mcrdata.xml with data from content store {1} for a MCRObject {0}")
-    public static void repairMcrdataXmlForObject(String objectId, String contentStore) {
-        ArrayList<String> derivates = getDerivatesOfObject(contentStore, objectId);
-        for (String derivate : derivates) {
-            repairMcrdataXmlForDerivate(derivate, contentStore);
-        }
+    public static List<String> repairMcrdataXmlForObject(String objectId, String contentStore) {
+        return getDerivatesOfObject(contentStore, objectId).parallelStream()
+            .map(id -> "repair mcrdata.xml for derivate " + id + " in content store " + contentStore)
+            .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "repair mcrdata.xml for derivate {0} in content store {1}",
@@ -118,30 +116,26 @@ public class MCRIFS2Commands {
             MCRFileCollection fileCollection = ((MCRCStoreIFS2) store).getIFS2FileCollection(mcrDerivateId);
             fileCollection.repairMetadata();
         } catch (IOException e) {
-            LOGGER.error("Erroe while repair derivate with ID {}", mcrDerivateId);
+            LOGGER.error("Error while repair derivate with ID {}", mcrDerivateId);
         }
     }
 
     @MCRCommand(syntax = "check mcrfsnodes for project id {0} of content store {1}",
         help = "check the entries of MCRFNODES with data from content store {1} for project ID {0}")
-    public static void checkMCRFSNODESForProject(String projectId, String contentStore) {
-        LOGGER.info("Start check of MCRFSNODES for project {}", projectId);
-        ArrayList<String> derivates = getDerivatesOfProject(contentStore, projectId);
-        for (String derivate : derivates) {
-            checkMCRFSNODESForDerivate(derivate, contentStore);
-        }
-        LOGGER.info("Stop check of MCRFSNODES for project {}", projectId);
+    public static List<String> checkMCRFSNODESForProject(String projectId, String contentStore) {
+        LOGGER.info("Checking MCRFSNODES for project {}", projectId);
+        return MCRCommandUtils.getIdsForProjectAndType(projectId, "derivate")
+            .map(id -> "check mcrfsnodes for derivate " + id + " of content store " + contentStore)
+            .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "check mcrfsnodes for object {0} of content store {1}",
         help = "check the entries of MCRFNODES with data from content store {1} for MCRObject {0}")
-    public static void checkMCRFSNODESForObject(String objectId, String contentStore) {
-        LOGGER.info("Start check of MCRFSNODES for object {}", objectId);
-        ArrayList<String> derivates = getDerivatesOfObject(contentStore, objectId);
-        for (String derivate : derivates) {
-            checkMCRFSNODESForDerivate(derivate, contentStore);
-        }
-        LOGGER.info("Stop check of MCRFSNODES for object {}", objectId);
+    public static List<String> checkMCRFSNODESForObject(String objectId, String contentStore) {
+        LOGGER.info("Checking MCRFSNODES for object {}", objectId);
+        return getDerivatesOfObject(contentStore, objectId).parallelStream()
+            .map(id -> "check mcrfsnodes for derivate " + id + " of content store " + contentStore)
+            .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "check mcrfsnodes for derivate {0} of content store {1}",
@@ -154,24 +148,20 @@ public class MCRIFS2Commands {
 
     @MCRCommand(syntax = "repair mcrfsnodes for project id {0} of content store {1}",
         help = "repair the entries of MCRFNODES with data from content store {1} for project ID {0}")
-    public static void repairMCRFSNODESForProject(String projectId, String contentStore) {
-        LOGGER.info("Start repair of MCRFSNODES for project {}", projectId);
-        ArrayList<String> derivates = getDerivatesOfProject(contentStore, projectId);
-        for (String derivate : derivates) {
-            repairMCRFSNODESForDerivate(derivate, contentStore);
-        }
-        LOGGER.info("Stop repair of MCRFSNODES for project {}", projectId);
+    public static List<String> repairMCRFSNODESForProject(String projectId, String contentStore) {
+        LOGGER.info("Repairing MCRFSNODES for project {}", projectId);
+        return MCRCommandUtils.getIdsForProjectAndType(projectId, "derivate")
+            .map(id -> "repair mcrfsnodes for derivate " + id + " of content store " + contentStore)
+            .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "repair mcrfsnodes for object {0} of content store {1}",
         help = "repair the entries of MCRFNODES with data from content store {1} for MCRObject {0}")
-    public static void repairMCRFSNODESForObject(String objectId, String contentStore) {
-        LOGGER.info("Start repair of MCRFSNODES for object {}", objectId);
-        ArrayList<String> derivates = getDerivatesOfObject(contentStore, objectId);
-        for (String derivate : derivates) {
-            repairMCRFSNODESForDerivate(derivate, contentStore);
-        }
-        LOGGER.info("Stop repair of MCRFSNODES for project {}", objectId);
+    public static List<String> repairMCRFSNODESForObject(String objectId, String contentStore) {
+        LOGGER.info("Repairing MCRFSNODES for object {}", objectId);
+        return getDerivatesOfObject(contentStore, objectId).parallelStream()
+            .map(id -> "repair mcrfsnodes for derivate " + id + " of content store " + contentStore)
+            .collect(Collectors.toList());
     }
 
     @MCRCommand(syntax = "repair mcrfsnodes for derivate {0} of content store {1}",
@@ -481,32 +471,6 @@ public class MCRIFS2Commands {
         return fsNode.getId();
     }
 
-    private static ArrayList<String> getDerivatesOfProject(String contentStore, String projectId) {
-        ArrayList<String> derivates = new ArrayList<>();
-        // get the IFS1.5
-        String contentStoreBasePath = MCRConfiguration2.getString("MCR.IFS.ContentStore." + contentStore + ".BaseDir")
-            .orElse("");
-        if (contentStoreBasePath.length() == 0) {
-            LOGGER.error("Cant find base directory property in form MCR.IFS.ContentStore.{}.BaseDir", contentStore);
-            return derivates;
-        }
-        String slotLayout = MCRConfiguration2.getString("MCR.IFS.ContentStore." + contentStore + ".SlotLayout")
-            .orElse("");
-        if (slotLayout.length() == 0) {
-            LOGGER.error("Cant find slot layout property in form MCR.IFS.ContentStore.{}.SlotLayout", contentStore);
-            return derivates;
-        }
-        File projectDir = new File(contentStoreBasePath, projectId);
-        if (!projectDir.exists()) {
-            LOGGER.error("Wrong project ID; can't find directory {}", projectDir.getAbsolutePath());
-            return derivates;
-        }
-        File derivateDir = new File(projectDir, "derivate");
-        int maxSlotDeep = (int) (slotLayout.chars().filter(ch -> ch == '-').count() + 1);
-        searchRecurive(derivates, derivateDir, maxSlotDeep, 0, projectId);
-        return derivates;
-    }
-
     private static ArrayList<String> getDerivatesOfObject(String contentStore, String objectId) {
         ArrayList<String> derivates = new ArrayList<>();
         String contentStoreBasePath = MCRConfiguration2.getString("MCR.IFS.ContentStore." + contentStore + ".BaseDir")
@@ -517,24 +481,6 @@ public class MCRIFS2Commands {
         }
         derivates = (ArrayList<String>) MCRLinkTableManager.instance().getDestinationOf(objectId, "derivate");
         return derivates;
-    }
-
-    private static void searchRecurive(ArrayList<String> derivates, File dir, int maxSlotDeep, int currentSlotDeep,
-        String projectId) {
-        if (currentSlotDeep == maxSlotDeep) {
-            return;
-        }
-        File[] dirList = dir.listFiles();
-        currentSlotDeep++;
-        for (File dirEntry : dirList) {
-            if (currentSlotDeep < maxSlotDeep && dirEntry.isDirectory()) {
-                searchRecurive(derivates, dirEntry, maxSlotDeep, currentSlotDeep, projectId);
-            }
-            if (dirEntry.getName().startsWith(projectId + "_derivate")) {
-                derivates.add(dirEntry.getName());
-            }
-        }
-
     }
 
     public static class MCRUnicodeFilenameNormalizer extends SimpleFileVisitor<Path> {

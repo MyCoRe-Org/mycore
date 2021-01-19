@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,10 +34,10 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRPathContent;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.MCRAbstractCommands;
+import org.mycore.frontend.cli.MCRCommandUtils;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -139,11 +140,9 @@ public class MCRMetsCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "add mets files for project id {0}", order = 30)
-    public static void addMetsFileForProjectID(String projectID) {
-        MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
-        List<String> dervateList = manager.listIDsForBase(projectID + "_derivate");
-        for (String derivateID : dervateList) {
-            addMetsFileForDerivate(derivateID);
-        }
+    public static List<String> addMetsFileForProjectID(String projectID) {
+        return MCRCommandUtils.getIdsForProjectAndType(projectID, "derivate")
+            .map(id -> "add mets files for derivate " + id)
+            .collect(Collectors.toList());
     }
 }
