@@ -298,7 +298,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         help = "Lists all users.",
         order = 160)
     public static void listAllUsers() throws Exception {
-        List<MCRUser> users = MCRUserManager.listUsers(null, null, null);
+        List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null);
 
         for (MCRUser uid : users) {
             listUser(uid);
@@ -352,7 +352,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (!dir.exists() || !dir.isDirectory()) {
             throw new MCRException("Directory does not exist: " + dir.getAbsolutePath());
         }
-        List<MCRUser> users = MCRUserManager.listUsers(null, null, null);
+        List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null);
         ArrayList<String> commands = new ArrayList<>(users.size());
         for (MCRUser user : users) {
             File userFile = new File(dir, user.getUserID() + ".xml");

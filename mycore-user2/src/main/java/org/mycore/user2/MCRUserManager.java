@@ -35,6 +35,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -331,34 +332,46 @@ public class MCRUserManager {
     }
 
     private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, Optional<String> userPattern,
-        Optional<String> realm, Optional<String> namePattern) {
+        Optional<String> realm, Optional<String> namePattern, Optional<String> mailPattern) {
         ArrayList<Predicate> predicates = new ArrayList<>(3);
         realm
             .filter(s -> !s.isEmpty())
             .map(s -> cb.equal(root.get(MCRUser_.realmID), s))
             .ifPresent(predicates::add);
 
-        Optional<Predicate> userPredicate = userPattern
-            .filter(s -> !s.isEmpty())
-            .map(s -> s.replace('*', '%'))
-            .map(s -> s.replace('?', '_'))
-            .map(s -> s.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale()))
-            .map(s -> cb.like(cb.lower(root.get(MCRUser_.userName)), s));
+        ArrayList<Predicate> searchPredicates = new ArrayList<>(3);
+        userPattern
+            .flatMap(s -> buildSearchPredicate(cb, root, MCRUser_.userName, s))
+            .ifPresent(searchPredicates::add);
 
-        Optional<Predicate> namePredicate = namePattern
-            .filter(s -> !s.isEmpty())
-            .map(s -> s.replace('*', '%'))
-            .map(s -> s.replace('?', '_'))
-            .map(s -> s.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale()))
-            .map(s -> cb.like(cb.lower(root.get(MCRUser_.realName)), s));
+        namePattern
+            .flatMap(s -> buildSearchPredicate(cb, root, MCRUser_.realName, s))
+            .ifPresent(searchPredicates::add);
 
-        if (userPattern.isPresent() && namePredicate.isPresent()) {
-            predicates.add(cb.or(userPredicate.get(), namePredicate.get()));
-        } else {
-            userPredicate.ifPresent(predicates::add);
-            namePredicate.ifPresent(predicates::add);
+        mailPattern
+            .flatMap(s -> buildSearchPredicate(cb, root, MCRUser_.EMail, s))
+            .ifPresent(searchPredicates::add);
+
+        if(!searchPredicates.isEmpty()) {
+            if(1 == searchPredicates.size()) {
+                predicates.add(searchPredicates.get(0));
+            } else {
+                predicates.add(cb.or(searchPredicates.toArray(new Predicate[searchPredicates.size()])));
+            }
         }
         return predicates.toArray(new Predicate[predicates.size()]);
+    }
+
+    private static Optional<Predicate> buildSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
+        SingularAttribute<MCRUser, String> attribute, String searchPattern) {
+        if (searchPattern.isEmpty()) {
+            return Optional.empty();
+        } else {
+            searchPattern = searchPattern.replace('*', '%');
+            searchPattern = searchPattern.replace('?', '_');
+            searchPattern = searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
+            return Optional.of(cb.like(cb.lower(root.get(attribute)), searchPattern));
+        }
     }
 
     /**
@@ -370,11 +383,12 @@ public class MCRUserManager {
      * this information call {@link MCRUserManager#getUser(String, String)}.
      *
      * @param userPattern a wildcard pattern for the login user name, may be null
-     * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @param mailPattern a wildcard pattern for the person's email, may be null
      * @return a list of matching users
      */
-    public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern) {
+    public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern, String mailPattern) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRUser> query = cb.createQuery(MCRUser.class);
@@ -384,7 +398,7 @@ public class MCRUserManager {
                 query
                     .where(
                         buildCondition(cb, user, Optional.ofNullable(userPattern), Optional.ofNullable(realm),
-                            Optional.ofNullable(namePattern))))
+                            Optional.ofNullable(namePattern), Optional.ofNullable(mailPattern))))
             .getResultList();
     }
 
@@ -394,11 +408,12 @@ public class MCRUserManager {
      * by login user name or real name.
      *
      * @param userPattern a wildcard pattern for the login user name, may be null
-     * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @param mailPattern a wildcard pattern for the person's email, may be null
      * @return the number of matching users
      */
-    public static int countUsers(String userPattern, String realm, String namePattern) {
+    public static int countUsers(String userPattern, String realm, String namePattern, String mailPattern) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Number> query = cb.createQuery(Number.class);
@@ -409,7 +424,7 @@ public class MCRUserManager {
                     .select(cb.count(user))
                     .where(
                         buildCondition(cb, user, Optional.ofNullable(userPattern), Optional.ofNullable(realm),
-                            Optional.ofNullable(namePattern))))
+                            Optional.ofNullable(namePattern), Optional.ofNullable(mailPattern))))
             .getSingleResult().intValue();
     }
 
