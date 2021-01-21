@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
@@ -49,6 +50,7 @@ import org.jdom2.transform.JDOMSource;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -134,6 +136,15 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         DAO.addCategory(null, category);
     }
 
+    @MCRCommand(syntax = "load classification from uri {0}",
+            help = "The command adds a new classification from URI {0} to the system.",
+            order = 17)
+    public static void loadFromURI(String fileURI) throws SAXParseException, URISyntaxException, TransformerException {
+        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
+        MCRCategory category = MCRXMLTransformer.getCategory(xml);
+        DAO.addCategory(null, category);
+    }
+
     /**
      * Replaces a classification with a new version
      *
@@ -157,6 +168,21 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static void updateFromURL(String fileURL)
         throws SAXParseException, MalformedURLException, URISyntaxException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(new URL(fileURL)));
+        MCRCategory category = MCRXMLTransformer.getCategory(xml);
+        if (DAO.exist(category.getId())) {
+            DAO.replaceCategory(category);
+        } else {
+            // add if classification does not exist
+            DAO.addCategory(null, category);
+        }
+    }
+
+    @MCRCommand(syntax = "update classification from uri {0}",
+        help = "The command updates a classification from URI {0} to the system.",
+        order = 27)
+    public static void updateFromURI(String fileURI) throws SAXParseException, URISyntaxException,
+            TransformerException {
+        Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
             DAO.replaceCategory(category);
