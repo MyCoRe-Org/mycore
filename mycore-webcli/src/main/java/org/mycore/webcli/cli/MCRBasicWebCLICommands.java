@@ -19,6 +19,7 @@
 package org.mycore.webcli.cli;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.mycore.common.MCRSessionMgr;
@@ -30,24 +31,31 @@ import org.mycore.webcli.container.MCRWebCLIContainer;
 
 @MCRCommandGroup(name = "Basic commands")
 public class MCRBasicWebCLICommands {
-    @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.")
+
+    @MCRCommand(syntax = "process from resources {0}", help = "Execute the commands listed in the resource file {0}.",
+            order = 10)
+    public static List<String> readCommandsResource(String resource) throws IOException, URISyntaxException {
+        return MCRCommandLineInterface.readCommandsRessource(resource);
+    }
+
+    @MCRCommand(syntax = "process {0}", help = "Execute the commands listed in the text file {0}.", order = 20)
     public static List<String> readCommandsFile(String file) throws IOException {
         return MCRCommandLineInterface.readCommandsFile(file);
     }
 
     @MCRCommand(syntax = "show command statistics",
-        help = "Show statistics on number of commands processed and execution time needed per command")
+        help = "Show statistics on number of commands processed and execution time needed per command", order = 30)
     public static void showCommandStatistics() {
         MCRCommandStatistics.showCommandStatistics();
     }
 
-    @MCRCommand(syntax = "cancel on error", help = "Cancel execution of further commands in case of error")
+    @MCRCommand(syntax = "cancel on error", help = "Cancel execution of further commands in case of error", order = 40)
     public static void cancelonError() {
         setContinueIfOneFails(false);
         MCRCommandLineInterface.cancelOnError();
     }
 
-    @MCRCommand(syntax = "skip on error", help = "Skip execution of failed command in case of error")
+    @MCRCommand(syntax = "skip on error", help = "Skip execution of failed command in case of error", order = 50)
     public static void skipOnError() {
         setContinueIfOneFails(true);
         MCRCommandLineInterface.skipOnError();

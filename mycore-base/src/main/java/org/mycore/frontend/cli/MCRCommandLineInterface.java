@@ -22,6 +22,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -29,6 +31,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -39,6 +42,7 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -321,19 +325,35 @@ public class MCRCommandLineInterface {
     public static List<String> readCommandsFile(String file) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(new File(file).toPath(), Charset.defaultCharset())) {
             output("Reading commands from file " + file);
-
-            String line;
-            List<String> list = new ArrayList<>();
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-
-                if (line.startsWith("#") || line.isEmpty()) {
-                    continue;
-                }
-                list.add(line);
-            }
-            return list;
+            return readCommandsFromBufferedReader(reader);
         }
+    }
+
+    public static List<String> readCommandsRessource(String resource) throws IOException {
+        final URL resourceURL = MCRClassTools.getClassLoader().getResource(resource);
+        if (resourceURL == null) {
+            return Collections.emptyList();
+        }
+        try (InputStream is = resourceURL.openStream()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.defaultCharset()))) {
+                output("Reading commands from resource " + resource);
+                return readCommandsFromBufferedReader(reader);
+            }
+        }
+    }
+
+    private static List<String> readCommandsFromBufferedReader(BufferedReader reader) throws IOException {
+        String line;
+        List<String> list = new ArrayList<>();
+        while ((line = reader.readLine()) != null) {
+            line = line.trim();
+
+            if (line.startsWith("#") || line.isEmpty()) {
+                continue;
+            }
+            list.add(line);
+        }
+        return list;
     }
 
     /**
