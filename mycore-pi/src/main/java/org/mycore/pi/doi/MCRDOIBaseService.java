@@ -39,6 +39,7 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -91,7 +92,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
-
+            schemaFactory.setResourceResolver(MCREntityResolver.instance());
             URL localSchemaURL = MCRClassTools.getClassLoader().getResource(schemaURL);
             if (localSchemaURL == null) {
                 throw new MCRConfigurationException(schemaURL + " was not found!");
