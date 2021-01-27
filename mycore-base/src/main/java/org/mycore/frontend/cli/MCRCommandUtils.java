@@ -41,7 +41,7 @@ public class MCRCommandUtils {
         if (idList.isEmpty()) {
             LOGGER.warn("No IDs found for type {}.", type);
         }
-        return idList.parallelStream();
+        return idList.stream();
     }
 
     /**
@@ -85,7 +85,7 @@ public class MCRCommandUtils {
         if (idList.isEmpty()) {
             LOGGER.warn("No IDs found for base {}.", base);
         }
-        return idList.parallelStream();
+        return idList.stream();
     }
 
     /**
@@ -131,6 +131,6 @@ public class MCRCommandUtils {
         if (idList.isEmpty()) {
             LOGGER.warn("No IDs found in range [{} -> {}].", from, to);
         }
-        return idList.parallelStream();
+        return idList.stream();
     }
 }
