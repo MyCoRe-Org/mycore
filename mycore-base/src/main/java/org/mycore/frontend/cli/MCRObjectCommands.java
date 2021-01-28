@@ -146,12 +146,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Removes MCRObjects of type {0}.",
         order = 20)
     public static List<String> deleteAllObjects(String type) {
-        final List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
-        List<String> cmds = new ArrayList<>(objectIds.size());
-        for (String id : objectIds) {
-            cmds.add("delete object " + id);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForType(type)
+            .map(id -> "delete object " + id)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -240,23 +237,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.",
         order = 30)
     public static List<String> deleteFromTo(String idFrom, String idTo) {
-        MCRObjectID from = MCRObjectID.getInstance(idFrom);
-        MCRObjectID to = MCRObjectID.getInstance(idTo);
-        int lowerBound = from.getNumberAsInteger();
-        int upperBound = to.getNumberAsInteger();
-
-        if (lowerBound > upperBound) {
-            throw new MCRException("The from-to-interval is false.");
-        }
-        List<String> cmds = new ArrayList<>(upperBound - lowerBound);
-
-        for (int i = lowerBound; i < upperBound + 1; i++) {
-            String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
-            if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
-                cmds.add("delete object " + id);
-            }
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsFromIdToId(idFrom, idTo)
+            .map(id -> "delete object " + id)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1072,27 +1055,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Validates all objects of base {0} against their specified schema.",
         order = 401)
     public static List<String> validateObjectsOfBase(String baseID) {
-        if (baseID == null || baseID.length() == 0) {
-            throw new MCRException("Base ID of objects required to check their schema validity.");
-        }
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        List<String> idList;
-        try {
-            idList = mgr.listIDsForBase(baseID);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new MCRException("Requested base ID " + baseID + " not found in store.", e);
-        }
-        int maxresults = idList.size();
-        if (maxresults == 0) {
-            LOGGER.warn("No IDs found for base {}, nothing to check.", baseID);
-            return new ArrayList<>();
-        }
-        List<String> cmds = new ArrayList<>(maxresults);
-        for (String objID : idList) {
-            LOGGER.debug("Adding {} to list of objects to validate schema.", objID);
-            cmds.add("validate object schema for ID " + objID);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForBaseId(baseID)
+            .map(id -> "validate object schema for ID " + id)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1106,27 +1071,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Validates all object of type {0} against their specified schema.",
         order = 402)
     public static List<String> validateObjectsOfType(String type) {
-        if (type == null || type.length() == 0) {
-            throw new MCRException("Type of objects required to check their schema validity.");
-        }
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        List<String> idList;
-        try {
-            idList = mgr.listIDsOfType(type);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new MCRException("Requested type " + type + " not found in store.", e);
-        }
-        int maxresults = idList.size();
-        if (maxresults == 0) {
-            LOGGER.warn("No IDs found for type {}, nothing to check.", type);
-            return new ArrayList<>();
-        }
-        List<String> cmds = new ArrayList<>(maxresults);
-        for (String objID : idList) {
-            LOGGER.debug("Adding {} to list of objects to validate schema.", objID);
-            cmds.add("validate object schema for ID " + objID);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForType(type)
+            .map(id -> "validate object schema for ID " + id)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1255,24 +1202,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 170)
     public static List<String> repairMetadataSearch(String type) {
         LOGGER.info("Start the repair for type {}", type);
-        String typetest = MCRConfiguration2.getString("MCR.Metadata.Type." + type).orElse("");
-
-        if (typetest.length() == 0) {
-            LOGGER.error("The type {} was not found.", type);
-            return Collections.emptyList();
-        }
-        List<String> ar = MCRXMLMetadataManager.instance().listIDsOfType(type);
-        if (ar.size() == 0) {
-            LOGGER.warn("No IDs found for type {}.", type);
-            return Collections.emptyList();
-        }
-
-        List<String> cmds = new ArrayList<>(ar.size());
-
-        for (String stid : ar) {
-            cmds.add("repair metadata search of ID " + stid);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForType(type)
+            .map(id -> "repair metadata search of ID " + id)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -1287,26 +1219,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 171)
     public static List<String> repairMetadataSearchForBase(String baseID) {
         LOGGER.info("Start the repair for base {}", baseID);
-        if (baseID == null || baseID.length() == 0) {
-            throw new MCRException("Base ID of objects required to repair their search indexing.");
-        }
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        List<String> idList;
-        try {
-            idList = mgr.listIDsForBase(baseID);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new MCRException("Requested base ID " + baseID + " not found in store.", e);
-        }
-        int maxresults = idList.size();
-        if (maxresults == 0) {
-            LOGGER.warn("No IDs found for base {}, nothing to check.", baseID);
-            return Collections.emptyList();
-        }
-        List<String> cmds = new ArrayList<>(maxresults);
-        for (String id : idList) {
-            cmds.add("repair metadata search of ID " + id);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForBaseId(baseID)
+            .map(id -> "repair metadata search of ID " + id)
+            .collect(Collectors.toList());
     }
 
     /**
