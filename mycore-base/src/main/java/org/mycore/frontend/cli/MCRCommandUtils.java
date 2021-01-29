@@ -78,7 +78,7 @@ public class MCRCommandUtils {
      *     Not thrown if the base exists but has no values.
      */
     public static final Stream<String> getIdsForBaseId(final String base) throws MCRUsageException {
-        if (MCRObjectID.getIDParts(base).length == 2) {
+        if (MCRObjectID.getIDParts(base).length != 2) {
             throw new MCRUsageException("Base ID ({project}_{type}) required to enumerate IDs!");
         }
         List<String> idList = MCRXMLMetadataManager.instance().listIDsForBase(base);
