@@ -48,15 +48,15 @@ public class MCRXPathBuilderTest extends MCRTestCase {
         new Document(root);
 
         assertEquals("/root", MCRXPathBuilder.buildXPath(root));
-        assertEquals("/root/contributor[1]", MCRXPathBuilder.buildXPath(author));
+        assertEquals("/root/contributor", MCRXPathBuilder.buildXPath(author));
         assertEquals("/root/title[1]", MCRXPathBuilder.buildXPath(title1));
         assertEquals("/root/title[2]", MCRXPathBuilder.buildXPath(title2));
-        assertEquals("/root/contributor[1]/@role", MCRXPathBuilder.buildXPath(role));
-        assertEquals("/root/contributor[1]/@xml:lang", MCRXPathBuilder.buildXPath(lang));
+        assertEquals("/root/contributor/@role", MCRXPathBuilder.buildXPath(role));
+        assertEquals("/root/contributor/@xml:lang", MCRXPathBuilder.buildXPath(lang));
 
         root.detach();
         assertEquals("root", MCRXPathBuilder.buildXPath(root));
-        assertEquals("root/contributor[1]", MCRXPathBuilder.buildXPath(author));
+        assertEquals("root/contributor", MCRXPathBuilder.buildXPath(author));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class MCRXPathBuilderTest extends MCRTestCase {
         container.addContent(mods);
 
         assertEquals("/container", MCRXPathBuilder.buildXPath(container));
-        assertEquals("/container/mods:mods[1]", MCRXPathBuilder.buildXPath(mods));
-        assertEquals("/container/mods:mods[1]/mods:name[1]", MCRXPathBuilder.buildXPath(name));
+        assertEquals("/container/mods:mods", MCRXPathBuilder.buildXPath(mods));
+        assertEquals("/container/mods:mods/mods:name", MCRXPathBuilder.buildXPath(name));
     }
 }
