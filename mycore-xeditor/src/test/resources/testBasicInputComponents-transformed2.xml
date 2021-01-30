@@ -18,8 +18,8 @@
           <option value="video">Video</option>
         </optgroup>
       </select>
-      <input name="/document/service[1]" checked="checked" id="oai" value="oai" type="checkbox" />
-      <input name="/document/service[1]" checked="checked" id="urn" value="urn" type="checkbox" />
+      <input name="/document/service" checked="checked" id="oai" value="oai" type="checkbox" />
+      <input name="/document/service" checked="checked" id="urn" value="urn" type="checkbox" />
       <div style="visibility:hidden">
         <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
         <input value="type service[1] service[2]" name="_xed_check" type="hidden" />
