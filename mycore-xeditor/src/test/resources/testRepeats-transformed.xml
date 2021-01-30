@@ -3,7 +3,7 @@
   <form action="http://localhost:8291/servlets/XEditor" method="post">
     <a id="rep-1" />
     <div>
-      <input name="/document/service" value="oai" type="text" />
+      <input name="/document/service[1]" value="oai" type="text" />
     </div>
     <a id="rep-2" />
     <div>
@@ -11,7 +11,7 @@
     </div>
     <a id="rep-3" />
     <div>
-      <input name="/document/name" value="" type="text" />
+      <input name="/document/name[1]" value="" type="text" />
     </div>
     <button name="_xed_submit_down:/document|1|build|name[(@type = &quot;personal&quot;)]|rep-3" class="btn btn-secondary" type="submit">
       <i class="fas fa-arrow-down" />
