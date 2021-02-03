@@ -19,7 +19,6 @@
 package org.mycore.frontend.servlets;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -96,7 +95,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
         }
 
         @Override
-        public ArrayList<String> getUserAttributeNames() {
+        public String[] getUserAttributeNames() {
             return null;
         }  
 

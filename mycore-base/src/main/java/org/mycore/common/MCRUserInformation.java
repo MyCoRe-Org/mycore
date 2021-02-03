@@ -18,8 +18,6 @@
 
 package org.mycore.common;
 
-import java.util.ArrayList;
-
 /**
  * Encapsulates informations about the current authenticated user.
  * 
@@ -57,8 +55,8 @@ public interface MCRUserInformation {
 
     /**
      * Get all attribute names if they are provided by the underlying user system
-     * @return user attribute names  as ArrayList or null if no value is defined
+     * @return user attribute names as String array or null if no value is defined
      */
-    ArrayList<String> getUserAttributeNames(); //TODO maybe more generic
+    String[] getUserAttributeNames(); //TODO maybe more generic
 
 }
