@@ -20,6 +20,8 @@ package org.mycore.common;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,6 +98,11 @@ public class MCRSessionTest extends MCRTestCase {
 
             @Override
             public String getUserAttribute(String attribute) {
+                return null;
+            }
+
+            @Override
+            public ArrayList<String> getUserAttributes() {
                 return null;
             }
         };

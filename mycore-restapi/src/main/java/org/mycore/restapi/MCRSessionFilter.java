@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -320,6 +321,11 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             if (MCRUserInformation.ATT_EMAIL.equals(attribute)) {
                 return jwt.getClaim("email").asString();
             }
+            return null;
+        }
+
+        @Override
+        public ArrayList<String> getUserAttributes() {
             return null;
         }
     }
