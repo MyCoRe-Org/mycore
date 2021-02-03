@@ -96,7 +96,7 @@ public class MCRContainerLoginServlet extends MCRServlet {
         }
 
         @Override
-        public ArrayList<String> getUserAttributes() {
+        public ArrayList<String> getUserAttributeNames() {
             return null;
         }  
 

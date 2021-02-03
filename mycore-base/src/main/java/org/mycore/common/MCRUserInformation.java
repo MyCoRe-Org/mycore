@@ -56,9 +56,9 @@ public interface MCRUserInformation {
     String getUserAttribute(String attribute);
 
     /**
-     * Get all attributes if they are provided by the underlying user system
-     * @return user attributes as ArrayList or null if no value is defined
+     * Get all attribute names if they are provided by the underlying user system
+     * @return user attribute names  as ArrayList or null if no value is defined
      */
-    ArrayList<String> getUserAttributes(); //TODO maybe more generic
+    ArrayList<String> getUserAttributeNames(); //TODO maybe more generic
 
 }

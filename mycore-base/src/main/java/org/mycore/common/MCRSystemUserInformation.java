@@ -79,7 +79,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
     }
 
     @Override 
-    public ArrayList<String> getUserAttributes() {
+    public ArrayList<String> getUserAttributeNames() {
         return null; //TODO may return Attributes
     }
 

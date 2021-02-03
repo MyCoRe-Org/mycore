@@ -102,7 +102,7 @@ public class MCRSessionTest extends MCRTestCase {
             }
 
             @Override
-            public ArrayList<String> getUserAttributes() {
+            public ArrayList<String> getUserAttributeNames() {
                 return null;
             }
         };
