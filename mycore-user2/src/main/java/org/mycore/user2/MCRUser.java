@@ -728,8 +728,11 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     @Override
+    @Transient
     public String[] getUserAttributeNames() {
-        return null;
+        return getAttributes().stream()
+            .map(MCRUserAttribute::getName)
+            .toArray(String[]::new);
     }
 
     @Transient
