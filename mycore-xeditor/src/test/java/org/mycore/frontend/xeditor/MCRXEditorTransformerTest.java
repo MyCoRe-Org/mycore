@@ -35,9 +35,11 @@ import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xsl.MCRParameterCollector;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -76,13 +78,20 @@ public class MCRXEditorTransformerTest extends MCRTestCase {
         MCRContent transformed = new MCRXEditorTransformer(session, pc).transform(input);
 
         Document expected = MCRSourceContent.getInstance("resource:" + expectedOutputFile).asXML();
+
         MCRBinding binding = new MCRBinding("//input[@type='hidden'][@name='_xed_session']/@value", true,
             new MCRBinding(expected));
         binding.setValue(session.getID() + "-" + session.getChangeTracker().getChangeCounter());
 
+        binding = new MCRBinding("//form/@action", true, new MCRBinding(expected));
+        binding.setValue(MCRFrontendUtil.getBaseURL() + "servlets/XEditor");
+
         String msg = "Transformed output is different to " + expectedOutputFile;
         boolean isEqual = MCRXMLHelper.deepEqual(expected, transformed.asXML());
         if (!isEqual) {
+            System.out.println("---------- expected: ----------");
+            System.out.println(new MCRJDOMContent(expected).asString());
+            System.out.println("---------- transformed: ----------");
             System.out.println(transformed.asString());
         }
         assertTrue(msg, isEqual);

@@ -49,7 +49,7 @@ public class MCRXPathBuilderTest extends MCRTestCase {
 
         assertEquals("/root", MCRXPathBuilder.buildXPath(root));
         assertEquals("/root/contributor", MCRXPathBuilder.buildXPath(author));
-        assertEquals("/root/title", MCRXPathBuilder.buildXPath(title1));
+        assertEquals("/root/title[1]", MCRXPathBuilder.buildXPath(title1));
         assertEquals("/root/title[2]", MCRXPathBuilder.buildXPath(title2));
         assertEquals("/root/contributor/@role", MCRXPathBuilder.buildXPath(role));
         assertEquals("/root/contributor/@xml:lang", MCRXPathBuilder.buildXPath(lang));

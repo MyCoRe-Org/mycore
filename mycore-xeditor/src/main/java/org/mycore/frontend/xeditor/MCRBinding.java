@@ -279,7 +279,10 @@ public class MCRBinding {
     }
 
     public String getAbsoluteXPath() {
-        return MCRXPathBuilder.buildXPath(getBoundNode());
+        String absPath = MCRXPathBuilder.buildXPath(getBoundNode());
+        return (boundNodes.size() > 1 && absPath.endsWith("[1]"))
+            ? absPath.substring(0, absPath.length() - 3)
+            : absPath;
     }
 
     public MCRXPathEvaluator getXPathEvaluator() {
