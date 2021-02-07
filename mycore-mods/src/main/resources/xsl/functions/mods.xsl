@@ -50,7 +50,7 @@
     <xsl:param name="node" as="element()"/>
     <xsl:param name="mode" as="xs:string"/>
     <xsl:choose>
-      <xsl:when test="$mode = 'parent' or $mode = 'single'">
+      <xsl:when test="$mode = 'parent' or $mode = 'single'  or $mode = 'label'">
         <xsl:variable name="uri" select="mcrmods:to-uri($node)"/>
         <xsl:choose>
           <xsl:when test="fn:string-length($uri) &gt; 0">
@@ -66,7 +66,24 @@
                     <xsl:variable name="reduced">
                       <xsl:apply-templates select="$class/mycoreclass" mode="remove-parents" />
                     </xsl:variable>
-                    <xsl:sequence select="$reduced/mycoreclass" />
+                    <xsl:choose>
+                      <xsl:when test="$mode = 'label'">
+                        <xsl:choose>
+                          <xsl:when test="$reduced/mycoreclass/categories/category/label[@xml:lang=$CurrentLang]">
+                            <xsl:sequence select="$reduced/mycoreclass/categories/category/label[@xml:lang=$CurrentLang]" />
+                          </xsl:when>
+                          <xsl:when test="$reduced/mycoreclass/categories/category/label[@xml:lang=$DefaultLang]">
+                            <xsl:sequence select="$reduced/mycoreclass/categories/category/label[@xml:lang=$DefaultLang]" />
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:sequence select="()" />
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:sequence select="$reduced/mycoreclass" />
+                      </xsl:otherwise>
+                    </xsl:choose>
                   </xsl:otherwise>
                 </xsl:choose>
               </xsl:when>
