@@ -399,7 +399,13 @@ public class MCRUtils {
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                     Path absolutePath = dir.normalize().toAbsolutePath();
-                    Files.setLastModifiedTime(absolutePath, directoryTimes.get(absolutePath));
+                    FileTime lastModifiedTime = directoryTimes.get(absolutePath);
+                    if (lastModifiedTime != null) {
+                        Files.setLastModifiedTime(absolutePath, lastModifiedTime);
+                    } else {
+                        LOGGER.warn("Could not restore last modified time for {} from TAR file {}.", absolutePath,
+                            source);
+                    }
                     return super.postVisitDirectory(dir, exc);
                 }
             });
