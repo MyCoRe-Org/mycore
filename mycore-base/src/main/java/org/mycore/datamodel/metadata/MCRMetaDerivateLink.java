@@ -49,14 +49,23 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
     }
 
     public void setLinkToFile(MCRPath file) {
+        if (!file.isAbsolute()) {
+            throw new IllegalArgumentException("file parameter must be absolute");
+        }
         String owner = file.getOwner();
-        String path = file.subpath(0, file.getNameCount() - 1).toString();
+        String path = file.getOwnerRelativePath();
+        if (path.isEmpty()) {
+            throw new IllegalArgumentException("file parameter is empty");
+        }
+        if (path.charAt(0) != '/') {
+            path = '/' + path; //normally not the case
+        }
         try {
             path = MCRXMLFunctions.encodeURIPath(path, true);
         } catch (URISyntaxException uriExc) {
             LOGGER.warn("Unable to encode URI path {}", path, uriExc);
         }
-        super.href = owner + '/' + path;
+        super.href = owner + path;
     }
 
     public void setFromDOM(Element element) throws MCRException {
