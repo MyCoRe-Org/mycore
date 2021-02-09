@@ -88,18 +88,27 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
         final MCRContentTransformer transformer = getTransformer();
 
         final Map<String, String> properties = getProperties();
-        final String schemaURL = properties.getOrDefault(CONFIG_SCHEMA, getDefaultSchemaPath());
+        final String schemaURLString = properties.getOrDefault(CONFIG_SCHEMA, getDefaultSchemaPath());
+        setSchema(resolveSchema(schemaURLString));
+    }
+
+    public static Schema resolveSchema(String schemaURLString) {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
             schemaFactory.setResourceResolver(MCREntityResolver.instance());
-            URL localSchemaURL = MCRClassTools.getClassLoader().getResource(schemaURL);
-            if (localSchemaURL == null) {
-                throw new MCRConfigurationException(schemaURL + " was not found!");
-            }
-            setSchema(schemaFactory.newSchema(localSchemaURL));
-        } catch (SAXException e) {
-            throw new MCRConfigurationException("Error while loading " + getServiceID() + " schema!", e);
+            //if(schemaURLString.startsWith("http://") || schemaURLString.startsWith("https://")){
+            //    final InputSource source = MCREntityResolver.instance().resolveEntity(null, schemaURLString);
+            //    return schemaFactory.newSchema((Source) source);
+            //} else {
+                URL schemaURL = MCRClassTools.getClassLoader().getResource(schemaURLString);
+                if (schemaURL == null) {
+                    throw new MCRConfigurationException(schemaURLString + " was not found!");
+                }
+                return schemaFactory.newSchema(schemaURL);
+            //}
+        } catch (SAXException /* | IOException */ e)  {
+            throw new MCRConfigurationException("Error while loading "+schemaURLString+" schema!", e);
         }
     }
 

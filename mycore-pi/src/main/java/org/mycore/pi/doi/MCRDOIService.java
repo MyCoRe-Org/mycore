@@ -125,6 +125,16 @@ public class MCRDOIService extends MCRDOIBaseService {
 
     public static final String DATACITE_SCHEMA_V43 = "xsd/datacite/v4.3/metadata.xsd";
 
+    /*
+    public static final String DATACITE_SCHEMA_V3 = "http://schema.datacite.org/meta/kernel-3/metadata.xsd";
+
+    public static final String DATACITE_SCHEMA_V4 = "http://schema.datacite.org/meta/kernel-4/metadata.xsd";
+
+    public static final String DATACITE_SCHEMA_V41 = "http://schema.datacite.org/meta/kernel-4.1/metadata.xsd";
+
+    public static final String DATACITE_SCHEMA_V43 = "http://schema.datacite.org/meta/kernel-4.3/metadata.xsd";
+     */
+
     private static final String DEFAULT_DATACITE_SCHEMA_PATH = DATACITE_SCHEMA_V3;
 
     private static final String TRANSLATE_PREFIX = "component.pi.register.error.";
