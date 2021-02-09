@@ -26,7 +26,6 @@ import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -46,7 +45,7 @@ public class MCRTarServlet extends MCRCompressServlet<TarArchiveOutputStream> {
     @Override
     protected void sendCompressedDirectory(MCRPath file, BasicFileAttributes attrs,
         TarArchiveOutputStream container) throws IOException {
-        TarArchiveEntry entry = new TarArchiveEntry(getFilename(file), TarConstants.LF_DIR);
+        TarArchiveEntry entry = new TarArchiveEntry(getFilename(file) + '/');
         entry.setModTime(attrs.lastModifiedTime().toMillis());
         container.putArchiveEntry(entry);
         container.closeArchiveEntry();
