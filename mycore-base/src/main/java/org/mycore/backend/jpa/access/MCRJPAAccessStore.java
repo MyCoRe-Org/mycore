@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -35,11 +36,8 @@ import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 
 /**
@@ -82,7 +80,7 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     public void createAccessDefinition(MCRRuleMapping rulemapping) {
 
         if (!existAccessDefinition(rulemapping.getPool(), rulemapping.getObjId())) {
-            Session session = MCRHIBConnection.instance().getSession();
+            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             MCRACCESSRULE accessRule = getAccessRule(rulemapping.getRuleId());
             if (accessRule == null) {
                 throw new NullPointerException("Cannot map a null rule.");
@@ -93,7 +91,7 @@ public class MCRJPAAccessStore extends MCRAccessStore {
             accdef.setRule(accessRule);
             accdef.setCreator(rulemapping.getCreator());
             accdef.setCreationdate(Timestamp.valueOf(dateFormat.format(rulemapping.getCreationdate())));
-            session.save(accdef);
+            em.persist(accdef);
         }
     }
 
@@ -127,8 +125,8 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     @Override
     public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
 
-        Session session = MCRHIBConnection.instance().getSession();
-        session.createQuery(
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.createQuery(
             "delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '"
                 + rulemapping.getObjId() + "'")
             .executeUpdate();
@@ -139,18 +137,17 @@ public class MCRJPAAccessStore extends MCRAccessStore {
      */
     @Override
     public void updateAccessDefinition(MCRRuleMapping rulemapping) {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         MCRACCESSRULE accessRule = getAccessRule(rulemapping.getRuleId());
         if (accessRule == null) {
             throw new NullPointerException("Cannot map a null rule.");
         }
         // update
-        MCRACCESS accdef = session.get(MCRACCESS.class,
+        MCRACCESS accdef = em.find(MCRACCESS.class,
             new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
         accdef.setRule(accessRule);
         accdef.setCreator(rulemapping.getCreator());
         accdef.setCreationdate(Timestamp.valueOf(dateFormat.format(rulemapping.getCreationdate())));
-        session.update(accdef);
     }
 
     /**
@@ -188,8 +185,8 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     @Override
     public ArrayList<String> getMappedObjectId(String pool) {
 
-        Session session = MCRHIBConnection.instance().getSession();
-        List<MCRACCESS> l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'", MCRACCESS.class)
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        List<MCRACCESS> l = em.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'", MCRACCESS.class)
             .getResultList();
         return l.stream()
             .map(aL -> aL.getKey().getObjid())
@@ -199,8 +196,8 @@ public class MCRJPAAccessStore extends MCRAccessStore {
     @Override
     public ArrayList<String> getPoolsForObject(String objid) {
 
-        Session session = MCRHIBConnection.instance().getSession();
-        List<MCRACCESS> l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'", MCRACCESS.class)
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        List<MCRACCESS> l = em.createQuery("from MCRACCESS where OBJID = '" + objid + "'", MCRACCESS.class)
             .getResultList();
         return l.stream()
             .map(access -> access.getKey().getAcpool())
@@ -237,14 +234,14 @@ public class MCRJPAAccessStore extends MCRAccessStore {
      */
     @Override
     public boolean isRuleInUse(String ruleid) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Query<MCRACCESS> query = session
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRACCESS> query = em
             .createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'", MCRACCESS.class);
         return !query.getResultList().isEmpty();
     }
 
     private static MCRACCESSRULE getAccessRule(String rid) {
-        Session session = MCRHIBConnection.instance().getSession();
-        return session.get(MCRACCESSRULE.class, rid);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        return em.find(MCRACCESSRULE.class, rid);
     }
 }

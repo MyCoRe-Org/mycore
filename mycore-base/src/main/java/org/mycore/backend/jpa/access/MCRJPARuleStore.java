@@ -32,10 +32,8 @@ import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRRuleStore;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
@@ -85,7 +83,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
     public void createRule(MCRAccessRule rule) {
 
         if (!existsRule(rule.getId())) {
-            Session session = MCRHIBConnection.instance().getSession();
+            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             MCRACCESSRULE hibrule = new MCRACCESSRULE();
 
             DateFormat df = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.ROOT);
@@ -94,7 +92,7 @@ public class MCRJPARuleStore extends MCRRuleStore {
             hibrule.setRid(rule.getId());
             hibrule.setRule(rule.getRuleString());
             hibrule.setDescription(rule.getDescription());
-            session.saveOrUpdate(hibrule);
+            em.persist(hibrule);
         } else {
             LOGGER.error("rule with id '{}' can't be created, rule still exists.", rule.getId());
         }
@@ -124,8 +122,8 @@ public class MCRJPARuleStore extends MCRRuleStore {
      */
     @Override
     public void updateRule(MCRAccessRule rule) {
-        Session session = MCRHIBConnection.instance().getSession();
-        MCRACCESSRULE hibrule = session.get(MCRACCESSRULE.class, rule.getId());
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRACCESSRULE hibrule = em.find(MCRACCESSRULE.class, rule.getId());
 
         DateFormat df = new SimpleDateFormat(SQL_DATE_FORMAT, Locale.ROOT);
         hibrule.setCreationdate(Timestamp.valueOf(df.format(rule.getCreationTime())));
@@ -140,8 +138,8 @@ public class MCRJPARuleStore extends MCRRuleStore {
      */
     @Override
     public void deleteRule(String ruleid) {
-        Session session = MCRHIBConnection.instance().getSession();
-        session.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'").executeUpdate();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'").executeUpdate();
         ruleCache.invalidate(ruleid);
     }
 
@@ -185,8 +183,8 @@ public class MCRJPARuleStore extends MCRRuleStore {
     @Override
     public int getNextFreeRuleID(String prefix) {
         int ret = 1;
-        Session session = MCRHIBConnection.instance().getSession();
-        List<String> l = session
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        List<String> l = em
             .createQuery("select max(rid) from MCRACCESSRULE where rid like '" + prefix + "%'", String.class)
             .getResultList();
         if (l.size() > 0) {

@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.inject.MCRInjectorConfig;
@@ -54,7 +53,7 @@ public class MCRJPAAltoChangeSetStore implements MCRAltoChangeSetStore {
         MCRDBStoredChangeSet storedChangeSet = new MCRDBStoredChangeSet(MCRSessionMgr.getCurrentSessionID(),
             changeSet.getDerivateID(), objectTitle, new Date(), null,
             userID, changeSet);
-        MCRHIBConnection.instance().getSession().save(storedChangeSet);
+        MCREntityManagerProvider.getCurrentEntityManager().persist(storedChangeSet);
 
         return storedChangeSet;
     }

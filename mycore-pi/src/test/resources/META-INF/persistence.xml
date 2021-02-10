@@ -25,11 +25,6 @@
       <property name="hibernate.format_sql" value="true" />
       <!-- We better always test with defined schema -->
       <property name="hibernate.default_schema" value="junit" />
-
-      <!-- hikari -->
-      <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider" />
-      <property name="hibernate.hikari.maximumPoolSize" value="10" />
-
     </properties>
   </persistence-unit>
 </persistence>

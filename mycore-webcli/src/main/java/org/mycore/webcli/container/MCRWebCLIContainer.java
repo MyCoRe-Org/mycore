@@ -50,7 +50,7 @@ import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -315,9 +315,8 @@ public class MCRWebCLIContainer {
          *
          * @param command
          * @return true if command processed successfully
-         * @throws IOException
          */
-        private boolean processCommand(String command) throws IOException {
+        private boolean processCommand(String command) {
             LOGGER.info("Processing command:'{}' ({} left)", command, commands.size());
             setCurrentCommand(command);
             long start = System.currentTimeMillis();
@@ -351,7 +350,7 @@ public class MCRWebCLIContainer {
                 return false;
             } finally {
                 session.beginTransaction();
-                MCRHIBConnection.instance().getSession().clear();
+                MCREntityManagerProvider.getCurrentEntityManager().clear();
                 session.commitTransaction();
             }
             return true;
@@ -530,7 +529,7 @@ public class MCRWebCLIContainer {
             }
             this.publisher = new SubmissionPublisher<>(ForkJoinPool.commonPool(), MAX_BUFFER);
             if (subscribers != null) {
-                subscribers.stream().forEach(publisher::subscribe);
+                subscribers.forEach(publisher::subscribe);
             }
             grabCurrentThread();
         }

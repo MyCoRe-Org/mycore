@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -131,16 +131,13 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
             registrationService.isCreated(mcrObject.getId(), ""));
 
         Assert.assertTrue("There should be one resolver", MCRPIManager.getInstance()
-            .getResolvers().stream()
-            .filter(r -> r.getName()
-                .equals(MCRMockResolver.NAME))
-            .count() > 0);
+            .getResolvers().stream().anyMatch(r -> r.getName().equals(MCRMockResolver.NAME)));
     }
 
     @Test
     public void testGetUnregisteredIdenifiers() throws Exception {
-        MCRHIBConnection.instance().getSession().save(generateMCRPI());
-        MCRHIBConnection.instance().getSession().save(generateMCRPI());
+        MCREntityManagerProvider.getCurrentEntityManager().persist(generateMCRPI());
+        MCREntityManagerProvider.getCurrentEntityManager().persist(generateMCRPI());
 
         long numOfUnregisteredPI = MCRPIManager.getInstance()
             .getUnregisteredIdentifiers("Unregistered")

@@ -45,7 +45,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.access.MCRAccessException;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRBaseContent;
@@ -144,7 +144,7 @@ public class MCRDOICommands {
                                 LOGGER.info("DOI is not registered in MyCoRe. Add to Database: {}", doi.asString());
                                 MCRPI databaseEntry = new MCRPI(doi.asString(), registrationService.getType(),
                                     objectID.toString(), "", serviceID, new Date());
-                                MCRHIBConnection.instance().getSession().save(databaseEntry);
+                                MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
                             }
 
                             // Update main files

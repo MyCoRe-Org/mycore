@@ -61,7 +61,9 @@ public class MCRHIBConnection {
      * This method returns the current session for queries on the database through hibernate
      * 
      * @return Session current session object
+     * @deprecated use {@link MCREntityManagerProvider#getCurrentEntityManager()} instead
      */
+    @Deprecated
     public Session getSession() {
         EntityManager currentEntityManager = MCREntityManagerProvider.getCurrentEntityManager();
         Session session = currentEntityManager.unwrap(Session.class);

@@ -39,7 +39,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
@@ -374,7 +374,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, T identifier) {
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
             this.getServiceID(), provideRegisterDate(obj, additional), null);
-        MCRHIBConnection.instance().getSession().save(databaseEntry);
+        MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
         return databaseEntry;
     }
 
