@@ -296,17 +296,26 @@ namespace mycore.viewer.widgets.mets {
             this.getStructLinks().forEach((elem: Element) => {
                 let chapterId = this.getAttributeNs(elem, "xlink", "from");
                 let physFileId = this.getAttributeNs(elem, "xlink", "to");
-                this.makeLink(this._chapterIdMap.get(chapterId), this._idImageMap.get(physFileId));
+                this.makeDirectLink(this._chapterIdMap.get(chapterId), this._idImageMap.get(physFileId));
             });
         }
 
-        private makeLink(chapter: model.StructureChapter, image: model.StructureImage) {
+        private linkParentsIndirect(chapter: model.StructureChapter, image: model.StructureImage){
             if (chapter.parent != null && !this._chapterImageMap.has(chapter.parent.id)) {
+                this.linkParentsIndirect(chapter.parent, image);
                 this._improvisationMap.set(chapter.parent.id, true); // we flag this link as improvisation
                 this._chapterImageMap.set(chapter.parent.id, image);
             }
+        }
 
-            if (!this._chapterImageMap.has(chapter.id) || this._imageList.indexOf(this._chapterImageMap.get(chapter.id)) > this._imageList.indexOf(image) || (this._improvisationMap.has(chapter.id) && this._improvisationMap.get(chapter.id))) {
+        private makeDirectLink(chapter: model.StructureChapter, image: model.StructureImage) {
+            this.linkParentsIndirect(chapter, image);
+
+            const hasNoLink = !this._chapterImageMap.has(chapter.id);
+            const currentLinkPosition = this._imageList.indexOf(this._chapterImageMap.get(chapter.id));
+            const currentIsImprovised = this._improvisationMap.has(chapter.id) && this._improvisationMap.get(chapter.id);
+
+            if (hasNoLink || currentLinkPosition > this._imageList.indexOf(image) || currentIsImprovised) {
                 this._chapterImageMap.set(chapter.id, image);
                 this._improvisationMap.set(chapter.id, false);
             }
