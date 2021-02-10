@@ -48,6 +48,8 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
 
     public static final String JWT_CLAIM_IP = "mcr:ip";
 
+    public static final String JWT_USER_ATTRIBUTE = "mcr:ua:";
+
     private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
     private static final String ROLES_PROPERTY = "MCR.Rest.JWT.Roles";
@@ -68,7 +70,8 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
             .withClaim("email", email)
             .withClaim("name", name);
         for (String userAttributeName : userInformation.getUserAttributeNames()) {
-            builder.withClaim(userAttributeName, userInformation.getUserAttribute(userAttributeName));
+            builder.withClaim(JWT_USER_ATTRIBUTE + userAttributeName, 
+                userInformation.getUserAttribute(userAttributeName));
         }
         return builder;
     }
