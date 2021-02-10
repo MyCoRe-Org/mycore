@@ -97,7 +97,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         Element xml = new Element("classificationBrowserData");
         xml.setAttribute("classification", settings.getClassifID());
         xml.setAttribute("webpage", settings.getWebpage());
-        settings.getParameters().ifPresent(p -> xml.setAttribute("parameters", "p"));
+        settings.getParameters().ifPresent(p -> xml.setAttribute("parameters", p));
 
         Optional<MCRQueryAdapter> queryAdapter = configureQueryAdapter(req, settings, xml);
 
