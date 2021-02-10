@@ -18,16 +18,26 @@
 
 package org.mycore.common.xsl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -39,6 +49,7 @@ import org.jdom2.Element;
 import org.jdom2.filter.Filters;
 import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -47,7 +58,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Lists all *.xsl stylesheets in the web application located in any 
- * WEB-INF/lib/*.jar or WEB-INF/classes/xsl/, outputs the
+ * WEB-INF/lib/*.jar or WEB-INF/classes/xsl/ or in {@link MCRConfigurationDir}, outputs the
  * dependencies (import/include) and contained templates.
  * 
  * @author Frank L\u00FCtzenkirchen
@@ -56,9 +67,9 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRXSLInfoServlet.class);
 
-    private Map<String, Stylesheet> stylesheets = new HashMap<>();
+    private final Map<String, Stylesheet> stylesheets = new HashMap<>();
 
-    private Set<String> unknown = new HashSet<>();
+    private final Set<String> unknown = new HashSet<>();
 
     protected void doGetPost(MCRServletJob job) throws Exception {
         if ("true".equals(job.getRequest().getParameter("reload"))) {
@@ -67,6 +78,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
         if (stylesheets.isEmpty()) {
             LOGGER.info("Collecting stylesheet information....");
+            findInConfigDir();
             findXSLinClassesDir();
             findXSLinLibJars();
             inspectStylesheets();
@@ -74,6 +86,54 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         }
 
         buildOutput(job);
+    }
+
+    private void findInConfigDir() throws IOException {
+        final File configDir = MCRConfigurationDir.getConfigurationDirectory();
+        if (configDir == null) {
+            return;
+        }
+        findInConfigResourcesDir(configDir);
+        findInConfigLibDir(configDir);
+    }
+
+    private void findInConfigResourcesDir(File configDir) throws IOException {
+        final Path resources = configDir.toPath().resolve("resources");
+        final Path xslResourcesPath = resources.resolve("xsl");
+        doForFilesRecursive(xslResourcesPath, n -> n.endsWith(".xsl"),
+            file -> foundStylesheet(resources.toUri().relativize(file.toUri()).toString(),
+                configDir.toPath().relativize(file).toString()));
+    }
+
+    private void findInConfigLibDir(File configDir) throws IOException {
+        final Path lib = configDir.toPath().resolve("lib");
+        try {
+            doForFilesRecursive(lib, n -> n.endsWith(".jar"),
+                file -> {
+                    try (InputStream in = Files.newInputStream(file)) {
+                        findInJarInputStream(configDir.toPath().relativize(file).toString(), in);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+        } catch (UncheckedIOException uioe) {
+            throw uioe.getCause();
+        }
+    }
+
+    private void doForFilesRecursive(Path baseDir, Predicate<String> lowerCaseCheck, Consumer<Path> pathConsumer)
+        throws IOException {
+        if (Files.isDirectory(baseDir)) {
+            Files.walkFileTree(baseDir, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (lowerCaseCheck.test(file.getFileName().toString().toLowerCase(Locale.ROOT))) {
+                        pathConsumer.accept(file);
+                    }
+                    return super.visitFile(file, attrs);
+                }
+            });
+        }
     }
 
     private void inspectStylesheets() {
@@ -84,8 +144,7 @@ public final class MCRXSLInfoServlet extends MCRServlet {
 
     private void handleUnknownStylesheets() {
         while (!unknown.isEmpty()) {
-            Set<String> list = new HashSet<>();
-            list.addAll(unknown);
+            Set<String> list = new HashSet<>(unknown);
             unknown.clear();
 
             for (String name : list) {
@@ -134,17 +193,22 @@ public final class MCRXSLInfoServlet extends MCRServlet {
     private void findXSLinJar(String pathOfJarFile) throws IOException {
         LOGGER.info("Diving into {}...", pathOfJarFile);
 
-        InputStream in = getServletContext().getResourceAsStream(pathOfJarFile);
-        ZipInputStream zis = new ZipInputStream(in);
-
-        for (ZipEntry ze = zis.getNextEntry(); ze != null; ze = zis.getNextEntry()) {
-            String name = ze.getName();
-            if (name.startsWith("xsl/") && name.endsWith(".xsl")) {
-                foundStylesheet(name, pathOfJarFile);
-            }
-            zis.closeEntry();
+        try (InputStream in = getServletContext().getResourceAsStream(pathOfJarFile)) {
+            findInJarInputStream(pathOfJarFile, in);
         }
-        zis.close();
+    }
+
+    private void findInJarInputStream(String pathOfJarFile, InputStream in) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(in)) {
+
+            for (ZipEntry ze = zis.getNextEntry(); ze != null; ze = zis.getNextEntry()) {
+                String name = ze.getName();
+                if (name.startsWith("xsl/") && name.endsWith(".xsl")) {
+                    foundStylesheet(name, pathOfJarFile);
+                }
+                zis.closeEntry();
+            }
+        }
     }
 
     private void findXSLinClassesDir() {
@@ -160,7 +224,9 @@ public final class MCRXSLInfoServlet extends MCRServlet {
         String file = path.substring(path.lastIndexOf("xsl/") + 4);
         LOGGER.info("Found {} in {}", file, source);
         Stylesheet stylesheet = getStylesheet(file);
-        source = source.substring(9); // cut off "/WEB-INF/"
+        if (source.startsWith("/WEB-INF/")) {
+            source = source.substring("/WEB-INF/".length()); // cut off
+        }
         stylesheet.origin.add(source);
     }
 
