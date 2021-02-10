@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -48,6 +49,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.imagetiler.MCRImage;
@@ -125,7 +127,7 @@ public class MCRTileCombineServlet extends MCRServlet {
      * See {@link #init()} how to attach a footer to every generated image.
      */
     @Override
-    protected void think(final MCRServletJob job) throws IOException, JDOMException {
+    protected void think(final MCRServletJob job) throws IOException, JDOMException, URISyntaxException {
         final HttpServletRequest request = job.getRequest();
         try {
             String pathInfo = request.getPathInfo();
@@ -174,7 +176,7 @@ public class MCRTileCombineServlet extends MCRServlet {
                     }
                     String redirectURL = response.encodeRedirectURL(new MessageFormat("{0}{1}/{2}/{3}{4}", Locale.ROOT)
                         .format(new Object[] { request.getContextPath(), request.getServletPath(), zoomAlias, derivate,
-                            imagePath }));
+                            MCRXMLFunctions.encodeURIPath(imagePath) }));
                     response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
                     response.setHeader("Location", redirectURL);
                     response.flushBuffer();
