@@ -26,10 +26,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javax.persistence.EntityTransaction;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Transaction;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 
 /**
@@ -145,12 +146,14 @@ public abstract class MCRUploadHelper {
         return path.substring(pos + 1);
     }
 
-    static Transaction startTransaction() {
+    static EntityTransaction startTransaction() {
         LOGGER.debug("Starting transaction");
-        return MCRHIBConnection.instance().getSession().beginTransaction();
+        final EntityTransaction transaction = MCREntityManagerProvider.getCurrentEntityManager().getTransaction();
+        transaction.begin();
+        return transaction;
     }
 
-    static void commitTransaction(Transaction tx) {
+    static void commitTransaction(EntityTransaction tx) {
         LOGGER.debug("Committing transaction");
         if (tx != null) {
             tx.commit();
@@ -159,7 +162,7 @@ public abstract class MCRUploadHelper {
         }
     }
 
-    static void rollbackAnRethrow(Transaction tx, Exception e) throws Exception {
+    static void rollbackAnRethrow(EntityTransaction tx, Exception e) throws Exception {
         LOGGER.debug("Rolling back transaction");
         if (tx != null) {
             tx.rollback();

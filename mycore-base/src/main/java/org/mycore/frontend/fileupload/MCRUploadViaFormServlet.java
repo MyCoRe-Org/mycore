@@ -26,12 +26,12 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.persistence.EntityTransaction;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Transaction;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
@@ -133,7 +133,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         LOGGER.info("UploadServlet uploading {}", path);
         MCRUploadHelper.checkPathName(path);
 
-        Transaction tx = MCRUploadHelper.startTransaction();
+        EntityTransaction tx = MCRUploadHelper.startTransaction();
         try {
             handler.receiveFile(path, in, size, null);
             MCRUploadHelper.commitTransaction(tx);

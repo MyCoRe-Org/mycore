@@ -25,11 +25,12 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
 import org.mycore.access.MCRAccessException;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -103,7 +104,7 @@ public class MCRPICommands {
             "{0} should be your granular service id.",
         order = 30)
     public static void migrateURNGranularToServiceID(String serviceID) {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         MCRXMLMetadataManager.instance().listIDsOfType("derivate").forEach(derivateID -> {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
 
@@ -114,13 +115,13 @@ public class MCRPICommands {
                 if (MCRPIManager.getInstance().exist(derivatePI)) {
                     LOGGER.warn("PI-Entry for {} already exist!", urn);
                 } else {
-                    session.save(derivatePI);
+                    em.persist(derivatePI);
                     derivate.getUrnMap().forEach((file, fileURN) -> {
                         MCRPI filePI = new MCRPI(fileURN, MCRDNBURN.TYPE, derivateID, file, serviceID, new Date());
                         if (MCRPIManager.getInstance().exist(filePI)) {
                             LOGGER.warn("PI-Entry for {} already exist!", fileURN);
                         } else {
-                            session.save(fileURN);
+                            em.persist(fileURN);
                         }
                     });
                 }

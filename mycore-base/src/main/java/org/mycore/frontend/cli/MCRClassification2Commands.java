@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -42,12 +43,11 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
 import org.jdom2.Document;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRSourceContent;
@@ -419,15 +419,15 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "fixes all categories with no labels (adds a label with categid as @text for default lang)",
         order = 110)
     public static void repairEmptyLabels() {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         String deleteEmptyLabels = "delete from {h-schema}MCRCategoryLabels where text is null or trim(text) = ''";
-        int affected = session.createNativeQuery(deleteEmptyLabels).executeUpdate();
+        int affected = em.createNativeQuery(deleteEmptyLabels).executeUpdate();
         LOGGER.info("Deleted {} labels.", affected);
         String sqlQuery = "select cat.classid,cat.categid from {h-schema}MCRCategory cat "
             + "left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where "
             + "label.text is null";
         @SuppressWarnings("unchecked")
-        List<Object[]> list = session.createNativeQuery(sqlQuery).getResultList();
+        List<Object[]> list = em.createNativeQuery(sqlQuery).getResultList();
 
         for (Object resultList : list) {
             Object[] arrayOfResults = (Object[]) resultList;
@@ -447,7 +447,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         order = 120)
     @SuppressWarnings("unchecked")
     public static void repairPositionInParent() {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         // this SQL-query find missing numbers in positioninparent
         String sqlQuery = "select parentid, min(cat1.positioninparent+1) from {h-schema}MCRCategory cat1 "
             + "where cat1.parentid is not null and not exists" + "(select 1 from {h-schema}MCRCategory cat2 "
@@ -456,9 +456,9 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + "(select max(cat3.positioninparent) from {h-schema}MCRCategory cat3 "
             + "where cat3.parentid=cat1.parentid) group by cat1.parentid";
 
-        for (List<Object[]> parentWithErrorsList = session.createNativeQuery(sqlQuery)
+        for (List<Object[]> parentWithErrorsList = em.createNativeQuery(sqlQuery)
             .getResultList(); !parentWithErrorsList
-                .isEmpty(); parentWithErrorsList = session.createNativeQuery(sqlQuery).getResultList()) {
+                .isEmpty(); parentWithErrorsList = em.createNativeQuery(sqlQuery).getResultList()) {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number firstErrorPositionInParent = (Number) parentWithErrors[1];
@@ -476,7 +476,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + "where cat3.parentid=cat1.parentid) and cat1.positioninparent > 0 group by cat1.parentid";
 
         while (true) {
-            List<Object[]> parentWithErrorsList = session.createNativeQuery(sqlQuery).getResultList();
+            List<Object[]> parentWithErrorsList = em.createNativeQuery(sqlQuery).getResultList();
 
             if (parentWithErrorsList.isEmpty()) {
                 break;
@@ -494,16 +494,16 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     }
 
     public static void repairCategoryWithWrongStartPos(Number parentID, Number wrongStartPositionInParent) {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         String sqlQuery = "update {h-schema}MCRCategory set positioninparent= positioninparent -"
             + wrongStartPositionInParent
             + "-1 where parentid=" + parentID + " and positioninparent > " + wrongStartPositionInParent;
 
-        session.createNativeQuery(sqlQuery).executeUpdate();
+        em.createNativeQuery(sqlQuery).executeUpdate();
     }
 
     private static void repairCategoryWithGapInPos(Number parentID, Number firstErrorPositionInParent) {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         // the query decrease the position in parent with a rate.
         // eg. posInParent: 0 1 2 5 6 7
         // at 3 the position get faulty, 5 is the min. of the position greather
@@ -519,7 +519,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             + firstErrorPositionInParent
             + ") where parentid=" + parentID + " and positioninparent > " + firstErrorPositionInParent;
 
-        session.createNativeQuery(sqlQuery).executeUpdate();
+        em.createNativeQuery(sqlQuery).executeUpdate();
     }
 
     @MCRCommand(syntax = "repair left right values for classification {0}",
@@ -608,13 +608,13 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     }
 
     private static void checkEmptyLabels(String classID, List<String> log) {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         String sqlQuery = "select cat.categid from {h-schema}MCRCategory cat "
             + "left outer join {h-schema}MCRCategoryLabels label on cat.internalid = label.category where "
             + "cat.classid='"
             + classID + "' and (label.text is null or trim(label.text) = '')";
         @SuppressWarnings("unchecked")
-        List<String> list = session.createNativeQuery(sqlQuery).getResultList();
+        List<String> list = em.createNativeQuery(sqlQuery).getResultList();
 
         for (String categIDString : list) {
             log.add("EMPTY lables for category " + new MCRCategoryID(classID, categIDString));
@@ -622,11 +622,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     }
 
     private static void checkMissingParent(String classID, List<String> log) {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         String sqlQuery = "select cat.categid from {h-schema}MCRCategory cat WHERE cat.classid='"
             + classID + "' and cat.level > 0 and cat.parentID is NULL";
         @SuppressWarnings("unchecked")
-        List<String> list = session.createNativeQuery(sqlQuery).getResultList();
+        List<String> list = em.createNativeQuery(sqlQuery).getResultList();
 
         for (String categIDString : list) {
             log.add("parentID is null for category " + new MCRCategoryID(classID, categIDString));
@@ -637,14 +637,14 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "restores parentID from information in the given classification, if left right values are correct",
         order = 130)
     public static void repairMissingParent(String classID) {
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         String sqlQuery = "update {h-schema}MCRCategory cat set cat.parentID=(select parent.internalID from "
             + "{h-schema}MCRCategory parent WHERE parent.classid='"
             + classID
             + "' and parent.leftValue<cat.leftValue and parent.rightValue>cat.rightValue and "
             + "parent.level=(cat.level-1)) WHERE cat.classid='"
             + classID + "' and cat.level > 0 and cat.parentID is NULL";
-        int updates = session.createNativeQuery(sqlQuery).executeUpdate();
+        int updates = em.createNativeQuery(sqlQuery).executeUpdate();
         LOGGER.info(() -> "Repaired " + updates + " parentID columns for classification " + classID);
     }
 }

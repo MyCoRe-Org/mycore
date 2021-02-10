@@ -27,8 +27,6 @@ import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.links.MCRLINKHREF;
 import org.mycore.backend.jpa.links.MCRLINKHREFPK;
@@ -47,10 +45,6 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     static Logger LOGGER = LogManager.getLogger(MCRHIBLinkTableStore.class);
 
     private String classname = MCRLINKHREF.class.getCanonicalName();
-
-    private Session getSession() {
-        return MCRHIBConnection.instance().getSession();
-    }
 
     /**
      * The constructor for the class MCRHIBLinkTableStore.
@@ -120,18 +114,14 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         StringBuilder sb = new StringBuilder();
         sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append('\'');
         MCRUtils.filterTrimmedNotEmpty(to)
-            .ifPresent(trimmedTo -> {
-                sb.append(" and MCRTO = '").append(trimmedTo).append('\'');
-            });
+            .ifPresent(trimmedTo -> sb.append(" and MCRTO = '").append(trimmedTo).append('\''));
         MCRUtils.filterTrimmedNotEmpty(type)
-            .ifPresent(trimmedType -> {
-                sb.append(" and MCRTYPE = '").append(trimmedType).append('\'');
-            });
+            .ifPresent(trimmedType -> sb.append(" and MCRTYPE = '").append(trimmedType).append('\''));
         LOGGER.debug("Deleting {} from database MCRLINKHREF", from);
-        Session session = getSession();
-        for (MCRLINKHREF mcrlinkhref : session.createQuery(sb.toString(), MCRLINKHREF.class).getResultList()) {
-            session.delete(mcrlinkhref);
-        }
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.createQuery(sb.toString(), MCRLINKHREF.class)
+            .getResultList()
+            .forEach(em::remove);
     }
 
     /**
@@ -150,23 +140,23 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     @Override
     public final int countTo(String fromtype, String to, String type, String restriction) {
-        Session session = getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         Number returns;
         StringBuilder qBf = new StringBuilder(1024);
         qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO like ").append('\'')
             .append(to).append('\'');
 
         if (type != null && type.length() != 0) {
-            qBf.append(" and MCRTYPE = \'").append(type).append('\'');
+            qBf.append(" and MCRTYPE = '").append(type).append('\'');
         }
         if (restriction != null && restriction.length() != 0) {
-            qBf.append(" and MCRTO like \'").append(restriction).append('\'');
+            qBf.append(" and MCRTO like '").append(restriction).append('\'');
         }
         if (fromtype != null && fromtype.length() != 0) {
-            qBf.append(" and MCRFROM like \'%_").append(fromtype).append("_%\'");
+            qBf.append(" and MCRFROM like '%_").append(fromtype).append("_%'");
         }
 
-        Query<Number> q = session.createQuery(qBf.toString(), Number.class);
+        TypedQuery<Number> q = em.createQuery(qBf.toString(), Number.class);
         returns = q.getSingleResult();
 
         return returns.intValue();

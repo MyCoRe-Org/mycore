@@ -56,7 +56,6 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRJPATestCase;
@@ -692,7 +691,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     private MCRCategoryImpl getRootCategoryFromSession() {
-        return MCRHIBConnection.instance().getSession().get(MCRCategoryImpl.class,
+        return MCREntityManagerProvider.getCurrentEntityManager().find(MCRCategoryImpl.class,
             ((MCRCategoryImpl) category).getInternalID());
     }
 
@@ -739,8 +738,8 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     }
 
     private void printCategoryTable() {
-        Session session = MCRHIBConnection.instance().getSession();
-        session.doWork(connection -> {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.unwrap(Session.class).doWork(connection -> {
             try (Statement statement = connection.createStatement()) {
                 String tableName = getDefaultSchema().map(s -> s + ".").orElse("") + "MCRCategory";
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM " + tableName);

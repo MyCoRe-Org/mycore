@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceException;
@@ -42,11 +43,6 @@ import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRFSNODES_;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -242,9 +238,9 @@ public class MCRIFS2Commands {
             LOGGER.error("Error while list all files of derivate with ID {}", mcrDerivateId);
             e.printStackTrace();
         }
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.getTransaction();
-        if (tx.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        if (tx.isActive()) {
             tx.commit();
         }
     }
@@ -273,12 +269,11 @@ public class MCRIFS2Commands {
     private static void fixDirectoryEntry(Path node, String derivateId, boolean checkOnly) {
         String name = node.getFileName().toString();
         LOGGER.debug("fixDirectoryEntry : name = {}", name);
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.getTransaction();
-        if (tx.getStatus().isNotOneOf(TransactionStatus.ACTIVE)) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        if (!tx.isActive()) {
             tx.begin();
         }
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
         Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
@@ -330,11 +325,11 @@ public class MCRIFS2Commands {
             em.persist(mcrfsnodes);
             tx.commit();
             LOGGER.debug("Entry {} fixed.", name);
-        } catch (HibernateException he) {
+        } catch (PersistenceException pe) {
             if (tx != null) {
                 tx.rollback();
             }
-            he.printStackTrace();
+            pe.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }

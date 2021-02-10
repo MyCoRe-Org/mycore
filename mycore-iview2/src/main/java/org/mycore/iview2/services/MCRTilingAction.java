@@ -23,12 +23,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.resource.transaction.spi.TransactionStatus;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -74,20 +74,22 @@ public class MCRTilingAction implements Runnable {
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        Transaction transaction = null;
-        try (Session session = MCRHIBConnection.instance().getSession()) {
+        EntityTransaction transaction = null;
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        try {
             MCRTileEventHandler tileEventHandler = new MCRTileEventHandler() {
-                Transaction transaction;
+                EntityTransaction transaction;
 
                 @Override
                 public void preImageReaderCreated() {
-                    transaction = session.beginTransaction();
+                    transaction = em.getTransaction();
+                    transaction.begin();
                 }
 
                 @Override
                 public void postImageReaderCreated() {
-                    session.clear(); //beside tileJob, no write access so far
-                    if (transaction.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
+                    em.clear(); //beside tileJob, no write access so far
+                    if (transaction.isActive()) {
                         transaction.commit();
                     }
                 }
@@ -105,12 +107,13 @@ public class MCRTilingAction implements Runnable {
                 LOGGER.error("IOException occured while tiling a queued picture", e);
                 throw e;
             }
-            transaction = session.beginTransaction();
-            session.update(tileJob);
+            transaction = em.getTransaction();
+            transaction.begin();
+            em.merge(tileJob);
             transaction.commit();
         } catch (Exception e) {
             LOGGER.error("Error while getting next tiling job.", e);
-            if (transaction != null && transaction.getStatus().isOneOf(TransactionStatus.ACTIVE)) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
             try {
@@ -120,6 +123,7 @@ public class MCRTilingAction implements Runnable {
             }
 
         } finally {
+            em.close();
             MCRSessionMgr.releaseCurrentSession();
             mcrSession.close();
         }
