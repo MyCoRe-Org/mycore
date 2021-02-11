@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink"
-            xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
   <xsd:import schemaLocation="xml-2009.xsd" namespace="http://www.w3.org/XML/1998/namespace" />
   <xsd:import schemaLocation="xlink-2008-06.xsd" namespace="http://www.w3.org/1999/xlink" />
@@ -35,12 +35,12 @@
 
   <xsd:complexType name="MCRClass">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" type="MCRLabel" name="label" />
-      <xsd:element minOccurs="0" type="MCRClassURL" name="url" />
+      <xsd:element name="label" type="MCRLabel" maxOccurs="unbounded" />
+      <xsd:element name="url" type="MCRClassURL" minOccurs="0" />
       <xsd:element name="categories">
         <xsd:complexType>
           <xsd:sequence>
-            <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRClassCategory" name="category">
+            <xsd:element name="category" type="MCRClassCategory" minOccurs="0" maxOccurs="unbounded">
               <xsd:unique name="uniqueTopCatLabel">
                 <xsd:selector xpath="label" />
                 <xsd:field xpath="@xml:lang" />
@@ -54,15 +54,15 @@
         </xsd:unique>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute use="required" type="rootId" name="ID" />
+    <xsd:attribute name="ID" type="rootId" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="MCRLabel">
     <xsd:simpleContent>
       <xsd:extension base="xsd:string">
-        <xsd:attribute use="required" ref="xml:lang" />
-        <xsd:attribute use="required" type="varchar-4096" name="text" />
-        <xsd:attribute type="varchar-4096" name="description" />
+        <xsd:attribute ref="xml:lang" use="required" />
+        <xsd:attribute name="text" type="varchar-4096" use="required" />
+        <xsd:attribute name="description" type="varchar-4096" />
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
@@ -74,16 +74,16 @@
 
   <xsd:complexType name="MCRClassCategory">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" type="MCRLabel" name="label" />
-      <xsd:element minOccurs="0" type="MCRClassURL" name="url" />
-      <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRClassCategory" name="category">
+      <xsd:element name="label" type="MCRLabel" maxOccurs="unbounded" />
+      <xsd:element name="url" type="MCRClassURL" minOccurs="0" />
+      <xsd:element name="category" type="MCRClassCategory" minOccurs="0" maxOccurs="unbounded">
         <xsd:unique name="uniqueSubCatLabel">
           <xsd:selector xpath="label" />
           <xsd:field xpath="@xml:lang" />
         </xsd:unique>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute use="required" type="categId" name="ID" />
+    <xsd:attribute name="ID" type="categId" use="required" />
   </xsd:complexType>
 
 </xsd:schema>

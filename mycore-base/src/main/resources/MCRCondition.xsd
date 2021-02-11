@@ -7,30 +7,30 @@
 
   <xsd:complexType name="MCRCondition">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRBoolean" name="boolean" />
+      <xsd:element name="boolean" type="MCRBoolean" minOccurs="0" maxOccurs="unbounded" />
     </xsd:sequence>
-    <xsd:attribute use="optional" type="xsd:string" name="format" />
+    <xsd:attribute name="format" type="xsd:string" use="optional" />
   </xsd:complexType>
 
   <xsd:complexType name="MCRBoolean">
-    <xsd:choice maxOccurs="unbounded" minOccurs="0">
-      <xsd:element type="MCRSimpleCondition" name="condition" />
-      <xsd:element type="MCRInnerBoolean" name="boolean" />
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="condition" type="MCRSimpleCondition" />
+      <xsd:element name="boolean" type="MCRInnerBoolean" />
     </xsd:choice>
-    <xsd:attribute use="required" type="xsd:string" name="operator" />
+    <xsd:attribute name="operator" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="MCRInnerBoolean">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRSimpleCondition" name="condition" />
+      <xsd:element name="condition" type="MCRSimpleCondition" minOccurs="0" maxOccurs="unbounded" />
     </xsd:sequence>
-    <xsd:attribute use="required" type="xsd:string" name="operator" />
+    <xsd:attribute name="operator" type="xsd:string" use="required" />
   </xsd:complexType>
 
   <xsd:complexType name="MCRSimpleCondition">
-    <xsd:attribute use="required" type="xsd:string" name="value" />
-    <xsd:attribute use="required" type="xsd:string" name="operator" />
-    <xsd:attribute use="required" type="xsd:string" name="field" />
+    <xsd:attribute name="value" type="xsd:string" use="required" />
+    <xsd:attribute name="operator" type="xsd:string" use="required" />
+    <xsd:attribute name="field" type="xsd:string" use="required" />
   </xsd:complexType>
 
 </xsd:schema>
