@@ -17,6 +17,16 @@
       <xsl:when test="$class/categories/category">
         <xsl:sequence select="fn:concat('??', $class/@ID, ':', $class/categories/category/@ID,'@', $CurrentLang, '??')" />
       </xsl:when>
+      <!-- return root label of the classification -->
+      <xsl:when test="$class/label[@xml:lang=$CurrentLang]">
+        <xsl:sequence select="$class/label[@xml:lang=$CurrentLang]/@text" />
+      </xsl:when>
+      <xsl:when test="$class/label[@xml:lang=$DefaultLang]">
+        <xsl:sequence select="$class/label[@xml:lang=$DefaultLang]/@text" />
+      </xsl:when>
+      <xsl:when test="$class/@ID">
+        <xsl:sequence select="fn:concat('??', $class/@ID, '@', $CurrentLang, '??')" />
+      </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="()" />
       </xsl:otherwise>
