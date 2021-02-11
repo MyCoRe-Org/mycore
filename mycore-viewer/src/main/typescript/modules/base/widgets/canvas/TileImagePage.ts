@@ -143,7 +143,6 @@ namespace mycore.viewer.widgets.canvas {
                     // backbuffer content is the same
                     return;
                 } else {
-                    this.abortLoadingTiles();
                     // need to draw the full buffer, because zoom level changed or never drawed before
                     this.vBackBuffer.width = newBackBuffer.size.width * 256;
                     this.vBackBuffer.height = newBackBuffer.size.height * 256;
