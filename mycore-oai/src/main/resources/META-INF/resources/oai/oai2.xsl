@@ -51,7 +51,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 <xsl:output method="html"/>
 
-
+<xsl:include href="url-encode.xsl" />
 
 <xsl:template name="style">
 td.value {
@@ -565,12 +565,17 @@ p.intro {
 <!-- oai resumptionToken -->
 
 <xsl:template match="oai:resumptionToken">
+   <xsl:variable name="urlEncodedResumptionToken">
+     <xsl:call-template name="url-encode">
+       <xsl:with-param name="str" select="."/>
+    </xsl:call-template>
+   </xsl:variable>
    <p>There are more results.</p>
    <table class="values">
      <tr><td class="key">resumptionToken:</td>
      <td class="value"><xsl:value-of select="."/>
 <xsl:text> </xsl:text>
-<a class="link" href="?verb={/oai:OAI-PMH/oai:request/@verb}&amp;resumptionToken={.}">Resume</a></td></tr>
+<a class="link" href="?verb={/oai:OAI-PMH/oai:request/@verb}&amp;resumptionToken={$urlEncodedResumptionToken}">Resume</a></td></tr>
    </table>
 </xsl:template>
 
@@ -693,4 +698,3 @@ p.intro {
 </xsl:template>
 
 </xsl:stylesheet>
-
