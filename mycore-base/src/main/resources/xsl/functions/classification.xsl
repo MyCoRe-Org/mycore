@@ -6,7 +6,7 @@
   xmlns:mcrclass="http://www.mycore.de/xslt/classification"
   exclude-result-prefixes="fn">
   
-  <xsl:function name="mcrclass:current-label" as="xs:element?">
+  <xsl:function name="mcrclass:current-label" as="element()?">
     <xsl:param name="class" as="element()" />
     <xsl:choose>
       <xsl:when test="$class/label[@xml:lang=$CurrentLang]">
