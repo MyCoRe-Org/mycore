@@ -261,10 +261,10 @@ dijit@1.6.5:
   resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.6.5.tgz#d4163896a75031cbcf3b857a5367daa3dd9b45e2"
   integrity sha1-1BY4lqdQMcvPO4V6U2fao92bReI=
 
-dojo@1.6.5:
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.6.5.tgz#df20f41358a5a161dc083af81832ed6f9fe21ca4"
-  integrity sha1-3yD0E1iloWHcCDr4GDLtb5/iHKQ=
+dojo@1.11.10:
+  version "1.11.10"
+  resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.11.10.tgz#dfa91df517cdc0447eb0839b25bb6e1539f4bf14"
+  integrity sha512-o2tHdzRDQqkUUchGLwSDHhuWU5K9NbZFDjBUb1VrGoPkjrCuYFtp9rtKHCtI6+oK6MKrWQ+DHlPHXiegtzPBsw==
 
 escape-string-regexp@^1.0.2:
   version "1.0.5"
