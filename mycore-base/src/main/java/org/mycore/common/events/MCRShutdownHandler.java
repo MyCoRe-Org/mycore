@@ -20,6 +20,7 @@ package org.mycore.common.events;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
@@ -119,18 +120,12 @@ public class MCRShutdownHandler {
         }
         final String system = cfgSystemName;
         System.out.println(system + " Shutting down system, please wait...\n");
-        shutdownLock.writeLock().lock();
-        try {
-            shuttingDown = true;
-            runClosables();
-            System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
-            MCRSessionMgr.close();
-            System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
-            LogManager.shutdown();
-            SINGLETON = null;
-        } finally {
-            shutdownLock.writeLock().unlock();
-        }
+        runClosables();
+        System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
+        MCRSessionMgr.close();
+        System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
+        LogManager.shutdown();
+        SINGLETON = null;
         // may be needed in webapp to release file handles correctly.
         if (leakPreventor != null) {
             ClassLoaderLeakPreventor myLeakPreventor = leakPreventor;
@@ -145,16 +140,23 @@ public class MCRShutdownHandler {
         Closeable[] closeables = requests.stream().toArray(Closeable[]::new);
         Stream.of(closeables)
             .peek(c -> logger.debug("Prepare Closing (1): {}", c))
-            .forEach(Closeable::prepareClose);
-        //during shut down more request may come in MCR-1726
-        requests.stream()
-            .filter(c -> !Arrays.asList(closeables).contains(c))
-            .peek(c -> logger.debug("Prepare Closing (2): {}", c))
-            .forEach(Closeable::prepareClose);
+            .forEach(Closeable::prepareClose); //may add more Closeables MCR-1726
+        shutdownLock.writeLock().lock();
+        try {
+            shuttingDown = true;
+            //during shut down more request may come in MCR-1726
+            final List<Closeable> alreadyPrepared = Arrays.asList(closeables);
+            requests.stream()
+                .filter(c -> !alreadyPrepared.contains(c))
+                .peek(c -> logger.debug("Prepare Closing (2): {}", c))
+                .forEach(Closeable::prepareClose);
 
-        requests.stream()
-            .peek(c -> logger.debug("Closing: {}", c))
-            .forEach(Closeable::close);
+            requests.stream()
+                .peek(c -> logger.debug("Closing: {}", c))
+                .forEach(Closeable::close);
+        } finally {
+            shutdownLock.writeLock().unlock();
+        }
     }
 
     /**
