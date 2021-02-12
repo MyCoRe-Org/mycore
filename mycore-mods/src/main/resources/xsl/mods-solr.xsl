@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:embargo="xalan://org.mycore.mods.MCRMODSEmbargoUtils" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xalan="http://xml.apache.org/xalan"
-  exclude-result-prefixes="xalan xlink mods mcrxsl">
+<xsl:stylesheet version="1.0" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:mcrmods="http://www.mycore.de/xslt/mods"
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  exclude-result-prefixes="xlink mods mcrmods fn">
+  <xsl:import href="resource:xsl/functions/mods.xsl" />
+  
   <xsl:import href="xslImport:solr-document:mods-solr.xsl" />
   <xsl:include href="mods-utils.xsl" />
   <xsl:include href="mods-enhancer.xsl" />
@@ -29,10 +35,9 @@
   </xsl:template>
 
   <xsl:template match="mods:*[@authority or @authorityURI]|mods:typeOfResource|mods:accessCondition">
-    <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
-    <xsl:if test="string-length($uri) &gt; 0">
+    <xsl:if test="mcrmods:is-supported(.)">
       <xsl:variable name="topField" select="not(ancestor::mods:relatedItem)" />
-      <xsl:variable name="classdoc" select="document($uri)" />
+      <xsl:variable name="classdoc" select="mcrmods:to-mycoreclass(., 'parent')" />
       <xsl:variable name="classid" select="$classdoc/mycoreclass/@ID" />
       <xsl:apply-templates select="$classdoc//category" mode="category">
         <xsl:with-param name="classid" select="$classid" />
@@ -282,11 +287,11 @@
   <xsl:template name="printModsName">
     <xsl:choose>
       <xsl:when test="mods:displayForm">
-        <xsl:value-of select="mcrxsl:normalizeUnicode(mods:displayForm)" />
+        <xsl:value-of select="fn:normalize-unicode(mods:displayForm)" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each select="mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
-          <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
+          <xsl:value-of select="concat(' ', fn:normalize-unicode(.))" />
         </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>

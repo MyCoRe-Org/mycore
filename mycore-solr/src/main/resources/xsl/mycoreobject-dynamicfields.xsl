@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
-  exclude-result-prefixes="xalan xlink mods mcrxsl">
-
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:mcrmods="http://www.mycore.de/xslt/mods"
+  exclude-result-prefixes="xalan xlink mods mcrxsl fn">
+  <xsl:import href="resource:xsl/functions/mods.xsl" />
   <xsl:import href="xslImport:solr-document:mycoreobject-dynamicfields.xsl" />
 
   <xsl:param name="MCR.Solr.DynamicFields" select="'false'" />
@@ -81,7 +83,7 @@
       <!-- dynamic class fields -->
       <xsl:for-each select="metadata/*[@class='MCRMetaClassification']/*">
         <xsl:variable name="classTree"
-          select="document(concat('classification:metadata:0:parents:', @classid, ':', mcrxsl:encodeURIPath(@categid)))/mycoreclass/categories//category" />
+          select="document(concat('classification:metadata:0:parents:', @classid, ':', fn:encode-for-uri(@categid)))/mycoreclass/categories//category" />
         <xsl:variable name="classid" select="@classid" />
         <xsl:variable name="notInherited" select="@inherited = '0'" />
 
@@ -127,11 +129,10 @@
 
       <!-- and once again for mods -->
       <xsl:for-each select="metadata//mods:*[@authority or @authorityURI]">
-        <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
-        <xsl:if test="string-length($uri) &gt; 0">
-          <xsl:variable name="class" select="mcrxsl:document($uri)" />
-          <xsl:variable name="classid" select="$class/mycoreclass/@ID" />
-          <xsl:variable name="classTree" select="$class/mycoreclass/categories//category" />
+        <xsl:if test="mcrmods:is-supported(.)">
+          <xsl:variable name="class" select="mcrmods:to-mycoreclass(., 'parent')" />
+          <xsl:variable name="classid" select="$class/@ID" />
+          <xsl:variable name="classTree" select="$class/categories//category" />
           <xsl:variable name="withTopField" select="not(ancestor::mods:relatedItem)" />
           <xsl:for-each select="$classTree">
             <!-- classid as fieldname -->
