@@ -269,7 +269,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 if (svnLogEntryPath != null) {
                     char type = svnLogEntryPath.getType();
                     versions.add(
-                        new MCRMetadataVersion(this, entry.getRevision(), entry.getAuthor(), entry.getDate(),
+                        new MCRMetadataVersion(new MCRMetadata(getStore(), getID(), entry.getRevision()),
+                            entry.getRevision(), entry.getAuthor(), entry.getDate(),
                             TYPE_STATE_MAPPING.get(String.valueOf(type))));
                 }
             }
@@ -306,7 +307,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
                 if (svnLogEntryPath != null) {
                     char type = svnLogEntryPath.getType();
-                    return new MCRMetadataVersion(this, logEntry.getRevision(), logEntry.getAuthor(),
+                    return new MCRMetadataVersion(new MCRMetadata(getStore(), getID(), logEntry.getRevision()),
+                        logEntry.getRevision(), logEntry.getAuthor(),
                         logEntry.getDate(),
                         TYPE_STATE_MAPPING.get(String.valueOf(type)));
                 }

@@ -38,7 +38,7 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
 /**
- * Provides information about the revision of a {@link MCRVersionedMetadata} object
+ * Provides information about the revision of a {@link MCRMetadata} object
  * at the time of object instantiation. This includes the revision number, date,
  * state ({@link MCRMetadataVersionState}), the committer and a reference to the metadata object itself.
  * 
@@ -74,7 +74,7 @@ public class MCRMetadataVersion {
      * The metadata object this version belongs to.
      */
     @XmlTransient
-    private final MCRVersionedMetadata vm;
+    private final MCRMetadata vm;
 
     /**
      * The revision number of this version.
@@ -114,10 +114,13 @@ public class MCRMetadataVersion {
      * @param state
      *            what object state does it represent ({@link MCRMetadataVersionState})
      */
-    public MCRMetadataVersion(MCRVersionedMetadata vm, long revision, String user, Date date,
-        MCRMetadataVersionState state) {
+    public MCRMetadataVersion(MCRMetadata vm, MCRMetadataVersionState state) {
+        this(vm, vm.getRevision(), vm.getUser(), vm.getDate(), state);
+    }
+    
+    public MCRMetadataVersion(MCRMetadata vm, long revision, String user, Date date, MCRMetadataVersionState state) {
         LOGGER.debug("Instantiating version information for {}_{} in revision {}.", vm.getStore().id,
-            vm.getStore().createIDWithLeadingZeros(vm.getID()), revision);
+            vm.getStore().createIDWithLeadingZeros(vm.getID()), vm.getRevision());
         this.vm = vm;
         this.revision = revision;
         this.user = user;
@@ -130,7 +133,7 @@ public class MCRMetadataVersion {
      * 
      * @return the metadata object this version belongs to
      */
-    public MCRVersionedMetadata getMetadataObject() {
+    public MCRMetadata getMetadataObject() {
         return vm;
     }
 
@@ -199,7 +202,7 @@ public class MCRMetadataVersion {
             throw new MCRUsageException(msg);
         }
         try {
-            SVNRepository repository = vm.getStore().getRepository();
+            SVNRepository repository = ((MCRVersioningMetadataStore) (vm.getStore())).getRepository();
             MCRByteArrayOutputStream baos = new MCRByteArrayOutputStream();
             repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);
             baos.close();

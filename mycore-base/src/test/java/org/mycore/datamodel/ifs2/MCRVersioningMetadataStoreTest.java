@@ -127,7 +127,8 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         assertNotNull(versions);
         assertEquals(1, versions.size());
         MCRMetadataVersion mv = versions.get(0);
-        assertSame(mv.getMetadataObject(), vm);
+        // assertSame(mv.getMetadataObject(), vm);
+        assertEquals(mv.getMetadataObject().read(), vm.getMetadata());
         assertEquals(baseRev, mv.getRevision());
         assertEquals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), mv.getUser());
         assertEquals(MCRMetadataVersionState.CREATED, mv.getState());
