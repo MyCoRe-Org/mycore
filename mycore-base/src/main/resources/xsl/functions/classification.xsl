@@ -10,10 +10,10 @@
     <xsl:param name="class" as="element()" />
     <xsl:choose>
       <xsl:when test="$class/label[@xml:lang=$CurrentLang]">
-        <xsl:sequence select="$class//label[@xml:lang=$CurrentLang]" />
+        <xsl:sequence select="$class/label[@xml:lang=$CurrentLang]" />
       </xsl:when>
       <xsl:when test="$class/label[@xml:lang=$DefaultLang]">
-        <xsl:sequence select="$class//label[@xml:lang=$DefaultLang]" />
+        <xsl:sequence select="$class/label[@xml:lang=$DefaultLang]" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="()" />
@@ -23,12 +23,10 @@
   
   <xsl:function name="mcrclass:current-label-text" as="xs:string?">
     <xsl:param name="class" as="element()" />
+    <xsl:variable name="label" select="mcrclass:current-label($class)" />
     <xsl:choose>
-      <xsl:when test="$class/label[@xml:lang=$CurrentLang]">
-        <xsl:sequence select="$class//label[@xml:lang=$CurrentLang]/@text" />
-      </xsl:when>
-      <xsl:when test="$class/label[@xml:lang=$DefaultLang]">
-        <xsl:sequence select="$class//label[@xml:lang=$DefaultLang]/@text" />
+      <xsl:when test="$label">
+        <xsl:sequence select="$label/@text" />
       </xsl:when>
       <xsl:when test="$class/@ID">
         <xsl:sequence select="fn:concat('??', $class/@ID, '@', $CurrentLang, '??')" />
