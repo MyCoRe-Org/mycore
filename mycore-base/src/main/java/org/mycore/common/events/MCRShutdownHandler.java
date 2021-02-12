@@ -109,7 +109,7 @@ public class MCRShutdownHandler {
     }
 
     void shutDown() {
-        Logger logger = LogManager.getLogger(MCRShutdownHandler.class);
+        Logger logger = LogManager.getLogger();
         String cfgSystemName = "MyCoRe:";
         try {
             cfgSystemName = MCRConfiguration2.getStringOrThrow(PROPERTY_SYSTEM_NAME) + ":";
@@ -119,24 +119,10 @@ public class MCRShutdownHandler {
         }
         final String system = cfgSystemName;
         System.out.println(system + " Shutting down system, please wait...\n");
-        logger.debug(() -> "requests: " + requests);
-        Closeable[] closeables = requests.stream().toArray(Closeable[]::new);
-        Stream.of(closeables)
-            .peek(c -> logger.debug("Prepare Closing (1): {}", c))
-            .forEach(Closeable::prepareClose);
         shutdownLock.writeLock().lock();
         try {
             shuttingDown = true;
-            //during shut down more request may come in MCR-1726
-            requests.stream()
-                .filter(c -> !Arrays.asList(closeables).contains(c))
-                .peek(c -> logger.debug("Prepare Closing (2): {}", c))
-                .forEach(Closeable::prepareClose);
-
-            requests.stream()
-                .peek(c -> logger.debug("Closing: {}", c))
-                .forEach(Closeable::close);
-
+            runClosables();
             System.out.println(system + " closing any remaining MCRSession instances, please wait...\n");
             MCRSessionMgr.close();
             System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
@@ -151,6 +137,24 @@ public class MCRShutdownHandler {
             leakPreventor = null;
             myLeakPreventor.runCleanUps();
         }
+    }
+
+    void runClosables() {
+        Logger logger = LogManager.getLogger();
+        logger.debug(() -> "requests: " + requests);
+        Closeable[] closeables = requests.stream().toArray(Closeable[]::new);
+        Stream.of(closeables)
+            .peek(c -> logger.debug("Prepare Closing (1): {}", c))
+            .forEach(Closeable::prepareClose);
+        //during shut down more request may come in MCR-1726
+        requests.stream()
+            .filter(c -> !Arrays.asList(closeables).contains(c))
+            .peek(c -> logger.debug("Prepare Closing (2): {}", c))
+            .forEach(Closeable::prepareClose);
+
+        requests.stream()
+            .peek(c -> logger.debug("Closing: {}", c))
+            .forEach(Closeable::close);
     }
 
     /**
