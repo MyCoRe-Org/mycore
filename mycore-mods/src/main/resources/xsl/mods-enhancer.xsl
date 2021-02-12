@@ -2,7 +2,8 @@
 <xsl:stylesheet version="1.0" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="xalan mcrxsl">
   <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="ServletsBaseURL" select="''" />
+  <!-- <xsl:param name="ServletsBaseURL" select="''" /> RS: duplicate parameter for XSLT3 -->
+
   <xsl:variable name="relacode" select="document('resource:relacode.xml')/relacode" />
   <xsl:key name="relacode" match="code" use="@key" />
 
