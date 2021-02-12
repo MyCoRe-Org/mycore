@@ -19,7 +19,6 @@
 package org.mycore.pi.doi;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -29,17 +28,20 @@ import java.util.function.Predicate;
 
 import javax.persistence.NoResultException;
 import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.jdom2.Document;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.xml.MCREntityResolver;
+import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xsl.MCRLazyStreamSource;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -47,6 +49,7 @@ import org.mycore.pi.MCRPIJobService;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -88,18 +91,33 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
         final MCRContentTransformer transformer = getTransformer();
 
         final Map<String, String> properties = getProperties();
-        final String schemaURL = properties.getOrDefault(CONFIG_SCHEMA, getDefaultSchemaPath());
+        final String schemaURLString = properties.getOrDefault(CONFIG_SCHEMA, getDefaultSchemaPath());
+        setSchema(resolveSchema(schemaURLString));
+    }
+
+    public static Schema resolveSchema(final String schemaURLString) {
         try {
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
             schemaFactory.setResourceResolver(MCREntityResolver.instance());
-            URL localSchemaURL = MCRClassTools.getClassLoader().getResource(schemaURL);
-            if (localSchemaURL == null) {
-                throw new MCRConfigurationException(schemaURL + " was not found!");
+
+            Source source = null;
+            String url = schemaURLString;
+            if (schemaURLString.startsWith("http://") || schemaURLString.startsWith("https://")) {
+                InputSource entity = MCREntityResolver.instance().resolveEntity(null, url);
+                if (entity != null) {
+                    source = new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
+                } else {
+                    source = MCRURIResolver.instance().resolve(url, null);
+                }
+            } else {
+                url = "resource:" + schemaURLString;
+                source = MCRURIResolver.instance().resolve(url, null);
             }
-            setSchema(schemaFactory.newSchema(localSchemaURL));
-        } catch (SAXException e) {
-            throw new MCRConfigurationException("Error while loading " + getServiceID() + " schema!", e);
+
+            return schemaFactory.newSchema(source);
+        } catch (SAXException | TransformerException | IOException e) {
+            throw new MCRConfigurationException("Error while loading "+schemaURLString+" schema!", e);
         }
     }
 

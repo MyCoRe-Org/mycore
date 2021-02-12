@@ -149,9 +149,9 @@
      ============================================================= -->
 
 	<xsd:import namespace="http://www.w3.org/1998/Math/MathML" schemaLocation="http://www.w3.org/Math/XMLSchema/mathml3/mathml3.xsd"/>
-	<xsd:import namespace="http://www.crossref.org/fundref.xsd" schemaLocation="fundref.xsd"/>
-	<xsd:import namespace="http://www.crossref.org/AccessIndicators.xsd" schemaLocation="AccessIndicators.xsd"/>
-	<xsd:import namespace="http://www.crossref.org/clinicaltrials.xsd" schemaLocation="clinicaltrials.xsd"/>
+	<xsd:import namespace="http://www.crossref.org/fundref.xsd" schemaLocation="http://data.crossref.org/schemas/fundref.xsd"/>
+	<xsd:import namespace="http://www.crossref.org/AccessIndicators.xsd" schemaLocation="http://data.crossref.org/schemas/AccessIndicators.xsd"/>
+	<xsd:import namespace="http://www.crossref.org/clinicaltrials.xsd" schemaLocation="http://data.crossref.org/schemas/clinicaltrials.xsd"/>
 	
 	
 	<xsd:attributeGroup name="publication_type.atts">

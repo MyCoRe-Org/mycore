@@ -40,6 +40,7 @@
 
   <!-- Datacite v4 -->
   <system systemId="http://schema.datacite.org/meta/kernel-4/metadata.xsd" uri="xsd/datacite/v4/metadata.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.0/metadata.xsd" uri="xsd/datacite/v4/metadata.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-4.0/include/datacite-titleType-v4.xsd"
           uri="xsd/datacite/v4/datacite-titleType-v4.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-4.0/include/datacite-contributorType-v4.xsd"
@@ -64,6 +65,8 @@
           uri="xsd/datacite/v4/datacite-titleType-v4.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-4.1/include/datacite-contributorType-v4.xsd"
           uri="xsd/datacite/v4/datacite-contributorType-v4.xsd" />
+  <system systemId="http://schema.datacite.org/meta/kernel-4.1/include/datacite-relatedIdentifierType-v4.xsd"
+          uri="xsd/datacite/v4/datacite-relatedIdentifierType-v4.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-4.1/include/datacite-funderIdentifierType-v4.xsd"
           uri="xsd/datacite/v4/datacite-funderIdentifierType-v4.xsd" />
   <system systemId="http://schema.datacite.org/meta/kernel-4.1/include/datacite-descriptionType-v4.xsd"

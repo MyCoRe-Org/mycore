@@ -218,7 +218,7 @@
           0. Include module common to multiple CrossRef schemas
 
      ============================================================= -->
-  <xsd:include schemaLocation="common4.4.1.xsd"/>
+  <xsd:include schemaLocation="http://data.crossref.org/schemas/common4.4.1.xsd"/>
   <!-- =============================================================
 
                           1. Shared attributes
@@ -238,15 +238,15 @@
      ================================================================= -->
   <!--      Most elements moved to common.xsd for version 3.0.0      -->
   <xsd:import namespace="http://www.ncbi.nlm.nih.gov/JATS1"
-              schemaLocation="JATS-journalpublishing1.xsd"/>
+              schemaLocation="http://data.crossref.org/schemas/JATS-journalpublishing1.xsd"/>
   <xsd:import namespace="http://www.w3.org/1998/Math/MathML"
               schemaLocation="http://www.w3.org/Math/XMLSchema/mathml3/mathml3.xsd"/>
-  <xsd:import namespace="http://www.crossref.org/fundref.xsd" schemaLocation="fundref.xsd"/>
+  <xsd:import namespace="http://www.crossref.org/fundref.xsd" schemaLocation="http://data.crossref.org/schemas/fundref.xsd"/>
   <xsd:import namespace="http://www.crossref.org/clinicaltrials.xsd"
-              schemaLocation="clinicaltrials.xsd"/>
+              schemaLocation="http://data.crossref.org/schemas/clinicaltrials.xsd"/>
   <xsd:import namespace="http://www.crossref.org/AccessIndicators.xsd"
-              schemaLocation="AccessIndicators.xsd"/>
-  <xsd:import namespace="http://www.crossref.org/relations.xsd" schemaLocation="relations.xsd"/>
+              schemaLocation="http://data.crossref.org/schemas/AccessIndicators.xsd"/>
+  <xsd:import namespace="http://www.crossref.org/relations.xsd" schemaLocation="http://data.crossref.org/schemas/relations.xsd"/>
 
   <xsd:element name="doi_batch">
     <xsd:annotation>
