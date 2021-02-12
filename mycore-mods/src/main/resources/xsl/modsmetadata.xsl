@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport"
-  xmlns:acl="xalan://org.mycore.access.MCRAccessManager" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" xmlns:mcr="http://www.mycore.org/"
-  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xalan="http://xml.apache.org/xalan"
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" 
+  xmlns:acl="xalan://org.mycore.access.MCRAccessManager" 
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" 
+  xmlns:mcr="http://www.mycore.org/"
+  xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:mods="http://www.loc.gov/mods/v3" 
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:mcrmods="http://www.mycore.de/xslt/mods"
   exclude-result-prefixes="xalan xlink mcr mcrxsl i18n acl mods mcrmods rdf"
   version="1.0">
+  
+  <xsl:import href="resource:xsl/functions/mods.xsl" />
+   
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.DOI.Resolver.MasterURL" />
   <xsl:param name="MCR.Mods.SherpaRomeo.ApiKey" select="''" />
@@ -219,10 +228,10 @@
   </xsl:template>
 
   <xsl:template match="*" mode="printModsClassInfo">
-    <xsl:variable name="classlink" select="mcrmods:getClassCategLink(.)" />
     <xsl:choose>
-      <xsl:when test="string-length($classlink) &gt; 0">
-        <xsl:for-each select="document($classlink)/mycoreclass/categories/category">
+      <xsl:when test="mcrmods:is-supported(.)">
+        <xsl:variable name="class" select="mcrmods:to-mycoreclass(., 'parent')" />
+        <xsl:for-each select="document($class)/categories/category">
           <xsl:apply-templates select="." mode="printModsClassInfo" />
         </xsl:for-each>
       </xsl:when>
@@ -498,10 +507,10 @@
       <xsl:choose>
         <xsl:when test="@valueURI">
           <!-- derived from printModsClassInfo template -->
-          <xsl:variable name="classlink" select="mcrmods:getClassCategParentLink(.)" />
           <xsl:choose>
-            <xsl:when test="string-length($classlink) &gt; 0">
-              <xsl:for-each select="document($classlink)/mycoreclass//category[position()=1 or position()=last()]">
+            <xsl:when test="mcrmods:is-supported(.)">
+              <xsl:variable name="class" select="mcrmods:to-mycoreclass(., 'parent')" />
+              <xsl:for-each select="$class//category[position()=1 or position()=last()]">
                 <xsl:if test="position() > 1">
                   <xsl:value-of select="', '" />
                 </xsl:if>
