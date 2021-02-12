@@ -119,6 +119,11 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         super();
         setTransformerFactory(DEFAULT_FACTORY_CLASS);
     }
+    
+    public MCRXSLTransformer(Class<TransformerFactory> tfClass) {
+        super();
+        setTransformerFactory(tfClass.getName());
+    }
 
     public synchronized void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
         TransformerFactory transformerFactory = Optional.ofNullable(factoryClass)
@@ -140,6 +145,17 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         MCRXSLTransformer instance = INSTANCE_CACHE.get(key);
         if (instance == null) {
             instance = new MCRXSLTransformer(stylesheets);
+            INSTANCE_CACHE.put(key, instance);
+        }
+        return instance;
+    }
+    
+    public static MCRXSLTransformer getInstance(Class<TransformerFactory> tfClass, String... stylesheets) {
+        String key = stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets);
+        MCRXSLTransformer instance = INSTANCE_CACHE.get(key);
+        if (instance == null) {
+            instance = new MCRXSLTransformer(tfClass);
+            instance.setStylesheets(stylesheets);
             INSTANCE_CACHE.put(key, instance);
         }
         return instance;
