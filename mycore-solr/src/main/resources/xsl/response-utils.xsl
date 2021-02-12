@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:acl="xalan://org.mycore.access.MCRAccessManager"
-  xmlns:xalan="http://xml.apache.org/xalan" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" exclude-result-prefixes="acl mcrxsl encoder xalan i18n">
+  xmlns:xalan="http://xml.apache.org/xalan" 
+  xmlns:encoder="xalan://java.net.URLEncoder" 
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" 
+  xmlns:fn="http://www.w3.org/2005/xpath-functions" 
+  exclude-result-prefixes="acl mcrxsl encoder xalan i18n fn">
   <xsl:param name="RequestURL" />
 
   <xsl:variable name="response" select="/response|/mycoreobject/response" />
@@ -401,7 +405,7 @@
     <!-- doc element of 'unmerged' response -->
     <xsl:variable name="filePath" select="str[@name='filePath']" />
     <xsl:variable name="fileName" select="str[@name='fileName']" />
-    <a href="{concat($fileNodeServlet,$derivateId,mcrxsl:encodeURIPath($filePath),$HttpSession)}">
+    <a href="{concat($fileNodeServlet,$derivateId,fn:encode-for-uri($filePath),$HttpSession)}">
       <xsl:value-of select="$fileName" />
     </a>
   </xsl:template>
