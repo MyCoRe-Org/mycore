@@ -256,10 +256,17 @@ detect-file@^1.0.0:
   resolved "https://registry.yarnpkg.com/detect-file/-/detect-file-1.0.0.tgz#f0d66d03672a825cb1b73bdb3fe62310c8e552b7"
   integrity sha1-8NZtA2cqglyxtzvbP+YjEMjlUrc=
 
-dijit@1.6.5:
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.6.5.tgz#d4163896a75031cbcf3b857a5367daa3dd9b45e2"
-  integrity sha1-1BY4lqdQMcvPO4V6U2fao92bReI=
+dijit@1.11.11:
+  version "1.11.11"
+  resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.11.11.tgz#34200a5a890a861fd60731401ee9dd69c2fce3c4"
+  integrity sha512-K32uEPoG3Gq/zbxZJbWze5Gk+8BuPLKFcFkCGO+1JL74CZaodKnAtNK5qBT7lIsc7npNlQYvYJE60taCz4pkdg==
+  dependencies:
+    dojo "1.11.11"
+
+dojo@1.11.11:
+  version "1.11.11"
+  resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.11.11.tgz#f690b539e0f8474425ad2cfc20f312f208037637"
+  integrity sha512-Xg3SqDYwarF2OTGHtP/SOysSJ4S6dA5hJi+Xe8btZDiERvEWqfkvbaNTpjh+RaOHy1jcDhz6qOFs67K9QMX7MQ==
 
 dojo@1.6.5:
   version "1.6.5"
