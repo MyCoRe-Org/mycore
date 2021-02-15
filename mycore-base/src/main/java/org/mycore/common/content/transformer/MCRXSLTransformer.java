@@ -96,9 +96,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
         .orElse(60000l);
 
-    @SuppressWarnings("unchecked")
-    private static final Class<TransformerFactory> DEFAULT_FACTORY_CLASS = (Class<TransformerFactory>) MCRConfiguration2
-        .getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
+    private static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
+        .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
 
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
@@ -119,8 +118,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     public MCRXSLTransformer() {
         this(DEFAULT_FACTORY_CLASS);
     }
-    
-    public MCRXSLTransformer(Class<TransformerFactory> tfClass) {
+
+    public MCRXSLTransformer(Class<? extends TransformerFactory> tfClass) {
         super();
         setTransformerFactory(tfClass.getName());
     }
@@ -149,7 +148,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
         return instance;
     }
-    
+
     public static MCRXSLTransformer getInstance(Class<TransformerFactory> tfClass, String... stylesheets) {
         String key = tfClass.getName() + "_"
             + (stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets));
@@ -168,11 +167,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         String property = "MCR.ContentTransformer." + id + ".Stylesheet";
         String[] stylesheets = MCRConfiguration2.getStringOrThrow(property).split(",");
         setStylesheets(stylesheets);
-        property = "MCR.ContentTransformer." + id + ".TransformerFactoryClass";
-        Optional<String> transformerFactory = MCRConfiguration2.getString(property);
-        if(transformerFactory.isPresent()) {
-            setTransformerFactory(transformerFactory.get());
-        }
+        MCRConfiguration2.getString("MCR.ContentTransformer." + id + ".TransformerFactoryClass")
+            .ifPresent(this::setTransformerFactory);
     }
 
     public void setStylesheets(String... stylesheets) {
