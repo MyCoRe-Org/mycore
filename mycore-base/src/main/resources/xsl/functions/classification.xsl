@@ -16,7 +16,7 @@
         <xsl:sequence select="$class/label[@xml:lang=$DefaultLang]" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:sequence select="()" />
+        <xsl:sequence select="$class/label[1]" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
