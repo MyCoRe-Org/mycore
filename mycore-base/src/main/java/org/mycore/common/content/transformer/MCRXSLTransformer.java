@@ -118,7 +118,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     public MCRXSLTransformer() {
         this(DEFAULT_FACTORY_CLASS);
     }
-
+    
     public MCRXSLTransformer(Class<? extends TransformerFactory> tfClass) {
         super();
         setTransformerFactory(tfClass.getName());
@@ -148,7 +148,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         }
         return instance;
     }
-
+    
     public static MCRXSLTransformer getInstance(Class<TransformerFactory> tfClass, String... stylesheets) {
         String key = tfClass.getName() + "_"
             + (stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets));
