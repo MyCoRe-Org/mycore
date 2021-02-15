@@ -96,8 +96,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
         .orElse(60000l);
 
-    private static final String DEFAULT_FACTORY_CLASS = MCRConfiguration2
-        .getString("MCR.LayoutService.TransformerFactoryClass").orElse(null);
+    @SuppressWarnings("unchecked")
+    private static final Class<TransformerFactory> DEFAULT_FACTORY_CLASS = (Class<TransformerFactory>) MCRConfiguration2
+        .getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
 
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
@@ -111,13 +112,12 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     protected SAXTransformerFactory tFactory;
 
     public MCRXSLTransformer(String... stylesheets) {
-        this();
+        this(DEFAULT_FACTORY_CLASS);
         setStylesheets(stylesheets);
     }
 
     public MCRXSLTransformer() {
-        super();
-        setTransformerFactory(DEFAULT_FACTORY_CLASS);
+        this(DEFAULT_FACTORY_CLASS);
     }
     
     public MCRXSLTransformer(Class<TransformerFactory> tfClass) {
@@ -169,9 +169,9 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         String[] stylesheets = MCRConfiguration2.getStringOrThrow(property).split(",");
         setStylesheets(stylesheets);
         property = "MCR.ContentTransformer." + id + ".TransformerFactoryClass";
-        String transformerFactory = MCRConfiguration2.getString(property).orElse(DEFAULT_FACTORY_CLASS);
-        if (transformerFactory != null && !transformerFactory.equals(DEFAULT_FACTORY_CLASS)) {
-            setTransformerFactory(transformerFactory);
+        Optional<String> transformerFactory = MCRConfiguration2.getString(property);
+        if(transformerFactory.isPresent()) {
+            setTransformerFactory(transformerFactory.get());
         }
     }
 
