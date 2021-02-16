@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xed="http://www.mycore.de/xeditor">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <!-- Transforms output of "classification:editorComplete:*" URIs to xeditor compatible format -->
   <xsl:param name="CurrentLang" />
   <xsl:param name="DefaultLang" />
@@ -28,7 +28,7 @@
     <xsl:variable name="toolTip">
       <xsl:apply-templates select="." mode="toolTip" />
     </xsl:variable>
-    
+
     <xsl:choose>
 	    <xsl:when test="label[lang('x-group')] and not($allSelectable='true')">
 		   	<optgroup title="{$toolTip}">

@@ -4,7 +4,7 @@
   <form action="http://localhost:8291/servlets/XEditor" method="post">
     <div>
       Diese Publikation mit dem Titel "Der neue XEditor - Utopie oder Wahnsinn?" dürfen Sie als John Doe bearbeiten.
-      <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" size="40" />
+      <input name="/document/title[1]" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" size="40" />
     </div>
     <div style="visibility:hidden">
       <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />

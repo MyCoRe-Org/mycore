@@ -3,13 +3,13 @@
 <html>
   <body>
     <form action="http://localhost:8291/servlets/XEditor" method="post">
-      <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
-      <input name="/document/author/firstName" value="Frank" id="firstName" />
-      <input name="/document/author/lastName" value="Lützenkirchen" type="text" id="lastName" />
-      <textarea name="/document/abstract">Der XEditor ermöglicht es, HTML-Formulare zur
+      <input name="/document/title[1]" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
+      <input name="/document/author[1]/firstName[1]" value="Frank" id="firstName" />
+      <input name="/document/author[1]/lastName[1]" value="Lützenkirchen" type="text" id="lastName" />
+      <textarea name="/document/abstract[1]">Der XEditor ermöglicht es, HTML-Formulare zur
         Bearbeitung von XML-Dokumenten zu verwenden.
       </textarea>
-      <select name="/document/type" id="type">
+      <select name="/document/type[1]" id="type">
         <optgroup label="Publikation">
           <option value="journal">Zeitschrift</option>
           <option selected="selected" value="article">Artikel</option>
@@ -22,7 +22,7 @@
       <input name="/document/service" checked="checked" id="urn" value="urn" type="checkbox" />
       <div style="visibility:hidden">
         <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
-        <input value="type service service[2]" name="_xed_check" type="hidden" />
+        <input value="type[1] service[1] service[2]" name="_xed_check" type="hidden" />
         <input value="1-3" name="_xed_session" type="hidden" />
       </div>
     </form>

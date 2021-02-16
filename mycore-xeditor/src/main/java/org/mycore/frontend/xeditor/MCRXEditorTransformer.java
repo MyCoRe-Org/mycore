@@ -74,6 +74,8 @@ public class MCRXEditorTransformer {
 
     private boolean withinSelectElement = false;
 
+    private boolean withinSelectMultiple = false;
+
     private boolean buildFilterXSL;
 
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
@@ -212,12 +214,17 @@ public class MCRXEditorTransformer {
         return currentBinding.hasValue(value);
     }
 
-    public void toggleWithinSelectElement() {
+    public void toggleWithinSelectElement(String attrMultiple) {
         withinSelectElement = !withinSelectElement;
+        withinSelectMultiple = "multiple".equals(attrMultiple);
     }
 
     public boolean isWithinSelectElement() {
         return withinSelectElement;
+    }
+
+    public boolean isWithinSelectMultiple() {
+        return withinSelectMultiple;
     }
 
     public String replaceXPaths(String text) {
