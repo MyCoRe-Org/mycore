@@ -102,7 +102,7 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         assertFalse(session.getValidator().isValid());
         assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
 
-        checkResult(session, "/document/year[1]", MCRValidationResults.MARKER_ERROR);
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_ERROR);
         checkResult(session, "/document/year[2]", MCRValidationResults.MARKER_SUCCESS);
         checkResult(session, "/document/year[3]", MCRValidationResults.MARKER_DEFAULT);
     }
@@ -115,7 +115,7 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         assertFalse(session.getValidator().isValid());
         assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
 
-        checkResult(session, "/document/price[1]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/price", MCRValidationResults.MARKER_SUCCESS);
         checkResult(session, "/document/price[2]", MCRValidationResults.MARKER_ERROR);
         checkResult(session, "/document/price[3]", MCRValidationResults.MARKER_DEFAULT);
     }
@@ -128,7 +128,7 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         assertFalse(session.getValidator().isValid());
         assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
 
-        checkResult(session, "/document/year[1]", MCRValidationResults.MARKER_SUCCESS);
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_SUCCESS);
         checkResult(session, "/document/year[2]", MCRValidationResults.MARKER_ERROR);
         checkResult(session, "/document/year[3]", MCRValidationResults.MARKER_DEFAULT);
     }
