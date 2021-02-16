@@ -4,10 +4,10 @@
   <body>
     <form action="http://localhost:8291/servlets/XEditor" method="post">
       <div class="form-group ">
-        <input name="/document/title" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
+        <input name="/document/title[1]" value="Der neue XEditor - Utopie oder Wahnsinn?" type="text" />
       </div>
       <div class="form-group ">
-        <input name="/document/year" value="" type="text" />
+        <input name="/document/year[1]" value="" type="text" />
       </div>
       <div style="visibility:hidden">
         <input value="testBasicInputComponents-source.xml" name="input" type="hidden" />
