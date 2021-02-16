@@ -81,7 +81,6 @@ public class MCREditorSubmission {
         for (Object node : binding.getBoundNodes()) {
             xPaths2CheckResubmission.remove(MCRXPathBuilder.buildXPath(node));
         }
-        xPaths2CheckResubmission.remove(binding.getAbsoluteXPath());
     }
 
     public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {

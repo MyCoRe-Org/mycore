@@ -154,7 +154,7 @@ public class MCRBindingTest extends MCRTestCase {
         MCRBinding documentBinding = new MCRBinding("document", true, rootBinding);
 
         MCRBinding id = new MCRBinding("name[@id][1]/@id", null, "id", documentBinding);
-        assertEquals("/document/name[1]/@id", id.getAbsoluteXPath());
+        assertEquals("/document/name/@id", id.getAbsoluteXPath());
         assertEquals("n1", id.getValue());
         binding = new MCRBinding("note[@href=concat('#',$id)]", true, documentBinding);
         Element note = (Element) (binding.getBoundNode());
