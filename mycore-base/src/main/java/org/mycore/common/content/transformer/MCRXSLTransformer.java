@@ -140,16 +140,10 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     public static MCRXSLTransformer getInstance(String... stylesheets) {
-        String key = stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets);
-        MCRXSLTransformer instance = INSTANCE_CACHE.get(key);
-        if (instance == null) {
-            instance = new MCRXSLTransformer(stylesheets);
-            INSTANCE_CACHE.put(key, instance);
-        }
-        return instance;
+        return getInstance(DEFAULT_FACTORY_CLASS, stylesheets);
     }
     
-    public static MCRXSLTransformer getInstance(Class<TransformerFactory> tfClass, String... stylesheets) {
+    public static MCRXSLTransformer getInstance(Class<? extends TransformerFactory> tfClass, String... stylesheets) {
         String key = tfClass.getName() + "_"
             + (stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets));
         MCRXSLTransformer instance = INSTANCE_CACHE.get(key);
