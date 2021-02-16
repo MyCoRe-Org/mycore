@@ -72,17 +72,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             @Override
             public void run() {
                 LOGGER.debug("SOLR Task Executor invoked: " + SOLR_TASK_QUEUE.size() + " Documents to process");
-                while (SOLR_TASK_QUEUE.size() > 0) {
-                    try {
-                        MCRDelayedRunnable processingTask = SOLR_TASK_QUEUE.poll(DELAY_IN_MS, TimeUnit.MILLISECONDS);
-                        if (processingTask != null) {
-                            LOGGER.info("Sending {} to SOLR...", processingTask.getId());
-                            processingTask.run();
-                        }
-                    } catch (InterruptedException e) {
-                        LOGGER.error("Error in SOLR indexing", e);
-                    }
-                }
+                processSolrTaskQueue();
 
             }
         }, DELAY_IN_MS * 2, DELAY_IN_MS * 2, TimeUnit.MILLISECONDS);
@@ -102,24 +92,27 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                     LOGGER.error("Could not shutdown SOLR-Indexing", e);
                 }
 
-                if (SOLR_TASK_QUEUE.size() > 0) {
+                if (!SOLR_TASK_QUEUE.isEmpty()) {
                     LOGGER.info("There are still {0} solr indexing tasks to complete before shutdown",
                         SOLR_TASK_QUEUE.size());
-                }
-
-                while (SOLR_TASK_QUEUE.size() > 0) {
-                    try {
-                        MCRDelayedRunnable processingTask = SOLR_TASK_QUEUE.poll(DELAY_IN_MS, TimeUnit.MILLISECONDS);
-                        if (processingTask != null) {
-                            LOGGER.info("Sending {} to SOLR...", processingTask.getId());
-                            processingTask.run();
-                        }
-                    } catch (InterruptedException e) {
-                        LOGGER.error("Error in SOLR indexing", e);
-                    }
+                    processSolrTaskQueue();
                 }
             }
         });
+    }
+
+    private static void processSolrTaskQueue() {
+        while (!SOLR_TASK_QUEUE.isEmpty()) {
+            try {
+                MCRDelayedRunnable processingTask = SOLR_TASK_QUEUE.poll(DELAY_IN_MS, TimeUnit.MILLISECONDS);
+                if (processingTask != null) {
+                    LOGGER.info("Sending {} to SOLR...", processingTask.getId());
+                    processingTask.run();
+                }
+            } catch (InterruptedException e) {
+                LOGGER.error("Error in SOLR indexing", e);
+            }
+        }
     }
 
     @Override
