@@ -18,6 +18,8 @@
 
 package org.mycore.access.mcrimpl;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -53,7 +55,7 @@ public class MCRGroupClauseTest extends MCRTestCase {
             }
 
             @Override
-            public String[] getUserAttributeNames() {
+            public ArrayList<String> getUserAttributeNames() {
                 return null;
             }
         };

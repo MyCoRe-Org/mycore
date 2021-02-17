@@ -18,6 +18,8 @@
 
 package org.mycore.common;
 
+import java.util.ArrayList;
+
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
@@ -77,7 +79,7 @@ public class MCRSystemUserInformation implements MCRUserInformation {
     }
 
     @Override 
-    public String[] getUserAttributeNames() {
+    public ArrayList<String> getUserAttributeNames() {
         return null; //TODO may return Attributes
     }
 

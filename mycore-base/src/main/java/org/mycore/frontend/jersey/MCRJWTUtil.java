@@ -59,15 +59,14 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
             .filter(userInformation::isUserInRole)
             .toArray(String[]::new);
         String subject = userInformation.getUserID();
-        JWTCreator.Builder builder =  JWT.create()
+        String email = userInformation.getUserAttribute(MCRUserInformation.ATT_EMAIL);
+        String name = userInformation.getUserAttribute(MCRUserInformation.ATT_REAL_NAME);
+        return JWT.create()
             .withIssuedAt(new Date())
             .withSubject(subject)
-            .withArrayClaim("mcr:roles", roles);
-        for (String userAttributeName : userInformation.getUserAttributeNames()) {
-            builder.withClaim(userAttributeName, userInformation.getUserAttribute(userAttributeName));
-        
-        }
-        return builder;
+            .withArrayClaim("mcr:roles", roles)
+            .withClaim("email", email)
+            .withClaim("name", name);
     }
 
     public static Algorithm getJWTAlgorithm() {

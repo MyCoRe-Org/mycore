@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -59,7 +60,7 @@ public class MCRUserInformationLookupTest extends MCRTestCase {
             }
 
             @Override
-            public String[] getUserAttributeNames() {
+            public ArrayList<String> getUserAttributeNames() {
                 return null;
             }
         });

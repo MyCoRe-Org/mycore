@@ -728,7 +728,7 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     }
 
     @Override
-    public String[] getUserAttributeNames() {
+    public ArrayList<String> getUserAttributeNames() {
         return null;
     }
 
