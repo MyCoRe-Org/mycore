@@ -620,13 +620,13 @@ public class MCRXMLFunctions {
     }
 
     public static boolean isCurrentUserSuperUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.getSuperUserInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+            .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID());
     }
 
     public static boolean isCurrentUserGuestUser() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.getGuestInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+            .equals(MCRSystemUserInformation.getGuestInstance().getUserID());
     }
 
     public static String getCurrentUserAttribute(String attribute) {
