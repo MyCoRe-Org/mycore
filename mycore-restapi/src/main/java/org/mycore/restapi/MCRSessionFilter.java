@@ -320,10 +320,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             if (MCRUserInformation.ATT_EMAIL.equals(attribute)) {
                 return jwt.getClaim("email").asString();
             }
-            if (!jwt.getClaim(MCRJWTUtil.JWT_USER_ATTRIBUTE_PREFIX + attribute).isNull()) {
-                return jwt.getClaim(MCRJWTUtil.JWT_USER_ATTRIBUTE_PREFIX + attribute).asString();
-            }
-            return null;
+            return jwt.getClaim(MCRJWTUtil.JWT_USER_ATTRIBUTE_PREFIX + attribute).asString();
         }
     }
 

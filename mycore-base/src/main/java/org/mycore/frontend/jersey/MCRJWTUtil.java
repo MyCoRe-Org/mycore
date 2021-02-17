@@ -56,11 +56,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
 
     private static Algorithm SHARED_SECRET;
 
-    public static JWTCreator.Builder getJWTBuilder(MCRUserInformation userInformation) {
-        return getJWTBuilder(userInformation, null);
-    }
-
-    public static JWTCreator.Builder getJWTBuilder(MCRUserInformation userInformation, String[] userAttributes) {
+    public static JWTCreator.Builder getJWTBuilder(MCRUserInformation userInformation, String... userAttributes) {
         String[] roles = MCRConfiguration2.getOrThrow(ROLES_PROPERTY, MCRConfiguration2::splitValue)
             .filter(userInformation::isUserInRole)
             .toArray(String[]::new);
