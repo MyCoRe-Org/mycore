@@ -48,6 +48,8 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
 
     public static final String JWT_CLAIM_IP = "mcr:ip";
 
+    public static final String JWT_USER_ATTRIBUTE = "mcr:ua:";
+
     private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
     private static final String ROLES_PROPERTY = "MCR.Rest.JWT.Roles";
@@ -55,18 +57,31 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
     private static Algorithm SHARED_SECRET;
 
     public static JWTCreator.Builder getJWTBuilder(MCRUserInformation userInformation) {
+         return getJWTBuilder(userInformation, null);
+    }
+
+    public static JWTCreator.Builder getJWTBuilder(MCRUserInformation userInformation, String[] userAttributes) {
         String[] roles = MCRConfiguration2.getOrThrow(ROLES_PROPERTY, MCRConfiguration2::splitValue)
             .filter(userInformation::isUserInRole)
             .toArray(String[]::new);
         String subject = userInformation.getUserID();
         String email = userInformation.getUserAttribute(MCRUserInformation.ATT_EMAIL);
         String name = userInformation.getUserAttribute(MCRUserInformation.ATT_REAL_NAME);
-        return JWT.create()
+        JWTCreator.Builder builder = JWT.create()
             .withIssuedAt(new Date())
             .withSubject(subject)
             .withArrayClaim("mcr:roles", roles)
             .withClaim("email", email)
             .withClaim("name", name);
+        if (userAttributes != null) {
+             for (String userAttribute : userAttributes) {
+                 String value = userInformation.getUserAttribute(userAttribute);
+                 if (value != null) {
+                     builder.withClaim(JWT_USER_ATTRIBUTE + userAttribute, value);
+                 }
+             }
+        }
+        return builder;
     }
 
     public static Algorithm getJWTAlgorithm() {
