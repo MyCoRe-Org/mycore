@@ -66,16 +66,15 @@ public class MCRJWTResource {
             .isPresent()) {
             return MCRJWTUtil.getJWTLoginErrorResponse("No active MyCoRe session found.");
         }
-        String[] userAttributes = request.getParameterValues("ua");
         MCRSession mcrSession = MCRServlet.getSession(request);
-        String jwt = getToken(mcrSession, userAttributes);
+        String jwt = getToken(mcrSession);
         return MCRJWTUtil.getJWTLoginSuccessResponse(jwt);
     }
 
-    private String getToken(MCRSession mcrSession, String[] userAttributes) throws UnsupportedEncodingException {
+    private String getToken(MCRSession mcrSession) throws UnsupportedEncodingException {
         MCRUserInformation userInformation = mcrSession.getUserInformation();
         String issuer = request.getRequestURL().toString();
-        return MCRJWTUtil.getJWTBuilder(userInformation, userAttributes)
+        return MCRJWTUtil.getJWTBuilder(userInformation)
             .withJWTId(mcrSession.getID())
             .withIssuer(issuer)
             .withAudience(AUDIENCE)
