@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
@@ -93,7 +94,7 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                 }
 
                 if (!SOLR_TASK_QUEUE.isEmpty()) {
-                    LOGGER.info("There are still {0} solr indexing tasks to complete before shutdown",
+                    LOGGER.info("There are still {} solr indexing tasks to complete before shutdown",
                         SOLR_TASK_QUEUE.size());
                     processSolrTaskQueue();
                 }
@@ -178,10 +179,12 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     @Override
     protected void updateDerivateFileIndex(MCREvent evt, MCRDerivate derivate) {
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            //MCR-2349 initialize solr client early enough
+            final SolrClient mainSolrClient = MCRSolrClientFactory.getMainSolrClient();
             putIntoTaskQueue(new MCRDelayedRunnable("updateDerivateFileIndex_" + derivate.getId().toString(),
                 DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
                     MCRSolrIndexer.rebuildContentIndex(Collections.singletonList(derivate.getId().toString()),
-                        MCRSolrClientFactory.getMainSolrClient(), MCRSolrIndexer.HIGH_PRIORITY);
+                        mainSolrClient, MCRSolrIndexer.HIGH_PRIORITY);
                 })));
         });
     }
@@ -234,8 +237,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     protected synchronized void solrDelete(MCRObjectID id) {
         LOGGER.debug("Solr: submitting data of \"{}\" for deleting", id);
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            //MCR-2349 initialize solr client early enough
+            final SolrClient mainSolrClient = MCRSolrClientFactory.getMainSolrClient();
             putIntoTaskQueue(new MCRDelayedRunnable(id.toString(), DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
-                MCRSolrIndexer.deleteById(MCRSolrClientFactory.getMainSolrClient(), id.toString());
+                MCRSolrIndexer.deleteById(mainSolrClient, id.toString());
             })));
         });
     }
@@ -243,10 +248,11 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     protected synchronized void deleteDerivate(MCRDerivate derivate) {
         LOGGER.debug("Solr: submitting data of \"{}\" for derivate", derivate.getId());
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            //MCR-2349 initialize solr client early enough
+            final SolrClient mainSolrClient = MCRSolrClientFactory.getMainSolrClient();
             putIntoTaskQueue(new MCRDelayedRunnable(derivate.getId().toString(), DELAY_IN_MS,
                 new MCRTransactionableRunnable(() -> {
-                    MCRSolrIndexer.deleteDerivate(MCRSolrClientFactory.getMainSolrClient(),
-                        derivate.getId().toString());
+                    MCRSolrIndexer.deleteDerivate(mainSolrClient, derivate.getId().toString());
                 })));
         });
     }
@@ -264,13 +270,14 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             }
         }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            //MCR-2349 initialize solr client early enough
+            final SolrClient mainSolrClient = MCRSolrClientFactory.getMainSolrClient();
             putIntoTaskQueue(
                 new MCRDelayedRunnable(path.toUri().toString(), DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
                     try {
                         MCRSolrIndexer
                             .submitIndexHandler(
-                                MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs,
-                                    MCRSolrClientFactory.getMainSolrClient()),
+                                MCRSolrIndexHandlerFactory.getInstance().getIndexHandler(path, attrs, mainSolrClient),
                                 MCRSolrIndexer.HIGH_PRIORITY);
                     } catch (Exception ex) {
                         LOGGER.error("Error creating transfer thread for file {}", path, ex);
@@ -284,10 +291,12 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             return;
         }
         MCRSessionMgr.getCurrentSession().onCommit(() -> {
+            //MCR-2349 initialize solr client early enough
+            final SolrClient mainSolrClient = MCRSolrClientFactory.getMainSolrClient();
             putIntoTaskQueue(
                 new MCRDelayedRunnable(file.toUri().toString(), DELAY_IN_MS, new MCRTransactionableRunnable(() -> {
                     UpdateResponse updateResponse = MCRSolrIndexer
-                        .deleteById(MCRSolrClientFactory.getMainSolrClient(), file.toUri().toString());
+                        .deleteById(mainSolrClient, file.toUri().toString());
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Deleted file {}. Response:{}", file, updateResponse);
                     }
