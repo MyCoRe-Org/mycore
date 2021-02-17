@@ -55,7 +55,8 @@ public class MCRGroupClauseTest extends MCRTestCase {
             }
 
             @Override
-            public ArrayList<String> getUserAttributeNames() {
+            public ArrayList<String> getUserAttributes() {
+                // TODO Auto-generated method stub
                 return null;
             }
         };

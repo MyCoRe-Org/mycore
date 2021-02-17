@@ -60,7 +60,7 @@ public class MCRUserInformationLookupTest extends MCRTestCase {
             }
 
             @Override
-            public ArrayList<String> getUserAttributeNames() {
+            public ArrayList<String> getUserAttributes() {
                 return null;
             }
         });

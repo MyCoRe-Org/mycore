@@ -98,7 +98,7 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
     }
 
     @Override
-    public ArrayList<String> getUserAttributeNames() {
+    public ArrayList<String> getUserAttributes() {
         return null;
     }
 

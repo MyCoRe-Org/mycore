@@ -325,7 +325,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         }
 
         @Override
-        public ArrayList<String> getUserAttributeNames() {
+        public ArrayList<String> getUserAttributes() {
             return null;
         }
     }
