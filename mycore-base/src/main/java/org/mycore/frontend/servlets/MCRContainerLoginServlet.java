@@ -19,7 +19,6 @@
 package org.mycore.frontend.servlets;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -94,11 +93,6 @@ public class MCRContainerLoginServlet extends MCRServlet {
         public String getUserAttribute(String attribute) {
             return null;
         }
-
-        @Override
-        public ArrayList<String> getUserAttributes() {
-            return null;
-        }  
 
         protected Optional<HttpServletRequest> getCurrentRequest() {
             LogManager.getLogger(getClass()).debug("Getting request from session: {}", session.getID());

@@ -727,11 +727,6 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
         }
     }
 
-    @Override
-    public ArrayList<String> getUserAttributes() {
-        return null;
-    }
-
     @Transient
     @XmlElement(name = "owner")
     private UserIdentifier getOwnerId() {

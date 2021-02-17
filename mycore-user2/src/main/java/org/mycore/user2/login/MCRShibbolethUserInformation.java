@@ -18,7 +18,6 @@
 
 package org.mycore.user2.login;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -95,11 +94,6 @@ public class MCRShibbolethUserInformation implements MCRUserInformation {
         Object value = attributes.get(key);
 
         return value != null ? value.toString() : null;
-    }
-
-    @Override
-    public ArrayList<String> getUserAttributes() {
-        return null;
     }
 
     // This is used for MCRUserAttributeMapper
