@@ -57,6 +57,6 @@ public interface MCRUserInformation {
      * Get all attribute names if they are provided by the underlying user system
      * @return user attribute names as String array or null if no value is defined
      */
-    String[] getUserAttributeNames();
+    String[] getUserAttributeNames(); //TODO maybe more generic
 
 }
