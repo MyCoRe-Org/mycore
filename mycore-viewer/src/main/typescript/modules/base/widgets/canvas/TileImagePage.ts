@@ -178,14 +178,11 @@ namespace mycore.viewer.widgets.canvas {
 
         }
 
-        protected static EMPTY_FUNCTION = () => {
-        };
-
         protected abortLoadingTiles() {
             this.vLoadingTiles.forEach((k, v) => {
-                v.onerror = TileImagePage.EMPTY_FUNCTION;
-                v.onload = TileImagePage.EMPTY_FUNCTION;
-                v.src = '#';
+                delete v.src;
+                delete v.onload;
+                delete v.onerror;
             });
             this.vLoadingTiles.clear();
         }
