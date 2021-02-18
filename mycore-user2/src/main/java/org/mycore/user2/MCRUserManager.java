@@ -352,8 +352,8 @@ public class MCRUserManager {
             .flatMap(s -> buildSearchPredicate(cb, root, MCRUser_.EMail, s))
             .ifPresent(searchPredicates::add);
 
-        if(!searchPredicates.isEmpty()) {
-            if(1 == searchPredicates.size()) {
+        if (!searchPredicates.isEmpty()) {
+            if (1 == searchPredicates.size()) {
                 predicates.add(searchPredicates.get(0));
             } else {
                 predicates.add(cb.or(searchPredicates.toArray(new Predicate[searchPredicates.size()])));
@@ -461,7 +461,8 @@ public class MCRUserManager {
 
     /**
      * Returns a {@link MCRUser} instance if the login succeeds.
-     * This method will return <code>null</code> if the user does not exist or the login is disabled.
+     * This method will return <code>null</code> if the user does not exist, no password was given or
+     * the login is disabled.
      * If the {@link MCRUser#getHashType()} is {@link MCRPasswordHashType#crypt}, {@link MCRPasswordHashType#md5} or
      * {@link MCRPasswordHashType#sha1} the hash value is automatically upgraded to {@link MCRPasswordHashType#sha256}.
      * @param userName Name of the user to login.
@@ -472,6 +473,11 @@ public class MCRUserManager {
         MCRUser user = getUser(userName);
         if (user == null || user.getHashType() == null) {
             LOGGER.warn(() -> "User not found: " + userName);
+            waitLoginPanalty();
+            return null;
+        }
+        if (password == null) {
+            LOGGER.warn("No password for user {} entered", userName);
             waitLoginPanalty();
             return null;
         }
