@@ -331,26 +331,16 @@ public class MCRUserManager {
             .getResultList();
     }
 
-    private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, Optional<String> userPattern,
-        Optional<String> realm, Optional<String> namePattern, Optional<String> mailPattern) {
-        ArrayList<Predicate> predicates = new ArrayList<>(3);
-        realm
-            .filter(s -> !s.isEmpty())
-            .map(s -> cb.equal(root.get(MCRUser_.realmID), s))
-            .ifPresent(predicates::add);
+    private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, String userPattern, String realm,
+        String namePattern, String mailPattern) {
+
+        ArrayList<Predicate> predicates = new ArrayList<>(2);
+        addEqualsPredicate(cb, root, MCRUser_.realmID, realm, predicates);
 
         ArrayList<Predicate> searchPredicates = new ArrayList<>(3);
-        userPattern
-            .flatMap(s -> buildSearchPredicate(cb, root, MCRUser_.userName, s))
-            .ifPresent(searchPredicates::add);
-
-        namePattern
-            .flatMap(s -> buildSearchPredicate(cb, root, MCRUser_.realName, s))
-            .ifPresent(searchPredicates::add);
-
-        mailPattern
-            .flatMap(s -> buildSearchPredicate(cb, root, MCRUser_.EMail, s))
-            .ifPresent(searchPredicates::add);
+        addSearchPredicate(cb, root, MCRUser_.userName, userPattern, searchPredicates);
+        addSearchPredicate(cb, root, MCRUser_.realName, namePattern, searchPredicates);
+        addSearchPredicate(cb, root, MCRUser_.EMail, mailPattern, searchPredicates);
 
         if (!searchPredicates.isEmpty()) {
             if (1 == searchPredicates.size()) {
@@ -359,19 +349,30 @@ public class MCRUserManager {
                 predicates.add(cb.or(searchPredicates.toArray(new Predicate[searchPredicates.size()])));
             }
         }
+
         return predicates.toArray(new Predicate[predicates.size()]);
     }
 
-    private static Optional<Predicate> buildSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
-        SingularAttribute<MCRUser, String> attribute, String searchPattern) {
-        if (searchPattern.isEmpty()) {
-            return Optional.empty();
-        } else {
-            searchPattern = searchPattern.replace('*', '%');
-            searchPattern = searchPattern.replace('?', '_');
-            searchPattern = searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
-            return Optional.of(cb.like(cb.lower(root.get(attribute)), searchPattern));
+    private static void addEqualsPredicate(CriteriaBuilder cb, Root<MCRUser> root,
+        SingularAttribute<MCRUser, String> attribute, String string, ArrayList<Predicate> predicates) {
+        if (null != string && !string.isEmpty()) {
+            predicates.add(cb.equal(root.get(attribute), string));
         }
+    }
+
+    private static void addSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
+        SingularAttribute<MCRUser, String> attribute, String searchPattern, ArrayList<Predicate> predicates) {
+        if (null != searchPattern && !searchPattern.isEmpty()) {
+            predicates.add(buildSearchPredicate(cb, root, attribute, searchPattern));
+        }
+    }
+
+    private static Predicate buildSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
+        SingularAttribute<MCRUser, String> attribute, String searchPattern) {
+        searchPattern = searchPattern.replace('*', '%');
+        searchPattern = searchPattern.replace('?', '_');
+        searchPattern = searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
+        return cb.like(cb.lower(root.get(attribute)), searchPattern);
     }
 
     /**
@@ -416,8 +417,7 @@ public class MCRUserManager {
             .createQuery(
                 query
                     .where(
-                        buildCondition(cb, user, Optional.ofNullable(userPattern), Optional.ofNullable(realm),
-                            Optional.ofNullable(namePattern), Optional.ofNullable(mailPattern))))
+                        buildCondition(cb, user, userPattern, realm, namePattern, mailPattern)))
             .getResultList();
     }
 
@@ -458,8 +458,7 @@ public class MCRUserManager {
                 query
                     .select(cb.count(user))
                     .where(
-                        buildCondition(cb, user, Optional.ofNullable(userPattern), Optional.ofNullable(realm),
-                            Optional.ofNullable(namePattern), Optional.ofNullable(mailPattern))))
+                        buildCondition(cb, user, userPattern, realm, namePattern, mailPattern)))
             .getSingleResult().intValue();
     }
 
