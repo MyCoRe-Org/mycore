@@ -385,6 +385,25 @@ public class MCRUserManager {
      * @param userPattern a wildcard pattern for the login user name, may be null
      * @param realm the realm the user belongs to, may be null
      * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @return a list of matching users
+     * @deprecated Use {@link MCRUserManager#listUsers(String, String, String, String)} instead.
+     */
+    @Deprecated
+    public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern) {
+        return listUsers(userPattern, realm, namePattern, null);
+    }
+
+    /**
+     * Searches for users in the database and returns a list of matching users.
+     * Wildcards containing * and ? for single character may be used for searching
+     * by login user name or real name.
+     *
+     * Pay attention that no role information is attached to user data. If you need
+     * this information call {@link MCRUserManager#getUser(String, String)}.
+     *
+     * @param userPattern a wildcard pattern for the login user name, may be null
+     * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param mailPattern a wildcard pattern for the person's email, may be null
      * @return a list of matching users
      */
@@ -400,6 +419,22 @@ public class MCRUserManager {
                         buildCondition(cb, user, Optional.ofNullable(userPattern), Optional.ofNullable(realm),
                             Optional.ofNullable(namePattern), Optional.ofNullable(mailPattern))))
             .getResultList();
+    }
+
+    /**
+     * Counts users in the database that match the given criteria.
+     * Wildcards containing * and ? for single character may be used for searching
+     * by login user name or real name.
+     *
+     * @param userPattern a wildcard pattern for the login user name, may be null
+     * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @return the number of matching users
+     * @deprecated Use {@link MCRUserManager#countUsers(String, String, String, String)} instead.
+     */
+    @Deprecated
+    public static int countUsers(String userPattern, String realm, String namePattern ) {
+        return countUsers(userPattern, realm, namePattern, null);
     }
 
     /**
