@@ -89,7 +89,11 @@ public class MCRUserManager {
             return getUser(userName, MCRRealmFactory.getLocalRealm());
         } else {
             String[] parts = userName.split("@");
-            return getUser(parts[0], (parts.length < 2) ? "" : parts[1]);
+            if (parts.length == 2) {
+                return getUser(parts[0], parts[1]);
+            } else {
+                return null;
+            }
         }
     }
 
