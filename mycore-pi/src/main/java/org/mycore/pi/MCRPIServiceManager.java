@@ -42,12 +42,11 @@ public class MCRPIServiceManager {
     }
 
     public List<String> getServiceIDList() {
-        return MCRConfiguration2.getPropertiesMap()
+        return MCRConfiguration2.getSubPropertiesMap(REGISTRATION_SERVICE_CONFIG_PREFIX)
             .entrySet()
             .stream()
-            .filter(p -> p.getKey().startsWith(REGISTRATION_SERVICE_CONFIG_PREFIX))
+            .filter(p -> !p.getValue().isEmpty())
             .map(Map.Entry::getKey)
-            .map(s -> s.substring(REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
             .filter(s -> !s.contains("."))
             .collect(Collectors.toList());
     }
