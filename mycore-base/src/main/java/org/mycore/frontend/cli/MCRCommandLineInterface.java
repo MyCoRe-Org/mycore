@@ -28,10 +28,10 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -332,13 +332,13 @@ public class MCRCommandLineInterface {
     public static List<String> readCommandsRessource(String resource) throws IOException {
         final URL resourceURL = MCRClassTools.getClassLoader().getResource(resource);
         if (resourceURL == null) {
-            return Collections.emptyList();
+            throw new IOException("Resource URL is null!");
         }
-        try (InputStream is = resourceURL.openStream()) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.defaultCharset()))) {
+        try (InputStream is = resourceURL.openStream();
+             InputStreamReader isr = new InputStreamReader(is,  StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(isr)) {
                 output("Reading commands from resource " + resource);
                 return readCommandsFromBufferedReader(reader);
-            }
         }
     }
 

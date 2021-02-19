@@ -19,7 +19,6 @@
 package org.mycore.webcli.cli;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.mycore.common.MCRSessionMgr;
@@ -32,9 +31,10 @@ import org.mycore.webcli.container.MCRWebCLIContainer;
 @MCRCommandGroup(name = "Basic commands")
 public class MCRBasicWebCLICommands {
 
-    @MCRCommand(syntax = "process from resources {0}", help = "Execute the commands listed in the resource file {0}.",
+    @MCRCommand(syntax = "process resource {0}",
+        help = "Execute the commands listed in the resource file {0}.",
             order = 10)
-    public static List<String> readCommandsResource(String resource) throws IOException, URISyntaxException {
+    public static List<String> readCommandsResource(String resource) throws IOException {
         return MCRCommandLineInterface.readCommandsRessource(resource);
     }
 
