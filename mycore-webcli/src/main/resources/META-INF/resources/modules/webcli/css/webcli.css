@@ -179,19 +179,22 @@ div.web-cli-queue > pre{
 
 /*multiDropDown*/
 
-.dropdown-submenu {
-    position: relative;
+div.dropdown-menu {
+    max-height: 90vh;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .dropdown-submenu>.dropdown-menu {
     top: 0;
-    left: 100%;
+    left:0;
     margin-top: -6px;
     margin-left: -1px;
     -webkit-border-radius: 0 6px 6px 6px;
     -moz-border-radius: 0 6px 6px;
     border-radius: 0 6px 6px 6px;
     overflow-x: auto;
+    position: fixed;
 }
 
 .dropdown-submenu:hover>.dropdown-menu {
