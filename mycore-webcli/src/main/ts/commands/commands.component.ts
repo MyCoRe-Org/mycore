@@ -46,9 +46,13 @@ export class WebCliCommandsComponent implements OnInit {
 
   onHoverSubmenu(event) {
     if (event.target.className == "dropdown-item") {
-      var maxHeight = window.innerHeight - event.target.parentElement.getBoundingClientRect().top - 10;
       if (event.target.parentElement.children.length > 1 && event.target.parentElement.children[1].className == "dropdown-menu") {
+        let maxHeight = window.innerHeight - event.target.parentElement.getBoundingClientRect().top - 10;
+        let parentTop = event.target.parentElement.getBoundingClientRect().top;
+        let parentRight = event.target.parentElement.getBoundingClientRect().right;
         event.target.parentElement.children[1].style.maxHeight = maxHeight;
+        event.target.parentElement.children[1].style.top = parentTop;
+        event.target.parentElement.children[1].style.left = parentRight;
       }
     }
   }
