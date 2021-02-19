@@ -18,8 +18,11 @@
 
 package org.mycore.iview2.iiif;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.mycore.access.MCRAccessManager;
@@ -56,19 +59,23 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
             return new MCRTileInfo(mcrID.toString(), mcrDer.getDerivate().getInternals().getMainDoc(), null);
         } else {
             MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrID);
-            for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                final boolean typeMatch = derLink.getClassifications().stream()
-                    .map(MCRCategoryID::toString)
-                    .anyMatch(derivateTypes::contains);
-                if (typeMatch) {
-                    final String maindoc = derLink.getMainDoc();
-                    if (maindoc != null) {
-                        return new MCRTileInfo(derLink.getXLinkHref(), maindoc, null);
+            for (String type : derivateTypes) {
+                for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                    if (derLink.getClassifications().stream()
+                        .map(MCRCategoryID::toString)
+                        .anyMatch(type::equals)) {
+                        final String maindoc = derLink.getMainDoc();
+                        if (maindoc != null) {
+                            final MCRTileInfo mcrTileInfo = new MCRTileInfo(derLink.getXLinkHref(), maindoc, null);
+                            final Optional<Path> tileFile = this.tileFileProvider.getTileFile(mcrTileInfo);
+                            if (tileFile.isPresent() && Files.exists(tileFile.get())) {
+                                return mcrTileInfo;
+                            }
+                        }
                     }
                 }
             }
         }
-
         throw new MCRIIIFImageNotFoundException(id);
     }
 

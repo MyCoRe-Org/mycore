@@ -76,7 +76,7 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     private final java.util.List<String> transparentFormats;
 
-    private final MCRTileFileProvider tileFileProvider;
+    protected final MCRTileFileProvider tileFileProvider;
 
     public MCRIVIEWIIIFImageImpl(String implName) {
         super(implName);
