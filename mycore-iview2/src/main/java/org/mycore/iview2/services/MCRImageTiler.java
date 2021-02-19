@@ -29,13 +29,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -162,15 +163,17 @@ public class MCRImageTiler implements Runnable, Closeable {
                             if (!running) {
                                 break;
                             }
-                            Transaction transaction = null;
+                            EntityTransaction transaction = null;
                             MCRTileJob job = null;
-                            try (Session session = MCRHIBConnection.instance().getSession()) {
-                                transaction = session.beginTransaction();
+                            EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+                            try {
+                                transaction = em.getTransaction();
+                                transaction.begin();
                                 job = TQ.poll();
                                 imageTilerCollection.setProperty("queue",
                                     TQ.stream().map(MCRTileJob::getPath).collect(Collectors.toList()));
                                 transaction.commit();
-                            } catch (HibernateException e) {
+                            } catch (PersistenceException e) {
                                 LOGGER.error("Error while getting next tiling job.", e);
                                 if (transaction != null) {
                                     try {
@@ -179,6 +182,8 @@ public class MCRImageTiler implements Runnable, Closeable {
                                         LOGGER.warn("Could not rollback transaction.", re);
                                     }
                                 }
+                            } finally {
+                                em.close();
                             }
                             if (job != null && !tilingServe.getExecutor().isShutdown()) {
                                 LOGGER.info("Creating:{}", job.getPath());

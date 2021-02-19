@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<html>
+  <body>
+    <form action="/servlets/XEditor" method="post">
+      <select name="/document/type[1]" id="type">
+        <optgroup label="Publikation">
+          <option value="journal">Zeitschrift</option>
+          <option selected="selected" value="article">Artikel</option>
+        </optgroup>
+        <optgroup label="Sonstiges">
+          <option value="video">Video</option>
+        </optgroup>
+      </select>
+      <select name="/document/service" id="service" multiple="multiple">
+        <option selected="selected" value="doi">DOI vergeben</option>
+        <option selected="selected" value="urn">URN vergeben</option>
+        <option value="epic">ePic vergeben</option>
+      </select>
+      <div style="visibility:hidden">
+        <input value="testSelect-source.xml" name="input" type="hidden" />
+        <input value="type[1] service[1] service[2]" name="_xed_check" type="hidden" />
+        <input value="1-2" name="_xed_session" type="hidden" />
+      </div>
+    </form>
+  </body>
+</html>

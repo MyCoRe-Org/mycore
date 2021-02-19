@@ -126,7 +126,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         startNewTransaction();
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
         assertEquals("User information was not updated", eMail, user.getEMailAddress());
-        assertEquals("User was created not updated", 1, MCRUserManager.countUsers(null, null, null));
+        assertEquals("User was created not updated", 1, MCRUserManager.countUsers(null, null, null, null));
         assertTrue("User is not in group " + groupName, user.getSystemRoleIDs().contains(groupName));
     }
 
@@ -163,20 +163,20 @@ public class MCRUserManagerTest extends MCRUserTestCase {
     }
 
     /**
-     * Test method for {@link org.mycore.user2.MCRUserManager#listUsers(java.lang.String, java.lang.String, java.lang.String)}.
+     * Test method for {@link org.mycore.user2.MCRUserManager#listUsers(java.lang.String, java.lang.String, java.lang.String, java.lang.String)}.
      */
     @Test
     public final void testListUsersStringStringString() {
-        List<MCRUser> listUsers = MCRUserManager.listUsers(null, null, "Test*");
+        List<MCRUser> listUsers = MCRUserManager.listUsers(null, null, "Test*", null);
         assertEquals("Could not find a user", 1, listUsers.size());
     }
 
     /**
-     * Test method for {@link org.mycore.user2.MCRUserManager#countUsers(java.lang.String, java.lang.String, java.lang.String)}.
+     * Test method for {@link org.mycore.user2.MCRUserManager#countUsers(java.lang.String, java.lang.String, java.lang.String, java.lang.String)}.
      */
     @Test
     public final void testCountUsers() {
-        assertEquals("Could not find a user", 1, MCRUserManager.countUsers(null, null, "*Case*"));
+        assertEquals("Could not find a user", 1, MCRUserManager.countUsers(null, null, "*Case*", null));
     }
 
     /**
@@ -225,7 +225,7 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         this.user.setOwner(this.user);
         MCRUserManager.updateUser(this.user);
         startNewTransaction();
-        assertEquals("Too many users", 1, MCRUserManager.countUsers(null, null, null));
+        assertEquals("Too many users", 1, MCRUserManager.countUsers(null, null, null, null));
         assertEquals("Too many users", 1, MCRUserManager.listUsers(this.user).size());
         Document exportableXML = MCRUserTransformer.buildExportableXML(this.user);
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());

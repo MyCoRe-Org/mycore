@@ -96,8 +96,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static long CHECK_PERIOD = MCRConfiguration2.getLong("MCR.LayoutService.LastModifiedCheckPeriod")
         .orElse(60000l);
 
-    private static final String DEFAULT_FACTORY_CLASS = MCRConfiguration2
-        .getString("MCR.LayoutService.TransformerFactoryClass").orElse(null);
+    private static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
+        .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
 
     /** The compiled XSL stylesheet */
     protected MCRTemplatesSource[] templateSources;
@@ -111,13 +111,17 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     protected SAXTransformerFactory tFactory;
 
     public MCRXSLTransformer(String... stylesheets) {
-        this();
+        this(DEFAULT_FACTORY_CLASS);
         setStylesheets(stylesheets);
     }
 
     public MCRXSLTransformer() {
+        this(DEFAULT_FACTORY_CLASS);
+    }
+    
+    public MCRXSLTransformer(Class<? extends TransformerFactory> tfClass) {
         super();
-        setTransformerFactory(DEFAULT_FACTORY_CLASS);
+        setTransformerFactory(tfClass.getName());
     }
 
     public synchronized void setTransformerFactory(String factoryClass) throws TransformerFactoryConfigurationError {
@@ -136,10 +140,16 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     }
 
     public static MCRXSLTransformer getInstance(String... stylesheets) {
-        String key = stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets);
+        return getInstance(DEFAULT_FACTORY_CLASS, stylesheets);
+    }
+    
+    public static MCRXSLTransformer getInstance(Class<? extends TransformerFactory> tfClass, String... stylesheets) {
+        String key = tfClass.getName() + "_"
+            + (stylesheets.length == 1 ? stylesheets[0] : Arrays.toString(stylesheets));
         MCRXSLTransformer instance = INSTANCE_CACHE.get(key);
         if (instance == null) {
-            instance = new MCRXSLTransformer(stylesheets);
+            instance = new MCRXSLTransformer(tfClass);
+            instance.setStylesheets(stylesheets);
             INSTANCE_CACHE.put(key, instance);
         }
         return instance;
@@ -151,11 +161,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         String property = "MCR.ContentTransformer." + id + ".Stylesheet";
         String[] stylesheets = MCRConfiguration2.getStringOrThrow(property).split(",");
         setStylesheets(stylesheets);
-        property = "MCR.ContentTransformer." + id + ".TransformerFactoryClass";
-        String transformerFactory = MCRConfiguration2.getString(property).orElse(DEFAULT_FACTORY_CLASS);
-        if (transformerFactory != null && !transformerFactory.equals(DEFAULT_FACTORY_CLASS)) {
-            setTransformerFactory(transformerFactory);
-        }
+        MCRConfiguration2.getString("MCR.ContentTransformer." + id + ".TransformerFactoryClass")
+            .ifPresent(this::setTransformerFactory);
     }
 
     public void setStylesheets(String... stylesheets) {

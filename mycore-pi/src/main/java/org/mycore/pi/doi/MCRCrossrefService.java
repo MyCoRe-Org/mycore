@@ -57,7 +57,7 @@ public class MCRCrossrefService extends MCRDOIBaseService {
 
     private static final String CONFIG_DEPOSITOR = "Depositor";
 
-    private static final String DEFAULT_SCHEMA = "xsd/crossref/4.4.1/crossref4.4.1.xsd";
+    public static final String DEFAULT_SCHEMA = "http://data.crossref.org/schemas/crossref4.4.1.xsd";
 
     private static final String TEST_HOST = "test.crossref.org";
 

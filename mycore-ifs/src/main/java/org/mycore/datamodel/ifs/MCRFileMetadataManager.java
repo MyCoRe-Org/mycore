@@ -18,6 +18,10 @@
 
 package org.mycore.datamodel.ifs;
 
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -100,22 +104,22 @@ public class MCRFileMetadataManager {
      */
     private String getIDPrefix() {
         if (prefix == null) {
-            String ip = "127.0.0.1";
+            InetAddress inetAddress = InetAddress.getLoopbackAddress();
 
             try {
-                ip = java.net.InetAddress.getLocalHost().getHostAddress();
+                inetAddress = java.net.InetAddress.getLocalHost();
             } catch (java.net.UnknownHostException ignored) {
             }
-
-            java.util.StringTokenizer st = new java.util.StringTokenizer(ip, ".");
-
-            long sum = Integer.parseInt(st.nextToken());
-
-            while (st.hasMoreTokens()) {
-                sum = (sum << 8) + Integer.parseInt(st.nextToken());
+            byte[] bytes = inetAddress.getAddress();
+            try {
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                md.update(bytes);
+                bytes = md.digest();
+            } catch (NoSuchAlgorithmException e) {
+                //should not happen but we can fallback to address safely
             }
-
-            String address = Long.toString(sum, 36);
+            BigInteger value = new BigInteger(bytes);
+            String address = value.toString(36);
             address = "000000" + address;
             prefix = address.substring(address.length() - 6);
         }

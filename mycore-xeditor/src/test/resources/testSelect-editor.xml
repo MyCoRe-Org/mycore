@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<html>
+  <body>
+    <xed:form xmlns:xed="http://www.mycore.de/xeditor">
+      <xed:source uri="resource:{$input}" />
+      <xed:bind xpath="document">
+        <xed:bind xpath="type">
+          <select id="type">
+            <optgroup label="Publikation">
+              <option value="journal">Zeitschrift</option>
+              <option value="article">Artikel</option>
+            </optgroup>
+            <optgroup label="Sonstiges">
+              <option value="video">Video</option>
+            </optgroup>
+          </select>
+        </xed:bind>
+        <xed:bind xpath="service">
+          <select id="service" multiple="multiple">
+            <option value="doi">DOI vergeben</option>
+            <option value="urn">URN vergeben</option>
+            <option value="epic">ePic vergeben</option>
+          </select>
+        </xed:bind>
+      </xed:bind>
+    </xed:form>
+  </body>
+</html>

@@ -59,8 +59,8 @@ namespace mycore.viewer.widgets.canvas {
 
         public _updateSizeIfChanged() {
             this._views.forEach(view => {
-                var retinaWidth = view.container.width() * (window.devicePixelRatio || 1);
-                var retinaHeight = view.container.height() * (window.devicePixelRatio || 1);
+                const retinaWidth = Math.round(view.container.width() * (window.devicePixelRatio || 1));
+                const retinaHeight = Math.round(view.container.height() * (window.devicePixelRatio || 1));
                 if (view.drawCanvas.width != retinaWidth
                     || view.drawCanvas.height != retinaHeight
                     || view.markCanvas.width != retinaWidth

@@ -85,7 +85,12 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
-
+  
+  <xsl:function name="mcrmods:to-category" as="element()?">
+    <xsl:param name="node" as="element()" />
+    <xsl:sequence select="mcrmods:to-mycoreclass($node, 'single')/categories/category" />
+  </xsl:function>
+  
   <xsl:function name="mcrmods:is-supported" as="xs:boolean">
     <xsl:param name="node" as="element()"/>
     <xsl:sequence

@@ -31,7 +31,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRJPATestCase;
 
 /**
@@ -54,8 +54,8 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         if (ACCESS_STORE == null) {
             ACCESS_STORE = new MCRJPAAccessStore();
         }
-        MCRHIBConnection.instance().getSession().save(TRUE_RULE);
-        MCRHIBConnection.instance().getSession().save(FALSE_RULE);
+        MCREntityManagerProvider.getCurrentEntityManager().persist(TRUE_RULE);
+        MCREntityManagerProvider.getCurrentEntityManager().persist(FALSE_RULE);
         startNewTransaction();
 
     }
@@ -91,7 +91,8 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         addRuleMapping(objID, permission, TRUE_RULE.getRid());
         startNewTransaction();
         assertNotNull(
-            MCRHIBConnection.instance().getSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
+            MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESS.class,
+                new MCRACCESSPK(permission, objID)));
     }
 
     private MCRRuleMapping addRuleMapping(final String objID, final String permission, final String rid) {
@@ -133,7 +134,9 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         startNewTransaction();
         ACCESS_STORE.deleteAccessDefinition(ruleMapping);
         startNewTransaction();
-        assertNull(MCRHIBConnection.instance().getSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID)));
+        assertNull(
+            MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESS.class,
+                new MCRACCESSPK(permission, objID)));
     }
 
     /**
@@ -149,7 +152,7 @@ public class MCRJPAAccessStoreTest extends MCRJPATestCase {
         ruleMapping.setRuleId(FALSE_RULE.getRid());
         ACCESS_STORE.updateAccessDefinition(ruleMapping);
         startNewTransaction();
-        MCRACCESS access = MCRHIBConnection.instance().getSession().get(MCRACCESS.class,
+        MCRACCESS access = MCREntityManagerProvider.getCurrentEntityManager().find(MCRACCESS.class,
             new MCRACCESSPK(permission, objID));
         assertEquals(FALSE_RULE, access.getRule());
     }

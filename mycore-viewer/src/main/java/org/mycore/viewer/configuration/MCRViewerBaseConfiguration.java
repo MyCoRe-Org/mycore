@@ -58,10 +58,9 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         setProperty("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
         setProperty("adminMail", MCRConfiguration2.getString("MCR.Mail.Recipients").orElse(""));
 
-        final String canvasOverviewEnabled = MCRConfiguration2.getString("canvas.overview.enabled").orElse("true");
-        if (canvasOverviewEnabled != null) {
-            setProperty("canvas.overview.enabled", Boolean.valueOf(canvasOverviewEnabled));
-        }
+        final String canvasOverviewEnabled = MCRConfiguration2.getString("MCR.Viewer.canvas.overview.enabled")
+                .orElse("true");
+        setProperty("canvas.overview.enabled", Boolean.valueOf(canvasOverviewEnabled));
 
         final String canvasOverviewCanvasOverviewMinVisibleSize = MCRConfiguration2
             .getString("MCR.Viewer.canvas.overview.minVisibleSize").orElse(null);

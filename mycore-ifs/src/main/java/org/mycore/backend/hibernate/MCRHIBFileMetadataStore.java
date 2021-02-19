@@ -34,7 +34,6 @@ import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRFSNODES_;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -52,10 +51,6 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     // LOGGER
     private static Logger LOGGER = LogManager.getLogger(MCRHIBFileMetadataStore.class);
-
-    private Session getSession() {
-        return MCRHIBConnection.instance().getSession();
-    }
 
     public MCRHIBFileMetadataStore() throws MCRPersistenceException {
     }
@@ -103,8 +98,8 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
             throw new MCRPersistenceException("MCRFilesystemNode must be either MCRFile or MCRDirectory");
         }
 
-        Session session = getSession();
-        MCRFSNODES fs = session.get(MCRFSNODES.class, id);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRFSNODES fs = em.find(MCRFSNODES.class, id);
         if (fs == null) {
             fs = new MCRFSNODES();
             fs.setId(id);
@@ -124,8 +119,8 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         fs.setNumchdf(numchdf);
         fs.setNumchtd(numchtd);
         fs.setNumchtf(numchtf);
-        if (!session.contains(fs)) {
-            session.saveOrUpdate(fs);
+        if (!em.contains(fs)) {
+            em.persist(fs);
         }
     }
 
@@ -169,17 +164,17 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
 
     @Override
     public void deleteNode(String id) throws MCRPersistenceException {
-        Session session = getSession();
-        MCRFSNODES node = session.get(MCRFSNODES.class, id);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRFSNODES node = em.find(MCRFSNODES.class, id);
         if (node != null) {
-            session.delete(node); //MCR-1634
+            em.remove(node); //MCR-1634
         }
     }
 
     @Override
     public MCRFilesystemNode retrieveNode(String id) throws MCRPersistenceException {
-        Session session = getSession();
-        MCRFSNODES node = session.get(MCRFSNODES.class, id);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        MCRFSNODES node = em.find(MCRFSNODES.class, id);
         if (node == null) {
             LOGGER.warn("There is no FSNODE with ID = {}", id);
             return null;

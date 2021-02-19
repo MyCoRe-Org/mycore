@@ -31,13 +31,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
@@ -176,8 +177,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running) {
             return;
         }
-        Session session = MCRHIBConnection.instance().getSession();
-        Query<?> query = session.createQuery("DELETE FROM MCRTileJob");
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        Query query = em.createQuery("DELETE FROM MCRTileJob");
         query.executeUpdate();
     }
 
@@ -192,8 +193,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
             List<MCRTileJob> empty = Collections.emptyList();
             return empty.iterator();
         }
-        Session session = MCRHIBConnection.instance().getSession();
-        Query<MCRTileJob> query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar()
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRTileJob> query = em.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar()
             + "' ORDER BY added ASC", MCRTileJob.class);
         List<MCRTileJob> result = query.getResultList();
         return result.iterator();
@@ -207,8 +208,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running) {
             return 0;
         }
-        Session session = MCRHIBConnection.instance().getSession();
-        Query<Number> query = session
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<Number> query = em
             .createQuery("SELECT count(*) FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar()
                 + "'", Number.class);
         return query.getSingleResult().intValue();
@@ -237,8 +238,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running) {
             return null;
         }
-        Session session = MCRHIBConnection.instance().getSession();
-        Query<MCRTileJob> query = session.createQuery("FROM MCRTileJob WHERE  derivate= :derivate AND path = :path",
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRTileJob> query = em.createQuery("FROM MCRTileJob WHERE  derivate= :derivate AND path = :path",
             MCRTileJob.class);
         query.setParameter("derivate", derivate);
         query.setParameter("path", path);
@@ -273,8 +274,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     private int preFetch(int amount) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Query<MCRTileJob> query = session.createQuery(
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRTileJob> query = em.createQuery(
             "FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC", MCRTileJob.class)
             .setMaxResults(amount);
         Iterator<MCRTileJob> queryResult = query.getResultList().iterator();
@@ -283,7 +284,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
             i++;
             MCRTileJob job = queryResult.next();
             preFetch.add(job.clone());
-            session.evict(job);
+            em.detach(job);
         }
         LOGGER.debug("prefetched {} tile jobs", i);
         return i;
@@ -297,8 +298,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running) {
             return false;
         }
-        Session session = MCRHIBConnection.instance().getSession();
-        session.update(job);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.merge(job);
         return true;
     }
 
@@ -306,8 +307,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running) {
             return false;
         }
-        Session session = MCRHIBConnection.instance().getSession();
-        session.save(job);
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        em.persist(job);
         return true;
     }
 
@@ -328,8 +329,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running) {
             return 0;
         }
-        Session session = MCRHIBConnection.instance().getSession();
-        Query<?> query = session.createQuery("DELETE FROM " + MCRTileJob.class.getName()
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        Query query = em.createQuery("DELETE FROM " + MCRTileJob.class.getName()
             + " WHERE derivate = :derivate AND path = :path");
         query.setParameter("derivate", derivate);
         query.setParameter("path", path);
@@ -349,8 +350,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running) {
             return 0;
         }
-        Session session = MCRHIBConnection.instance().getSession();
-        Query<?> query = session
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        Query query = em
             .createQuery("DELETE FROM " + MCRTileJob.class.getName() + " WHERE derivate = :derivate");
         query.setParameter("derivate", derivate);
         try {

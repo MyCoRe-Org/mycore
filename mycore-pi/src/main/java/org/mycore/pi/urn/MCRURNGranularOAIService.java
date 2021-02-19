@@ -29,11 +29,12 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
 import org.mycore.access.MCRAccessException;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -92,7 +93,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
         throws MCRPersistentIdentifierException {
         LOGGER.info("Add single urn to {} / {}", obj.getId(), additional);
 
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         MCRPath filePath = MCRPath.getPath(obj.getId().toString(), additional);
         if (!Files.exists(filePath)) {
             throw new MCRPersistentIdentifierException("Invalid path : " + additional);
@@ -107,7 +108,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
         derivate.getOrCreateFileMetadata(filePath, urntoAssign.asString()).setUrn(urntoAssign.asString());
         MCRPI databaseEntry = new MCRPI(urntoAssign.asString(), getType(), obj.getId().toString(), additional,
             this.getServiceID(), new Date());
-        session.save(databaseEntry);
+        em.persist(databaseEntry);
         return newURN;
     }
 
@@ -115,7 +116,7 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
         throws MCRPersistentIdentifierException {
         LOGGER.info("Add URNs to all files of {}", obj.getId());
 
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
 
         Path path = MCRPath.getPath(obj.getId().toString(), "/");
         MCRFileCollectingFileVisitor<Path> collectingFileVisitor = new MCRFileCollectingFileVisitor<>();
@@ -152,13 +153,13 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
             MCRPI databaseEntry = new MCRPI(subURN.asString(), getType(), obj.getId().toString(),
                 pathList.get(pathListIndex).getOwnerRelativePath(),
                 this.getServiceID(), null);
-            session.save(databaseEntry);
+            em.persist(databaseEntry);
         }
 
         derivate.setURN(newURN.asString());
         MCRPI databaseEntry = new MCRPI(newURN.asString(), getType(), obj.getId().toString(), "",
             this.getServiceID(), new Date());
-        session.save(databaseEntry);
+        em.persist(databaseEntry);
         return newURN;
     }
 

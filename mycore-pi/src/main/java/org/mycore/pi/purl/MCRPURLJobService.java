@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
@@ -122,7 +122,7 @@ public class MCRPURLJobService extends MCRPIJobService<MCRPURL> {
     }
 
     @Override
-    public void deleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
+    public void deleteJob(Map<String, String> parameters) {
         // deleting ist not supported
     }
 
@@ -137,7 +137,7 @@ public class MCRPURLJobService extends MCRPIJobService<MCRPURL> {
 
         MCRPI databaseEntry = new MCRPI(identifier.asString(), getType(), obj.getId().toString(), additional,
             this.getServiceID(), provideRegisterDate(obj, additional), registrationStarted);
-        MCRHIBConnection.instance().getSession().save(databaseEntry);
+        MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
         return databaseEntry;
     }
 

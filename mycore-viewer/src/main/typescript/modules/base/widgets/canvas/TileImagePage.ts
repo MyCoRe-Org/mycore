@@ -143,7 +143,6 @@ namespace mycore.viewer.widgets.canvas {
                     // backbuffer content is the same
                     return;
                 } else {
-                    this.abortLoadingTiles();
                     // need to draw the full buffer, because zoom level changed or never drawed before
                     this.vBackBuffer.width = newBackBuffer.size.width * 256;
                     this.vBackBuffer.height = newBackBuffer.size.height * 256;
@@ -179,14 +178,11 @@ namespace mycore.viewer.widgets.canvas {
 
         }
 
-        protected static EMPTY_FUNCTION = () => {
-        };
-
         protected abortLoadingTiles() {
             this.vLoadingTiles.forEach((k, v) => {
-                v.onerror = TileImagePage.EMPTY_FUNCTION;
-                v.onload = TileImagePage.EMPTY_FUNCTION;
-                v.src = '#';
+                delete v.src;
+                delete v.onload;
+                delete v.onerror;
             });
             this.vLoadingTiles.clear();
         }

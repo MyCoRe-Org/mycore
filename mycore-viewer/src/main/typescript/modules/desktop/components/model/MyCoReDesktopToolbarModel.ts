@@ -63,7 +63,9 @@ namespace mycore.viewer.model {
             });
 
             this.viewSelect = new widgets.toolbar.ToolbarDropdownButton('viewSelect', 'viewSelect', this.viewSelectChilds, 'eye');
-            this._viewSelectGroup.addComponent(this.viewSelect);
+            if (this._viewSelectGroup != null && typeof this._viewSelectGroup != "undefined") {
+                this._viewSelectGroup.addComponent(this.viewSelect);
+            }
         }
 
         public addSelectionSwitchButton():void{

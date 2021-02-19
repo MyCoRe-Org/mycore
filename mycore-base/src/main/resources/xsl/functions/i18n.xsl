@@ -27,12 +27,11 @@
                 <xsl:iterate select="$arguments">
                     <xsl:param name="replTrans" select="$translation" as="xs:string" />
                     <xsl:param name="repl" select="0" as="xs:integer" />
-                    <xsl:variable name="replaced" select="fn:replace($replTrans, concat('\{',$repl,'\}'), .)" />
                     <xsl:on-completion>
-                        <xsl:value-of select="$replaced" />
+                        <xsl:value-of select="$replTrans" />
                     </xsl:on-completion>
                     <xsl:next-iteration>
-                        <xsl:with-param name="replTrans" select="$replaced" />
+                        <xsl:with-param name="replTrans" select="fn:replace($replTrans, concat('\{',$repl,'\}'), .)" />
                         <xsl:with-param name="repl" select="($repl + 1)" />
                     </xsl:next-iteration>
                 </xsl:iterate>

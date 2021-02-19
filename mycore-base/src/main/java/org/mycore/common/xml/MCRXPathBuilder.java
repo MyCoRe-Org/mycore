@@ -25,6 +25,8 @@ import org.jdom2.Namespace;
 import org.jdom2.Parent;
 import org.mycore.common.MCRConstants;
 
+import java.util.List;
+
 /**
  * Builds an absolute XPath expression for a given element or attribute within a JDOM XML structure.
  *
@@ -34,7 +36,7 @@ public class MCRXPathBuilder {
 
     /**
      * Builds an absolute XPath expression for a given element or attribute within a JDOM XML structure.
-     * In case any ancestor element in context is not the first one, the XPath will also contain a position predicate.
+     * For each element that is not the root element, the XPath will also contain a position predicate.
      * For all namespaces commonly used in MyCoRe, their namespace prefixes will be used.
      *
      * @param object a JDOM element or attribute
@@ -52,7 +54,7 @@ public class MCRXPathBuilder {
 
     /**
      * Builds an absolute XPath expression for the given attribute within a JDOM XML structure.
-     * In case any ancestor element in context is not the first one, the XPath will also contain position predicates.
+     * For each element that is not the root element, the XPath will also contain a position predicate.
      * For all namespaces commonly used in MyCoRe, their namespace prefixes will be used.
      *
      * @param attribute a JDOM attribute
@@ -68,7 +70,7 @@ public class MCRXPathBuilder {
 
     /**
      * Builds an absolute XPath expression for the given element within a JDOM XML structure.
-     * In case any ancestor element in context is not the first one, the XPath will also contain position predicates.
+     * For each element that is not the root element, the XPath will also contain a position predicate.
      * For all namespaces commonly used in MyCoRe, their namespace prefixes will be used.
      *
      * @param element a JDOM element
@@ -120,7 +122,9 @@ public class MCRXPathBuilder {
         }
 
         Element parentElement = (Element) parent;
-        int pos = parentElement.getChildren(element.getName(), element.getNamespace()).indexOf(element);
-        return (pos == 0 ? "" : "[" + ++pos + "]");
+        List<Element> siblings = parentElement.getChildren(element.getName(), element.getNamespace());
+        int pos = siblings.indexOf(element) + 1;
+
+        return "[" + pos + "]";
     }
 }

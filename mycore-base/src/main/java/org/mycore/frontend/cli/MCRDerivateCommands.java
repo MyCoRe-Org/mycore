@@ -32,7 +32,6 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -111,12 +110,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "delete all derivates", help = "Removes all derivates from the repository", order = 10)
     public static List<String> deleteAllDerivates() {
-        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<>(ids.size());
-        for (String id : ids) {
-            cmds.add("delete derivate " + id);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForType("derivate")
+            .map(id -> "delete derivate " + id)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -148,25 +144,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "delete derivate from {0} to {1}",
         help = "The command remove derivates in the number range between the MCRObjectID {0} and {1}.",
         order = 20)
-    public static void delete(String idFrom, String idTo)
+    public static List<String> delete(String idFrom, String idTo)
         throws MCRPersistenceException, MCRActiveLinkException, MCRAccessException {
-
-        MCRObjectID from = MCRObjectID.getInstance(idFrom);
-        MCRObjectID to = MCRObjectID.getInstance(idTo);
-        int lowerBound = from.getNumberAsInteger();
-        int upperBound = to.getNumberAsInteger();
-
-        if (lowerBound > upperBound) {
-            throw new MCRException("The from-to-interval is false.");
-        }
-
-        for (int i = lowerBound; i < upperBound + 1; i++) {
-
-            String id = MCRObjectID.formatID(from.getProjectId(), from.getTypeId(), i);
-            if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
-                delete(id);
-            }
-        }
+        return MCRCommandUtils.getIdsFromIdToId(idFrom, idTo)
+            .map(id -> "delete derivate " + id)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -489,19 +471,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             + " For {1} save is the default.",
         order = 100)
     public static List<String> exportAllDerivates(String dirname, String style) {
-        // check dirname
-        File dir = new File(dirname);
-
-        if (dir.isFile()) {
-            throw new MCRException(dirname + " is not a dirctory.");
-        }
-
-        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<>(ids.size());
-        for (String id : ids) {
-            cmds.add("export derivate " + id + " to directory " + dirname + " with " + style);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForType("derivate")
+            .map(id -> "export derivate " + id + " to directory " + dirname + " with " + style)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -519,22 +491,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             + " For {2} save is the default.",
         order = 110)
     public static List<String> exportAllDerivatesOfProject(String project, String dirname, String style) {
-        // check dirname
-        File dir = new File(dirname);
-
-        if (dir.isFile()) {
-            throw new MCRException(dirname + " is not a dirctory.");
-        }
-
-        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<>(ids.size());
-        for (String id : ids) {
-            if (!id.startsWith(project)) {
-                continue;
-            }
-            cmds.add("export derivate " + id + " to directory " + dirname + " with " + style);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
+            .map(id -> "export derivate " + id + " to directory " + dirname + " with " + style)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -633,16 +592,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         order = 140)
     public static List<String> repairDerivateSearch() {
         LOGGER.info("Start the repair for type derivate.");
-        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        if (ids.size() == 0) {
-            LOGGER.warn("No IDs found for type derivate.");
-            return Collections.emptyList();
-        }
-        List<String> cmds = new ArrayList<>(ids.size());
-        for (String id : ids) {
-            cmds.add("repair derivate search of ID " + id);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForType("derivate")
+            .map(id -> "repair derivate search of ID " + id)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -656,27 +608,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         order = 141)
     public static List<String> repairDerivateSearchForBase(String project) {
         LOGGER.info("Start the repair for project {}.", project);
-        if (project == null || project.length() == 0) {
-            throw new MCRException("Project identifier required to repair its search indexing.");
-        }
-        String baseID = project + "_derivate";
-        MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
-        List<String> idList;
-        try {
-            idList = mgr.listIDsForBase(baseID);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new MCRException("Requested base ID " + baseID + " not found in store.", e);
-        }
-        int maxresults = idList.size();
-        if (maxresults == 0) {
-            LOGGER.warn("No IDs found for base {}, nothing to check.", baseID);
-            return Collections.emptyList();
-        }
-        List<String> cmds = new ArrayList<>(maxresults);
-        for (String id : idList) {
-            cmds.add("repair derivate search of ID " + id);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
+            .map(id -> "repair derivate search of ID " + id)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -725,16 +659,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         order = 160)
     public static List<String> synchronizeAllDerivates() {
         LOGGER.info("Start the synchronization for derivates.");
-        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        if (ids.size() == 0) {
-            LOGGER.warn("No ID's was found for type derivate.");
-            return Collections.emptyList();
-        }
-        List<String> cmds = new ArrayList<>(ids.size());
-        for (String id : ids) {
-            cmds.add("synchronize derivate with ID " + id);
-        }
-        return cmds;
+        return MCRCommandUtils.getIdsForType("derivate")
+            .map(id -> "synchronize derivate with ID " + id)
+            .collect(Collectors.toList());
     }
 
     /**

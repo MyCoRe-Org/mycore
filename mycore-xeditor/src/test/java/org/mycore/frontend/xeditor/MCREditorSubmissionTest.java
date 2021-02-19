@@ -48,9 +48,9 @@ public class MCREditorSubmissionTest extends MCRTestCase {
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
         Map<String, String[]> submittedValues = new HashMap<>();
-        submittedValues.put("/document/title", new String[] { "Title" });
-        submittedValues.put("/document/author/@firstName", new String[] { "Jim" });
-        submittedValues.put("/document/author/@lastName", new String[] { "" });
+        submittedValues.put("/document/title[1]", new String[] { "Title" });
+        submittedValues.put("/document/author[1]/@firstName", new String[] { "Jim" });
+        submittedValues.put("/document/author[1]/@lastName", new String[] { "" });
         session.getSubmission().setSubmittedValues(submittedValues);
         session.getSubmission().emptyNotResubmittedNodes();
 
@@ -62,7 +62,7 @@ public class MCREditorSubmissionTest extends MCRTestCase {
     }
 
     @Test
-    public void testSubmitCheckbox() throws JaxenException, JDOMException, IOException {
+    public void testSubmitSingleCheckbox() throws JaxenException, JDOMException, IOException {
         String template = "document[@archive='false']";
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
@@ -84,14 +84,48 @@ public class MCREditorSubmissionTest extends MCRTestCase {
     }
 
     @Test
-    public void testSubmitSelectOptions()
+    public void testSubmitSelectSingleOption()
         throws JaxenException, JDOMException, IOException {
-        String template = "document[category='a'][category[2]='b'][category[3]='c']";
+        String template = "document[category='a']";
         MCREditorSession session = new MCREditorSession();
         session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
 
         session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category", true, session.getRootBinding()));
+            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
+        session.getSubmission().emptyNotResubmittedNodes();
+
+        List<Element> categories = session.getEditedXML().getRootElement().getChildren("category");
+        assertEquals(1, categories.size());
+        assertEquals("", categories.get(0).getText());
+
+        session.getSubmission()
+            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
+
+        Map<String, String[]> submittedValues = new HashMap<>();
+        submittedValues.put("/document/category[1]", new String[] { "b" });
+        session.getSubmission().setSubmittedValues(submittedValues);
+
+        session.getSubmission().emptyNotResubmittedNodes();
+
+        categories = session.getEditedXML().getRootElement().getChildren("category");
+        assertEquals(1, categories.size());
+        assertEquals("b", categories.get(0).getText());
+    }
+
+    @Test
+    public void testSubmitSelectMultipleOptions()
+        throws JaxenException, JDOMException, IOException {
+        String template = "document[category[1]='a'][category[2]='b'][category[3]='c']";
+        MCREditorSession session = new MCREditorSession();
+        session.setEditedXML(new Document(new MCRNodeBuilder().buildElement(template, null, null)));
+
+        session.getSubmission()
+            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
+        session.getSubmission()
+            .mark2checkResubmission(new MCRBinding("/document/category[2]", true, session.getRootBinding()));
+        session.getSubmission()
+            .mark2checkResubmission(new MCRBinding("/document/category[3]", true, session.getRootBinding()));
+
         session.getSubmission().emptyNotResubmittedNodes();
 
         List<Element> categories = session.getEditedXML().getRootElement().getChildren("category");
@@ -101,7 +135,11 @@ public class MCREditorSubmissionTest extends MCRTestCase {
         assertEquals("", categories.get(2).getText());
 
         session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category", true, session.getRootBinding()));
+            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
+        session.getSubmission()
+            .mark2checkResubmission(new MCRBinding("/document/category[2]", true, session.getRootBinding()));
+        session.getSubmission()
+            .mark2checkResubmission(new MCRBinding("/document/category[3]", true, session.getRootBinding()));
 
         Map<String, String[]> submittedValues = new HashMap<>();
         submittedValues.put("/document/category", new String[] { "c", "d" });
@@ -116,7 +154,11 @@ public class MCREditorSubmissionTest extends MCRTestCase {
         assertEquals("", categories.get(2).getText());
 
         session.getSubmission()
-            .mark2checkResubmission(new MCRBinding("/document/category", true, session.getRootBinding()));
+            .mark2checkResubmission(new MCRBinding("/document/category[1]", true, session.getRootBinding()));
+        session.getSubmission()
+            .mark2checkResubmission(new MCRBinding("/document/category[2]", true, session.getRootBinding()));
+        session.getSubmission()
+            .mark2checkResubmission(new MCRBinding("/document/category[3]", true, session.getRootBinding()));
 
         submittedValues.clear();
         submittedValues.put("/document/category", new String[] { "a", "b", "c", "d" });

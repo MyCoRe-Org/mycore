@@ -3,7 +3,7 @@
            xmlns:m="http://www.w3.org/1998/Math/MathML"
            elementFormDefault="qualified"
            targetNamespace="http://www.w3.org/1998/Math/MathML">
-   <xs:include schemaLocation="mathml3-strict-content.xsd"/>
+   <xs:include schemaLocation="http://www.w3.org/Math/XMLSchema/mathml3/mathml3-strict-content.xsd"/>
    <xs:complexType name="cn.content" mixed="true">
       <xs:choice minOccurs="0" maxOccurs="unbounded">
          <xs:element ref="m:mglyph"/>

@@ -77,12 +77,6 @@ public class MCREditorSubmission {
         }
     }
 
-    private void removeXPaths2CheckResubmission(MCRBinding binding) {
-        for (Object node : binding.getBoundNodes()) {
-            xPaths2CheckResubmission.remove(MCRXPathBuilder.buildXPath(node));
-        }
-    }
-
     public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
         for (String xPath : xPaths2CheckResubmission) {
             MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
@@ -150,9 +144,11 @@ public class MCREditorSubmission {
             value = MCRXMLFunctions.normalizeUnicode(value);
             value = MCRXMLHelper.removeIllegalChars(value);
             binding.setValue(i, value);
+
+            Object node = binding.getBoundNodes().get(i);
+            xPaths2CheckResubmission.remove(MCRXPathBuilder.buildXPath(node));
         }
 
-        removeXPaths2CheckResubmission(binding);
         binding.detach();
     }
 

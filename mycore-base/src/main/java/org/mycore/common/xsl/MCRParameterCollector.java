@@ -191,10 +191,12 @@ public class MCRParameterCollector {
 
     /**
      * Copies all MCRConfiguration properties as XSL parameters.
+     * and replaces ":" in property keys with "_"
      */
     private void setFromConfiguration() {
         for (Map.Entry<String, String> property : MCRConfiguration2.getPropertiesMap().entrySet()) {
-            parameters.put(property.getKey(), property.getValue());
+            String key = property.getKey().replace(":","_");
+            parameters.put(key, property.getValue());
         }
     }
 

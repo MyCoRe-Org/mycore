@@ -256,17 +256,15 @@ detect-file@^1.0.0:
   resolved "https://registry.yarnpkg.com/detect-file/-/detect-file-1.0.0.tgz#f0d66d03672a825cb1b73bdb3fe62310c8e552b7"
   integrity sha1-8NZtA2cqglyxtzvbP+YjEMjlUrc=
 
-dijit@1.16.3:
-  version "1.16.3"
-  resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.16.3.tgz#7888e144edab454eca7f08bb7b7aaa66f5b5e098"
-  integrity sha512-D1dvhLYU2qXQ92rK49z0pQvskQphKyA9j9b5CyljwrNWDSbikIFzKobF9W+srEAMHRD10mHSJEHu5F/Fkyfg3w==
-  dependencies:
-    dojo "1.16.3"
+dijit@1.6.5:
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/dijit/-/dijit-1.6.5.tgz#d4163896a75031cbcf3b857a5367daa3dd9b45e2"
+  integrity sha1-1BY4lqdQMcvPO4V6U2fao92bReI=
 
-dojo@1.16.3:
-  version "1.16.3"
-  resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.16.3.tgz#f9d2343184b5e5ffda2ee5666029da20508e1013"
-  integrity sha512-+mPovtmbULx5V69lWji496gMfhXuL1WCC0KBq0hig4Tz6WGAYxTOJV6ch3bewNzSJHmaHiSsIMYkW8jcUrhLIQ==
+dojo@1.6.5:
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/dojo/-/dojo-1.6.5.tgz#df20f41358a5a161dc083af81832ed6f9fe21ca4"
+  integrity sha1-3yD0E1iloWHcCDr4GDLtb5/iHKQ=
 
 escape-string-regexp@^1.0.2:
   version "1.0.5"
@@ -619,9 +617,9 @@ inherits@2:
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
 
 ini@^1.3.4:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.5.tgz#eee25f56db1c9ec6085e0c22778083f596abf927"
-  integrity sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.8.tgz#a29da425b48806f34767a4efce397269af28432c"
+  integrity sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==
 
 interpret@~1.1.0:
   version "1.1.0"

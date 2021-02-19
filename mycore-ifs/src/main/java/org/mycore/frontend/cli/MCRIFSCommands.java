@@ -69,9 +69,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRFSNODES_;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -544,12 +541,11 @@ public class MCRIFSCommands {
             return;
         }
         Map<String, MCRContentStore> availableStores = MCRContentStoreFactory.getAvailableStores();
-        Session session = MCRHIBConnection.instance().getSession();
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         MCRXMLMetadataManager mgr = MCRXMLMetadataManager.instance();
         List<String> idList = mgr.listIDsForBase(projectId + "_derivate");
         int counter = 0;
         int maxresults = idList.size();
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
         Root<MCRFSNODES> nodes = query.from(MCRFSNODES.class);
@@ -581,7 +577,7 @@ public class MCRIFSCommands {
                         datecal.setTime(date);
                         String fctid = fsNode.getFctid();
                         String md5 = fsNode.getMd5();
-                        session.evict(fsNode);
+                        em.detach(fsNode);
                         LOGGER.debug(
                             "File for [owner] {} [name] {} [storeid] {} [storageid] {} [fctid] {} [size] {} [md5] {}",
                             derid, name, storeName, storageid, fctid, size, md5);
@@ -606,7 +602,7 @@ public class MCRIFSCommands {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                session.clear();
+                em.clear();
             }
         }
         LOGGER.info("Check done for {} entries", Integer.toString(counter));
@@ -698,11 +694,11 @@ public class MCRIFSCommands {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
         Root<MCRFSNODES> root = query.from(MCRFSNODES.class);
-        ((Query<MCRFSNODES>) em.createQuery(query
+        (em.createQuery(query
             .where(cb.equal(root.get(MCRFSNODES_.storeid), storeIFS2.getID()),
                 cb.equal(root.get(MCRFSNODES_.type), "F"))
             .orderBy(cb.asc(root.get(MCRFSNODES_.owner)), cb.asc(cb.length(root.get(MCRFSNODES_.storageid))))))
-                .stream()
+                .getResultStream()
                 .peek(em::detach)
                 .filter(f -> MCRObjectID.isValid(f.getOwner()))
                 .map(f -> {
@@ -748,11 +744,11 @@ public class MCRIFSCommands {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRFSNODES> query = cb.createQuery(MCRFSNODES.class);
         Root<MCRFSNODES> root = query.from(MCRFSNODES.class);
-        ((Query<MCRFSNODES>) em.createQuery(query
+        (em.createQuery(query
             .where(cb.equal(root.get(MCRFSNODES_.storeid), storeIFS2.getID()),
                 cb.equal(root.get(MCRFSNODES_.type), "F"))
             .orderBy(cb.asc(root.get(MCRFSNODES_.owner)), cb.asc(cb.length(root.get(MCRFSNODES_.storageid))))))
-                .stream()
+                .getResultStream()
                 .peek(em::detach)
                 .filter(f -> MCRObjectID.isValid(f.getOwner()))
                 .map(f -> {

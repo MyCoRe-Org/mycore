@@ -23,7 +23,7 @@ import java.util.function.BiConsumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
@@ -95,7 +95,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
                 entry.setMcrVersion(MCRCoreVersion.getVersion());
                 entry.setMycoreID(obj.getId().toString());
                 LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
-                MCRHIBConnection.instance().getSession().save(entry);
+                MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
             });
 
         handleObjectUpdated(evt, obj);

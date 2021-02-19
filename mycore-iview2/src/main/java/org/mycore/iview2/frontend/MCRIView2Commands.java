@@ -48,12 +48,12 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.cli.MCRAbstractCommands;
+import org.mycore.frontend.cli.MCRCommandUtils;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.imagetiler.MCRImage;
@@ -92,7 +92,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         help = "tiles all images of all derivates with a supported image type as main document",
         order = 40)
     public static List<String> tileAll() {
-        return forAllDerivates(TILE_DERIVATE_TILES_COMMAND_SYNTAX);
+        MessageFormat syntaxMF = new MessageFormat(TILE_DERIVATE_TILES_COMMAND_SYNTAX, Locale.ROOT);
+        return MCRCommandUtils.getIdsForType("derivate")
+            .map(id -> syntaxMF.format(new Object[] { id }))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -103,16 +106,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         help = "checks if all images have valid iview2 files and start tiling if not",
         order = 10)
     public static List<String> checkAll() {
-        return forAllDerivates(CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX);
-    }
-
-    private static List<String> forAllDerivates(String batchCommandSyntax) {
-        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<>(ids.size());
-        for (String id : ids) {
-            cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(new String[] { id }));
-        }
-        return cmds;
+        MessageFormat syntaxMF = new MessageFormat(CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX, Locale.ROOT);
+        return MCRCommandUtils.getIdsForType("derivate")
+            .map(id -> syntaxMF.format(new Object[] { id }))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -123,7 +120,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         help = "tiles all images of derivates of a project with a supported image type as main document",
         order = 41)
     public static List<String> tileAllOfProject(String project) {
-        return forAllDerivatesOfProject(TILE_DERIVATE_TILES_COMMAND_SYNTAX, project);
+        MessageFormat syntaxMF = new MessageFormat(TILE_DERIVATE_TILES_COMMAND_SYNTAX, Locale.ROOT);
+        return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
+            .map(id -> syntaxMF.format(new Object[] { id }))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -134,18 +134,10 @@ public class MCRIView2Commands extends MCRAbstractCommands {
         help = "checks if all images have valid iview2 files and start tiling if not",
         order = 11)
     public static List<String> checkAllOfProject(String project) {
-        return forAllDerivatesOfProject(CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX, project);
-    }
-
-    private static List<String> forAllDerivatesOfProject(String batchCommandSyntax, String project) {
-        List<String> ids = MCRXMLMetadataManager.instance().listIDsOfType("derivate");
-        List<String> cmds = new ArrayList<>(ids.size());
-        for (String id : ids) {
-            if (id.startsWith(project)) {
-                cmds.add(new MessageFormat(batchCommandSyntax, Locale.ROOT).format(new String[] { id }));
-            }
-        }
-        return cmds;
+        MessageFormat syntaxMF = new MessageFormat(CHECK_TILES_OF_DERIVATE_COMMAND_SYNTAX, Locale.ROOT);
+        return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
+            .map(id -> syntaxMF.format(new Object[] { id }))
+            .collect(Collectors.toList());
     }
 
     /**

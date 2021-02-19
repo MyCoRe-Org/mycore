@@ -35,6 +35,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,7 +89,11 @@ public class MCRUserManager {
             return getUser(userName, MCRRealmFactory.getLocalRealm());
         } else {
             String[] parts = userName.split("@");
-            return getUser(parts[0], parts[1]);
+            if (parts.length == 2) {
+                return getUser(parts[0], parts[1]);
+            } else {
+                return null;
+            }
         }
     }
 
@@ -330,35 +335,48 @@ public class MCRUserManager {
             .getResultList();
     }
 
-    private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, Optional<String> userPattern,
-        Optional<String> realm, Optional<String> namePattern) {
-        ArrayList<Predicate> predicates = new ArrayList<>(3);
-        realm
-            .filter(s -> !s.isEmpty())
-            .map(s -> cb.equal(root.get(MCRUser_.realmID), s))
-            .ifPresent(predicates::add);
+    private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, String userPattern, String realm,
+        String namePattern, String mailPattern) {
 
-        Optional<Predicate> userPredicate = userPattern
-            .filter(s -> !s.isEmpty())
-            .map(s -> s.replace('*', '%'))
-            .map(s -> s.replace('?', '_'))
-            .map(s -> s.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale()))
-            .map(s -> cb.like(cb.lower(root.get(MCRUser_.userName)), s));
+        ArrayList<Predicate> predicates = new ArrayList<>(2);
+        addEqualsPredicate(cb, root, MCRUser_.realmID, realm, predicates);
 
-        Optional<Predicate> namePredicate = namePattern
-            .filter(s -> !s.isEmpty())
-            .map(s -> s.replace('*', '%'))
-            .map(s -> s.replace('?', '_'))
-            .map(s -> s.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale()))
-            .map(s -> cb.like(cb.lower(root.get(MCRUser_.realName)), s));
+        ArrayList<Predicate> searchPredicates = new ArrayList<>(3);
+        addSearchPredicate(cb, root, MCRUser_.userName, userPattern, searchPredicates);
+        addSearchPredicate(cb, root, MCRUser_.realName, namePattern, searchPredicates);
+        addSearchPredicate(cb, root, MCRUser_.EMail, mailPattern, searchPredicates);
 
-        if (userPattern.isPresent() && namePredicate.isPresent()) {
-            predicates.add(cb.or(userPredicate.get(), namePredicate.get()));
-        } else {
-            userPredicate.ifPresent(predicates::add);
-            namePredicate.ifPresent(predicates::add);
+        if (!searchPredicates.isEmpty()) {
+            if (1 == searchPredicates.size()) {
+                predicates.add(searchPredicates.get(0));
+            } else {
+                predicates.add(cb.or(searchPredicates.toArray(new Predicate[searchPredicates.size()])));
+            }
         }
+
         return predicates.toArray(new Predicate[predicates.size()]);
+    }
+
+    private static void addEqualsPredicate(CriteriaBuilder cb, Root<MCRUser> root,
+        SingularAttribute<MCRUser, String> attribute, String string, ArrayList<Predicate> predicates) {
+        if (null != string && !string.isEmpty()) {
+            predicates.add(cb.equal(root.get(attribute), string));
+        }
+    }
+
+    private static void addSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
+        SingularAttribute<MCRUser, String> attribute, String searchPattern, ArrayList<Predicate> predicates) {
+        if (null != searchPattern && !searchPattern.isEmpty()) {
+            predicates.add(buildSearchPredicate(cb, root, attribute, searchPattern));
+        }
+    }
+
+    private static Predicate buildSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
+        SingularAttribute<MCRUser, String> attribute, String searchPattern) {
+        searchPattern = searchPattern.replace('*', '%');
+        searchPattern = searchPattern.replace('?', '_');
+        searchPattern = searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
+        return cb.like(cb.lower(root.get(attribute)), searchPattern);
     }
 
     /**
@@ -370,11 +388,31 @@ public class MCRUserManager {
      * this information call {@link MCRUserManager#getUser(String, String)}.
      *
      * @param userPattern a wildcard pattern for the login user name, may be null
-     * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @return a list of matching users
+     * @deprecated Use {@link MCRUserManager#listUsers(String, String, String, String)} instead.
+     */
+    @Deprecated
+    public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern) {
+        return listUsers(userPattern, realm, namePattern, null);
+    }
+
+    /**
+     * Searches for users in the database and returns a list of matching users.
+     * Wildcards containing * and ? for single character may be used for searching
+     * by login user name or real name.
+     *
+     * Pay attention that no role information is attached to user data. If you need
+     * this information call {@link MCRUserManager#getUser(String, String)}.
+     *
+     * @param userPattern a wildcard pattern for the login user name, may be null
+     * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @param mailPattern a wildcard pattern for the person's email, may be null
      * @return a list of matching users
      */
-    public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern) {
+    public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern, String mailPattern) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRUser> query = cb.createQuery(MCRUser.class);
@@ -383,8 +421,7 @@ public class MCRUserManager {
             .createQuery(
                 query
                     .where(
-                        buildCondition(cb, user, Optional.ofNullable(userPattern), Optional.ofNullable(realm),
-                            Optional.ofNullable(namePattern))))
+                        buildCondition(cb, user, userPattern, realm, namePattern, mailPattern)))
             .getResultList();
     }
 
@@ -394,11 +431,28 @@ public class MCRUserManager {
      * by login user name or real name.
      *
      * @param userPattern a wildcard pattern for the login user name, may be null
-     * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @return the number of matching users
+     * @deprecated Use {@link MCRUserManager#countUsers(String, String, String, String)} instead.
+     */
+    @Deprecated
+    public static int countUsers(String userPattern, String realm, String namePattern ) {
+        return countUsers(userPattern, realm, namePattern, null);
+    }
+
+    /**
+     * Counts users in the database that match the given criteria.
+     * Wildcards containing * and ? for single character may be used for searching
+     * by login user name or real name.
+     *
+     * @param userPattern a wildcard pattern for the login user name, may be null
+     * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @param mailPattern a wildcard pattern for the person's email, may be null
      * @return the number of matching users
      */
-    public static int countUsers(String userPattern, String realm, String namePattern) {
+    public static int countUsers(String userPattern, String realm, String namePattern, String mailPattern) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Number> query = cb.createQuery(Number.class);
@@ -408,8 +462,7 @@ public class MCRUserManager {
                 query
                     .select(cb.count(user))
                     .where(
-                        buildCondition(cb, user, Optional.ofNullable(userPattern), Optional.ofNullable(realm),
-                            Optional.ofNullable(namePattern))))
+                        buildCondition(cb, user, userPattern, realm, namePattern, mailPattern)))
             .getSingleResult().intValue();
     }
 
@@ -446,7 +499,8 @@ public class MCRUserManager {
 
     /**
      * Returns a {@link MCRUser} instance if the login succeeds.
-     * This method will return <code>null</code> if the user does not exist or the login is disabled.
+     * This method will return <code>null</code> if the user does not exist, no password was given or
+     * the login is disabled.
      * If the {@link MCRUser#getHashType()} is {@link MCRPasswordHashType#crypt}, {@link MCRPasswordHashType#md5} or
      * {@link MCRPasswordHashType#sha1} the hash value is automatically upgraded to {@link MCRPasswordHashType#sha256}.
      * @param userName Name of the user to login.
@@ -457,6 +511,11 @@ public class MCRUserManager {
         MCRUser user = getUser(userName);
         if (user == null || user.getHashType() == null) {
             LOGGER.warn(() -> "User not found: " + userName);
+            waitLoginPanalty();
+            return null;
+        }
+        if (password == null) {
+            LOGGER.warn("No password for user {} entered", userName);
             waitLoginPanalty();
             return null;
         }
