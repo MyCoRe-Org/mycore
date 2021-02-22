@@ -690,7 +690,7 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="mods:identifier[@type='uri' or @type='doi' or @type='urn']" mode="present">
+  <xsl:template match="mods:identifier[@type='uri' or @type='doi' or @type='urn' or @type='zdbid']" mode="present">
     <tr>
       <td valign="top" class="metaname">
         <xsl:choose>
@@ -727,6 +727,11 @@
           </xsl:when>
           <xsl:when test="@type='urn' and not(contains($link,'http'))">
             <a href="https://nbn-resolving.org/{$link}">
+              <xsl:value-of select="$link" />
+            </a>
+          </xsl:when>
+          <xsl:when test="@type='zdbid' and not(contains($link,'http'))">
+            <a href="https://ld.zdb-services.de/resource/{$link}">
               <xsl:value-of select="$link" />
             </a>
           </xsl:when>
