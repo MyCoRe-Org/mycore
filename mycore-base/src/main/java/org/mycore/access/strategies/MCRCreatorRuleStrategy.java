@@ -18,7 +18,9 @@
 
 package org.mycore.access.strategies;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,8 +59,9 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
     private static final String SUBMITTED_CATEGORY = MCRConfiguration2
         .getString("MCR.Access.Strategy.SubmittedCategory").orElse("state:submitted");
 
-    private static final String CREATOR_ROLE = MCRConfiguration2.getString("MCR.Access.Strategy.CreatorRole")
-        .orElse("submitter");
+    private static final List<String> CREATOR_ROLES = MCRConfiguration2
+        .getOrThrow("MCR.Access.Strategy.CreatorRole", MCRConfiguration2::splitValue)
+        .collect(Collectors.toList());
 
     private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
@@ -117,7 +120,8 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
             try {
                 mcrObjectId = MCRObjectID.getInstance(id);
                 MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
-                if (currentUser.isUserInRole(CREATOR_ROLE) && objectStatusIsSubmitted(mcrObjectId)) {
+                if (CREATOR_ROLES.stream().anyMatch(currentUser::isUserInRole)
+                    && objectStatusIsSubmitted(mcrObjectId)) {
                     if (isCurrentUserCreator(mcrObjectId, currentUser)) {
                         return true;
                     }
