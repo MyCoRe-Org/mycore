@@ -706,7 +706,13 @@
         <xsl:variable name="link" select="." />
         <xsl:choose>
           <xsl:when test="contains($link,'ppn') or contains($link,'PPN')">
-            <a class="ppn" href="{$link}">
+            <a class="ppn">
+              <xsl:attribute name="href">
+                <xsl:choose>
+                  <xsl:when test="contains($link, 'uri.gbv.de/')"><xsl:value-of select="concat($link, '?format=redirect')"/></xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$link"/></xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
               <xsl:choose>
                 <xsl:when test="contains($link, 'PPN=')">
                   <xsl:value-of select="substring-after($link, 'PPN=')" />
