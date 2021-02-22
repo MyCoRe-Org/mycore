@@ -118,11 +118,6 @@ public class MCRSolrIndexer {
                 while (SOLR_COLLECTION.stream().findAny().isPresent()) {
                     Thread.yield(); //wait for index handler
                 }
-                SOLR_EXECUTOR.submit(SOLR_EXECUTOR.getExecutor()::shutdown,
-                    Integer.MIN_VALUE)
-                    .getFuture()
-                    .join();
-                waitForShutdown(SOLR_EXECUTOR.getExecutor());
             }
 
             @Override
@@ -132,6 +127,12 @@ public class MCRSolrIndexer {
 
             @Override
             public void close() {
+                //MCR-2349 close after MCRSolrIndexEventHandler
+                SOLR_EXECUTOR.submit(SOLR_EXECUTOR.getExecutor()::shutdown,
+                    Integer.MIN_VALUE)
+                    .getFuture()
+                    .join();
+                waitForShutdown(SOLR_EXECUTOR.getExecutor());
                 String documentStats = new MessageFormat("Solr documents: {0}, each: {1} ms.", Locale.ROOT).format(
                     new Object[] { MCRSolrIndexStatisticCollector.DOCUMENTS.getDocuments(),
                         MCRSolrIndexStatisticCollector.DOCUMENTS.reset() });
