@@ -68,6 +68,10 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
     }
 
     static {
+        //MCR-2359 make sure that MCRSolrIndexer is initialized
+        //and its ShutdownHandler are registred
+        MCRSolrIndexer.SOLR_EXECUTOR.submit(() -> null);
+
         SOLR_TASK_EXECUTOR.scheduleWithFixedDelay(new Runnable() {
 
             @Override
@@ -85,7 +89,9 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
             }
 
             @Override
-            public void close() {
+            public void prepareClose() {
+                //MCR-2349
+                //MCRSolrIndexer requires an early stop of index jobs
                 SOLR_TASK_EXECUTOR.shutdown();
                 try {
                     SOLR_TASK_EXECUTOR.awaitTermination(10, TimeUnit.MINUTES);
@@ -98,6 +104,11 @@ public class MCRSolrIndexEventHandler extends MCREventHandlerBase {
                         SOLR_TASK_QUEUE.size());
                     processSolrTaskQueue();
                 }
+            }
+
+            @Override
+            public void close() {
+                //all work done in prepareClose phase
             }
         });
     }
