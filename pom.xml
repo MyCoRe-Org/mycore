@@ -4,10 +4,10 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>45</version>
+    <version>46-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2021.02</version>
+  <version>2021.05-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
@@ -29,13 +29,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>v2021.02</tag>
+    <tag>HEAD</tag>
   </scm>
   <properties>
     <argLine />
-    <changelog.since>2020-09-08</changelog.since>
+    <changelog.since>2021-02-23</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2020.11</changes.version>
+    <changes.version>2021.05</changes.version>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <forbiddenapis.version>2.6</forbiddenapis.version>
