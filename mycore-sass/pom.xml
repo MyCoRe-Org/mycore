@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2021.02-SNAPSHOT</version>
+    <version>2021.02</version>
   </parent>
   <artifactId>mycore-sass</artifactId>
   <name>MyCoRe SASS</name>
