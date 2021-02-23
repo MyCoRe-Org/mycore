@@ -690,7 +690,7 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="mods:identifier[@type='uri' or @type='doi' or @type='urn']" mode="present">
+  <xsl:template match="mods:identifier[@type='uri' or @type='doi' or @type='urn' or @type='zdbid']" mode="present">
     <tr>
       <td valign="top" class="metaname">
         <xsl:choose>
@@ -706,7 +706,13 @@
         <xsl:variable name="link" select="." />
         <xsl:choose>
           <xsl:when test="contains($link,'ppn') or contains($link,'PPN')">
-            <a class="ppn" href="{$link}">
+            <a class="ppn">
+              <xsl:attribute name="href">
+                <xsl:choose>
+                  <xsl:when test="contains($link, 'uri.gbv.de/')"><xsl:value-of select="concat($link, '?format=redirect')"/></xsl:when>
+                  <xsl:otherwise><xsl:value-of select="$link"/></xsl:otherwise>
+                </xsl:choose>
+              </xsl:attribute>
               <xsl:choose>
                 <xsl:when test="contains($link, 'PPN=')">
                   <xsl:value-of select="substring-after($link, 'PPN=')" />
@@ -727,6 +733,11 @@
           </xsl:when>
           <xsl:when test="@type='urn' and not(contains($link,'http'))">
             <a href="https://nbn-resolving.org/{$link}">
+              <xsl:value-of select="$link" />
+            </a>
+          </xsl:when>
+          <xsl:when test="@type='zdbid' and not(contains($link,'http'))">
+            <a href="https://ld.zdb-services.de/resource/{$link}">
               <xsl:value-of select="$link" />
             </a>
           </xsl:when>
