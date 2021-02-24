@@ -1220,6 +1220,17 @@ Applications based on MyCoRe use a common core, which provides the functionality
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.glassfish.jersey.ext</groupId>
+        <artifactId>jersey-mvc-jsp</artifactId>
+        <version>${jersey.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.core.version}</version>
