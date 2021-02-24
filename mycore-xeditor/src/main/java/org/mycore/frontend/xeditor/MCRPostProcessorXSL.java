@@ -21,11 +21,14 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.xml.transform.TransformerFactory;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Text;
 import org.jdom2.filter.Filters;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -33,9 +36,26 @@ import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.xml.sax.SAXException;
 
+/**
+ * PostProcessor for MyCoRe editor framework
+ * that allows execution of XSLT stylesheets after an editor is closed
+ */
 public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
+    private static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
+        .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
+
+    private Class<? extends TransformerFactory> factoryClass;
+
     private String stylesheet;
+
+    public MCRPostProcessorXSL() {
+        this(DEFAULT_FACTORY_CLASS);
+    }
+
+    public MCRPostProcessorXSL(Class<? extends TransformerFactory> factoryClass) {
+        this.factoryClass = factoryClass;
+    }
 
     public void setStylesheet(String stylesheet) {
         this.stylesheet = stylesheet;
@@ -47,7 +67,7 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
         }
 
         MCRContent source = new MCRJDOMContent(xml);
-        MCRContent transformed = MCRXSL2XMLTransformer.getInstance("xsl/" + stylesheet).transform(source);
+        MCRContent transformed = MCRXSL2XMLTransformer.getInstance(factoryClass, "xsl/" + stylesheet).transform(source);
         MCRContent normalized = new MCRNormalizeUnicodeTransformer().transform(transformed);
         return normalized.asXML();
     }
