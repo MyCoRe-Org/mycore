@@ -32,17 +32,13 @@ public class MCRPostProcessorXSL3 extends MCRPostProcessorXSL {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRPostProcessorXSL3.class);
 
-    private static Class<? extends TransformerFactory> FACTORY_CLASS = null;
-
-    static {
+    public MCRPostProcessorXSL3() throws ClassNotFoundException {
         try {
-            FACTORY_CLASS = MCRClassTools.forName("net.sf.saxon.TransformerFactoryImpl");
+            Class<? extends TransformerFactory> factoryClass = MCRClassTools
+                .forName("net.sf.saxon.TransformerFactoryImpl");
+            init(factoryClass);
         } catch (ClassNotFoundException e) {
             LOGGER.error("Transformer class not found", e);
         }
-    }
-
-    public MCRPostProcessorXSL3() throws ClassNotFoundException {
-        super(FACTORY_CLASS);
     }
 }

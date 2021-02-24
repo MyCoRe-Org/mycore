@@ -50,10 +50,10 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
     private String stylesheet;
 
     public MCRPostProcessorXSL() {
-        this(DEFAULT_FACTORY_CLASS);
+        init(DEFAULT_FACTORY_CLASS);
     }
 
-    public MCRPostProcessorXSL(Class<? extends TransformerFactory> factoryClass) {
+    protected void init(Class<? extends TransformerFactory> factoryClass) {
         this.factoryClass = factoryClass;
     }
 
