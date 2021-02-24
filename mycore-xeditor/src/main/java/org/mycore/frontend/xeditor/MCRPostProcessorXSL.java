@@ -42,15 +42,14 @@ import org.xml.sax.SAXException;
  */
 public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
-    private static final Class<? extends TransformerFactory> DEFAULT_FACTORY_CLASS = MCRConfiguration2
-        .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
-
     private Class<? extends TransformerFactory> factoryClass;
 
     private String stylesheet;
 
     public MCRPostProcessorXSL() {
-        init(DEFAULT_FACTORY_CLASS);
+        Class<? extends TransformerFactory> factoryClass = MCRConfiguration2
+            .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
+        init(factoryClass);
     }
 
     protected void init(Class<? extends TransformerFactory> factoryClass) {
