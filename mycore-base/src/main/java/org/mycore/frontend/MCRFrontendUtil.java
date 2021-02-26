@@ -238,7 +238,8 @@ public class MCRFrontendUtil {
     }
 
     /**
-     * Returns the instance saved by the current thread via {@link #configureSession(MCRSession, HttpServletRequest, HttpServletResponse)}.
+     * Returns the instance saved for the current thread via
+     * {@link #configureSession(MCRSession, HttpServletRequest, HttpServletResponse)}.
      * @return {@link Optional#empty()} if no servlet job is available for the current {@link MCRSession}
      */
     public static Optional<MCRServletJob> getCurrentServletJob() {
