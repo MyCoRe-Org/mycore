@@ -492,8 +492,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
                     <bannedDependencies>
                       <searchTransitive>true</searchTransitive>
                       <excludes>
-                        <exclude>org.glassfish.hk2.external:aopalliance-repackaged</exclude>
-                        <exclude>org.glassfish.hk2.external:jakarta.inject</exclude>
+                        <exclude>org.glassfish.hk2.external:aopalliance-repackaged:*:*:compile</exclude>
+                        <exclude>org.glassfish.hk2.external:jakarta.inject:*:*:compile</exclude>
+                        <exclude>org.glassfish.hk2.external:aopalliance-repackaged:*:*:runtime</exclude>
+                        <exclude>org.glassfish.hk2.external:jakarta.inject:*:*:runtime</exclude>
                         <exclude>org.apache.geronimo.specs:geronimo-activation_1.1_spec</exclude>
                       </excludes>
                       <message>Do not use OSGI repacked libraries from jersey</message>
@@ -530,6 +532,17 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <ignoredResourcePattern>/?about.html$</ignoredResourcePattern>
                 <ignoredResourcePattern>/?catalog.xml$</ignoredResourcePattern>
               </ignoredResourcePatterns>
+              <ignoredDependencies>
+                <!-- scope provided -->
+                <dependency>
+                  <groupId>org.glassfish.hk2.external</groupId>
+                  <artifactId>aopalliance-repackaged</artifactId>
+                </dependency>
+                <dependency>
+                  <groupId>org.glassfish.hk2.external</groupId>
+                  <artifactId>jakarta.inject</artifactId>
+                </dependency>
+              </ignoredDependencies>
             </configuration>
             <executions>
               <execution>
@@ -1157,69 +1170,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-servlet-core</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-client</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-common</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.core</groupId>
-        <artifactId>jersey-server</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.media</groupId>
-        <artifactId>jersey-media-multipart</artifactId>
-        <version>${jersey.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
         <version>${hibernate.core.version}</version>
@@ -1534,6 +1484,16 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>provided</scope>
       </dependency>
       <dependency>
+        <groupId>org.glassfish.hk2.external</groupId>
+        <artifactId>aopalliance-repackaged</artifactId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.hk2.external</groupId>
+        <artifactId>jakarta.inject</artifactId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
         <version>6.2.4</version>
@@ -1638,57 +1598,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-servlet</artifactId>
-        <version>${jersey.version}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <!-- not before 2.26 -->
-        <groupId>org.glassfish.jersey.inject</groupId>
-        <artifactId>jersey-hk2</artifactId>
-        <version>${jersey.version}</version>
-        <scope>runtime</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.media</groupId>
-        <artifactId>jersey-media-json-jackson</artifactId>
-        <version>${jersey.version}</version>
-        <scope>runtime</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.media</groupId>
-        <artifactId>jersey-media-sse</artifactId>
-        <version>${jersey.version}</version>
-        <scope>runtime</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>aopalliance-repackaged</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
         <version>3.27.0-GA</version>
@@ -1704,6 +1613,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
         <version>${log4j.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>${jersey.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -1749,42 +1665,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>org.glassfish.grizzly</groupId>
         <artifactId>grizzly-http-servlet</artifactId>
         <version>${grizzly.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-grizzly2-http</artifactId>
-        <version>${jersey.version}</version>
-        <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-grizzly2-servlet</artifactId>
-        <version>${jersey.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.test-framework</groupId>
-        <artifactId>jersey-test-framework-core</artifactId>
-        <version>${jersey.version}</version>
-        <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>jakarta.inject</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-        <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
-        <version>${jersey.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
