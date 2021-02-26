@@ -78,6 +78,4 @@ public class MCRServletJob {
             throw new MCRConfigurationException(msg, ex);
         }
     }
-
-
 }
