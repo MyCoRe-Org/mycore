@@ -19,14 +19,10 @@
 package org.mycore.frontend.servlets;
 
 import java.net.InetAddress;
-import java.net.URI;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.MCRFrontendUtil;
 
@@ -40,18 +36,10 @@ import org.mycore.frontend.MCRFrontendUtil;
  */
 public class MCRServletJob {
     /** The HttpServletRequest object */
-    private final HttpServletRequest theRequest;
+    private HttpServletRequest theRequest = null;
 
     /** The HttpServletResponse object */
-    private final HttpServletResponse theResponse;
-
-    private String sessionID;
-
-    private static final ThreadLocal<MCRServletJob> CURRENT = new ThreadLocal<>();
-
-    static {
-        addSessionListener();
-    }
+    private HttpServletResponse theResponse = null;
 
     /**
      * The constructor takes the given objects and stores them in private
@@ -91,48 +79,5 @@ public class MCRServletJob {
         }
     }
 
-    /**
-     * Saves this instance as the 'current' servlet job.
-     *
-     * Can be retrieved afterwards by {@link #getCurrent()}.
-     * @throws IllegalStateException if {@link MCRSessionMgr#hasCurrentSession()} returns false
-     */
-    public void setAsCurrent() throws IllegalStateException {
-        if (!MCRSessionMgr.hasCurrentSession()) {
-            throw new IllegalStateException("No current MCRSession available");
-        }
-        final MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        mcrSession.setFirstURI(() -> URI.create(getRequest().getRequestURI()));
-        sessionID = mcrSession.getID();
-        CURRENT.set(this);
-    }
-
-    /**
-     * Returns the instance saved by the current thread via {@link #setAsCurrent()}.
-     * @return {@link Optional#empty()} if no servlet job is available for the current {@link MCRSession}
-     */
-    public static Optional<MCRServletJob> getCurrent() {
-        final MCRServletJob servletJob = CURRENT.get();
-        final Optional<MCRServletJob> rv = Optional.ofNullable(servletJob)
-            .filter(job -> MCRSessionMgr.hasCurrentSession())
-            .filter(job -> MCRSessionMgr.getCurrentSession().getID().equals(job.sessionID));
-        if (rv.isEmpty()) {
-            CURRENT.remove();
-        }
-        return rv;
-    }
-
-    private static void addSessionListener() {
-        MCRSessionMgr.addSessionListener(event -> {
-            switch (event.getType()) {
-                case passivated:
-                case destroyed:
-                    CURRENT.remove();
-                    break;
-                default:
-                    break;
-            }
-        });
-    }
 
 }
