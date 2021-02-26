@@ -167,7 +167,8 @@ public class MCRFrontendUtil {
     }
 
     public static void configureSession(MCRSession session, HttpServletRequest request, HttpServletResponse response) {
-        session.setServletJob(new MCRServletJob(request, response));
+        final MCRServletJob servletJob = new MCRServletJob(request, response);
+        servletJob.setAsCurrent();
         // language
         getProperty(request, "lang").ifPresent(session::setCurrentLanguage);
 

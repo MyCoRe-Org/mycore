@@ -44,10 +44,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import javax.persistence.EntityTransaction;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,7 +56,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
-import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -112,8 +110,6 @@ public class MCRSession implements Cloneable {
     private boolean dataBaseAccess;
 
     private ThreadLocal<EntityTransaction> transaction = new ThreadLocal<>();
-
-    private ThreadLocal<MCRServletJob> servletJob = new ThreadLocal<>();
 
     private StackTraceElement[] constructingStackTrace;
 
@@ -310,27 +306,10 @@ public class MCRSession implements Cloneable {
         return lastAccessTime;
     }
 
-    public void setServletJob(MCRServletJob job) {
+    public void setFirstURI(Supplier<URI> uri) {
         if (!firstURI.isPresent()) {
-            firstURI = Optional.of(URI.create(job.getRequest().getRequestURI()));
+            firstURI = Optional.of(uri.get());
         }
-        servletJob.set(job);
-    }
-
-    /**
-     * Returns this thread current HttpServletRequest.
-     * Does not work in a Thread that does not handle the current request or in CLI.
-     */
-    public Optional<HttpServletRequest> getServletRequest() {
-        return Optional.ofNullable(servletJob.get()).map(MCRServletJob::getRequest);
-    }
-
-    /**
-     * Returns this thread current HttpServletResponse.
-     * Does not work in a Thread that does not handle the current request or in CLI.
-     */
-    public Optional<HttpServletResponse> getServletResponse() {
-        return Optional.ofNullable(servletJob.get()).map(MCRServletJob::getResponse);
     }
 
     /**
@@ -369,7 +348,6 @@ public class MCRSession implements Cloneable {
             firstURI = Optional.of(DEFAULT_URI);
         }
         onCommitTasks.remove();
-        servletJob.remove();
     }
 
     /**
