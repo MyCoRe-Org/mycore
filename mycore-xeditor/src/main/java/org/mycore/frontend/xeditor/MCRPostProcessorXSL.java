@@ -21,11 +21,15 @@ package org.mycore.frontend.xeditor;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.xml.transform.TransformerFactory;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Text;
 import org.jdom2.filter.Filters;
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -33,21 +37,50 @@ import org.mycore.common.content.transformer.MCRXSL2XMLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.xml.sax.SAXException;
 
+/**
+ * PostProcessor for MyCoRe editor framework
+ * that allows execution of XSLT stylesheets after an editor is closed
+ * 
+ * &lt;xed:post-processor class="org.mycore.frontend.xeditor.MCRPostProcessorXSL" 
+ *      xsl="editor/ir_xeditor2mods.xsl" transformer="saxon" /&gt;
+ * 
+ * You can specify with param xsl the stylesheet, which should be processed and 
+ * you can specify with parm transformer the XSLStylesheetProcessor ('xalan' or 'saxon').
+ * If no transformer is specified the default transformer will be used
+ * (property: MCR.LayoutService.TransformerFactoryClass).
+ */
 public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
-    private String stylesheet;
+    private String transformer;
 
-    public void setStylesheet(String stylesheet) {
-        this.stylesheet = stylesheet;
-    }
+    private String stylesheet;
 
     public Document process(Document xml) throws IOException, JDOMException, SAXException {
         if (stylesheet == null) {
             return xml.clone();
         }
 
+        Class<? extends TransformerFactory> factoryClass = null;
+        try {
+            if ("xalan".equals(transformer)) {
+                factoryClass = MCRClassTools
+                    .forName("org.apache.xalan.processor.TransformerFactoryImpl");
+            }
+            if ("saxon".equals(transformer)) {
+                factoryClass = MCRClassTools
+                    .forName("net.sf.saxon.TransformerFactoryImpl");
+            }
+        } catch (ClassNotFoundException e) {
+            //do nothing, use default
+        }
+
+        if (factoryClass == null) {
+            factoryClass = MCRConfiguration2
+                .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
+        }
+
         MCRContent source = new MCRJDOMContent(xml);
-        MCRContent transformed = MCRXSL2XMLTransformer.getInstance("xsl/" + stylesheet).transform(source);
+        MCRContent transformed = MCRXSL2XMLTransformer.getInstance(factoryClass, "xsl/" + stylesheet).transform(source);
         MCRContent normalized = new MCRNormalizeUnicodeTransformer().transform(transformed);
         return normalized.asXML();
     }
@@ -55,6 +88,13 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
     @Override
     public void setAttributes(Map<String, String> attributeMap) {
         this.stylesheet = attributeMap.get("xsl");
+        if (attributeMap.containsKey("transformer")) {
+            this.transformer = attributeMap.get("transformer");
+        }
+    }
+
+    public void setStylesheet(String stylesheet) {
+        this.stylesheet = stylesheet;
     }
 }
 
