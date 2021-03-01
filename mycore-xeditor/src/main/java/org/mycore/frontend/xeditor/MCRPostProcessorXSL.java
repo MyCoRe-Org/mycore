@@ -56,11 +56,11 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
     private String stylesheet;
 
     public Document process(Document xml) throws IOException, JDOMException, SAXException {
-        Class<? extends TransformerFactory> factoryClass = null;
         if (stylesheet == null) {
             return xml.clone();
         }
 
+        Class<? extends TransformerFactory> factoryClass = null;
         try {
             if ("xalan".equals(transformer)) {
                 factoryClass = MCRClassTools
