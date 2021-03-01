@@ -41,8 +41,8 @@ import org.xml.sax.SAXException;
  * PostProcessor for MyCoRe editor framework
  * that allows execution of XSLT stylesheets after an editor is closed
  * 
- * <xed:post-processor class="org.mycore.frontend.xeditor.MCRPostProcessorXSL" 
- *      xsl="editor/ir_xeditor2mods.xsl" transformer="saxon" />
+ * &lt;xed:post-processor class="org.mycore.frontend.xeditor.MCRPostProcessorXSL" 
+ *      xsl="editor/ir_xeditor2mods.xsl" transformer="saxon" /&gt;
  * 
  * You can specify with param xsl the stylesheet, which should be processed and 
  * you can specify with parm transformer the XSLStylesheetProcessor ('xalan' or 'saxon').
