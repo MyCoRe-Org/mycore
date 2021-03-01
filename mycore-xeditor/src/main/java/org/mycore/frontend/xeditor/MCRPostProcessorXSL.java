@@ -51,32 +51,31 @@ import org.xml.sax.SAXException;
  */
 public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
-    private Class<? extends TransformerFactory> factoryClass;
-
     private String transformer;
 
     private String stylesheet;
 
     public Document process(Document xml) throws IOException, JDOMException, SAXException {
+        Class<? extends TransformerFactory> factoryClass = null;
         if (stylesheet == null) {
             return xml.clone();
         }
 
         try {
             if ("xalan".equals(transformer)) {
-                this.factoryClass = MCRClassTools
+                factoryClass = MCRClassTools
                     .forName("org.apache.xalan.processor.TransformerFactoryImpl");
             }
             if ("saxon".equals(transformer)) {
-                this.factoryClass = MCRClassTools
+                factoryClass = MCRClassTools
                     .forName("net.sf.saxon.TransformerFactoryImpl");
             }
         } catch (ClassNotFoundException e) {
             //do nothing, use default
         }
 
-        if (this.factoryClass == null) {
-            this.factoryClass = MCRConfiguration2
+        if (factoryClass == null) {
+            factoryClass = MCRConfiguration2
                 .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
         }
 
