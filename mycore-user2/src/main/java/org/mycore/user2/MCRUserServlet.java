@@ -26,9 +26,11 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -374,16 +376,15 @@ public class MCRUserServlet extends MCRServlet {
         }
         user.setEMail(eMail);
 
-        Element attributes = u.getChild("attributes");
-        if (attributes != null) {
-            List<Element> attributeList = attributes.getChildren("attribute");
-            Set<MCRUserAttribute> newAttrs = attributeList.stream()
-                .map(a -> new MCRUserAttribute(a.getAttributeValue("name"), a.getAttributeValue("value")))
-                .collect(Collectors.toSet());
-            user.getAttributes().retainAll(newAttrs);
-            newAttrs.removeAll(user.getAttributes());
-            user.getAttributes().addAll(newAttrs);
-        }
+        List<Element> attributeList = Optional.ofNullable(u.getChild("attributes"))
+            .map(attributes -> attributes.getChildren("attribute"))
+            .orElse(Collections.emptyList());
+        Set<MCRUserAttribute> newAttrs = attributeList.stream()
+            .map(a -> new MCRUserAttribute(a.getAttributeValue("name"), a.getAttributeValue("value")))
+            .collect(Collectors.toSet());
+        user.getAttributes().retainAll(newAttrs);
+        newAttrs.removeAll(user.getAttributes());
+        user.getAttributes().addAll(newAttrs);
     }
 
     /**
