@@ -28,6 +28,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Text;
 import org.jdom2.filter.Filters;
+import org.mycore.common.MCRClassTools;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -39,30 +40,44 @@ import org.xml.sax.SAXException;
 /**
  * PostProcessor for MyCoRe editor framework
  * that allows execution of XSLT stylesheets after an editor is closed
+ * 
+ * <xed:post-processor class="org.mycore.frontend.xeditor.MCRPostProcessorXSL" 
+ *      xsl="editor/ir_xeditor2mods.xsl" transformer="saxon" />
+ * 
+ * You can specify with param xsl the stylesheet, which should be processed and 
+ * you can specify with parm transformer the XSLStylesheetProcessor ('xalan' or 'saxon').
+ * If no transformer is specified the default transformer will be used
+ * (property: MCR.LayoutService.TransformerFactoryClass).
  */
 public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
 
     private Class<? extends TransformerFactory> factoryClass;
 
+    private String transformer;
+
     private String stylesheet;
-
-    public MCRPostProcessorXSL() {
-        Class<? extends TransformerFactory> factoryClass = MCRConfiguration2
-            .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
-        init(factoryClass);
-    }
-
-    protected void init(Class<? extends TransformerFactory> factoryClass) {
-        this.factoryClass = factoryClass;
-    }
-
-    public void setStylesheet(String stylesheet) {
-        this.stylesheet = stylesheet;
-    }
 
     public Document process(Document xml) throws IOException, JDOMException, SAXException {
         if (stylesheet == null) {
             return xml.clone();
+        }
+
+        try {
+            if ("xalan".equals(transformer)) {
+                this.factoryClass = MCRClassTools
+                    .forName("org.apache.xalan.processor.TransformerFactoryImpl");
+            }
+            if ("saxon".equals(transformer)) {
+                this.factoryClass = MCRClassTools
+                    .forName("net.sf.saxon.TransformerFactoryImpl");
+            }
+        } catch (ClassNotFoundException e) {
+            //do nothing, use default
+        }
+
+        if (this.factoryClass == null) {
+            this.factoryClass = MCRConfiguration2
+                .<TransformerFactory>getClass("MCR.LayoutService.TransformerFactoryClass").orElseThrow();
         }
 
         MCRContent source = new MCRJDOMContent(xml);
@@ -74,6 +89,13 @@ public class MCRPostProcessorXSL implements MCRXEditorPostProcessor {
     @Override
     public void setAttributes(Map<String, String> attributeMap) {
         this.stylesheet = attributeMap.get("xsl");
+        if (attributeMap.containsKey("transformer")) {
+            this.transformer = attributeMap.get("transformer");
+        }
+    }
+
+    public void setStylesheet(String stylesheet) {
+        this.stylesheet = stylesheet;
     }
 }
 
