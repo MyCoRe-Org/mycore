@@ -244,6 +244,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("redirect", new MCRRedirectResolver());
         supportedSchemes.put("data", new MCRDataURLResolver());
         supportedSchemes.put("i18n", new MCRI18NResolver());
+        supportedSchemes.put("checkPermissionChain", new MCRCheckPermissionChainResolver());
         supportedSchemes.put("checkPermission", new MCRCheckPermissionResolver());
         MCRRESTResolver restResolver = new MCRRESTResolver();
         supportedSchemes.put("http", restResolver);
@@ -1670,6 +1671,46 @@ public final class MCRURIResolver implements URIResolver {
             });
 
             return new JDOMSource(i18nElement);
+        }
+    }
+
+    private static class MCRCheckPermissionChainResolver implements URIResolver {
+        /**
+         * Checks the permission and if granted resolve the uri
+         *
+         * Syntax: <code>checkPermissionChain:{?id}:{permission}:{$uri}</code>
+         *
+         * @param href
+         *            URI in the syntax above
+         * @param base
+         *            not used
+         *
+         * @return if you have the permission then the resolved uri otherwise an Exception
+         * @see javax.xml.transform.URIResolver
+         */
+        public Source resolve(String href, String base) throws TransformerException {
+            final String[] split = href.split(":",4);
+
+            if(split.length!=4){
+                throw new MCRException("Syntax needs to be checkPermissionChain:{?id}:{permission}:{uri} but was " + href);
+            }
+
+            final String permission = split[2];
+
+            final String uri = split[3];
+            final boolean hasAccess;
+
+            if(!split[1].isBlank()){
+                hasAccess = MCRAccessManager.checkPermission(permission, split[1]);
+            } else {
+                hasAccess = MCRAccessManager.checkPermission(permission);
+            }
+
+            if(!hasAccess){
+                throw new TransformerException("No Access to " + uri + " ("+href+" )");
+            }
+
+            return MCRURIResolver.instance().resolve(uri, base);
         }
     }
 
