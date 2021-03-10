@@ -46,7 +46,7 @@
         </xsl:when>
       </xsl:choose>
       <xsl:if test="/user/@realm = 'local' and (not($isCurrentUser) or not(/user/@locked = 'true'))">
-        <a class="btn btn-default" href="{$WebApplicationBaseURL}authorization/change-password.xed?action=password&amp;id={$uid}">
+        <a class="btn btn-primary" href="{$WebApplicationBaseURL}authorization/change-password.xed?action=password&amp;id={$uid}">
           <xsl:value-of select="i18n:translate('component.user2.admin.changepw')" />
         </a>
       </xsl:if>
@@ -60,8 +60,10 @@
 
   <xsl:template match="user">
     <div class="user-details">
-      <div id="buttons" class="btn-group pull-right">
-        <xsl:apply-templates select="." mode="actions" />
+      <div class="text-right mb-3">
+        <div id="buttons" class="btn-group">
+          <xsl:apply-templates select="." mode="actions" />
+        </div>
       </div>
       <div class="clearfix" />
       <h2>
@@ -93,7 +95,7 @@
           <form method="get" action="MCRUserServlet">
             <input name="action" value="show" type="hidden" />
             <input name="id" value="{$uid}" type="hidden" />
-            <input value="{i18n:translate('component.user2.button.cancelNo')}" class="btn btn-default" type="submit" />
+            <input value="{i18n:translate('component.user2.button.cancelNo')}" class="btn btn-primary" type="submit" />
           </form>
         </div>
       </xsl:if>

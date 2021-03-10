@@ -12,17 +12,17 @@
   </xed:template>
 
   <xed:template id="editor4currentUser">
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
+    <xed:include ref="realName" />
+    <xed:include ref="email" />
   </xed:template>
 
   <xed:template id="editor4newReadUser">
     <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
       required="true" maxlength="16" />
     <xed:bind xpath="@realm" default="local" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwords" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
+    <xed:include ref="passwords" />
+    <xed:include ref="passwordHint" />
+    <xed:include ref="realName" />
 
     <xed:validate xpath="/user[@realm = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
       i18n="component.user2.admin.inputhints.sameUsername" />
@@ -32,30 +32,30 @@
     <mcruser:template name="textInput" xpath="@name" id="userName" i18n="component.user2.admin.userAccount" i18n.error="component.user2.admin.inputhints.username"
       required="true" maxlength="43" />
     <xed:bind xpath="@realm" default="local" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
+    <xed:include ref="passwordHint" />
+    <xed:include ref="realName" />
   </xed:template>
 
   <xed:template id="editor4newAdmins">
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="userAccount" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwords" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
+    <xed:include ref="userAccount" />
+    <xed:include ref="passwords" />
+    <xed:include ref="passwordHint" />
+    <xed:include ref="realName" />
+    <xed:include ref="email" />
 
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
+    <xed:include ref="editor4admins" />
 
     <xed:validate xpath="/user[@realm = 'local']/@name" display="global" class="org.mycore.user2.MCRUserServlet" method="checkUserName"
       i18n="component.user2.admin.inputhints.sameUsername" />
   </xed:template>
 
   <xed:template id="editor4changeAdmins">
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="userAccount" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="passwordHint" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="realName" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="email" />
+    <xed:include ref="userAccount" />
+    <xed:include ref="passwordHint" />
+    <xed:include ref="realName" />
+    <xed:include ref="email" />
 
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4admins" />
+    <xed:include ref="editor4admins" />
   </xed:template>
 
   <xed:template id="editor4admins">
@@ -68,8 +68,8 @@
     <mcruser:template name="textInput" xpath="validUntil" id="validUntil" i18n="component.user2.admin.user.validUntil" i18n.error="component.user2.admin.inputhints.date"
       validate="true" type="datetime" format="yyyy-MM-dd;yyyy-MM-dd'T'HH:mm:ss'Z'" maxlength="20" />
 
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="owner" />
-    <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="roles" />
+    <xed:include ref="owner" />
+    <xed:include ref="roles" />
   </xed:template>
 
   <xed:template id="buttons">
@@ -125,11 +125,11 @@
   </xed:template>
 
   <xed:template id="realName">
-    <mcruser:template name="textInput" xpath="realName" id="realName" i18n="component.user2.admin.realName" maxlength="255" />
+    <mcruser:template name="textInput" xpath="realName" id="realNameInput" i18n="component.user2.admin.realName" maxlength="255" />
   </xed:template>
 
   <xed:template id="email">
-    <mcruser:template name="textInput" xpath="eMail" id="email" i18n="component.user2.admin.email" i18n.error="component.user2.admin.email.syntax"
+    <mcruser:template name="textInput" xpath="eMail" id="emailInput" i18n="component.user2.admin.email" i18n.error="component.user2.admin.email.syntax"
       validate="true" matches="\S+@\S+\.\S+" maxlength="255" />
   </xed:template>
 
@@ -198,6 +198,41 @@
                 <xed:controls>insert remove up down</xed:controls>
               </div>
             </div>
+          </div>
+        </div>
+      </xed:repeat>
+    </xed:bind>
+  </xed:template>
+
+  <xed:template id="attributes">
+    <xed:cleanup-rule xpath="//attribute" relevant-if="string-length(@value) &gt; 0 and string-length(@name) &gt; 0" />
+    <xed:cleanup-rule xpath="//attributes" relevant-if="count(//attribute) &gt; 0" />
+    <xed:bind xpath="attributes">
+      <xed:repeat min="0" xpath="attribute">
+        <div class="form-group row">
+          <label class="col-md-3 control-label">
+            <xed:output i18n="component.user2.admin.user.attributes"/>
+          </label>
+          <div class="col-md-3">
+            <div class="controls">
+              <xed:bind xpath="@name">
+                <select class="form-control form-control-inline">
+                  <option value="">
+                    <xed:multi-lang>
+                      <xed:lang xml:lang="de">bitte wählen</xed:lang>
+                      <xed:lang xml:lang="en">please select</xed:lang>
+                    </xed:multi-lang>
+                  </option>
+                  <xed:include uri="xslStyle:items2options:classification:editor:-1:children:user_attributes"/>
+                </select>
+              </xed:bind>
+            </div>
+          </div>
+          <mcruser:template name="textInput" xpath="@value" id="attrValue" disabled="false" inline="true" colsize="sm"
+                            colwidth="3"
+                            i18n.error="component.user2.admin.inputhints.attrVal" required="false" maxlength="255"/>
+          <div class="col-sm-3">
+            <xed:controls>insert remove up down</xed:controls>
           </div>
         </div>
       </xed:repeat>

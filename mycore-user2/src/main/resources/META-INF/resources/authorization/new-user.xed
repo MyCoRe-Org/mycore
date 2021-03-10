@@ -3,6 +3,8 @@
 <MyCoReWebPage>
   <section xml:lang="all" i18n="component.user2.admin.create.title">
     <xed:form class="userEditor form-horizontal" role="form" xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcruser="http://www.mycore.de/components/mcruser">
+      <xed:preload uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" />
+      <xed:preload uri="xslStyle:user-xeditor-templates:webapp:{$MCR.UserForms.CustomIncludes}" />
       <xed:cancel url="{$ServletsBaseURL}MCRUserServlet" />
 
       <xed:bind xpath="user">
@@ -13,13 +15,13 @@
             </h3>
           </div>
           <div class="card-body">
-            <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="failed-validation-messages" />
+            <xed:include ref="failed-validation-messages" />
 
-            <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="editor4newAdmins" />
+            <xed:include ref="editor4newAdmins" />
           </div>
           <div class="card-footer clearfix">
             <div class="pull-right">
-              <xed:include uri="xslStyle:user-xeditor-templates:webapp:authorization/user-editor.xed" ref="buttons" />
+              <xed:include ref="buttons" />
             </div>
           </div>
         </div>
