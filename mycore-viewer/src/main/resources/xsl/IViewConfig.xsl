@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
-                xmlns:uuid="java:java.util.UUID"
                 exclude-result-prefixes="iview2">
   <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="MCR.Viewer.bootstrapURL" />
+  <xsl:param name="MCR.Viewer.bootstrapURL" /> <!-- just for legacy reasons -->
   <xsl:param name="MCR.Viewer.FontaweSomeURL" />
+  <xsl:param name="MCR.Viewer.BootstrapURL" >
+    <xsl:if test="string-length($MCR.Viewer.bootstrapURL)&gt;0">
+      <xsl:choose>
+        <xsl:when
+                test="'/'=substring($MCR.Viewer.bootstrapURL, string-length($MCR.Viewer.bootstrapURL) - string-length('/') + 1)">
+          <xsl:value-of select="$MCR.Viewer.bootstrapURL"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat($MCR.Viewer.bootstrapURL, '/')"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:param>
 
   <xsl:output method="html" encoding="UTF-8" indent="yes" />
 
@@ -25,9 +37,9 @@
                   type="text/css" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:if test="string-length($MCR.Viewer.bootstrapURL)&gt;0">
-              <script type="text/javascript" src="{$MCR.Viewer.bootstrapURL}/js/bootstrap.min.js"></script>
-              <link href="{$MCR.Viewer.bootstrapURL}/css/bootstrap.css" type="text/css" rel="stylesheet"></link>
+            <xsl:if test="string-length($MCR.Viewer.BootstrapURL)&gt;0">
+              <script type="text/javascript" src="{$MCR.Viewer.BootstrapURL}js/bootstrap.min.js"></script>
+              <link href="{$MCR.Viewer.BootstrapURL}css/bootstrap.css" type="text/css" rel="stylesheet"></link>
             </xsl:if>
             <xsl:if test="string-length($MCR.Viewer.FontaweSomeURL)&gt;0">
               <link href="{$MCR.Viewer.FontaweSomeURL}" type="text/css" rel="stylesheet"></link>
