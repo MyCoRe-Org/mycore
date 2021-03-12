@@ -3,7 +3,6 @@
                 xmlns:iview2="xalan://org.mycore.iview2.frontend.MCRIView2XSLFunctions"
                 exclude-result-prefixes="iview2">
   <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="MCR.Viewer.bootstrapURL" />
 
   <xsl:output method="text" media-type="text/javascript" indent="no" />
 
