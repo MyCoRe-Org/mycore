@@ -51,7 +51,6 @@ public class MCRSolrWorldReadableURIResolver implements URIResolver {
             Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();
             if ("isWorldReadable".equals(key)) {
                 return new DOMSource(doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadable(mcrID))));
-
             }
             if ("isWorldReadableComplete".equals(key)) {
                 return new DOMSource(
@@ -63,8 +62,6 @@ public class MCRSolrWorldReadableURIResolver implements URIResolver {
         } catch (ParserConfigurationException e) {
             LOGGER.error("Could not create DOM document", e);
         }
-
         return null;
     }
-
 }
