@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:fn="http://www.w3.org/2005/xpath-functions"
-  exclude-result-prefixes="mcrxsl xalan mods xlink ex">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xalan="http://xml.apache.org/xalan" xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
+  xmlns:ex="http://exslt.org/dates-and-times" exclude-result-prefixes="mcrxsl xalan mods xlink ex">
   <!-- should really be last stylesheet to be imported -->
   <xsl:import href="xslImport:solr-document:solr-basetemplate.xsl" />
   <xsl:template match="text()" />
@@ -25,10 +23,10 @@
       </field>
     </xsl:for-each>
     <field name="worldReadable">
-      <xsl:value-of select="document(concat('solrwr:isWorldReadable:',@ID))/text()" />
+      <xsl:value-of select="mcrxsl:isWorldReadable(@ID)" />
     </field>
     <field name="worldReadableComplete">
-      <xsl:value-of select="document(concat('solrwr:isWorldReadableComplete:',@ID))/text()" />
+      <xsl:value-of select="mcrxsl:isWorldReadableComplete(@ID)" />
     </field>
     <xsl:call-template name="applyClassifications" />
     <xsl:for-each select="metadata/*//*[@xlink:title|text()]">
@@ -159,7 +157,7 @@
   <xsl:template name="applyClassifications">
     <xsl:for-each select="./descendant::*[@classid and @categid]">
       <xsl:variable name="classid" select="@classid" />
-      <xsl:variable name="uri" select="concat('classification:metadata:0:parents:', @classid, ':', fn:encode-for-uri(@categid))" />
+      <xsl:variable name="uri" select="concat('classification:metadata:0:parents:', @classid, ':', mcrxsl:encodeURIPath(@categid))" />
       <xsl:apply-templates select="document($uri)//category" mode="category">
         <xsl:with-param name="classid" select="$classid" />
         <xsl:with-param name="withTopField" select="@inherited = '0'" />
