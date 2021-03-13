@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <!-- moved one level up from mods-enhancer.xsl -->
-  <xsl:param name="ServletsBaseURL" select="''" />
-  
   <xsl:include href="mods-enhancer.xsl"/>
   <xsl:include href="xslInclude:mods"/>
   <xsl:template match="/mycoreobject">
