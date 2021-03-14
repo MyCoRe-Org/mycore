@@ -18,6 +18,7 @@
 
 package org.mycore.common;
 
+import java.lang.Character.UnicodeScript;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -28,9 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.ibm.icu.lang.UCharacter;
-import com.ibm.icu.lang.UScript;
 
 /**
  * Detects the language of a given text string by 
@@ -47,15 +45,15 @@ public class MCRLanguageDetector {
 
     private static Properties endings = new Properties();
 
-    private static Map<Integer, String> code2languageCodes = new HashMap<>();
+    private static Map<UnicodeScript, String> code2languageCodes = new HashMap<>();
 
     static {
-        code2languageCodes.put(UScript.ARABIC, "ar");
-        code2languageCodes.put(UScript.GREEK, "el");
-        code2languageCodes.put(UScript.HAN, "zh");
-        code2languageCodes.put(UScript.HEBREW, "he");
-        code2languageCodes.put(UScript.JAPANESE, "ja");
-        code2languageCodes.put(UScript.KATAKANA, "ja");
+        code2languageCodes.put(UnicodeScript.ARABIC, "ar");
+        code2languageCodes.put(UnicodeScript.GREEK, "el");
+        code2languageCodes.put(UnicodeScript.HAN, "zh");
+        code2languageCodes.put(UnicodeScript.HEBREW, "he");
+        code2languageCodes.put(UnicodeScript.HIRAGANA, "ja");
+        code2languageCodes.put(UnicodeScript.KATAKANA, "ja");
 
         words.put("de", "als am auch auf aus bei bis das dem den der deren derer des dessen"
             + " die dies diese dieser dieses ein eine einer eines einem für"
@@ -114,31 +112,32 @@ public class MCRLanguageDetector {
         }
         LOGGER.debug("Detecting language of [{}]", text);
 
-        Map<Integer, AtomicInteger> scores = new HashMap<>();
+        Map<UnicodeScript, AtomicInteger> scores = new HashMap<>();
         buildScores(text, scores);
-        int code = getCodeWithMaxScore(scores);
+        UnicodeScript code = getCodeWithMaxScore(scores);
 
         return code2languageCodes.getOrDefault(code, null);
     }
 
-    private static void buildScores(String text, Map<Integer, AtomicInteger> scores) {
+    private static void buildScores(String text, Map<UnicodeScript, AtomicInteger> scores) {
         try {
             char[] chararray = text.toCharArray();
             for (int i = 0; i < text.length(); i++) {
-                int code = UScript.getScript(UCharacter.codePointAt(chararray, i));
+                UnicodeScript code = UnicodeScript.of(Character.codePointAt(chararray, i));
                 increaseScoreFor(scores, code);
             }
         } catch (Exception ignored) {
         }
     }
 
-    private static void increaseScoreFor(Map<Integer, AtomicInteger> scores, int code) {
+    private static void increaseScoreFor(Map<UnicodeScript, AtomicInteger> scores, UnicodeScript code) {
         scores.computeIfAbsent(code, k -> new AtomicInteger()).incrementAndGet();
     }
 
-    private static int getCodeWithMaxScore(Map<Integer, AtomicInteger> scores) {
-        int maxCode = 0, maxScore = 0;
-        for (Integer code : scores.keySet()) {
+    private static UnicodeScript getCodeWithMaxScore(Map<UnicodeScript, AtomicInteger> scores) {
+        UnicodeScript maxCode = null;
+        int maxScore = 0;
+        for (UnicodeScript code : scores.keySet()) {
             int score = scores.get(code).get();
             if (score > maxScore) {
                 maxScore = score;
@@ -161,7 +160,7 @@ public class MCRLanguageDetector {
 
         if (bestLanguage == null) {
             int bestScore = 0;
-            Enumeration languages = words.keys();
+            Enumeration<Object> languages = words.keys();
             while (languages.hasMoreElements()) {
                 String language = (String) languages.nextElement();
                 String wordList = words.getProperty(language);
