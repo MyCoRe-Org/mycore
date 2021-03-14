@@ -32,8 +32,22 @@ import org.mycore.common.xml.MCRXMLFunctions;
 import org.w3c.dom.Document;
 
 /**
- * URI-Resolver, that checks if an object is
+ * URI-Resolver, that checks if a MyCoRe object is
  * worldReadable or worldReadableComplete
+ * 
+ * It is registered as property:
+ * MCR.URIResolver.ModuleResolver.solrwr=org.mycore.solr.common.xml.MCRSolrWorldReadableURIResolver
+ *  
+ * returns an XML text node: 'true' or 'false'
+ * 
+ * sample usage (usually in SOLR indexing templates):
+ * 
+ * &lt;field name="worldReadable"&gt;
+ *     &lt;xsl:value-of select="document(concat('solrwr:isWorldReadable:',@ID))/text()" /&gt;
+ * &lt;/field&gt;
+ * &lt;field name="worldReadableComplete"&gt;
+ *     &lt;xsl:value-of select="document(concat('solrwr:isWorldReadableComplete:',@ID))/text()" /&gt;
+ * &lt;/field&gt;
  * 
  */
 public class MCRSolrWorldReadableURIResolver implements URIResolver {
