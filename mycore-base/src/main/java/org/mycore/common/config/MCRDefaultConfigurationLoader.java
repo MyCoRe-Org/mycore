@@ -24,14 +24,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.commons.io.input.TeeInputStream;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRURLContent;
-
-import com.ibm.icu.util.StringTokenizer;
 
 /**
  * @author Thomas Scheffler (yagee)
