@@ -1727,6 +1727,37 @@ public class MCRCalendar {
     }
 
     /**
+     * The method get a date String in format yyyy-MM-ddThh:mm:ssZ for ancient date values.
+     *
+     * @param date the date string
+     * @param useLastValue as boolean 
+     *   - true if incomplete dates should be filled up with last month or last day
+     * @param calendarName the name if the calendar defined in MCRCalendar
+     * @return the date in format yyyy-MM-ddThh:mm:ssZ
+     */
+    public static String getISODateToFormattedString(String date, boolean useLastValue, String calendarName) {
+        String formattedDate = null;
+        try {
+            Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date, useLastValue, calendarName);
+            GregorianCalendar gregorianCalendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
+            formattedDate = MCRCalendar.getCalendarDateToFormattedString(gregorianCalendar, "yyyy-MM-dd")
+                + "T00:00:00.000Z";
+            if (gregorianCalendar.get(Calendar.ERA) == GregorianCalendar.BC) {
+                formattedDate = "-" + formattedDate;
+            }
+        } catch (Exception e) {
+            String errorMsg = "Error while converting date string : " + date + " - " + useLastValue +
+                " - " + calendarName;
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(errorMsg, e);
+            }
+            LOGGER.warn(errorMsg);
+            return "";
+        }
+        return formattedDate;
+    }
+
+    /**
      * This method returns the calendar type as string.
      *
      * @param calendar
@@ -1749,5 +1780,4 @@ public class MCRCalendar {
             return TAG_JULIAN;
         }
     }
-
 }
