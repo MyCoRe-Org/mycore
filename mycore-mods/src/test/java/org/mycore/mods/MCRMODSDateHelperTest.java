@@ -24,14 +24,13 @@ import static org.junit.Assert.assertNull;
 import java.time.Year;
 import java.time.ZoneId;
 import java.time.temporal.ChronoField;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
-
-import com.ibm.icu.util.Calendar;
 
 /**
  * @author Frank L\u00FCtzenkirchen
