@@ -131,8 +131,11 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
 
     public List<MCRMetaLangText> getTitle() {
         return elementsWithNameFromContentList(TITLE_ELEMENT_NAME)
-            .map(el -> new MCRMetaLangText(TITLE_ELEMENT_NAME, el.getAttributeValue(LANG_ATTRIBUTE_NAME), null, 0, null,
-                title))
+            .map(el -> {
+                MCRMetaLangText mlt = new MCRMetaLangText();
+                mlt.setFromDOM(el);
+                return mlt;
+            })
             .collect(Collectors.toList());
     }
 
