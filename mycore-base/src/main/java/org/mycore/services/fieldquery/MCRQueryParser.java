@@ -125,7 +125,8 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
     }
 
     private String getToday() {
-        return LocalDate.now(ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMANY));
+        return LocalDate.now(ZoneOffset.systemDefault())
+            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMANY));
     }
 
     /** Pattern for MCRQueryConditions expressed as String */
