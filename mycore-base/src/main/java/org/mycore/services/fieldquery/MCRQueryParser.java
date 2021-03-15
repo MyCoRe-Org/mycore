@@ -19,6 +19,7 @@
 package org.mycore.services.fieldquery;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +124,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
     }
 
     private String getToday() {
-        return LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        return LocalDate.now(ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 
     /** Pattern for MCRQueryConditions expressed as String */
