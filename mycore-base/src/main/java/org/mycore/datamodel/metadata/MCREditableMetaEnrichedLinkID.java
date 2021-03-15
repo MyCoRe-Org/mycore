@@ -19,11 +19,9 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.jdom2.Content;
 import org.jdom2.Element;
-import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
@@ -49,13 +47,8 @@ public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
     public void setTitles(List<MCRMetaLangText> titles) {
         elementsWithNameFromContentList(TITLE_ELEMENT_NAME).forEach(getContentList()::remove);
         titles.stream().map(title -> {
-            final Element titleElement = new Element(TITLE_ELEMENT_NAME);
-            Optional.ofNullable(title.getLang())
-                .ifPresent(lang -> titleElement.setAttribute(LANG_ATTRIBUTE_NAME, lang, MCRConstants.XML_NAMESPACE));
-            titleElement.setText(title.getText());
-            return titleElement;
+            return title.createXML();
         }).forEach(getContentList()::add);
-
     }
 
     protected void setOrCreateElement(String elementName, String textContent) {
