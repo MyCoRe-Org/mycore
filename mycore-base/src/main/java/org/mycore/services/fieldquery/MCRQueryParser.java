@@ -23,6 +23,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -124,7 +125,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
     }
 
     private String getToday() {
-        return LocalDate.now(ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        return LocalDate.now(ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMANY));
     }
 
     /** Pattern for MCRQueryConditions expressed as String */
