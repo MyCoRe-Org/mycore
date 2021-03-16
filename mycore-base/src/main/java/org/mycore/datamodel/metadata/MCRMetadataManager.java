@@ -209,20 +209,6 @@ public final class MCRMetadataManager {
         // handle events
         fireEvent(mcrDerivate, null, MCREvent.CREATE_EVENT);
 
-        // add the link to metadata
-        final MCRMetaEnrichedLinkID der = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
-
-        try {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("adding Derivate in data store");
-            }
-            MCRMetadataManager.addOrUpdateDerivateToObject(objid, der);
-        } catch (final Exception e) {
-            MCRMetadataManager.restore(mcrDerivate, objid, objectBackup);
-            // throw final exception
-            throw new MCRPersistenceException("Error while creatlink to MCRObject " + objid + ".", e);
-        }
-
         // create data in IFS
         if (mcrDerivate.getDerivate().getInternals() != null) {
             MCRObjectID derId = mcrDerivate.getId();
@@ -254,6 +240,20 @@ public final class MCRMetadataManager {
                     LOGGER.warn("Empty derivate, the File or Directory -->{}<--  was not found.", sourcepath);
                 }
             }
+        }
+
+        // add the link to metadata
+        final MCRMetaEnrichedLinkID der = MCRMetaEnrichedLinkIDFactory.getInstance().getDerivateLink(mcrDerivate);
+
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("adding Derivate in data store");
+            }
+            MCRMetadataManager.addOrUpdateDerivateToObject(objid, der);
+        } catch (final Exception e) {
+            MCRMetadataManager.restore(mcrDerivate, objid, objectBackup);
+            // throw final exception
+            throw new MCRPersistenceException("Error while creating link to MCRObject " + objid + ".", e);
         }
     }
 
@@ -755,10 +755,6 @@ public final class MCRMetadataManager {
                 LOGGER.warn(e.getMessage(), e);
             }
         }
-        // add the link to metadata
-        final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance()
-            .getDerivateLink(mcrDerivate);
-        addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink);
 
         // update the derivate
         mcrDerivate.getService().setDate("createdate", old.getService().getDate("createdate"));
@@ -784,6 +780,10 @@ public final class MCRMetadataManager {
             }
         }
 
+        // add the link to metadata
+        final MCRMetaEnrichedLinkID derivateLink = MCRMetaEnrichedLinkIDFactory.getInstance()
+            .getDerivateLink(mcrDerivate);
+        addOrUpdateDerivateToObject(newMetadataObjectID, derivateLink);
     }
 
     /**
