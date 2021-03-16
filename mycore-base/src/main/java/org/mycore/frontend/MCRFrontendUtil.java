@@ -26,6 +26,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -82,6 +83,8 @@ public class MCRFrontendUtil {
 
     public static byte[] SESSION_NETMASK_IPV6;
 
+    private static final ThreadLocal<Map.Entry<String, MCRServletJob>> CURRENT_SERVLET_JOB = new ThreadLocal<>();
+
     static {
         try {
             SESSION_NETMASK_IPV4 = InetAddress.getByName(MCRFrontendUtil.SESSION_NETMASK_IPV4_STRING).getAddress();
@@ -95,7 +98,8 @@ public class MCRFrontendUtil {
             throw new MCRConfigurationException("MCR.Servlet.Session.NetMask.IPv6 is not a correct IPv6 network mask.",
                 e);
         }
-        prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request    
+        prepareBaseURLs(""); // getBaseURL() etc. may be called before any HTTP Request
+        addSessionListener();
     }
 
     /** The IP addresses of trusted web proxies */
@@ -167,7 +171,8 @@ public class MCRFrontendUtil {
     }
 
     public static void configureSession(MCRSession session, HttpServletRequest request, HttpServletResponse response) {
-        session.setServletJob(new MCRServletJob(request, response));
+        final MCRServletJob servletJob = new MCRServletJob(request, response);
+        setAsCurrent(session, servletJob);
         // language
         getProperty(request, "lang").ifPresent(session::setCurrentLanguage);
 
@@ -219,6 +224,34 @@ public class MCRFrontendUtil {
             }
         }
         return remoteAddress;
+    }
+
+    /**
+     * Saves this instance as the 'current' servlet job.
+     *
+     * Can be retrieved afterwards by {@link #getCurrentServletJob()}.
+     * @throws IllegalStateException if {@link MCRSessionMgr#hasCurrentSession()} returns false
+     */
+    private static void setAsCurrent(MCRSession session, MCRServletJob job) throws IllegalStateException {
+        session.setFirstURI(() -> URI.create(job.getRequest().getRequestURI()));
+        CURRENT_SERVLET_JOB.set(Map.entry(session.getID(), job));
+    }
+
+    /**
+     * Returns the instance saved for the current thread via
+     * {@link #configureSession(MCRSession, HttpServletRequest, HttpServletResponse)}.
+     * @return {@link Optional#empty()} if no servlet job is available for the current {@link MCRSession}
+     */
+    public static Optional<MCRServletJob> getCurrentServletJob() {
+        final Map.Entry<String, MCRServletJob> servletJob = CURRENT_SERVLET_JOB.get();
+        final Optional<MCRServletJob> rv = Optional.ofNullable(servletJob)
+            .filter(job -> MCRSessionMgr.hasCurrentSession())
+            .filter(job -> MCRSessionMgr.getCurrentSession().getID().equals(job.getKey()))
+            .map(Map.Entry::getValue);
+        if (rv.isEmpty()) {
+            CURRENT_SERVLET_JOB.remove();
+        }
+        return rv;
     }
 
     /**
@@ -401,4 +434,18 @@ public class MCRFrontendUtil {
         }
         return ip.getAddress().length == byteLength;
     }
+
+    private static void addSessionListener() {
+        MCRSessionMgr.addSessionListener(event -> {
+            switch (event.getType()) {
+                case passivated:
+                case destroyed:
+                    CURRENT_SERVLET_JOB.remove();
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
 }

@@ -96,7 +96,8 @@ public class MCRContainerLoginServlet extends MCRServlet {
 
         protected Optional<HttpServletRequest> getCurrentRequest() {
             LogManager.getLogger(getClass()).debug("Getting request from session: {}", session.getID());
-            return session.getServletRequest();
+            return MCRFrontendUtil.getCurrentServletJob()
+                .map(MCRServletJob::getRequest);
         }
     }
 
