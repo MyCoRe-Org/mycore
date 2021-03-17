@@ -117,10 +117,6 @@
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.ibm.icu</groupId>
-      <artifactId>icu4j</artifactId>
-      <scope>test</scope>
-    </dependency>
+
   </dependencies>
 </project>

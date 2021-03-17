@@ -18,8 +18,12 @@
 
 package org.mycore.services.fieldquery;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,9 +36,6 @@ import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRParseException;
 import org.mycore.parsers.bool.MCRSetCondition;
-
-import com.ibm.icu.util.Calendar;
-import com.ibm.icu.util.GregorianCalendar;
 
 /**
  * Parses query conditions for use in MCRSearcher.
@@ -124,11 +125,8 @@ public class MCRQueryParser extends MCRBooleanClauseParser<Void> {
     }
 
     private String getToday() {
-        GregorianCalendar cal = new GregorianCalendar();
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH) + 1;
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        return day + "." + month + "." + year;
+        return LocalDate.now(ZoneOffset.systemDefault())
+            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.GERMANY));
     }
 
     /** Pattern for MCRQueryConditions expressed as String */

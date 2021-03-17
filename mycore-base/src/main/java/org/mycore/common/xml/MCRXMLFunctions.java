@@ -105,9 +105,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.ibm.icu.util.Calendar;
-import com.ibm.icu.util.GregorianCalendar;
-
 /**
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
@@ -230,9 +227,7 @@ public class MCRXMLFunctions {
      * @param calendarName the name if the calendar defined in MCRCalendar
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
-    public static String getISODateFromMCRHistoryDate(String date, String fieldName, String calendarName)
-        throws ParseException {
-        String formattedDate;
+    public static String getISODateFromMCRHistoryDate(String date, String fieldName, String calendarName){
         if (fieldName == null || fieldName.trim().length() == 0) {
             return "";
         }
@@ -240,24 +235,7 @@ public class MCRXMLFunctions {
         if ("bis".equals(fieldName)) {
             useLastValue = true;
         }
-        try {
-            Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date, useLastValue, calendarName);
-            GregorianCalendar gregorianCalendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
-            formattedDate = MCRCalendar.getCalendarDateToFormattedString(gregorianCalendar, "yyyy-MM-dd")
-                + "T00:00:00.000Z";
-            if (gregorianCalendar.get(Calendar.ERA) == GregorianCalendar.BC) {
-                formattedDate = "-" + formattedDate;
-            }
-        } catch (Exception e) {
-            String errorMsg = "Error while converting date string : " + date + " - " + useLastValue +
-                " - " + calendarName;
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(errorMsg, e);
-            }
-            LOGGER.warn(errorMsg);
-            return "";
-        }
-        return formattedDate;
+        return MCRCalendar.getISODateToFormattedString(date, useLastValue, calendarName);
     }
 
     /**
