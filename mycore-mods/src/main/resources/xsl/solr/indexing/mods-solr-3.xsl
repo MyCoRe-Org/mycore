@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="3.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+  xmlns:fn="http://www.w3.org/2005/xpath-functions"
   xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions" 
   xmlns:embargo="xalan://org.mycore.mods.MCRMODSEmbargoUtils" 
   xmlns:xlink="http://www.w3.org/1999/xlink" 
   xmlns:xalan="http://xml.apache.org/xalan"
-  exclude-result-prefixes="xalan xlink mods mcrxsl">
+
+  exclude-result-prefixes="xalan xlink mods fn">
   
   <xsl:import href="xslImport:solr-document:solr/indexing/mods-solr-3.xsl" />
   <xsl:include href="mods-utils.xsl" />
@@ -288,11 +289,11 @@
   <xsl:template name="printModsName">
     <xsl:choose>
       <xsl:when test="mods:displayForm">
-        <xsl:value-of select="mcrxsl:normalizeUnicode(mods:displayForm)" />
+        <xsl:value-of select="fn:normalize-unicode(mods:displayForm)" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:for-each select="mods:namePart[@type!='date'] | mods:namePart[not(@type)] | text()">
-          <xsl:value-of select="concat(' ',mcrxsl:normalizeUnicode(.))" />
+          <xsl:value-of select="concat(' ',fn:normalize-unicode(.))" />
         </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
