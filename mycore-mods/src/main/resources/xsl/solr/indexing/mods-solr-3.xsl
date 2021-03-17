@@ -4,15 +4,16 @@
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
   xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:xlink="http://www.w3.org/1999/xlink" 
+  xmlns:mcrmods="http://www.mycore.de/xslt/mods"
 
-  exclude-result-prefixes="xlink mods fn">
+  exclude-result-prefixes="xlink mods fn mcrmods">
   
-  <xsl:import href="xslImport:solr-document:solr/indexing/mods-solr-3.xsl" />
+  <xsl:import href="xslImport:solr-document-3:solr/indexing/mods-solr-3.xsl" />
+  <xsl:import href="resource:xsl/functions/mods.xsl" />
   <xsl:include href="utils/mods-utils-3.xsl" />
-  
   <xsl:include href="utils/mods-enhancer-3.xsl" />
   
-  <!--siehe: mir/mods2mods-classmapping (XSLT3-compatibel)-->
+  <!--siehe: mir/mods2mods-classmapping.xsl (XSLT3-compatible)-->
   <xsl:include href="xslInclude:mods" />
   
   <xsl:strip-space elements="mods:*" />

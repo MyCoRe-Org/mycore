@@ -170,7 +170,7 @@
             </xsl:for-each>
           </xsl:for-each>
         </xsl:variable>
-        <xsl:value-of select="mcri18n:translate('component.mods.metaData.dictionary.proceedingOf',$completeTitle)" />
+        <xsl:value-of select="mcri18n:translate-with-params('component.mods.metaData.dictionary.proceedingOf',$completeTitle)" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates mode="mods.internalId" select="." />
@@ -534,7 +534,10 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- TODO: Migration to XSLT3 -->
+  <!-- TODO: Migration to XSLT3 
+       bekommen wir diese Info auch aus den Servflags?
+       XSLT3 kann inzwischen auch JSON verarbeiten! -->
+  
   <!-- 
   <xsl:template mode="preferredPI" match="mods:mods">
     <xsl:param name="type" />
