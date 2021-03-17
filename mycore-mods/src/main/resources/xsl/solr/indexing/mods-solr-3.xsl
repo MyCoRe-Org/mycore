@@ -3,11 +3,9 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
   xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:embargo="xalan://org.mycore.mods.MCRMODSEmbargoUtils" 
   xmlns:xlink="http://www.w3.org/1999/xlink" 
-  xmlns:xalan="http://xml.apache.org/xalan"
 
-  exclude-result-prefixes="xalan xlink mods fn">
+  exclude-result-prefixes="xlink mods fn">
   
   <xsl:import href="xslImport:solr-document:solr/indexing/mods-solr-3.xsl" />
   <xsl:include href="mods-utils.xsl" />
@@ -36,11 +34,10 @@
   </xsl:template>
 
   <xsl:template match="mods:*[@authority or @authorityURI]|mods:typeOfResource|mods:accessCondition">
-    <xsl:variable name="uri" xmlns:mcrmods="xalan://org.mycore.mods.classification.MCRMODSClassificationSupport" select="mcrmods:getClassCategParentLink(.)" />
-    <xsl:if test="string-length($uri) &gt; 0">
+    <xsl:variable name="classdoc" select="mcrmods:to-mycoreclass(., 'parent')" />    
+    <xsl:if test="$classdoc">
       <xsl:variable name="topField" select="not(ancestor::mods:relatedItem)" />
-      <xsl:variable name="classdoc" select="document($uri)" />
-      <xsl:variable name="classid" select="$classdoc/mycoreclass/@ID" />
+      <xsl:variable name="classid" select="$classdoc/@ID" />
       <xsl:apply-templates select="$classdoc//category" mode="category">
         <xsl:with-param name="classid" select="$classid" />
         <xsl:with-param name="withTopField" select="$topField" />
