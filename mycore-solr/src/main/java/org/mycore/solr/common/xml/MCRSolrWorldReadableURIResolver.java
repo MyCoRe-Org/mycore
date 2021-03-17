@@ -26,6 +26,7 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.xml.MCRDOMUtils;
@@ -93,9 +94,14 @@ public class MCRSolrWorldReadableURIResolver implements URIResolver {
 
             if ("getCurrentUserAttribute".equals(key)) {
                 return new DOMSource(
-                    doc.createTextNode(MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(key)));
+                    doc.createTextNode(MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(value)));
             }
-
+            
+            if ("isDisplayedEnabledDerivate".equals(key)) {
+                return new DOMSource(
+                    doc.createTextNode(Boolean.toString(MCRAccessManager.checkDerivateDisplayPermission(value))));
+            }
+            
             return new DOMSource(doc.createTextNode(""));
 
         } catch (ParserConfigurationException e) {
