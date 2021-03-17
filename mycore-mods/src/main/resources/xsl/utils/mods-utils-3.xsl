@@ -348,7 +348,7 @@
         <xsl:with-param name="entity" select="." />
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="nameIdentifier" select="xalan:nodeset($nameIds)/nameIdentifier[1]" />
+    <xsl:variable name="nameIdentifier" select="$nameIds/nameIdentifier[1]" />
 
     <!-- if user is in role editor or admin, show all; other users only gets their own and published publications -->
     <xsl:variable name="owner">
@@ -478,7 +478,7 @@
             <xsl:with-param name="name" select="normalize-space(substring-after($displayForm, ','))" />
           </xsl:call-template>
         </xsl:variable>
-        <xsl:variable name="modsNameParts" select="xalan:nodeset($modsNames)" />
+        <xsl:variable name="modsNameParts" select="$modsNames" />
         <xsl:for-each select="$modsNameParts/namePart">
           <mods:namePart type="given">
             <xsl:value-of select="." />
@@ -491,7 +491,7 @@
             <xsl:with-param name="name" select="normalize-space($displayForm)" />
           </xsl:call-template>
         </xsl:variable>
-        <xsl:variable name="modsNameParts" select="xalan:nodeset($modsNames)" />
+        <xsl:variable name="modsNameParts" select="$modsNames" />
         <xsl:for-each select="$modsNameParts/namePart">
           <mods:namePart>
             <xsl:choose>
