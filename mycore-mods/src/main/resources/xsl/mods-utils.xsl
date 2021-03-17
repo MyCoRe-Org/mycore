@@ -15,6 +15,7 @@
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="MCR.MODS.Utils.shortenTitleLength" />
 
+  <!-- template copied to util/mods-utils-3.xsl -->
   <xsl:template mode="mods.type" match="mods:mods">
     <xsl:choose>
       <xsl:when

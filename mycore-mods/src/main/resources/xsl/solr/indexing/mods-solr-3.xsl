@@ -8,10 +8,13 @@
   exclude-result-prefixes="xlink mods fn">
   
   <xsl:import href="xslImport:solr-document:solr/indexing/mods-solr-3.xsl" />
-  <xsl:include href="mods-utils.xsl" />
+  <xsl:include href="utils/mods-utils-3.xsl" />
+  
+  <!-- 
   <xsl:include href="mods-enhancer.xsl" />
   <xsl:include href="xslInclude:mods" />
-
+  -->
+  
   <xsl:strip-space elements="mods:*" />
 
   <xsl:template match="mycoreobject[./metadata/def.modsContainer/modsContainer/mods:mods]">
@@ -20,7 +23,7 @@
     <xsl:apply-templates select="metadata//mods:*[@authority or @authorityURI]|metadata//mods:mods/mods:typeOfResource|metadata//mods:mods/mods:accessCondition" />
     <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" />
     <field name="mods.type">
-      <xsl:apply-templates select="." mode="mods-type" />
+      <xsl:apply-templates select="metadata/def.modsContainer/modsContainer/mods:mods" mode="mods.type" />
     </field>
     <field name="search_result_link_text">
       <xsl:apply-templates select="." mode="resulttitle" />
