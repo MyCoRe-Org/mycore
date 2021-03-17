@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
@@ -62,6 +61,10 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
     private static final List<String> CREATOR_ROLES = MCRConfiguration2
         .getOrThrow("MCR.Access.Strategy.CreatorRole", MCRConfiguration2::splitValue)
         .collect(Collectors.toList());
+
+    private static final List<String> CREATOR_PERMISSIONS = MCRConfiguration2
+            .getOrThrow("MCR.Access.Strategy.CreatorPermissions", MCRConfiguration2::splitValue)
+            .collect(Collectors.toList());
 
     private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
@@ -115,7 +118,7 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
     }
 
     public boolean isCreatorRuleAvailable(String id, String permission) {
-        if (MCRAccessManager.PERMISSION_WRITE.equals(permission)) {
+        if (CREATOR_PERMISSIONS.contains(permission)) {
             MCRObjectID mcrObjectId = null;
             try {
                 mcrObjectId = MCRObjectID.getInstance(id);
