@@ -36,12 +36,12 @@
             <xsl:sequence select="xs:anyURI(concat('modsclass:/typeOfResource/',fn:encode-for-uri($node)))"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:sequence select="()"/>
+            <xsl:sequence select="xs:anyURI('')"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:sequence select="()"/>
+        <xsl:sequence select="xs:anyURI('')"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
