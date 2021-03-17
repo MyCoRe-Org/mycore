@@ -10,10 +10,10 @@
   <xsl:import href="xslImport:solr-document:solr/indexing/mods-solr-3.xsl" />
   <xsl:include href="utils/mods-utils-3.xsl" />
   
-  <!-- 
-  <xsl:include href="mods-enhancer.xsl" />
+  <xsl:include href="utils/mods-enhancer-3.xsl" />
+  
+  <!--siehe: mir/mods2mods-classmapping (XSLT3-compatibel)-->
   <xsl:include href="xslInclude:mods" />
-  -->
   
   <xsl:strip-space elements="mods:*" />
 
