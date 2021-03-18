@@ -7,7 +7,7 @@
   exclude-result-prefixes="fn">
   
   <xsl:function name="mcrclass:current-label" as="element()?">
-    <xsl:param name="class" as="element()" />
+    <xsl:param name="class" as="element()?" />
     <xsl:choose>
       <xsl:when test="$class/label[@xml:lang=$CurrentLang]">
         <xsl:sequence select="$class/label[@xml:lang=$CurrentLang]" />
@@ -22,7 +22,7 @@
   </xsl:function>
   
   <xsl:function name="mcrclass:current-label-text" as="xs:string?">
-    <xsl:param name="class" as="element()" />
+    <xsl:param name="class" as="element()?" />
     <xsl:variable name="label" select="mcrclass:current-label($class)" />
     <xsl:choose>
       <xsl:when test="$label">

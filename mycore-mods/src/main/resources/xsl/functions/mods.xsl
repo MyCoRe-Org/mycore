@@ -15,7 +15,7 @@
         'recordContentSource':(), 'region':(), 'roleTerm':(), 'scriptTerm':(), 'state':(), 'subject':(), 'targetAudience':(), 'temporal':(),
         'territory':(), 'titleInfo':(), 'topic':(), 'typeOfResource':()}"/>
 
-  <xsl:function name="mcrmods:to-uri" as="xs:anyURI">
+  <xsl:function name="mcrmods:to-uri" as="xs:anyURI?">
     <xsl:param name="node" as="element()"/>
     <xsl:choose>
       <xsl:when test="mcrmods:is-supported($node)">
