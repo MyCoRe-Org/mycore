@@ -9,7 +9,8 @@
   exclude-result-prefixes="xlink mods fn mcrmods">
   
   <xsl:import href="xslImport:solr-document-3:solr/indexing/mods-solr-3.xsl" />
-  <xsl:import href="resource:xsl/functions/mods.xsl" />
+  <!-- already imported earlier in chain -->
+  <!-- <xsl:import href="resource:xsl/functions/mods.xsl" /> -->
   <xsl:include href="utils/mods-utils-3.xsl" />
   <xsl:include href="utils/mods-enhancer-3.xsl" />
   
