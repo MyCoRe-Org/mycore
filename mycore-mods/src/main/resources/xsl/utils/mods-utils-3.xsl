@@ -534,11 +534,12 @@
     </xsl:choose>
   </xsl:template>
 
-  <!-- TODO: Migration to XSLT3 
-       bekommen wir diese Info auch aus den Servflags?
+  <!-- TODO: Migration to XSLT3
+       Wird das Template überhaupt aufgerufen?
+       Wenn ja - Bekommen wir diese Infos ggf. auch aus den Servflags?
        XSLT3 kann inzwischen auch JSON verarbeiten! -->
-  
-  <!-- 
+
+  <!--
   <xsl:template mode="preferredPI" match="mods:mods">
     <xsl:param name="type" />
     <xsl:param name="prefix" select="''"/>
