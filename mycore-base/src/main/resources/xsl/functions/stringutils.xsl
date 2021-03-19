@@ -11,18 +11,19 @@
                 
                 exclude-result-prefixes="fn xs">
 
-    <xsl:function name="mcrstring:shorten" as="xs:string">
-        <xsl:param name="input" as="xs:string"/>
-        <xsl:param name="length" as="xs:integer"/>
-        <xsl:choose>
-          <xsl:when test="string-length($input) &lt;=$length">
-            <xsl:value-of select="$input" />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="concat(substring($input, 1, $length),substring-before(substring($input,$length+1), ' '), '...')" />
-          </xsl:otherwise>
-        </xsl:choose>
-    </xsl:function>
+  <xsl:function name="mcrstring:shorten" as="xs:string">
+    <xsl:param name="input" as="xs:string" />
+    <xsl:param name="length" as="xs:integer" />
+    <xsl:choose>
+      <xsl:when test="string-length($input) &lt;=$length">
+        <xsl:value-of select="$input" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of
+          select="concat(substring($input, 1, $length),substring-before(substring($input,$length+1), ' '), '...')" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
 
   <xsl:function name="mcrstring:abbreviate-center" as="xs:string">
     <xsl:param name="input" as="xs:string" />
