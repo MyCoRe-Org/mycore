@@ -37,5 +37,24 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
-
+  
+  <xsl:function name="mcrstring:pretty-filesize" as="xs:string">
+    <xsl:param name="size" as="xs:integer" />
+    <xsl:variable name="suffixes" select="['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']" />
+    <xsl:for-each select="min((1 to array:size($suffixes))[$size &lt; math:pow(1024, .)])">
+      <xsl:variable name="out" select="$size div math:pow(1024, . - 1)" />
+      <xsl:choose>
+        <xsl:when test="$out &gt;= 100 or (round($out * 100) = $out * 100) ">
+          <xsl:value-of select="concat(format-number($out, '###'),' ', array:get($suffixes, .))" />
+        </xsl:when>
+        <xsl:when test="$out &gt;= 10">
+          <xsl:value-of select="concat(format-number($out, '##.#'),' ', array:get($suffixes, .))" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat(format-number($out, '#.##'),' ', array:get($suffixes, .))" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+  </xsl:function>
+    
 </xsl:stylesheet>
