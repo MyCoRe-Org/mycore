@@ -9,6 +9,9 @@
   <xsl:function name="mcrclass:current-label" as="element()?">
     <xsl:param name="class" as="element()?" />
     <xsl:choose>
+      <xsl:when test="$class[@classid and @categid]">
+        <xsl:sequence select="mcrclass:current-label(document(concat('classification:metadata:0:children:',$class/@classid,':',$class/@categid))//category)" />
+      </xsl:when>
       <xsl:when test="$class/label[@xml:lang=$CurrentLang]">
         <xsl:sequence select="$class/label[@xml:lang=$CurrentLang]" />
       </xsl:when>
