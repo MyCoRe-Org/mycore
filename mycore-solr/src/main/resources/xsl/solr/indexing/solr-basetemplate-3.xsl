@@ -27,10 +27,10 @@
       </field>
     </xsl:for-each>
     <field name="worldReadable">
-      <xsl:value-of select="document(concat('solrwr:isWorldReadable:',@ID))/text()" />
+      <xsl:value-of select="document(concat('userobjectrights:isWorldReadable:',@ID))/text()" />
     </field>
     <field name="worldReadableComplete">
-      <xsl:value-of select="document(concat('solrwr:isWorldReadableComplete:',@ID))/text()" />
+      <xsl:value-of select="document(concat('userobjectrights:isWorldReadableComplete:',@ID))/text()" />
     </field>
     <xsl:call-template name="applyClassifications" />
     <xsl:for-each select="metadata/*//*[@xlink:title|text()]">
