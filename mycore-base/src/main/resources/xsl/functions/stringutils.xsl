@@ -8,7 +8,6 @@
                 xmlns:math="http://www.w3.org/2005/xpath-functions/math"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:mcrstring="http://www.mycore.de/xslt/stringutils"
-                
                 exclude-result-prefixes="fn xs">
 
   <xsl:function name="mcrstring:shorten" as="xs:string">
