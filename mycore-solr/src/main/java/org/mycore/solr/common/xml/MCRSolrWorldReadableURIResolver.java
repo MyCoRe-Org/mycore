@@ -26,6 +26,9 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.xml.MCRDOMUtils;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -59,19 +62,47 @@ public class MCRSolrWorldReadableURIResolver implements URIResolver {
         String query = href.substring(href.indexOf(":") + 1);
 
         String key = query.substring(0, href.indexOf(":"));
-        String mcrID = query.substring(href.indexOf(":") + 1);
+        String value = query.substring(href.indexOf(":") + 1);
 
         try {
             Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();
             if ("isWorldReadable".equals(key)) {
-                return new DOMSource(doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadable(mcrID))));
+                return new DOMSource(doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadable(value))));
             }
             if ("isWorldReadableComplete".equals(key)) {
                 return new DOMSource(
-                    doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadableComplete(mcrID))));
+                    doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadableComplete(value))));
+            }
+            if ("isCurrentUserInRole".equals(key)) {
+                return new DOMSource(
+                    doc.createTextNode(
+                        Boolean.toString(MCRSessionMgr.getCurrentSession().getUserInformation().isUserInRole(value))));
+            }
+            if ("isCurrentUserSuperUser".equals(key)) {
+                return new DOMSource(
+                    doc.createTextNode(
+                        Boolean.toString(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+                            .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID()))));
             }
 
-            return new DOMSource(doc.createTextNode("false"));
+            if ("isCurrentUserGuestUser".equals(key)) {
+                return new DOMSource(
+                    doc.createTextNode(
+                        Boolean.toString(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+                            .equals(MCRSystemUserInformation.getGuestInstance().getUserID()))));
+            }
+
+            if ("getCurrentUserAttribute".equals(key)) {
+                return new DOMSource(
+                    doc.createTextNode(MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(value)));
+            }
+            
+            if ("isDisplayedEnabledDerivate".equals(key)) {
+                return new DOMSource(
+                    doc.createTextNode(Boolean.toString(MCRAccessManager.checkDerivateDisplayPermission(value))));
+            }
+            
+            return new DOMSource(doc.createTextNode(""));
 
         } catch (ParserConfigurationException e) {
             LOGGER.error("Could not create DOM document", e);

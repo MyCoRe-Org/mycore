@@ -7,9 +7,10 @@
   xmlns:mcrmods="http://www.mycore.de/xslt/mods"
   xmlns:mcrsolr="http://www.mycore.de/xslt/solr">
   
+  <xsl:import href="xslImport:solr-document-3:solr/indexing/mycoreobject-dynamicfields-3.xsl" />
+
   <xsl:import href="resource:xsl/functions/mods.xsl" />
   <xsl:import href="resource:xsl/functions/solr.xsl" />
-  <xsl:import href="xslImport:solr-document-3:solr/indexing/mycoreobject-dynamicfields-3.xsl" />
 
   <xsl:param name="MCR.Solr.DynamicFields" select="'false'" />
   <xsl:param name="MCR.Solr.DynamicFields.excludes" select="''" />
