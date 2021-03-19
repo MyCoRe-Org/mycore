@@ -26,15 +26,10 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-<<<<<<< HEAD:mycore-solr/src/main/java/org/mycore/solr/common/xml/MCRSolrWorldReadableURIResolver.java
-import org.mycore.common.xml.MCRDOMUtils;
-import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXMLFunctions;
-=======
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
->>>>>>> 797a62627... MCR-2347 MCRSolrWorldReadableURIResolver to MCRUserAndObjectRightsURI...:mycore-base/src/main/java/org/mycore/common/xml/MCRUserAndObjectRightsURIResolver.java
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -72,29 +67,14 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
     public Source resolve(String href, String base) throws TransformerException {
         String query = href.substring(href.indexOf(":") + 1);
 
-<<<<<<< HEAD:mycore-solr/src/main/java/org/mycore/solr/common/xml/MCRSolrWorldReadableURIResolver.java
-        String key = query.substring(0, href.indexOf(":"));
-        String mcrID = query.substring(href.indexOf(":") + 1);
-=======
         String key = query.substring(0, query.indexOf(":"));
         String value = query.substring(query.indexOf(":") + 1);
->>>>>>> 797a62627... MCR-2347 MCRSolrWorldReadableURIResolver to MCRUserAndObjectRightsURI...:mycore-base/src/main/java/org/mycore/common/xml/MCRUserAndObjectRightsURIResolver.java
 
         try {
             Document doc = MCRDOMUtils.getDocumentBuilder().newDocument();
             Element result = doc.createElement("boolean");
             doc.appendChild(result);
             if ("isWorldReadable".equals(key)) {
-<<<<<<< HEAD:mycore-solr/src/main/java/org/mycore/solr/common/xml/MCRSolrWorldReadableURIResolver.java
-                return new DOMSource(doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadable(mcrID))));
-            }
-            if ("isWorldReadableComplete".equals(key)) {
-                return new DOMSource(
-                    doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadableComplete(mcrID))));
-            }
-
-            return new DOMSource(doc.createTextNode("false"));
-=======
                 result.appendChild(doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadable(value))));
                 return new DOMSource(doc);
             }
@@ -103,13 +83,13 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
                     doc.createTextNode(Boolean.toString(MCRXMLFunctions.isWorldReadableComplete(value))));
                 return new DOMSource(doc);
             }
-            
+
             if ("isDisplayedEnabledDerivate".equals(key)) {
                 result.appendChild(
                     doc.createTextNode(Boolean.toString(MCRAccessManager.checkDerivateDisplayPermission(value))));
                 return new DOMSource(doc);
             }
-            
+
             if ("isCurrentUserInRole".equals(key)) {
                 result.appendChild(
                     doc.createTextNode(
@@ -135,16 +115,14 @@ public class MCRUserAndObjectRightsURIResolver implements URIResolver {
             if ("getCurrentUserAttribute".equals(key)) {
                 doc = MCRDOMUtils.getDocumentBuilder().newDocument();
                 Element attr = doc.createElement("userattribute");
-                attr.setAttribute("name",  key);
+                attr.setAttribute("name", key);
                 doc.appendChild(attr);
                 attr.appendChild(
                     doc.createTextNode(MCRSessionMgr.getCurrentSession().getUserInformation().getUserAttribute(value)));
                 return new DOMSource(doc);
             }
-            
-            return new DOMSource(doc);
->>>>>>> 797a62627... MCR-2347 MCRSolrWorldReadableURIResolver to MCRUserAndObjectRightsURI...:mycore-base/src/main/java/org/mycore/common/xml/MCRUserAndObjectRightsURIResolver.java
 
+            return new DOMSource(doc);
         } catch (ParserConfigurationException e) {
             LOGGER.error("Could not create DOM document", e);
         }
