@@ -43,7 +43,6 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -74,19 +73,20 @@ public class MCRMODSLinkedMetadataTest extends MCRJPATestCase {
 
     @After
     public void tearDown() throws Exception {
-        MCRMetadataStore metadataStore = MCRXMLMetadataManager.instance().getStore(seriesID);
-        while (metadataStore.listIDs(true).hasNext()) {
-            metadataStore.listIDs(true).forEachRemaining(i -> {
-                final MCRObjectID currentId = MCRObjectID.getInstance(MCRObjectID.formatID(seriesID.getBase(), i));
+        MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
+        String seriesBase = seriesID.getBase();
+        while (!mm.listIDsForBase(seriesBase).isEmpty()) {
+            for (String storeID : mm.listIDsForBase(seriesBase)) {
+                final MCRObjectID currentId = MCRObjectID.getInstance(storeID);
                 System.err.println("Delete " + currentId);
                 try {
                     MCRMetadataManager.deleteMCRObject(currentId);
                 } catch (MCRActiveLinkException | MCRAccessException e) {
                     System.err.println("Cannot delete " + currentId + " at this moment.");
                 }
-            });
+            }
         }
-        MCRStoreManager.removeStore(metadataStore.getID());
+        MCRStoreManager.removeStore(seriesID.getBase());
         super.tearDown();
     }
 

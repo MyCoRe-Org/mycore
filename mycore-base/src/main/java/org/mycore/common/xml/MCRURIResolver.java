@@ -37,6 +37,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -102,9 +103,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRDataURL;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -1469,19 +1468,18 @@ public final class MCRURIResolver implements URIResolver {
                 if (versions != null && !versions.isEmpty()) {
                     return getSource(versions);
                 } else {
-                    MCRMetadataStore metadataStore = metadataManager.getStore(id, true);
-                    return getSource(metadataStore.retrieve(mcrId.getNumberAsInteger()));
+                    return getSource(new Date(metadataManager.getLastModified(mcrId)));
                 }
             } catch (Exception e) {
                 throw new TransformerException(e);
             }
         }
 
-        private Source getSource(MCRStoredMetadata retrieve) throws IOException {
+        private Source getSource(Date date) throws IOException {
             Element e = new Element("versions");
             Element v = new Element("version");
             e.addContent(v);
-            v.setAttribute("date", MCRXMLFunctions.getISODate(retrieve.getLastModified(), null));
+            v.setAttribute("date", MCRXMLFunctions.getISODate(date, null));
             return new JDOMSource(e);
         }
 
