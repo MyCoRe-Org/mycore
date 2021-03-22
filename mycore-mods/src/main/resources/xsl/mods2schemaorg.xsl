@@ -165,7 +165,7 @@
           </xsl:for-each>
         </xsl:variable>
         <xsl:choose>
-          <xsl:when test="$type='Dataset'">
+          <xsl:when test="contains($type, 'Dataset')">
             <fn:array key="creator">
               <xsl:copy-of select="$personal" />
             </fn:array>
@@ -251,22 +251,25 @@
       </xsl:if>
 
       <!-- thumbnailUrl & image-->
-      <xsl:variable name="imgSrc">
-        <xsl:call-template name="displayPreviewURL" />
-      </xsl:variable>
-      <xsl:if test="string-length($imgSrc)&gt;0">
-        <fn:string key="thumbnailUrl">
-          <xsl:value-of select="$imgSrc" />
-        </fn:string>
-        <fn:string key="image">
-          <xsl:value-of select="$imgSrc" />
-        </fn:string>
+
+      <xsl:if test="not(contains($type, 'Dataset'))">
+        <xsl:variable name="imgSrc">
+          <xsl:call-template name="displayPreviewURL" />
+        </xsl:variable>
+        <xsl:if test="string-length($imgSrc)&gt;0">
+          <fn:string key="thumbnailUrl">
+            <xsl:value-of select="$imgSrc" />
+          </fn:string>
+          <fn:string key="image">
+            <xsl:value-of select="$imgSrc" />
+          </fn:string>
+        </xsl:if>
       </xsl:if>
 
       <xsl:apply-templates select="*" mode="extension" />
 
       <!-- child files -->
-      <xsl:if test="$type!='Dataset'">
+      <xsl:if test="not(contains($type, 'Dataset'))">
         <xsl:call-template name="addFiles" />
       </xsl:if>
 
