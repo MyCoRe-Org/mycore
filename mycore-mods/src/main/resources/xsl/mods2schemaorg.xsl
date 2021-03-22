@@ -157,13 +157,25 @@
       <!-- author -->
       <xsl:variable name="authors" select="mods:name[@type='personal' and contains(mods:role/mods:roleTerm, 'aut')]" />
       <xsl:if test="count($authors) &gt; 0">
-        <fn:array key="author">
+        <xsl:variable name="personal">
           <xsl:for-each select="$authors">
             <xsl:call-template name="person">
               <xsl:with-param name="modsName" select="." />
             </xsl:call-template>
           </xsl:for-each>
-        </fn:array>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="contains($type, 'Dataset')">
+            <fn:array key="creator">
+              <xsl:copy-of select="$personal" />
+            </fn:array>
+          </xsl:when>
+          <xsl:otherwise>
+            <fn:array key="author">
+              <xsl:copy-of select="$personal" />
+            </fn:array>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:if>
 
       <!-- sponsor -->
@@ -239,22 +251,27 @@
       </xsl:if>
 
       <!-- thumbnailUrl & image-->
-      <xsl:variable name="imgSrc">
-        <xsl:call-template name="displayPreviewURL" />
-      </xsl:variable>
-      <xsl:if test="string-length($imgSrc)&gt;0">
-        <fn:string key="thumbnailUrl">
-          <xsl:value-of select="$imgSrc" />
-        </fn:string>
-        <fn:string key="image">
-          <xsl:value-of select="$imgSrc" />
-        </fn:string>
+
+      <xsl:if test="not(contains($type, 'Dataset'))">
+        <xsl:variable name="imgSrc">
+          <xsl:call-template name="displayPreviewURL" />
+        </xsl:variable>
+        <xsl:if test="string-length($imgSrc)&gt;0">
+          <fn:string key="thumbnailUrl">
+            <xsl:value-of select="$imgSrc" />
+          </fn:string>
+          <fn:string key="image">
+            <xsl:value-of select="$imgSrc" />
+          </fn:string>
+        </xsl:if>
       </xsl:if>
 
       <xsl:apply-templates select="*" mode="extension" />
 
       <!-- child files -->
-      <xsl:call-template name="addFiles" />
+      <xsl:if test="not(contains($type, 'Dataset'))">
+        <xsl:call-template name="addFiles" />
+      </xsl:if>
 
       <!-- Article Stuff-->
       <xsl:if test="contains($type, 'Article')">
