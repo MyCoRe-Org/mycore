@@ -202,6 +202,10 @@
       <artifactId>jakarta.activation</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.sun.mail</groupId>
       <artifactId>mailapi</artifactId>
     </dependency>
