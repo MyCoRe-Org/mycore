@@ -20,6 +20,7 @@ package org.mycore.mods;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -75,9 +76,9 @@ public class MCRMODSLinkedMetadataTest extends MCRJPATestCase {
     public void tearDown() throws Exception {
         MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
         String seriesBase = seriesID.getBase();
-        while (!mm.listIDsForBase(seriesBase).isEmpty()) {
-            for (String storeID : mm.listIDsForBase(seriesBase)) {
-                final MCRObjectID currentId = MCRObjectID.getInstance(storeID);
+        for (List<String> ids = mm.listIDsForBase(seriesBase); !ids.isEmpty(); ids = mm.listIDsForBase(seriesBase)) {
+            for (String id : ids) {
+                final MCRObjectID currentId = MCRObjectID.getInstance(id);
                 System.err.println("Delete " + currentId);
                 try {
                     MCRMetadataManager.deleteMCRObject(currentId);

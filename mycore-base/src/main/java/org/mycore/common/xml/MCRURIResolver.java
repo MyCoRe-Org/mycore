@@ -35,9 +35,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -1468,18 +1469,19 @@ public final class MCRURIResolver implements URIResolver {
                 if (versions != null && !versions.isEmpty()) {
                     return getSource(versions);
                 } else {
-                    return getSource(new Date(metadataManager.getLastModified(mcrId)));
+                    return getSource(Instant.ofEpochMilli(metadataManager.getLastModified(mcrId))
+                        .truncatedTo(ChronoUnit.MILLIS));
                 }
             } catch (Exception e) {
                 throw new TransformerException(e);
             }
         }
 
-        private Source getSource(Date date) throws IOException {
+        private Source getSource(Instant lastModified) throws IOException {
             Element e = new Element("versions");
             Element v = new Element("version");
             e.addContent(v);
-            v.setAttribute("date", MCRXMLFunctions.getISODate(date, null));
+            v.setAttribute("date", lastModified.toString());
             return new JDOMSource(e);
         }
 

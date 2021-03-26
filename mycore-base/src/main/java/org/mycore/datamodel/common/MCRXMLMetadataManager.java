@@ -101,9 +101,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRXMLMetadataManager {
 
-    public static final int REV_LATEST = -1;
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRXMLMetadataManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The singleton */
     private static MCRXMLMetadataManager SINGLETON;
