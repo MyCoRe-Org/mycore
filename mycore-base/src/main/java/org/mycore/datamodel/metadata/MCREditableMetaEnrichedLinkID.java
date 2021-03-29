@@ -51,7 +51,7 @@ public class MCREditableMetaEnrichedLinkID extends MCRMetaEnrichedLinkID {
         }).forEach(getContentList()::add);
     }
 
-    protected void setOrCreateElement(String elementName, String textContent) {
+    public void setOrCreateElement(String elementName, String textContent) {
         elementsWithNameFromContentList(elementName)
             .findFirst()
             .orElseGet(() -> createNewElement(elementName))
