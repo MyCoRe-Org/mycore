@@ -54,7 +54,7 @@ public class MCREventManagerTest extends MCRTestCase {
         try {
             MCREventManager.instance();
         } catch (MCRConfigurationException e) {
-            assertEquals("Could not instantiate class org.mycore.datamodel.common.MCRXMLMetadataEventHandler", e.getMessage());
+            assertEquals("Configuration property MCR.EventHandler.Mode.Foo is not set.", e.getMessage());
         }
     }
 }
