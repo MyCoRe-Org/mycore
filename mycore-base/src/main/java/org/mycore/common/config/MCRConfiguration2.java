@@ -391,16 +391,21 @@ public class MCRConfiguration2 {
 
     private static <T> T instantiateClass(Class<? extends T> cl) {
         try {
-            return (T) Stream.of(cl.getMethods())
-                .filter(m -> m.getReturnType().isAssignableFrom(cl))
-                .filter(m -> Modifier.isStatic(m.getModifiers()))
-                .filter(m -> Modifier.isPublic(m.getModifiers()))
-                .filter(m -> m.getName().toLowerCase(Locale.ROOT).contains("instance"))
-                .findAny()
-                .orElseThrow(() -> new MCRConfigurationException("Could not instantiate class " + cl.getName()))
-                .invoke(cl, (Object[]) null);
-        } catch (ReflectiveOperationException r) {
-            throw new MCRConfigurationException("Could not instantiate class " + cl.getName(), r);
+            return cl.getConstructor().newInstance();
+        } catch (Exception e) {
+            // no default constructor, check for singleton factory method
+            try {
+                return (T) Stream.of(cl.getMethods())
+                    .filter(m -> m.getReturnType().isAssignableFrom(cl))
+                    .filter(m -> Modifier.isStatic(m.getModifiers()))
+                    .filter(m -> Modifier.isPublic(m.getModifiers()))
+                    .filter(m -> m.getName().toLowerCase(Locale.ROOT).contains("instance"))
+                    .findAny()
+                    .orElseThrow(() -> new MCRConfigurationException("Could not instantiate class " + cl.getName(), e))
+                    .invoke(cl, (Object[]) null);
+            } catch (ReflectiveOperationException r) {
+                throw new MCRConfigurationException("Could not instantiate class " + cl.getName(), r);
+            }
         }
     }
 
