@@ -23,7 +23,6 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.frontend.jersey.MCRJerseyDefaultConfiguration;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFilter;
 
 public abstract class MCRJerseyRestApp extends ResourceConfig {
@@ -32,7 +31,6 @@ public abstract class MCRJerseyRestApp extends ResourceConfig {
         super();
         initAppName();
         property(ServerProperties.APPLICATION_NAME, getApplicationName());
-        MCRJerseyDefaultConfiguration.setupGuiceBridge(this);
         String[] restPackages = getRestPackages();
         packages(restPackages);
         property(ServerProperties.RESPONSE_SET_STATUS_OVER_SEND_ERROR, true);

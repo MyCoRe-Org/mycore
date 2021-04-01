@@ -23,7 +23,6 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACLFilter;
-import org.mycore.frontend.jersey.feature.MCRGuiceBridgeFeature;
 
 /**
  * Default jersey configuration for mycore.
@@ -31,7 +30,6 @@ import org.mycore.frontend.jersey.feature.MCRGuiceBridgeFeature;
  * <ul>
  *     <li>adds the multipart feature</li>
  *     <li>resolves all resource of the property 'MCR.Jersey.Resource.Packages'</li>
- *     <li>initializes the bridge between jersey and guice</li>
  * </ul>
  *
  */
@@ -45,9 +43,6 @@ public class MCRJerseyDefaultConfiguration implements MCRJerseyConfiguration {
 
         // include mcr jersey feature
         setupFeatures(resourceConfig);
-
-        // setup guice bridge
-        setupGuiceBridge(resourceConfig);
     }
 
     /**
@@ -73,21 +68,6 @@ public class MCRJerseyDefaultConfiguration implements MCRJerseyConfiguration {
         resourceConfig.register(MultiPartFeature.class);
         // mycore features
         resourceConfig.packages("org.mycore.frontend.jersey.feature");
-    }
-
-    /**
-     * Adds the binding between guice and hk2. This binding is one directional.
-     * You can add guice services into hk2 (jersey) resources. You cannot add
-     * a hk2 service into guice.
-     * <p>
-     * <a href="https://hk2.java.net/guice-bridge/">about the bridge</a>
-     * </p>
-     *
-     * @param resourceConfig the jersey resource configuration
-     */
-    public static void setupGuiceBridge(ResourceConfig resourceConfig) {
-        LogManager.getLogger().info("Initialize hk2 - guice bridge...");
-        resourceConfig.register(MCRGuiceBridgeFeature.class);
     }
 
 }
