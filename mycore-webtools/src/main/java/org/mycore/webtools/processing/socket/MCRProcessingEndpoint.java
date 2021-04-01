@@ -50,7 +50,6 @@ import org.mycore.frontend.ws.common.MCRWebsocketJSONDecoder;
 import org.mycore.frontend.ws.endoint.MCRAbstractEndpoint;
 
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 
 @ServerEndpoint(value = "/ws/mycore-webtools/processing",
     configurator = MCRWebsocketDefaultConfigurator.class,
@@ -69,12 +68,8 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
     private MCRProcessableRegistry registry = MCRConfiguration2
         .<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
 
-    private MCRProcessableWebsocketSender sender;
-
-    @Inject
-    public MCRProcessingEndpoint(MCRProcessableWebsocketSender sender) {
-        this.sender = sender;
-    }
+    private MCRProcessableWebsocketSender sender = MCRConfiguration2
+        .<MCRProcessableWebsocketSender>getInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
 
     @OnMessage
     public void onMessage(Session session, JsonObject request) {

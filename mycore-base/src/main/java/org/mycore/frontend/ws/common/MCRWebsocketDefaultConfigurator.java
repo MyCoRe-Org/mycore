@@ -23,7 +23,7 @@ import javax.websocket.HandshakeResponse;
 import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpointConfig;
 
-import org.mycore.common.inject.MCRInjectorConfig;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServlet;
 
 /**
@@ -38,7 +38,7 @@ public class MCRWebsocketDefaultConfigurator extends ServerEndpointConfig.Config
 
     @Override
     public <T> T getEndpointInstance(Class<T> endpointClass) throws InstantiationException {
-        return MCRInjectorConfig.injector().getInstance(endpointClass);
+        return MCRConfiguration2.instantiateClass(endpointClass.getName());
     }
 
     @Override
