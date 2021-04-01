@@ -77,7 +77,8 @@ public class MCRJobMaster implements Runnable, Closeable {
         runLock = new ReentrantLock();
         jobQueue = MCRJobQueue.getInstance(action);
 
-        MCRProcessableRegistry registry = MCRConfiguration2.<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
+        MCRProcessableRegistry registry = MCRConfiguration2
+            .<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
         processableCollection = new MCRProcessableDefaultCollection(getName());
         registry.register(processableCollection);
     }

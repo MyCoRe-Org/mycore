@@ -66,7 +66,8 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         SESSIONS = Collections.synchronizedMap(new HashMap<>());
     }
 
-    private MCRProcessableRegistry registry = MCRConfiguration2.<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
+    private MCRProcessableRegistry registry = MCRConfiguration2
+        .<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
 
     private MCRProcessableWebsocketSender sender;
 

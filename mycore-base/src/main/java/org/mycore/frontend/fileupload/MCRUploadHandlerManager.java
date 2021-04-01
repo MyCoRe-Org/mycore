@@ -48,7 +48,8 @@ public class MCRUploadHandlerManager {
     static {
         HANDLERS = new MCRCache<>(100, "UploadHandlerManager UploadHandlers");
         COLLECTION = new MCRProcessableDefaultCollection("Upload Manager");
-        MCRProcessableRegistry registry = MCRConfiguration2.<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
+        MCRProcessableRegistry registry = MCRConfiguration2
+            .<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
         registry.register(COLLECTION);
 
     }

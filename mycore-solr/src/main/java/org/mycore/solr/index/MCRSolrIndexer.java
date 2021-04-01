@@ -92,7 +92,8 @@ public class MCRSolrIndexer {
     private static final int BATCH_AUTO_COMMIT_WITHIN_MS = 60000;
 
     static {
-        MCRProcessableRegistry registry = MCRConfiguration2.<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
+        MCRProcessableRegistry registry = MCRConfiguration2
+            .<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
 
         int poolSize = MCRConfiguration2.getInt(SOLR_CONFIG_PREFIX + "Indexer.ThreadCount").orElse(4);
         final ExecutorService threadPool = new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS,

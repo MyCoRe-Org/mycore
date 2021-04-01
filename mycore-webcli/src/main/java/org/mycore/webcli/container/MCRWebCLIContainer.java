@@ -98,7 +98,8 @@ public class MCRWebCLIContainer {
 
     static {
         PROCESSABLE_COLLECTION = new MCRProcessableDefaultCollection("Web CLI");
-        MCRProcessableRegistry registry = MCRConfiguration2.<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
+        MCRProcessableRegistry registry = MCRConfiguration2
+            .<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
         registry.register(PROCESSABLE_COLLECTION);
 
         ExecutorService service = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "WebCLI"));
