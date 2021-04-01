@@ -35,6 +35,7 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableCollectionListener;
@@ -65,13 +66,12 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         SESSIONS = Collections.synchronizedMap(new HashMap<>());
     }
 
-    private MCRProcessableRegistry registry;
+    private MCRProcessableRegistry registry = MCRConfiguration2.<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
 
     private MCRProcessableWebsocketSender sender;
 
     @Inject
-    public MCRProcessingEndpoint(MCRProcessableRegistry registry, MCRProcessableWebsocketSender sender) {
-        this.registry = registry;
+    public MCRProcessingEndpoint(MCRProcessableWebsocketSender sender) {
         this.sender = sender;
     }
 
