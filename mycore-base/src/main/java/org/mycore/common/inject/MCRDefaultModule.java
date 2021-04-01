@@ -19,8 +19,6 @@
 package org.mycore.common.inject;
 
 import org.mycore.common.events.MCRStartupHandler;
-import org.mycore.common.processing.MCRProcessableRegistry;
-import org.mycore.common.processing.impl.MCRCentralProcessableRegistry;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.ServletModule;
@@ -35,8 +33,6 @@ public class MCRDefaultModule extends AbstractModule {
     @Override
     protected void configure() {
 
-        // PROCESSING API
-        bind(MCRProcessableRegistry.class).to(MCRCentralProcessableRegistry.class);
         if (MCRStartupHandler.isWebApp()) {
             install(new ServletModule());
         }

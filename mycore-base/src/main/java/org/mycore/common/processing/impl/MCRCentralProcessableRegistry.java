@@ -29,14 +29,11 @@ import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.common.processing.MCRProcessableRegistryListener;
 
-import com.google.inject.Singleton;
-
 /**
  * Central base implementation for a processable registry.
  * 
  * @author Matthias Eichner
  */
-@Singleton
 public class MCRCentralProcessableRegistry implements MCRProcessableRegistry {
 
     private static Logger LOGGER = LogManager.getLogger();
