@@ -520,15 +520,15 @@ public class MCRSession implements Cloneable {
 
     private boolean isTransitionAllowed(MCRUserInformation userSystemAdapter) {
         //allow if current user super user or system user or not logged in
-        if (MCRSystemUserInformation.getSuperUserInstance().equals(userInformation)
-            || MCRSystemUserInformation.getGuestInstance().equals(userInformation)
-            || MCRSystemUserInformation.getSystemUserInstance().equals(userInformation)) {
+        if (MCRSystemUserInformation.getSuperUserInstance().getUserID().equals(userInformation.getUserID())
+            || MCRSystemUserInformation.getGuestInstance().getUserID().equals(userInformation.getUserID())
+            || MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(userInformation.getUserID())) {
             return true;
         }
         //allow if new user information has default rights of guest user
         //or userID equals old userID
-        return MCRSystemUserInformation.getGuestInstance().equals(userSystemAdapter)
-            || MCRSystemUserInformation.getSystemUserInstance().equals(userSystemAdapter)
+        return MCRSystemUserInformation.getGuestInstance().getUserID().equals(userSystemAdapter.getUserID())
+            || MCRSystemUserInformation.getSystemUserInstance().getUserID().equals(userSystemAdapter.getUserID())
             || userInformation.getUserID().equals(userSystemAdapter.getUserID());
     }
 
