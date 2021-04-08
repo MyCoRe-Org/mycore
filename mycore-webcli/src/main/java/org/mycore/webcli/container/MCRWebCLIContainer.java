@@ -56,7 +56,6 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.inject.MCRInjectorConfig;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
@@ -99,7 +98,7 @@ public class MCRWebCLIContainer {
 
     static {
         PROCESSABLE_COLLECTION = new MCRProcessableDefaultCollection("Web CLI");
-        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+        MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
         registry.register(PROCESSABLE_COLLECTION);
 
         ExecutorService service = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "WebCLI"));

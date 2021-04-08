@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.inject.MCRInjectorConfig;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.viewer.alto.MCRALTOUtil;
 import org.mycore.viewer.alto.model.MCRStoredChangeSet;
@@ -30,8 +30,8 @@ import org.mycore.viewer.alto.service.MCRAltoChangeSetStore;
 
 public class MCRViewerAltoEditorConfiguration extends MCRViewerConfiguration {
 
-    private MCRAltoChangeSetStore changeSetStore = MCRInjectorConfig.injector()
-        .getInstance(MCRAltoChangeSetStore.class);
+    private MCRAltoChangeSetStore changeSetStore = MCRConfiguration2
+        .<MCRAltoChangeSetStore>getInstanceOf("MCR.Viewer.AltoChangeSetStore.Class").orElseThrow();
 
     @Override
     public MCRViewerConfiguration setup(HttpServletRequest request) {

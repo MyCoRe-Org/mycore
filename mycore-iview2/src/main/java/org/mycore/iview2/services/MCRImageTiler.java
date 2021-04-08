@@ -44,7 +44,6 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
-import org.mycore.common.inject.MCRInjectorConfig;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
@@ -72,7 +71,6 @@ public class MCRImageTiler implements Runnable, Closeable {
 
     private volatile Thread waiter;
 
-    @SuppressWarnings("unchecked")
     private MCRImageTiler() {
         MCRShutdownHandler.getInstance().addCloseable(this);
         runLock = new ReentrantLock();
@@ -121,7 +119,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         LOGGER.info("Supported image file types for reading: {}", Arrays.toString(ImageIO.getReaderFormatNames()));
 
         MCRProcessableDefaultCollection imageTilerCollection = new MCRProcessableDefaultCollection("Image Tiler");
-        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+        MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
         registry.register(imageTilerCollection);
 
         if (activated) {

@@ -35,6 +35,7 @@ import javax.websocket.server.ServerEndpoint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableCollectionListener;
@@ -49,7 +50,6 @@ import org.mycore.frontend.ws.common.MCRWebsocketJSONDecoder;
 import org.mycore.frontend.ws.endoint.MCRAbstractEndpoint;
 
 import com.google.gson.JsonObject;
-import com.google.inject.Inject;
 
 @ServerEndpoint(value = "/ws/mycore-webtools/processing",
     configurator = MCRWebsocketDefaultConfigurator.class,
@@ -65,15 +65,10 @@ public class MCRProcessingEndpoint extends MCRAbstractEndpoint {
         SESSIONS = Collections.synchronizedMap(new HashMap<>());
     }
 
-    private MCRProcessableRegistry registry;
+    private MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
 
-    private MCRProcessableWebsocketSender sender;
-
-    @Inject
-    public MCRProcessingEndpoint(MCRProcessableRegistry registry, MCRProcessableWebsocketSender sender) {
-        this.registry = registry;
-        this.sender = sender;
-    }
+    private MCRProcessableWebsocketSender sender = MCRConfiguration2
+        .<MCRProcessableWebsocketSender>getInstanceOf("MCR.Processable.WebsocketSender.Class").orElseThrow();
 
     @OnMessage
     public void onMessage(Session session, JsonObject request) {

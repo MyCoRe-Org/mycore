@@ -22,7 +22,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -35,6 +34,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.viewer.alto.MCRALTOUtil;
 import org.mycore.viewer.alto.model.MCRAltoChangePID;
@@ -47,11 +47,11 @@ import org.mycore.viewer.alto.service.MCRAltoChangeSetStore;
 
 public class MCRALTOEditorResource {
 
-    @Inject
-    private MCRAltoChangeSetStore changeSetStore;
+    private MCRAltoChangeSetStore changeSetStore = MCRConfiguration2
+        .<MCRAltoChangeSetStore>getInstanceOf("MCR.Viewer.AltoChangeSetStore.Class").orElseThrow();
 
-    @Inject
-    private MCRAltoChangeApplier changeApplier;
+    private MCRAltoChangeApplier changeApplier = MCRConfiguration2
+        .<MCRAltoChangeApplier>getInstanceOf("MCR.Viewer.AltoChangeApplier.Class").orElseThrow();
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

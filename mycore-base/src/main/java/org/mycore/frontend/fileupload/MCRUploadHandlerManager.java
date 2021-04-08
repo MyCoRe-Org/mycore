@@ -24,7 +24,6 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.inject.MCRInjectorConfig;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
@@ -48,9 +47,8 @@ public class MCRUploadHandlerManager {
     static {
         HANDLERS = new MCRCache<>(100, "UploadHandlerManager UploadHandlers");
         COLLECTION = new MCRProcessableDefaultCollection("Upload Manager");
-        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+        MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
         registry.register(COLLECTION);
-
     }
 
     static void register(MCRUploadHandler handler) {

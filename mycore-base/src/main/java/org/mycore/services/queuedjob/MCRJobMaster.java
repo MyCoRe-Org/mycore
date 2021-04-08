@@ -42,7 +42,6 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
-import org.mycore.common.inject.MCRInjectorConfig;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
@@ -78,7 +77,7 @@ public class MCRJobMaster implements Runnable, Closeable {
         runLock = new ReentrantLock();
         jobQueue = MCRJobQueue.getInstance(action);
 
-        MCRProcessableRegistry registry = MCRInjectorConfig.injector().getInstance(MCRProcessableRegistry.class);
+        MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
         processableCollection = new MCRProcessableDefaultCollection(getName());
         registry.register(processableCollection);
     }

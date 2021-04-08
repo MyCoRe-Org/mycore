@@ -34,9 +34,6 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.function.MCRTriConsumer;
-import org.mycore.common.inject.MCRInjectorConfig;
-
-import com.google.inject.ConfigurationException;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
@@ -394,9 +391,9 @@ public class MCRConfiguration2 {
 
     private static <T> T instantiateClass(Class<? extends T> cl) {
         try {
-            return MCRInjectorConfig.injector().getInstance(cl);
-        } catch (ConfigurationException e) {
-            // no default or injectable constructor, check for singleton factory method
+            return cl.getConstructor().newInstance();
+        } catch (Exception e) {
+            // no default constructor, check for singleton factory method
             try {
                 return (T) Stream.of(cl.getMethods())
                     .filter(m -> m.getReturnType().isAssignableFrom(cl))
