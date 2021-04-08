@@ -119,8 +119,7 @@ public class MCRImageTiler implements Runnable, Closeable {
         LOGGER.info("Supported image file types for reading: {}", Arrays.toString(ImageIO.getReaderFormatNames()));
 
         MCRProcessableDefaultCollection imageTilerCollection = new MCRProcessableDefaultCollection("Image Tiler");
-        MCRProcessableRegistry registry = MCRConfiguration2
-            .<MCRProcessableRegistry>getSingleInstanceOf("MCR.Processable.Registry.Class").orElseThrow();
+        MCRProcessableRegistry registry = MCRProcessableRegistry.getSingleInstance();
         registry.register(imageTilerCollection);
 
         if (activated) {
