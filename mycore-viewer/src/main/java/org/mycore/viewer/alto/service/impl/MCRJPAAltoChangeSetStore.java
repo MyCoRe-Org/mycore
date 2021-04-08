@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.inject.MCRInjectorConfig;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.viewer.alto.model.MCRAltoChangeSet;
 import org.mycore.viewer.alto.model.MCRDBStoredChangeSet;
 import org.mycore.viewer.alto.model.MCRStoredChangeSet;
@@ -33,8 +33,8 @@ import org.mycore.viewer.alto.service.MCRDerivateTitleResolver;
 
 public class MCRJPAAltoChangeSetStore implements MCRAltoChangeSetStore {
 
-    private MCRDerivateTitleResolver titleResolver = MCRInjectorConfig.injector()
-        .getInstance(MCRDerivateTitleResolver.class);
+    private MCRDerivateTitleResolver titleResolver = MCRConfiguration2
+        .<MCRDerivateTitleResolver>getInstanceOf("MCR.Viewer.DerivateTitleResolver.Class").orElseThrow();
 
     @Override
     public MCRStoredChangeSet get(String pid) {
