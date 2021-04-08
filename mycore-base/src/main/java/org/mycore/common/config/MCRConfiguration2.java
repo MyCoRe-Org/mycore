@@ -18,22 +18,21 @@
 
 package org.mycore.common.config;
 
-import java.lang.reflect.Modifier;
+import org.apache.logging.log4j.LogManager;
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.function.MCRTriConsumer;
+
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.function.MCRTriConsumer;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
@@ -136,7 +135,7 @@ public class MCRConfiguration2 {
      *             if the class can not be loaded or instantiated
      */
     public static <T> Optional<T> getInstanceOf(String name) throws MCRConfigurationException {
-        return getString(name).map(MCRConfiguration2::instantiateClass);
+        return MCRConfigurableInstanceHelper.getInstance(name);
     }
 
     /**
@@ -157,7 +156,8 @@ public class MCRConfiguration2 {
     public static <T> Optional<T> getSingleInstanceOf(String name) {
         return getString(name)
             .map(className -> new SingletonKey(name, className))
-            .map(key -> (T) instanceHolder.computeIfAbsent(key, k -> getInstanceOf(name).orElse(null)));
+            .map(key -> (T) instanceHolder.computeIfAbsent(key,
+                k -> MCRConfigurableInstanceHelper.getInstance(name).orElse(null)));
     }
 
     /**
@@ -182,7 +182,7 @@ public class MCRConfiguration2 {
             .or(() -> Optional.ofNullable(alternative)
                 .map(className -> new MCRConfiguration2.SingletonKey(name, className.getName()))
                 .map(key -> (T) MCRConfiguration2.instanceHolder.computeIfAbsent(key,
-                    k -> instantiateClass(alternative))));
+                    (k) -> MCRConfigurableInstanceHelper.getInstance(alternative, Collections.emptyMap(), null))));
     }
 
     /**
@@ -262,6 +262,42 @@ public class MCRConfiguration2 {
         return MCRConfigurationBase.PROPERTY_SPLITTER.splitAsStream(value)
             .map(String::trim)
             .filter(s -> !s.isEmpty());
+    }
+
+    /**
+     * @param prefix
+     * @return a list of properties which represent a configurable class
+     */
+    public static Stream<String> getInstantiatablePropertyKeys(String prefix) {
+        return getSubPropertiesMap(prefix).entrySet()
+            .stream()
+            .filter(es -> {
+                String s = es.getKey();
+                if (!s.contains(".")) {
+                    return true;
+                }
+
+                return (s.endsWith(".class") || s.endsWith(".Class")) &&
+                    !s.substring(0, s.length() - ".class".length()).contains(".");
+            })
+            .filter(es -> es.getValue() != null)
+            .filter(es -> !es.getValue().isBlank())
+            .map(Map.Entry::getKey)
+            .map(prefix::concat);
+    }
+
+    /**
+     * Gets a list of properties which represent a configurable class and turns them in to a map.
+     * @param prefix
+     * @param <T>
+     * @return a map where the key is a String describing the configurable instance value
+     */
+    public static <T> Map<String, Callable<T>> getInstances(String prefix) {
+        return getInstantiatablePropertyKeys(prefix)
+            .collect(Collectors.toMap(MCRConfigurableInstanceHelper::getIDFromClassProperty, v -> {
+                final String classProp = v;
+                return () -> (T) getInstanceOf(classProp).orElse(null);
+            }));
     }
 
     /**
@@ -386,27 +422,7 @@ public class MCRConfiguration2 {
         LogManager.getLogger().debug("Loading Class: {}", classname);
 
         Class<? extends T> cl = getClassObject(classname);
-        return instantiateClass(cl);
-    }
-
-    private static <T> T instantiateClass(Class<? extends T> cl) {
-        try {
-            return cl.getConstructor().newInstance();
-        } catch (Exception e) {
-            // no default constructor, check for singleton factory method
-            try {
-                return (T) Stream.of(cl.getMethods())
-                    .filter(m -> m.getReturnType().isAssignableFrom(cl))
-                    .filter(m -> Modifier.isStatic(m.getModifiers()))
-                    .filter(m -> Modifier.isPublic(m.getModifiers()))
-                    .filter(m -> m.getName().toLowerCase(Locale.ROOT).contains("instance"))
-                    .findAny()
-                    .orElseThrow(() -> new MCRConfigurationException("Could not instantiate class " + cl.getName(), e))
-                    .invoke(cl, (Object[]) null);
-            } catch (ReflectiveOperationException r) {
-                throw new MCRConfigurationException("Could not instantiate class " + cl.getName(), r);
-            }
-        }
+        return MCRConfigurableInstanceHelper.getInstance(cl, Collections.emptyMap(), null);
     }
 
     private static <T> Class<? extends T> getClassObject(String classname) {
