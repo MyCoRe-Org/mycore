@@ -19,11 +19,6 @@
 package org.mycore.mods.identifier;
 
 public class MCRMODSDOIMetadataService extends MCRAbstractMODSMetadataService {
-
-    public MCRMODSDOIMetadataService(String inscriberID) {
-        super(inscriberID);
-    }
-
     @Override
     protected String getIdentifierType() {
         return "doi";

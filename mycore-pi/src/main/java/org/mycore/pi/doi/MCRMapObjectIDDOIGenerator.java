@@ -38,8 +38,8 @@ public class MCRMapObjectIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectI
 
     private String generatorID;
 
-    public MCRMapObjectIDDOIGenerator(String generatorID) {
-        super(generatorID);
+    public MCRMapObjectIDDOIGenerator() {
+        super();
         mcrdoiParser = new MCRDOIParser();
         this.generatorID = generatorID;
     }

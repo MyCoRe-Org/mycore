@@ -80,14 +80,12 @@ public class MCRURNGranularRESTService extends MCRPIService<MCRDNBURN> {
 
     private final Function<MCRDerivate, Stream<MCRPath>> derivateFileStream;
 
-    public MCRURNGranularRESTService(String registrationServiceID) {
-        this(registrationServiceID,
-            MCRURNGranularRESTService::defaultDerivateFileStream);
+    public MCRURNGranularRESTService() {
+        this(MCRURNGranularRESTService::defaultDerivateFileStream);
     }
 
-    public MCRURNGranularRESTService(String registrationServiceID,
-        Function<MCRDerivate, Stream<MCRPath>> derivateFileStreamFunc) {
-        super(registrationServiceID, MCRDNBURN.TYPE);
+    public MCRURNGranularRESTService(Function<MCRDerivate, Stream<MCRPath>> derivateFileStreamFunc) {
+        super(MCRDNBURN.TYPE);
         this.derivateFileStream = derivateFileStreamFunc;
     }
 

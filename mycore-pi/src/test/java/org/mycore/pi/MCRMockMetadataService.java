@@ -34,10 +34,6 @@ public class MCRMockMetadataService extends MCRPIMetadataService<MCRMockIdentifi
 
     private Map<String, MCRMockIdentifier> map = new HashMap<>();
 
-    public MCRMockMetadataService(String inscriberID) {
-        super(inscriberID);
-    }
-
     @Override
     public void insertIdentifier(MCRMockIdentifier identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {

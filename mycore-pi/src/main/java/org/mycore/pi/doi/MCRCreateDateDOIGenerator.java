@@ -56,8 +56,8 @@ public class MCRCreateDateDOIGenerator extends MCRPIGenerator<MCRDigitalObjectId
 
     private String prefix = MCRConfiguration2.getStringOrThrow("MCR.DOI.Prefix");
 
-    public MCRCreateDateDOIGenerator(String generatorID) {
-        super(generatorID);
+    public MCRCreateDateDOIGenerator() {
+        super();
         mcrdoiParser = new MCRDOIParser();
     }
 

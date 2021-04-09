@@ -65,8 +65,8 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     private static final MCRJobQueue REGISTER_JOB_QUEUE = initializeJobQueue();
 
-    public MCRPIJobService(String registrationServiceID, String identType) {
-        super(registrationServiceID, identType);
+    public MCRPIJobService(String identType) {
+        super(identType);
     }
 
     private static MCRJobQueue initializeJobQueue() {

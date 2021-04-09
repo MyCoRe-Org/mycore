@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -91,8 +92,9 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
             .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
             .limit(numOfDerivFiles);
         String serviceID = "TestService";
-        MCRURNGranularRESTService testService = new MCRURNGranularRESTService(serviceID,
-            foo);
+        MCRURNGranularRESTService testService = new MCRURNGranularRESTService(foo);
+        testService.init("MCR.PI.Service.TestService");
+        testService.setProperties(getTestServiceProperties());
         testService.register(derivate, "", true);
         timerTask();
 
@@ -117,6 +119,31 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
 
         System.out.println("End: " + new Date());
 
+    }
+
+    protected Map<String, String> getTestServiceProperties(){
+        HashMap<String, String> serviceProps = new HashMap<>();
+
+        serviceProps.put("Generator", "UUID");
+        serviceProps.put("supportDfgViewerURN", Boolean.TRUE.toString());
+
+        return serviceProps;
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
+        testProperties.put("MCR.PI.Generator.UUID", MCRUUIDURNGenerator.class.getName());
+        testProperties.put("MCR.PI.Generator.UUID.Namespace", "frontend-");
+        testProperties.put("MCR.PI.DNB.Credentials.Login", "test");
+        testProperties.put("MCR.PI.DNB.Credentials.Password", "test");
+        return testProperties;
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     public class MockObjectDerivate extends MockUp<MCRObjectDerivate> {
@@ -172,23 +199,5 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         public String probeContentType(Path path) throws IOException {
             return "";
         }
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        testProperties.put("MCR.PI.Service.TestService.Generator", "UUID");
-        testProperties.put("MCR.PI.Service.TestService.supportDfgViewerURN", Boolean.TRUE.toString());
-        testProperties.put("MCR.PI.Generator.UUID", MCRUUIDURNGenerator.class.getName());
-        testProperties.put("MCR.PI.Generator.UUID.Namespace", "frontend-");
-        testProperties.put("MCR.PI.DNB.Credentials.Login", "test");
-        testProperties.put("MCR.PI.DNB.Credentials.Password", "test");
-        return testProperties;
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
     }
 }

@@ -22,22 +22,29 @@ import static org.mycore.pi.MCRPIService.GENERATOR_CONFIG_PREFIX;
 
 import java.util.Map;
 
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
 
     private String generatorID;
+    private Map<String, String> properties;
 
-    public MCRPIGenerator(String generatorID) {
-        this.generatorID = generatorID;
+    public final Map<String, String> getProperties() {
+        return properties;
     }
 
-    protected final Map<String, String> getProperties() {
-        final String configPrefix = GENERATOR_CONFIG_PREFIX + generatorID + ".";
-        return MCRConfiguration2.getSubPropertiesMap(configPrefix);
+    @MCRPostConstruction
+    public void init(String property){
+        generatorID = property.substring(GENERATOR_CONFIG_PREFIX.length());
+    }
+
+    @MCRProperty(name = "*")
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
     }
 
     /**

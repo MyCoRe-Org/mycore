@@ -19,11 +19,6 @@
 package org.mycore.mods.identifier;
 
 public class MCRMODSPURLMetadataService extends MCRAbstractMODSMetadataService {
-
-    public MCRMODSPURLMetadataService(String inscriberID) {
-        super(inscriberID);
-    }
-
     @Override
     protected String getIdentifierType() {
         return "purl";

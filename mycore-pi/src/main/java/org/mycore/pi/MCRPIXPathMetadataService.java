@@ -36,11 +36,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
 public class MCRPIXPathMetadataService extends MCRPIMetadataService<MCRPersistentIdentifier> {
-
-    public MCRPIXPathMetadataService(String inscriberID) {
-        super(inscriberID);
-    }
-
     @Override
     public void insertIdentifier(MCRPersistentIdentifier identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {

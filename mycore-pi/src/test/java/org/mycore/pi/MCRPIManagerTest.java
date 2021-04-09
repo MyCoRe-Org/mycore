@@ -34,6 +34,7 @@ import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -153,7 +154,8 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     }
 
     private MCRMockIdentifier generatePIFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {
-        MCRMockIdentifierGenerator mcruuidurnGenerator = new MCRMockIdentifierGenerator(MOCK_PID_GENERATOR);
+        MCRMockIdentifierGenerator mcruuidurnGenerator = (MCRMockIdentifierGenerator) MCRConfiguration2
+            .getInstanceOf("MCR.PI.Generator." + MOCK_PID_GENERATOR).get();
         MCRObject mcrObject = new MCRObject();
         mcrObject.setId(mycoreID);
         return mcruuidurnGenerator.generate(mcrObject, "");

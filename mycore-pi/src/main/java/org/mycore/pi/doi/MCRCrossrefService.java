@@ -71,10 +71,6 @@ public class MCRCrossrefService extends MCRDOIBaseService {
 
     private String depositorMail;
 
-    public MCRCrossrefService(String registrationServiceID) {
-        super(registrationServiceID);
-    }
-
     @Override
     protected String getDefaultSchemaPath() {
         return DEFAULT_SCHEMA;

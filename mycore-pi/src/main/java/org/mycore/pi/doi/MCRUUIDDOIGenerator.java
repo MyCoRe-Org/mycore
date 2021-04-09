@@ -32,8 +32,8 @@ public class MCRUUIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifi
 
     private String prefix = MCRConfiguration2.getStringOrThrow("MCR.DOI.Prefix");
 
-    public MCRUUIDDOIGenerator(String generatorString) {
-        super(generatorString);
+    public MCRUUIDDOIGenerator() {
+        super();
         mcrdoiParser = new MCRDOIParser();
     }
 

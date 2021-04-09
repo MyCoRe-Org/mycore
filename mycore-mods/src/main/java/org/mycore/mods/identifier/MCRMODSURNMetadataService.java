@@ -19,11 +19,6 @@
 package org.mycore.mods.identifier;
 
 public class MCRMODSURNMetadataService extends MCRAbstractMODSMetadataService {
-
-    public MCRMODSURNMetadataService(String inscriberID) {
-        super(inscriberID);
-    }
-
     @Override
     protected String getIdentifierType() {
         return "urn";

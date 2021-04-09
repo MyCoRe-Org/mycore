@@ -54,7 +54,8 @@ public class MCRPIUtils {
 
     private static MCRDNBURN generateURNFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {
         String testGenerator = "testGenerator";
-        MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator(testGenerator);
+        MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator();
+        mcruuidurnGenerator.init(MCRPIService.GENERATOR_CONFIG_PREFIX+testGenerator);
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(mycoreID);
         return mcruuidurnGenerator.generate(mcrObject1, "");

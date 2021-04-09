@@ -20,35 +20,23 @@ package org.mycore.pi;
 
 import static org.mycore.pi.MCRPIJobService.CREATION_PREDICATE;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
 
 public class MCRPIServiceManager {
 
     public static final String REGISTRATION_SERVICE_CONFIG_PREFIX = "MCR.PI.Service.";
-
-    private final Map<String, MCRPIService> serviceCache = new ConcurrentHashMap<>();
 
     public static MCRPIServiceManager getInstance() {
         return InstanceHolder.INSTANCE;
     }
 
     public List<String> getServiceIDList() {
-        return MCRConfiguration2.getSubPropertiesMap(REGISTRATION_SERVICE_CONFIG_PREFIX)
-            .entrySet()
-            .stream()
-            .filter(p -> !p.getValue().isEmpty())
-            .map(Map.Entry::getKey)
-            .filter(s -> !s.contains("."))
-            .collect(Collectors.toList());
+        return MCRConfiguration2.getInstantiatablePropertyKeys(REGISTRATION_SERVICE_CONFIG_PREFIX)
+                .map(s->s.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
+                .collect(Collectors.toList());
     }
 
     public List<MCRPIService> getServiceList() {
@@ -70,25 +58,9 @@ public class MCRPIServiceManager {
             .collect(Collectors.toList());
     }
 
-    public <T extends MCRPersistentIdentifier> MCRPIService<T> getRegistrationService(
-        String id) {
-
-        final MCRPIService mcrpiService = serviceCache.computeIfAbsent(id, (registrationServiceID) -> {
-            String propertyName = REGISTRATION_SERVICE_CONFIG_PREFIX + registrationServiceID;
-            Class<? extends MCRPIService<T>> piClass = MCRConfiguration2.<MCRPIService<T>>getClass(propertyName)
-                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(propertyName));
-
-            try {
-                Constructor<? extends MCRPIService<T>> constructor = piClass.getConstructor(String.class);
-                return constructor.newInstance(registrationServiceID);
-            } catch (NoSuchMethodException e) {
-                throw new MCRConfigurationException("The property : " + propertyName
-                    + " points to existing class, but without string constructor(serviceid)!", e);
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                throw new MCRException("Cant initialize class the class defined in: " + propertyName, e);
-            }
-        });
-        return mcrpiService;
+    public <T extends MCRPersistentIdentifier> MCRPIService<T> getRegistrationService(String id) {
+        return (MCRPIService<T>) MCRConfiguration2
+            .getSingleInstanceOf(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + id).get();
     }
 
     private static class InstanceHolder {

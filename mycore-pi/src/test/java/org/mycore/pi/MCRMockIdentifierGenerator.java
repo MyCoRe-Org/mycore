@@ -28,10 +28,6 @@ public class MCRMockIdentifierGenerator extends MCRPIGenerator<MCRMockIdentifier
 
     public static final String TEST_PROPERTY_VALUE = "mockPropertyValue";
 
-    public MCRMockIdentifierGenerator(String generatorID) {
-        super(generatorID);
-    }
-
     @Override
     public MCRMockIdentifier generate(MCRBase mcrBase, String additional) throws MCRPersistentIdentifierException {
         Assert.assertEquals("Test propterties should be set!", getProperties().get(TEST_PROPERTY), TEST_PROPERTY_VALUE);

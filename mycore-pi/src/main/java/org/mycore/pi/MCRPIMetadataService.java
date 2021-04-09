@@ -18,14 +18,10 @@
 
 package org.mycore.pi;
 
-import static org.mycore.pi.MCRPIService.METADATA_SERVICE_CONFIG_PREFIX;
-
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -37,21 +33,15 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  */
 public abstract class MCRPIMetadataService<T extends MCRPersistentIdentifier> {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private Map<String, String> properties;
 
-    private String metadataManagerID;
-
-    public MCRPIMetadataService(String metadataManagerID) {
-        this.metadataManagerID = metadataManagerID;
+    public final Map<String, String> getProperties() {
+        return properties;
     }
 
-    protected final Map<String, String> getProperties() {
-        return getPropertiesWithPrefix(METADATA_SERVICE_CONFIG_PREFIX);
-    }
-
-    protected final Map<String, String> getPropertiesWithPrefix(String configPrefix) {
-        final String myConfigPrefix = configPrefix + metadataManagerID + ".";
-        return MCRConfiguration2.getSubPropertiesMap(myConfigPrefix);
+    @MCRProperty(name = "*")
+    public final void setProperties(Map<String, String> properties) {
+        this.properties = properties;
     }
 
     public abstract void insertIdentifier(T identifier, MCRBase obj, String additional)

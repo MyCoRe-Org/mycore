@@ -31,10 +31,6 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  */
 public class MCRIDPURLGenerator extends MCRPIGenerator<MCRPURL> {
 
-    public MCRIDPURLGenerator(String generatorID) {
-        super(generatorID);
-    }
-
     @Override
     public MCRPURL generate(MCRBase mcrObj, String additional)
         throws MCRPersistentIdentifierException {

@@ -31,10 +31,6 @@ public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
 
     private static final String URN_NBN_DE = "urn:nbn:de:";
 
-    public MCRDNBURNGenerator(String generatorID) {
-        super(generatorID);
-    }
-
     protected abstract String buildNISS(MCRObjectID mcrID, String additional);
 
     /**
