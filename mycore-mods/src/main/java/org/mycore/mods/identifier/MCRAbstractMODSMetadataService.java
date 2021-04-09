@@ -49,10 +49,6 @@ public class MCRAbstractMODSMetadataService
 
     public static final String PREFIX_PROPERTY_KEY = "Prefix";
 
-    public MCRAbstractMODSMetadataService(String inscriberID) {
-        super(inscriberID);
-    }
-
     @Override
     public void insertIdentifier(MCRPersistentIdentifier identifier, MCRBase base, String additional)
         throws MCRPersistentIdentifierException {

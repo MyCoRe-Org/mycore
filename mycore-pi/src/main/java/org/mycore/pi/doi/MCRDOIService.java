@@ -141,11 +141,6 @@ public class MCRDOIService extends MCRDOIBaseService {
 
     private boolean useTestServer;
 
-    public MCRDOIService(String serviceID) {
-        super(serviceID);
-
-    }
-
     private void init() {
         Map<String, String> properties = getProperties();
         useTestServer = Boolean

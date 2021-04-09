@@ -35,8 +35,8 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MCRURNOAIService(String registrationServiceID) {
-        super(registrationServiceID, MCRDNBURN.TYPE);
+    public MCRURNOAIService() {
+        super(MCRDNBURN.TYPE);
     }
 
     @Override

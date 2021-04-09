@@ -56,8 +56,8 @@ public class MCRPURLJobService extends MCRPIJobService<MCRPURL> {
 
     private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
 
-    public MCRPURLJobService(String registrationServiceID) {
-        super(registrationServiceID, TYPE);
+    public MCRPURLJobService() {
+        super(TYPE);
     }
 
     @Override

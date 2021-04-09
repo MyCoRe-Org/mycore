@@ -59,8 +59,8 @@ public class MCRURNGranularOAIService extends MCRPIService<MCRDNBURN> {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public MCRURNGranularOAIService(String registrationServiceID) {
-        super(registrationServiceID, MCRDNBURN.TYPE);
+    public MCRURNGranularOAIService() {
+        super(MCRDNBURN.TYPE);
     }
 
     @Override

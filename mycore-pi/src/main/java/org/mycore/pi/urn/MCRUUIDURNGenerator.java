@@ -37,10 +37,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRUUIDURNGenerator extends MCRDNBURNGenerator {
 
-    public MCRUUIDURNGenerator(String generatorID) {
-        super(generatorID);
-    }
-
     @Override
     protected String buildNISS(MCRObjectID mcrID, String additional) {
         return UUID.randomUUID().toString();

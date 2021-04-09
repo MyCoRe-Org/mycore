@@ -19,8 +19,6 @@ package org.mycore.pi;
 
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,12 +38,13 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -81,7 +80,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
     protected static final String TRANSLATE_PREFIX = "component.pi.register.error.";
 
-    private final String registrationServiceID;
+    private String registrationServiceID;
 
     private final String type;
 
@@ -93,9 +92,15 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         REGISTER_POOL = Executors.newFixedThreadPool(1, threadFactory);
     }
 
-    public MCRPIService(String registrationServiceID, String identifierType) {
-        this.registrationServiceID = registrationServiceID;
+    private Map<String, String> properties;
+
+    public MCRPIService(String identifierType) {
         this.type = identifierType;
+    }
+
+    @MCRPostConstruction
+    public void init(String prop) {
+        registrationServiceID = prop.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length());
     }
 
     // generated identifier is already present in database
@@ -167,33 +172,19 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     public MCRPIMetadataService<T> getMetadataService() {
         Map<String, String> properties = getProperties();
 
-        final String metadataManager;
+        final String metadataService;
         if (properties.containsKey(METADATA_SERVICE_PROPERTY_KEY)) {
-            metadataManager = properties.get(METADATA_SERVICE_PROPERTY_KEY);
+            metadataService = properties.get(METADATA_SERVICE_PROPERTY_KEY);
         } else {
             throw new MCRConfigurationException(
                 getServiceID() + " has no " + METADATA_SERVICE_PROPERTY_KEY + "!");
         }
 
-        final String className = MCRConfiguration2.getStringOrThrow(METADATA_SERVICE_CONFIG_PREFIX
-            + metadataManager);
-
-        try {
-            Class<? extends MCRPIMetadataService<T>> classObject = MCRClassTools.forName(className);
-            Constructor<? extends MCRPIMetadataService<T>> constructor = classObject.getConstructor(String.class);
-            return constructor.newInstance(metadataManager);
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + (METADATA_SERVICE_CONFIG_PREFIX + metadataManager) + ") not found: "
-                    + className,
-                e);
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + (METADATA_SERVICE_CONFIG_PREFIX + metadataManager)
-                    + ") needs a string constructor: " + className);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new MCRException(e);
-        }
+        String msProperty = METADATA_SERVICE_CONFIG_PREFIX + metadataService;
+        MCRPIMetadataService<T> metadataServiceObj = (MCRPIMetadataService<T>) MCRConfiguration2
+            .getInstanceOf(msProperty)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(msProperty));
+        return metadataServiceObj;
     }
 
     protected MCRPIGenerator<T> getGenerator() {
@@ -205,21 +196,9 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             .orElseThrow(generatorPropertiesNotSetError);
 
         String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
-        String className = MCRConfiguration2.getStringOrThrow(generatorPropertyKey);
-
-        try {
-            Class<? extends MCRPIGenerator<T>> classObject = MCRClassTools.forName(className);
-            Constructor<? extends MCRPIGenerator<T>> constructor = classObject.getConstructor(String.class);
-            return constructor.newInstance(generatorName);
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + generatorPropertyKey + ") not found: " + className, e);
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException(
-                "Configurated class (" + generatorPropertyKey + ") needs a string constructor: " + className);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            throw new MCRException(e);
-        }
+        MCRPIGenerator<T> generator = (MCRPIGenerator<T>) MCRConfiguration2.getInstanceOf(generatorPropertyKey)
+                .orElseThrow(()-> MCRConfiguration2.createConfigurationException(generatorPropertyKey));
+        return generator;
     }
 
     public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
@@ -437,8 +416,12 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     }
 
     protected final Map<String, String> getProperties() {
-        final String configPrefix = REGISTRATION_CONFIG_PREFIX + registrationServiceID + ".";
-        return MCRConfiguration2.getSubPropertiesMap(configPrefix);
+        return properties;
+    }
+
+    @MCRProperty(name = "*")
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
     }
 
     protected T getNewIdentifier(MCRBase id, String additional) throws MCRPersistentIdentifierException {

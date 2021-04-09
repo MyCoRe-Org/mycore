@@ -36,10 +36,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRFLURNGenerator extends MCRDNBURNGenerator {
     private String last;
 
-    public MCRFLURNGenerator(String generatorID) {
-        super(generatorID);
-    }
-
     protected synchronized String buildNISS(MCRObjectID mcrID, String additional) {
         Calendar now = new GregorianCalendar(TimeZone.getTimeZone("GMT+01:00"), Locale.ENGLISH);
         int yyy = 2268 - now.get(Calendar.YEAR);

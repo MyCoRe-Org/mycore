@@ -39,8 +39,8 @@ public abstract class MCRCountingDNBURNGenerator extends MCRDNBURNGenerator {
 
     private static final Map<String, AtomicInteger> PATTERN_COUNT_MAP = new HashMap<>();
 
-    MCRCountingDNBURNGenerator(String generatorID) {
-        super(generatorID);
+    MCRCountingDNBURNGenerator() {
+        super();
     }
 
     protected AtomicInteger readCountFromDatabase(String countPattern) {

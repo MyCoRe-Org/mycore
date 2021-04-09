@@ -30,8 +30,8 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  */
 public class MCRStaticDOIGenerator extends MCRPIGenerator<MCRDigitalObjectIdentifier> {
 
-    public MCRStaticDOIGenerator(String generatorID) {
-        super(generatorID);
+    public MCRStaticDOIGenerator() {
+        super();
         checkPropertyExists("doi");
     }
 

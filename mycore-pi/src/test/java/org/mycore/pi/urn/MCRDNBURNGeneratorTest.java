@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -45,8 +46,9 @@ public class MCRDNBURNGeneratorTest extends MCRStoreTestCase {
         MCRObjectID getID = MCRObjectID.getNextFreeId("test", "mock");
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(getID);
-        MCRDNBURN generated = new MCRFLURNGenerator(GENERATOR_ID)
-            .generate(mcrObject1, "");
+        MCRFLURNGenerator flGenerator = (MCRFLURNGenerator) MCRConfiguration2
+            .getInstanceOf("MCR.PI.Generator." + GENERATOR_ID).get();
+        MCRDNBURN generated = flGenerator.generate(mcrObject1, "");
 
         String urn = generated.asString();
         LOGGER.info("THE URN IS: {}", urn);

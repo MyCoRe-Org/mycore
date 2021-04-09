@@ -26,6 +26,7 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -39,7 +40,8 @@ public class MCRMapObjectIDDOIGeneratorTest extends MCRTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        doiGenerator = new MCRMapObjectIDDOIGenerator("MapObjectIDDOI");
+        doiGenerator = (MCRMapObjectIDDOIGenerator) MCRConfiguration2.getInstanceOf("MCR.PI.Generator.MapObjectIDDOI")
+            .get();
     }
 
     @Test
@@ -66,6 +68,7 @@ public class MCRMapObjectIDDOIGeneratorTest extends MCRTestCase {
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
+        testProperties.put("MCR.PI.Generator.MapObjectIDDOI", MCRMapObjectIDDOIGenerator.class.getName());
         testProperties.put("MCR.PI.Generator.MapObjectIDDOI.Prefix.junit_test", TEST_DOI_PREFIX);
         testProperties.put("MCR.PI.Generator.MapObjectIDDOI.Prefix.my_test", TEST_DOI_PREFIX + "/my.");
         return testProperties;

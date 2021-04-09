@@ -47,8 +47,8 @@ public class MCRPURLService extends MCRPIService<MCRPURL> {
 
     private static final String DEFAULT_CONTEXT_PATH = "receive/$ID";
 
-    public MCRPURLService(String registrationServiceID) {
-        super(registrationServiceID, TYPE);
+    public MCRPURLService() {
+        super(TYPE);
     }
 
     @Override

@@ -141,8 +141,8 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
     private String[] xpath;
 
-    public MCRGenericPIGenerator(String generatorID) {
-        super(generatorID);
+    public MCRGenericPIGenerator() {
+        super();
 
         final Map<String, String> properties = getProperties();
 
@@ -173,10 +173,10 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
     }
 
     // for testing purposes
-    MCRGenericPIGenerator(String id, String generalPattern, SimpleDateFormat dateFormat,
+    MCRGenericPIGenerator(String generalPattern, SimpleDateFormat dateFormat,
         String objectTypeMapping, String objectProjectMapping,
         int countPrecision, String type, String... xpaths) {
-        super(id);
+        super();
         setObjectProjectMapping(objectProjectMapping);
         setGeneralPattern(generalPattern);
         setDateFormat(dateFormat);

@@ -79,8 +79,8 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
 
     private String transformerID;
 
-    public MCRDOIBaseService(String registrationServiceID) {
-        super(registrationServiceID, TYPE);
+    public MCRDOIBaseService() {
+        super(TYPE);
     }
 
     protected void initCommonProperties() {
