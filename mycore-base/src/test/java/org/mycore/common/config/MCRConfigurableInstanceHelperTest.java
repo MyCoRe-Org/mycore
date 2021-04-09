@@ -4,6 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 
 import java.util.List;
 import java.util.Map;

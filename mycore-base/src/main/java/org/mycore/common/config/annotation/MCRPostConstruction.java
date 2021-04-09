@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.config;
+package org.mycore.common.config.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -25,7 +25,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation tells the {@link MCRConfigurableInstanceHelper} which method should be called after the creation
+ * This annotation tells which method should be called after the creation
  * of the object.
  * The method should have a String as a parameter which will get the property passed.
  * @author Sebastian Hofmann

@@ -20,6 +20,8 @@ package org.mycore.common.config;
 
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -16,7 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.common.config;
+package org.mycore.common.config.annotation;
+
+import org.mycore.common.config.MCRConfigurationException;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -25,7 +27,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation tells the {@link MCRConfigurableInstanceHelper} which properties need to be assigned to which field
+ * This annotation tells which properties need to be assigned to which field
  * or method. All annotated members need to be public. The fields should always have the type {@link String} and if you
  * need a custom type, then you can annotate a method with a single parameter of type {@link String}, which can then
  * create/retrieve the object and assign it to your field.
