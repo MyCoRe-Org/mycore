@@ -43,7 +43,7 @@ public class MCRGenericPIGeneratorTest extends MCRStoreTestCase {
             new SimpleDateFormat("yyyy", Locale.ROOT), null, null, 3,
             "dnbUrn", "/mycoreobject/metadata/test1/test2/text()", "/mycoreobject/metadata/test1/test3/text()");
 
-        generator.init(MCRPIService.GENERATOR_CONFIG_PREFIX + "test1");
+        //generator.init(MCRPIService.GENERATOR_CONFIG_PREFIX + "test1");
 
         MCRObjectID testID = MCRObjectID.getInstance("my_test_00000001");
         MCRObject mcrObject = new MCRObject();
