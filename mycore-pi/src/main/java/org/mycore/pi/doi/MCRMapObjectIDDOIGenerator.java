@@ -41,7 +41,6 @@ public class MCRMapObjectIDDOIGenerator extends MCRPIGenerator<MCRDigitalObjectI
     public MCRMapObjectIDDOIGenerator() {
         super();
         mcrdoiParser = new MCRDOIParser();
-        this.generatorID = generatorID;
     }
 
     @Override

@@ -49,6 +49,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
@@ -143,7 +144,11 @@ public class MCRGenericPIGenerator extends MCRPIGenerator<MCRPersistentIdentifie
 
     public MCRGenericPIGenerator() {
         super();
+    }
 
+    @MCRPostConstruction
+    public void init(String property){
+        super.init(property);
         final Map<String, String> properties = getProperties();
 
         setGeneralPattern(properties.get(PROPERTY_KEY_GENERAL_PATTERN));
