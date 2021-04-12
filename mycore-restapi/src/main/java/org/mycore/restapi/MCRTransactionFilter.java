@@ -28,7 +28,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSession;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRSessionMgr;
 
 @Priority(Priorities.USER)
@@ -43,21 +43,20 @@ public class MCRTransactionFilter implements ContainerRequestFilter {
         if (MCRSessionMgr.isLocked()) {
             return;
         }
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        if (mcrSession.isTransactionActive()) {
+        if (MCRJPAUtil.isTransactionActive()) {
             LOGGER.debug("Filter scoped JPA transaction is active.");
-            if (mcrSession.transactionRequiresRollback()) {
+            if (MCRJPAUtil.transactionRequiresRollback()) {
                 try {
-                    mcrSession.rollbackTransaction();
+                    MCRJPAUtil.rollbackTransaction();
                 } finally {
                     throw new InternalServerErrorException("Transaction rollback was required.");
                 }
             }
-            mcrSession.commitTransaction();
+            MCRJPAUtil.commitTransaction();
         }
         if (Boolean.TRUE.equals(requestContext.getProperty(PROP_REQUIRE_TRANSACTION))) {
             LOGGER.debug("Starting user JPA transaction.");
-            mcrSession.beginTransaction();
+            MCRJPAUtil.beginTransaction();
         }
     }
 }

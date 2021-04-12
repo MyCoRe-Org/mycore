@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.junit.Test;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -60,7 +61,7 @@ public class MCRIFSCopyTest extends MCRIFSTest {
     public void async() throws Exception {
         // create derivate
         create();
-        MCRSessionMgr.getCurrentSession().commitTransaction();
+        MCRJPAUtil.commitTransaction();
 
         // execute threads
         MCRSystemUserInformation systemUser = MCRSystemUserInformation.getSystemUserInstance();

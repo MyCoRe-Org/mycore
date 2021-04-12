@@ -29,6 +29,7 @@ import java.util.concurrent.Callable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
@@ -48,7 +49,7 @@ public class MCRTransactionableCallableTest extends MCRTestCase {
         try {
             assertTrue(transactionableRunnable.call());
         } catch (Exception e) {
-            fail(e.getMessage());
+            throw new MCRException(e);
         }
         assertEquals(sessionID, testCallable.getSessionContextID());
         session.close();

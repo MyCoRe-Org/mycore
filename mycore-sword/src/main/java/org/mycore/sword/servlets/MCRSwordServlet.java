@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -45,11 +46,11 @@ public class MCRSwordServlet extends HttpServlet {
         LOGGER.info("{} ip={} mcr={} user={}", req.getPathInfo(), MCRFrontendUtil.getRemoteAddr(req), session.getID(),
             session.getUserInformation().getUserID());
         MCRFrontendUtil.configureSession(session, req, resp);
-        MCRSessionMgr.getCurrentSession().beginTransaction();
+        MCRJPAUtil.beginTransaction();
     }
 
     protected void afterRequest(HttpServletRequest req, HttpServletResponse resp) {
-        MCRSessionMgr.getCurrentSession().commitTransaction();
+        MCRJPAUtil.commitTransaction();
         MCRSessionMgr.releaseCurrentSession();
     }
 

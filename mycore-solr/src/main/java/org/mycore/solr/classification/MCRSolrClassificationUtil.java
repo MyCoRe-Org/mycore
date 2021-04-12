@@ -101,7 +101,7 @@ public abstract class MCRSolrClassificationUtil {
      * @param solrDocumentList the list to index
      */
     public static void bulkIndex(final SolrClient client, List<SolrInputDocument> solrDocumentList) {
-        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+        MCRSessionMgr.getCurrentSession().onPassivate(() -> {
             List<List<SolrInputDocument>> partitionList = Lists.partition(solrDocumentList, 1000);
             int docNum = solrDocumentList.size();
             int added = 0;

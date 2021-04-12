@@ -18,9 +18,13 @@
 
 package org.mycore.backend.jpa;
 
+import java.util.Optional;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
+
+import org.mycore.common.config.MCRConfiguration2;
 
 public class MCREntityManagerProvider {
 
@@ -32,6 +36,17 @@ public class MCREntityManagerProvider {
 
     public static EntityManagerFactory getEntityManagerFactory() {
         return factory;
+    }
+
+    public static boolean isDataBaseAccessEnabled() {
+        return  context != null && MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true);
+    }
+
+    public static Optional<EntityManager> getEnabledEntityManager() {
+        if (isDataBaseAccessEnabled()) {
+            return Optional.ofNullable(getCurrentEntityManager());
+        }
+        return Optional.empty();
     }
 
     public static EntityManager getCurrentEntityManager() {

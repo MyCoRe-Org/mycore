@@ -47,6 +47,7 @@ import javax.ws.rs.ext.Provider;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
@@ -121,7 +122,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
         MCRSessionMgr.unlock();
         MCRSession currentSession = MCRSessionMgr.getCurrentSession(); //bind to this request
         currentSession.setCurrentIP(MCRFrontendUtil.getRemoteAddr(httpServletRequest));
-        currentSession.beginTransaction();
+        MCRJPAUtil.beginTransaction();
         //3 cases for authentication
         Optional<MCRUserInformation> userInformation = Optional.empty();
         String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
@@ -273,19 +274,19 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
     private static void closeSessionIfNeeded() {
         if (MCRSessionMgr.hasCurrentSession()) {
-            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             try {
-                if (currentSession.isTransactionActive()) {
+                if (MCRJPAUtil.isTransactionActive()) {
                     LOGGER.debug("Active MCRSession and JPA-Transaction found. Clearing up");
-                    if (currentSession.transactionRequiresRollback()) {
-                        currentSession.rollbackTransaction();
+                    if (MCRJPAUtil.transactionRequiresRollback()) {
+                        MCRJPAUtil.rollbackTransaction();
                     } else {
-                        currentSession.commitTransaction();
+                        MCRJPAUtil.commitTransaction();
                     }
                 } else {
                     LOGGER.debug("Active MCRSession found. Clearing up");
                 }
             } finally {
+                MCRSession currentSession = MCRSessionMgr.getCurrentSession();
                 MCRSessionMgr.releaseCurrentSession();
                 currentSession.close();
                 LOGGER.debug("Session closed.");

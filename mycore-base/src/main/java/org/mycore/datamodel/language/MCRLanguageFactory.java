@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -227,10 +228,10 @@ public class MCRLanguageFactory {
      */
     private void readLanguageClassification() {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        if (!session.isTransactionActive()) {
-            session.beginTransaction();
+        if (!MCRJPAUtil.isTransactionActive()) {
+            MCRJPAUtil.beginTransaction();
             buildLanguagesFromClassification();
-            session.commitTransaction();
+            MCRJPAUtil.commitTransaction();
         } else {
             buildLanguagesFromClassification();
         }

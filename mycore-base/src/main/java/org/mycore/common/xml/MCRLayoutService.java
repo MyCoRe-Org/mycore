@@ -34,8 +34,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
@@ -199,7 +199,7 @@ public class MCRLayoutService {
                 } else {
                     transformer.transform(source, bout);
                 }
-                endCurrentTransaction();
+                MCRJPAUtil.commitTransaction();
                 response.setContentLength(bout.size());
                 bout.writeTo(servletOutputStream);
             } finally {
@@ -250,10 +250,4 @@ public class MCRLayoutService {
         }
     }
 
-    /**
-     * Called before sending data to end hibernate transaction.
-     */
-    private static void endCurrentTransaction() {
-        MCRSessionMgr.getCurrentSession().commitTransaction();
-    }
 }

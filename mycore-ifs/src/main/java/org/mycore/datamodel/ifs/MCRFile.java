@@ -503,7 +503,7 @@ public class MCRFile extends MCRFilesystemNode {
             LogManager.getLogger().info("Move was successful");
         }
         //if commit is successful: delete old local file
-        MCRSessionMgr.getCurrentSession().onCommit(() -> {
+        MCRSessionMgr.getCurrentSession().onPassivate(() -> {
             try {
                 LogManager.getLogger().info("Delete moved file '{}' from old store.", localFile);
                 Files.delete(localFile);

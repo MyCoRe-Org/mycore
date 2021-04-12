@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -76,16 +77,16 @@ public class MCRTransactionableRunnable implements Runnable, MCRDecorator<Runnab
             this.session = MCRSessionMgr.getCurrentSession();
         }
         MCRSessionMgr.setCurrentSession(this.session);
-        session.beginTransaction();
+        MCRJPAUtil.beginTransaction();
         try {
             this.runnable.run();
         } finally {
             try {
-                session.commitTransaction();
+                MCRJPAUtil.commitTransaction();
             } catch (Exception commitExc) {
                 LOGGER.error("Error while commiting transaction.", commitExc);
                 try {
-                    session.rollbackTransaction();
+                    MCRJPAUtil.rollbackTransaction();
                 } catch (Exception rollbackExc) {
                     LOGGER.error("Error while rollbacking transaction.", commitExc);
                 }

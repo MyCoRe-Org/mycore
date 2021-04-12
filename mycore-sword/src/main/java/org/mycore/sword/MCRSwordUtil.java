@@ -70,6 +70,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
@@ -178,7 +179,6 @@ public class MCRSwordUtil {
     }
 
     private static void addDirectoryToZip(ZipArchiveOutputStream zipOutputStream, Path directory) {
-        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
 
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(directory)) {
             paths.forEach(p -> {
@@ -193,11 +193,11 @@ public class MCRSwordUtil {
                         zipArchiveEntry = new ZipArchiveEntry(fileName);
                         zipArchiveEntry.setSize(Files.size(p));
                         zipOutputStream.putArchiveEntry(zipArchiveEntry);
-                        if (currentSession.isTransactionActive()) {
-                            currentSession.commitTransaction();
+                        if (MCRJPAUtil.isTransactionActive()) {
+                            MCRJPAUtil.commitTransaction();
                         }
                         Files.copy(p, zipOutputStream);
-                        currentSession.beginTransaction();
+                        MCRJPAUtil.beginTransaction();
                         zipOutputStream.closeArchiveEntry();
                     }
                 } catch (IOException e) {
@@ -224,8 +224,8 @@ public class MCRSwordUtil {
     public static Path createTempFileFromStream(String fileName, InputStream inputStream, String checkMd5)
         throws IOException {
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-        if (currentSession.isTransactionActive()) {
-            currentSession.commitTransaction();
+        if (MCRJPAUtil.isTransactionActive()) {
+            MCRJPAUtil.commitTransaction();
         }
 
         final Path zipTempFile = Files.createTempFile("swordv2_", fileName);
@@ -236,7 +236,7 @@ public class MCRSwordUtil {
                 md5Digest = MessageDigest.getInstance("MD5");
                 inputStream = new DigestInputStream(inputStream, md5Digest);
             } catch (NoSuchAlgorithmException e) {
-                currentSession.beginTransaction();
+                MCRJPAUtil.beginTransaction();
                 throw new MCRConfigurationException("No MD5 available!", e);
             }
         }
@@ -246,12 +246,12 @@ public class MCRSwordUtil {
         if (checkMd5 != null) {
             final String md5String = MCRUtils.toHexString(md5Digest.digest());
             if (!md5String.equals(checkMd5)) {
-                currentSession.beginTransaction();
+                MCRJPAUtil.beginTransaction();
                 throw new IOException("MD5 mismatch, expected " + checkMd5 + " got " + md5String);
             }
         }
 
-        currentSession.beginTransaction();
+        MCRJPAUtil.beginTransaction();
         return zipTempFile;
     }
 
@@ -291,8 +291,8 @@ public class MCRSwordUtil {
                         try (SeekableByteChannel destinationChannel = Files.newByteChannel(targetFilePath,
                             StandardOpenOption.WRITE, StandardOpenOption.SYNC, StandardOpenOption.CREATE);
                             SeekableByteChannel sourceChannel = Files.newByteChannel(file, StandardOpenOption.READ)) {
-                            if (currentSession.isTransactionActive()) {
-                                currentSession.commitTransaction();
+                            if (MCRJPAUtil.isTransactionActive()) {
+                                MCRJPAUtil.commitTransaction();
                             }
                             ByteBuffer buffer = ByteBuffer.allocateDirect(COPY_BUFFER_SIZE);
                             while (sourceChannel.read(buffer) != -1 || buffer.position() > 0) {
@@ -301,8 +301,8 @@ public class MCRSwordUtil {
                                 buffer.compact();
                             }
                         } finally {
-                            if (!currentSession.isTransactionActive()) {
-                                currentSession.beginTransaction();
+                            if (!MCRJPAUtil.isTransactionActive()) {
+                                MCRJPAUtil.beginTransaction();
                             }
                         }
 

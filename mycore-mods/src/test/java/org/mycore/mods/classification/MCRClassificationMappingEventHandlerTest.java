@@ -34,6 +34,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
@@ -57,7 +58,6 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
 
     @Test
     public void testMapping() throws SAXParseException, IOException, JDOMException, URISyntaxException {
-        MCRSessionMgr.getCurrentSession().isTransactionActive();
         ClassLoader classLoader = getClass().getClassLoader();
         SAXBuilder saxBuilder = new SAXBuilder();
 

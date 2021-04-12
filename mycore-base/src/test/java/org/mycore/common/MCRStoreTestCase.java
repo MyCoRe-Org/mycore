@@ -60,6 +60,9 @@ public abstract class MCRStoreTestCase extends MCRJPATestCase {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.Metadata.Store.BaseDir", storeBaseDir.getRoot().getAbsolutePath());
         testProperties.put("MCR.Metadata.Store.SVNBase", svnBaseDir.getRoot().toURI().toString());
+        testProperties.put("MCR.EventHandler.MCRObject.100.Class", "");
+        testProperties.put("MCR.EventHandler.MCRDerivate.100.Class", "");
+        testProperties.put("MCR.EventHandler.MCRPath.100.Class", "");
         return testProperties;
     }
 

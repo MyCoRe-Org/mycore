@@ -41,6 +41,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
@@ -78,8 +79,8 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
         }
         if (headers.getAcceptableMediaTypes().contains(MediaType.TEXT_HTML_TYPE)) {
             // try to return a html error page
-            if (!MCRSessionMgr.isLocked() && !MCRSessionMgr.getCurrentSession().isTransactionActive()) {
-                MCRSessionMgr.getCurrentSession().beginTransaction();
+            if (!MCRSessionMgr.isLocked() && !MCRJPAUtil.isTransactionActive()) {
+                MCRJPAUtil.beginTransaction();
             }
             try {
                 int status = response.getStatus();
@@ -96,7 +97,7 @@ public class MCRJerseyExceptionMapper implements ExceptionMapper<Exception> {
                 return Response.status(Status.INTERNAL_SERVER_ERROR).entity(transformException).build();
             } finally {
                 if (!MCRSessionMgr.isLocked()) {
-                    MCRSessionMgr.getCurrentSession().commitTransaction();
+                    MCRJPAUtil.commitTransaction();
                 }
             }
         }

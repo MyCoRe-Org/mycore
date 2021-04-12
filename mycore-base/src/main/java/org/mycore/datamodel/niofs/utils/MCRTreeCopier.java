@@ -32,6 +32,7 @@ import java.nio.file.attribute.FileTime;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -102,8 +103,8 @@ public class MCRTreeCopier implements FileVisitor<Path> {
             }
             if (restartTransaction && MCRSessionMgr.hasCurrentSession()) {
                 final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-                currentSession.commitTransaction();
-                currentSession.beginTransaction();
+                MCRJPAUtil.commitTransaction();
+                MCRJPAUtil.beginTransaction();
             }
             Files.copy(source, target, StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException x) {

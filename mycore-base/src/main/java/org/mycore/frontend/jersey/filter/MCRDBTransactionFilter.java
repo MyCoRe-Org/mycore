@@ -23,6 +23,7 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -31,16 +32,16 @@ public class MCRDBTransactionFilter implements ContainerRequestFilter, Container
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        if (session.transactionRequiresRollback()) {
-            session.rollbackTransaction();
+        if (MCRJPAUtil.transactionRequiresRollback()) {
+            MCRJPAUtil.rollbackTransaction();
         } else {
-            session.commitTransaction();
+            MCRJPAUtil.commitTransaction();
         }
     }
 
     @Override
     public void filter(ContainerRequestContext request) {
-        MCRSessionMgr.getCurrentSession().beginTransaction();
+        MCRJPAUtil.beginTransaction();
     }
 
 }

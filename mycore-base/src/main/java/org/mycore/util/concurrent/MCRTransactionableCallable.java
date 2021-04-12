@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -78,15 +79,15 @@ public class MCRTransactionableCallable<V> implements Callable<V>, MCRDecorator<
         }
         MCRSessionMgr.setCurrentSession(this.session);
         try {
-            session.beginTransaction();
+            MCRJPAUtil.beginTransaction();
             return this.callable.call();
         } finally {
             try {
-                session.commitTransaction();
+                MCRJPAUtil.commitTransaction();
             } catch (Exception commitExc) {
                 LOGGER.error("Error while commiting transaction.", commitExc);
                 try {
-                    session.rollbackTransaction();
+                    MCRJPAUtil.rollbackTransaction();
                 } catch (Exception rollbackExc) {
                     LOGGER.error("Error while rollbacking transaction.", commitExc);
                 }

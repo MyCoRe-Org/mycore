@@ -44,7 +44,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRSessionMgr;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
@@ -91,7 +91,7 @@ public class MCRIViewZipResource {
 
         @Override
         public void write(OutputStream out) throws IOException, WebApplicationException {
-            MCRSessionMgr.getCurrentSession().beginTransaction();
+            MCRJPAUtil.beginTransaction();
             try {
                 final ZipArchiveOutputStream zipStream = new ZipArchiveOutputStream(new BufferedOutputStream(out));
                 zipStream.setLevel(Deflater.BEST_SPEED);
@@ -129,7 +129,7 @@ public class MCRIViewZipResource {
             } catch (Exception exc) {
                 throw new WebApplicationException(exc);
             } finally {
-                MCRSessionMgr.getCurrentSession().commitTransaction();
+                MCRJPAUtil.commitTransaction();
             }
         }
     }

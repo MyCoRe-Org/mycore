@@ -46,12 +46,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-import javax.persistence.EntityTransaction;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -107,17 +103,13 @@ public class MCRSession implements Cloneable {
 
     private long loginTime, lastAccessTime, thisAccessTime, createTime;
 
-    private boolean dataBaseAccess;
-
-    private ThreadLocal<EntityTransaction> transaction = new ThreadLocal<>();
-
     private StackTraceElement[] constructingStackTrace;
 
     private Optional<URI> firstURI = Optional.empty();
 
     private ThreadLocal<Throwable> lastActivatedStackTrace = new ThreadLocal<>();
 
-    private ThreadLocal<Queue<Runnable>> onCommitTasks = ThreadLocal.withInitial(LinkedList::new);
+    private ThreadLocal<Queue<Runnable>> onPassivateTasks = ThreadLocal.withInitial(LinkedList::new);
 
     private static ExecutorService COMMIT_SERVICE;
 
@@ -153,6 +145,7 @@ public class MCRSession implements Cloneable {
         });
     }
 
+
     /**
      * The constructor of a MCRSession. As default the user ID is set to the value of the property variable named
      * 'MCR.Users.Guestuser.UserName'.
@@ -160,7 +153,6 @@ public class MCRSession implements Cloneable {
     MCRSession() {
         userInformation = guestUserInformation;
         setCurrentLanguage(MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG));
-        dataBaseAccess = MCRHIBConnection.isEnabled();
 
         accessCount = new AtomicInteger();
         concurrentAccess = new AtomicInteger();
@@ -347,7 +339,8 @@ public class MCRSession implements Cloneable {
         if (!firstURI.isPresent()) {
             firstURI = Optional.of(DEFAULT_URI);
         }
-        onCommitTasks.remove();
+        this.submitOnPassivateTasks();
+        onPassivateTasks.remove();
     }
 
     /**
@@ -371,64 +364,6 @@ public class MCRSession implements Cloneable {
 
     public long getCreateTime() {
         return createTime;
-    }
-
-    /**
-     * starts a new database transaction.
-     */
-    public void beginTransaction() {
-        if (dataBaseAccess) {
-            EntityTransaction entityTransaction = MCREntityManagerProvider.getCurrentEntityManager().getTransaction();
-            entityTransaction.begin();
-            transaction.set(entityTransaction);
-        }
-    }
-
-    /**
-     * Determine whether the current resource transaction has been marked for rollback.
-     * @return boolean indicating whether the transaction has been marked for rollback
-     */
-    public boolean transactionRequiresRollback() {
-        return isTransactionActive() && transaction.get().getRollbackOnly();
-    }
-
-    /**
-     * commits the database transaction. Commit is only done if {@link #isTransactionActive()} returns true.
-     */
-    public void commitTransaction() {
-        if (isTransactionActive()) {
-            transaction.get().commit();
-            MCREntityManagerProvider.getCurrentEntityManager().clear();
-            transaction.remove();
-        }
-        submitOnCommitTasks();
-    }
-
-    /**
-     * forces the database transaction to roll back. Roll back is only performed if {@link #isTransactionActive()}
-     * returns true.
-     */
-    public void rollbackTransaction() {
-        if (isTransactionActive()) {
-            transaction.get().rollback();
-            MCREntityManagerProvider.getCurrentEntityManager().close();
-            transaction.remove();
-        }
-    }
-
-    /**
-     * Is the transaction still alive?
-     *
-     * @return true if the transaction is still alive
-     */
-    public boolean isTransactionActive() {
-        if (!dataBaseAccess) {
-            return false;
-        }
-        if (transaction.get() == null) {
-            transaction.set(MCREntityManagerProvider.getCurrentEntityManager().getTransaction());
-        }
-        return transaction.get() != null && transaction.get().isActive();
     }
 
     public StackTraceElement[] getConstructingStackTrace() {
@@ -464,17 +399,17 @@ public class MCRSession implements Cloneable {
     }
 
     /**
-     * Add a task which will be executed after {@link #commitTransaction()} was called.
+     * Add a task which will be executed after session was passivated.
      *
      * @param task thread witch will be executed after an commit
      */
-    public void onCommit(Runnable task) {
-        this.onCommitTasks.get().offer(Objects.requireNonNull(task));
+    public void onPassivate(Runnable task) {
+        this.onPassivateTasks.get().offer(Objects.requireNonNull(task));
     }
 
-    private void submitOnCommitTasks() {
-        Queue<Runnable> runnables = onCommitTasks.get();
-        onCommitTasks.remove();
+    private void submitOnPassivateTasks() {
+        Queue<Runnable> runnables = onPassivateTasks.get();
+        onPassivateTasks.remove();
         CompletableFuture.allOf(runnables.stream()
             .map(r -> new MCRTransactionableRunnable(r, this))
             .map(MCRSession::toCompletableFuture)

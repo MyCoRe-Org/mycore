@@ -29,6 +29,7 @@ import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -258,15 +259,15 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
             session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
         }
 
-        boolean transactionActive = !session.isTransactionActive();
+        boolean transactionActive = !MCRJPAUtil.isTransactionActive();
         try {
             if (transactionActive) {
-                session.beginTransaction();
+                MCRJPAUtil.beginTransaction();
             }
             task.run();
         } finally {
-            if (transactionActive && session.isTransactionActive()) {
-                session.commitTransaction();
+            if (transactionActive && MCRJPAUtil.isTransactionActive()) {
+                MCRJPAUtil.commitTransaction();
             }
 
             if (jobUserPresent) {

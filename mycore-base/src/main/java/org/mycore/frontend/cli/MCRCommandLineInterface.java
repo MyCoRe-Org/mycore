@@ -42,6 +42,7 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -183,9 +184,9 @@ public class MCRCommandLineInterface {
         MCRSessionMgr.setCurrentSession(session);
 
         try {
-            session.beginTransaction();
+            MCRJPAUtil.beginTransaction();
             List<String> commandsReturned = knownCommands.invokeCommand(expandCommand(command));
-            session.commitTransaction();
+            MCRJPAUtil.commitTransaction();
             addCommandsToQueue(commandsReturned);
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
@@ -224,9 +225,9 @@ public class MCRCommandLineInterface {
     private static void rollbackTransaction(MCRSession session) {
         output("Command failed. Performing transaction rollback...");
 
-        if (session.isTransactionActive()) {
+        if (MCRJPAUtil.isTransactionActive()) {
             try {
-                session.rollbackTransaction();
+                MCRJPAUtil.rollbackTransaction();
             } catch (Exception ex2) {
                 MCRCLIExceptionHandler.handleException(ex2);
             }

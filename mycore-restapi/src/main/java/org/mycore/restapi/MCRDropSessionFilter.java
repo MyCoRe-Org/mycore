@@ -31,6 +31,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -51,8 +52,8 @@ public class MCRDropSessionFilter implements ContainerRequestFilter {
         LogManager.getLogger().info("Has Session? {}", MCRSessionMgr.hasCurrentSession());
         if (MCRSessionMgr.hasCurrentSession()) {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-            if (currentSession.isTransactionActive()) {
-                currentSession.commitTransaction();
+            if (MCRJPAUtil.isTransactionActive()) {
+                MCRJPAUtil.commitTransaction();
             }
             MCRSessionMgr.releaseCurrentSession();
             currentSession.close();

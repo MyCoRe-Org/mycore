@@ -46,9 +46,8 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRFSNODES_;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRLinkTableManager;
@@ -344,10 +343,9 @@ public class MCRIFS2Commands {
         String oldMd5 = "";
         long oldSize = 0;
         boolean foundEntry = false;
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        boolean transactionActive = mcrSession.isTransactionActive();
+        boolean transactionActive = MCRJPAUtil.isTransactionActive();
         if (!transactionActive) {
-            mcrSession.beginTransaction();
+            MCRJPAUtil.beginTransaction();
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         try {
@@ -438,10 +436,10 @@ public class MCRIFS2Commands {
             mcrfsnodes.setFctid(fctid);
             mcrfsnodes.setMd5(md5);
             em.merge(mcrfsnodes);
-            mcrSession.commitTransaction();
+            MCRJPAUtil.commitTransaction();
             LOGGER.debug("Entry {} fixed.", node.getFileName());
         } catch (PersistenceException pe) {
-            mcrSession.rollbackTransaction();
+            MCRJPAUtil.rollbackTransaction();
             pe.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();

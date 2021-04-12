@@ -40,7 +40,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRSessionMgr;
+import org.mycore.backend.jpa.MCRJPAUtil;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -107,7 +107,7 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
             resultRessource = MCRSwordUtil.getZippedDerivateMediaResource(derivateID);
         }
 
-        MCRSessionMgr.getCurrentSession().commitTransaction();
+        MCRJPAUtil.commitTransaction();
         return resultRessource;
     }
 
