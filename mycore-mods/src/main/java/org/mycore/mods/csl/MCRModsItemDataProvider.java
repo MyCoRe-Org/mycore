@@ -464,6 +464,10 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     @Override
     public void addContent(MCRContent content) throws IOException, JDOMException, SAXException {
         final Document document = content.asXML();
+        addContent(document);
+    }
+
+    protected void addContent(Document document) {
         final MCRObject object = new MCRObject(document);
         wrapper = new MCRMODSWrapper(object);
         this.id = object.getId().toString();

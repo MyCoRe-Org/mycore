@@ -369,7 +369,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </snapshots>
       <id>dev.bibsonomy.org</id>
       <name>Official Source Code Releases of selected BibSonomy Modules</name>
-      <url>http://dev.bibsonomy.org/maven2/</url>
+      <url>https://dev.bibsonomy.org/maven2/</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -1186,6 +1186,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>org.jdom</groupId>
         <artifactId>jdom2</artifactId>
         <version>2.0.6</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>1.12.1</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>

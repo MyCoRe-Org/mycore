@@ -247,8 +247,8 @@ public class MCRLoginServlet extends MCRServlet {
     }
 
     private static boolean currentUserIsGuest() {
-        return MCRSessionMgr.getCurrentSession().getUserInformation()
-            .equals(MCRSystemUserInformation.getGuestInstance());
+        return MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
+            .equals(MCRSystemUserInformation.getGuestInstance().getUserID());
     }
 
     private int getNumLoginOptions() {
