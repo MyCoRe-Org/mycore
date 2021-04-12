@@ -33,8 +33,6 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataStore;
-import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
@@ -103,8 +101,7 @@ public class MCRObjectServlet extends MCRContentServlet {
     private MCRContent requestVersionedObject(final MCRObjectID mcrid, final HttpServletResponse resp, final long rev)
         throws IOException {
         MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
-        MCRMetadataStore metadataStore = xmlMetadataManager.getStore(mcrid, true);
-        if (metadataStore instanceof MCRVersioningMetadataStore) {
+        if (xmlMetadataManager.listRevisions(mcrid) != null) {
             MCRContent content = xmlMetadataManager.retrieveContent(mcrid, rev);
             if (content != null) {
                 return content;

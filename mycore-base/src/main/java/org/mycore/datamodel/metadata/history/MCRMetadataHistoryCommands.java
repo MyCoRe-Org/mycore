@@ -45,12 +45,10 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUsageException;
 import org.mycore.datamodel.common.MCRCreatorCache;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
-import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -115,14 +113,15 @@ public class MCRMetadataHistoryCommands {
     @MCRCommand(syntax = "build metadata history of base {0}",
         help = "build metadata history of all objects with base id {0}")
     public static List<String> buildHistory(String baseId) {
-        MCRMetadataStore store = MCRXMLMetadataManager.instance().getStore(baseId, true);
-        if (store instanceof MCRVersioningMetadataStore) {
-            LogManager.getLogger().info("Verify SVN history of {}", baseId);
-            ((MCRVersioningMetadataStore) store).verify();
-        }
+        MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
+        mm.verifyStore (baseId);
         ExecutorService executorService = Executors.newWorkStealingPool();
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-        int maxId = store.getHighestStoredID();
+        String[] idParts = MCRObjectID.getIDParts(baseId);
+        if (idParts.length != 2) {
+            throw new MCRUsageException("Valid base ID required!");
+        }
+        int maxId = mm.getHighestStoredID(idParts[0], idParts[1]);
         AtomicInteger completed = new AtomicInteger(maxId);
         IntStream.rangeClosed(1, maxId)
             .parallel()
@@ -162,14 +161,8 @@ public class MCRMetadataHistoryCommands {
 
     private static Stream<MCRMetaHistoryItem> buildDerivateHistory(MCRObjectID derId) {
         try {
-            List<MCRMetadataVersion> versions = Collections.emptyList();
-            MCRMetadataStore store = MCRXMLMetadataManager.instance().getStore(derId, true);
-            if (store instanceof MCRVersioningMetadataStore) {
-                MCRVersionedMetadata versionedMetadata = ((MCRVersioningMetadataStore) store)
-                    .retrieve(derId.getNumberAsInteger());
-                versions = versionedMetadata.listVersions();
-            }
-            if (versions.isEmpty()) {
+            List<MCRMetadataVersion> versions = MCRXMLMetadataManager.instance().listRevisions(derId);
+            if (versions == null || versions.isEmpty()) {
                 return buildSimpleDerivateHistory(derId);
             } else {
                 return buildDerivateHistory(derId, versions);
@@ -182,14 +175,8 @@ public class MCRMetadataHistoryCommands {
 
     private static Stream<MCRMetaHistoryItem> buildObjectHistory(MCRObjectID objId) {
         try {
-            List<MCRMetadataVersion> versions = Collections.emptyList();
-            MCRMetadataStore store = MCRXMLMetadataManager.instance().getStore(objId, true);
-            if (store instanceof MCRVersioningMetadataStore) {
-                MCRVersionedMetadata versionedMetadata = ((MCRVersioningMetadataStore) store)
-                    .retrieve(objId.getNumberAsInteger());
-                versions = versionedMetadata.listVersions();
-            }
-            if (versions.isEmpty()) {
+            List<MCRMetadataVersion> versions = MCRXMLMetadataManager.instance().listRevisions(objId);
+            if (versions == null || versions.isEmpty()) {
                 return buildSimpleObjectHistory(objId);
             } else {
                 return buildObjectHistory(objId, versions);

@@ -35,6 +35,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -102,9 +104,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRDataURL;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -1469,19 +1469,19 @@ public final class MCRURIResolver implements URIResolver {
                 if (versions != null && !versions.isEmpty()) {
                     return getSource(versions);
                 } else {
-                    MCRMetadataStore metadataStore = metadataManager.getStore(id, true);
-                    return getSource(metadataStore.retrieve(mcrId.getNumberAsInteger()));
+                    return getSource(Instant.ofEpochMilli(metadataManager.getLastModified(mcrId))
+                        .truncatedTo(ChronoUnit.MILLIS));
                 }
             } catch (Exception e) {
                 throw new TransformerException(e);
             }
         }
 
-        private Source getSource(MCRStoredMetadata retrieve) throws IOException {
+        private Source getSource(Instant lastModified) throws IOException {
             Element e = new Element("versions");
             Element v = new Element("version");
             e.addContent(v);
-            v.setAttribute("date", MCRXMLFunctions.getISODate(retrieve.getLastModified(), null));
+            v.setAttribute("date", lastModified.toString());
             return new JDOMSource(e);
         }
 

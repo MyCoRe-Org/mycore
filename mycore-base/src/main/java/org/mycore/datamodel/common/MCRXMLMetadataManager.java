@@ -101,9 +101,7 @@ import org.xml.sax.SAXException;
  */
 public class MCRXMLMetadataManager {
 
-    public static final int REV_LATEST = -1;
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRXMLMetadataManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** The singleton */
     private static MCRXMLMetadataManager SINGLETON;
@@ -236,7 +234,7 @@ public class MCRXMLMetadataManager {
      *
      * @param base the MCRObjectID base, e.g. DocPortal_document
      */
-    public MCRMetadataStore getStore(String base) {
+    private MCRMetadataStore getStore(String base) {
         String[] split = base.split("_");
         return getStore(split[0], split[1], false);
     }
@@ -249,19 +247,9 @@ public class MCRXMLMetadataManager {
      *                 is thrown.
      * @return the metadata store
      */
-    public MCRMetadataStore getStore(String base, boolean readOnly) {
+    private MCRMetadataStore getStore(String base, boolean readOnly) {
         String[] split = base.split("_");
         return getStore(split[0], split[1], readOnly);
-    }
-
-    /**
-     * Returns IFS2 MCRMetadataStore used to store metadata of the given MCRObjectID
-     *
-     * @param mcrid the mycore object identifier
-     * @return the metadata store
-     */
-    public MCRMetadataStore getStore(MCRObjectID mcrid) {
-        return getStore(mcrid.getProjectId(), mcrid.getTypeId(), false);
     }
 
     /**
@@ -272,19 +260,8 @@ public class MCRXMLMetadataManager {
      *                 is thrown.
      * @return the metadata store
      */
-    public MCRMetadataStore getStore(MCRObjectID mcrid, boolean readOnly) {
+    private MCRMetadataStore getStore(MCRObjectID mcrid, boolean readOnly) {
         return getStore(mcrid.getProjectId(), mcrid.getTypeId(), readOnly);
-    }
-
-    /**
-     * Returns IFS2 MCRMetadataStore used to store metadata of the given MCRObjectID
-     *
-     * @param project the project, e.g. DocPortal
-     * @param type the object type, e.g. document
-     * @return the metadata store
-     */
-    public MCRMetadataStore getStore(String project, String type) {
-        return getStore(project, type, false);
     }
 
     /**
@@ -295,7 +272,7 @@ public class MCRXMLMetadataManager {
      * @param readOnly if readOnly, this method will throw an exception if the store does not exist's yet
      * @return the metadata store
      */
-    public MCRMetadataStore getStore(String project, String type, boolean readOnly) {
+    private MCRMetadataStore getStore(String project, String type, boolean readOnly) {
         String projectType = getStoryKey(project, type);
         String prefix = "MCR.IFS2.Store." + projectType + ".";
         String forceXML = MCRConfiguration2.getString(prefix + "ForceXML").orElse(null);
@@ -321,6 +298,20 @@ public class MCRXMLMetadataManager {
                     .format(new Object[] { project, type }));
         }
         return store;
+    }
+
+    /**
+     * Try to validate a store.
+     * @param base The base ID of a to-be-validated store
+     */
+    public void verifyStore(String base) {
+        MCRMetadataStore store = getStore(base);
+        if (store instanceof MCRVersioningMetadataStore) {
+            LOGGER.info("Verifying SVN history of {}.", base);
+            ((MCRVersioningMetadataStore) (getStore(base))).verify();
+        } else {
+            LOGGER.warn("Cannot verify unversioned store {}!", base);
+        }
     }
 
     @SuppressWarnings("unchecked")
