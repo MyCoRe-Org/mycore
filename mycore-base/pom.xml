@@ -111,6 +111,7 @@
             <name>known.issues</name>
             <value>org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks</value>
           </property>
+          <trimStackTrace>false</trimStackTrace>
         </configuration>
       </plugin>
       <plugin>
