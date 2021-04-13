@@ -24,7 +24,6 @@ import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -102,9 +101,9 @@ public class MCRSession implements Cloneable {
     private Locale locale = null;
 
     /** The unique ID of this session */
-    private String sessionID = null;
+    private String sessionID;
 
-    private String ip = null;
+    private String ip;
 
     private long loginTime, lastAccessTime, thisAccessTime, createTime;
 
@@ -168,7 +167,7 @@ public class MCRSession implements Cloneable {
         userInformation = guestUserInformation;
         setCurrentLanguage(MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG));
         dataBaseAccess = MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
-            && !TRANSACTION_SERVICE_LOADER.stream().findAny().isEmpty();
+            && TRANSACTION_SERVICE_LOADER.stream().findAny().isPresent();
 
         accessCount = new AtomicInteger();
         concurrentAccess = new AtomicInteger();
@@ -224,7 +223,7 @@ public class MCRSession implements Cloneable {
             mapChanged = false;
             final Set<Entry<Object, Object>> entrySet = Collections.unmodifiableMap(map).entrySet();
             final Map.Entry<Object, Object>[] entryArray = entrySet.toArray(emptyEntryArray);
-            mapEntries = Collections.unmodifiableList(Arrays.asList(entryArray));
+            mapEntries = List.of(entryArray);
         }
         return mapEntries;
     }
@@ -278,7 +277,7 @@ public class MCRSession implements Cloneable {
     public final void setCurrentIP(String newip) {
         //a necessary condition for an IP address is to start with an hexadecimal value or ':'
         if (Character.digit(newip.charAt(0), 16) == -1 && newip.charAt(0) != ':') {
-            LOGGER.error("Is not a valid IP address: " + newip);
+            LOGGER.error("Is not a valid IP address: {}", newip);
             return;
         }
         try {
@@ -315,7 +314,7 @@ public class MCRSession implements Cloneable {
     }
 
     public void setFirstURI(Supplier<URI> uri) {
-        if (!firstURI.isPresent()) {
+        if (firstURI.isEmpty()) {
             firstURI = Optional.of(uri.get());
         }
     }
@@ -352,7 +351,7 @@ public class MCRSession implements Cloneable {
         } else {
             LOGGER.debug("deactivate currentThreadCount: {}", currentThreadCount.get().get());
         }
-        if (!firstURI.isPresent()) {
+        if (firstURI.isEmpty()) {
             firstURI = Optional.of(DEFAULT_URI);
         }
         onCommitTasks.remove();
@@ -370,7 +369,7 @@ public class MCRSession implements Cloneable {
     void fireSessionEvent(MCRSessionEvent.Type type, int concurrentAccessors) {
         MCRSessionEvent event = new MCRSessionEvent(this, type, concurrentAccessors);
         LOGGER.debug(event);
-        MCRSessionMgr.getListeners().stream().forEach(l -> l.sessionEvent(event));
+        MCRSessionMgr.getListeners().forEach(l -> l.sessionEvent(event));
     }
 
     public long getThisAccessTime() {
