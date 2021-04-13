@@ -21,7 +21,7 @@ package org.mycore.common;
 /**
  * Thread safety: Implementation must not ensure that concurrent access is without side effects.
  */
-public interface MCRSessionTransaction {
+public interface MCRPersistenceTransaction {
 
     /**
      * preconditions in the backend are met and this instance should be used for transactions

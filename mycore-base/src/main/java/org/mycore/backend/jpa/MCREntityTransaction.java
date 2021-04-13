@@ -18,9 +18,9 @@
 
 package org.mycore.backend.jpa;
 
-import org.mycore.common.MCRSessionTransaction;
+import org.mycore.common.MCRPersistenceTransaction;
 
-public class MCREntityTransaction implements MCRSessionTransaction {
+public class MCREntityTransaction implements MCRPersistenceTransaction {
 
     @Override
     public boolean isReady() {

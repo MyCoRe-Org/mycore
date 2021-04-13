@@ -70,8 +70,8 @@ public class MCRSession implements Cloneable {
 
     private static final URI DEFAULT_URI = URI.create("");
 
-    public static final ServiceLoader<MCRSessionTransaction> TRANSACTION_SERVICE_LOADER = ServiceLoader
-        .load(MCRSessionTransaction.class, MCRClassTools.getClassLoader());
+    public static final ServiceLoader<MCRPersistenceTransaction> TRANSACTION_SERVICE_LOADER = ServiceLoader
+        .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader());
 
     /** A map storing arbitrary session data * */
     private Map<Object, Object> map = new Hashtable<>();
@@ -109,11 +109,11 @@ public class MCRSession implements Cloneable {
 
     private boolean dataBaseAccess;
 
-    private ThreadLocal<List<MCRSessionTransaction>> transaction = ThreadLocal
+    private ThreadLocal<List<MCRPersistenceTransaction>> transaction = ThreadLocal
         .withInitial(() -> TRANSACTION_SERVICE_LOADER
             .stream()
             .map(ServiceLoader.Provider::get)
-            .filter(MCRSessionTransaction::isReady)
+            .filter(MCRPersistenceTransaction::isReady)
             .collect(Collectors.toUnmodifiableList()));
 
     private StackTraceElement[] constructingStackTrace;
@@ -385,7 +385,7 @@ public class MCRSession implements Cloneable {
      */
     public void beginTransaction() {
         if (dataBaseAccess) {
-            transaction.get().forEach(MCRSessionTransaction::begin);
+            transaction.get().forEach(MCRPersistenceTransaction::begin);
         }
     }
 
@@ -394,7 +394,7 @@ public class MCRSession implements Cloneable {
      * @return boolean indicating whether the transaction has been marked for rollback
      */
     public boolean transactionRequiresRollback() {
-        return isTransactionActive() && transaction.get().stream().anyMatch(MCRSessionTransaction::getRollbackOnly);
+        return isTransactionActive() && transaction.get().stream().anyMatch(MCRPersistenceTransaction::getRollbackOnly);
     }
 
     /**
@@ -402,7 +402,7 @@ public class MCRSession implements Cloneable {
      */
     public void commitTransaction() {
         if (isTransactionActive()) {
-            transaction.get().forEach(MCRSessionTransaction::commit);
+            transaction.get().forEach(MCRPersistenceTransaction::commit);
             transaction.remove();
         }
         submitOnCommitTasks();
@@ -414,7 +414,7 @@ public class MCRSession implements Cloneable {
      */
     public void rollbackTransaction() {
         if (isTransactionActive()) {
-            transaction.get().forEach(MCRSessionTransaction::rollback);
+            transaction.get().forEach(MCRPersistenceTransaction::rollback);
             transaction.remove();
         }
     }
@@ -425,7 +425,7 @@ public class MCRSession implements Cloneable {
      * @return true if the transaction is still alive
      */
     public boolean isTransactionActive() {
-        return dataBaseAccess && transaction.get().stream().anyMatch(MCRSessionTransaction::isActive);
+        return dataBaseAccess && transaction.get().stream().anyMatch(MCRPersistenceTransaction::isActive);
     }
 
     public StackTraceElement[] getConstructingStackTrace() {
