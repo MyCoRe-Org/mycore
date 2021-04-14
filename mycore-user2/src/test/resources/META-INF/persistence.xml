@@ -12,7 +12,7 @@
       <property name="javax.persistence.jdbc.password" value="" />
       <property name="hibernate.cache.use_second_level_cache" value="false" />
       <property name="hibernate.jdbc.batch_size" value="0" />
-      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.show_sql" value="false" />
     </properties>
   </persistence-unit>
 </persistence>
