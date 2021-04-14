@@ -49,14 +49,6 @@ public interface MCRPersistenceTransaction {
     void rollback();
 
     /**
-     * Mark the current transaction so that the only
-     * possible outcome of the transaction is for the transaction 
-     * to be rolled back. 
-     * @throws IllegalStateException if <code>isActive()</code> is false
-     */
-    void setRollbackOnly();
-
-    /**
      * Determine whether the current transaction has been
      * marked for rollback.
      * @return boolean indicating whether the transaction has been
