@@ -61,14 +61,15 @@ public class MCRUserAttribute implements Comparable<MCRUserAttribute> {
         this.name = Objects.requireNonNull(name);
     }
 
-    @Column(name = "value", length = 255)
+    @Column(name = "value", length = 255, nullable = false)
     @XmlAttribute
     public String getValue() {
         return value;
     }
 
     public void setValue(String value) {
-        this.value = value;
+        //require non-null MCR-2374
+        this.value = Objects.requireNonNull(value);
     }
 
     @Override
