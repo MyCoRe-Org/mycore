@@ -49,5 +49,15 @@
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.itextpdf</groupId>
+      <artifactId>html2pdf</artifactId>
+      <version>3.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.itextpdf</groupId>
+      <artifactId>kernel</artifactId>
+      <version>7.1.15</version>
+    </dependency>
   </dependencies>
 </project>
