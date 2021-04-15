@@ -32,6 +32,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.undercouch.citeproc.helper.json.JsonBuilder;
+import de.undercouch.citeproc.helper.json.StringJsonBuilder;
+import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -61,6 +64,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     private static final String NON_DROPPING_PARTICLE = "nonDroppingParticle";
 
     private static final String DROPPING_PARTICLE = "droppingParticle";
+    public static final String USABLE_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type) or @xlink:type='simple')]";
 
     private MCRMODSWrapper wrapper;
 
@@ -86,7 +90,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public CSLItemData retrieveItem(String id) {
         final CSLItemDataBuilder idb = new CSLItemDataBuilder().id(id);
 
-        idb.URL(MCRFrontendUtil.getBaseURL() + "receive/" + id);
+        processURL(id, idb);
         processGenre(idb);
         processTitles(idb);
         processNames(idb);
@@ -95,7 +99,23 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         processAbstract(idb);
         processModsPart(idb);
 
-        return idb.build();
+        CSLItemData build = idb.build();
+        if(LOGGER.isDebugEnabled()){
+            JsonBuilder jsonBuilder = new StringJsonBuilderFactory().createJsonBuilder();
+            String str = (String) build.toJson(jsonBuilder);
+            LOGGER.debug("Created json object: {}", str);
+        }
+
+        return build;
+    }
+
+
+    private void processURL(String id, CSLItemDataBuilder idb) {
+        // use mods:url first
+        String url = Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
+                .map(Element::getTextNormalize)
+                .orElseGet(() -> MCRFrontendUtil.getBaseURL() + "receive/" + id);
+        idb.URL(url);
     }
 
     protected void processModsPart(CSLItemDataBuilder idb) {
@@ -314,13 +334,15 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             idb.title(buildTitle(titleInfoElement));
         }
 
-        final Element parentTitleInfoElement = wrapper
-            .getElement("mods:relatedItem[@type='host']/mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
-                " or @xlink:type='simple')]");
-        if (parentTitleInfoElement != null) {
-            idb.containerTitleShort(buildShortTitle(parentTitleInfoElement));
-            idb.containerTitle(buildTitle(parentTitleInfoElement));
-        }
+
+        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + USABLE_TITLE_XPATH)).ifPresent((titleInfo)-> {
+            idb.containerTitleShort(buildShortTitle(titleInfo));
+            idb.containerTitle(buildTitle(titleInfo));
+        });
+
+        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='series']/"+ USABLE_TITLE_XPATH)).ifPresent((relatedItem)-> {
+            idb.collectionTitle(buildTitle(relatedItem));
+        });
 
     }
 
