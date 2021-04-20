@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import de.undercouch.citeproc.helper.json.JsonBuilder;
-import de.undercouch.citeproc.helper.json.StringJsonBuilder;
 import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,7 +63,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     private static final String NON_DROPPING_PARTICLE = "nonDroppingParticle";
 
     private static final String DROPPING_PARTICLE = "droppingParticle";
-    public static final String USABLE_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type) or @xlink:type='simple')]";
+
+    public static final String USABLE_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
+        " or @xlink:type='simple')]";
 
     private MCRMODSWrapper wrapper;
 
@@ -335,12 +336,14 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         }
 
 
-        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + USABLE_TITLE_XPATH)).ifPresent((titleInfo)-> {
+        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + USABLE_TITLE_XPATH))
+            .ifPresent((titleInfo) -> {
             idb.containerTitleShort(buildShortTitle(titleInfo));
             idb.containerTitle(buildTitle(titleInfo));
         });
 
-        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='series']/"+ USABLE_TITLE_XPATH)).ifPresent((relatedItem)-> {
+        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='series']/" + USABLE_TITLE_XPATH))
+            .ifPresent((relatedItem) -> {
             idb.collectionTitle(buildTitle(relatedItem));
         });
 
