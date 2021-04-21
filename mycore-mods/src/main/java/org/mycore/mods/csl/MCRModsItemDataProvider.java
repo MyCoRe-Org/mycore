@@ -67,6 +67,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public static final String USABLE_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
         " or @xlink:type='simple')]";
 
+    public static final String MODS_RELATED_ITEM_XPATH = "mods:relatedItem/";
+
     private MCRMODSWrapper wrapper;
 
     private String id;
@@ -99,6 +101,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         processPublicationData(idb);
         processAbstract(idb);
         processModsPart(idb);
+        processLanguage(idb);
 
         CSLItemData build = idb.build();
         if(LOGGER.isDebugEnabled()){
@@ -110,8 +113,18 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         return build;
     }
 
+    protected void processLanguage(CSLItemDataBuilder idb) {
+        Optional.ofNullable(
+                wrapper.getElement("mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']"))
+                .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                        "mods:language/mods:languageTerm[@authority='rfc5646' and @type='type']")))
+                .ifPresent(el -> {
+                    idb.language(el.getTextNormalize());
+                });
+    }
 
-    private void processURL(String id, CSLItemDataBuilder idb) {
+
+    protected void processURL(String id, CSLItemDataBuilder idb) {
         // use mods:url first
         String url = Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
                 .map(Element::getTextNormalize)
@@ -195,16 +208,14 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     protected void processGenre(CSLItemDataBuilder idb) {
         final List<Element> elements = wrapper.getElements("mods:genre");
         final Set<String> genres = elements.stream()
-            .map(MCRClassMapper::getCategoryID)
+            .map(this::getGenreStringFromElement)
             .filter(Objects::nonNull)
-            .map(MCRCategoryID::getID)
             .collect(Collectors.toSet());
 
         final List<Element> parentElements = wrapper.getElements("mods:relatedItem[@type='host']/mods:genre");
         final Set<String> parentGenres = parentElements.stream()
-            .map(MCRClassMapper::getCategoryID)
+            .map(this::getGenreStringFromElement)
             .filter(Objects::nonNull)
-            .map(MCRCategoryID::getID)
             .collect(Collectors.toSet());
 
         if (genres.contains("article")) {
@@ -272,6 +283,18 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
           } */
     }
 
+    protected String getGenreStringFromElement(Element genre) {
+        if(genre.getAttributeValue("authorityURI")!=null){
+            MCRCategoryID categoryID = MCRClassMapper.getCategoryID(genre);
+            if(categoryID==null){
+                return null;
+            }
+            return categoryID.getID();
+        } else {
+            return genre.getText();
+        }
+    }
+
     protected void processAbstract(CSLItemDataBuilder idb) {
         Optional.ofNullable(wrapper.getElement("mods:abstract[not(@altFormat)]")).ifPresent(abstr -> {
             idb.abstrct(abstr.getTextNormalize());
@@ -280,21 +303,29 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     protected void processPublicationData(CSLItemDataBuilder idb) {
         Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:place/mods:placeTerm"))
+            .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                "mods:originInfo[@eventType='publication']/mods:place/mods:placeTerm")))
             .ifPresent(el -> {
                 idb.publisherPlace(el.getTextNormalize());
             });
 
         Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:publisher"))
+            .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                "mods:originInfo[@eventType='publication']/mods:publisher")))
             .ifPresent(el -> {
                 idb.publisher(el.getTextNormalize());
             });
 
         Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:edition"))
+            .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                "mods:originInfo[@eventType='publication']/mods:edition")))
             .ifPresent(el -> {
                 idb.edition(el.getTextNormalize());
             });
 
         Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:dateIssued"))
+            .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                "mods:originInfo[@eventType='publication']/mods:dateIssued")))
             .ifPresent(el -> {
                 idb.issued(new CSLDateBuilder().raw(el.getTextNormalize()).build());
             });
@@ -353,65 +384,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         final List<Element> modsNameElements = wrapper.getElements("mods:name");
         HashMap<String, List<CSLName>> roleNameMap = new HashMap<>();
         for (Element modsName : modsNameElements) {
-            final CSLNameBuilder nameBuilder = new CSLNameBuilder();
-
-            final boolean isInstitution = "corporate".equals(modsName.getAttributeValue("type"));
-            nameBuilder.isInstitution(isInstitution);
-
-            if (!isInstitution) {
-                //todo: maybe better mapping here
-                HashMap<String, List<String>> typeContentsMap = new HashMap<>();
-                modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
-                    final String type = namePart.getAttributeValue("type");
-                    final String content = namePart.getTextNormalize();
-                    if (("family".equals(type) || "given".equals(type)) && nonDroppingParticles.contains(content)) {
-                        final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
-                            (t) -> new LinkedList<>());
-                        contents.add(content);
-                    } else if(("family".equals(type) || "given".equals(type)) && droppingParticles.contains(content)) {
-                        final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
-                                (t) -> new LinkedList<>());
-                        contents.add(content);
-                    }else {
-                        final List<String> contents = typeContentsMap.computeIfAbsent(type, (t) -> new LinkedList<>());
-                        contents.add(content);
-                    }
-                });
-
-                if (typeContentsMap.containsKey("family")) {
-                    nameBuilder.family(String.join(" ", typeContentsMap.get("family")));
-                }
-
-                if (typeContentsMap.containsKey("given")) {
-                    nameBuilder.given(String.join(" ", typeContentsMap.get("given")));
-                }
-
-                if (typeContentsMap.containsKey(NON_DROPPING_PARTICLE)) {
-                    nameBuilder.nonDroppingParticle(String.join(" ", typeContentsMap.get(NON_DROPPING_PARTICLE)));
-                }
-
-                if (typeContentsMap.containsKey(DROPPING_PARTICLE)) {
-                    nameBuilder.droppingParticle(String.join(" ", typeContentsMap.get(DROPPING_PARTICLE)));
-                }
-            } else {
-                Optional.ofNullable(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE))
-                    .ifPresent((nameBuilder::literal));
-            }
-
-            final CSLName cslName = nameBuilder.build();
+            final CSLName cslName = buildName(modsName);
             if(isNameEmpty(cslName)) {
                 continue;
             }
-
-            final Element roleElement = modsName.getChild("role", MODS_NAMESPACE);
-            if (roleElement != null) {
-                final List<Element> roleTerms = roleElement.getChildren("roleTerm", MODS_NAMESPACE);
-                for (Element roleTermElement : roleTerms) {
-                    final String role = roleTermElement.getTextNormalize();
-                    final List<CSLName> cslNames = roleNameMap.computeIfAbsent(role, (s) -> new LinkedList<>());
-                    cslNames.add(cslName);
-                }
-            }
+            fillRoleMap(roleNameMap, modsName, cslName);
         }
 
         roleNameMap.forEach((role, list) -> {
@@ -447,9 +424,93 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             }
         });
 
+
+        HashMap<String, List<CSLName>> parentRoleMap = new HashMap<>();
+        final List<Element> parentModsNameElements = wrapper.getElements("mods:relatedItem/mods:name");
+
+        for (Element modsName : parentModsNameElements) {
+            final CSLName cslName = buildName(modsName);
+            if(isNameEmpty(cslName)) {
+                continue;
+            }
+            fillRoleMap(parentRoleMap, modsName, cslName);
+        }
+        roleNameMap.forEach((role, list) -> {
+            final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
+            switch (role) {
+                case "aut":
+                    idb.containerAuthor(cslNames);
+                    break;
+                case "edt":
+                    idb.collectionEditor(cslNames);
+                    break;
+            }
+        });
     }
 
-    private boolean isNameEmpty(CSLName cslName) {
+    private void fillRoleMap(HashMap<String, List<CSLName>> roleNameMap, Element modsName, CSLName cslName) {
+        final Element roleElement = modsName.getChild("role", MODS_NAMESPACE);
+        if (roleElement != null) {
+            final List<Element> roleTerms = roleElement.getChildren("roleTerm", MODS_NAMESPACE);
+            for (Element roleTermElement : roleTerms) {
+                final String role = roleTermElement.getTextNormalize();
+                final List<CSLName> cslNames = roleNameMap.computeIfAbsent(role, (s) -> new LinkedList<>());
+                cslNames.add(cslName);
+            }
+        }
+    }
+
+    private CSLName buildName(Element modsName) {
+        final CSLNameBuilder nameBuilder = new CSLNameBuilder();
+
+        final boolean isInstitution = "corporate".equals(modsName.getAttributeValue("type"));
+        nameBuilder.isInstitution(isInstitution);
+
+        if (!isInstitution) {
+            //todo: maybe better mapping here
+            HashMap<String, List<String>> typeContentsMap = new HashMap<>();
+            modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
+                final String type = namePart.getAttributeValue("type");
+                final String content = namePart.getTextNormalize();
+                if (("family".equals(type) || "given".equals(type)) && nonDroppingParticles.contains(content)) {
+                    final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
+                        (t) -> new LinkedList<>());
+                    contents.add(content);
+                } else if(("family".equals(type) || "given".equals(type)) && droppingParticles.contains(content)) {
+                    final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
+                            (t) -> new LinkedList<>());
+                    contents.add(content);
+                }else {
+                    final List<String> contents = typeContentsMap.computeIfAbsent(type, (t) -> new LinkedList<>());
+                    contents.add(content);
+                }
+            });
+
+            if (typeContentsMap.containsKey("family")) {
+                nameBuilder.family(String.join(" ", typeContentsMap.get("family")));
+            }
+
+            if (typeContentsMap.containsKey("given")) {
+                nameBuilder.given(String.join(" ", typeContentsMap.get("given")));
+            }
+
+            if (typeContentsMap.containsKey(NON_DROPPING_PARTICLE)) {
+                nameBuilder.nonDroppingParticle(String.join(" ", typeContentsMap.get(NON_DROPPING_PARTICLE)));
+            }
+
+            if (typeContentsMap.containsKey(DROPPING_PARTICLE)) {
+                nameBuilder.droppingParticle(String.join(" ", typeContentsMap.get(DROPPING_PARTICLE)));
+            }
+        } else {
+            Optional.ofNullable(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE))
+                .ifPresent((nameBuilder::literal));
+        }
+
+        final CSLName cslName = nameBuilder.build();
+        return cslName;
+    }
+
+    protected boolean isNameEmpty(CSLName cslName) {
         Predicate<String> isNullOrEmpty = (p) -> p == null || p.isEmpty();
         return isNullOrEmpty.test(cslName.getFamily()) &&
             isNullOrEmpty.test(cslName.getGiven()) &&
