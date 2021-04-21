@@ -134,7 +134,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processModsPart(CSLItemDataBuilder idb) {
-        final Element modsPartElement = wrapper.getElement("mods:relatedItem[@type='host']/mods:part");
+        final Element modsPartElement = wrapper.getElement("mods:relatedItem/mods:part");
         if (modsPartElement != null) {
             final List<Element> detailElements = modsPartElement.getChildren("detail", MODS_NAMESPACE);
             for (Element detailElement : detailElements) {
@@ -260,28 +260,29 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         } else if (genres.contains("report") || genres.contains("research_results") || genres.contains("in_house")
             || genres.contains("press_release") || genres.contains("declaration")) {
             idb.type(CSLType.REPORT);
-        } /* else if (genres.contains("teaching_material") || genres.contains("lecture_resource")
+            /* } else if (genres.contains("teaching_material") || genres.contains("lecture_resource")
                || genres.contains("course_resources")) {
-           // TODO: find right mapping
-          } else if (genres.contains("lexicon")) {
-           // TODO: find right mapping
-          } else if (genres.contains("collection")) {
-           // TODO: find right mapping
-          } else if(genres.contains("lecture")){
-           // TODO: find right mapping
-          } else if (genres.contains("series")) {
-           // TODO: find right mapping
-          } else if (genres.contains("journal")) {
-           // TODO: find right mapping
-          } else if (genres.contains("newspaper")) {
-           // TODO: find right mapping
-          } else if (genres.contains("picture")) {
-           // TODO: find right mapping
-          } else if (genres.contains("poster")) {
-           // TODO: find right mapping
-          } else {
-          
-          } */
+               // TODO: find right mapping
+              } else if (genres.contains("lexicon")) {
+               // TODO: find right mapping
+              } else if (genres.contains("collection")) {
+               // TODO: find right mapping
+              } else if(genres.contains("lecture")){
+               // TODO: find right mapping
+              } else if (genres.contains("series")) {
+               // TODO: find right mapping
+              } else if (genres.contains("journal")) {
+               // TODO: find right mapping
+              } else if (genres.contains("newspaper")) {
+               // TODO: find right mapping
+              } else if (genres.contains("picture")) {
+               // TODO: find right mapping
+              } else if (genres.contains("poster")) {
+               // TODO: find right mapping
+              */
+        } else {
+            idb.type(CSLType.ARTICLE);
+        }
     }
 
     protected String getGenreStringFromElement(Element genre) {
