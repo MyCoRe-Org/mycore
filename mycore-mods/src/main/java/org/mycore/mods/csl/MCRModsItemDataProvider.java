@@ -227,7 +227,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             } else {
                 idb.type(CSLType.ARTICLE);
             }
-        } else if (genres.contains("book")) {
+        } else if (genres.contains("book") || genres.contains("proceedings") || genres.contains("collection")
+            || genres.contains("festschrift") || genres.contains("lexicon") || genres.contains("monograph")
+            || genres.contains("lecture")) {
             idb.type(CSLType.BOOK);
         } else if (genres.contains("interview")) {
             idb.type(CSLType.INTERVIEW);
@@ -241,14 +243,16 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             idb.type(CSLType.ENTRY_ENCYCLOPEDIA);
         } else if (genres.contains("preface")) {
             idb.type(CSLType.ARTICLE);
-        } else if (genres.contains("speech")) {
+        } else if (genres.contains("speech") || genres.contains("poster")) {
             idb.type(CSLType.SPEECH);
         } else if (genres.contains("video")) {
             idb.type(CSLType.MOTION_PICTURE);
         } else if (genres.contains("broadcasting")) {
             idb.type(CSLType.BROADCAST);
+        } else if (genres.contains("picture")) {
+            idb.type(CSLType.BROADCAST);
         } else if (genres.contains("review")) {
-            idb.type(CSLType.REVIEW);
+            idb.type(CSLType.GRAPHIC);
             if (parentGenres.contains("book")) {
                 idb.type(CSLType.REVIEW_BOOK);
             }
@@ -263,21 +267,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             /* } else if (genres.contains("teaching_material") || genres.contains("lecture_resource")
                || genres.contains("course_resources")) {
                // TODO: find right mapping
-              } else if (genres.contains("lexicon")) {
-               // TODO: find right mapping
-              } else if (genres.contains("collection")) {
-               // TODO: find right mapping
-              } else if(genres.contains("lecture")){
-               // TODO: find right mapping
               } else if (genres.contains("series")) {
                // TODO: find right mapping
               } else if (genres.contains("journal")) {
                // TODO: find right mapping
               } else if (genres.contains("newspaper")) {
-               // TODO: find right mapping
-              } else if (genres.contains("picture")) {
-               // TODO: find right mapping
-              } else if (genres.contains("poster")) {
                // TODO: find right mapping
               */
         } else {
