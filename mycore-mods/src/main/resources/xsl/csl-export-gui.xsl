@@ -30,6 +30,7 @@
 
 
     <xsl:param name="MCR.Export.CSL.Styles"/>
+    <xsl:param name="MCR.Export.CSL.Rows"/>
     <xsl:param name="WebApplicationBaseURL"/>
 
     <xsl:template name="exportGUI">
@@ -39,6 +40,7 @@
          object -> for single mycoreobject
          -->
         <xsl:param name="type"/>
+        <script type="text/javascript">window["MCR.Export.CSL.Rows"] = &quot;<xsl:value-of select="$MCR.Export.CSL.Rows"/>&quot;;</script>
         <script src="{$WebApplicationBaseURL}js/csl-export.js"/>
         <div class="input-group mb-3 flex-wrap" data-export="{$type}">
             <select name="style" class="form-control">

@@ -17,6 +17,8 @@
  *
  *
  */
+const CSL_EXPORT_ROWS = "MCR.Export.CSL.Rows";
+
 window.addEventListener('load', function () {
     let list = document.querySelectorAll("[data-export]");
     let array = Array.prototype.slice.call(list);
@@ -37,9 +39,20 @@ window.addEventListener('load', function () {
 
                     let location = window.location.href;
                     let hashIndex = location.indexOf("#");
-                    if(hashIndex!==-1){
+                    if (hashIndex !== -1) {
                         location = location.substring(0, hashIndex);
                     }
+                    // check if solr search and set rows to 500
+                    if (type.indexOf("response") !== -1) {
+                        let rows = CSL_EXPORT_ROWS in window ? window[CSL_EXPORT_ROWS] : "500";
+                        if (location.indexOf("rows") !== -1) {
+                            location = location.replace(/([?&])(rows=)[0-9]+/g, "$1$2" + rows);
+                        } else {
+                            let joinSign = location.indexOf("?") === -1 ? "?" : "&";
+                            location += joinSign + "rows=" + rows;
+                        }
+                    }
+
                     location += transformerQuery + styleQuery;
                     window.location.assign(location);
                 }
