@@ -96,12 +96,12 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         processURL(id, idb);
         processGenre(idb);
         processTitles(idb);
+        processLanguage(idb);
         processNames(idb);
         processIdentifier(idb);
         processPublicationData(idb);
         processAbstract(idb);
         processModsPart(idb);
-        processLanguage(idb);
 
         CSLItemData build = idb.build();
         if(LOGGER.isDebugEnabled()){
@@ -117,7 +117,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         Optional.ofNullable(
                 wrapper.getElement("mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']"))
                 .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
-                        "mods:language/mods:languageTerm[@authority='rfc5646' and @type='type']")))
+                "mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']")))
                 .ifPresent(el -> {
                     idb.language(el.getTextNormalize());
                 });
@@ -126,10 +126,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     protected void processURL(String id, CSLItemDataBuilder idb) {
         // use mods:url first
-        String url = Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
+        Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
                 .map(Element::getTextNormalize)
-                .orElseGet(() -> MCRFrontendUtil.getBaseURL() + "receive/" + id);
-        idb.URL(url);
+            .or(() -> Optional.of(MCRFrontendUtil.getBaseURL() + "receive/" + id)
+                .filter(url -> this.wrapper.getMCRObject().getStructure().getDerivates().size() > 0))
+            .ifPresent(idb::URL);
     }
 
     protected void processModsPart(CSLItemDataBuilder idb) {
