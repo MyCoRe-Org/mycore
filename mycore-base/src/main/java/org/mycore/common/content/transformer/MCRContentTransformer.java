@@ -45,8 +45,12 @@ public abstract class MCRContentTransformer {
 
     protected String fileExtension;
 
+    protected String contentDisposition = DEFAULT_CONTENT_DISPOSITION;
+
     /** The default MIME type */
     private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
+
+    public static final String DEFAULT_CONTENT_DISPOSITION = "inline";
 
     /** Called by the factory to initialize configuration of this transformer */
     public void init(String id) {
@@ -54,6 +58,8 @@ public abstract class MCRContentTransformer {
         String extensionProperty = "MCR.ContentTransformer." + id + ".FileExtension";
         this.mimeType = MCRConfiguration2.getString(mimeProperty).orElseGet(this::getDefaultMimeType);
         this.fileExtension = MCRConfiguration2.getString(extensionProperty).orElseGet(this::getDefaultExtension);
+        this.contentDisposition = MCRConfiguration2.getString("MCR.ContentTransformer." + id + ".ContentDisposition")
+            .orElse("inline");
     }
 
     /** Transforms MCRContent. Subclasses implement different transformation methods */
@@ -92,6 +98,10 @@ public abstract class MCRContentTransformer {
      */
     public String getFileExtension() throws Exception {
         return fileExtension;
+    }
+
+    public String getContentDisposition() {
+        return contentDisposition;
     }
 
     protected String getDefaultExtension() {
