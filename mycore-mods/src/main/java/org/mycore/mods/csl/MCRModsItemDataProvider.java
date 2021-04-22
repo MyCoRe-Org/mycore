@@ -250,9 +250,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         } else if (genres.contains("broadcasting")) {
             idb.type(CSLType.BROADCAST);
         } else if (genres.contains("picture")) {
-            idb.type(CSLType.BROADCAST);
-        } else if (genres.contains("review")) {
             idb.type(CSLType.GRAPHIC);
+        } else if (genres.contains("review")) {
+            idb.type(CSLType.REVIEW);
             if (parentGenres.contains("book")) {
                 idb.type(CSLType.REVIEW_BOOK);
             }
@@ -404,6 +404,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                     break;
                 case "ivr":
                     idb.interviewer(cslNames);
+                    break;
+                case "ive":
+                    idb.author(cslNames);
                     break;
                 case "ill":
                     idb.illustrator(cslNames);
