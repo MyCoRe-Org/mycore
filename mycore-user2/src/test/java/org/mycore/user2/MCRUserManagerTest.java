@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -122,12 +123,40 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         this.user.setEMail(eMail);
         String groupName = "admin";
         this.user.getSystemRoleIDs().add(groupName);
+        this.user.getAttributes().add(new MCRUserAttribute("id_key1", "value1"));
+        this.user.getAttributes().add(new MCRUserAttribute("id_key1", "value2"));
+
         MCRUserManager.updateUser(this.user);
         startNewTransaction();
         MCRUser user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
         assertEquals("User information was not updated", eMail, user.getEMailAddress());
         assertEquals("User was created not updated", 1, MCRUserManager.countUsers(null, null, null, null));
         assertTrue("User is not in group " + groupName, user.getSystemRoleIDs().contains(groupName));
+
+        final List<MCRUserAttribute> attributes = user.getAttributes()
+                .stream()
+                .filter(attr -> attr.getName().equals("id_key1"))
+                .collect(Collectors.toList());
+
+        assertEquals("There should be two (id_key1) attributes", 2, attributes.size());
+
+        final MCRUserAttribute value2Attr = attributes
+                .stream()
+                .filter(attr-> attr.getValue().equals("value2"))
+                .findFirst()
+                .get();
+
+        user.getAttributes().retainAll(List.of(value2Attr));
+        MCRUserManager.updateUser(user);
+        startNewTransaction();
+        user = MCRUserManager.getUser(this.user.getUserName(), this.user.getRealm());
+
+        /*
+         * currently both attributes get removed if retain all is used
+         * Hibernate: delete from MCRUserAttr where id=? and name=? // this is the default attribute junit=test
+         * Hibernate: delete from MCRUserAttr where id=? and name=? // this is the id_key1 attribute(s)
+         */
+        assertEquals("There should be one attribute", 1, user.getAttributes().size());
     }
 
     /**
