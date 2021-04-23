@@ -134,8 +134,10 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processModsPart(CSLItemDataBuilder idb) {
-        final Element modsPartElement = wrapper.getElement("mods:relatedItem/mods:part");
-        if (modsPartElement != null) {
+        String issueVolumeXP = "mods:relatedItem/mods:part[count(mods:detail[@type='issue' or @type='volume'])>0]";
+        final Optional<Element> parentPartOpt = Optional.ofNullable(wrapper.getElement(issueVolumeXP))
+            .or(() -> Optional.ofNullable(wrapper.getElement(".//" + issueVolumeXP)));
+        parentPartOpt.ifPresent((modsPartElement) -> {
             final List<Element> detailElements = modsPartElement.getChildren("detail", MODS_NAMESPACE);
             for (Element detailElement : detailElements) {
                 final String type = detailElement.getAttributeValue("type");
@@ -170,41 +172,44 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
                 }
             }
-            final Element modsExtentElement = wrapper
+        });
+
+        final Element modsExtentElement = wrapper
                 .getElement("mods:relatedItem[@type='host']/mods:part/mods:extent[@unit='pages']");
-            if (modsExtentElement != null) {
-                final String start = modsExtentElement.getChildTextNormalize("start", MODS_NAMESPACE);
-                final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
-                final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
-                final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
+        if (modsExtentElement != null) {
+            final String start = modsExtentElement.getChildTextNormalize("start", MODS_NAMESPACE);
+            final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
+            final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
+            final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
 
-                if (list != null) {
-                    idb.page(list);
-                } else if (start != null && end != null) {
-                    idb.pageFirst(start);
-                    idb.page(start + "-" + end);
-                } else if (start != null && total != null) {
-                    idb.pageFirst(start);
+            if (list != null) {
+                idb.page(list);
+            } else if (start != null && end != null) {
+                idb.pageFirst(start);
+                idb.page(start + "-" + end);
+            } else if (start != null && total != null) {
+                idb.pageFirst(start);
 
-                    try {
-                        final int totalI = Integer.parseInt(total);
-                        final int startI = Integer.parseInt(start);
-                        idb.page(start + "-" + (totalI - startI));
-                    } catch (NumberFormatException e) {
-                        idb.page(start);
-                    }
-
-                    idb.numberOfPages(total);
-                } else if (start != null) {
-                    idb.pageFirst(start);
+                try {
+                    final int totalI = Integer.parseInt(total);
+                    final int startI = Integer.parseInt(start);
+                    idb.page(start + "-" + (totalI - startI));
+                } catch (NumberFormatException e) {
                     idb.page(start);
-                } else if (end != null) {
-                    idb.pageFirst(end);
-                    idb.page(end);
                 }
+
+                idb.numberOfPages(total);
+            } else if (start != null) {
+                idb.pageFirst(start);
+                idb.page(start);
+            } else if (end != null) {
+                idb.pageFirst(end);
+                idb.page(end);
             }
         }
+
     }
+
 
     protected void processGenre(CSLItemDataBuilder idb) {
         final List<Element> elements = wrapper.getElements("mods:genre");
@@ -369,11 +374,10 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             idb.containerTitle(buildTitle(titleInfo));
         });
 
-        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='series']/" + USABLE_TITLE_XPATH))
-            .ifPresent((relatedItem) -> {
+        wrapper.getElements(".//mods:relatedItem[@type='series']/" + USABLE_TITLE_XPATH).stream()
+                .findFirst().ifPresent((relatedItem)-> {
             idb.collectionTitle(buildTitle(relatedItem));
         });
-
     }
 
     protected void processNames(CSLItemDataBuilder idb) {
@@ -434,7 +438,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             }
             fillRoleMap(parentRoleMap, modsName, cslName);
         }
-        roleNameMap.forEach((role, list) -> {
+        parentRoleMap.forEach((role, list) -> {
             final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
             switch (role) {
                 case "aut":
