@@ -50,6 +50,7 @@ public class MCRXPathTestValidator extends MCRValidator {
     @Override
     public boolean validateBinding(MCRValidationResults results, MCRBinding binding) {
         boolean isValid = true; // all nodes must validate
+
         List<Object> boundNodes = binding.getBoundNodes();
         for (int i = 0; i < boundNodes.size(); i++) {
             Object node = boundNodes.get(i);
@@ -60,6 +61,10 @@ public class MCRXPathTestValidator extends MCRValidator {
             }
 
             MCRBinding nodeBinding = new MCRBinding(i + 1, binding);
+            if (!isRelevant(nodeBinding)) {
+                continue;
+            }
+
             MCRXPathEvaluator evaluator = nodeBinding.getXPathEvaluator();
             boolean result = evaluator.test(xPathExpression);
             nodeBinding.detach();
