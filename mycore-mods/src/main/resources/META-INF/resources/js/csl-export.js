@@ -75,7 +75,7 @@ function createFetchFunction(trigger, initialSelectInfo, styleSelect, formatSele
         // this function will be called if the the request is started
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error("Network response was not ok");
         }
 
         response.blob().then(function(blob){
@@ -84,7 +84,7 @@ function createFetchFunction(trigger, initialSelectInfo, styleSelect, formatSele
             if (newSelectInfo.style === initialSelectInfo.style && newSelectInfo.format === initialSelectInfo.format) {
 
                 trigger.href = URL.createObjectURL(blob);
-                trigger.download = 'export.' + initialSelectInfo.format;
+                trigger.download = "export." + initialSelectInfo.format;
                 setTriggerLoadingState(trigger, false);
                 changeTriggerState(trigger, true);
             }
@@ -118,14 +118,14 @@ window.addEventListener('load', function () {
                 } else {
                     changeTriggerState(trigger, false);
                 }
-            }
+            };
 
-            styleSelect.addEventListener('change', onChange);
-            formatSelect.addEventListener('change', onChange);
+            styleSelect.addEventListener("change", onChange);
+            formatSelect.addEventListener("change", onChange);
 
         } else {
             // just download on click if no fetch api
-            trigger.addEventListener('click', function () {
+            trigger.addEventListener("click", function () {
                 let selectInfo = getSelectInfo(styleSelect, formatSelect);
                 if (selectInfo.style.trim().length > 0 && selectInfo.format.trim().length > 0) {
                     let location = getDownloadLocation(type, selectInfo.format, selectInfo.style);
