@@ -130,6 +130,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 .map(Element::getTextNormalize)
             .or(() -> Optional.of(MCRFrontendUtil.getBaseURL() + "receive/" + id)
                 .filter(url -> this.wrapper.getMCRObject().getStructure().getDerivates().size() > 0))
+            .or(()-> Optional.of(wrapper.getElement("mods:relatedItem[@type='host']/mods:location/mods:url"))
+                        .map(Element::getTextNormalize))
             .ifPresent(idb::URL);
     }
 
