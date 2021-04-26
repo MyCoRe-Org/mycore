@@ -242,7 +242,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             idb.type(CSLType.DATASET);
         } else if (genres.contains("patent")) {
             idb.type(CSLType.PATENT);
-        } else if (genres.contains("chapter")) {
+        } else if (genres.contains("chapter") || genres.contains("contribution")) {
             idb.type(CSLType.CHAPTER);
         } else if (genres.contains("entry")) {
             idb.type(CSLType.ENTRY_ENCYCLOPEDIA);
