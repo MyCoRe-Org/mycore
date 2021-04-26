@@ -30,8 +30,6 @@ import org.mycore.common.MCRTestCase;
 import java.io.IOException;
 import java.io.StringReader;
 
-import static org.junit.Assert.*;
-
 public class MCRModsItemDataProviderTest extends MCRTestCase {
 
     @Test
