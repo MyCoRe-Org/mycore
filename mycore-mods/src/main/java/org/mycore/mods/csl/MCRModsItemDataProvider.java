@@ -449,6 +449,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 case "edt":
                     idb.collectionEditor(cslNames);
                     break;
+                default:
+                    // we dont care
+                    break;
             }
         });
     }
