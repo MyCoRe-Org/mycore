@@ -24,9 +24,12 @@ import de.undercouch.citeproc.csl.CSLItemData;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRCache;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.csl.MCRItemDataProvider;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -38,6 +41,8 @@ import java.util.List;
  */
 public class MCRListModsItemDataProvider extends MCRItemDataProvider {
 
+    protected static MCRCache<String, CSLItemData> cslCache = new MCRCache<>(2000, "CSL Mods Data");
+
     private HashMap<String , CSLItemData> store = new HashMap<>();
 
     @Override
@@ -48,10 +53,17 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
         for (Element object : objects) {
             Element copy = object.clone().detach();
             String objectID = copy.getAttributeValue("ID");
-            MCRModsItemDataProvider midp = new MCRModsItemDataProvider();
-            midp.addContent(new MCRJDOMContent(copy));
-            CSLItemData cslItemData = midp.retrieveItem(objectID);
-            store.put(objectID, cslItemData);
+            MCRObjectID mcrObjectID = MCRObjectID.getInstance(objectID);
+            CSLItemData itemData = cslCache.getIfUpToDate(objectID, MCRXMLMetadataManager.instance()
+                .getLastModified(mcrObjectID));
+            if (itemData == null) {
+                MCRModsItemDataProvider midp = new MCRModsItemDataProvider();
+                midp.addContent(new MCRJDOMContent(copy));
+                itemData = midp.retrieveItem(objectID);
+                cslCache.put(objectID, itemData);
+            }
+
+            store.put(objectID, itemData);
         }
     }
 

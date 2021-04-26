@@ -179,7 +179,8 @@ public class MCRLayoutService {
             if (fileExtension != null && fileExtension.length() > 0) {
                 filename += "." + fileExtension;
             }
-            response.setHeader("Content-Disposition", "inline;filename=\"" + filename + "\"");
+            response.setHeader("Content-Disposition",
+                transformer.getContentDisposition() + ";filename=\"" + filename + "\"");
             String ct = transformer.getMimeType();
             String enc = transformer.getEncoding();
             if (enc != null) {
