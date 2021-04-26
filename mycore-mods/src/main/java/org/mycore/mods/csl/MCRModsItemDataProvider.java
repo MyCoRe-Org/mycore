@@ -32,6 +32,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import de.undercouch.citeproc.helper.json.JsonBuilder;
+import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -62,6 +64,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     private static final String DROPPING_PARTICLE = "droppingParticle";
 
+    public static final String USABLE_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
+        " or @xlink:type='simple')]";
+
+    public static final String MODS_RELATED_ITEM_XPATH = "mods:relatedItem/";
+
     private MCRMODSWrapper wrapper;
 
     private String id;
@@ -86,21 +93,53 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public CSLItemData retrieveItem(String id) {
         final CSLItemDataBuilder idb = new CSLItemDataBuilder().id(id);
 
-        idb.URL(MCRFrontendUtil.getBaseURL() + "receive/" + id);
+        processURL(id, idb);
         processGenre(idb);
         processTitles(idb);
+        processLanguage(idb);
         processNames(idb);
         processIdentifier(idb);
         processPublicationData(idb);
         processAbstract(idb);
         processModsPart(idb);
 
-        return idb.build();
+        CSLItemData build = idb.build();
+        if(LOGGER.isDebugEnabled()){
+            JsonBuilder jsonBuilder = new StringJsonBuilderFactory().createJsonBuilder();
+            String str = (String) build.toJson(jsonBuilder);
+            LOGGER.debug("Created json object: {}", str);
+        }
+
+        return build;
+    }
+
+    protected void processLanguage(CSLItemDataBuilder idb) {
+        Optional.ofNullable(
+                wrapper.getElement("mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']"))
+                .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                "mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']")))
+                .ifPresent(el -> {
+                    idb.language(el.getTextNormalize());
+                });
+    }
+
+
+    protected void processURL(String id, CSLItemDataBuilder idb) {
+        // use mods:url first
+        Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
+                .map(Element::getTextNormalize)
+            .or(() -> Optional.of(MCRFrontendUtil.getBaseURL() + "receive/" + id)
+                .filter(url -> this.wrapper.getMCRObject().getStructure().getDerivates().size() > 0))
+            .or(()-> Optional.of(wrapper.getElement("mods:relatedItem[@type='host']/mods:location/mods:url"))
+                        .map(Element::getTextNormalize))
+            .ifPresent(idb::URL);
     }
 
     protected void processModsPart(CSLItemDataBuilder idb) {
-        final Element modsPartElement = wrapper.getElement("mods:relatedItem[@type='host']/mods:part");
-        if (modsPartElement != null) {
+        String issueVolumeXP = "mods:relatedItem/mods:part[count(mods:detail[@type='issue' or @type='volume'])>0]";
+        final Optional<Element> parentPartOpt = Optional.ofNullable(wrapper.getElement(issueVolumeXP))
+            .or(() -> Optional.ofNullable(wrapper.getElement(".//" + issueVolumeXP)));
+        parentPartOpt.ifPresent((modsPartElement) -> {
             final List<Element> detailElements = modsPartElement.getChildren("detail", MODS_NAMESPACE);
             for (Element detailElement : detailElements) {
                 final String type = detailElement.getAttributeValue("type");
@@ -135,55 +174,56 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
                 }
             }
-            final Element modsExtentElement = wrapper
+        });
+
+        final Element modsExtentElement = wrapper
                 .getElement("mods:relatedItem[@type='host']/mods:part/mods:extent[@unit='pages']");
-            if (modsExtentElement != null) {
-                final String start = modsExtentElement.getChildTextNormalize("start", MODS_NAMESPACE);
-                final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
-                final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
-                final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
+        if (modsExtentElement != null) {
+            final String start = modsExtentElement.getChildTextNormalize("start", MODS_NAMESPACE);
+            final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
+            final String list = modsExtentElement.getChildTextNormalize("list", MODS_NAMESPACE);
+            final String total = modsExtentElement.getChildTextNormalize("total", MODS_NAMESPACE);
 
-                if (list != null) {
-                    idb.page(list);
-                } else if (start != null && end != null) {
-                    idb.pageFirst(start);
-                    idb.page(start + "-" + end);
-                } else if (start != null && total != null) {
-                    idb.pageFirst(start);
+            if (list != null) {
+                idb.page(list);
+            } else if (start != null && end != null) {
+                idb.pageFirst(start);
+                idb.page(start + "-" + end);
+            } else if (start != null && total != null) {
+                idb.pageFirst(start);
 
-                    try {
-                        final int totalI = Integer.parseInt(total);
-                        final int startI = Integer.parseInt(start);
-                        idb.page(start + "-" + (totalI - startI));
-                    } catch (NumberFormatException e) {
-                        idb.page(start);
-                    }
-
-                    idb.numberOfPages(total);
-                } else if (start != null) {
-                    idb.pageFirst(start);
+                try {
+                    final int totalI = Integer.parseInt(total);
+                    final int startI = Integer.parseInt(start);
+                    idb.page(start + "-" + (totalI - startI));
+                } catch (NumberFormatException e) {
                     idb.page(start);
-                } else if (end != null) {
-                    idb.pageFirst(end);
-                    idb.page(end);
                 }
+
+                idb.numberOfPages(total);
+            } else if (start != null) {
+                idb.pageFirst(start);
+                idb.page(start);
+            } else if (end != null) {
+                idb.pageFirst(end);
+                idb.page(end);
             }
         }
+
     }
+
 
     protected void processGenre(CSLItemDataBuilder idb) {
         final List<Element> elements = wrapper.getElements("mods:genre");
         final Set<String> genres = elements.stream()
-            .map(MCRClassMapper::getCategoryID)
+            .map(this::getGenreStringFromElement)
             .filter(Objects::nonNull)
-            .map(MCRCategoryID::getID)
             .collect(Collectors.toSet());
 
         final List<Element> parentElements = wrapper.getElements("mods:relatedItem[@type='host']/mods:genre");
         final Set<String> parentGenres = parentElements.stream()
-            .map(MCRClassMapper::getCategoryID)
+            .map(this::getGenreStringFromElement)
             .filter(Objects::nonNull)
-            .map(MCRCategoryID::getID)
             .collect(Collectors.toSet());
 
         if (genres.contains("article")) {
@@ -194,7 +234,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             } else {
                 idb.type(CSLType.ARTICLE);
             }
-        } else if (genres.contains("book")) {
+        } else if (genres.contains("book") || genres.contains("proceedings") || genres.contains("collection")
+            || genres.contains("festschrift") || genres.contains("lexicon") || genres.contains("monograph")
+            || genres.contains("lecture")) {
             idb.type(CSLType.BOOK);
         } else if (genres.contains("interview")) {
             idb.type(CSLType.INTERVIEW);
@@ -202,18 +244,20 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             idb.type(CSLType.DATASET);
         } else if (genres.contains("patent")) {
             idb.type(CSLType.PATENT);
-        } else if (genres.contains("chapter")) {
+        } else if (genres.contains("chapter") || genres.contains("contribution")) {
             idb.type(CSLType.CHAPTER);
         } else if (genres.contains("entry")) {
             idb.type(CSLType.ENTRY_ENCYCLOPEDIA);
         } else if (genres.contains("preface")) {
             idb.type(CSLType.ARTICLE);
-        } else if (genres.contains("speech")) {
+        } else if (genres.contains("speech") || genres.contains("poster")) {
             idb.type(CSLType.SPEECH);
         } else if (genres.contains("video")) {
             idb.type(CSLType.MOTION_PICTURE);
         } else if (genres.contains("broadcasting")) {
             idb.type(CSLType.BROADCAST);
+        } else if (genres.contains("picture")) {
+            idb.type(CSLType.GRAPHIC);
         } else if (genres.contains("review")) {
             idb.type(CSLType.REVIEW);
             if (parentGenres.contains("book")) {
@@ -227,28 +271,31 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         } else if (genres.contains("report") || genres.contains("research_results") || genres.contains("in_house")
             || genres.contains("press_release") || genres.contains("declaration")) {
             idb.type(CSLType.REPORT);
-        } /* else if (genres.contains("teaching_material") || genres.contains("lecture_resource")
+            /* } else if (genres.contains("teaching_material") || genres.contains("lecture_resource")
                || genres.contains("course_resources")) {
-           // TODO: find right mapping
-          } else if (genres.contains("lexicon")) {
-           // TODO: find right mapping
-          } else if (genres.contains("collection")) {
-           // TODO: find right mapping
-          } else if(genres.contains("lecture")){
-           // TODO: find right mapping
-          } else if (genres.contains("series")) {
-           // TODO: find right mapping
-          } else if (genres.contains("journal")) {
-           // TODO: find right mapping
-          } else if (genres.contains("newspaper")) {
-           // TODO: find right mapping
-          } else if (genres.contains("picture")) {
-           // TODO: find right mapping
-          } else if (genres.contains("poster")) {
-           // TODO: find right mapping
-          } else {
-          
-          } */
+               // TODO: find right mapping
+              } else if (genres.contains("series")) {
+               // TODO: find right mapping
+              } else if (genres.contains("journal")) {
+               // TODO: find right mapping
+              } else if (genres.contains("newspaper")) {
+               // TODO: find right mapping
+              */
+        } else {
+            idb.type(CSLType.ARTICLE);
+        }
+    }
+
+    protected String getGenreStringFromElement(Element genre) {
+        if(genre.getAttributeValue("authorityURI")!=null){
+            MCRCategoryID categoryID = MCRClassMapper.getCategoryID(genre);
+            if(categoryID==null){
+                return null;
+            }
+            return categoryID.getID();
+        } else {
+            return genre.getText();
+        }
     }
 
     protected void processAbstract(CSLItemDataBuilder idb) {
@@ -259,21 +306,29 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     protected void processPublicationData(CSLItemDataBuilder idb) {
         Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:place/mods:placeTerm"))
+            .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                "mods:originInfo[@eventType='publication']/mods:place/mods:placeTerm")))
             .ifPresent(el -> {
                 idb.publisherPlace(el.getTextNormalize());
             });
 
         Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:publisher"))
+            .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                "mods:originInfo[@eventType='publication']/mods:publisher")))
             .ifPresent(el -> {
                 idb.publisher(el.getTextNormalize());
             });
 
         Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:edition"))
+            .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                "mods:originInfo[@eventType='publication']/mods:edition")))
             .ifPresent(el -> {
                 idb.edition(el.getTextNormalize());
             });
 
         Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:dateIssued"))
+            .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+                "mods:originInfo[@eventType='publication']/mods:dateIssued")))
             .ifPresent(el -> {
                 idb.issued(new CSLDateBuilder().raw(el.getTextNormalize()).build());
             });
@@ -314,79 +369,28 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             idb.title(buildTitle(titleInfoElement));
         }
 
-        final Element parentTitleInfoElement = wrapper
-            .getElement("mods:relatedItem[@type='host']/mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
-                " or @xlink:type='simple')]");
-        if (parentTitleInfoElement != null) {
-            idb.containerTitleShort(buildShortTitle(parentTitleInfoElement));
-            idb.containerTitle(buildTitle(parentTitleInfoElement));
-        }
 
+        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + USABLE_TITLE_XPATH))
+            .ifPresent((titleInfo) -> {
+            idb.containerTitleShort(buildShortTitle(titleInfo));
+            idb.containerTitle(buildTitle(titleInfo));
+        });
+
+        wrapper.getElements(".//mods:relatedItem[@type='series']/" + USABLE_TITLE_XPATH).stream()
+                .findFirst().ifPresent((relatedItem)-> {
+            idb.collectionTitle(buildTitle(relatedItem));
+        });
     }
 
     protected void processNames(CSLItemDataBuilder idb) {
         final List<Element> modsNameElements = wrapper.getElements("mods:name");
         HashMap<String, List<CSLName>> roleNameMap = new HashMap<>();
         for (Element modsName : modsNameElements) {
-            final CSLNameBuilder nameBuilder = new CSLNameBuilder();
-
-            final boolean isInstitution = "corporate".equals(modsName.getAttributeValue("type"));
-            nameBuilder.isInstitution(isInstitution);
-
-            if (!isInstitution) {
-                //todo: maybe better mapping here
-                HashMap<String, List<String>> typeContentsMap = new HashMap<>();
-                modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
-                    final String type = namePart.getAttributeValue("type");
-                    final String content = namePart.getTextNormalize();
-                    if (("family".equals(type) || "given".equals(type)) && nonDroppingParticles.contains(content)) {
-                        final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
-                            (t) -> new LinkedList<>());
-                        contents.add(content);
-                    } else if(("family".equals(type) || "given".equals(type)) && droppingParticles.contains(content)) {
-                        final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
-                                (t) -> new LinkedList<>());
-                        contents.add(content);
-                    }else {
-                        final List<String> contents = typeContentsMap.computeIfAbsent(type, (t) -> new LinkedList<>());
-                        contents.add(content);
-                    }
-                });
-
-                if (typeContentsMap.containsKey("family")) {
-                    nameBuilder.family(String.join(" ", typeContentsMap.get("family")));
-                }
-
-                if (typeContentsMap.containsKey("given")) {
-                    nameBuilder.given(String.join(" ", typeContentsMap.get("given")));
-                }
-
-                if (typeContentsMap.containsKey(NON_DROPPING_PARTICLE)) {
-                    nameBuilder.nonDroppingParticle(String.join(" ", typeContentsMap.get(NON_DROPPING_PARTICLE)));
-                }
-
-                if (typeContentsMap.containsKey(DROPPING_PARTICLE)) {
-                    nameBuilder.droppingParticle(String.join(" ", typeContentsMap.get(DROPPING_PARTICLE)));
-                }
-            } else {
-                Optional.ofNullable(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE))
-                    .ifPresent((nameBuilder::literal));
-            }
-
-            final CSLName cslName = nameBuilder.build();
+            final CSLName cslName = buildName(modsName);
             if(isNameEmpty(cslName)) {
                 continue;
             }
-
-            final Element roleElement = modsName.getChild("role", MODS_NAMESPACE);
-            if (roleElement != null) {
-                final List<Element> roleTerms = roleElement.getChildren("roleTerm", MODS_NAMESPACE);
-                for (Element roleTermElement : roleTerms) {
-                    final String role = roleTermElement.getTextNormalize();
-                    final List<CSLName> cslNames = roleNameMap.computeIfAbsent(role, (s) -> new LinkedList<>());
-                    cslNames.add(cslName);
-                }
-            }
+            fillRoleMap(roleNameMap, modsName, cslName);
         }
 
         roleNameMap.forEach((role, list) -> {
@@ -407,6 +411,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 case "ivr":
                     idb.interviewer(cslNames);
                     break;
+                case "ive":
+                    idb.author(cslNames);
+                    break;
                 case "ill":
                     idb.illustrator(cslNames);
                     break;
@@ -422,9 +429,96 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             }
         });
 
+
+        HashMap<String, List<CSLName>> parentRoleMap = new HashMap<>();
+        final List<Element> parentModsNameElements = wrapper.getElements("mods:relatedItem/mods:name");
+
+        for (Element modsName : parentModsNameElements) {
+            final CSLName cslName = buildName(modsName);
+            if(isNameEmpty(cslName)) {
+                continue;
+            }
+            fillRoleMap(parentRoleMap, modsName, cslName);
+        }
+        parentRoleMap.forEach((role, list) -> {
+            final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
+            switch (role) {
+                case "aut":
+                    idb.containerAuthor(cslNames);
+                    break;
+                case "edt":
+                    idb.collectionEditor(cslNames);
+                    break;
+                default:
+                    // we dont care
+                    break;
+            }
+        });
     }
 
-    private boolean isNameEmpty(CSLName cslName) {
+    private void fillRoleMap(HashMap<String, List<CSLName>> roleNameMap, Element modsName, CSLName cslName) {
+        final Element roleElement = modsName.getChild("role", MODS_NAMESPACE);
+        if (roleElement != null) {
+            final List<Element> roleTerms = roleElement.getChildren("roleTerm", MODS_NAMESPACE);
+            for (Element roleTermElement : roleTerms) {
+                final String role = roleTermElement.getTextNormalize();
+                final List<CSLName> cslNames = roleNameMap.computeIfAbsent(role, (s) -> new LinkedList<>());
+                cslNames.add(cslName);
+            }
+        }
+    }
+
+    private CSLName buildName(Element modsName) {
+        final CSLNameBuilder nameBuilder = new CSLNameBuilder();
+
+        final boolean isInstitution = "corporate".equals(modsName.getAttributeValue("type"));
+        nameBuilder.isInstitution(isInstitution);
+
+        if (!isInstitution) {
+            //todo: maybe better mapping here
+            HashMap<String, List<String>> typeContentsMap = new HashMap<>();
+            modsName.getChildren("namePart", MODS_NAMESPACE).forEach(namePart -> {
+                final String type = namePart.getAttributeValue("type");
+                final String content = namePart.getTextNormalize();
+                if (("family".equals(type) || "given".equals(type)) && nonDroppingParticles.contains(content)) {
+                    final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
+                        (t) -> new LinkedList<>());
+                    contents.add(content);
+                } else if(("family".equals(type) || "given".equals(type)) && droppingParticles.contains(content)) {
+                    final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
+                            (t) -> new LinkedList<>());
+                    contents.add(content);
+                }else {
+                    final List<String> contents = typeContentsMap.computeIfAbsent(type, (t) -> new LinkedList<>());
+                    contents.add(content);
+                }
+            });
+
+            if (typeContentsMap.containsKey("family")) {
+                nameBuilder.family(String.join(" ", typeContentsMap.get("family")));
+            }
+
+            if (typeContentsMap.containsKey("given")) {
+                nameBuilder.given(String.join(" ", typeContentsMap.get("given")));
+            }
+
+            if (typeContentsMap.containsKey(NON_DROPPING_PARTICLE)) {
+                nameBuilder.nonDroppingParticle(String.join(" ", typeContentsMap.get(NON_DROPPING_PARTICLE)));
+            }
+
+            if (typeContentsMap.containsKey(DROPPING_PARTICLE)) {
+                nameBuilder.droppingParticle(String.join(" ", typeContentsMap.get(DROPPING_PARTICLE)));
+            }
+        } else {
+            Optional.ofNullable(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE))
+                .ifPresent((nameBuilder::literal));
+        }
+
+        final CSLName cslName = nameBuilder.build();
+        return cslName;
+    }
+
+    protected boolean isNameEmpty(CSLName cslName) {
         Predicate<String> isNullOrEmpty = (p) -> p == null || p.isEmpty();
         return isNullOrEmpty.test(cslName.getFamily()) &&
             isNullOrEmpty.test(cslName.getGiven()) &&
