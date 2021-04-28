@@ -20,9 +20,11 @@ package org.mycore.iview2.backend;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Locale;
 
 import javax.imageio.ImageIO;
@@ -76,12 +78,14 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
                 Path pImg = Files.createTempFile("MyCoRe-Thumbnail-", ".png");
                 try (OutputStream os = Files.newOutputStream(pImg)) {
                     ImageIO.write(bImage, "png", os);
-
-                    MCRImage mcrImage = MCRImage.getInstance(pImg, tileInfo.getDerivate(), tileInfo.getImagePath());
-                    mcrImage.setTileDir(MCRIView2Tools.getTileDir());
-                    mcrImage.tile();
-                } finally {
-                    Files.deleteIfExists(pImg);
+                }
+                MCRImage mcrImage = MCRImage.getInstance(pImg, tileInfo.getDerivate(), tileInfo.getImagePath());
+                mcrImage.setTileDir(MCRIView2Tools.getTileDir());
+                mcrImage.tile();
+                
+                //delete file
+                try (InputStream is = Files.newInputStream(pImg, StandardOpenOption.DELETE_ON_CLOSE)) {
+                 is.read();
                 }
             } catch (IOException e) {
                 LOGGER.error("Error creating thumbnail for PDF", e);
