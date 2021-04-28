@@ -869,6 +869,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>com.itextpdf</groupId>
         <artifactId>html2pdf</artifactId>
         <version>3.0.4</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.itextpdf</groupId>
