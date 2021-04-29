@@ -85,11 +85,11 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
                     mcrImage.tile();
                 } catch (IOException e) {
                     LOGGER.error("Error creating tiles for thumbnail of PDF: " + pImg.toString(), e);
-                }
-
-                //delete file
-                try (InputStream is = Files.newInputStream(pImg, StandardOpenOption.DELETE_ON_CLOSE)) {
-                    is.read();
+                } finally {
+                    //delete file
+                    try (InputStream is = Files.newInputStream(pImg, StandardOpenOption.DELETE_ON_CLOSE)) {
+                        is.read();
+                    }
                 }
             } catch (IOException e) {
                 LOGGER.error("Error creating thumbnail for PDF", e);
