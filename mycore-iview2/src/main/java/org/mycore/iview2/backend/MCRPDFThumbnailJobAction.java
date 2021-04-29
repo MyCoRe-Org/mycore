@@ -84,7 +84,7 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
                     mcrImage.setTileDir(MCRIView2Tools.getTileDir());
                     mcrImage.tile();
                 } catch (IOException e) {
-                    LOGGER.error("Error creating tiles from thumbnail for PDF: " + pImg.toString(), e);
+                    LOGGER.error("Error creating tiles for thumbnail of PDF: " + pImg.toString(), e);
                 }
 
                 //delete file
