@@ -79,13 +79,17 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
                 try (OutputStream os = Files.newOutputStream(pImg)) {
                     ImageIO.write(bImage, "png", os);
                 }
-                MCRImage mcrImage = MCRImage.getInstance(pImg, tileInfo.getDerivate(), tileInfo.getImagePath());
-                mcrImage.setTileDir(MCRIView2Tools.getTileDir());
-                mcrImage.tile();
-                
+                try {
+                    MCRImage mcrImage = MCRImage.getInstance(pImg, tileInfo.getDerivate(), tileInfo.getImagePath());
+                    mcrImage.setTileDir(MCRIView2Tools.getTileDir());
+                    mcrImage.tile();
+                } catch (IOException e) {
+                    LOGGER.error("Error creating tiles from thumbnail for PDF: " + pImg.toString(), e);
+                }
+
                 //delete file
                 try (InputStream is = Files.newInputStream(pImg, StandardOpenOption.DELETE_ON_CLOSE)) {
-                 is.read();
+                    is.read();
                 }
             } catch (IOException e) {
                 LOGGER.error("Error creating thumbnail for PDF", e);
