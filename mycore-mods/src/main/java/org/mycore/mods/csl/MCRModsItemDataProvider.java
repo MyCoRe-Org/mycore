@@ -69,6 +69,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     public static final String MODS_RELATED_ITEM_XPATH = "mods:relatedItem/";
 
+    public static final String MODS_ORIGIN_INFO_PUBLICATION = "mods:originInfo[@eventType='publication' or not" +
+            "(@eventType)]";
+
     private MCRMODSWrapper wrapper;
 
     private String id;
@@ -305,30 +308,30 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processPublicationData(CSLItemDataBuilder idb) {
-        Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:place/mods:placeTerm"))
+        Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:place/mods:placeTerm"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
-                "mods:originInfo[@eventType='publication']/mods:place/mods:placeTerm")))
+                    MODS_ORIGIN_INFO_PUBLICATION + "/mods:place/mods:placeTerm")))
             .ifPresent(el -> {
                 idb.publisherPlace(el.getTextNormalize());
             });
 
-        Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:publisher"))
+        Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:publisher"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
-                "mods:originInfo[@eventType='publication']/mods:publisher")))
+                    MODS_ORIGIN_INFO_PUBLICATION + "/mods:publisher")))
             .ifPresent(el -> {
                 idb.publisher(el.getTextNormalize());
             });
 
-        Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:edition"))
+        Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:edition"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
-                "mods:originInfo[@eventType='publication']/mods:edition")))
+                    MODS_ORIGIN_INFO_PUBLICATION + "/mods:edition")))
             .ifPresent(el -> {
                 idb.edition(el.getTextNormalize());
             });
 
-        Optional.ofNullable(wrapper.getElement("mods:originInfo[@eventType='publication']/mods:dateIssued"))
+        Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:dateIssued"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
-                "mods:originInfo[@eventType='publication']/mods:dateIssued")))
+                    MODS_ORIGIN_INFO_PUBLICATION + "/mods:dateIssued")))
             .ifPresent(el -> {
                 idb.issued(new CSLDateBuilder().raw(el.getTextNormalize()).build());
             });
