@@ -215,6 +215,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Metadata.Manager.Class", MCRDefaultXMLMetadataManager.class.getCanonicalName());
         testProperties.put("MCR.Metadata.Type.document", "true");
         testProperties.put("MCR.Metadata.ObjectID.NumberPattern", "00000000");
         return testProperties;
