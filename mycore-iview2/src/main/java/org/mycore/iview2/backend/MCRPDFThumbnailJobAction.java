@@ -78,7 +78,7 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
                 Path pImg = Files.createTempFile("MyCoRe-Thumbnail-", ".png");
                 try (OutputStream os = Files.newOutputStream(pImg)) {
                     ImageIO.write(bImage, "png", os);
-                    
+
                     MCRImage mcrImage = MCRImage.getInstance(pImg, tileInfo.getDerivate(), tileInfo.getImagePath());
                     mcrImage.setTileDir(MCRIView2Tools.getTileDir());
                     mcrImage.tile();
