@@ -46,12 +46,12 @@ import org.xml.sax.SAXException;
 /**
  * Provides an abstract class for persistence managers of MCRObject and MCRDerivate xml
  * metadata to extend, with methods to perform CRUD operations on object metadata.
- * 
+ *
  * The default xml metadata manager is MCRDefaultXMLMetadataManager. If you wish to use
  * another manager implementation instead, change the following property accordingly:
- * 
+ *
  * MCR.Metadata.Manager.Class=org.mycore.datamodel.common.MCRDefaultXMLMetadataManager
- * 
+ *
  * Xml metadata managers have a default class they will instantiate for every store.
  * If you wish to use a different default class, change the following property
  * accordingly. For example, when using the MCRDefaultXMLMetadataManager:
@@ -60,15 +60,15 @@ import org.xml.sax.SAXException;
  *
  * The following directory will be used by xml metadata managers to keep up-to-date
  * store contents in. This directory will be created if it does not exist yet.
- * 
+ *
  * MCR.Metadata.Store.BaseDir=/path/to/metadata/dir
- * 
+ *
  * For each project and type, subdirectories will be created below this path,
  * for example %MCR.Metadata.Store.BaseDir%/DocPortal/document/.
- * 
+ *
  * If an SVN-based store is configured, then the following property will be used to
- * store & manage local SVN repositories:
- * 
+ * store and manage local SVN repositories:
+ *
  * MCR.Metadata.Store.SVNBase=file:///path/to/local/svndir/
  *
  * It is also possible to change individual properties per project and object type
