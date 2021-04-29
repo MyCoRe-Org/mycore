@@ -44,30 +44,32 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
 /**
- * Provides an interface for persistence managers of MCRObject and MCRDerivate xml metadata
- * with methods to create, retrieve, update and delete object metadata
- * using IFS2 MCRMetadataStore instances.
+ * Provides an abstract class for persistence managers of MCRObject and MCRDerivate xml
+ * metadata to extend, with methods to perform CRUD operations on object metadata.
  * 
- * The default metadata manager is MCRXMLMetadataManager. If you wish to use
- * another manager implementation instead, change the following property accordingly.
+ * The default xml metadata manager is MCRDefaultXMLMetadataManager. If you wish to use
+ * another manager implementation instead, change the following property accordingly:
  * 
- * MCR.Metadata.Manager.Class=full.qualified.class.name.of.manager.here
+ * MCR.Metadata.Manager.Class=org.mycore.datamodel.common.MCRDefaultXMLMetadataManager
+ * 
+ * Xml metadata managers have a default class they will instantiate for every store.
+ * If you wish to use a different default class, change the following property
+ * accordingly. For example, when using the MCRDefaultXMLMetadataManager:
  *
- * For configuration, at least the following properties must be set:
+ * MCR.Metadata.Store.DefaultClass=org.mycore.datamodel.ifs2.MCRVersioningMetadataStore
  *
+ * The following directory will be used by xml metadata managers to keep up-to-date
+ * store contents in. This directory will be created if it does not exist yet.
+ * 
  * MCR.Metadata.Store.BaseDir=/path/to/metadata/dir
- * MCR.Metadata.Store.SVNBase=file:///path/to/local/svndir/
- *
- * Both directories will be created if they do not exist yet.
- * For each project and type, a subdirectory will be created,
+ * 
+ * For each project and type, subdirectories will be created below this path,
  * for example %MCR.Metadata.Store.BaseDir%/DocPortal/document/.
- *
- * The default IFS2 store is MCRVersioningMetadataStore, which
- * versions metadata using SVN in local repositories below SVNBase.
- * If you do not want versioning and would like to have better
- * performance, change the following property to
- *
- * MCR.Metadata.Store.DefaultClass=org.mycore.datamodel.ifs2.MCRMetadataStore
+ * 
+ * If an SVN-based store is configured, then the following property will be used to
+ * store & manage local SVN repositories:
+ * 
+ * MCR.Metadata.Store.SVNBase=file:///path/to/local/svndir/
  *
  * It is also possible to change individual properties per project and object type
  * and overwrite the defaults, for example
@@ -76,7 +78,8 @@ import org.xml.sax.SAXException;
  * MCR.IFS2.Store.SVNRepositoryURL=file:///use/other/location/for/document/versions/
  * MCR.IFS2.Store.SlotLayout=2-2-2-2
  *
- * See documentation of MCRStore and MCRMetadataStore for details.
+ * See documentation of MCRStore, MCRMetadataStore and the MCRXMLMetadataManager
+ * extensions (e.g. MCRDefaultXMLMetadataManager) for details.
  *
  * @author Christoph Neidahl (OPNA2608)
  */
