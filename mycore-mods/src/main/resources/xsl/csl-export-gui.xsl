@@ -43,18 +43,32 @@
         <script type="text/javascript">window["MCR.Export.CSL.Rows"] = &quot;<xsl:value-of select="$MCR.Export.CSL.Rows"/>&quot;;</script>
         <script src="{$WebApplicationBaseURL}js/csl-export.js"/>
         <div class="input-group mb-3 flex-wrap" data-export="{$type}">
-            <select name="style" class="form-control">
-                <option value="">
-                    <xsl:value-of select="i18n:translate('component.mods.csl.export.style')"/>
-                </option>
-                <xsl:call-template name="styles2Options"/>
-            </select>
             <select name="format" class="form-control">
                 <option value="">
                     <xsl:value-of select="i18n:translate('component.mods.csl.export.format')"/>
                 </option>
-                <option>PDF</option>
-                <option>HTML</option>
+                <option value="pdf">PDF</option>
+                <option value="html">HTML</option>
+                <xsl:if test="$type = 'basket'">
+                    <option value="mods">MODS</option>
+                    <option value="bibtex">BibTex</option>
+                    <option value="endnote">Endnote</option>
+                    <option value="ris">RIS</option>
+                    <option value="isi">ISI</option>
+                    <option value="mods2csv">CSV</option>
+                </xsl:if>
+            </select>
+            <select name="style">
+                <xsl:attribute name="class">
+                    <xsl:text>form-control</xsl:text>
+                    <xsl:if test="$type = 'basket'">
+                        <xsl:text> d-none</xsl:text>
+                    </xsl:if>
+                </xsl:attribute>
+                <option value="">
+                    <xsl:value-of select="i18n:translate('component.mods.csl.export.style')"/>
+                </option>
+                <xsl:call-template name="styles2Options"/>
             </select>
             <div class="input-group-append">
                 <a href="#" class="action btn btn-md btn-csl-export" data-trigger-export="true">

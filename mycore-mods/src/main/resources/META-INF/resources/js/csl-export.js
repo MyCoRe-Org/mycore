@@ -18,28 +18,32 @@
  *
  */
 const CSL_EXPORT_ROWS = "MCR.Export.CSL.Rows";
+const STANDALONE_FORMATS = ["mods", "bibtex", "endnote", "ris", "isi", "mods2csv"];
 
-function getDownloadLocation(type, format, style) {
-    let transformerQuery = "&XSL.Transformer=" + type + "-csl-" + format;
-    let styleQuery = "&XSL.style=" + style;
-
+function getDownloadLocation(type, selectInfo) {
+    let format = selectInfo.format;
+    let style = selectInfo.style;
     let location = window.location.href;
-    let hashIndex = location.indexOf("#");
-    if (hashIndex !== -1) {
-        location = location.substring(0, hashIndex);
-    }
-    // check if solr search and set rows to 500
-    if (type.indexOf("response") !== -1) {
-        let rows = CSL_EXPORT_ROWS in window ? window[CSL_EXPORT_ROWS] : "500";
-        if (location.indexOf("rows") !== -1) {
-            location = location.replace(/([?&])(rows=)[0-9]+/g, "$1$2" + rows);
-        } else {
-            let joinSign = location.indexOf("?") === -1 ? "?" : "&";
-            location += joinSign + "rows=" + rows;
+    if (!isStandaloneFormat(format)) {
+        let transformerQuery = "&XSL.Transformer=" + type + "-csl-" + format;
+        let hashIndex = location.indexOf("#");
+        if (hashIndex !== -1) {
+            location = location.substring(0, hashIndex);
         }
+        // check if solr search and set rows to 500
+        if (type.indexOf("response") !== -1) {
+            let rows = CSL_EXPORT_ROWS in window ? window[CSL_EXPORT_ROWS] : "500";
+            if (location.indexOf("rows") !== -1) {
+                location = location.replace(/([?&])(rows=)[0-9]+/g, "$1$2" + rows);
+            } else {
+                let joinSign = location.indexOf("?") === -1 ? "?" : "&";
+                location += joinSign + "rows=" + rows;
+            }
+        }
+        return location + transformerQuery + "&XSL.style=" + style;
+    } else {
+        return window["webApplicationBaseURL"] + "servlets/MCRExportServlet?basket=objects&transformer=" + format;
     }
-
-    return location + transformerQuery + styleQuery;
 }
 
 function getSelectInfo(styleSelect, formatSelect) {
@@ -78,11 +82,11 @@ function createFetchFunction(trigger, initialSelectInfo, styleSelect, formatSele
             throw new Error("Network response was not ok");
         }
 
-        response.blob().then(function(blob){
+        response.blob().then(function (blob) {
             // check if the select has changed to different style or format since request start
             let newSelectInfo = getSelectInfo(styleSelect, formatSelect);
-            if (newSelectInfo.style === initialSelectInfo.style && newSelectInfo.format === initialSelectInfo.format) {
-
+            if (newSelectInfo.format === initialSelectInfo.format &&
+                (isStandaloneFormat(newSelectInfo.format) || newSelectInfo.style === initialSelectInfo.style)) {
                 trigger.href = URL.createObjectURL(blob);
                 trigger.download = "export." + initialSelectInfo.format;
                 setTriggerLoadingState(trigger, false);
@@ -90,6 +94,10 @@ function createFetchFunction(trigger, initialSelectInfo, styleSelect, formatSele
             }
         });
     };
+}
+
+function isStandaloneFormat(format) {
+    return STANDALONE_FORMATS.indexOf(format) !== -1;
 }
 
 window.addEventListener('load', function () {
@@ -102,36 +110,29 @@ window.addEventListener('load', function () {
         const formatSelect = element.querySelector("[name='format']");
         const trigger = element.querySelector("[data-trigger-export='true']");
 
-        if ("fetch" in window) {
+        changeTriggerState(trigger, false);
+        let onChange = function () {
+            let selectInfo = getSelectInfo(styleSelect, formatSelect);
+            if (isStandaloneFormat(selectInfo.format)) {
+                styleSelect.classList.add("d-none");
+            } else {
+                styleSelect.classList.remove("d-none");
+            }
             changeTriggerState(trigger, false);
-            let onChange = function () {
+            if (selectInfo.format.length > 0 && (selectInfo.style.length > 0 || isStandaloneFormat(selectInfo.format))) {
+                setTriggerLoadingState(trigger, true);
+                let location = getDownloadLocation(type, selectInfo);
+                fetch(location, {method: "GET"})
+                    .then(createFetchFunction(trigger, selectInfo, styleSelect, formatSelect))
+                    .catch(function (error) {
+                        throw error;
+                    });
+            } else {
                 changeTriggerState(trigger, false);
-                let selectInfo = getSelectInfo(styleSelect, formatSelect);
-                if (selectInfo.style.length > 0 && selectInfo.format.length > 0) {
-                    setTriggerLoadingState(trigger, true);
-                    let location = getDownloadLocation(type, selectInfo.format, selectInfo.style);
-                    fetch(location, {method: "GET"})
-                        .then(createFetchFunction(trigger, selectInfo, styleSelect, formatSelect))
-                        .catch(function (error) {
-                            throw error;
-                        });
-                } else {
-                    changeTriggerState(trigger, false);
-                }
-            };
+            }
+        };
 
-            styleSelect.addEventListener("change", onChange);
-            formatSelect.addEventListener("change", onChange);
-
-        } else {
-            // just download on click if no fetch api
-            trigger.addEventListener("click", function () {
-                let selectInfo = getSelectInfo(styleSelect, formatSelect);
-                if (selectInfo.style.trim().length > 0 && selectInfo.format.trim().length > 0) {
-                    let location = getDownloadLocation(type, selectInfo.format, selectInfo.style);
-                    window.location.assign(location);
-                }
-            });
-        }
+        styleSelect.addEventListener("change", onChange);
+        formatSelect.addEventListener("change", onChange);
     });
 });
