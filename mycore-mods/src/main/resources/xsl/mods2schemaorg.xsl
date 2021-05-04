@@ -422,6 +422,13 @@
           </xsl:for-each>
         </fn:array>
       </xsl:if>
+
+      <xsl:if test="$modsName/mods:affiliation">
+        <fn:string key="affiliation">
+          <xsl:value-of select="$modsName/mods:affiliation" />
+        </fn:string>
+      </xsl:if>
+
     </fn:map>
   </xsl:template>
 
