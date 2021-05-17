@@ -69,7 +69,11 @@
   <rule ref="category/java/performance.xml/IntegerInstantiation" />
   <rule ref="category/java/performance.xml/LongInstantiation" />
   <rule ref="category/java/performance.xml/ShortInstantiation" />
-  <rule ref="category/java/codestyle.xml/ClassNamingConventions" />
+  <rule ref="category/java/codestyle.xml/ClassNamingConventions">
+    <properties>
+      <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]+(Utils?|Helper|Manager|Commands)" />
+    </properties>
+  </rule>
   <rule ref="category/java/codestyle.xml/GenericsNaming" />
   <rule ref="category/java/codestyle.xml/MethodNamingConventions" />
   <rule ref="category/java/errorprone.xml/MethodWithSameNameAsEnclosingClass" />
