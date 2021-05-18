@@ -83,9 +83,13 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
                     mcrImage.setTileDir(MCRIView2Tools.getTileDir());
                     mcrImage.tile();
                 } finally {
-                    //delete file
+                    //delete temp file (see MCR-2404)
+                    //The method Files.deleteIfExists(pImg) does not work here under Windows,
+                    //because it looks like the file is still locked when the method is called
+                    //DELETE_ON_CLOSE on the outer try{} does not work 
+                    //because ImageIO.write() closes the stream and the file will be deleted to early
                     try (InputStream is = Files.newInputStream(pImg, StandardOpenOption.DELETE_ON_CLOSE)) {
-                        is.read();
+                        is.read();  // read one byte
                     }
                 }
             } catch (IOException e) {
