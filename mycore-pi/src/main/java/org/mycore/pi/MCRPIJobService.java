@@ -18,25 +18,20 @@
 
 package org.mycore.pi;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -325,54 +320,6 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     protected PiJobAction getAction(Map<String, String> contextParameters) {
         return PiJobAction.valueOf(contextParameters.get("action"));
-    }
-
-    protected Predicate<MCRBase> getCreationPredicate() {
-        final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
-            getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE;
-        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
-            return (o) -> false;
-        }
-        return getPredicateInstance(predicateProperty);
-    }
-
-    protected Predicate<MCRBase> getRegistrationCondition() {
-        final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
-            getServiceID() + "." + MCRPIJobService.REGISTRATION_PREDICATE;
-        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
-            return (o) -> true;
-        }
-        return getPredicateInstance(predicateProperty);
-    }
-
-    public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
-        final String clazz = MCRConfiguration2.getStringOrThrow(predicateProperty);
-        final String errorMessageBegin = String.format(Locale.ROOT, "Configured class %s(%s)", clazz,
-            predicateProperty);
-        try {
-            return (Predicate<MCRBase>) MCRClassTools.forName(clazz)
-                .getConstructor(String.class)
-                .newInstance(predicateProperty + ".");
-        } catch (ClassNotFoundException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " was not found!", e);
-        } catch (IllegalAccessException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " has no public constructor!", e);
-        } catch (InstantiationException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " seems to be abstract!", e);
-        } catch (NoSuchMethodException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " has no default constructor!", e);
-        } catch (InvocationTargetException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " could not be initialized", e);
-        } catch (ClassCastException e) {
-            throw new MCRConfigurationException(
-                errorMessageBegin + " needs to extend the right parent class",
-                e);
-        }
     }
 
     @Override

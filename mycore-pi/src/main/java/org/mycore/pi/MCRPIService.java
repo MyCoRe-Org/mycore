@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -502,4 +503,54 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
         return properties.get(propertyName);
     }
+    
+    protected Predicate<MCRBase> getCreationPredicate() {
+        final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
+            getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE;
+        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
+            return (o) -> false;
+        }
+        return getPredicateInstance(predicateProperty);
+    }
+
+    protected Predicate<MCRBase> getRegistrationPredicate() {
+        final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
+            getServiceID() + "." + MCRPIJobService.REGISTRATION_PREDICATE;
+        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
+            return (o) -> true;
+        }
+        return getPredicateInstance(predicateProperty);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
+        final String clazz = MCRConfiguration2.getStringOrThrow(predicateProperty);
+        final String errorMessageBegin = String.format(Locale.ROOT, "Configured class %s(%s)", clazz,
+            predicateProperty);
+        try {
+            return (Predicate<MCRBase>) MCRClassTools.forName(clazz)
+                .getConstructor(String.class)
+                .newInstance(predicateProperty + ".");
+        } catch (ClassNotFoundException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " was not found!", e);
+        } catch (IllegalAccessException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " has no public constructor!", e);
+        } catch (InstantiationException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " seems to be abstract!", e);
+        } catch (NoSuchMethodException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " has no default constructor!", e);
+        } catch (InvocationTargetException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " could not be initialized", e);
+        } catch (ClassCastException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " needs to extend the right parent class",
+                e);
+        }
+    }
+
 }

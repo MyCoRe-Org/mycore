@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import javax.persistence.NoResultException;
 import javax.xml.XMLConstants;
@@ -152,8 +151,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
             contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
             this.addUpdateJob(contextParameters);
         } else if (!hasRegistrationStarted(obj.getId(), additional)) {
-            Predicate<MCRBase> registrationCondition = getRegistrationCondition();
-            if (registrationCondition.test(obj)) {
+            if (getRegistrationPredicate().test(obj)) {
                 // validate
                 transform(obj, doi.asString());
                 this.updateStartRegistrationDate(obj.getId(), "", new Date());
@@ -165,7 +163,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
     @Override
     public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional, MCRDigitalObjectIdentifier identifier) {
         Date registrationStarted = null;
-        if (getRegistrationCondition().test(obj)) {
+        if (getRegistrationPredicate().test(obj)) {
             registrationStarted = new Date();
             startRegisterJob(obj, identifier);
         }
