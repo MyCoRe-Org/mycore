@@ -116,7 +116,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
 
             return schemaFactory.newSchema(source);
         } catch (SAXException | TransformerException | IOException e) {
-            throw new MCRConfigurationException("Error while loading "+schemaURLString+" schema!", e);
+            throw new MCRConfigurationException("Error while loading " + schemaURLString + " schema!", e);
         }
     }
 
@@ -150,13 +150,12 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
             contextParameters.put(CONTEXT_DOI, doi.asString());
             contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
             this.addUpdateJob(contextParameters);
-        } else if (!hasRegistrationStarted(obj.getId(), additional)) {
-            if (getRegistrationPredicate().test(obj)) {
-                // validate
-                transform(obj, doi.asString());
-                this.updateStartRegistrationDate(obj.getId(), "", new Date());
-                startRegisterJob(obj, doi);
-            }
+        } else if (!hasRegistrationStarted(obj.getId(), additional)
+            && getRegistrationPredicate().test(obj)) {
+            // validate
+            transform(obj, doi.asString());
+            this.updateStartRegistrationDate(obj.getId(), "", new Date());
+            startRegisterJob(obj, doi);
         }
     }
 
