@@ -50,7 +50,7 @@ public class MCRPURLJobService extends MCRPIJobService<MCRPURL> {
 
     private static final String PURL_BASE_URL = "RegisterBaseURL";
 
-    private static final String PURL_CONTEXT_CONFIG = "RegisterContext";
+    private static final String PURL_CONTEXT_CONFIG = "RegisterURLContext";
 
     private static final String PURL_MAINTAINER_CONFIG = "Maintainer";
 

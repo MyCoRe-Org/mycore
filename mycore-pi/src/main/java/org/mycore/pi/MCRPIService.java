@@ -101,32 +101,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     // generated identifier is already present in database
     private static final int ERR_CODE_0_1 = 0x0001;
 
+    @SuppressWarnings("unused")
     private static Logger LOGGER = LogManager.getLogger();
-
-    /**
-     * Removes a flag from a {@link MCRObject}
-     *
-     * @param obj           the object
-     * @param databaseEntry the database entry
-     * @return the remove entry parsed from json or null
-     */
-    public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
-        MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
-        int flagCount = flags.size();
-        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
-            String flag = flags.get(flagIndex);
-            MCRPI pi = getGson().fromJson(flag, MCRPI.class);
-            if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
-                pi.getAdditional().equals(databaseEntry.getAdditional()) &&
-                pi.getService().equals(databaseEntry.getService()) &&
-                pi.getType().equals(databaseEntry.getType())) {
-                service.removeFlag(flagIndex);
-                return databaseEntry;
-            }
-        }
-        return null;
-    }
 
     protected static Gson getGson() {
         return new GsonBuilder().registerTypeAdapter(Date.class, new MCRGsonUTCDateAdapter())
@@ -225,6 +201,31 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
         String json = getGson().toJson(databaseEntry);
         obj.getService().addFlag(PI_FLAG, json);
+    }
+
+    /**
+     * Removes a flag from a {@link MCRObject}
+     *
+     * @param obj           the object
+     * @param databaseEntry the database entry
+     * @return the remove entry parsed from json or null
+     */
+    public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        int flagCount = flags.size();
+        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
+            String flag = flags.get(flagIndex);
+            MCRPI pi = getGson().fromJson(flag, MCRPI.class);
+            if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
+                pi.getAdditional().equals(databaseEntry.getAdditional()) &&
+                pi.getService().equals(databaseEntry.getService()) &&
+                pi.getType().equals(databaseEntry.getType())) {
+                service.removeFlag(flagIndex);
+                return databaseEntry;
+            }
+        }
+        return null;
     }
 
     public static boolean hasFlag(MCRObjectID id, String additional, MCRPIRegistrationInfo mcrpi) {
