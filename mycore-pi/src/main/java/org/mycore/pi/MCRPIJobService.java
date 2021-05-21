@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +33,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -320,6 +322,19 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
 
     protected PiJobAction getAction(Map<String, String> contextParameters) {
         return PiJobAction.valueOf(contextParameters.get("action"));
+    }
+
+    /**
+     * This function is replaced by getRegistrationPredicate() 
+     * in parent class MCRPIJobService
+     * @return the registration predicate
+     * 
+     * @see MCRPIJobService
+     * @version 2020.06
+     */
+    @Deprecated
+    protected Predicate<MCRBase> getRegistrationCondition() {
+        return super.getRegistrationPredicate();
     }
 
     @Override
