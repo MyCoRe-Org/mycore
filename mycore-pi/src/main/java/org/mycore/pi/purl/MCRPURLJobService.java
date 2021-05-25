@@ -50,7 +50,7 @@ public class MCRPURLJobService extends MCRPIJobService<MCRPURL> {
 
     private static final String PURL_BASE_URL = "RegisterBaseURL";
 
-    private static final String PURL_CONTEXT_CONFIG = "RegisterContext";
+    private static final String PURL_CONTEXT_CONFIG = "RegisterURLContext";
 
     private static final String PURL_MAINTAINER_CONFIG = "Maintainer";
 
@@ -130,7 +130,7 @@ public class MCRPURLJobService extends MCRPIJobService<MCRPURL> {
     public MCRPI insertIdentifierToDatabase(MCRBase obj, String additional,
         MCRPURL identifier) {
         Date registrationStarted = null;
-        if (getRegistrationCondition().test(obj)) {
+        if (getRegistrationPredicate().test(obj)) {
             registrationStarted = new Date();
             startRegisterJob(obj, identifier);
         }
@@ -160,7 +160,7 @@ public class MCRPURLJobService extends MCRPIJobService<MCRPURL> {
     protected void update(MCRPURL purl, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         if (!hasRegistrationStarted(obj.getId(), additional)) {
-            Predicate<MCRBase> registrationCondition = getRegistrationCondition();
+            Predicate<MCRBase> registrationCondition = getRegistrationPredicate();
             if (registrationCondition.test(obj)) {
                 this.updateStartRegistrationDate(obj.getId(), "", new Date());
                 startRegisterJob(obj, purl);
