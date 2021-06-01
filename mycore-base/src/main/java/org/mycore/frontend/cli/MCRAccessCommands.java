@@ -85,8 +85,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      */
     public static void createPermissionsFromFile(String filename) throws Exception {
-        ;
-
         MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         if (!checkFilename(filename)) {
             return;
