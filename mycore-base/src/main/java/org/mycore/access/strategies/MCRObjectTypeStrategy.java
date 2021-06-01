@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -74,7 +75,8 @@ public class MCRObjectTypeStrategy implements MCRCombineableAccessCheckStrategy 
     }
 
     private static boolean hasTypePermission(String objectType, String permission) {
-        return objectType != null && MCRAccessManager.getAccessImpl().hasRule("default_" + objectType, permission);
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        return objectType != null && accessImpl.hasRule("default_" + objectType, permission);
     }
 
     private static String getObjectType(String id) {

@@ -65,8 +65,8 @@ public class MCRAccessManager {
         MCRShutdownHandler.getInstance().addCloseable(EXECUTOR_SERVICE::shutdownNow);
     }
 
-    public static MCRAccessInterface getAccessImpl() {
-        return MCRConfiguration2.getSingleInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class).get();
+    public static <T extends MCRAccessInterface> T getAccessImpl() {
+        return (T) MCRConfiguration2.getSingleInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class).get();
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
@@ -87,11 +87,15 @@ public class MCRAccessManager {
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
      *             if an error was occurred
-     * @see MCRAccessInterface#addRule(String, String, Element, String)
+     * @see MCRRuleAccessInterface#addRule(String, String, Element, String)
      */
     public static void addRule(MCRObjectID id, String permission, Element rule, String description)
         throws MCRException {
-        getAccessImpl().addRule(id.toString(), permission, rule, description);
+        requireRulesInterface().addRule(id.toString(), permission, rule, description);
+    }
+
+    private static MCRRuleAccessInterface getRuleImpl(){
+        return getAccessImpl();
     }
 
     /**
@@ -107,11 +111,11 @@ public class MCRAccessManager {
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
      *             if an error was occurred
-     * @see MCRAccessInterface#addRule(String, String, Element, String)
+     * @see MCRRuleAccessInterface#addRule(String, String, Element, String)
      */
     public static void addRule(String id, String permission, Element rule, String description)
         throws MCRException {
-        getAccessImpl().addRule(id, permission, rule, description);
+        requireRulesInterface().addRule(id, permission, rule, description);
     }
 
     /**
@@ -123,10 +127,10 @@ public class MCRAccessManager {
      *            the access permission for the rule
      * @throws MCRException
      *             if an error was occurred
-     * @see MCRAccessInterface#removeRule(String, String)
+     * @see MCRRuleAccessInterface#removeRule(String, String)
      */
     public static void removeRule(MCRObjectID id, String permission) throws MCRException {
-        getAccessImpl().removeRule(id.toString(), permission);
+        requireRulesInterface().removeRule(id.toString(), permission);
     }
 
     /**
@@ -138,10 +142,10 @@ public class MCRAccessManager {
      *            the access permission for the rule
      * @throws MCRException
      *             if an error was occurred
-     * @see MCRAccessInterface#removeRule(String, String)
+     * @see MCRRuleAccessInterface#removeRule(String, String)
      */
     public static void removeRule(String id, String permission) throws MCRException {
-        getAccessImpl().removeRule(id, permission);
+        getRuleImpl().removeRule(id, permission);
     }
 
     /**
@@ -151,10 +155,10 @@ public class MCRAccessManager {
      *            the MCRObjectID of an object
      * @throws MCRException
      *             if an error was occurred
-     * @see MCRAccessInterface#removeRule(String)
+     * @see MCRRuleAccessInterface#removeRule(String)
      */
     public static void removeAllRules(MCRObjectID id) throws MCRException {
-        getAccessImpl().removeAllRules(id.toString());
+        getRuleImpl().removeAllRules(id.toString());
     }
 
     /**
@@ -170,11 +174,11 @@ public class MCRAccessManager {
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
      *             if an error was occurred
-     * @see MCRAccessInterface#updateRule(String, String, Element, String)
+     * @see MCRRuleAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(MCRObjectID id, String permission, Element rule, String description)
         throws MCRException {
-        getAccessImpl().updateRule(id.toString(), permission, rule, description);
+        getRuleImpl().updateRule(id.toString(), permission, rule, description);
     }
 
     /**
@@ -190,11 +194,11 @@ public class MCRAccessManager {
      *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
      *             if an error was occurred
-     * @see MCRAccessInterface#updateRule(String, String, Element, String)
+     * @see MCRRuleAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(String id, String permission, Element rule, String description)
         throws MCRException {
-        getAccessImpl().updateRule(id, permission, rule, description);
+        getRuleImpl().updateRule(id, permission, rule, description);
     }
 
     /**
@@ -205,7 +209,7 @@ public class MCRAccessManager {
      * @param permission
      *            the access permission for the rule
      * @return true if the access is allowed otherwise it return
-     * @see MCRAccessInterface#checkPermission(String, String)
+     * @see MCRRuleAccessInterface#checkPermission(String, String)
      */
     public static boolean checkPermission(MCRObjectID id, String permission) {
         return checkPermission(id.toString(), permission);
@@ -337,7 +341,7 @@ public class MCRAccessManager {
      * @return a <code>List</code> of all for <code>id</code> defined permissions
      */
     public static Collection<String> getPermissionsForID(String id) {
-        return getAccessImpl().getPermissionsForID(id);
+        return getRuleImpl().getPermissionsForID(id);
     }
 
     /**
@@ -348,7 +352,7 @@ public class MCRAccessManager {
      * @return a <code>List</code> of all for <code>id</code> defined permissions
      */
     public static Collection<String> getPermissionsForID(MCRObjectID id) {
-        return getAccessImpl().getPermissionsForID(id.toString());
+        return getRuleImpl().getPermissionsForID(id.toString());
     }
 
     /**
@@ -388,7 +392,11 @@ public class MCRAccessManager {
      *            the access permission for the rule
      */
     public static boolean hasRule(String id, String permission) {
-        return getAccessImpl().hasRule(id, permission);
+        if(getAccessImpl() instanceof MCRRuleAccessInterface) {
+            return requireRulesInterface().hasRule(id, permission);
+        } else {
+            return true;
+        }
     }
 
     public static CompletableFuture<Boolean> checkPermission(MCRUserInformation user, Supplier<Boolean> checkSuplier) {
@@ -420,4 +428,10 @@ public class MCRAccessManager {
         };
     }
 
+    public static MCRRuleAccessInterface requireRulesInterface() {
+        if(!(getAccessImpl() instanceof MCRRuleAccessInterface)) {
+            throw new MCRException(MCRAccessInterface.class + " is no "+ MCRRuleAccessInterface.class);
+        }
+        return getAccessImpl();
+    }
 }

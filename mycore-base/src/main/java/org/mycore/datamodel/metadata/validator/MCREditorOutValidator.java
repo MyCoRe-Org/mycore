@@ -46,6 +46,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
@@ -391,12 +392,17 @@ public class MCREditorOutValidator {
         for (Element datatag : servicelist) {
             checkMetaTags(datatag);
         }
-        Collection<String> li = MCRAccessManager.getPermissionsForID(id.toString());
-        if (li != null && !li.isEmpty()) {
-            hasacls = true;
-        }
-        if (service.getChild("servacls") == null && !hasacls) {
-            setDefaultObjectACLs(service);
+
+        if (service.getChild("servacls") == null) {
+            if(MCRAccessManager.getAccessImpl() instanceof MCRRuleAccessInterface) {
+                Collection<String> li = MCRAccessManager.getPermissionsForID(id.toString());
+                if (li != null && !li.isEmpty()) {
+                    hasacls = true;
+                }
+                if(!hasacls){
+                    setDefaultObjectACLs(service);
+                }
+            }
         }
     }
 

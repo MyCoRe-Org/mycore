@@ -39,8 +39,9 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessException;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
@@ -172,10 +173,13 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     protected void setDefaultPermissions(MCRObjectID derivateID) {
         if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
             MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = accessImpl.getAccessPermissionsFromConfiguration();
-            for (String permission : configuredPermissions) {
-                MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
-                    "default derivate rule");
+            if(accessImpl instanceof MCRRuleAccessInterface) {
+                MCRRuleAccessInterface ruleAccessImpl = (MCRRuleAccessInterface) accessImpl;
+                Collection<String> configuredPermissions = ruleAccessImpl.getAccessPermissionsFromConfiguration();
+                for (String permission : configuredPermissions) {
+                    MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
+                            "default derivate rule");
+                }
             }
         }
     }

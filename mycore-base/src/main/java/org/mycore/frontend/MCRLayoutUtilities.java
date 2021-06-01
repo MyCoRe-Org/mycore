@@ -60,6 +60,7 @@ import org.jdom2.util.NamespaceStack;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRException;
@@ -310,27 +311,6 @@ public class MCRLayoutUtilities {
         return access;
     }
 
-    /**
-     * Verifies a single item on access according to $permission and for a given
-     * user
-     *
-     * @param permission an ACL permission
-     * @param item element to check
-     * @param access
-     *            initial value
-     * @param userID a user id
-     *
-     * @deprecated userID as string is not enough - we need to pass the complete MCRUserInformation object
-     */
-    @Deprecated
-    public static boolean itemAccess(String permission, Element item, boolean access, String userID) {
-        MCRAccessInterface am = MCRAccessManager.getAccessImpl();
-        String objID = getWebpageACLID(item);
-        if (am.hasRule(objID, permission)) {
-            access = am.checkPermission(objID, permission, userID);
-        }
-        return access;
-    }
 
     private static String getWebpageACLID(Element item) {
         return OBJIDPREFIX_WEBPAGE + getWebpageID(item);
@@ -436,7 +416,11 @@ public class MCRLayoutUtilities {
 
     public static boolean hasRule(String permission, String webpageID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
-        return am.hasRule(getWebpageACLID(webpageID), permission);
+        if(am instanceof MCRRuleAccessInterface){
+            return ((MCRRuleAccessInterface)am).hasRule(getWebpageACLID(webpageID), permission);
+        } else {
+            return true;
+        }
     }
 
     public static String getRuleID(String permission, String webpageID) {
@@ -451,7 +435,10 @@ public class MCRLayoutUtilities {
 
     public static String getRuleDescr(String permission, String webpageID) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
-        String ruleDes = am.getRuleDescription(getWebpageACLID(webpageID), permission);
+        String ruleDes = null;
+         if(am instanceof MCRRuleAccessInterface) {
+             ruleDes = ((MCRRuleAccessInterface)am).getRuleDescription(getWebpageACLID(webpageID), permission);
+         }
         if (ruleDes != null) {
             return ruleDes;
         } else {

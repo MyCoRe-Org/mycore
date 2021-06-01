@@ -41,9 +41,9 @@ import org.mycore.common.config.MCRConfiguration2;
  * @author Jens Kupferschmidt
  * 
  */
-public class MCRAccessBaseImpl implements MCRAccessInterface {
+public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
 
-    private static MCRAccessInterface SINGLETON;
+    private static MCRRuleAccessInterface SINGLETON;
 
     protected static final String ACCESS_PERMISSIONS = MCRConfiguration2.getString("MCR.Access.AccessPermissions")
         .orElse("read,write,delete");
@@ -59,7 +59,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @return a singleton instance of MCRAccessInterface
      */
-    public static synchronized MCRAccessInterface instance() {
+    public static synchronized MCRRuleAccessInterface instance() {
         if (SINGLETON == null) {
             SINGLETON = new MCRAccessBaseImpl();
         }
@@ -159,20 +159,6 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
         } finally {
             LOGGER.debug("Check {} on {} took:{}", permission, id, System.currentTimeMillis() - start);
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mycore.access.MCRAccessInterface#checkAccess(java.lang.String,
-     *      java.lang.String, MCRUser)
-     */
-    @Deprecated
-    @Override
-    public boolean checkPermission(String id, String permission, String userID) {
-        LOGGER.debug("Execute MCRAccessBaseImpl checkPermission for ID {} for permission {} for user{}", id, permission,
-            userID);
-        return true;
     }
 
     @Override

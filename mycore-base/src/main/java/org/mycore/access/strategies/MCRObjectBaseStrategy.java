@@ -60,7 +60,7 @@ public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy 
         if (id == null || id.length() == 0 || permission == null || permission.length() == 0) {
             return false;
         }
-        if (MCRAccessManager.getAccessImpl().hasRule(id, permission)) {
+        if (MCRAccessManager.requireRulesInterface().hasRule(id, permission)) {
             LOGGER.debug("using access rule defined for object.");
             return MCRAccessManager.getAccessImpl().checkPermission(id, permission);
         }
@@ -73,7 +73,8 @@ public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy 
     }
 
     private boolean hasBasePermission(String objectBase, String permission) {
-        return objectBase != null && MCRAccessManager.getAccessImpl().hasRule("default_" + objectBase, permission);
+        return objectBase != null && MCRAccessManager.requireRulesInterface()
+                .hasRule("default_" + objectBase, permission);
     }
 
     private static String getObjectBase(String id) {

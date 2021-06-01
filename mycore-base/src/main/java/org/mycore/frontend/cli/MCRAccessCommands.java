@@ -33,7 +33,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
@@ -85,7 +85,9 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      */
     public static void createPermissionsFromFile(String filename) throws Exception {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        ;
+
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         if (!checkFilename(filename)) {
             return;
         }
@@ -138,7 +140,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "Remove all permission entries from the Access Control System.",
         order = 40)
     public static void deleteAllPermissions() throws Exception {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         for (String permission : accessImpl.getPermissions()) {
             accessImpl.removeRule(permission);
         }
@@ -154,7 +156,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "Remove a named permission entriy from the Access Control System.",
         order = 30)
     public static void deletePermission(String permission) throws Exception {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         accessImpl.removeRule(permission);
     }
 
@@ -164,7 +166,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "list all permissions", help = "List all permission entries.", order = 20)
     public static void listAllPermissions() throws MCRException {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         Collection<String> permissions = accessImpl.getPermissions();
         boolean noPermissionsDefined = true;
         for (String permission : permissions) {
@@ -197,7 +199,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "Export all permissions from the Access Control System to the file {0}.",
         order = 50)
     public static void exportAllPermissionsToFile(String filename) throws Exception {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
 
         Element mcrpermissions = new Element("mcrpermissions");
         mcrpermissions.addNamespaceDeclaration(XSI_NAMESPACE);
@@ -279,7 +281,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         order = 60)
     public static void permissionUpdateForID(String permission, String id, String strFileRule, String description)
         throws Exception {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         Element rule = getRuleFromFile(strFileRule);
         if (rule == null) {
             return;
@@ -325,7 +327,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         order = 80)
     public static void permissionUpdateForSelected(String permission, String strFileRule, String description)
         throws Exception {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         Element rule = getRuleFromFile(strFileRule);
         if (rule == null) {
             return;
@@ -347,7 +349,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "The command delete access rule for a given id of a given permission",
         order = 110)
     public static void permissionDeleteForID(String permission, String id) {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         accessImpl.removeRule(id, permission);
     }
 
@@ -361,7 +363,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "The command delete all access rules for a given id",
         order = 120)
     public static void permissionDeleteAllForID(String id) {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         accessImpl.removeAllRules(id);
     }
 
@@ -376,7 +378,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "The command delete access rule for a query selected set of object ids of a given permission",
         order = 130)
     public static void permissionDeleteForSelected(String permission) {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
             accessImpl.removeRule(id, permission);
         }
@@ -392,7 +394,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         help = "The command delete all access rules for a query selected set of object ids",
         order = 140)
     public static void permissionDeleteAllForSelected() {
-        MCRAccessInterface accessImpl = MCRAccessManager.getAccessImpl();
+        MCRRuleAccessInterface accessImpl = MCRAccessManager.requireRulesInterface();
         for (String id : MCRObjectCommands.getSelectedObjectIDs()) {
             accessImpl.removeAllRules(id);
         }

@@ -47,7 +47,7 @@ import javax.ws.rs.core.HttpHeaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
-import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -254,7 +254,7 @@ public class MCRUploadResource {
 
     private void setDefaultPermissions(MCRObjectID derivateID) {
         if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
-            MCRAccessInterface aclImpl = MCRAccessManager.getAccessImpl();
+            MCRRuleAccessInterface aclImpl = MCRAccessManager.getAccessImpl();
             Collection<String> configuredPermissions = aclImpl.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),

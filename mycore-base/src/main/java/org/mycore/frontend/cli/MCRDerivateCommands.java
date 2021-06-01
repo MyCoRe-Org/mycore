@@ -51,8 +51,9 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMSource;
-import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessException;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -519,11 +520,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             obj.getDerivate().getInternals().setSourcePath(nid);
             LOGGER.info("New Internal Path ====>{}", nid);
             // add ACL's
-            Collection<String> l = ACCESS_IMPL.getPermissionsForID(nid);
-            for (String permission : l) {
-                Element rule = ACCESS_IMPL.getRule(nid, permission);
-                obj.getService().addRule(permission, rule);
+            if(ACCESS_IMPL instanceof MCRRuleAccessInterface){
+                Collection<String> l = ((MCRRuleAccessInterface) ACCESS_IMPL).getPermissionsForID(nid);
+                for (String permission : l) {
+                    Element rule = ((MCRRuleAccessInterface) ACCESS_IMPL).getRule(nid, permission);
+                    obj.getService().addRule(permission, rule);
+                }
             }
+
             // build JDOM
             xml = obj.createXML();
 
