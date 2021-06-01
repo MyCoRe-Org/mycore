@@ -94,10 +94,6 @@ public class MCRAccessManager {
         requireRulesInterface().addRule(id.toString(), permission, rule, description);
     }
 
-    private static MCRRuleAccessInterface getRuleImpl(){
-        return getAccessImpl();
-    }
-
     /**
      * adds an access rule for an ID to an access system.
      *
@@ -145,7 +141,7 @@ public class MCRAccessManager {
      * @see MCRRuleAccessInterface#removeRule(String, String)
      */
     public static void removeRule(String id, String permission) throws MCRException {
-        getRuleImpl().removeRule(id, permission);
+        requireRulesInterface().removeRule(id, permission);
     }
 
     /**
@@ -158,7 +154,7 @@ public class MCRAccessManager {
      * @see MCRRuleAccessInterface#removeRule(String)
      */
     public static void removeAllRules(MCRObjectID id) throws MCRException {
-        getRuleImpl().removeAllRules(id.toString());
+        requireRulesInterface().removeAllRules(id.toString());
     }
 
     /**
@@ -178,7 +174,7 @@ public class MCRAccessManager {
      */
     public static void updateRule(MCRObjectID id, String permission, Element rule, String description)
         throws MCRException {
-        getRuleImpl().updateRule(id.toString(), permission, rule, description);
+        requireRulesInterface().updateRule(id.toString(), permission, rule, description);
     }
 
     /**
@@ -198,7 +194,7 @@ public class MCRAccessManager {
      */
     public static void updateRule(String id, String permission, Element rule, String description)
         throws MCRException {
-        getRuleImpl().updateRule(id, permission, rule, description);
+        requireRulesInterface().updateRule(id, permission, rule, description);
     }
 
     /**
@@ -341,7 +337,7 @@ public class MCRAccessManager {
      * @return a <code>List</code> of all for <code>id</code> defined permissions
      */
     public static Collection<String> getPermissionsForID(String id) {
-        return getRuleImpl().getPermissionsForID(id);
+        return requireRulesInterface().getPermissionsForID(id);
     }
 
     /**
@@ -352,7 +348,7 @@ public class MCRAccessManager {
      * @return a <code>List</code> of all for <code>id</code> defined permissions
      */
     public static Collection<String> getPermissionsForID(MCRObjectID id) {
-        return getRuleImpl().getPermissionsForID(id.toString());
+        return requireRulesInterface().getPermissionsForID(id.toString());
     }
 
     /**
