@@ -306,7 +306,7 @@ public class MCRLayoutUtilities {
     public static boolean itemAccess(String permission, Element item, boolean access) {
         String objID = getWebpageACLID(item);
         if (MCRAccessManager.hasRule(objID, permission)) {
-            access = MCRAccessManager.checkPermission(objID, permission);
+            return MCRAccessManager.checkPermission(objID, permission);
         }
         return access;
     }
