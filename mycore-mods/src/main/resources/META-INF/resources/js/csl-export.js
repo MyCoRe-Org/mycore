@@ -20,27 +20,32 @@
 const CSL_EXPORT_ROWS = "MCR.Export.CSL.Rows";
 const STANDALONE_FORMATS = ["mods", "bibtex", "endnote", "ris", "isi", "mods2csv"];
 
+function getCSLDownloadLocation(type, format, style) {
+    let location = window.location.href;
+    let transformerQuery = "&XSL.Transformer=" + type + "-csl-" + format;
+    let hashIndex = location.indexOf("#");
+    if (hashIndex !== -1) {
+        location = location.substring(0, hashIndex);
+    }
+    // check if solr search and set rows to 500
+    if (type.indexOf("response") !== -1) {
+        let rows = CSL_EXPORT_ROWS in window ? window[CSL_EXPORT_ROWS] : "500";
+        if (location.indexOf("rows") !== -1) {
+            location = location.replace(/([?&])(rows=)[0-9]+/g, "$1$2" + rows);
+        } else {
+            let joinSign = location.indexOf("?") === -1 ? "?" : "&";
+            location += joinSign + "rows=" + rows;
+        }
+    }
+    return location + transformerQuery + "&XSL.style=" + style;
+}
+
 function getDownloadLocation(type, selectInfo) {
     let format = selectInfo.format;
     let style = selectInfo.style;
     let location = window.location.href;
     if (!isStandaloneFormat(format)) {
-        let transformerQuery = "&XSL.Transformer=" + type + "-csl-" + format;
-        let hashIndex = location.indexOf("#");
-        if (hashIndex !== -1) {
-            location = location.substring(0, hashIndex);
-        }
-        // check if solr search and set rows to 500
-        if (type.indexOf("response") !== -1) {
-            let rows = CSL_EXPORT_ROWS in window ? window[CSL_EXPORT_ROWS] : "500";
-            if (location.indexOf("rows") !== -1) {
-                location = location.replace(/([?&])(rows=)[0-9]+/g, "$1$2" + rows);
-            } else {
-                let joinSign = location.indexOf("?") === -1 ? "?" : "&";
-                location += joinSign + "rows=" + rows;
-            }
-        }
-        return location + transformerQuery + "&XSL.style=" + style;
+        return getCSLDownloadLocation(type, format, style);
     } else {
         return window["webApplicationBaseURL"] + "servlets/MCRExportServlet?basket=objects&transformer=" + format;
     }
