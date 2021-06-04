@@ -20,6 +20,10 @@
 const CSL_EXPORT_ROWS = "MCR.Export.CSL.Rows";
 const STANDALONE_FORMATS = ["mods", "bibtex", "endnote", "ris", "isi", "mods2csv"];
 
+function isStandaloneFormat(format) {
+    return STANDALONE_FORMATS.indexOf(format) !== -1;
+}
+
 function getCSLDownloadLocation(type, format, style) {
     let location = window.location.href;
     let transformerQuery = "&XSL.Transformer=" + type + "-csl-" + format;
@@ -43,12 +47,11 @@ function getCSLDownloadLocation(type, format, style) {
 function getDownloadLocation(type, selectInfo) {
     let format = selectInfo.format;
     let style = selectInfo.style;
-    let location = window.location.href;
-    if (!isStandaloneFormat(format)) {
-        return getCSLDownloadLocation(type, format, style);
-    } else {
+    if (isStandaloneFormat(format)) {
         return window["webApplicationBaseURL"] + "servlets/MCRExportServlet?basket=objects&transformer=" + format;
     }
+
+    return getCSLDownloadLocation(type, format, style);
 }
 
 function getSelectInfo(styleSelect, formatSelect) {
@@ -101,8 +104,12 @@ function createFetchFunction(trigger, initialSelectInfo, styleSelect, formatSele
     };
 }
 
-function isStandaloneFormat(format) {
-    return STANDALONE_FORMATS.indexOf(format) !== -1;
+function updateStyleSelect(format, styleSelect) {
+    if (isStandaloneFormat(format)) {
+        styleSelect.classList.add("d-none");
+    } else {
+        styleSelect.classList.remove("d-none");
+    }
 }
 
 window.addEventListener('load', function () {
@@ -118,11 +125,7 @@ window.addEventListener('load', function () {
         changeTriggerState(trigger, false);
         let onChange = function () {
             let selectInfo = getSelectInfo(styleSelect, formatSelect);
-            if (isStandaloneFormat(selectInfo.format)) {
-                styleSelect.classList.add("d-none");
-            } else {
-                styleSelect.classList.remove("d-none");
-            }
+            updateStyleSelect(selectInfo.format, styleSelect);
             changeTriggerState(trigger, false);
             if (selectInfo.format.length > 0 && (selectInfo.style.length > 0 || isStandaloneFormat(selectInfo.format))) {
                 setTriggerLoadingState(trigger, true);
