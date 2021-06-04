@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- basic XML Schema components for mycore metadata objects
+     used together with datamodel plugin version <= 0.7
+     @deprecated
+ -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:mcr="http://www.mycore.org/XMLSchema">
   <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink-2008-06.xsd" />
