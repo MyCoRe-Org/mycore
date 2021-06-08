@@ -117,7 +117,7 @@ public class MCRConditionTransformer {
     private static StringBuilder handleSetCondition(MCRSetCondition<MCRCondition> setCond, Set<String> usedFields,
         boolean subCondition) {
         if (explicitAndOrMapping()) {
-            return handleSetConditionExplicit(setCond, usedFields, subCondition);
+            return handleSetConditionExplicit(setCond, usedFields);
         } else {
             return handleSetConditionDefault(setCond, usedFields, subCondition);
         }
@@ -125,8 +125,7 @@ public class MCRConditionTransformer {
 
     @SuppressWarnings("rawtypes")
     private static StringBuilder handleSetConditionExplicit(MCRSetCondition<MCRCondition> setCond,
-                                                            Set<String> usedFields,
-                                                            boolean subCondition) {
+                                                            Set<String> usedFields) {
         List<MCRCondition<MCRCondition>> children = setCond.getChildren();
         if (children.isEmpty()) {
             return null;
