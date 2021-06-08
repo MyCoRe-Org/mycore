@@ -67,6 +67,10 @@ public class MCRConditionTransformer {
         return toSolrQueryString(condition, usedFields, false).toString();
     }
 
+    public static boolean explicitAndOrMapping() {
+        return MCRConfiguration2.getBoolean("MCR.Solr.ConditionTransformer.ExplicitAndOrMapping").orElse(false);
+    }
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static StringBuilder toSolrQueryString(MCRCondition condition, Set<String> usedFields,
         boolean subCondition) {
@@ -112,6 +116,39 @@ public class MCRConditionTransformer {
     @SuppressWarnings("rawtypes")
     private static StringBuilder handleSetCondition(MCRSetCondition<MCRCondition> setCond, Set<String> usedFields,
         boolean subCondition) {
+        if (explicitAndOrMapping()) {
+            return handleSetConditionExplicit(setCond, usedFields, subCondition);
+        } else {
+            return handleSetConditionDefault(setCond, usedFields, subCondition);
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static StringBuilder handleSetConditionExplicit(MCRSetCondition<MCRCondition> setCond,
+                                                            Set<String> usedFields,
+                                                            boolean subCondition) {
+        List<MCRCondition<MCRCondition>> children = setCond.getChildren();
+        if (children.isEmpty()) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        Iterator<MCRCondition<MCRCondition>> iterator = children.iterator();
+        StringBuilder subSb = toSolrQueryString(iterator.next(), usedFields, true);
+        sb.append(subSb);
+        while (iterator.hasNext()) {
+            sb.append(' ').append(setCond.getOperator().toUpperCase()).append(' ');
+            subSb = toSolrQueryString(iterator.next(), usedFields, true);
+            sb.append(subSb);
+        }
+        sb.append(")");
+        return sb;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static StringBuilder handleSetConditionDefault(MCRSetCondition<MCRCondition> setCond,
+                                                           Set<String> usedFields,
+                                                           boolean subCondition) {
         boolean stripPlus;
         if (setCond instanceof MCROrCondition) {
             stripPlus = true;
@@ -150,7 +187,9 @@ public class MCRConditionTransformer {
         StringBuilder sb = new StringBuilder();
         sb.append("-");
         StringBuilder solrQueryString = toSolrQueryString(child, usedFields, true);
-        stripPlus(solrQueryString);
+        if(!explicitAndOrMapping()) {
+            stripPlus(solrQueryString);
+        }
         if (solrQueryString == null || solrQueryString.length() == 0) {
             return null;
         }
@@ -195,7 +234,9 @@ public class MCRConditionTransformer {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append('+');
+        if(!explicitAndOrMapping()) {
+            sb.append('+');
+        }
         sb.append(field);
         sb.append(":");
         String replaced = value.replaceAll("\\s+", " AND ");
@@ -211,7 +252,9 @@ public class MCRConditionTransformer {
 
     public static StringBuilder getPhraseQuery(String field, String value) {
         StringBuilder sb = new StringBuilder();
-        sb.append('+');
+        if(!explicitAndOrMapping()) {
+            sb.append('+');
+        }
         sb.append(field);
         sb.append(":");
         sb.append('"');
