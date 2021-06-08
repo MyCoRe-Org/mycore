@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -136,7 +137,7 @@ public class MCRConditionTransformer {
         StringBuilder subSb = toSolrQueryString(iterator.next(), usedFields, true);
         sb.append(subSb);
         while (iterator.hasNext()) {
-            sb.append(' ').append(setCond.getOperator().toUpperCase()).append(' ');
+            sb.append(' ').append(setCond.getOperator().toUpperCase(Locale.ROOT)).append(' ');
             subSb = toSolrQueryString(iterator.next(), usedFields, true);
             sb.append(subSb);
         }
