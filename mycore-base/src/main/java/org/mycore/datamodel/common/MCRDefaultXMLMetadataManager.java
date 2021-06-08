@@ -94,7 +94,7 @@ import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  */
-public class MCRDefaultXMLMetadataManager extends MCRXMLMetadataManager {
+public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
