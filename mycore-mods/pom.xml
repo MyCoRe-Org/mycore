@@ -117,6 +117,11 @@
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-webtools</artifactId>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 </project>

@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -106,32 +107,8 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     // generated identifier is already present in database
     private static final int ERR_CODE_0_1 = 0x0001;
 
+    @SuppressWarnings("unused")
     private static Logger LOGGER = LogManager.getLogger();
-
-    /**
-     * Removes a flag from a {@link MCRObject}
-     *
-     * @param obj           the object
-     * @param databaseEntry the database entry
-     * @return the remove entry parsed from json or null
-     */
-    public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
-        MCRObjectService service = obj.getService();
-        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
-        int flagCount = flags.size();
-        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
-            String flag = flags.get(flagIndex);
-            MCRPI pi = getGson().fromJson(flag, MCRPI.class);
-            if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
-                pi.getAdditional().equals(databaseEntry.getAdditional()) &&
-                pi.getService().equals(databaseEntry.getService()) &&
-                pi.getType().equals(databaseEntry.getType())) {
-                service.removeFlag(flagIndex);
-                return databaseEntry;
-            }
-        }
-        return null;
-    }
 
     protected static Gson getGson() {
         return new GsonBuilder().registerTypeAdapter(Date.class, new MCRGsonUTCDateAdapter())
@@ -204,6 +181,31 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
     public static void addFlagToObject(MCRBase obj, MCRPI databaseEntry) {
         String json = getGson().toJson(databaseEntry);
         obj.getService().addFlag(PI_FLAG, json);
+    }
+
+    /**
+     * Removes a flag from a {@link MCRObject}
+     *
+     * @param obj           the object
+     * @param databaseEntry the database entry
+     * @return the remove entry parsed from json or null
+     */
+    public static MCRPI removeFlagFromObject(MCRBase obj, MCRPI databaseEntry) {
+        MCRObjectService service = obj.getService();
+        ArrayList<String> flags = service.getFlags(MCRPIService.PI_FLAG);
+        int flagCount = flags.size();
+        for (int flagIndex = 0; flagIndex < flagCount; flagIndex++) {
+            String flag = flags.get(flagIndex);
+            MCRPI pi = getGson().fromJson(flag, MCRPI.class);
+            if (pi.getIdentifier().equals(databaseEntry.getIdentifier()) &&
+                pi.getAdditional().equals(databaseEntry.getAdditional()) &&
+                pi.getService().equals(databaseEntry.getService()) &&
+                pi.getType().equals(databaseEntry.getType())) {
+                service.removeFlag(flagIndex);
+                return databaseEntry;
+            }
+        }
+        return null;
     }
 
     public static boolean hasFlag(MCRObjectID id, String additional, MCRPIRegistrationInfo mcrpi) {
@@ -484,4 +486,54 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
         return properties.get(propertyName);
     }
+    
+    protected Predicate<MCRBase> getCreationPredicate() {
+        final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
+            getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE;
+        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
+            return (o) -> false;
+        }
+        return getPredicateInstance(predicateProperty);
+    }
+
+    protected Predicate<MCRBase> getRegistrationPredicate() {
+        final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
+            getServiceID() + "." + MCRPIJobService.REGISTRATION_PREDICATE;
+        if (MCRConfiguration2.getString(predicateProperty).isEmpty()) {
+            return (o) -> true;
+        }
+        return getPredicateInstance(predicateProperty);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Predicate<MCRBase> getPredicateInstance(String predicateProperty) {
+        final String clazz = MCRConfiguration2.getStringOrThrow(predicateProperty);
+        final String errorMessageBegin = String.format(Locale.ROOT, "Configured class %s(%s)", clazz,
+            predicateProperty);
+        try {
+            return (Predicate<MCRBase>) MCRClassTools.forName(clazz)
+                .getConstructor(String.class)
+                .newInstance(predicateProperty + ".");
+        } catch (ClassNotFoundException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " was not found!", e);
+        } catch (IllegalAccessException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " has no public constructor!", e);
+        } catch (InstantiationException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " seems to be abstract!", e);
+        } catch (NoSuchMethodException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " has no default constructor!", e);
+        } catch (InvocationTargetException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " could not be initialized", e);
+        } catch (ClassCastException e) {
+            throw new MCRConfigurationException(
+                errorMessageBegin + " needs to extend the right parent class",
+                e);
+        }
+    }
+
 }

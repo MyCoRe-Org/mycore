@@ -98,6 +98,12 @@ namespace mycore.upload {
                 manualToggle.addEventListener("click", (e) => {
                     e.preventDefault();
                     const fileInput = document.createElement("input");
+                    let testing = "mcr-testing" in window;
+                    if(testing){
+                        fileInput.setAttribute("id", "mcr-testing-file-input");
+                        manualToggle.appendChild(fileInput);
+                    }
+
                     const uploadID = (Math.random() * 10000).toString(10);
 
                     fileInput.setAttribute("type", "file");
@@ -108,7 +114,9 @@ namespace mycore.upload {
                             FileTransferQueue.getQueue().add(fileTransfer);
                         }
                     });
-                    fileInput.click();
+                    if(!testing){
+                        fileInput.click();
+                    }
                 });
             }
         }

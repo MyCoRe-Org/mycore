@@ -50,7 +50,8 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="mods:mods">
+  <!-- make sure that only one mods:mods element is matched -->
+  <xsl:template match="mods:mods[. = ../../modsContainer[1]/mods:mods]">
     <xsl:for-each select="mods:titleInfo/descendant-or-self::*[text()]">
       <field name="mods.title">
         <xsl:value-of select="text()" />

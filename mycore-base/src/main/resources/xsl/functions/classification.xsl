@@ -5,7 +5,14 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:mcrclass="http://www.mycore.de/xslt/classification"
   exclude-result-prefixes="fn">
-  
+
+  <xsl:function name="mcrclass:category" as="element()?">
+    <xsl:param name="classid" as="xs:string" />
+    <xsl:param name="categid" as="xs:string" />
+    <xsl:sequence
+      select="document(concat('classification:metadata:0:children:',$classid,':',$categid))//category" />
+  </xsl:function>
+
   <xsl:function name="mcrclass:current-label" as="element()?">
     <xsl:param name="class" as="element()?" />
     <xsl:choose>

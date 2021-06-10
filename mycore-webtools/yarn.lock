@@ -70,6 +70,11 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
+"@types/node@8.0.5":
+  version "8.0.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.5.tgz#71ac2a2c33a4231dd2427f1b5a5b66ad2b185b5f"
+  integrity sha512-IsNpVyW4zlHwGhmgvo431KHiiLrTM4Exs5fbagWCt7Rl5IqBfN6BUdV4NW9Px+ItxtA9bsHJ+pFp4roZDe9/Sg==
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"

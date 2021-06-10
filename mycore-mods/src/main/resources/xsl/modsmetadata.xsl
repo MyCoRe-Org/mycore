@@ -948,6 +948,11 @@
         <xsl:value-of select="$dateIssued" />
         <xsl:text>)</xsl:text>
       </xsl:if>
+      <!-- Articlenumber -->
+      <xsl:if test="mods:part/mods:detail[@type='article_number']/mods:number">
+        <xsl:value-of
+          select="concat(i18n:translate('mir.articlenumber.short'),mods:part/mods:detail[@type='article_number']/mods:number)" />
+      </xsl:if>
       <!-- Pages -->
       <xsl:if test="mods:part/mods:extent[@unit='pages']">
         <xsl:text>, </xsl:text>
