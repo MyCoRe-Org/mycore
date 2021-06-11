@@ -7,7 +7,7 @@
     <version>45</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2020.06.2</version>
+  <version>2020.06.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
@@ -29,7 +29,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>v2020.06.2</tag>
+    <tag>2020.06.x</tag>
   </scm>
   <properties>
     <argLine />
