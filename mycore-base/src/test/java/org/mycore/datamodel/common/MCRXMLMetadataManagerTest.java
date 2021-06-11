@@ -44,7 +44,6 @@ import org.junit.Test;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
@@ -109,9 +108,8 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
 
     @Test
     public void delete() throws IOException {
-        MCRStoredMetadata metadata = getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
+        getStore().create(MyCoRe_document_00000001.id, MyCoRe_document_00000001.blob,
             MyCoRe_document_00000001.lastModified);
-        assertFalse(MyCoRe_document_00000001.id + " should not have been deleted", metadata.isDeleted());
         assertTrue(MyCoRe_document_00000001.id + " should exist", getStore().exists(MyCoRe_document_00000001.id));
         try {
             getStore().delete(MCR_document_00000001.id);

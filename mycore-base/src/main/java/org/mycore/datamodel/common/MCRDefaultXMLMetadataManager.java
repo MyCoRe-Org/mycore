@@ -367,13 +367,12 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return project + "_" + objectType;
     }
 
-    public MCRStoredMetadata create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
+    public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException {
         try {
             MCRStoredMetadata sm = getStore(mcrid, false).create(xml, mcrid.getNumberAsInteger());
             sm.setLastModified(lastModified);
             MCRConfigurationBase.systemModified();
-            return sm;
         } catch (Exception exc) {
             throw new MCRPersistenceException("Error while storing object: " + mcrid, exc);
         }
@@ -388,7 +387,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         }
     }
 
-    public MCRStoredMetadata update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
+    public void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException {
         if (!exists(mcrid)) {
             throw new MCRPersistenceException("Object to update does not exist: " + mcrid);
@@ -398,7 +397,6 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
             sm.update(xml);
             sm.setLastModified(lastModified);
             MCRConfigurationBase.systemModified();
-            return sm;
         } catch (Exception exc) {
             throw new MCRPersistenceException("Unable to update object " + mcrid, exc);
         }
