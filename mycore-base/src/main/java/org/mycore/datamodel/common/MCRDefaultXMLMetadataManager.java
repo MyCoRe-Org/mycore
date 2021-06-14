@@ -450,7 +450,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return vm.listVersions();
     }
 
-    public MCRVersionedMetadata getVersionedMetaData(MCRObjectID id) throws IOException {
+    private MCRVersionedMetadata getVersionedMetaData(MCRObjectID id) throws IOException {
         if (id == null) {
             return null;
         }

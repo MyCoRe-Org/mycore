@@ -44,7 +44,6 @@ import org.junit.Test;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.content.MCRByteContent;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
@@ -142,9 +141,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         getStore().create(MyCoRe_document_00000001.id,
             new MCRByteContent(MyCoRe_document_00000001.blob, MCR_document_00000001.lastModified.getTime()),
             MyCoRe_document_00000001.lastModified);
-        MCRVersionedMetadata data = getStore().getVersionedMetaData(MyCoRe_document_00000001.id);
-        assertFalse(data.isDeleted());
-        assertFalse(data.isDeletedInRepository());
+        assertTrue(getStore().exists(MyCoRe_document_00000001.id));
         Document doc = getStore().retrieveXML(MyCoRe_document_00000001.id);
         assertEquals("Stored document ID do not match:", MyCoRe_document_00000001.id.toString(), doc.getRootElement()
             .getAttributeValue("id"));

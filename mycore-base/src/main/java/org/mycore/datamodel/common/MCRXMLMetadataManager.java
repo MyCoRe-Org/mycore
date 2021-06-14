@@ -34,7 +34,6 @@ import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
@@ -167,18 +166,6 @@ public class MCRXMLMetadataManager {
      */
     public List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException {
         return IMPLEMENTATION.listRevisions(id);
-    }
-
-    /**
-     * Delegation, see linked method for relevant documentation.
-     *
-     * @param id
-     * @return
-     * @throws IOException
-     * @see MCRXMLMetadataManagerAdapter#getVersionedMetaData(MCRObjectID)
-     */
-    public MCRVersionedMetadata getVersionedMetaData(MCRObjectID id) throws IOException {
-        return IMPLEMENTATION.getVersionedMetaData(id);
     }
 
     /**

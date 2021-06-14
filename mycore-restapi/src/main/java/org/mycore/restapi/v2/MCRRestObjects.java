@@ -374,8 +374,7 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        List<MCRMetadataVersion> versions = MCRXMLMetadataManager.instance().getVersionedMetaData(id)
-            .listVersions();
+        List<MCRMetadataVersion> versions = MCRXMLMetadataManager.instance().listRevisions(id);
         return Response.ok()
             .entity(new GenericEntity<>(versions, TypeUtils.parameterize(List.class, MCRMetadataVersion.class)))
             .lastModified(lastModified)

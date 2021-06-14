@@ -28,7 +28,6 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -152,17 +151,6 @@ public interface MCRXMLMetadataManagerAdapter {
      *         store doesn't support versioning
      */
     List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException;
-
-    /**
-     * Attempts to retrieve a versioned metadata object for a given ID.
-     *
-     * @param id
-     *            the id of the object to be retrieved
-     * @return {@link MCRVersionedMetadata} object for the given ID, or null if the ID is null
-     *         or the store for the ID does not do versioning.
-     * @throws IOException
-     */
-    MCRVersionedMetadata getVersionedMetaData(MCRObjectID id) throws IOException;
 
     /**
      * This method returns the highest stored ID number for a given MCRObjectID
