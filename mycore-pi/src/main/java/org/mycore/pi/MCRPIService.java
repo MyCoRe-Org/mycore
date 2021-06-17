@@ -42,6 +42,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRGsonUTCDateAdapter;
 import org.mycore.common.MCRSessionMgr;
@@ -203,7 +204,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         String json = getGson().toJson(databaseEntry);
         obj.getService().addFlag(PI_FLAG, json);
     }
-
+    
     /**
      * Removes a flag from a {@link MCRObject}
      *
@@ -378,6 +379,21 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
             this.getServiceID(), provideRegisterDate(obj, additional), null);
         MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
         return databaseEntry;
+    }
+    
+    public static void updateFlagsInDatabase(MCRBase obj) {
+        Gson gson = MCRPIService.getGson();
+        obj.getService().getFlags(MCRPIService.PI_FLAG).stream()
+        .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
+        .filter(entry -> !MCRPIManager.getInstance().exist(entry))
+        .forEach(entry -> {
+            //TODO: disabled for MCR-1393
+            //                    entry.setMcrRevision(MCRCoreVersion.getRevision());
+            entry.setMcrVersion(MCRCoreVersion.getVersion());
+            entry.setMycoreID(obj.getId().toString());
+            LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
+            MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
+        });
     }
 
     public final String getType() {

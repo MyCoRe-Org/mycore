@@ -23,16 +23,11 @@ import java.util.function.BiConsumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
-
-import com.google.gson.Gson;
 
 public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
 
@@ -85,19 +80,7 @@ public class MCRPersistentIdentifierEventHandler extends MCREventHandlerBase {
                 pi.getType(),
                 pi.getService()));
 
-        Gson gson = MCRPIService.getGson();
-        obj.getService().getFlags(MCRPIService.PI_FLAG).stream()
-            .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
-            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
-            .forEach(entry -> {
-                //TODO: disabled for MCR-1393
-                //                    entry.setMcrRevision(MCRCoreVersion.getRevision());
-                entry.setMcrVersion(MCRCoreVersion.getVersion());
-                entry.setMycoreID(obj.getId().toString());
-                LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
-                MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
-            });
-
+        MCRPIService.updateFlagsInDatabase(obj);
         handleObjectUpdated(evt, obj);
     }
 
