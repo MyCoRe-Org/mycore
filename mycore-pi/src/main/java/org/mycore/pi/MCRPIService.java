@@ -204,7 +204,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         String json = getGson().toJson(databaseEntry);
         obj.getService().addFlag(PI_FLAG, json);
     }
-    
+
     /**
      * Removes a flag from a {@link MCRObject}
      *
