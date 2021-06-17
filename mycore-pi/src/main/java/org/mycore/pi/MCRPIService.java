@@ -388,7 +388,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         .filter(entry -> !MCRPIManager.getInstance().exist(entry))
         .forEach(entry -> {
             // disabled: Git does not provide a revision number as integer (see MCR-1393)
-            // entry.setMcrRevision(MCRCoreVersion.getRevision());
+            //           entry.setMcrRevision(MCRCoreVersion.getRevision());
             entry.setMcrVersion(MCRCoreVersion.getVersion());
             entry.setMycoreID(obj.getId().toString());
             LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
