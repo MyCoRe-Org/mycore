@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -38,8 +39,6 @@ import javax.persistence.criteria.Root;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.annotations.QueryHints;
-import org.hibernate.query.Query;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
@@ -63,9 +62,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryLink;
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
-    private static MCRHIBConnection HIB_CONNECTION_INSTANCE;
-
-    private static Logger LOGGER = LogManager.getLogger(MCRCategLinkServiceImpl.class);
+    private static Logger LOGGER = LogManager.getLogger();
 
     private static Class<MCRCategoryLinkImpl> LINK_CLASS = MCRCategoryLinkImpl.class;
 
@@ -76,10 +73,6 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         "MCRCategLinkService category cache");
 
     private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
-
-    public MCRCategLinkServiceImpl() {
-        HIB_CONNECTION_INSTANCE = MCRHIBConnection.instance();
-    }
 
     @Override
     public Map<MCRCategoryID, Number> countLinks(MCRCategory parent, boolean childrenOnly) {
@@ -103,18 +96,18 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
         //have to use rootID here if childrenOnly=false
         //old classification browser/editor could not determine links correctly otherwise
+        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         if (!childrenOnly) {
             parent = parent.getRoot();
         } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
-            parent = MCRCategoryDAOImpl.getByNaturalID(MCREntityManagerProvider.getCurrentEntityManager(),
-                parent.getId());
+            parent = MCRCategoryDAOImpl.getByNaturalID(em, parent.getId());
         }
         LOGGER.info("parentID:{}", parent.getId());
         String classID = parent.getId().getRootID();
-        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + queryName);
+        TypedQuery<Object[]> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + queryName, Object[].class);
         // query can take long time, please cache result
-        q.setCacheable(true);
-        q.setReadOnly(true);
+        setCacheable(q);
+        setReadOnly(q);
         q.setParameter("classID", classID);
         if (childrenOnly) {
             q.setParameter("parentID", ((MCRCategoryImpl) parent).getInternalID());
@@ -123,8 +116,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             q.setParameter("type", type);
         }
         // get object count for every category (not accumulated)
-        @SuppressWarnings("unchecked")
-        List<Object[]> result = (List<Object[]>) q.getResultList();
+        List<Object[]> result = q.getResultList();
         for (Object[] sr : result) {
             MCRCategoryID key = new MCRCategoryID(classID, sr[0].toString());
             Number value = (Number) sr[1];
@@ -135,7 +127,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @Override
     public void deleteLink(MCRCategLinkReference reference) {
-        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectID");
+        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "deleteByObjectID");
         q.setParameter("id", reference.getObjectID());
         q.setParameter("type", reference.getType());
         int deleted = q.executeUpdate();
@@ -172,35 +165,36 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategory(MCRCategoryID id) {
-        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategory");
-        q.setCacheable(true);
+        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<String> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategory", String.class);
+        setCacheable(q);
         q.setParameter("id", id);
-        q.setReadOnly(true);
-        return (Collection<String>) q.getResultList();
+        setReadOnly(q);
+        return q.getResultList();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
-        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategoryAndType");
-        q.setCacheable(true);
+        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<String> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "ObjectIDByCategoryAndType", String.class);
+        setCacheable(q);
         q.setParameter("id", id);
         q.setParameter("type", type);
-        q.setReadOnly(true);
-        return (Collection<String>) q.getResultList();
+        setReadOnly(q);
+        return q.getResultList();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Collection<MCRCategoryID> getLinksFromReference(MCRCategLinkReference reference) {
-        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "categoriesByObjectID");
-        q.setCacheable(true);
+        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRCategoryID> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "categoriesByObjectID",
+            MCRCategoryID.class);
+        setCacheable(q);
         q.setParameter("id", reference.getObjectID());
         q.setParameter("type", reference.getType());
-        q.setReadOnly(true);
-        return (Collection<MCRCategoryID>) q.getResultList();
+        setReadOnly(q);
+        return q.getResultList();
     }
 
     @Override
@@ -261,7 +255,6 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return boolMap;
     }
 
-    @SuppressWarnings("unchecked")
     private Map<MCRCategoryID, Boolean> hasLinksForClassifications() {
         HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<>() {
             private static final long serialVersionUID = 1L;
@@ -271,10 +264,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 return Optional.ofNullable(super.get(key)).orElse(Boolean.FALSE);
             }
         };
-        Query<?> linkedClassifications = MCRHIBConnection.instance()
-            .getNamedQuery(NAMED_QUERY_NAMESPACE + "linkedClassifications");
-        linkedClassifications.setReadOnly(true);
-        ((List<String>) linkedClassifications.getResultList()).stream().map(MCRCategoryID::rootID)
+        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<String> linkedClassifications = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "linkedClassifications",
+            String.class);
+        setReadOnly(linkedClassifications);
+        linkedClassifications.getResultList()
+            .stream().map(MCRCategoryID::rootID)
             .forEach(id -> boolMap.put(id, true));
         return boolMap;
     }
@@ -347,9 +342,10 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @Override
     public boolean isInCategory(MCRCategLinkReference reference, MCRCategoryID id) {
-        Query<?> q = HIB_CONNECTION_INSTANCE.getNamedQuery(NAMED_QUERY_NAMESPACE + "CategoryAndObjectID");
-        q.setCacheable(true);
-        q.setReadOnly(true);
+        final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        Query q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "CategoryAndObjectID");
+        setCacheable(q);
+        setReadOnly(q);
         q.setParameter("rootID", id.getRootID());
         q.setParameter("categID", id.getID());
         q.setParameter("objectID", reference.getObjectID());
@@ -385,6 +381,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         TypedQuery<MCRCategoryLink> q = em.createNamedQuery(NAMED_QUERY_NAMESPACE + "links", MCRCategoryLink.class);
         q.setParameter("type", type);
         return q.getResultList();
+    }
+
+    private static void setReadOnly(Query query) {
+        query.setHint("org.hibernate.readOnly", Boolean.TRUE);
+    }
+
+    private static void setCacheable(Query query) {
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
     }
 
 }

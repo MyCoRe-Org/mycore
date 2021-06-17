@@ -26,8 +26,8 @@ import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRStartupHandler;
 
 public class MCRJobQueueInitializer implements MCRStartupHandler.AutoExecutable {
@@ -46,7 +46,8 @@ public class MCRJobQueueInitializer implements MCRStartupHandler.AutoExecutable 
 
     @Override
     public void startUp(ServletContext servletContext) {
-        if (MCRHIBConnection.isEnabled()) {
+        if (MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
+            && MCREntityManagerProvider.getEntityManagerFactory() != null) {
             EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             TypedQuery<Object> query = em.createNamedQuery("mcrjob.classes", Object.class);
             List<Object> resultList = query.getResultList();

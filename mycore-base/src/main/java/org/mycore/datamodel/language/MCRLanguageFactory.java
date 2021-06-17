@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -156,7 +156,9 @@ public class MCRLanguageFactory {
      * should be read again.
      */
     private boolean classificationHasChanged() {
-        return MCRHIBConnection.isEnabled() && (classification != null)
+        //TODO: remove usage of MCREntityManagerProvider
+        return MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
+            && MCREntityManagerProvider.getEntityManagerFactory() != null && (classification != null)
             && (categoryDAO.getLastModified() > classificationLastRead);
     }
 
