@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
@@ -79,7 +80,8 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             permStr);
         if (hasAPIAccess) {
             String objId = "restapi:" + thePath;
-            if (acl.hasRule(objId, permStr)) {
+            boolean isRuleInterface = acl instanceof MCRRuleAccessInterface;
+            if (!isRuleInterface || ((MCRRuleAccessInterface) acl).hasRule(objId, permStr)) {
                 if (aclProvider.checkPermission(objId, permStr)) {
                     return;
                 }

@@ -39,6 +39,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.input.sax.XMLReaders;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
@@ -206,11 +207,15 @@ public class MCRMODSCommands extends MCRAbstractCommands {
     protected static void setDefaultPermissions(MCRObjectID derivateID) {
         if (MCRConfiguration2.getBoolean("MCR.Access.AddDerivateDefaultRule").orElse(true)) {
             MCRAccessInterface ai = MCRAccessManager.getAccessImpl();
-            Collection<String> configuredPermissions = ai.getAccessPermissionsFromConfiguration();
-            for (String permission : configuredPermissions) {
-                MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
-                    "default derivate rule");
+            if (ai instanceof MCRRuleAccessInterface) {
+                Collection<String> configuredPermissions = ((MCRRuleAccessInterface) ai)
+                    .getAccessPermissionsFromConfiguration();
+                for (String permission : configuredPermissions) {
+                    MCRAccessManager.addRule(derivateID, permission, MCRAccessManager.getTrueRule(),
+                        "default derivate rule");
+                }
             }
+
         }
     }
 }

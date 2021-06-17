@@ -902,10 +902,10 @@ public final class MCRURIResolver implements URIResolver {
                     // one pool Element under access per defined AccessRule in
                     // Pool
                     // for (Object-)ID
-                    addRule(container, permission, MCRAccessManager.getAccessImpl().getRule(objId, permission));
+                    addRule(container, permission, MCRAccessManager.requireRulesInterface().getRule(objId, permission));
                 }
             } else {
-                addRule(container, action, MCRAccessManager.getAccessImpl().getRule(objId, action));
+                addRule(container, action, MCRAccessManager.requireRulesInterface().getRule(objId, action));
             }
 
             return new JDOMSource(container);

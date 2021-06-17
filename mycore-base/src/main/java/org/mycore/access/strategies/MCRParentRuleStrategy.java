@@ -28,6 +28,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
@@ -55,8 +56,9 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
      */
     public boolean checkPermission(String id, String permission) {
         String currentID;
-        for (currentID = id; currentID != null
-            && !MCRAccessManager.getAccessImpl().hasRule(currentID, permission); currentID = getParentID(currentID)) {
+        MCRRuleAccessInterface mcrRuleAccessInterface = MCRAccessManager.requireRulesInterface();
+        for (currentID = id; currentID != null && !mcrRuleAccessInterface.hasRule(currentID, permission);
+             currentID = getParentID(currentID)) {
             LOGGER.debug("No access rule specified for: {}. Trying to use parent ID.", currentID);
         }
         LOGGER.debug("Using access rule defined for: {}", currentID);

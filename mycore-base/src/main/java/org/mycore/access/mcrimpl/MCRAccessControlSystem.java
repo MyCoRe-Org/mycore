@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.mycore.access.MCRAccessBaseImpl;
-import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -83,7 +83,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     private static HashMap<String, Integer> nextFreeRuleID;
 
     // extended methods
-    public static synchronized MCRAccessInterface instance() {
+    public static synchronized MCRRuleAccessInterface instance() {
         if (singleton == null) {
             singleton = new MCRAccessControlSystem();
         }
@@ -155,11 +155,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         updateRule(POOL_PRIVILEGE_ID, permission, rule, description);
     }
 
-    @Override
-    @Deprecated
-    public boolean checkPermission(String id, String permission, String userID) {
-        return checkAccess(id, permission, userID, null);
-    }
 
     @Override
     public boolean checkPermission(String id, String permission, MCRUserInformation userInfo) {
