@@ -297,14 +297,14 @@ public class MCRPURLManager {
             response = conn.getResponseCode();
 
             if (response != 200 || conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
-                    StandardCharsets.UTF_8));
-                String line = null;
-                LOGGER.error(conn.getRequestMethod() + conn.getURL() + " -> " + conn.getResponseCode());
-                while ((line = rd.readLine()) != null) {
-                    LOGGER.error(line);
+                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
+                    StandardCharsets.UTF_8))) {
+                    String line = null;
+                    LOGGER.error(conn.getRequestMethod() + conn.getURL() + " -> " + conn.getResponseCode());
+                    while ((line = rd.readLine()) != null) {
+                        LOGGER.error(line);
+                    }
                 }
-                rd.close();
             }
         } catch (Exception e) {
             LOGGER.error(e);
