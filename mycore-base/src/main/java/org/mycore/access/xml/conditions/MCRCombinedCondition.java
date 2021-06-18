@@ -18,7 +18,7 @@
 package org.mycore.access.xml.conditions;
 
 import org.jdom2.Element;
-import org.mycore.access.xml.MCRConditionFactory;
+import org.mycore.access.xml.MCRConditionHelper;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +38,7 @@ public abstract class MCRCombinedCondition implements MCRCondition, MCRDebuggabl
     public void parse(Element xml) {
         boundElement = xml;
         for (Element child : xml.getChildren()) {
-            conditions.add(MCRConditionFactory.parse(child));
+            conditions.add(MCRConditionHelper.parse(child));
         }
     }
 
@@ -56,12 +56,10 @@ public abstract class MCRCombinedCondition implements MCRCondition, MCRDebuggabl
     }
 
     protected void setChildElementMatching(MCRCondition c, boolean matches) {
-        if (isDebug()) {
-            if (c instanceof MCRDebuggableCondition) {
-                Element el = ((MCRDebuggableCondition) c).getBoundElement();
-                if (el != null) {
-                    el.setAttribute("matches", Boolean.toString(matches));
-                }
+        if (isDebug() && c instanceof MCRDebuggableCondition) {
+            Element el = ((MCRDebuggableCondition) c).getBoundElement();
+            if (el != null) {
+                el.setAttribute("matches", Boolean.toString(matches));
             }
         }
     }

@@ -27,15 +27,6 @@ public class MCRSimpleCondition implements MCRCondition, MCRDebuggableCondition 
     public String value = UNDEFINED;
 
     protected String type;
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     private Element boundElement = null;
 
     @Override
@@ -50,6 +41,14 @@ public class MCRSimpleCondition implements MCRCondition, MCRDebuggableCondition 
 
     public void setCurrentValue(MCRFacts facts) {
         this.value = UNDEFINED;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public boolean matches(MCRFacts facts) {
@@ -76,7 +75,6 @@ public class MCRSimpleCondition implements MCRCondition, MCRDebuggableCondition 
     public String toString() {
         return type + "=" + value;
     }
-
 
     @Override
     public Element getBoundElement() {

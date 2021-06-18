@@ -41,7 +41,7 @@ public class MCRFacts {
         if (osc.isPresent()) {
             return osc.get();
         } else {
-            MCRSimpleCondition sc = (MCRSimpleCondition) (MCRConditionFactory.build(type));
+            MCRSimpleCondition sc = (MCRSimpleCondition) (MCRConditionHelper.build(type));
             sc.setCurrentValue(this);
             facts.add(sc);
             return sc;

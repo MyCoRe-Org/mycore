@@ -50,16 +50,9 @@ public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStr
 
     private Map<String, String> properties;
 
-    private MCRAccessCheckStrategy fallbackStrategy = null;
-
-    public MCRXMLAccessSystem() {
-    }
-
     @MCRPostConstruction
     public void init(String property) {
         rules = this.buildRulesFromXML();
-        Optional<MCRAccessCheckStrategy> fallback = MCRConfiguration2.getInstanceOf(property + ".FallbackStrategy");
-        fallback.ifPresent(strategy -> fallbackStrategy = strategy);
     }
 
     @MCRProperty(name = "rulesURI", required = false)
@@ -79,7 +72,7 @@ public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStr
     private MCRCondition buildRulesFromXML() {
         Element eRules = MCRURIResolver.instance().resolve(rulesURI);
         Objects.requireNonNull(eRules, "The rulesURI " + rulesURI + " resolved to null!");
-        return MCRConditionFactory.parse(eRules);
+        return MCRConditionHelper.parse(eRules);
     }
 
     @Override
@@ -93,41 +86,42 @@ public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStr
     }
 
     @Override
-    public boolean checkPermission(String id, String permission, MCRUserInformation userInfo) {
+    public boolean checkPermission(final String checkID, String permission, MCRUserInformation userInfo) {
         String action = permission.replaceAll("db$", ""); // writedb -> write
 
         String target; // metadata|files|webpage
         String cacheKey;
 
         MCRFacts facts = new MCRFacts();
+        String id = checkID;
 
-        if(id==null ){
+        if(checkID==null ){
             cacheKey = action;
         } else{
-            if (MCRObjectID.isValid(id)) {
-                MCRObjectID oid = MCRObjectID.getInstance(id);
+            if (MCRObjectID.isValid(checkID)) {
+                MCRObjectID oid = MCRObjectID.getInstance(checkID);
                 target = "metadata";
 
                 if ("derivate".equals(oid.getTypeId())) {
-                    facts.add(MCRConditionFactory.build("derivateid", id));
+                    facts.add(MCRConditionHelper.build("derivateid", checkID));
                     target = "files";
                     MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(oid);
                     id = deriv.getOwnerID().toString();
                 }
-            } else if (id.startsWith("webpage")) {
+            } else if (checkID.startsWith("webpage")) {
                 target = "webpage";
-            } else if (id.startsWith("solr")){
+            } else if (checkID.startsWith("solr")){
                 target = "solr";
             } else {
                 target = "unknown";
             }
             cacheKey = action + " " + id + " " + target;
-            facts.add(MCRConditionFactory.build("id", id));
-            facts.add(MCRConditionFactory.build("target", target));
+            facts.add(MCRConditionHelper.build("id", id));
+            facts.add(MCRConditionHelper.build("target", target));
         }
 
         LOGGER.debug("Testing {} ", cacheKey);
-        facts.add(MCRConditionFactory.build("action", action));
+        facts.add(MCRConditionHelper.build("action", action));
 
 
 

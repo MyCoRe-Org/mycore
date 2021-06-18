@@ -27,7 +27,7 @@ import org.mycore.common.config.MCRConfigurationException;
 
 import java.util.Optional;
 
-public class MCRConditionFactory {
+public class MCRConditionHelper {
 
     public static final String CONDITION_PREFIX = "MCR.Access.XML.";
 

@@ -18,7 +18,7 @@
 package org.mycore.access.xml.conditions;
 
 import org.jdom2.Element;
-import org.mycore.access.xml.MCRConditionFactory;
+import org.mycore.access.xml.MCRConditionHelper;
 import org.mycore.access.xml.MCRFacts;
 
 public class MCRNotCondition implements MCRCondition, MCRDebuggableCondition {
@@ -55,7 +55,7 @@ public class MCRNotCondition implements MCRCondition, MCRDebuggableCondition {
 
     public void parse(Element xml) {
         this.boundElement = xml;
-        negatedCondition = MCRConditionFactory.parse(xml.getChildren().get(0));
+        negatedCondition = MCRConditionHelper.parse(xml.getChildren().get(0));
     }
 
     @Override
