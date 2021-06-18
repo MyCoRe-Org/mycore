@@ -28,7 +28,6 @@ import org.mycore.access.xml.conditions.MCRCondition;
 import org.mycore.access.xml.conditions.MCRDebuggableCondition;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.xml.MCRURIResolver;
@@ -38,7 +37,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStrategy {
 
