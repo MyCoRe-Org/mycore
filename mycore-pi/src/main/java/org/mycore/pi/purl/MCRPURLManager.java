@@ -102,7 +102,11 @@ public class MCRPURLManager {
             try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
                 wr.write(data);
                 wr.flush();
-                LOGGER.error(url + " -> " + conn.getResponseCode());
+                if (conn.getResponseCode() == 200) {
+                    LOGGER.info(conn.getRequestMethod() + conn.getURL() + " -> " + conn.getResponseCode());
+                } else {
+                    LOGGER.error(conn.getRequestMethod() + conn.getURL() + " -> " + conn.getResponseCode());
+                }
 
                 // Get the response
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(),
@@ -137,6 +141,7 @@ public class MCRPURLManager {
      */
     public void logout() {
         HttpURLConnection conn = null;
+        int responseCode = -1;
         try {
             URL url = new URL(purlServerBaseURL + ADMIN_PATH + "/logout?referrer=/docs/index.html");
             conn = (HttpURLConnection) url.openConnection();
@@ -147,10 +152,12 @@ public class MCRPURLManager {
             try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
                 wr.flush();
             }
-            LOGGER.debug(url + " -> " + conn.getResponseCode());
+            responseCode = conn.getResponseCode();
+            LOGGER.debug(conn.getRequestMethod() + conn.getURL() + " -> " + responseCode);
         } catch (IOException e) {
             if (!e.getMessage().contains(
                 "Server returned HTTP response code: 403 for URL: ")) {
+                LOGGER.error(conn.getRequestMethod() + conn.getURL() + " -> " + responseCode);
                 LOGGER.error(e);
             }
         } finally {
@@ -206,6 +213,7 @@ public class MCRPURLManager {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
                     StandardCharsets.UTF_8))) {
                     String line;
+                    LOGGER.error(conn.getRequestMethod() + conn.getURL() + " -> " + conn.getResponseCode());
                     while ((line = rd.readLine()) != null) {
                         LOGGER.error(line);
                     }
@@ -254,6 +262,7 @@ public class MCRPURLManager {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
                     StandardCharsets.UTF_8))) {
                     String line = null;
+                    LOGGER.error(conn.getRequestMethod() + conn.getURL() + " -> " + conn.getResponseCode());
                     while ((line = rd.readLine()) != null) {
                         LOGGER.error(line);
                     }
@@ -291,6 +300,7 @@ public class MCRPURLManager {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
                     StandardCharsets.UTF_8));
                 String line = null;
+                LOGGER.error(conn.getRequestMethod() + conn.getURL() + " -> " + conn.getResponseCode());
                 while ((line = rd.readLine()) != null) {
                     LOGGER.error(line);
                 }
