@@ -64,7 +64,7 @@ public class MCRAbstractMODSMetadataService
 
         if (identifierElement != null) {
             throw new MCRPersistentIdentifierException(
-                type + "with prefix " + getProperties().get(PREFIX_PROPERTY_KEY) + " already exist!");
+                type + " with prefix " + getProperties().get(PREFIX_PROPERTY_KEY) + " already exist!");
         }
 
         identifierElement = new Element("identifier", MCRConstants.MODS_NAMESPACE);
