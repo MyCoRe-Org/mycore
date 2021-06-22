@@ -343,4 +343,70 @@ public class MCRPURLManager {
         }
         return false;
     }
+    
+    /**
+     * return the PURL metadata
+     *
+     * @param purl      - the purl
+     * @return an XML document containing the metadata of the PURL
+     *        or null if the PURL does not exist
+     */
+    public Document retrievePURLMetadata(String purl, String targetURL) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
+            conn = (HttpURLConnection) url.openConnection();
+            int response = conn.getResponseCode();
+
+            if (response == 200) {
+
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                DocumentBuilder db = dbf.newDocumentBuilder();
+
+                return db.parse(conn.getInputStream());
+                /* <purl status="1">
+                 *   <id>/test/rosdok/ppn750527188</id> 
+                 *   <type>302</type>
+                 *   <maintainers>
+                 *     <uid>rosdok</uid>
+                 *     <uid>test</uid>
+                 *   </maintainers>
+                 *   <target>
+                 *     <url>http://localhost:8080/rosdok/resolve/id/rosdok_document_0000000259</url>
+                 *   </target> 
+                 * </purl>
+                 */
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * check if a PURL exists
+     *
+     * @param purl      - the purl
+     * @return true, if the given PURL is known
+     */
+    public boolean existsPURL(String purl) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
+            conn = (HttpURLConnection) url.openConnection();
+            int response = conn.getResponseCode();
+            return response == 200;
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return false;
+    }
 }
