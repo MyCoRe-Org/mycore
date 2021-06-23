@@ -1,0 +1,73 @@
+name: test
+
+on: [ push, pull_request ]
+
+env:
+  MAVEN_OPTS: -Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled
+  GECKODRIVER_VERSION: 0.27.0
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: 11
+        distribution: adopt
+
+    - name: Fetch Geckodriver cache
+      id: geckodriver-cache
+      uses: actions/cache@v2
+      with:
+        path: ~/geckodriver
+        key: ${{ env.GECKODRIVER_VERSION }}
+
+    - name: Fetch Geckodriver
+      if: steps.geckodriver-cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir ~/geckodriver
+        curl -L https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz | \
+          tar -C ~/geckodriver/ -xzvf-
+
+    - name: Set up test dependencies
+      run: |
+        # PPA by Mozilla for ESR releases
+        sudo add-apt-repository ppa:mozillateam/ppa
+
+        sudo apt update
+        sudo apt install firefox-esr chromium-browser chromium-chromedriver dbus-x11
+
+        # Selenium wants to run non-ESR FF
+        sudo rm -rf /usr/lib/firefox/
+        sudo ln -s firefox-esr /usr/lib/firefox
+        sudo ln -s firefox-esr /usr/lib/firefox/firefox
+        firefox --version
+
+        ~/geckodriver/geckodriver --version
+        echo "${HOME}/geckodriver" >> $GITHUB_PATH
+
+    - name: Restore Maven cache
+      uses: skjolber/maven-cache-github-action@v1
+      with:
+        step: restore
+
+    - name: Build
+      run: |
+        export $(dbus-launch)
+        mkdir ~/tmp
+        export TMPDIR=~/tmp
+        export FIREFOX_BIN=$(which firefox-esr)
+        export SELENIUM_BROWSER=firefox
+
+        mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
+        mvn -P!standard-with-extra-repos -B javadoc:javadoc
+
+    - name: Save Maven cache
+      uses: skjolber/maven-cache-github-action@v1
+      with:
+        step: save
