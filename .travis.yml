@@ -1,3 +1,8 @@
+arch: arm64
+os: linux
+dist: focal
+# RS above for testing Travis Partner Queues
+
 language: java
 dist: bionic
 jdk:
