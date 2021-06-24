@@ -74,7 +74,7 @@ public class MCRAbstractMODSMetadataService
         wrapper.addElement(identifierElement);
     }
 
-    private MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {
+    protected MCRObject checkObject(MCRBase base) throws MCRPersistentIdentifierException {
         if (!(base instanceof MCRObject)) {
             throw new MCRPersistentIdentifierException(getClass().getName() + " does only support MyCoReObjects!");
         }
@@ -109,7 +109,7 @@ public class MCRAbstractMODSMetadataService
         return getProperties().get("Type");
     }
 
-    private String getXPath() {
+    protected String getXPath() {
         final String prefixCondition;
 
         if (getProperties().containsKey(PREFIX_PROPERTY_KEY)) {
