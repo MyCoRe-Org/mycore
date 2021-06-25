@@ -62,10 +62,15 @@ public class MCRPURLService extends MCRPIService<MCRPURL> {
         LOGGER.info("TODO: Register PURL at PURL-Server!");
 
         doWithPURLManager(
-            manager -> manager
-                .registerNewPURL(purl.getUrl().getPath(), buildTargetURL(obj), "302", getProperties().getOrDefault(
-                    PURL_MAINTAINER_CONFIG, "test")));
-
+            manager -> {
+                if (!manager.existsPURL(purl.getUrl().getPath())) {
+                    manager.registerNewPURL(purl.getUrl().getPath(), buildTargetURL(obj), "302",
+                        getProperties().getOrDefault(PURL_MAINTAINER_CONFIG, "test"));
+                } else {
+                    manager.updateExistingPURL(purl.getUrl().getPath(), buildTargetURL(obj), "302",
+                        getProperties().getOrDefault(PURL_MAINTAINER_CONFIG, "test"));
+                }
+            });
     }
 
     protected String buildTargetURL(MCRBase obj) {

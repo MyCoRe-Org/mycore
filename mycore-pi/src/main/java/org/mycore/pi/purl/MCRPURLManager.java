@@ -102,7 +102,11 @@ public class MCRPURLManager {
             try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
                 wr.write(data);
                 wr.flush();
-                LOGGER.error(url + " -> " + conn.getResponseCode());
+                if (conn.getResponseCode() == 200) {
+                    LOGGER.info(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
+                } else {
+                    LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
+                }
 
                 // Get the response
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(),
@@ -137,6 +141,7 @@ public class MCRPURLManager {
      */
     public void logout() {
         HttpURLConnection conn = null;
+        int responseCode = -1;
         try {
             URL url = new URL(purlServerBaseURL + ADMIN_PATH + "/logout?referrer=/docs/index.html");
             conn = (HttpURLConnection) url.openConnection();
@@ -147,11 +152,12 @@ public class MCRPURLManager {
             try (OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8)) {
                 wr.flush();
             }
-            LOGGER.debug(url + " -> " + conn.getResponseCode());
+            responseCode = conn.getResponseCode();
+            LOGGER.debug(conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode);
         } catch (IOException e) {
             if (!e.getMessage().contains(
                 "Server returned HTTP response code: 403 for URL: ")) {
-                LOGGER.error(e);
+                LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + responseCode, e);
             }
         } finally {
             if (conn != null) {
@@ -206,6 +212,7 @@ public class MCRPURLManager {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
                     StandardCharsets.UTF_8))) {
                     String line;
+                    LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
                     while ((line = rd.readLine()) != null) {
                         LOGGER.error(line);
                     }
@@ -254,6 +261,7 @@ public class MCRPURLManager {
                 try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
                     StandardCharsets.UTF_8))) {
                     String line = null;
+                    LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
                     while ((line = rd.readLine()) != null) {
                         LOGGER.error(line);
                     }
@@ -288,13 +296,14 @@ public class MCRPURLManager {
             response = conn.getResponseCode();
 
             if (response != 200 || conn.getErrorStream() != null && LOGGER.isErrorEnabled()) {
-                BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
-                    StandardCharsets.UTF_8));
-                String line = null;
-                while ((line = rd.readLine()) != null) {
-                    LOGGER.error(line);
+                try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getErrorStream(),
+                    StandardCharsets.UTF_8))) {
+                    String line = null;
+                    LOGGER.error(conn.getRequestMethod() + " " + conn.getURL() + " -> " + conn.getResponseCode());
+                    while ((line = rd.readLine()) != null) {
+                        LOGGER.error(line);
+                    }
                 }
-                rd.close();
             }
         } catch (Exception e) {
             LOGGER.error(e);
@@ -334,6 +343,72 @@ public class MCRPURLManager {
                 Element eTargetUrl = (Element) eTarget.getElementsByTagName("url").item(0);
                 return targetURL.equals(eTargetUrl.getTextContent().trim());
             }
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * return the PURL metadata
+     *
+     * @param purl      - the purl
+     * @return an XML document containing the metadata of the PURL
+     *        or null if the PURL does not exist
+     */
+    public Document retrievePURLMetadata(String purl, String targetURL) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
+            conn = (HttpURLConnection) url.openConnection();
+            int response = conn.getResponseCode();
+
+            if (response == 200) {
+
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                DocumentBuilder db = dbf.newDocumentBuilder();
+
+                return db.parse(conn.getInputStream());
+                /* <purl status="1">
+                 *   <id>/test/rosdok/ppn750527188</id> 
+                 *   <type>302</type>
+                 *   <maintainers>
+                 *     <uid>rosdok</uid>
+                 *     <uid>test</uid>
+                 *   </maintainers>
+                 *   <target>
+                 *     <url>http://localhost:8080/rosdok/resolve/id/rosdok_document_0000000259</url>
+                 *   </target> 
+                 * </purl>
+                 */
+            }
+        } catch (Exception e) {
+            LOGGER.error(e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * check if a PURL exists
+     *
+     * @param purl      - the purl
+     * @return true, if the given PURL is known
+     */
+    public boolean existsPURL(String purl) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(purlServerBaseURL + PURL_PATH + purl);
+            conn = (HttpURLConnection) url.openConnection();
+            int response = conn.getResponseCode();
+            return response == 200;
         } catch (Exception e) {
             LOGGER.error(e);
         } finally {
