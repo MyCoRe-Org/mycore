@@ -45,6 +45,7 @@ import org.apache.commons.io.IOUtils;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRStaticContent;
@@ -105,11 +106,11 @@ public class MCREpubZipResource {
                 e);
         } finally { // releases the session reliable
             try {
-                if (session != null && session.isTransactionActive()) {
-                    if (session.transactionRequiresRollback()) {
-                        session.rollbackTransaction();
+                if (session != null && MCRTransactionHelper.isTransactionActive()) {
+                    if (MCRTransactionHelper.transactionRequiresRollback()) {
+                        MCRTransactionHelper.rollbackTransaction();
                     } else {
-                        session.commitTransaction();
+                        MCRTransactionHelper.commitTransaction();
                     }
                 }
             } finally {

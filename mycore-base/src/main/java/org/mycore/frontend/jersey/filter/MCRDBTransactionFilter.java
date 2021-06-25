@@ -25,22 +25,24 @@ import javax.ws.rs.container.ContainerResponseFilter;
 
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 
 public class MCRDBTransactionFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        if (session.transactionRequiresRollback()) {
-            session.rollbackTransaction();
+        if (MCRTransactionHelper.transactionRequiresRollback()) {
+            MCRTransactionHelper.rollbackTransaction();
         } else {
-            session.commitTransaction();
+            MCRTransactionHelper.commitTransaction();
         }
     }
 
     @Override
     public void filter(ContainerRequestContext request) {
-        MCRSessionMgr.getCurrentSession().beginTransaction();
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionHelper.beginTransaction();
     }
 
 }

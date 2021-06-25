@@ -60,7 +60,8 @@ public class MCRIFSCopyTest extends MCRIFSTest {
     public void async() throws Exception {
         // create derivate
         create();
-        MCRSessionMgr.getCurrentSession().commitTransaction();
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionHelper.commitTransaction();
 
         // execute threads
         MCRSystemUserInformation systemUser = MCRSystemUserInformation.getSystemUserInstance();

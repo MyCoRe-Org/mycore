@@ -74,6 +74,7 @@ import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.util.MCRRestContentHelper;
@@ -148,13 +149,13 @@ public class MCRRestDerivateContents {
     private static void doWithinTransaction(IOOperation op) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         try {
-            mcrSession.beginTransaction();
+            MCRTransactionHelper.beginTransaction();
             op.run();
         } finally {
-            if (mcrSession.transactionRequiresRollback()) {
-                mcrSession.rollbackTransaction();
+            if (MCRTransactionHelper.transactionRequiresRollback()) {
+                MCRTransactionHelper.rollbackTransaction();
             } else {
-                mcrSession.commitTransaction();
+                MCRTransactionHelper.commitTransaction();
             }
         }
     }

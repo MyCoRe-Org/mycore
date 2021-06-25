@@ -33,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 
 @Priority(Priorities.USER + 1)
 /**
@@ -51,8 +52,8 @@ public class MCRDropSessionFilter implements ContainerRequestFilter {
         LogManager.getLogger().info("Has Session? {}", MCRSessionMgr.hasCurrentSession());
         if (MCRSessionMgr.hasCurrentSession()) {
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-            if (currentSession.isTransactionActive()) {
-                currentSession.commitTransaction();
+            if (MCRTransactionHelper.isTransactionActive()) {
+                MCRTransactionHelper.commitTransaction();
             }
             MCRSessionMgr.releaseCurrentSession();
             currentSession.close();

@@ -33,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.frontend.servlets.MCRServlet;
 
 /**
@@ -90,7 +91,7 @@ public class MCRPersistenceServletFilter implements Filter {
         //get session for DB access
         MCRSession session = MCRServlet.getSession(req);
         MCRSessionMgr.setCurrentSession(session);
-        session.beginTransaction();
+        MCRTransactionHelper.beginTransaction();
         try {
             String url;
             String mcrId = MCRServlet.getProperty(req, "id");
@@ -103,7 +104,7 @@ public class MCRPersistenceServletFilter implements Filter {
             LOGGER.info("Matched URL: {}", url);
             return url;
         } finally {
-            session.commitTransaction();
+            MCRTransactionHelper.commitTransaction();
             MCRSessionMgr.releaseCurrentSession();
         }
     }

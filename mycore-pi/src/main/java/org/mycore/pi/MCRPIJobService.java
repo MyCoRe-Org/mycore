@@ -31,6 +31,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -255,15 +256,15 @@ public abstract class MCRPIJobService<T extends MCRPersistentIdentifier>
             session.setUserInformation(MCRSystemUserInformation.getJanitorInstance());
         }
 
-        boolean transactionActive = !session.isTransactionActive();
+        boolean transactionActive = !MCRTransactionHelper.isTransactionActive();
         try {
             if (transactionActive) {
-                session.beginTransaction();
+                MCRTransactionHelper.beginTransaction();
             }
             task.run();
         } finally {
-            if (transactionActive && session.isTransactionActive()) {
-                session.commitTransaction();
+            if (transactionActive && MCRTransactionHelper.isTransactionActive()) {
+                MCRTransactionHelper.commitTransaction();
             }
 
             if (jobUserPresent) {

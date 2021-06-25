@@ -55,6 +55,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationDirSetup;
@@ -234,7 +235,8 @@ public class MCRServlet extends HttpServlet {
         // store the HttpSession ID in MCRSession
         if (session.put("http.session", theSession.getId()) == null) {
             //first request
-            session.beginTransaction(); //for MCRTranslation.getAvailableLanguages()
+            //for MCRTranslation.getAvailableLanguages()
+            MCRTransactionHelper.beginTransaction();
             try {
                 String acceptLanguage = req.getHeader("Accept-Language");
                 if (acceptLanguage != null) {
@@ -249,10 +251,10 @@ public class MCRServlet extends HttpServlet {
                         });
                 }
             } finally {
-                if (session.transactionRequiresRollback()) {
-                    session.rollbackTransaction();
+                if (MCRTransactionHelper.transactionRequiresRollback()) {
+                    MCRTransactionHelper.rollbackTransaction();
                 }
-                session.commitTransaction();
+                MCRTransactionHelper.commitTransaction();
             }
         }
         // Forward MCRSessionID to XSL Stylesheets
@@ -308,13 +310,13 @@ public class MCRServlet extends HttpServlet {
         } catch (Error error) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                session.rollbackTransaction();
+                MCRTransactionHelper.rollbackTransaction();
             }
             throw error;
         } catch (Exception ex) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                session.rollbackTransaction();
+                MCRTransactionHelper.rollbackTransaction();
             }
             if (isBrokenPipe(ex)) {
                 LOGGER.info("Ignore broken pipe.");
@@ -413,19 +415,19 @@ public class MCRServlet extends HttpServlet {
         try {
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                session.beginTransaction();
+                MCRTransactionHelper.beginTransaction();
             }
             configureSession(job);
             think(job);
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                session.commitTransaction();
+                MCRTransactionHelper.commitTransaction();
             }
         } catch (Exception ex) {
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 LOGGER.warn("Exception occurred, performing database rollback.");
-                session.rollbackTransaction();
+                MCRTransactionHelper.rollbackTransaction();
             } else {
                 LOGGER.warn("Exception occurred, cannot rollback database transaction right now.");
             }
@@ -451,12 +453,12 @@ public class MCRServlet extends HttpServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
             // current Servlet not called via RequestDispatcher
-            session.beginTransaction();
+            MCRTransactionHelper.beginTransaction();
         }
         render(job, thinkException);
         if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
             // current Servlet not called via RequestDispatcher
-            session.commitTransaction();
+            MCRTransactionHelper.commitTransaction();
         }
     }
 

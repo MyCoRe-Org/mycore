@@ -46,6 +46,7 @@ import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCRStartupHandler;
@@ -183,9 +184,9 @@ public class MCRCommandLineInterface {
         MCRSessionMgr.setCurrentSession(session);
 
         try {
-            session.beginTransaction();
+            MCRTransactionHelper.beginTransaction();
             List<String> commandsReturned = knownCommands.invokeCommand(expandCommand(command));
-            session.commitTransaction();
+            MCRTransactionHelper.commitTransaction();
             addCommandsToQueue(commandsReturned);
         } catch (Exception ex) {
             MCRCLIExceptionHandler.handleException(ex);
@@ -224,9 +225,9 @@ public class MCRCommandLineInterface {
     private static void rollbackTransaction(MCRSession session) {
         output("Command failed. Performing transaction rollback...");
 
-        if (session.isTransactionActive()) {
+        if (MCRTransactionHelper.isTransactionActive()) {
             try {
-                session.rollbackTransaction();
+                MCRTransactionHelper.rollbackTransaction();
             } catch (Exception ex2) {
                 MCRCLIExceptionHandler.handleException(ex2);
             }
