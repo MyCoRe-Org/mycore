@@ -38,6 +38,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRSeekableChannelContent;
 
@@ -310,7 +311,8 @@ final class ContentUtils {
      * Called before sending data to end hibernate transaction.
      */
     static void endCurrentTransaction() {
-        MCRSessionMgr.getCurrentSession().commitTransaction();
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionHelper.commitTransaction();
     }
 
     /**

@@ -41,6 +41,7 @@ import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -107,7 +108,8 @@ public class MCRSwordMediaHandler implements MCRSwordLifecycle, MCRSwordUtil.MCR
             resultRessource = MCRSwordUtil.getZippedDerivateMediaResource(derivateID);
         }
 
-        MCRSessionMgr.getCurrentSession().commitTransaction();
+        MCRSessionMgr.getCurrentSession();
+        MCRTransactionHelper.commitTransaction();
         return resultRessource;
     }
 

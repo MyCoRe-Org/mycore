@@ -49,6 +49,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRXMLFunctions;
 import org.mycore.datamodel.common.MCRLinkTableManager;
@@ -345,9 +346,9 @@ public class MCRIFS2Commands {
         long oldSize = 0;
         boolean foundEntry = false;
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        boolean transactionActive = mcrSession.isTransactionActive();
+        boolean transactionActive = MCRTransactionHelper.isTransactionActive();
         if (!transactionActive) {
-            mcrSession.beginTransaction();
+            MCRTransactionHelper.beginTransaction();
         }
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         try {
@@ -438,10 +439,10 @@ public class MCRIFS2Commands {
             mcrfsnodes.setFctid(fctid);
             mcrfsnodes.setMd5(md5);
             em.merge(mcrfsnodes);
-            mcrSession.commitTransaction();
+            MCRTransactionHelper.commitTransaction();
             LOGGER.debug("Entry {} fixed.", node.getFileName());
         } catch (PersistenceException pe) {
-            mcrSession.rollbackTransaction();
+            MCRTransactionHelper.rollbackTransaction();
             pe.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();

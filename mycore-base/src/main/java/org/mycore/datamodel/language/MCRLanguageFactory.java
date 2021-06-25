@@ -29,6 +29,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -229,10 +230,10 @@ public class MCRLanguageFactory {
      */
     private void readLanguageClassification() {
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        if (!session.isTransactionActive()) {
-            session.beginTransaction();
+        if (!MCRTransactionHelper.isTransactionActive()) {
+            MCRTransactionHelper.beginTransaction();
             buildLanguagesFromClassification();
-            session.commitTransaction();
+            MCRTransactionHelper.commitTransaction();
         } else {
             buildLanguagesFromClassification();
         }

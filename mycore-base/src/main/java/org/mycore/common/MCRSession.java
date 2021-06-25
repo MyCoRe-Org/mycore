@@ -35,7 +35,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -45,7 +44,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,9 +67,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 public class MCRSession implements Cloneable {
 
     private static final URI DEFAULT_URI = URI.create("");
-
-    public static final ServiceLoader<MCRPersistenceTransaction> TRANSACTION_SERVICE_LOADER = ServiceLoader
-        .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader());
 
     /** A map storing arbitrary session data * */
     private Map<Object, Object> map = new Hashtable<>();
@@ -106,15 +101,6 @@ public class MCRSession implements Cloneable {
     private String ip;
 
     private long loginTime, lastAccessTime, thisAccessTime, createTime;
-
-    private boolean dataBaseAccess;
-
-    private ThreadLocal<List<MCRPersistenceTransaction>> transaction = ThreadLocal
-        .withInitial(() -> TRANSACTION_SERVICE_LOADER
-            .stream()
-            .map(ServiceLoader.Provider::get)
-            .filter(MCRPersistenceTransaction::isReady)
-            .collect(Collectors.toUnmodifiableList()));
 
     private StackTraceElement[] constructingStackTrace;
 
@@ -166,9 +152,6 @@ public class MCRSession implements Cloneable {
     MCRSession() {
         userInformation = guestUserInformation;
         setCurrentLanguage(MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG));
-        dataBaseAccess = MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
-            && TRANSACTION_SERVICE_LOADER.stream().findAny().isPresent();
-
         accessCount = new AtomicInteger();
         concurrentAccess = new AtomicInteger();
 
@@ -383,40 +366,35 @@ public class MCRSession implements Cloneable {
     /**
      * starts a new database transaction.
      */
+    @Deprecated
     public void beginTransaction() {
-        if (dataBaseAccess) {
-            transaction.get().forEach(MCRPersistenceTransaction::begin);
-        }
+        MCRTransactionHelper.beginTransaction();
     }
 
     /**
      * Determine whether the current resource transaction has been marked for rollback.
      * @return boolean indicating whether the transaction has been marked for rollback
      */
+    @Deprecated
     public boolean transactionRequiresRollback() {
-        return isTransactionActive() && transaction.get().stream().anyMatch(MCRPersistenceTransaction::getRollbackOnly);
+        return MCRTransactionHelper.transactionRequiresRollback();
     }
 
     /**
      * commits the database transaction. Commit is only done if {@link #isTransactionActive()} returns true.
      */
+    @Deprecated
     public void commitTransaction() {
-        if (isTransactionActive()) {
-            transaction.get().forEach(MCRPersistenceTransaction::commit);
-            transaction.remove();
-        }
-        submitOnCommitTasks();
+        MCRTransactionHelper.commitTransaction();
     }
 
     /**
      * forces the database transaction to roll back. Roll back is only performed if {@link #isTransactionActive()}
      * returns true.
      */
+    @Deprecated
     public void rollbackTransaction() {
-        if (isTransactionActive()) {
-            transaction.get().forEach(MCRPersistenceTransaction::rollback);
-            transaction.remove();
-        }
+        MCRTransactionHelper.rollbackTransaction();
     }
 
     /**
@@ -424,8 +402,9 @@ public class MCRSession implements Cloneable {
      *
      * @return true if the transaction is still alive
      */
+    @Deprecated
     public boolean isTransactionActive() {
-        return dataBaseAccess && transaction.get().stream().anyMatch(MCRPersistenceTransaction::isActive);
+        return MCRTransactionHelper.isTransactionActive();
     }
 
     public StackTraceElement[] getConstructingStackTrace() {
@@ -469,7 +448,7 @@ public class MCRSession implements Cloneable {
         this.onCommitTasks.get().offer(Objects.requireNonNull(task));
     }
 
-    private void submitOnCommitTasks() {
+    protected void submitOnCommitTasks() {
         Queue<Runnable> runnables = onCommitTasks.get();
         onCommitTasks.remove();
         CompletableFuture.allOf(runnables.stream()

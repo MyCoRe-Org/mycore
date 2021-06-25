@@ -34,6 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.streams.MCRNotClosingInputStream;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
@@ -94,7 +95,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
         handler.startUpload(numFiles);
 
         MCRSession session = MCRSessionMgr.getCurrentSession();
-        session.commitTransaction();
+        MCRTransactionHelper.commitTransaction();
 
         for (Part file : files) {
             try {
@@ -104,7 +105,7 @@ public final class MCRUploadViaFormServlet extends MCRServlet {
             }
         }
 
-        session.beginTransaction();
+        MCRTransactionHelper.beginTransaction();
     }
 
     private void handleUploadedFile(MCRUploadHandler handler, Part file) throws Exception {

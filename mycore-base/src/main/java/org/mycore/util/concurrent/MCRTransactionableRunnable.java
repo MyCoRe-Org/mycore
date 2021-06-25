@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 
 /**
  * Encapsulates a {@link Runnable} with a mycore session and a database transaction.
@@ -76,16 +77,16 @@ public class MCRTransactionableRunnable implements Runnable, MCRDecorator<Runnab
             this.session = MCRSessionMgr.getCurrentSession();
         }
         MCRSessionMgr.setCurrentSession(this.session);
-        session.beginTransaction();
+        MCRTransactionHelper.beginTransaction();
         try {
             this.runnable.run();
         } finally {
             try {
-                session.commitTransaction();
+                MCRTransactionHelper.commitTransaction();
             } catch (Exception commitExc) {
                 LOGGER.error("Error while commiting transaction.", commitExc);
                 try {
-                    session.rollbackTransaction();
+                    MCRTransactionHelper.rollbackTransaction();
                 } catch (Exception rollbackExc) {
                     LOGGER.error("Error while rollbacking transaction.", commitExc);
                 }

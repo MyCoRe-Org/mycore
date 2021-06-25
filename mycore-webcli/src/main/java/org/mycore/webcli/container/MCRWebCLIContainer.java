@@ -54,6 +54,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.processing.MCRProcessableCollection;
@@ -319,7 +320,7 @@ public class MCRWebCLIContainer {
             LOGGER.info("Processing command:'{}' ({} left)", command, commands.size());
             setCurrentCommand(command);
             long start = System.currentTimeMillis();
-            session.beginTransaction();
+            MCRTransactionHelper.beginTransaction();
             try {
                 List<String> commandsReturned = null;
                 for (List<MCRCommand> cmds : knownCommands.values()) {
@@ -330,7 +331,7 @@ public class MCRWebCLIContainer {
                     commandsReturned = runCommand(command, cmds);
                 }
                 updateKnownCommandsIfNeeded();
-                session.commitTransaction();
+                MCRTransactionHelper.commitTransaction();
                 if (commandsReturned != null) {
                     LOGGER.info("Command processed ({} ms)", System.currentTimeMillis() - start);
                 } else {
@@ -339,7 +340,7 @@ public class MCRWebCLIContainer {
             } catch (Exception ex) {
                 LOGGER.error("Command '{}' failed. Performing transaction rollback...", command, ex);
                 try {
-                    session.rollbackTransaction();
+                    MCRTransactionHelper.rollbackTransaction();
                 } catch (Exception ex2) {
                     LOGGER.error("Error while perfoming rollback for command '{}'!", command, ex2);
                 }
@@ -348,9 +349,9 @@ public class MCRWebCLIContainer {
                 }
                 return false;
             } finally {
-                session.beginTransaction();
+                MCRTransactionHelper.beginTransaction();
                 MCREntityManagerProvider.getCurrentEntityManager().clear();
-                session.commitTransaction();
+                MCRTransactionHelper.commitTransaction();
             }
             return true;
         }
