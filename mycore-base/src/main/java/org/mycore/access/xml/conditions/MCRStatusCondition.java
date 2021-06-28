@@ -17,12 +17,34 @@
  */
 package org.mycore.access.xml.conditions;
 
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jdom2.Element;
 import org.mycore.access.xml.MCRFacts;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
 public class MCRStatusCondition extends MCRSimpleCondition {
+    private static Logger LOGGER = LogManager.getLogger();
+    
+    private String idFact;
+
+    public MCRStatusCondition(){
+        super();
+        idFact = "id";
+    }
+
+    @Override
+    public void parse(Element xml) {
+        super.parse(xml);
+        if(xml.getAttributeValue("id")!=null) {
+            LOGGER.warn("Attribute 'id' is deprecated - use 'fact' instead!");
+        }
+        this.idFact = Optional.ofNullable(xml.getAttributeValue("fact")).orElse(Optional.ofNullable(xml.getAttributeValue("id")).orElse("id"));
+    }
 
     @Override
     public boolean matches(MCRFacts facts) {
@@ -32,7 +54,7 @@ public class MCRStatusCondition extends MCRSimpleCondition {
 
     @Override
     public void setCurrentValue(MCRFacts facts) {
-        MCRIDCondition idc = (MCRIDCondition) (facts.require("id"));
+        MCRIDCondition idc = (MCRIDCondition) (facts.require(idFact));
         MCRObject object = idc.getObject();
         if(object==null) {
             super.setCurrentValue(facts);
