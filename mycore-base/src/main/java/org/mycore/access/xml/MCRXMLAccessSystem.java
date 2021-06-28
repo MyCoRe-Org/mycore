@@ -17,6 +17,9 @@
  */
 package org.mycore.access.xml;
 
+import java.util.Map;
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -28,6 +31,7 @@ import org.mycore.access.xml.conditions.MCRCondition;
 import org.mycore.access.xml.conditions.MCRDebuggableCondition;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.xml.MCRURIResolver;
@@ -35,16 +39,25 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-import java.util.Map;
-import java.util.Objects;
-
+/**
+ * base class for XML rule based access system
+ * 
+ * enabled it with the 2 properties:
+ * MCR.Access.Class=org.mycore.access.xml.MCRXMLAccessSystem
+ * MCR.Access.Strategy.Class=org.mycore.access.xml.MCRXMLAccessSystem
+ * 
+ */
 public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStrategy {
 
     protected static final Logger LOGGER = LogManager.getLogger();
 
     private MCRCondition rules;
 
-    private String rulesURI = "resource:rules.xml";
+    //RS: when introducing this feature in 2021.06.LTS it needed to be configured twice
+    //(as access system and as strategy). To simplify things during the transition period 
+    //we are going to use the base property to initialize the rulesURI for both cases
+    //By using the property MCR.Access.Strategy.RulesURI it could be overwritten if used for strategy.
+    private String rulesURI = MCRConfiguration2.getString("MCR.Access.RulesURI").orElse("resource:rules.xml");
 
     private Map<String, String> properties;
 
@@ -53,7 +66,7 @@ public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStr
         rules = this.buildRulesFromXML();
     }
 
-    @MCRProperty(name = "rulesURI", required = false)
+    @MCRProperty(name = "RulesURI", required = false)
     public void setRulesURI(String uri) {
         rulesURI = uri;
     }
@@ -93,9 +106,9 @@ public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStr
         MCRFacts facts = new MCRFacts();
         String id = checkID;
 
-        if(checkID==null ){
+        if (checkID == null) {
             cacheKey = action;
-        } else{
+        } else {
             if (MCRObjectID.isValid(checkID)) {
                 MCRObjectID oid = MCRObjectID.getInstance(checkID);
                 target = "metadata";
@@ -108,7 +121,7 @@ public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStr
                 }
             } else if (checkID.startsWith("webpage")) {
                 target = "webpage";
-            } else if (checkID.startsWith("solr")){
+            } else if (checkID.startsWith("solr")) {
                 target = "solr";
             } else {
                 target = "unknown";
@@ -121,14 +134,12 @@ public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStr
         LOGGER.debug("Testing {} ", cacheKey);
         facts.add(MCRConditionHelper.build("action", action));
 
-
-
         boolean result;
         if (LOGGER.isDebugEnabled()) {
             MCRCondition rules = buildRulesFromXML();
             result = rules.matches(facts);
             LOGGER.debug("Facts are: {}", facts);
-            if(rules instanceof MCRDebuggableCondition){
+            if (rules instanceof MCRDebuggableCondition) {
                 Element xmlTree = ((MCRDebuggableCondition) rules).getBoundElement();
                 String xmlString = new XMLOutputter(Format.getPrettyFormat()).outputString(xmlTree);
                 LOGGER.debug(xmlString);
@@ -145,6 +156,5 @@ public class MCRXMLAccessSystem implements MCRAccessInterface, MCRAccessCheckStr
     public boolean checkPermission(String permission) {
         return checkPermission(null, permission);
     }
-
 
 }
