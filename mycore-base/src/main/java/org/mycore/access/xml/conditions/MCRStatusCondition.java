@@ -29,10 +29,10 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 
 public class MCRStatusCondition extends MCRSimpleCondition {
     private static Logger LOGGER = LogManager.getLogger();
-    
+
     private String idFact;
 
-    public MCRStatusCondition(){
+    public MCRStatusCondition() {
         super();
         idFact = "id";
     }
@@ -56,7 +56,7 @@ public class MCRStatusCondition extends MCRSimpleCondition {
     public void setCurrentValue(MCRFacts facts) {
         MCRIDCondition idc = (MCRIDCondition) (facts.require(idFact));
         MCRObject object = idc.getObject();
-        if(object==null) {
+        if (object == null) {
             super.setCurrentValue(facts);
         } else {
             MCRObjectService service = object.getService();
