@@ -38,8 +38,8 @@ import javax.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
@@ -75,10 +75,9 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         LogManager.getLogger().warn(path + ": Checking API access: " + permission);
         String thePath = path.startsWith("/") ? path : "/" + path;
 
-        MCRAccessInterface acl = MCRAccessControlSystem.instance();
+        MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
         String permStr = permission.toString();
-        boolean hasAPIAccess = aclProvider.checkPermission("restapi:/",
-            permStr);
+        boolean hasAPIAccess = aclProvider.checkPermission("restapi:/", permStr);
         if (hasAPIAccess) {
             String objId = "restapi:" + thePath;
             boolean isRuleInterface = acl instanceof MCRRuleAccessInterface;
