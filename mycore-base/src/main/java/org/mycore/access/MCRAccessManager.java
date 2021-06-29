@@ -389,7 +389,7 @@ public class MCRAccessManager {
      */
     public static boolean hasRule(String id, String permission) {
         // if impl doesnt have a hasRule method, we assume there is a rule for id, permission
-        if(getAccessImpl() instanceof MCRRuleAccessInterface) {
+        if (getAccessImpl() instanceof MCRRuleAccessInterface) {
             return requireRulesInterface().hasRule(id, permission);
         } else {
             return true;
@@ -426,8 +426,8 @@ public class MCRAccessManager {
     }
 
     public static MCRRuleAccessInterface requireRulesInterface() {
-        if(!(getAccessImpl() instanceof MCRRuleAccessInterface)) {
-            throw new MCRException(MCRAccessInterface.class + " is no "+ MCRRuleAccessInterface.class);
+        if (!(getAccessImpl() instanceof MCRRuleAccessInterface)) {
+            throw new MCRException(MCRAccessInterface.class + " is no " + MCRRuleAccessInterface.class);
         }
         return getAccessImpl();
     }
