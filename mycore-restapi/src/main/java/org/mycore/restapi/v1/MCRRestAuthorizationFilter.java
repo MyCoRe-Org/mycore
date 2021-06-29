@@ -20,6 +20,7 @@ package org.mycore.restapi.v1;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -164,6 +165,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 requestContext.getAcceptableMediaTypes()
                     .stream()
                     .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
+                    .filter(Objects::nonNull)
                     .toArray(String[]::new));
         } catch (MCRRestAPIException e) {
             LogManager.getLogger().warn("API Access denied!");
