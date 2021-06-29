@@ -50,18 +50,22 @@ public class MCRIPCondition extends MCRSimpleCondition {
 
     @Override
     public boolean matches(MCRFacts facts) {
-        facts.require(this.type);
-        if (currentIP != null && checkIP != null) {
-            return checkIP.contains(currentIP);
-        } else {
-            return false;
+        MCRIPCondition theCondi = (MCRIPCondition)facts.require(this.type);
+        if (theCondi.currentIP != null && checkIP != null) {
+            boolean result = checkIP.contains(theCondi.currentIP);
+            if (result) {
+                facts.add(this);
+                return true;
+            }
         }
+        return false;
     }
 
     @Override
     public void setCurrentValue(MCRFacts facts) {
         try {
-            currentIP = new MCRIPAddress(MCRSessionMgr.getCurrentSession().getCurrentIP());
+            this.value = MCRSessionMgr.getCurrentSession().getCurrentIP();
+            currentIP = new MCRIPAddress(this.value);
         } catch (UnknownHostException e) {
             currentIP = null;
         }
