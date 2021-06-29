@@ -40,10 +40,11 @@ public class MCRStatusCondition extends MCRSimpleCondition {
     @Override
     public void parse(Element xml) {
         super.parse(xml);
-        if(xml.getAttributeValue("id")!=null) {
+        if (xml.getAttributeValue("id") != null) {
             LOGGER.warn("Attribute 'id' is deprecated - use 'fact' instead!");
         }
-        this.idFact = Optional.ofNullable(xml.getAttributeValue("fact")).orElse(Optional.ofNullable(xml.getAttributeValue("id")).orElse("id"));
+        this.idFact = Optional.ofNullable(xml.getAttributeValue("fact"))
+            .orElse(Optional.ofNullable(xml.getAttributeValue("id")).orElse("id"));
     }
 
     @Override
