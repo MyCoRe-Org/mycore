@@ -65,6 +65,11 @@ class MCRConfigurableInstanceHelper {
             });
     }
 
+    /**
+     * checks if a class is annotated with @{@link Singleton}
+     * @param property the property which contains the class
+     * @return true if the class in the property is annotated with Singleton
+     */
     public static boolean isSingleton(String property) {
         return MCRConfiguration2.getString(property)
             .stream().anyMatch(propertyVal -> {
