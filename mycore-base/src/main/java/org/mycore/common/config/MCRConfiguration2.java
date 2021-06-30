@@ -135,7 +135,11 @@ public class MCRConfiguration2 {
      *             if the class can not be loaded or instantiated
      */
     public static <T> Optional<T> getInstanceOf(String name) throws MCRConfigurationException {
-        return MCRConfigurableInstanceHelper.getInstance(name);
+        if(MCRConfigurableInstanceHelper.isSingleton(name)){
+            return getSingleInstanceOf(name);
+        } else {
+            return MCRConfigurableInstanceHelper.getInstance(name);
+        }
     }
 
     /**

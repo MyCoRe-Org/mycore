@@ -23,6 +23,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 
+import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -62,6 +63,20 @@ class MCRConfigurableInstanceHelper {
                 }
                 return getInstance(tClass, properties, property);
             });
+    }
+
+    public static boolean isSingleton(String property) {
+        return MCRConfiguration2.getString(property)
+                .stream().anyMatch(propertyVal -> {
+                    try {
+                        Singleton declaredAnnotation = MCRClassTools.forName(propertyVal)
+                                .getAnnotation(Singleton.class);
+                        return declaredAnnotation!=null;
+                    } catch (ClassNotFoundException e) {
+                        throw new MCRConfigurationException("The configurable instance has a not existing class " +
+                                "(" + propertyVal + ") configured " + property, e);
+                    }
+                });
     }
 
     public static String getIDFromClassProperty(String property){
