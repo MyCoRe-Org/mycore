@@ -35,12 +35,7 @@ import java.util.Optional;
 public class MCRCategoryCondition extends MCRSimpleCondition {
     private static Logger LOGGER = LogManager.getLogger();
 
-    private String idFact;
-
-    public MCRCategoryCondition() {
-        super();
-        idFact = "id";
-    }
+    private String idFact = "id";
 
     @Override
     public void parse(Element xml) {

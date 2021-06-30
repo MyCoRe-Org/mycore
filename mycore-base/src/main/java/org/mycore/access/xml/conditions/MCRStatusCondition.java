@@ -30,12 +30,11 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 public class MCRStatusCondition extends MCRSimpleCondition {
     private static Logger LOGGER = LogManager.getLogger();
 
-    private String idFact;
-
-    public MCRStatusCondition() {
-        super();
-        idFact = "id";
-    }
+    /**
+     * id of the fact that contains the ID of the MyCoRe-Object or Derivate
+     * possible values are "id" or "derivateid".
+     */
+    private String idFact = "id";
 
     @Override
     public void parse(Element xml) {
