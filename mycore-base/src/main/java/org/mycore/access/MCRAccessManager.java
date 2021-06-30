@@ -29,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.access.strategies.MCRDerivateIDStrategy;
+import org.mycore.access.xml.MCRXMLAccessSystem;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
@@ -70,8 +71,17 @@ public class MCRAccessManager {
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
-        return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
-            .orElseGet(MCRDerivateIDStrategy::new);
+        //RS: If the new XML access system implementation is configured 
+        //    we return this implementation as access strategy.
+        //    Later this code can be simplified (remove hard dependency to class MCRXMLAccessSystem)
+        //    if we remove the strategy concept (planed for MyCoRe LTS 2022)
+        if (MCRXMLAccessSystem.class.getName()
+            .equals(MCRConfiguration2.getString("MCR.Access.Class").orElse(null))) {
+            return MCRConfiguration2.<MCRAccessCheckStrategy>getSingleInstanceOf("MCR.Access.Class").get();
+        } else {
+            return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
+                .orElseGet(MCRDerivateIDStrategy::new);
+        }
     }
 
     /**
