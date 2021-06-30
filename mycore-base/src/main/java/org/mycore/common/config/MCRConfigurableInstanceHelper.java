@@ -67,16 +67,16 @@ class MCRConfigurableInstanceHelper {
 
     public static boolean isSingleton(String property) {
         return MCRConfiguration2.getString(property)
-                .stream().anyMatch(propertyVal -> {
-                    try {
-                        Singleton declaredAnnotation = MCRClassTools.forName(propertyVal)
-                                .getAnnotation(Singleton.class);
-                        return declaredAnnotation!=null;
-                    } catch (ClassNotFoundException e) {
-                        throw new MCRConfigurationException("The configurable instance has a not existing class " +
-                                "(" + propertyVal + ") configured " + property, e);
-                    }
-                });
+            .stream().anyMatch(propertyVal -> {
+                try {
+                    Singleton declaredAnnotation = MCRClassTools.forName(propertyVal)
+                        .getAnnotation(Singleton.class);
+                    return declaredAnnotation != null;
+                } catch (ClassNotFoundException e) {
+                    throw new MCRConfigurationException("The configurable instance has a not existing class " +
+                        "(" + propertyVal + ") configured " + property, e);
+                }
+            });
     }
 
     public static String getIDFromClassProperty(String property){
