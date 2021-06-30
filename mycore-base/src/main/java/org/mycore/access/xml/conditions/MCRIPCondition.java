@@ -34,10 +34,6 @@ public class MCRIPCondition extends MCRSimpleCondition {
 
     private MCRIPAddress currentIP = null;
 
-    public MCRIPCondition() {
-        super();
-    }
-
     @Override
     public void parse(Element xml) {
         super.parse(xml);
@@ -50,7 +46,7 @@ public class MCRIPCondition extends MCRSimpleCondition {
 
     @Override
     public boolean matches(MCRFacts facts) {
-        MCRIPCondition theCondi = (MCRIPCondition)facts.require(this.type);
+        MCRIPCondition theCondi = (MCRIPCondition) facts.require(this.type);
         if (theCondi.currentIP != null && checkIP != null) {
             boolean result = checkIP.contains(theCondi.currentIP);
             if (result) {
