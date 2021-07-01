@@ -28,7 +28,7 @@ import org.mycore.mods.MCRMODSWrapper;
 
 import java.util.List;
 
-public class MCRModsCollectionCondition extends MCRSimpleCondition {
+public class MCRMODSCollectionCondition extends MCRSimpleCondition {
 
     private static final String XPATH_COLLECTION = "mods:classification[contains(@valueURI,'/collection#')]";
 

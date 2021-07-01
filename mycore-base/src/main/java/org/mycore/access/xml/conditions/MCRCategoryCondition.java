@@ -18,6 +18,8 @@
 
 package org.mycore.access.xml.conditions;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.xml.MCRFacts;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
@@ -28,20 +30,21 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class MCRCategoryCondition extends MCRSimpleCondition {
+    private static Logger LOGGER = LogManager.getLogger();
 
-    private String idFact;
-
-    public MCRCategoryCondition(){
-        super();
-        idFact = "id";
-    }
+    private String idFact = "id";
 
     @Override
     public void parse(Element xml) {
         super.parse(xml);
-        this.idFact = xml.getAttributeValue("id");
+        if (xml.getAttributeValue("id") != null) {
+            LOGGER.warn("Attribute 'id' is deprecated - use 'fact' instead!");
+        }
+        this.idFact = Optional.ofNullable(xml.getAttributeValue("fact"))
+            .orElse(Optional.ofNullable(xml.getAttributeValue("id")).orElse("id"));
     }
 
     @Override

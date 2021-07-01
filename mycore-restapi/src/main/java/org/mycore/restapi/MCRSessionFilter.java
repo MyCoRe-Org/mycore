@@ -137,7 +137,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             byte[] encodedAuth = authorization.substring(basicPrefix.length()).trim()
                 .getBytes(StandardCharsets.ISO_8859_1);
             String userPwd = new String(Base64.getDecoder().decode(encodedAuth), StandardCharsets.ISO_8859_1);
-            if (userPwd != null && userPwd.contains(":")) {
+            if (userPwd != null && userPwd.contains(":") && userPwd.length() > 1) {
                 String[] upSplit = userPwd.split(":");
                 String username = upSplit[0];
                 String password = upSplit[1];

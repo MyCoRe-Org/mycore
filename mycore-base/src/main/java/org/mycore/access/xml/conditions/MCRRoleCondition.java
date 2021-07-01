@@ -26,13 +26,14 @@ public class MCRRoleCondition extends MCRSimpleCondition {
 
     @Override
     public boolean matches(MCRFacts facts) {
-        if (!super.matches(facts)) {
-            MCRSession session = MCRSessionMgr.getCurrentSession();
-            MCRUserInformation user = session.getUserInformation();
-            if (user.isUserInRole(value)) {
-                facts.add(this);
-                return true;
-            }
+        if (super.matches(facts)) {
+            return true;
+        }
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        MCRUserInformation user = session.getUserInformation();
+        if (user.isUserInRole(value)) {
+            facts.add(this);
+            return true;
         }
         return false;
     }

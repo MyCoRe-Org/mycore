@@ -17,53 +17,54 @@
  */
 package org.mycore.access.xml.conditions;
 
-import java.util.Optional;
+import java.net.UnknownHostException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.access.mcrimpl.MCRIPAddress;
 import org.mycore.access.xml.MCRFacts;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.common.MCRSessionMgr;
 
-public class MCRStatusCondition extends MCRSimpleCondition {
+public class MCRIPCondition extends MCRSimpleCondition {
+
+    @SuppressWarnings("unused")
     private static Logger LOGGER = LogManager.getLogger();
 
-    /**
-     * id of the fact that contains the ID of the MyCoRe-Object or Derivate
-     * possible values are "id" or "derivateid".
-     */
-    private String idFact = "id";
+    private MCRIPAddress checkIP = null;
+
+    private MCRIPAddress currentIP = null;
 
     @Override
     public void parse(Element xml) {
         super.parse(xml);
-        if (xml.getAttributeValue("id") != null) {
-            LOGGER.warn("Attribute 'id' is deprecated - use 'fact' instead!");
+        try {
+            checkIP = new MCRIPAddress(this.value);
+        } catch (UnknownHostException e) {
+            checkIP = null;
         }
-        this.idFact = Optional.ofNullable(xml.getAttributeValue("fact"))
-            .orElse(Optional.ofNullable(xml.getAttributeValue("id")).orElse("id"));
     }
 
     @Override
     public boolean matches(MCRFacts facts) {
-        facts.require(this.type);
-        return super.matches(facts);
+        MCRIPCondition theCondi = (MCRIPCondition) facts.require(this.type);
+        if (theCondi.currentIP != null && checkIP != null) {
+            boolean result = checkIP.contains(theCondi.currentIP);
+            if (result) {
+                facts.add(this);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public void setCurrentValue(MCRFacts facts) {
-        MCRIDCondition idc = (MCRIDCondition) (facts.require(idFact));
-        MCRObject object = idc.getObject();
-        if (object == null) {
-            super.setCurrentValue(facts);
-        } else {
-            MCRObjectService service = object.getService();
-            MCRCategoryID status = service.getState();
-            if (status != null) {
-                value = status.getID();
-            }
+        try {
+            this.value = MCRSessionMgr.getCurrentSession().getCurrentIP();
+            currentIP = new MCRIPAddress(this.value);
+        } catch (UnknownHostException e) {
+            currentIP = null;
         }
     }
 }
