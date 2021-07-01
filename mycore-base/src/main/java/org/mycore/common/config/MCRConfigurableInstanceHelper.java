@@ -23,6 +23,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 
+import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -61,6 +62,25 @@ class MCRConfigurableInstanceHelper {
                         "(" + propertyVal + ") configured " + property, e);
                 }
                 return getInstance(tClass, properties, property);
+            });
+    }
+
+    /**
+     * checks if a class is annotated with @{@link Singleton}
+     * @param property the property which contains the class
+     * @return true if the class in the property is annotated with Singleton
+     */
+    public static boolean isSingleton(String property) {
+        return MCRConfiguration2.getString(property)
+            .stream().anyMatch(propertyVal -> {
+                try {
+                    Singleton declaredAnnotation = MCRClassTools.forName(propertyVal)
+                        .getAnnotation(Singleton.class);
+                    return declaredAnnotation != null;
+                } catch (ClassNotFoundException e) {
+                    throw new MCRConfigurationException("The configurable instance has a not existing class " +
+                        "(" + propertyVal + ") configured " + property, e);
+                }
             });
     }
 
