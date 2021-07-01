@@ -27,6 +27,7 @@ import org.mycore.access.xml.MCRFacts;
 import org.mycore.common.MCRSessionMgr;
 
 public class MCRIPCondition extends MCRSimpleCondition {
+
     @SuppressWarnings("unused")
     private static Logger LOGGER = LogManager.getLogger();
 
