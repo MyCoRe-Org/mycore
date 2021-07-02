@@ -96,7 +96,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             .filter(s -> !responseContext.getStatusInfo().getFamily().equals(Response.Status.Family.CLIENT_ERROR))
             .filter(s -> responseContext.getHeaderString(HttpHeaders.AUTHORIZATION) == null)
             .map(h -> renewJWT ? ("Bearer " + MCRRestAPIAuthentication
-                .getToken(currentSession.getUserInformation(), currentSession.getCurrentIP())
+                .getToken(currentSession, currentSession.getCurrentIP())
                 .orElseThrow(() -> new InternalServerErrorException("Could not get JSON Web Token"))) : h)
             .ifPresent(h -> {
                 responseContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, h);
