@@ -24,7 +24,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Base64;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Priority;
@@ -186,6 +188,12 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                     }
                 }
                 userInformation = Optional.of(new MCRJWTUserInformation(jwt));
+                for (Map.Entry<String, Claim> entry : jwt.getClaims().entrySet()) {
+                    if (entry.getKey().startsWith(MCRJWTUtil.JWT_SESSION_ATTRIBUTE_PREFIX)) {
+                        currentSession.put(entry.getKey().substring(MCRJWTUtil.JWT_SESSION_ATTRIBUTE_PREFIX.length()), 
+                            entry.getValue().asString());
+                    }
+                }
             } catch (JWTVerificationException e) {
                 LOGGER.error(e.getMessage());
                 LinkedHashMap<String, String> attrs = new LinkedHashMap<>();
