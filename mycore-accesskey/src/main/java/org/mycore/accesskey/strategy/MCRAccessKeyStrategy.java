@@ -42,26 +42,25 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
     
     @Override
     public boolean checkPermission(String id, String permission) {
-        final MCRObjectID objectId = MCRObjectID.getInstance(id);
-        if (objectId.getTypeId().equals("derivate")) {
-            MCRObjectID objId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
-            return checkDerivatePermission(objectId, objId, permission);
+        if (MCRAccessManager.PERMISSION_WRITE.equals(permission) 
+            || MCRAccessManager.PERMISSION_READ.equals(permission)) {
+            if (MCRObjectID.isValid(id)) {
+                final MCRObjectID objectId = MCRObjectID.getInstance(id);
+                if (objectId.getTypeId().equals("derivate")) {
+                    MCRObjectID objId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
+                    LOGGER.debug("check derivate {}, object {} permission {}.", objectId, objId, permission);
+                    return Stream.of(objectId, objId)
+                        .filter(Objects::nonNull)
+                        .filter(_id -> MCRAccessKeyManager.getAccessKeys(_id).size() > 0)
+                        .findFirst()
+                        .map(_id -> userHasValidAccessKey(_id, permission))
+                        .orElse(Boolean.FALSE);
+                }
+                LOGGER.debug("check object {} permission {}.", objectId, permission);
+                return userHasValidAccessKey(objectId, permission);
+            }
         }
-        return checkObjectPermission(objectId, permission);
-    }
-
-    /**
-     * Checks access for an object.
-     *
-     * @param objectId the {@link MCRObjectID}
-     * @param permission permission type
-     * @return true if the access is permitted or false if not
-     */
-    private boolean checkObjectPermission(MCRObjectID objectId, String permission) {
-        LOGGER.debug("check object {} permission {}.", objectId, permission);
-        boolean isWritePermission = MCRAccessManager.PERMISSION_WRITE.equals(permission);
-        boolean isReadPermission = MCRAccessManager.PERMISSION_READ.equals(permission);
-        return (isWritePermission || isReadPermission) && userHasValidAccessKey(objectId, isReadPermission);
+        return false;
     }
 
     /**
@@ -69,46 +68,23 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      * If there is an invalid {@link MCRAccessKey} attribute, the attribute will be deleted.
      *
      * @param objectId the {@link MCRObjectID}
-     * @param isReadPermission permission type
+     * @param permission permission type
      * @return if {@MCRAccessKey} is valid or not for permssion.
     */
-    private static boolean userHasValidAccessKey(MCRObjectID objectId, boolean isReadPermission) {
+    private static boolean userHasValidAccessKey(MCRObjectID objectId, String permission) {
         final String userKey = MCRAccessKeyUserUtils.getAccessKey(objectId);
         if (userKey != null) {
             MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyByValue(objectId, userKey);
             if (accessKey != null) {
-                if (isReadPermission && accessKey.getType().equals(MCRAccessManager.PERMISSION_READ) || 
-                        accessKey.getType().equals(MCRAccessManager.PERMISSION_WRITE)) {
+                if ((permission.equals(MCRAccessManager.PERMISSION_READ) 
+                    && accessKey.getType().equals(MCRAccessManager.PERMISSION_READ)) 
+                    || accessKey.getType().equals(MCRAccessManager.PERMISSION_WRITE)) {
                     LOGGER.debug("Access granted. User has a key to access the resource {}.", objectId);
                     return true;
                 }
             } else {
                 MCRAccessKeyUserUtils.deleteAccessKey(objectId);
             }
-        }
-        return false;
-    }
-
-    /**
-     * Checks access for a derivate. 
-     * If no access key exists for the derivate, the access key for the parent object is checked.
-     *
-     * @param derivateId the {@link MCRObjectID} of the derivate
-     * @param objectId the {@link MCRObjectID} of the parent
-     * @param permission permission type
-     * @return true if the access is permitted or false if not
-     */
-    private boolean checkDerivatePermission(MCRObjectID derivateId, MCRObjectID objectId, String permission) {
-        LOGGER.debug("check derivate {}, object {} permission {}.", derivateId, objectId, permission);
-        boolean isWritePermission = MCRAccessManager.PERMISSION_WRITE.equals(permission);
-        boolean isReadPermission = MCRAccessManager.PERMISSION_READ.equals(permission);
-        if ((isWritePermission || isReadPermission)) {
-            return Stream.of(derivateId, objectId)
-                .filter(Objects::nonNull)
-                .filter(id -> MCRAccessKeyManager.getAccessKeys(id).size() > 0)
-                .findFirst()
-                .map(id -> userHasValidAccessKey(id, isReadPermission))
-                .orElse(Boolean.FALSE);
         }
         return false;
     }
