@@ -65,11 +65,20 @@ public class MCRAccessManager {
         MCRShutdownHandler.getInstance().addCloseable(EXECUTOR_SERVICE::shutdownNow);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends MCRAccessInterface> T getAccessImpl() {
-        return (T) MCRConfiguration2.getSingleInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class).get();
+        return (T) MCRConfiguration2.<MCRAccessInterface>getInstanceOf("MCR.Access.Class")
+            .orElseGet(MCRAccessBaseImpl::new);
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
+        // if accessImpl equals acccessStrategy we reuse the accessImpl, 
+        // to make sure, that only one singleton gets created
+        // (used to instantitate fact-based access system) 
+        if (MCRConfiguration2.getString("MCR.Access.Class").orElse("UNDEFINED")
+            .equals(MCRConfiguration2.getString("MCR.Access.Class").orElse(null))) {
+            return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Class").orElseThrow();
+        }
         return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
             .orElseGet(MCRDerivateIDStrategy::new);
     }

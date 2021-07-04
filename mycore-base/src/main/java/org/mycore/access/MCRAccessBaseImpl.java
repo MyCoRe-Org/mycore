@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import javax.inject.Singleton;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -41,9 +43,8 @@ import org.mycore.common.config.MCRConfiguration2;
  * @author Jens Kupferschmidt
  * 
  */
+@Singleton
 public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
-
-    private static MCRRuleAccessInterface SINGLETON;
 
     protected static final String ACCESS_PERMISSIONS = MCRConfiguration2.getString("MCR.Access.AccessPermissions")
         .orElse("read,write,delete");
@@ -52,19 +53,6 @@ public class MCRAccessBaseImpl implements MCRRuleAccessInterface {
     private static final Logger LOGGER = LogManager.getLogger(MCRAccessBaseImpl.class);
 
     public MCRAccessBaseImpl() {
-    }
-
-    /**
-     * The method return a singleton instance of MCRAccessInterface.
-     * 
-     * @return a singleton instance of MCRAccessInterface
-     */
-    public static synchronized MCRRuleAccessInterface instance() {
-        if (SINGLETON == null) {
-            SINGLETON = new MCRAccessBaseImpl();
-        }
-
-        return SINGLETON;
     }
 
     /*
