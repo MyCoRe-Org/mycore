@@ -18,7 +18,7 @@
 
 package org.mycore.user2;
 
-import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
@@ -62,7 +62,7 @@ public final class MCRUser2Constants {
     static final String CATEG_LINK_TYPE = "mcr-user";
 
     /**
-     * {@link MCRConfiguration} prefix for all properties used by this MyCoRe component.
+     * {@link MCRConfiguration2} prefix for all properties used by this MyCoRe component.
      */
     public static final String CONFIG_PREFIX = "MCR.user2.";
 

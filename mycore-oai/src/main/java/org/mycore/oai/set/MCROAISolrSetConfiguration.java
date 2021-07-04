@@ -21,13 +21,12 @@ package org.mycore.oai.set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrDocument;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
 /**
  * Default implementation for a set configuration. Loads the information from the
- * {@link MCRConfiguration} (MCR.OAIDataProvider.myprovider.Sets.<b>SET_ID</b>).
+ * {@link MCRConfiguration2} (MCR.OAIDataProvider.myprovider.Sets.<b>SET_ID</b>).
  * 
  * @author Matthias Eichner
  */

@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.oai.pmh.DateUtils;
@@ -41,7 +40,7 @@ import org.mycore.oai.pmh.OAIIdentifierDescription;
 import org.mycore.oai.pmh.SimpleIdentify;
 
 /**
- * Simple MyCoRe implementation of a OAI-PMH {@link Identify} class. Uses the {@link MCRConfiguration} to retrieve
+ * Simple MyCoRe implementation of a OAI-PMH {@link Identify} class. Uses the {@link MCRConfiguration2} to retrieve
  * all important settings. Earliest date stamp is calculated with the 'restriction' query and sort by 'created'.
  * Also adds custom description elements from URIs configured by MCR.OAIDataProvider.OAI.DescriptionURI
  *
