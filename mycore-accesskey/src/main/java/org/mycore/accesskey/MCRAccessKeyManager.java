@@ -38,7 +38,7 @@ import org.mycore.accesskey.exception.MCRAccessKeyInvalidValueException;
 import org.mycore.accesskey.exception.MCRAccessKeyNotFoundException;
 
 /**
- * Methods to manage {@MCRAccessKey}.
+ * Methods to manage {@link MCRAccessKey}.
  */
 public final class MCRAccessKeyManager {
 

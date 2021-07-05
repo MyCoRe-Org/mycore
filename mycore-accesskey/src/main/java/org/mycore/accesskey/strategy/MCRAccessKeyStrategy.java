@@ -18,9 +18,7 @@
 
 package org.mycore.accesskey.strategy;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +27,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.accesskey.MCRAccessKeyManager;
 import org.mycore.accesskey.MCRAccessKeyUserUtils;
 import org.mycore.accesskey.backend.MCRAccessKey;
 
@@ -42,49 +39,41 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
     
     @Override
     public boolean checkPermission(String id, String permission) {
-        if (MCRAccessManager.PERMISSION_WRITE.equals(permission) 
-            || MCRAccessManager.PERMISSION_READ.equals(permission)) {
-            if (MCRObjectID.isValid(id)) {
-                final MCRObjectID objectId = MCRObjectID.getInstance(id);
-                if (objectId.getTypeId().equals("derivate")) {
-                    MCRObjectID objId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
-                    LOGGER.debug("check derivate {}, object {} permission {}.", objectId, objId, permission);
-                    return Stream.of(objectId, objId)
-                        .filter(Objects::nonNull)
-                        .filter(_id -> MCRAccessKeyManager.getAccessKeys(_id).size() > 0)
-                        .findFirst()
-                        .map(_id -> userHasValidAccessKey(_id, permission))
-                        .orElse(Boolean.FALSE);
+        if ((MCRAccessManager.PERMISSION_WRITE.equals(permission) 
+            || MCRAccessManager.PERMISSION_READ.equals(permission)) && MCRObjectID.isValid(id)) {
+            MCRObjectID objectId = MCRObjectID.getInstance(id);
+            if (objectId.getTypeId().equals("derivate")) {
+                LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
+                MCRAccessKey accessKey = MCRAccessKeyUserUtils.getAccessKey(objectId);
+                if (accessKey != null) {
+                    return checkPermission(permission, accessKey);
                 }
-                LOGGER.debug("check object {} permission {}.", objectId, permission);
-                return userHasValidAccessKey(objectId, permission);
+                objectId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
+            }
+            LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
+            final MCRAccessKey accessKey = MCRAccessKeyUserUtils.getAccessKey(objectId);
+            if (accessKey != null) {
+                return checkPermission(permission, accessKey);
             }
         }
         return false;
     }
 
-    /**
-     * Checks if a user has a valid {@link MCRAccessKey} for given {@link MCRObjectID} and permission.
-     * If there is an invalid {@link MCRAccessKey} attribute, the attribute will be deleted.
-     *
-     * @param objectId the {@link MCRObjectID}
-     * @param permission permission type
-     * @return if {@MCRAccessKey} is valid or not for permssion.
-    */
-    private static boolean userHasValidAccessKey(MCRObjectID objectId, String permission) {
-        final String userKey = MCRAccessKeyUserUtils.getAccessKey(objectId);
-        if (userKey != null) {
-            MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyByValue(objectId, userKey);
-            if (accessKey != null) {
-                if ((permission.equals(MCRAccessManager.PERMISSION_READ) 
-                    && accessKey.getType().equals(MCRAccessManager.PERMISSION_READ)) 
-                    || accessKey.getType().equals(MCRAccessManager.PERMISSION_WRITE)) {
-                    LOGGER.debug("Access granted. User has a key to access the resource {}.", objectId);
-                    return true;
-                }
-            } else {
-                MCRAccessKeyUserUtils.deleteAccessKey(objectId);
-            }
+    private boolean checkPermission(String permission, MCRAccessKey accessKey) {
+        if ((permission.equals(MCRAccessManager.PERMISSION_READ) 
+            && accessKey.getType().equals(MCRAccessManager.PERMISSION_READ)) 
+            || accessKey.getType().equals(MCRAccessManager.PERMISSION_WRITE)) {
+            LOGGER.debug("Access granted. User has a key to access the resource {}.",
+                accessKey.getObjectId().toString());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkPermission(String id, String permission, MCRAccessKey accessKey) {
+        LOGGER.debug("check object {} permission {}.", id, permission);
+        if (MCRObjectID.isValid(id) && id.equals(accessKey.getObjectId().toString())) {
+            return checkPermission(permission, accessKey);
         }
         return false;
     }

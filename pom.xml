@@ -107,6 +107,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <packages>org.mycore.access*</packages>
               </group>
               <group>
+                <title>MyCoRe Access Key</title>
+                <packages>org.mycore.accesskey*</packages>
+              </group>
+              <group>
                 <title>MyCoRe Persistence Backend Implementations</title>
                 <packages>org.mycore.backend*</packages>
               </group>
@@ -642,6 +646,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <group>
                   <title>MyCoRe Authorization System</title>
                   <packages>org.mycore.access*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe Access Key</title>
+                  <packages>org.mycore.accesskey*</packages>
                 </group>
                 <group>
                   <title>MyCoRe Persistence Backend Implementations</title>
