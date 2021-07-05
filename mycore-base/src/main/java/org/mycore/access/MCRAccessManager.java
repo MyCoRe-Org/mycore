@@ -76,7 +76,7 @@ public class MCRAccessManager {
         // to make sure, that only one singleton gets created
         // (used to instantitate fact-based access system) 
         if (MCRConfiguration2.getString("MCR.Access.Class").orElse("UNDEFINED")
-            .equals(MCRConfiguration2.getString("MCR.Access.Class").orElse(null))) {
+            .equals(MCRConfiguration2.getString("MCR.Access.Strategy.Class").orElse(null))) {
             return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Class").orElseThrow();
         }
         return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
