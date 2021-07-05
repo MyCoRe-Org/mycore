@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRCategoryIDFact;
-import org.mycore.access.facts.fact.MCRIDFact;
+import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -60,7 +60,7 @@ public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryID
 
     @Override
     public Optional<MCRCategoryIDFact> computeFact(MCRFactsHolder facts) {
-        Optional<MCRIDFact> idc = facts.require(idFact);
+        Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
             MCRObjectID objectID = idc.get().getValue();
             if (objectID != null) {

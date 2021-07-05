@@ -22,13 +22,13 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 
-public class MCRIDFact extends MCRAbstractFact<MCRObjectID> {
+public class MCRObjectIDFact extends MCRAbstractFact<MCRObjectID> {
 
-    public MCRIDFact(String name, String term) {
+    public MCRObjectIDFact(String name, String term) {
         super(name, term);
     }
     
-    public MCRIDFact(String name, String term, MCRObjectID value) {
+    public MCRObjectIDFact(String name, String term, MCRObjectID value) {
         super(name, term);
         setValue(value);
     }

@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
-import org.mycore.access.facts.fact.MCRIDFact;
+import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.access.facts.fact.MCRSimpleFact;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
@@ -38,7 +38,7 @@ public class MCRCreatedByCondition extends MCRSimpleCondition {
 
     @Override
     public Optional<MCRSimpleFact> computeFact(MCRFactsHolder facts) {
-        Optional<MCRIDFact> idc = facts.require(idFact);
+        Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
             MCRObjectService service = idc.get().getObject().getService();
             List<String> flags = service.getFlags("createdby");

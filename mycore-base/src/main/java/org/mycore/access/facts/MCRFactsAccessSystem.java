@@ -30,7 +30,7 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.facts.fact.MCRIDFact;
+import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.access.facts.fact.MCRSimpleFact;
 import org.mycore.access.facts.model.MCRCombinedCondition;
 import org.mycore.access.facts.model.MCRCondition;
@@ -142,12 +142,12 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
                 target = "metadata";
 
                 if ("derivate".equals(oid.getTypeId())) {
-                    facts.add(new MCRIDFact("derid", checkID, oid));
+                    facts.add(new MCRObjectIDFact("derid", checkID, oid));
                     target = "files";
                     MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(oid);
-                    facts.add(new MCRIDFact("objid", checkID, deriv.getOwnerID()));
+                    facts.add(new MCRObjectIDFact("objid", checkID, deriv.getOwnerID()));
                 } else {
-                    facts.add(new MCRIDFact("objid", checkID, oid));
+                    facts.add(new MCRObjectIDFact("objid", checkID, oid));
                 }
             } else if (checkID.startsWith("webpage")) {
                 target = "webpage";
