@@ -72,10 +72,10 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xsl.MCRErrorListener;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
@@ -777,8 +777,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
         try {
             StringBuilder log = new StringBuilder("Revisions:\n");
-            List<MCRMetadataVersion> revisions = MCRXMLMetadataManager.instance().listRevisions(mcrId);
-            for (MCRMetadataVersion revision : revisions) {
+            List<? extends MCRAbstractMetadataVersion<?>> revisions = MCRXMLMetadataManager.instance()
+                .listRevisions(mcrId);
+            for (MCRAbstractMetadataVersion<?> revision : revisions) {
                 log.append(revision.getRevision()).append(" ");
                 log.append(revision.getType()).append(" ");
                 log.append(sdf.format(revision.getDate())).append(" ");

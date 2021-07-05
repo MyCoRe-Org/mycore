@@ -127,7 +127,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         assertEquals(1, versions.size());
         MCRMetadataVersion mv = versions.get(0);
         assertSame(mv.getMetadataObject(), vm);
-        assertEquals(baseRev, mv.getRevision());
+        assertEquals(baseRev, Long.parseLong(mv.getRevision()));
         assertEquals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID(), mv.getUser());
         assertEquals(MCRMetadataVersion.CREATED, mv.getType());
 
@@ -140,9 +140,9 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         versions = vm.listVersions();
         assertEquals(2, versions.size());
         mv = versions.get(0);
-        assertEquals(baseRev, mv.getRevision());
+        assertEquals(baseRev, Long.parseLong(mv.getRevision()));
         mv = versions.get(1);
-        assertEquals(vm.getRevision(), mv.getRevision());
+        assertEquals(vm.getRevision(), Long.parseLong(mv.getRevision()));
         assertEquals(MCRMetadataVersion.UPDATED, mv.getType());
 
         bzzz();
@@ -152,11 +152,11 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
         versions = vm.listVersions();
         assertEquals(3, versions.size());
         mv = versions.get(0);
-        assertEquals(baseRev, mv.getRevision());
+        assertEquals(baseRev, Long.parseLong(mv.getRevision()));
         mv = versions.get(2);
-        assertEquals(vm.getRevision(), mv.getRevision());
-        assertTrue(versions.get(0).getRevision() < versions.get(1).getRevision());
-        assertTrue(versions.get(1).getRevision() < versions.get(2).getRevision());
+        assertEquals(vm.getRevision(), Long.parseLong(mv.getRevision()));
+        assertTrue(Long.parseLong(versions.get(0).getRevision()) < Long.parseLong(versions.get(1).getRevision()));
+        assertTrue(Long.parseLong(versions.get(1).getRevision()) < Long.parseLong(versions.get(2).getRevision()));
         assertTrue(versions.get(0).getDate().before(versions.get(1).getDate()));
         assertTrue(versions.get(1).getDate().before(versions.get(2).getDate()));
 
@@ -172,7 +172,7 @@ public class MCRVersioningMetadataStoreTest extends MCRIFS2VersioningTestCase {
 
         bzzz();
         versions.get(1).restore();
-        assertTrue(vm.getRevision() > versions.get(2).getRevision());
+        assertTrue(vm.getRevision() > Long.parseLong(versions.get(2).getRevision()));
         assertTrue(vm.getLastModified().after(versions.get(2).getDate()));
         assertEquals("bango", vm.getMetadata().asXML().getRootElement().getName());
         assertEquals(4, vm.listVersions().size());

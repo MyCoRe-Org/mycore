@@ -150,7 +150,7 @@ public interface MCRXMLMetadataManagerAdapter {
      *         the given object or null if the id is null or the metadata
      *         store doesn't support versioning
      */
-    List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException;
+    List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException;
 
     /**
      * This method returns the highest stored ID number for a given MCRObjectID

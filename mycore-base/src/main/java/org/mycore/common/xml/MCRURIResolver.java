@@ -102,9 +102,9 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRDataURL;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRFileMetadata;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -1465,7 +1465,7 @@ public final class MCRURIResolver implements URIResolver {
             MCRObjectID mcrId = MCRObjectID.getInstance(id);
             MCRXMLMetadataManager metadataManager = MCRXMLMetadataManager.instance();
             try {
-                List<MCRMetadataVersion> versions = metadataManager.listRevisions(mcrId);
+                List<? extends MCRAbstractMetadataVersion<?>> versions = metadataManager.listRevisions(mcrId);
                 if (versions != null && !versions.isEmpty()) {
                     return getSource(versions);
                 } else {
@@ -1485,13 +1485,13 @@ public final class MCRURIResolver implements URIResolver {
             return new JDOMSource(e);
         }
 
-        private Source getSource(List<MCRMetadataVersion> versions) {
+        private Source getSource(List<? extends MCRAbstractMetadataVersion<?>> versions) {
             Element e = new Element("versions");
-            for (MCRMetadataVersion version : versions) {
+            for (MCRAbstractMetadataVersion<?> version : versions) {
                 Element v = new Element("version");
                 v.setAttribute("user", version.getUser());
                 v.setAttribute("date", MCRXMLFunctions.getISODate(version.getDate(), null));
-                v.setAttribute("r", Long.toString(version.getRevision()));
+                v.setAttribute("r", version.getRevision());
                 v.setAttribute("action", Character.toString(version.getType()));
                 e.addContent(v);
             }
@@ -1689,10 +1689,11 @@ public final class MCRURIResolver implements URIResolver {
          * @see javax.xml.transform.URIResolver
          */
         public Source resolve(String href, String base) throws TransformerException {
-            final String[] split = href.split(":",4);
+            final String[] split = href.split(":", 4);
 
-            if(split.length!=4){
-                throw new MCRException("Syntax needs to be checkPermissionChain:{?id}:{permission}:{uri} but was " + href);
+            if (split.length != 4) {
+                throw new MCRException(
+                    "Syntax needs to be checkPermissionChain:{?id}:{permission}:{uri} but was " + href);
             }
 
             final String permission = split[2];
@@ -1700,14 +1701,14 @@ public final class MCRURIResolver implements URIResolver {
             final String uri = split[3];
             final boolean hasAccess;
 
-            if(!split[1].isBlank()){
+            if (!split[1].isBlank()) {
                 hasAccess = MCRAccessManager.checkPermission(permission, split[1]);
             } else {
                 hasAccess = MCRAccessManager.checkPermission(permission);
             }
 
-            if(!hasAccess){
-                throw new TransformerException("No Access to " + uri + " ("+href+" )");
+            if (!hasAccess) {
+                throw new TransformerException("No Access to " + uri + " (" + href + " )");
             }
 
             return MCRURIResolver.instance().resolve(uri, base);

@@ -17,13 +17,12 @@
  */
 package org.mycore.datamodel.common;
 
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -58,9 +57,9 @@ public class MCRCreatorCache {
                     try {
                         return Optional.ofNullable(MCRXMLMetadataManager.instance().listRevisions(objectId))
                             .map(versions -> versions.stream()
-                                .sorted(Comparator.comparingLong(MCRMetadataVersion::getRevision)
-                                    .reversed())
-                                .filter(v -> v.getType() == MCRMetadataVersion.CREATED).findFirst()
+                                .sorted(
+                                    Collections.reverseOrder((v1, v2) -> v1.getRevision().compareTo(v2.getRevision())))
+                                .filter(v -> v.getType() == MCRAbstractMetadataVersion.CREATED).findFirst()
                                 .map(version -> {
                                     LOGGER.info(
                                         "Found creator {} in revision {} of {}",

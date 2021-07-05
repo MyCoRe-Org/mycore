@@ -33,7 +33,6 @@ import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
@@ -164,7 +163,7 @@ public class MCRXMLMetadataManager {
      * @return
      * @see MCRXMLMetadataManagerAdapter#listRevisions(MCRObjectID)
      */
-    public List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException {
+    public List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException {
         return IMPLEMENTATION.listRevisions(id);
     }
 

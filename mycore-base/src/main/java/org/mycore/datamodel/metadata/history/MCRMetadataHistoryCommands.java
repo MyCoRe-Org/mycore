@@ -46,6 +46,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUsageException;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRCreatorCache;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
@@ -114,7 +115,7 @@ public class MCRMetadataHistoryCommands {
         help = "build metadata history of all objects with base id {0}")
     public static List<String> buildHistory(String baseId) {
         MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
-        mm.verifyStore (baseId);
+        mm.verifyStore(baseId);
         ExecutorService executorService = Executors.newWorkStealingPool();
         MCRSession currentSession = MCRSessionMgr.getCurrentSession();
         String[] idParts = MCRObjectID.getIDParts(baseId);
@@ -161,7 +162,8 @@ public class MCRMetadataHistoryCommands {
 
     private static Stream<MCRMetaHistoryItem> buildDerivateHistory(MCRObjectID derId) {
         try {
-            List<MCRMetadataVersion> versions = MCRXMLMetadataManager.instance().listRevisions(derId);
+            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
+                .listRevisions(derId);
             if (versions == null || versions.isEmpty()) {
                 return buildSimpleDerivateHistory(derId);
             } else {
@@ -175,7 +177,8 @@ public class MCRMetadataHistoryCommands {
 
     private static Stream<MCRMetaHistoryItem> buildObjectHistory(MCRObjectID objId) {
         try {
-            List<MCRMetadataVersion> versions = MCRXMLMetadataManager.instance().listRevisions(objId);
+            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
+                .listRevisions(objId);
             if (versions == null || versions.isEmpty()) {
                 return buildSimpleObjectHistory(objId);
             } else {
@@ -241,12 +244,13 @@ public class MCRMetadataHistoryCommands {
         }
     }
 
-    private static Stream<MCRMetaHistoryItem> buildDerivateHistory(MCRObjectID derId, List<MCRMetadataVersion> versions)
+    private static Stream<MCRMetaHistoryItem> buildDerivateHistory(MCRObjectID derId,
+        List<? extends MCRAbstractMetadataVersion<?>> versions)
         throws IOException {
         boolean exist = false;
         LogManager.getLogger().debug("Complete history rebuild of {} should be possible", derId);
         ArrayList<MCRMetaHistoryItem> items = new ArrayList<>(100);
-        for (MCRMetadataVersion version : versions) {
+        for (MCRAbstractMetadataVersion<?> version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();
             if (version.getType() == MCRMetadataVersion.DELETED) {
@@ -283,12 +287,13 @@ public class MCRMetadataHistoryCommands {
         return items.stream();
     }
 
-    private static Stream<MCRMetaHistoryItem> buildObjectHistory(MCRObjectID objId, List<MCRMetadataVersion> versions)
+    private static Stream<MCRMetaHistoryItem> buildObjectHistory(MCRObjectID objId,
+        List<? extends MCRAbstractMetadataVersion<?>> versions)
         throws IOException {
         boolean exist = false;
         LogManager.getLogger().debug("Complete history rebuild of {} should be possible", objId);
         ArrayList<MCRMetaHistoryItem> items = new ArrayList<>(100);
-        for (MCRMetadataVersion version : versions) {
+        for (MCRAbstractMetadataVersion<?> version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();
             if (version.getType() == MCRMetadataVersion.DELETED) {

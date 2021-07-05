@@ -256,7 +256,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 SVNLogEntryPath svnLogEntryPath = entry.getChangedPaths().get(path);
                 if (svnLogEntryPath != null) {
                     char type = svnLogEntryPath.getType();
-                    versions.add(new MCRMetadataVersion(this, entry, type));
+                    versions.add(new MCRMetadataVersion(this, Long.toString(entry.getRevision()), entry.getAuthor(),
+                        entry.getDate(), type));
                 }
             }
             return versions;
@@ -292,7 +293,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
                 SVNLogEntryPath svnLogEntryPath = logEntry.getChangedPaths().get(path);
                 if (svnLogEntryPath != null) {
                     char type = svnLogEntryPath.getType();
-                    return new MCRMetadataVersion(this, logEntry, type);
+                    return new MCRMetadataVersion(this, Long.toString(logEntry.getRevision()), logEntry.getAuthor(),
+                        logEntry.getDate(), type);
                 }
             }
             LOGGER.warn("Metadata object {} in store {} has no revision ''{}''!", getID(), getStore().getID(),
