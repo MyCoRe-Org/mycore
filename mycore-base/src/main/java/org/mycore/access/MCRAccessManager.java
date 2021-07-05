@@ -72,11 +72,11 @@ public class MCRAccessManager {
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
-        // if accessImpl equals acccessStrategy we reuse the accessImpl, 
+        // if acccessStrategy equals accessImp we reuse the accessImpl, 
         // to make sure, that only one singleton gets created
-        // (used to instantitate fact-based access system) 
-        if (MCRConfiguration2.getString("MCR.Access.Class").orElse("UNDEFINED")
-            .equals(MCRConfiguration2.getString("MCR.Access.Strategy.Class").orElse(null))) {
+        // (used to instantiate fact-based access system) 
+        if (MCRConfiguration2.getString("MCR.Access.Strategy.Class").orElse("UNDEFINED")
+            .equals(MCRConfiguration2.getString("MCR.Access.Class").orElse(null))) {
             return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Class").orElseThrow();
         }
         return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
