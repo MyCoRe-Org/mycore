@@ -107,8 +107,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <packages>org.mycore.access*</packages>
               </group>
               <group>
-                <title>MyCoRe Access Key</title>
-                <packages>org.mycore.accesskey*</packages>
+                <title>MyCoRe ACL</title>
+                <packages>org.mycore.mcr.acl*</packages>
               </group>
               <group>
                 <title>MyCoRe Persistence Backend Implementations</title>
@@ -648,8 +648,8 @@ Applications based on MyCoRe use a common core, which provides the functionality
                   <packages>org.mycore.access*</packages>
                 </group>
                 <group>
-                  <title>MyCoRe Access Key</title>
-                  <packages>org.mycore.accesskey*</packages>
+                  <title>MyCoRe ACL</title>
+                  <packages>org.mycore.mcr.acl*</packages>
                 </group>
                 <group>
                   <title>MyCoRe Persistence Backend Implementations</title>
@@ -1233,7 +1233,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
-        <artifactId>mycore-accesskey</artifactId>
+        <artifactId>mycore-acl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2169,7 +2169,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
   </developers>
   <modules>
     <module>mycore-base</module>
-    <module>mycore-accesskey</module>
+    <module>mycore-acl</module>
     <module>mycore-acl-editor2</module>
     <module>mycore-classbrowser</module>
     <module>mycore-classeditor</module>

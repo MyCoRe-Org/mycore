@@ -32,7 +32,7 @@
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
-      <artifactId>mycore-accesskey</artifactId>
+      <artifactId>mycore-acl</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
