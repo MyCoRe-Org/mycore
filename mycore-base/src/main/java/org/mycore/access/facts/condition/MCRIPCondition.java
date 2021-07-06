@@ -35,7 +35,6 @@ public class MCRIPCondition extends MCRAbstractFactCondition<MCRIPAddress, MCRIp
 
     private static Logger LOGGER = LogManager.getLogger();
 
-    @MCRProperty(name = "IP", required = false)
     private String defaultIP;
 
     public void parse(Element xml) {
@@ -63,5 +62,10 @@ public class MCRIPCondition extends MCRAbstractFactCondition<MCRIPAddress, MCRIp
             LOGGER.error("Unknown IP Address", e);
         }
         return Optional.empty();
+    }
+    
+    @MCRProperty(name = "IP", required = false)
+    public void setDefaultIP(String ip){
+        defaultIP = ip;
     }
 }
