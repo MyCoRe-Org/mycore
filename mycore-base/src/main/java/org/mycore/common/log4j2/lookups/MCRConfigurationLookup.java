@@ -21,11 +21,10 @@ package org.mycore.common.log4j2.lookups;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.lookup.StrLookup;
-import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * Lookup a value in {@link MCRConfiguration}. Uses <code>key</code> as property key.
+ * Lookup a value in {@link MCRConfiguration2}. Uses <code>key</code> as property key.
  * 
  * @author Thomas Scheffler
  */

@@ -46,7 +46,7 @@ import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 import org.mycore.common.log4j2.MCRSessionThreadContext;
 
 /**
- * Called by {@link MCRStartupHandler} on start up to setup {@link MCRConfiguration}.
+ * Called by {@link MCRStartupHandler} on start up to setup {@link MCRConfiguration2}.
  *
  * @author Thomas Scheffler (yagee)
  * @since 2013.12
