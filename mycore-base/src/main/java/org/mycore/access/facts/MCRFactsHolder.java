@@ -40,10 +40,10 @@ public class MCRFactsHolder {
         facts.add(fact);
     }
 
-    public boolean isFact(String factName, String inquiry) {
+    public boolean isFact(String factName, String term) {
         Optional<MCRFact<?>> osc = facts.stream()
             .filter(f -> factName.equals(f.getName()))
-            .filter(f -> inquiry.equals(inquiry))
+            .filter(f -> term.equals(f.getTerm()))
             .findFirst();
         return osc.isPresent();
     }
