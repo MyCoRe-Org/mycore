@@ -67,6 +67,18 @@ jobs:
         mvn -B -Plocal-testing,!standard-with-extra-repos clean install -Dlog4j.configurationFile=$PWD/ci/log4j2.xml -T2
         mvn -P!standard-with-extra-repos -B javadoc:javadoc
 
+    - name: Upload logs on build failure
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: |
+          ./**/surefire-reports
+          ./**/failsafe-reports
+          ./**/screenshots
+          ./**/*error*.log
+          ./**/*test.log
+
     - name: Save Maven cache
       uses: skjolber/maven-cache-github-action@v1
       with:
