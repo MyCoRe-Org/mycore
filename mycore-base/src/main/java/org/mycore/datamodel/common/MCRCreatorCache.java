@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion.MCRMetadataVersionState;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -60,7 +61,7 @@ public class MCRCreatorCache {
                             .map(versions -> versions.stream()
                                 .sorted(Comparator.comparingLong(MCRMetadataVersion::getRevision)
                                     .reversed())
-                                .filter(v -> v.getType() == MCRMetadataVersion.CREATED).findFirst()
+                                .filter(v -> v.getState() == MCRMetadataVersionState.CREATED).findFirst()
                                 .map(version -> {
                                     LOGGER.info(
                                         "Found creator {} in revision {} of {}",

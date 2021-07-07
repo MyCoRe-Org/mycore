@@ -784,7 +784,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             List<MCRMetadataVersion> revisions = MCRXMLMetadataManager.instance().listRevisions(mcrId);
             for (MCRMetadataVersion revision : revisions) {
                 log.append(revision.getRevision()).append(" ");
-                log.append(revision.getType()).append(" ");
+                log.append(String.valueOf(revision.getState()).charAt(0)).append(" ");
                 log.append(sdf.format(revision.getDate())).append(" ");
                 log.append(revision.getUser());
                 log.append("\n");

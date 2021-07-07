@@ -49,6 +49,7 @@ import org.mycore.datamodel.common.MCRCreatorCache;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion.MCRMetadataVersionState;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -262,7 +263,7 @@ public class MCRMetadataHistoryCommands {
         for (MCRMetadataVersion version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();
-            if (version.getType() == MCRMetadataVersion.DELETED) {
+            if (version.getState() == MCRMetadataVersionState.DELETED) {
                 if (exist) {
                     items.add(delete(derId, user, revDate));
                     exist = false;
@@ -270,7 +271,7 @@ public class MCRMetadataHistoryCommands {
             } else {
                 //created or updated
                 int timeOffset = 0;
-                if (version.getType() == MCRMetadataVersion.CREATED && !exist) {
+                if (version.getState() == MCRMetadataVersionState.CREATED && !exist) {
                     items.add(create(derId, user, revDate));
                     timeOffset = 1;
                     exist = true;
@@ -304,7 +305,7 @@ public class MCRMetadataHistoryCommands {
         for (MCRMetadataVersion version : versions) {
             String user = version.getUser();
             Instant revDate = version.getDate().toInstant();
-            if (version.getType() == MCRMetadataVersion.DELETED) {
+            if (version.getState() == MCRMetadataVersionState.DELETED) {
                 if (exist) {
                     items.add(delete(objId, user, revDate));
                     exist = false;
@@ -312,7 +313,7 @@ public class MCRMetadataHistoryCommands {
             } else {
                 //created or updated
                 int timeOffset = 0;
-                if (version.getType() == MCRMetadataVersion.CREATED && !exist) {
+                if (version.getState() == MCRMetadataVersionState.CREATED && !exist) {
                     items.add(create(objId, user, revDate));
                     timeOffset = 1;
                     exist = true;

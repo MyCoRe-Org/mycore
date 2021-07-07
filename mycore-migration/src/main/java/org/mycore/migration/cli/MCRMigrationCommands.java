@@ -65,6 +65,7 @@ import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
+import org.mycore.datamodel.ifs2.MCRMetadataVersion.MCRMetadataVersionState;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
@@ -122,7 +123,7 @@ public class MCRMigrationCommands {
                 List<MCRMetadataVersion> versions = versionedMetadata.listVersions();
                 MCRMetadataVersion firstVersion = versions.get(0);
                 for (MCRMetadataVersion version : versions) {
-                    if (version.getType() == 'A') {
+                    if (version.getState() == MCRMetadataVersionState.CREATED) {
                         firstVersion = version; // get last 'added'
                     }
                 }

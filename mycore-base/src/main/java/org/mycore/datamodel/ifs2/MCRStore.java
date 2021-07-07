@@ -538,7 +538,7 @@ public abstract class MCRStore {
         this.storeConfig = storeConfig;
     }
 
-    private String createIDWithLeadingZeros(final int id) {
+    String createIDWithLeadingZeros(final int id) {
         final NumberFormat numWithLeadingZerosFormat = NumberFormat.getIntegerInstance(Locale.ROOT);
         numWithLeadingZerosFormat.setMinimumIntegerDigits(idLength);
         numWithLeadingZerosFormat.setGroupingUsed(false);
