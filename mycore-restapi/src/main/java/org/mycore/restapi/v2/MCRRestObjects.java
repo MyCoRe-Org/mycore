@@ -78,10 +78,10 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -356,7 +356,8 @@ public class MCRRestObjects {
     @Operation(
         summary = "Returns MCRObject with the given " + PARAM_MCRID + ".",
         responses = @ApiResponse(content = @Content(
-            array = @ArraySchema(uniqueItems = true, schema = @Schema(implementation = MCRMetadataVersion.class)))),
+            array = @ArraySchema(uniqueItems = true,
+                schema = @Schema(implementation = MCRAbstractMetadataVersion.class)))),
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
     @XmlElementWrapper(name = "versions")
@@ -374,10 +375,9 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        List<MCRMetadataVersion> versions = MCRXMLMetadataManager.instance().getVersionedMetaData(id)
-            .listVersions();
+        List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance().listRevisions(id);
         return Response.ok()
-            .entity(new GenericEntity<>(versions, TypeUtils.parameterize(List.class, MCRMetadataVersion.class)))
+            .entity(new GenericEntity<>(versions, TypeUtils.parameterize(List.class, MCRAbstractMetadataVersion.class)))
             .lastModified(lastModified)
             .build();
     }

@@ -28,8 +28,6 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRStoredMetadata;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -93,10 +91,9 @@ public interface MCRXMLMetadataManagerAdapter {
      * @param mcrid the MCRObjectID
      * @param xml the xml metadata of the MCRObject
      * @param lastModified the date of last modification to set
-     * @return the stored metadata as IFS2 object
      * @throws MCRPersistenceException the object couldn't be created due persistence problems
      */
-    MCRStoredMetadata create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
+    void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException;
 
     /**
@@ -113,9 +110,8 @@ public interface MCRXMLMetadataManagerAdapter {
      * @param mcrid the MCRObjectID
      * @param xml the xml metadata of the MCRObject
      * @param lastModified the date of last modification to set
-     * @return the stored metadata as IFS2 object
      */
-    MCRStoredMetadata update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
+    void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException;
 
     /**
@@ -154,18 +150,7 @@ public interface MCRXMLMetadataManagerAdapter {
      *         the given object or null if the id is null or the metadata
      *         store doesn't support versioning
      */
-    List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException;
-
-    /**
-     * Attempts to retrieve a versioned metadata object for a given ID.
-     *
-     * @param id
-     *            the id of the object to be retrieved
-     * @return {@link MCRVersionedMetadata} object for the given ID, or null if the ID is null
-     *         or the store for the ID does not do versioning.
-     * @throws IOException
-     */
-    MCRVersionedMetadata getVersionedMetaData(MCRObjectID id) throws IOException;
+    List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException;
 
     /**
      * This method returns the highest stored ID number for a given MCRObjectID

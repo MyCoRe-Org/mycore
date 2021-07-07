@@ -33,9 +33,6 @@ import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRStoredMetadata;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
@@ -102,13 +99,12 @@ public class MCRXMLMetadataManager {
      * @param mcrid
      * @param xml
      * @param lastModified
-     * @return
      * @throws MCRPersistenceException
      * @see MCRXMLMetadataManagerAdapter#create(MCRObjectID, MCRContent, Date)
      */
-    public MCRStoredMetadata create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
+    public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException {
-        return IMPLEMENTATION.create(mcrid, xml, lastModified);
+        IMPLEMENTATION.create(mcrid, xml, lastModified);
     }
 
     /**
@@ -128,12 +124,11 @@ public class MCRXMLMetadataManager {
      * @param mcrid
      * @param xml
      * @param lastModified
-     * @return
      * @see MCRXMLMetadataManagerAdapter#update(MCRObjectID, MCRContent, Date)
      */
-    public MCRStoredMetadata update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
+    public void update(MCRObjectID mcrid, MCRContent xml, Date lastModified)
         throws MCRPersistenceException {
-        return IMPLEMENTATION.update(mcrid, xml, lastModified);
+        IMPLEMENTATION.update(mcrid, xml, lastModified);
     }
 
     /**
@@ -168,20 +163,8 @@ public class MCRXMLMetadataManager {
      * @return
      * @see MCRXMLMetadataManagerAdapter#listRevisions(MCRObjectID)
      */
-    public List<MCRMetadataVersion> listRevisions(MCRObjectID id) throws IOException {
+    public List<? extends MCRAbstractMetadataVersion<?>> listRevisions(MCRObjectID id) throws IOException {
         return IMPLEMENTATION.listRevisions(id);
-    }
-
-    /**
-     * Delegation, see linked method for relevant documentation.
-     *
-     * @param id
-     * @return
-     * @throws IOException
-     * @see MCRXMLMetadataManagerAdapter#getVersionedMetaData(MCRObjectID)
-     */
-    public MCRVersionedMetadata getVersionedMetaData(MCRObjectID id) throws IOException {
-        return IMPLEMENTATION.getVersionedMetaData(id);
     }
 
     /**
@@ -307,12 +290,11 @@ public class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID
      * @param xml the xml metadata of the MCRObject
      * @param lastModified the date of last modification to set
-     * @return the stored metadata as IFS2 object
      * @throws MCRPersistenceException the object couldn't be created due persistence problems
      */
-    public MCRStoredMetadata create(MCRObjectID mcrid, Document xml, Date lastModified)
+    public void create(MCRObjectID mcrid, Document xml, Date lastModified)
         throws MCRPersistenceException {
-        return create(mcrid, new MCRJDOMContent(xml), lastModified);
+        create(mcrid, new MCRJDOMContent(xml), lastModified);
     }
 
     /**
@@ -321,11 +303,10 @@ public class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID
      * @param xml the xml metadata of the MCRObject
      * @param lastModified the date of last modification to set
-     * @return the stored metadata as IFS2 object
      * @throws MCRPersistenceException the object couldn't be created due persistence problems
      */
-    public MCRStoredMetadata create(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException {
-        return create(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
+    public void create(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException {
+        create(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
     }
 
     public void delete(String mcrid) throws MCRPersistenceException {
@@ -338,12 +319,11 @@ public class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID
      * @param xml the xml metadata of the MCRObject
      * @param lastModified the date of last modification to set
-     * @return the stored metadata as IFS2 object
      * @throws MCRPersistenceException the object couldn't be updated due persistence problems
      */
-    public MCRStoredMetadata update(MCRObjectID mcrid, Document xml, Date lastModified)
+    public void update(MCRObjectID mcrid, Document xml, Date lastModified)
         throws MCRPersistenceException {
-        return update(mcrid, new MCRJDOMContent(xml), lastModified);
+        update(mcrid, new MCRJDOMContent(xml), lastModified);
     }
 
     /**
@@ -352,15 +332,14 @@ public class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID
      * @param xml the xml metadata of the MCRObject
      * @param lastModified the date of last modification to set
-     * @return the stored metadata as IFS2 object
      * @throws MCRPersistenceException the object couldn't be created or updated due persistence problems
      */
-    public MCRStoredMetadata createOrUpdate(MCRObjectID mcrid, Document xml, Date lastModified)
+    public void createOrUpdate(MCRObjectID mcrid, Document xml, Date lastModified)
         throws MCRPersistenceException {
         if (exists(mcrid)) {
-            return update(mcrid, xml, lastModified);
+            update(mcrid, xml, lastModified);
         } else {
-            return create(mcrid, xml, lastModified);
+            create(mcrid, xml, lastModified);
         }
     }
 
@@ -370,10 +349,10 @@ public class MCRXMLMetadataManager {
      * @param mcrid the MCRObjectID
      * @param xml the xml metadata of the MCRObject
      * @param lastModified the date of last modification to set
-     * @return the stored metadata as IFS2 object
+     * @throws MCRPersistenceException the object couldn't be updated due persistence problems
      */
-    public MCRStoredMetadata update(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException {
-        return update(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
+    public void update(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException {
+        update(mcrid, new MCRByteContent(xml, lastModified.getTime()), lastModified);
     }
 
     /**

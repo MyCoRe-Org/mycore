@@ -60,11 +60,10 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
-import org.mycore.datamodel.ifs2.MCRVersionedMetadata;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaDerivateLink;
@@ -111,22 +110,22 @@ public class MCRMigrationCommands {
         MCRBase obj = MCRMetadataManager.retrieve(objectID);
         MCRObjectService service = obj.getService();
         if (!service.isFlagTypeSet(MCRObjectService.FLAG_TYPE_CREATEDBY)) { //the egg
-            MCRVersionedMetadata versionedMetadata = MCRXMLMetadataManager.instance().getVersionedMetaData(objectID);
+            List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
+                .listRevisions(objectID);
             String createUser = null, modifyUser = null;
-            if (versionedMetadata == null) {
+            if (versions == null) {
                 LOGGER.warn(
                     "Cannot restore author servflags as there are no versions available. Setting to current user.");
                 createUser = MCRSessionMgr.getCurrentSession().getUserInformation().getUserID();
                 modifyUser = createUser;
             } else {
-                List<MCRMetadataVersion> versions = versionedMetadata.listVersions();
-                MCRMetadataVersion firstVersion = versions.get(0);
-                for (MCRMetadataVersion version : versions) {
+                MCRAbstractMetadataVersion<?> firstVersion = versions.get(0);
+                for (MCRAbstractMetadataVersion<?> version : versions) {
                     if (version.getType() == 'A') {
                         firstVersion = version; // get last 'added'
                     }
                 }
-                MCRMetadataVersion lastVersion = versions.get(versions.size() - 1);
+                MCRAbstractMetadataVersion<?> lastVersion = versions.get(versions.size() - 1);
                 createUser = firstVersion.getUser();
                 modifyUser = lastVersion.getUser();
             }
