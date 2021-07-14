@@ -92,6 +92,7 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.media.services.MCRThumbnailGenerator;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
+import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
@@ -628,6 +629,7 @@ public class MCRRestObjects {
             @ApiResponse(responseCode = "404", description = "object is not found"),
         })
     @MCRRequireTransaction
+    @MCRApiDraft("MCRObjectState")
     public Response setState(@PathParam(PARAM_MCRID) MCRObjectID id, String state) {
         //check preconditions
         if (!MCRMetadataManager.exists(id)) {
@@ -675,6 +677,7 @@ public class MCRRestObjects {
             @ApiResponse(responseCode = "204", description = "no state is set"),
             @ApiResponse(responseCode = "404", description = "object is not found"),
         })
+    @MCRApiDraft("MCRObjectState")
     public Response getState(@PathParam(PARAM_MCRID) MCRObjectID id) {
         //check preconditions
         if (!MCRMetadataManager.exists(id)) {

@@ -28,6 +28,7 @@ import javax.ws.rs.InternalServerErrorException;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.restapi.MCRApiDraftFilter;
 import org.mycore.restapi.MCRContentNegotiationViaExtensionFilter;
 import org.mycore.restapi.MCRDropSessionFilter;
 import org.mycore.restapi.MCRJerseyRestApp;
@@ -60,6 +61,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         register(MCRNoFormDataPutFilter.class);
         register(MCRDropSessionFilter.class);
         register(MCRExceptionMapper.class);
+        register(MCRApiDraftFilter.class);
         //after removing the following line, test if json output from MCRRestClassification is still OK
         register(JacksonJaxbJsonProvider.class); //jetty >= 2.31, do not use DefaultJacksonJaxbJsonProvider
         setupOAS();
