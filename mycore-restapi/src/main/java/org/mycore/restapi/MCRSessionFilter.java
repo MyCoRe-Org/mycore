@@ -77,7 +77,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     private static final String PROP_RENEW_JWT = "mcr:renewJWT";
 
     private static final List<String> ALLOWED_JWT_SESSION_ATTRIBUTES = MCRConfiguration2
-            .getString("MCR.RestAPI.JWT.AllowedSessionAttributes").stream()
+            .getString("MCR.RestAPI.JWT.AllowedSessionAttributePrefixes").stream()
             .flatMap(MCRConfiguration2::splitValue)
             .collect(Collectors.toList());
 
