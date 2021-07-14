@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.annotation.Annotation;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
@@ -78,6 +79,8 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRObjectIDDate;
@@ -611,6 +614,82 @@ public class MCRRestObjects {
     public Response testDeleteObject(@PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
         return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+    @PUT
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{" + PARAM_MCRID + "}/service/state")
+    @Operation(summary = "change state of object {" + PARAM_MCRID + "}",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        responses = {
+            @ApiResponse(responseCode = "204", description = "operation was successful"),
+            @ApiResponse(responseCode = "400", description = "Invalid state"),
+            @ApiResponse(responseCode = "404", description = "object is not found"),
+        })
+    @MCRRequireTransaction
+    public Response setState(@PathParam(PARAM_MCRID) MCRObjectID id, String state) {
+        //check preconditions
+        if (!MCRMetadataManager.exists(id)) {
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
+                .withMessage("MCRObject " + id + " not found")
+                .toException();
+        }
+        if (!state.isEmpty()) {
+            MCRCategoryID categState = new MCRCategoryID(
+                MCRConfiguration2.getString("MCR.Metadata.Service.State.Classification.ID").orElse("state"), state);
+            if (!MCRCategoryDAOFactory.getInstance().exist(categState)) {
+                throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCROBJECT_INVALID_STATE)
+                    .withMessage("Category " + categState + " not found")
+                    .toException();
+            }
+        }
+        final MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(id);
+        if (state.isEmpty()) {
+            mcrObject.getService().removeState();
+        } else {
+            mcrObject.getService().setState(state);
+        }
+        try {
+            MCRMetadataManager.update(mcrObject);
+            return Response.status(Response.Status.NO_CONTENT).build();
+        } catch (MCRAccessException e) {
+            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NO_PERMISSION)
+                .withMessage("You may not modify or create metadata of MCRObject " + id + ".")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
+        }
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Path("/{" + PARAM_MCRID + "}/service/state")
+    @Operation(summary = "get state of object {" + PARAM_MCRID + "}",
+        tags = MCRRestUtils.TAG_MYCORE_OBJECT,
+        responses = {
+            @ApiResponse(responseCode = "307", description = "redirect to state category"),
+            @ApiResponse(responseCode = "204", description = "no state is set"),
+            @ApiResponse(responseCode = "404", description = "object is not found"),
+        })
+    public Response getState(@PathParam(PARAM_MCRID) MCRObjectID id) {
+        //check preconditions
+        if (!MCRMetadataManager.exists(id)) {
+            throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCROBJECT_NOT_FOUND)
+                .withMessage("MCRObject " + id + " not found")
+                .toException();
+        }
+        final MCRCategoryID state = MCRMetadataManager.retrieveMCRObject(id).getService().getState();
+        if (state == null) {
+            return Response.noContent().build();
+        }
+        return Response.temporaryRedirect(
+            uriInfo.resolve(URI.create("classifications/" + state.getRootID() + "/" + state.getID())))
+            .build();
     }
 
 }
