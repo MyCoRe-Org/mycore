@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response;
 
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.MCRJWTUtil;
 import org.mycore.frontend.jersey.MCRStaticContent;
@@ -67,15 +66,16 @@ public class MCRJWTResource {
             return MCRJWTUtil.getJWTLoginErrorResponse("No active MyCoRe session found.");
         }
         String[] userAttributes = request.getParameterValues("ua");
+        String[] sessionAttributes = request.getParameterValues("sa");
         MCRSession mcrSession = MCRServlet.getSession(request);
-        String jwt = getToken(mcrSession, userAttributes);
+        String jwt = getToken(mcrSession, userAttributes, sessionAttributes);
         return MCRJWTUtil.getJWTLoginSuccessResponse(jwt);
     }
 
-    private String getToken(MCRSession mcrSession, String[] userAttributes) throws UnsupportedEncodingException {
-        MCRUserInformation userInformation = mcrSession.getUserInformation();
+    private String getToken(MCRSession mcrSession, String[] userAttributes, String[] sessionAttributes) 
+        throws UnsupportedEncodingException {
         String issuer = request.getRequestURL().toString();
-        return MCRJWTUtil.getJWTBuilder(userInformation, userAttributes)
+        return MCRJWTUtil.getJWTBuilder(mcrSession, userAttributes, sessionAttributes)
             .withJWTId(mcrSession.getID())
             .withIssuer(issuer)
             .withAudience(AUDIENCE)

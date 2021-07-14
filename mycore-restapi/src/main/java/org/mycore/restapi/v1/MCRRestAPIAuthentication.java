@@ -35,8 +35,8 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.frontend.jersey.MCRJWTUtil;
@@ -94,7 +94,7 @@ public class MCRRestAPIAuthentication {
     public Response authorize(@DefaultValue("") @HeaderParam("Authorization") String authorization) throws IOException {
         if (authorization.startsWith("Basic ")) {
             //login handled by MCRSessionFilter
-            Optional<String> jwt = getToken(MCRSessionMgr.getCurrentSession().getUserInformation(),
+            Optional<String> jwt = getToken(MCRSessionMgr.getCurrentSession(),
                 MCRFrontendUtil.getRemoteAddr(req));
             if (jwt.isPresent()) {
                 return MCRJWTUtil.getJWTLoginSuccessResponse(jwt.get());
@@ -105,9 +105,9 @@ public class MCRRestAPIAuthentication {
             MCRRestAPIUtil.getWWWAuthenticateHeader("Basic", null, app));
     }
 
-    public static Optional<String> getToken(MCRUserInformation userInformation, String remoteIp) {
+    public static Optional<String> getToken(MCRSession session, String remoteIp) {
         ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
-        return Optional.ofNullable(userInformation)
+        return Optional.ofNullable(session)
             .map(MCRJWTUtil::getJWTBuilder)
             .map(b -> {
                 return b.withAudience(AUDIENCE)
@@ -128,7 +128,7 @@ public class MCRRestAPIAuthentication {
     public Response renew(@DefaultValue("") @HeaderParam("Authorization") String authorization) throws IOException {
         if (authorization.startsWith("Bearer ")) {
             //login handled by MCRSessionFilter
-            Optional<String> jwt = getToken(MCRSessionMgr.getCurrentSession().getUserInformation(),
+            Optional<String> jwt = getToken(MCRSessionMgr.getCurrentSession(),
                 MCRFrontendUtil.getRemoteAddr(req));
             if (jwt.isPresent()) {
                 return MCRJWTUtil.getJWTRenewSuccessResponse(jwt.get());

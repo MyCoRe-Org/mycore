@@ -24,7 +24,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Base64;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Priority;
@@ -52,6 +55,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRJWTUtil;
 import org.mycore.frontend.jersey.resources.MCRJWTResource;
@@ -72,6 +76,11 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     public static final Logger LOGGER = LogManager.getLogger();
 
     private static final String PROP_RENEW_JWT = "mcr:renewJWT";
+
+    private static final List<String> ALLOWED_JWT_SESSION_ATTRIBUTES = MCRConfiguration2
+            .getString("MCR.RestAPI.JWT.AllowedSessionAttributePrefixes").stream()
+            .flatMap(MCRConfiguration2::splitValue)
+            .collect(Collectors.toList());
 
     @Context
     HttpServletRequest httpServletRequest;
@@ -97,7 +106,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             .filter(s -> !responseContext.getStatusInfo().getFamily().equals(Response.Status.Family.CLIENT_ERROR))
             .filter(s -> responseContext.getHeaderString(HttpHeaders.AUTHORIZATION) == null)
             .map(h -> renewJWT ? ("Bearer " + MCRRestAPIAuthentication
-                .getToken(currentSession.getUserInformation(), currentSession.getCurrentIP())
+                .getToken(currentSession, currentSession.getCurrentIP())
                 .orElseThrow(() -> new InternalServerErrorException("Could not get JSON Web Token"))) : h)
             .ifPresent(h -> {
                 responseContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, h);
@@ -187,6 +196,20 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                     }
                 }
                 userInformation = Optional.of(new MCRJWTUserInformation(jwt));
+                if (!ALLOWED_JWT_SESSION_ATTRIBUTES.isEmpty()) {
+                    for (Map.Entry<String, Claim> entry : jwt.getClaims().entrySet()) {
+                        if (entry.getKey().startsWith(MCRJWTUtil.JWT_SESSION_ATTRIBUTE_PREFIX)) {
+                            final String key = entry.getKey()
+                                .substring(MCRJWTUtil.JWT_SESSION_ATTRIBUTE_PREFIX.length());
+                            for (String prefix : ALLOWED_JWT_SESSION_ATTRIBUTES) {
+                                if (key.startsWith(prefix)) {
+                                    currentSession.put(key, entry.getValue().asString());
+                                    break;
+                                }
+                            }                            
+                        }
+                    }
+                }
             } catch (JWTVerificationException e) {
                 LOGGER.error(e.getMessage());
                 LinkedHashMap<String, String> attrs = new LinkedHashMap<>();

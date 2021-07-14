@@ -26,11 +26,13 @@ import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
@@ -50,13 +52,21 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
     
     public static final String JWT_USER_ATTRIBUTE_PREFIX = "mcr:ua:";
 
+    public static final String JWT_SESSION_ATTRIBUTE_PREFIX = "mcr:sa:";
+
     private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
     private static final String ROLES_PROPERTY = "MCR.Rest.JWT.Roles";
 
     private static Algorithm SHARED_SECRET;
 
-    public static JWTCreator.Builder getJWTBuilder(MCRUserInformation userInformation, String... userAttributes) {
+    public static JWTCreator.Builder getJWTBuilder(MCRSession mcrSession) {
+        return getJWTBuilder(mcrSession, null, null);
+    }
+
+    public static JWTCreator.Builder getJWTBuilder(MCRSession mcrSession, 
+        String[] userAttributes, String[] sessionAttributes) {
+        MCRUserInformation userInformation = mcrSession.getUserInformation();
         String[] roles = MCRConfiguration2.getOrThrow(ROLES_PROPERTY, MCRConfiguration2::splitValue)
             .filter(userInformation::isUserInRole)
             .toArray(String[]::new);
@@ -74,6 +84,15 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
                 String value = userInformation.getUserAttribute(userAttribute);
                 if (value != null) {
                     builder.withClaim(JWT_USER_ATTRIBUTE_PREFIX + userAttribute, value);
+                }
+            }
+        }
+        if (sessionAttributes != null) {
+            for (String sessionAttribute : sessionAttributes) {
+                Object object = mcrSession.get(sessionAttribute);
+                String value = Optional.ofNullable(object).map(Object::toString).orElse("null");
+                if (value != null) {
+                    builder.withClaim(JWT_SESSION_ATTRIBUTE_PREFIX + sessionAttribute, value);
                 }
             }
         }
