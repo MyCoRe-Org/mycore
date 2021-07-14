@@ -40,6 +40,8 @@ final class MCRErrorCodeConstants {
 
     public static final String MCROBJECT_STILL_LINKED = "MCROBJECT_STILL_LINKED";
 
+    public static final String MCROBJECT_INVALID_STATE = "MCROBJECT_INVALID_STATE";
+
     //MCRDerivate
     public static final String MCRDERIVATE_NO_PERMISSION = "MCRDERIVATE_NO_PERMISSION";
 
