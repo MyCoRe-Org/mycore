@@ -26,6 +26,17 @@ import java.util.StringJoiner;
 import org.mycore.access.facts.model.MCRFact;
 import org.mycore.access.facts.model.MCRFactComputer;
 
+/**
+ * This class holds all facts which are validated as 'true'
+ * If an identical fact is request again during the rules processing
+ * the result is taken from here and won't be calculated again.
+ * 
+ * Internally it also stores the fact computers, for easier access.
+ * Fact computers are usually the conditions parsed from the rules.xml.
+ *  
+ * @author Robert Stephan
+ *
+ */
 public class MCRFactsHolder {
 
     private Collection<MCRFactComputer<MCRFact<?>>> computers;

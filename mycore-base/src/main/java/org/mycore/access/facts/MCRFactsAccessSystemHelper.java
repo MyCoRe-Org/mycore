@@ -25,6 +25,13 @@ import org.mycore.access.facts.model.MCRCondition;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
+/**
+ * Utility functions for parsing conditions from rules.xml
+ * in fact-based access system.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRFactsAccessSystemHelper {
 
     public static final String CONDITION_PREFIX = "MCR.Access.Facts.Condition.";
@@ -36,7 +43,6 @@ public class MCRFactsAccessSystemHelper {
         return cond;
     }
 
-    
     static MCRCondition build(String type) {
         Optional<MCRCondition> optCondition = MCRConfiguration2.getInstanceOf(CONDITION_PREFIX + type);
         if (optCondition.isEmpty()) {

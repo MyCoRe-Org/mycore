@@ -48,7 +48,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * base class for XML rule based access system
+ * base class for XML fact based access system
  * 
  * enabled it with the 2 properties:
  * MCR.Access.Class=org.mycore.access.xml.MCRXMLAccessSystem
