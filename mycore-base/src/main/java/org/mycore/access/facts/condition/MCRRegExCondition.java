@@ -25,6 +25,17 @@ import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRSimpleFact;
 import org.mycore.access.facts.model.MCRFact;
 
+/**
+ * This condition checks if the given id or another fact matches a regular expression.
+ *   
+ * Examples:
+ * &lt;rege&gt;webpage:/content/search/.*_intern.xed&lt;/regex&gt;
+ * &lt;regex basefact='user'&gt;.*admin&lt;/regex&gt;
+ * &lt;regex basefact='category'&gt;ddc:.*&lt;/regex&gt;
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRRegExCondition extends MCRSimpleCondition {
 
     private String baseFactName;
@@ -33,14 +44,14 @@ public class MCRRegExCondition extends MCRSimpleCondition {
     public void parse(Element xml) {
         super.parse(xml);
         baseFactName = Optional.ofNullable(xml.getAttributeValue("basefact")).orElse("id");
-        setFactName(Optional.ofNullable(xml.getAttributeValue("fact")).orElse(getType() + "-"+baseFactName));
+        setFactName(Optional.ofNullable(xml.getAttributeValue("fact")).orElse(getType() + "-" + baseFactName));
     }
 
     @Override
     public Optional<MCRSimpleFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRFact<?>> baseFact = facts.require(baseFactName);
         if (baseFact.isPresent()) {
-            String v = baseFact.get().getValue().toString(); 
+            String v = baseFact.get().getValue().toString();
             if (v.matches(getTerm())) {
                 MCRSimpleFact fact = new MCRSimpleFact(getFactName(), getTerm());
                 fact.setValue(v);

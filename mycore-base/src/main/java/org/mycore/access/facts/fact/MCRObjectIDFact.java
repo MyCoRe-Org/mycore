@@ -21,24 +21,30 @@ import org.mycore.access.facts.MCRObjectCacheFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-
+/**
+ * This fact implementation can store a MyCoRe object id
+ * and allows access to the corresponding MyCoRe object.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRObjectIDFact extends MCRAbstractFact<MCRObjectID> {
 
     public MCRObjectIDFact(String name, String term) {
         super(name, term);
     }
-    
+
     public MCRObjectIDFact(String name, String term, MCRObjectID value) {
         super(name, term);
         setValue(value);
     }
 
     /**
-     * @return the object for this Condition or null if it is not a object
+     * @return the object for this condition or null if it is not a object
      */
     public MCRObject getObject() {
         MCRObjectID objectID = getValue();
-        if(objectID==null){
+        if (objectID == null) {
             return null;
         }
         return MCRObjectCacheFactory.instance().getObject(objectID);

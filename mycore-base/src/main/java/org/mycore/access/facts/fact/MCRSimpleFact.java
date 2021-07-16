@@ -17,8 +17,15 @@
  */
 package org.mycore.access.facts.fact;
 
-
-//default: value = inquiry
+/**
+ * This implementation can store a simple String as fact.
+ * 
+ * In the default case the query term is stored as value.
+ * Subclasses may override this behaviour.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRSimpleFact extends MCRAbstractFact<String> {
 
     public MCRSimpleFact(String name, String term) {

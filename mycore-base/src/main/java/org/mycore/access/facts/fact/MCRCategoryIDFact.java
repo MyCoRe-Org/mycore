@@ -19,7 +19,12 @@ package org.mycore.access.facts.fact;
 
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
-
+/**
+ * This fact implementation can store a MyCoRe classification as MCRCategoryID
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRCategoryIDFact extends MCRAbstractFact<MCRCategoryID> {
 
     public MCRCategoryIDFact(String name, String term) {

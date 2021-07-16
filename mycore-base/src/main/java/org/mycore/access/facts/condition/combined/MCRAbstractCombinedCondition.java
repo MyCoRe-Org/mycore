@@ -25,12 +25,19 @@ import org.mycore.access.facts.MCRFactsAccessSystemHelper;
 import org.mycore.access.facts.model.MCRCombinedCondition;
 import org.mycore.access.facts.model.MCRCondition;
 
+/**
+ * This is the base implementation for a combined condition.
+ * It can be used to create conditions for a boolean algebra (and, or, not)
+ * 
+ * @author Robert Stephan
+ *
+ */
 public abstract class MCRAbstractCombinedCondition implements MCRCombinedCondition {
 
     protected Set<MCRCondition> conditions = new HashSet<MCRCondition>();
 
     protected boolean debug = false;
-    
+
     private String type = null;
 
     protected Element boundElement = null;
@@ -68,7 +75,7 @@ public abstract class MCRAbstractCombinedCondition implements MCRCombinedConditi
             }
         }
     }
-    
+
     @Override
     public String getType() {
         return type;
@@ -80,6 +87,5 @@ public abstract class MCRAbstractCombinedCondition implements MCRCombinedConditi
     public Set<MCRCondition> getChildConditions() {
         return conditions;
     }
-    
-    
+
 }

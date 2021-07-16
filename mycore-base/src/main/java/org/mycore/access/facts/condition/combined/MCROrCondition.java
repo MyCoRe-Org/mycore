@@ -19,6 +19,13 @@ package org.mycore.access.facts.condition.combined;
 
 import org.mycore.access.facts.MCRFactsHolder;
 
+/**
+ * /**
+ * This condition combines its child conditions with a boolean OR
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCROrCondition extends MCRAbstractCombinedCondition {
 
     public boolean matches(MCRFactsHolder facts) {

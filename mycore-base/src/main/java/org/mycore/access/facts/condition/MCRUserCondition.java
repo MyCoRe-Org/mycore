@@ -25,6 +25,15 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 
+/**
+ * This condition checks if the current user matches the query string.
+ * 
+ * Example:
+ * &lt;user&gt;mcradmin&lt;/user&gt;
+ * 
+ * @author mcradmin
+ *
+ */
 public class MCRUserCondition extends MCRSimpleCondition {
 
     @Override
@@ -36,7 +45,7 @@ public class MCRUserCondition extends MCRSimpleCondition {
             fact.setValue(user.getUserID());
             facts.add(fact);
             return Optional.of(fact);
-        }   
+        }
         return Optional.empty();
     }
 }

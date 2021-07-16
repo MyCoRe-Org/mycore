@@ -33,6 +33,23 @@ import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+/**
+ * This implementation checks if the given object belongs to a certain classification entry.
+ * 
+ * As default the object is read from the fact "objid".
+ * Using the attribute 'idfact' another fact containing an object id can be specified
+ * 
+ * Example:
+ * &lt;category idfact='the_other_object' fact='published'&gt;state:published&lt;/category&gt;
+ * 
+ * This rule will check if the object already stored as fact 'the_other_object' belongs to
+ * the category 'state:published'.
+ * If true, a fact 'published' will be stored in the facts holder.
+ * 
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryID, MCRCategoryIDFact> {
 
     private static Logger LOGGER = LogManager.getLogger();
@@ -43,14 +60,14 @@ public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryID
     public void parse(Element xml) {
         super.parse(xml);
         if (xml.getAttributeValue("id") != null) {
-            LOGGER.warn("Attribute 'id' is deprecated - use 'fact' instead!");
+            LOGGER.warn("Attribute 'id' is deprecated - use 'idfact' instead!");
         }
         this.idFact = Optional.ofNullable(xml.getAttributeValue("idfact")).orElse("objid");
     }
 
     @Override
     public boolean matches(MCRFactsHolder facts) {
-        if(super.matches(facts)) {
+        if (super.matches(facts)) {
             return true;
         }
 

@@ -26,6 +26,12 @@ import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.access.facts.fact.MCRSimpleFact;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
+/**
+ * This condition check if the given object has the specified createdby service flag.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRCreatedByCondition extends MCRSimpleCondition {
 
     private String idFact = "objid";

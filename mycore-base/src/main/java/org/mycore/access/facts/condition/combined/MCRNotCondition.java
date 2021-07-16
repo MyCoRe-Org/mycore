@@ -21,6 +21,16 @@ import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.model.MCRCondition;
 
+/**
+ * This condition negates its child condition 
+ * (boolean NOT)
+ * 
+ * Only the first child condition will be evaluated.
+ * Further child conditions will be ignored.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRNotCondition extends MCRAbstractCombinedCondition {
 
     public boolean matches(MCRFactsHolder facts) {

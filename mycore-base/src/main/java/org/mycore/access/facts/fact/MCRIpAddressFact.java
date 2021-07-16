@@ -19,6 +19,14 @@ package org.mycore.access.facts.fact;
 
 import org.mycore.access.mcrimpl.MCRIPAddress;
 
+/**
+ * This fact implementation can store an IP address
+ * 
+ * @author Robert Stephan
+ * 
+ * @see MCRIPAddress
+ *
+ */
 public class MCRIpAddressFact extends MCRAbstractFact<MCRIPAddress> {
 
     public MCRIpAddressFact(String name, String inquiry) {

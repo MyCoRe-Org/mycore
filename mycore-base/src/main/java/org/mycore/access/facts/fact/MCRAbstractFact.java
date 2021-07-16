@@ -21,14 +21,28 @@ import java.util.Objects;
 
 import org.mycore.access.facts.model.MCRFact;
 
+/**
+ * This is the base implementation for a fact.
+ * A fact consists of a name and a value.
+ * Additionally the query term used to retrieve the fact is stored.
+ * 
+ * Two facts are equal if their names and terms are equal.
+ * 
+ * @author Robert Stephan
+ *
+ * @param <T> the type of the fact
+ * 
+ * @see MCRFact
+ *
+ */
 public abstract class MCRAbstractFact<T> implements MCRFact<T> {
 
     private T value = null;
 
     private String name;
-    
+
     private String term;
-    
+
     public MCRAbstractFact(String name, String term) {
         this.name = name;
         this.term = term;
@@ -43,7 +57,7 @@ public abstract class MCRAbstractFact<T> implements MCRFact<T> {
     public String getName() {
         return name;
     }
-    
+
     @Override
     public void setTerm(String term) {
         this.term = term;
@@ -87,5 +101,5 @@ public abstract class MCRAbstractFact<T> implements MCRFact<T> {
         MCRAbstractFact other = (MCRAbstractFact) obj;
         return Objects.equals(name, other.name) && Objects.equals(term, other.term);
     }
-    
+
 }

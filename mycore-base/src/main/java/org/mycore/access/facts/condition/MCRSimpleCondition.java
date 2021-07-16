@@ -23,23 +23,28 @@ import org.mycore.access.facts.MCRFactsAccessSystem;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRSimpleFact;
 
+/**
+ * This is a simple implemenation.
+ * It checks if the fact already exists in the fact database and returns it.
+ * Otherwise it returns an empty Optional
+ * 
+ * This is useful for "static" facts that are created before the rule processing started
+ * in MCRFactsAccessSystem.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRSimpleCondition extends MCRAbstractFactCondition<String, MCRSimpleFact> {
 
     /**
-     * This is simple implemenation
-     * It checks if the fact already exists in the fact dabase and returns it.
-     * Otherwise it returns an empty Optional
-     * 
-     * This is useful for "static" facts that are not created before the rule processing started
-     * in MCRFactsAccessSystem.
-     * 
-     * Sub classes should override this method to retrieve the fact from MyCoReObject, MCRSession or elsewhere ...
+     * Subclasses should override this method to retrieve the fact from MyCoReObject, MCRSession 
+     * or from elsewhere ...
      *  
      *  @see MCRFactsAccessSystem
      */
     @Override
     public Optional<MCRSimpleFact> computeFact(MCRFactsHolder facts) {
-        MCRSimpleFact checkFact = new MCRSimpleFact(getFactName(),  getTerm());
+        MCRSimpleFact checkFact = new MCRSimpleFact(getFactName(), getTerm());
         if (facts.isFact(getFactName(), getTerm())) {
             return Optional.of(checkFact);
         } else {

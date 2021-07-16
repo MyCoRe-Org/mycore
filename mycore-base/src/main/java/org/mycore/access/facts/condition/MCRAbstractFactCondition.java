@@ -24,22 +24,35 @@ import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.model.MCRFact;
 import org.mycore.access.facts.model.MCRFactCondition;
 
+/**
+ * This is the base implementation for a condition which evaluates or produces facts
+ * 
+ * Subclasses should call super.parse(xml) to bind the XML element to the condition.
+ * 
+ * If you specify the attribute 'fact' on the condition XML. It will be used as name for
+ * the newly created fact. Otherwise the name of the condition will be used as name for the fact.
+ * 
+ * @author Robert Stephan
+ *
+ * @param <V> the class of the value
+ * @param <F> the class of the fact
+ */
 public abstract class MCRAbstractFactCondition<V, F extends MCRFact<V>> implements MCRFactCondition<F> {
 
     static final String UNDEFINED = "undefined";
-    
+
     private String factName;
-    
+
     private String term;
-    
+
     private Element boundElement = null;
-    
+
     private String type;
-    
+
     private boolean debug;
 
     /** 
-     * implementors need to call super.parse(xml) to bind the Element to the condition
+     * implementors of this method should call super.parse(xml) to bind the XML element to the condition
      */
     public void parse(Element xml) {
         boundElement = xml;
@@ -61,7 +74,7 @@ public abstract class MCRAbstractFactCondition<V, F extends MCRFact<V>> implemen
     public Element getBoundElement() {
         return boundElement;
     }
-    
+
     public String getType() {
         return type;
     }
@@ -69,15 +82,15 @@ public abstract class MCRAbstractFactCondition<V, F extends MCRFact<V>> implemen
     public String getFactName() {
         return factName;
     }
-    
+
     public void setFactName(String factName) {
         this.factName = factName;
     }
-    
+
     public String getTerm() {
         return term;
     }
-    
+
     public void setTerm(String term) {
         this.term = term;
     }
@@ -89,7 +102,7 @@ public abstract class MCRAbstractFactCondition<V, F extends MCRFact<V>> implemen
 
     @Override
     public void setDebug(boolean b) {
-        this.debug =b;
-        
+        this.debug = b;
+
     }
 }

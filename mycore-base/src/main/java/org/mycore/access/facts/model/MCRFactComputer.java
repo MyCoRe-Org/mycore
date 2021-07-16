@@ -35,5 +35,12 @@ import org.mycore.access.facts.MCRFactsHolder;
 public interface MCRFactComputer<F extends MCRFact<?>> extends MCRCondition {
     String getFactName();
 
+    /**
+     * Implementors are responsible to store the facts holder in the fact set
+     * if applicable
+     * 
+     * @param facts - the facts holder containing already retrieved facts
+     * @return
+     */
     Optional<F> computeFact(MCRFactsHolder facts);
 }

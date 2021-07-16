@@ -31,6 +31,17 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.annotation.MCRProperty;
 
+/**
+ * This condition checks if the current user has an IP of the specified IP range.
+ * 
+ * Example:
+ * &lt;ip&gt;192.168.0.0/255.255.0.0&lt;/ip&gt;
+ * 
+ * Please specify IP ranges with the full netmask.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRIPCondition extends MCRAbstractFactCondition<MCRIPAddress, MCRIpAddressFact> {
 
     private static Logger LOGGER = LogManager.getLogger();
@@ -63,9 +74,9 @@ public class MCRIPCondition extends MCRAbstractFactCondition<MCRIPAddress, MCRIp
         }
         return Optional.empty();
     }
-    
+
     @MCRProperty(name = "IP", required = false)
-    public void setDefaultIP(String ip){
+    public void setDefaultIP(String ip) {
         defaultIP = ip;
     }
 }

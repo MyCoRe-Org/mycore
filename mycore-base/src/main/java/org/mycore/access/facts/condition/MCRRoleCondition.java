@@ -25,6 +25,13 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 
+/**
+ * This condition checks if the user of the current session
+ * is member of the given role.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRRoleCondition extends MCRSimpleCondition {
 
     @Override

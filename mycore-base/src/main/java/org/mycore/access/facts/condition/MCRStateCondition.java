@@ -26,11 +26,24 @@ import org.mycore.access.facts.fact.MCRSimpleFact;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
-public class MCRStatusCondition extends MCRSimpleCondition {
+/**
+ * This implementation of a condition
+ * checks if the given MyCoRe object or derivate
+ * has the given state entry in service flags.
+ * 
+ * Examples:
+ * 
+ * &lt;status&gt;review&lt;/status&gt;  
+ * &lt;status basefact="derid"&gt;published&lt;/status&gt;  
+ * 
+ * @author Robert Stephan
+ *
+ */
+public class MCRStateCondition extends MCRSimpleCondition {
 
     /**
      * id of the fact that contains the ID of the MyCoRe-Object or Derivate
-     * possible values are "id" or "derivateid".
+     * possible values are "objid" or "derivateid".
      */
     private String idFact = "objid";
 
@@ -43,10 +56,10 @@ public class MCRStatusCondition extends MCRSimpleCondition {
     @Override
     public Optional<MCRSimpleFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
-        if(idc.isPresent()){
+        if (idc.isPresent()) {
             MCRObjectService service = idc.get().getObject().getService();
             MCRCategoryID state = service.getState();
-            if(getTerm().equals(state.getID())) {
+            if (getTerm().equals(state.getID())) {
                 MCRSimpleFact fact = new MCRSimpleFact(getFactName(), getTerm());
                 fact.setValue(state.getID());
                 facts.add(fact);
