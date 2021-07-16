@@ -20,10 +20,31 @@ package org.mycore.access.facts.model;
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
 
+/**
+ * This interface represents a rule of the fact-based access system. 
+ * It is specified in the rules.xml file.
+ * 
+ * Sub interfaces are {@link MCRCombinedCondition}, which is used to build a boolean algebra (and, or, not, ...)
+ * and {@link MCRFactCondition}, which validates existing facts or creates new ones.
+ * 
+ * New rules need to be registered in mycore.properties as follows:
+ * 
+ * MCR.Access.Facts.Condition.{type}={class}
+ * e.g. MCR.Access.Facts.Condition.ip=org.mycore.access.facts.condition.MCRIPCondition
+ * 
+ * @author Robert Stephan
+ *
+ */
 public interface MCRCondition {
-    
+
+    /**
+     * the type of the rule
+     * @return
+     */
     String getType();
-    
+
+    boolean matches(MCRFactsHolder facts);
+
     void parse(Element xml);
 
     /**
@@ -31,11 +52,9 @@ public interface MCRCondition {
      * @return the part of the xml which this Condition represents
      */
     Element getBoundElement();
-    
+
     boolean isDebug();
-    
+
     void setDebug(boolean b);
-    
-    boolean matches(MCRFactsHolder facts);
-    
+
 }
