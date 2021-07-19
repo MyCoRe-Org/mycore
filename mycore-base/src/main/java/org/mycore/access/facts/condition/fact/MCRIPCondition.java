@@ -42,7 +42,7 @@ import org.mycore.common.config.annotation.MCRProperty;
  * @author Robert Stephan
  *
  */
-public class MCRIPCondition extends MCRAbstractFactCondition<MCRIPAddress, MCRIpAddressFact> {
+public class MCRIPCondition extends MCRAbstractFactCondition<MCRIpAddressFact> {
 
     private static Logger LOGGER = LogManager.getLogger();
 

@@ -34,7 +34,7 @@ import org.mycore.access.facts.fact.MCRStringFact;
  * @author Robert Stephan
  *
  */
-public class MCRStringCondition extends MCRAbstractFactCondition<String, MCRStringFact> {
+public class MCRStringCondition extends MCRAbstractFactCondition<MCRStringFact> {
 
     /**
      * Subclasses should override this method to retrieve the fact from MyCoReObject, MCRSession 

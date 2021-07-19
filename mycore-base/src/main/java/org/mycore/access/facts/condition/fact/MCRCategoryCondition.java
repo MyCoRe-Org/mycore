@@ -50,7 +50,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @author Robert Stephan
  *
  */
-public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryID, MCRCategoryIDFact> {
+public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryIDFact> {
 
     private static Logger LOGGER = LogManager.getLogger();
 
