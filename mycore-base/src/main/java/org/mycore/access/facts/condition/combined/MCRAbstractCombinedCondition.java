@@ -48,6 +48,13 @@ public abstract class MCRAbstractCombinedCondition extends MCRAbstractCondition 
         }
     }
 
+    /**
+     * @return the conditions
+     */
+    public Set<MCRCondition> getChildConditions() {
+        return conditions;
+    }
+
     public void debugInfoForMatchingChildElement(MCRCondition c, boolean matches) {
         if (isDebug()) {
             Element el = c.getBoundElement();
@@ -55,13 +62,6 @@ public abstract class MCRAbstractCombinedCondition extends MCRAbstractCondition 
                 el.setAttribute("_matches", Boolean.toString(matches));
             }
         }
-    }
-
-    /**
-     * @return the conditions
-     */
-    public Set<MCRCondition> getChildConditions() {
-        return conditions;
     }
 
 }
