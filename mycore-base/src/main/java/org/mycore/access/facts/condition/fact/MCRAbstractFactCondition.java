@@ -35,7 +35,6 @@ import org.mycore.access.facts.model.MCRFactCondition;
  * 
  * @author Robert Stephan
  *
- * @param <V> the class of the value
  * @param <F> the class of the fact
  */
 public abstract class MCRAbstractFactCondition<F extends MCRFact<?>> extends MCRAbstractCondition implements MCRFactCondition<F> {
