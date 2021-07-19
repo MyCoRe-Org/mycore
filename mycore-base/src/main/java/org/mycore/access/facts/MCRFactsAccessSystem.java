@@ -51,8 +51,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * base class for XML fact based access system
  * 
  * enabled it with the 2 properties:
- * MCR.Access.Class=org.mycore.access.xml.MCRXMLAccessSystem
- * MCR.Access.Strategy.Class=org.mycore.access.xml.MCRXMLAccessSystem
+ * MCR.Access.Class=org.mycore.access.facts.MCRFactsAccessSystem
+ * MCR.Access.Strategy.Class=org.mycore.access.facts.MCRFactsAccessSystem
  * 
  */
 @Singleton
