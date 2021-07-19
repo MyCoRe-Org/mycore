@@ -17,33 +17,19 @@
  */
 package org.mycore.access.facts.condition;
 
-import java.util.Optional;
-
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
-import org.mycore.access.facts.model.MCRFact;
-import org.mycore.access.facts.model.MCRFactCondition;
+import org.mycore.access.facts.model.MCRCondition;
 
 /**
- * This is the base implementation for a condition which evaluates or produces facts
+ * This is the base implementation for a condition.
  * 
- * Subclasses should call super.parse(xml) to bind the XML element to the condition.
- * 
- * If you specify the attribute 'fact' on the condition XML. It will be used as name for
- * the newly created fact. Otherwise the name of the condition will be used as name for the fact.
+ * It is the super class for MCRCombinedCondition and MCRFactCondition.
  * 
  * @author Robert Stephan
  *
- * @param <V> the class of the value
- * @param <F> the class of the fact
  */
-public abstract class MCRAbstractFactCondition<V, F extends MCRFact<V>> implements MCRFactCondition<F> {
-
-    static final String UNDEFINED = "undefined";
-
-    private String factName;
-
-    private String term;
+public abstract class MCRAbstractCondition implements MCRCondition {
 
     private Element boundElement = null;
 
@@ -57,20 +43,8 @@ public abstract class MCRAbstractFactCondition<V, F extends MCRFact<V>> implemen
     public void parse(Element xml) {
         boundElement = xml;
         type = xml.getName();
-        term = xml.getTextTrim();
-        factName = Optional.ofNullable(xml.getAttributeValue("fact")).orElse(type);
     }
 
-    @Override
-    public boolean matches(MCRFactsHolder facts) {
-        if (facts.isFact(getFactName(), getTerm())) {
-            return true;
-        }
-        Optional<F> computed = computeFact(facts);
-        return computed.isPresent();
-    }
-
-    @Override
     public Element getBoundElement() {
         return boundElement;
     }
@@ -79,30 +53,14 @@ public abstract class MCRAbstractFactCondition<V, F extends MCRFact<V>> implemen
         return type;
     }
 
-    public String getFactName() {
-        return factName;
-    }
-
-    public void setFactName(String factName) {
-        this.factName = factName;
-    }
-
-    public String getTerm() {
-        return term;
-    }
-
-    public void setTerm(String term) {
-        this.term = term;
-    }
-
-    @Override
     public boolean isDebug() {
         return debug;
     }
 
-    @Override
     public void setDebug(boolean b) {
         this.debug = b;
 
     }
+
+    public abstract boolean matches(MCRFactsHolder facts);
 }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.access.facts.condition;
+package org.mycore.access.facts.condition.fact;
 
 import java.util.Optional;
 

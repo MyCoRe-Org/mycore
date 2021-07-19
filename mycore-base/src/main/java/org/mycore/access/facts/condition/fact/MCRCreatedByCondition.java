@@ -15,42 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mycore.access.facts.condition;
+package org.mycore.access.facts.condition.fact;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.access.facts.fact.MCRStringFact;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
 /**
- * This implementation of a condition
- * checks if the given MyCoRe object or derivate
- * has the given state entry in service flags.
- * 
- * Examples:
- * 
- * &lt;status&gt;review&lt;/status&gt;  
- * &lt;status basefact="derid"&gt;published&lt;/status&gt;  
+ * This condition check if the given object has the specified createdby service flag.
  * 
  * @author Robert Stephan
  *
  */
-public class MCRStateCondition extends MCRStringCondition {
+public class MCRCreatedByCondition extends MCRStringCondition {
 
-    /**
-     * id of the fact that contains the ID of the MyCoRe-Object or Derivate
-     * possible values are "objid" or "derivateid".
-     */
     private String idFact = "objid";
 
     @Override
     public void parse(Element xml) {
         super.parse(xml);
-        this.idFact = Optional.ofNullable(xml.getAttributeValue("idfact")).orElse("objid");
+        idFact = Optional.ofNullable(xml.getAttributeValue("idfact")).orElse("objid");
     }
 
     @Override
@@ -58,12 +47,13 @@ public class MCRStateCondition extends MCRStringCondition {
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
             MCRObjectService service = idc.get().getObject().getService();
-            MCRCategoryID state = service.getState();
-            if (getTerm().equals(state.getID())) {
-                MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
-                fact.setValue(state.getID());
-                facts.add(fact);
-                return Optional.of(fact);
+            List<String> flags = service.getFlags("createdby");
+            for (String flag : flags) {
+                if (flag.equals(getTerm())) {
+                    MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
+                    facts.add(fact);
+                    return Optional.of(fact);
+                }
             }
         }
         return Optional.empty();

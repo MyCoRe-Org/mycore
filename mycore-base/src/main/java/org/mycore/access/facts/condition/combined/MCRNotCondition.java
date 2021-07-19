@@ -43,8 +43,8 @@ public class MCRNotCondition extends MCRAbstractCombinedCondition {
                 boundElement.setAttribute("_matched", Boolean.toString(result));
             }
 
-            if (this.boundElement != null) {
-                this.boundElement.setAttribute("_matched", Boolean.toString(negated));
+            if (this.getBoundElement() != null) {
+                this.getBoundElement().setAttribute("_matched", Boolean.toString(negated));
             }
         }
         return negated;

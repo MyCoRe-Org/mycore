@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.access.facts.condition;
+package org.mycore.access.facts.condition.fact;
 
 import java.util.Objects;
 import java.util.Optional;

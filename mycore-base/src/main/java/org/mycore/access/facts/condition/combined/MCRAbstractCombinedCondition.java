@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsAccessSystemHelper;
+import org.mycore.access.facts.condition.MCRAbstractCondition;
 import org.mycore.access.facts.model.MCRCombinedCondition;
 import org.mycore.access.facts.model.MCRCondition;
 
@@ -32,39 +33,19 @@ import org.mycore.access.facts.model.MCRCondition;
  * @author Robert Stephan
  *
  */
-public abstract class MCRAbstractCombinedCondition implements MCRCombinedCondition {
+public abstract class MCRAbstractCombinedCondition extends MCRAbstractCondition implements MCRCombinedCondition {
 
     protected Set<MCRCondition> conditions = new HashSet<MCRCondition>();
-
-    protected boolean debug = false;
-
-    private String type = null;
-
-    protected Element boundElement = null;
 
     public void add(MCRCondition condition) {
         conditions.add(condition);
     }
 
     public void parse(Element xml) {
-        boundElement = xml;
+        super.parse(xml);
         for (Element child : xml.getChildren()) {
             conditions.add(MCRFactsAccessSystemHelper.parse(child));
         }
-        type = xml.getName();
-    }
-
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-
-    @Override
-    public Element getBoundElement() {
-        return boundElement;
     }
 
     public void debugInfoForMatchingChildElement(MCRCondition c, boolean matches) {
@@ -74,11 +55,6 @@ public abstract class MCRAbstractCombinedCondition implements MCRCombinedConditi
                 el.setAttribute("_matches", Boolean.toString(matches));
             }
         }
-    }
-
-    @Override
-    public String getType() {
-        return type;
     }
 
     /**
