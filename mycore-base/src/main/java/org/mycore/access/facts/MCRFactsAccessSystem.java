@@ -61,7 +61,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     protected static final Logger LOGGER = LogManager.getLogger();
 
     private MCRCondition rules;
-    
+
     private Collection<MCRFactComputable<MCRFact<?>>> computers;
 
     //RS: when introducing this feature in 2021.06.LTS it needed to be configured twice
@@ -83,17 +83,17 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         collectComputers(rules, collectedComputers);
         return collectedComputers.values();
     }
-    
+
     @SuppressWarnings("unchecked")
-    private void collectComputers(MCRCondition coll, Map<String, MCRFactComputable<MCRFact<?>>> computers){
-        if(coll instanceof MCRFactComputable<?> && !computers.containsKey(((MCRFactComputable<?>) coll).getFactName())) {
-            computers.put(((MCRFactComputable<?>) coll).getFactName(), (MCRFactComputable<MCRFact<?>>)coll);
+    private void collectComputers(MCRCondition coll, Map<String, MCRFactComputable<MCRFact<?>>> computers) {
+        if (coll instanceof MCRFactComputable<?>
+            && !computers.containsKey(((MCRFactComputable<?>) coll).getFactName())) {
+            computers.put(((MCRFactComputable<?>) coll).getFactName(), (MCRFactComputable<MCRFact<?>>) coll);
         }
-        if(coll instanceof MCRCombinedCondition) {
+        if (coll instanceof MCRCombinedCondition) {
             ((MCRCombinedCondition) coll).getChildConditions().forEach(c -> collectComputers(c, computers));
         }
     }
-    
 
     @MCRProperty(name = "RulesURI", required = false)
     public void setRulesURI(String uri) {
