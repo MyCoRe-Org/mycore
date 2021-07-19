@@ -66,16 +66,6 @@ public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryID
     }
 
     @Override
-    public boolean matches(MCRFactsHolder facts) {
-        if (super.matches(facts)) {
-            return true;
-        }
-
-        Optional<MCRCategoryIDFact> computed = computeFact(facts);
-        return computed.isPresent();
-    }
-
-    @Override
     public Optional<MCRCategoryIDFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
