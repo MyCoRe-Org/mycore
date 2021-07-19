@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 
 import org.mycore.access.facts.model.MCRFact;
-import org.mycore.access.facts.model.MCRFactComputer;
+import org.mycore.access.facts.model.MCRFactComputable;
 
 /**
  * This class holds all facts which are validated as 'true'
@@ -39,11 +39,11 @@ import org.mycore.access.facts.model.MCRFactComputer;
  */
 public class MCRFactsHolder {
 
-    private Collection<MCRFactComputer<MCRFact<?>>> computers;
+    private Collection<MCRFactComputable<MCRFact<?>>> computers;
 
     private final Set<MCRFact<?>> facts = new HashSet<MCRFact<?>>();
 
-    public MCRFactsHolder(Collection<MCRFactComputer<MCRFact<?>>> computers) {
+    public MCRFactsHolder(Collection<MCRFactComputable<MCRFact<?>>> computers) {
         this.computers = computers;
     }
 
@@ -59,7 +59,7 @@ public class MCRFactsHolder {
         return osc.isPresent();
     }
 
-    public Optional<MCRFact<?>> require(String factName, MCRFactComputer<MCRFact<?>> factComputer) {
+    public Optional<MCRFact<?>> require(String factName, MCRFactComputable<MCRFact<?>> factComputer) {
         Optional<MCRFact<?>> osc = facts.stream().filter(f -> factName.equals(f.getName())).findFirst();
         if (osc.isPresent()) {
             return osc;
@@ -79,7 +79,7 @@ public class MCRFactsHolder {
         if (osc.isPresent()) {
             return osc;
         } else {
-            Optional<MCRFactComputer<MCRFact<?>>> theComputer = computers.stream()
+            Optional<MCRFactComputable<MCRFact<?>>> theComputer = computers.stream()
                 .filter(c -> factName.equals(c.getFactName())).findFirst();
             if (theComputer.isPresent()) {
                 Optional<MCRFact<?>> fact = theComputer.get().computeFact(this);

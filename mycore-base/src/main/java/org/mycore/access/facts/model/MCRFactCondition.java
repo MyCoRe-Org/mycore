@@ -21,7 +21,7 @@ package org.mycore.access.facts.model;
  * This interface describes a rule (from rules.xml) which can evaluate existing facts
  * or create new facts if applicable.
  * 
- * By extending {@link MCRFactComputer} the rule knows how to create its facts
+ * By extending {@link MCRFactComputable} the rule knows how to create its facts
  * from the given object or environment.
  * 
  * New rules need to be registered in mycore.properties as follows:
@@ -33,6 +33,6 @@ package org.mycore.access.facts.model;
  *
  * @param <F> the fact to be generated
  */
-public interface MCRFactCondition<F extends MCRFact<?>> extends MCRCondition, MCRFactComputer<F> {
+public interface MCRFactCondition<F extends MCRFact<?>> extends MCRCondition, MCRFactComputable<F> {
 
 }

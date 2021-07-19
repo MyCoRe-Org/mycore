@@ -32,7 +32,7 @@ import org.mycore.access.facts.MCRFactsHolder;
  *
  * @param <F> the class of the fact that can be created by this fact computer
  */
-public interface MCRFactComputer<F extends MCRFact<?>> extends MCRCondition {
+public interface MCRFactComputable<F extends MCRFact<?>> extends MCRCondition {
     String getFactName();
 
     /**
