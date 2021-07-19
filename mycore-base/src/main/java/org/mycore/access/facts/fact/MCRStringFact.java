@@ -26,9 +26,9 @@ package org.mycore.access.facts.fact;
  * @author Robert Stephan
  *
  */
-public class MCRSimpleFact extends MCRAbstractFact<String> {
+public class MCRStringFact extends MCRAbstractFact<String> {
 
-    public MCRSimpleFact(String name, String term) {
+    public MCRStringFact(String name, String term) {
         super(name, term);
         setValue(term);
     }

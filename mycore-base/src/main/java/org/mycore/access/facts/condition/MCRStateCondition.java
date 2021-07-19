@@ -22,7 +22,7 @@ import java.util.Optional;
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
-import org.mycore.access.facts.fact.MCRSimpleFact;
+import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
@@ -39,7 +39,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
  * @author Robert Stephan
  *
  */
-public class MCRStateCondition extends MCRSimpleCondition {
+public class MCRStateCondition extends MCRStringCondition {
 
     /**
      * id of the fact that contains the ID of the MyCoRe-Object or Derivate
@@ -54,13 +54,13 @@ public class MCRStateCondition extends MCRSimpleCondition {
     }
 
     @Override
-    public Optional<MCRSimpleFact> computeFact(MCRFactsHolder facts) {
+    public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
             MCRObjectService service = idc.get().getObject().getService();
             MCRCategoryID state = service.getState();
             if (getTerm().equals(state.getID())) {
-                MCRSimpleFact fact = new MCRSimpleFact(getFactName(), getTerm());
+                MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
                 fact.setValue(state.getID());
                 facts.add(fact);
                 return Optional.of(fact);

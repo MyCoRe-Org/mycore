@@ -20,7 +20,7 @@ package org.mycore.access.facts.condition;
 import java.util.Optional;
 
 import org.mycore.access.facts.MCRFactsHolder;
-import org.mycore.access.facts.fact.MCRSimpleFact;
+import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
@@ -34,14 +34,14 @@ import org.mycore.common.MCRUserInformation;
  * @author mcradmin
  *
  */
-public class MCRUserCondition extends MCRSimpleCondition {
+public class MCRUserCondition extends MCRStringCondition {
 
     @Override
-    public Optional<MCRSimpleFact> computeFact(MCRFactsHolder facts) {
+    public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRUserInformation user = session.getUserInformation();
         if (user != null && getTerm().equals(user.getUserID())) {
-            MCRSimpleFact fact = new MCRSimpleFact(getFactName(), getTerm());
+            MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
             fact.setValue(user.getUserID());
             facts.add(fact);
             return Optional.of(fact);

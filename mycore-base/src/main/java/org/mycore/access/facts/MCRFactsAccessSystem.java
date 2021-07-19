@@ -31,7 +31,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
-import org.mycore.access.facts.fact.MCRSimpleFact;
+import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.access.facts.model.MCRCombinedCondition;
 import org.mycore.access.facts.model.MCRCondition;
 import org.mycore.access.facts.model.MCRFact;
@@ -157,12 +157,12 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
                 target = "unknown";
             }
             cacheKey = action + " " + checkID + " " + target;
-            facts.add(new MCRSimpleFact("id", checkID));
-            facts.add(new MCRSimpleFact("target", target));
+            facts.add(new MCRStringFact("id", checkID));
+            facts.add(new MCRStringFact("target", target));
         }
 
         LOGGER.debug("Testing {} ", cacheKey);
-        facts.add(new MCRSimpleFact("action", action));
+        facts.add(new MCRStringFact("action", action));
 
         boolean result;
         if (LOGGER.isDebugEnabled()) {

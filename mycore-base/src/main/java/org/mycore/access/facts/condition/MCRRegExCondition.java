@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
-import org.mycore.access.facts.fact.MCRSimpleFact;
+import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.access.facts.model.MCRFact;
 
 /**
@@ -36,7 +36,7 @@ import org.mycore.access.facts.model.MCRFact;
  * @author Robert Stephan
  *
  */
-public class MCRRegExCondition extends MCRSimpleCondition {
+public class MCRRegExCondition extends MCRStringCondition {
 
     private String baseFactName;
 
@@ -48,12 +48,12 @@ public class MCRRegExCondition extends MCRSimpleCondition {
     }
 
     @Override
-    public Optional<MCRSimpleFact> computeFact(MCRFactsHolder facts) {
+    public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRFact<?>> baseFact = facts.require(baseFactName);
         if (baseFact.isPresent()) {
             String v = baseFact.get().getValue().toString();
             if (v.matches(getTerm())) {
-                MCRSimpleFact fact = new MCRSimpleFact(getFactName(), getTerm());
+                MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
                 fact.setValue(v);
                 facts.add(fact);
                 return Optional.of(fact);

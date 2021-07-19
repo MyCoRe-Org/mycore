@@ -23,7 +23,7 @@ import java.util.Optional;
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
-import org.mycore.access.facts.fact.MCRSimpleFact;
+import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
 /**
@@ -32,7 +32,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
  * @author Robert Stephan
  *
  */
-public class MCRCreatedByCondition extends MCRSimpleCondition {
+public class MCRCreatedByCondition extends MCRStringCondition {
 
     private String idFact = "objid";
 
@@ -43,14 +43,14 @@ public class MCRCreatedByCondition extends MCRSimpleCondition {
     }
 
     @Override
-    public Optional<MCRSimpleFact> computeFact(MCRFactsHolder facts) {
+    public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
             MCRObjectService service = idc.get().getObject().getService();
             List<String> flags = service.getFlags("createdby");
             for (String flag : flags) {
                 if (flag.equals(getTerm())) {
-                    MCRSimpleFact fact = new MCRSimpleFact(getFactName(), getTerm());
+                    MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
                     facts.add(fact);
                     return Optional.of(fact);
                 }

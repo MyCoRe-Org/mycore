@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import org.mycore.access.facts.MCRFactsAccessSystem;
 import org.mycore.access.facts.MCRFactsHolder;
-import org.mycore.access.facts.fact.MCRSimpleFact;
+import org.mycore.access.facts.fact.MCRStringFact;
 
 /**
  * This is a simple implemenation.
@@ -34,7 +34,7 @@ import org.mycore.access.facts.fact.MCRSimpleFact;
  * @author Robert Stephan
  *
  */
-public class MCRSimpleCondition extends MCRAbstractFactCondition<String, MCRSimpleFact> {
+public class MCRStringCondition extends MCRAbstractFactCondition<String, MCRStringFact> {
 
     /**
      * Subclasses should override this method to retrieve the fact from MyCoReObject, MCRSession 
@@ -43,8 +43,8 @@ public class MCRSimpleCondition extends MCRAbstractFactCondition<String, MCRSimp
      *  @see MCRFactsAccessSystem
      */
     @Override
-    public Optional<MCRSimpleFact> computeFact(MCRFactsHolder facts) {
-        MCRSimpleFact checkFact = new MCRSimpleFact(getFactName(), getTerm());
+    public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
+        MCRStringFact checkFact = new MCRStringFact(getFactName(), getTerm());
         if (facts.isFact(getFactName(), getTerm())) {
             return Optional.of(checkFact);
         } else {
