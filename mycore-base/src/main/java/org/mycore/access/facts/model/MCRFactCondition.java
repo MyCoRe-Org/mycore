@@ -27,7 +27,7 @@ package org.mycore.access.facts.model;
  * New rules need to be registered in mycore.properties as follows:
  * 
  * MCR.Access.Facts.Condition.{type}={class}
- * e.g. MCR.Access.Facts.Condition.ip=org.mycore.access.facts.condition.MCRIPCondition
+ * e.g. MCR.Access.Facts.Condition.ip=org.mycore.access.facts.condition.fact.MCRIPCondition
  * 
  * @author Robert Stephan
  *
