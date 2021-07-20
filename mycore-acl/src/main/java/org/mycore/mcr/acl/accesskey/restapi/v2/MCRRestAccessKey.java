@@ -18,7 +18,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.mcr.acl.accesskey.restapi;
+package org.mycore.mcr.acl.accesskey.restapi.v2;
 
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
@@ -45,17 +45,16 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyTransformer;
 import org.mycore.mcr.acl.accesskey.backend.MCRAccessKey;
-import org.mycore.mcr.acl.accesskey.restapi.annotation.MCRRequireAccessKeyAuthorization;
-import org.mycore.mcr.acl.accesskey.restapi.model.MCRAccessKeyInformation;
+import org.mycore.mcr.acl.accesskey.restapi.v2.annotation.MCRRequireAccessKeyAuthorization;
+import org.mycore.mcr.acl.accesskey.restapi.v2.model.MCRAccessKeyInformation;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 
-@Path("/accesskeys")
-public class MCRAccessKeyResource {
+@Path("/objects/{" + PARAM_MCRID + "}/accesskeys")
+public class MCRRestAccessKey {
 
     private static final String VALUE = "value";
 
     @GET
-    @Path("/{" + PARAM_MCRID + "}")
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKeys(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
@@ -81,7 +80,6 @@ public class MCRAccessKeyResource {
     }
 
     @POST
-    @Path("/{" + PARAM_MCRID + "}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
@@ -94,7 +92,7 @@ public class MCRAccessKeyResource {
     }
 
     @DELETE
-    @Path("/{" + PARAM_MCRID + "}/{" + VALUE + "}")
+    @Path("/{" + VALUE + "}")
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
@@ -106,7 +104,7 @@ public class MCRAccessKeyResource {
     }
     
     @PUT
-    @Path("/{" + PARAM_MCRID + "}/{" + VALUE + "}")
+    @Path("/{" + VALUE + "}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization

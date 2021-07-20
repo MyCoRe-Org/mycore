@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.mcr.acl.accesskey.restapi;
+package org.mycore.mcr.acl.accesskey.restapi.v2;
 
 import java.util.Optional;
 
@@ -32,7 +32,7 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.restapi.v2.MCRErrorResponse;
 
 @Provider
-public class MCRAccessKeyExceptionMapper implements ExceptionMapper<MCRAccessKeyException> {
+public class MCRRestAccessKeyExceptionMapper implements ExceptionMapper<MCRAccessKeyException> {
 
     @Context
     Request request;
