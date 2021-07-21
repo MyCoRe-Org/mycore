@@ -42,7 +42,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <frontend.maven.plugin.version>1.11.2</frontend.maven.plugin.version>
     <grizzly.version>2.4.4</grizzly.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
-    <hibernate.version>5.4.28.Final</hibernate.version>
+    <hibernate.version>5.5.4.Final</hibernate.version>
     <hk2.version>2.6.1</hk2.version>
     <httpcomponents.version>4.5.13</httpcomponents.version>
     <httpcore.version>4.4.14</httpcore.version>
