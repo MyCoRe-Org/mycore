@@ -28,6 +28,13 @@ import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSEmbargoUtils;
 
+/**
+ * condition for fact-based access system, that checks 
+ * if an embargo exists for a given MyCoRe object 
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRMODSEmbargoCondition extends MCRStringCondition {
 
     private String idFact = "objid";
@@ -37,7 +44,7 @@ public class MCRMODSEmbargoCondition extends MCRStringCondition {
         super.parse(xml);
         this.idFact = Optional.ofNullable(xml.getAttributeValue("idfact")).orElse("objid");
     }
-    
+
     @Override
     public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
@@ -45,9 +52,9 @@ public class MCRMODSEmbargoCondition extends MCRStringCondition {
             MCRObjectID objectID = idc.get().getValue();
             if (objectID != null) {
                 String embargo = MCRMODSEmbargoUtils.getEmbargo(objectID);
-             
+
                 //only positive facts are added to the facts holder
-                if (embargo!=null) {
+                if (embargo != null) {
                     MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
                     fact.setValue(embargo);
                     facts.add(fact);
@@ -57,20 +64,4 @@ public class MCRMODSEmbargoCondition extends MCRStringCondition {
         }
         return Optional.empty();
     }
-
-   /* ******************************
-    * OLD Implementation
-    ********************************
-    @Override
-    public void setCurrentValue(MCRFacts facts) {
-        MCRIDCondition idc = (MCRIDCondition) (facts.require("id"));
-        MCRObjectID objectID = idc.getObjectID();
-        if (objectID == null) {
-            super.setCurrentValue(facts);
-        } else {
-            String embargo = MCRMODSEmbargoUtils.getEmbargo(objectID);
-            this.value = Boolean.toString(embargo != null);
-        }
-    }
-    */
 }

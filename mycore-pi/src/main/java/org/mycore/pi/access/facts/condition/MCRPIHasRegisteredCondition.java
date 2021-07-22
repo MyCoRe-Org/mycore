@@ -31,6 +31,14 @@ import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIServiceManager;
 
+
+/**
+ * condition for fact-based access system,
+ * that checks if a persistent identifier was registered for the given object.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRPIHasRegisteredCondition extends MCRStringCondition {
 
     private String idFact = "objid";
@@ -43,9 +51,9 @@ public class MCRPIHasRegisteredCondition extends MCRStringCondition {
 
     @Override
     public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
-        Optional<MCRObjectIDFact> idc = facts.require(idFact);
-        if (idc.isPresent()) {
-            MCRObjectID objectID = idc.get().getValue();
+        Optional<MCRObjectIDFact> oIdFact = facts.require(idFact);
+        if (oIdFact.isPresent()) {
+            MCRObjectID objectID = oIdFact.get().getValue();
             if (objectID != null) {
                 boolean anyRegistered = MCRPIServiceManager.getInstance().getServiceList().stream()
                     .anyMatch(service -> {

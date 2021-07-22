@@ -29,6 +29,15 @@ import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 
+/**
+ * condition for fact-based access system, that
+ * checks if a certain value of the collection condition is set for the given object
+ * 
+ * TODO Could probably be replaced with a more generic XPathCondition.
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRMODSCollectionCondition extends MCRStringCondition {
 
     private static final String XPATH_COLLECTION = "mods:classification[contains(@valueURI,'/collection#')]";
@@ -52,10 +61,12 @@ public class MCRMODSCollectionCondition extends MCRStringCondition {
                 List<Element> e = wrapper.getElements(XPATH_COLLECTION);
                 if ((e != null) && !(e.isEmpty())) {
                     String value = e.get(0).getAttributeValue("valueURI").split("#")[1];
-                    MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
-                    fact.setValue(value);
-                    facts.add(fact);
-                    return Optional.of(fact);
+                    if (value.equals(getTerm())) {
+                        MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
+                        fact.setValue(value);
+                        facts.add(fact);
+                        return Optional.of(fact);
+                    }
                 }
             }
         }
