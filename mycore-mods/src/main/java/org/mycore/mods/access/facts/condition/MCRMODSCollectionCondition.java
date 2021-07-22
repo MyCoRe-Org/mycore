@@ -16,38 +16,49 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.mods.access.xml.condition;
-
-import org.jdom2.Element;
-import org.mycore.access.xml.MCRFacts;
-import org.mycore.access.xml.MCRObjectCacheFactory;
-import org.mycore.access.xml.conditions.MCRSimpleCondition;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mods.MCRMODSWrapper;
+package org.mycore.mods.access.facts.condition;
 
 import java.util.List;
+import java.util.Optional;
 
-public class MCRMODSCollectionCondition extends MCRSimpleCondition {
+import org.jdom2.Element;
+import org.mycore.access.facts.MCRFactsHolder;
+import org.mycore.access.facts.condition.fact.MCRStringCondition;
+import org.mycore.access.facts.fact.MCRObjectIDFact;
+import org.mycore.access.facts.fact.MCRStringFact;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.mods.MCRMODSWrapper;
+
+public class MCRMODSCollectionCondition extends MCRStringCondition {
 
     private static final String XPATH_COLLECTION = "mods:classification[contains(@valueURI,'/collection#')]";
 
+    private String idFact = "objid";
+
     @Override
-    public boolean matches(MCRFacts facts) {
-        facts.require(this.type);
-        return super.matches(facts);
+    public void parse(Element xml) {
+        super.parse(xml);
+        this.idFact = Optional.ofNullable(xml.getAttributeValue("idfact")).orElse("objid");
     }
 
     @Override
-    public void setCurrentValue(MCRFacts facts) {
-        MCRSimpleCondition idc = (MCRSimpleCondition) (facts.require("id"));
-        MCRObject object = MCRObjectCacheFactory.instance().getObject(MCRObjectID.getInstance(idc.value));
-        MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
+    public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
 
-        List<Element> e = wrapper.getElements(XPATH_COLLECTION);
-        if ((e != null) && !(e.isEmpty())) {
-            String valueURI = e.get(0).getAttributeValue("valueURI");
-            this.value = valueURI.split("#")[1];
+        Optional<MCRObjectIDFact> idc = facts.require(idFact);
+        if (idc.isPresent()) {
+            MCRObject object = idc.get().getObject();
+            if (object != null) {
+                MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
+                List<Element> e = wrapper.getElements(XPATH_COLLECTION);
+                if ((e != null) && !(e.isEmpty())) {
+                    String value = e.get(0).getAttributeValue("valueURI").split("#")[1];
+                    MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
+                    fact.setValue(value);
+                    facts.add(fact);
+                    return Optional.of(fact);
+                }
+            }
         }
+        return Optional.empty();
     }
 }

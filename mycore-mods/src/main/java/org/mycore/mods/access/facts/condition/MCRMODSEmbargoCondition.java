@@ -16,22 +16,51 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.mods.access.xml.condition;
+package org.mycore.mods.access.facts.condition;
 
-import org.mycore.access.xml.MCRFacts;
-import org.mycore.access.xml.conditions.MCRIDCondition;
-import org.mycore.access.xml.conditions.MCRSimpleCondition;
+import java.util.Optional;
+
+import org.jdom2.Element;
+import org.mycore.access.facts.MCRFactsHolder;
+import org.mycore.access.facts.condition.fact.MCRStringCondition;
+import org.mycore.access.facts.fact.MCRObjectIDFact;
+import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSEmbargoUtils;
 
-public class MCRMODSEmbargoCondition extends MCRSimpleCondition {
+public class MCRMODSEmbargoCondition extends MCRStringCondition {
+
+    private String idFact = "objid";
 
     @Override
-    public boolean matches(MCRFacts facts) {
-        facts.require(this.type);
-        return super.matches(facts);
+    public void parse(Element xml) {
+        super.parse(xml);
+        this.idFact = Optional.ofNullable(xml.getAttributeValue("idfact")).orElse("objid");
+    }
+    
+    @Override
+    public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
+        Optional<MCRObjectIDFact> idc = facts.require(idFact);
+        if (idc.isPresent()) {
+            MCRObjectID objectID = idc.get().getValue();
+            if (objectID != null) {
+                String embargo = MCRMODSEmbargoUtils.getEmbargo(objectID);
+             
+                //only positive facts are added to the facts holder
+                if (embargo!=null) {
+                    MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
+                    fact.setValue(embargo);
+                    facts.add(fact);
+                    return Optional.of(fact);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
+   /* ******************************
+    * OLD Implementation
+    ********************************
     @Override
     public void setCurrentValue(MCRFacts facts) {
         MCRIDCondition idc = (MCRIDCondition) (facts.require("id"));
@@ -43,4 +72,5 @@ public class MCRMODSEmbargoCondition extends MCRSimpleCondition {
             this.value = Boolean.toString(embargo != null);
         }
     }
+    */
 }
