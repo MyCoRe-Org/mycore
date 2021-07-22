@@ -16,39 +16,54 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.pi.access.xml.condition;
+package org.mycore.pi.access.facts.condition;
 
-import org.mycore.access.xml.MCRFacts;
-import org.mycore.access.xml.conditions.MCRIDCondition;
-import org.mycore.access.xml.conditions.MCRSimpleCondition;
+import java.util.List;
+import java.util.Optional;
+
+import org.jdom2.Element;
+import org.mycore.access.facts.MCRFactsHolder;
+import org.mycore.access.facts.condition.fact.MCRStringCondition;
+import org.mycore.access.facts.fact.MCRObjectIDFact;
+import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIServiceManager;
 
-import java.util.List;
+public class MCRPIHasRegisteredCondition extends MCRStringCondition {
 
-public class MCRPIHasRegisteredCondition extends MCRSimpleCondition {
+    private String idFact = "objid";
 
     @Override
-    public boolean matches(MCRFacts facts) {
-        facts.require(this.type);
-        return super.matches(facts);
+    public void parse(Element xml) {
+        super.parse(xml);
+        this.idFact = Optional.ofNullable(xml.getAttributeValue("idfact")).orElse("objid");
     }
 
     @Override
-    public void setCurrentValue(MCRFacts facts) {
-        MCRIDCondition idc = (MCRIDCondition) (facts.require("id"));
-        MCRObjectID id = idc.getObjectID();
-        if (id == null) {
-            super.setCurrentValue(facts);
-        } else {
-            boolean anyRegistered = MCRPIServiceManager.getInstance().getServiceList().stream().anyMatch(service -> {
-                final List<MCRPIRegistrationInfo> createdIdentifiers = MCRPIManager.getInstance()
-                        .getCreatedIdentifiers(id, service.getType(), service.getServiceID());
-                return createdIdentifiers.stream().anyMatch(pid -> service.isRegistered(id, pid.getAdditional()));
-            });
-            this.setValue(Boolean.toString(anyRegistered));
+    public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
+        Optional<MCRObjectIDFact> idc = facts.require(idFact);
+        if (idc.isPresent()) {
+            MCRObjectID objectID = idc.get().getValue();
+            if (objectID != null) {
+                boolean anyRegistered = MCRPIServiceManager.getInstance().getServiceList().stream()
+                    .anyMatch(service -> {
+                        final List<MCRPIRegistrationInfo> createdIdentifiers = MCRPIManager.getInstance()
+                            .getCreatedIdentifiers(objectID, service.getType(), service.getServiceID());
+                        return createdIdentifiers.stream()
+                            .anyMatch(pid -> service.isRegistered(objectID, pid.getAdditional()));
+                    });
+
+                //only positive facts are added to the facts holder
+                if (anyRegistered) {
+                    MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
+                    fact.setValue(Boolean.TRUE.toString());
+                    facts.add(fact);
+                    return Optional.of(fact);
+                }
+            }
         }
+        return Optional.empty();
     }
 }
