@@ -24,7 +24,7 @@ import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.access.facts.fact.MCRStringFact;
-import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * This condition check if the given object has the specified createdby service flag.
@@ -46,13 +46,15 @@ public class MCRCreatedByCondition extends MCRStringCondition {
     public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
-            MCRObjectService service = idc.get().getObject().getService();
-            List<String> flags = service.getFlags("createdby");
-            for (String flag : flags) {
-                if (flag.equals(getTerm())) {
-                    MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
-                    facts.add(fact);
-                    return Optional.of(fact);
+            Optional<MCRObject> optMcrObj = idc.get().getObject();
+            if (optMcrObj.isPresent()) {
+                List<String> flags = optMcrObj.get().getService().getFlags("createdby");
+                for (String flag : flags) {
+                    if (flag.equals(getTerm())) {
+                        MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
+                        facts.add(fact);
+                        return Optional.of(fact);
+                    }
                 }
             }
         }

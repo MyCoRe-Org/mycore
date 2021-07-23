@@ -17,6 +17,8 @@
  */
 package org.mycore.access.facts.fact;
 
+import java.util.Optional;
+
 import org.mycore.access.facts.MCRObjectCacheFactory;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -42,12 +44,12 @@ public class MCRObjectIDFact extends MCRAbstractFact<MCRObjectID> {
     /**
      * @return the object for this condition or null if it is not a object
      */
-    public MCRObject getObject() {
+    public Optional<MCRObject> getObject() {
         MCRObjectID objectID = getValue();
         if (objectID == null) {
-            return null;
+            return Optional.empty();
         }
-        return MCRObjectCacheFactory.instance().getObject(objectID);
+        return Optional.ofNullable(MCRObjectCacheFactory.instance().getObject(objectID));
     }
 
 }
