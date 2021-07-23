@@ -20,14 +20,21 @@ package org.mycore.access.facts.condition.fact;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang.StringUtils;
 import org.jdom2.Element;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.access.facts.fact.MCRStringFact;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * This condition check if the given object has the specified createdby service flag.
+ * 
+ * If term in condition is empty - the check is for the current user
+ * 
+ * &lt;createdby /&gt;  checks if the object was created by currentUser
+ * &lt;createdby&gt;administrator&lt;/createdby&gt;
  * 
  * @author Robert Stephan
  *
@@ -48,10 +55,13 @@ public class MCRCreatedByCondition extends MCRStringCondition {
         if (idc.isPresent()) {
             Optional<MCRObject> optMcrObj = idc.get().getObject();
             if (optMcrObj.isPresent()) {
+                String checkUser = StringUtils.defaultIfBlank(getTerm(),
+                    MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
                 List<String> flags = optMcrObj.get().getService().getFlags("createdby");
                 for (String flag : flags) {
-                    if (flag.equals(getTerm())) {
+                    if (flag.equals(checkUser)) {
                         MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
+                        fact.setValue(checkUser);
                         facts.add(fact);
                         return Optional.of(fact);
                     }
