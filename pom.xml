@@ -908,6 +908,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>2.0.0</version>
       </dependency>
       <dependency>
+        <groupId>edu.wisc.library.ocfl</groupId>
+        <artifactId>ocfl-java-core</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+      <dependency>
         <groupId>io.bit3</groupId>
         <artifactId>jsass</artifactId>
         <version>5.10.4</version>
