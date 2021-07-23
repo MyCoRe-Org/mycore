@@ -56,7 +56,7 @@ public class MCRCreatedByConditionTest extends MCRTestCase {
         holder.add(new MCRObjectIDFact("objid", testId.toString(), testId));
 
         MCRCreatedByCondition createdByCondition = new MCRCreatedByCondition();
-        createdByCondition.parse(new Element("createdBy"));
+        createdByCondition.parse(new Element("createdby"));
 
         Assert.assertTrue("current user should be creator", createdByCondition.matches(holder));
     }
@@ -74,7 +74,7 @@ public class MCRCreatedByConditionTest extends MCRTestCase {
         holder.add(new MCRObjectIDFact("objid", testId.toString(), testId));
 
         MCRCreatedByCondition createdByCondition = new MCRCreatedByCondition();
-        createdByCondition.parse(new Element("createdBy"));
+        createdByCondition.parse(new Element("createdby"));
 
         Assert.assertFalse("current user should not be the creator", createdByCondition.matches(holder));
     }

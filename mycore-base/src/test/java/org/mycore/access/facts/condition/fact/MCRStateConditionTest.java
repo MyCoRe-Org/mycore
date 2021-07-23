@@ -55,16 +55,16 @@ public class MCRStateConditionTest extends MCRJPATestCase {
         state.setRootID("state");
         state.setRootID("state");
 
-        MCRCategoryImpl _new = new MCRCategoryImpl();
-        _new.setRootID("state");
-        _new.setCategID("new");
+        MCRCategoryImpl newState = new MCRCategoryImpl();
+        newState.setRootID("state");
+        newState.setCategID("new");
 
         MCRCategoryImpl published = new MCRCategoryImpl();
         published.setRootID("state");
         published.setCategID("published");
 
         instance.addCategory(null, state);
-        instance.addCategory(state.getId(), _new);
+        instance.addCategory(state.getId(), newState);
         instance.addCategory(state.getId(), published);
     }
 
@@ -82,7 +82,7 @@ public class MCRStateConditionTest extends MCRJPATestCase {
 
         MCRStateCondition mcrStateCondition = new MCRStateCondition();
         mcrStateCondition.parse(new Element("state").setText("published"));
-        Assert.assertTrue("State should be published!", mcrStateCondition.matches(holder));
+        Assert.assertTrue("State should be 'published'!", mcrStateCondition.matches(holder));
     }
 
 
@@ -100,6 +100,6 @@ public class MCRStateConditionTest extends MCRJPATestCase {
 
         MCRStateCondition mcrStateCondition = new MCRStateCondition();
         mcrStateCondition.parse(new Element("state").setText("new"));
-        Assert.assertFalse("State should not be published!", mcrStateCondition.matches(holder));
+        Assert.assertFalse("State should not be 'published'!", mcrStateCondition.matches(holder));
     }
 }

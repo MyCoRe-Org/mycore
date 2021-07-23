@@ -39,6 +39,15 @@ public class MCRIPConditionTest extends MCRTestCase {
     }
 
     @Test
+    public void testRangeConditionMatch() {
+        MCRSessionMgr.getCurrentSession().setCurrentIP("111.111.111.111");
+        MCRIPCondition condition = new MCRIPCondition();
+        condition.parse(new Element("ip").setText("111.111.0.0/255.255.0.0"));
+        MCRFactsHolder facts = new MCRFactsHolder(Collections.emptyList());
+        Assert.assertTrue("The ip should match", condition.matches(facts));
+    }
+
+    @Test
     public void testConditionNotMatch() {
         MCRSessionMgr.getCurrentSession().setCurrentIP("222.222.222.222");
         MCRIPCondition condition = new MCRIPCondition();

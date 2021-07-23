@@ -55,8 +55,8 @@ public class MCRMODSGenreConditionTest extends MCRTestCase {
         hackObjectIntoCache(object, testId);
         holder.add(new MCRObjectIDFact("objid", testId.toString(), testId));
 
-        Element classification = mw.addElement("genre");
-        classification.setAttribute("valueURI", "https://mycore.de/classifications/mir_genres#article");
+        Element genre = mw.addElement("genre");
+        genre.setAttribute("valueURI", "https://mycore.de/classifications/mir_genres#article");
 
         MCRMODSGenreCondition genreCondition = new MCRMODSGenreCondition();
         genreCondition.parse(new Element("genre").setText("article"));
@@ -75,8 +75,8 @@ public class MCRMODSGenreConditionTest extends MCRTestCase {
         hackObjectIntoCache(object, testId);
         holder.add(new MCRObjectIDFact("objid", testId.toString(), testId));
 
-        Element classification = mw.addElement("genre");
-        classification.setAttribute("valueURI", "https://mycore.de/classifications/mir_genres#book");
+        Element genre = mw.addElement("genre");
+        genre.setAttribute("valueURI", "https://mycore.de/classifications/mir_genres#book");
 
         MCRMODSGenreCondition genreCondition = new MCRMODSGenreCondition();
         genreCondition.parse(new Element("genre").setText("article"));
