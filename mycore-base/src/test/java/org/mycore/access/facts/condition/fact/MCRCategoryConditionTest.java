@@ -18,6 +18,14 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,7 +34,6 @@ import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -35,14 +42,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
 
 public class MCRCategoryConditionTest extends MCRJPATestCase {
 

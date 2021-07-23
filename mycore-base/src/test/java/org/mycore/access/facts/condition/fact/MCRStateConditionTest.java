@@ -21,7 +21,6 @@ package org.mycore.access.facts.condition.fact;
 import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.jdom2.Element;
@@ -32,12 +31,8 @@ import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.MCRTestCase;
-import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.impl.MCRAbstractCategoryImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;

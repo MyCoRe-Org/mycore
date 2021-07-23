@@ -18,24 +18,21 @@
 
 package org.mycore.mods.access.facts.condition;
 
+import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
+
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
-
-import java.util.ArrayList;
-import java.util.Map;
-
-import static org.junit.Assert.*;
-import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
 
 public class MCRMODSCollectionConditionTest extends MCRTestCase {
 

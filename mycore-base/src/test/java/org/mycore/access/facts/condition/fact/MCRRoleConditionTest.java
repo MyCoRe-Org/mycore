@@ -18,6 +18,8 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import java.util.ArrayList;
+
 import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,10 +27,6 @@ import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTestCase;
-
-import java.util.ArrayList;
-
-import static org.junit.Assert.*;
 
 public class MCRRoleConditionTest extends MCRTestCase {
 

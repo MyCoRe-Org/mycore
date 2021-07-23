@@ -18,12 +18,12 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import java.lang.reflect.Field;
+
 import org.mycore.access.facts.MCRObjectCacheFactory;
 import org.mycore.common.MCRCache;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
-import java.lang.reflect.Field;
 
 public class MCRFactsTestUtil {
 

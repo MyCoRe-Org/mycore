@@ -18,26 +18,21 @@
 
 package org.mycore.access.facts.condition.fact;
 
+import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
+
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.access.facts.MCRFactsHolder;
-import org.mycore.access.facts.MCRObjectCacheFactory;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRStoreTestCase;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Map;
-
-import static org.junit.Assert.*;
-import static org.mycore.access.facts.condition.fact.MCRFactsTestUtil.hackObjectIntoCache;
 
 public class MCRCreatedByConditionTest extends MCRTestCase {
 
