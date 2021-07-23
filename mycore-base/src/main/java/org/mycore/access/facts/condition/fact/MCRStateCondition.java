@@ -24,7 +24,7 @@ import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.access.facts.fact.MCRStringFact;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * This implementation of a condition
@@ -57,13 +57,15 @@ public class MCRStateCondition extends MCRStringCondition {
     public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
-            MCRObjectService service = idc.get().getObject().getService();
-            MCRCategoryID state = service.getState();
-            if (getTerm().equals(state.getID())) {
-                MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
-                fact.setValue(state.getID());
-                facts.add(fact);
-                return Optional.of(fact);
+            Optional<MCRObject> optMcrObj = idc.get().getObject();
+            if (optMcrObj.isPresent()) {
+                MCRCategoryID state = optMcrObj.get().getService().getState();
+                if (getTerm().equals(state.getID())) {
+                    MCRStringFact fact = new MCRStringFact(getFactName(), getTerm());
+                    fact.setValue(state.getID());
+                    facts.add(fact);
+                    return Optional.of(fact);
+                }
             }
         }
         return Optional.empty();

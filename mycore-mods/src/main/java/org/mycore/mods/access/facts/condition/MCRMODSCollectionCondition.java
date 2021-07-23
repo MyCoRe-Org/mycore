@@ -55,9 +55,9 @@ public class MCRMODSCollectionCondition extends MCRStringCondition {
 
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
-            MCRObject object = idc.get().getObject();
-            if (object != null) {
-                MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
+            Optional<MCRObject> optMCRObject = idc.get().getObject();
+            if (optMCRObject.isPresent()) {
+                MCRMODSWrapper wrapper = new MCRMODSWrapper(optMCRObject.get());
                 List<Element> e = wrapper.getElements(XPATH_COLLECTION);
                 if ((e != null) && !(e.isEmpty())) {
                     String value = e.get(0).getAttributeValue("valueURI").split("#")[1];
