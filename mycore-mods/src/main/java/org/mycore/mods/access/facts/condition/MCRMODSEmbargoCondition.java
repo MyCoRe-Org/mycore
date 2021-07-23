@@ -25,7 +25,7 @@ import org.mycore.access.facts.MCRFactsHolder;
 import org.mycore.access.facts.condition.fact.MCRStringCondition;
 import org.mycore.access.facts.fact.MCRObjectIDFact;
 import org.mycore.access.facts.fact.MCRStringFact;
-import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSEmbargoUtils;
 
 /**
@@ -49,9 +49,9 @@ public class MCRMODSEmbargoCondition extends MCRStringCondition {
     public Optional<MCRStringFact> computeFact(MCRFactsHolder facts) {
         Optional<MCRObjectIDFact> idc = facts.require(idFact);
         if (idc.isPresent()) {
-            MCRObjectID objectID = idc.get().getValue();
-            if (objectID != null) {
-                String embargo = MCRMODSEmbargoUtils.getEmbargo(objectID);
+            Optional<MCRObject> optMCRObject = idc.get().getObject();
+            if (optMCRObject.isPresent()) {
+                String embargo = MCRMODSEmbargoUtils.getEmbargo(optMCRObject.get());
 
                 //only positive facts are added to the facts holder
                 if (embargo != null) {
