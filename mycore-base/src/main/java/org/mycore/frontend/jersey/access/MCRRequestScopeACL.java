@@ -21,7 +21,7 @@ package org.mycore.frontend.jersey.access;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 public interface MCRRequestScopeACL {
 

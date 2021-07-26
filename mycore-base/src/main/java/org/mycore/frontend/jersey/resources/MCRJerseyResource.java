@@ -20,8 +20,8 @@ package org.mycore.frontend.jersey.resources;
 
 import java.net.URI;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.UriInfo;
 
 public abstract class MCRJerseyResource {
 

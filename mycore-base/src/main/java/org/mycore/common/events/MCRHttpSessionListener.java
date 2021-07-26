@@ -20,15 +20,15 @@ package org.mycore.common.events;
 
 import java.util.Optional;
 
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionResolver;
 import org.mycore.frontend.servlets.MCRServlet;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 
 /**
  * Handles different HttpSession events.
@@ -45,7 +45,7 @@ public class MCRHttpSessionListener implements HttpSessionListener {
     /*
      * (non-Javadoc)
      *
-     * @see javax.servlet.http.HttpSessionListener#sessionCreated(javax.servlet.http.HttpSessionEvent)
+     * @see jakarta.servlet.http.HttpSessionListener#sessionCreated(jakarta.servlet.http.HttpSessionEvent)
      */
     public void sessionCreated(HttpSessionEvent hse) {
         LOGGER.debug(() -> "HttpSession " + hse.getSession().getId() + " is being created by: " + hse.getSource());
@@ -54,7 +54,7 @@ public class MCRHttpSessionListener implements HttpSessionListener {
     /*
      * (non-Javadoc)
      *
-     * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
+     * @see jakarta.servlet.http.HttpSessionListener#sessionDestroyed(jakarta.servlet.http.HttpSessionEvent)
      */
     public void sessionDestroyed(HttpSessionEvent hse) {
         // clear MCRSessions

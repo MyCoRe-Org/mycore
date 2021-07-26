@@ -18,13 +18,13 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-
 import org.jdom2.Document;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
 
 /**
  * @author Frank L\u00FCtzenkirchen

@@ -158,6 +158,11 @@
       <artifactId>jackson-module-jaxb-annotations</artifactId>
     </dependency>
     <dependency>
+      <!-- required by hibernate -->
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
     </dependency>
@@ -220,7 +225,7 @@
     </dependency>
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-annotations</artifactId>
+      <artifactId>swagger-annotations-jakarta</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.activation</groupId>
@@ -296,7 +301,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-web</artifactId>
+      <artifactId>log4j-jakarta-web</artifactId>
+    </dependency>
+    <dependency>
+      <!-- required by hibernate -->
+      <groupId>org.codehaus.woodstox</groupId>
+      <artifactId>stax2-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.glassfish.hk2</groupId>
@@ -328,7 +338,7 @@
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
+      <artifactId>hibernate-core-jakarta</artifactId>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>

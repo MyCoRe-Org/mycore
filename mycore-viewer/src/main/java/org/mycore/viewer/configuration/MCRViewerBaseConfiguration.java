@@ -20,12 +20,12 @@ package org.mycore.viewer.configuration;
 
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Base configuration for the mycore image viewer. Sets the following parameter:

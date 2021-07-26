@@ -18,10 +18,10 @@
 
 package org.mycore.wfc.actionmapping;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
+
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * A JAXB XML Adapter that parses String to MCRCondition an back.

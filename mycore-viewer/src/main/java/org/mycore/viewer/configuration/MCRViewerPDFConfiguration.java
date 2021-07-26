@@ -18,11 +18,11 @@
 
 package org.mycore.viewer.configuration;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class MCRViewerPDFConfiguration extends MCRViewerBaseConfiguration {
 

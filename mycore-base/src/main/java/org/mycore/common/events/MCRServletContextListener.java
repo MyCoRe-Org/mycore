@@ -18,8 +18,8 @@
 
 package org.mycore.common.events;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * is a shutdown hook for the current <code>ServletContext</code>. For this class to register itself as a shutdown hook

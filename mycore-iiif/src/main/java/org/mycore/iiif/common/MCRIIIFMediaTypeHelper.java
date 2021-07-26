@@ -18,7 +18,7 @@
 
 package org.mycore.iiif.common;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 /**
  * @author Thomas Scheffler (yagee)

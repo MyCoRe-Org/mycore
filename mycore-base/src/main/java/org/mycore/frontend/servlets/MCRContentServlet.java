@@ -24,15 +24,15 @@ import java.nio.file.NoSuchFileException;
 import java.util.Locale;
 import java.util.Objects;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Supplier;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.util.MCRServletContentHelper;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Thomas Scheffler (yagee)

@@ -26,10 +26,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -38,6 +34,10 @@ import org.mycore.common.content.MCRContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.frontend.servlets.MCRStaticXMLFileServlet;
 import org.xml.sax.SAXException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Frank L\u00FCtzenkirchen

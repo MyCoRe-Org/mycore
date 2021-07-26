@@ -20,10 +20,6 @@ package org.mycore.frontend.jersey.feature;
 
 import java.lang.reflect.Method;
 
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.Provider;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.jersey.filter.MCRCacheFilter;
@@ -31,6 +27,10 @@ import org.mycore.frontend.jersey.filter.MCRDBTransactionFilter;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 import org.mycore.frontend.jersey.filter.MCRSessionLockFilter;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
+
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.ext.Provider;
 
 /**
  * Default feature for mycore. Does register a cache, transaction, session and

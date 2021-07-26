@@ -18,13 +18,13 @@
 
 package org.mycore.frontend.classeditor.access;
 
-import javax.ws.rs.container.ContainerRequestContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 /**
  * @author Thomas Scheffler (yagee)

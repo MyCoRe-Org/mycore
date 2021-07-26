@@ -22,16 +22,16 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Provider;
-
 import org.glassfish.jersey.server.filter.UriConnegFilter;
 import org.mycore.common.config.MCRConfiguration2;
+
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.PreMatching;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.Provider;
 
 /**
  * This filter uses Jersey's default implementation of UriConnectFilter to set

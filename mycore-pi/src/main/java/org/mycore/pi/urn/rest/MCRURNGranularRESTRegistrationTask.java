@@ -24,14 +24,14 @@ import java.util.TimerTask;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import javax.persistence.EntityTransaction;
-import javax.persistence.RollbackException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.urn.MCRDNBURN;
+
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.RollbackException;
 
 /**
  * Created by chi on 26.01.17.

@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -33,6 +31,8 @@ import org.mycore.frontend.servlets.MCRClassificationBrowser2.MCRQueryAdapter;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.solr.MCRSolrClientFactory;
 import org.mycore.solr.MCRSolrConstants;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class MCRSolrQueryAdapter implements MCRQueryAdapter {
     private static final Logger LOGGER = LogManager.getLogger(MCRSolrQueryAdapter.class);

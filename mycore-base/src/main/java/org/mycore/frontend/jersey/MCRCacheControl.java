@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Used to define the {@link javax.ws.rs.core.HttpHeaders#CACHE_CONTROL} header via annotation
+ * Used to define the {@link jakarta.ws.rs.core.HttpHeaders#CACHE_CONTROL} header via annotation
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

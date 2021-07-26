@@ -26,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.servlet.ServletContext;
-
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +33,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.pi.MCRPIRegistrationInfo;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * @author shermann

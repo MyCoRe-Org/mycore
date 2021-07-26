@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.WebApplicationException;
-
 import org.mycore.common.MCRJSONTypeAdapter;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -47,6 +45,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+
+import jakarta.ws.rs.WebApplicationException;
 
 public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryListWrapper> {
     private JsonSerializationContext serializationContext;

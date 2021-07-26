@@ -21,12 +21,12 @@ package org.mycore.restapi.converter;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Provider;
-
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
+
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.Provider;
 
 @Provider
 @Produces({ MediaType.APPLICATION_JSON + ";charset=UTF-8" })

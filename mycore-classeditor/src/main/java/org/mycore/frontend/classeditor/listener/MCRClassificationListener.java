@@ -18,15 +18,15 @@
 
 package org.mycore.frontend.classeditor.listener;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.ws.rs.ext.Provider;
-
 import org.mycore.common.MCRJSONManager;
 import org.mycore.frontend.classeditor.MCRCategoryIDTypeAdapter;
 import org.mycore.frontend.classeditor.MCRCategoryListTypeAdapter;
 import org.mycore.frontend.classeditor.MCRCategoryTypeAdapter;
 import org.mycore.frontend.classeditor.MCRLabelSetTypeAdapter;
+
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.ws.rs.ext.Provider;
 
 @Provider
 public class MCRClassificationListener implements ServletContextListener {

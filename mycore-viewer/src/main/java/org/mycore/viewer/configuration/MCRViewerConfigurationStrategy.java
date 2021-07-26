@@ -18,7 +18,7 @@
 
 package org.mycore.viewer.configuration;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Strategy which decides which image viewer configuration should be loaded by the

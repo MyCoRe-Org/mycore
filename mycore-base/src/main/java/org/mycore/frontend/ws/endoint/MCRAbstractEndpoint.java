@@ -22,13 +22,13 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.websocket.Session;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSessionResolver;
 import org.mycore.frontend.servlets.MCRServlet;
+
+import jakarta.websocket.Session;
 
 /**
  * Starting class for all mycore websocket endpoints.

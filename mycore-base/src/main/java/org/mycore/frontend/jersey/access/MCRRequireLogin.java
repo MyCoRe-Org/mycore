@@ -18,11 +18,11 @@
 
 package org.mycore.frontend.jersey.access;
 
-import javax.ws.rs.container.ContainerRequestContext;
-
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 /**
  * @author Thomas Scheffler (yagee)

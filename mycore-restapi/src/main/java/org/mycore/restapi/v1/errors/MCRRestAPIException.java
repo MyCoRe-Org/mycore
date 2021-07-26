@@ -21,7 +21,7 @@ package org.mycore.restapi.v1.errors;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * exception that can be thrown during rest api requests

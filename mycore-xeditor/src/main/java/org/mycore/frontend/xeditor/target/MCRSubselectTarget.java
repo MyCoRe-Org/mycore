@@ -20,15 +20,15 @@ package org.mycore.frontend.xeditor.target;
 
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.ServletContext;
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
+
+import jakarta.servlet.ServletContext;
+import jakarta.xml.bind.DatatypeConverter;
 
 /**
  * @author Frank L\u00FCtzenkirchen

@@ -341,7 +341,7 @@
     <servlet-name>MyCoRe Jersey Resource</servlet-name>
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
+      <param-name>jakarta.ws.rs.Application</param-name>
       <param-value>org.mycore.frontend.jersey.MCRJerseyResourceConfig</param-value>
     </init-param>
     <load-on-startup>0</load-on-startup>

@@ -21,7 +21,6 @@ package org.mycore.wcms2.navigation;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.jdom2.Document;
@@ -40,6 +39,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.google.gson.JsonObject;
+
+import jakarta.xml.bind.JAXBException;
 
 public class MCRWCMSNavigationUtils {
 

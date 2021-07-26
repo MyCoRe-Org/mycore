@@ -18,9 +18,9 @@
 
 package org.mycore.viewer.configuration;
 
-import javax.servlet.http.HttpSession;
-
 import org.mycore.datamodel.metadata.MCRObjectID;
+
+import jakarta.servlet.http.HttpSession;
 
 public interface MCRIviewACLProvider {
     boolean checkAccess(HttpSession session, MCRObjectID derivateID);

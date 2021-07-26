@@ -35,8 +35,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.util.IOUtils;
@@ -44,6 +42,7 @@ import org.mycore.common.MCRDeveloperTools;
 
 import io.bit3.jsass.importer.Import;
 import io.bit3.jsass.importer.Importer;
+import jakarta.servlet.ServletContext;
 
 /**
  * Imports scss files using {@link ServletContext}.

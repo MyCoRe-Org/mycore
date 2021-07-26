@@ -23,15 +23,15 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-
 import org.apache.http.client.utils.URIBuilder;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.streams.MCRMD5InputStream;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
+
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
 
 /**
  * Utility class working as a client for the OAuth2 API of orcid.org.

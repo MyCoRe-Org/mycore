@@ -18,10 +18,10 @@
 
 package org.mycore.backend.jpa;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-
 import org.mycore.datamodel.metadata.MCRObjectID;
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 /**
  * Converts {@link MCRObjectID} to {@link String}.

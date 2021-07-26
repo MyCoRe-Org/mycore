@@ -22,9 +22,6 @@ import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -33,6 +30,9 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.processing.MCRAbstractProcessable;
 import org.mycore.common.processing.MCRProcessableStatus;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 
 /**
  * A slave thread of {@link MCRJobMaster}.

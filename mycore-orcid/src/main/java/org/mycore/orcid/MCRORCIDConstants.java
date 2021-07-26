@@ -21,9 +21,9 @@ package org.mycore.orcid;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
 import org.jdom2.Namespace;
+
+import jakarta.ws.rs.core.MediaType;
 
 /**
  * Utility class to hold constants and namespace representation used in the XML of the ORCID API.

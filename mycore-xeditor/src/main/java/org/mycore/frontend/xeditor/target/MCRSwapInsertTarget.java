@@ -18,8 +18,6 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import javax.servlet.ServletContext;
-
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXPathBuilder;
@@ -27,6 +25,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.MCRRepeatBinding;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * @author Frank L\u00FCtzenkirchen

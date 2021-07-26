@@ -28,9 +28,6 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Optional;
 
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.Response;
-
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRUserInformation;
@@ -44,6 +41,9 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+
+import jakarta.servlet.ServletContext;
+import jakarta.ws.rs.core.Response;
 
 public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
     public static final String JWT_CLAIM_ROLES = "mcr:roles";

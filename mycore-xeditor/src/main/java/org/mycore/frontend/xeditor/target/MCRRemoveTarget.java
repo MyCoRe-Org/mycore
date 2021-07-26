@@ -18,11 +18,11 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import javax.servlet.ServletContext;
-
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * @author Frank L\u00FCtzenkirchen

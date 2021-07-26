@@ -18,21 +18,21 @@
 
 package org.mycore.restapi.v1.errors;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.restapi.v1.utils.MCRRestAPIUtil;
 
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+
 /**
- * Maps response status {@link javax.ws.rs.core.Response.Status#FORBIDDEN} to
- * {@link javax.ws.rs.core.Response.Status#UNAUTHORIZED} if current user is guest.
+ * Maps response status {@link jakarta.ws.rs.core.Response.Status#FORBIDDEN} to
+ * {@link jakarta.ws.rs.core.Response.Status#UNAUTHORIZED} if current user is guest.
  */
 public class MCRForbiddenExceptionMapper implements ExceptionMapper<ForbiddenException> {
     @Context

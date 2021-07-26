@@ -18,9 +18,6 @@
 
 package org.mycore.wfc;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -28,6 +25,9 @@ import org.mycore.wfc.actionmapping.MCRAction;
 import org.mycore.wfc.actionmapping.MCRActionMappings;
 import org.mycore.wfc.actionmapping.MCRCollection;
 import org.mycore.wfc.actionmapping.MCRDecision;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * @author Thomas Scheffler (yagee)

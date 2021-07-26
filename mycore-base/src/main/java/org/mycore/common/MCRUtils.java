@@ -58,7 +58,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -75,6 +74,8 @@ import org.mycore.datamodel.niofs.MCRPathUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
+
+import jakarta.xml.bind.DatatypeConverter;
 
 /**
  * This class represent a general set of external methods to support the programming API.

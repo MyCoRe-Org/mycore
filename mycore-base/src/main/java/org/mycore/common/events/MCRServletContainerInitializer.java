@@ -26,14 +26,13 @@ import java.security.ProtectionDomain;
 import java.util.Enumeration;
 import java.util.Set;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
 
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor;
 import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventorFactory;
 
@@ -43,7 +42,7 @@ import se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventorFactory;
 public class MCRServletContainerInitializer implements ServletContainerInitializer {
 
     /* (non-Javadoc)
-     * @see javax.servlet.ServletContainerInitializer#onStartup(java.util.Set, javax.servlet.ServletContext)
+     * @see jakarta.servlet.ServletContainerInitializer#onStartup(java.util.Set, jakarta.servlet.ServletContext)
      */
     @Override
     public void onStartup(final Set<Class<?>> c, final ServletContext ctx) throws ServletException {
