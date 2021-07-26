@@ -18,12 +18,6 @@
 
 package org.mycore.common.config;
 
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRException;
-import org.mycore.common.config.annotation.MCRPostConstruction;
-import org.mycore.common.config.annotation.MCRProperty;
-
-import javax.inject.Singleton;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -32,6 +26,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRException;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
+
+import jakarta.inject.Singleton;
 
 /**
  * Creates Objects which are preconfigured with properties.

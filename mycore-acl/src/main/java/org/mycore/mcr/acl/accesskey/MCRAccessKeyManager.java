@@ -26,8 +26,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessCacheHelper;
@@ -48,6 +46,8 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyInvalidSecretException
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyInvalidTypeException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+
+import jakarta.persistence.EntityManager;
 
 /**
  * Methods to manage {@link MCRAccessKey}.

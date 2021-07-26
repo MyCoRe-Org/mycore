@@ -24,14 +24,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
 import edu.wisc.library.ocfl.core.OcflRepositoryBuilder;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
 import edu.wisc.library.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
-import org.mycore.common.config.annotation.MCRProperty;
-
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 /**
  * Simple way to provide a {@link OcflRepository}

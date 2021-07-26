@@ -20,14 +20,13 @@ package org.mycore.ocfl;
 
 import java.io.IOException;
 
-import javax.inject.Singleton;
-
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
 import org.mycore.ocfl.layout.MCRStorageLayoutExtension;
 
 import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionRegistry;
+import jakarta.inject.Singleton;
 
 /**
  * Repository Provider for the MyCoRe-Storage-Layout

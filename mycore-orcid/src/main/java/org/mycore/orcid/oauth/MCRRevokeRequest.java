@@ -20,7 +20,7 @@ package org.mycore.orcid.oauth;
 
 import java.io.IOException;
 
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.client.WebTarget;
 
 import org.mycore.common.config.MCRConfigurationException;
 

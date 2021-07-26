@@ -26,11 +26,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceException;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import org.apache.logging.log4j.LogManager;
 import org.hibernate.Session;
 import org.hibernate.dialect.PostgreSQL9Dialect;
@@ -39,6 +34,11 @@ import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.AbstractEntityPersister;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
+
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 /**
  * Helper class to check if EntityManagerFactory is correctly configured.

@@ -18,11 +18,11 @@
 
 package org.mycore.webtools.processing.socket;
 
-import javax.websocket.Session;
-
 import org.mycore.common.processing.MCRProcessable;
 import org.mycore.common.processing.MCRProcessableCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
+
+import jakarta.websocket.Session;
 
 /**
  * Base interface to send processables, collections and the registry over the wire.

@@ -33,8 +33,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -55,6 +53,8 @@ import org.swordapp.server.MediaResource;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Sebastian Hofmann (mcrshofm)

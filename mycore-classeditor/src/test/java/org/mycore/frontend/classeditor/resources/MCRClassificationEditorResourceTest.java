@@ -27,10 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.client.ClientConfig;
@@ -59,6 +55,10 @@ import org.mycore.frontend.classeditor.mocks.LinkTableStoreMock;
 import org.mycore.frontend.classeditor.wrapper.MCRCategoryListWrapper;
 import org.mycore.frontend.jersey.filter.MCRSessionHookFilter;
 import org.mycore.frontend.jersey.resources.MCRJerseyTest;
+
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class MCRClassificationEditorResourceTest extends MCRJerseyTest {
     private CategoryDAOMock categDAO;

@@ -35,7 +35,7 @@ import org.mycore.services.fieldquery.MCRQueryParser;
 public class MCRQLSearchUtilsTest extends MCRTestCase {
     /**
      * Test method for
-     * {@link MCRSolrSearchUtils#getSolrQuery(MCRQuery, Document, javax.servlet.http.HttpServletRequest)}
+     * {@link MCRSolrSearchUtils#getSolrQuery(MCRQuery, Document, jakarta.servlet.http.HttpServletRequest)}
      * .
      */
     @Test

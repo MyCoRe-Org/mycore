@@ -25,8 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ws.rs.WebApplicationException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
@@ -44,6 +42,8 @@ import org.xml.sax.SAXParseException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import jakarta.ws.rs.WebApplicationException;
 
 /**
  * The default implementation to convert MyCoRe Webpage sections

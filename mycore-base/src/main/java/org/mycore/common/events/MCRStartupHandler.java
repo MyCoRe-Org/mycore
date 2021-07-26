@@ -20,8 +20,6 @@ package org.mycore.common.events;
 
 import java.util.stream.Stream;
 
-import javax.servlet.ServletContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRClassTools;
@@ -30,6 +28,8 @@ import org.mycore.common.config.MCRConfigurationDirSetup;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.xml.MCRURIResolver;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Initializes classes that implement {@link AutoExecutable} interface that are defined via

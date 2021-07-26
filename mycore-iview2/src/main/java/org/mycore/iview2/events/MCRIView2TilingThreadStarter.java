@@ -18,12 +18,12 @@
 
 package org.mycore.iview2.events;
 
-import javax.servlet.ServletContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.iview2.services.MCRImageTiler;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Handles tiling process in a web application.

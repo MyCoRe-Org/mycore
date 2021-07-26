@@ -20,7 +20,7 @@ package org.mycore.viewer.configuration;
 
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Default image viewer configuration. Decides if the mets or the pdf configuration is used.

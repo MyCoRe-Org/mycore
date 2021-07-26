@@ -26,8 +26,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.websocket.Session;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCRShutdownHandler;
@@ -37,6 +35,8 @@ import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.webtools.processing.socket.MCRProcessableWebsocketSender;
 
 import com.google.gson.Gson;
+
+import jakarta.websocket.Session;
 
 /**
  * Websocket implementation of sending processable objects.

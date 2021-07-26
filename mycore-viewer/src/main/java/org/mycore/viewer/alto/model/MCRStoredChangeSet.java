@@ -20,10 +20,10 @@ package org.mycore.viewer.alto.model;
 
 import java.util.Date;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 
 @MappedSuperclass
 public class MCRStoredChangeSet extends MCRStoredAltoChangeSetMetadata {

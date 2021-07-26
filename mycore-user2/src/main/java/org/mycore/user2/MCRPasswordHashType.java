@@ -18,7 +18,7 @@
 
 package org.mycore.user2;
 
-import javax.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnum;
 
 /**
  * This enum represents different hash type for user passwords.

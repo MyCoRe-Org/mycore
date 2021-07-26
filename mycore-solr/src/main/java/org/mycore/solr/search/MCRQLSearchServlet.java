@@ -23,10 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +36,11 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.solr.proxy.MCRSolrProxyServlet;
 import org.xml.sax.SAXException;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class MCRQLSearchServlet extends MCRServlet {//extends MCRSearchServlet {
 

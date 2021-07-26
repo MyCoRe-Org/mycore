@@ -20,5 +20,5 @@
     xmlns = @XmlNs(prefix = "xlink", namespaceURI = "http://www.w3.org/1999/xlink"))
 package org.mycore.datamodel.classifications2.model;
 
-import javax.xml.bind.annotation.XmlNs;
-import javax.xml.bind.annotation.XmlSchema;
+import jakarta.xml.bind.annotation.XmlNs;
+import jakarta.xml.bind.annotation.XmlSchema;

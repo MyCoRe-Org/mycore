@@ -25,8 +25,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
@@ -51,6 +49,8 @@ import org.mycore.pi.MCRPersistentIdentifierEventHandler;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
+
+import jakarta.persistence.EntityManager;
 
 @MCRCommandGroup(name = "PI Commands")
 public class MCRPICommands {

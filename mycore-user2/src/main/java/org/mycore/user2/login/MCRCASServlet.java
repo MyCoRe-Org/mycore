@@ -18,10 +18,6 @@
 
 package org.mycore.user2.login;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jasig.cas.client.authentication.AttributePrincipal;
@@ -34,6 +30,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUser2Constants;
 import org.mycore.user2.MCRUserManager;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Login user with JA-SIG Central Authentication Service (CAS).

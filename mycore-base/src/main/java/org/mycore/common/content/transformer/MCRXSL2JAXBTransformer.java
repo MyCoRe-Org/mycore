@@ -21,10 +21,6 @@ package org.mycore.common.content.transformer;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.util.JAXBResult;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.sax.TransformerHandler;
@@ -36,6 +32,11 @@ import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.util.JAXBResult;
 
 /**
  * Transforms XML content using a static XSL stylesheet.

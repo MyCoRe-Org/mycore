@@ -20,9 +20,9 @@ package org.mycore.backend.jpa.links;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 /**
  * This class hold all primary keys of MCRLINKHREF

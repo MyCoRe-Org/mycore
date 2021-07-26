@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.xml.transform.Transformer;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +35,9 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Collects parameters used in XSL transformations, by copying them from
@@ -309,7 +310,7 @@ public class MCRParameterCollector {
         StringBuilder buffer = getBaseURLUpToHostName();
 
         //when called by MCRErrorServlet
-        String errorURI = (String) request.getAttribute("javax.servlet.error.request_uri");
+        String errorURI = (String) request.getAttribute("jakarta.servlet.error.request_uri");
         buffer.append(errorURI != null ? errorURI : request.getRequestURI());
 
         String queryString = request.getQueryString();

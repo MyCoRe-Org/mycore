@@ -20,13 +20,13 @@ package org.mycore.sword.servlets;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.mycore.sword.MCRSwordConfigurationDefault;
 import org.mycore.sword.manager.MCRSwordServiceDocumentManager;
 import org.swordapp.server.ServiceDocumentAPI;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Sebastian Hofmann (mcrshofm)

@@ -25,8 +25,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
@@ -41,6 +39,9 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.MCRPathXML;
 import org.mycore.frontend.servlets.MCRContentServlet;
 import org.xml.sax.SAXException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This servlet delivers the contents of an MCRFilesystemNode to the client
@@ -66,7 +67,7 @@ public class MCRFileNodeServlet extends MCRContentServlet {
     private static Pattern patternDerivateID = Pattern.compile(".+_derivate_[0-9]+");
 
     /* (non-Javadoc)
-     * @see org.mycore.frontend.servlets.MCRContentServlet#getContent(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see org.mycore.frontend.servlets.MCRContentServlet#getContent(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse)
      */
     @Override
     public MCRContent getContent(HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -18,9 +18,9 @@
 
 package org.mycore.viewer.configuration;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.mycore.frontend.MCRFrontendUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class MCRViewerEPUBConfiguration extends MCRViewerBaseConfiguration {
 

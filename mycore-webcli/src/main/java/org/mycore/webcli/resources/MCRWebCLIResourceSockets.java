@@ -26,18 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.websocket.CloseReason;
-import javax.websocket.Extension;
-import javax.websocket.MessageHandler;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerEndpoint;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
@@ -48,6 +36,18 @@ import org.mycore.frontend.ws.endoint.MCRAbstractEndpoint;
 import org.mycore.webcli.container.MCRWebCLIContainer;
 
 import com.google.gson.JsonObject;
+
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.Extension;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.RemoteEndpoint;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerEndpoint;
 
 /**
  * @author Michel Buechner (mcrmibue)

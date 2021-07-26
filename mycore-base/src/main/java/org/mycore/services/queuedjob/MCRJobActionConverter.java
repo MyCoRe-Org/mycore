@@ -17,11 +17,11 @@
  */
 package org.mycore.services.queuedjob;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-import javax.persistence.PersistenceException;
-
 import org.mycore.common.MCRClassTools;
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import jakarta.persistence.PersistenceException;
 
 /**
  * @author Ren\u00E9 Adler (eagle)

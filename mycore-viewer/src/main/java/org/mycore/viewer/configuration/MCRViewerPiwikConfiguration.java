@@ -18,9 +18,9 @@
 
 package org.mycore.viewer.configuration;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.mycore.common.config.MCRConfiguration2;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class MCRViewerPiwikConfiguration extends MCRViewerConfiguration {
 

@@ -25,7 +25,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -39,6 +38,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import jakarta.xml.bind.util.JAXBSource;
 
 /**
  * @author Thomas Scheffler (yagee)

@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 
@@ -43,6 +42,8 @@ import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.solr.index.document.jaxb.MCRSolrInputDocumentList;
 import org.xml.sax.SAXException;
+
+import jakarta.xml.bind.JAXBException;
 
 /**
  * @author Thomas Scheffler (yagee)

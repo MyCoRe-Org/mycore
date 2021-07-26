@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.Provider;
-
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.ext.Provider;
 
 /**
  * Jersey configuration 

@@ -30,9 +30,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.UriInfo;
-
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
@@ -41,6 +38,9 @@ import org.mycore.frontend.filter.MCRSecureTokenV2FilterConfig;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 
 import com.google.gson.stream.JsonWriter;
+
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.UriInfo;
 
 /**
  * @author Thomas Scheffler (yagee)

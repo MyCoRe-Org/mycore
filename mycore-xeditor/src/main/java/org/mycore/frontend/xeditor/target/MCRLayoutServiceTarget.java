@@ -18,8 +18,6 @@
 
 package org.mycore.frontend.xeditor.target;
 
-import javax.servlet.ServletContext;
-
 import org.jdom2.Document;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -27,6 +25,8 @@ import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * @author Frank L\u00FCtzenkirchen

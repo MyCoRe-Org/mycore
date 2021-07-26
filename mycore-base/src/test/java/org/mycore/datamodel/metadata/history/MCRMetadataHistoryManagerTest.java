@@ -25,12 +25,12 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.datamodel.metadata.MCRObjectID;
+
+import jakarta.persistence.EntityManager;
 
 public class MCRMetadataHistoryManagerTest extends MCRJPATestCase {
 

@@ -28,10 +28,6 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Locale;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -53,6 +49,10 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.mets.model.MCRMETSGeneratorFactory;
 import org.mycore.mets.tools.MCRMetsSave;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -188,7 +188,7 @@ public class MCRMETSServlet extends MCRServlet {
      * (non-Javadoc)
      * 
      * @see
-     * org.mycore.frontend.servlets.MCRServlet#getLastModified(javax.servlet
+     * org.mycore.frontend.servlets.MCRServlet#getLastModified(jakarta.servlet
      * .http.HttpServletRequest)
      */
     @Override

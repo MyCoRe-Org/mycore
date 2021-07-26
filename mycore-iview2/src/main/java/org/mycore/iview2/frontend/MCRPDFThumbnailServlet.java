@@ -24,15 +24,15 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRContentServlet;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -51,8 +51,8 @@ public class MCRPDFThumbnailServlet extends MCRContentServlet {
     private MCRPDFTools pdfTools;
 
     /* (non-Javadoc)
-     * @see org.mycore.frontend.servlets.MCRContentServlet#getContent(javax.servlet.http.HttpServletRequest,
-      * javax.servlet.http.HttpServletResponse)
+     * @see org.mycore.frontend.servlets.MCRContentServlet#getContent(jakarta.servlet.http.HttpServletRequest,
+      * jakarta.servlet.http.HttpServletResponse)
      */
     @Override
     public MCRContent getContent(HttpServletRequest req, HttpServletResponse resp) throws IOException {
