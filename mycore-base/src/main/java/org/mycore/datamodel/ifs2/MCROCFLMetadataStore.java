@@ -36,11 +36,11 @@ import edu.wisc.library.ocfl.core.extension.storage.layout.config.HashedNTupleId
  */
 public class MCROCFLMetadataStore extends MCRNewMetadataStore {
 
-    protected boolean hasBaseDir = true;
-
-    protected boolean hasWorkDir = true;
-
-    protected boolean hasSlotLayout = false;
+    public MCROCFLMetadataStore() {
+        hasBaseDirectory = true;
+        hasWorkDirectory = true;
+        hasSlotLayout = false;
+    }
 
     // TODO not yet supported
     protected boolean canVerify = false;
@@ -58,7 +58,7 @@ public class MCROCFLMetadataStore extends MCRNewMetadataStore {
         Map.entry(MESSAGE_UPDATED, MCRNewMetadataVersion.UPDATED),
         Map.entry(MESSAGE_DELETED, MCRNewMetadataVersion.DELETED)));
 
-    private static final char convertMessageToType(String message) throws MCRPersistenceException {
+    private static char convertMessageToType(String message) throws MCRPersistenceException {
         if (!MESSAGE_TYPE_MAPPING.containsKey(message)) {
             throw new MCRPersistenceException("Cannot identify version type from message '" + message + "'");
         }
@@ -109,11 +109,9 @@ public class MCROCFLMetadataStore extends MCRNewMetadataStore {
             getStoredOcflVersion(metadata).getVersionInfo().getMessage()) == MCRNewMetadataVersion.DELETED) {
             throw new MCRUsageException("Cannot read already deleted object '" + objName + "'");
         }
-        try (InputStream storedContentStream = storeObject.getFile(objName + this.suffix).getStream()) {
-            return forceContent(new MCRStreamContent(storedContentStream));
-        } catch (IOException e) {
-            throw new MCRPersistenceException("Object '" + objName + "' could not be read", e);
-        }
+
+        InputStream storedContentStream = storeObject.getFile(objName + this.suffix).getStream();
+        return forceContent(new MCRStreamContent(storedContentStream));
     }
 
     @Override
@@ -189,9 +187,21 @@ public class MCROCFLMetadataStore extends MCRNewMetadataStore {
     @Override
     public Stream<MCRNewMetadataVersion> getVersions(MCRNewMetadata metadata)
         throws MCRPersistenceException, MCRUsageException {
-        repo.describeObject(metadata.getFullID().toString()).getVersionMap();
-        // TODO implement
-        return null;
+        String objName = metadata.getFullID().toString();
+        Map<VersionNum, VersionDetails> versionMap = repo.describeObject(objName).getVersionMap();
+
+        return versionMap.entrySet().stream().map(v -> {
+            VersionNum key = v.getKey();
+            VersionDetails details = v.getValue();
+            VersionInfo versionInfo = details.getVersionInfo();
+
+            return new MCRNewMetadataVersion(new MCRNewMetadata(this, metadata.getID(),
+                String.valueOf(key.getVersionNum())),
+                key.toString(),
+                versionInfo.getUser().toString(),
+                Date.from(details.getCreated().toInstant()), convertMessageToType(versionInfo.getMessage()));
+        });
+
     }
 
     @Override
@@ -218,14 +228,12 @@ public class MCROCFLMetadataStore extends MCRNewMetadataStore {
 
     @Override
     public int getHighestStoredID() throws MCRPersistenceException {
-        // TODO implement
-        return 0;
+        return getStoredIDs().max().orElse(0);
     }
 
     @Override
     public Iterator<Integer> listIDs(boolean order) throws MCRPersistenceException {
-        // TODO implement
-        return null;
+        return getStoredIDs().iterator();
     }
 
 }

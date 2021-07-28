@@ -61,7 +61,8 @@ public class MCRNewMetadata {
             if (this.revision == null) {
                 this.revision = store.getVersionLast(this).getRevision();
             }
-            return store.readContent(this);
+            this.content = store.readContent(this);
+            return this.content;
         } catch (MCRPersistenceException e) {
             throw new MCRPersistenceException(
                 "Failed to read " + id.toString() + " in revision " + revision + " from store!", e);
