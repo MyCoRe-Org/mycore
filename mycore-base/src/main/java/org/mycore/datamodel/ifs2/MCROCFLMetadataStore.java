@@ -7,11 +7,15 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
 
@@ -81,7 +85,7 @@ public class MCROCFLMetadataStore extends MCRNewMetadataStore {
     protected void createContent(MCRNewMetadata metadata, MCRContent content)
         throws MCRPersistenceException, MCRUsageException {
         String objName = metadata.getFullID().toString();
-        VersionInfo info = new VersionInfo().setMessage(MESSAGE_CREATED);
+        VersionInfo info = createVersionInfo(MESSAGE_CREATED);
         Date targetDate = metadata.getDate();
         if (targetDate != null) {
             info.setCreated(targetDate.toInstant().atOffset(ZoneOffset.UTC));
@@ -122,12 +126,24 @@ public class MCROCFLMetadataStore extends MCRNewMetadataStore {
             throw new MCRUsageException("Cannot update nonexistent object '" + objName + "'");
         }
         try (InputStream objectAsStream = forceContent(content).getInputStream()) {
-            repo.updateObject(ObjectVersionId.head(objName), new VersionInfo().setMessage("Updated"), init -> {
+            VersionInfo versionInfo = createVersionInfo(MESSAGE_UPDATED);
+            repo.updateObject(ObjectVersionId.head(objName), versionInfo, init -> {
                 init.writeFile(objectAsStream, objName + this.suffix, OcflOption.OVERWRITE);
             });
         } catch (IOException e) {
             throw new MCRPersistenceException("Failed to update object '" + objName + "'", e);
         }
+    }
+
+    private VersionInfo createVersionInfo(String message) {
+        VersionInfo versionInfo = new VersionInfo();
+        versionInfo.setMessage(message);
+        String userID = Optional.ofNullable(MCRSessionMgr.getCurrentSession())
+                .map(MCRSession::getUserInformation)
+                .map(MCRUserInformation::getUserID)
+                .orElse(null);
+        versionInfo.setUser(userID,null);
+        return versionInfo;
     }
 
     @Override
@@ -141,7 +157,7 @@ public class MCROCFLMetadataStore extends MCRNewMetadataStore {
         if (versionType == MCRNewMetadataVersion.DELETED) {
             throw new MCRUsageException("Cannot delete already deleted object '" + objName + "'");
         }
-        repo.updateObject(ObjectVersionId.head(objName), new VersionInfo().setMessage("Deleted"), init -> {
+        repo.updateObject(ObjectVersionId.head(objName), createVersionInfo(MESSAGE_DELETED), init -> {
             init.removeFile(objName + this.suffix);
         });
     }
