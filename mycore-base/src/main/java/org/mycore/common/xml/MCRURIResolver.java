@@ -608,7 +608,7 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 MCRXMLMetadataManager xmlmm = MCRXMLMetadataManager.instance();
                 MCRContent content = params.containsKey("r")
-                    ? xmlmm.retrieveContent(mcrid, Long.valueOf(params.get("r")))
+                    ? xmlmm.retrieveContent(mcrid, params.get("r"))
                     : xmlmm.retrieveContent(mcrid);
                 if (content == null) {
                     return null;
@@ -1516,7 +1516,7 @@ public final class MCRURIResolver implements URIResolver {
             MCRObjectID mcrId = MCRObjectID.getInstance(parts[parts.length - 1]);
             LOGGER.info("Resolving deleted object {}", mcrId);
             try {
-                MCRContent lastPresentVersion = MCRXMLMetadataManager.instance().retrieveContent(mcrId, -1);
+                MCRContent lastPresentVersion = MCRXMLMetadataManager.instance().retrieveContent(mcrId);
                 if (lastPresentVersion == null) {
                     LOGGER.warn("Could not resolve deleted object {}", mcrId);
                     return new JDOMSource(MCRObjectFactory.getSampleObject(mcrId));

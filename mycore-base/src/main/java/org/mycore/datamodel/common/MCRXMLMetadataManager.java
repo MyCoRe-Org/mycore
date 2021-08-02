@@ -150,9 +150,9 @@ public class MCRXMLMetadataManager {
      * @param revision
      * @return
      * @throws IOException
-     * @see MCRXMLMetadataManagerAdapter#retrieveContent(MCRObjectID, long)
+     * @see MCRXMLMetadataManagerAdapter#retrieveContent(MCRObjectID, String)
      */
-    public MCRContent retrieveContent(MCRObjectID mcrid, long revision) throws IOException {
+    public MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException {
         return IMPLEMENTATION.retrieveContent(mcrid, revision);
     }
 

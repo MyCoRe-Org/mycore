@@ -391,7 +391,7 @@ public class MCRRestObjects {
         summary = "Returns MCRObject with the given " + PARAM_MCRID + " and revision.",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     public Response getObjectVersion(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id,
-        @PathParam("revision") long revision)
+        @PathParam("revision") String revision)
         throws IOException {
         MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id, revision);
         if (mcrContent == null) {

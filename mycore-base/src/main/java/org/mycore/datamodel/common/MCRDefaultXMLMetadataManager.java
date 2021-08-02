@@ -412,9 +412,9 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         return metadata;
     }
 
-    public MCRContent retrieveContent(MCRObjectID mcrid, long revision) throws IOException {
+    public MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException {
         LOGGER.info("Getting object {} in revision {}", mcrid, revision);
-        MCRMetadataVersion version = getMetadataVersion(mcrid, revision);
+        MCRMetadataVersion version = getMetadataVersion(mcrid, Long.parseLong(revision));
         if (version != null) {
             return version.retrieve();
         }

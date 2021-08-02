@@ -72,13 +72,12 @@ public class MCRObjectServlet extends MCRContentServlet {
                     .getUserID(), currentSession.getCurrentIP()));
             return null;
         }
-        long rev = REV_CURRENT;
+        String rev = null;
         final String revision = getProperty(req, "r");
         if (revision != null) {
-            rev = Long.parseLong(revision);
+            rev = revision;
         }
-        MCRContent localObject = (rev == REV_CURRENT) ? requestLocalObject(mcrid, resp)
-            : requestVersionedObject(mcrid,
+        MCRContent localObject = (rev == null) ? requestLocalObject(mcrid, resp) : requestVersionedObject(mcrid,
                 resp, rev);
         if (localObject == null) {
             return null;
@@ -98,7 +97,7 @@ public class MCRObjectServlet extends MCRContentServlet {
         return null;
     }
 
-    private MCRContent requestVersionedObject(final MCRObjectID mcrid, final HttpServletResponse resp, final long rev)
+    private MCRContent requestVersionedObject(final MCRObjectID mcrid, final HttpServletResponse resp, final String rev)
         throws IOException {
         MCRXMLMetadataManager xmlMetadataManager = MCRXMLMetadataManager.instance();
         if (xmlMetadataManager.listRevisions(mcrid) != null) {

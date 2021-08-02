@@ -909,6 +909,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <groupId>edu.wisc.library.ocfl</groupId>
+        <artifactId>ocfl-java-api</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>edu.wisc.library.ocfl</groupId>
         <artifactId>ocfl-java-core</artifactId>
         <version>1.2.0</version>
       </dependency>

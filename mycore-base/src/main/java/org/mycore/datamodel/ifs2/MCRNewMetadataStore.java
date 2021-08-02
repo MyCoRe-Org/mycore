@@ -1,5 +1,16 @@
 package org.mycore.datamodel.ifs2;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jdom2.JDOMException;
+import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUsageException;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,17 +26,6 @@ import java.util.StringTokenizer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jdom2.JDOMException;
-import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.config.MCRConfigurationException;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
-import org.xml.sax.SAXException;
 
 /**
  * New abstract store class.
@@ -283,8 +283,11 @@ public abstract class MCRNewMetadataStore extends MCRStore {
 
     public MCRNewMetadataVersion getVersionLast(MCRNewMetadata metadata)
         throws MCRPersistenceException, MCRUsageException {
-        String firstRevision = getVersions(metadata).sequential().reduce((first, second) -> second).orElseThrow(
-            () -> new MCRUsageException("Failed to find last version of " + metadata.getFullID().toString()))
+        String firstRevision = getVersions(metadata).sequential()
+            //.filter(v -> v.getType() == MCRAbstractMetadataVersion.UPDATED)
+            .reduce((first, second) -> second)
+            .orElseThrow(
+                () -> new MCRUsageException("Failed to find last version of " + metadata.getFullID().toString()))
             .getRevision();
         metadata.setRevision(firstRevision);
         return getVersion(metadata);

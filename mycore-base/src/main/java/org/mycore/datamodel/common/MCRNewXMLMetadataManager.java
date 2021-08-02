@@ -18,6 +18,25 @@
 
 package org.mycore.datamodel.common;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
@@ -38,25 +57,6 @@ import org.mycore.datamodel.ifs2.MCRStoreManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata. Provides
@@ -332,10 +332,11 @@ public class MCRNewXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return metadata;
     }
 
-    public MCRContent retrieveContent(MCRObjectID mcrid, long revision) throws IOException {
+    public MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException {
         LOGGER.info("Getting object {} in revision {}", mcrid, revision);
-        MCRNewMetadataVersion version = getMetadataVersion(mcrid, String.valueOf(revision));
+        MCRNewMetadataVersion version = getMetadataVersion(mcrid, revision);
         if (version != null) {
+            version.getMetadataObject().read();
             return version.retrieve();
         }
         return null;
