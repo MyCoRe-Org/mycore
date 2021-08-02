@@ -28,7 +28,7 @@ import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyUserUtils;
-import org.mycore.mcr.acl.accesskey.backend.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
 
 /**
  * Strategy for {@link MCRAccessKey}.

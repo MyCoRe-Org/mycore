@@ -18,7 +18,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.mcr.acl.accesskey.backend;
+package org.mycore.mcr.acl.accesskey.backend.jpa;
 
 import static org.junit.Assert.assertEquals;
 

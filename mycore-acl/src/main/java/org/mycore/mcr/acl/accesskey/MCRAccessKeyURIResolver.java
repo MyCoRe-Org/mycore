@@ -29,7 +29,7 @@ import javax.xml.transform.URIResolver;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 
-import org.mycore.mcr.acl.accesskey.backend.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**

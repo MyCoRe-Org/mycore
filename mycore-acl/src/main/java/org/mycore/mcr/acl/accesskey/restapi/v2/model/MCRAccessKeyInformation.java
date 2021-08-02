@@ -24,7 +24,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.mycore.mcr.acl.accesskey.backend.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
 
 public class MCRAccessKeyInformation {
 

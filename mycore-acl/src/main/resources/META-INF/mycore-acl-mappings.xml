@@ -1,3 +1,3 @@
 <entity-mappings>
-  <entity class="org.mycore.mcr.acl.accesskey.backend.MCRAccessKey" />
+  <entity class="org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey" />
 </entity-mappings>

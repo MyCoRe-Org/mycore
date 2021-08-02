@@ -44,7 +44,7 @@ import javax.ws.rs.PUT;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyTransformer;
-import org.mycore.mcr.acl.accesskey.backend.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.restapi.v2.annotation.MCRRequireAccessKeyAuthorization;
 import org.mycore.mcr.acl.accesskey.restapi.v2.model.MCRAccessKeyInformation;
 import org.mycore.restapi.annotations.MCRRequireTransaction;

@@ -33,7 +33,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.jdom2.Element;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.backend.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationException;
 
 /**

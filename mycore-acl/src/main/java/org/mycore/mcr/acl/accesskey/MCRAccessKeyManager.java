@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.backend.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyInvalidTypeException;
