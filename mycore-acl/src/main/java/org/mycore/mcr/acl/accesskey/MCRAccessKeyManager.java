@@ -198,44 +198,31 @@ public final class MCRAccessKeyManager {
         }
         final MCRAccessKey accessKey = getAccessKeyByValue(objectId, currentValue);
         if (accessKey != null) {
-            if (accessKey.getValue().equals(value) && accessKey.getType().equals(type)) {
-                LOGGER.info("Nothing to update.");
-            } else {
-                if (accessKey.getValue().equals(value)) {
-                    if (isValidType(type)) {
+            if (!accessKey.getValue().equals(value)) {
+                if (getAccessKeyByValue(objectId, value) == null) {
+                    if (isValidValue(value)) {
                         MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-                        accessKey.setType(type);
-                        MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                        accessKey.setValue(value);
                     } else {
-                        LOGGER.warn("Unkown Type.");
-                        throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
+                        LOGGER.warn("Incorrect Value.");
+                        throw new MCRAccessKeyInvalidValueException("Incorrect Value.");
                     }
                 } else {
-                    if (getAccessKeyByValue(objectId, value) == null) {
-                        if (!accessKey.getType().equals(type)) {
-                            if (isValidType(type)) {
-                                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-                                accessKey.setType(type);
-                                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-                            } else {
-                                LOGGER.warn("Unkown Type.");
-                                throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
-                            }
-                        } else {
-                            if (isValidValue(value)) {
-                                accessKey.setValue(value);
-                                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-                            } else {
-                                LOGGER.warn("Incorrect Value.");
-                                throw new MCRAccessKeyInvalidValueException("Incorrect Value.");
-                            }
-                        }
-                    } else {
-                        LOGGER.warn("Key collision.");
-                        throw new MCRAccessKeyCollisionException("Key collision.");
-                    }
+                    LOGGER.warn("Key collision.");
+                    throw new MCRAccessKeyCollisionException("Key collision.");
                 }
             }
+            if (!accessKey.getType().equals(type)) {
+                if (isValidType(type)) {
+                    MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                    accessKey.setType(type);
+                } else {
+                    accessKey.setValue(currentValue);
+                    LOGGER.warn("Unkown Type.");
+                    throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
+                }
+            }
+            accessKey.setComment(newAccessKey.getComment());
         } else {
             LOGGER.warn("Key does not exists.");
             throw new MCRAccessKeyNotFoundException("Key does not exists.");

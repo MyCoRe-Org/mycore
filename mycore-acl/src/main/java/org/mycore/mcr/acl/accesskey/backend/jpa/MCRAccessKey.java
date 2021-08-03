@@ -71,14 +71,17 @@ public class MCRAccessKey {
     /** The unique and internal information id */
     private int id;
 
-    /** The access key information*/
+    /** The access key information */
     private MCRObjectID mcrObjectId; 
 
-    /** The key value*/
+    /** The key value */
     private String value;
 
-    /** The permission type*/
+    /** The permission type */
     private String type;
+
+    /** The comment */
+    private String comment;
 
     private MCRAccessKey() {
     }
@@ -175,6 +178,22 @@ public class MCRAccessKey {
      */
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * @return comment
+     */
+    @Column(name = "comment",
+        nullable = true)
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * @param comment the comment
+     */
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override
