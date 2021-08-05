@@ -17,6 +17,7 @@
  */
 package org.mycore.access.facts;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,8 +41,10 @@ import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -57,6 +60,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 @Singleton
 public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckStrategy {
+
+    private static String RESOLVED_RULES_FILE_NAME = "rules.resolved.xml";
 
     protected static final Logger LOGGER = LogManager.getLogger();
 
@@ -112,6 +117,12 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     private MCRCondition buildRulesFromXML() {
         Element eRules = MCRURIResolver.instance().resolve(rulesURI);
         Objects.requireNonNull(eRules, "The rulesURI " + rulesURI + " resolved to null!");
+        try {
+            MCRJDOMContent content = new MCRJDOMContent(eRules);
+            content.sendTo(MCRConfigurationDir.getConfigFile(RESOLVED_RULES_FILE_NAME));
+        } catch (IOException e) {
+            LOGGER.error("Could not write file 'rules.resolved.xml' to config directory", e);
+        }
         return MCRFactsAccessSystemHelper.parse(eRules);
     }
 
