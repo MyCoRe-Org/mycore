@@ -39,8 +39,8 @@ import org.xml.sax.XMLReader;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserFactory {
-    private static String SAX_FEATURE_XINCLUDE="http://apache.org/xml/features/xinclude";
-    
+    private static String SAX_FEATURE_XINCLUDE = "http://apache.org/xml/features/xinclude";
+
     private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration2.getBoolean("MCR.XMLParser.ValidateSchema")
         .orElse(true);
 
