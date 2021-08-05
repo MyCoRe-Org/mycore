@@ -31,8 +31,8 @@ import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationException;
+import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 /**
  * This class contains EventHandler methods to manage access keys of

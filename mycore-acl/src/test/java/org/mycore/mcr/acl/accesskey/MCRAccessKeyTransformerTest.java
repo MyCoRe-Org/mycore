@@ -38,7 +38,7 @@ import org.junit.Test;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 public class MCRAccessKeyTransformerTest extends MCRTestCase {
 

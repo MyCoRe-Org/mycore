@@ -35,8 +35,8 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
+import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 public class MCRAccessKeyManagerTest extends MCRJPATestCase {
 
@@ -45,8 +45,6 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
     private static final String READ_KEY = "blah";
 
     private static final String WRITE_KEY = "blub";
-
-    private static final MCRObjectID objectId = MCRObjectID.getInstance(MCR_OBJECT_ID);
 
     @Override
     protected Map<String, String> getTestProperties() {
@@ -57,6 +55,7 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
 
     @Test(expected = MCRAccessKeyCollisionException.class)
     public void testKeyAddCollison() {
+        final MCRObjectID objectId = MCRObjectID.getInstance(MCR_OBJECT_ID);
         final MCRAccessKey accessKeyRead = new MCRAccessKey(objectId, WRITE_KEY, 
             MCRAccessManager.PERMISSION_READ);
         MCRAccessKeyManager.addAccessKey(accessKeyRead);
@@ -67,6 +66,7 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
 
     @Test
     public void testCreateKey() throws MCRException, IOException {
+        final MCRObjectID objectId = MCRObjectID.getInstance(MCR_OBJECT_ID);
         final MCRAccessKey accessKeyRead = new MCRAccessKey(objectId, READ_KEY, 
                 MCRAccessManager.PERMISSION_READ);
         MCRAccessKeyManager.addAccessKey(accessKeyRead);
@@ -77,6 +77,7 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
 
     @Test(expected = MCRAccessKeyCollisionException.class)
     public void testDuplicate() {
+        final MCRObjectID objectId = MCRObjectID.getInstance(MCR_OBJECT_ID);
         final MCRAccessKey accessKey = new MCRAccessKey(objectId, READ_KEY, 
             MCRAccessManager.PERMISSION_READ);
         MCRAccessKeyManager.addAccessKey(accessKey);
@@ -87,6 +88,7 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
 
     @Test
     public void testExistsKey() throws MCRException {
+        final MCRObjectID objectId = MCRObjectID.getInstance(MCR_OBJECT_ID);
         final MCRAccessKey accessKey = new MCRAccessKey(objectId, READ_KEY, 
             MCRAccessManager.PERMISSION_READ);
         MCRAccessKeyManager.addAccessKey(accessKey);
@@ -95,6 +97,7 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
 
     @Test
     public void testUpdateType() throws MCRException {
+        final MCRObjectID objectId = MCRObjectID.getInstance(MCR_OBJECT_ID);
         final MCRAccessKey accessKey = new MCRAccessKey(objectId, READ_KEY, 
             MCRAccessManager.PERMISSION_READ);
         MCRAccessKeyManager.addAccessKey(accessKey);
@@ -108,6 +111,7 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
 
     @Test
     public void testDeleteKey() throws MCRAccessException {
+        final MCRObjectID objectId = MCRObjectID.getInstance(MCR_OBJECT_ID);
         final MCRAccessKey accessKey = new MCRAccessKey(objectId, READ_KEY, 
             MCRAccessManager.PERMISSION_READ);
         MCRAccessKeyManager.addAccessKey(accessKey);
