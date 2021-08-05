@@ -258,7 +258,12 @@ public final class MCRURIResolver implements URIResolver {
      *
      * @see javax.xml.transform.URIResolver
      */
+
     public Source resolve(String href, String base) throws TransformerException {
+        return resolve(href, base, true);
+    }
+
+    public Source resolve(String href, String base, boolean fallback2EntityResolver) throws TransformerException {
         if (LOGGER.isDebugEnabled()) {
             if (base != null) {
                 LOGGER.debug("Including {} from {}", href, base);
@@ -278,14 +283,16 @@ public final class MCRURIResolver implements URIResolver {
         if (uriResolver != null) {
             return uriResolver.resolve(href, base);
         } else { // try to handle as URL, use default resolver for file:// and
-            try {
-                InputSource entity = MCREntityResolver.instance().resolveEntity(null, href);
-                if (entity != null) {
-                    LOGGER.debug("Resolved via EntityResolver: {}", entity.getSystemId());
-                    return new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
+            if (fallback2EntityResolver) {
+                try {
+                    InputSource entity = MCREntityResolver.instance().resolveEntity(null, href);
+                    if (entity != null) {
+                        LOGGER.debug("Resolved via EntityResolver: {}", entity.getSystemId());
+                        return new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
+                    }
+                } catch (IOException e) {
+                    LOGGER.debug("Error while resolving uri: {}", href);
                 }
-            } catch (IOException e) {
-                LOGGER.debug("Error while resolving uri: {}", href);
             }
             // http://
             if (href.endsWith("/") && scheme.equals("file")) {
@@ -529,7 +536,7 @@ public final class MCRURIResolver implements URIResolver {
         @Override
         public MCRCacheableURIResponse getResponse(String href, String base) throws TransformerException {
             URI hrefURI = MCRURIResolver.resolveURI(href, base);
-            InputStream responseStream;
+
             String eTag, lastModified;
             try {
                 HttpCacheContext context = HttpCacheContext.create();

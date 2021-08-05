@@ -39,7 +39,12 @@ import org.xml.sax.XMLReader;
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLParserFactory {
+    private static String SAX_FEATURE_XINCLUDE="http://apache.org/xml/features/xinclude";
+    
     private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration2.getBoolean("MCR.XMLParser.ValidateSchema")
+        .orElse(true);
+
+    private static boolean XINCLUDE_AWARE = MCRConfiguration2.getBoolean("MCR.XMLParser.XIncludeAware")
         .orElse(true);
 
     private static XMLReaderJDOMFactory nonValidatingFactory = new MCRXMLReaderSAX2Factory(false);
@@ -116,6 +121,7 @@ public class MCRXMLParserFactory {
                 reader.setFeature(SAX_FEATURE_VALIDATION, isValidating());
                 reader.setFeature(SAX_FEATURE_NAMESPACES, true);
                 reader.setFeature(SAX_FEATURE_NAMESPACE_PREFIXES, true);
+                reader.setFeature(SAX_FEATURE_XINCLUDE, XINCLUDE_AWARE);
                 return reader;
             } catch (SAXException | ParserConfigurationException e) {
                 throw new JDOMException("Unable to create SAX2 XMLReader.", e);

@@ -37,6 +37,8 @@ import javax.xml.catalog.CatalogException;
 import javax.xml.catalog.CatalogFeatures;
 import javax.xml.catalog.CatalogManager;
 import javax.xml.catalog.CatalogResolver;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -44,8 +46,10 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRStreamUtils;
+import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.function.MCRThrowFunction;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -104,15 +108,29 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
 
     private InputSource resolveEntity(String publicId, String systemId,
         MCRThrowFunction<CatalogEntityIdentifier, InputSource, IOException> alternative) throws IOException {
+        InputSource entity = null;
         try {
-            InputSource entity = catalogResolver.resolveEntity(publicId, systemId);
+            entity = catalogResolver.resolveEntity(publicId, systemId);
             if (entity != null) {
                 return resolvedEntity(entity);
             }
         } catch (CatalogException e) {
             LOGGER.debug(e.getMessage());
         }
-        return alternative.apply(new CatalogEntityIdentifier(publicId, systemId));
+        entity = alternative.apply(new CatalogEntityIdentifier(publicId, systemId));
+        if (entity == null) {
+            MCRURIResolver uriResolver = MCRURIResolver.instance();
+            String scheme = uriResolver.getScheme(systemId, null);
+            try {
+                if (scheme != null && uriResolver.getResolver(scheme) != null) {
+                    Source s = MCRURIResolver.instance().resolve(systemId, null, false);
+                    return new MCRSourceContent(s).getInputSource();
+                }
+            } catch (MCRUsageException | TransformerException e) {
+                return null;
+            }
+        }
+        return entity;
     }
 
     /* (non-Javadoc)
