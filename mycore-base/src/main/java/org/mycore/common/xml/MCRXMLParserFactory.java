@@ -42,6 +42,9 @@ public class MCRXMLParserFactory {
     private static boolean VALIDATE_BY_DEFAULT = MCRConfiguration2.getBoolean("MCR.XMLParser.ValidateSchema")
         .orElse(true);
 
+    private static boolean XINCLUDE_AWARE = MCRConfiguration2.getBoolean("MCR.XMLParser.XIncludeAware")
+        .orElse(true);
+
     private static XMLReaderJDOMFactory nonValidatingFactory = new MCRXMLReaderSAX2Factory(false);
 
     private static XMLReaderJDOMFactory validatingFactory = new MCRXMLReaderSAX2Factory(true);
@@ -112,7 +115,11 @@ public class MCRXMLParserFactory {
         @Override
         public XMLReader createXMLReader() throws JDOMException {
             try {
-                XMLReader reader = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader();
+                SAXParserFactory saxParserFactory = SAXParserFactory.newDefaultInstance();
+                if (XINCLUDE_AWARE) {
+                    saxParserFactory.setXIncludeAware(true);
+                }
+                XMLReader reader = saxParserFactory.newSAXParser().getXMLReader();
                 reader.setFeature(SAX_FEATURE_VALIDATION, isValidating());
                 reader.setFeature(SAX_FEATURE_NAMESPACES, true);
                 reader.setFeature(SAX_FEATURE_NAMESPACE_PREFIXES, true);
