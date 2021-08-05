@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Base64;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MediaType;
@@ -97,8 +96,7 @@ public class MCRRestAccessKey {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response deleteAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
-        @PathParam(VALUE) final String valueEncoded) throws IOException {
-        final String value = new String(Base64.getUrlDecoder().decode(valueEncoded), "UTF-8");
+        @PathParam(VALUE) final String value) throws IOException {
         MCRAccessKeyManager.deleteAccessKey(objectId, value);
         return Response.noContent().build();
     }
@@ -112,8 +110,7 @@ public class MCRRestAccessKey {
     public Response updateAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
         @PathParam(VALUE) final String valueEncoded, final String accessKeyJson) throws IOException {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
-        final String value = new String(Base64.getUrlDecoder().decode(valueEncoded), "UTF-8");
-        MCRAccessKeyManager.updateAccessKey(objectId, value, accessKey);
+        MCRAccessKeyManager.updateAccessKey(accessKey);
         return Response.noContent().build();
     }
 }

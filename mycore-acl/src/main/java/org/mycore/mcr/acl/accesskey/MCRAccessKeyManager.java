@@ -20,6 +20,7 @@
 
 package org.mycore.mcr.acl.accesskey;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -29,6 +30,9 @@ import org.apache.logging.log4j.Logger;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.backend.jpa.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
@@ -43,6 +47,9 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 public final class MCRAccessKeyManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final int HASH_ITERATIONS = MCRConfiguration2
+        .getInt("MCR.ACL.AccessKey.Value.HashIterations").orElse(1000);
 
     /**
      * Returns all access keys for given {@link MCRObjectID}.
@@ -63,7 +70,7 @@ public final class MCRAccessKeyManager {
      * @param type permission type
      * @return true if valid or false
      */
-    private static boolean isValidType(String type) {
+    public static boolean isValidType(String type) {
         return (type.equals(MCRAccessManager.PERMISSION_READ)
             || type.equals(MCRAccessManager.PERMISSION_WRITE));
     }
@@ -74,8 +81,24 @@ public final class MCRAccessKeyManager {
      * @param value the value 
      * @return true if valid or false
      */
-    private static boolean isValidValue(String value) {
+    public static boolean isValidValue(String value) {
         return value.length() > 0;
+    }
+
+    /**
+     * Encrypts value and uses {@link MCRObjectID} as salt.
+     *
+     * @param value the key value
+     * @param objectId the {@link MCRObjectID}
+     * @return encrypted value as SHA256 string
+     * @throws MCRException if encryption fails
+     */
+    public static String encryptValue(final String value, final MCRObjectID objectId) throws MCRException {
+        try {
+            return MCRUtils.asSHA256String(HASH_ITERATIONS, objectId.toString().getBytes(), value);
+        } catch(NoSuchAlgorithmException e) {
+            throw new MCRException("Encryption failed.");
+        }
     }
 
     /**
@@ -83,9 +106,9 @@ public final class MCRAccessKeyManager {
      * Checks for a {@link MCRAccessKey} collision
      *
      * @param accessKey the access key
-     * @throws MCRAccessKeyException key is not valid
+     * @throws MCRException key is not valid
      */
-    public static synchronized void addAccessKey(final MCRAccessKey accessKey) throws MCRAccessKeyException {
+    public static synchronized void addAccessKey(final MCRAccessKey accessKey) throws MCRException {
         final MCRObjectID objectId = accessKey.getObjectId();
         if (objectId == null) {
             LOGGER.warn("Object id is required.");
@@ -101,7 +124,9 @@ public final class MCRAccessKeyManager {
             LOGGER.warn("Incorrect value.");
             throw new MCRAccessKeyInvalidValueException("Incorrect value.");
         }
-        if (getAccessKeyByValue(objectId, value) == null) {
+        final String encryptedValue = encryptValue(value, objectId);
+        accessKey.setValue(encryptedValue);
+        if (getAccessKeyByValue(objectId, encryptedValue) == null) {
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.persist(accessKey);
         } else {
@@ -111,12 +136,12 @@ public final class MCRAccessKeyManager {
     }
 
     /**
-    * Adds {@link MCRAccessKey} list for given {@link MCRObjectID}.
-    *
-    * @param objectId the {@link MCRObjectID}
-    * @param accessKeys the {@link MCRAccessKey} list
-    * @throws MCRAccessKeyException key is not valid
-    */
+     * Adds {@link MCRAccessKey} list for given {@link MCRObjectID}.
+     *
+     * @param objectId the {@link MCRObjectID}
+     * @param accessKeys the {@link MCRAccessKey} list
+     * @throws MCRAccessKeyException key is not valid
+     */
     public static synchronized void addAccessKeys(final MCRObjectID objectId, final List<MCRAccessKey> accessKeys)
         throws MCRAccessKeyException {
         for (MCRAccessKey accessKey : accessKeys) {
@@ -178,55 +203,39 @@ public final class MCRAccessKeyManager {
     /**
      * Updates {@link MCRAccessKey}
      *
-     * @param objectId {@link MCRAccessKey} of the key to be updated
-     * @param currentValue current value of the key to be updated
-     * @param newAccessKey the new {@link MCRAccessKey}
-     * @throws MCRAccessKeyException if update fails
+     * @param updatedAccessKey the new {@link MCRAccessKey}
+     * @throws MCRException if update fails
      */
-    public static synchronized void updateAccessKey(final MCRObjectID objectId,
-        final String currentValue, final MCRAccessKey newAccessKey)
-        throws MCRAccessKeyException {
-        final String type = newAccessKey.getType();
-        if (type == null) {
-            LOGGER.warn("Permission type is required");
-            throw new MCRAccessKeyInvalidTypeException("Permission type is required.");
+    public static void updateAccessKey(final MCRAccessKey updatedAccessKey) throws MCRException{
+        final MCRObjectID objectId = updatedAccessKey.getObjectId();
+        if (objectId == null) {
+            LOGGER.warn("Object id is required.");
+            throw new MCRAccessKeyException("Object id is required.");
         }
-        final String value = newAccessKey.getValue();
+        String value = updatedAccessKey.getValue();
         if (value == null) {
             LOGGER.warn("Value is required.");
             throw new MCRAccessKeyInvalidValueException("Value is required.");
         }
-        final MCRAccessKey accessKey = getAccessKeyByValue(objectId, currentValue);
-        if (accessKey != null) {
-            if (!accessKey.getValue().equals(value)) {
-                if (getAccessKeyByValue(objectId, value) == null) {
-                    if (isValidValue(value)) {
-                        MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-                        accessKey.setValue(value);
-                    } else {
-                        LOGGER.warn("Incorrect Value.");
-                        throw new MCRAccessKeyInvalidValueException("Incorrect Value.");
-                    }
-                } else {
-                    LOGGER.warn("Key collision.");
-                    throw new MCRAccessKeyCollisionException("Key collision.");
-                }
-            }
-            if (!accessKey.getType().equals(type)) {
-                if (isValidType(type)) {
-                    MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-                    accessKey.setType(type);
-                } else {
-                    accessKey.setValue(currentValue);
-                    LOGGER.warn("Unkown Type.");
-                    throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
-                }
-            }
-            accessKey.setComment(newAccessKey.getComment());
-        } else {
+        final MCRAccessKey accessKey = getAccessKeyByValue(objectId, value);
+        if (accessKey == null) {
             LOGGER.warn("Key does not exists.");
             throw new MCRAccessKeyNotFoundException("Key does not exists.");
         }
+        final String type = updatedAccessKey.getType();
+        if (!accessKey.getType().equals(type)) {
+            if (type == null) {
+                LOGGER.warn("Permission type is required");
+                throw new MCRAccessKeyInvalidTypeException("Permission type is required.");
+            }
+            if (!isValidType(type)) {
+                LOGGER.warn("Unkown Type.");
+                throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
+            }
+            MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+            accessKey.setType(type);
+        }
+        accessKey.setComment(updatedAccessKey.getComment());
     }
 
     /**
