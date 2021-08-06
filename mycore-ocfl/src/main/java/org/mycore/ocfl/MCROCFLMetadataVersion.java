@@ -16,19 +16,18 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.ifs2;
-
-import java.io.IOException;
-import java.util.Date;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+package org.mycore.ocfl;
 
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
+import java.util.Date;
 
 /**
  * Provides information about a stored version of metadata and allows to
@@ -38,9 +37,9 @@ import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
  */
 @XmlRootElement(name = "revision")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class MCRNewMetadataVersion extends MCRAbstractMetadataVersion<MCRNewMetadata> {
+public class MCROCFLMetadataVersion extends MCRAbstractMetadataVersion<MCRContent> {
 
-    public MCRNewMetadataVersion(MCRNewMetadata vm, String revision, String user, Date date, char type) {
+    public MCROCFLMetadataVersion(MCRContent vm, String revision, String user, Date date, char type) {
         super(vm, revision, user, date, type);
     }
 
@@ -53,7 +52,7 @@ public class MCRNewMetadataVersion extends MCRAbstractMetadataVersion<MCRNewMeta
      */
     @Override
     public MCRContent retrieve() throws IOException {
-        return vm.getContent();
+        return vm;
     }
 
     /**
@@ -64,6 +63,6 @@ public class MCRNewMetadataVersion extends MCRAbstractMetadataVersion<MCRNewMeta
      */
     @Override
     public void restore() throws IOException, JDOMException {
-        vm.update(retrieve());
+        throw new IOException("Can not restore a version!");
     }
 }

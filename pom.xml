@@ -1316,6 +1316,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-ocfl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>mycore-orcid</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -2183,5 +2188,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-xeditor</module>
     <module>mycore-coma</module>
     <module>mycore-cronjob</module>
+    <module>mycore-ocfl</module>
   </modules>
 </project>

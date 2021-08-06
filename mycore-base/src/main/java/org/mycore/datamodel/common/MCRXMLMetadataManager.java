@@ -65,7 +65,7 @@ public class MCRXMLMetadataManager {
         }
         if (IMPLEMENTATION == null) {
             IMPLEMENTATION = MCRConfiguration2
-                .getSingleInstanceOf("MCR.Metadata.Manager.Class", MCRDefaultXMLMetadataManager.class).get();
+                .getSingleInstanceOf("MCR.Metadata.Manager", MCRDefaultXMLMetadataManager.class).get();
         }
         return SINGLETON;
     }
