@@ -21,6 +21,9 @@
 package org.mycore.mcr.acl.accesskey.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -64,6 +67,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 @Entity
 @Table(name = "MCRAccessKey")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MCRAccessKey {
 
     private static final long serialVersionUID = 1L;
@@ -82,6 +86,18 @@ public class MCRAccessKey {
 
     /** The comment */
     private String comment;
+
+    /** The creator */
+    private String creator;
+
+    /** The creation date */
+    private Date creationDate;
+
+    /** Last modified by */
+    private String lastChanger;
+
+    /** Last modified date */
+    private Date lastChangeDate;
 
     private MCRAccessKey() {
     }
@@ -194,6 +210,70 @@ public class MCRAccessKey {
      */
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    /**
+     * @return name of creator
+     */
+    @Column(name = "creator",
+        nullable = true)
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * @param creator name of creator
+     */
+    public void setCreator(final String creator) {
+        this.creator = creator;
+    }
+    
+    /**
+     * @return date of creation
+     */
+    @Column(name = "creationDate",
+        nullable = true)
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    /**
+     * @param creationDate date of creation
+     */
+    public void setCreationDate(final Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    /**
+     * @return name of last changer
+     */
+    @Column(name = "lastChanger",
+        nullable = true)
+    public String getLastChanger() {
+        return lastChanger;
+    }
+
+    /**
+     * @param lastChanger name of modifier
+     */
+    public void setLastChanger(final String lastChanger) {
+        this.lastChanger = lastChanger;
+    }
+    
+    /**
+     * @return last date of change
+     */
+    @Column(name = "lastChangeDate",
+        nullable = true)
+    public Date getLastChangeDate() {
+        return lastChangeDate;
+    }
+
+    /**
+     * @param lastChangeDate last date of change
+     */
+    public void setLastChangeDate(final Date lastChangeDate) {
+        this.lastChangeDate = lastChangeDate;
     }
 
     @Override

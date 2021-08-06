@@ -127,8 +127,8 @@ public final class MCRAccessKeyManager {
             throw new MCRAccessKeyInvalidValueException("Incorrect value.");
         }
         final String encryptedValue = encryptValue(value, objectId);
-        accessKey.setValue(encryptedValue);
         if (getAccessKeyByValue(objectId, encryptedValue) == null) {
+            accessKey.setValue(encryptedValue);
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.persist(accessKey);
         } else {
@@ -225,11 +225,7 @@ public final class MCRAccessKeyManager {
             throw new MCRAccessKeyNotFoundException("Key does not exists.");
         }
         final String type = updatedAccessKey.getType();
-        if (!accessKey.getType().equals(type)) {
-            if (type == null) {
-                LOGGER.warn("Permission type is required");
-                throw new MCRAccessKeyInvalidTypeException("Permission type is required.");
-            }
+        if (type != null && !accessKey.getType().equals(type)) {
             if (!isValidType(type)) {
                 LOGGER.warn("Unkown Type.");
                 throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
@@ -237,7 +233,10 @@ public final class MCRAccessKeyManager {
             MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
             accessKey.setType(type);
         }
-        accessKey.setComment(updatedAccessKey.getComment());
+        final String comment = updatedAccessKey.getComment();
+        if (comment != null) {
+            accessKey.setComment(comment);
+        }
     }
 
     /**
