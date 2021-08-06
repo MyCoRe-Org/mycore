@@ -87,7 +87,8 @@ public class MCRRestAccessKey {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
         accessKey.setObjectId(objectId);
         MCRAccessKeyManager.addAccessKey(accessKey);
-        return Response.noContent().build();
+        accessKey.setValue(MCRAccessKeyManager.encryptValue(accessKey.getValue(), objectId));
+        return Response.ok(accessKey).build();
     }
 
     @DELETE
@@ -108,9 +109,11 @@ public class MCRRestAccessKey {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response updateAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
-        @PathParam(VALUE) final String valueEncoded, final String accessKeyJson) throws IOException {
+        @PathParam(VALUE) final String value, final String accessKeyJson) throws IOException {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
+        accessKey.setObjectId(objectId);
+        accessKey.setValue(value);
         MCRAccessKeyManager.updateAccessKey(accessKey);
-        return Response.noContent().build();
+        return Response.ok(accessKey).build();
     }
 }
