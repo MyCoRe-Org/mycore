@@ -76,7 +76,7 @@ public class MCRAccessKey {
     private int id;
 
     /** The access key information */
-    private MCRObjectID mcrObjectId; 
+    private MCRObjectID objectId; 
 
     /** The key value */
     private String value;
@@ -127,7 +127,7 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return the linked mcrObjectId
+     * @return the linked objectId
      */
     @JsonIgnore
     @Column(name = "object_id",
@@ -135,14 +135,14 @@ public class MCRAccessKey {
         nullable = false)
     @Convert(converter = MCRObjectIDConverter.class)
     public MCRObjectID getObjectId() {
-        return mcrObjectId;
+        return objectId;
     }
 
     /**
-     * @param mcrObjectId the {@link MCRObjectID} to set
+     * @param objectId the {@link MCRObjectID} to set
      */
-    public void setObjectId(final MCRObjectID mcrObjectId) {
-        this.mcrObjectId = mcrObjectId;
+    public void setObjectId(final MCRObjectID objectId) {
+        this.objectId = objectId;
     }
 
     /**

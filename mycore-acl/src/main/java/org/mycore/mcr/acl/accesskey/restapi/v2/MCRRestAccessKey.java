@@ -25,7 +25,6 @@ import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -41,7 +40,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyTransformer;
@@ -88,8 +86,8 @@ public class MCRRestAccessKey {
     public Response addAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, final String accessKeyJson) {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
         accessKey.setObjectId(objectId);
-        accessKey.setCreator(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-        accessKey.setCreation(new Date());
+        accessKey.setCreator(null);
+        accessKey.setCreation(null);
         accessKey.setLastChanger(null);
         accessKey.setLastChange(null);
         MCRAccessKeyManager.addAccessKey(accessKey);
@@ -118,8 +116,6 @@ public class MCRRestAccessKey {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
         accessKey.setObjectId(objectId);
         accessKey.setValue(value);
-        accessKey.setLastChanger(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-        accessKey.setLastChange(new Date());
         MCRAccessKeyManager.updateAccessKey(accessKey);
         return Response.ok(MCRAccessKeyManager.getAccessKeyByValue(objectId, value)).build();
     }

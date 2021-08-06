@@ -22,6 +22,7 @@ package org.mycore.mcr.acl.accesskey;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -32,6 +33,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -129,6 +131,10 @@ public final class MCRAccessKeyManager {
         final String encryptedValue = encryptValue(value, objectId);
         if (getAccessKeyByValue(objectId, encryptedValue) == null) {
             accessKey.setValue(encryptedValue);
+            if (accessKey.getCreator() == null && accessKey.getCreation() == null) {
+                accessKey.setCreator(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+                accessKey.setCreation(new Date());
+            }
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.persist(accessKey);
         } else {
@@ -237,6 +243,8 @@ public final class MCRAccessKeyManager {
         if (comment != null) {
             accessKey.setComment(comment);
         }
+        accessKey.setLastChanger(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+        accessKey.setLastChange(new Date());
     }
 
     /**
