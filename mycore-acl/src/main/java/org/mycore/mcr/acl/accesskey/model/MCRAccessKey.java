@@ -91,13 +91,13 @@ public class MCRAccessKey {
     private String creator;
 
     /** The creation date */
-    private Date creationDate;
+    private Date creation;
 
     /** Last modified by */
     private String lastChanger;
 
     /** Last modified date */
-    private Date lastChangeDate;
+    private Date lastChange;
 
     private MCRAccessKey() {
     }
@@ -231,17 +231,17 @@ public class MCRAccessKey {
     /**
      * @return date of creation
      */
-    @Column(name = "creationDate",
+    @Column(name = "creation",
         nullable = true)
-    public Date getCreationDate() {
-        return creationDate;
+    public Date getCreation() {
+        return creation;
     }
 
     /**
-     * @param creationDate date of creation
+     * @param creation date of creation
      */
-    public void setCreationDate(final Date creationDate) {
-        this.creationDate = creationDate;
+    public void setCreation(final Date creation) {
+        this.creation = creation;
     }
 
     /**
@@ -263,17 +263,17 @@ public class MCRAccessKey {
     /**
      * @return last date of change
      */
-    @Column(name = "lastChangeDate",
+    @Column(name = "lastChange",
         nullable = true)
-    public Date getLastChangeDate() {
-        return lastChangeDate;
+    public Date getLastChange() {
+        return lastChange;
     }
 
     /**
-     * @param lastChangeDate last date of change
+     * @param lastChange last date of change
      */
-    public void setLastChangeDate(final Date lastChangeDate) {
-        this.lastChangeDate = lastChangeDate;
+    public void setLastChange(final Date lastChange) {
+        this.lastChange = lastChange;
     }
 
     @Override

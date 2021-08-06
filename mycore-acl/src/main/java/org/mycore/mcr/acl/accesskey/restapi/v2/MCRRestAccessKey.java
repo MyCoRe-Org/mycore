@@ -89,7 +89,7 @@ public class MCRRestAccessKey {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
         accessKey.setObjectId(objectId);
         accessKey.setCreator(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-        accessKey.setCreationDate(new Date());
+        accessKey.setCreation(new Date());
         MCRAccessKeyManager.addAccessKey(accessKey);
         return Response.ok(MCRAccessKeyManager.getAccessKeyByValue(objectId, accessKey.getValue())).build();
     }
@@ -116,8 +116,8 @@ public class MCRRestAccessKey {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
         accessKey.setObjectId(objectId);
         accessKey.setValue(value);
-        accessKey.setLastChangeDate(new Date());
         accessKey.setLastChanger(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+        accessKey.setLastChange(new Date());
         MCRAccessKeyManager.updateAccessKey(accessKey);
         return Response.ok(MCRAccessKeyManager.getAccessKeyByValue(objectId, value)).build();
     }
