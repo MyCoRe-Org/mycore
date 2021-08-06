@@ -90,6 +90,8 @@ public class MCRRestAccessKey {
         accessKey.setObjectId(objectId);
         accessKey.setCreator(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
         accessKey.setCreation(new Date());
+        accessKey.setLastChanger(null);
+        accessKey.setLastChange(null);
         MCRAccessKeyManager.addAccessKey(accessKey);
         return Response.ok(MCRAccessKeyManager.getAccessKeyByValue(objectId, accessKey.getValue())).build();
     }
