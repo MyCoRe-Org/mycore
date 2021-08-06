@@ -127,6 +127,7 @@ public class MCREntityResolver implements EntityResolver2, LSResourceResolver {
                     return new MCRSourceContent(s).getInputSource();
                 }
             } catch (MCRUsageException | TransformerException e) {
+                LOGGER.debug("error while calling URIResolver from EntityResolver", e);
                 return null;
             }
         }
