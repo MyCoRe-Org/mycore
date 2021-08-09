@@ -42,7 +42,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
     @NamedQuery(name = "MCRAccessKey.getById",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.objectId = :objId"),
+            + "  WHERE k.objectId = :objId"
+            + "  ORDER BY creation ASC"),
     @NamedQuery(name = "MCRAccessKey.getByValue",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
