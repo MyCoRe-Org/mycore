@@ -219,14 +219,6 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
-      <groupId>edu.wisc.library.ocfl</groupId>
-      <artifactId>ocfl-java-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>edu.wisc.library.ocfl</groupId>
-      <artifactId>ocfl-java-core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>io.swagger.core.v3</groupId>
       <artifactId>swagger-annotations</artifactId>
     </dependency>
