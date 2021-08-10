@@ -304,7 +304,8 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             TransformerHandler handler = tFactory.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());
             handler.getTransformer().setErrorListener(errorListener);
-            if (TRACE_LISTENER_ENABLED) {
+            // trace listener only works with xalan
+            if (TRACE_LISTENER_ENABLED && handler.getTransformer() instanceof TransformerImpl) {
                 TransformerImpl transformer = (TransformerImpl) handler.getTransformer();
                 TraceManager traceManager = transformer.getTraceManager();
                 try {
