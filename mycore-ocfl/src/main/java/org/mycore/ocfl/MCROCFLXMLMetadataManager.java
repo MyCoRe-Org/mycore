@@ -250,6 +250,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return getRepository().listObjectIds()
             .filter(id -> id.startsWith(MCR_OBJECT_ID_PREFIX))
             .map(id -> id.substring(MCR_OBJECT_ID_PREFIX.length()))
+            .filter(id -> id.startsWith(project + "_" + type))
             .mapToInt((fullId) -> Integer.parseInt(fullId.substring(project.length() + type.length() + 2))).sorted();
     }
 
