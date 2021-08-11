@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.datamodel.metadata.MCRBase;
@@ -159,16 +158,12 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
     @Override
     protected void update(MCRPURL purl, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        if (!hasRegistrationStarted(obj.getId(), additional)) {
-            Predicate<MCRBase> registrationCondition = getRegistrationPredicate();
-            if (registrationCondition.test(obj)) {
-                this.updateStartRegistrationDate(obj.getId(), "", new Date());
-                startRegisterJob(obj, purl);
-            }
-        } else {
-            if (isRegistered(obj.getId(), "")) {
-                startUpdateJob(obj, purl);
-            }
+        if (isRegistered(obj.getId(), additional)) {
+            startUpdateJob(obj, purl);
+        } else if (!hasRegistrationStarted(obj.getId(), additional)
+            && getRegistrationPredicate().test(obj)) {
+            this.updateStartRegistrationDate(obj.getId(), "", new Date());
+            startRegisterJob(obj, purl);
         }
     }
 
