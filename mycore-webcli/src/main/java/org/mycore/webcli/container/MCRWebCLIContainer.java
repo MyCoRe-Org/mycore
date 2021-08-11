@@ -317,6 +317,10 @@ public class MCRWebCLIContainer {
          * @return true if command processed successfully
          */
         private boolean processCommand(String command) {
+            if(command.trim().startsWith("#")) {
+                // ignore comment
+                return true;
+            }
             LOGGER.info("Processing command:'{}' ({} left)", command, commands.size());
             setCurrentCommand(command);
             long start = System.currentTimeMillis();
