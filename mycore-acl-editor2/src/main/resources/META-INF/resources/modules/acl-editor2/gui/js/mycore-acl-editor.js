@@ -179,7 +179,7 @@ var ACLEditor = function(){
 			});
 
 			$("body").on("keydown", ".acle2-access-filter-input", function(key) {
-				if(key.which == 13) {
+				if(key.key == 'Enter') {
 					filterTable();
 				}
 			});
@@ -196,7 +196,7 @@ var ACLEditor = function(){
 			});
 
 			$("body").on("keydown", ".acle2-table-access-entry-input", function(key) {
-				if(key.which == 13) {
+				if(key.key == 'Enter') {
 					$(".acle2-edit").find(".acle2-show-input").removeClass("form-group mcr-invalid");
 					var parent = $(this).parent();
 					var entry = parent.parent();
@@ -224,7 +224,7 @@ var ACLEditor = function(){
 						$(this).remove();
 					}
 				}
-				if(key.which == 27) {
+				if(key.key == 'Escape') {
 					$(".acle2-edit").find(".acle2-show-input").removeClass("form-group mcr-invalid");
 					var parent = $(this).parent();
 					var entry = parent.parent();
@@ -246,7 +246,8 @@ var ACLEditor = function(){
 			});
 
 			$("body").on("keydown", "#acle2-elem-per-page", function(key) {
-				if(key.which == 13) {
+				if(key.key == 'Enter') {
+					setElemPerPageCount();
 					splitTable();
 				}
 			});
@@ -326,6 +327,7 @@ var ACLEditor = function(){
 			accessTableInstance = accessTable;
 			ruleListInstance = ruleList;
 			var lang = $("#mycore-acl-editor2").attr("lang");
+			loadElemPerPageCount();
 			jQuery.getJSON("../../rsc/locale/translate/" + lang + "/ACLE.*", function(data) {
 				i18nKeys = data;
 				replacei18n();
@@ -828,6 +830,18 @@ var ACLEditor = function(){
             }
         });
     }
+
+	function loadElemPerPageCount() {
+		if(!localStorage.getItem('ACLE.elemPerPage')) {
+			setElemPerPageCount();
+		} else {
+			$("#acle2-elem-per-page-input").val(localStorage.getItem('ACLE.elemPerPage'));
+		}
+	}
+
+	function setElemPerPageCount() {
+		localStorage.setItem('ACLE.elemPerPage', $("#acle2-elem-per-page-input").val());
+	}
 }
 
 $(document).ready(function() {

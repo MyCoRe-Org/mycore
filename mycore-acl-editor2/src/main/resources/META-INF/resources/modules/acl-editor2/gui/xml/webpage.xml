@@ -62,7 +62,7 @@
                </div>
                <div id="acle2-elem-per-page" class="">
                  <text i18n="ACLE.labels.access.elemPerPage"/>
-                 <input class="input-sm form-control" id="acle2-elem-per-page-input" type="text" value="100"></input>
+                 <input class="input-sm form-control" id="acle2-elem-per-page-input" type="text" value="20"></input>
               </div>
             </div>
           </div>
