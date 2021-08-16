@@ -89,7 +89,7 @@ var RuleList = function(){
 				$("#acle2-button-delete-rule").hide();
 				$("#acle2-button-filter-rule").hide();
 			}
-			$("#acle2-rule-detail-ruleID").html(ruleID);
+			$("#acle2-rule-detail-ruleID").val(ruleID);
 			$("#acle2-rule-detail-ruleDesc").val(entry.attr("ruledesc"));
 			$(".acle2-rule-detail-ruleText").val(entry.attr("ruletext"));
 			$(".acle2-rule-selected").removeClass("acle2-rule-selected");

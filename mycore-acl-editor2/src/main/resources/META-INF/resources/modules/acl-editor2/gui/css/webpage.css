@@ -123,13 +123,18 @@ label{
 
 #acle2-access-table td:nth-child(1) {
 	width: 20px;
+	padding: 0.75rem 0.5rem;
+	text-overflow: unset;
 }
 
 #acle2-access-table th:nth-child(5) {
 	width: 30px;
+	padding: 0.75rem 0.5rem;
 }
 #acle2-access-table td:nth-child(5) {
 	width: 30px;
+	padding: 0.75rem 0.5rem;
+	text-overflow: unset;
 }
 
 .acle2-table-access-entry > td.acle2-table-access-entry-td{
@@ -308,7 +313,7 @@ select, textarea, input[type="text"]{
 
 #acle2-button-access-filter{
     margin-left: 15px;
-    margin-top: 5px
+    margin-top: 10px;
 }
 
 .input-xxlarge {
