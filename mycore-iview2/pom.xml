@@ -51,7 +51,17 @@
       <artifactId>log4j-api</artifactId>
     </dependency>
     <dependency>
-      <!-- needed for some PDF documents -->
+      <!-- needed for PDF documents with JPEG2000 images-->
+      <groupId>com.github.jai-imageio</groupId>
+      <artifactId>jai-imageio-core</artifactId>
+    </dependency>
+    <dependency>
+      <!-- needed for PDF documents with JPEG2000 images-->
+      <groupId>com.github.jai-imageio</groupId>
+      <artifactId>jai-imageio-jpeg2000</artifactId>
+    </dependency>
+    <dependency>
+      <!-- needed for PDF documents with JBIG2 images-->
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>jbig2-imageio</artifactId>
     </dependency>
