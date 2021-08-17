@@ -138,7 +138,7 @@ public interface MCRXMLMetadataManagerAdapter {
      *         with the given revision
      * @throws IOException
      */
-    MCRContent retrieveContent(MCRObjectID mcrid, long revision) throws IOException;
+    MCRContent retrieveContent(MCRObjectID mcrid, String revision) throws IOException;
 
     /**
      * Lists all versions of this metadata object available in the

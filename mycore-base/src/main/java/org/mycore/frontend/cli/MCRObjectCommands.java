@@ -805,7 +805,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         syntax = "restore {0} to revision {1}",
         help = "Restores the selected MCRObject to the selected revision.",
         order = 270)
-    public static void restoreToRevision(String id, long revision) {
+    public static void restoreToRevision(String id, String revision) {
         LOGGER.info("Try to restore object {} with revision {}", id, revision);
         MCRObjectID mcrId = MCRObjectID.getInstance(id);
         try {

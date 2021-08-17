@@ -908,6 +908,16 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>2.0.0</version>
       </dependency>
       <dependency>
+        <groupId>edu.wisc.library.ocfl</groupId>
+        <artifactId>ocfl-java-api</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>edu.wisc.library.ocfl</groupId>
+        <artifactId>ocfl-java-core</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+      <dependency>
         <groupId>io.bit3</groupId>
         <artifactId>jsass</artifactId>
         <version>5.10.4</version>
@@ -1302,6 +1312,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-oai</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-ocfl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -2173,5 +2188,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-xeditor</module>
     <module>mycore-coma</module>
     <module>mycore-cronjob</module>
+    <module>mycore-ocfl</module>
   </modules>
 </project>

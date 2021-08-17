@@ -264,7 +264,7 @@ public abstract class MCRObjectUtils {
      * @throws MCRPersistenceException There is no such object with the given id and revision.
      * @throws ClassCastException The returning type must be the same as the type of the restored object
      */
-    public static <T extends MCRBase> T restore(MCRObjectID mcrId, Long revision) throws IOException,
+    public static <T extends MCRBase> T restore(MCRObjectID mcrId, String revision) throws IOException,
         MCRPersistenceException {
         @SuppressWarnings("unchecked")
         T mcrBase = (T) (mcrId.getTypeId().equals("derivate") ? new MCRDerivate() : new MCRObject());
