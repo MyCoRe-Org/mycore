@@ -21,6 +21,7 @@
 package org.mycore.mcr.acl.accesskey;
 
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
@@ -43,10 +44,10 @@ public class MCRAccessKeyUserUtils {
      *
      * @param objectId the {@link MCRObjectID}
      * @param value the value of a {@link MCRAccessKey}
-     * @throws MCRAccessKeyNotFoundException if there is no matching {@link MCRAccessKey} with the same value.
+     * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
     public static synchronized void addAccessKey(final MCRObjectID objectId, final String value) 
-        throws MCRAccessKeyNotFoundException {
+        throws MCRException {
         final MCRUser user = MCRUserManager.getCurrentUser();
         addAccessKey(user, objectId, value);
     }
@@ -57,17 +58,18 @@ public class MCRAccessKeyUserUtils {
      * @param user the {@link MCRUser} the value should assigned
      * @param objectId the {@link MCRObjectID}
      * @param value the value of a {@link MCRAccessKey}
-     * @throws MCRAccessKeyNotFoundException if there is no matching {@link MCRAccessKey} with the same value.
+     * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
     public static synchronized void addAccessKey(final MCRUser user, final MCRObjectID objectId, final String value) 
-        throws MCRAccessKeyNotFoundException {
+        throws MCRException {
 
+        final String encryptedValue = MCRAccessKeyManager.encryptValue(value, objectId);
         final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyByValue(objectId, value);
         if (accessKey == null) {
             throw new MCRAccessKeyNotFoundException("Key does not exists.");
         }
 
-        user.setUserAttribute(ACCESS_KEY_PREFIX + objectId, value);
+        user.setUserAttribute(ACCESS_KEY_PREFIX + objectId, encryptedValue);
         MCRUserManager.updateUser(user);
 
         MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
