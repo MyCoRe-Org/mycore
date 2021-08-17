@@ -25,7 +25,7 @@ const FORMAT_MAP = {
     "mods2csv": "mods2csv",
     "mods": "xml",
     "bibtex": "xml"
-}
+};
 
 function isStandaloneFormat(format) {
     return STANDALONE_FORMATS.indexOf(format) !== -1;
@@ -107,11 +107,7 @@ function setTriggerLoadingState(trigger, loading) {
 }
 
 function getFileEnding(initialSelectInfo) {
-    if(initialSelectInfo.format in FORMAT_MAP) {
-        return FORMAT_MAP[initialSelectInfo.format];
-    } else {
-        return initialSelectInfo.format;
-    }
+    return initialSelectInfo.format in FORMAT_MAP ? FORMAT_MAP[initialSelectInfo.format] : initialSelectInfo.format;
 }
 
 function createFetchFunction(trigger, initialSelectInfo, styleSelect, formatSelect) {
