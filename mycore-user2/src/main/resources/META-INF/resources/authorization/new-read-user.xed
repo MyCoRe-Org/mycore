@@ -21,7 +21,7 @@
             <xed:include ref="editor4newReadUser" />
           </div>
           <div class="card-footer clearfix">
-            <div class="pull-right">
+            <div class="float-right">
               <xed:include ref="buttons" />
             </div>
           </div>
