@@ -139,19 +139,18 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         } else {
             if (MCRObjectID.isValid(checkID)) {
                 MCRObjectID oid = MCRObjectID.getInstance(checkID);
+                target = "derivate".equals(oid.getTypeId()) ? "files" : "metadata";
+                
                 if (MCRMetadataManager.exists(oid)) {
                     if ("derivate".equals(oid.getTypeId())) {
                         facts.add(new MCRObjectIDFact("derid", checkID, oid));
-                        target = "files";
                         MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(oid);
                         facts.add(new MCRObjectIDFact("objid", checkID, deriv.getOwnerID()));
                     } else {
-                        target = "metadata";
                         facts.add(new MCRObjectIDFact("objid", checkID, oid));
                     }
                 } else {
                     LOGGER.debug("There is no object or derivate with id " + oid.toString() + " in metadata store");
-                    return false;
                 }
             } else if (checkID.startsWith("webpage")) {
                 target = "webpage";
