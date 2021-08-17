@@ -32,6 +32,7 @@
     <xsl:param name="MCR.Export.CSL.Styles"/>
     <xsl:param name="MCR.Export.CSL.Rows"/>
     <xsl:param name="WebApplicationBaseURL"/>
+    <xsl:param name="MCR.ContentTransformer.solr2csv.Stylesheet"/>
 
     <xsl:template name="exportGUI">
         <!-- supply
@@ -49,6 +50,11 @@
                 </option>
                 <option value="pdf">PDF</option>
                 <option value="html">HTML</option>
+                <xsl:if test="$type ='response'">
+                    <xsl:if test="string-length($MCR.ContentTransformer.solr2csv.Stylesheet)&gt;0">
+                        <option value="solr2csv">CSV</option>
+                    </xsl:if>
+                </xsl:if>
                 <xsl:if test="$type = 'basket'">
                     <option value="mods">MODS</option>
                     <option value="bibtex">BibTex</option>
