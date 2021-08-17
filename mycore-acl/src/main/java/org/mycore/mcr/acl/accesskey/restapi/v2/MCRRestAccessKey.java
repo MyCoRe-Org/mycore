@@ -39,7 +39,9 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import javax.ws.rs.WebApplicationException;
 
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyTransformer;
@@ -47,18 +49,29 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.restapi.v2.annotation.MCRRequireAccessKeyAuthorization;
 import org.mycore.mcr.acl.accesskey.restapi.v2.model.MCRAccessKeyInformation;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+import org.mycore.restapi.v2.MCRErrorResponse;
 
 @Path("/objects/{" + PARAM_MCRID + "}/accesskeys")
 public class MCRRestAccessKey {
 
     private static final String VALUE = "value";
 
+    private WebApplicationException getUnknownObjectException() {
+        return MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            .withMessage("Object doesn't exists!")
+            .withErrorCode("objectNotFound")
+            .toException();
+    }
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKeys(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
         @DefaultValue("0") @QueryParam("offset") long offset,
         @DefaultValue("128") @QueryParam("limit") long limit) {
+        if (!MCRMetadataManager.exists(objectId)) {
+            throw getUnknownObjectException();
+        }
         final long fromIndex = offset;
         List<MCRAccessKey> accessKeys = MCRAccessKeyManager.getAccessKeys(objectId);
         final int totalAccessKeyCount = accessKeys.size();
@@ -85,6 +98,9 @@ public class MCRRestAccessKey {
     @MCRRequireTransaction
     public Response addAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, final String accessKeyJson) {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
+        if (!MCRMetadataManager.exists(objectId)) {
+            throw getUnknownObjectException();
+        }
         accessKey.setObjectId(objectId);
         accessKey.setCreator(null);
         accessKey.setCreation(null);
@@ -101,6 +117,9 @@ public class MCRRestAccessKey {
     @MCRRequireTransaction
     public Response deleteAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
         @PathParam(VALUE) final String value) throws IOException {
+        if (!MCRMetadataManager.exists(objectId)) {
+            throw getUnknownObjectException();
+        }
         MCRAccessKeyManager.deleteAccessKey(objectId, value);
         return Response.noContent().build();
     }
@@ -113,6 +132,9 @@ public class MCRRestAccessKey {
     @MCRRequireTransaction
     public Response updateAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
         @PathParam(VALUE) final String value, final String accessKeyJson) throws IOException {
+        if (!MCRMetadataManager.exists(objectId)) {
+            throw getUnknownObjectException();
+        }
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
         accessKey.setObjectId(objectId);
         accessKey.setValue(value);
