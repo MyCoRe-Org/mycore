@@ -19,9 +19,31 @@
  */
 const CSL_EXPORT_ROWS = "MCR.Export.CSL.Rows";
 const STANDALONE_FORMATS = ["mods", "bibtex", "endnote", "ris", "isi", "mods2csv"];
+const SOLR_STANDALONE_FORMATS = ["solr2csv"];
+const FORMAT_MAP = {
+    "solr2csv": "csv",
+    "mods2csv": "mods2csv",
+    "mods": "xml",
+    "bibtex": "xml"
+};
 
 function isStandaloneFormat(format) {
     return STANDALONE_FORMATS.indexOf(format) !== -1;
+}
+
+function isSolrStandaloneFormat(format) {
+    return SOLR_STANDALONE_FORMATS.indexOf(format) !== -1;
+}
+
+function getSolrDownloadLocation(transformer) {
+    let location = window.location.href;
+    let transformerQuery = "&XSL.Transformer=" + transformer+"&fl=*";
+    let hashIndex = location.indexOf("#");
+    if (hashIndex !== -1) {
+        location = location.substring(0, hashIndex);
+    }
+
+    return location + transformerQuery;
 }
 
 function getCSLDownloadLocation(type, format, style) {
@@ -49,6 +71,9 @@ function getDownloadLocation(type, selectInfo) {
     let style = selectInfo.style;
     if (isStandaloneFormat(format)) {
         return window["webApplicationBaseURL"] + "servlets/MCRExportServlet?basket=objects&transformer=" + format;
+    }
+    if (isSolrStandaloneFormat(format)) {
+        return getSolrDownloadLocation(format);
     }
 
     return getCSLDownloadLocation(type, format, style);
@@ -81,6 +106,10 @@ function setTriggerLoadingState(trigger, loading) {
     }
 }
 
+function getFileEnding(initialSelectInfo) {
+    return initialSelectInfo.format in FORMAT_MAP ? FORMAT_MAP[initialSelectInfo.format] : initialSelectInfo.format;
+}
+
 function createFetchFunction(trigger, initialSelectInfo, styleSelect, formatSelect) {
     // this function will be called when the request is started
     return function (response) {
@@ -96,7 +125,7 @@ function createFetchFunction(trigger, initialSelectInfo, styleSelect, formatSele
             if (newSelectInfo.format === initialSelectInfo.format &&
                 (isStandaloneFormat(newSelectInfo.format) || newSelectInfo.style === initialSelectInfo.style)) {
                 trigger.href = URL.createObjectURL(blob);
-                trigger.download = "export." + initialSelectInfo.format;
+                trigger.download = "export." + getFileEnding(initialSelectInfo);
                 setTriggerLoadingState(trigger, false);
                 changeTriggerState(trigger, true);
             }
@@ -105,7 +134,7 @@ function createFetchFunction(trigger, initialSelectInfo, styleSelect, formatSele
 }
 
 function updateStyleSelect(format, styleSelect) {
-    if (isStandaloneFormat(format)) {
+    if (isStandaloneFormat(format) || isSolrStandaloneFormat(format)) {
         styleSelect.classList.add("d-none");
     } else {
         styleSelect.classList.remove("d-none");
@@ -127,7 +156,9 @@ window.addEventListener('load', function () {
             let selectInfo = getSelectInfo(styleSelect, formatSelect);
             updateStyleSelect(selectInfo.format, styleSelect);
             changeTriggerState(trigger, false);
-            if (selectInfo.format.length > 0 && (selectInfo.style.length > 0 || isStandaloneFormat(selectInfo.format))) {
+            if (selectInfo.format.length > 0 && (selectInfo.style.length > 0 ||
+                isStandaloneFormat(selectInfo.format) ||
+                isSolrStandaloneFormat(selectInfo.format))) {
                 setTriggerLoadingState(trigger, true);
                 let location = getDownloadLocation(type, selectInfo);
                 fetch(location, {method: "GET"})
