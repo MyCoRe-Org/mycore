@@ -461,8 +461,6 @@ public class MCRRestDerivates {
     }
 
     public static class DerivateMetadata {
-        private boolean displayEnabled = true;
-
         private String mainDoc;
 
         private int order = 1;
@@ -470,17 +468,6 @@ public class MCRRestDerivates {
         private List<MCRCategoryID> classifications = List.of();
 
         private List<DerivateTitle> titles = List.of();
-
-        boolean isDisplayEnabled() {
-            return displayEnabled;
-        }
-
-        @JsonProperty("display")
-        @FormParam("display")
-        @DefaultValue("true")
-        public void setDisplayEnabled(boolean displayEnabled) {
-            this.displayEnabled = displayEnabled;
-        }
 
         String getMainDoc() {
             return mainDoc;
