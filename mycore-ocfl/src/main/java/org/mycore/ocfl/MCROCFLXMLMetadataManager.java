@@ -111,8 +111,13 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     @Override
     public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified) throws MCRPersistenceException {
+        create(mcrid, xml, lastModified, null);
+    }
+
+    public void create(MCRObjectID mcrid, MCRContent xml, Date lastModified, String user)
+        throws MCRPersistenceException {
         String objName = getObjName(mcrid);
-        VersionInfo info = buildVersionInfo(MESSAGE_CREATED);
+        VersionInfo info = buildVersionInfo(MESSAGE_CREATED, lastModified, user);
         try (InputStream objectAsStream = xml.getInputStream()) {
             getRepository().updateObject(ObjectVersionId.head(objName), info, init -> {
                 init.writeFile(objectAsStream, buildFilePath(mcrid));
@@ -124,6 +129,10 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     @Override
     public void delete(MCRObjectID mcrid) throws MCRPersistenceException {
+        delete(mcrid, null, null);
+    }
+
+    public void delete(MCRObjectID mcrid, Date date, String user) throws MCRPersistenceException {
         String objName = getObjName(mcrid);
         if (!exists(mcrid)) {
             throw new MCRUsageException("Cannot delete nonexistent object '" + objName + "'");
@@ -134,19 +143,24 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         if (versionType == MCROCFLMetadataVersion.DELETED) {
             throw new MCRUsageException("Cannot delete already deleted object '" + objName + "'");
         }
-        repo.updateObject(ObjectVersionId.head(objName), buildVersionInfo(MESSAGE_DELETED), init -> {
+        repo.updateObject(ObjectVersionId.head(objName), buildVersionInfo(MESSAGE_DELETED, date, null), init -> {
             init.removeFile(buildFilePath(mcrid));
         });
     }
 
     @Override
     public void update(MCRObjectID mcrid, MCRContent xml, Date lastModified) throws MCRPersistenceException {
+        update(mcrid, xml, lastModified, null);
+    }
+
+    public void update(MCRObjectID mcrid, MCRContent xml, Date lastModified, String user)
+        throws MCRPersistenceException {
         String objName = getObjName(mcrid);
         if (!exists(mcrid)) {
             throw new MCRUsageException("Cannot update nonexistent object '" + objName + "'");
         }
         try (InputStream objectAsStream = xml.getInputStream()) {
-            VersionInfo versionInfo = buildVersionInfo(MESSAGE_UPDATED);
+            VersionInfo versionInfo = buildVersionInfo(MESSAGE_UPDATED, lastModified, user);
             getRepository().updateObject(ObjectVersionId.head(objName), versionInfo, init -> {
                 init.writeFile(objectAsStream, buildFilePath(mcrid), OcflOption.OVERWRITE);
             });
@@ -217,11 +231,12 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         }
     }
 
-    private VersionInfo buildVersionInfo(String message) {
+    private VersionInfo buildVersionInfo(String message, Date versionDate, String user) {
         VersionInfo versionInfo = new VersionInfo();
         versionInfo.setMessage(message);
-        versionInfo.setCreated(new Date().toInstant().atOffset(ZoneOffset.UTC));
-        String userID = Optional.ofNullable(MCRSessionMgr.getCurrentSession())
+        versionInfo.setCreated((versionDate == null ? new Date() : versionDate).toInstant().atOffset(ZoneOffset.UTC));
+        String userID = user != null ? user
+            : Optional.ofNullable(MCRSessionMgr.getCurrentSession())
             .map(MCRSession::getUserInformation)
             .map(MCRUserInformation::getUserID)
             .orElse(null);
