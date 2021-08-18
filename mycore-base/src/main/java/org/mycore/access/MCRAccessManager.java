@@ -18,6 +18,7 @@
 package org.mycore.access;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -65,13 +66,24 @@ public class MCRAccessManager {
         MCRShutdownHandler.getInstance().addCloseable(EXECUTOR_SERVICE::shutdownNow);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends MCRAccessInterface> T getAccessImpl() {
-        return (T) MCRConfiguration2.getSingleInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class).get();
+        return (T) MCRConfiguration2.<MCRAccessInterface>getInstanceOf("MCR.Access.Class")
+            .orElseGet(MCRAccessBaseImpl::new);
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
-        return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
-            .orElseGet(MCRDerivateIDStrategy::new);
+        // if acccessStrategy equals accessImpl we reuse the accessImpl, 
+        // to make sure, that only one singleton gets created
+        // (used to instantiate fact-based access system) 
+        Optional<String> optStrategy = MCRConfiguration2.getString("MCR.Access.Strategy.Class");
+        Optional<String> optAccessImpl = MCRConfiguration2.getString("MCR.Access.Class");
+        if (optStrategy.isPresent() && optAccessImpl.isPresent() && optStrategy.get().equals(optAccessImpl.get())) {
+            return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Class").orElseThrow();
+        } else {
+            return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
+                .orElseGet(MCRDerivateIDStrategy::new);
+        }
     }
 
     /**
