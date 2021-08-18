@@ -80,9 +80,10 @@ public class MCRAccessManager {
         Optional<String> optAccessImpl = MCRConfiguration2.getString("MCR.Access.Class");
         if (optStrategy.isPresent() && optAccessImpl.isPresent() && optStrategy.get().equals(optAccessImpl.get())) {
             return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Class").orElseThrow();
+        } else {
+            return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
+                .orElseGet(MCRDerivateIDStrategy::new);
         }
-        return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
-            .orElseGet(MCRDerivateIDStrategy::new);
     }
 
     /**
