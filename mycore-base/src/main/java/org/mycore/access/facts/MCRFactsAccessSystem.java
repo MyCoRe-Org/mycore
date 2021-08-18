@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
@@ -43,7 +44,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -138,16 +138,21 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
             cacheKey = action;
         } else {
             if (MCRObjectID.isValid(checkID)) {
-                MCRObjectID oid = MCRObjectID.getInstance(checkID);
-                target = "metadata";
+                MCRObjectID mcrId = MCRObjectID.getInstance(checkID);
+                target = "derivate".equals(mcrId.getTypeId()) ? "files" : "metadata";
 
-                if ("derivate".equals(oid.getTypeId())) {
-                    facts.add(new MCRObjectIDFact("derid", checkID, oid));
-                    target = "files";
-                    MCRDerivate deriv = MCRMetadataManager.retrieveMCRDerivate(oid);
-                    facts.add(new MCRObjectIDFact("objid", checkID, deriv.getOwnerID()));
+                if (MCRMetadataManager.exists(mcrId)) {
+                    if ("derivate".equals(mcrId.getTypeId())) {
+                        facts.add(new MCRObjectIDFact("derid", checkID, mcrId));
+                        MCRObjectID mcrobjID = MCRMetadataManager.getObjectId(mcrId, 10, TimeUnit.MINUTES);
+                        if (mcrobjID != null) {
+                            facts.add(new MCRObjectIDFact("objid", checkID, mcrobjID));
+                        }
+                    } else {
+                        facts.add(new MCRObjectIDFact("objid", checkID, mcrId));
+                    }
                 } else {
-                    facts.add(new MCRObjectIDFact("objid", checkID, oid));
+                    LOGGER.debug("There is no object or derivate with id " + mcrId.toString() + " in metadata store");
                 }
             } else if (checkID.startsWith("webpage")) {
                 target = "webpage";
@@ -160,9 +165,9 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
             facts.add(new MCRStringFact("id", checkID));
             facts.add(new MCRStringFact("target", target));
         }
+        facts.add(new MCRStringFact("action", action));
 
         LOGGER.debug("Testing {} ", cacheKey);
-        facts.add(new MCRStringFact("action", action));
 
         boolean result;
         if (LOGGER.isDebugEnabled()) {
