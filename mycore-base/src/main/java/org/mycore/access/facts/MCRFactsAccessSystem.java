@@ -17,6 +17,7 @@
  */
 package org.mycore.access.facts;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -117,11 +118,17 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     private MCRCondition buildRulesFromXML() {
         Element eRules = MCRURIResolver.instance().resolve(rulesURI);
         Objects.requireNonNull(eRules, "The rulesURI " + rulesURI + " resolved to null!");
+        MCRJDOMContent content = new MCRJDOMContent(eRules);
         try {
-            MCRJDOMContent content = new MCRJDOMContent(eRules);
-            content.sendTo(MCRConfigurationDir.getConfigFile(RESOLVED_RULES_FILE_NAME));
+            File configFile = MCRConfigurationDir.getConfigFile(RESOLVED_RULES_FILE_NAME);
+            if (configFile != null) {
+                content.sendTo(configFile);
+            } else {
+                throw new IOException("MCRConfigurationDir is not available!");
+            }
         } catch (IOException e) {
-            LOGGER.error("Could not write file 'rules.resolved.xml' to config directory", e);
+            LOGGER.error("Could not write file '" + RESOLVED_RULES_FILE_NAME + "' to config directory", e);
+            LOGGER.info("Rules file is: \n" + new XMLOutputter(Format.getPrettyFormat()).outputString(eRules));
         }
         return MCRFactsAccessSystemHelper.parse(eRules);
     }
