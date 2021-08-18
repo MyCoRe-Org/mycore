@@ -17,6 +17,8 @@
  */
 package org.mycore.access.facts;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,8 +43,10 @@ import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.MCRConfigurationDir;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -57,6 +61,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 @Singleton
 public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckStrategy {
+
+    private static String RESOLVED_RULES_FILE_NAME = "rules.resolved.xml";
 
     protected static final Logger LOGGER = LogManager.getLogger();
 
@@ -112,6 +118,18 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     private MCRCondition buildRulesFromXML() {
         Element eRules = MCRURIResolver.instance().resolve(rulesURI);
         Objects.requireNonNull(eRules, "The rulesURI " + rulesURI + " resolved to null!");
+        MCRJDOMContent content = new MCRJDOMContent(eRules);
+        try {
+            File configFile = MCRConfigurationDir.getConfigFile(RESOLVED_RULES_FILE_NAME);
+            if (configFile != null) {
+                content.sendTo(configFile);
+            } else {
+                throw new IOException("MCRConfigurationDir is not available!");
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not write file '" + RESOLVED_RULES_FILE_NAME + "' to config directory", e);
+            LOGGER.info("Rules file is: \n" + new XMLOutputter(Format.getPrettyFormat()).outputString(eRules));
+        }
         return MCRFactsAccessSystemHelper.parse(eRules);
     }
 
