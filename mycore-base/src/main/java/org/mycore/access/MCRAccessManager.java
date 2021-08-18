@@ -18,6 +18,7 @@
 package org.mycore.access;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -72,11 +73,12 @@ public class MCRAccessManager {
     }
 
     private static MCRAccessCheckStrategy getAccessStrategy() {
-        // if acccessStrategy equals accessImp we reuse the accessImpl, 
+        // if acccessStrategy equals accessImpl we reuse the accessImpl, 
         // to make sure, that only one singleton gets created
         // (used to instantiate fact-based access system) 
-        if (MCRConfiguration2.getString("MCR.Access.Strategy.Class").orElse("UNDEFINED")
-            .equals(MCRConfiguration2.getString("MCR.Access.Class").orElse(null))) {
+        Optional<String> optStrategy = MCRConfiguration2.getString("MCR.Access.Strategy.Class");
+        Optional<String> optAccessImpl = MCRConfiguration2.getString("MCR.Access.Class");
+        if (optStrategy.isPresent() && optAccessImpl.isPresent() && optStrategy.get().equals(optAccessImpl.get())) {
             return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Class").orElseThrow();
         }
         return MCRConfiguration2.<MCRAccessCheckStrategy>getInstanceOf("MCR.Access.Strategy.Class")
