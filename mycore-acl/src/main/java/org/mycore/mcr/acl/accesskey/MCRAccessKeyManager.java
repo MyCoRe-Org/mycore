@@ -131,9 +131,13 @@ public final class MCRAccessKeyManager {
         final String encryptedValue = encryptValue(value, objectId);
         if (getAccessKeyByValue(objectId, encryptedValue) == null) {
             accessKey.setValue(encryptedValue);
-            if (accessKey.getCreator() == null && accessKey.getCreation() == null) {
+            if (accessKey.getCreator() == null || accessKey.getCreation() == null) {
                 accessKey.setCreator(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
                 accessKey.setCreation(new Date());
+            }
+            if (accessKey.getLastChanger() == null || accessKey.getLastChange() == null) {
+                accessKey.setLastChanger(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+                accessKey.setLastChange(new Date());
             }
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.persist(accessKey);

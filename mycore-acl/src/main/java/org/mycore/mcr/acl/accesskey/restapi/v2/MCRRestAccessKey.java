@@ -26,9 +26,13 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -45,6 +49,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyTransformer;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.restapi.v2.annotation.MCRRequireAccessKeyAuthorization;
 import org.mycore.mcr.acl.accesskey.restapi.v2.model.MCRAccessKeyInformation;
@@ -55,6 +60,10 @@ import org.mycore.restapi.v2.MCRErrorResponse;
 @MCRApiDraft("MCRAccessKey")
 @Path("/objects/{" + PARAM_MCRID + "}/accesskeys")
 public class MCRRestAccessKey {
+
+    @Context
+    UriInfo uriInfo;
+
 
     private static final String VALUE = "value";
 
@@ -69,28 +78,35 @@ public class MCRRestAccessKey {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKeys(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @DefaultValue("0") @QueryParam("offset") long offset,
-        @DefaultValue("128") @QueryParam("limit") long limit) {
+        @DefaultValue("0") @QueryParam("offset") int offset,
+        @DefaultValue("128") @QueryParam("limit") int limit) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
         final long fromIndex = offset;
-        List<MCRAccessKey> accessKeys = MCRAccessKeyManager.getAccessKeys(objectId);
-        final int totalAccessKeyCount = accessKeys.size();
-        if (offset < 0 || limit <= 0 || fromIndex >= Integer.MAX_VALUE || totalAccessKeyCount == 0 
-            || (int) fromIndex >= totalAccessKeyCount) {
-            accessKeys = new ArrayList<MCRAccessKey>();
-        } else {
-            long toIndex = offset + limit;
-            if (toIndex > Integer.MAX_VALUE) {
-                toIndex = Integer.MAX_VALUE;
-            }
-            if ((int) toIndex >= totalAccessKeyCount) {
-                toIndex = (long) totalAccessKeyCount;
-            }
-            accessKeys = accessKeys.subList((int) fromIndex, (int) toIndex);
+        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.getAccessKeys(objectId);
+        final List<MCRAccessKey> accessKeysResult = accessKeys.stream()
+            .skip(offset)
+            .limit(limit)
+            .collect(Collectors.toList());
+        return Response.ok(new MCRAccessKeyInformation(accessKeysResult, accessKeys.size())).build();
+    }
+
+    @GET
+    @Path("/{" + VALUE + "}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @MCRRequireAccessKeyAuthorization
+    public Response getAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
+        @PathParam("VALUE") final String value) {
+        if (!MCRMetadataManager.exists(objectId)) {
+            throw getUnknownObjectException();
         }
-        return Response.ok(new MCRAccessKeyInformation(accessKeys, totalAccessKeyCount)).build();
+        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyByValue(objectId, value);
+        if (accessKey != null) {
+            throw new MCRAccessKeyNotFoundException("Key does not exists.");
+        } else {
+            return Response.ok(accessKey).build();
+        }
     }
 
     @POST
@@ -104,26 +120,12 @@ public class MCRRestAccessKey {
             throw getUnknownObjectException();
         }
         accessKey.setObjectId(objectId);
-        accessKey.setCreator(null);
+        accessKey.setCreator(null); //to prevent the client from setting, this is done by the KeyManager
         accessKey.setCreation(null);
         accessKey.setLastChanger(null);
         accessKey.setLastChange(null);
         MCRAccessKeyManager.addAccessKey(accessKey);
-        return Response.ok(MCRAccessKeyManager.getAccessKeyByValue(objectId, accessKey.getValue())).build();
-    }
-
-    @DELETE
-    @Path("/{" + VALUE + "}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @MCRRequireAccessKeyAuthorization
-    @MCRRequireTransaction
-    public Response deleteAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
-        @PathParam(VALUE) final String value) throws IOException {
-        if (!MCRMetadataManager.exists(objectId)) {
-            throw getUnknownObjectException();
-        }
-        MCRAccessKeyManager.deleteAccessKey(objectId, value);
-        return Response.noContent().build();
+        return Response.created(uriInfo.getAbsolutePathBuilder().path(accessKey.getValue()).build()).build();
     }
     
     @PUT
@@ -141,6 +143,21 @@ public class MCRRestAccessKey {
         accessKey.setObjectId(objectId);
         accessKey.setValue(value);
         MCRAccessKeyManager.updateAccessKey(accessKey);
-        return Response.ok(MCRAccessKeyManager.getAccessKeyByValue(objectId, value)).build();
+        return Response.noContent().build();
     }
+
+    @DELETE
+    @Path("/{" + VALUE + "}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @MCRRequireAccessKeyAuthorization
+    @MCRRequireTransaction
+    public Response deleteAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
+        @PathParam(VALUE) final String value) throws IOException {
+        if (!MCRMetadataManager.exists(objectId)) {
+            throw getUnknownObjectException();
+        }
+        MCRAccessKeyManager.deleteAccessKey(objectId, value);
+        return Response.noContent().build();
+    }
+
 }
