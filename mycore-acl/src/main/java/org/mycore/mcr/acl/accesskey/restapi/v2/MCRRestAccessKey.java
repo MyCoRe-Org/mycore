@@ -120,7 +120,7 @@ public class MCRRestAccessKey {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
-        @PathParam("VALUE") final String value) {
+        @PathParam(VALUE) final String value) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
