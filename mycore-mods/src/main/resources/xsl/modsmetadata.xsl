@@ -7,6 +7,7 @@
   version="1.0">
   <xsl:param name="MCR.Handle.Resolver.MasterURL" />
   <xsl:param name="MCR.DOI.Resolver.MasterURL" />
+  <xsl:param name="MCR.Scopus.Backlink" select="''" />
   <xsl:param name="MCR.Mods.SherpaRomeo.ApiKey" select="''" />
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="wcms.useTargets" select="'no'" /><!-- TODO: refacture! -->
@@ -747,6 +748,20 @@
             </a>
           </xsl:otherwise>
         </xsl:choose>
+      </td>
+    </tr>
+  </xsl:template>
+
+  <xsl:template match="mods:identifier[@type='scopus']" mode="present">
+    <tr>
+      <td valign="top" class="metaname">
+        <xsl:value-of select="concat(i18n:translate('component.mods.metaData.dictionary.identifier.scopus'),':')" />
+      </td>
+      <td class="metavalue">
+        <xsl:variable name="scopus" select="." />
+        <a href="{$MCR.Scopus.Backlink}{$scopus}">
+          <xsl:value-of select="$scopus" />
+        </a>
       </td>
     </tr>
   </xsl:template>
