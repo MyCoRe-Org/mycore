@@ -24,12 +24,11 @@ import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -45,6 +44,14 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.WebApplicationException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyManager;
@@ -55,26 +62,31 @@ import org.mycore.mcr.acl.accesskey.restapi.v2.annotation.MCRRequireAccessKeyAut
 import org.mycore.mcr.acl.accesskey.restapi.v2.model.MCRAccessKeyInformation;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 import org.mycore.restapi.v2.MCRErrorResponse;
 
 @MCRApiDraft("MCRAccessKey")
 @Path("/objects/{" + PARAM_MCRID + "}/accesskeys")
 public class MCRRestAccessKey {
 
+    private static final String VALUE = "value";
+
     @Context
     UriInfo uriInfo;
 
-
-    private static final String VALUE = "value";
-
-    private WebApplicationException getUnknownObjectException() {
-        return MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-            .withMessage("Object doesn't exists!")
-            .withErrorCode("objectNotFound")
-            .toException();
-    }
-    
     @GET
+    @Operation(
+        summary = "Lists all access keys for the given object",
+        responses = {
+            @ApiResponse(responseCode = "200", content = {@Content(mediaType = MediaType.APPLICATION_JSON,
+                array = @ArraySchema(schema = @Schema(implementation = MCRAccessKey.class)))}),
+            @ApiResponse(responseCode = "401",
+                description = "You do not have create permission and need to authenticate first",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+            @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID,
+                description = MCRObjectIDParamConverterProvider.MSG_INVALID,
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+        })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKeys(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
@@ -83,7 +95,6 @@ public class MCRRestAccessKey {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
-        final long fromIndex = offset;
         final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.getAccessKeys(objectId);
         final List<MCRAccessKey> accessKeysResult = accessKeys.stream()
             .skip(offset)
@@ -94,6 +105,18 @@ public class MCRRestAccessKey {
 
     @GET
     @Path("/{" + VALUE + "}")
+    @Operation(
+        summary = "Get access key for the given object with id",
+        responses = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                schema = @Schema(implementation = MCRAccessKey.class))),
+            @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID,
+                description = MCRObjectIDParamConverterProvider.MSG_INVALID,
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+            @ApiResponse(responseCode = "401",
+                description = "You do not have create permission and need to authenticate first",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+        })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
@@ -103,13 +126,26 @@ public class MCRRestAccessKey {
         }
         final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyByValue(objectId, value);
         if (accessKey != null) {
-            throw new MCRAccessKeyNotFoundException("Key does not exists.");
-        } else {
             return Response.ok(accessKey).build();
         }
+        throw new MCRAccessKeyNotFoundException("Key does not exists.");
     }
 
     @POST
+    @Operation(
+        summary = "Create MCRAccessKey",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "MCRAccessKey successfully created",
+                headers = @Header(name = HttpHeaders.LOCATION)),
+            @ApiResponse(responseCode = "400", description = "Invalid type or invalid value",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+            @ApiResponse(responseCode = "401",
+                description = "You do not have create permission and need to authenticate first",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+        })
+    @RequestBody(required = true,
+        content = @Content(mediaType = MediaType.APPLICATION_JSON,
+            schema = @Schema(implementation = MCRAccessKey.class)))
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
@@ -130,6 +166,21 @@ public class MCRRestAccessKey {
     
     @PUT
     @Path("/{" + VALUE + "}")
+    @Operation(
+        summary = "Update MCRAccessKey",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "MCRAccessKey successfully updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request. Check type, values.",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+            @ApiResponse(responseCode = "401",
+                description = "You do not have create permission and need to authenticate first",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+            @ApiResponse(responseCode = "404", description = "ObjectID or MCRAccessKey doesn't exists",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+        })
+    @RequestBody(required = true,
+        content = @Content(mediaType = MediaType.APPLICATION_JSON,
+            schema = @Schema(implementation = MCRAccessKey.class)))
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
@@ -148,6 +199,19 @@ public class MCRRestAccessKey {
 
     @DELETE
     @Path("/{" + VALUE + "}")
+    @Operation(
+        summary = "Deletes MCRAccessKey",
+        responses = {
+            @ApiResponse(responseCode = "204", description = "MCRAccessKey successfully deleted"),
+            @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID,
+                description = MCRObjectIDParamConverterProvider.MSG_INVALID,
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+            @ApiResponse(responseCode = "401",
+                description = "You do not have create permission and need to authenticate first",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+            @ApiResponse(responseCode = "404", description = "ObjectID or MCRAccessKey doesn't exists",
+                content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
+        })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
@@ -158,6 +222,13 @@ public class MCRRestAccessKey {
         }
         MCRAccessKeyManager.deleteAccessKey(objectId, value);
         return Response.noContent().build();
+    }
+
+    private WebApplicationException getUnknownObjectException() {
+        return MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
+            .withMessage("Object doesn't exists!")
+            .withErrorCode("objectNotFound")
+            .toException();
     }
 
 }
