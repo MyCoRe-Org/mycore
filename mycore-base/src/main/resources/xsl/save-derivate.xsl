@@ -38,7 +38,8 @@
   <mycorederivate>
     <xsl:copy-of select="mycorederivate/@ID" />
     <xsl:copy-of select="mycorederivate/@label" />
-    <xsl:copy-of select="mycoreobject/@version" />
+    <xsl:copy-of select="mycorederivate/@version" />
+    <xsl:copy-of select="mycorederivate/@order" />
     <xsl:copy-of select="mycorederivate/@xsi:noNamespaceSchemaLocation" />
     <derivate>
       <xsl:if test="mycorederivate/derivate/linkmetas">
@@ -57,6 +58,9 @@
           </xsl:for-each>
         </xsl:copy>
       </xsl:for-each>
+      <xsl:if test="mycorederivate/derivate/classifications">
+        <xsl:copy-of select="mycorederivate/derivate/classifications" />
+      </xsl:if>
     </derivate>
     <service>
       <xsl:copy-of select="mycorederivate/service/*" />
