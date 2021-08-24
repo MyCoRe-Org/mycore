@@ -27,7 +27,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.MCRAccessKeyUserUtils;
+import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 /**
@@ -44,14 +44,14 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             MCRObjectID objectId = MCRObjectID.getInstance(id);
             if (objectId.getTypeId().equals("derivate")) {
                 LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
-                MCRAccessKey accessKey = MCRAccessKeyUserUtils.getAccessKey(objectId);
+                MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
                 if (accessKey != null) {
                     return checkPermission(permission, accessKey);
                 }
                 objectId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
             }
             LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
-            final MCRAccessKey accessKey = MCRAccessKeyUserUtils.getAccessKey(objectId);
+            final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
             if (accessKey != null) {
                 return checkPermission(permission, accessKey);
             }

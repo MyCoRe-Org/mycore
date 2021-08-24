@@ -33,7 +33,7 @@ import org.mycore.user2.MCRUserManager;
 /**
  * Methods for setting and removing {@link MCRAccessKey} for users.
  */
-public class MCRAccessKeyUserUtils {
+public class MCRAccessKeyUtils {
 
     /**
      * Prefix for user attribute name for value
@@ -47,7 +47,7 @@ public class MCRAccessKeyUserUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
-    public static synchronized void addAccessKey(final MCRObjectID objectId, final String value) 
+    public static synchronized void addAccessKeyToCurrentUser(final MCRObjectID objectId, final String value) 
         throws MCRException {
         final MCRUser user = MCRUserManager.getCurrentUser();
         addAccessKey(user, objectId, value);
@@ -82,7 +82,7 @@ public class MCRAccessKeyUserUtils {
      *
      * @param objectId the {@link MCRObjectID}
      */
-    public static synchronized void deleteAccessKey(final MCRObjectID objectId) {
+    public static synchronized void deleteAccessKeyFromCurrentUser(final MCRObjectID objectId) {
         deleteAccessKey(MCRUserManager.getCurrentUser(), objectId);
     }
 
@@ -106,7 +106,7 @@ public class MCRAccessKeyUserUtils {
      * @param objectId the {@link MCRObjectID}
      * @return value or null
      */
-    public static synchronized String getUserAccessKeyValue(final MCRUserInformation userInformation, 
+    public static synchronized String getAccessKeyValue(final MCRUserInformation userInformation, 
         final MCRObjectID objectId) {
         return userInformation.getUserAttribute(ACCESS_KEY_PREFIX + objectId.toString());
     }
@@ -117,8 +117,23 @@ public class MCRAccessKeyUserUtils {
      * @param objectId the {@link MCRObjectID}
      * @return value or null
      */
-    public static synchronized String getUserAccessKeyValue(final MCRObjectID objectId) {
-        return getUserAccessKeyValue(MCRSessionMgr.getCurrentSession().getUserInformation(), objectId);
+    public static synchronized String getAccessKeyValueFromCurrentUser(final MCRObjectID objectId) {
+        return getAccessKeyValue(MCRSessionMgr.getCurrentSession().getUserInformation(), objectId);
+    }
+
+    /**
+     * Fetches access key from user for a {@link MCRObjectID}.
+     *
+     * @param user the {@link MCRUser}
+     * @param objectId the {@link MCRObjectID}
+     * @return {@link MCRAccessKey} or null
+     */
+    public static synchronized MCRAccessKey getAccessKeyFromUser(final MCRUser user, final MCRObjectID objectId) {
+        final String userKey = getAccessKeyValue(user, objectId);
+        if (userKey != null) {
+            return MCRAccessKeyManager.getAccessKeyByValue(objectId, userKey);
+        }
+        return null;
     }
 
     /**
@@ -127,11 +142,7 @@ public class MCRAccessKeyUserUtils {
      * @param objectId the {@link MCRObjectID}
      * @return {@link MCRAccessKey} or null
      */
-    public static synchronized MCRAccessKey getAccessKey(final MCRObjectID objectId) {
-        final String userKey = getUserAccessKeyValue(objectId);
-        if (userKey != null) {
-            return MCRAccessKeyManager.getAccessKeyByValue(objectId, userKey);
-        }
-        return null;
+    public static synchronized MCRAccessKey getAccessKeyFromCurrentUser(final MCRObjectID objectId) {
+        return getAccessKeyFromUser(MCRUserManager.getCurrentUser(), objectId);
     }
 }
