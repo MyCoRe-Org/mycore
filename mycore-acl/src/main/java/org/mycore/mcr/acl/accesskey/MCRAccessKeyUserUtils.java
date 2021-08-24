@@ -23,6 +23,7 @@ package org.mycore.mcr.acl.accesskey;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
@@ -64,7 +65,7 @@ public class MCRAccessKeyUserUtils {
         throws MCRException {
 
         final String encryptedValue = MCRAccessKeyManager.encryptValue(value, objectId);
-        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyByValue(objectId, value);
+        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyByValue(objectId, encryptedValue);
         if (accessKey == null) {
             throw new MCRAccessKeyNotFoundException("Key does not exists.");
         }
@@ -101,12 +102,23 @@ public class MCRAccessKeyUserUtils {
     /**
      * Fetches access key value from user attribute for a {@link MCRObjectID}.
      *
+     * @param userInformation the {@link MCRUserInformation}
      * @param objectId the {@link MCRObjectID}
      * @return value or null
      */
-    public static synchronized String getUserAccessKeyValue(MCRObjectID objectId) {
-        return MCRSessionMgr.getCurrentSession().getUserInformation()
-            .getUserAttribute(ACCESS_KEY_PREFIX + objectId.toString());
+    public static synchronized String getUserAccessKeyValue(final MCRUserInformation userInformation, 
+        final MCRObjectID objectId) {
+        return userInformation.getUserAttribute(ACCESS_KEY_PREFIX + objectId.toString());
+    }
+
+    /**
+     * Fetches access key value from user attribute for a {@link MCRObjectID}.
+     *
+     * @param objectId the {@link MCRObjectID}
+     * @return value or null
+     */
+    public static synchronized String getUserAccessKeyValue(final MCRObjectID objectId) {
+        return getUserAccessKeyValue(MCRSessionMgr.getCurrentSession().getUserInformation(), objectId);
     }
 
     /**
@@ -115,7 +127,7 @@ public class MCRAccessKeyUserUtils {
      * @param objectId the {@link MCRObjectID}
      * @return {@link MCRAccessKey} or null
      */
-    public static synchronized MCRAccessKey getAccessKey(MCRObjectID objectId) {
+    public static synchronized MCRAccessKey getAccessKey(final MCRObjectID objectId) {
         final String userKey = getUserAccessKeyValue(objectId);
         if (userKey != null) {
             return MCRAccessKeyManager.getAccessKeyByValue(objectId, userKey);
