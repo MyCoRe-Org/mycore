@@ -45,8 +45,8 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             if (objectId.getTypeId().equals("derivate")) {
                 LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
                 MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
-                if (accessKey != null) {
-                    return checkPermission(permission, accessKey);
+                if (accessKey != null && checkPermission(permission, accessKey)) {
+                    return true;
                 }
                 objectId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
             }
