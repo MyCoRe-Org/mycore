@@ -58,15 +58,18 @@ export default new class MCRAccessKeyServicePlugin {
       const exception: MCRException = {};
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          if (error.response.status == 401) {
+          if (error.response.status == 401 || error.response.status == 403) {
             exception.errorCode = "noPermission";
           } else if (error.response.status >= 500) {
              exception.errorCode = "server";
           } else {
             const errorResponse: MCRErrorResponse = error.response.data as MCRErrorResponse;
-            if (errorResponse.errorCode != null) {
-              exception.errorCode = errorResponse.errorCode;
-              exception.message = errorResponse.message;
+            const errorCode = errorResponse.errorCode;
+            if (errorCode != null) {
+              if (errorCode != "UNKNOWN") {
+                  exception.errorCode = errorResponse.errorCode;
+                  exception.message = errorResponse.message;
+              }
             }
           }
         } else if (error.request) {
