@@ -119,6 +119,7 @@ export function getLocale(): string {
   }
 }
 
+
 export function getIsSessionEnabled(): boolean {
   return window.accessKeySession != "false" ? false : true;
 }
@@ -130,5 +131,4 @@ const locale = getLocale();
 const isSessionEnabled = getIsSessionEnabled();
 
 export { webApplicationBaseURL, objectID, parentID, locale, isSessionEnabled }
-
 
