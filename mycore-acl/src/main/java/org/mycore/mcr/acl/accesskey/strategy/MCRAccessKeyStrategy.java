@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
@@ -39,6 +40,10 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final String CONFIG_KEY = "MCR.AccessKey.Session";
+
+    private static boolean sessionEnabled = MCRConfiguration2.getBoolean(CONFIG_KEY).orElse(false);
     
     @Override
     public boolean checkPermission(String id, String permission) {
@@ -64,15 +69,32 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             MCRObjectID objectId = MCRObjectID.getInstance(id);
             if (objectId.getTypeId().equals("derivate")) {
                 LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
-                MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
+                if (sessionEnabled) {
+                    final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
+                    if (accessKey != null && checkPermission(permission, accessKey)) {
+                        LOGGER.debug("found valid access key in session");
+                        return true;
+                    }
+                }
+                final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
                 if (accessKey != null && checkPermission(permission, accessKey)) {
+                    LOGGER.debug("found valid access key in user attribute");
                     return true;
                 }
                 objectId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
             }
             LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
+
+            if (sessionEnabled) {
+                final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
+                if (accessKey != null && checkPermission(permission, accessKey)) {
+                    LOGGER.debug("found valid access key in session");
+                    return true;
+                }
+            }
             final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
             if (accessKey != null) {
+                LOGGER.debug("found valid access key in user attribute");
                 return checkPermission(permission, accessKey);
             }
         }
