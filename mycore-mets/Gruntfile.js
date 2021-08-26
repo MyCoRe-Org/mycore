@@ -148,7 +148,7 @@ module.exports = function (grunt) {
         },
         jasmine: { // runs javascript unit Tests
             options: {
-                version: '3.8.0'
+                version: "3.8.0"
             },
             pivotal: {
                 src: ['<%= properties.webVisiblePath %>/shared/angular/angular.js',
