@@ -21,12 +21,11 @@
 package org.mycore.mcr.acl.accesskey.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 
 import java.util.Map;
 
 import org.junit.Test;
-
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -46,9 +45,9 @@ public class MCRAccessKeyTest extends MCRTestCase {
     @Test
     public void testKey() {
         final MCRAccessKey accessKey = 
-            new MCRAccessKey(MCRObjectID.getInstance(MCR_OBJECT_ID), READ_KEY, MCRAccessManager.PERMISSION_READ);
+            new MCRAccessKey(MCRObjectID.getInstance(MCR_OBJECT_ID), READ_KEY, PERMISSION_READ);
         assertEquals(MCR_OBJECT_ID, accessKey.getObjectId().toString());
         assertEquals(READ_KEY, accessKey.getValue());
-        assertEquals(MCRAccessManager.PERMISSION_READ, accessKey.getType());
+        assertEquals(PERMISSION_READ, accessKey.getType());
     }
 }

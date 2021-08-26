@@ -20,6 +20,9 @@
 
 package org.mycore.mcr.acl.accesskey;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -29,7 +32,6 @@ import javax.persistence.EntityManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
@@ -74,8 +76,7 @@ public final class MCRAccessKeyManager {
      * @return true if valid or false
      */
     public static boolean isValidType(String type) {
-        return (type.equals(MCRAccessManager.PERMISSION_READ)
-            || type.equals(MCRAccessManager.PERMISSION_WRITE));
+        return (type.equals(PERMISSION_READ) || type.equals(PERMISSION_WRITE));
     }
 
     /**

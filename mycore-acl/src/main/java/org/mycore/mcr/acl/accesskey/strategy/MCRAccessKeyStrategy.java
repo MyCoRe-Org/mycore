@@ -18,12 +18,15 @@
 
 package org.mycore.mcr.acl.accesskey.strategy;
 
+import static org.mycore.access.MCRAccessManager.PERMISSION_PREVIEW;
+import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
+import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
+import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
+
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import org.mycore.access.MCRAccessManager;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -39,8 +42,25 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
     
     @Override
     public boolean checkPermission(String id, String permission) {
-        if ((MCRAccessManager.PERMISSION_WRITE.equals(permission) 
-            || MCRAccessManager.PERMISSION_READ.equals(permission)) && MCRObjectID.isValid(id)) {
+        if (PERMISSION_WRITE.equals(permission) || PERMISSION_READ.equals(permission)) {
+            return checkFullObjectPermission(id, permission);
+        } else if (PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission)) {
+            LOGGER.debug("mapped permission to read");
+            return checkFullObjectPermission(id, PERMISSION_READ);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Checks full object and derivate permission including derivate parent
+     *
+     * @param id of a {@link MCRObjectID}
+     * @param permission permission type
+     * @return true if permitted, otherwise false
+     */
+    private boolean checkFullObjectPermission(final String id, final String permission) {
+        if (MCRObjectID.isValid(id)) {
             MCRObjectID objectId = MCRObjectID.getInstance(id);
             if (objectId.getTypeId().equals("derivate")) {
                 LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
@@ -67,9 +87,9 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      * @return true if permitted, otherwise false
      */
     private boolean checkPermission(String permission, MCRAccessKey accessKey) {
-        if ((permission.equals(MCRAccessManager.PERMISSION_READ) 
-            && accessKey.getType().equals(MCRAccessManager.PERMISSION_READ)) 
-            || accessKey.getType().equals(MCRAccessManager.PERMISSION_WRITE)) {
+        if ((permission.equals(PERMISSION_READ) 
+            && accessKey.getType().equals(PERMISSION_READ)) 
+            || accessKey.getType().equals(PERMISSION_WRITE)) {
             LOGGER.debug("Access granted. User has a key to access the resource {}.",
                 accessKey.getObjectId().toString());
             return true;
@@ -85,10 +105,16 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      * @param accessKey the {@link MCRAccessKey}
      * @return true if permitted, otherwise false
      */
-    public boolean checkPermission(String id, String permission, MCRAccessKey accessKey) {
-        LOGGER.debug("check object {} permission {}.", id, permission);
-        if (MCRObjectID.isValid(id) && id.equals(accessKey.getObjectId().toString())) {
-            return checkPermission(permission, accessKey);
+    public boolean checkObjectPermission(String id, String permission, MCRAccessKey accessKey) {
+        if ((PERMISSION_WRITE.equals(permission) || PERMISSION_READ.equals(permission)
+            || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
+            && MCRObjectID.isValid(id) && id.equals(accessKey.getObjectId().toString())) {
+            if (PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission)) {
+                LOGGER.debug("mapped permission to read");
+                return checkPermission(PERMISSION_READ, accessKey);
+            } else {
+                return checkPermission(permission, accessKey);
+            }
         }
         return false;
     }

@@ -74,7 +74,6 @@ public class MCRAccessKeyUtils {
         MCRUserManager.updateUser(user);
 
         MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-        MCRSessionMgr.getCurrentSession().setUserInformation(user.clone());
     }
 
     /**
@@ -128,7 +127,7 @@ public class MCRAccessKeyUtils {
      * @param objectId the {@link MCRObjectID}
      * @return {@link MCRAccessKey} or null
      */
-    public static synchronized MCRAccessKey getAccessKeyFromUser(final MCRUser user, final MCRObjectID objectId) {
+    public static synchronized MCRAccessKey getAccessKey(final MCRUser user, final MCRObjectID objectId) {
         final String userKey = getAccessKeyValue(user, objectId);
         if (userKey != null) {
             return MCRAccessKeyManager.getAccessKeyByValue(objectId, userKey);
@@ -143,6 +142,6 @@ public class MCRAccessKeyUtils {
      * @return {@link MCRAccessKey} or null
      */
     public static synchronized MCRAccessKey getAccessKeyFromCurrentUser(final MCRObjectID objectId) {
-        return getAccessKeyFromUser(MCRUserManager.getCurrentUser(), objectId);
+        return getAccessKey(MCRUserManager.getCurrentUser(), objectId);
     }
 }
