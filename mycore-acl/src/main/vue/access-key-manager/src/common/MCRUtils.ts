@@ -47,15 +47,29 @@ declare global {
     objectID: string; 
     parentID: string;
     currentLang: string; 
+    accessKeySession: string;
   }
 }
 
+export function urlEncode(value: string): string {
+  return btoa(value)
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+}
+
 export async function fetchJWT(webApplicationBaseURL: string, objectID: string,
-  parentID: string): Promise<AxiosResponse> {
+  parentID: string, includeSession: boolean): Promise<AxiosResponse> {
   const params = new URLSearchParams();
   params.append("ua", `acckey_${objectID}`);
   if (parentID) {
     params.append("ua", `acckey_${parentID}`);
+  }
+  if (includeSession) {
+    params.append("sa", `acckey_${objectID}`);
+    if (parentID) {
+      params.append("sa", `acckey_${parentID}`);
+    }
   }
   return await axios.get(`${webApplicationBaseURL}rsc/jwt`, { params });
 }
@@ -105,11 +119,16 @@ export function getLocale(): string {
   }
 }
 
+export function getIsSessionEnabled(): boolean {
+  return window.accessKeySession != "false" ? false : true;
+}
+
 const webApplicationBaseURL = getWebApplicationBaseURL();
 const objectID = getObjectID();
 const parentID = getParentID();
 const locale = getLocale();
+const isSessionEnabled = getIsSessionEnabled();
 
-export { webApplicationBaseURL, objectID, parentID, locale }
+export { webApplicationBaseURL, objectID, parentID, locale, isSessionEnabled }
 
 
