@@ -75,7 +75,6 @@ export default new class MCRAccessKeyServicePlugin {
       }
       return Promise.reject(exception);
     });
-
     this.instance.defaults.headers.common['Authorization'] = `Bearer ${options.token}`;
   }
 

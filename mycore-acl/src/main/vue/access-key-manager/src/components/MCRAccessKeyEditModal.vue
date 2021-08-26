@@ -392,9 +392,9 @@
     private async handleException(e: MCRException): Promise<void> {
       const errorCode: string = e.errorCode;
       if (errorCode != null) {
-        if (errorCode == "collision") {
+        if (errorCode.endsWith("collision")) {
           this.inputValueFeedback = this.$t("mcr.accessKey.text.error.collision");
-        } else if (errorCode == "unknownKey" || errorCode == "unknownObject"){
+        } else if (errorCode.endsWith("unknownKey") || errorCode.endsWith("unknownObject")){
           this.$emit("inconsistency");
           this.close();
         } else {

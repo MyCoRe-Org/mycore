@@ -26,6 +26,6 @@ package org.mycore.mcr.acl.accesskey.exception;
  */
 public class MCRAccessKeyCollisionException extends MCRAccessKeyException {
     public MCRAccessKeyCollisionException(String errorMessage) {
-        super(errorMessage, "collision");
+        super(errorMessage, "mcr.accessKey.error.collision");
     }
 }
