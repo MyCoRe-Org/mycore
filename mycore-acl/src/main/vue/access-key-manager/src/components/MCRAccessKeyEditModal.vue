@@ -52,7 +52,7 @@
     </template>
     <b-alert 
       v-model="showAlert"
-      variant="danger"
+      :variant="alertVariant"
       style="text-align: center;"
     >{{ alertMessage }}</b-alert>
     <b-form-group
@@ -262,6 +262,7 @@
     private alertMessage = "";
     private isProcessing = true;
     private inputValueFeedback = "";
+    private alertVariant = "danger";
 
     private get showAlert(): boolean {
       return this.alertMessage.length > 0;
@@ -283,6 +284,32 @@
       this.value = generateRandomString(32);
     }
 
+    private setAccessKey(accessKey: MCRAccessKey): void {
+      this.id = accessKey.value;
+      this.selected = accessKey.type;
+      this.comment = accessKey.comment;
+      if (accessKey.creator != null) {
+        this.creator = accessKey.creator;
+      } else {
+        this.creator = "-";
+      }
+      if (accessKey.creation != null) {
+        this.creation = new Date(accessKey.creation).toLocaleString();
+      } else {
+        this.creation = "-";
+      }
+      if (accessKey.lastChanger != null) {
+        this.lastChanger = accessKey.lastChanger;
+      } else {
+        this.lastChanger = "-";
+      }
+      if (accessKey.lastChange != null) {
+        this.lastChange = new Date(accessKey.lastChange).toLocaleString();
+      } else {
+       this.lastChange = "-";
+      }
+    }
+
     public show(accessKey: MCRAccessKey): void {
       this.isProcessing = true;
       if (accessKey == null) {
@@ -292,29 +319,7 @@
         this.comment = "";
         this.inputValueFeedback = null;
       } else {
-        this.id = accessKey.value;
-        this.selected = accessKey.type;
-        this.comment = accessKey.comment;
-        if (accessKey.creator != null) {
-          this.creator = accessKey.creator;
-        } else {
-          this.creator = "-";
-        }
-        if (accessKey.creation != null) {
-          this.creation = new Date(accessKey.creation).toLocaleString();
-        } else {
-          this.creation = "-";
-        }
-        if (accessKey.lastChanger != null) {
-          this.lastChanger = accessKey.lastChanger;
-        } else {
-          this.lastChanger = "-";
-        }
-        if (accessKey.lastChange != null) {
-          this.lastChange = new Date(accessKey.lastChange).toLocaleString();
-        } else {
-         this.lastChange = "-";
-        }
+        this.setAccessKey(accessKey);
       }
       this.alertMessage = "";
       this.$bvModal.show("modal-center");
@@ -358,9 +363,12 @@
       }
       try {
         await this.$client.updateAccessKey(accessKey);
+        this.alertVariant = "success";
+        this.alertMessage = this.$t("mcr.accessKey.success.update");
         const result: MCRAccessKey = await this.$client.getAccessKey(accessKey.value);
+        this.setAccessKey(result);
         this.$emit("update", result);
-        this.close();
+        this.isProcessing = false;
       } catch(error) {
         this.handleException(error);  
       }

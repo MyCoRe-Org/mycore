@@ -248,8 +248,6 @@
       const index = this.accessKeys.findIndex(item => item.value == accessKey.value);
       if (index >= 0) {
         this.$set(this.accessKeys, index, accessKey);
-        this.alertVariant = "success";
-        this.alertMessage = this.$t("mcr.accessKey.success.update", accessKey.value);
       } else {
         this.showFatalError();
       }
