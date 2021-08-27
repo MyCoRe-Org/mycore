@@ -80,7 +80,7 @@ public class MCRAccessKey {
     private MCRObjectID objectId; 
 
     /** The status */
-    private boolean enabled;
+    private Boolean enabled;
 
     /** The key value */
     private String value;
@@ -176,14 +176,14 @@ public class MCRAccessKey {
      */
     @Column(name = "enabled",
         nullable = false)
-    public boolean getEnabled() {
+    public Boolean getEnabled() {
         return enabled;
     }
 
     /**
      * @param enabled the state
      */
-    public void setEnabled(final boolean enabled) {
+    public void setEnabled(final Boolean enabled) {
         this.enabled = enabled;
     }
 

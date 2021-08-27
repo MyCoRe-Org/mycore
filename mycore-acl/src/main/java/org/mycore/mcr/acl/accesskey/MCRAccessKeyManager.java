@@ -140,6 +140,10 @@ public final class MCRAccessKeyManager {
                 accessKey.setLastChanger(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
                 accessKey.setLastChange(new Date());
             }
+            final Boolean enabled = accessKey.getEnabled();
+            if (enabled == null) {
+                accessKey.setEnabled(true);
+            }
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.persist(accessKey);
         } else {
@@ -243,6 +247,14 @@ public final class MCRAccessKeyManager {
             }
             MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
             accessKey.setType(type);
+        }
+        final Boolean enabled = updatedAccessKey.getEnabled();
+        if (enabled != null) {
+            accessKey.setEnabled(enabled);
+        }
+        final Date expiration = updatedAccessKey.getExpiration();
+        if (expiration != null) {
+            accessKey.setExpiration(expiration);
         }
         final String comment = updatedAccessKey.getComment();
         if (comment != null) {
