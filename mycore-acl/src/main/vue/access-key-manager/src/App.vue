@@ -243,8 +243,8 @@
       this.alertVariant = "success";
       this.alertMessage = this.$t("mcr.accessKey.success.add", accessKey.value, value);
       if (isSessionEnabled) {
-        this.alertMessage += " " + this.$t("mcr.accessKey.success.add.url", 
-          webApplicationBaseURL, objectID, urlEncode(value));
+        this.alertMessage += ` ${this.$t("mcr.accessKey.success.add.url")} ` +
+          this.$t("mcr.accessKey.success.add.url.format", webApplicationBaseURL, objectID, urlEncode(value));
       }
     }
 
