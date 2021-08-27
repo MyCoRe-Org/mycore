@@ -79,11 +79,17 @@ public class MCRAccessKey {
     /** The access key information */
     private MCRObjectID objectId; 
 
+    /** The status */
+    private boolean enabled;
+
     /** The key value */
     private String value;
 
     /** The permission type */
     private String type;
+
+    /** The expiration date* */
+    private Date expiration;
 
     /** The comment */
     private String comment;
@@ -166,6 +172,22 @@ public class MCRAccessKey {
     }
 
     /**
+     * @return enabled or not
+     */
+    @Column(name = "enabled",
+        nullable = false)
+    public boolean getEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the state
+     */
+    public void setEnabled(final boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    /**
      * @return the key value
      */
     @Column(name = "value",
@@ -176,7 +198,7 @@ public class MCRAccessKey {
 
     /**
      * @param value key value
-    */
+     */
     public void setValue(final String value) {
         this.value = value;
     }
@@ -195,6 +217,22 @@ public class MCRAccessKey {
      */
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * @return expiration date
+     */
+    @Column(name = "expiration",
+        nullable = true)
+    public Date getExpiration() {
+        return expiration;
+    }
+
+    /**
+     * @param expiration the expiration date
+     */
+    public void setExpiration(final Date expiration) {
+        this.expiration = expiration;
     }
 
     /**
