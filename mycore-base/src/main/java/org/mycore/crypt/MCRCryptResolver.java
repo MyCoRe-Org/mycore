@@ -23,7 +23,6 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 
-import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;

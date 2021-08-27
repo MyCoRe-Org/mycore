@@ -22,8 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 
-import java.util.Optional;
-
 /**
  * MCR.Crypt.Cipher.id1.Class=org.mycore.crypt.MCRAESCipher
  * MCR.Crypt.Cipher.id1.KeyFile=example_1.secret
@@ -41,9 +39,6 @@ public class MCRCipherFactory {
                         "Property " + propertiy + "not configured or class not found."
                         )
                 );
-        //if (cipher.isEmpty()) {
-        //    throw new MCRCryptCipherConfigurationException ( "Property " + propertiy + " not configured or class not found.");
-        //}
         if (! cipher.isInitialised()) { 
             LOGGER.debug("init Cipher for id {} .", id );
             cipher.init(id);
@@ -60,9 +55,6 @@ public class MCRCipherFactory {
                         "Property " + propertiy + "not configured or class not found."
                         )
                 );
-        //if (cipher.isEmpty()) {
-        //    throw new MCRCryptCipherConfigurationException ( "Property " + propertiy + " not configured or class not found.");
-        //}
         cipher.reset();
         return cipher;
     }

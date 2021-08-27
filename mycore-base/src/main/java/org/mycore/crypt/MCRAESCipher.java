@@ -30,7 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.FileSystems;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.StandardOpenOption; 
-import java.util.Optional;
 import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
 import javax.crypto.BadPaddingException;
@@ -111,7 +110,7 @@ public class MCRAESCipher extends MCRCipher {
         } catch (NoSuchAlgorithmException e) {
             throw new MCRException("Error while generating keyfile.", e);
         } catch (FileAlreadyExistsException e) {
-            throw new FileAlreadyExistsException( keyFile, null, " A cryptKey shouldn't generated if it allready exists.");
+            throw new FileAlreadyExistsException(keyFile,null,"A cryptKey shouldn't generated if it allready exists.");
         } catch (IOException e) {
             throw new MCRException("Error while write key to file.", e);
         }
@@ -167,7 +166,7 @@ public class MCRAESCipher extends MCRCipher {
             byte[] decryptedBytes = decryptCipher.doFinal(bytes);
             return decryptedBytes;
         } catch ( BadPaddingException| IllegalBlockSizeException e ) {
-            throw new MCRCryptCipherConfigurationException("Can't decrypt value - wrong configuration or wrong key.", e);
+            throw new MCRCryptCipherConfigurationException("Can't decrypt value - wrong configuration or wrong key.",e);
         }
     }
 
