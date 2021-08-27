@@ -26,9 +26,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
