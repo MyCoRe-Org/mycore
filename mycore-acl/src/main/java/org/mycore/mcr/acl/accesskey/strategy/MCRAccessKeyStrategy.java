@@ -41,9 +41,9 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String CONFIG_KEY = "MCR.AccessKey.Session";
-
-    private static boolean sessionEnabled = MCRConfiguration2.getBoolean(CONFIG_KEY).orElse(false);
+    private static final String ALLOWED_SESSION_PERMISSION_TYPES = MCRConfiguration2
+        .getString("MCR.AccessKey.Session.AllowedPermissionTypes")
+        .orElse(null);
     
     @Override
     public boolean checkPermission(String id, String permission) {
@@ -69,7 +69,8 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             MCRObjectID objectId = MCRObjectID.getInstance(id);
             if (objectId.getTypeId().equals("derivate")) {
                 LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
-                if (sessionEnabled) {
+                if (ALLOWED_SESSION_PERMISSION_TYPES != null 
+                    && ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
                     final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
                     if (accessKey != null && checkPermission(permission, accessKey)) {
                         LOGGER.debug("found valid access key in session");
@@ -85,7 +86,8 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             }
             LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
 
-            if (sessionEnabled) {
+            if (ALLOWED_SESSION_PERMISSION_TYPES != null 
+                && ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
                 final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
                 if (accessKey != null && checkPermission(permission, accessKey)) {
                     LOGGER.debug("found valid access key in session");

@@ -52,33 +52,33 @@ public class MCRAccessKeyFilter implements Filter {
    
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String CONFIG_KEY = "MCR.AccessKey.Session";
-
-    private boolean enabled = false;
+    private static final String ALLOWED_PERMISSION_TYPES = MCRConfiguration2
+        .getString("MCR.AccessKey.Session.AllowedPermissionTypes")
+        .orElse(null);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        enabled = MCRConfiguration2.getBoolean(CONFIG_KEY).orElse(false);
-        if (enabled) {
-            LOGGER.info("MCRAccessKeyFilter is enabled.");
+        if (ALLOWED_PERMISSION_TYPES != null && ALLOWED_PERMISSION_TYPES.length() > 0) {
+            LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: %s", 
+                ALLOWED_PERMISSION_TYPES);
         }
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        if (enabled) {
+        if (ALLOWED_PERMISSION_TYPES != null && ALLOWED_PERMISSION_TYPES.length() > 0) {
             final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             final MCRObjectID objectId = getMCRObjectID(httpServletRequest);
             if (objectId != null) {
                 String value = httpServletRequest.getParameter("accesskey");
                 if (value != null) {
                     try {
-                        value = new String(Base64.getUrlDecoder().decode(value.getBytes(StandardCharsets.UTF_8)), 
-                            StandardCharsets.UTF_8);
                         MCRServlet.initializeMCRSession(httpServletRequest, getFilterName());
                         MCRFrontendUtil.configureSession(MCRSessionMgr.getCurrentSession(), httpServletRequest, 
                             (HttpServletResponse) response);
+                        value = new String(Base64.getUrlDecoder().decode(value.getBytes(StandardCharsets.UTF_8)), 
+                            StandardCharsets.UTF_8);
                         MCRAccessKeyUtils.addAccessKeyToCurrentSession(objectId, value);
                     } catch (Exception e) {
                         MCRTransactionHelper.rollbackTransaction();

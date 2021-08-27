@@ -67,7 +67,7 @@ public class MCRAccessKeyStrategyTest extends MCRStoreTestCase {
         testProperties
             .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
         testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-        testProperties.put("MCR.AccessKey.Session", "true");
+        testProperties.put("MCR.AccessKey.Session.AllowedPermissionTypes", "read");
         testProperties.put("MCR.Metadata.Type.document", "true");
         testProperties.put("MCR.Metadata.Type.object", Boolean.TRUE.toString());
         testProperties.put("MCR.Metadata.Type.derivate", Boolean.TRUE.toString());
@@ -155,16 +155,16 @@ public class MCRAccessKeyStrategyTest extends MCRStoreTestCase {
         assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_DELETE));
         assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_WRITE));
 
-        MCRAccessKeyUtils.addAccessKeyToCurrentSession(object.getId(), WRITE_VALUE);
+        MCRAccessKeyUtils.addAccessKeyToCurrentSession(object.getId(), WRITE_VALUE); //test filter
 
         assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
-        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_WRITE));
         assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_DELETE));
         assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_PREVIEW));
         assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_VIEW));
 
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_READ));
-        assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_WRITE));
         assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_DELETE));
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_PREVIEW));
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_VIEW));
@@ -253,7 +253,7 @@ public class MCRAccessKeyStrategyTest extends MCRStoreTestCase {
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_READ));
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_PREVIEW));
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_VIEW));
-        assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_WRITE));
         assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_DELETE));
     }
     
@@ -301,18 +301,30 @@ public class MCRAccessKeyStrategyTest extends MCRStoreTestCase {
         MCRUser user = new MCRUser("junit");
         MCRSessionMgr.getCurrentSession().setUserInformation(user);
 
-        final MCRAccessKey readKey = new MCRAccessKey(derivate.getId(), READ_VALUE, PERMISSION_READ);
-        MCRAccessKeyManager.addAccessKey(readKey);
         final MCRAccessKey writeKey = new MCRAccessKey(derivate.getId(), WRITE_VALUE, PERMISSION_WRITE);
         MCRAccessKeyManager.addAccessKey(writeKey);
 
-        MCRAccessKeyUtils.addAccessKeyToCurrentUser(derivate.getId(), READ_VALUE);
         MCRAccessKeyUtils.addAccessKeyToCurrentSession(derivate.getId(), WRITE_VALUE);
+
+        assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_READ));
+        assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_PREVIEW));
+        assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_VIEW));
+        assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_DELETE));
+
+
+        final MCRAccessKey writeKey2 = new MCRAccessKey(derivate.getId(), READ_VALUE, PERMISSION_WRITE);
+        MCRAccessKeyManager.addAccessKey(writeKey2);
+
+        MCRAccessKeyUtils.addAccessKeyToCurrentUser(derivate.getId(), READ_VALUE);
 
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_READ));
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_PREVIEW));
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_VIEW));
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_WRITE));
         assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_DELETE));
+
+
+
     }
 }
