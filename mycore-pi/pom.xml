@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2021.08</version>
+    <version>2021.11-SNAPSHOT</version>
   </parent>
   <artifactId>mycore-pi</artifactId>
   <name>MyCoRe Persistent Identifier</name>
