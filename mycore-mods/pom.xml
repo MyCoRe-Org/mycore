@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2021.08-SNAPSHOT</version>
+    <version>2021.08</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-mods</artifactId>
