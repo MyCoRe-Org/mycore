@@ -250,10 +250,12 @@ public final class MCRAccessKeyManager {
         }
         final Boolean enabled = updatedAccessKey.getEnabled();
         if (enabled != null) {
+            MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
             accessKey.setEnabled(enabled);
         }
         final Date expiration = updatedAccessKey.getExpiration();
         if (expiration != null) {
+            MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
             accessKey.setExpiration(expiration);
         }
         final String comment = updatedAccessKey.getComment();

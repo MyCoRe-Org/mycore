@@ -26,6 +26,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.junit.After;
@@ -171,6 +172,71 @@ public class MCRAccessKeyStrategyTest extends MCRStoreTestCase {
     }
 
     @Test
+    public void testEnabled() {
+        final MCRUser user = new MCRUser("junit");
+        MCRSessionMgr.getCurrentSession().setUserInformation(user);
+
+        final MCRAccessKey writeKey = new MCRAccessKey(object.getId(), WRITE_VALUE, PERMISSION_WRITE);
+        MCRAccessKeyManager.addAccessKey(writeKey);
+        MCRAccessKeyUtils.addAccessKeyToCurrentUser(object.getId(), WRITE_VALUE);
+
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_DELETE));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_PREVIEW));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_VIEW));
+
+        writeKey.setEnabled(false);
+        MCRAccessKeyManager.updateAccessKey(writeKey);
+        System.out.println(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_DELETE));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_PREVIEW));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_VIEW));
+
+        writeKey.setEnabled(true);
+        MCRAccessKeyManager.updateAccessKey(writeKey);
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_DELETE));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_PREVIEW));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_VIEW));
+    }
+
+    @Test
+    public void testExpiration() {
+        final MCRUser user = new MCRUser("junit");
+        MCRSessionMgr.getCurrentSession().setUserInformation(user);
+
+        final MCRAccessKey writeKey = new MCRAccessKey(object.getId(), WRITE_VALUE, PERMISSION_WRITE);
+        MCRAccessKeyManager.addAccessKey(writeKey);
+        MCRAccessKeyUtils.addAccessKeyToCurrentUser(object.getId(), WRITE_VALUE);
+
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_DELETE));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_PREVIEW));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_VIEW));
+
+        writeKey.setExpiration(new Date()); //now
+        MCRAccessKeyManager.updateAccessKey(writeKey);
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_DELETE));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_PREVIEW));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_VIEW));
+
+        writeKey.setExpiration(new Date(new Date().getTime() + (1000 * 60 * 60 * 24))); //tomorrow
+        MCRAccessKeyManager.updateAccessKey(writeKey);
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_WRITE));
+        assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_DELETE));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_PREVIEW));
+        assertTrue(strategy.checkPermission(OBJECT_ID, PERMISSION_VIEW));
+    }
+
+    @Test
     public void testObjectUser() {
         final MCRUser user = new MCRUser("junit");
         MCRSessionMgr.getCurrentSession().setUserInformation(user);
@@ -312,7 +378,6 @@ public class MCRAccessKeyStrategyTest extends MCRStoreTestCase {
         assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_WRITE));
         assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_DELETE));
 
-
         final MCRAccessKey writeKey2 = new MCRAccessKey(derivate.getId(), READ_VALUE, PERMISSION_WRITE);
         MCRAccessKeyManager.addAccessKey(writeKey2);
 
@@ -323,8 +388,6 @@ public class MCRAccessKeyStrategyTest extends MCRStoreTestCase {
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_VIEW));
         assertTrue(strategy.checkPermission(DERIVATE_ID, PERMISSION_WRITE));
         assertFalse(strategy.checkPermission(DERIVATE_ID, PERMISSION_DELETE));
-
-
 
     }
 }

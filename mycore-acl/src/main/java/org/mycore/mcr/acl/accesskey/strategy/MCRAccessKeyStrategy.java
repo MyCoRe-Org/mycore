@@ -113,6 +113,13 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
      * @return true if permitted, otherwise false
      */
     private boolean checkPermission(String permission, MCRAccessKey accessKey) {
+        if (!Boolean.TRUE.equals(accessKey.getEnabled())) {
+            return false;
+        }
+        final Date expiration = accessKey.getExpiration();
+        if (expiration != null && new Date().after(expiration)) {
+            return false;
+        }
         if ((permission.equals(PERMISSION_READ) 
             && accessKey.getType().equals(PERMISSION_READ)) 
             || accessKey.getType().equals(PERMISSION_WRITE)) {

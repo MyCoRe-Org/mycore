@@ -104,6 +104,21 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
     }
 
     @Test
+    public void testUpdateEnabled() throws MCRException {
+        MCRAccessKey accessKey = new MCRAccessKey(objectId, READ_KEY, PERMISSION_READ);
+        MCRAccessKeyManager.addAccessKey(accessKey);
+        accessKey.setValue(MCRAccessKeyManager.encryptValue(READ_KEY, objectId));
+        accessKey.setEnabled(false);
+        MCRAccessKeyManager.updateAccessKey(accessKey);
+        accessKey = MCRAccessKeyManager.getAccessKeys(objectId).get(0);
+        assertEquals(accessKey.getEnabled(), false);
+        accessKey.setEnabled(true);
+        MCRAccessKeyManager.updateAccessKey(accessKey);
+        accessKey = MCRAccessKeyManager.getAccessKeys(objectId).get(0);
+        assertEquals(accessKey.getEnabled(), true);
+    }
+
+    @Test
     public void testDeleteKey() throws MCRException {
         final MCRAccessKey accessKey = new MCRAccessKey(objectId, READ_KEY, PERMISSION_READ);
         MCRAccessKeyManager.addAccessKey(accessKey);
