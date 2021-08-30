@@ -107,6 +107,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <packages>org.mycore.access*</packages>
               </group>
               <group>
+                <title>MyCoRe ACL</title>
+                <packages>org.mycore.mcr.acl*</packages>
+              </group>
+              <group>
                 <title>MyCoRe Persistence Backend Implementations</title>
                 <packages>org.mycore.backend*</packages>
               </group>
@@ -642,6 +646,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <group>
                   <title>MyCoRe Authorization System</title>
                   <packages>org.mycore.access*</packages>
+                </group>
+                <group>
+                  <title>MyCoRe ACL</title>
+                  <packages>org.mycore.mcr.acl*</packages>
                 </group>
                 <group>
                   <title>MyCoRe Persistence Backend Implementations</title>
@@ -1222,6 +1230,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>1.13.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-acl</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
@@ -2156,6 +2169,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
   </developers>
   <modules>
     <module>mycore-base</module>
+    <module>mycore-acl</module>
     <module>mycore-acl-editor2</module>
     <module>mycore-classbrowser</module>
     <module>mycore-classeditor</module>
