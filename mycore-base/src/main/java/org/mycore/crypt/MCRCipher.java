@@ -22,15 +22,55 @@ import java.nio.file.FileAlreadyExistsException;
 
 import org.mycore.access.MCRAccessManager;
 
+/**
+ * Abstract class of a concrete cipherimplementation
+ * 
+ * After checking the permission call the encrypt an decrypt
+ * functionality. The permission is set by acl.
+ * 
+ * Example for chipher with id abstract:
+ * crypt:abstract   {encrypt:decrypt}   "administrators only"
+ *  
+ * @author Paul Borchert
+ *
+ */
 
 public abstract class MCRCipher {
     
     protected String cipherID;
     
-    abstract public void init(String id);
+    /**
+     * Initialize the chipher by reading the key from file. If the cipher can't initialized an exception
+     * will thrown. Common issue is an missing key. In this case the methods throws 
+     * a MCRCryptKeyFileNotFoundException.
+     * 
+     * Needs the id of cipher as parameter, because the id can't be set during 
+     * instanciating by getSingleInstanceOf.  
+     * 
+     * @param id ID of cipher as configured
+     */
+    abstract public void init(String id) throws MCRCryptKeyFileNotFoundException;
+    
+    /**
+     * Return whether cipher has been initialized. 
+     */
     abstract public boolean isInitialised();
+    
+    /**
+     * Revert init process. 
+     */
     abstract public void reset();
+    
+    /**
+     * If no keyfile exsits, generate the secret key an write it 
+     * to the keyfile.  
+     */
     abstract public void generateKeyFile() throws FileAlreadyExistsException;
+    
+    /**
+     * Generate the secret key an write it to the keyfile. Overwrites
+     * exsisting keyfile.   
+     */
     abstract public void overwriteKeyFile() ;
     
     

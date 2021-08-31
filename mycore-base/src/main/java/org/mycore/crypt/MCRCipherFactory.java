@@ -23,12 +23,25 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 
 /**
- * MCR.Crypt.Cipher.id1.Class=org.mycore.crypt.MCRAESCipher
+ * Create Instances of MCRCipher as configured in mycore.properties.
+ * The cipher is defined by the java class. 
+ * The secret key is saved in an keyfile. 
+ *  
+ * MCR.Crypt.Cipher.abstract.Class=org.mycore.crypt.MCRAESCipher
  * MCR.Crypt.Cipher.id1.KeyFile=example_1.secret
  *
  */
 public class MCRCipherFactory {
     private static Logger LOGGER = LogManager.getLogger(MCRCipherFactory.class.getName());
+    
+    /**
+     * Create a single instance of a MCRCipher and initialize it. If the cipher can't initialized an exception
+     * will thrown. Common issue is an missing key. In this case the methods throws 
+     * a MCRCryptKeyFileNotFoundException. 
+     * 
+     * @param id ID of cipher as configured
+     * @return instance of cipher
+     */
     
     public static MCRCipher getCipher(String id) throws MCRCryptKeyFileNotFoundException {
         LOGGER.debug("getCipher for id {} .", id );
@@ -45,6 +58,15 @@ public class MCRCipherFactory {
         }
         return cipher;
     }
+    
+    /**
+     * Create a single instance of a MCRCipher without initialising it.
+     * The resulting instance can used to generate an new key.
+     * 
+     * @param id ID of cipher as configured
+     * @return instance of cipher
+     */
+    
     
     public static MCRCipher getUnIntitialisedCipher(String id) {
         LOGGER.debug("getCipher for id {} .", id );

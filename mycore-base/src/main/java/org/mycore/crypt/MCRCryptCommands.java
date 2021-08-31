@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
  * which can be used by the command line interface.
  * 
  * @author Paul Borchert
- * @version $Revision: 1.0 $ $Date: 2021/08/10 07:58:28 $
  */
 
 @MCRCommandGroup(name = "Crypt Commands")
@@ -44,10 +43,8 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     private static Logger LOGGER = LogManager.getLogger(MCRCryptCommands.class.getName());
 
     /**
-     * list all cipher
+     * list all cipher configuration
      * 
-     * @param permission
-     *            String type of permission like read, writedb, etc.
      */
     @MCRCommand(syntax = "show cipher configuration",
         help = "The command list all chipher configured in mycore.properties",
@@ -66,8 +63,8 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     /**
      * generate keyfile for cipher {0} 
      * 
-     * @param chipherid
-     *            String id of chipher configured in properties
+     * @param cipherid
+     *            String id of cipher configured in properties
      */
     @MCRCommand(syntax = "generate keyfile for cipher {0}",
         help = "The command generate the keyfile for the cipher configured in mycore.properties. "
@@ -91,8 +88,8 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     /**
      * generate and overwrite of keyfile of cipher {0} 
      * 
-     * @param chipherid
-     *            String id of chipher configured in properties
+     * @param cipherid
+     *            String id of cipher configured in properties
      */
     @MCRCommand(syntax = "overwrite keyfile for cipher {0}",
         help = "The command generate on overwrite the keyfile for the cipher configured in mycore.properties."
@@ -118,8 +115,8 @@ public class MCRCryptCommands extends MCRAbstractCommands {
      * @param value
      *            The value to be encrypted
      * 
-     * @param chipherid
-     *            String id of chipher configured in properties
+     * @param cipherid
+     *            String id of cipher configured in properties
      */
     @MCRCommand(syntax = "encrypt {0} with cipher {1}",
         help = "The command encrypt the value with cipher.",
@@ -142,8 +139,8 @@ public class MCRCryptCommands extends MCRAbstractCommands {
      * @param value
      *            The value to be decrypted
      * 
-     * @param chipherid
-     *            String id of chipher configured in properties
+     * @param cipherid
+     *            String id of cipher configured in properties
      */
     @MCRCommand(syntax = "decrypt {0} with cipher {1}",
         help = "The command encrypt the value with cipher.",

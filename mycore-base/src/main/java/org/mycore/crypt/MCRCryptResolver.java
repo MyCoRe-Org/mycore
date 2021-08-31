@@ -28,6 +28,21 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
+/**
+ * This class provides an URIResolver for encryption and decryption.
+ * 
+ * URI Pattern:
+ * crypt:{encrypt/decrypt}:{cipherid}:{value}
+ * 
+ * where 
+ * <ul>
+ *   <li>encrypt/decrypt - the action to act an value</li>
+ *   <li>cipherid - ID of the cipher</li>  
+ *   <li>value - string to be encryptet or decypted</li>
+ * </ul>
+ * @author Paul Borchert
+ */
+
 public class MCRCryptResolver implements URIResolver {
 
     public static final String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
