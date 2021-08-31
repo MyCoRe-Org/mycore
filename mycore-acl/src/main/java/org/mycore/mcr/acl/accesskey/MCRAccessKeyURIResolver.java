@@ -25,6 +25,7 @@ import java.util.List;
 import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 
+import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -48,6 +49,6 @@ public class MCRAccessKeyURIResolver implements URIResolver {
         if (accessKeys.size() != 0) {
             return new JDOMSource(MCRAccessKeyTransformer.servFlagFromAccessKeys(accessKeys));
         }
-        return null;
+        return new JDOMSource(new Element("null"));
     }
 }

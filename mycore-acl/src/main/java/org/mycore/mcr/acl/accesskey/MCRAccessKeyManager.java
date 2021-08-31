@@ -116,17 +116,17 @@ public final class MCRAccessKeyManager {
     public static synchronized void addAccessKey(final MCRAccessKey accessKey) throws MCRException {
         final MCRObjectID objectId = accessKey.getObjectId();
         if (objectId == null) {
-            LOGGER.warn("Object id is required.");
+            LOGGER.debug("Object id is required.");
             throw new MCRAccessKeyException("Object id is required.");
         }
         final String type = accessKey.getType();
         if (type == null || !isValidType(type)) {
-            LOGGER.warn("Invalid permission type.");
+            LOGGER.debug("Invalid permission type.");
             throw new MCRAccessKeyInvalidTypeException("Invalid permission type.");
         }
         final String value = accessKey.getValue();
         if (value == null || !isValidValue(value)) {
-            LOGGER.warn("Incorrect value.");
+            LOGGER.debug("Incorrect value.");
             throw new MCRAccessKeyInvalidValueException("Incorrect value.");
         }
         final String encryptedValue = encryptValue(value, objectId);
@@ -147,7 +147,7 @@ public final class MCRAccessKeyManager {
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.persist(accessKey);
         } else {
-            LOGGER.warn("Key collision.");
+            LOGGER.debug("Key collision.");
             throw new MCRAccessKeyCollisionException("Key collision.");
         }
     }
@@ -199,7 +199,7 @@ public final class MCRAccessKeyManager {
         throws MCRAccessKeyNotFoundException {
         final MCRAccessKey accessKey = getAccessKeyByValue(objectId, value);
         if (accessKey == null) {
-            LOGGER.warn("Key does not exists.");
+            LOGGER.debug("Key does not exists.");
             throw new MCRAccessKeyNotFoundException("Key does not exists.");
         } else {
             deleteAccessKey(accessKey);
@@ -226,44 +226,47 @@ public final class MCRAccessKeyManager {
     public static void updateAccessKey(final MCRAccessKey updatedAccessKey) throws MCRException{
         final MCRObjectID objectId = updatedAccessKey.getObjectId();
         if (objectId == null) {
-            LOGGER.warn("Object id is required.");
+            LOGGER.debug("Object id is required.");
             throw new MCRAccessKeyException("Object id is required.");
         }
         String value = updatedAccessKey.getValue();
         if (value == null) {
-            LOGGER.warn("Value is required.");
+            LOGGER.debug("Value is required.");
             throw new MCRAccessKeyInvalidValueException("Value is required.");
         }
         final MCRAccessKey accessKey = getAccessKeyByValue(objectId, value);
-        if (accessKey == null) {
-            LOGGER.warn("Key does not exists.");
+        if (accessKey != null) {
+            final String type = updatedAccessKey.getType();
+            if (type != null && !accessKey.getType().equals(type)) {
+                if (isValidType(type)) {
+                    MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                    accessKey.setType(type);
+                    MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                } else {
+                    LOGGER.debug("Unkown Type.");
+                    throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
+                }
+            }
+            final Boolean enabled = updatedAccessKey.getEnabled();
+            if (enabled != null) {
+                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                accessKey.setEnabled(enabled);
+            }
+            final Date expiration = updatedAccessKey.getExpiration();
+            if (expiration != null) {
+                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                accessKey.setExpiration(expiration);
+            }
+            final String comment = updatedAccessKey.getComment();
+            if (comment != null) {
+                accessKey.setComment(comment);
+            }
+            accessKey.setLastChanger(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+            accessKey.setLastChange(new Date());
+        } else { 
+            LOGGER.debug("Key does not exists.");
             throw new MCRAccessKeyNotFoundException("Key does not exists.");
         }
-        final String type = updatedAccessKey.getType();
-        if (type != null && !accessKey.getType().equals(type)) {
-            if (!isValidType(type)) {
-                LOGGER.warn("Unkown Type.");
-                throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
-            }
-            MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-            accessKey.setType(type);
-        }
-        final Boolean enabled = updatedAccessKey.getEnabled();
-        if (enabled != null) {
-            MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-            accessKey.setEnabled(enabled);
-        }
-        final Date expiration = updatedAccessKey.getExpiration();
-        if (expiration != null) {
-            MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
-            accessKey.setExpiration(expiration);
-        }
-        final String comment = updatedAccessKey.getComment();
-        if (comment != null) {
-            accessKey.setComment(comment);
-        }
-        accessKey.setLastChanger(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-        accessKey.setLastChange(new Date());
     }
 
     /**
