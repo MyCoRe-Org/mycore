@@ -77,14 +77,21 @@
             :items="accessKeys"
             :per-page="perPage"
             :current-page="currentPage"
+            sort-icon-left
             responsive
             striped
           >
             <template #head(id)>
               {{ $t("mcr.accessKey.label.id") }}
             </template>
+            <template #head(enabled)>
+              {{ $t("mcr.accessKey.label.state") }}
+            </template>
             <template #head(type)>
               {{ $t("mcr.accessKey.label.type") }}
+            </template>
+            <template #head(expiration)>
+              {{ $t("mcr.accessKey.label.expiration") }}
             </template>
             <template #head(comment)>
               {{ $t("mcr.accessKey.label.comment") }}
@@ -107,11 +114,17 @@
             <template #cell(id)="data">
               {{ data.item.value.substring(0,8) }}
             </template>
+            <template #cell(state)="data">
+              {{ (data.item.enabled == true) ? $t("mcr.accessKey.label.state.enabled") : $t("mcr.accessKey.label.state.disabled") }}
+            </template>
             <template #cell(type)="data">
               {{ $t("mcr.accessKey.label.type." + data.item.type) }}
             </template>
+            <template #cell(expiration)="data">
+              {{ (data.item.expiration != null) ? new Date(data.item.expiration).toLocaleDateString() : "-" }}
+            </template>
             <template #cell(comment)="data">
-              {{ data.item.comment }}
+              {{ (data.item.comment != null && data.item.comment.length > 50) ? data.item.comment.substring(0, 50) + "..." : data.item.comment}}
             </template>
             <template #cell(edit)="data">
               <b-link
@@ -133,6 +146,7 @@
           ></b-pagination>
           <MCRAccessKeyEditModal
             ref="new" 
+            v-bind:locale="locale"
             v-on:add="addAccessKey"
             v-on:update="updateAccessKey"
             v-on:remove="removeAccessKey"
@@ -146,7 +160,8 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
   import MCRAccessKey from '@/common/MCRAccessKey';
-  import { ButtonPlugin, PaginationPlugin, TablePlugin, LayoutPlugin, AlertPlugin, OverlayPlugin, ModalPlugin, FormInputPlugin, FormSelectPlugin, InputGroupPlugin, FormGroupPlugin, LinkPlugin, PopoverPlugin, FormTextareaPlugin, FormPlugin } from 'bootstrap-vue'
+  import { ButtonPlugin, PaginationPlugin, TablePlugin, LayoutPlugin, AlertPlugin, OverlayPlugin, ModalPlugin, FormInputPlugin, FormSelectPlugin, InputGroupPlugin, FormGroupPlugin, LinkPlugin, PopoverPlugin, FormTextareaPlugin, FormPlugin, FormCheckboxPlugin, FormDatepickerPlugin } from 'bootstrap-vue'
+  import 'bootstrap-vue/dist/bootstrap-vue.css'
   import MCRAccessKeyServicePlugin, { MCRAccessKeyInformation } from '@/plugins/MCRAccessKeyServicePlugin';
   import MCRLocalePlugin from '@/plugins/MCRLocalePlugin';
   import MCRException from '@/common/MCRException';
@@ -157,7 +172,7 @@
   import { webApplicationBaseURL, objectID, parentID, locale, fetchDict, fetchJWT, isSessionEnabled, urlEncode, isDerivate } from '@/common/MCRUtils';
   import dict from '@/common/i18n/MCRAccessKeyI18n';
 
-  library.add(faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft); //TODO merge
+  library.add(faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft);
 
   Vue.use(ButtonPlugin)
   Vue.use(PaginationPlugin)
@@ -170,6 +185,8 @@
   Vue.use(FormSelectPlugin)
   Vue.use(InputGroupPlugin)
   Vue.use(FormGroupPlugin)
+  Vue.use(FormCheckboxPlugin)
+  Vue.use(FormDatepickerPlugin)
   Vue.use(LinkPlugin)
   Vue.use(FormPlugin)
   Vue.use(PopoverPlugin)
@@ -185,11 +202,18 @@
     },
   })
   export default class AccessKeyManager extends Vue {
+    private locale: string;
     private fields = [
       {
         key: "id",
         thClass: 'col-1 text-center',
         tdClass: 'col-1 text-center',
+      },
+      {
+        key: "state",
+        thClass: 'col-1 text-center',
+        tdClass: 'col-1 text-center',
+        sortable: true
       },
       {
         key: "type",
@@ -198,9 +222,15 @@
         sortable: true
       },
       {
+        key: "expiration",
+        thClass: 'col-2 text-center',
+        tdClass: 'col-2 text-center',
+        sortable: true
+      },
+      {
         key: "comment",
-        thClass: 'col-8 text-center',
-        tdClass: 'col-8 text-center',
+        thClass: 'col-5 text-center',
+        tdClass: 'col-5 text-center',
       },
       {
         key: "edit",
@@ -295,6 +325,7 @@
       }
     }
     public async created(): Promise<void> {
+      this.locale = locale;
       if (webApplicationBaseURL == null) {
         this.showFatalError();
         this.isProcessing = false;

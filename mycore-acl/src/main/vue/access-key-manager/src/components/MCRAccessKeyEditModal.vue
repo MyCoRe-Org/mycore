@@ -115,6 +115,43 @@
         </b-form-invalid-feedback>
       </b-input-group>
     </b-form-group>
+    <div
+      v-if="id != ''"
+    >
+      <b-form-group
+        label-cols-lg="2"
+      >
+        <template #label>
+          {{ $t("mcr.accessKey.label.state") }}
+          <b-link
+            id="popover-enabled"
+          >
+            <font-awesome-icon 
+              icon="info-circle"
+              class="text-secondary"
+            ></font-awesome-icon>
+          </b-link>
+          <b-popover
+            target="popover-enabled"
+            :title="$t('mcr.accessKey.title.popover')"
+            triggers="hover"
+          >
+            <span 
+              v-html="$t('mcr.accessKey.popover.enabled')"
+            ></span>
+          </b-popover>
+        </template>
+        <b-form-checkbox
+          id="enabled-checkbox"
+          v-model="enabled"
+          switch
+          @change="stateChanged"
+        >
+          {{ (enabled == true) ? $t("mcr.accessKey.label.state.enabled") : $t("mcr.accessKey.label.state.disabled") }}
+        </b-form-checkbox>
+      </b-form-group>
+      <hr class="my-3">
+    </div>
     <b-form-group
       label-cols-lg="2"
     >
@@ -147,6 +184,36 @@
     </b-form-group>
     <b-form-group
       label-cols-lg="2"
+    >
+      <template #label>
+        {{ $t("mcr.accessKey.label.expiration") }}
+        <b-link
+          id="popover-expiration"
+        >
+          <font-awesome-icon 
+            icon="info-circle"
+            class="text-secondary"
+          ></font-awesome-icon>
+        </b-link>
+        <b-popover
+          target="popover-expiration"
+          :title="$t('mcr.accessKey.title.popover')"
+          triggers="hover"
+        >
+          <span 
+            v-html="$t('mcr.accessKey.popover.expiration')"
+          ></span>
+        </b-popover>
+      </template>
+      <b-form-datepicker 
+        v-model="expiration"
+        :locale="locale"
+        :value-as-date=true
+        placeholder="-"
+      ></b-form-datepicker>
+    </b-form-group>
+    <b-form-group
+      label-cols-lg="2"
       :label="$t('mcr.accessKey.label.comment')"
       label-for="textarea-comment"
     >
@@ -159,6 +226,7 @@
     <div
       v-if="id != ''"
     >
+      <hr class="my-3">
       <b-form-group
         label-cols-lg="2"
         :label="$t('mcr.accessKey.label.creator')"
@@ -233,6 +301,7 @@
         <font-awesome-icon 
           icon="plus"
         ></font-awesome-icon>
+        {{ $t("mcr.accessKey.button.new") }}
       </b-button>
     </template>
   </b-modal>
@@ -240,19 +309,22 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator';
+  import { Component, Vue, Prop } from 'vue-property-decorator';
   import MCRAccessKey from '@/common/MCRAccessKey';
   import MCRException from '@/common/MCRException';
   import { generateRandomString } from '@/common/MCRUtils';
 
   @Component
   export default class Modal extends Vue {
+    @Prop({ default: "en" }) locale!: string;
     private options = [
       { value: "read", text: this.$t("mcr.accessKey.label.type.read") },
       { value: "writedb", text: this.$t("mcr.accessKey.label.type.writedb") }
     ];
     private value = "";
     private id = "";
+    private enabled = true;
+    private expiration: Date;
     private comment = "";
     private selected = "read";
     private creator = "";
@@ -280,13 +352,40 @@
       }
     }
 
+    private async updateAccessKey(accessKey: MCRAccessKey): Promise<void> {
+      try {
+        await this.$client.updateAccessKey(accessKey);
+        this.alertVariant = "success";
+        this.alertMessage = this.$t("mcr.accessKey.success.update");
+        const result: MCRAccessKey = await this.$client.getAccessKey(accessKey.value);
+        this.setAccessKey(result);
+        this.$emit("update", result);
+      } catch(error) {
+        this.handleException(error);  
+      }
+    }
+
+    private async stateChanged(): Promise<void> {
+      this.isProcessing = true;
+      const accessKey: MCRAccessKey = {
+        value: this.id,
+        enabled: this.enabled,
+      }
+      await this.updateAccessKey(accessKey);
+      this.isProcessing = false;
+    }
+
     private generate(): void {
       this.value = generateRandomString(32);
     }
 
     private setAccessKey(accessKey: MCRAccessKey): void {
       this.id = accessKey.value;
+      this.enabled = accessKey.enabled;
       this.selected = accessKey.type;
+      if (accessKey.expiration != null) {
+        this.expiration = new Date(accessKey.expiration);
+      }
       this.comment = accessKey.comment;
       if (accessKey.creator != null) {
         this.creator = accessKey.creator;
@@ -315,7 +414,9 @@
       if (accessKey == null) {
         this.id = "";
         this.value = "";
+        this.enabled = true;
         this.selected = "read";
+        this.expiration = null;
         this.comment = "";
         this.inputValueFeedback = null;
       } else {
@@ -341,8 +442,12 @@
       }
       const accessKey: MCRAccessKey = {
         value: this.value,
+        enabled: this.enabled,
         type: this.selected,
         comment: this.comment,
+      }
+      if (this.expiration != null) {
+        accessKey.expiration = this.expiration;
       }
       try {
         const id: string= await this.$client.addAccessKey(accessKey);
@@ -361,17 +466,11 @@
         type: this.selected,
         comment: this.comment,
       }
-      try {
-        await this.$client.updateAccessKey(accessKey);
-        this.alertVariant = "success";
-        this.alertMessage = this.$t("mcr.accessKey.success.update");
-        const result: MCRAccessKey = await this.$client.getAccessKey(accessKey.value);
-        this.setAccessKey(result);
-        this.$emit("update", result);
-        this.isProcessing = false;
-      } catch(error) {
-        this.handleException(error);  
+      if (this.expiration != null) {
+        accessKey.expiration = this.expiration;
       }
+      await this.updateAccessKey(accessKey);
+      this.isProcessing = false;
     }
 
     private async remove(): Promise<void> {
