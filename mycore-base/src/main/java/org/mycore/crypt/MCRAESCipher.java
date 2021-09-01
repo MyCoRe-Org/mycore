@@ -97,7 +97,7 @@ public class MCRAESCipher extends MCRCipher {
     }
     
     public void reset() {
-        SecretKey secretKey = null;
+        secretKey = null;
         encryptCipher = null;
         decryptCipher = null;
     }
