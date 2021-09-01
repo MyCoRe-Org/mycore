@@ -46,18 +46,18 @@ public class MCRAESCipher extends MCRCipher {
     private static final Logger LOGGER = LogManager.getLogger(MCRAESCipher.class);
 
     private String keyFile;
+    private SecretKey secretKey;
+    private Cipher encryptCipher;
+    private Cipher decryptCipher;
+    
     
     @MCRProperty(name = "KeyFile", required = true)
     public void setRulesURI(String path) {
         keyFile = path;
     }
     
-    private SecretKey secretKey;
-    private Cipher encryptCipher;
-    private Cipher decryptCipher;
-        
     public MCRAESCipher() {
-        SecretKey secretKey = null;
+        secretKey = null;
         encryptCipher = null;
         decryptCipher = null;
     }

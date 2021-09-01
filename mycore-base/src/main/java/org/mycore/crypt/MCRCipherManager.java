@@ -28,11 +28,11 @@ import org.mycore.common.config.MCRConfiguration2;
  * The secret key is saved in an keyfile. 
  *  
  * MCR.Crypt.Cipher.abstract.Class=org.mycore.crypt.MCRAESCipher
- * MCR.Crypt.Cipher.id1.KeyFile=example_1.secret
+ * MCR.Crypt.Cipher.abstract.KeyFile=example_1.secret
  *
  */
-public class MCRCipherFactory {
-    private static Logger LOGGER = LogManager.getLogger(MCRCipherFactory.class.getName());
+public class MCRCipherManager {
+    private static Logger LOGGER = LogManager.getLogger(MCRCipherManager.class.getName());
     
     /**
      * Create a single instance of a MCRCipher and initialize it. If the cipher can't initialized an exception

@@ -69,7 +69,7 @@ public class MCRCryptResolver implements URIResolver {
         
         String returnString = "";
         
-        MCRCipher cipher = MCRCipherFactory.getCipher(cipherID);
+        MCRCipher cipher = MCRCipherManager.getCipher(cipherID);
         
         if (action.equals("encrypt")) {
             try {

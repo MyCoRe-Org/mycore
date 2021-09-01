@@ -73,7 +73,7 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     public static void generateKeyFile(String cipherid) {
         LOGGER.info("Start generateKeyFile");
         try {
-            MCRCipher cipher = MCRCipherFactory.getUnIntitialisedCipher(cipherid);
+            MCRCipher cipher = MCRCipherManager.getUnIntitialisedCipher(cipherid);
             cipher.generateKeyFile();
             cipher.init(cipherid);
             LOGGER.info("Keyfile generated.");
@@ -98,7 +98,7 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     public static void overwriteKeyFile(String cipherid) {
         LOGGER.info("Start genrerateKeyFile");
         try {
-            MCRCipher cipher = MCRCipherFactory.getUnIntitialisedCipher(cipherid);
+            MCRCipher cipher = MCRCipherManager.getUnIntitialisedCipher(cipherid);
             cipher.overwriteKeyFile();
             cipher.init(cipherid);
             LOGGER.info("Keyfile overwriten.");
@@ -123,7 +123,7 @@ public class MCRCryptCommands extends MCRAbstractCommands {
         order = 30)
     public static void encrypt(String value, String cipherid) {
         try {
-            MCRCipher cipher = MCRCipherFactory.getCipher(cipherid);
+            MCRCipher cipher = MCRCipherManager.getCipher(cipherid);
             LOGGER.info("Encrypted Value: " + cipher.encrypt(value));
         } catch (MCRCryptKeyNoPermission e) {
             LOGGER.info("Value not encrypted. No Permission for chipher " + cipherid + ".");
@@ -147,7 +147,7 @@ public class MCRCryptCommands extends MCRAbstractCommands {
         order = 40)
     public static void decrypt(String value, String cipherid) {
         try {
-            MCRCipher cipher = MCRCipherFactory.getCipher(cipherid);
+            MCRCipher cipher = MCRCipherManager.getCipher(cipherid);
             LOGGER.info("Decrypted Value: " + cipher.decrypt(value));
         } catch (MCRCryptKeyNoPermission e) {
             LOGGER.info("Value not decrypted. No Permission for chipher " + cipherid + ".");
