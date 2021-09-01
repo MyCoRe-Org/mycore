@@ -120,7 +120,7 @@ export function getLocale(): string {
 }
 
 export function getIsSessionEnabled(): boolean {
-  return window.accessKeySession != "false" ? false : true;
+  return window.accessKeySession == "false" ? false : true;
 }
 
 export function isDerivate(objectID: string): boolean {
