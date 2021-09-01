@@ -45,12 +45,19 @@ declare global {
   interface Window { 
     webApplicationBaseURL: string; 
     objectID: string; 
+    parentID: string;
     currentLang: string; 
   }
 }
 
-export async function fetchJWT(webApplicationBaseURL: string, objectID: string): Promise<AxiosResponse> {
-  return await axios.get(`${webApplicationBaseURL}rsc/jwt`, { params: {"ua": `acckey_${objectID}` } });
+export async function fetchJWT(webApplicationBaseURL: string, objectID: string,
+  parentID: string): Promise<AxiosResponse> {
+  const params = new URLSearchParams();
+  params.append("ua", `acckey_${objectID}`);
+  if (parentID) {
+    params.append("ua", `acckey_${parentID}`);
+  }
+  return await axios.get(`${webApplicationBaseURL}rsc/jwt`, { params });
 }
 
 export async function fetchDict(baseURL:string, locale: string): Promise<AxiosResponse> {
@@ -77,6 +84,13 @@ export function getObjectID(): string {
   return getParameterByName("objectid");
 }
 
+export function getParentID(): string {
+  if (window.parentID != null) {
+    return window.parentID;
+  }
+  return getParameterByName("parentid");
+}
+
 export function getLocale(): string {
   if (window.currentLang != null) {
     return window.currentLang;
@@ -93,8 +107,9 @@ export function getLocale(): string {
 
 const webApplicationBaseURL = getWebApplicationBaseURL();
 const objectID = getObjectID();
+const parentID = getParentID();
 const locale = getLocale();
 
-export { webApplicationBaseURL, objectID, locale }
+export { webApplicationBaseURL, objectID, parentID, locale }
 
 

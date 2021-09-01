@@ -154,7 +154,7 @@
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { webApplicationBaseURL, objectID, locale, fetchDict, fetchJWT } from '@/common/MCRUtils';
+  import { webApplicationBaseURL, objectID, parentID, locale, fetchDict, fetchJWT } from '@/common/MCRUtils';
   import dict from '@/common/i18n/MCRAccessKeyI18n';
 
   library.add(faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft); //TODO merge
@@ -308,7 +308,7 @@
       }
       let token = "";
       try {
-        const result = await fetchJWT(webApplicationBaseURL, objectID);
+        const result = await fetchJWT(webApplicationBaseURL, objectID, parentID);
         token = result.data["access_token"];
       } catch(error) {
         this.alertVariant = "danger";
