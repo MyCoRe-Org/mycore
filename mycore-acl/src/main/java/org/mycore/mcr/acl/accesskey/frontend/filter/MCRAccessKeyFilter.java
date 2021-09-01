@@ -59,7 +59,7 @@ public class MCRAccessKeyFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         if (ALLOWED_PERMISSION_TYPES != null && ALLOWED_PERMISSION_TYPES.length() > 0) {
-            LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: %s", 
+            LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: {}", 
                 ALLOWED_PERMISSION_TYPES);
         }
     }
@@ -69,7 +69,7 @@ public class MCRAccessKeyFilter implements Filter {
         throws IOException, ServletException {
         if (ALLOWED_PERMISSION_TYPES != null && ALLOWED_PERMISSION_TYPES.length() > 0) {
             final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-            final MCRObjectID objectId = getMCRObjectID(httpServletRequest);
+            final MCRObjectID objectId = extractObjectId(httpServletRequest);
             if (objectId != null) {
                 String value = httpServletRequest.getParameter("accesskey");
                 if (value != null) {
@@ -81,6 +81,7 @@ public class MCRAccessKeyFilter implements Filter {
                             StandardCharsets.UTF_8);
                         MCRAccessKeyUtils.addAccessKeyToCurrentSession(objectId, value);
                     } catch (Exception e) {
+                        LOGGER.debug("Cannot set access key to session", e);
                         MCRTransactionHelper.rollbackTransaction();
                     } finally {
                         MCRServlet.cleanupMCRSession(httpServletRequest, getFilterName());
@@ -93,26 +94,25 @@ public class MCRAccessKeyFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    private String getFilterName() {
-        return this.getClass().getSimpleName();
-    }
-
     @Override
     public void destroy() {
         //not needed
     }
 
-    private MCRObjectID getMCRObjectID(final HttpServletRequest req) {
-        final String pathInfo = req.getPathInfo();
+    private String getFilterName() {
+        return this.getClass().getSimpleName();
+    }
+
+    private static MCRObjectID extractObjectId(final HttpServletRequest request) {
+        final String pathInfo = request.getPathInfo();
         final String id = pathInfo == null ? null : pathInfo.substring(1);
-        MCRObjectID mcrid = null;
         if (id != null) {
             try {
-                mcrid = MCRObjectID.getInstance(id); // create Object with given ID, only ID syntax check performed
+                return MCRObjectID.getInstance(id);
             } catch (final MCRException e) {
-                return null; // sorry, no object to return
+                LOGGER.debug("Cannot convert {} to MCRObjectID", id);
             }
         }
-        return mcrid;
+        return null;
     }
 }
