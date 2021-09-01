@@ -154,7 +154,7 @@
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { webApplicationBaseURL, objectID, parentID, locale, fetchDict, fetchJWT, isSessionEnabled, urlEncode } from '@/common/MCRUtils';
+  import { webApplicationBaseURL, objectID, parentID, locale, fetchDict, fetchJWT, isSessionEnabled, urlEncode, isDerivate } from '@/common/MCRUtils';
   import dict from '@/common/i18n/MCRAccessKeyI18n';
 
   library.add(faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft); //TODO merge
@@ -242,7 +242,7 @@
       this.accessKeys.push(accessKey);
       this.alertVariant = "success";
       this.alertMessage = this.$t("mcr.accessKey.success.add", accessKey.value, value);
-      if (isSessionEnabled) {
+      if (isSessionEnabled && !isDerivate(objectID)) {
         this.alertMessage += ` ${this.$t("mcr.accessKey.success.add.url")} ` +
           this.$t("mcr.accessKey.success.add.url.format", webApplicationBaseURL, objectID, urlEncode(value));
       }

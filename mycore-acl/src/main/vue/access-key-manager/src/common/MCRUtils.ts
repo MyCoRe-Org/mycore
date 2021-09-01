@@ -119,9 +119,12 @@ export function getLocale(): string {
   }
 }
 
-
 export function getIsSessionEnabled(): boolean {
   return window.accessKeySession != "false" ? false : true;
+}
+
+export function isDerivate(objectID: string): boolean {
+  return objectID.includes("_derivate_");
 }
 
 const webApplicationBaseURL = getWebApplicationBaseURL();
