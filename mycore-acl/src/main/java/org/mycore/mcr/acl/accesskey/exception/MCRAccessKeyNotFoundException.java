@@ -25,6 +25,6 @@ package org.mycore.mcr.acl.accesskey.exception;
  */
 public class MCRAccessKeyNotFoundException extends MCRAccessKeyException {
     public MCRAccessKeyNotFoundException(String errorMessage) {
-        super(errorMessage, "unknownKey");
+        super(errorMessage, "mcr.accessKey.error.unknownKey");
     }
 }
