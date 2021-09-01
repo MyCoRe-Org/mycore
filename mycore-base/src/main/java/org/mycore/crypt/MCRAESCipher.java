@@ -23,8 +23,8 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.MCRException;
 
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
@@ -134,23 +134,15 @@ public class MCRAESCipher extends MCRCipher {
     }
     
     protected String pencrypt(String text) throws MCRCryptCipherConfigurationException {
-        try {
-            byte[] encryptedBytes = pencrypt (text.getBytes("UTF8"));
-            String encryptedString = java.util.Base64.getEncoder().encodeToString(encryptedBytes);
-            return encryptedString;
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException( e );
-        }
+        byte[] encryptedBytes = pencrypt (text.getBytes(StandardCharsets.UTF_8));
+        String encryptedString = java.util.Base64.getEncoder().encodeToString(encryptedBytes);
+        return encryptedString;
     }
     protected String pdecrypt(String text) throws MCRCryptCipherConfigurationException {
-        try {
-            byte[] encryptedBytes = java.util.Base64.getDecoder().decode(text);
-            byte[] decryptedBytes = pdecrypt(encryptedBytes);
-            String decryptedText = new String(decryptedBytes, "UTF8");
-            return decryptedText;
-        } catch (UnsupportedEncodingException e) {
-            throw new MCRException( e );
-        }
+        byte[] encryptedBytes = java.util.Base64.getDecoder().decode(text);
+        byte[] decryptedBytes = pdecrypt(encryptedBytes);
+        String decryptedText = new String(decryptedBytes, StandardCharsets.UTF_8);
+        return decryptedText;
     }
     
     protected byte[] pencrypt(byte[] bytes) throws MCRCryptCipherConfigurationException {

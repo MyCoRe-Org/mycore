@@ -18,6 +18,7 @@
 
 package org.mycore.crypt;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 
 import org.mycore.access.MCRAccessManager;
@@ -79,7 +80,7 @@ public abstract class MCRCipher {
     }
     
     public byte[] encrypt(byte[] bytes) throws MCRCryptKeyNoPermission {
-        return ((checkPermission( "encrypt" )) ? pencrypt(bytes) : "".getBytes());
+        return ((checkPermission( "encrypt" )) ? pencrypt(bytes) : "".getBytes(StandardCharsets.UTF_8));
     }
     
     public String decrypt(String text) throws MCRCryptKeyNoPermission {
