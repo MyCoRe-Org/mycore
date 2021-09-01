@@ -25,4 +25,4 @@ Vue.config.productionTip = false;
 
 new Vue({
   render: h => h(AccessKeyManager),
-}).$mount("#access");
+}).$mount("#manager");

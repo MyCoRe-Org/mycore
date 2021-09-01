@@ -16,7 +16,7 @@
         <artifactId>frontend-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>yarn-install-access-key-editor</id>
+            <id>yarn-install-access-key-manager</id>
             <goals>
               <goal>yarn</goal>
             </goals>
@@ -27,7 +27,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>yarn-build-access-key-editor</id>
+            <id>yarn-build-access-key-manager</id>
             <goals>
               <goal>yarn</goal>
             </goals>
