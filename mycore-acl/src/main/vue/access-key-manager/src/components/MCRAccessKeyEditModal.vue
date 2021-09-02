@@ -57,13 +57,13 @@
     >{{ alertMessage }}</b-alert>
     <b-form-group
       label-cols-lg="2"
-      label-for="input-id"
+      label-for="input-secret"
       :label="$t('mcr.accessKey.label.id')"
-      v-if="id != ''"
+      v-if="isEdit"
     >
       <b-form-input 
-        id="input-id" 
-        v-model="id"
+        id="input-secret"
+        v-model="secret"
         readonly
       ></b-form-input>
     </b-form-group>
@@ -104,7 +104,7 @@
         </b-input-group-prepend>
         <b-form-input 
           id="input-value" 
-          v-model="value"
+          v-model="secret"
           :state="inputState"
           aria-describedby="input-value-feedback"
         ></b-form-input>
@@ -116,7 +116,7 @@
       </b-input-group>
     </b-form-group>
     <div
-      v-if="id != ''"
+      v-if="isEdit"
     >
       <b-form-group
         label-cols-lg="2"
@@ -143,11 +143,11 @@
         </template>
         <b-form-checkbox
           id="enabled-checkbox"
-          v-model="enabled"
+          v-model="isActive"
           switch
           @change="stateChanged"
         >
-          {{ (enabled == true) ? $t("mcr.accessKey.label.state.enabled") : $t("mcr.accessKey.label.state.disabled") }}
+          {{ (isActive == true) ? $t("mcr.accessKey.label.state.enabled") : $t("mcr.accessKey.label.state.disabled") }}
         </b-form-checkbox>
       </b-form-group>
       <hr class="my-3">
@@ -209,6 +209,7 @@
         v-model="expiration"
         :locale="locale"
         :value-as-date=true
+        :reset-button=true
         placeholder="-"
       ></b-form-datepicker>
     </b-form-group>
@@ -224,7 +225,7 @@
       ></b-form-textarea>
     </b-form-group>
     <div
-      v-if="id != ''"
+      v-if="isEdit"
     >
       <hr class="my-3">
       <b-form-group
@@ -274,7 +275,7 @@
     </div>
     <template #modal-footer>
       <b-button
-        v-if="id != ''"
+        v-if="isEdit"
         v-on:click="remove()"
         variant="danger"
       >
@@ -284,7 +285,7 @@
         {{ $t("mcr.accessKey.button.remove") }}
       </b-button>
       <b-button 
-        v-if="id != ''"
+        v-if="isEdit"
         v-on:click="update()"
         variant="primary"
       >
@@ -321,9 +322,9 @@
       { value: "read", text: this.$t("mcr.accessKey.label.type.read") },
       { value: "writedb", text: this.$t("mcr.accessKey.label.type.writedb") }
     ];
-    private value = "";
-    private id = "";
-    private enabled = true;
+    private isEdit = false;
+    private secret = "";
+    private isActive = true;
     private expiration: Date;
     private comment = "";
     private selected = "read";
@@ -345,19 +346,19 @@
     }
 
     private get title(): string {
-      if (this.id == "") {
-        return this.$t("mcr.accessKey.title.add");
-      } else {
+      if (this.isEdit) {
         return this.$t("mcr.accessKey.title.edit");
+      } else {
+        return this.$t("mcr.accessKey.title.add");
       }
     }
 
-    private async updateAccessKey(accessKey: MCRAccessKey): Promise<void> {
+    private async updateAccessKey(secret: string, accessKey: MCRAccessKey): Promise<void> {
       try {
-        await this.$client.updateAccessKey(accessKey);
+        await this.$client.updateAccessKey(secret, accessKey);
         this.alertVariant = "success";
         this.alertMessage = this.$t("mcr.accessKey.success.update");
-        const result: MCRAccessKey = await this.$client.getAccessKey(accessKey.value);
+        const result: MCRAccessKey = await this.$client.getAccessKey(secret);
         this.setAccessKey(result);
         this.$emit("update", result);
       } catch(error) {
@@ -368,27 +369,26 @@
     private async stateChanged(): Promise<void> {
       this.isProcessing = true;
       const accessKey: MCRAccessKey = {
-        value: this.id,
-        enabled: this.enabled,
+        isActive: this.isActive
       }
-      await this.updateAccessKey(accessKey);
+      await this.updateAccessKey(this.secret, accessKey);
       this.isProcessing = false;
     }
 
     private generate(): void {
-      this.value = generateRandomString(32);
+      this.secret = generateRandomString(32);
     }
 
     private setAccessKey(accessKey: MCRAccessKey): void {
-      this.id = accessKey.value;
-      this.enabled = accessKey.enabled;
+      this.secret = accessKey.secret;
       this.selected = accessKey.type;
       if (accessKey.expiration != null) {
         this.expiration = new Date(accessKey.expiration);
       }
+      this.isActive = accessKey.isActive;
       this.comment = accessKey.comment;
       if (accessKey.creator != null) {
-        this.creator = accessKey.creator;
+      this.creator = accessKey.creator;
       } else {
         this.creator = "-";
       }
@@ -412,14 +412,14 @@
     public show(accessKey: MCRAccessKey): void {
       this.isProcessing = true;
       if (accessKey == null) {
-        this.id = "";
-        this.value = "";
-        this.enabled = true;
+        this.isEdit = false;
+        this.secret = "";
         this.selected = "read";
         this.expiration = null;
         this.comment = "";
         this.inputValueFeedback = null;
       } else {
+        this.isEdit = true;
         this.setAccessKey(accessKey);
       }
       this.alertMessage = "";
@@ -433,7 +433,7 @@
 
     private async add(): Promise<void> {
       this.isProcessing = true;
-      if (this.value.length == 0) {
+      if (this.secret.length == 0) {
         this.inputValueFeedback = this.$t("mcr.accessKey.error.invalidValue");
         this.isProcessing = false;
         return;
@@ -441,18 +441,19 @@
         this.inputValueFeedback = null;
       }
       const accessKey: MCRAccessKey = {
-        value: this.value,
-        enabled: this.enabled,
+        secret: this.secret,
         type: this.selected,
-        comment: this.comment,
       }
       if (this.expiration != null) {
         accessKey.expiration = this.expiration;
       }
+      if (this.comment != null) {
+        accessKey.comment = this.comment;  
+      }
       try {
-        const id: string= await this.$client.addAccessKey(accessKey);
-        const result: MCRAccessKey = await this.$client.getAccessKey(id);
-        this.$emit("add", result, accessKey.value);
+        const secret: string = await this.$client.addAccessKey(accessKey);
+        const result: MCRAccessKey = await this.$client.getAccessKey(secret);
+        this.$emit("add", result, accessKey.secret);
         this.close();
       } catch (error) {
         this.handleException(error);  
@@ -462,14 +463,15 @@
     private async update(): Promise<void> {
       this.isProcessing = true;
       const accessKey: MCRAccessKey = {
-        value: this.id,
         type: this.selected,
-        comment: this.comment,
       }
       if (this.expiration != null) {
         accessKey.expiration = this.expiration;
       }
-      await this.updateAccessKey(accessKey);
+      if (this.comment != null) {
+        accessKey.comment = this.comment;  
+      }
+      await this.updateAccessKey(this.secret, accessKey);
       this.isProcessing = false;
     }
 
@@ -487,8 +489,8 @@
       if (sure) { 
         this.isProcessing = true;
         try {
-          await this.$client.removeAccessKey(this.id);
-          this.$emit("remove", this.id);
+          await this.$client.removeAccessKey(this.secret);
+          this.$emit("remove", this.secret);
           this.close();
         } catch(error) {
           this.handleException(error);  

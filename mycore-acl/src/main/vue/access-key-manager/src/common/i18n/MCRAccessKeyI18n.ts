@@ -28,7 +28,7 @@ const dict: Record<string, string> = {
   "mcr.accessKey.error.expired": "The access key is expired.",
   "mcr.accessKey.error.fatal": "An unknown error has occurred. Please update the application or contact an administrator",
   "mcr.accessKey.error.invalidType": "The type is invalid.",
-  "mcr.accessKey.error.invalidValue": "The value is invalid.",
+  "mcr.accessKey.error.invalidSecret": "The secret is invalid.",
   "mcr.accessKey.error.noPermission": "Please make sure that you have the necessary access rights.",
   "mcr.accessKey.error.request": "A connection to the server could not be established. Please check your internet connection or contact an administrator.",
   "mcr.accessKey.error.server": "The server could not handle the request. Please contact an administrator.",

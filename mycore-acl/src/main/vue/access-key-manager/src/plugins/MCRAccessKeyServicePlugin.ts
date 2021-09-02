@@ -86,8 +86,8 @@ export default new class MCRAccessKeyServicePlugin {
     return <MCRAccessKeyInformation>response.data;
   }
 
-  public async getAccessKey(id: string): Promise<MCRAccessKey> {
-    const response = await this.instance.get(`accesskeys/${id}`);
+  public async getAccessKey(secret: string): Promise<MCRAccessKey> {
+    const response = await this.instance.get(`accesskeys/${secret}`);
     return response.data;
   }
 
@@ -96,11 +96,11 @@ export default new class MCRAccessKeyServicePlugin {
     return response.headers["location"].split("/").pop();
   }
 
-  public async updateAccessKey(accessKey: MCRAccessKey): Promise<void> {
-    await this.instance.put(`/accesskeys/${accessKey.value}`, accessKey);
+  public async updateAccessKey(secret: string, accessKey: MCRAccessKey): Promise<void> {
+    await this.instance.put(`/accesskeys/${secret}`, accessKey);
   }
 
-  public async removeAccessKey(id: string): Promise<void> {
-    await this.instance.delete(`accesskeys/${id}`);
+  public async removeAccessKey(secret: string): Promise<void> {
+    await this.instance.delete(`accesskeys/${secret}`);
   }
 }

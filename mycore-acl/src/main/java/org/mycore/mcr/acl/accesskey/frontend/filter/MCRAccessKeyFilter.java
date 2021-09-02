@@ -79,7 +79,7 @@ public class MCRAccessKeyFilter implements Filter {
                         MCRFrontendUtil.configureSession(MCRSessionMgr.getCurrentSession(), httpServletRequest, 
                             (HttpServletResponse) response);
                         value = new String(Base64.getUrlDecoder().decode(value.getBytes(UTF_8)), UTF_8);
-                        MCRAccessKeyUtils.addAccessKeyToCurrentSession(objectId, value);
+                        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, value);
                     } catch (Exception e) {
                         LOGGER.debug("Cannot set access key to session", e);
                         MCRTransactionHelper.rollbackTransaction();

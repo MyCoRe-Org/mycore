@@ -112,10 +112,10 @@
               </div>
             </template>
             <template #cell(id)="data">
-              {{ data.item.value.substring(0,8) }}
+              {{ data.item.secret.substring(0,8) }}
             </template>
             <template #cell(state)="data">
-              {{ (data.item.enabled == true) ? $t("mcr.accessKey.label.state.enabled") : $t("mcr.accessKey.label.state.disabled") }}
+              {{ (data.item.isActive == true) ? $t("mcr.accessKey.label.state.enabled") : $t("mcr.accessKey.label.state.disabled") }}
             </template>
             <template #cell(type)="data">
               {{ $t("mcr.accessKey.label.type." + data.item.type) }}
@@ -124,7 +124,7 @@
               {{ (data.item.expiration != null) ? new Date(data.item.expiration).toLocaleDateString() : "-" }}
             </template>
             <template #cell(comment)="data">
-              {{ (data.item.comment != null && data.item.comment.length > 50) ? data.item.comment.substring(0, 50) + "..." : data.item.comment}}
+              {{ ((data.item.comment != null) && (data.item.comment.length > 50)) ? data.item.comment.substring(0, 50) + "..." : data.item.comment }}
             </template>
             <template #cell(edit)="data">
               <b-link
@@ -268,18 +268,18 @@
       window.history.back();
     }
 
-    private addAccessKey(accessKey: MCRAccessKey, value: string) {
+    private addAccessKey(accessKey: MCRAccessKey, secret: string) {
       this.accessKeys.push(accessKey);
       this.alertVariant = "success";
-      this.alertMessage = this.$t("mcr.accessKey.success.add", accessKey.value, value);
+      this.alertMessage = this.$t("mcr.accessKey.success.add", accessKey.secret, secret);
       if (isSessionEnabled && !isDerivate(objectID)) {
         this.alertMessage += ` ${this.$t("mcr.accessKey.success.add.url")} ` +
-          this.$t("mcr.accessKey.success.add.url.format", webApplicationBaseURL, objectID, urlEncode(value));
+          this.$t("mcr.accessKey.success.add.url.format", webApplicationBaseURL, objectID, urlEncode(secret));
       }
     }
 
     private updateAccessKey(accessKey: MCRAccessKey) {
-      const index = this.accessKeys.findIndex(item => item.value == accessKey.value);
+      const index = this.accessKeys.findIndex(item => item.secret == accessKey.secret);
       if (index >= 0) {
         this.$set(this.accessKeys, index, accessKey);
       } else {
@@ -287,12 +287,12 @@
       }
     }
 
-    private removeAccessKey(id: string) {
-      const index = this.accessKeys.findIndex(item => item.value == id);
+    private removeAccessKey(secret: string) {
+      const index = this.accessKeys.findIndex(item => item.secret == secret);
       if (index >= 0) {
         this.$delete(this.accessKeys, index);
         this.alertVariant = "success";
-        this.alertMessage = this.$t("mcr.accessKey.success.delete", id);
+        this.alertMessage = this.$t("mcr.accessKey.success.delete", secret);
       } else {
         this.showFatalError();
       }

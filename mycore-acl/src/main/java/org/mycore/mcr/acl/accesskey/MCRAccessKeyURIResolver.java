@@ -45,7 +45,7 @@ public class MCRAccessKeyURIResolver implements URIResolver {
     @Override
     public Source resolve(String href, String base) {
         final MCRObjectID objectId = MCRObjectID.getInstance(href.substring(href.indexOf(":") + 1));
-        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.getAccessKeys(objectId);
+        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.listAccessKeys(objectId);
         if (accessKeys.size() != 0) {
             return new JDOMSource(MCRAccessKeyTransformer.servFlagFromAccessKeys(accessKeys));
         }

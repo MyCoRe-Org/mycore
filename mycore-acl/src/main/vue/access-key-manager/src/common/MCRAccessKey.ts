@@ -17,9 +17,9 @@
  */
 
 export default interface MCRAccessKey {
-  value: string;
-  enabled?: boolean;
+  secret?: string;
   type?: string;
+  isActive?: boolean;
   expiration?: Date;
   comment?: string;
   creator?: string;

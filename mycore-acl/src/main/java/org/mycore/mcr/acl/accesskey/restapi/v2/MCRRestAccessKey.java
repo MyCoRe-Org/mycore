@@ -71,7 +71,7 @@ import org.mycore.restapi.v2.MCRErrorResponse;
     tags = @Tag(name = "mcr_access_key", description = "Operations for access keys"))
 public class MCRRestAccessKey {
 
-    private static final String VALUE = "value";
+    private static final String SECRET = "secret";
 
     @Context
     UriInfo uriInfo;
@@ -91,13 +91,13 @@ public class MCRRestAccessKey {
         })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
-    public Response getAccessKeys(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
+    public Response listAccessKeys(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
         @DefaultValue("0") @QueryParam("offset") int offset,
         @DefaultValue("128") @QueryParam("limit") int limit) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
-        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.getAccessKeys(objectId);
+        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.listAccessKeys(objectId);
         final List<MCRAccessKey> accessKeysResult = accessKeys.stream()
             .skip(offset)
             .limit(limit)
@@ -106,7 +106,7 @@ public class MCRRestAccessKey {
     }
 
     @GET
-    @Path("/{" + VALUE + "}")
+    @Path("/{" + SECRET + "}")
     @Operation(
         summary = "Get access key for the given object with id",
         responses = {
@@ -122,11 +122,11 @@ public class MCRRestAccessKey {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
-        @PathParam(VALUE) final String value) {
+        @PathParam(SECRET) final String secret) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
-        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyByValue(objectId, value);
+        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
         if (accessKey != null) {
             return Response.ok(accessKey).build();
         }
@@ -152,22 +152,17 @@ public class MCRRestAccessKey {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
-    public Response addAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, final String accessKeyJson) {
+    public Response createAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, final String accessKeyJson) {
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
-        accessKey.setObjectId(objectId);
-        accessKey.setCreator(null); //to prevent the client from setting, this is done by the KeyManager
-        accessKey.setCreation(null);
-        accessKey.setLastChanger(null);
-        accessKey.setLastChange(null);
-        MCRAccessKeyManager.addAccessKey(accessKey);
-        return Response.created(uriInfo.getAbsolutePathBuilder().path(accessKey.getValue()).build()).build();
+        MCRAccessKeyManager.createAccessKey(objectId, accessKey);
+        return Response.created(uriInfo.getAbsolutePathBuilder().path(accessKey.getSecret()).build()).build();
     }
     
     @PUT
-    @Path("/{" + VALUE + "}")
+    @Path("/{" + SECRET + "}")
     @Operation(
         summary = "Update MCRAccessKey",
         responses = {
@@ -188,19 +183,17 @@ public class MCRRestAccessKey {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response updateAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
-        @PathParam(VALUE) final String value, final String accessKeyJson) {
+        @PathParam(SECRET) final String secret, final String accessKeyJson) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
-        accessKey.setObjectId(objectId);
-        accessKey.setValue(value);
-        MCRAccessKeyManager.updateAccessKey(accessKey);
+        MCRAccessKeyManager.updateAccessKey(objectId, secret, accessKey);
         return Response.noContent().build();
     }
 
     @DELETE
-    @Path("/{" + VALUE + "}")
+    @Path("/{" + SECRET + "}")
     @Operation(
         summary = "Deletes MCRAccessKey",
         responses = {
@@ -217,12 +210,12 @@ public class MCRRestAccessKey {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
-    public Response deleteAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
-        @PathParam(VALUE) final String value) {
+    public Response removeAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
+        @PathParam(SECRET) final String secret) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
-        MCRAccessKeyManager.deleteAccessKey(objectId, value);
+        MCRAccessKeyManager.removeAccessKey(objectId, secret);
         return Response.noContent().build();
     }
 
