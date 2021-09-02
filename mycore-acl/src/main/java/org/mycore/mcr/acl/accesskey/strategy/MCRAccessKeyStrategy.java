@@ -23,7 +23,9 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,9 +43,11 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String ALLOWED_SESSION_PERMISSION_TYPES = MCRConfiguration2
+    private static final Set<String> ALLOWED_SESSION_PERMISSION_TYPES = MCRConfiguration2
         .getString("MCR.AccessKey.Session.AllowedPermissionTypes")
-        .orElse(null);
+        .stream()
+        .flatMap(MCRConfiguration2::splitValue)
+        .collect(Collectors.toSet());
     
     @Override
     public boolean checkPermission(String id, String permission) {
@@ -69,8 +73,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             MCRObjectID objectId = MCRObjectID.getInstance(id);
             if (objectId.getTypeId().equals("derivate")) {
                 LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
-                if (ALLOWED_SESSION_PERMISSION_TYPES != null 
-                    && ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
+                if (ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
                     final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
                     if (accessKey != null && checkPermission(permission, accessKey)) {
                         LOGGER.debug("found valid access key in session");
@@ -86,8 +89,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             }
             LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
 
-            if (ALLOWED_SESSION_PERMISSION_TYPES != null 
-                && ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
+            if (ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
                 final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
                 if (accessKey != null && checkPermission(permission, accessKey)) {
                     LOGGER.debug("found valid access key in session");
