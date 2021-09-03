@@ -59,8 +59,6 @@ public class MCRAccessKeyUtilsTest extends MCRJPATestCase {
     public void setUp() throws Exception {
         super.setUp();
         objectId = MCRObjectID.getInstance(OBJECT_ID);
-        final MCRUser user = new MCRUser("junit");
-        MCRSessionMgr.getCurrentSession().setUserInformation(user);
     }
 
     @Test(expected = MCRAccessKeyNotFoundException.class)
@@ -69,7 +67,21 @@ public class MCRAccessKeyUtilsTest extends MCRJPATestCase {
     }
 
     @Test
+    public void testSession() {
+        final MCRAccessKey accessKey = new MCRAccessKey(objectId, READ_KEY, PERMISSION_READ); 
+        MCRAccessKeyManager.addAccessKey(accessKey);
+        MCRAccessKeyUtils.addAccessKeyToCurrentSession(objectId, READ_KEY);
+        assertNotNull(MCRAccessKeyUtils.getAccessKeyValueFromCurrentSession(objectId));
+        assertNotNull(MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId));
+        MCRAccessKeyUtils.deleteAccessKeyFromCurrentSession(objectId);
+        assertNull(MCRAccessKeyUtils.getAccessKeyValueFromCurrentSession(objectId));
+        assertNull(MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId));
+    }
+
+    @Test
     public void testUser() {
+        final MCRUser user = new MCRUser("junit");
+        MCRSessionMgr.getCurrentSession().setUserInformation(user);
         final MCRAccessKey accessKey = new MCRAccessKey(objectId, READ_KEY, PERMISSION_READ); 
         MCRAccessKeyManager.addAccessKey(accessKey);
         MCRAccessKeyUtils.addAccessKeyToCurrentUser(objectId, READ_KEY);
@@ -81,7 +93,21 @@ public class MCRAccessKeyUtilsTest extends MCRJPATestCase {
     }
 
     @Test
-    public void testOverride() {
+    public void testSessionOverride() {
+        final MCRAccessKey accessKeyRead = new MCRAccessKey(objectId, READ_KEY, PERMISSION_READ); 
+        MCRAccessKeyManager.addAccessKey(accessKeyRead);
+        MCRAccessKeyUtils.addAccessKeyToCurrentSession(objectId, READ_KEY);
+        final String readValue = MCRAccessKeyUtils.getAccessKeyValueFromCurrentSession(objectId);
+        final MCRAccessKey accessKeyWrite = new MCRAccessKey(objectId, WRITE_KEY, PERMISSION_WRITE); 
+        MCRAccessKeyManager.addAccessKey(accessKeyWrite);
+        MCRAccessKeyUtils.addAccessKeyToCurrentSession(objectId, WRITE_KEY);
+        assertNotEquals(readValue, MCRAccessKeyUtils.getAccessKeyValueFromCurrentSession(objectId));
+    }
+
+    @Test
+    public void testUserOverride() {
+        final MCRUser user = new MCRUser("junit");
+        MCRSessionMgr.getCurrentSession().setUserInformation(user);
         final MCRAccessKey accessKeyRead = new MCRAccessKey(objectId, READ_KEY, PERMISSION_READ); 
         MCRAccessKeyManager.addAccessKey(accessKeyRead);
         MCRAccessKeyUtils.addAccessKeyToCurrentUser(objectId, READ_KEY);

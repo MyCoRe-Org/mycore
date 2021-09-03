@@ -154,7 +154,7 @@
   import { library } from '@fortawesome/fontawesome-svg-core'
   import { faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { webApplicationBaseURL, objectID, parentID, locale, fetchDict, fetchJWT } from '@/common/MCRUtils';
+  import { webApplicationBaseURL, objectID, parentID, locale, fetchDict, fetchJWT, isSessionEnabled, urlEncode, isDerivate } from '@/common/MCRUtils';
   import dict from '@/common/i18n/MCRAccessKeyI18n';
 
   library.add(faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft); //TODO merge
@@ -242,6 +242,10 @@
       this.accessKeys.push(accessKey);
       this.alertVariant = "success";
       this.alertMessage = this.$t("mcr.accessKey.success.add", accessKey.value, value);
+      if (isSessionEnabled && !isDerivate(objectID)) {
+        this.alertMessage += ` ${this.$t("mcr.accessKey.success.add.url")} ` +
+          this.$t("mcr.accessKey.success.add.url.format", webApplicationBaseURL, objectID, urlEncode(value));
+      }
     }
 
     private updateAccessKey(accessKey: MCRAccessKey) {
@@ -308,7 +312,7 @@
       }
       let token = "";
       try {
-        const result = await fetchJWT(webApplicationBaseURL, objectID, parentID);
+        const result = await fetchJWT(webApplicationBaseURL, objectID, parentID, isSessionEnabled);
         token = result.data["access_token"];
       } catch(error) {
         this.alertVariant = "danger";

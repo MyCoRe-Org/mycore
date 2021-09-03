@@ -23,11 +23,14 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
@@ -39,6 +42,12 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
 
     private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final Set<String> ALLOWED_SESSION_PERMISSION_TYPES = MCRConfiguration2
+        .getString("MCR.AccessKey.Session.AllowedPermissionTypes")
+        .stream()
+        .flatMap(MCRConfiguration2::splitValue)
+        .collect(Collectors.toSet());
     
     @Override
     public boolean checkPermission(String id, String permission) {
@@ -64,15 +73,32 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             MCRObjectID objectId = MCRObjectID.getInstance(id);
             if (objectId.getTypeId().equals("derivate")) {
                 LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
-                MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
+                if (ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
+                    final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
+                    if (accessKey != null && checkPermission(permission, accessKey)) {
+                        LOGGER.debug("found valid access key in session");
+                        return true;
+                    }
+                }
+                final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
                 if (accessKey != null && checkPermission(permission, accessKey)) {
+                    LOGGER.debug("found valid access key in user attribute");
                     return true;
                 }
                 objectId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
             }
             LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
+
+            if (ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
+                final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
+                if (accessKey != null && checkPermission(permission, accessKey)) {
+                    LOGGER.debug("found valid access key in session");
+                    return true;
+                }
+            }
             final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
             if (accessKey != null) {
+                LOGGER.debug("found valid access key in user attribute");
                 return checkPermission(permission, accessKey);
             }
         }

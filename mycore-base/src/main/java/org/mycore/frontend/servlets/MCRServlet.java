@@ -78,9 +78,9 @@ import org.xml.sax.SAXParseException;
 public class MCRServlet extends HttpServlet {
     public static final String ATTR_MYCORE_SESSION = "mycore.session";
 
-    private static final String CURRENT_THREAD_NAME_KEY = "currentThreadName";
+    public static final String CURRENT_THREAD_NAME_KEY = "currentThreadName";
 
-    private static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
+    public static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
 
     private static final long serialVersionUID = 1L;
 

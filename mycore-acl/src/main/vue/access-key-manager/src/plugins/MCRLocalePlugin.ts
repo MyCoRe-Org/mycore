@@ -26,7 +26,7 @@ export default new class MCRLocalePlugin {
       let str = dict[key];
       if (str != null) {
         for (let i = 0; i < args.length; i++) {
-          str = str.replace("{" + i + "}", args[i]);
+          str = str.replaceAll(`{${i}}`, args[i]);
         }
         return str;
       } else {
