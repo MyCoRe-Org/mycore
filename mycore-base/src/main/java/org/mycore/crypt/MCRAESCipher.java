@@ -52,7 +52,7 @@ public class MCRAESCipher extends MCRCipher {
     
     
     @MCRProperty(name = "KeyFile", required = true)
-    public void setRulesURI(String path) {
+    public void setKeyFile(String path) {
         keyFile = path;
     }
     
