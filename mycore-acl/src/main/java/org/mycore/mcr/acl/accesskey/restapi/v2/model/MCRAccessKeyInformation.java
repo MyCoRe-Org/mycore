@@ -32,10 +32,6 @@ public class MCRAccessKeyInformation {
 
     private int totalAccessKeyCount;
 
-    private MCRAccessKeyInformation() {
-
-    }
-
     public MCRAccessKeyInformation(List<MCRAccessKey> accessKeys, int totalAccessKeyCount) {
         setAccessKeys(accessKeys);
         setTotalAccessKeyCount(totalAccessKeyCount);

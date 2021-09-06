@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.junit.Test;
@@ -71,7 +70,7 @@ public class MCRAccessKeyManagerTest extends MCRJPATestCase {
     }
 
     @Test
-    public void testCreateKey() throws MCRException, IOException {
+    public void testCreateKey() throws MCRException {
         final MCRAccessKey accessKeyRead = new MCRAccessKey(objectId, READ_KEY, PERMISSION_READ);
         MCRAccessKeyManager.addAccessKey(accessKeyRead);
         final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyByValue(objectId, 

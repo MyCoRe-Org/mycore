@@ -87,7 +87,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
                 }
                 objectId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
             }
-            LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
+            LOGGER.debug("check object {} permission {}.", objectId, permission);
 
             if (ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
                 final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);

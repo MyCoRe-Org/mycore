@@ -45,10 +45,10 @@ public class MCRRestAccessKeyExceptionMapper implements ExceptionMapper<MCRAcces
     public static Response fromException(MCRAccessKeyException e) {
         if (e instanceof MCRAccessKeyNotFoundException) {
             return getResponse(e, Response.Status.NOT_FOUND.getStatusCode(),
-                ((MCRAccessKeyException) e).getErrorCode());
+                e.getErrorCode());
         }
         return getResponse(e, Response.Status.BAD_REQUEST.getStatusCode(),
-            ((MCRAccessKeyException) e).getErrorCode());
+            e.getErrorCode());
     }
 
     private static Response getResponse(Exception e, int statusCode, String errorCode) {

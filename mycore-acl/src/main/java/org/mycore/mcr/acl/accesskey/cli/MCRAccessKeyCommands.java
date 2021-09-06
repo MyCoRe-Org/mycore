@@ -35,14 +35,14 @@ public class MCRAccessKeyCommands {
 
     @MCRCommand(syntax = "clear access keys",
         help = "Deletes all access keys")
-    public static void clearAccessKeys() throws Exception {
+    public static void clearAccessKeys() {
         MCRAccessKeyManager.clearAccessKeys();
         LOGGER.info("cleared all access keys");
     }
 
     @MCRCommand(syntax = "clear all access keys of id {0}",
         help = "Deletes all access keys of given MCRObject/Derivate")
-    public static void clearAccessKeys(String objId) throws Exception {
+    public static void clearAccessKeys(String objId) {
         final MCRObjectID objectId = MCRObjectID.getInstance(objId);
         MCRAccessKeyManager.clearAccessKeys(objectId);
         LOGGER.info("cleared all access keys of {}.", objId);
