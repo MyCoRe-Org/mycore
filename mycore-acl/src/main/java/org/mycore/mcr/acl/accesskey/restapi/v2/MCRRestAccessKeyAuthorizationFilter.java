@@ -23,8 +23,8 @@ package org.mycore.mcr.acl.accesskey.restapi.v2;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
 import javax.ws.rs.HttpMethod;
-import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -44,9 +44,7 @@ public class MCRRestAccessKeyAuthorizationFilter implements ContainerRequestFilt
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        if (requestContext.getMethod().equals(HttpMethod.OPTIONS)) {
-            return;
-        } else {
+        if (!requestContext.getMethod().equals(HttpMethod.OPTIONS)) {
             final MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
             if (MCRAccessManager.checkPermission(pathParameters.
                 getFirst(PARAM_MCRID), MCRAccessManager.PERMISSION_WRITE)) {
