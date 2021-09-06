@@ -19,21 +19,20 @@
 import _Vue from 'vue';
 
 export default new class MCRLocalePlugin {
-
+  /* eslint-disable */
   public async install(Vue: typeof _Vue, dict: Record<string, string>) {
-
-    Vue.prototype.$t = function(key: string, ...args: string[]) {
+    Vue.prototype.$t = function (key: string, ...args: string[]) {
       let str = dict[key];
       if (str != null) {
         for (let i = 0; i < args.length; i++) {
           str = str.replaceAll(`{${i}}`, args[i]);
         }
         return str;
-      } else {
-        // eslint-disable-next-line no-console
-        console.error("unknown key: %s", key);
-        return "";
       }
-    }
+      // eslint-disable-next-line no-console
+      console.error('unknown key: %s', key);
+      return '';
+    };
   }
-}
+  /* eslint-enable */
+}();

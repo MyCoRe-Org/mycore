@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default interface MCRAccessKey {
+interface MCRAccessKey {
   secret?: string;
   type?: string;
   isActive?: boolean;
@@ -27,3 +27,5 @@ export default interface MCRAccessKey {
   lastChanger?: string;
   lastChange?: string;
 }
+
+export default MCRAccessKey;

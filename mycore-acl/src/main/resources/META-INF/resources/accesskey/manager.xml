@@ -6,16 +6,7 @@
     <script src="../vue/access-key-manager/accessKeyManager.umd.js"></script>
     <link rel="stylesheet" href="../vue/access-key-manager/accessKeyManager.css"></link>
 
-    <div id="app">
-      <access-key-manager></access-key-manager>
-    </div>
+    <access-key-manager></access-key-manager>
 
-    <script>
-      new Vue({
-        components: {
-          'access-key-manager': accessKeyManager
-        }
-      }).$mount('#app')
-    </script>
   </section>
 </MyCoReWebPage>
