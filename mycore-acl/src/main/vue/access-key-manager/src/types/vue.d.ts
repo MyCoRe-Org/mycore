@@ -5,10 +5,8 @@ import MCRAccessKeyServicePlugin from '@/plugins/MCRAccessKeyServicePlugin';
 //    Vue has the constructor type in types/vue.d.ts
 declare module 'vue/types/vue' {
   // 3. Declare augmentation for Vue
-  /* eslint-disable */
   interface Vue {
-    $t: any;
+    $t: function;
     $client: MCRAccessKeyServicePlugin;
   }
-  /* eslint-enable */
 }

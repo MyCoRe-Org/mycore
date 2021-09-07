@@ -17,7 +17,7 @@
 -->
 
 <template>
-  <div id="app">
+  <div>
     <b-container
       fluid
     >
@@ -160,11 +160,11 @@
     </b-container>
   </div>
 </template>
+
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import MCRAccessKey from '@/common/MCRAccessKey';
 import MCRAccessKeyServicePlugin, { MCRAccessKeyInformation } from '@/plugins/MCRAccessKeyServicePlugin';
-import MCRLocalePlugin from '@/plugins/MCRLocalePlugin';
 import MCRException from '@/common/MCRException';
 import MCRAccessKeyEditModal from './components/MCRAccessKeyEditModal.vue';
 import {
@@ -172,212 +172,193 @@ import {
   objectID,
   parentID,
   locale,
-  fetchDict,
   fetchJWT,
   isSessionEnabled,
   urlEncode,
   isDerivate,
 } from '@/common/MCRUtils';
-import dict from '@/common/i18n/MCRAccessKeyI18n';
 
-Vue.use(MCRLocalePlugin, dict);
-
-  @Component({
-    components: {
-      MCRAccessKeyEditModal,
-    },
-  })
+@Component({
+  components: {
+    MCRAccessKeyEditModal,
+  },
+})
 export default class AccessKeyManager extends Vue {
-    private locale = locale;
+  private locale = locale;
 
-    private fields = [
-      {
-        key: 'id',
-        thClass: 'col-1 text-center',
-        tdClass: 'col-1 text-center',
-      },
-      {
-        key: 'state',
-        thClass: 'col-1 text-center',
-        tdClass: 'col-1 text-center',
-        sortable: true,
-      },
-      {
-        key: 'type',
-        thClass: 'col-2 text-center',
-        tdClass: 'col-2 text-center',
-        sortable: true,
-      },
-      {
-        key: 'expiration',
-        thClass: 'col-2 text-center',
-        tdClass: 'col-2 text-center',
-        sortable: true,
-      },
-      {
-        key: 'comment',
-        thClass: 'col-5 text-center',
-        tdClass: 'col-5 text-center',
-      },
-      {
-        key: 'edit',
-        label: '',
-        thClass: 'col-1 text-right',
-        tdClass: 'col-1 text-right',
-      },
-    ];
+  private fields = [
+    {
+      key: 'id',
+      thClass: 'col-1 text-center',
+      tdClass: 'col-1 text-center',
+    },
+    {
+      key: 'state',
+      thClass: 'col-1 text-center',
+      tdClass: 'col-1 text-center',
+      sortable: true,
+    },
+    {
+      key: 'type',
+      thClass: 'col-2 text-center',
+      tdClass: 'col-2 text-center',
+      sortable: true,
+    },
+    {
+      key: 'expiration',
+      thClass: 'col-2 text-center',
+      tdClass: 'col-2 text-center',
+      sortable: true,
+    },
+    {
+      key: 'comment',
+      thClass: 'col-5 text-center',
+      tdClass: 'col-5 text-center',
+    },
+    {
+      key: 'edit',
+      label: '',
+      thClass: 'col-1 text-right',
+      tdClass: 'col-1 text-right',
+    },
+  ];
 
-    private perPage = 8;
+  private perPage = 8;
 
-    private currentPage = 1;
+  private currentPage = 1;
 
-    private accessKeys: Array<MCRAccessKey> = [];
+  private accessKeys: Array<MCRAccessKey> = [];
 
-    private alertMessage = '';
+  private alertMessage = '';
 
-    private alertVariant = 'danger';
+  private alertVariant = 'danger';
 
-    private isProcessing = true;
+  private isProcessing = true;
 
-    private isAuthorized = false;
+  private isAuthorized = false;
 
-    private openModal(localIndex: number): void {
-      let accessKey: MCRAccessKey = null;
-      if (localIndex != null) {
-        const index = localIndex + (this.currentPage - 1) * this.perPage;
-        accessKey = this.accessKeys[index];
-      }
-      (this.$refs.new as MCRAccessKeyEditModal).show(accessKey);
+  private openModal(localIndex: number): void {
+    let accessKey: MCRAccessKey = null;
+    if (localIndex != null) {
+      const index = localIndex + (this.currentPage - 1) * this.perPage;
+      accessKey = this.accessKeys[index];
     }
+    (this.$refs.new as MCRAccessKeyEditModal).show(accessKey);
+  }
 
-    private get rows(): number {
-      return this.accessKeys.length;
+  private get rows(): number {
+    return this.accessKeys.length;
+  }
+
+  private get showAlert(): boolean {
+    return this.alertMessage.length > 0;
+  }
+
+  /* eslint-disable */
+  private goBack(): void {
+    window.history.back();
+  }
+  /* eslint-enable */
+
+  private addAccessKey(accessKey: MCRAccessKey, secret: string) {
+    this.accessKeys.push(accessKey);
+    this.alertVariant = 'success';
+    this.alertMessage = this.$t('mcr.accessKey.success.add', accessKey.secret, secret);
+    if (isSessionEnabled && !isDerivate(objectID)) {
+      this.alertMessage += ` ${this.$t('mcr.accessKey.success.add.url')} ${this.$t('mcr.accessKey.success.add.url.format', webApplicationBaseURL, objectID, urlEncode(secret))}`;
     }
+  }
 
-    private get showAlert(): boolean {
-      return this.alertMessage.length > 0;
+  private updateAccessKey(accessKey: MCRAccessKey) {
+    const index = this.accessKeys.findIndex((item) => item.secret === accessKey.secret);
+    if (index >= 0) {
+      this.$set(this.accessKeys, index, accessKey);
+    } else {
+      this.showFatalError();
     }
+  }
 
-    /* eslint-disable */
-    private goBack(): void {
-      window.history.back();
-    }
-    /* eslint-enable */
-
-    private addAccessKey(accessKey: MCRAccessKey, secret: string) {
-      this.accessKeys.push(accessKey);
+  private removeAccessKey(secret: string) {
+    const index = this.accessKeys.findIndex((item) => item.secret === secret);
+    if (index >= 0) {
+      this.$delete(this.accessKeys, index);
       this.alertVariant = 'success';
-      this.alertMessage = this.$t('mcr.accessKey.success.add', accessKey.secret, secret);
-      if (isSessionEnabled && !isDerivate(objectID)) {
-        this.alertMessage += ` ${this.$t('mcr.accessKey.success.add.url')} ${this.$t('mcr.accessKey.success.add.url.format', webApplicationBaseURL, objectID, urlEncode(secret))}`;
-      }
+      this.alertMessage = this.$t('mcr.accessKey.success.delete', secret);
+    } else {
+      this.showFatalError();
     }
+  }
 
-    private updateAccessKey(accessKey: MCRAccessKey) {
-      const index = this.accessKeys.findIndex((item) => item.secret === accessKey.secret);
-      if (index >= 0) {
-        this.$set(this.accessKeys, index, accessKey);
-      } else {
-        this.showFatalError();
-      }
+  private showFatalError(): void {
+    this.alertVariant = 'danger';
+    this.alertMessage = this.$t('mcr.accessKey.error.fatal');
+  }
+
+  private initializeServicePlugin(token: string): void {
+    try {
+      Vue.use(MCRAccessKeyServicePlugin, {
+        baseURL: webApplicationBaseURL,
+        objectID,
+        token,
+      });
+    } catch (error) { // should not happen
+      this.showFatalError();
     }
+  }
 
-    private removeAccessKey(secret: string) {
-      const index = this.accessKeys.findIndex((item) => item.secret === secret);
-      if (index >= 0) {
-        this.$delete(this.accessKeys, index);
-        this.alertVariant = 'success';
-        this.alertMessage = this.$t('mcr.accessKey.success.delete', secret);
-      } else {
-        this.showFatalError();
-      }
+  public async created(): Promise<void> {
+    if (webApplicationBaseURL == null) {
+      this.showFatalError();
+      this.isProcessing = false;
+      // eslint-disable-next-line no-console
+      console.error('webApplicationBaseURL is not set');
+      return;
     }
-
-    private showFatalError(): void {
+    if (objectID == null) {
+      this.showFatalError();
+      this.isProcessing = false;
+      // eslint-disable-next-line no-console
+      console.error('objectID is not set');
+      return;
+    }
+    let token = '';
+    try {
+      const result = await fetchJWT(webApplicationBaseURL, objectID, parentID, isSessionEnabled);
+      token = result.data.access_token;
+    } catch (error) {
       this.alertVariant = 'danger';
-      this.alertMessage = this.$t('mcr.accessKey.error.fatal');
+      this.alertMessage = this.$t('mcr.accessKey.error.noPermission');
+      this.isProcessing = false;
+      // eslint-disable-next-line no-console
+      console.error('couldn\'t fetch JWT');
+      return;
     }
-
-    /* eslint-disable */
-    private async updateI18n(): Promise<void> {
-      try {
-        const result = await fetchDict(webApplicationBaseURL, locale);
-        Object.assign(dict, result.data);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('i18n update failed.');
-      }
-    }
-    /* eslint-enable */
-
-    private initializeServicePlugin(token: string): void {
-      try {
-        Vue.use(MCRAccessKeyServicePlugin, {
-          baseURL: webApplicationBaseURL,
-          objectID,
-          token,
-        });
-      } catch (error) { // should not happen
-        this.showFatalError();
-      }
-    }
-
-    public async created(): Promise<void> {
-      if (webApplicationBaseURL == null) {
-        this.showFatalError();
-        this.isProcessing = false;
-        // eslint-disable-next-line no-console
-        console.error('webApplicationBaseURL is not set');
-        return;
-      }
-      await this.updateI18n();
-      if (objectID == null) {
-        this.showFatalError();
-        this.isProcessing = false;
-        // eslint-disable-next-line no-console
-        console.error('objectID is not set');
-        return;
-      }
-      let token = '';
-      try {
-        const result = await fetchJWT(webApplicationBaseURL, objectID, parentID, isSessionEnabled);
-        token = result.data.access_token;
-      } catch (error) {
-        this.alertVariant = 'danger';
-        this.alertMessage = this.$t('mcr.accessKey.error.noPermission');
-        this.isProcessing = false;
-        // eslint-disable-next-line no-console
-        console.error('couldn\'t fetch JWT');
-        return;
-      }
-      this.initializeServicePlugin(token);
-      try {
-        const accessKeyInformation: MCRAccessKeyInformation = await this.$client.getAccessKeys();
-        this.accessKeys = accessKeyInformation.items;
-        this.isAuthorized = true;
-      } catch (error) {
-        const exception: MCRException = error as MCRException;
-        /* eslint-disable */
-        const  errorCode = exception.errorCode;
-        /* eslint-enable */
-        if (errorCode != null) {
-          if (errorCode === 'request') {
-            this.alertVariant = 'warning';
-            this.alertMessage = this.$t('mcr.accessKey.error.request');
-          } else if (errorCode === 'noPermission') {
-            this.alertVariant = 'danger';
-            this.alertMessage = this.$t('mcr.accessKey.error.noPermission');
-          } else {
-            // eslint-disable-next-line no-console
-            console.error('unknown error code: %s', errorCode);
-          }
+    this.initializeServicePlugin(token);
+    try {
+      const accessKeyInformation: MCRAccessKeyInformation = await this.$client.getAccessKeys();
+      this.accessKeys = accessKeyInformation.items;
+      this.isAuthorized = true;
+    } catch (error) {
+      const exception: MCRException = error as MCRException;
+      const { errorCode } = exception;
+      if (errorCode != null) {
+        if (errorCode === 'request') {
+          this.alertVariant = 'warning';
+          this.alertMessage = this.$t('mcr.accessKey.error.request');
+        } else if (errorCode === 'noPermission') {
+          this.alertVariant = 'danger';
+          this.alertMessage = this.$t('mcr.accessKey.error.noPermission');
         } else {
           // eslint-disable-next-line no-console
-          console.error(error);
-          this.showFatalError();
+          console.error('unknown error code: %s', errorCode);
         }
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(error);
+        this.showFatalError();
       }
-      this.isProcessing = false;
     }
+    this.isProcessing = false;
+  }
 }
 </script>
