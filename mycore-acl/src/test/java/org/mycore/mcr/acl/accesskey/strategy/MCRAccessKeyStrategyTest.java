@@ -189,7 +189,6 @@ public class MCRAccessKeyStrategyTest extends MCRStoreTestCase {
         writeKey.setIsActive(false);
         MCRAccessKeyManager.updateAccessKey(object.getId(), 
             MCRAccessKeyManager.hashSecret(WRITE_VALUE, object.getId()), writeKey);
-        System.out.println(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
         assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_READ));
         assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_WRITE));
         assertFalse(strategy.checkPermission(OBJECT_ID, PERMISSION_DELETE));

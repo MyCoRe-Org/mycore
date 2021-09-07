@@ -22,10 +22,10 @@ interface MCRAccessKey {
   isActive?: boolean;
   expiration?: Date;
   comment?: string;
-  creator?: string;
-  creation?: string;
-  lastChanger?: string;
-  lastChange?: string;
+  created?: string;
+  createdBy?: string;
+  lastModified?: string;
+  lastModifiedBy?: string;
 }
 
 export default MCRAccessKey;

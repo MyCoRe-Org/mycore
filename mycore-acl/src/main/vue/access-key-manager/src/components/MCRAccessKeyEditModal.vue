@@ -231,45 +231,45 @@
         <hr class="my-3">
         <b-form-group
           label-cols-lg="2"
-          :label="$t('mcr.accessKey.label.creator')"
-          label-for="input-creator"
+          :label="$t('mcr.accessKey.label.createdBy')"
+          label-for="input-created-by"
         >
           <b-form-input
-            id="input-creator"
-            v-model="creator"
+            id="input-created-by"
+            v-model="createdBy"
             readonly
           ></b-form-input>
         </b-form-group>
         <b-form-group
           label-cols-lg="2"
-          label-for="input-creation"
-          :label="$t('mcr.accessKey.label.creation')"
+          label-for="input-created"
+          :label="$t('mcr.accessKey.label.created')"
         >
           <b-form-input
-            id="input-creation"
-            v-model="creation"
+            id="input-created"
+            v-model="created"
             readonly
           ></b-form-input>
         </b-form-group>
         <b-form-group
           label-cols-lg="2"
-          label-for="input-last-changer"
-          :label="$t('mcr.accessKey.label.lastChanger')"
+          label-for="input-last-modfied-by"
+          :label="$t('mcr.accessKey.label.lastModifiedBy')"
         >
           <b-form-input
-            id="input-last-changer"
-            v-model="lastChanger"
+            id="input-last-modified-by"
+            v-model="lastModifiedBy"
             readonly
           ></b-form-input>
         </b-form-group>
         <b-form-group
           label-cols-lg="2"
-          label-for="input-last-change"
-          :label="$t('mcr.accessKey.label.lastChange')"
+          label-for="input-last-modified"
+          :label="$t('mcr.accessKey.label.lastModified')"
         >
           <b-form-input
-            id="input-last-change"
-            v-model="lastChange"
+            id="input-last-modified"
+            v-model="lastModified"
             readonly
           ></b-form-input>
         </b-form-group>
@@ -338,13 +338,13 @@ export default class Modal extends Vue {
 
   private selected = 'read';
 
-  private creator = '';
+  private createdBy = '';
 
-  private creation = '';
+  private created = '';
 
-  private lastChanger = '';
+  private lastModifiedBy = '';
 
-  private lastChange = '';
+  private lastModified = '';
 
   private alertMessage = '';
 
@@ -403,25 +403,25 @@ export default class Modal extends Vue {
     }
     this.isActive = accessKey.isActive;
     this.comment = accessKey.comment;
-    if (accessKey.creator != null) {
-      this.creator = accessKey.creator;
+    if (accessKey.createdBy != null) {
+      this.createdBy = accessKey.createdBy;
     } else {
-      this.creator = '-';
+      this.createdBy = '-';
     }
-    if (accessKey.creation != null) {
-      this.creation = new Date(accessKey.creation).toLocaleString();
+    if (accessKey.created != null) {
+      this.created = new Date(accessKey.created).toLocaleString();
     } else {
-      this.creation = '-';
+      this.created = '-';
     }
-    if (accessKey.lastChanger != null) {
-      this.lastChanger = accessKey.lastChanger;
+    if (accessKey.lastModifiedBy != null) {
+      this.lastModifiedBy = accessKey.lastModifiedBy;
     } else {
-      this.lastChanger = '-';
+      this.lastModifiedBy = '-';
     }
-    if (accessKey.lastChange != null) {
-      this.lastChange = new Date(accessKey.lastChange).toLocaleString();
+    if (accessKey.lastModified != null) {
+      this.lastModified = new Date(accessKey.lastModified).toLocaleString();
     } else {
-      this.lastChange = '-';
+      this.lastModified = '-';
     }
   }
 

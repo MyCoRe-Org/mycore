@@ -119,10 +119,10 @@ public final class MCRAccessKeyManager {
             throw new MCRAccessKeyInvalidSecretException("Incorrect secret.");
         }
         accessKey.setSecret(hashSecret(secret, objectId));
-        accessKey.setCreator(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-        accessKey.setCreation(new Date());
-        accessKey.setLastChanger(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-        accessKey.setLastChange(new Date());
+        accessKey.setCreatedBy(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+        accessKey.setCreated(new Date());
+        accessKey.setLastModifiedBy(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+        accessKey.setLastModified(new Date());
         if (accessKey.getIsActive() == null) {
             accessKey.setIsActive(true);
         }
@@ -251,8 +251,8 @@ public final class MCRAccessKeyManager {
             if (comment != null) {
                 accessKey.setComment(comment);
             }
-            accessKey.setLastChanger(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
-            accessKey.setLastChange(new Date());
+            accessKey.setLastModifiedBy(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+            accessKey.setLastModified(new Date());
         } else { 
             LOGGER.debug("Key does not exists.");
             throw new MCRAccessKeyNotFoundException("Key does not exists.");

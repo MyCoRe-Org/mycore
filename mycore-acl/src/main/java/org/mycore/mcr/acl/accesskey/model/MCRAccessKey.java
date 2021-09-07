@@ -43,7 +43,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
             + "  WHERE k.objectId = :objectId"
-            + "  ORDER BY k.lastChange ASC"),
+            + "  ORDER BY k.lastModified ASC"),
     @NamedQuery(name = "MCRAccessKey.getWithSecret",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
@@ -94,17 +94,17 @@ public class MCRAccessKey {
     /** The comment */
     private String comment;
 
-    /** The creator */
-    private String creator;
+    /** The date of creation */
+    private Date created;
 
-    /** The creation date */
-    private Date creation;
+    /** The name of creator */
+    private String createdBy;
 
-    /** Last modified by */
-    private String lastChanger;
+    /** The date of last modification */
+    private Date lastModified;
 
-    /** Last modified date */
-    private Date lastChange;
+    /** The name of the last modifier */
+    private String lastModifiedBy;
 
     protected MCRAccessKey() {
     }
@@ -239,63 +239,64 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return name of creator
-     */
-    @Column(name = "creator")
-    public String getCreator() {
-        return creator;
-    }
-
-    /**
-     * @param creator name of creator
-     */
-    public void setCreator(final String creator) {
-        this.creator = creator;
-    }
-    
-    /**
      * @return date of creation
      */
-    @Column(name = "creation")
-    public Date getCreation() {
-        return creation;
+    @Column(name = "created")
+    public Date getCreated() {
+        return created;
     }
 
     /**
-     * @param creation date of creation
+     * @param created date of creation
      */
-    public void setCreation(final Date creation) {
-        this.creation = creation;
+    public void setCreated(final Date created) {
+        this.created = created;
     }
 
     /**
-     * @return name of last changer
+     * @return name of creator
      */
-    @Column(name = "lastChanger")
-    public String getLastChanger() {
-        return lastChanger;
+    @Column(name = "createdBy")
+    public String getCreatedBy() {
+        return createdBy;
     }
 
     /**
-     * @param lastChanger name of modifier
+     * @param createdBy name of creator
      */
-    public void setLastChanger(final String lastChanger) {
-        this.lastChanger = lastChanger;
-    }
-    
-    /**
-     * @return last date of change
-     */
-    @Column(name = "lastChange")
-    public Date getLastChange() {
-        return lastChange;
+    public void setCreatedBy(final String createdBy) {
+        this.createdBy = createdBy;
     }
 
     /**
-     * @param lastChange last date of change
+     * @return date of last modification
      */
-    public void setLastChange(final Date lastChange) {
-        this.lastChange = lastChange;
+    @Column(name = "lastModified")
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    /**
+     * @param lastModified date of last modification
+     */
+    @Column(name = "lastModified")
+    public void setLastModified(final Date lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    /**
+     * @return name of last modifier
+     */
+    @Column(name = "lastModifiedBy")
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    /**
+     * @param lastModifiedBy name of last modifier
+     */
+    public void setLastModifiedBy(final String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 
     @Override
