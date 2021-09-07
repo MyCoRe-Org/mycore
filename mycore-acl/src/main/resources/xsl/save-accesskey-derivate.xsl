@@ -15,13 +15,13 @@
   </xsl:template>
 
   <xsl:template match="servflags[@class='MCRMetaLangText']">
-    <xsl:variable name="accessKeys" select="document(concat('accesskey:', /mycorederivate/@ID))/servflag" />
+    <xsl:variable name="accessKeys" select="document(concat('accesskey:', /mycorederivate/@ID))" />
     <xsl:copy>
       <xsl:copy-of select="@*"/>
       <xsl:copy-of select="node()"/>
-      <xsl:if test="$accessKeys">
-        <xsl:copy-of select="$accessKeys" />
-      </xsl:if>
+      <servflag type="accesskeys" inherited="0" form="plain">
+        <xsl:value-of select="$accessKeys" />
+      </servflag>
     </xsl:copy>
   </xsl:template>
 </xsl:stylesheet>

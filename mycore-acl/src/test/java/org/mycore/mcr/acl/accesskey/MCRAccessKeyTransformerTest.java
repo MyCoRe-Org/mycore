@@ -78,15 +78,15 @@ public class MCRAccessKeyTransformerTest extends MCRTestCase {
     }
 
     @Test
-    public void testServFlagTransform() throws IOException {
+    public void testElementTransform() throws IOException {
         final MCRAccessKey accessKeyRead = new MCRAccessKey(READ_KEY, PERMISSION_READ);
         final MCRAccessKey accessKeyWrite = new MCRAccessKey(WRITE_KEY, PERMISSION_WRITE);
         final List<MCRAccessKey> accessKeys = new ArrayList<>();
         accessKeys.add(accessKeyRead);
         accessKeys.add(accessKeyWrite);
-        final Element servFlag = MCRAccessKeyTransformer.servFlagFromAccessKeys(accessKeys);
-        new XMLOutputter(Format.getPrettyFormat()).output(servFlag, System.out);
-        final List<MCRAccessKey> transAccessKeys = MCRAccessKeyTransformer.accessKeysFromElement(objectId, servFlag);
+        final Element element = MCRAccessKeyTransformer.elementFromAccessKeys(accessKeys);
+        new XMLOutputter(Format.getPrettyFormat()).output(element, System.out);
+        final List<MCRAccessKey> transAccessKeys = MCRAccessKeyTransformer.accessKeysFromElement(objectId, element);
         assertEquals(2, transAccessKeys.size());
         final MCRAccessKey transAccessKeyRead = transAccessKeys.get(0);
         assertEquals(accessKeyRead.getSecret(), transAccessKeyRead.getSecret());
@@ -100,12 +100,10 @@ public class MCRAccessKeyTransformerTest extends MCRTestCase {
         final MCRAccessKey accessKey = new MCRAccessKey(READ_KEY, PERMISSION_READ);
         final List<MCRAccessKey> accessKeys = new ArrayList<>();
         accessKeys.add(accessKey);
-        final Element servFlag = MCRAccessKeyTransformer.servFlagFromAccessKeys(accessKeys);
+        final String accessKeysJson = MCRAccessKeyTransformer.jsonFromAccessKeys(accessKeys);
+        final Element servFlag = createServFlag("accesskeys", accessKeysJson);
         servFlags.addContent(servFlag);
-        final Element sf1 = new Element("servflag");
-        sf1.setAttribute("type", "createdby");
-        sf1.setAttribute("inherited", "0");
-        sf1.setAttribute("form", "plain");
+        final Element sf1 = createServFlag("createdby", "administrator");
         sf1.setText("administrator");
         servFlags.addContent(sf1);
         service.addContent(servFlags);
@@ -114,5 +112,14 @@ public class MCRAccessKeyTransformerTest extends MCRTestCase {
         final MCRAccessKey transAccessKey = transAccessKeys.get(0);
         assertEquals(accessKey.getSecret(), transAccessKey.getSecret());
         assertEquals(accessKey.getType(), transAccessKey.getType());
+    }
+
+    private static Element createServFlag(final String type, final String content) {
+        final Element servFlag = new Element("servflag");
+        servFlag.setAttribute("type", type);
+        servFlag.setAttribute("inherited", "0");
+        servFlag.setAttribute("form", "plain");
+        servFlag.setText(content);
+        return servFlag;
     }
 }
