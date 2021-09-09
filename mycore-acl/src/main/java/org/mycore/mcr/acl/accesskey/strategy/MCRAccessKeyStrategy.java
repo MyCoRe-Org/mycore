@@ -46,7 +46,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Set<String> ALLOWED_SESSION_PERMISSION_TYPES = MCRConfiguration2
-        .getString("MCR.AccessKey.Session.AllowedPermissionTypes")
+        .getString("MCR.ACL.AccessKey.Session.AllowedPermissionTypes")
         .stream()
         .flatMap(MCRConfiguration2::splitValue)
         .collect(Collectors.toSet());

@@ -68,7 +68,7 @@ public class MCRAccessKeyStrategyTest extends MCRStoreTestCase {
         testProperties
             .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
         testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
-        testProperties.put("MCR.AccessKey.Session.AllowedPermissionTypes", "read");
+        testProperties.put("MCR.ACL.AccessKey.Session.AllowedPermissionTypes", "read");
         testProperties.put("MCR.Metadata.Type.document", "true");
         testProperties.put("MCR.Metadata.Type.object", Boolean.TRUE.toString());
         testProperties.put("MCR.Metadata.Type.derivate", Boolean.TRUE.toString());
