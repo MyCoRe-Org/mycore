@@ -65,9 +65,9 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
         String exp = "alto:Layout/alto:Page/alto:PrintSpace//alto:String";
         Namespace namespace = root.getNamespace();
         Namespace altoNS = Namespace.getNamespace("alto", namespace.getURI());
-        XPathExpression<Element> STRING_EXP = XPathFactory.instance().compile(exp, Filters.element(), null, altoNS);
+        XPathExpression<Element> stringExp = XPathFactory.instance().compile(exp, Filters.element(), null, altoNS);
 
-        for (Element stringElement : STRING_EXP.evaluate(root)) {
+        for (Element stringElement : stringExp.evaluate(root)) {
             String content = stringElement.getAttributeValue("CONTENT");
             String hpos = stringElement.getAttributeValue("HPOS");
             String vpos = stringElement.getAttributeValue("VPOS");
