@@ -29,11 +29,11 @@ import org.apache.solr.common.SolrInputDocument;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
 
@@ -43,13 +43,6 @@ import org.mycore.solr.index.file.MCRSolrFileIndexAccumulator;
  * @author Matthias Eichner
  */
 public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
-
-    static XPathExpression<Element> STRING_EXP;
-
-    static {
-        String exp = "alto:Layout/alto:Page/alto:PrintSpace//alto:String";
-        STRING_EXP = XPathFactory.instance().compile(exp, Filters.element(), null, MCRConstants.ALTO_NAMESPACE);
-    }
 
     @Override
     public void accumulate(SolrInputDocument document, Path filePath, BasicFileAttributes attributes)
@@ -69,6 +62,11 @@ public class MCRSolrAltoExtractor implements MCRSolrFileIndexAccumulator {
 
     private void extract(Element root, SolrInputDocument document) {
         StringBuilder altoContent = new StringBuilder();
+        String exp = "alto:Layout/alto:Page/alto:PrintSpace//alto:String";
+        Namespace namespace = root.getNamespace();
+        Namespace altoNS = Namespace.getNamespace("alto", namespace.getURI());
+        XPathExpression<Element> STRING_EXP = XPathFactory.instance().compile(exp, Filters.element(), null, altoNS);
+
         for (Element stringElement : STRING_EXP.evaluate(root)) {
             String content = stringElement.getAttributeValue("CONTENT");
             String hpos = stringElement.getAttributeValue("HPOS");
