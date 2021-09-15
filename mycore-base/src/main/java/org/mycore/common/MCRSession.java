@@ -56,6 +56,7 @@ import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.util.concurrent.MCRTransactionableRunnable;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -231,9 +232,11 @@ public class MCRSession implements Cloneable {
 
     /** sets the current language */
     public final void setCurrentLanguage(String language) {
-        Locale newLocale = Locale.forLanguageTag(language);
-        this.language = language;
-        this.locale = newLocale;
+        if(MCRTranslation.getAvailableLanguages().contains(language)) {
+            Locale newLocale = Locale.forLanguageTag(language);
+            this.language = language;
+            this.locale = newLocale;
+        }
     }
 
     public Locale getLocale() {
