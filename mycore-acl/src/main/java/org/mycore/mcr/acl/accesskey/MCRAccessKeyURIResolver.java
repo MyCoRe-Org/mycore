@@ -23,7 +23,6 @@ package org.mycore.mcr.acl.accesskey;
 import java.util.List;
 
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
 import org.jdom2.transform.JDOMSource;
@@ -43,7 +42,7 @@ public class MCRAccessKeyURIResolver implements URIResolver {
      * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
      */
     @Override
-    public Source resolve(String href, String base) throws TransformerException {
+    public Source resolve(String href, String base) {
         final MCRObjectID objectId = MCRObjectID.getInstance(href.substring(href.indexOf(":") + 1));
         final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.getAccessKeys(objectId);
         if (accessKeys.size() != 0) {

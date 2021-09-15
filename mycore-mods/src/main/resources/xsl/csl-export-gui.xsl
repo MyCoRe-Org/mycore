@@ -88,10 +88,18 @@
     <xsl:template name="styles2Options">
         <xsl:for-each select="str:tokenize($MCR.Export.CSL.Styles, ',')">
             <option value="{text()}">
-                <xsl:variable name="cslDocument" select="document(concat('resource:', text(), '.csl'))" />
-                <xsl:variable name="title" select="$cslDocument/csl:style/csl:info/csl:title" />
-                <!-- <xsl:variable name="title" select="$cslDocument/csl:style/csl:info/csl:title-short" -->
-                <xsl:value-of select="$title" />
+                <xsl:variable name="cslDocument" select="document(concat('resource:', text(), '.csl'))"/>
+                <xsl:variable name="title" select="$cslDocument/csl:style/csl:info/csl:title"/>
+                <xsl:variable name="short-title" select="$cslDocument/csl:style/csl:info/csl:title-short"/>
+
+                <xsl:choose>
+                    <xsl:when test="string-length($short-title) &gt; 0">
+                        <xsl:value-of select="concat($short-title, ' (', $title, ')')"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$title" />
+                    </xsl:otherwise>
+                </xsl:choose>
             </option>
         </xsl:for-each>
     </xsl:template>

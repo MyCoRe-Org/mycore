@@ -90,10 +90,9 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
         if (sessionAttributes != null) {
             for (String sessionAttribute : sessionAttributes) {
                 Object object = mcrSession.get(sessionAttribute);
-                String value = Optional.ofNullable(object).map(Object::toString).orElse("null");
-                if (value != null) {
+                Optional.ofNullable(object).map(Object::toString).ifPresent((value)-> {
                     builder.withClaim(JWT_SESSION_ATTRIBUTE_PREFIX + sessionAttribute, value);
-                }
+                });
             }
         }
         return builder;

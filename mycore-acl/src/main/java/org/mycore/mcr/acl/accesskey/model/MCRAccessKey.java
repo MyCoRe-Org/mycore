@@ -20,9 +20,6 @@
 
 package org.mycore.mcr.acl.accesskey.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -38,12 +35,15 @@ import javax.persistence.Table;
 import org.mycore.backend.jpa.MCRObjectIDConverter;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @NamedQueries({
     @NamedQuery(name = "MCRAccessKey.getById",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
             + "  WHERE k.objectId = :objId"
-            + "  ORDER BY lastChange ASC"),
+            + "  ORDER BY k.lastChange ASC"),
     @NamedQuery(name = "MCRAccessKey.getByValue",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
@@ -63,8 +63,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  
 /**
  * Access keys for a {@link MCRObject}.
- * An access keys contains a value and a type.
- * Value is the key value of the key and type the permission.
+ * An access key contains a value and a type.
+ * Value is the key value of the key and type is the permission.
  */
 @Entity
 @Table(name = "MCRAccessKey")
@@ -100,7 +100,7 @@ public class MCRAccessKey {
     /** Last modified date */
     private Date lastChange;
 
-    private MCRAccessKey() {
+    protected MCRAccessKey() {
     }
 
     /**
@@ -110,6 +110,7 @@ public class MCRAccessKey {
      * @param type the type of permission.
      */
     public MCRAccessKey(final String value, final String type) {
+        this();
         setValue(value);
         setType(type);
     }
@@ -122,9 +123,8 @@ public class MCRAccessKey {
      * @param type the type of permission.
      */
     public MCRAccessKey(final MCRObjectID objectId, final String value, final String type) {
+        this(value, type);
         setObjectId(objectId);
-        setValue(value);
-        setType(type);
     }
 
     /**
@@ -200,8 +200,7 @@ public class MCRAccessKey {
     /**
      * @return comment
      */
-    @Column(name = "comment",
-        nullable = true)
+    @Column(name = "comment")
     public String getComment() {
         return comment;
     }
@@ -216,8 +215,7 @@ public class MCRAccessKey {
     /**
      * @return name of creator
      */
-    @Column(name = "creator",
-        nullable = true)
+    @Column(name = "creator")
     public String getCreator() {
         return creator;
     }
@@ -232,8 +230,7 @@ public class MCRAccessKey {
     /**
      * @return date of creation
      */
-    @Column(name = "creation",
-        nullable = true)
+    @Column(name = "creation")
     public Date getCreation() {
         return creation;
     }
@@ -248,8 +245,7 @@ public class MCRAccessKey {
     /**
      * @return name of last changer
      */
-    @Column(name = "lastChanger",
-        nullable = true)
+    @Column(name = "lastChanger")
     public String getLastChanger() {
         return lastChanger;
     }
@@ -264,8 +260,7 @@ public class MCRAccessKey {
     /**
      * @return last date of change
      */
-    @Column(name = "lastChange",
-        nullable = true)
+    @Column(name = "lastChange")
     public Date getLastChange() {
         return lastChange;
     }

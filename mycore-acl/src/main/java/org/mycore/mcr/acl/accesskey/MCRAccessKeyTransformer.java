@@ -20,12 +20,9 @@
 
 package org.mycore.mcr.acl.accesskey;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,6 +30,9 @@ import org.jdom2.Element;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Methods for transforming {@link MCRAccessKey} between JSON.
@@ -131,17 +131,17 @@ public class MCRAccessKeyTransformer {
                     }
                 }
             }
-        } else if (element.getName().equals(SERV_FLAG) && element.getAttributeValue("type") == ACCESS_KEY_TYPE) {
+        } else if (element.getName().equals(SERV_FLAG) && ACCESS_KEY_TYPE.equals(element.getAttributeValue("type"))) {
             return accessKeysFromServFlag(objectId, element);
         } 
-        return new ArrayList<MCRAccessKey>();
+        return new ArrayList<>();
     }
 
     /**
      * Transforms servflag element to {@link MCRAccessKey} list
      *
      * @param objectId the linked {@link MCRObjectID}
-     * @param the servflag element
+     * @param servFlag servlag element {@link org.mycore.datamodel.metadata.MCRObjectService}
      * @return the {@link MCRAccessKey} list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */

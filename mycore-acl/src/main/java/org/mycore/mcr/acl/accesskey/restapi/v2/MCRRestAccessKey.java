@@ -22,8 +22,6 @@ package org.mycore.mcr.acl.accesskey.restapi.v2;
 
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
-import java.io.IOException;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -190,7 +188,7 @@ public class MCRRestAccessKey {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response updateAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
-        @PathParam(VALUE) final String value, final String accessKeyJson) throws IOException {
+        @PathParam(VALUE) final String value, final String accessKeyJson) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
@@ -220,7 +218,7 @@ public class MCRRestAccessKey {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response deleteAccessKey(@PathParam(PARAM_MCRID) final MCRObjectID objectId, 
-        @PathParam(VALUE) final String value) throws IOException {
+        @PathParam(VALUE) final String value) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException();
         }
