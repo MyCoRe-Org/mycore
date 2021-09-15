@@ -49,6 +49,7 @@ import org.mycore.common.config.MCRConfiguration;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * Servlet/Jersey Resource utility class.
@@ -170,7 +171,9 @@ public class MCRFrontendUtil {
     public static void configureSession(MCRSession session, HttpServletRequest request, HttpServletResponse response) {
         session.setServletJob(new MCRServletJob(request, response));
         // language
-        getProperty(request, "lang").ifPresent(session::setCurrentLanguage);
+        getProperty(request, "lang")
+                .filter(MCRTranslation.getAvailableLanguages()::contains)
+                .ifPresent(session::setCurrentLanguage);
 
         // Set the IP of the current session
         if (session.getCurrentIP().length() == 0) {
