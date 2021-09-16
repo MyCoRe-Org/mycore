@@ -17,8 +17,8 @@
  */
 
 import _Vue from 'vue';
-import axios, { AxiosInstance } from "axios";
-import MCRException from "@/common/MCRException"
+import axios, { AxiosInstance } from 'axios';
+import MCRException from '@/common/MCRException';
 import MCRAccessKey from '@/common/MCRAccessKey';
 
 export interface MCRAccessKeyInformation {
@@ -41,66 +41,65 @@ interface MCRErrorResponse {
 }
 
 export default new class MCRAccessKeyServicePlugin {
-
   private instance: AxiosInstance;
 
   public install(Vue: typeof _Vue, options: MCRAccessKeyServiceOptions) {
+    /* eslint-disable */
     Vue.prototype.$client = this;
+    /* eslint-enable */
 
     this.instance = axios.create({
       baseURL: `${options.baseURL}api/v2/objects/${options.objectID}/`,
-      timeout: 2000
+      timeout: 2000,
     });
 
-    this.instance.interceptors.response.use(function (response) {
-      return response;
-    }, function (error) {
+    this.instance.interceptors.response.use((response) => response, (error) => {
       const exception: MCRException = {};
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          if (error.response.status == 401 || error.response.status == 403) {
-            exception.errorCode = "noPermission";
+          if (error.response.status === 401 || error.response.status === 403) {
+            exception.errorCode = 'noPermission';
           } else if (error.response.status >= 500) {
-             exception.errorCode = "server";
+            exception.errorCode = 'server';
           } else {
             const errorResponse: MCRErrorResponse = error.response.data as MCRErrorResponse;
-            const errorCode = errorResponse.errorCode;
+            const { errorCode } = errorResponse;
             if (errorCode != null) {
-              if (errorCode != "UNKNOWN") {
-                  exception.errorCode = errorResponse.errorCode;
-                  exception.message = errorResponse.message;
+              if (errorCode !== 'UNKNOWN') {
+                exception.errorCode = errorResponse.errorCode;
+                exception.message = errorResponse.message;
               }
             }
           }
         } else if (error.request) {
-           exception.errorCode = "request";
+          exception.errorCode = 'request';
         }
       }
       return Promise.reject(exception);
     });
-    this.instance.defaults.headers.common['Authorization'] = `Bearer ${options.token}`;
+    this.instance.defaults.headers.common.Authorization = `Bearer ${options.token}`;
   }
 
   public async getAccessKeys(): Promise<MCRAccessKeyInformation> {
-    const response = await this.instance.get("accesskeys");
+    const response = await this.instance.get('accesskeys');
     return <MCRAccessKeyInformation>response.data;
   }
 
-  public async getAccessKey(id: string): Promise<MCRAccessKey> {
-    const response = await this.instance.get(`accesskeys/${id}`);
+  public async getAccessKey(secret: string): Promise<MCRAccessKey> {
+    const response = await this.instance.get(`accesskeys/${secret}`);
     return response.data;
   }
 
   public async addAccessKey(accessKey: MCRAccessKey): Promise<string> {
-    const response = await this.instance.post("accesskeys", accessKey);
-    return response.headers["location"].split("/").pop();
+    const response = await this.instance.post('accesskeys', accessKey);
+    return response.headers.location.split('/').pop();
   }
 
-  public async updateAccessKey(accessKey: MCRAccessKey): Promise<void> {
-    await this.instance.put(`/accesskeys/${accessKey.value}`, accessKey);
+  public async updateAccessKey(secret: string, accessKey: MCRAccessKey): Promise<void> {
+    await this.instance.put(`/accesskeys/${secret}`, accessKey);
   }
 
-  public async removeAccessKey(id: string): Promise<void> {
-    await this.instance.delete(`accesskeys/${id}`);
+  public async removeAccessKey(secret: string): Promise<void> {
+    await this.instance.delete(`accesskeys/${secret}`);
   }
-}
+}();

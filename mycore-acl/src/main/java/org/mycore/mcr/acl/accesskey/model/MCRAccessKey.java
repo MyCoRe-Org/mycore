@@ -39,23 +39,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @NamedQueries({
-    @NamedQuery(name = "MCRAccessKey.getById",
+    @NamedQuery(name = "MCRAccessKey.getWithObjectId",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.objectId = :objId"
-            + "  ORDER BY k.lastChange ASC"),
-    @NamedQuery(name = "MCRAccessKey.getByValue",
+            + "  WHERE k.objectId = :objectId"
+            + "  ORDER BY k.lastModified ASC"),
+    @NamedQuery(name = "MCRAccessKey.getWithSecret",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.value = :value AND k.objectId = :objId"),
-    @NamedQuery(name = "MCRAccessKey.getByType",
+            + "  WHERE k.secret = :secret AND k.objectId = :objectId"),
+    @NamedQuery(name = "MCRAccessKey.getWithType",
         query = "SELECT k"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.type = :type AND k.objectId = :objId"),
-    @NamedQuery(name = "MCRAccessKey.clearById",
+            + "  WHERE k.type = :type AND k.objectId = :objectId"),
+    @NamedQuery(name = "MCRAccessKey.clearWithObjectId",
         query = "DELETE"
             + "  FROM MCRAccessKey k"
-            + "  WHERE k.objectId = :objId"),
+            + "  WHERE k.objectId = :objectId"),
     @NamedQuery(name = "MCRAccessKey.clear",
         query = "DELETE"
             + "  FROM MCRAccessKey k"),
@@ -63,8 +63,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  
 /**
  * Access keys for a {@link MCRObject}.
- * An access key contains a value and a type.
- * Value is the key value of the key and type is the permission.
+ * An access keys contains a secret and a type.
+ * Value is the key secret of the key and type the permission.
  */
 @Entity
 @Table(name = "MCRAccessKey")
@@ -79,52 +79,46 @@ public class MCRAccessKey {
     /** The access key information */
     private MCRObjectID objectId; 
 
-    /** The key value */
-    private String value;
+    /** The secret */
+    private String secret;
 
     /** The permission type */
     private String type;
 
+    /** The status */
+    private Boolean isActive;
+
+    /** The expiration date* */
+    private Date expiration;
+
     /** The comment */
     private String comment;
 
-    /** The creator */
-    private String creator;
+    /** The date of creation */
+    private Date created;
 
-    /** The creation date */
-    private Date creation;
+    /** The name of creator */
+    private String createdBy;
 
-    /** Last modified by */
-    private String lastChanger;
+    /** The date of last modification */
+    private Date lastModified;
 
-    /** Last modified date */
-    private Date lastChange;
+    /** The name of the last modifier */
+    private String lastModifiedBy;
 
     protected MCRAccessKey() {
     }
 
     /**
-     * Creates a new access key with value and type.
+     * Creates a new access key with secret and type.
      *
-     * @param value the value the user must know to acquire permission.
+     * @param secret the secret the user must know to acquire permission.
      * @param type the type of permission.
      */
-    public MCRAccessKey(final String value, final String type) {
+    public MCRAccessKey(final String secret, final String type) {
         this();
-        setValue(value);
+        setSecret(secret);
         setType(type);
-    }
-
-    /**
-     * Creates a new access key with value and type.
-     *
-     * @param objectId the assigned {@link MCRObjectID}.
-     * @param value the value the user must know to acquire permission.
-     * @param type the type of permission.
-     */
-    public MCRAccessKey(final MCRObjectID objectId, final String value, final String type) {
-        this(value, type);
-        setObjectId(objectId);
     }
 
     /**
@@ -166,19 +160,19 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return the key value
+     * @return the key secret
      */
-    @Column(name = "value",
+    @Column(name = "secret",
         nullable = false)
-    public String getValue() {
-        return value;
+    public String getSecret() {
+        return secret;
     }
 
     /**
-     * @param value key value
-    */
-    public void setValue(final String value) {
-        this.value = value;
+     * @param secret key secret
+     */
+    public void setSecret(final String secret) {
+        this.secret = secret;
     }
 
     /**
@@ -198,6 +192,38 @@ public class MCRAccessKey {
     }
 
     /**
+     * @return active or not
+     */
+    @Column(name = "isActive",
+        nullable = false)
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    /**
+     * @param isActive the state
+     */
+    public void setIsActive(final Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    /**
+     * @return expiration date
+     */
+    @Column(name = "expiration")
+    public Date getExpiration() {
+        return expiration;
+    }
+
+    /**
+     * @param expiration the expiration date
+     */
+    public void setExpiration(final Date expiration) {
+
+        this.expiration = expiration;
+    }
+
+    /**
      * @return comment
      */
     @Column(name = "comment")
@@ -213,63 +239,64 @@ public class MCRAccessKey {
     }
 
     /**
-     * @return name of creator
-     */
-    @Column(name = "creator")
-    public String getCreator() {
-        return creator;
-    }
-
-    /**
-     * @param creator name of creator
-     */
-    public void setCreator(final String creator) {
-        this.creator = creator;
-    }
-    
-    /**
      * @return date of creation
      */
-    @Column(name = "creation")
-    public Date getCreation() {
-        return creation;
+    @Column(name = "created")
+    public Date getCreated() {
+        return created;
     }
 
     /**
-     * @param creation date of creation
+     * @param created date of creation
      */
-    public void setCreation(final Date creation) {
-        this.creation = creation;
+    public void setCreated(final Date created) {
+        this.created = created;
     }
 
     /**
-     * @return name of last changer
+     * @return name of creator
      */
-    @Column(name = "lastChanger")
-    public String getLastChanger() {
-        return lastChanger;
+    @Column(name = "createdBy")
+    public String getCreatedBy() {
+        return createdBy;
     }
 
     /**
-     * @param lastChanger name of modifier
+     * @param createdBy name of creator
      */
-    public void setLastChanger(final String lastChanger) {
-        this.lastChanger = lastChanger;
-    }
-    
-    /**
-     * @return last date of change
-     */
-    @Column(name = "lastChange")
-    public Date getLastChange() {
-        return lastChange;
+    public void setCreatedBy(final String createdBy) {
+        this.createdBy = createdBy;
     }
 
     /**
-     * @param lastChange last date of change
+     * @return date of last modification
      */
-    public void setLastChange(final Date lastChange) {
-        this.lastChange = lastChange;
+    @Column(name = "lastModified")
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    /**
+     * @param lastModified date of last modification
+     */
+    @Column(name = "lastModified")
+    public void setLastModified(final Date lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    /**
+     * @return name of last modifier
+     */
+    @Column(name = "lastModifiedBy")
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    /**
+     * @param lastModifiedBy name of last modifier
+     */
+    public void setLastModifiedBy(final String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
     }
 
     @Override
@@ -282,6 +309,6 @@ public class MCRAccessKey {
         }
         MCRAccessKey other = (MCRAccessKey) o;
         return this.id == other.getId() && this.type.equals(other.getType())
-            && this.value.equals(other.getValue());
+            && this.secret.equals(other.getSecret());
     }
 }

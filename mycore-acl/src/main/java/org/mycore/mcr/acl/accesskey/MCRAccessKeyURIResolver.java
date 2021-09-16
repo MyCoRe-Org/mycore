@@ -26,14 +26,15 @@ import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 
 import org.jdom2.transform.JDOMSource;
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationException;
 
 /**
- * Returns a JSON-String as servflag with {@link MCRAccessKey} for an given {@link MCRObjectID}.
+ * Returns a JSON string with all {@link MCRAccessKey} for an given {@link MCRObjectID}.
  * <p>Syntax:</p>
  * <ul>
- * <li><code>accesskey:{mcrObjectId}</code> to resolve a servflag</li>
+ * <li><code>accesskeys:{objectId}</code> to resolve a access keys as json string and count as attribute</li>
  * </ul>
  */
 public class MCRAccessKeyURIResolver implements URIResolver {
@@ -42,12 +43,9 @@ public class MCRAccessKeyURIResolver implements URIResolver {
      * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
      */
     @Override
-    public Source resolve(String href, String base) {
+    public Source resolve(String href, String base) throws MCRAccessKeyTransformationException {
         final MCRObjectID objectId = MCRObjectID.getInstance(href.substring(href.indexOf(":") + 1));
-        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.getAccessKeys(objectId);
-        if (accessKeys.size() != 0) {
-            return new JDOMSource(MCRAccessKeyTransformer.servFlagFromAccessKeys(accessKeys));
-        }
-        return null;
+        final List<MCRAccessKey> accessKeys = MCRAccessKeyManager.listAccessKeys(objectId);
+        return new JDOMSource(MCRAccessKeyTransformer.elementFromAccessKeys(accessKeys));
     }
 }

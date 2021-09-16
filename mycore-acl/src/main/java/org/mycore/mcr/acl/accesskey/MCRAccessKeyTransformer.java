@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationException;
@@ -38,8 +36,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Methods for transforming {@link MCRAccessKey} between JSON.
  */
 public class MCRAccessKeyTransformer {
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Name of service element.
@@ -99,15 +95,15 @@ public class MCRAccessKeyTransformer {
      * Transforms a {@link MCRAccessKey} list to JSON.
      *
      * @param accessKeys the {@link MCRAccessKey} list
-     * @return JSON or null if the transformation fails
+     * @return access keys as json array string
+     * @throws MCRAccessKeyTransformationException if the transformation fails
      */
     public static String jsonFromAccessKeys(final List<MCRAccessKey> accessKeys) {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.writeValueAsString(accessKeys);
-        } catch (JsonProcessingException e) { //should not happen
-            LOGGER.warn("Access keys could not be converted to JSON.");
-            return null;
+        } catch (JsonProcessingException e) {
+            throw new MCRAccessKeyTransformationException("Access keys could not be converted to JSON.");
         }
     }
 
@@ -127,13 +123,15 @@ public class MCRAccessKeyTransformer {
                 final List<Element> servFlags = servFlagsRoot.getChildren(SERV_FLAG);
                 for (Element servFlag : servFlags) {
                     if (servFlag.getAttributeValue("type").equals(ACCESS_KEY_TYPE)) {
-                        return accessKeysFromServFlag(objectId, servFlag);
+                        return accessKeysFromAccessKeyElement(objectId, servFlag);
                     }
                 }
             }
-        } else if (element.getName().equals(SERV_FLAG) && ACCESS_KEY_TYPE.equals(element.getAttributeValue("type"))) {
-            return accessKeysFromServFlag(objectId, element);
-        } 
+        } else if (SERV_FLAG.equals(element.getName()) && ACCESS_KEY_TYPE.equals(element.getAttributeValue("type"))) {
+            return accessKeysFromAccessKeyElement(objectId, element);
+        } else if (element.getName().equals(ACCESS_KEY_TYPE)) {
+            return accessKeysFromAccessKeyElement(objectId, element);
+        }
         return new ArrayList<>();
     }
 
@@ -145,9 +143,9 @@ public class MCRAccessKeyTransformer {
      * @return the {@link MCRAccessKey} list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    private static List<MCRAccessKey> accessKeysFromServFlag(MCRObjectID objectId, Element servFlag)
+    private static List<MCRAccessKey> accessKeysFromAccessKeyElement(MCRObjectID objectId, Element element)
         throws MCRAccessKeyTransformationException {
-        final String json = servFlag.getText();
+        final String json = element.getText();
         final List<MCRAccessKey> accessKeyList = accessKeysFromJson(json);
         for (MCRAccessKey accessKey : accessKeyList) {
             accessKey.setObjectId(objectId);
@@ -156,31 +154,29 @@ public class MCRAccessKeyTransformer {
     }
 
     /**
-     * Transforms {@link MCRAccessKey} list to a servflag
+     * Transforms {@link MCRAccessKey} list to a element
      *
      * @param accessKeys the {@link MCRAccessKey} list
-     * @return the servlag or null if there is no {@link MCRAccessKey}
+     * @return the accesskeys element with access key list as json string as content
+     * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static Element servFlagFromAccessKeys(final List<MCRAccessKey> accessKeys) {
+    public static Element elementFromAccessKeys(final List<MCRAccessKey> accessKeys)
+        throws MCRAccessKeyTransformationException {
         final String jsonString = jsonFromAccessKeys(accessKeys);
-        if (jsonString != null) {
-            return servFlagfromAccessKeysJson(jsonString);
-        }
-        return new Element("null");
+        final Element element = elementFromAccessKeysJson(jsonString);
+        element.setAttribute("count", Integer.toString(accessKeys.size()));
+        return element;
     }
 
     /**
-     * Transforms JSON of {@link MCRAccessKey} list to a servflag element
+     * Transforms JSON of {@link MCRAccessKey} list to a element
      *
      * @param json the JSON
-     * @return the servlag
+     * @return element with accesskeys name
      */
-    private static Element servFlagfromAccessKeysJson(final String json) {
-        final Element servFlag = new Element(SERV_FLAG);
-        servFlag.setAttribute("type", ACCESS_KEY_TYPE);
-        servFlag.setAttribute("inherited", "0");
-        servFlag.setAttribute("form", "plain");
-        servFlag.setText(json);
-        return servFlag;
+    private static Element elementFromAccessKeysJson(final String json) {
+        final Element element = new Element(ACCESS_KEY_TYPE);
+        element.setText(json);
+        return element;
     } 
 }

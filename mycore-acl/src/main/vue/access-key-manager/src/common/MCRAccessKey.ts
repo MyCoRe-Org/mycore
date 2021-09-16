@@ -16,12 +16,16 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default interface MCRAccessKey {
-  value: string;
-  type: string;
-  comment: string;
-  creator?: string;
-  creation?: string;
-  lastChanger?: string;
-  lastChange?: string;
+interface MCRAccessKey {
+  secret?: string;
+  type?: string;
+  isActive?: boolean;
+  expiration?: Date;
+  comment?: string;
+  created?: string;
+  createdBy?: string;
+  lastModified?: string;
+  lastModifiedBy?: string;
 }
+
+export default MCRAccessKey;

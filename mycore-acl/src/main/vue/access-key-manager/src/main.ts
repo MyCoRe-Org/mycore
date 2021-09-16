@@ -16,13 +16,78 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Vue from 'vue'
-import AccessKeyManager from './App.vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+import Vue from 'vue';
+import vueCustomElement from 'vue-custom-element';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+import {
+  ButtonPlugin,
+  PaginationPlugin,
+  TablePlugin,
+  LayoutPlugin,
+  AlertPlugin,
+  OverlayPlugin,
+  ModalPlugin,
+  FormInputPlugin,
+  FormSelectPlugin,
+  InputGroupPlugin,
+  FormGroupPlugin,
+  LinkPlugin,
+  PopoverPlugin,
+  FormTextareaPlugin,
+  FormPlugin,
+  FormCheckboxPlugin,
+  FormDatepickerPlugin,
+} from 'bootstrap-vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faEdit,
+  faTimes,
+  faPlus,
+  faInfoCircle,
+  faTrash,
+  faSave,
+  faRandom,
+  faAngleLeft,
+} from '@fortawesome/free-solid-svg-icons';
+import dict from '@/common/i18n/MCRAccessKeyI18n';
+import MCRLocalePlugin from '@/plugins/MCRLocalePlugin';
+import AccessKeyManager from './App.vue';
+import { fetchDict, locale, webApplicationBaseURL } from '@/common/MCRUtils';
 
 Vue.config.productionTip = false;
 
-new Vue({
-  render: h => h(AccessKeyManager),
-}).$mount("#manager");
+Vue.use(vueCustomElement);
+
+Vue.use(MCRLocalePlugin, dict);
+
+Vue.use(ButtonPlugin);
+Vue.use(PaginationPlugin);
+Vue.use(TablePlugin);
+Vue.use(LayoutPlugin);
+Vue.use(AlertPlugin);
+Vue.use(OverlayPlugin);
+Vue.use(ModalPlugin);
+Vue.use(FormInputPlugin);
+Vue.use(FormSelectPlugin);
+Vue.use(InputGroupPlugin);
+Vue.use(FormGroupPlugin);
+Vue.use(FormCheckboxPlugin);
+Vue.use(FormDatepickerPlugin);
+Vue.use(LinkPlugin);
+Vue.use(FormPlugin);
+Vue.use(PopoverPlugin);
+Vue.use(FormTextareaPlugin);
+
+library.add(faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, faAngleLeft);
+Vue.component('font-awesome-icon', FontAwesomeIcon);
+
+fetchDict(webApplicationBaseURL, locale).then((result) => {
+  Object.assign(dict, result.data);
+}).catch(() => {
+  // eslint-disable-next-line no-console
+  console.error('i18n update failed.');
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+Vue.customElement('access-key-manager', (AccessKeyManager as any).options);
