@@ -180,7 +180,7 @@ public class MCRAltoHighlightResource {
     }
 
     private String toMCRPathId(String ifsId) {
-        return ifsId.replaceFirst("ifs:/", "");
+        return ifsId.replaceFirst("ifs\\d?:/", "");
     }
 
     private JsonObject buildPositionObject(String altoWord) {
