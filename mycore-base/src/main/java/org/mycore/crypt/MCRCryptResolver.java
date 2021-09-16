@@ -75,7 +75,7 @@ public class MCRCryptResolver implements URIResolver {
         	LOGGER.error(MCRException.getStackTraceAsString(e));
         	returnString =  action.equals("encrypt") ? "" : value;
         } catch ( MCRCryptKeyNoPermissionException e) {
-        	LOGGER.info("No permission to read cryptkey.");
+        	LOGGER.info("No permission to read cryptkey" + cipherID + ".");
         	returnString =  action.equals("encrypt") ? "" : value;
         } catch ( MCRCryptCipherConfigurationException e) {
         	LOGGER.error(e.getStackTraceAsString());

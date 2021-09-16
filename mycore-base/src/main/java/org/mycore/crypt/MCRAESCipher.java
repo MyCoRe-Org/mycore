@@ -160,7 +160,8 @@ public class MCRAESCipher extends MCRCipher {
             byte[] decryptedBytes = decryptCipher.doFinal(bytes);
             return decryptedBytes;
         } catch ( BadPaddingException| IllegalBlockSizeException e ) {
-            throw new MCRCryptCipherConfigurationException("Can't decrypt value - wrong configuration or wrong key.",e);
+            throw new MCRCryptCipherConfigurationException("Can't decrypt value - "
+                    +" possible issues: corrupted crypted value, wrong configuration or bad key.",e);
         }
     }
 
