@@ -32,15 +32,15 @@ import org.mycore.services.i18n.MCRTranslation;
 import java.util.Map;
 
 /**
- * This class contains commands that show system components and resources.
+ * This class contains commands that may be helpful during development.
  *
  * @author Torsten Krause
  */
 
-@MCRCommandGroup(name = "Info Commands")
-public class MCRInfoCommands {
+@MCRCommandGroup(name = "Developer Commands")
+public class MCRDeveloperCommands {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRInfoCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRDeveloperCommands.class);
 
     @MCRCommand(
             syntax = "show message {0} for {1}",
