@@ -20,6 +20,11 @@
 
 package org.mycore.mcr.acl.accesskey;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -29,6 +34,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserAttribute;
 import org.mycore.user2.MCRUserManager;
 
 /**
@@ -107,6 +113,37 @@ public class MCRAccessKeyUtils {
     public static synchronized void addAccessKeySecretToCurrentUser(final MCRObjectID objectId, final String value) 
         throws MCRException {
         addAccessKeySecret(MCRUserManager.getCurrentUser(), objectId, value);
+    }
+
+    /**
+     * Cleans all access key secret attributes of users if the corresponding key does not exist.
+     */
+    public static void cleanUpUserAttributes() {
+        final List<MCRUser> users = MCRUserManager.listUsers(null, null, null, null);
+        final Set<MCRUserAttribute> validAttributes = new HashSet<>();
+        final Set<MCRUserAttribute> deadAttributes = new HashSet<>();
+        for (MCRUser user : users) {
+            final List<MCRUserAttribute> attributes = user.getAttributes()
+                .stream()
+                .filter(attribute -> attribute.getName().startsWith(MCRAccessKeyUtils.ACCESS_KEY_PREFIX))
+                .filter(attribute -> !validAttributes.contains(attribute))
+                .collect(Collectors.toList());
+            for (MCRUserAttribute attribute : attributes) {
+                final String attributeName = attribute.getName();
+                final MCRObjectID objectId = MCRObjectID.getInstance(attributeName.substring(
+                    attributeName.indexOf("_") + 1));
+                if (deadAttributes.contains(attribute)) {
+                    MCRAccessKeyUtils.removeAccessKeySecret(user, objectId); //best solution?
+                } else {
+                    if (MCRAccessKeyManager.getAccessKeyWithSecret(objectId, attribute.getValue()) != null) {
+                        validAttributes.add(attribute);
+                    } else {
+                        MCRAccessKeyUtils.removeAccessKeySecret(user, objectId); //best solution?
+                        deadAttributes.add(attribute);
+                    }
+                }
+            }
+        }
     }
 
     /**
