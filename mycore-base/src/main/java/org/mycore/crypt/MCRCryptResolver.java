@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
-
+import org.mycore.common.MCRException;
 import java.util.Set;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -68,33 +68,20 @@ public class MCRCryptResolver implements URIResolver {
         String value = parts[3];
         
         String returnString = "";
-        
-        MCRCipher cipher = MCRCipherManager.getCipher(cipherID);
-        
-        if (action.equals("encrypt")) {
-            try {
-                returnString = cipher.encrypt(value);
-            } catch ( MCRCryptKeyNoPermission e) {
-            	LOGGER.info("No permission to read cryptkey. Returning empty string.");
-                returnString =  "";
-            } catch ( MCRCryptCipherConfigurationException e) {
-            	LOGGER.error(e.getStackTraceAsString());
-            	LOGGER.error("Invalid configuration or key. Returning empty string.");
-            	returnString =  "";
-            }
+        try {
+            MCRCipher cipher = MCRCipherManager.getCipher(cipherID);
+            returnString =  action.equals("encrypt") ? cipher.encrypt(value) : cipher.decrypt(value);
+        } catch (MCRCryptKeyFileNotFoundException e) {
+        	LOGGER.error(MCRException.getStackTraceAsString(e));
+        	returnString =  action.equals("encrypt") ? "" : value;
+        } catch ( MCRCryptKeyNoPermissionException e) {
+        	LOGGER.info("No permission to read cryptkey.");
+        	returnString =  action.equals("encrypt") ? "" : value;
+        } catch ( MCRCryptCipherConfigurationException e) {
+        	LOGGER.error(e.getStackTraceAsString());
+        	LOGGER.error("Invalid configuration or key.");
+        	returnString =  action.equals("encrypt") ? "" : value;
         }
-        if (action.equals("decrypt")) {
-            try {
-                returnString = cipher.decrypt(value);
-            } catch ( MCRCryptKeyNoPermission e) {
-            	LOGGER.info("No permission to read cryptkey. Returning undecrypted value.");
-                returnString =  value;
-            } catch ( MCRCryptCipherConfigurationException e) {
-            	LOGGER.error(e.getStackTraceAsString());
-            	LOGGER.error("Invalid configuration or key. Returning undecrypted value.");
-            	returnString =  value;
-            }
-        } 
         
         final Element root = new Element("value");
         root.setText(returnString);

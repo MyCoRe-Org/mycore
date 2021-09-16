@@ -1,6 +1,4 @@
 /*
- * $Id$ 
- * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -23,23 +21,25 @@
 
 package org.mycore.crypt;
 
-public class MCRCryptInvalidKeyException extends MCRCryptException {
+import org.mycore.common.MCRCatchException;
+
+public class MCRCryptKeyNoPermissionException extends MCRCatchException {
     private String errorCode;
 
-    public MCRCryptInvalidKeyException(String errorMessage) {
+    public MCRCryptKeyNoPermissionException(String errorMessage) {
         super(errorMessage);
     }
 
-    public MCRCryptInvalidKeyException(String errorMessage, String errorCode) {
+    public MCRCryptKeyNoPermissionException(String errorMessage, String errorCode) {
         super(errorMessage);
         this.errorCode = errorCode;
     }
 
-    public MCRCryptInvalidKeyException(Throwable cause) {
+    /*public MCRCryptKeyNoPermissionException(Throwable cause) {
         super(cause);
-    }
+    }*/
     
-    public MCRCryptInvalidKeyException(String message, Throwable cause) {
+    public MCRCryptKeyNoPermissionException(String message, Throwable cause) {
         super(message, cause);
     }
     

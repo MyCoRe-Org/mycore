@@ -62,7 +62,7 @@ public class MCRAESCipher extends MCRCipher {
         decryptCipher = null;
     }
     
-    public void init (String id) throws MCRCryptKeyFileNotFoundException {
+    public void init (String id) throws MCRCryptKeyFileNotFoundException,InvalidKeyException {
         cipherID = id;
         
         String encodedKey = null;
@@ -80,16 +80,14 @@ public class MCRAESCipher extends MCRCipher {
             throw new MCRCryptKeyFileNotFoundException ( 
                     "Keyfile " + keyFile 
                     + " not found. Generate new one with cli command or copy file to path."
-                    , e ) ;
+                    ) ;
         } catch (IOException e) {
             throw new MCRException ("Can't read keyFile " + keyFile + ".",e) ; 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new MCRCryptCipherConfigurationException (
                     "The algorithm AES/ECB/PKCS5PADDING ist not provided by this javaversion."
                     + "Update Java or configure an other chipher in mycore.properties.", e);
-        } catch (InvalidKeyException e) {
-            throw new MCRCryptInvalidKeyException("Please ensure that keyfile ist correct or generate new one.",e); 
-        }
+        } 
     }
     
     public boolean isInitialised() {
@@ -108,9 +106,12 @@ public class MCRAESCipher extends MCRCipher {
             String cryptKey = generateKey ();
             Files.writeString(FileSystems.getDefault().getPath(keyFile), cryptKey, StandardOpenOption.CREATE_NEW);
         } catch (NoSuchAlgorithmException e) {
-            throw new MCRException("Error while generating keyfile.", e);
+            throw new MCRCryptCipherConfigurationException(
+            		"Error while generating keyfile: The configured algorithm is not available.", e);
         } catch (FileAlreadyExistsException e) {
-            throw new FileAlreadyExistsException(keyFile,null,"A cryptKey shouldn't generated if it allready exists.");
+            throw new FileAlreadyExistsException(keyFile,null,
+            		"A cryptKey shouldn't generated if it allready exists. "
+            		+" If you aware of the consequences use overwrite keyfile.");
         } catch (IOException e) {
             throw new MCRException("Error while write key to file.", e);
         }
@@ -122,7 +123,8 @@ public class MCRAESCipher extends MCRCipher {
             String cryptKey = generateKey (); 
             Files.writeString(FileSystems.getDefault().getPath(keyFile), cryptKey);
         } catch (NoSuchAlgorithmException e) {
-            throw new MCRException("Error while generating keyfile.", e);
+            throw new MCRCryptCipherConfigurationException(
+            		"Error while generating keyfile. The configured algorithm is not available.", e);
         } catch (IOException e) {
             throw new MCRException("Error while write key to file.", e);
         }
@@ -133,19 +135,19 @@ public class MCRAESCipher extends MCRCipher {
         return java.util.Base64.getEncoder().encodeToString(tmpSecretKey.getEncoded());
     }
     
-    protected String pencrypt(String text) throws MCRCryptCipherConfigurationException {
-        byte[] encryptedBytes = pencrypt (text.getBytes(StandardCharsets.UTF_8));
+    protected String encryptImpl(String text) throws MCRCryptCipherConfigurationException {
+        byte[] encryptedBytes = encryptImpl (text.getBytes(StandardCharsets.UTF_8));
         String encryptedString = java.util.Base64.getEncoder().encodeToString(encryptedBytes);
         return encryptedString;
     }
-    protected String pdecrypt(String text) throws MCRCryptCipherConfigurationException {
+    protected String decryptImpl(String text) throws MCRCryptCipherConfigurationException {
         byte[] encryptedBytes = java.util.Base64.getDecoder().decode(text);
-        byte[] decryptedBytes = pdecrypt(encryptedBytes);
+        byte[] decryptedBytes = decryptImpl(encryptedBytes);
         String decryptedText = new String(decryptedBytes, StandardCharsets.UTF_8);
         return decryptedText;
     }
     
-    protected byte[] pencrypt(byte[] bytes) throws MCRCryptCipherConfigurationException {
+    protected byte[] encryptImpl(byte[] bytes) throws MCRCryptCipherConfigurationException {
         try {
             byte[] encryptedBytes = encryptCipher.doFinal(bytes);
             return encryptedBytes;
@@ -153,7 +155,7 @@ public class MCRAESCipher extends MCRCipher {
             throw new MCRCryptCipherConfigurationException("Can't encrypt value - wrong configuration.", e);
         }
     }
-    protected byte[] pdecrypt(byte[] bytes) throws MCRCryptCipherConfigurationException {
+    protected byte[] decryptImpl(byte[] bytes) throws MCRCryptCipherConfigurationException {
         try {
             byte[] decryptedBytes = decryptCipher.doFinal(bytes);
             return decryptedBytes;

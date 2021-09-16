@@ -23,7 +23,9 @@
 
 package org.mycore.crypt;
 
-public class MCRCryptCipherConfigurationException extends MCRCryptException {
+import org.mycore.common.config.MCRConfigurationException;
+
+public class MCRCryptCipherConfigurationException extends MCRConfigurationException {
     private String errorCode;
 
     public MCRCryptCipherConfigurationException(String errorMessage) {

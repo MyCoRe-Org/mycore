@@ -21,7 +21,9 @@
 
 package org.mycore.crypt;
 
-public class MCRCryptKeyFileNotFoundException extends MCRCryptException {
+import java.io.FileNotFoundException;
+
+public class MCRCryptKeyFileNotFoundException extends FileNotFoundException {
     private String errorCode;
 
     public MCRCryptKeyFileNotFoundException(String errorMessage) {
@@ -33,13 +35,13 @@ public class MCRCryptKeyFileNotFoundException extends MCRCryptException {
         this.errorCode = errorCode;
     }
 
-    public MCRCryptKeyFileNotFoundException(Throwable cause) {
+    /*public MCRCryptKeyFileNotFoundException(Throwable cause) {
         super(cause);
-    }
+    }*/
     
-    public MCRCryptKeyFileNotFoundException(String message, Throwable cause) {
+    /*public MCRCryptKeyFileNotFoundException(String message, Throwable cause) {
         super(message, cause);
-    }
+    }*/
     
     public String getErrorCode() {
         return errorCode;

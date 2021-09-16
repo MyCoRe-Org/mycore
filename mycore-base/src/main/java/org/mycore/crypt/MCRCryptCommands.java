@@ -29,6 +29,7 @@ import org.mycore.frontend.cli.MCRAbstractCommands;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.security.InvalidKeyException;
 
 /**
  * This class provides a set of commands for the org.mycore.crypt management
@@ -70,16 +71,16 @@ public class MCRCryptCommands extends MCRAbstractCommands {
         help = "The command generate the keyfile for the cipher configured in mycore.properties. "
                + "Fails if key file exists.",
         order = 20)
-    public static void generateKeyFile(String cipherid) {
+    public static void generateKeyFile(String cipherid)
+            throws MCRCryptKeyFileNotFoundException, MCRCryptCipherConfigurationException {
         LOGGER.info("Start generateKeyFile");
         try {
             MCRCipher cipher = MCRCipherManager.getUnIntitialisedCipher(cipherid);
             cipher.generateKeyFile();
             cipher.init(cipherid);
             LOGGER.info("Keyfile generated.");
-        } catch (MCRCryptCipherConfigurationException e) {
-            LOGGER.info(e.getStackTraceAsString());
-            LOGGER.info("Error while initialising cipher. No keyfile generated. ");
+        } catch (InvalidKeyException e ) {
+            throw new MCRCryptCipherConfigurationException ("Generation of keyfile goes wrong. Key is invalid." , e);
         } catch (FileAlreadyExistsException e) {
             LOGGER.info("Keyfile already exists. No keyfile generated.");
         }
@@ -95,18 +96,17 @@ public class MCRCryptCommands extends MCRAbstractCommands {
         help = "The command generate on overwrite the keyfile for the cipher configured in mycore.properties."
                + " Fails if key file exists.",
         order = 20)
-    public static void overwriteKeyFile(String cipherid) {
-        LOGGER.info("Start genrerateKeyFile");
+    public static void overwriteKeyFile(String cipherid) 
+    		throws MCRCryptCipherConfigurationException, MCRCryptKeyFileNotFoundException {
+        LOGGER.info("Start overwriteKeyFile");
         try {
             MCRCipher cipher = MCRCipherManager.getUnIntitialisedCipher(cipherid);
             cipher.overwriteKeyFile();
             cipher.init(cipherid);
             LOGGER.info("Keyfile overwriten.");
-        } catch (MCRCryptCipherConfigurationException e) {
-            LOGGER.info(e.getStackTraceAsString());
-            LOGGER.info("Error while initialising cipher. No keyfile generated. ");
+        } catch (InvalidKeyException e ) {
+            throw new MCRCryptCipherConfigurationException ("Generation of keyfile goes wrong. Key is invalid." , e);
         } 
-        
     }
     
     /**
@@ -121,16 +121,11 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "encrypt {0} with cipher {1}",
         help = "The command encrypt the value with cipher.",
         order = 30)
-    public static void encrypt(String value, String cipherid) {
-        try {
-            MCRCipher cipher = MCRCipherManager.getCipher(cipherid);
-            LOGGER.info("Encrypted Value: " + cipher.encrypt(value));
-        } catch (MCRCryptKeyNoPermission e) {
-            LOGGER.info("Value not encrypted. No Permission for chipher " + cipherid + ".");
-        } catch ( MCRCryptCipherConfigurationException e) {
-        	LOGGER.info(e.getStackTraceAsString());
-        	LOGGER.info("Value not encrypted. Invalid configuration or key.");
-        }
+    public static void encrypt(String value, String cipherid)
+            throws MCRCryptKeyNoPermissionException, MCRCryptKeyFileNotFoundException,
+                   MCRCryptCipherConfigurationException {
+        MCRCipher cipher = MCRCipherManager.getCipher(cipherid);
+        LOGGER.info("Encrypted Value: " + cipher.encrypt(value));
     }
     
     /**
@@ -145,16 +140,12 @@ public class MCRCryptCommands extends MCRAbstractCommands {
     @MCRCommand(syntax = "decrypt {0} with cipher {1}",
         help = "The command encrypt the value with cipher.",
         order = 40)
-    public static void decrypt(String value, String cipherid) {
-        try {
-            MCRCipher cipher = MCRCipherManager.getCipher(cipherid);
-            LOGGER.info("Decrypted Value: " + cipher.decrypt(value));
-        } catch (MCRCryptKeyNoPermission e) {
-            LOGGER.info("Value not decrypted. No Permission for chipher " + cipherid + ".");
-        } catch ( MCRCryptCipherConfigurationException e) {
-        	LOGGER.info(e.getStackTraceAsString());
-        	LOGGER.info("Value not decrypted. Invalid configuration or key.");
-        }
+    public static void decrypt(String value, String cipherid) 
+    	    throws MCRCryptKeyNoPermissionException, MCRCryptKeyFileNotFoundException, 
+    	        MCRCryptCipherConfigurationException {
+        MCRCipher cipher = MCRCipherManager.getCipher(cipherid);
+        LOGGER.info("Decrypted Value: " + cipher.decrypt(value));
+        
     }
 
 }

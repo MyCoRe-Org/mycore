@@ -18,8 +18,8 @@
 
 package org.mycore.crypt;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
+import java.security.InvalidKeyException;
 
 import org.mycore.access.MCRAccessManager;
 
@@ -50,7 +50,7 @@ public abstract class MCRCipher {
      * 
      * @param id ID of cipher as configured
      */
-    abstract public void init(String id) throws MCRCryptKeyFileNotFoundException;
+    abstract public void init(String id) throws MCRCryptKeyFileNotFoundException, InvalidKeyException;
     
     /**
      * Return whether cipher has been initialized. 
@@ -75,29 +75,45 @@ public abstract class MCRCipher {
     abstract public void overwriteKeyFile() ;
     
     
-    public String encrypt(String text) throws MCRCryptKeyNoPermission {
-        return ((checkPermission( "encrypt" )) ? pencrypt(text) : "");
+    public String encrypt(String text) throws MCRCryptKeyNoPermissionException {
+    	if (checkPermission( "encrypt" )) {
+    		return encryptImpl(text);
+    	} else {
+    		throw new MCRCryptKeyNoPermissionException("No Permission to encrypt with the chiper "+cipherID+".");
+    	}
     }
     
-    public byte[] encrypt(byte[] bytes) throws MCRCryptKeyNoPermission {
-        return ((checkPermission( "encrypt" )) ? pencrypt(bytes) : "".getBytes(StandardCharsets.UTF_8));
+    public byte[] encrypt(byte[] bytes) throws MCRCryptKeyNoPermissionException {
+    	if (checkPermission( "encrypt" )) {
+    		return encryptImpl(bytes);
+    	} else {
+    		throw new MCRCryptKeyNoPermissionException("No Permission to encrypt with the chiper "+cipherID+".");
+    	}
     }
     
-    public String decrypt(String text) throws MCRCryptKeyNoPermission {
-        return ((checkPermission( "decrypt" )) ? pdecrypt(text) : text);
+    public String decrypt(String text) throws MCRCryptKeyNoPermissionException {
+    	if (checkPermission( "decrypt" )) {
+    		return decryptImpl(text);
+    	} else {
+    		throw new MCRCryptKeyNoPermissionException("No Permission to decrypt with the chiper "+cipherID+".");
+    	}
     }
     
-    public byte[] decrypt(byte[] bytes) throws MCRCryptKeyNoPermission {
-        return ((checkPermission( "decrypt" )) ? pencrypt(bytes) : bytes);
+    public byte[] decrypt(byte[] bytes) throws MCRCryptKeyNoPermissionException {
+    	if (checkPermission( "decrypt" )) {
+    		return decryptImpl(bytes);
+    	} else {
+    		throw new MCRCryptKeyNoPermissionException("No Permission to decrypt with the chiper "+cipherID+".");
+    	}
     }
     
     private boolean checkPermission ( String action) {
         return (MCRAccessManager.checkPermission("crypt:cipher:" + cipherID , action ));
     }
     
-    abstract protected String pencrypt(String text);
-    abstract protected String pdecrypt(String text);
-    abstract protected byte[] pencrypt(byte[] bytes);
-    abstract protected byte[] pdecrypt(byte[] bytes);
+    abstract protected String encryptImpl(String text);
+    abstract protected String decryptImpl(String text);
+    abstract protected byte[] encryptImpl(byte[] bytes);
+    abstract protected byte[] decryptImpl(byte[] bytes);
     
 }

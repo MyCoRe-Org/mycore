@@ -21,6 +21,7 @@ package org.mycore.crypt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
+import java.security.InvalidKeyException;
 
 /**
  * Create Instances of MCRCipher as configured in mycore.properties.
@@ -54,8 +55,13 @@ public class MCRCipherManager {
                 );
         if (! cipher.isInitialised()) { 
             LOGGER.debug("init Cipher for id {} .", id );
-            cipher.init(id);
+            try {
+                cipher.init(id);
+            } catch (InvalidKeyException e) {
+                throw new MCRCryptCipherConfigurationException ("Can't initialize cipher. Key is invalid." , e);
+            }
         }
+        
         return cipher;
     }
     
