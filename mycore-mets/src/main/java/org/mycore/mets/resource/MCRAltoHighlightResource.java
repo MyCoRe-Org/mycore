@@ -170,7 +170,17 @@ public class MCRAltoHighlightResource {
             JsonArray positions = new JsonArray();
             int wordCount = StringUtils.countMatches(altoContent, "<em>");
             for (int i = wordIndex; i < wordIndex + wordCount; i++) {
-                positions.add(buildPositionObject(altoWords.get(i)));
+                String altoWord = altoWords.get(i);
+
+                if(!altoWord.equals("")){
+                    JsonObject positionObject = buildPositionObject(altoWord);
+
+                    if(!positionObject.entrySet().isEmpty()){
+                        positions.add(positionObject);
+                    }
+                } else if(wordCount < altoWords.size()){
+                    wordCount++;
+                }
             }
             wordIndex += wordCount;
             hit.add("positions", positions);
@@ -187,11 +197,13 @@ public class MCRAltoHighlightResource {
         JsonObject positionObject = new JsonObject();
         String plainWord = altoWord.replaceAll("<em>|</em>", "");
         String[] split = plainWord.split("\\|");
-        positionObject.addProperty("content", split[0]);
-        positionObject.addProperty("xpos", Integer.parseInt(split[1]));
-        positionObject.addProperty("vpos", Integer.parseInt(split[2]));
-        positionObject.addProperty("width", Integer.parseInt(split[3]));
-        positionObject.addProperty("height", Integer.parseInt(split[4]));
+        if(split.length == 5){
+            positionObject.addProperty("content", split[0]);
+            positionObject.addProperty("xpos", Integer.parseInt(split[1]));
+            positionObject.addProperty("vpos", Integer.parseInt(split[2]));
+            positionObject.addProperty("width", Integer.parseInt(split[3]));
+            positionObject.addProperty("height", Integer.parseInt(split[4]));
+        }
         return positionObject;
     }
 
