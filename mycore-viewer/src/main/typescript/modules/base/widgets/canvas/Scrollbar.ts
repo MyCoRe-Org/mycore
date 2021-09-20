@@ -197,7 +197,7 @@ namespace mycore.viewer.widgets.canvas {
             relation = (realSize - (sliderSize - (this._viewSize * relation))) / this._areaSize;
 
             //calculate and set slider position
-            var sliderPos = Math.max(this._position * relation + 15, 15);
+            const sliderPos = Math.min(Math.max(this._position * relation + 15, 15), (this.areaSize * relation) - sliderSize) + 15;
             var sliderPosStyleKey = this._horizontal ? "left" : "top";
             var sliderPosStyle = {};
             sliderPosStyle[sliderPosStyleKey] = sliderPos + "px";
