@@ -147,7 +147,7 @@ namespace mycore.viewer.widgets.canvas {
         }
 
         public draw(ctx: CanvasRenderingContext2D, rect: Rect, sourceScale, overview: boolean, infoScale:number): void {
-            if ((!overview && sourceScale != this._fbScale) || this._fbScale == -1) {
+            if ((!overview && sourceScale !== this._fbScale) || this._fbScale === -1) {
                 if(!this._promiseRunning ){
                     this._updateBackBuffer(sourceScale);
                 }
