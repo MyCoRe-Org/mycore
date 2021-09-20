@@ -193,7 +193,7 @@ namespace mycore.viewer.widgets.canvas {
 
             var scaledViewport = vp.size.scale(1 / vp.scale);
             var minY = 1;
-            const maxY = (this._rotation == 90 || this._rotation == 270 ?
+            const maxY = (this._rotation === 90 || this._rotation === 270 ?
                 (((this.relocated ? 1 : 0) + this._model.pageCount) / 2) * this.getPageHeightWithSpace() :
                 Math.ceil(((this.relocated ? 1 : 0) + this._model.pageCount) / 2) * this.getPageHeightWithSpace());
             const correctedY = Math.min(Math.max(vp.position.y, minY), maxY);
