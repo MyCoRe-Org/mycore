@@ -145,7 +145,7 @@ public class MCRDeveloperCommands {
             String xmlText = new XMLOutputter(Format.getPrettyFormat()).outputString(resource);
             LOGGER.info("Resolved resource for uri {}:\n{}", uri, xmlText);
         } catch (Exception e) {
-            LOGGER.info("Failed to resolve resource for uri {}", uri);
+            LOGGER.info("Failed to resolve resource for uri " + uri, e);
         }
     }
 
