@@ -167,6 +167,58 @@ public class MCRAccessKeyUtils {
     }
 
     /**
+     * Retrieves linked access key if exists from session
+     *
+     * @param session the {@link MCRSession}
+     * @param objectId of a {@link MCRObjectID}
+     * @return access key
+     */
+    public static MCRAccessKey getLinkedAccessKey(final MCRSession session,
+        final MCRObjectID objectId) {
+        final String secret = getAccessKeySecret(session, objectId);
+        if (secret != null) {
+            return MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves linked access key if exists from user
+     *
+     * @param userInformation the {@link MCRUserInformation}
+     * @param objectId of a {@link MCRObjectID}
+     * @return access key
+     */
+    public static MCRAccessKey getLinkedAccessKey(final MCRUserInformation userInformation, 
+        final MCRObjectID objectId) {
+        final String secret = getAccessKeySecret(userInformation, objectId);
+        if (secret != null) {
+            return MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves linked access key if exists from current session
+     *
+     * @param objectId of a {@link MCRObjectID}
+     * @return access key
+     */
+    public static MCRAccessKey getLinkedAccessKeyFromCurrentSession(final MCRObjectID objectId) {
+        return getLinkedAccessKey(MCRSessionMgr.getCurrentSession(), objectId);
+    }
+
+    /**
+     * Retrieves linked access key if exists from current user
+     *
+     * @param objectId of a {@link MCRObjectID}
+     * @return access key
+     */
+    public static MCRAccessKey getLinkedAccessKeyFromCurrentUser(final MCRObjectID objectId) {
+        return getLinkedAccessKey(MCRSessionMgr.getCurrentSession().getUserInformation(), objectId);
+    }
+
+    /**
      * Deletes the access key value attribute from given {@link MCRSession} for {@link MCRObjectID}.
      *
      * @param session the {@link MCRSession}
