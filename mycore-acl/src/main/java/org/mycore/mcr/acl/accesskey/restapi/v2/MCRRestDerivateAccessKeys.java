@@ -20,7 +20,7 @@
 
 package org.mycore.mcr.acl.accesskey.restapi.v2;
 
-import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.SECRET;
+import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.PARAM_SECRET;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 import static org.mycore.restapi.v2.MCRRestUtils.TAG_MYCORE_DERIVATE;
@@ -82,15 +82,13 @@ public class MCRRestDerivateAccessKeys {
         })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
-    public Response listAccessKeysForDerivate(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @DefaultValue("0") @QueryParam("offset") int offset,
-        @DefaultValue("128") @QueryParam("limit") int limit) {
+    public Response listAccessKeysForDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
+        @DefaultValue("0") @QueryParam("offset") int offset, @DefaultValue("128") @QueryParam("limit") int limit) {
         return MCRRestAccessKeyHelper.doListAccessKeys(derivateId, offset, limit);
     }
 
     @GET
-    @Path("/{" + SECRET + "}")
+    @Path("/{" + PARAM_SECRET + "}")
     @Operation(
         summary = "Gets access key for a derivate",
         responses = {
@@ -107,8 +105,8 @@ public class MCRRestDerivateAccessKeys {
         })
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
-    public Response getAccessKeyFromDerivate(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_DERID) final MCRObjectID derivateId, @PathParam(SECRET) final String secret) {
+    public Response getAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
+        @PathParam(PARAM_SECRET) final String secret) {
         return MCRRestAccessKeyHelper.doGetAccessKey(derivateId, secret);
     }
 
@@ -133,13 +131,13 @@ public class MCRRestDerivateAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
-    public Response createAccessKeyForDerivate(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_DERID) final MCRObjectID derivateId, final String accessKeyJson) {
+    public Response createAccessKeyForDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
+        final String accessKeyJson) {
         return MCRRestAccessKeyHelper.doCreateAccessKey(derivateId, accessKeyJson, uriInfo);
     }
 
     @PUT
-    @Path("/{" + SECRET + "}")
+    @Path("/{" + PARAM_SECRET + "}")
     @Operation(
         summary = "Updates an access key for a derivate",
         responses = {
@@ -159,14 +157,13 @@ public class MCRRestDerivateAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
-    public Response updateAccessKeyFromDerivate(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_DERID) final MCRObjectID derivateId, @PathParam(SECRET) final String secret,
-        final String accessKeyJson) {
+    public Response updateAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
+        @PathParam(PARAM_SECRET) final String secret, final String accessKeyJson) {
         return MCRRestAccessKeyHelper.doUpdateAccessKey(derivateId, secret, accessKeyJson);
     }
 
     @DELETE
-    @Path("/{" + SECRET + "}")
+    @Path("/{" + PARAM_SECRET + "}")
     @Operation(
         summary = "Deletes an access key from a derivate",
         responses = {
@@ -183,8 +180,8 @@ public class MCRRestDerivateAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
-    public Response removeAccessKeyFromDerivate(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_DERID) final MCRObjectID derivateId, @PathParam(SECRET) final String secret) {
+    public Response removeAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
+        @PathParam(PARAM_SECRET) final String secret) {
         return MCRRestAccessKeyHelper.doRemoveAccessKey(derivateId, secret);
     }
 }

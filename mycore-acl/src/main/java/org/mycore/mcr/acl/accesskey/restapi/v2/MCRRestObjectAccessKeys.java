@@ -20,7 +20,7 @@
 
 package org.mycore.mcr.acl.accesskey.restapi.v2;
 
-import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.SECRET;
+import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.PARAM_SECRET;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 import static org.mycore.restapi.v2.MCRRestUtils.TAG_MYCORE_OBJECT;
 
@@ -88,7 +88,7 @@ public class MCRRestObjectAccessKeys {
     }
 
     @GET
-    @Path("/{" + SECRET + "}")
+    @Path("/{" + PARAM_SECRET + "}")
     @Operation(
         summary = "Gets access key for an object",
         responses = {
@@ -106,7 +106,7 @@ public class MCRRestObjectAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(SECRET) final String secret) {
+        @PathParam(PARAM_SECRET) final String secret) {
         return MCRRestAccessKeyHelper.doGetAccessKey(objectId, secret);
     }
 
@@ -137,7 +137,7 @@ public class MCRRestObjectAccessKeys {
     }
 
     @PUT
-    @Path("/{" + SECRET + "}")
+    @Path("/{" + PARAM_SECRET + "}")
     @Operation(
         summary = "Updates an access key for an object",
         responses = {
@@ -158,12 +158,12 @@ public class MCRRestObjectAccessKeys {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response updateAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(SECRET) final String secret, final String accessKeyJson) {
+        @PathParam(PARAM_SECRET) final String secret, final String accessKeyJson) {
         return MCRRestAccessKeyHelper.doUpdateAccessKey(objectId, secret, accessKeyJson);
     }
 
     @DELETE
-    @Path("/{" + SECRET + "}")
+    @Path("/{" + PARAM_SECRET + "}")
     @Operation(
         summary = "Deletes an access key from an object",
         responses = {
@@ -181,7 +181,7 @@ public class MCRRestObjectAccessKeys {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response removeAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(SECRET) final String secret) {
+        @PathParam(PARAM_SECRET) final String secret) {
         return MCRRestAccessKeyHelper.doRemoveAccessKey(objectId, secret);
     }
 }

@@ -38,7 +38,10 @@ import org.mycore.restapi.v2.MCRErrorResponse;
 
 public class MCRRestAccessKeyHelper {
 
-    public static final String SECRET = "secret";
+    /**
+     * Placeholder for the path param secret
+     */
+    protected static final String PARAM_SECRET = "secret";
 
     private static WebApplicationException getUnknownObjectException(final MCRObjectID objectId) {
         return MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
