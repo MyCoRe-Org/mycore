@@ -18,6 +18,9 @@
 
 package org.mycore.util.concurrent;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
@@ -59,5 +62,43 @@ public class MCRPrioritySupplier<T> implements Supplier<T>, MCRPrioritizable {
     @Override
     public long getCreated() {
         return created;
+    }
+
+    /**
+     * use this instead of {@link CompletableFuture#supplyAsync(Supplier, Executor)}
+     * 
+     * This method keep the priority
+     * @param es
+     * @return
+     */
+    public CompletableFuture<T> runAsync(ExecutorService es) {
+        CompletableFuture<T> result = new CompletableFuture<>();
+        MCRPrioritySupplier<T> supplier = this;
+        class MCRAsyncPrioritySupplier
+            implements Runnable, MCRPrioritizable, CompletableFuture.AsynchronousCompletionTask {
+            public void run() {
+                try {
+                    if (!result.isDone()) {
+                        result.complete(supplier.get());
+                    }
+                } catch (Throwable t) {
+                    result.completeExceptionally(t);
+                }
+            }
+
+            @Override
+            public int getPriority() {
+                return supplier.getPriority();
+            }
+
+            @Override
+            public long getCreated() {
+                return supplier.getCreated();
+            }
+
+        }
+        es.execute(new MCRAsyncPrioritySupplier());
+        return result;
+
     }
 }

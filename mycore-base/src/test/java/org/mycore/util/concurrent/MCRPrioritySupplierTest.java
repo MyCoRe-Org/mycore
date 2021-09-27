@@ -46,12 +46,12 @@ public class MCRPrioritySupplierTest {
 
         TaskConsumer callback = new TaskConsumer();
 
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(1), 1), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(2), 2), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(3), 3), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(4), 4), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(5), 5), es).thenAccept(callback);
-        CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(new Task(10), 10), es).thenAccept(callback);
+        new MCRPrioritySupplier<>(new Task(1), 1).runAsync(es).thenAccept(callback);
+        new MCRPrioritySupplier<>(new Task(2), 2).runAsync(es).thenAccept(callback);
+        new MCRPrioritySupplier<>(new Task(3), 3).runAsync(es).thenAccept(callback);
+        new MCRPrioritySupplier<>(new Task(4), 4).runAsync(es).thenAccept(callback);
+        new MCRPrioritySupplier<>(new Task(5), 5).runAsync(es).thenAccept(callback);
+        new MCRPrioritySupplier<>(new Task(10), 10).runAsync(es).thenAccept(callback);
 
         es.awaitTermination(1, TimeUnit.SECONDS);
 

@@ -18,7 +18,6 @@
 
 package org.mycore.util.concurrent;
 
-import java.lang.reflect.Field;
 import java.util.Comparator;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -45,36 +44,11 @@ public class MCRRunnableComperator implements Comparator<Runnable> {
         if (isComparable(o1, o2)) {
             return ((Comparable) o1).compareTo(o2);
         }
-        // T might be AsyncSupply, UniApply, etc., but we want to
-        // compare our original Runnables.
-        Comparable unwrap1 = unwrap(o1);
-        Comparable unwrap2 = unwrap(o2);
-
-        if (unwrap1 != null) {
-            return unwrap1.compareTo(unwrap2);
-        }
         return -1;
     }
 
     private boolean isComparable(Runnable o1, Runnable o2) {
         return o1 instanceof Comparable && o2 instanceof Comparable;
-    }
-
-    @SuppressWarnings({ "rawtypes" })
-    private Comparable unwrap(Runnable r) {
-        try {
-            Field field = r.getClass().getDeclaredField("fn");
-            field.setAccessible(true);
-            // NB: For performance-intensive contexts, you may want to
-            // cache these in a ConcurrentHashMap<Class<?>, Field>.
-            Object object = field.get(r);
-            if (object instanceof Comparable) {
-                return (Comparable) object;
-            }
-            return null;
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            return null;
-        }
     }
 
 }

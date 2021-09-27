@@ -95,7 +95,7 @@ public class MCRCommandLineInterface {
     public static void main(String[] args) {
         if (!(MCRCommandLineInterface.class.getClassLoader() instanceof URLClassLoader)) {
             System.out.println("Current ClassLoader is not extendable at runtime. Using workaround.");
-            Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[0]));
+            Thread.currentThread().setContextClassLoader(new CLIURLClassLoader(new URL[0]));
         }
         MCRStartupHandler.startUp(null/*no servlet context here*/);
         system = MCRConfiguration2.getStringOrThrow("MCR.CommandLineInterface.SystemName") + ":";
@@ -415,6 +415,19 @@ public class MCRCommandLineInterface {
 
     static void output(String message) {
         System.out.println(system + " " + message);
+    }
+
+    private static class CLIURLClassLoader extends URLClassLoader {
+
+        CLIURLClassLoader(URL[] urls) {
+            super(urls);
+        }
+
+        @Override
+        protected void addURL(URL url) {
+            //make this callable via reflection later;
+            super.addURL(url);
+        }
     }
 
 }

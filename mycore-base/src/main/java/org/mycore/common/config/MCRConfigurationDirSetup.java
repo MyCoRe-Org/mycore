@@ -19,6 +19,7 @@
 package org.mycore.common.config;
 
 import java.io.File;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -29,6 +30,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,7 +69,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
             .filter(URLClassLoader.class::isInstance)
             .map(URLClassLoader.class::cast)
             .findFirst();
-        if (!classLoaderOptional.isPresent()) {
+        if (classLoaderOptional.isEmpty()) {
             System.err
                 .println(classLoaderOptional.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
             return;
@@ -74,11 +77,11 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
         File libDir = MCRConfigurationDir.getConfigFile("lib");
         URLClassLoader urlClassLoader = classLoaderOptional.get();
         Set<URL> currentCPElements = Stream.of(urlClassLoader.getURLs()).collect(Collectors.toSet());
-        Class<? extends ClassLoader> classLoaderClass = urlClassLoader.getClass();
         try {
-            Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-            addUrlMethod.setAccessible(true);
+            Class<? extends ClassLoader> classLoaderClass = urlClassLoader.getClass();
+            BiConsumer<ClassLoader, URL> addUrlMethod = addToClassPath(classLoaderClass);
             getFileStream(resourceDir, libDir)
+                .filter(Objects::nonNull)
                 .map(File::toURI)
                 .map(u -> {
                     try {
@@ -90,17 +93,58 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
                 })
                 .filter(Objects::nonNull)
                 .filter(u -> !currentCPElements.contains(u))
-                .forEach(u -> {
-                    System.out.println("Adding to CLASSPATH: " + u);
-                    try {
-                        addUrlMethod.invoke(urlClassLoader, u);
-                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                        LOGGER.error("Could not add {} to current classloader.", u, e);
-                    }
-                });
-        } catch (NoSuchMethodException | SecurityException e) {
+                .peek(u -> System.out.println("Adding to CLASSPATH: " + u))
+                .forEach(url -> addUrlMethod.accept(urlClassLoader, url));
+        } catch (InaccessibleObjectException | ReflectiveOperationException | SecurityException e) {
             LogManager.getLogger(MCRConfigurationInputStream.class)
-                .warn("{} does not support adding additional JARs at runtime", classLoaderClass, e);
+                .warn("{} does not support adding additional JARs at runtime", urlClassLoader.getClass(), e);
+        }
+    }
+
+    /**
+     * Returns a BiConsumer that adds a URL to the classpath of a ClassLoader instance of <code>classLoaderClass</code>.
+     */
+    private static BiConsumer<ClassLoader, URL> addToClassPath(Class<? extends ClassLoader> classLoaderClass)
+        throws NoSuchMethodException {
+        Method method;
+        Function<URL, ?> argumentMapper;
+        final Method addURL = getDeclaredMethod(classLoaderClass, "addURL", URL.class);
+        //URLClassLoader does not allow to setAccessible(true) anymore in java >=16
+        if (addURL.trySetAccessible()) {
+            //works well in Tomcat
+            System.out.println("Using " + addURL + " to modify classpath.");
+            method = addURL;
+            argumentMapper = u -> u;
+        } else {
+            final Method jettyFallback = getDeclaredMethod(classLoaderClass, "addClassPath", String.class);
+            System.out.println("Using " + jettyFallback + " to modify classpath.");
+            argumentMapper = URL::toString;
+            method = jettyFallback;
+        }
+        Method finalMethod = method;
+        Function<URL, ?> finalArgumentMapper = argumentMapper;
+        return (cl, url) -> {
+            try {
+                finalMethod.invoke(cl, finalArgumentMapper.apply(url));
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                LOGGER.error("Could not add {} to current classloader.", url, e);
+            }
+        };
+    }
+
+    private static Method getDeclaredMethod(Class<? extends ClassLoader> clazz, String method, Class... args)
+        throws NoSuchMethodException {
+        try {
+            return clazz.getDeclaredMethod(method, args);
+        } catch (NoSuchMethodException e) {
+            try {
+                if (ClassLoader.class.isAssignableFrom(clazz.getSuperclass())) {
+                    return getDeclaredMethod((Class<? extends ClassLoader>) clazz.getSuperclass(), method, args);
+                }
+            } catch (NoSuchMethodException e2) {
+                throw e;
+            }
+            throw e;
         }
     }
 
