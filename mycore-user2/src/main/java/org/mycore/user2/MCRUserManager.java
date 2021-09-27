@@ -32,6 +32,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -336,7 +337,7 @@ public class MCRUserManager {
     }
 
     private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, String userPattern, String realm,
-        String namePattern, String mailPattern) {
+        String namePattern, String mailPattern, String attributeNamePattern) {
 
         ArrayList<Predicate> predicates = new ArrayList<>(2);
         addEqualsPredicate(cb, root, MCRUser_.realmID, realm, predicates);
@@ -345,6 +346,12 @@ public class MCRUserManager {
         addSearchPredicate(cb, root, MCRUser_.userName, userPattern, searchPredicates);
         addSearchPredicate(cb, root, MCRUser_.realName, namePattern, searchPredicates);
         addSearchPredicate(cb, root, MCRUser_.EMail, mailPattern, searchPredicates);
+
+        if (attributeNamePattern != null && !attributeNamePattern.isEmpty()) { // TODO maybe create method
+            Join<MCRUser, MCRUserAttribute> userAttributeJoin = root.join(MCRUser_.attributes);
+            searchPredicates.add(cb.like(userAttributeJoin.get(MCRUserAttribute_.name),
+                buildSearchPattern(attributeNamePattern)));
+        }
 
         if (!searchPredicates.isEmpty()) {
             if (1 == searchPredicates.size()) {
@@ -371,12 +378,15 @@ public class MCRUserManager {
         }
     }
 
-    private static Predicate buildSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
-        SingularAttribute<MCRUser, String> attribute, String searchPattern) {
+    private static String buildSearchPattern(String searchPattern) {
         searchPattern = searchPattern.replace('*', '%');
         searchPattern = searchPattern.replace('?', '_');
-        searchPattern = searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
-        return cb.like(cb.lower(root.get(attribute)), searchPattern);
+        return searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
+    }
+
+    private static Predicate buildSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
+        SingularAttribute<MCRUser, String> attribute, String searchPattern) {
+        return cb.like(cb.lower(root.get(attribute)), buildSearchPattern(searchPattern));
     }
 
     /**
@@ -398,6 +408,11 @@ public class MCRUserManager {
         return listUsers(userPattern, realm, namePattern, null);
     }
 
+    // TODO deprecated?
+    public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern, String mailPattern) {
+        return listUsers(userPattern, realm, namePattern, mailPattern, null, 0, Integer.MAX_VALUE);
+    }
+
     /**
      * Searches for users in the database and returns a list of matching users.
      * Wildcards containing * and ? for single character may be used for searching
@@ -412,7 +427,8 @@ public class MCRUserManager {
      * @param mailPattern a wildcard pattern for the person's email, may be null
      * @return a list of matching users
      */
-    public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern, String mailPattern) {
+    public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern, String mailPattern,
+        String attributeNamePattern, final int offset, final int limit) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRUser> query = cb.createQuery(MCRUser.class);
@@ -421,7 +437,9 @@ public class MCRUserManager {
             .createQuery(
                 query
                     .where(
-                        buildCondition(cb, user, userPattern, realm, namePattern, mailPattern)))
+                        buildCondition(cb, user, userPattern, realm, namePattern, mailPattern, attributeNamePattern)))
+            .setFirstResult(offset)
+            .setMaxResults(limit)
             .getResultList();
     }
 
@@ -441,6 +459,11 @@ public class MCRUserManager {
         return countUsers(userPattern, realm, namePattern, null);
     }
 
+    // TODO deprecated?
+    public static int countUsers(String userPattern, String realm, String namePattern, String mailPattern) {
+        return countUsers(userPattern, realm, namePattern, mailPattern, null);
+    }
+
     /**
      * Counts users in the database that match the given criteria.
      * Wildcards containing * and ? for single character may be used for searching
@@ -452,7 +475,8 @@ public class MCRUserManager {
      * @param mailPattern a wildcard pattern for the person's email, may be null
      * @return the number of matching users
      */
-    public static int countUsers(String userPattern, String realm, String namePattern, String mailPattern) {
+    public static int countUsers(String userPattern, String realm, String namePattern, String mailPattern,
+        String attributeNamePattern) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Number> query = cb.createQuery(Number.class);
@@ -462,7 +486,7 @@ public class MCRUserManager {
                 query
                     .select(cb.count(user))
                     .where(
-                        buildCondition(cb, user, userPattern, realm, namePattern, mailPattern)))
+                        buildCondition(cb, user, userPattern, realm, namePattern, mailPattern, attributeNamePattern)))
             .getSingleResult().intValue();
     }
 
