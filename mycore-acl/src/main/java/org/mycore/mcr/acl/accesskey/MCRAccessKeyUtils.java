@@ -162,7 +162,7 @@ public class MCRAccessKeyUtils {
             }
             offset++;
         }
-        while (users.size() > 0);
+        while (users.size() == limit);
     }
 
     /**
