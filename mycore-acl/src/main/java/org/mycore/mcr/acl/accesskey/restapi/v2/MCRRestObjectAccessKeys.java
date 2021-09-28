@@ -63,7 +63,7 @@ public class MCRRestObjectAccessKeys {
 
     @Context
     UriInfo uriInfo;
-    
+
     @GET
     @Operation(
         summary = "Lists all access keys for an object",
