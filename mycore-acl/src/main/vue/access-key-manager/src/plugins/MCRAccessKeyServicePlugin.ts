@@ -89,45 +89,30 @@ export default new class MCRAccessKeyServicePlugin {
   }
 
   public async getAccessKeys(): Promise<MCRAccessKeyInformation> {
-    if (this.derivateID != null) {
-      const response = await this.instance.get(`derivates/${this.derivateID}/accesskeys`);
-      return <MCRAccessKeyInformation>response.data;
-    }
-    const response = await this.instance.get('accesskeys');
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys` : 'accesskeys';
+    const response = await this.instance.get(url);
     return <MCRAccessKeyInformation>response.data;
   }
 
   public async getAccessKey(secret: string): Promise<MCRAccessKey> {
-    if (this.derivateID != null) {
-      const response = await this.instance.get(`derivates/${this.derivateID}/accesskeys/${secret}`);
-      return response.data;
-    }
-    const response = await this.instance.get(`accesskeys/${secret}`);
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${secret}` : `accesskeys/${secret}`;
+    const response = await this.instance.get(url);
     return response.data;
   }
 
   public async addAccessKey(accessKey: MCRAccessKey): Promise<string> {
-    if (this.derivateID != null) {
-      const response = await this.instance.post(`derivates/${this.derivateID}/accesskeys`, accessKey);
-      return response.headers.location.split('/').pop();
-    }
-    const response = await this.instance.post('accesskeys', accessKey);
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys` : 'accesskeys';
+    const response = await this.instance.post(url, accessKey);
     return response.headers.location.split('/').pop();
   }
 
   public async updateAccessKey(secret: string, accessKey: MCRAccessKey): Promise<void> {
-    if (this.derivateID != null) {
-      await this.instance.put(`derivates/${this.derivateID}/accesskeys/${secret}`, accessKey);
-    } else {
-      await this.instance.put(`/accesskeys/${secret}`, accessKey);
-    }
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${secret}` : `/accesskeys/${secret}`;
+    await this.instance.put(url, accessKey);
   }
 
   public async removeAccessKey(secret: string): Promise<void> {
-    if (this.derivateID != null) {
-      await this.instance.delete(`derivates/${this.derivateID}/accesskeys/${secret}`);
-    } else {
-      await this.instance.delete(`accesskeys/${secret}`);
-    }
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${secret}` : `accesskeys/${secret}`;
+    await this.instance.delete(url);
   }
 }();
