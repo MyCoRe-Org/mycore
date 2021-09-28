@@ -24,7 +24,7 @@ import javax.xml.transform.URIResolver;
  * &lt;/properties&gt; <br>
  * </code>
  * If no entries with the given key prefix exist, a properties element without entry elements is returned.
- * <br/>
+ * <br>
  * Result for a key: <code> <br>
  *     &lt;entry key=&quot;key&quot;&gt;value&lt;/property&gt;
  * </code>
