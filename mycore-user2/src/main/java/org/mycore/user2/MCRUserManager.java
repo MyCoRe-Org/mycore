@@ -342,7 +342,7 @@ public class MCRUserManager {
         return searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
     }
 
-    private static void isValidSearchPattern(String searchPattern) {
+    private static boolean isValidSearchPattern(String searchPattern) {
         return null != searchPattern && !searchPattern.isEmpty();
     }
 
@@ -425,7 +425,6 @@ public class MCRUserManager {
      * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param mailPattern a wildcard pattern for the person's email, may be null
      * @return a list of all matching users
-     * @deprecated Use {@link MCRUserManager#listUsers(String, String, String, String)} instead.
      */
     public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern, String mailPattern) {
         return listUsers(userPattern, realm, namePattern, mailPattern, null, 0, Integer.MAX_VALUE);
