@@ -10,7 +10,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.URIResolver;
 
 /**
- * Resolves the Property values for the given key or key prefix.<br><br>
+ * Resolves the property values for the given key or key prefix.<br><br>
  * <br>
  * Syntax: <code>property:{key-prefix}*</code> or <br>
  *         <code>property:{key}</code>
