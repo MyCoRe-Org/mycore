@@ -38,6 +38,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
@@ -343,7 +344,7 @@ public class MCRUserManager {
     }
 
     private static boolean isValidSearchPattern(String searchPattern) {
-        return null != searchPattern && !searchPattern.isEmpty();
+        return StringUtils.isNotEmpty(searchPattern);
     }
 
     private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, String userPattern, String realm,
