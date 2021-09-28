@@ -137,7 +137,7 @@ public class MCRAccessKeyUtils {
         final int limit = 1024;
         List<MCRUser> users = new ArrayList<>();
         do {
-            users = listUsersWithAccessKey(offset * limit, limit);
+            users = listUsersWithAccessKey(offset, limit);
             for (final MCRUser user : users) {
                 final List<MCRUserAttribute> attributes = user.getAttributes()
                     .stream()
@@ -160,7 +160,7 @@ public class MCRAccessKeyUtils {
                     }
                 }
             }
-            offset++;
+            offset += limit;
         }
         while (users.size() == limit);
     }
