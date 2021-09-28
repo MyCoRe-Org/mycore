@@ -336,6 +336,16 @@ public class MCRUserManager {
             .getResultList();
     }
 
+    private static String buildSearchPattern(String searchPattern) {
+        searchPattern = searchPattern.replace('*', '%');
+        searchPattern = searchPattern.replace('?', '_');
+        return searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
+    }
+
+    private static void isValidSearchPattern(String searchPattern) {
+        return null != searchPattern && !searchPattern.isEmpty();
+    }
+
     private static Predicate[] buildCondition(CriteriaBuilder cb, Root<MCRUser> root, String userPattern, String realm,
         String namePattern, String mailPattern, String attributeNamePattern) {
 
@@ -347,7 +357,7 @@ public class MCRUserManager {
         addSearchPredicate(cb, root, MCRUser_.realName, namePattern, searchPredicates);
         addSearchPredicate(cb, root, MCRUser_.EMail, mailPattern, searchPredicates);
 
-        if (attributeNamePattern != null && !attributeNamePattern.isEmpty()) { // TODO maybe create method
+        if (isValidSearchPattern(attributeNamePattern)) {
             Join<MCRUser, MCRUserAttribute> userAttributeJoin = root.join(MCRUser_.attributes);
             searchPredicates.add(cb.like(userAttributeJoin.get(MCRUserAttribute_.name),
                 buildSearchPattern(attributeNamePattern)));
@@ -366,22 +376,16 @@ public class MCRUserManager {
 
     private static void addEqualsPredicate(CriteriaBuilder cb, Root<MCRUser> root,
         SingularAttribute<MCRUser, String> attribute, String string, ArrayList<Predicate> predicates) {
-        if (null != string && !string.isEmpty()) {
+        if (isValidSearchPattern(string)) {
             predicates.add(cb.equal(root.get(attribute), string));
         }
     }
 
     private static void addSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
         SingularAttribute<MCRUser, String> attribute, String searchPattern, ArrayList<Predicate> predicates) {
-        if (null != searchPattern && !searchPattern.isEmpty()) {
+        if (isValidSearchPattern(searchPattern)) {
             predicates.add(buildSearchPredicate(cb, root, attribute, searchPattern));
         }
-    }
-
-    private static String buildSearchPattern(String searchPattern) {
-        searchPattern = searchPattern.replace('*', '%');
-        searchPattern = searchPattern.replace('?', '_');
-        return searchPattern.toLowerCase(MCRSessionMgr.getCurrentSession().getLocale());
     }
 
     private static Predicate buildSearchPredicate(CriteriaBuilder cb, Root<MCRUser> root,
@@ -400,7 +404,7 @@ public class MCRUserManager {
      * @param userPattern a wildcard pattern for the login user name, may be null
      * @param realm the realm the user belongs to, may be null
      * @param namePattern a wildcard pattern for the person's real name, may be null
-     * @return a list of matching users
+     * @return a list of all matching users
      * @deprecated Use {@link MCRUserManager#listUsers(String, String, String, String)} instead.
      */
     @Deprecated
@@ -408,7 +412,21 @@ public class MCRUserManager {
         return listUsers(userPattern, realm, namePattern, null);
     }
 
-    // TODO deprecated?
+    /**
+     * Searches for users in the database and returns a list of all matching users.
+     * Wildcards containing * and ? for single character may be used for searching
+     * by login user name or real name.
+     *
+     * Pay attention that no role information is attached to user data. If you need
+     * this information call {@link MCRUserManager#getUser(String, String)}.
+     *
+     * @param userPattern a wildcard pattern for the login user name, may be null
+     * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @param mailPattern a wildcard pattern for the person's email, may be null
+     * @return a list of all matching users
+     * @deprecated Use {@link MCRUserManager#listUsers(String, String, String, String)} instead.
+     */
     public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern, String mailPattern) {
         return listUsers(userPattern, realm, namePattern, mailPattern, null, 0, Integer.MAX_VALUE);
     }
@@ -425,10 +443,13 @@ public class MCRUserManager {
      * @param realm the realm the user belongs to, may be null
      * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param mailPattern a wildcard pattern for the person's email, may be null
-     * @return a list of matching users
+     * @param attributeNamePattern a wildcard pattern for person's attribute names, may be null
+     * @param offset an offset for matching users
+     * @param limit a limit for matching users
+     * @return a list of matching users in offset and limit range
      */
     public static List<MCRUser> listUsers(String userPattern, String realm, String namePattern, String mailPattern,
-        String attributeNamePattern, final int offset, final int limit) {
+        String attributeNamePattern, int offset, int limit) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MCRUser> query = cb.createQuery(MCRUser.class);
@@ -459,7 +480,17 @@ public class MCRUserManager {
         return countUsers(userPattern, realm, namePattern, null);
     }
 
-    // TODO deprecated?
+    /**
+     * Counts users in the database that match the given criteria.
+     * Wildcards containing * and ? for single character may be used for searching
+     * by login user name or real name.
+     *
+     * @param userPattern a wildcard pattern for the login user name, may be null
+     * @param realm the realm the user belongs to, may be null
+     * @param namePattern a wildcard pattern for the person's real name, may be null
+     * @param mailPattern a wildcard pattern for the person's email, may be null
+     * @return the number of matching users
+     */
     public static int countUsers(String userPattern, String realm, String namePattern, String mailPattern) {
         return countUsers(userPattern, realm, namePattern, mailPattern, null);
     }
@@ -473,6 +504,7 @@ public class MCRUserManager {
      * @param realm the realm the user belongs to, may be null
      * @param namePattern a wildcard pattern for the person's real name, may be null
      * @param mailPattern a wildcard pattern for the person's email, may be null
+     * @param attributeNamePattern a wildcard pattern for person's attribute names, may be null
      * @return the number of matching users
      */
     public static int countUsers(String userPattern, String realm, String namePattern, String mailPattern,
