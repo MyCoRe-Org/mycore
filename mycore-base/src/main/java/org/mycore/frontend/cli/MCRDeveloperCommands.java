@@ -74,7 +74,7 @@ public class MCRDeveloperCommands {
 
     @MCRCommand(
             syntax = "show all messages for {0}",
-            help = "Show all messages for locale {1}",
+            help = "Show all messages for locale {0}",
             order = 30
     )
     public static void showMessages(String lang) {
