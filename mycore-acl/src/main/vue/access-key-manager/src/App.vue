@@ -314,7 +314,7 @@ export default class AccessKeyManager extends Vue {
       console.error('webApplicationBaseURL is not set');
       return;
     }
-    if ((objectID == null) || (derivateID != null && objectID == null)) {
+    if ((objectID == null)) {
       this.showFatalError();
       this.isProcessing = false;
       // eslint-disable-next-line no-console
