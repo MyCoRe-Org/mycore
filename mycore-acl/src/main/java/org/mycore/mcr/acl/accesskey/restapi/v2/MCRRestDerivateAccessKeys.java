@@ -77,7 +77,7 @@ public class MCRRestDerivateAccessKeys {
             @ApiResponse(responseCode = "401",
                 description = "You do not have create permission and need to authenticate first",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404", description = "Derivate or access key doesn't exists",
+            @ApiResponse(responseCode = "404", description = "Derivate or access key does not exist",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
@@ -100,7 +100,7 @@ public class MCRRestDerivateAccessKeys {
             @ApiResponse(responseCode = "401",
                 description = "You do not have create permission and need to authenticate first",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404", description = "Derivate or access key doesn't exists",
+            @ApiResponse(responseCode = "404", description = "Derivate or access key does not exist",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
@@ -121,7 +121,7 @@ public class MCRRestDerivateAccessKeys {
             @ApiResponse(responseCode = "401",
                 description = "You do not have create permission and need to authenticate first",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404", description = "Derivate doesn't exists",
+            @ApiResponse(responseCode = "404", description = "Derivate does not exist",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @RequestBody(required = true,
@@ -147,7 +147,7 @@ public class MCRRestDerivateAccessKeys {
             @ApiResponse(responseCode = "401",
                 description = "You do not have create permission and need to authenticate first",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404", description = "Derivate or access key doesn't exists",
+            @ApiResponse(responseCode = "404", description = "Derivate or access key does not exist",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @RequestBody(required = true,
@@ -174,7 +174,7 @@ public class MCRRestDerivateAccessKeys {
             @ApiResponse(responseCode = "401",
                 description = "You do not have create permission and need to authenticate first",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
-            @ApiResponse(responseCode = "404", description = "Derivate or access key doesn't exists",
+            @ApiResponse(responseCode = "404", description = "Derivate or access key does not exist",
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)

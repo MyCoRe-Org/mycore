@@ -45,7 +45,7 @@ public class MCRRestAccessKeyHelper {
 
     private static WebApplicationException getUnknownObjectException(final MCRObjectID objectId) {
         return MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
-            .withMessage(objectId + " doesn't exists!")
+            .withMessage(objectId + " does not exist!")
             .withErrorCode("objectNotFound")
             .toException();
     }
@@ -68,7 +68,7 @@ public class MCRRestAccessKeyHelper {
         if (accessKey != null) {
             return Response.ok(accessKey).build();
         }
-        throw new MCRAccessKeyNotFoundException("Key does not exists.");
+        throw new MCRAccessKeyNotFoundException("Key does not exist.");
     }
 
     protected static Response doListAccessKeys(final MCRObjectID objectId, final int offset, final int limit) {

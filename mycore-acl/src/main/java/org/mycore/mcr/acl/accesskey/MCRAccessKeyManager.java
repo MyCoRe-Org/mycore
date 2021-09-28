@@ -212,8 +212,8 @@ public final class MCRAccessKeyManager {
         throws MCRAccessKeyNotFoundException {
         final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
         if (accessKey == null) {
-            LOGGER.debug("Key does not exists.");
-            throw new MCRAccessKeyNotFoundException("Key does not exists.");
+            LOGGER.debug("Key does not exist.");
+            throw new MCRAccessKeyNotFoundException("Key does not exist.");
         } else {
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.remove(em.contains(accessKey) ? accessKey : em.merge(accessKey));
@@ -263,8 +263,8 @@ public final class MCRAccessKeyManager {
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.merge(accessKey);
         } else { 
-            LOGGER.debug("Key does not exists.");
-            throw new MCRAccessKeyNotFoundException("Key does not exists.");
+            LOGGER.debug("Key does not exist.");
+            throw new MCRAccessKeyNotFoundException("Key does not exist.");
         }
     }
 

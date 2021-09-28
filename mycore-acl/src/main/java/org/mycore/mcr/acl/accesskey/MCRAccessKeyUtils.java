@@ -55,7 +55,7 @@ public class MCRAccessKeyUtils {
 
         final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
         if (accessKey == null) {
-            throw new MCRAccessKeyNotFoundException("Key does not exists.");
+            throw new MCRAccessKeyNotFoundException("Key does not exist.");
         }
         
         session.put(getAttributeName(objectId), secret);
@@ -76,7 +76,7 @@ public class MCRAccessKeyUtils {
         final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
         final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
         if (accessKey == null) {
-            throw new MCRAccessKeyNotFoundException("Key does not exists.");
+            throw new MCRAccessKeyNotFoundException("Key does not exist.");
         }
 
         user.setUserAttribute(getAttributeName(objectId), secret);
