@@ -76,6 +76,8 @@ public class MCRPrioritySupplier<T> implements Supplier<T>, MCRPrioritizable {
         MCRPrioritySupplier<T> supplier = this;
         class MCRAsyncPrioritySupplier
             implements Runnable, MCRPrioritizable, CompletableFuture.AsynchronousCompletionTask {
+            @Override
+            @SuppressWarnings("PMD.AvoidCatchingThrowable")
             public void run() {
                 try {
                     if (!result.isDone()) {
