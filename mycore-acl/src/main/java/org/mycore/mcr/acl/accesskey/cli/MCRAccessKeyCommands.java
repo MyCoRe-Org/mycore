@@ -63,12 +63,6 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Cleared all access keys of {}.", objectIdString);
     }
 
-    private static MCRAccessKey readAccessKeyFromFile(final String pathString) throws IOException, MCRException {
-        final Path path = Path.of(pathString);
-        final String accessKeyJson = Files.readString(path, UTF_8);
-        return MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
-    }
-
     @MCRCommand(syntax = "create access key for {0} from file {1}",
         help = "Creates an access key {0} for MCRObject/Derivate from file {1} in json format")
     public static void createAccessKey(final String objectIdString, final String pathString)
@@ -144,11 +138,17 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Cleaned up access keys.");
     }
 
-    @MCRCommand(syntax = "hash secret {0} for {1}",
+    @MCRCommand(syntax = "hash access key secret {0} for {1}",
         help = "Hashes secret {0} for MCRObject/Derivate {1}")
     public static void hashSecret(final String secret, final String objectIdString) throws MCRException {
         final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
         final String result = MCRAccessKeyManager.hashSecret(secret, objectId);
         LOGGER.info("Hashed secret for {}: '{}'.", objectIdString, result);
+    }
+
+    private static MCRAccessKey readAccessKeyFromFile(final String pathString) throws IOException, MCRException {
+        final Path path = Path.of(pathString);
+        final String accessKeyJson = Files.readString(path, UTF_8);
+        return MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
     }
 }
