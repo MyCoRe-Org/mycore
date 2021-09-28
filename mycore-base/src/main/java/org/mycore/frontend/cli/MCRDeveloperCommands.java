@@ -79,7 +79,7 @@ public class MCRDeveloperCommands {
     )
     public static void showMessages(String lang) {
         Map<String, String> values = MCRTranslation.translatePrefix("", MCRTranslation.getLocale(lang));
-        if (!values.isEmpty()) {
+        if (values.isEmpty()) {
             LOGGER.info("Found no messages");
         } else {
             values.forEach((key, value) -> {
