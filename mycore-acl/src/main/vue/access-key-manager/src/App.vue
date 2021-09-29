@@ -170,12 +170,11 @@ import MCRAccessKeyEditModal from './components/MCRAccessKeyEditModal.vue';
 import {
   webApplicationBaseURL,
   objectID,
-  parentID,
+  derivateID,
   locale,
   fetchJWT,
   isSessionEnabled,
   urlEncode,
-  isDerivate,
 } from '@/common/MCRUtils';
 
 @Component({
@@ -264,7 +263,7 @@ export default class AccessKeyManager extends Vue {
     this.accessKeys.push(accessKey);
     this.alertVariant = 'success';
     this.alertMessage = this.$t('mcr.accessKey.success.add', accessKey.secret, secret);
-    if (isSessionEnabled && !isDerivate(objectID)) {
+    if (isSessionEnabled && derivateID == null) {
       this.alertMessage += ` ${this.$t('mcr.accessKey.success.add.url')} ${this.$t('mcr.accessKey.success.add.url.format', webApplicationBaseURL, objectID, urlEncode(secret))}`;
     }
   }
@@ -300,6 +299,7 @@ export default class AccessKeyManager extends Vue {
         baseURL: webApplicationBaseURL,
         objectID,
         token,
+        derivateID,
       });
     } catch (error) { // should not happen
       this.showFatalError();
@@ -314,7 +314,7 @@ export default class AccessKeyManager extends Vue {
       console.error('webApplicationBaseURL is not set');
       return;
     }
-    if (objectID == null) {
+    if ((objectID == null)) {
       this.showFatalError();
       this.isProcessing = false;
       // eslint-disable-next-line no-console
@@ -323,7 +323,7 @@ export default class AccessKeyManager extends Vue {
     }
     let token = '';
     try {
-      const result = await fetchJWT(webApplicationBaseURL, objectID, parentID, isSessionEnabled);
+      const result = await fetchJWT(webApplicationBaseURL, objectID, derivateID, isSessionEnabled);
       token = result.data.access_token;
     } catch (error) {
       this.alertVariant = 'danger';

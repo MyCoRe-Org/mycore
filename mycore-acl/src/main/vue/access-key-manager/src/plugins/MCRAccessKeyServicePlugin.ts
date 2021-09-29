@@ -30,6 +30,7 @@ export interface MCRAccessKeyServiceOptions {
   baseURL: string;
   objectID: string;
   token: string;
+  derivateID?: string;
 }
 
 interface MCRErrorResponse {
@@ -43,6 +44,10 @@ interface MCRErrorResponse {
 export default new class MCRAccessKeyServicePlugin {
   private instance: AxiosInstance;
 
+  private objectID: string;
+
+  private derivateID: string;
+
   public install(Vue: typeof _Vue, options: MCRAccessKeyServiceOptions) {
     /* eslint-disable */
     Vue.prototype.$client = this;
@@ -52,6 +57,9 @@ export default new class MCRAccessKeyServicePlugin {
       baseURL: `${options.baseURL}api/v2/objects/${options.objectID}/`,
       timeout: 2000,
     });
+
+    this.objectID = options.objectID;
+    this.derivateID = options.derivateID;
 
     this.instance.interceptors.response.use((response) => response, (error) => {
       const exception: MCRException = {};
@@ -81,25 +89,30 @@ export default new class MCRAccessKeyServicePlugin {
   }
 
   public async getAccessKeys(): Promise<MCRAccessKeyInformation> {
-    const response = await this.instance.get('accesskeys');
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys` : 'accesskeys';
+    const response = await this.instance.get(url);
     return <MCRAccessKeyInformation>response.data;
   }
 
   public async getAccessKey(secret: string): Promise<MCRAccessKey> {
-    const response = await this.instance.get(`accesskeys/${secret}`);
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${secret}` : `accesskeys/${secret}`;
+    const response = await this.instance.get(url);
     return response.data;
   }
 
   public async addAccessKey(accessKey: MCRAccessKey): Promise<string> {
-    const response = await this.instance.post('accesskeys', accessKey);
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys` : 'accesskeys';
+    const response = await this.instance.post(url, accessKey);
     return response.headers.location.split('/').pop();
   }
 
   public async updateAccessKey(secret: string, accessKey: MCRAccessKey): Promise<void> {
-    await this.instance.put(`/accesskeys/${secret}`, accessKey);
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${secret}` : `/accesskeys/${secret}`;
+    await this.instance.put(url, accessKey);
   }
 
   public async removeAccessKey(secret: string): Promise<void> {
-    await this.instance.delete(`accesskeys/${secret}`);
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${secret}` : `accesskeys/${secret}`;
+    await this.instance.delete(url);
   }
 }();

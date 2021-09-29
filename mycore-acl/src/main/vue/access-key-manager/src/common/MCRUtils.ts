@@ -43,7 +43,7 @@ declare global {
   interface Window {
     webApplicationBaseURL: string;
     objectID: string;
-    parentID: string;
+    derivateID: string;
     currentLang: string;
     accessKeySession: string;
   }
@@ -57,16 +57,16 @@ export function urlEncode(value: string): string {
 }
 
 export async function fetchJWT(webApplicationBaseURL: string, objectID: string,
-  parentID: string, includeSession: boolean): Promise<AxiosResponse> {
+  derivateID: string, includeSession: boolean): Promise<AxiosResponse> {
   const params = new URLSearchParams();
   params.append('ua', `acckey_${objectID}`);
-  if (parentID) {
-    params.append('ua', `acckey_${parentID}`);
+  if (derivateID) {
+    params.append('ua', `acckey_${derivateID}`);
   }
   if (includeSession) {
     params.append('sa', `acckey_${objectID}`);
-    if (parentID) {
-      params.append('sa', `acckey_${parentID}`);
+    if (derivateID) {
+      params.append('sa', `acckey_${derivateID}`);
     }
   }
   return axios.get(`${webApplicationBaseURL}rsc/jwt`, { params });
@@ -96,11 +96,11 @@ export function getObjectID(): string {
   return getParameterByName('objectid');
 }
 
-export function getParentID(): string {
-  if (window.parentID != null) {
-    return window.parentID;
+export function getDerivateID(): string {
+  if (window.derivateID != null) {
+    return window.derivateID;
   }
-  return getParameterByName('parentid');
+  return getParameterByName('derivateid');
 }
 
 export function getLocale(): string {
@@ -120,16 +120,12 @@ export function getIsSessionEnabled(): boolean {
   return window.accessKeySession !== 'false';
 }
 
-export function isDerivate(objectID: string): boolean {
-  return objectID.includes('_derivate_');
-}
-
 const webApplicationBaseURL = getWebApplicationBaseURL();
 const objectID = getObjectID();
-const parentID = getParentID();
+const derivateID = getDerivateID();
 const locale = getLocale();
 const isSessionEnabled = getIsSessionEnabled();
 
 export {
-  webApplicationBaseURL, objectID, parentID, locale, isSessionEnabled,
+  webApplicationBaseURL, objectID, derivateID, locale, isSessionEnabled,
 };
