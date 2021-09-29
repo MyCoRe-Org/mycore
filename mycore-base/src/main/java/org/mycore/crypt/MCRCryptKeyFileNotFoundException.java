@@ -1,4 +1,5 @@
 /*
+ *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
@@ -18,13 +19,31 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.mcr.acl.accesskey.exception;
+package org.mycore.crypt;
 
-/**
- * Exception that refers to an invalid value.
- */
-public class MCRAccessKeyInvalidValueException extends MCRAccessKeyException {
-    public MCRAccessKeyInvalidValueException(String errorMessage) {
-        super(errorMessage, "mcr.accessKey.error.invalidValue");
+import java.io.FileNotFoundException;
+
+public class MCRCryptKeyFileNotFoundException extends FileNotFoundException {
+    private String errorCode;
+
+    public MCRCryptKeyFileNotFoundException(String errorMessage) {
+        super(errorMessage);
+    }
+
+    public MCRCryptKeyFileNotFoundException(String errorMessage, String errorCode) {
+        super(errorMessage);
+        this.errorCode = errorCode;
+    }
+
+    /*public MCRCryptKeyFileNotFoundException(Throwable cause) {
+        super(cause);
+    }*/
+    
+    /*public MCRCryptKeyFileNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }*/
+    
+    public String getErrorCode() {
+        return errorCode;
     }
 }

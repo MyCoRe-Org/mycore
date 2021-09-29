@@ -71,8 +71,7 @@ public class MCRProcessableSupplier<R> extends MCRProcessableTask<Callable<R>> i
     public static <T> MCRProcessableSupplier<T> of(Callable<T> task, ExecutorService executorService,
         Integer priority) {
         MCRProcessableSupplier<T> ps = new MCRProcessableSupplier<>(task);
-        ps.future = CompletableFuture.supplyAsync(new MCRPrioritySupplier<>(ps, priority),
-            executorService);
+        ps.future = new MCRPrioritySupplier<>(ps, priority).runAsync(executorService);
         return ps;
     }
 

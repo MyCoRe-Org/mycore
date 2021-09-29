@@ -16,7 +16,9 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default interface MCRException {
+interface MCRException {
   errorCode?: string;
   message?: string;
 }
+
+export default MCRException;

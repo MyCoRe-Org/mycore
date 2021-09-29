@@ -32,9 +32,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * use this information on {@link MCREventHandler}'s to exclude those
  * marked objects from operations which makes no sense.
  *
- * <h1>
+ * <h2>
  * Current delete behavior:
- * </h1>
+ * </h2>
  * <ol>
  *   <li>An user delete's a parent object with 500 children.</li>
  *   <li>MyCoRe tries to delete the parent, but first, it has to delete all children.</li>
@@ -50,9 +50,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * deleted".
  * </p>
  *
- * <h1>
+ * <h2>
  * Current import behavior:
- * </h1>
+ * </h2>
  *
  * <ol>
  *   <li>An import is started with a bunch of hierarchic objects.</li>

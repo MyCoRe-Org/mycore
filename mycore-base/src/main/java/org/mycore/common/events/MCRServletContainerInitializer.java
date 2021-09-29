@@ -47,10 +47,14 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
      */
     @Override
     public void onStartup(final Set<Class<?>> c, final ServletContext ctx) throws ServletException {
-        final ClassLoaderLeakPreventorFactory leakPreventorFactory = new ClassLoaderLeakPreventorFactory();
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        ClassLoaderLeakPreventor leakPreventor = leakPreventorFactory.newLeakPreventor(classLoader);
-        leakPreventor.runPreClassLoaderInitiators();
+        final boolean runClassLoaderLeakPreventor = runClassLoaderLeakPreventor();
+        ClassLoaderLeakPreventor leakPreventor = null;
+        if (runClassLoaderLeakPreventor) {
+            final ClassLoaderLeakPreventorFactory leakPreventorFactory = new ClassLoaderLeakPreventorFactory();
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            leakPreventor = leakPreventorFactory.newLeakPreventor(classLoader);
+            leakPreventor.runPreClassLoaderInitiators();
+        }
         MCRShutdownHandler shutdownHandler = MCRShutdownHandler.getInstance();
         shutdownHandler.isWebAppRunning = true;
         shutdownHandler.leakPreventor = leakPreventor;
@@ -85,6 +89,13 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
         String fileName = location.getFile();
         File sourceFile = new File(fileName);
         return sourceFile.getName();
+    }
+
+    private boolean runClassLoaderLeakPreventor() {
+        //do not run ClassLoaderLeakPreventor by default on JRE 17
+        String defaultValue = (Runtime.version().feature() > 11) ? Boolean.FALSE.toString() : Boolean.TRUE.toString();
+        final String propValue = System.getProperty("MCR.ClassLoaderLeakPreventor", defaultValue);
+        return Boolean.parseBoolean(propValue);
     }
 
 }

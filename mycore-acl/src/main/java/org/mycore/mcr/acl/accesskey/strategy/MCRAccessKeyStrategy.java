@@ -23,6 +23,7 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -43,104 +44,94 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final Set<String> ALLOWED_SESSION_PERMISSION_TYPES = MCRConfiguration2
-        .getString("MCR.AccessKey.Session.AllowedPermissionTypes")
-        .stream()
-        .flatMap(MCRConfiguration2::splitValue)
-        .collect(Collectors.toSet());
-    
+    private static final String ACCESS_KEY_STRATEGY_PROP_PREFX = "MCR.ACL.AccessKey.Strategy";
+
+    private static final String ALLOWED_OBJECT_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP_PREFX + ".AllowedObjectTypes";
+
+    private static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP_PREFX
+        + ".AllowedSessionPermissionTypes";
+
+    private static Set<String> allowedObjectTypes = loadAllowedObjectTypes();
+
+    private static Set<String> allowedSessionPermissionTypes = loadAllowedSessionPermissionTypes();
+
+    private static Set<String> parseListStringToSet(final Optional<String> listString) {
+        return listString.stream()
+            .flatMap(MCRConfiguration2::splitValue)
+            .collect(Collectors.toSet());
+    }
+
+    private static Set<String> loadAllowedObjectTypes() {
+        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_OBJECT_TYPES_PROP::equals, (p1, p2, p3) -> {
+            allowedObjectTypes = parseListStringToSet(p3);
+        });
+        return parseListStringToSet(MCRConfiguration2.getString(ALLOWED_OBJECT_TYPES_PROP));
+    }
+
+    private static Set<String> loadAllowedSessionPermissionTypes() {
+        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_SESSION_PERMISSION_TYPES_PROP::equals, (p1, p2, p3) -> {
+            allowedSessionPermissionTypes = parseListStringToSet(p3);
+        });
+        return parseListStringToSet(MCRConfiguration2.getString(ALLOWED_SESSION_PERMISSION_TYPES_PROP));
+    }
+
     @Override
-    public boolean checkPermission(String id, String permission) {
-        if (PERMISSION_WRITE.equals(permission) || PERMISSION_READ.equals(permission)) {
-            return checkFullObjectPermission(id, permission);
-        } else if (PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission)) {
-            LOGGER.debug("mapped permission to read");
-            return checkFullObjectPermission(id, PERMISSION_READ);
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Checks full object and derivate permission including derivate parent
-     *
-     * @param id of a {@link MCRObjectID}
-     * @param permission permission type
-     * @return true if permitted, otherwise false
-     */
-    private boolean checkFullObjectPermission(final String id, final String permission) {
-        if (MCRObjectID.isValid(id)) {
-            MCRObjectID objectId = MCRObjectID.getInstance(id);
-            if (objectId.getTypeId().equals("derivate")) {
-                LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
-                if (ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
-                    final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
-                    if (accessKey != null && checkPermission(permission, accessKey)) {
-                        LOGGER.debug("found valid access key in session");
-                        return true;
-                    }
-                }
-                final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
-                if (accessKey != null && checkPermission(permission, accessKey)) {
-                    LOGGER.debug("found valid access key in user attribute");
-                    return true;
-                }
-                objectId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
-            }
-            LOGGER.debug("check object {} permission {}.", objectId, permission);
-
-            if (ALLOWED_SESSION_PERMISSION_TYPES.contains(permission)) {
-                final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentSession(objectId);
-                if (accessKey != null && checkPermission(permission, accessKey)) {
-                    LOGGER.debug("found valid access key in session");
-                    return true;
-                }
-            }
-            final MCRAccessKey accessKey = MCRAccessKeyUtils.getAccessKeyFromCurrentUser(objectId);
-            if (accessKey != null) {
-                LOGGER.debug("found valid access key in user attribute");
-                return checkPermission(permission, accessKey);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks the access with a {@link MCRAccessKey}.
-     *
-     * @param permission permission type
-     * @param accessKey the {@link MCRAccessKey}
-     * @return true if permitted, otherwise false
-     */
-    private boolean checkPermission(String permission, MCRAccessKey accessKey) {
-        if ((permission.equals(PERMISSION_READ) 
-            && accessKey.getType().equals(PERMISSION_READ)) 
-            || accessKey.getType().equals(PERMISSION_WRITE)) {
-            LOGGER.debug("Access granted. User has a key to access the resource {}.",
-                accessKey.getObjectId().toString());
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks the access with a {@link MCRAccessKey}.
-     *
-     * @param id of a {@link MCRObjectID}
-     * @param permission permission type
-     * @param accessKey the {@link MCRAccessKey}
-     * @return true if permitted, otherwise false
-     */
-    public boolean checkObjectPermission(String id, String permission, MCRAccessKey accessKey) {
-        if ((PERMISSION_WRITE.equals(permission) || PERMISSION_READ.equals(permission)
+    public boolean checkPermission(final String objectIdString, final String permission) {
+        if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
             || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
-            && MCRObjectID.isValid(id) && id.equals(accessKey.getObjectId().toString())) {
-            if (PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission)) {
-                LOGGER.debug("mapped permission to read");
-                return checkPermission(PERMISSION_READ, accessKey);
-            } else {
-                return checkPermission(permission, accessKey);
+            && MCRObjectID.isValid(objectIdString)) {
+            final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);
+            if ("derivate".equals(objectId.getTypeId())) {
+                return checkDerivatePermission(objectId, permission);
             }
+            return checkObjectPermission(objectId, permission);
+        }
+        return false;
+    }
+
+    /**
+     * Fetches access key and checks object permission
+     *
+     * @param objectId the {@link MCRObjectID}
+     * @param permission permission type
+     * @return true if permitted, otherwise false
+     */
+    public boolean checkObjectPermission(final MCRObjectID objectId, final String permission) {
+        LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
+        if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
+            || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
+            && allowedObjectTypes.contains(objectId.getTypeId())) {
+            if (allowedSessionPermissionTypes.contains(permission)) {
+                final MCRAccessKey accessKey = MCRAccessKeyUtils.getLinkedAccessKeyFromCurrentSession(objectId);
+                if (accessKey != null && MCRAccessKeyStrategyHelper.verifyAccessKey(permission, accessKey)) {
+                    return true;
+                }
+            }
+            final MCRAccessKey accessKey = MCRAccessKeyUtils.getLinkedAccessKeyFromCurrentUser(objectId);
+            if (accessKey != null && MCRAccessKeyStrategyHelper.verifyAccessKey(permission, accessKey)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Fetches access key and checks derivate permission
+     *
+     * @param objectId the {@link MCRObjectID}
+     * @param permission permission type
+     * @return true if permitted, otherwise false
+     */
+    public boolean checkDerivatePermission(final MCRObjectID objectId, final String permission) {
+        LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
+        if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
+            || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
+            && allowedObjectTypes.contains(objectId.getTypeId())) {
+            if (checkObjectPermission(objectId, permission)) {
+                return true;
+            }
+            final MCRObjectID parentObjectId= MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
+            return checkObjectPermission(parentObjectId, permission);
         }
         return false;
     }

@@ -35,11 +35,12 @@ namespace mycore.viewer.widgets.canvas {
 
             var widthMultiplicator = (this._rotation == 90 || this._rotation == 270) ? 1 : 2;
             var widthDivisor = (widthMultiplicator == 1) ? 2 : 1;
-            this._horizontalScrollbar.areaSize = this._pageDimension.width * widthMultiplicator;
-            this._verticalScrollbar.areaSize = rowCount * this.getPageHeightWithSpace();
 
             this._horizontalScrollbar.viewSize = this._pageController.viewport.size.width / this._pageController.viewport.scale;
             this._verticalScrollbar.viewSize = this._pageController.viewport.size.height / this._pageController.viewport.scale;
+
+            this._horizontalScrollbar.areaSize = this._pageDimension.width * widthMultiplicator;
+            this._verticalScrollbar.areaSize = rowCount * this.getPageHeightWithSpace() + (this._verticalScrollbar.viewSize / 2) - this.getPageHeightSpace();
 
             this._horizontalScrollbar.position = vp.position.x - (vp.size.width / vp.scale / 2) + (this._pageDimension.width / widthDivisor);
             this._verticalScrollbar.position = vp.position.y - (vp.size.height / vp.scale / 2);
@@ -192,18 +193,20 @@ namespace mycore.viewer.widgets.canvas {
 
             var scaledViewport = vp.size.scale(1 / vp.scale);
             var minY = 1;
-            var maxY = this._model.pageCount / 2 * this.getPageHeightWithSpace();
-            var correctedY = Math.min(Math.max(vp.position.y, minY), maxY);
+            const maxY = (this._rotation === 90 || this._rotation === 270 ?
+                (((this.relocated ? 1 : 0) + this._model.pageCount) / 2) * this.getPageHeightWithSpace() :
+                Math.ceil(((this.relocated ? 1 : 0) + this._model.pageCount) / 2) * this.getPageHeightWithSpace());
+            const correctedY = Math.min(Math.max(vp.position.y, minY), maxY);
             if (scaledViewport.width > (this._pageDimension.width * widthMultiplicator)) {
-                var corrected = new Position2D(0, correctedY);
+                const corrected = new Position2D(0, correctedY);
                 if (!vp.position.equals(corrected)) {
                     vp.position = new Position2D(0, correctedY);
                 }
             } else {
-                var minimalX = -this._pageDimension.width + scaledViewport.width / 2;
-                var maximalX = this._pageDimension.width - scaledViewport.width / 2;
+                const minimalX = -(this._pageDimension.width / (2 / widthMultiplicator)) + scaledViewport.width / 2;
+                const maximalX = (this._pageDimension.width / (2 / widthMultiplicator)) - scaledViewport.width / 2;
                 var correctedX = Math.max(minimalX, Math.min(maximalX, vp.position.x));
-                var corrected = new Position2D(correctedX, correctedY);
+                const corrected = new Position2D(correctedX, correctedY);
                 if (!vp.position.equals(corrected)) {
                     vp.position = corrected;
                 }
