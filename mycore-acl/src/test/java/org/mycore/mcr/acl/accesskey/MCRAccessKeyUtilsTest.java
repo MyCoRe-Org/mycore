@@ -20,12 +20,14 @@
 
 package org.mycore.mcr.acl.accesskey;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotEquals;
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -33,6 +35,7 @@ import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
@@ -112,5 +115,31 @@ public class MCRAccessKeyUtilsTest extends MCRJPATestCase {
         MCRAccessKeyManager.createAccessKey(objectId, accessKeyWrite);
         MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(objectId, WRITE_KEY);
         assertNotEquals(readSecret, MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(objectId));
+    }
+
+    @Test
+    public void testCleanUpUserAttributes() {
+        final MCRAccessKey accessKey = new MCRAccessKey(READ_KEY, PERMISSION_READ);
+        MCRAccessKeyManager.createAccessKey(objectId, accessKey);
+
+        final MCRUser user = new MCRUser("junit");
+        MCRUserManager.createUser(user);
+        MCRAccessKeyUtils.addAccessKeySecret(MCRUserManager.getUser("junit"), objectId, READ_KEY);
+
+        final MCRAccessKey accessKey2 = new MCRAccessKey(READ_KEY, PERMISSION_READ);
+        final MCRObjectID objectId2 = MCRObjectID.getInstance("mcr_test_00000002");
+        MCRAccessKeyManager.createAccessKey(objectId2, accessKey2);
+        MCRAccessKeyUtils.addAccessKeySecret(MCRUserManager.getUser("junit"), objectId2, READ_KEY);
+
+        final MCRUser user1 = new MCRUser("junit1");
+        MCRUserManager.createUser(user1);
+        MCRAccessKeyUtils.addAccessKeySecret(MCRUserManager.getUser("junit1"), objectId, READ_KEY);
+
+        MCRAccessKeyManager.removeAccessKey(objectId, MCRAccessKeyManager.hashSecret(READ_KEY, objectId));
+        MCRAccessKeyUtils.cleanUpUserAttributes();
+
+        assertNull(MCRAccessKeyUtils.getAccessKeySecret(MCRUserManager.getUser("junit"), objectId));
+        assertNull(MCRAccessKeyUtils.getAccessKeySecret(MCRUserManager.getUser("junit1"), objectId));
+        assertNotNull(MCRAccessKeyUtils.getAccessKeySecret(MCRUserManager.getUser("junit"), objectId2));
     }
 }

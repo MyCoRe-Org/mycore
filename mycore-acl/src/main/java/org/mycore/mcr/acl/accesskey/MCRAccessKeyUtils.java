@@ -20,6 +20,12 @@
 
 package org.mycore.mcr.acl.accesskey;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -29,6 +35,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserAttribute;
 import org.mycore.user2.MCRUserManager;
 
 /**
@@ -107,6 +114,55 @@ public class MCRAccessKeyUtils {
     public static synchronized void addAccessKeySecretToCurrentUser(final MCRObjectID objectId, final String value) 
         throws MCRException {
         addAccessKeySecret(MCRUserManager.getCurrentUser(), objectId, value);
+    }
+
+    /**
+     * Lists all users which own at least an access key user attribute in given range
+     *
+     * @param offset the offset
+     * @param limit the limit
+     * @return a list with all users which own at least an access key in given range
+     */
+    private static List<MCRUser> listUsersWithAccessKey(final int offset, final int limit) {
+        return MCRUserManager.listUsers(null, null, null, null, ACCESS_KEY_PREFIX + "*", offset, limit);
+    }
+
+    /**
+     * Cleans all access key secret attributes of users if the corresponding key does not exist.
+     */
+    public static void cleanUpUserAttributes() {
+        final Set<MCRUserAttribute> validAttributes = new HashSet<>();
+        final Set<MCRUserAttribute> deadAttributes = new HashSet<>();
+        int offset = 0;
+        final int limit = 1024;
+        List<MCRUser> users = new ArrayList<>();
+        do {
+            users = listUsersWithAccessKey(offset, limit);
+            for (final MCRUser user : users) {
+                final List<MCRUserAttribute> attributes = user.getAttributes()
+                    .stream()
+                    .filter(attribute -> attribute.getName().startsWith(MCRAccessKeyUtils.ACCESS_KEY_PREFIX))
+                    .filter(attribute -> !validAttributes.contains(attribute))
+                    .collect(Collectors.toList());
+                for (MCRUserAttribute attribute : attributes) {
+                    final String attributeName = attribute.getName();
+                    final MCRObjectID objectId = MCRObjectID.getInstance(attributeName.substring(
+                        attributeName.indexOf("_") + 1));
+                    if (deadAttributes.contains(attribute)) {
+                        MCRAccessKeyUtils.removeAccessKeySecret(user, objectId);
+                    } else {
+                        if (MCRAccessKeyManager.getAccessKeyWithSecret(objectId, attribute.getValue()) != null) {
+                            validAttributes.add(attribute);
+                        } else {
+                            MCRAccessKeyUtils.removeAccessKeySecret(user, objectId);
+                            deadAttributes.add(attribute);
+                        }
+                    }
+                }
+            }
+            offset += limit;
+        }
+        while (users.size() == limit);
     }
 
     /**

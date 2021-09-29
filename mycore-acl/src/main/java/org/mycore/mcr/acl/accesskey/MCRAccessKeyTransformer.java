@@ -78,7 +78,7 @@ public class MCRAccessKeyTransformer {
      * Transforms JSON to {@link MCRAccessKey} list.
      *
      * @param json the json
-     * @return the {@link MCRAccessKey}
+     * @return the {@link MCRAccessKey} list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
     public static List<MCRAccessKey> accessKeysFromJson(final String json) 
@@ -92,13 +92,31 @@ public class MCRAccessKeyTransformer {
     }
 
     /**
+     * Transforms a {@link MCRAccessKey} to JSON.
+     *
+     * @param accessKey the {@link MCRAccessKey}
+     * @return access key as json string
+     * @throws MCRAccessKeyTransformationException if the transformation fails
+     */
+    public static String jsonFromAccessKey(final MCRAccessKey accessKey)
+        throws MCRAccessKeyTransformationException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(accessKey);
+        } catch (JsonProcessingException e) {
+            throw new MCRAccessKeyTransformationException("Access key could not be converted to JSON.");
+        }
+    }
+
+    /**
      * Transforms a {@link MCRAccessKey} list to JSON.
      *
      * @param accessKeys the {@link MCRAccessKey} list
      * @return access keys as json array string
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static String jsonFromAccessKeys(final List<MCRAccessKey> accessKeys) {
+    public static String jsonFromAccessKeys(final List<MCRAccessKey> accessKeys)
+        throws MCRAccessKeyTransformationException {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.writeValueAsString(accessKeys);
