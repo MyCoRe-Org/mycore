@@ -54,7 +54,7 @@ public class MCRAccessKeyFilter implements Filter {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String ALLOWED_PERMISSION_TYPES = MCRConfiguration2
-        .getString("MCR.ACL.AccessKey.Session.AllowedPermissionTypes")
+        .getString("MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes")
         .orElse(null);
 
     @Override
