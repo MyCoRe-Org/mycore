@@ -54,8 +54,11 @@ public final class MCRAccessKeyManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final int HASH_ITERATIONS = MCRConfiguration2
-        .getInt("MCR.ACL.AccessKey.Secret.HashIterations").orElse(1000);
+    private static final boolean HASHING_ENABLED = MCRConfiguration2
+        .getBoolean("MCR.ACL.AccessKey.Secret.Hashing.Enabled").orElse(false);
+
+    private static final int HASHING_ITERATIONS = MCRConfiguration2
+        .getInt("MCR.ACL.AccessKey.Secret.Hashing.Iterations").orElse(1000);
 
     /**
      * Returns all access keys for given {@link MCRObjectID}.
@@ -103,11 +106,11 @@ public final class MCRAccessKeyManager {
      * @throws MCRException if encryption fails
      */
     public static String hashSecret(final String secret, final MCRObjectID objectId) throws MCRException {
-        if (HASH_ITERATIONS == -1) {
+        if (!HASHING_ENABLED) {
             return secret;
         }
         try {
-            return MCRUtils.asSHA256String(HASH_ITERATIONS, objectId.toString().getBytes(UTF_8), secret);
+            return MCRUtils.asSHA256String(HASHING_ITERATIONS, objectId.toString().getBytes(UTF_8), secret);
         } catch(NoSuchAlgorithmException e) {
             throw new MCRException("Cannot hash secret.", e);
         }
