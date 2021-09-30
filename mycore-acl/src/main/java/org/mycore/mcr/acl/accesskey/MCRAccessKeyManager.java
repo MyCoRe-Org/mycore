@@ -103,7 +103,7 @@ public final class MCRAccessKeyManager {
      * @throws MCRException if encryption fails
      */
     public static String hashSecret(final String secret, final MCRObjectID objectId) throws MCRException {
-        if (HASH_ITERATIONS == 0) {
+        if (HASH_ITERATIONS == -1) {
             return secret;
         }
         try {
