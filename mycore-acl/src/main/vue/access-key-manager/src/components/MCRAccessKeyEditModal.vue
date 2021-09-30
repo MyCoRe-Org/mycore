@@ -58,7 +58,7 @@
       <b-form-group
         label-cols-lg="2"
         label-for="input-secret"
-        :label="$t('mcr.accessKey.label.id')"
+        :label="$t('mcr.accessKey.label.secret')"
         v-if="isEdit"
       >
         <b-form-input
@@ -72,9 +72,9 @@
         v-else
       >
         <template #label>
-          {{ $t("mcr.accessKey.label.value") }}*
+          {{ $t("mcr.accessKey.label.secret") }}*
           <b-link
-            id="popover-value"
+            id="popover-secret"
           >
             <font-awesome-icon
               icon="info-circle"
@@ -82,12 +82,12 @@
             ></font-awesome-icon>
           </b-link>
           <b-popover
-            target="popover-value"
+            target="popover-secret"
             :title="$t('mcr.accessKey.title.popover')"
             triggers="hover"
           >
             <span
-              v-html="$t('mcr.accessKey.popover.value')"
+              v-html="$t('mcr.accessKey.popover.secret')"
             ></span>
           </b-popover>
         </template>
@@ -103,13 +103,13 @@
             </b-button>
           </b-input-group-prepend>
           <b-form-input
-            id="input-value"
+            id="input-secret"
             v-model="secret"
             :state="inputState"
-            aria-describedby="input-value-feedback"
+            aria-describedby="input-secret-feedback"
           ></b-form-input>
           <b-form-invalid-feedback
-            id="input-value-feedback"
+            id="input-secret-feedback"
           >
             {{ inputValueFeedback }}
           </b-form-invalid-feedback>

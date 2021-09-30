@@ -103,6 +103,9 @@ public final class MCRAccessKeyManager {
      * @throws MCRException if encryption fails
      */
     public static String hashSecret(final String secret, final MCRObjectID objectId) throws MCRException {
+        if (HASH_ITERATIONS == 0) {
+            return secret;
+        }
         try {
             return MCRUtils.asSHA256String(HASH_ITERATIONS, objectId.toString().getBytes(UTF_8), secret);
         } catch(NoSuchAlgorithmException e) {

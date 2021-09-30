@@ -106,8 +106,8 @@ public class MCRRestDerivateAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @PathParam(PARAM_SECRET) final String secret) {
-        return MCRRestAccessKeyHelper.doGetAccessKey(derivateId, secret);
+        @PathParam(PARAM_SECRET) final String encodedSecret) {
+        return MCRRestAccessKeyHelper.doGetAccessKey(derivateId, encodedSecret);
     }
 
     @POST
@@ -158,8 +158,8 @@ public class MCRRestDerivateAccessKeys {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response updateAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @PathParam(PARAM_SECRET) final String secret, final String accessKeyJson) {
-        return MCRRestAccessKeyHelper.doUpdateAccessKey(derivateId, secret, accessKeyJson);
+        @PathParam(PARAM_SECRET) final String encodedSecret, final String accessKeyJson) {
+        return MCRRestAccessKeyHelper.doUpdateAccessKey(derivateId, encodedSecret, accessKeyJson);
     }
 
     @DELETE
@@ -181,7 +181,7 @@ public class MCRRestDerivateAccessKeys {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response removeAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @PathParam(PARAM_SECRET) final String secret) {
-        return MCRRestAccessKeyHelper.doRemoveAccessKey(derivateId, secret);
+        @PathParam(PARAM_SECRET) final String encodedSecret) {
+        return MCRRestAccessKeyHelper.doRemoveAccessKey(derivateId, encodedSecret);
     }
 }

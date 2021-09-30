@@ -81,8 +81,8 @@
             responsive
             striped
           >
-            <template #head(id)>
-              {{ $t("mcr.accessKey.label.id") }}
+            <template #head(secret)>
+              {{ $t("mcr.accessKey.label.secret") }}
             </template>
             <template #head(enabled)>
               {{ $t("mcr.accessKey.label.state") }}
@@ -111,8 +111,9 @@
                 </b-button>
               </div>
             </template>
-            <template #cell(id)="data">
-              {{ data.item.secret.substring(0,8) }}
+            <template #cell(secret)="data">
+              {{ (data.item.secret.length > 8) ? data.item.secret.substring(0,5) + "..." :
+                data.item.secret }}
             </template>
             <template #cell(state)="data">
               {{ (data.item.isActive == true) ? $t("mcr.accessKey.label.state.enabled") :
@@ -187,7 +188,7 @@ export default class AccessKeyManager extends Vue {
 
   private fields = [
     {
-      key: 'id',
+      key: 'secret',
       thClass: 'col-1 text-center',
       tdClass: 'col-1 text-center',
     },

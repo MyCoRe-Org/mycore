@@ -20,6 +20,7 @@ import _Vue from 'vue';
 import axios, { AxiosInstance } from 'axios';
 import MCRException from '@/common/MCRException';
 import MCRAccessKey from '@/common/MCRAccessKey';
+import { urlEncode, urlDecode } from '@/common/MCRUtils';
 
 export interface MCRAccessKeyInformation {
   items: Array<MCRAccessKey>;
@@ -95,7 +96,8 @@ export default new class MCRAccessKeyServicePlugin {
   }
 
   public async getAccessKey(secret: string): Promise<MCRAccessKey> {
-    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${secret}` : `accesskeys/${secret}`;
+    const encodedSecret = urlEncode(secret);
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${encodedSecret}` : `accesskeys/${encodedSecret}`;
     const response = await this.instance.get(url);
     return response.data;
   }
@@ -103,16 +105,18 @@ export default new class MCRAccessKeyServicePlugin {
   public async addAccessKey(accessKey: MCRAccessKey): Promise<string> {
     const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys` : 'accesskeys';
     const response = await this.instance.post(url, accessKey);
-    return response.headers.location.split('/').pop();
+    return urlDecode(response.headers.location.split('/').pop());
   }
 
   public async updateAccessKey(secret: string, accessKey: MCRAccessKey): Promise<void> {
-    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${secret}` : `/accesskeys/${secret}`;
+    const encodedSecret = urlEncode(secret);
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${encodedSecret}` : `/accesskeys/${encodedSecret}`;
     await this.instance.put(url, accessKey);
   }
 
   public async removeAccessKey(secret: string): Promise<void> {
-    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${secret}` : `accesskeys/${secret}`;
+    const encodedSecret = urlEncode(secret);
+    const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${encodedSecret}` : `accesskeys/${encodedSecret}`;
     await this.instance.delete(url);
   }
 }();

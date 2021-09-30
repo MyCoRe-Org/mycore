@@ -20,6 +20,9 @@
 
 package org.mycore.mcr.acl.accesskey.restapi.v2;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,14 +60,14 @@ public class MCRRestAccessKeyHelper {
             throw getUnknownObjectException(objectId);
         }
         MCRAccessKeyManager.createAccessKey(objectId, accessKey);
-        return Response.created(uriInfo.getAbsolutePathBuilder().path(accessKey.getSecret()).build()).build();
+        return Response.created(uriInfo.getAbsolutePathBuilder().path(encode(accessKey.getSecret())).build()).build();
     }
 
-    protected static Response doGetAccessKey(final MCRObjectID objectId, final String secret) {
+    protected static Response doGetAccessKey(final MCRObjectID objectId, final String encodedSecret) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
+        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, decode(encodedSecret));
         if (accessKey != null) {
             return Response.ok(accessKey).build();
         }
@@ -83,21 +86,29 @@ public class MCRRestAccessKeyHelper {
         return Response.ok(new MCRAccessKeyInformation(accessKeysResult, accessKeys.size())).build();
     }
 
-    protected static Response doRemoveAccessKey(final MCRObjectID objectId, final String secret) {
+    protected static Response doRemoveAccessKey(final MCRObjectID objectId, final String encodedSecret) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        MCRAccessKeyManager.removeAccessKey(objectId, secret);
+        MCRAccessKeyManager.removeAccessKey(objectId, decode(encodedSecret));
         return Response.noContent().build();
     }
 
-    protected static Response doUpdateAccessKey(final MCRObjectID objectId, final String secret,
+    protected static Response doUpdateAccessKey(final MCRObjectID objectId, final String encodedSecret,
         final String accessKeyJson) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
-        MCRAccessKeyManager.updateAccessKey(objectId, secret, accessKey);
+        MCRAccessKeyManager.updateAccessKey(objectId, decode(encodedSecret), accessKey);
         return Response.noContent().build();
+    }
+
+    private static String encode(final String text) {
+        return Base64.getUrlEncoder().encodeToString(text.getBytes(UTF_8));
+    }
+
+    private static String decode(final String text) {
+        return new String(Base64.getUrlDecoder().decode(text.getBytes(UTF_8)), UTF_8);
     }
 }
