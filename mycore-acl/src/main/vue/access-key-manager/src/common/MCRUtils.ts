@@ -73,7 +73,7 @@ export async function fetchJWT(webApplicationBaseURL: string, objectID: string,
 }
 
 export async function fetchDict(baseURL:string, locale: string): Promise<AxiosResponse> {
-  return axios.get(`${baseURL}rsc/locale/translate/${locale}/mcr.accessKey.*`);
+  return axios.get(`${baseURL}rsc/locale/translate/${locale}/component.acl.accesskey*`);
 }
 
 export function getWebApplicationBaseURL(): string {

@@ -25,6 +25,6 @@ package org.mycore.mcr.acl.accesskey.exception;
  */
 public class MCRAccessKeyInvalidSecretException extends MCRAccessKeyException {
     public MCRAccessKeyInvalidSecretException(String errorMessage) {
-        super(errorMessage, "mcr.accessKey.error.invalidSecret");
+        super(errorMessage, "component.acl.accesskey.frontend.error.invalidSecret");
     }
 }
