@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>47-SNAPSHOT</version>
+    <version>48-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
   <version>2021.11-SNAPSHOT</version>
@@ -33,12 +33,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
   </scm>
   <properties>
     <argLine />
-    <changelog.since>2021-02-23</changelog.since>
+    <changelog.since>2021-08-30</changelog.since>
     <!-- until snapshot matches released version (required for 'mvn changes:changes-check') -->
-    <changes.version>2021.05</changes.version>
+    <changes.version>2021.11</changes.version>
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
-    <forbiddenapis.version>3.1</forbiddenapis.version>
+    <forbiddenapis.version>3.2</forbiddenapis.version>
     <frontend.maven.plugin.version>1.11.2</frontend.maven.plugin.version>
     <grizzly.version>2.4.4</grizzly.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
