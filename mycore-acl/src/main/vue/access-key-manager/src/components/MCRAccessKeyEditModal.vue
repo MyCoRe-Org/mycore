@@ -518,7 +518,7 @@ export default class Modal extends Vue {
     const { errorCode } = e;
     if (errorCode != null) {
       if (errorCode.endsWith('collision')) {
-        this.inputValueFeedback = this.$t('mcr.accessKey.text.error.collision');
+        this.inputValueFeedback = this.$t('mcr.accessKey.error.collision');
       } else if (errorCode.endsWith('unknownKey') || errorCode.endsWith('unknownObject')) {
         this.$emit('inconsistency');
         this.close();
