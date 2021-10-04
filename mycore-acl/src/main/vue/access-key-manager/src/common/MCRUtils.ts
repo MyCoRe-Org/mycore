@@ -56,10 +56,6 @@ export function urlEncode(value: string): string {
     .replace(/\//g, '_');
 }
 
-export function urlDecode(value: string): string {
-  return atob(value.replace(/_/g, '/').replace(/-/g, '+'));
-}
-
 export async function fetchJWT(webApplicationBaseURL: string, objectID: string,
   derivateID: string, includeSession: boolean): Promise<AxiosResponse> {
   const params = new URLSearchParams();

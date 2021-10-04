@@ -21,6 +21,7 @@
 package org.mycore.mcr.acl.accesskey.restapi.v2;
 
 import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.PARAM_SECRET;
+import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.QUERY_PARAM_SECRET_ENCODING;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 import static org.mycore.restapi.v2.MCRRestUtils.TAG_MYCORE_OBJECT;
 
@@ -82,8 +83,8 @@ public class MCRRestObjectAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response listAccessKeysForObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @DefaultValue("0") @QueryParam("offset") int offset,
-        @DefaultValue("128") @QueryParam("limit") int limit) {
+        @DefaultValue("0") @QueryParam("offset") final int offset,
+        @DefaultValue("128") @QueryParam("limit") final int limit) {
         return MCRRestAccessKeyHelper.doListAccessKeys(objectId, offset, limit);
     }
 
@@ -106,8 +107,9 @@ public class MCRRestObjectAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_SECRET) final String encodedSecret) {
-        return MCRRestAccessKeyHelper.doGetAccessKey(objectId, encodedSecret);
+        @PathParam(PARAM_SECRET) final String secret,
+        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+        return MCRRestAccessKeyHelper.doGetAccessKey(objectId, secret, secretEncoding);
     }
 
     @POST
@@ -158,8 +160,9 @@ public class MCRRestObjectAccessKeys {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response updateAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_SECRET) final String encodedSecret, final String accessKeyJson) {
-        return MCRRestAccessKeyHelper.doUpdateAccessKey(objectId, encodedSecret, accessKeyJson);
+        @PathParam(PARAM_SECRET) final String secret, final String accessKeyJson,
+        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+        return MCRRestAccessKeyHelper.doUpdateAccessKey(objectId, secret, accessKeyJson, secretEncoding);
     }
 
     @DELETE
@@ -181,7 +184,8 @@ public class MCRRestObjectAccessKeys {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response removeAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
-        @PathParam(PARAM_SECRET) final String encodedSecret) {
-        return MCRRestAccessKeyHelper.doRemoveAccessKey(objectId, encodedSecret);
+        @PathParam(PARAM_SECRET) final String secret,
+        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
+        return MCRRestAccessKeyHelper.doRemoveAccessKey(objectId, secret, secretEncoding);
     }
 }

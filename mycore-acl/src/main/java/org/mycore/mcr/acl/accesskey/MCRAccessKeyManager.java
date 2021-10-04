@@ -54,11 +54,13 @@ public final class MCRAccessKeyManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final boolean HASHING_ENABLED = MCRConfiguration2
-        .getBoolean("MCR.ACL.AccessKey.Secret.Hashing.Enabled").orElse(false);
+    private static final String SECRET_HASHING_PROP_PREFX = "MCR.ACL.AccessKey.Secret.Hashing";
 
-    private static final int HASHING_ITERATIONS = MCRConfiguration2
-        .getInt("MCR.ACL.AccessKey.Secret.Hashing.Iterations").orElse(1000);
+    private static final boolean HASHING_ENABLED = MCRConfiguration2.getBoolean(SECRET_HASHING_PROP_PREFX)
+        .orElse(true);
+
+    private static final int HASHING_ITERATIONS = MCRConfiguration2.getInt(SECRET_HASHING_PROP_PREFX + ".Iterations")
+        .orElse(1000);
 
     /**
      * Returns all access keys for given {@link MCRObjectID}.
