@@ -22,6 +22,7 @@ package org.mycore.mcr.acl.accesskey.restapi.v2;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,11 +47,6 @@ public class MCRRestAccessKeyHelper {
      */
     protected static final String PARAM_SECRET = "secret";
 
-    /**
-     * Placeholder for the query param secret_format
-     */
-    protected static final String QUERY_PARAM_SECRET_ENCODING = "secret_encoding";
-
     private static WebApplicationException getUnknownObjectException(final MCRObjectID objectId) {
         return MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
             .withMessage(objectId + " does not exist!")
@@ -65,24 +61,15 @@ public class MCRRestAccessKeyHelper {
             throw getUnknownObjectException(objectId);
         }
         MCRAccessKeyManager.createAccessKey(objectId, accessKey);
-        String secret = accessKey.getSecret();
-        if (secret.startsWith("/")) {
-          secret = "/" + secret; // add slash because path builder removes first slash
-        }
-        return Response.created(uriInfo.getAbsolutePathBuilder().path(secret).build()).build();
+        final String encodedSecret = URLEncoder.encode(accessKey.getSecret(), UTF_8);
+        return Response.created(uriInfo.getAbsolutePathBuilder().path(encodedSecret).build()).build();
     }
 
-    protected static Response doGetAccessKey(final MCRObjectID objectId, final String secret,
-        final String secretEncoding) {
+    protected static Response doGetAccessKey(final MCRObjectID objectId, final String secret) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        MCRAccessKey accessKey = null;
-        if (secretEncoding != null) {
-            accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, decode(secret, secretEncoding));
-        } else {
-            accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
-        }
+        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
         if (accessKey != null) {
             return Response.ok(accessKey).build();
         }
@@ -101,37 +88,21 @@ public class MCRRestAccessKeyHelper {
         return Response.ok(new MCRAccessKeyInformation(accessKeysResult, accessKeys.size())).build();
     }
 
-    protected static Response doRemoveAccessKey(final MCRObjectID objectId, final String secret,
-        final String secretEncoding) {
+    protected static Response doRemoveAccessKey(final MCRObjectID objectId, final String secret) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
-        if (secretEncoding != null) {
-            MCRAccessKeyManager.removeAccessKey(objectId, decode(secret, secretEncoding));
-        } else {
-            MCRAccessKeyManager.removeAccessKey(objectId, secret);
-        }
+        MCRAccessKeyManager.removeAccessKey(objectId, secret);
         return Response.noContent().build();
     }
 
     protected static Response doUpdateAccessKey(final MCRObjectID objectId, final String secret,
-        final String accessKeyJson, final String secretEncoding) {
+        final String accessKeyJson) {
         if (!MCRMetadataManager.exists(objectId)) {
             throw getUnknownObjectException(objectId);
         }
         final MCRAccessKey accessKey = MCRAccessKeyTransformer.accessKeyFromJson(accessKeyJson);
-        if (secretEncoding != null) {
-            MCRAccessKeyManager.updateAccessKey(objectId, decode(secret, secretEncoding), accessKey);
-        } else {
-            MCRAccessKeyManager.updateAccessKey(objectId, secret, accessKey);
-        }
+        MCRAccessKeyManager.updateAccessKey(objectId, secret, accessKey);
         return Response.noContent().build();
-    }
-
-    private static String decode(final String text, final String encoding) {
-        if ("base64url".equals(encoding)) {
-            return new String(Base64.getUrlDecoder().decode(text.getBytes(UTF_8)), UTF_8);
-        }
-        return text;
     }
 }

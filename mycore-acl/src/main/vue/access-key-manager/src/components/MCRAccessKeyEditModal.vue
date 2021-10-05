@@ -449,8 +449,8 @@ export default class Modal extends Vue {
 
   private async add(): Promise<void> {
     this.isProcessing = true;
-    if (this.secret.length === 0) {
-      this.inputValueFeedback = this.$t('mcr.accessKey.error.invalidValue');
+    if (this.secret.length === 0 || this.secret.includes('/') || this.secret.includes('\\')) {
+      this.inputValueFeedback = this.$t('mcr.accessKey.error.invalidSecret');
       this.isProcessing = false;
       return;
     }

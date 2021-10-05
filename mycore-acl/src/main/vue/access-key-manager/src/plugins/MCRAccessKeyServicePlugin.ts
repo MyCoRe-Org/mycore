@@ -20,7 +20,6 @@ import _Vue from 'vue';
 import axios, { AxiosInstance } from 'axios';
 import MCRException from '@/common/MCRException';
 import MCRAccessKey from '@/common/MCRAccessKey';
-import { urlEncode } from '@/common/MCRUtils';
 
 export interface MCRAccessKeyInformation {
   items: Array<MCRAccessKey>;
@@ -41,8 +40,6 @@ interface MCRErrorResponse {
   timestamp: string;
   uuid: string;
 }
-
-const SECRET_ENCODING_TYPE_NAME = 'base64url';
 
 export default new class MCRAccessKeyServicePlugin {
   private instance: AxiosInstance;
@@ -98,11 +95,9 @@ export default new class MCRAccessKeyServicePlugin {
   }
 
   public async getAccessKey(secret: string): Promise<MCRAccessKey> {
-    const encodedSecret = urlEncode(secret);
+    const encodedSecret = encodeURIComponent(secret);
     const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${encodedSecret}` : `accesskeys/${encodedSecret}`;
-    const response = await this.instance.get(url, {
-      params: { secret_encoding: SECRET_ENCODING_TYPE_NAME },
-    });
+    const response = await this.instance.get(url);
     return <MCRAccessKey>response.data;
   }
 
@@ -110,22 +105,18 @@ export default new class MCRAccessKeyServicePlugin {
     const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys` : 'accesskeys';
     const response = await this.instance.post(url, accessKey);
     const locationHeader = response.headers.location;
-    return locationHeader.substr(locationHeader.indexOf('/accesskeys/') + '/accesskeys/'.length);
+    return decodeURIComponent(locationHeader.substr(locationHeader.indexOf('/accesskeys/') + '/accesskeys/'.length));
   }
 
   public async updateAccessKey(secret: string, accessKey: MCRAccessKey): Promise<void> {
-    const encodedSecret = urlEncode(secret);
+    const encodedSecret = encodeURIComponent(secret);
     const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${encodedSecret}` : `/accesskeys/${encodedSecret}`;
-    await this.instance.put(url, accessKey, {
-      params: { secret_encoding: SECRET_ENCODING_TYPE_NAME },
-    });
+    await this.instance.put(url, accessKey);
   }
 
   public async removeAccessKey(secret: string): Promise<void> {
-    const encodedSecret = urlEncode(secret);
+    const encodedSecret = encodeURIComponent(secret);
     const url = this.derivateID != null ? `derivates/${this.derivateID}/accesskeys/${encodedSecret}` : `accesskeys/${encodedSecret}`;
-    await this.instance.delete(url, {
-      params: { secret_encoding: SECRET_ENCODING_TYPE_NAME },
-    });
+    await this.instance.delete(url);
   }
 }();

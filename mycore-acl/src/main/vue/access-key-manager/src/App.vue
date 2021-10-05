@@ -175,7 +175,6 @@ import {
   locale,
   fetchJWT,
   isSessionEnabled,
-  urlEncode,
 } from '@/common/MCRUtils';
 
 @Component({
@@ -265,7 +264,7 @@ export default class AccessKeyManager extends Vue {
     this.alertVariant = 'success';
     this.alertMessage = this.$t('mcr.accessKey.success.add', accessKey.secret, secret);
     if (isSessionEnabled && derivateID == null) {
-      this.alertMessage += ` ${this.$t('mcr.accessKey.success.add.url')} ${this.$t('mcr.accessKey.success.add.url.format', webApplicationBaseURL, objectID, urlEncode(secret))}`;
+      this.alertMessage += ` ${this.$t('mcr.accessKey.success.add.url')} ${this.$t('mcr.accessKey.success.add.url.format', webApplicationBaseURL, objectID, encodeURIComponent(secret))}`;
     }
   }
 

@@ -21,7 +21,6 @@
 package org.mycore.mcr.acl.accesskey.restapi.v2;
 
 import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.PARAM_SECRET;
-import static org.mycore.mcr.acl.accesskey.restapi.v2.MCRRestAccessKeyHelper.QUERY_PARAM_SECRET_ENCODING;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_DERID;
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 import static org.mycore.restapi.v2.MCRRestUtils.TAG_MYCORE_DERIVATE;
@@ -108,9 +107,8 @@ public class MCRRestDerivateAccessKeys {
     @Produces(MediaType.APPLICATION_JSON)
     @MCRRequireAccessKeyAuthorization
     public Response getAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @PathParam(PARAM_SECRET) final String secret,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
-        return MCRRestAccessKeyHelper.doGetAccessKey(derivateId, secret, secretEncoding);
+        @PathParam(PARAM_SECRET) final String secret) {
+        return MCRRestAccessKeyHelper.doGetAccessKey(derivateId, secret);
     }
 
     @POST
@@ -161,9 +159,8 @@ public class MCRRestDerivateAccessKeys {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response updateAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @PathParam(PARAM_SECRET) final String encodedSecret, final String accessKeyJson,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
-        return MCRRestAccessKeyHelper.doUpdateAccessKey(derivateId, encodedSecret, accessKeyJson, secretEncoding);
+        @PathParam(PARAM_SECRET) final String encodedSecret, final String accessKeyJson) {
+        return MCRRestAccessKeyHelper.doUpdateAccessKey(derivateId, encodedSecret, accessKeyJson);
     }
 
     @DELETE
@@ -185,8 +182,7 @@ public class MCRRestDerivateAccessKeys {
     @MCRRequireAccessKeyAuthorization
     @MCRRequireTransaction
     public Response removeAccessKeyFromDerivate(@PathParam(PARAM_DERID) final MCRObjectID derivateId,
-        @PathParam(PARAM_SECRET) final String secret,
-        @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
-        return MCRRestAccessKeyHelper.doRemoveAccessKey(derivateId, secret, secretEncoding);
+        @PathParam(PARAM_SECRET) final String secret) {
+        return MCRRestAccessKeyHelper.doRemoveAccessKey(derivateId, secret);
     }
 }
