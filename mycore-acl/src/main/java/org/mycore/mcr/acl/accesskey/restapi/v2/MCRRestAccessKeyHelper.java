@@ -128,8 +128,8 @@ public class MCRRestAccessKeyHelper {
         return Response.noContent().build();
     }
 
-    private static String decode(final String text, final String type) {
-        if ("base64".equals(type)) {
+    private static String decode(final String text, final String encoding) {
+        if ("base64".equals(encoding)) {
             return new String(Base64.getUrlDecoder().decode(text.getBytes(UTF_8)), UTF_8);
         }
         return text;
