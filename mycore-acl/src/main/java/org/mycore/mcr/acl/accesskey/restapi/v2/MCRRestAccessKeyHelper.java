@@ -129,7 +129,7 @@ public class MCRRestAccessKeyHelper {
     }
 
     private static String decode(final String text, final String encoding) {
-        if ("base64".equals(encoding)) {
+        if ("base64url".equals(encoding)) {
             return new String(Base64.getUrlDecoder().decode(text.getBytes(UTF_8)), UTF_8);
         }
         return text;

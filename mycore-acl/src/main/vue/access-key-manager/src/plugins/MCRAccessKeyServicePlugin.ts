@@ -42,7 +42,7 @@ interface MCRErrorResponse {
   uuid: string;
 }
 
-const SECRET_ENCODING_TYPE_NAME = 'base64';
+const SECRET_ENCODING_TYPE_NAME = 'base64url';
 
 export default new class MCRAccessKeyServicePlugin {
   private instance: AxiosInstance;
