@@ -20,8 +20,6 @@
 
 package org.mycore.mcr.acl.accesskey.frontend.filter;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.IOException;
 
 import javax.servlet.Filter;
