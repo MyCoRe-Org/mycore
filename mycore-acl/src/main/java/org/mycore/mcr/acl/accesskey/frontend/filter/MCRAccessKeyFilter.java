@@ -20,10 +20,7 @@
 
 package org.mycore.mcr.acl.accesskey.frontend.filter;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.IOException;
-import java.util.Base64;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -78,7 +75,6 @@ public class MCRAccessKeyFilter implements Filter {
                         MCRServlet.initializeMCRSession(httpServletRequest, getFilterName());
                         MCRFrontendUtil.configureSession(MCRSessionMgr.getCurrentSession(), httpServletRequest, 
                             (HttpServletResponse) response);
-                        value = new String(Base64.getUrlDecoder().decode(value.getBytes(UTF_8)), UTF_8);
                         MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, value);
                     } catch (Exception e) {
                         LOGGER.debug("Cannot set access key to session", e);
