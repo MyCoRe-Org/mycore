@@ -33,7 +33,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -43,7 +43,7 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
 
     protected static MCRCache<String, CSLItemData> cslCache = new MCRCache<>(2000, "CSL Mods Data");
 
-    private HashMap<String , CSLItemData> store = new HashMap<>();
+    private LinkedHashMap<String , CSLItemData> store = new LinkedHashMap<>();
 
     @Override
     public void addContent(MCRContent content) throws IOException, JDOMException, SAXException {
