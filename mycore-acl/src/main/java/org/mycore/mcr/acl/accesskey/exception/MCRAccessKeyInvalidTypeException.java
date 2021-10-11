@@ -25,6 +25,6 @@ package org.mycore.mcr.acl.accesskey.exception;
  */
 public class MCRAccessKeyInvalidTypeException extends MCRAccessKeyException {
     public MCRAccessKeyInvalidTypeException(String errorMessage) {
-        super(errorMessage, "mcr.accessKey.error.invalidType");
+        super(errorMessage, "component.acl.accesskey.frontend.error.invalidType");
     }
 }

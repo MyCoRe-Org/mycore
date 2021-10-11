@@ -50,7 +50,6 @@ import {
   faRandom,
   faAngleLeft,
 } from '@fortawesome/free-solid-svg-icons';
-import dict from '@/common/i18n/MCRAccessKeyI18n';
 import MCRLocalePlugin from '@/plugins/MCRLocalePlugin';
 import AccessKeyManager from './App.vue';
 import { fetchDict, locale, webApplicationBaseURL } from '@/common/MCRUtils';
@@ -58,8 +57,6 @@ import { fetchDict, locale, webApplicationBaseURL } from '@/common/MCRUtils';
 Vue.config.productionTip = false;
 
 Vue.use(vueCustomElement);
-
-Vue.use(MCRLocalePlugin, dict);
 
 Vue.use(ButtonPlugin);
 Vue.use(PaginationPlugin);
@@ -83,11 +80,10 @@ library.add(faEdit, faTimes, faPlus, faInfoCircle, faTrash, faSave, faRandom, fa
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 fetchDict(webApplicationBaseURL, locale).then((result) => {
-  Object.assign(dict, result.data);
+  Vue.use(MCRLocalePlugin, result.data);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Vue.customElement('access-key-manager', (AccessKeyManager as any).options);
 }).catch(() => {
   // eslint-disable-next-line no-console
   console.error('i18n update failed.');
 });
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-Vue.customElement('access-key-manager', (AccessKeyManager as any).options);
