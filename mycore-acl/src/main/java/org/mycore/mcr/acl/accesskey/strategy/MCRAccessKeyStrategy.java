@@ -130,8 +130,10 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
             if (checkObjectPermission(objectId, permission)) {
                 return true;
             }
-            final MCRObjectID parentObjectId= MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
-            return checkObjectPermission(parentObjectId, permission);
+            final MCRObjectID parentObjectId = MCRMetadataManager.getObjectId(objectId, 10, TimeUnit.MINUTES);
+            if (parentObjectId != null) {
+                return checkObjectPermission(parentObjectId, permission);
+            }
         }
         return false;
     }
