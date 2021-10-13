@@ -1134,7 +1134,12 @@ public final class MCRURIResolver implements URIResolver {
             try {
                 Source result = MCRURIResolver.instance().resolve(target, base);
                 if (result != null) {
-                    return result;
+                    // perform actual construction of xml document, as in MCRURIResolver#resolve(String),
+                    // by performing the same actions as MCRSourceContent#asXml(),
+                    // but with a MCRXMLParser configured to be silent to suppress undesirable log messages
+                    MCRContent content = new MCRSourceContent(result).getBaseContent();
+                    Document document = MCRXMLParserFactory.getParser(false, true).parseXML(content);
+                    return new JDOMSource(document.getRootElement().detach());
                 } else {
                     LOGGER.debug("MCRNotNullResolver returning empty xml");
                     return new JDOMSource(new Element("null"));
