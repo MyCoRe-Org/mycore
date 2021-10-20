@@ -39,6 +39,7 @@ import org.apache.logging.log4j.LogManager;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.restapi.v2.annotation.MCRRequireAuthorization;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,6 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @OpenAPIDefinition(
     tags = @Tag(name = MCRRestUtils.TAG_MYCORE_ABOUT, description = "repository events"))
 @Singleton
+@MCRRequireAuthorization
 public class MCREvents {
 
     @Context

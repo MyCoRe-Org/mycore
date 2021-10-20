@@ -79,6 +79,7 @@ import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
+import org.mycore.restapi.v2.annotation.MCRRequireAuthorization;
 import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -94,6 +95,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates")
+@MCRRequireAuthorization
 public class MCRRestDerivates {
 
     public static final Logger LOGGER = LogManager.getLogger();

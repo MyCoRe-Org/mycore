@@ -21,9 +21,12 @@ package org.mycore.restapi.v2;
 import java.util.Date;
 import java.util.Optional;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+
+import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
 
 public final class MCRRestUtils {
 
@@ -54,5 +57,17 @@ public final class MCRRestUtils {
         return Optional.ofNullable(request)
             .map(r -> r.evaluatePreconditions(lastModified, eTag))
             .map(Response.ResponseBuilder::build);
+    }
+
+    public static MCRRestAPIACLPermission getRestAPIACLPermission(final String method) {
+        switch (method) {
+            case HttpMethod.GET:
+            case HttpMethod.HEAD:
+                return MCRRestAPIACLPermission.READ;
+            case HttpMethod.DELETE:
+                return MCRRestAPIACLPermission.DELETE;
+            default:
+                return MCRRestAPIACLPermission.WRITE;
+        }
     }
 }

@@ -22,7 +22,9 @@ package org.mycore.mcr.acl.accesskey.restapi.v2;
 
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_MCRID;
 
+import javax.annotation.Priority;
 import javax.ws.rs.HttpMethod;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
@@ -37,6 +39,7 @@ import org.mycore.restapi.v2.MCRErrorResponse;
 
 @Provider
 @MCRRequireAccessKeyAuthorization
+@Priority(Priorities.AUTHORIZATION + 2)
 public class MCRRestAccessKeyAuthorizationFilter implements ContainerRequestFilter {
 
     @Context

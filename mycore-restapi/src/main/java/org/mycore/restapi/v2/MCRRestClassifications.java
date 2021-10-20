@@ -52,6 +52,7 @@ import org.mycore.datamodel.classifications2.model.MCRClassURL;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRDetailLevel;
+import org.mycore.restapi.v2.annotation.MCRRequireAuthorization;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,6 +65,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path("/classifications")
 @OpenAPIDefinition(
     tags = @Tag(name = MCRRestUtils.TAG_MYCORE_CLASSIFICATION, description = "Operations on classifications"))
+@MCRRequireAuthorization
 public class MCRRestClassifications {
 
     private static final String PARAM_CATEGID = "categid";

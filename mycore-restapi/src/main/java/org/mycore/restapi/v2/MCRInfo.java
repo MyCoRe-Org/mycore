@@ -43,6 +43,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.restapi.converter.MCRInstantXMLAdapter;
+import org.mycore.restapi.v2.annotation.MCRRequireAuthorization;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -57,6 +58,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path("/mycore")
 @OpenAPIDefinition(
     tags = @Tag(name = MCRRestUtils.TAG_MYCORE_ABOUT, description = "informations about this repository"))
+@MCRRequireAuthorization
 public class MCRInfo {
 
     private static final Date INIT_TIME = new Date();

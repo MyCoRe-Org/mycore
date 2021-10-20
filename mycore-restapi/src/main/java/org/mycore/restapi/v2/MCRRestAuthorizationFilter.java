@@ -18,11 +18,7 @@
 
 package org.mycore.restapi.v2;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.Priority;
 import javax.ws.rs.ForbiddenException;
@@ -35,16 +31,16 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.logging.log4j.LogManager;
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRAccessManager;
-import org.mycore.access.MCRRuleAccessInterface;
-import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
-import org.mycore.restapi.converter.MCRDetailLevel;
+import org.mycore.restapi.v2.annotation.MCRRequireAuthorization;
+import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
 
-@Priority(Priorities.AUTHORIZATION)
+@Provider
+@MCRRequireAuthorization
+@Priority(Priorities.AUTHORIZATION + 1)
 public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
 
     public static final String PARAM_CLASSID = "classid";
@@ -57,41 +53,6 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
 
     @Context
     ResourceInfo resourceInfo;
-
-    /**
-     * checks if the given REST API operation is allowed
-     * @param permission "read" or "write"
-     * @param path - the REST API path, e.g. /v1/messages
-     *
-     * @throws javax.ws.rs.ForbiddenException if access is restricted
-     */
-    private void checkRestAPIAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
-        String path)
-        throws ForbiddenException {
-        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
-        LogManager.getLogger().warn(path + ": Checking API access: " + permission);
-        String thePath = path.startsWith("/") ? path : "/" + path;
-
-        MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
-        String permStr = permission.toString();
-        boolean hasAPIAccess = aclProvider.checkPermission("restapi:/", permStr);
-        if (hasAPIAccess) {
-            String objId = "restapi:" + thePath;
-            boolean isRuleInterface = acl instanceof MCRRuleAccessInterface;
-            if (!isRuleInterface || ((MCRRuleAccessInterface) acl).hasRule(objId, permStr)) {
-                if (aclProvider.checkPermission(objId, permStr)) {
-                    return;
-                }
-            } else {
-                return;
-            }
-        }
-        throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-            .withErrorCode(MCRErrorCodeConstants.API_NO_PERMISSION)
-            .withMessage("REST-API action is not allowed.")
-            .withDetail("Check access right '" + permission + "' on ACLs 'restapi:/' and 'restapi:" + path + "'!")
-            .toException();
-    }
 
     private void checkBaseAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
         String objectId, String derId, String path)
@@ -122,75 +83,19 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             .toException();
     }
 
-    private void checkDetailLevel(ContainerRequestContext requestContext, String... detail) throws ForbiddenException {
-        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
-        List<String> missedPermissions = Stream.of(detail)
-            .map(d -> "rest-detail-" + d)
-            .filter(d -> MCRAccessManager.hasRule(MCRAccessControlSystem.POOL_PRIVILEGE_ID, d))
-            .filter(d -> !aclProvider.checkPermission(d))
-            .collect(Collectors.toList());
-        if (!missedPermissions.isEmpty()) {
-            throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
-                .withErrorCode(MCRErrorCodeConstants.API_NO_PERMISSION)
-                .withMessage("REST-API action is not allowed.")
-                .withDetail("Check access right(s) '" + missedPermissions + "' on "
-                    + MCRAccessControlSystem.POOL_PRIVILEGE_ID + "'!")
-                .toException();
-        }
-    }
-
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        MCRRestAPIACLPermission permission;
-        switch (requestContext.getMethod()) {
-            case HttpMethod.OPTIONS:
-                return;
-            case HttpMethod.GET:
-            case HttpMethod.HEAD:
-                permission = MCRRestAPIACLPermission.READ;
-                break;
-            case HttpMethod.DELETE:
-                permission = MCRRestAPIACLPermission.DELETE;
-                break;
-            default:
-                permission = MCRRestAPIACLPermission.WRITE;
+        final String method = requestContext.getMethod();
+        if (HttpMethod.OPTIONS.equals(method)) {
+            return;
         }
+        final MCRRestAPIACLPermission permission = MCRRestUtils.getRestAPIACLPermission(method);
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)
             .ifPresent(path -> {
-                checkRestAPIAccess(requestContext, permission, path);
                 MultivaluedMap<String, String> pathParameters = requestContext.getUriInfo().getPathParameters();
                 checkBaseAccess(requestContext, permission, pathParameters.getFirst(PARAM_MCRID),
                     pathParameters.getFirst(PARAM_DERID), pathParameters.getFirst(PARAM_DER_PATH));
             });
-        checkDetailLevel(requestContext,
-            requestContext.getAcceptableMediaTypes()
-                .stream()
-                .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
-                .filter(Objects::nonNull)
-                .toArray(String[]::new));
-    }
-
-    /**
-     * The REST API access permissions (read, write, delete)
-     */
-    public enum MCRRestAPIACLPermission {
-        READ {
-            public String toString() {
-                return MCRAccessManager.PERMISSION_READ;
-            }
-        },
-
-        WRITE {
-            public String toString() {
-                return MCRAccessManager.PERMISSION_WRITE;
-            }
-        },
-
-        DELETE {
-            public String toString() {
-                return MCRAccessManager.PERMISSION_DELETE;
-            }
-        }
     }
 }

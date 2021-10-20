@@ -97,6 +97,7 @@ import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
+import org.mycore.restapi.v2.annotation.MCRRequireAuthorization;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -123,6 +124,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         description = "Operations on derivates belonging to metadata objects"),
     @Tag(name = MCRRestUtils.TAG_MYCORE_FILE, description = "Operations on files in derivates"),
 })
+@MCRRequireAuthorization
 public class MCRRestObjects {
 
     private static Logger LOGGER = LogManager.getLogger();
