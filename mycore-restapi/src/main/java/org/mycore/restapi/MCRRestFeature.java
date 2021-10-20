@@ -20,6 +20,7 @@ package org.mycore.restapi;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +43,13 @@ import org.mycore.restapi.annotations.MCRRequireTransaction;
  */
 @Provider
 public class MCRRestFeature extends MCRJerseyDefaultFeature {
+  
+    private static final Set<String> IGNORE_ACCESS_FILTER_CLASS_NAMES = MCRConfiguration2
+        .getString("MCR.RestAPI.Filter.Access.Ignore")
+        .stream()
+        .flatMap(MCRConfiguration2::splitValue)
+        .collect(Collectors.toSet());
+
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         Class<?> resourceClass = resourceInfo.getResourceClass();
@@ -86,12 +94,14 @@ public class MCRRestFeature extends MCRJerseyDefaultFeature {
 
     @Override
     protected void registerAccessFilter(FeatureContext context, Class<?> resourceClass, Method resourceMethod) {
-        if (resourceClass.getPackageName().contains(".v1")) {
-            context.register(org.mycore.restapi.v1.MCRRestAuthorizationFilter.class);
-        } else {
-            context.register(org.mycore.restapi.v2.MCRRestAuthorizationFilter.class);
+        if (!IGNORE_ACCESS_FILTER_CLASS_NAMES.contains(resourceClass.getSimpleName())) {
+            if (resourceClass.getPackageName().contains(".v1")) {
+                context.register(org.mycore.restapi.v1.MCRRestAuthorizationFilter.class);
+            } else {
+                context.register(org.mycore.restapi.v2.MCRRestAuthorizationFilter.class);
+            }
+            super.registerAccessFilter(context, resourceClass, resourceMethod);
         }
-        super.registerAccessFilter(context, resourceClass, resourceMethod);
     }
 
 }
