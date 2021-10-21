@@ -30,6 +30,7 @@ import javax.ws.rs.ext.Provider;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.feature.MCRJerseyDefaultFeature;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
+import org.mycore.restapi.v2.MCRRestBaseAccessFilter;
 
 /**
  * Jersey configuration 
@@ -90,7 +91,7 @@ public class MCRRestFeature extends MCRJerseyDefaultFeature {
         if (resourceClass.getPackageName().contains(".v1")) {
             context.register(org.mycore.restapi.v1.MCRRestAuthorizationFilter.class);
         } else {
-            context.register(org.mycore.restapi.v2.MCRRestBaseAccessFilter.class);
+            context.register(MCRRestBaseAccessFilter.class);
         }
         super.registerAccessFilter(context, resourceClass, resourceMethod);
     }
