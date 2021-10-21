@@ -56,10 +56,12 @@ import org.mycore.mcr.acl.accesskey.restapi.v2.annotation.MCRRequireAccessKeyAut
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
+import org.mycore.restapi.v2.annotation.MCRRequireAuthorization;
 
 @MCRApiDraft("MCRAccessKey")
 @Path("/objects/{" + PARAM_MCRID + "}/accesskeys")
 @Tag(name = TAG_MYCORE_OBJECT)
+@MCRRequireAuthorization
 public class MCRRestObjectAccessKeys {
 
     @Context

@@ -35,6 +35,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.access.MCRAccessInterface;
@@ -43,8 +44,12 @@ import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
+import org.mycore.restapi.v2.annotation.MCRRequireAuthorization;
+import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
 
-@Priority(Priorities.AUTHORIZATION)
+@Provider
+@MCRRequireAuthorization
+@Priority(Priorities.AUTHORIZATION + 1)
 public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
 
     public static final String PARAM_CLASSID = "classid";
@@ -74,17 +79,14 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
 
         MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
         String permStr = permission.toString();
-        boolean hasAPIAccess = aclProvider.checkPermission("restapi:/", permStr);
-        if (hasAPIAccess) {
-            String objId = "restapi:" + thePath;
-            boolean isRuleInterface = acl instanceof MCRRuleAccessInterface;
-            if (!isRuleInterface || ((MCRRuleAccessInterface) acl).hasRule(objId, permStr)) {
-                if (aclProvider.checkPermission(objId, permStr)) {
-                    return;
-                }
-            } else {
+        String objId = "restapi:" + thePath;
+        boolean isRuleInterface = acl instanceof MCRRuleAccessInterface;
+        if (!isRuleInterface || ((MCRRuleAccessInterface) acl).hasRule(objId, permStr)) {
+            if (aclProvider.checkPermission(objId, permStr)) {
                 return;
             }
+        } else {
+            return;
         }
         throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
             .withErrorCode(MCRErrorCodeConstants.API_NO_PERMISSION)
@@ -141,20 +143,11 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        MCRRestAPIACLPermission permission;
-        switch (requestContext.getMethod()) {
-            case HttpMethod.OPTIONS:
-                return;
-            case HttpMethod.GET:
-            case HttpMethod.HEAD:
-                permission = MCRRestAPIACLPermission.READ;
-                break;
-            case HttpMethod.DELETE:
-                permission = MCRRestAPIACLPermission.DELETE;
-                break;
-            default:
-                permission = MCRRestAPIACLPermission.WRITE;
+        final String method = requestContext.getMethod();
+        if (HttpMethod.OPTIONS.equals(method)) {
+            return;
         }
+        final MCRRestAPIACLPermission permission = MCRRestUtils.getRestAPIACLPermission(method);
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)
             .ifPresent(path -> {
@@ -169,28 +162,5 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
                 .filter(Objects::nonNull)
                 .toArray(String[]::new));
-    }
-
-    /**
-     * The REST API access permissions (read, write, delete)
-     */
-    public enum MCRRestAPIACLPermission {
-        READ {
-            public String toString() {
-                return MCRAccessManager.PERMISSION_READ;
-            }
-        },
-
-        WRITE {
-            public String toString() {
-                return MCRAccessManager.PERMISSION_WRITE;
-            }
-        },
-
-        DELETE {
-            public String toString() {
-                return MCRAccessManager.PERMISSION_DELETE;
-            }
-        }
     }
 }
