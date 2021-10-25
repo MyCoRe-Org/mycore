@@ -276,7 +276,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "load all objects from directory {0}",
-        help = "Loads all MCRObjects from the directory {0} to the system.",
+        help = "Loads all MCRObjects from the directory {0} to the system. " +
+                "If the numerical part of a provided ID is zero, a new ID with the same base and type is assigned.",
         order = 70)
     public static List<String> loadFromDirectory(String directory) {
         return processFromDirectory(false, directory, false);
@@ -351,7 +352,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "load object from file {0}",
-        help = "Adds a MCRObject from the file {0} to the system.",
+        help = "Loads an MCRObject from the file {0} to the system. " +
+                "If the numerical part of the provided ID is zero, a new ID with the same base and type is assigned.",
         order = 60)
     public static boolean loadFromFile(String file) throws MCRException, SAXParseException,
         IOException, MCRAccessException {
@@ -403,7 +405,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Load or update an MCRObject's from an XML file.
+     * Load or update an MCRObject from an XML file. If the numerical part of the contained ID is zero,
+     * a new ID with the same base and type is assigned.
      *
      * @param file
      *            the location of the xml file
@@ -446,6 +449,12 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             MCRMetadataManager.update(mcrObject);
             LOGGER.info("{} updated.", mcrObject.getId());
         } else {
+            MCRObjectID objectId = mcrObject.getId();
+            if (objectId.getNumberAsInteger() == 0) {
+                MCRObjectID newObjectId = MCRObjectID.getNextFreeId(objectId.getBase(), objectId.getTypeId());
+                mcrObject.setId(newObjectId);
+                LOGGER.info("Assigned new ID {}", newObjectId);
+            }
             MCRMetadataManager.create(mcrObject);
             LOGGER.info("{} loaded.", mcrObject.getId());
         }
