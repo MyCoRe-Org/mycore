@@ -71,6 +71,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     public static final String MODS_ORIGIN_INFO_PUBLICATION = "mods:originInfo[@eventType='publication' or not" +
             "(@eventType)]";
+    public static final String NONE_TYPE = "none";
 
     private MCRMODSWrapper wrapper;
 
@@ -492,7 +493,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                             (t) -> new LinkedList<>());
                     contents.add(content);
                 }else {
-                    final List<String> contents = typeContentsMap.computeIfAbsent(type, (t) -> new LinkedList<>());
+                    final List<String> contents = typeContentsMap.computeIfAbsent(Optional.ofNullable(type).orElse(NONE_TYPE), (t) -> new LinkedList<>());
                     contents.add(content);
                 }
             });
@@ -512,13 +513,21 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             if (typeContentsMap.containsKey(DROPPING_PARTICLE)) {
                 nameBuilder.droppingParticle(String.join(" ", typeContentsMap.get(DROPPING_PARTICLE)));
             }
+
+            if (typeContentsMap.containsKey(NONE_TYPE)) {
+                nameBuilder.literal(String.join(" ", typeContentsMap.get(NONE_TYPE)));
+            }
+
+            Element displayForm = modsName.getChild("displayForm", MODS_NAMESPACE);
+            if (typeContentsMap.isEmpty() && displayForm != null) {
+                nameBuilder.literal(displayForm.getTextNormalize());
+            }
         } else {
             Optional.ofNullable(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE))
                 .ifPresent((nameBuilder::literal));
         }
 
-        final CSLName cslName = nameBuilder.build();
-        return cslName;
+        return nameBuilder.build();
     }
 
     protected boolean isNameEmpty(CSLName cslName) {
