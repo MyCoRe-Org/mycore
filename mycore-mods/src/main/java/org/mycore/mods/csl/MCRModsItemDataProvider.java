@@ -493,7 +493,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                             (t) -> new LinkedList<>());
                     contents.add(content);
                 }else {
-                    final List<String> contents = typeContentsMap.computeIfAbsent(Optional.ofNullable(type).orElse(NONE_TYPE), (t) -> new LinkedList<>());
+                    final List<String> contents = typeContentsMap.computeIfAbsent(Optional.ofNullable(type)
+                            .orElse(NONE_TYPE), (t) -> new LinkedList<>());
                     contents.add(content);
                 }
             });
