@@ -86,7 +86,7 @@
               </strong>
             </xsl:if>
           </p>
-          <form class="pull-left" method="post" action="MCRUserServlet">
+          <form class="float-left" method="post" action="MCRUserServlet">
             <input name="action" value="delete" type="hidden" />
             <input name="id" value="{$uid}" type="hidden" />
             <input name="XSL.step" value="deleted" type="hidden" />
