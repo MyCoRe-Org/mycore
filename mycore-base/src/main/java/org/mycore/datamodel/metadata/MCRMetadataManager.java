@@ -176,6 +176,13 @@ public final class MCRMetadataManager {
                 "The derivate " + mcrDerivate.getId() + " already exists, nothing done.");
         }
 
+        MCRObjectID derivateId = mcrDerivate.getId();
+        if (derivateId.getNumberAsInteger() == 0) {
+            MCRObjectID newDerivateId = MCRObjectID.getNextFreeId(derivateId.getBase(), derivateId.getTypeId());
+            mcrDerivate.setId(newDerivateId);
+            LOGGER.info("Assigned new derivate id {}", newDerivateId);
+        }
+
         try {
             mcrDerivate.validate();
         } catch (MCRException exc) {
@@ -306,6 +313,13 @@ public final class MCRMetadataManager {
         // exist the object?
         if (MCRMetadataManager.exists(mcrObject.getId())) {
             throw new MCRPersistenceException("The object " + mcrObject.getId() + " allready exists, nothing done.");
+        }
+
+        MCRObjectID objectId = mcrObject.getId();
+        if (objectId.getNumberAsInteger() == 0) {
+            MCRObjectID newObjectId = MCRObjectID.getNextFreeId(objectId.getBase(), objectId.getTypeId());
+            mcrObject.setId(newObjectId);
+            LOGGER.info("Assigned new object id {}", newObjectId);
         }
 
         // create this object in datastore

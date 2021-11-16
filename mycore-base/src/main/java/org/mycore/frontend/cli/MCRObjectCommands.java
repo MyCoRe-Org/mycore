@@ -449,12 +449,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             MCRMetadataManager.update(mcrObject);
             LOGGER.info("{} updated.", mcrObject.getId());
         } else {
-            MCRObjectID objectId = mcrObject.getId();
-            if (objectId.getNumberAsInteger() == 0) {
-                MCRObjectID newObjectId = MCRObjectID.getNextFreeId(objectId.getBase(), objectId.getTypeId());
-                mcrObject.setId(newObjectId);
-                LOGGER.info("Assigned new ID {}", newObjectId);
-            }
             MCRMetadataManager.create(mcrObject);
             LOGGER.info("{} loaded.", mcrObject.getId());
         }

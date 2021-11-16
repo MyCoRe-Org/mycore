@@ -339,12 +339,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             MCRMetadataManager.update(derivate);
             LOGGER.info("{} updated.", derivate.getId());
         } else {
-            MCRObjectID derivateId = derivate.getId();
-            if (derivateId.getNumberAsInteger() == 0) {
-                MCRObjectID newDerivateId = MCRObjectID.getNextFreeId(derivateId.getBase(), derivateId.getTypeId());
-                derivate.setId(newDerivateId);
-                LOGGER.info("Assigned new ID {}", newDerivateId);
-            }
             MCRMetadataManager.create(derivate);
             LOGGER.info("{} loaded.", derivate.getId());
         }
