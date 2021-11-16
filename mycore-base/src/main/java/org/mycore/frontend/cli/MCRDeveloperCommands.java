@@ -156,7 +156,7 @@ public class MCRDeveloperCommands {
 
     @MCRCommand(
             syntax = "touch object {0}",
-            help = "Touch object with id {0}",
+            help = "Load and update object with id {0} without making any modifications",
             order = 80
     )
     public static void touchObject(String id) {
@@ -172,7 +172,7 @@ public class MCRDeveloperCommands {
 
     @MCRCommand(
             syntax = "touch derivate {0}",
-            help = "Touch derivate with id {0}",
+            help = "Load and update derivate with id {0} without making any modifications",
             order = 90
     )
     public static void touchDerivate(String id) {
