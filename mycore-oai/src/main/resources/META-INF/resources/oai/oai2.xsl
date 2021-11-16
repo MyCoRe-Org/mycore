@@ -570,7 +570,18 @@ p.intro {
        <xsl:with-param name="str" select="."/>
     </xsl:call-template>
    </xsl:variable>
-   <p>There are more results.</p>
+   <xsl:choose>
+     <xsl:when test="@completeListSize">
+       <p>
+         <xsl:text>There are more results (</xsl:text>
+         <xsl:value-of select="@completeListSize"/>
+         <xsl:text> in total).</xsl:text>
+       </p>
+     </xsl:when>
+     <xsl:otherwise>
+       <p>There are more results.</p>
+     </xsl:otherwise>
+   </xsl:choose>
    <table class="values">
      <tr><td class="key">resumptionToken:</td>
      <td class="value"><xsl:value-of select="."/>
