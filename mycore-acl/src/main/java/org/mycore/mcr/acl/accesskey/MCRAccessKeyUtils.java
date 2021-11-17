@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.mycore.access.MCRAccessManager;
@@ -31,6 +32,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
@@ -58,15 +60,30 @@ public class MCRAccessKeyUtils {
      */
     public static synchronized void addAccessKeySecret(final MCRSession session, final MCRObjectID objectId, 
         final String value) throws MCRException {
-        final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
 
+        final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
         final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
-        if (accessKey == null) {
-            throw new MCRAccessKeyNotFoundException("Key does not exist.");
+        if (accessKey != null) {
+            session.put(getAttributeName(objectId), secret);
+            MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
         }
-        
-        session.put(getAttributeName(objectId), secret);
-        MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+        if ("derivate".equals(objectId.getTypeId()) && accessKey == null) {
+            throw new MCRAccessKeyNotFoundException("Key does not exist.");
+        } else {
+            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId, 0, TimeUnit.SECONDS);
+            boolean success = false;
+            for (final MCRObjectID derivateId : derivateIds) {
+                try {
+                    addAccessKeySecret(session, derivateId, value);
+                    success = true;
+                } catch (MCRAccessKeyNotFoundException e) {
+                    //
+                }
+            }
+            if (!success && accessKey == null) {
+                throw new MCRAccessKeyNotFoundException("Key does not exist.");
+            }
+        }
     }
 
     /**
@@ -77,19 +94,33 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
-    public static synchronized void addAccessKeySecret(final MCRUser user, final MCRObjectID objectId, String value)
-        throws MCRException {
+    public static synchronized void addAccessKeySecret(final MCRUser user, final MCRObjectID objectId,
+        final String value) throws MCRException {
 
         final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
         final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
-        if (accessKey == null) {
-            throw new MCRAccessKeyNotFoundException("Key does not exist.");
+        if (accessKey != null) {
+            user.setUserAttribute(getAttributeName(objectId), secret);
+            MCRUserManager.updateUser(user);
+            MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
         }
-
-        user.setUserAttribute(getAttributeName(objectId), secret);
-        MCRUserManager.updateUser(user);
-
-        MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+        if ("derivate".equals(objectId.getTypeId()) && accessKey == null) {
+            throw new MCRAccessKeyNotFoundException("Key does not exist.");
+        } else {
+            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId, 0, TimeUnit.SECONDS);
+            boolean success = false;
+            for (final MCRObjectID derivateId : derivateIds) {
+                try {
+                    addAccessKeySecret(user, derivateId, value);
+                    success = true;
+                } catch (MCRAccessKeyNotFoundException e) {
+                    //
+                }
+            }
+            if (!success && accessKey == null) {
+                throw new MCRAccessKeyNotFoundException("Key does not exist.");
+            }
+        }
     }
 
     /**
