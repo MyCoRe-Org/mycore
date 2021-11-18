@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
@@ -218,14 +219,15 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             throw new MCRUsageException("Object '" + objName + "' could not be found", e);
         }
 
-        // maybe use .head(objName) instead to prevent requests of old versions of deleted objects
-        if (convertMessageToType(repo.getObject(ObjectVersionId.version(objName, revision)).getVersionInfo()
+        if (convertMessageToType(repo.getObject(ObjectVersionId.head(objName)).getVersionInfo()
             .getMessage()) == MCROCFLMetadataVersion.DELETED) {
             throw new MCRUsageException("Cannot read already deleted object '" + objName + "'");
         }
 
         try (InputStream storedContentStream = storeObject.getFile(buildFilePath(mcrid)).getStream()) {
-            return new MCRJDOMContent(new MCRStreamContent(storedContentStream).asXML());
+            Document xml = new MCRStreamContent(storedContentStream).asXML();
+            xml.getRootElement().setAttribute("rev", revision);
+            return new MCRJDOMContent(xml);
         } catch (JDOMException | SAXException e) {
             throw new MCRPersistenceException("Can not parse XML from OCFL-Store", e);
         }
