@@ -36,7 +36,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -50,22 +49,18 @@ public class MCRAccessKeyFilter implements Filter {
    
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String ALLOWED_PERMISSION_TYPES = MCRConfiguration2
-        .getString("MCR.ACL.AccessKey.Strategy.AllowedSessionPermissionTypes")
-        .orElse(null);
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        if (ALLOWED_PERMISSION_TYPES != null && ALLOWED_PERMISSION_TYPES.length() > 0) {
+        if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
             LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: {}", 
-                ALLOWED_PERMISSION_TYPES);
+                String.join(",", MCRAccessKeyUtils.getAllowedSessionPermissionTypes()));
         }
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        if (ALLOWED_PERMISSION_TYPES != null && ALLOWED_PERMISSION_TYPES.length() > 0) {
+        if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
             final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             final MCRObjectID objectId = extractObjectId(httpServletRequest);
             if (objectId != null) {

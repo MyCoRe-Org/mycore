@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
@@ -53,7 +53,7 @@ public class MCRAccessKeyUtilsTest extends MCRAccessKeyTestCase {
         derivateId = getDerivate().getId();
     }
 
-    @Test(expected = MCRAccessKeyNotFoundException.class)
+    @Test(expected = MCRAccessKeyException.class)
     public void testUnkownKey() {
         MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(objectId, READ_KEY);
     }

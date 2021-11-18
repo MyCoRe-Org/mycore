@@ -38,12 +38,6 @@ import org.mycore.user2.MCRUser;
 
 public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
 
-    private static final String ACCESS_KEY_STRATEGY_PROP = "MCR.ACL.AccessKey.Strategy";
-
-    private static final String ALLOWED_OBJECT_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP + ".AllowedObjectTypes";
-
-    private static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP + ".AllowedSessionPermissionTypes";
-    
     private static final String READ_VALUE = "bla";
     
     private static final String WRITE_VALUE = "blu";
@@ -54,11 +48,6 @@ public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
 
     private MCRObjectID derivateId = null;
 
-    private void setUpInstanceDefaultProperties() {
-        MCRConfiguration2.set(ALLOWED_OBJECT_TYPES_PROP, "object,derivate");
-        MCRConfiguration2.set(ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read,writedb");
-    }
-    
     @Before
     @Override
     public void setUp() throws Exception {
@@ -66,7 +55,6 @@ public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
         objectId = getObject().getId();
         derivateId = getDerivate().getId();
         strategy = new MCRAccessKeyStrategy();
-        setUpInstanceDefaultProperties();
     }
 
     @Test
@@ -260,13 +248,13 @@ public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
 
     @Test
     public void checkDominance() {
-        MCRConfiguration2.set(ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read");
         MCRUser user = new MCRUser("junit");
         MCRSessionMgr.getCurrentSession().setUserInformation(user);
 
         final MCRAccessKey writeKey = new MCRAccessKey(WRITE_VALUE, PERMISSION_WRITE);
         MCRAccessKeyManager.createAccessKey(derivateId, writeKey);
         MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(derivateId, WRITE_VALUE);
+        MCRConfiguration2.set(ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read");
 
         assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
         assertFalse(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));

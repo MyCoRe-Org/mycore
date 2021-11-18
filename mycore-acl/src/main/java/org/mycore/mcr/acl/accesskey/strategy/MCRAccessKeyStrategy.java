@@ -23,15 +23,11 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_VIEW;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.MCRAccessKeyUtils;
@@ -43,37 +39,6 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final String ACCESS_KEY_STRATEGY_PROP_PREFX = "MCR.ACL.AccessKey.Strategy";
-
-    private static final String ALLOWED_OBJECT_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP_PREFX + ".AllowedObjectTypes";
-
-    private static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP_PREFX
-        + ".AllowedSessionPermissionTypes";
-
-    private static Set<String> allowedObjectTypes = loadAllowedObjectTypes();
-
-    private static Set<String> allowedSessionPermissionTypes = loadAllowedSessionPermissionTypes();
-
-    private static Set<String> parseListStringToSet(final Optional<String> listString) {
-        return listString.stream()
-            .flatMap(MCRConfiguration2::splitValue)
-            .collect(Collectors.toSet());
-    }
-
-    private static Set<String> loadAllowedObjectTypes() {
-        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_OBJECT_TYPES_PROP::equals, (p1, p2, p3) -> {
-            allowedObjectTypes = parseListStringToSet(p3);
-        });
-        return parseListStringToSet(MCRConfiguration2.getString(ALLOWED_OBJECT_TYPES_PROP));
-    }
-
-    private static Set<String> loadAllowedSessionPermissionTypes() {
-        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_SESSION_PERMISSION_TYPES_PROP::equals, (p1, p2, p3) -> {
-            allowedSessionPermissionTypes = parseListStringToSet(p3);
-        });
-        return parseListStringToSet(MCRConfiguration2.getString(ALLOWED_SESSION_PERMISSION_TYPES_PROP));
-    }
 
     @Override
     public boolean checkPermission(final String objectIdString, final String permission) {
@@ -100,8 +65,8 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
         LOGGER.debug("check object {} permission {}.", objectId.toString(), permission);
         if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
             || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
-            && allowedObjectTypes.contains(objectId.getTypeId())) {
-            if (allowedSessionPermissionTypes.contains(permission)) {
+            && MCRAccessKeyUtils.isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
+            if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed(permission)) {
                 final MCRAccessKey accessKey = MCRAccessKeyUtils.getLinkedAccessKeyFromCurrentSession(objectId);
                 if (accessKey != null && MCRAccessKeyStrategyHelper.verifyAccessKey(permission, accessKey)) {
                     return true;
@@ -126,7 +91,7 @@ public class MCRAccessKeyStrategy implements MCRAccessCheckStrategy {
         LOGGER.debug("check derivate {} permission {}.", objectId.toString(), permission);
         if ((PERMISSION_READ.equals(permission) || PERMISSION_WRITE.equals(permission)
             || PERMISSION_VIEW.equals(permission) || PERMISSION_PREVIEW.equals(permission))
-            && allowedObjectTypes.contains(objectId.getTypeId())) {
+            && MCRAccessKeyUtils.isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
             if (checkObjectPermission(objectId, permission)) {
                 return true;
             }

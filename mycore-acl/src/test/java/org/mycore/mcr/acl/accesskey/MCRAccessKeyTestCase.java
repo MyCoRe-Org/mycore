@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
@@ -34,6 +35,12 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 public class MCRAccessKeyTestCase extends MCRStoreTestCase {
+
+    private static final String ACCESS_KEY_STRATEGY_PROP = "MCR.ACL.AccessKey.Strategy";
+
+    protected static final String ALLOWED_OBJECT_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP + ".AllowedObjectTypes";
+
+    protected static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP + ".AllowedSessionPermissionTypes";
 
     private static final String OBJECT_ID = "mcr_object_00000001";
 
@@ -56,6 +63,11 @@ public class MCRAccessKeyTestCase extends MCRStoreTestCase {
         return testProperties;
     }
 
+    protected void setUpInstanceDefaultProperties() {
+        MCRConfiguration2.set(ALLOWED_OBJECT_TYPES_PROP, "object,derivate");
+        MCRConfiguration2.set(ALLOWED_SESSION_PERMISSION_TYPES_PROP, "read,writedb");
+    }
+
     @Before
     @Override
     public void setUp() throws Exception {
@@ -76,6 +88,7 @@ public class MCRAccessKeyTestCase extends MCRStoreTestCase {
         metaLinkID.setReference(objectId.toString(), null, null);
         derivate.getDerivate().setLinkMeta(metaLinkID);
         MCRMetadataManager.create(derivate);
+        setUpInstanceDefaultProperties();
     }
 
     @After
