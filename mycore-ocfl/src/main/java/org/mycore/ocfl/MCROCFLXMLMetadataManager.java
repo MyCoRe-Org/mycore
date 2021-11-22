@@ -258,7 +258,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             MCROCFLContent content = new MCROCFLContent(getRepository(), objName, buildFilePath(id), key.toString());
             return new MCROCFLMetadataVersion(content,
                 key.toString(),
-                versionInfo.getUser().toString(),
+                versionInfo.getUser().getName(),
                 Date.from(details.getCreated().toInstant()), convertMessageToType(versionInfo.getMessage()));
         }).collect(Collectors.toList());
     }
