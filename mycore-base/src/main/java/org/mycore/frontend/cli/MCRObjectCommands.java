@@ -137,7 +137,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     @MCRCommand(
             syntax = "select objects with xpath {0}",
-            help = "Selects MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list",
+            help = "Selects MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list" +
+                " (this command may take a while, use with care in case of a large number of objects)",
             order = 10)
     public static void selectObjectsWithXpath(String xPath) throws Exception {
 
