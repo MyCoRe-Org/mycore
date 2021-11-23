@@ -42,6 +42,12 @@
     <xs:attribute ref="xml:lang" use="optional" />
     <xs:attribute name="form" fixed="plain" type="xs:string" />
   </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaDateLangText">
+    <xs:attribute ref="xml:lang" use="optional" />
+    <xs:attribute name="form" fixed="plain" type="xs:string" />
+    <xs:attribute name="date" type="xs:string" use="optional" />
+    <xs:attribute name="format" type="xs:string" use="optional" />
+  </xs:attributeGroup>
   <xs:attributeGroup name="MCRMetaClassification">
     <xs:attribute name="categid" use="required" type="xs:normalizedString" />
     <xs:attribute name="classid" use="required" type="xs:NCName" />
@@ -101,7 +107,7 @@
     <xs:attribute name="measurement" type="xs:string"/>
   </xs:attributeGroup>
 
-  <!-- this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined elsewhere <service> is defined 
+  <!-- this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined elsewhere <service> is defined
     below -->
   <xs:element name="mycoreobject">
     <xs:complexType>
@@ -175,6 +181,8 @@
         <xs:element ref="servdates" minOccurs="0" />
         <xs:element ref="servacls" minOccurs="0" />
         <xs:element ref="servflags" minOccurs="0" />
+        <xs:element ref="servmessages" minOccurs="0" />
+        <xs:element ref="servclasses" minOccurs="0" />
         <xs:element ref="servstates" minOccurs="0" />
       </xs:all>
     </xs:complexType>
@@ -257,7 +265,49 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-   <xs:element name="servstates">
+  <xs:element name="servmessages">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="servmessage" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute fixed="MCRMetaLangText" use="required" type="xs:string" name="class" />
+      <xs:attribute use="optional" type="xs:boolean" name="heritable" />
+      <xs:attribute use="optional" type="xs:boolean" name="notinherit" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servmessage">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="inherited" use="optional" type="xs:integer" fixed="0" />
+          <xs:attribute name="type" type="xs:string" />
+          <xs:attributeGroup ref="MCRMetaDateLangText" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servclasses">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="servclass" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute fixed="MCRMetaClassification" use="required" type="xs:string" name="class" />
+      <xs:attribute use="optional" type="xs:boolean" name="heritable" />
+      <xs:attribute use="optional" type="xs:boolean" name="notinherit" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servclass">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="inherited" use="optional" type="xs:integer" fixed="0" />
+          <xs:attribute name="type" type="xs:string" />
+          <xs:attributeGroup ref="MCRMetaClassification" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servstates">
     <xs:complexType>
       <xs:sequence>
         <xs:element ref="servstate" maxOccurs="1" />
