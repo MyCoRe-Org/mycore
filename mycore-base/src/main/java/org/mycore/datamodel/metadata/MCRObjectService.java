@@ -740,7 +740,7 @@ public class MCRObjectService {
         }
 
         if (messages.size() != 0) {
-            org.jdom2.Element elmm = new org.jdom2.Element("servmessages");
+            Element elmm = new Element("servmessages");
             elmm.setAttribute("class", "MCRMetaDateLangText");
 
             for (MCRMetaDateLangText message : messages) {
@@ -751,7 +751,7 @@ public class MCRObjectService {
         }
 
         if (classifications.size() != 0) {
-            org.jdom2.Element elmm = new org.jdom2.Element("servclasses");
+            Element elmm = new Element("servclasses");
             elmm.setAttribute("class", "MCRMetaClassification");
 
             for (MCRMetaClassification classification : classifications) {
@@ -1041,7 +1041,8 @@ public class MCRObjectService {
         String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
         MCRUtils.filterTrimmedNotEmpty(value)
             .map(messageValue -> {
-                MCRMetaDateLangText message = new MCRMetaDateLangText("servmessage", null, lType, 0, null, messageValue);
+                MCRMetaDateLangText message =
+                    new MCRMetaDateLangText("servmessage", null, lType, 0, null, messageValue);
                 message.setDate(MCRISO8601Date.now());
                 return message;
             })
