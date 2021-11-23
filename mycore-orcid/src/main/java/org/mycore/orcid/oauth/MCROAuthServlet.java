@@ -59,6 +59,8 @@ public class MCROAuthServlet extends MCRServlet {
 
     private String scopes = MCRConfiguration2.getStringOrThrow("MCR.ORCID.OAuth.Scopes");
 
+    private String userServlet = MCRConfiguration2.getStringOrThrow("MCR.ORCID.OAuth.User.Servlet");
+
     private String redirectURL;
 
     @Override
@@ -66,7 +68,7 @@ public class MCROAuthServlet extends MCRServlet {
         String baseURL = MCRFrontendUtil.getBaseURL();
 
         this.redirectURL = baseURL + job.getRequest().getServletPath().substring(1);
-        String userProfileURL = MCRServlet.getServletBaseURL() + "MCRUserServlet?action=show&XSL.Style=orcid-oauth";
+        String userProfileURL = MCRServlet.getServletBaseURL() + userServlet;
 
         String code = job.getRequest().getParameter("code");
         String error = job.getRequest().getParameter("error");
