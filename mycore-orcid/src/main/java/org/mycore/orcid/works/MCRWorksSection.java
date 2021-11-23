@@ -157,10 +157,23 @@ public class MCRWorksSection {
     }
 
     public Optional<MCRWork> findWork(MCRObject obj) {
+        return findWorks(obj).findFirst();
+    }
+
+    public Optional<MCRWork> findOwnWork(MCRObjectID oid) {
+        MCRObject obj = MCRMetadataManager.retrieveMCRObject(oid);
+        return findOwnWork(obj);
+    }
+
+    public Optional<MCRWork> findOwnWork(MCRObject obj) {
+        return findWorks(obj).filter(work -> work.getSource().isThisApplication()).findFirst();
+    }
+
+    public Stream<MCRWork> findWorks(MCRObject obj) {
         MCRMODSWrapper wrapper = new MCRMODSWrapper(obj);
         List<Element> objectIdentifiers = wrapper.getElements("mods:identifier");
         Set<String> objectKeys = buildIdentifierKeys(objectIdentifiers);
-        return works.stream().filter(work -> matches(work, obj.getId(), objectKeys)).findFirst();
+        return works.stream().filter(work -> matches(work, obj.getId(), objectKeys));
     }
 
     private boolean matches(MCRWork work, MCRObjectID oid, Set<String> objectIdentifiers) {
@@ -184,6 +197,10 @@ public class MCRWorksSection {
     /** Returns true, if there is a work in the ORCID profile that's origin is the given MyCoRe object */
     public boolean containsWork(MCRObjectID oid) {
         return findWork(oid).isPresent();
+    }
+
+    public boolean containsOwnWork(MCRObjectID oid) {
+        return findOwnWork(oid).isPresent();
     }
 
     /** Returns all works in the ORCID profile that have been added by ths MyCoRe application */
