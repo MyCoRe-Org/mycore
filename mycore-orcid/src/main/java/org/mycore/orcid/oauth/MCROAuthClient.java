@@ -110,6 +110,7 @@ public class MCROAuthClient {
         builder.addParameter("redirect_uri", redirectURL);
         builder.addParameter("scope", scopes.trim());
         builder.addParameter("state", buildStateParam());
+        builder.addParameter("prompt", "login");
         builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
 
         if (MCRConfiguration2.getOrThrow("MCR.ORCID.PreFillRegistrationForm", Boolean::parseBoolean)) {
