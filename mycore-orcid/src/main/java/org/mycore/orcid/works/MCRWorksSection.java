@@ -109,6 +109,12 @@ public class MCRWorksSection {
         return modsCollection;
     }
 
+    public Element buildUnmergedMODSCollection() {
+        Element modsCollection = new Element("modsCollection", MCRConstants.MODS_NAMESPACE);
+        groups.forEach(g -> modsCollection.addContent(g.buildUnmergedMODS()));
+        return modsCollection;
+    }
+
     /**
      * Fetches the grouping of works and all work summaries from the ORCID profile.
      * Can be called to refresh information on grouping to find out how grouping of works

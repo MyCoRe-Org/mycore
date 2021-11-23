@@ -57,4 +57,12 @@ public class MCRGroupOfWorks {
         }
         return mods;
     }
+
+    public List<Element> buildUnmergedMODS() {
+        List<Element> modslist = new ArrayList<>();
+        for (MCRWork work : works) {
+            modslist.add(work.getMODS());
+        }
+        return modslist;
+    }
 }
