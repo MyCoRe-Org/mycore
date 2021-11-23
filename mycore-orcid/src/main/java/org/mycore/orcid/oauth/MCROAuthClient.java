@@ -100,7 +100,7 @@ public class MCROAuthClient {
         builder.addParameter("client_id", clientID);
         builder.addParameter("response_type", "code");
         builder.addParameter("redirect_uri", redirectURL);
-        builder.addParameter("scope", scopes.trim().replace(" ", "%20"));
+        builder.addParameter("scope", scopes.trim());
         builder.addParameter("state", buildStateParam());
         builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
 
