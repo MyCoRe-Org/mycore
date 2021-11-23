@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -53,6 +54,9 @@ public class MCRORCIDUser {
     private static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + "orcid";
 
     private static final String ATTR_ORCID_TOKEN = "token_orcid";
+
+    private static final String MATCH_ONLY_NAME_IDENTIFIER = MCRConfiguration2
+	    .getString("MCR.ORCID.User.NameIdentifier").orElse("");
 
     private MCRUser user;
 
@@ -134,7 +138,13 @@ public class MCRORCIDUser {
     public static Set<String> getNameIdentifierKeys(MCRMODSWrapper wrapper) {
         Set<String> identifierKeys = new HashSet<>();
 
-        List<Element> nameIdentifiers = wrapper.getElements("mods:name/mods:nameIdentifier");
+        List<Element> nameIdentifiers = null;
+        if(MATCH_ONLY_NAME_IDENTIFIER.isEmpty()) {
+            nameIdentifiers = wrapper.getElements("mods:name/mods:nameIdentifier");
+        } else {
+            nameIdentifiers = wrapper
+		    .getElements("mods:name/mods:nameIdentifier[@type = '" + MATCH_ONLY_NAME_IDENTIFIER + "']");
+        }
         for (Element nameIdentifier : nameIdentifiers) {
             String key = buildNameIdentifierKey(nameIdentifier.getAttributeValue("type"), nameIdentifier.getText());
             LOGGER.info("found name identifier in publication: " + key);
