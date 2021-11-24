@@ -39,7 +39,6 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.bibtex.MCRBibTeX2MODSTransformer;
 import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid.MCRORCIDConstants;
@@ -140,11 +139,6 @@ public class MCRWorksFetcher {
         work.setMODS(mods);
         String sourceID = workXML.getAttributeValue("source");
         work.setSource(MCRWorkSource.getInstance(sourceID));
-
-        if (work.getSource().isThisApplication()) {
-            String oid = workXML.getAttributeValue("oid");
-            work.setObjectID(MCRObjectID.getInstance(oid));
-        }
     }
 
     /**
