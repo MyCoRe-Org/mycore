@@ -83,6 +83,14 @@ public class MCROAuthClient {
         return req;
     }
 
+    public MCRRevokeRequest getRevokeRequest(String token) {
+        MCRRevokeRequest req = new MCRRevokeRequest(client.target(baseURL));
+        req.set("client_id", clientID);
+        req.set("client_secret", clientSecret);
+        req.set("token", token);
+        return req;
+    }
+
     /**
      * Builds the URL where to redirect the user's browser to initiate a three-way authorization
      * and request permission to access the given scopes. If
