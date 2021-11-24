@@ -20,24 +20,32 @@ package org.mycore.orcid.oauth;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.Response;
+import javax.ws.rs.client.WebTarget;
+
+import org.mycore.common.config.MCRConfigurationException;
 
 /**
- * Represents the response on a token request against the OAuth2 API of orcid.org.
+ * Represents a token request against the OAuth2 API of orcid.org.
  *
  * @author Frank L\u00FCtzenkirchen
  * @author Kai Brandhorst
  */
-public class MCRTokenResponse extends MCRORCIDResponse {
+public class MCRRevokeRequest extends MCRORCIDRequest {
 
-    MCRTokenResponse(Response response) throws IOException {
-        super(response);
+    MCRRevokeRequest(WebTarget baseTarget) {
+        super(baseTarget);
     }
 
     /**
-     * Returns the access token, in case the request wasSuccessful()
+     * Posts the request and returns the response.
+     *
+     * @throws MCRConfigurationException if request fails, e.g. because of misconfigured client ID and secret
      */
-    public String getAccessToken() {
-        return responseData.get("access_token").asText();
+    public MCRRevokeResponse post() throws MCRConfigurationException, IOException {
+        MCRRevokeResponse response = new MCRRevokeResponse(post("revoke"));
+        if (!response.wasSuccessful()) {
+            throw new MCRConfigurationException(response.getStatusMessage());
+        }
+        return response;
     }
 }
