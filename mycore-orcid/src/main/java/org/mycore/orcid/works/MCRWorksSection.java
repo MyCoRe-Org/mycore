@@ -164,9 +164,6 @@ public class MCRWorksSection {
     }
 
     private boolean matches(MCRWork work, MCRObjectID oid, Set<String> objectIdentifiers) {
-        if (oid.equals(work.getObjectID())) {
-            return true;
-        }
         Set<String> workIdentifiers = buildIdentifierKeys(work.getIdentifiers());
         workIdentifiers.retainAll(objectIdentifiers);
         return !workIdentifiers.isEmpty();
