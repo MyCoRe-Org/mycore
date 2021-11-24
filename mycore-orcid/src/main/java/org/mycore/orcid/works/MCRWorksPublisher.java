@@ -82,15 +82,15 @@ public class MCRWorksPublisher {
         return work;
     }
 
-    void update(MCRWork work) throws IOException, SAXException {
+    void update(MCRWork work, MCRObjectID oid) throws IOException, SAXException {
         WebTarget target = orcid.getWebTarget().path("work").path(work.getPutCode());
         Builder builder = buildInvocation(target);
 
-        Document workXML = buildWorkXMLFrom(work.getObjectID());
+        Document workXML = buildWorkXMLFrom(oid);
         workXML.getRootElement().setAttribute("put-code", work.getPutCode());
         Entity<InputStream> input = buildRequestEntity(workXML);
 
-        LOGGER.info("put (update) {} to {}", work.getObjectID(), target.getUri());
+        LOGGER.info("put (update) {} to {}", oid, target.getUri());
         Response response = builder.put(input);
         expect(response, Response.Status.OK);
     }
@@ -98,7 +98,6 @@ public class MCRWorksPublisher {
     void delete(MCRWork work) throws IOException, JDOMException, SAXException {
         WebTarget target = orcid.getWebTarget().path("work").path(work.getPutCode());
         Builder builder = buildInvocation(target);
-        LOGGER.info("delete {} from {}", work.getObjectID(), target.getUri());
         Response response = builder.delete();
         expect(response, Response.Status.NO_CONTENT);
         orcid.getWorksSection().removeWork(work);
