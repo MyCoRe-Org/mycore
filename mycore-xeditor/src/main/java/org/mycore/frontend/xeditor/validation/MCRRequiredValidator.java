@@ -50,6 +50,10 @@ public class MCRRequiredValidator extends MCRValidator {
             return true;
         }
 
+        if (!isRelevant(binding)) {
+            return true;
+        }
+
         boolean isValid = false;
 
         // at least one value must exist
