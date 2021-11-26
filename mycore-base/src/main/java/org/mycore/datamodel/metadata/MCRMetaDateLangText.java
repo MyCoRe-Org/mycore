@@ -19,11 +19,8 @@
 package org.mycore.datamodel.metadata;
 
 import com.google.gson.JsonObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRISO8601Date;
 import org.mycore.datamodel.common.MCRISO8601Format;
 
@@ -36,15 +33,9 @@ import java.util.Objects;
  *
  * @version $Revision$ $Date$
  */
-public class MCRMetaDateLangText extends MCRMetaDefault {
-
-    protected String text;
-
-    protected String form;
+public class MCRMetaDateLangText extends MCRMetaLangText {
 
     protected MCRISO8601Date isoDate;
-
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * This is the constructor. <br>
@@ -53,8 +44,6 @@ public class MCRMetaDateLangText extends MCRMetaDefault {
      */
     public MCRMetaDateLangText() {
         super();
-        text = "";
-        form = "plain";
     }
 
     /**
@@ -78,88 +67,8 @@ public class MCRMetaDateLangText extends MCRMetaDefault {
      */
     public MCRMetaDateLangText(String subtag, String lang, String type, int inherted, String form, String text)
         throws MCRException {
-        super(subtag, lang, type, inherted);
-        this.text = "";
-
-        if (text != null) {
-            this.text = text.trim();
-        }
-
-        this.form = "plain";
-
-        if (form != null) {
-            this.form = form.trim();
-        }
+        super(subtag, lang, type, inherted, form, text);
     }
-
-    /**
-     * This method set the language, type and text.
-     *
-     * @param lang
-     *            the new language string, if this is null or empty, nothing is
-     *            to do
-     * @param type
-     *            the optional type string
-     * @param text
-     *            the new text string
-     */
-    public final void set(String lang, String type, String form, String text) {
-        setLang(lang);
-        setType(type);
-
-        if (text != null) {
-            this.text = text.trim();
-        }
-
-        this.form = "plain";
-
-        if (form != null) {
-            this.form = form.trim();
-        }
-    }
-
-    /**
-     * This method set the text.
-     *
-     * @param text
-     *            the new text string
-     */
-    public final void setText(String text) {
-        if (text != null) {
-            this.text = text.trim();
-        }
-    }
-
-    /**
-     * This method set the form attribute.
-     *
-     * @param form
-     *            the new form string
-     */
-    public final void setForm(String form) {
-        if (form != null) {
-            text = form.trim();
-        }
-    }
-
-    /**
-     * This method get the text element.
-     *
-     * @return the text
-     */
-    public final String getText() {
-        return text;
-    }
-
-    /**
-     * This method get the form attribute.
-     *
-     * @return the form attribute
-     */
-    public final String getForm() {
-        return form;
-    }
-
 
     /**
      * sets the date for this meta data object
@@ -191,22 +100,6 @@ public class MCRMetaDateLangText extends MCRMetaDefault {
     public void setFromDOM(Element element) {
         super.setFromDOM(element);
 
-        String tempText = element.getText();
-
-        if (tempText == null) {
-            tempText = "";
-        }
-
-        text = tempText.trim();
-
-        String tempForm = element.getAttributeValue("form");
-
-        if (tempForm == null) {
-            tempForm = "plain";
-        }
-
-        form = tempForm.trim();
-
         String tempDate = element.getAttributeValue("date");
 
         if(tempDate != null) {
@@ -237,9 +130,6 @@ public class MCRMetaDateLangText extends MCRMetaDefault {
     @Override
     public Element createXML() throws MCRException {
         Element elm = super.createXML();
-        MCRUtils.filterTrimmedNotEmpty(form)
-            .ifPresent(s -> elm.setAttribute("form", s));
-        elm.addContent(text);
 
         if(isoDate != null) {
             elm.setAttribute("date", isoDate.getISOString());
@@ -253,7 +143,7 @@ public class MCRMetaDateLangText extends MCRMetaDefault {
     }
 
     /**
-     * Creates the JSON representation. Extends the {@link MCRMetaDefault#createJSON()} method
+     * Creates the JSON representation. Extends the {@link MCRMetaLangText#createJSON()} method
      * with the following data.
      *
      * <pre>
@@ -269,10 +159,6 @@ public class MCRMetaDateLangText extends MCRMetaDefault {
     @Override
     public JsonObject createJSON() {
         JsonObject obj = super.createJSON();
-        if (getForm() != null) {
-            obj.addProperty("form", getForm());
-        }
-        obj.addProperty("text", getText());
         if (isoDate != null) {
             obj.addProperty("date", isoDate.getISOString());
             MCRISO8601Format isoFormat = isoDate.getIsoFormat();
@@ -283,24 +169,7 @@ public class MCRMetaDateLangText extends MCRMetaDefault {
         return obj;
     }
 
-    /**
-     * Validates this MCRMetaLangText. This method throws an exception if:
-     * <ul>
-     * <li>the subtag is not null or empty</li>
-     * <li>the lang value was supported</li>
-     * <li>the inherited value is lower than zero</li>
-     * <li>the trimmed text is null or empty</li>
-     * </ul>
-     *
-     * @throws MCRException the MCRMetaLangText is invalid
-     */
-    public void validate() throws MCRException {
-        super.validate();
-        text = MCRUtils.filterTrimmedNotEmpty(text)
-            .orElseThrow(() -> new MCRException(getSubTag() + ": text is null or empty"));
-        form = MCRUtils.filterTrimmedNotEmpty(form)
-            .orElse("plain");
-    }
+
 
     /**
      * clone of this instance
@@ -313,38 +182,15 @@ public class MCRMetaDateLangText extends MCRMetaDefault {
     public MCRMetaDateLangText clone() {
         MCRMetaDateLangText clone = (MCRMetaDateLangText) super.clone();
 
-        MCRISO8601Date dateClone = new MCRISO8601Date();
-        dateClone.setFormat(isoDate.getIsoFormat());
-        dateClone.setDate(isoDate.getDate());
-
-        clone.form = this.form;
-        clone.text = this.text;
-        clone.isoDate = dateClone;
+        clone.isoDate = this.isoDate; // this is ok because iso Date is immutable
 
         return clone;
     }
 
     /**
-     * This method put debug data to the logger (for the debug mode).
-     */
-    @Override
-    public final void debug() {
-        if (LOGGER.isDebugEnabled()) {
-            super.debugDefault();
-            LOGGER.debug("Format             = {}", form);
-            if (isoDate != null) {
-                LOGGER.debug("Date               = {}", isoDate.getISOString());
-                LOGGER.debug("Format             = {}", isoDate.getIsoFormat());
-            }
-            LOGGER.debug("Text               = {}", text);
-            LOGGER.debug(" ");
-        }
-    }
-
-    /**
      * Check the equivalence between this instance and the given object.
      *
-     * @param obj the MCRMetaLangText object
+     * @param obj the MCRMetaDateLangText object
      * @return true if its equal
      */
     @Override
@@ -356,4 +202,5 @@ public class MCRMetaDateLangText extends MCRMetaDefault {
         return Objects.equals(this.text, other.text) && Objects.equals(this.form, other.form)
             && Objects.equals(this.isoDate, other.isoDate);
     }
+
 }
