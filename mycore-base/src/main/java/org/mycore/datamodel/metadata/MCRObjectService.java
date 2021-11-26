@@ -42,8 +42,8 @@ import org.mycore.datamodel.common.MCRISO8601Date;
 /**
  * This class implements all methods for handling MCRObject service data.
  * The service data stores technical information that is no metadata.
- * The service data holds five types of data, dates, flags, messages,
- * classifications and states. The flags and messages are text strings
+ * The service data holds six types of data (dates, rules  flags, messages,
+ * classifications and states). The flags and messages are text strings
  * and are optional.
  * <p>
  *
@@ -73,7 +73,8 @@ import org.mycore.datamodel.common.MCRISO8601Date;
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
-    private static Logger LOGGER = LogManager.getLogger();
+    
+    private static final Logger LOGGER = LogManager.getLogger(MCRObjectService.class);
 
     /**
      * constant for create date
@@ -95,15 +96,15 @@ public class MCRObjectService {
      */
     public static final String FLAG_TYPE_MODIFIEDBY = "modifiedby";
 
-    private final ArrayList<MCRMetaISO8601Date> dates;
+    private final ArrayList<MCRMetaISO8601Date> dates = new ArrayList<>();
 
-    private final ArrayList<MCRMetaAccessRule> rules;
+    private final ArrayList<MCRMetaAccessRule> rules = new ArrayList<>();
 
-    private final ArrayList<MCRMetaLangText> flags;
+    private final ArrayList<MCRMetaLangText> flags = new ArrayList<>();
 
-    private final ArrayList<MCRMetaDateLangText> messages;
+    private final ArrayList<MCRMetaDateLangText> messages = new ArrayList<>();
 
-    private final ArrayList<MCRMetaClassification> classifications;
+    private final ArrayList<MCRMetaClassification> classifications = new ArrayList<>();
 
     private MCRCategoryID state;
 
@@ -112,21 +113,17 @@ public class MCRObjectService {
      * to null.
      */
     public MCRObjectService() {
-        dates = new ArrayList<>();
 
-        Date curTime = new Date();
+        Date now = new Date();
 
-        MCRMetaISO8601Date d = new MCRMetaISO8601Date("servdate", DATE_TYPE_CREATEDATE, 0);
-        d.setDate(curTime);
-        dates.add(d);
-        d = new MCRMetaISO8601Date("servdate", DATE_TYPE_MODIFYDATE, 0);
-        d.setDate(curTime);
-        dates.add(d);
+        MCRMetaISO8601Date createDate = new MCRMetaISO8601Date("servdate", DATE_TYPE_CREATEDATE, 0);
+        createDate.setDate(now);
+        dates.add(createDate);
 
-        rules = new ArrayList<>();
-        flags = new ArrayList<>();
-        messages = new ArrayList<>();
-        classifications = new ArrayList<>();
+        MCRMetaISO8601Date modifyDate = new MCRMetaISO8601Date("servdate", DATE_TYPE_MODIFYDATE, 0);
+        modifyDate.setDate(now);
+        dates.add(modifyDate);
+
     }
 
     /**
@@ -137,32 +134,29 @@ public class MCRObjectService {
      *            a list of relevant DOM elements for the metadata
      */
     public final void setFromDOM(Element service) {
-        // Date part
-        Element servdates = service.getChild("servdates");
+        
+        // date part
+        Element datesElement = service.getChild("servdates");
         dates.clear();
 
-        if (servdates != null) {
-            List<Element> dateList = servdates.getChildren();
-
-            for (Element dateElement : dateList) {
+        if (datesElement != null) {
+            List<Element> dateElements = datesElement.getChildren();
+            for (Element dateElement : dateElements) {
                 String dateElementName = dateElement.getName();
-
                 if (!"servdate".equals(dateElementName)) {
                     continue;
                 }
-
                 MCRMetaISO8601Date date = new MCRMetaISO8601Date();
                 date.setFromDOM(dateElement);
-
                 setDate(date);
             }
         }
 
-        // Rule part
-        Element servacls = service.getChild("servacls");
-        if (servacls != null) {
-            List<Element> ruleList = servacls.getChildren();
-            for (Element ruleElement : ruleList) {
+        // rule part
+        Element rulesElement = service.getChild("servacls");
+        if (rulesElement != null) {
+            List<Element> ruleElements = rulesElement.getChildren();
+            for (Element ruleElement : ruleElements) {
                 if (!ruleElement.getName().equals("servacl")) {
                     continue;
                 }
@@ -172,11 +166,11 @@ public class MCRObjectService {
             }
         }
 
-        // Flag part
+        // flag part
         Element flagsElement = service.getChild("servflags");
         if (flagsElement != null) {
-            List<Element> flagList = flagsElement.getChildren();
-            for (Element flagElement : flagList) {
+            List<Element> flagElements = flagsElement.getChildren();
+            for (Element flagElement : flagElements) {
                 if (!flagElement.getName().equals("servflag")) {
                     continue;
                 }
@@ -186,11 +180,11 @@ public class MCRObjectService {
             }
         }
 
-        // Classification part
+        // classification part
         Element classificationsElement = service.getChild("servclasses");
         if (classificationsElement != null) {
-            List<Element> classificationList = classificationsElement.getChildren();
-            for (Element classificationElement : classificationList) {
+            List<Element> classificationElements = classificationsElement.getChildren();
+            for (Element classificationElement : classificationElements) {
                 if (!classificationElement.getName().equals("servclass")) {
                     continue;
                 }
@@ -200,11 +194,11 @@ public class MCRObjectService {
             }
         }
 
-        // Message part
+        // nessage part
         Element messagesElement = service.getChild("servmessages");
         if (messagesElement != null) {
-            List<Element> messageList = messagesElement.getChildren();
-            for (Element messageElement : messageList) {
+            List<Element> messageElements = messagesElement.getChildren();
+            for (Element messageElement : messageElements) {
                 if (!messageElement.getName().equals("servmessage")) {
                     continue;
                 }
@@ -217,8 +211,8 @@ public class MCRObjectService {
         // States part
         Element statesElement = service.getChild("servstates");
         if (statesElement != null) {
-            List<Element> flagList = statesElement.getChildren();
-            for (Element stateElement : flagList) {
+            List<Element> stateElements = statesElement.getChildren();
+            for (Element stateElement : stateElements) {
                 if (!stateElement.getName().equals("servstate")) {
                     continue;
                 }
@@ -482,11 +476,11 @@ public class MCRObjectService {
      * This method get a single flag from the flag list as a string.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a flag string
      */
     public final String getFlag(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > flags.size()) {
+        if (index < 0 || index >= flags.size()) {
             throw new IndexOutOfBoundsException("Index error in getFlag.");
         }
         return flags.get(index).getText();
@@ -496,11 +490,11 @@ public class MCRObjectService {
      * This method gets a single flag type from the flag list as a string.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a flag type
      */
     public final String getFlagType(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > flags.size()) {
+        if (index < 0 || index >= flags.size()) {
             throw new IndexOutOfBoundsException("Index error in getFlagType.");
         }
         return flags.get(index).getType();
@@ -538,10 +532,10 @@ public class MCRObjectService {
      * @param index
      *            a index in the list
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      */
     public final void removeFlag(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > flags.size()) {
+        if (index < 0 || index >= flags.size()) {
             throw new IndexOutOfBoundsException("Index error in removeFlag.");
         }
 
@@ -568,7 +562,7 @@ public class MCRObjectService {
      * @param value
      *            the value of a flag as string
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      */
     public final void replaceFlag(int index, String value) throws IndexOutOfBoundsException {
         MCRUtils.filterTrimmedNotEmpty(value)
@@ -588,7 +582,7 @@ public class MCRObjectService {
      * @param value
      *            the value of a flag as string
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      */
     public final void replaceFlagType(int index, String value) throws IndexOutOfBoundsException {
         MCRUtils.filterTrimmedNotEmpty(value)
@@ -642,11 +636,11 @@ public class MCRObjectService {
      * This method get a single rule from the rules list as a JDOM Element.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a the MCRMetaAccessRule instance
      */
     public final MCRMetaAccessRule getRule(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > rules.size()) {
+        if (index < 0 || index >= rules.size()) {
             throw new IndexOutOfBoundsException("Index error in getRule.");
         }
         return rules.get(index);
@@ -657,11 +651,11 @@ public class MCRObjectService {
      * string.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a rule permission string
      */
     public final String getRulePermission(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > rules.size()) {
+        if (index < 0 || index >= rules.size()) {
             throw new IndexOutOfBoundsException("Index error in getRulePermission.");
         }
         return rules.get(index).getPermission();
@@ -673,10 +667,10 @@ public class MCRObjectService {
      * @param index
      *            a index in the list
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      */
     public final void removeRule(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > rules.size()) {
+        if (index < 0 || index >= rules.size()) {
             throw new IndexOutOfBoundsException("Index error in removeRule.");
         }
         rules.remove(index);
@@ -981,11 +975,11 @@ public class MCRObjectService {
      * This method get a single messages from the message list as a string.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a message string
      */
     public final String getMessage(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > messages.size()) {
+        if (index < 0 || index >= messages.size()) {
             throw new IndexOutOfBoundsException("Index error in getMessage.");
         }
         return messages.get(index).getText();
@@ -995,11 +989,11 @@ public class MCRObjectService {
      * This method gets a single message type from the message list as a string.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a message type
      */
     public final String getMessageType(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > messages.size()) {
+        if (index < 0 || index >= messages.size()) {
             throw new IndexOutOfBoundsException("Index error in getMessageType.");
         }
         return messages.get(index).getType();
@@ -1009,11 +1003,11 @@ public class MCRObjectService {
      * This method get a single messages from the message list.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a message value
      */
     public final MCRMetaDateLangText getMessageMCRMetaLangText(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > messages.size()) {
+        if (index < 0 || index >= messages.size()) {
             throw new IndexOutOfBoundsException("Index error in getMessageMCRMetaLangText.");
         }
         return messages.get(index);
@@ -1057,7 +1051,7 @@ public class MCRObjectService {
      * @param value
      *            the value of a message as string
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      */
     public final void replaceMessage(int index, String value) throws IndexOutOfBoundsException {
         MCRUtils.filterTrimmedNotEmpty(value)
@@ -1070,13 +1064,13 @@ public class MCRObjectService {
      * @param index
      *            a index in the list
      * @param value
-     *            the value of a flag as string
+     *            the value of a message as string
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      */
     public final void replaceMessageType(int index, String value) throws IndexOutOfBoundsException {
         MCRUtils.filterTrimmedNotEmpty(value)
-            .ifPresent(flagValue -> updateMessage(index, message -> message.setType(value)));
+            .ifPresent(messageValue -> updateMessage(index, message -> message.setType(value)));
     }
 
     private void updateMessage(int index, Consumer<MCRMetaDateLangText> messageUpdater) {
@@ -1090,10 +1084,10 @@ public class MCRObjectService {
      * @param index
      *            a index in the list
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      */
     public final void removeMessage(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > messages.size()) {
+        if (index < 0 || index >= messages.size()) {
             throw new IndexOutOfBoundsException("Index error in removeMessage.");
         }
         messages.remove(index);
@@ -1159,11 +1153,11 @@ public class MCRObjectService {
      * This method get a single classification from the classification list as a string.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a classification string
      */
     public final String getClassification(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > classifications.size()) {
+        if (index < 0 || index >= classifications.size()) {
             throw new IndexOutOfBoundsException("Index error in getClassification.");
         }
         return classifications.get(index).getCategId();
@@ -1173,11 +1167,11 @@ public class MCRObjectService {
      * This method gets a single message type from the message list as a string.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a message type
      */
     public final String getClassificationClassId(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > classifications.size()) {
+        if (index < 0 || index >= classifications.size()) {
             throw new IndexOutOfBoundsException("Index error in getClassificationClassId.");
         }
         return classifications.get(index).getClassId();
@@ -1187,19 +1181,19 @@ public class MCRObjectService {
      * This method get a single classification from the classification list as.
      *
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      * @return a classification value
      */
     public final MCRMetaClassification getClassificationAsMCRMetaClassification(int index)
         throws IndexOutOfBoundsException {
-        if (index < 0 || index > classifications.size()) {
+        if (index < 0 || index >= classifications.size()) {
             throw new IndexOutOfBoundsException("Index error in getClassificationAsMCRMetaClassification.");
         }
         return classifications.get(index);
     }
 
     /**
-     * This method adds a flag to the flag list.
+     * This method adds a classification to the classification list.
      *
      * @param classId
      *              a cId as string
@@ -1228,14 +1222,14 @@ public class MCRObjectService {
     }
 
     /**
-     * This method set a classification in the flag list.
+     * This method set a classification in the classification list.
      *
      * @param index
      *            a index in the list
      * @param classId
      *            the classId of a classification as string
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      */
     public final void replaceClassification(int index, String classId) throws IndexOutOfBoundsException {
         MCRUtils.filterTrimmedNotEmpty(classId)
@@ -1254,10 +1248,10 @@ public class MCRObjectService {
      * @param index
      *            a index in the list
      * @exception IndexOutOfBoundsException
-     *                throw this exception, if the index is false
+     *                throw this exception, if the index is invalid
      */
     public final void removeClassification(int index) throws IndexOutOfBoundsException {
-        if (index < 0 || index > classifications.size()) {
+        if (index < 0 || index >= classifications.size()) {
             throw new IndexOutOfBoundsException("Index error in removeClassification.");
         }
         classifications.remove(index);
