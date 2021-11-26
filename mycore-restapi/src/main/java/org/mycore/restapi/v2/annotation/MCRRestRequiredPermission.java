@@ -28,5 +28,5 @@ import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface MCRRestRequiredPermission {
-    MCRRestAPIACLPermission value() default MCRRestAPIACLPermission.DELETE;
+    MCRRestAPIACLPermission value();
 }
