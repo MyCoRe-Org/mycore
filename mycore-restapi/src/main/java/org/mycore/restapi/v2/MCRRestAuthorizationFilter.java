@@ -43,6 +43,8 @@ import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
+import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
+import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
 
 @Priority(Priorities.AUTHORIZATION)
 public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
@@ -139,22 +141,29 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         }
     }
 
-    @Override
-    public void filter(ContainerRequestContext requestContext) {
-        MCRRestAPIACLPermission permission;
-        switch (requestContext.getMethod()) {
-            case HttpMethod.OPTIONS:
-                return;
+    private MCRRestAPIACLPermission permissionFromMethod(final String method) {
+        switch (method) {
             case HttpMethod.GET:
             case HttpMethod.HEAD:
-                permission = MCRRestAPIACLPermission.READ;
-                break;
+                return MCRRestAPIACLPermission.READ;
             case HttpMethod.DELETE:
-                permission = MCRRestAPIACLPermission.DELETE;
-                break;
+                return MCRRestAPIACLPermission.DELETE;
             default:
-                permission = MCRRestAPIACLPermission.WRITE;
+                return MCRRestAPIACLPermission.WRITE;
         }
+    }
+
+    @Override
+    public void filter(ContainerRequestContext requestContext) {
+        final String method = requestContext.getMethod();
+        if (HttpMethod.OPTIONS.equals(method)) {
+            return;
+        }
+        final MCRRestRequiredPermission annotation =
+            resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class);
+        final MCRRestAPIACLPermission permission = Optional.ofNullable(annotation)
+            .map(a -> a.value())
+            .orElseGet(() -> permissionFromMethod(method));
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)
             .ifPresent(path -> {
@@ -169,28 +178,5 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
                 .map(m -> m.getParameters().get(MCRDetailLevel.MEDIA_TYPE_PARAMETER))
                 .filter(Objects::nonNull)
                 .toArray(String[]::new));
-    }
-
-    /**
-     * The REST API access permissions (read, write, delete)
-     */
-    public enum MCRRestAPIACLPermission {
-        READ {
-            public String toString() {
-                return MCRAccessManager.PERMISSION_READ;
-            }
-        },
-
-        WRITE {
-            public String toString() {
-                return MCRAccessManager.PERMISSION_WRITE;
-            }
-        },
-
-        DELETE {
-            public String toString() {
-                return MCRAccessManager.PERMISSION_DELETE;
-            }
-        }
     }
 }
