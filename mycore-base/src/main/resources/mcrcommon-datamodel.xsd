@@ -270,7 +270,7 @@
       <xs:sequence>
         <xs:element ref="servmessage" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
-      <xs:attribute fixed="MCRMetaLangText" use="required" type="xs:string" name="class" />
+      <xs:attribute fixed="MCRMetaDateLangText" use="required" type="xs:string" name="class" />
       <xs:attribute use="optional" type="xs:boolean" name="heritable" />
       <xs:attribute use="optional" type="xs:boolean" name="notinherit" />
     </xs:complexType>
