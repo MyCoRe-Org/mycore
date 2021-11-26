@@ -521,6 +521,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
             Element displayForm = modsName.getChild("displayForm", MODS_NAMESPACE);
             if (typeContentsMap.isEmpty() && displayForm != null) {
+                LOGGER.warn("The displayForm ({}) is used, because no mods name elements are present in doc {}!",
+                    displayForm.getTextNormalize(), this.id);
                 nameBuilder.literal(displayForm.getTextNormalize());
             }
         } else {
