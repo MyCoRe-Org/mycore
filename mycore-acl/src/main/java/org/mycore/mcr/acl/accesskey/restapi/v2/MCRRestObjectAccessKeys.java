@@ -52,10 +52,11 @@ import javax.ws.rs.PUT;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
-import org.mycore.mcr.acl.accesskey.restapi.v2.annotation.MCRRequireAccessKeyAuthorization;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
+import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
+import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
 
 @MCRApiDraft("MCRAccessKey")
 @Path("/objects/{" + PARAM_MCRID + "}/accesskeys")
@@ -81,7 +82,7 @@ public class MCRRestObjectAccessKeys {
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRequireAccessKeyAuthorization
+    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     public Response listAccessKeysForObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
         @DefaultValue("0") @QueryParam("offset") final int offset,
         @DefaultValue("128") @QueryParam("limit") final int limit) {
@@ -105,7 +106,7 @@ public class MCRRestObjectAccessKeys {
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRequireAccessKeyAuthorization
+    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     public Response getAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
         @PathParam(PARAM_SECRET) final String secret,
         @QueryParam(QUERY_PARAM_SECRET_ENCODING) final String secretEncoding) {
@@ -131,7 +132,7 @@ public class MCRRestObjectAccessKeys {
             schema = @Schema(implementation = MCRAccessKey.class)))
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRequireAccessKeyAuthorization
+    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
     public Response createAccessKeyForObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
         final String accessKeyJson) {
@@ -157,7 +158,7 @@ public class MCRRestObjectAccessKeys {
             schema = @Schema(implementation = MCRAccessKey.class)))
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRequireAccessKeyAuthorization
+    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
     public Response updateAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
         @PathParam(PARAM_SECRET) final String secret, final String accessKeyJson,
@@ -181,7 +182,7 @@ public class MCRRestObjectAccessKeys {
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),
         })
     @Produces(MediaType.APPLICATION_JSON)
-    @MCRRequireAccessKeyAuthorization
+    @MCRRestRequiredPermission(MCRRestAPIACLPermission.WRITE)
     @MCRRequireTransaction
     public Response removeAccessKeyFromObject(@PathParam(PARAM_MCRID) final MCRObjectID objectId,
         @PathParam(PARAM_SECRET) final String secret,
