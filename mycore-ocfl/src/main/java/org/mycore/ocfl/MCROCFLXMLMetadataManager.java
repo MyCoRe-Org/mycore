@@ -218,8 +218,9 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         } catch (NotFoundException e) {
             throw new MCRUsageException("Object '" + objName + "' could not be found", e);
         }
-
-        if (convertMessageToType(repo.getObject(ObjectVersionId.head(objName)).getVersionInfo()
+        
+        // maybe use .head(objName) instead to prevent requests of old versions of deleted objects
+        if (convertMessageToType(repo.getObject(ObjectVersionId.version(objName, revision)).getVersionInfo()
             .getMessage()) == MCROCFLMetadataVersion.DELETED) {
             throw new MCRUsageException("Cannot read already deleted object '" + objName + "'");
         }
