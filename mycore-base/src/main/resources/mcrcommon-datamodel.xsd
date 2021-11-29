@@ -113,6 +113,10 @@
       <xs:attribute name="ID" use="required" type="xs:NCName" />
       <xs:attribute name="label" type="xs:string" />
       <xs:attribute name="version" type="xs:string" />
+      <!-- The rev attribute ('revision') is optional. 
+           It is only set on objects retrieved from a versioned metadata store.
+           It will be ignored if the object is imported or updated to the store again -->
+      <xs:attribute name="rev" type="xs:string" />
     </xs:complexType>
   </xs:element>
 
