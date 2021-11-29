@@ -39,6 +39,7 @@
     <xsl:copy-of select="mycorederivate/@ID" />
     <xsl:copy-of select="mycorederivate/@label" />
     <xsl:copy-of select="mycorederivate/@version" />
+    <xsl:copy-of select="mycorederivate/@rev" />
     <xsl:copy-of select="mycorederivate/@order" />
     <xsl:copy-of select="mycorederivate/@xsi:noNamespaceSchemaLocation" />
     <derivate>
