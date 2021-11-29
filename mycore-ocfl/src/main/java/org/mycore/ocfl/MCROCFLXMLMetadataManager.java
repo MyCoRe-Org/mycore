@@ -218,7 +218,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         } catch (NotFoundException e) {
             throw new MCRUsageException("Object '" + objName + "' could not be found", e);
         }
-        
+
         // maybe use .head(objName) instead to prevent requests of old versions of deleted objects
         if (convertMessageToType(repo.getObject(ObjectVersionId.version(objName, revision)).getVersionInfo()
             .getMessage()) == MCROCFLMetadataVersion.DELETED) {
@@ -240,9 +240,9 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         versionInfo.setCreated((versionDate == null ? new Date() : versionDate).toInstant().atOffset(ZoneOffset.UTC));
         String userID = user != null ? user
             : Optional.ofNullable(MCRSessionMgr.getCurrentSession())
-            .map(MCRSession::getUserInformation)
-            .map(MCRUserInformation::getUserID)
-            .orElse(null);
+                .map(MCRSession::getUserInformation)
+                .map(MCRUserInformation::getUserID)
+                .orElse(null);
         versionInfo.setUser(userID, null);
         return versionInfo;
     }
