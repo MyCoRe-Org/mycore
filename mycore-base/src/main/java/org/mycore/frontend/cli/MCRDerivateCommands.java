@@ -97,8 +97,9 @@ import org.xml.sax.SAXParseException;
  */
 @MCRCommandGroup(name = "Derivate Commands")
 public class MCRDerivateCommands extends MCRAbstractCommands {
+
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRDerivateCommands.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(MCRDerivateCommands.class);
 
     /** The ACL interface */
     private static final MCRAccessInterface ACCESS_IMPL = MCRAccessManager.getAccessImpl();
@@ -160,7 +161,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "load all derivates from directory {0}",
         help = "Loads all MCRDerivates from the directory {0} to the system. " +
-                "If the numerical part of a provided ID is zero, a new ID with the same base and type is assigned.",
+            "If the numerical part of a provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 60)
     public static List<String> loadFromDirectory(String directory) {
         return processFromDirectory(directory, false);
@@ -228,7 +229,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     @MCRCommand(syntax = "load derivate from file {0}",
         help = "Loads an MCRDerivate from the file {0} to the system. " +
-                "If the numerical part of the provided ID is zero, a new ID with the same base and type is assigned.",
+            "If the numerical part of the provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 40)
     public static boolean loadFromFile(String file)
         throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
@@ -283,7 +284,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
     /**
      * Load or update an MCRDerivate from an XML file. If the numerical part of the contained ID is zero,
-     * a new ID with the same base and type is assigned.
+     * a new ID with the same project ID and type is assigned.
      *
      * @param file
      *            the location of the xml file

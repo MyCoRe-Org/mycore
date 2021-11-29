@@ -103,8 +103,7 @@ import org.xml.sax.XMLReader;
  * @author Robert Stephan
  * @version $Revision$ $Date$
  */
-@MCRCommandGroup(
-    name = "Object Commands")
+@MCRCommandGroup(name = "Object Commands")
 public class MCRObjectCommands extends MCRAbstractCommands {
     private static final String EXPORT_OBJECT_TO_DIRECTORY_COMMAND = "export object {0} to directory {1} with {2}";
 
@@ -277,7 +276,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "load all objects from directory {0}",
         help = "Loads all MCRObjects from the directory {0} to the system. " +
-                "If the numerical part of a provided ID is zero, a new ID with the same base and type is assigned.",
+            "If the numerical part of a provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 70)
     public static List<String> loadFromDirectory(String directory) {
         return processFromDirectory(false, directory, false);
@@ -353,7 +352,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @MCRCommand(
         syntax = "load object from file {0}",
         help = "Loads an MCRObject from the file {0} to the system. " +
-                "If the numerical part of the provided ID is zero, a new ID with the same base and type is assigned.",
+            "If the numerical part of the provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 60)
     public static boolean loadFromFile(String file) throws MCRException, SAXParseException,
         IOException, MCRAccessException {
@@ -406,7 +405,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Load or update an MCRObject from an XML file. If the numerical part of the contained ID is zero,
-     * a new ID with the same base and type is assigned.
+     * a new ID with the same project ID and type is assigned.
      *
      * @param file
      *            the location of the xml file
