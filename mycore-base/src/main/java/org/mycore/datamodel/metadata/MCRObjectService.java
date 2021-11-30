@@ -1137,6 +1137,17 @@ public class MCRObjectService {
     }
 
     /**
+     * This method returns all classification values.
+     *
+     * @return a list of classification values
+     */
+    public final List<MCRCategoryID> getClassificationsAsMCRCategoryID() {
+        return getClassificationsAsList().stream()
+            .map(c -> new MCRCategoryID(c.getClassId(), c.getCategId()))
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
      * This method returns all classification values of the specified type.
      *
      * @param classId
@@ -1146,6 +1157,19 @@ public class MCRObjectService {
     public final List<String> getClassifications(String classId) {
         return getClassificationsAsMCRMetaClassification(classId).stream()
             .map(MCRMetaClassification::getCategId)
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
+     * This method returns all classification values of the specified type.
+     *
+     * @param classId
+     *              a classId as string.
+     * @return a list of classification values
+     */
+    public final List<MCRCategoryID> getClassificationsAsMCRCategoryID(String classId) {
+        return getClassificationsAsMCRMetaClassification(classId).stream()
+            .map(c -> new MCRCategoryID(c.getClassId(), c.getCategId()))
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -1191,6 +1215,7 @@ public class MCRObjectService {
         }
         return classifications.get(index);
     }
+
 
     /**
      * This method adds a classification to the classification list.
