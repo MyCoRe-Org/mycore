@@ -25,6 +25,10 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.services.i18n.MCRTranslation;
@@ -146,6 +150,39 @@ public class MCRDeveloperCommands {
             LOGGER.info("Resolved resource for uri {}:\n{}", uri, xmlText);
         } catch (Exception e) {
             LOGGER.info("Failed to resolve resource for uri " + uri, e);
+        }
+    }
+
+
+    @MCRCommand(
+            syntax = "touch object {0}",
+            help = "Load and update object with id {0} without making any modifications",
+            order = 80
+    )
+    public static void touchObject(String id) {
+        try {
+            MCRObjectID objectId = MCRObjectID.getInstance(id);
+            MCRObject object = MCRMetadataManager.retrieveMCRObject(objectId);
+            MCRMetadataManager.update(object);
+            LOGGER.info("Touched object with id {}", id);
+        } catch (Exception e) {
+            LOGGER.info("Failed to touch object with id " + id, e);
+        }
+    }
+
+    @MCRCommand(
+            syntax = "touch derivate {0}",
+            help = "Load and update derivate with id {0} without making any modifications",
+            order = 90
+    )
+    public static void touchDerivate(String id) {
+        try {
+            MCRObjectID derivateId = MCRObjectID.getInstance(id);
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
+            MCRMetadataManager.update(derivate);
+            LOGGER.info("Touched derivate with id {}", id);
+        } catch (Exception e) {
+            LOGGER.info("Failed to touch derivate with id " + id, e);
         }
     }
 
