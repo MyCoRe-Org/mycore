@@ -20,51 +20,40 @@
 
 package org.mycore.mcr.acl.accesskey;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotEquals;
 import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
+import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
-import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
-public class MCRAccessKeyUtilsTest extends MCRJPATestCase {
-
-    private static final String OBJECT_ID = "mcr_test_00000001";
+public class MCRAccessKeyUtilsTest extends MCRAccessKeyTestCase {
 
     private static final String READ_KEY = "blah";
 
     private static final String WRITE_KEY = "blub";
 
-    private MCRObjectID objectId;
+    private MCRObjectID objectId = null;
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        return testProperties;
-    }
+    private MCRObjectID derivateId = null;
 
-    @Override
     @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
-        objectId = MCRObjectID.getInstance(OBJECT_ID);
+        objectId = getObject().getId();
+        derivateId = getDerivate().getId();
     }
 
-    @Test(expected = MCRAccessKeyNotFoundException.class)
+    @Test(expected = MCRAccessKeyException.class)
     public void testUnkownKey() {
         MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(objectId, READ_KEY);
     }
@@ -75,8 +64,14 @@ public class MCRAccessKeyUtilsTest extends MCRJPATestCase {
         MCRAccessKeyManager.createAccessKey(objectId, accessKey);
         MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, READ_KEY);
         assertNotNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentSession(objectId));
+        assertNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentSession(derivateId));
         MCRAccessKeyUtils.removeAccessKeySecretFromCurrentSession(objectId);
         assertNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentSession(objectId));
+        final MCRAccessKey accessKeyDerivate = new MCRAccessKey(WRITE_KEY, PERMISSION_READ); 
+        MCRAccessKeyManager.createAccessKey(derivateId, accessKeyDerivate);
+        MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, WRITE_KEY);
+        assertNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentSession(objectId));
+        assertNotNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentSession(derivateId));
     }
 
     @Test
@@ -89,6 +84,11 @@ public class MCRAccessKeyUtilsTest extends MCRJPATestCase {
         assertNotNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(objectId));
         MCRAccessKeyUtils.removeAccessKeySecretFromCurrentUser(objectId);
         assertNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(objectId));
+        final MCRAccessKey accessKeyDerivate = new MCRAccessKey(WRITE_KEY, PERMISSION_READ); 
+        MCRAccessKeyManager.createAccessKey(derivateId, accessKeyDerivate);
+        MCRAccessKeyUtils.addAccessKeySecretToCurrentUser(objectId, WRITE_KEY);
+        assertNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(objectId));
+        assertNotNull(MCRAccessKeyUtils.getAccessKeySecretFromCurrentUser(derivateId));
     }
 
     @Test
@@ -127,7 +127,7 @@ public class MCRAccessKeyUtilsTest extends MCRJPATestCase {
         MCRAccessKeyUtils.addAccessKeySecret(MCRUserManager.getUser("junit"), objectId, READ_KEY);
 
         final MCRAccessKey accessKey2 = new MCRAccessKey(READ_KEY, PERMISSION_READ);
-        final MCRObjectID objectId2 = MCRObjectID.getInstance("mcr_test_00000002");
+        final MCRObjectID objectId2 = MCRObjectID.getInstance("mcr_object_00000002");
         MCRAccessKeyManager.createAccessKey(objectId2, accessKey2);
         MCRAccessKeyUtils.addAccessKeySecret(MCRUserManager.getUser("junit"), objectId2, READ_KEY);
 
