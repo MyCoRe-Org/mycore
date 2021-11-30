@@ -20,17 +20,25 @@ package org.mycore.common.content;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.xml.bind.util.JAXBSource;
 import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
@@ -75,6 +83,17 @@ public class MCRSourceContent extends MCRWrappedContent {
                         break;
                     }
                 }
+            }
+        } else if (source instanceof JAXBSource) {
+            try {
+                JAXBSource src = (JAXBSource) source;
+                StringWriter writer = new StringWriter();
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                transformer.transform(src, new StreamResult(writer));
+                baseContent = new MCRJDOMContent(new SAXBuilder().build(new StringReader(writer.toString())));
+            } catch (TransformerException | JDOMException | IOException e) {
+                throw new MCRException("Error while resolving JAXBSource", e);
             }
         } else if (source instanceof SAXSource) {
             SAXSource src = (SAXSource) source;
