@@ -445,10 +445,6 @@ public class MCRAccessKeyUtils {
         return allowedSessionPermissionTypes.contains(permission);
     }
 
-    public static boolean isAccessKeyForObjectTypeAllowed() {
-        return allowedObjectTypes.isEmpty();
-    }
-
     public static boolean isAccessKeyForObjectTypeAllowed(final String type) {
         return allowedObjectTypes.contains(type);
     }
