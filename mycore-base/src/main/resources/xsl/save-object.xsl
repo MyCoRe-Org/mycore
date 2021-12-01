@@ -30,7 +30,6 @@
     <xsl:copy-of select="mycoreobject/@ID" />
     <xsl:copy-of select="mycoreobject/@label" />
     <xsl:copy-of select="mycoreobject/@version" />
-    <xsl:copy-of select="mycoreobject/@rev" />
     <xsl:copy-of select="mycoreobject/@xsi:noNamespaceSchemaLocation" />
     <structure>
       <xsl:copy-of select="mycoreobject/structure/parents" />
