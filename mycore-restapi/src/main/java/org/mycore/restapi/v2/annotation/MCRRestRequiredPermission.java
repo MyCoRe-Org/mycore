@@ -23,7 +23,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
+import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

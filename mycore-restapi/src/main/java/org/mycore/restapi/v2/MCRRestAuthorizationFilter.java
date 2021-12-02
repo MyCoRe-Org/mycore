@@ -37,14 +37,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.access.MCRRuleAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.frontend.jersey.access.MCRRequestScopeACL;
 import org.mycore.restapi.converter.MCRDetailLevel;
+import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
+import org.mycore.restapi.v2.access.MCRRestAccessManager;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
-import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
 
 @Priority(Priorities.AUTHORIZATION)
 public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
@@ -67,26 +66,12 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
      *
      * @throws javax.ws.rs.ForbiddenException if access is restricted
      */
-    private void checkRestAPIAccess(ContainerRequestContext requestContext, MCRRestAPIACLPermission permission,
-        String path)
-        throws ForbiddenException {
-        MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
+    private void checkRestAPIAccess(final ContainerRequestContext requestContext,
+        final MCRRestAPIACLPermission permission, final String path) throws ForbiddenException {
         LogManager.getLogger().warn(path + ": Checking API access: " + permission);
-        String thePath = path.startsWith("/") ? path : "/" + path;
-
-        MCRAccessInterface acl = MCRAccessManager.getAccessImpl();
-        String permStr = permission.toString();
-        boolean hasAPIAccess = aclProvider.checkPermission("restapi:/", permStr);
-        if (hasAPIAccess) {
-            String objId = "restapi:" + thePath;
-            boolean isRuleInterface = acl instanceof MCRRuleAccessInterface;
-            if (!isRuleInterface || ((MCRRuleAccessInterface) acl).hasRule(objId, permStr)) {
-                if (aclProvider.checkPermission(objId, permStr)) {
-                    return;
-                }
-            } else {
-                return;
-            }
+        final MCRRequestScopeACL aclProvider = MCRRequestScopeACL.getInstance(requestContext);
+        if (MCRRestAccessManager.checkRestAPIAccess(aclProvider, permission, path)) {
+            return;
         }
         throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
             .withErrorCode(MCRErrorCodeConstants.API_NO_PERMISSION)
@@ -141,18 +126,6 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
         }
     }
 
-    private MCRRestAPIACLPermission permissionFromMethod(final String method) {
-        switch (method) {
-            case HttpMethod.GET:
-            case HttpMethod.HEAD:
-                return MCRRestAPIACLPermission.READ;
-            case HttpMethod.DELETE:
-                return MCRRestAPIACLPermission.DELETE;
-            default:
-                return MCRRestAPIACLPermission.WRITE;
-        }
-    }
-
     @Override
     public void filter(ContainerRequestContext requestContext) {
         final String method = requestContext.getMethod();
@@ -163,7 +136,7 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
             resourceInfo.getResourceMethod().getAnnotation(MCRRestRequiredPermission.class);
         final MCRRestAPIACLPermission permission = Optional.ofNullable(annotation)
             .map(a -> a.value())
-            .orElseGet(() -> permissionFromMethod(method));
+            .orElseGet(() -> MCRRestAPIACLPermission.fromMethod(method));
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)
             .ifPresent(path -> {
