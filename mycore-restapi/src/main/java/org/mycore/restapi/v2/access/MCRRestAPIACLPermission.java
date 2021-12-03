@@ -18,18 +18,18 @@
 
 package org.mycore.restapi.v2.access;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
-
 import java.util.Arrays;
+
 import javax.ws.rs.HttpMethod;
+
+import org.mycore.access.MCRAccessManager;
 
 /**
  * The REST API access permissions (read, write, delete)
  */
 public enum MCRRestAPIACLPermission {
-    READ(PERMISSION_READ), WRITE(PERMISSION_WRITE), DELETE(PERMISSION_DELETE);
+    READ(MCRAccessManager.PERMISSION_READ), WRITE(MCRAccessManager.PERMISSION_WRITE),
+    DELETE(MCRAccessManager.PERMISSION_DELETE);
 
     private String value;
 
