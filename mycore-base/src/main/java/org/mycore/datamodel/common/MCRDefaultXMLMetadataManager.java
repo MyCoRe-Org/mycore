@@ -41,12 +41,15 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationBase;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.ifs2.MCRMetadataStore;
 import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.ifs2.MCRObjectIDFileSystemDate;
@@ -59,6 +62,7 @@ import org.mycore.datamodel.ifs2.MCRVersioningMetadataStore;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
+import org.xml.sax.SAXException;
 
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata.
@@ -416,7 +420,14 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         LOGGER.info("Getting object {} in revision {}", mcrid, revision);
         MCRMetadataVersion version = getMetadataVersion(mcrid, Long.parseLong(revision));
         if (version != null) {
-            return version.retrieve();
+            MCRContent content = version.retrieve();
+            try {
+                Document doc = content.asXML();
+                doc.getRootElement().setAttribute("rev", version.getRevision());
+                return new MCRJDOMContent(doc);
+            } catch (JDOMException | SAXException e) {
+                throw new MCRPersistenceException("Could not parse XML from default store", e);
+            }
         }
         return null;
     }
