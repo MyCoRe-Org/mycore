@@ -18,58 +18,100 @@
 
 package org.mycore.ocfl.commands;
 
-import java.util.ArrayList;
+import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRUsageException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.ocfl.MCROFCLMigration;
+import org.mycore.ocfl.MCROCFLAdaptionRepositoryProvider;
+import org.mycore.ocfl.MCROCFLBaseClass;
 
 @MCRCommandGroup(name = "OCFL Commands")
 public class MCROCFLCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String SUCCESS = "success";
+    private static final String CONFIGURED_REPOSITORY = MCRConfiguration2
+        .getStringOrThrow("MCR.Metadata.Manager.Repository");
 
-    public static final String SUCCESS_BUT_WITHOUT_HISTORY = SUCCESS + " but without history";
+    public static MCROCFLBaseClass baseClass;
 
-    public static final String FAILED = "failed";
+    @MCRCommand(syntax = "export repository {0}", help = "export repository {0} to ocfl-export")
+    public static void exportRepository(String repositoryKey) throws IOException {
+        MCROCFLAdaptionRepositoryProvider adapter = new MCROCFLAdaptionRepositoryProvider(repositoryKey);
+        // MCROCFLAdaptionRepositoryProvider adapter = new MCROCFLAdaptionRepositoryProvider();
+        adapter.init();
+        adapter.exportRepository();
+        // MCROCFLAdaptionRepositoryProvider.getRepository("Adapt");
+        LOGGER.info("Successfully exported repository {}", repositoryKey);
+    }
 
-    public static final String FAILED_AND_NOW_INVALID_STATE = FAILED + " and now invalid state";
+    @MCRCommand(syntax = "export object {0} in repository {1}",
+        help = "export object {0} in repository {1} to ocfl-export")
+    public static void exportObject(String mcrid, String repositoryKey) throws IOException {
+        MCROCFLAdaptionRepositoryProvider adapter = new MCROCFLAdaptionRepositoryProvider(repositoryKey);
+        adapter.init();
+        adapter.exportObject(mcrid);
+        LOGGER.info("Successfully exported object {}", mcrid);
+    }
 
-    @MCRCommand(syntax = "migrate metadata to repository {0}",
-        help = "migrates all the metadata to the ocfl " +
-            "repository with the id {0}")
-    public static void migrateToOCFL(String repository) {
-        MCROFCLMigration migration = new MCROFCLMigration(repository);
+    @MCRCommand(syntax = "import repository {0}", help = "import repository {0} from ocfl-export")
+    public static void importRepository(String repositoryKey) throws IOException {
+        MCROCFLAdaptionRepositoryProvider adapter = new MCROCFLAdaptionRepositoryProvider(repositoryKey);
+        adapter.init();
+        adapter.importRepository();
+        LOGGER.info("Successfully imported repository {}", repositoryKey);
+    }
 
-        migration.start();
+    @MCRCommand(syntax = "restore repository", help = "restore ocfl repository from backup if available")
+    public static void restoreRepo() throws IOException {
+        MCROCFLBaseClass.restoreRoot(CONFIGURED_REPOSITORY);
+    }
 
-        ArrayList<String> success = migration.getSuccess();
-        ArrayList<String> failed = migration.getFailed();
-        ArrayList<String> invalidState = migration.getInvalidState();
-        ArrayList<String> withoutHistory = migration.getWithoutHistory();
+    @MCRCommand(syntax = "purge repository backup", help = "clear the backup of a ocfl repository")
+    public static void purgeRepoBCK() throws IOException {
+        MCROCFLBaseClass.clearBackup(CONFIGURED_REPOSITORY);
+    }
 
-        LOGGER.info("The migration resulted in \n" +
-            SUCCESS + ": {}, \n" +
-            FAILED + ": {} \n" +
-            FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n ",
-            String.join(", ", success),
-            String.join(", ", failed),
-            String.join(", ", invalidState),
-            String.join(", ", withoutHistory));
+    @MCRCommand(syntax = "migrate metadata from {0} to {1}",
+        help = "migrate metadata from {0} to {1} with repository Main")
+    public static void migrateMetadata(String from, String to) throws IOException {
+        migrateMetadata(from, to, CONFIGURED_REPOSITORY);
+    }
 
-        LOGGER.info("The migration resulted in \n" +
-            SUCCESS + ": {}, \n" +
-            FAILED + ": {} \n" +
-            FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n ",
-            success.size(),
-            failed.size(),
-            invalidState.size(),
-            withoutHistory.size());
+    @MCRCommand(syntax = "migrate metadata from {0} to {1} with {2}",
+        help = "migrate metadata from {0} to {1} with repository {2}")
+    public static void migrateMetadata(String from, String to, String repositoryKey) throws IOException {
+        baseClass = new MCROCFLBaseClass(repositoryKey);
+        switch (from) {
+            case "xml":
+            case "svn":
+                switch (to) {
+                    case "ocfl":
+                        MCROCFLBaseClass.convertXMLToOcfl(repositoryKey);
+                        break;
+                    default:
+                        throw new MCRUsageException("Invalid Command Parameter 'to'");
+                }
+                break;
+            case "ocfl":
+                switch (to) {
+                    case "ocfl":
+                        baseClass.convertOcflToOcfl();
+                        break;
+                    case "xml":
+                    case "svn":
+                        baseClass.convertOcflToXML(repositoryKey);
+                        break;
+                    default:
+                        throw new MCRUsageException("Invalid Command Parameter 'to'");
+                }
+                break;
+            default:
+                throw new MCRUsageException("Invalid Command Parameter 'from'");
+        }
     }
 }
