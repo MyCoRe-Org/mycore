@@ -32,16 +32,16 @@ import org.mycore.restapi.v2.access.MCRRestAccessManager;
 public class MCRRestCheckAPIAccessResolver implements URIResolver {
 
     /**
-     * returns the boolean value for the given RestACL permission.
+     * Checks permission for a given rest api path.
      *
-     * Syntax: <code>checkRestAPIAccess:{id}:{permission}</code>
+     * Syntax: <code>checkRestAPIAccess:{path}:{permission}</code>
      * 
      * @param href
      *            URI in the syntax above
      * @param base
      *            not used
      * 
-     * @return the root element "boolean" of the XML document with content string true of false
+     * @return the root element "boolean" of the XML document with content string "true" or "false"
      * @see javax.xml.transform.URIResolver
      */
     @Override
