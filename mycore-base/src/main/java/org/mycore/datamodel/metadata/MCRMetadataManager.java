@@ -79,7 +79,7 @@ public final class MCRMetadataManager {
     private static final MCRCache<MCRObjectID, List<MCRObjectID>> OBJECT_DERIVATE_MAP = new MCRCache<>(10000,
         "derivate objectid cache");
 
-    private static MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
+    private static final MCRXMLMetadataManager XML_MANAGER = MCRXMLMetadataManager.instance();
 
     private MCRMetadataManager() {
 
@@ -113,7 +113,7 @@ public final class MCRMetadataManager {
             mcrObjectID = MCRObjectID.getInstance(list.iterator().next());
         } else {
             //one expensive process
-            if (exists(derivateID)) {
+            if (MCRMetadataManager.exists(derivateID)) {
                 mcrObjectID = MCRMetadataManager.retrieveMCRDerivate(derivateID).getOwnerID();
             }
         }
@@ -149,7 +149,7 @@ public final class MCRMetadataManager {
         if (!derivateIds.isEmpty()) {
             return derivateIds;
         } else {
-            if (exists(objectId)) {
+            if (MCRMetadataManager.exists(objectId)) {
                 MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectId);
                 List<MCRMetaEnrichedLinkID> derivates = mcrObject.getStructure().getDerivates();
                 for (MCRMetaEnrichedLinkID der : derivates) {
@@ -171,31 +171,42 @@ public final class MCRMetadataManager {
      *            if write permission to object is missing
      */
     public static void create(final MCRDerivate mcrDerivate) throws MCRPersistenceException, MCRAccessException {
-        if (exists(mcrDerivate.getId())) {
-            throw new MCRPersistenceException(
-                "The derivate " + mcrDerivate.getId() + " already exists, nothing done.");
+
+        MCRObjectID derivateId = mcrDerivate.getId();
+
+        if (MCRMetadataManager.exists(derivateId)) {
+            throw new MCRPersistenceException("The derivate " + derivateId + " already exists, nothing done.");
+        }
+
+        // assign new id if necessary
+        if (derivateId.getNumberAsInteger() == 0) {
+            derivateId = MCRObjectID.getNextFreeId(derivateId.getBase());
+            mcrDerivate.setId(derivateId);
+            LOGGER.info("Assigned new derivate id {}", derivateId);
         }
 
         try {
             mcrDerivate.validate();
         } catch (MCRException exc) {
-            throw new MCRPersistenceException("The derivate " + mcrDerivate.getId() + " is not valid.", exc);
+            throw new MCRPersistenceException("The derivate " + derivateId + " is not valid.", exc);
         }
-        final MCRObjectID objid = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
-        if (!MCRAccessManager.checkPermission(objid, PERMISSION_WRITE)) {
-            throw MCRAccessException.missingPermission("Add derivate " + mcrDerivate.getId() + " to object.",
-                objid.toString(),
+
+        final MCRObjectID objectId = mcrDerivate.getDerivate().getMetaLink().getXLinkHrefID();
+        if (!MCRAccessManager.checkPermission(objectId, PERMISSION_WRITE)) {
+            throw MCRAccessException.missingPermission("Add derivate " + derivateId + " to object.",
+                objectId.toString(),
                 PERMISSION_WRITE);
         }
+
         byte[] objectBackup;
         try {
-            objectBackup = MCRXMLMetadataManager.instance().retrieveBLOB(objid);
+            objectBackup = MCRXMLMetadataManager.instance().retrieveBLOB(objectId);
         } catch (IOException ioExc) {
-            throw new MCRPersistenceException("Unable to retrieve xml blob of " + objid);
+            throw new MCRPersistenceException("Unable to retrieve xml blob of " + objectId);
         }
         if (objectBackup == null) {
             throw new MCRPersistenceException(
-                "Cannot find " + objid + " to attach derivate " + mcrDerivate.getId() + " to it.");
+                "Cannot find " + objectId + " to attach derivate " + derivateId + " to it.");
         }
 
         // prepare the derivate metadata and store under the XML table
@@ -211,8 +222,7 @@ public final class MCRMetadataManager {
 
         // create data in IFS
         if (mcrDerivate.getDerivate().getInternals() != null) {
-            MCRObjectID derId = mcrDerivate.getId();
-            MCRPath rootPath = MCRPath.getPath(derId.toString(), "/");
+            MCRPath rootPath = MCRPath.getPath(derivateId.toString(), "/");
             if (mcrDerivate.getDerivate().getInternals().getSourcePath() == null) {
                 try {
                     rootPath.getFileSystem().createRoot(rootPath.getOwner());
@@ -228,12 +238,12 @@ public final class MCRMetadataManager {
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("Starting File-Import");
                         }
-                        importDerivate(derId.toString(), f.toPath());
+                        importDerivate(derivateId.toString(), f.toPath());
                     } catch (final Exception e) {
                         if (Files.exists(rootPath)) {
-                            deleteDerivate(derId.toString());
+                            deleteDerivate(derivateId.toString());
                         }
-                        MCRMetadataManager.restore(mcrDerivate, objid, objectBackup);
+                        MCRMetadataManager.restore(mcrDerivate, objectId, objectBackup);
                         throw new MCRPersistenceException("Can't add derivate to the IFS", e);
                     }
                 } else {
@@ -249,11 +259,11 @@ public final class MCRMetadataManager {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("adding Derivate in data store");
             }
-            MCRMetadataManager.addOrUpdateDerivateToObject(objid, der);
+            MCRMetadataManager.addOrUpdateDerivateToObject(objectId, der);
         } catch (final Exception e) {
-            MCRMetadataManager.restore(mcrDerivate, objid, objectBackup);
+            MCRMetadataManager.restore(mcrDerivate, objectId, objectBackup);
             // throw final exception
-            throw new MCRPersistenceException("Error while creating link to MCRObject " + objid + ".", e);
+            throw new MCRPersistenceException("Error while creating link to MCRObject " + objectId + ".", e);
         }
     }
 
@@ -296,16 +306,26 @@ public final class MCRMetadataManager {
      * @throws MCRAccessException if "create-{objectType}" privilege is missing
      */
     public static void create(final MCRObject mcrObject) throws MCRPersistenceException, MCRAccessException {
-        String createBasePrivilege = "create-" + mcrObject.getId().getBase();
-        String createTypePrivilege = "create-" + mcrObject.getId().getTypeId();
+
+        MCRObjectID objectId = mcrObject.getId();
+
+        String createBasePrivilege = "create-" + objectId.getBase();
+        String createTypePrivilege = "create-" + objectId.getTypeId();
         if (!MCRAccessManager.checkPermission(createBasePrivilege)
             && !MCRAccessManager.checkPermission(createTypePrivilege)) {
-            throw MCRAccessException.missingPrivilege("Create object with id " + mcrObject.getId(), createBasePrivilege,
+            throw MCRAccessException.missingPrivilege("Create object with id " + objectId, createBasePrivilege,
                 createTypePrivilege);
         }
         // exist the object?
-        if (MCRMetadataManager.exists(mcrObject.getId())) {
-            throw new MCRPersistenceException("The object " + mcrObject.getId() + " allready exists, nothing done.");
+        if (MCRMetadataManager.exists(objectId)) {
+            throw new MCRPersistenceException("The object " + objectId + " allready exists, nothing done.");
+        }
+
+        // assign new id if necessary
+        if (objectId.getNumberAsInteger() == 0) {
+            objectId = MCRObjectID.getNextFreeId(objectId.getBase());
+            mcrObject.setId(objectId);
+            LOGGER.info("Assigned new object id {}", objectId);
         }
 
         // create this object in datastore
@@ -333,7 +353,7 @@ public final class MCRMetadataManager {
 
         // add the MCRObjectID to the child list in the parent object
         if (parentId != null) {
-            parent.getStructure().addChild(new MCRMetaLinkID("child", mcrObject.getId(),
+            parent.getStructure().addChild(new MCRMetaLinkID("child", objectId,
                 mcrObject.getStructure().getParent().getXLinkLabel(), mcrObject.getLabel()));
             MCRMetadataManager.fireUpdateEvent(parent);
         }
@@ -607,7 +627,7 @@ public final class MCRMetadataManager {
     public static void fireRepairEvent(final MCRObject mcrObject) throws MCRPersistenceException {
         // check derivate link
         for (MCRMetaLinkID derivate : mcrObject.getStructure().getDerivates()) {
-            if (!exists(derivate.getXLinkHrefID())) {
+            if (!MCRMetadataManager.exists(derivate.getXLinkHrefID())) {
                 LOGGER.error("Can't find MCRDerivate {}", derivate.getXLinkHrefID());
             }
         }
