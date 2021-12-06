@@ -138,14 +138,12 @@ public class MCRORCIDUser {
     public static Set<String> getNameIdentifierKeys(MCRMODSWrapper wrapper) {
         Set<String> identifierKeys = new HashSet<>();
 
-        List<Element> nameIdentifiers = null;
-        if(MATCH_ONLY_NAME_IDENTIFIER.isEmpty()) {
-            nameIdentifiers = wrapper.getElements("mods:name/mods:nameIdentifier");
-        } else {
-            nameIdentifiers = wrapper
-		    .getElements("mods:name/mods:nameIdentifier[@type = '" + MATCH_ONLY_NAME_IDENTIFIER + "']");
-        }
-        for (Element nameIdentifier : nameIdentifiers) {
+        String xPath = "mods:name/mods:nameIdentifier";    
+	if(! MATCH_ONLY_NAME_IDENTIFIER.isEmpty()) {
+		xPath += "[@type = '" + MATCH_ONLY_NAME_IDENTIFIER + "']";
+	}
+		
+        for (Element nameIdentifier : wrapper.getElements(xPath)) {
             String key = buildNameIdentifierKey(nameIdentifier.getAttributeValue("type"), nameIdentifier.getText());
             LOGGER.info("found name identifier in publication: " + key);
             identifierKeys.add(key);
