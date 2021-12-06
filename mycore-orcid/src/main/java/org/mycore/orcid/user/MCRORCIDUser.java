@@ -139,11 +139,11 @@ public class MCRORCIDUser {
         Set<String> identifierKeys = new HashSet<>();
 
         String xPath = "mods:name/mods:nameIdentifier";
-        if (! MATCH_ONLY_NAME_IDENTIFIER.isEmpty()) {
+        if (!MATCH_ONLY_NAME_IDENTIFIER.isEmpty()) {
             xPath += "[@type = '" + MATCH_ONLY_NAME_IDENTIFIER + "']";
         }
 
-        List<Element> nameIdentifiers = wrapper.getElements(xPath));
+        List<Element> nameIdentifiers = wrapper.getElements(xPath);
         for (Element nameIdentifier : nameIdentifiers) {
             String key = buildNameIdentifierKey(nameIdentifier.getAttributeValue("type"), nameIdentifier.getText());
             LOGGER.info("found name identifier in publication: " + key);
