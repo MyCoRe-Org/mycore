@@ -5,8 +5,7 @@
   xmlns:xed="http://www.mycore.de/xeditor"
   xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:transformer="xalan://org.mycore.frontend.xeditor.MCRXEditorTransformer"
-  exclude-result-prefixes="xsl xed xalan i18n transformer">
+  exclude-result-prefixes="xsl xed xalan i18n">
 
   <!-- ========== Repeater buttons: <xed:repeat><xed:controls> ========== -->
 
@@ -51,7 +50,8 @@
 
   <xsl:template match="xed:validate" mode="message">
     <span class="help-inline">
-      <xsl:apply-templates select="node()" mode="xeditor" />
+      <!-- <xsl:apply-templates select="node()" mode="xeditor" />  -->
+      <xsl:copy-of select="*|text()" />
     </span>
   </xsl:template>
 

@@ -19,12 +19,11 @@
 package org.mycore.frontend.xeditor.validation;
 
 import org.jaxen.JaxenException;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXPathBuilder;
 import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 import java.util.List;
 
@@ -32,14 +31,14 @@ public abstract class MCRValidator {
 
     private static final String ATTR_RELEVANT_IF = "relevant-if";
 
-    private Node ruleElement;
+    private Element ruleElement;
 
     protected String xPath;
     protected String relevantIfXPath;
 
-    public void init(String baseXPath, Node ruleElement) {
-        Node relativeXPath = ruleElement.getAttributes().getNamedItem("xpath");
-        this.xPath = relativeXPath != null ? relativeXPath.getNodeValue() : baseXPath;
+    public void init(String baseXPath, Element ruleElement) {
+        String relativeXPath = ruleElement.getAttributeValue("xpath");
+        this.xPath = relativeXPath != null ? relativeXPath : baseXPath;
         this.ruleElement = ruleElement;
 
         if (hasRequiredAttributes()) {
@@ -55,14 +54,12 @@ public abstract class MCRValidator {
         // empty
     }
 
-    public Node getRuleElement() {
+    public Element getRuleElement() {
         return ruleElement;
     }
 
     public String getAttributeValue(String name) {
-        NamedNodeMap attributes = ruleElement.getAttributes();
-        Node attribute = attributes.getNamedItem(name);
-        return attribute == null ? null : attribute.getNodeValue();
+        return ruleElement.getAttributeValue(name);
     }
 
     public boolean hasAttributeValue(String name) {

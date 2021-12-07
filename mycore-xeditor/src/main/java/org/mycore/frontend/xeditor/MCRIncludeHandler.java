@@ -27,26 +27,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.StreamSupport;
 
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMResult;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xalan.extensions.ExpressionContext;
-import org.apache.xpath.NodeSet;
-import org.apache.xpath.XPathContext;
-import org.apache.xpath.objects.XNodeSet;
-import org.apache.xpath.objects.XNodeSetForDOM;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.ElementFilter;
-import org.jdom2.transform.JDOMSource;
 import org.jdom2.util.IteratorIterable;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.xml.MCRURIResolver;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Handles xed:include, xed:preload and xed:modify|xed:extend to include XEditor components by URI and ID.
@@ -210,29 +200,13 @@ public class MCRIncludeHandler {
         return refID != null;
     }
 
-    public XNodeSet resolve(ExpressionContext context, String ref) throws JDOMException, TransformerException {
+    public Element resolve(String ref) throws JDOMException, TransformerException {
         LOGGER.debug("including component " + ref);
         Map<String, Element> cache = chooseCacheLevel(ref, Boolean.FALSE.toString());
-        Element resolved = cache.get(ref);
-        return (resolved == null ? null : asNodeSet(context, jdom2dom(resolved)));
+        return cache.get(ref);
     }
 
-    public XNodeSet resolve(ExpressionContext context, String uri, String sStatic)
-        throws TransformerException, JDOMException {
-        LOGGER.debug("including xml " + uri);
-
-        Element xml = resolve(uri, sStatic);
-        Node node = jdom2dom(xml);
-
-        try {
-            return asNodeSet(context, node);
-        } catch (Exception ex) {
-            LOGGER.error(ex);
-            throw ex;
-        }
-    }
-
-    private Element resolve(String uri, String sStatic)
+    public Element resolve(String uri, String sStatic)
         throws TransformerException, TransformerFactoryConfigurationError {
         Map<String, Element> cache = chooseCacheLevel(uri, sStatic);
 
@@ -252,19 +226,5 @@ public class MCRIncludeHandler {
         } else {
             return cacheAtTransformationLevel;
         }
-    }
-
-    private Node jdom2dom(Element element) throws TransformerException, JDOMException {
-        DOMResult result = new DOMResult();
-        JDOMSource source = new JDOMSource(element);
-        TransformerFactory.newInstance().newTransformer().transform(source, result);
-        return result.getNode();
-    }
-
-    private XNodeSet asNodeSet(ExpressionContext context, Node node) throws TransformerException, JDOMException {
-        NodeSet nodeSet = new NodeSet();
-        nodeSet.addNode(node);
-        XPathContext xpc = context.getXPathContext();
-        return new XNodeSetForDOM((NodeList) nodeSet, xpc);
     }
 }

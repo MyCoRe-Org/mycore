@@ -23,10 +23,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.jaxen.JaxenException;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
-import org.w3c.dom.Node;
 
 /**
  * @author Frank L\u00FCtzenkirchen
@@ -47,7 +47,7 @@ public class MCRXEditorValidator {
         this.session = session;
     }
 
-    public void addRule(String baseXPath, Node ruleElement) {
+    public void addRule(String baseXPath, Element ruleElement) {
         addIfConfigured(new MCRRequiredValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMinLengthValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMaxLengthValidator(), baseXPath, ruleElement);
@@ -67,7 +67,7 @@ public class MCRXEditorValidator {
         addIfConfigured(new MCRExternalValidator(), baseXPath, ruleElement);
     }
 
-    private void addIfConfigured(MCRValidator validator, String baseXPath, Node ruleElement) {
+    private void addIfConfigured(MCRValidator validator, String baseXPath, Element ruleElement) {
         validator.init(baseXPath, ruleElement);
         if (validator.hasRequiredAttributes()) {
             validationRules.add(validator);
