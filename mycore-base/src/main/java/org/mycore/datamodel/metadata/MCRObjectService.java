@@ -1251,7 +1251,8 @@ public class MCRObjectService {
      *                throw this exception, if the index is invalid
      */
     public final void replaceClassification(int index, MCRCategoryID value) throws IndexOutOfBoundsException {
-        updateClassification(index, classificationValue ->  classificationValue.setValue(value.getRootID(), value.getID()));
+        updateClassification(index, classificationValue ->
+            classificationValue.setValue(value.getRootID(), value.getID()));
     }
 
     /**
