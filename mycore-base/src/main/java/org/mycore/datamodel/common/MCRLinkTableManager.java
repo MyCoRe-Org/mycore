@@ -475,7 +475,7 @@ public class MCRLinkTableManager {
         if (state != null) {
             categories.add(state);
         }
-        for(MCRCategoryID classification : obj.getService().getClassificationsAsMCRCategoryID()) {
+        for(MCRCategoryID classification : obj.getService().getClassifications()) {
             categories.add(classification);
         }
         if (categories.size() > 0) {

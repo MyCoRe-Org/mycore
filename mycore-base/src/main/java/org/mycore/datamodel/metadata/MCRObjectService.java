@@ -586,7 +586,7 @@ public class MCRObjectService {
      */
     public final void replaceFlagType(int index, String value) throws IndexOutOfBoundsException {
         MCRUtils.filterTrimmedNotEmpty(value)
-            .ifPresent(flagValue -> updateFlag(index, flag -> flag.setType(value)));
+            .ifPresent(flagValue -> updateFlag(index, flag -> flag.setType(flagValue)));
     }
 
     /**
@@ -959,6 +959,17 @@ public class MCRObjectService {
     }
 
     /**
+     * This method returns all messages values of any type.
+     *
+     * @return a list of message values
+     */
+    public final List<String> getMessages() {
+        return messages.stream()
+            .map(MCRMetaDateLangText::getText)
+            .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
      * This method returns all messages values of the specified type.
      *
      * @param type
@@ -1000,17 +1011,17 @@ public class MCRObjectService {
     }
 
     /**
-     * This method get a single messages from the message list.
+     * This method gets a single message date from the message list as a {@link MCRISO8601Date}.
      *
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is invalid
      * @return a message value
      */
-    public final MCRMetaDateLangText getMessageMCRMetaLangText(int index) throws IndexOutOfBoundsException {
+    public final MCRISO8601Date getMessageDate(int index) throws IndexOutOfBoundsException {
         if (index < 0 || index >= messages.size()) {
             throw new IndexOutOfBoundsException("Index error in getMessageMCRMetaLangText.");
         }
-        return messages.get(index);
+        return messages.get(index).getDate();
     }
 
     /**
@@ -1070,7 +1081,7 @@ public class MCRObjectService {
      */
     public final void replaceMessageType(int index, String value) throws IndexOutOfBoundsException {
         MCRUtils.filterTrimmedNotEmpty(value)
-            .ifPresent(messageValue -> updateMessage(index, message -> message.setType(value)));
+            .ifPresent(messageValue -> updateMessage(index, message -> message.setType(messageValue)));
     }
 
     private void updateMessage(int index, Consumer<MCRMetaDateLangText> messageUpdater) {
@@ -1115,7 +1126,7 @@ public class MCRObjectService {
     }
 
     /**
-     * Returns the classifications as list.
+     * This method returns all classification values.
      *
      * @return classifications as list
      */
@@ -1126,23 +1137,23 @@ public class MCRObjectService {
     /**
      * This method returns all classification values of the specified type.
      *
-     * @param classId
-     *              a classId as string.
+     * @param type
+     *              a type as string.
      * @return a list of classification values
      */
-    protected final List<MCRMetaClassification> getClassificationsAsMCRMetaClassification(String classId) {
+    protected final List<MCRMetaClassification> getClassificationsAsMCRMetaClassification(String type) {
         return classifications.stream()
-            .filter(metaClassification -> classId.equals(metaClassification.getClassId()))
+            .filter(metaLangText -> type.equals(metaLangText.getType()))
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
-     * This method returns all classification values.
+     * This method returns all classification values of any type.
      *
      * @return a list of classification values
      */
-    public final List<MCRCategoryID> getClassificationsAsMCRCategoryID() {
-        return getClassificationsAsList().stream()
+    public final List<MCRCategoryID> getClassifications() {
+        return classifications.stream()
             .map(c -> new MCRCategoryID(c.getClassId(), c.getCategId()))
             .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -1150,25 +1161,12 @@ public class MCRObjectService {
     /**
      * This method returns all classification values of the specified type.
      *
-     * @param classId
-     *              a classId as string.
+     * @param type
+     *              a type as string.
      * @return a list of classification values
      */
-    public final List<String> getClassifications(String classId) {
-        return getClassificationsAsMCRMetaClassification(classId).stream()
-            .map(MCRMetaClassification::getCategId)
-            .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    /**
-     * This method returns all classification values of the specified type.
-     *
-     * @param classId
-     *              a classId as string.
-     * @return a list of classification values
-     */
-    public final List<MCRCategoryID> getClassificationsAsMCRCategoryID(String classId) {
-        return getClassificationsAsMCRMetaClassification(classId).stream()
+    public final List<MCRCategoryID> getClassifications(String type) {
+        return getClassificationsAsMCRMetaClassification(type).stream()
             .map(c -> new MCRCategoryID(c.getClassId(), c.getCategId()))
             .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -1180,26 +1178,28 @@ public class MCRObjectService {
      *                throw this exception, if the index is invalid
      * @return a classification string
      */
-    public final String getClassification(int index) throws IndexOutOfBoundsException {
+    public final MCRCategoryID getClassification(int index) throws IndexOutOfBoundsException {
         if (index < 0 || index >= classifications.size()) {
             throw new IndexOutOfBoundsException("Index error in getClassification.");
         }
-        return classifications.get(index).getCategId();
+        MCRMetaClassification classification = classifications.get(index);
+        return new MCRCategoryID(classification.getCategId(), classification.getClassId());
     }
 
     /**
-     * This method gets a single message type from the message list as a string.
+     * This method gets a single classification type from the classification list as a string.
      *
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is invalid
-     * @return a message type
+     * @return a classification type
      */
-    public final String getClassificationClassId(int index) throws IndexOutOfBoundsException {
+    public final String getClassificationType(int index) throws IndexOutOfBoundsException {
         if (index < 0 || index >= classifications.size()) {
-            throw new IndexOutOfBoundsException("Index error in getClassificationClassId.");
+            throw new IndexOutOfBoundsException("Index error in getClassification.");
         }
-        return classifications.get(index).getClassId();
+        return classifications.get(index).getType();
     }
+
 
     /**
      * This method get a single classification from the classification list as.
@@ -1220,30 +1220,24 @@ public class MCRObjectService {
     /**
      * This method adds a classification to the classification list.
      *
-     * @param classId
-     *              a cId as string
-     * @param categId
-     *              the new class id as string
+     * @param value -
+     *            the new classification
      */
-    public final void addClassification(String classId, String categId) {
-        MCRUtils.filterTrimmedNotEmpty(classId).ifPresent(classIdValue ->
-            MCRUtils.filterTrimmedNotEmpty(categId)
-                .map(categIdValue ->
-                    new MCRMetaClassification("servclass", 0, null, new MCRCategoryID(classIdValue, categIdValue)))
-                .ifPresent(classifications::add));
+    public final void addClassification(MCRCategoryID value) {
+        addClassification(null, value);
     }
 
     /**
-     * This method adds a classification to the classifications list.
+     * This method adds a classification to the classification list.
      *
-     * @param classification
-     *              the new classification value as string
+     * @param type
+     *              a type as string
+     * @param value
+     *              the new classification value as {@link MCRCategoryID}
      */
-    public final void addClassification(MCRCategoryID classification) {
-        if (classification == null) {
-            return;
-        }
-        addClassification(classification.getRootID(), classification.getID());
+    public final void addClassification(String type, MCRCategoryID value) {
+        String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
+        classifications.add( new MCRMetaClassification("servclass", 0, lType, value));
     }
 
     /**
@@ -1251,15 +1245,29 @@ public class MCRObjectService {
      *
      * @param index
      *            a index in the list
-     * @param classId
-     *            the classId of a classification as string
+     * @param value
+     *            the classification as {@link MCRCategoryID}
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is invalid
      */
-    public final void replaceClassification(int index, String classId) throws IndexOutOfBoundsException {
-        MCRUtils.filterTrimmedNotEmpty(classId)
-            .ifPresent(classIdValue -> updateClassification(index, classification ->
-                classification.setValue(classification.getCategId(), classIdValue)));
+    public final void replaceClassification(int index, MCRCategoryID value) throws IndexOutOfBoundsException {
+        updateClassification(index, classificationValue ->  classificationValue.setValue(value.getRootID(), value.getID()));
+    }
+
+    /**
+     * This method sets the type value of a classification at the specified index.
+     *
+     * @param index
+     *            a index in the list
+     * @param value
+     *            the value of a flag as string
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is invalid
+     */
+    public final void replaceClassificationType(int index, String value) throws IndexOutOfBoundsException {
+        MCRUtils.filterTrimmedNotEmpty(value)
+            .ifPresent(classificationValue -> updateClassification(index, classification ->
+                classification.setType(classificationValue)));
     }
 
     private void updateClassification(int index, Consumer<MCRMetaClassification> classificationUpdater) {
@@ -1283,14 +1291,14 @@ public class MCRObjectService {
     }
 
     /**
-     * This method removes all classification with the specified classId from
+     * This method removes all classification with the specified type from
      * the classification list.
      *
-     * @param classId
-     *            a classId as string
+     * @param type
+     *            a type as string
      */
-    public final void removeClassifications(String classId) {
-        List<MCRMetaClassification> internalList = getClassificationsAsMCRMetaClassification(classId);
+    public final void removeClassifications(String type) {
+        List<MCRMetaClassification> internalList = getClassificationsAsMCRMetaClassification(type);
         classifications.removeAll(internalList);
     }
 
