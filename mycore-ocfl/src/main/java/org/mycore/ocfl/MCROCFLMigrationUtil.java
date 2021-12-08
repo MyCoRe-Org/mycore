@@ -1,3 +1,21 @@
+/*
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.mycore.ocfl;
 
 import java.io.File;
@@ -10,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.stream.Stream;
-
-import javax.persistence.PersistenceException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +48,7 @@ import edu.wisc.library.ocfl.api.OcflRepository;
  * @author Tobias Lenhardt [Hammer1279]
  * @author Sebastian Hofmann
  */
-public class MCROCFLBaseClass {
+public class MCROCFLMigrationUtil {
 
     private final static Logger LOGGER = LogManager.getLogger();
 
@@ -54,7 +70,7 @@ public class MCROCFLBaseClass {
      * Moves a directory from origin to target
      * @param origin Origin Directory as Path
      * @param target Target Directory as Path
-     * @throws IOException
+     * @throws IOException if an I/O error occurs
      */
     public static final void moveDir(Path origin, Path target) throws IOException {
         if (target.toFile().exists()) {
@@ -71,10 +87,9 @@ public class MCROCFLBaseClass {
     /**
      * Deletes a Directory
      * @param dir Path for the Directory to delete
-     * @throws IOException
-     * @throws PersistenceException
+     * @throws IOException if an I/O error occurs
      */
-    public static final void delDir(Path dir) throws IOException, PersistenceException {
+    public static final void delDir(Path dir) throws IOException {
         if (dir.toFile().exists()) {
             Stream<Path> walker = Files.walk(dir);
             walker
@@ -83,18 +98,18 @@ public class MCROCFLBaseClass {
                 .forEach(File::delete);
             walker.close();
         } else {
-            throw new PersistenceException("Directory " + dir.getFileName() + " does not exist!");
+            throw new IOException("Directory " + dir.getFileName() + " does not exist!");
         }
     }
 
-    public MCROCFLBaseClass(String repoKey) {
+    public MCROCFLMigrationUtil(String repoKey) {
         this.adaptionRepo = new MCROCFLAdaptionRepositoryProvider(repoKey);
     }
 
     /**
      * Restore the {@code ocfl-root} from {@code ocfl-backup}
      * @param repository RepositoryKey for config
-     * @throws IOException
+     * @throws IOException if an I/O error occurs
      */
     public static final void restoreRoot(String repository) throws IOException {
         Path rootDir = Paths
@@ -109,8 +124,8 @@ public class MCROCFLBaseClass {
 
     /**
      * Deletes the {@code ocfl-backup} directory
-     * @param repository <i>unused</i>
-     * @throws IOException
+     * @param repository <i>unused for now</i>
+     * @throws IOException if an I/O error occurs
      */
     public static final void clearBackup(String repository) throws IOException {
         Path backupDir = Paths.get(MCRConfiguration2.getStringOrThrow(BACKUP_CONFIG));
@@ -120,7 +135,7 @@ public class MCROCFLBaseClass {
     /**
      * Convert from XML to OCFL using {@code MCROCFLMigration}
      * @param repository RepositoryKey
-     * @throws IOException
+     * @throws IOException if an I/O error occurs
      */
     public static void convertXMLToOcfl(String repository) throws IOException {
 
@@ -164,7 +179,7 @@ public class MCROCFLBaseClass {
     /**
      * Convert between OCFL Layouts or create backups of Repos
      * @apiNote due to how its implemented, if a Layout is not changed it just makes a backup
-     * @throws IOException
+     * @throws IOException if an I/O error occurs
      */
     public void convertOcflToOcfl() throws IOException {
         if (null == adaptionRepo) {
@@ -182,7 +197,7 @@ public class MCROCFLBaseClass {
     /**
      * Copies all objects from the OCFL Repository into the Native Metadata Manager
      * @param repositoryKey Name of the Repository
-     * @throws IOException
+     * @throws IOException if an I/O error occurs
      * @throws MCRException Metadata Manager <strong>MUST NOT</strong> be {@code MCROCFLXMLMetadataManager}
      */
     public void convertOcflToXML(String repositoryKey) throws IOException, MCRException {

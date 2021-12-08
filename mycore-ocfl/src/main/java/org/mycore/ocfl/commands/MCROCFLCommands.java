@@ -27,7 +27,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.MCROCFLAdaptionRepositoryProvider;
-import org.mycore.ocfl.MCROCFLBaseClass;
+import org.mycore.ocfl.MCROCFLMigrationUtil;
 
 @MCRCommandGroup(name = "OCFL Commands")
 public class MCROCFLCommands {
@@ -37,7 +37,7 @@ public class MCROCFLCommands {
     private static final String CONFIGURED_REPOSITORY = MCRConfiguration2
         .getStringOrThrow("MCR.Metadata.Manager.Repository");
 
-    public static MCROCFLBaseClass baseClass;
+    public static MCROCFLMigrationUtil baseClass;
 
     @MCRCommand(syntax = "export repository {0}", help = "export repository {0} to ocfl-export")
     public static void exportRepository(String repositoryKey) throws IOException {
@@ -68,12 +68,12 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "restore repository", help = "restore ocfl repository from backup if available")
     public static void restoreRepo() throws IOException {
-        MCROCFLBaseClass.restoreRoot(CONFIGURED_REPOSITORY);
+        MCROCFLMigrationUtil.restoreRoot(CONFIGURED_REPOSITORY);
     }
 
     @MCRCommand(syntax = "purge repository backup", help = "clear the backup of a ocfl repository")
     public static void purgeRepoBCK() throws IOException {
-        MCROCFLBaseClass.clearBackup(CONFIGURED_REPOSITORY);
+        MCROCFLMigrationUtil.clearBackup(CONFIGURED_REPOSITORY);
     }
 
     @MCRCommand(syntax = "migrate metadata from {0} to {1}",
@@ -85,13 +85,13 @@ public class MCROCFLCommands {
     @MCRCommand(syntax = "migrate metadata from {0} to {1} with {2}",
         help = "migrate metadata from {0} to {1} with repository {2}")
     public static void migrateMetadata(String from, String to, String repositoryKey) throws IOException {
-        baseClass = new MCROCFLBaseClass(repositoryKey);
+        baseClass = new MCROCFLMigrationUtil(repositoryKey);
         switch (from) {
             case "xml":
             case "svn":
                 switch (to) {
                     case "ocfl":
-                        MCROCFLBaseClass.convertXMLToOcfl(repositoryKey);
+                        MCROCFLMigrationUtil.convertXMLToOcfl(repositoryKey);
                         break;
                     default:
                         throw new MCRUsageException("Invalid Command Parameter 'to'");
