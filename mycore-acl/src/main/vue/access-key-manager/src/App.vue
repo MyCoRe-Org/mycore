@@ -44,7 +44,7 @@
         >
           <h3
           >
-            {{ $t("mcr.accessKey.title.main") }}
+            {{ $t("component.acl.accesskey.frontend.title.main") }}
           </h3>
         </b-col>
       </b-row>
@@ -63,7 +63,7 @@
           <h5
             v-if="alertVariant == 'danger' || alertVariant == 'warning'"
           >
-            {{ $t("mcr.accessKey.title.alert") }}
+            {{ $t("component.acl.accesskey.frontend.title.alert") }}
           </h5>
           <span
             v-html="alertMessage"
@@ -81,20 +81,20 @@
             responsive
             striped
           >
-            <template #head(id)>
-              {{ $t("mcr.accessKey.label.id") }}
+            <template #head(secret)>
+              {{ $t("component.acl.accesskey.frontend.label.secret") }}
             </template>
             <template #head(enabled)>
-              {{ $t("mcr.accessKey.label.state") }}
+              {{ $t("component.acl.accesskey.frontend.label.state") }}
             </template>
             <template #head(type)>
-              {{ $t("mcr.accessKey.label.type") }}
+              {{ $t("component.acl.accesskey.frontend.label.type") }}
             </template>
             <template #head(expiration)>
-              {{ $t("mcr.accessKey.label.expiration") }}
+              {{ $t("component.acl.accesskey.frontend.label.expiration") }}
             </template>
             <template #head(comment)>
-              {{ $t("mcr.accessKey.label.comment") }}
+              {{ $t("component.acl.accesskey.frontend.label.comment") }}
             </template>
             <template #table-caption>
               <div
@@ -107,19 +107,21 @@
                   <font-awesome-icon
                     icon="plus"
                   ></font-awesome-icon>
-                  {{ $t("mcr.accessKey.button.add") }}
+                  {{ $t("component.acl.accesskey.frontend.button.add") }}
                 </b-button>
               </div>
             </template>
-            <template #cell(id)="data">
-              {{ data.item.secret.substring(0,8) }}
+            <template #cell(secret)="data">
+              {{ (data.item.secret.length > 8) ? data.item.secret.substring(0,5) + "..." :
+                data.item.secret }}
             </template>
             <template #cell(state)="data">
-              {{ (data.item.isActive == true) ? $t("mcr.accessKey.label.state.enabled") :
-                $t("mcr.accessKey.label.state.disabled") }}
+              {{ (data.item.isActive == true) ?
+                $t("component.acl.accesskey.frontend.label.state.enabled") :
+                $t("component.acl.accesskey.frontend.label.state.disabled") }}
             </template>
             <template #cell(type)="data">
-              {{ $t("mcr.accessKey.label.type." + data.item.type) }}
+              {{ $t("component.acl.accesskey.frontend.label.type." + data.item.type) }}
             </template>
             <template #cell(expiration)="data">
               {{ (data.item.expiration != null) ?
@@ -174,7 +176,6 @@ import {
   locale,
   fetchJWT,
   isSessionEnabled,
-  urlEncode,
 } from '@/common/MCRUtils';
 
 @Component({
@@ -187,7 +188,7 @@ export default class AccessKeyManager extends Vue {
 
   private fields = [
     {
-      key: 'id',
+      key: 'secret',
       thClass: 'col-1 text-center',
       tdClass: 'col-1 text-center',
     },
@@ -262,9 +263,9 @@ export default class AccessKeyManager extends Vue {
   private addAccessKey(accessKey: MCRAccessKey, secret: string) {
     this.accessKeys.push(accessKey);
     this.alertVariant = 'success';
-    this.alertMessage = this.$t('mcr.accessKey.success.add', accessKey.secret, secret);
+    this.alertMessage = this.$t('component.acl.accesskey.frontend.success.add', accessKey.secret, secret);
     if (isSessionEnabled && derivateID == null) {
-      this.alertMessage += ` ${this.$t('mcr.accessKey.success.add.url')} ${this.$t('mcr.accessKey.success.add.url.format', webApplicationBaseURL, objectID, urlEncode(secret))}`;
+      this.alertMessage += ` ${this.$t('component.acl.accesskey.frontend.success.add.url')} ${this.$t('component.acl.accesskey.frontend.success.add.url.format', webApplicationBaseURL, objectID, encodeURIComponent(secret))}`;
     }
   }
 
@@ -282,7 +283,7 @@ export default class AccessKeyManager extends Vue {
     if (index >= 0) {
       this.$delete(this.accessKeys, index);
       this.alertVariant = 'success';
-      this.alertMessage = this.$t('mcr.accessKey.success.delete', secret);
+      this.alertMessage = this.$t('component.acl.accesskey.frontend.success.delete', secret);
     } else {
       this.showFatalError();
     }
@@ -290,7 +291,7 @@ export default class AccessKeyManager extends Vue {
 
   private showFatalError(): void {
     this.alertVariant = 'danger';
-    this.alertMessage = this.$t('mcr.accessKey.error.fatal');
+    this.alertMessage = this.$t('component.acl.accesskey.frontend.error.fatal');
   }
 
   private initializeServicePlugin(token: string): void {
@@ -327,7 +328,7 @@ export default class AccessKeyManager extends Vue {
       token = result.data.access_token;
     } catch (error) {
       this.alertVariant = 'danger';
-      this.alertMessage = this.$t('mcr.accessKey.error.noPermission');
+      this.alertMessage = this.$t('component.acl.accesskey.frontend.error.noPermission');
       this.isProcessing = false;
       // eslint-disable-next-line no-console
       console.error('couldn\'t fetch JWT');
@@ -344,10 +345,10 @@ export default class AccessKeyManager extends Vue {
       if (errorCode != null) {
         if (errorCode === 'request') {
           this.alertVariant = 'warning';
-          this.alertMessage = this.$t('mcr.accessKey.error.request');
+          this.alertMessage = this.$t('component.acl.accesskey.frontend.error.request');
         } else if (errorCode === 'noPermission') {
           this.alertVariant = 'danger';
-          this.alertMessage = this.$t('mcr.accessKey.error.noPermission');
+          this.alertMessage = this.$t('component.acl.accesskey.frontend.error.noPermission');
         } else {
           // eslint-disable-next-line no-console
           console.error('unknown error code: %s', errorCode);

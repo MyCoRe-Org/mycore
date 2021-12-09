@@ -55,10 +55,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
+import org.jdom2.filter.Filters;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
@@ -103,8 +107,7 @@ import org.xml.sax.XMLReader;
  * @author Robert Stephan
  * @version $Revision$ $Date$
  */
-@MCRCommandGroup(
-    name = "Object Commands")
+@MCRCommandGroup(name = "Object Commands")
 public class MCRObjectCommands extends MCRAbstractCommands {
     private static final String EXPORT_OBJECT_TO_DIRECTORY_COMMAND = "export object {0} to directory {1} with {2}";
 
@@ -129,6 +132,33 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return Collections.EMPTY_LIST;
         }
         return list;
+    }
+
+    @MCRCommand(
+            syntax = "select objects with xpath {0}",
+            help = "Selects MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list" +
+                " (this command may take a while, use with care in case of a large number of objects)",
+            order = 10)
+    public static void selectObjectsWithXpath(String xPath) throws Exception {
+
+        XPathExpression<Object> xPathExpression = XPathFactory
+                .instance()
+                .compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
+
+        List<String> selectedObjectIds  = MCRXMLMetadataManager
+                .instance()
+                .listIDs()
+                .stream()
+                .filter(id -> !id.contains("_derivate_"))
+                .map(MCRObjectID::getInstance)
+                .map(MCRMetadataManager::retrieveMCRObject)
+                .filter(mcrObject -> !xPathExpression.evaluate(mcrObject.createXML()).isEmpty())
+                .map(MCRObject::getId)
+                .map(MCRObjectID::toString)
+                .collect(Collectors.toList());
+
+        MCRObjectCommands.setSelectedObjectIDs(selectedObjectIds);
+
     }
 
     /**
@@ -276,7 +306,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "load all objects from directory {0}",
-        help = "Loads all MCRObjects from the directory {0} to the system.",
+        help = "Loads all MCRObjects from the directory {0} to the system. " +
+            "If the numerical part of a provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 70)
     public static List<String> loadFromDirectory(String directory) {
         return processFromDirectory(false, directory, false);
@@ -351,7 +382,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "load object from file {0}",
-        help = "Adds a MCRObject from the file {0} to the system.",
+        help = "Loads an MCRObject from the file {0} to the system. " +
+            "If the numerical part of the provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 60)
     public static boolean loadFromFile(String file) throws MCRException, SAXParseException,
         IOException, MCRAccessException {
@@ -403,7 +435,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Load or update an MCRObject's from an XML file.
+     * Load or update an MCRObject from an XML file. If the numerical part of the contained ID is zero,
+     * a new ID with the same project ID and type is assigned.
      *
      * @param file
      *            the location of the xml file
@@ -752,7 +785,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static void listSelected() {
         LOGGER.info("List selected MCRObjects");
         if (getSelectedObjectIDs().isEmpty()) {
-            LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
+            LOGGER.info("No Resultset to work with, use command \"select objects with solr query {0} in core {1}\"" +
+                    " or \"select objects with xpath {0}\" to build one");
             return;
         }
         StringBuilder out = new StringBuilder();

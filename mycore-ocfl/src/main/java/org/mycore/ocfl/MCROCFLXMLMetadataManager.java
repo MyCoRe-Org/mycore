@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRPersistenceException;
@@ -225,7 +226,9 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         }
 
         try (InputStream storedContentStream = storeObject.getFile(buildFilePath(mcrid)).getStream()) {
-            return new MCRJDOMContent(new MCRStreamContent(storedContentStream).asXML());
+            Document xml = new MCRStreamContent(storedContentStream).asXML();
+            xml.getRootElement().setAttribute("rev", revision);
+            return new MCRJDOMContent(xml);
         } catch (JDOMException | SAXException e) {
             throw new MCRPersistenceException("Can not parse XML from OCFL-Store", e);
         }
@@ -237,9 +240,9 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         versionInfo.setCreated((versionDate == null ? new Date() : versionDate).toInstant().atOffset(ZoneOffset.UTC));
         String userID = user != null ? user
             : Optional.ofNullable(MCRSessionMgr.getCurrentSession())
-            .map(MCRSession::getUserInformation)
-            .map(MCRUserInformation::getUserID)
-            .orElse(null);
+                .map(MCRSession::getUserInformation)
+                .map(MCRUserInformation::getUserID)
+                .orElse(null);
         versionInfo.setUser(userID, null);
         return versionInfo;
     }
@@ -256,7 +259,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             MCROCFLContent content = new MCROCFLContent(getRepository(), objName, buildFilePath(id), key.toString());
             return new MCROCFLMetadataVersion(content,
                 key.toString(),
-                versionInfo.getUser().toString(),
+                versionInfo.getUser().getName(),
                 Date.from(details.getCreated().toInstant()), convertMessageToType(versionInfo.getMessage()));
         }).collect(Collectors.toList());
     }

@@ -28,16 +28,9 @@ import javax.ws.rs.core.Response;
  * @author Frank L\u00FCtzenkirchen
  * @author Kai Brandhorst
  */
-public class MCRTokenResponse extends MCRORCIDResponse {
+public class MCRRevokeResponse extends MCRORCIDResponse {
 
-    MCRTokenResponse(Response response) throws IOException {
+    MCRRevokeResponse(Response response) throws IOException {
         super(response);
-    }
-
-    /**
-     * Returns the access token, in case the request wasSuccessful()
-     */
-    public String getAccessToken() {
-        return responseData.get("access_token").asText();
     }
 }

@@ -25,6 +25,6 @@ package org.mycore.mcr.acl.accesskey.exception;
  */
 public class MCRAccessKeyDisabledException extends MCRAccessKeyException {
     public MCRAccessKeyDisabledException(String errorMessage) {
-        super(errorMessage, "mcr.accessKey.error.disabled");
+        super(errorMessage, "component.acl.accesskey.frontend.error.disabled");
     }
 }

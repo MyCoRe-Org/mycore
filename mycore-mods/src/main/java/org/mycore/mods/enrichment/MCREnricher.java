@@ -74,7 +74,7 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  *
  * @author Frank L\u00FCtzenkirchen
  */
-class MCREnricher {
+public class MCREnricher {
 
     private static final Logger LOGGER = LogManager.getLogger(MCREnricher.class);
 

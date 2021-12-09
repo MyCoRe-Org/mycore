@@ -52,6 +52,8 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
 
     private String configuredItemProviderProperty;
 
+    private boolean unsorted;
+
     {
         transformerInstances = new HashMap<>();
     }
@@ -62,6 +64,9 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
         configuredFormat = MCRConfiguration2.getString(CONFIG_PREFIX + id + ".format").orElse(DEFAULT_FORMAT);
         configuredStyle = MCRConfiguration2.getString(CONFIG_PREFIX + id + ".style").orElse(DEFAULT_STYLE);
         configuredItemProviderProperty = CONFIG_PREFIX + id + "." + ITEM_PROVIDER;
+        // when set to true, then the sorting of the CSL Style is used instead
+        // of the one provided by the ItemDataProvider
+        unsorted = !MCRConfiguration2.getBoolean(CONFIG_PREFIX + id + ".CSLSorting").orElse(false);
         createItemDataProvider();
     }
 
@@ -123,7 +128,7 @@ public class MCRCSLTransformer extends MCRParameterizedTransformer {
             final MCRItemDataProvider dataProvider = transformerInstance.getDataProvider();
 
             dataProvider.addContent(bibtext);
-            citationProcessor.registerCitationItems(dataProvider.getIds());
+            citationProcessor.registerCitationItems(dataProvider.getIds(), unsorted);
             Bibliography biblio = citationProcessor.makeBibliography();
             String result = biblio.makeString();
 

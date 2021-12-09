@@ -25,6 +25,6 @@ package org.mycore.mcr.acl.accesskey.exception;
  */
 public class MCRAccessKeyTransformationException extends MCRAccessKeyException {
     public MCRAccessKeyTransformationException(String errorMessage) {
-        super(errorMessage, "mcr.accessKey.error.transformation");
+        super(errorMessage, "component.acl.accesskey.frontend.error.transformation");
     }
 }

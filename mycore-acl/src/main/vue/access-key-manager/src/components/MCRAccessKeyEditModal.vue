@@ -58,7 +58,7 @@
       <b-form-group
         label-cols-lg="2"
         label-for="input-secret"
-        :label="$t('mcr.accessKey.label.id')"
+        :label="$t('component.acl.accesskey.frontend.label.secret')"
         v-if="isEdit"
       >
         <b-form-input
@@ -72,9 +72,9 @@
         v-else
       >
         <template #label>
-          {{ $t("mcr.accessKey.label.value") }}*
+          {{ $t("component.acl.accesskey.frontend.label.secret") }}*
           <b-link
-            id="popover-value"
+            id="popover-secret"
           >
             <font-awesome-icon
               icon="info-circle"
@@ -82,12 +82,12 @@
             ></font-awesome-icon>
           </b-link>
           <b-popover
-            target="popover-value"
-            :title="$t('mcr.accessKey.title.popover')"
+            target="popover-secret"
+            :title="$t('component.acl.accesskey.frontend.title.popover')"
             triggers="hover"
           >
             <span
-              v-html="$t('mcr.accessKey.popover.value')"
+              v-html="$t('component.acl.accesskey.frontend.popover.secret')"
             ></span>
           </b-popover>
         </template>
@@ -103,13 +103,13 @@
             </b-button>
           </b-input-group-prepend>
           <b-form-input
-            id="input-value"
+            id="input-secret"
             v-model="secret"
             :state="inputState"
-            aria-describedby="input-value-feedback"
+            aria-describedby="input-secret-feedback"
           ></b-form-input>
           <b-form-invalid-feedback
-            id="input-value-feedback"
+            id="input-secret-feedback"
           >
             {{ inputValueFeedback }}
           </b-form-invalid-feedback>
@@ -122,7 +122,7 @@
           label-cols-lg="2"
         >
           <template #label>
-            {{ $t("mcr.accessKey.label.state") }}
+            {{ $t("component.acl.accesskey.frontend.label.state") }}
             <b-link
               id="popover-enabled"
             >
@@ -133,11 +133,11 @@
             </b-link>
             <b-popover
               target="popover-enabled"
-              :title="$t('mcr.accessKey.title.popover')"
+              :title="$t('component.acl.accesskey.frontend.title.popover')"
               triggers="hover"
             >
               <span
-                v-html="$t('mcr.accessKey.popover.enabled')"
+                v-html="$t('component.acl.accesskey.frontend.popover.enabled')"
               ></span>
             </b-popover>
           </template>
@@ -148,7 +148,8 @@
             @change="stateChanged"
           >
             {{ (isActive == true) ?
-              $t("mcr.accessKey.label.state.enabled") : $t("mcr.accessKey.label.state.disabled") }}
+              $t("component.acl.accesskey.frontend.label.state.enabled") :
+              $t("component.acl.accesskey.frontend.label.state.disabled") }}
           </b-form-checkbox>
         </b-form-group>
         <hr class="my-3">
@@ -157,7 +158,7 @@
         label-cols-lg="2"
       >
         <template #label>
-          {{ $t("mcr.accessKey.label.type") }}*
+          {{ $t("component.acl.accesskey.frontend.label.type") }}*
           <b-link
             id="popover-type"
           >
@@ -168,11 +169,11 @@
           </b-link>
           <b-popover
             target="popover-type"
-            :title="$t('mcr.accessKey.title.popover')"
+            :title="$t('component.acl.accesskey.frontend.title.popover')"
             triggers="hover"
           >
             <span
-              v-html="$t('mcr.accessKey.popover.type')"
+              v-html="$t('component.acl.accesskey.frontend.popover.type')"
             ></span>
           </b-popover>
         </template>
@@ -187,7 +188,7 @@
         label-cols-lg="2"
       >
         <template #label>
-          {{ $t("mcr.accessKey.label.expiration") }}
+          {{ $t("component.acl.accesskey.frontend.label.expiration") }}
           <b-link
             id="popover-expiration"
           >
@@ -198,11 +199,11 @@
           </b-link>
           <b-popover
             target="popover-expiration"
-            :title="$t('mcr.accessKey.title.popover')"
+            :title="$t('component.acl.accesskey.frontend.title.popover')"
             triggers="hover"
           >
             <span
-              v-html="$t('mcr.accessKey.popover.expiration')"
+              v-html="$t('component.acl.accesskey.frontend.popover.expiration')"
             ></span>
           </b-popover>
         </template>
@@ -216,7 +217,7 @@
       </b-form-group>
       <b-form-group
         label-cols-lg="2"
-        :label="$t('mcr.accessKey.label.comment')"
+        :label="$t('component.acl.accesskey.frontend.label.comment')"
         label-for="textarea-comment"
       >
         <b-form-textarea
@@ -231,7 +232,7 @@
         <hr class="my-3">
         <b-form-group
           label-cols-lg="2"
-          :label="$t('mcr.accessKey.label.createdBy')"
+          :label="$t('component.acl.accesskey.frontend.label.createdBy')"
           label-for="input-created-by"
         >
           <b-form-input
@@ -243,7 +244,7 @@
         <b-form-group
           label-cols-lg="2"
           label-for="input-created"
-          :label="$t('mcr.accessKey.label.created')"
+          :label="$t('component.acl.accesskey.frontend.label.created')"
         >
           <b-form-input
             id="input-created"
@@ -254,7 +255,7 @@
         <b-form-group
           label-cols-lg="2"
           label-for="input-last-modfied-by"
-          :label="$t('mcr.accessKey.label.lastModifiedBy')"
+          :label="$t('component.acl.accesskey.frontend.label.lastModifiedBy')"
         >
           <b-form-input
             id="input-last-modified-by"
@@ -265,7 +266,7 @@
         <b-form-group
           label-cols-lg="2"
           label-for="input-last-modified"
-          :label="$t('mcr.accessKey.label.lastModified')"
+          :label="$t('component.acl.accesskey.frontend.label.lastModified')"
         >
           <b-form-input
             id="input-last-modified"
@@ -283,7 +284,7 @@
           <font-awesome-icon
             icon="trash"
           ></font-awesome-icon>
-          {{ $t("mcr.accessKey.button.remove") }}
+          {{ $t("component.acl.accesskey.frontend.button.remove") }}
         </b-button>
         <b-button
           v-if="isEdit"
@@ -293,7 +294,7 @@
           <font-awesome-icon
             icon="save"
           ></font-awesome-icon>
-          {{ $t("mcr.accessKey.button.update") }}
+          {{ $t("component.acl.accesskey.frontend.button.update") }}
         </b-button>
         <b-button
           v-else
@@ -303,7 +304,7 @@
           <font-awesome-icon
             icon="plus"
           ></font-awesome-icon>
-          {{ $t("mcr.accessKey.button.new") }}
+          {{ $t("component.acl.accesskey.frontend.button.new") }}
         </b-button>
       </template>
     </b-modal>
@@ -322,8 +323,8 @@ export default class Modal extends Vue {
   locale!: string;
 
   private options = [
-    { value: 'read', text: this.$t('mcr.accessKey.label.type.read') },
-    { value: 'writedb', text: this.$t('mcr.accessKey.label.type.writedb') },
+    { value: 'read', text: this.$t('component.acl.accesskey.frontend.label.type.read') },
+    { value: 'writedb', text: this.$t('component.acl.accesskey.frontend.label.type.writedb') },
   ];
 
   private isEdit = false;
@@ -364,16 +365,16 @@ export default class Modal extends Vue {
 
   private get title(): string {
     if (this.isEdit) {
-      return this.$t('mcr.accessKey.title.edit');
+      return this.$t('component.acl.accesskey.frontend.title.edit');
     }
-    return this.$t('mcr.accessKey.title.add');
+    return this.$t('component.acl.accesskey.frontend.title.add');
   }
 
   private async updateAccessKey(secret: string, accessKey: MCRAccessKey): Promise<void> {
     try {
       await this.$client.updateAccessKey(secret, accessKey);
       this.alertVariant = 'success';
-      this.alertMessage = this.$t('mcr.accessKey.success.update');
+      this.alertMessage = this.$t('component.acl.accesskey.frontend.success.update');
       const result: MCRAccessKey = await this.$client.getAccessKey(secret);
       this.setAccessKey(result);
       this.$emit('update', result);
@@ -449,8 +450,9 @@ export default class Modal extends Vue {
 
   private async add(): Promise<void> {
     this.isProcessing = true;
+    // if (this.secret.length === 0 || this.secret.includes('/') || this.secret.includes('\\')) {
     if (this.secret.length === 0) {
-      this.inputValueFeedback = this.$t('mcr.accessKey.error.invalidValue');
+      this.inputValueFeedback = this.$t('component.acl.accesskey.frontend.error.invalidSecret');
       this.isProcessing = false;
       return;
     }
@@ -492,15 +494,15 @@ export default class Modal extends Vue {
   }
 
   private async remove(): Promise<void> {
-    const sure: boolean = await this.$bvModal.msgBoxConfirm(this.$t('mcr.accessKey.text.remove'), {
-      title: this.$t('mcr.accessKey.title.modal'),
+    const sure: boolean = await this.$bvModal.msgBoxConfirm(this.$t('component.acl.accesskey.frontend.text.remove'), {
+      title: this.$t('component.acl.accesskey.frontend.title.modal'),
       size: 'sm',
       noCloseOnBackdrop: true,
       noCloseOnEsc: true,
       hideBackdrop: true,
       okVariant: 'danger',
-      okTitle: this.$t('mcr.accessKey.button.yes'),
-      cancelTitle: this.$t('mcr.accessKey.button.no'),
+      okTitle: this.$t('component.acl.accesskey.frontend.button.yes'),
+      cancelTitle: this.$t('component.acl.accesskey.frontend.button.no'),
     });
     if (sure) {
       this.isProcessing = true;
@@ -518,7 +520,7 @@ export default class Modal extends Vue {
     const { errorCode } = e;
     if (errorCode != null) {
       if (errorCode.endsWith('collision')) {
-        this.inputValueFeedback = this.$t('mcr.accessKey.text.error.collision');
+        this.inputValueFeedback = this.$t('component.acl.accesskey.text.error.collision');
       } else if (errorCode.endsWith('unknownKey') || errorCode.endsWith('unknownObject')) {
         this.$emit('inconsistency');
         this.close();

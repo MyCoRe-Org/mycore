@@ -23,7 +23,9 @@ package org.mycore.mcr.acl.accesskey;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.mycore.access.MCRAccessManager;
@@ -31,8 +33,11 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
+import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
@@ -42,11 +47,41 @@ import org.mycore.user2.MCRUserManager;
  * Methods for setting and removing {@link MCRAccessKey} for users.
  */
 public class MCRAccessKeyUtils {
-
     /**
      * Prefix for user attribute name for value
      */
     public static final String ACCESS_KEY_PREFIX = "acckey_";
+
+    private static final String ACCESS_KEY_STRATEGY_PROP_PREFX = "MCR.ACL.AccessKey.Strategy";
+
+    private static final String ALLOWED_OBJECT_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP_PREFX + ".AllowedObjectTypes";
+
+    private static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP_PREFX
+        + ".AllowedSessionPermissionTypes";
+
+    private static Set<String> allowedObjectTypes = loadAllowedObjectTypes();
+
+    private static Set<String> allowedSessionPermissionTypes = loadAllowedSessionPermissionTypes();
+
+    private static Set<String> parseListStringToSet(final Optional<String> listString) {
+        return listString.stream()
+            .flatMap(MCRConfiguration2::splitValue)
+            .collect(Collectors.toSet());
+    }
+
+    private static Set<String> loadAllowedObjectTypes() {
+        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_OBJECT_TYPES_PROP::equals, (p1, p2, p3) -> {
+            allowedObjectTypes = parseListStringToSet(p3);
+        });
+        return parseListStringToSet(MCRConfiguration2.getString(ALLOWED_OBJECT_TYPES_PROP));
+    }
+
+    private static Set<String> loadAllowedSessionPermissionTypes() {
+        MCRConfiguration2.addPropertyChangeEventLister(ALLOWED_SESSION_PERMISSION_TYPES_PROP::equals, (p1, p2, p3) -> {
+            allowedSessionPermissionTypes = parseListStringToSet(p3);
+        });
+        return parseListStringToSet(MCRConfiguration2.getString(ALLOWED_SESSION_PERMISSION_TYPES_PROP));
+    }
 
     /**
      * Adds the value of {@link MCRAccessKey} as an attribute to a {@link MCRSession} for {@link MCRObjectID}.
@@ -54,19 +89,66 @@ public class MCRAccessKeyUtils {
      * @param session the {@link MCRSession}
      * @param objectId the {@link MCRObjectID}
      * @param value the value of a {@link MCRAccessKey}
-     * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
+     * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value or not allowed.
+     */
+    public static synchronized void addAccessKeySecretForObject(final MCRSession session, final MCRObjectID objectId,
+        final String value) throws MCRException {
+        if (!isAccessKeyForSessionAllowed()) {
+            throw new MCRAccessKeyException("Access keys is not allowed.");
+        }
+        if (isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
+            final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
+            final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
+            if (accessKey == null) {
+                throw new MCRAccessKeyNotFoundException("Access key is invalid.");
+            } else if (isAccessKeyForSessionAllowed(accessKey.getType())) {
+                session.put(getAttributeName(objectId), secret);
+                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+            } else {
+                throw new MCRAccessKeyException("Access key is not allowed.");
+            }
+        } else {
+            throw new MCRAccessKeyException("Access key is not allowed.");
+        }
+    }
+
+    /**
+     * Adds the value of {@link MCRAccessKey} as an attribute to a {@link MCRSession} for {@link MCRObjectID}
+     * including derivates.
+     *
+     * @param session the {@link MCRSession}
+     * @param objectId the {@link MCRObjectID}
+     * @param value the value of a {@link MCRAccessKey}
+     * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value or not allowed.
      */
     public static synchronized void addAccessKeySecret(final MCRSession session, final MCRObjectID objectId, 
         final String value) throws MCRException {
-        final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
-
-        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
-        if (accessKey == null) {
-            throw new MCRAccessKeyNotFoundException("Key does not exist.");
+        if (!isAccessKeyForSessionAllowed()) {
+            throw new MCRAccessKeyException("Access keys is not allowed.");
         }
-        
-        session.put(getAttributeName(objectId), secret);
-        MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+        if ("derivate".equals(objectId.getTypeId())) {
+            addAccessKeySecretForObject(session, objectId, value);
+        } else {
+            boolean success = false;
+            try {
+                addAccessKeySecretForObject(session, objectId, value);
+                success = true;
+            } catch (MCRAccessKeyException e) {
+                //
+            }
+            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId, 0, TimeUnit.SECONDS);
+            for (final MCRObjectID derivateId : derivateIds) {
+                try {
+                    addAccessKeySecretForObject(session, derivateId, value);
+                    success = true;
+                } catch (MCRAccessKeyException e) {
+                    //
+                }
+            }
+            if (!success) {
+                throw new MCRAccessKeyException("Access key is invalid or is not allowed.");
+            }
+        }
     }
 
     /**
@@ -77,19 +159,57 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
-    public static synchronized void addAccessKeySecret(final MCRUser user, final MCRObjectID objectId, String value)
-        throws MCRException {
-
-        final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
-        final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
-        if (accessKey == null) {
-            throw new MCRAccessKeyNotFoundException("Key does not exist.");
+    public static synchronized void addAccessKeySecretForObject(final MCRUser user, final MCRObjectID objectId,
+        final String value) throws MCRException {
+        if (isAccessKeyForObjectTypeAllowed(objectId.getTypeId())) {
+            final String secret = MCRAccessKeyManager.hashSecret(value, objectId);
+            final MCRAccessKey accessKey = MCRAccessKeyManager.getAccessKeyWithSecret(objectId, secret);
+            if (accessKey == null) {
+                throw new MCRAccessKeyNotFoundException("Access key is invalid.");
+            } else {
+                user.setUserAttribute(getAttributeName(objectId), secret);
+                MCRUserManager.updateUser(user);
+                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+            }
+        } else {
+            throw new MCRAccessKeyException("Access key is not allowed.");
         }
+    }
 
-        user.setUserAttribute(getAttributeName(objectId), secret);
-        MCRUserManager.updateUser(user);
-
-        MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+    /**
+     * Adds the value of a {@link MCRAccessKey} as user attribute to a {@link MCRUser} for a {@link MCRObjectID}
+     * including derivates.
+     *
+     * @param user the {@link MCRUser} the value should assigned
+     * @param objectId the {@link MCRObjectID}
+     * @param value the value of a {@link MCRAccessKey}
+     * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
+     */
+    public static synchronized void addAccessKeySecret(final MCRUser user, final MCRObjectID objectId,
+        final String value) throws MCRException {
+        if ("derivate".equals(objectId.getTypeId())) {
+            addAccessKeySecretForObject(user, objectId, value);
+        } else {
+            boolean success = false;
+            try {
+                addAccessKeySecretForObject(user, objectId, value);
+                success = true;
+            } catch (MCRAccessKeyException e) {
+                //
+            }
+            final List<MCRObjectID> derivateIds = MCRMetadataManager.getDerivateIds(objectId, 0, TimeUnit.SECONDS);
+            for (final MCRObjectID derivateId : derivateIds) {
+                try {
+                    addAccessKeySecretForObject(user, derivateId, value);
+                    success = true;
+                } catch (MCRAccessKeyException e) {
+                    //
+                }
+            }
+            if (!success) {
+                throw new MCRAccessKeyException("Access key is invalid or is not allowed.");
+            }
+        }
     }
 
     /**
@@ -315,5 +435,21 @@ public class MCRAccessKeyUtils {
      */
     public static synchronized void removeAccessKeySecretFromCurrentUser(final MCRObjectID objectId) {
         removeAccessKeySecret(MCRUserManager.getCurrentUser(), objectId);
+    }
+
+    public static boolean isAccessKeyForSessionAllowed() {
+        return !allowedSessionPermissionTypes.isEmpty();
+    }
+
+    public static boolean isAccessKeyForSessionAllowed(final String permission) {
+        return allowedSessionPermissionTypes.contains(permission);
+    }
+
+    public static boolean isAccessKeyForObjectTypeAllowed(final String type) {
+        return allowedObjectTypes.contains(type);
+    }
+
+    public static Set<String> getAllowedSessionPermissionTypes() {
+        return allowedSessionPermissionTypes;
     }
 }

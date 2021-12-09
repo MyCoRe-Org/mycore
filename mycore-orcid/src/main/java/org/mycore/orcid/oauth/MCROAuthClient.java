@@ -83,6 +83,14 @@ public class MCROAuthClient {
         return req;
     }
 
+    public MCRRevokeRequest getRevokeRequest(String token) {
+        MCRRevokeRequest req = new MCRRevokeRequest(client.target(baseURL));
+        req.set("client_id", clientID);
+        req.set("client_secret", clientSecret);
+        req.set("token", token);
+        return req;
+    }
+
     /**
      * Builds the URL where to redirect the user's browser to initiate a three-way authorization
      * and request permission to access the given scopes. If
@@ -100,8 +108,9 @@ public class MCROAuthClient {
         builder.addParameter("client_id", clientID);
         builder.addParameter("response_type", "code");
         builder.addParameter("redirect_uri", redirectURL);
-        builder.addParameter("scope", scopes.trim().replace(" ", "%20"));
+        builder.addParameter("scope", scopes.trim());
         builder.addParameter("state", buildStateParam());
+        builder.addParameter("prompt", "login");
         builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
 
         if (MCRConfiguration2.getOrThrow("MCR.ORCID.PreFillRegistrationForm", Boolean::parseBoolean)) {

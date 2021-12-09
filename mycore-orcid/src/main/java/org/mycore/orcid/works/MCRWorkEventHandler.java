@@ -85,7 +85,7 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
 
             Optional<MCRWork> work = works.findWork(oid);
             if (work.isPresent()) {
-                work.get().update();
+                work.get().update(oid);
             } else {
                 works.addWorkFrom(oid);
             }

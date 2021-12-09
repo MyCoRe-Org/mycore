@@ -16,28 +16,17 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid.oauth;
+package org.mycore.restapi.v2.annotation;
 
-import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.ws.rs.core.Response;
+import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
 
-/**
- * Represents the response on a token request against the OAuth2 API of orcid.org.
- *
- * @author Frank L\u00FCtzenkirchen
- * @author Kai Brandhorst
- */
-public class MCRTokenResponse extends MCRORCIDResponse {
-
-    MCRTokenResponse(Response response) throws IOException {
-        super(response);
-    }
-
-    /**
-     * Returns the access token, in case the request wasSuccessful()
-     */
-    public String getAccessToken() {
-        return responseData.get("access_token").asText();
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface MCRRestRequiredPermission {
+    MCRRestAPIACLPermission value();
 }

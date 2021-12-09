@@ -130,7 +130,7 @@ public class MCRORCIDResource {
             } else if (!status.isInORCIDProfile()) {
                 works.addWorkFrom(oid);
             } else if (status.isInORCIDProfile()) {
-                works.findWork(oid).get().update();
+                works.findWork(oid).get().update(oid);
             }
 
             return publicationStatus(oid, user);

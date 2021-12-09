@@ -49,10 +49,10 @@ public class MCRPublicationStatus {
 
             MCRORCIDProfile profile = orcidUser.getProfile();
             MCRWorksSection works = profile.getWorksSection();
-            isInORCIDProfile = works.containsWork(oid);
+            isInORCIDProfile = works.containsWork(oid); // Maybe containsOwnWork(oid);
 
             if (isInORCIDProfile) {
-                putCode = works.findWork(oid).get().getPutCode();
+                putCode = works.findWork(oid).get().getPutCode(); // Maybe findOwnWork(oid)
             }
         }
     }

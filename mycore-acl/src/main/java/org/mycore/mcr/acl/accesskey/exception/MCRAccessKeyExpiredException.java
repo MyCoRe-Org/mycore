@@ -25,6 +25,6 @@ package org.mycore.mcr.acl.accesskey.exception;
  */
 public class MCRAccessKeyExpiredException extends MCRAccessKeyException {
     public MCRAccessKeyExpiredException(String errorMessage) {
-        super(errorMessage, "mcr.accessKey.error.expired");
+        super(errorMessage, "component.acl.accesskey.frontend.error.expired");
     }
 }

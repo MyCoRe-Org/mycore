@@ -16,28 +16,29 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid.oauth;
+package org.mycore.restapi.v2.common;
 
-import java.io.IOException;
-
-import javax.ws.rs.core.Response;
+import org.mycore.access.MCRAccessManager;
 
 /**
- * Represents the response on a token request against the OAuth2 API of orcid.org.
- *
- * @author Frank L\u00FCtzenkirchen
- * @author Kai Brandhorst
+ * The REST API access permissions (read, write, delete)
  */
-public class MCRTokenResponse extends MCRORCIDResponse {
+public enum MCRRestAPIACLPermission {
+    READ {
+        public String toString() {
+            return MCRAccessManager.PERMISSION_READ;
+        }
+    },
 
-    MCRTokenResponse(Response response) throws IOException {
-        super(response);
-    }
+    WRITE {
+        public String toString() {
+            return MCRAccessManager.PERMISSION_WRITE;
+        }
+    },
 
-    /**
-     * Returns the access token, in case the request wasSuccessful()
-     */
-    public String getAccessToken() {
-        return responseData.get("access_token").asText();
+    DELETE {
+        public String toString() {
+            return MCRAccessManager.PERMISSION_DELETE;
+        }
     }
 }

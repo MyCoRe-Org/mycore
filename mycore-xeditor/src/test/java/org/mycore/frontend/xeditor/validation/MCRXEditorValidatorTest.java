@@ -280,6 +280,88 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         checkResult(session, "/document/author[3]", MCRValidationResults.MARKER_SUCCESS);
     }
 
+    @Test
+    public void testRequiredRelevantIfRule() throws JDOMException, JaxenException {
+
+        MCREditorSession session;
+
+        session = buildSession("document[title='Title']");
+        addRule(session, "/document/title", "required", "true", "relevant-if", "false()" );
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession("document[title]");
+        addRule(session, "/document/title", "required", "true", "relevant-if", "false()" );
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession("document[title='Title']");
+        addRule(session, "/document/title", "required", "true", "relevant-if", "true()" );
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[title]");
+        addRule(session, "/document/title", "required", "true", "relevant-if", "true()" );
+        assertFalse(session.getValidator().isValid());
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_ERROR);
+
+    }
+
+    @Test
+    public void testMinIntegerRelevantIfRule() throws JDOMException, JaxenException {
+
+        MCREditorSession session;
+
+        session = buildSession("document[year='2000']");
+        addRule(session, "/document/year", "min", "2000", "type", "integer", "relevant-if", "false()");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession("document[year='1999']");
+        addRule(session, "/document/year", "min", "2000", "type", "integer", "relevant-if", "false()");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession("document[year='2000']");
+        addRule(session, "/document/year", "min", "2000", "type", "integer", "relevant-if", "true()");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[year='1999']");
+        addRule(session, "/document/year", "min", "2000", "type", "integer", "relevant-if", "true()");
+        assertFalse(session.getValidator().isValid());
+        checkResult(session, "/document/year", MCRValidationResults.MARKER_ERROR);
+
+    }
+
+    @Test
+    public void testXPathTestRelevantIfRule() throws JDOMException, JaxenException {
+
+        MCREditorSession session;
+
+        session = buildSession("document[title='Foo']");
+        addRule(session, "/document/title", "test", "text()='Foo'", "relevant-if", "false()" );
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession("document[title='Bar']");
+        addRule(session, "/document/title", "test", "text()='Foo'", "relevant-if", "false()" );
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_DEFAULT);
+
+        session = buildSession("document[title='Foo']");
+        addRule(session, "/document/title", "test", "text()='Foo'", "relevant-if", "true()" );
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[title='Bar']");
+        addRule(session, "/document/title", "test", "text()='Foo'", "relevant-if", "true()" );
+        assertFalse(session.getValidator().isValid());
+        checkResult(session, "/document/title", MCRValidationResults.MARKER_ERROR);
+
+    }
+
+
     public static boolean nameStartsWithJ(String name) {
         return name.startsWith("J");
     }

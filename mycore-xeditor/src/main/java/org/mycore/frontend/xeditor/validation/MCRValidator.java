@@ -21,15 +21,21 @@ package org.mycore.frontend.xeditor.validation;
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXPathBuilder;
+import org.mycore.common.xml.MCRXPathEvaluator;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import java.util.List;
+
 public abstract class MCRValidator {
+
+    private static final String ATTR_RELEVANT_IF = "relevant-if";
 
     private Node ruleElement;
 
     protected String xPath;
+    protected String relevantIfXPath;
 
     public void init(String baseXPath, Node ruleElement) {
         Node relativeXPath = ruleElement.getAttributes().getNamedItem("xpath");
@@ -37,6 +43,7 @@ public abstract class MCRValidator {
         this.ruleElement = ruleElement;
 
         if (hasRequiredAttributes()) {
+            relevantIfXPath = getAttributeValue(ATTR_RELEVANT_IF);
             configure();
         }
     }
@@ -71,9 +78,18 @@ public abstract class MCRValidator {
 
     public boolean validateBinding(MCRValidationResults results, MCRBinding binding) {
         boolean isValid = true; // all nodes must validate
-        for (Object node : binding.getBoundNodes()) {
+
+        List<Object> boundNodes = binding.getBoundNodes();
+        for (int i = 0; i < boundNodes.size(); i++) {
+            Object node = boundNodes.get(i);
+
             String absPath = MCRXPathBuilder.buildXPath(node);
             if (results.hasError(absPath)) {
+                continue;
+            }
+
+            MCRBinding nodeBinding = new MCRBinding(i + 1, binding);
+            if (!isRelevant(nodeBinding)) {
                 continue;
             }
 
@@ -87,6 +103,17 @@ public abstract class MCRValidator {
             isValid = isValid && result;
         }
         return isValid;
+    }
+
+    protected boolean isRelevant(MCRBinding binding) {
+        if (null == relevantIfXPath) {
+            return true;
+        } else {
+            MCRXPathEvaluator evaluator = binding.getXPathEvaluator();
+            boolean isRelevant = evaluator.test(relevantIfXPath);
+            binding.detach();
+            return isRelevant;
+        }
     }
 
     protected boolean isValid(String value) {
