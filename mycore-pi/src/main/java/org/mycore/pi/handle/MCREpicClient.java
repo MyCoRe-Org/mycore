@@ -87,7 +87,8 @@ public class MCREpicClient {
         }
     }
 
-    public void create(String url, MCRHandle handle) throws IOException, MCREpicException {
+    public void create(String url, MCRHandle handle, List<MCRHandleInfo> additionalInformation)
+        throws IOException, MCREpicException {
         final HttpPut httpPut = new HttpPut(baseURL + "handles/" + handle.toString());
 
         final MCRHandleInfo register = new MCRHandleInfo();
@@ -95,8 +96,9 @@ public class MCREpicClient {
         register.setType("URL");
         register.setParsed_data(url);
 
-        final String handleInfoStr = new Gson().toJson(Stream.of(register).collect(Collectors.toList()));
-        System.out.println(handleInfoStr);
+        final String handleInfoStr = new Gson()
+            .toJson(Stream.concat(Stream.of(register), additionalInformation.stream()).collect(Collectors.toList()));
+
         httpPut.setEntity(new StringEntity(handleInfoStr));
         httpPut.setHeader("Content-Type", "application/json");
 

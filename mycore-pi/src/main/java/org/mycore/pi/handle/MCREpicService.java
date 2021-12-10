@@ -19,15 +19,25 @@
 package org.mycore.pi.handle;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
+import org.jdom2.Document;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.content.MCRContent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.pi.MCRPIJobService;
@@ -63,6 +73,17 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
      */
     @MCRProperty(name = "BaseURL", required = false)
     public String baseURL;
+
+    @MCRProperty(name = "Transformer", required = false)
+    public String transformerID = null;
+
+    @MCRProperty(name = "MetadataType", required = false)
+    public String metadataType = null;
+
+    @MCRProperty(name = "MetadataIndex", required = false)
+    public String metadataIndex = null;
+
+    public ConcurrentHashMap<String, ReentrantLock> idLockMap = new ConcurrentHashMap<>();
 
     public MCREpicService() {
         super("handle");
@@ -134,15 +155,49 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     }
 
     private void createOrUpdate(String epic, String objId) throws MCRPersistentIdentifierException {
-        validateJobUserRights(MCRObjectID.getInstance(objId));
+        new ReentrantLock();
+
+        final MCRObjectID objectID = MCRObjectID.getInstance(objId);
+        if (!MCRMetadataManager.exists(objectID)) {
+            return;
+        }
+
+        validateJobUserRights(objectID);
 
         final MCRHandle mcrHandle = new MCRHandle(epic);
         final String urlForObject = getURLForObject(objId);
 
-        try {
-            getClient().create(urlForObject, mcrHandle);
-        } catch (IOException e) {
-            throw new MCRPersistentIdentifierException("Error while communicating with EPIC Service", e);
+            try {
+                final ArrayList<MCRHandleInfo> handleInfos = new ArrayList<>();
+                processMedataData(objectID, handleInfos);
+
+                ReentrantLock reentrantLock = idLockMap.computeIfAbsent(epic, (l) -> new ReentrantLock());
+                try {
+                    reentrantLock.lock();
+                    getClient().create(urlForObject, mcrHandle, handleInfos);
+                } finally {
+                    reentrantLock.unlock();
+                }
+            } catch (IOException e) {
+                throw new MCRPersistentIdentifierException("Error while communicating with EPIC Service", e);
+            }
+
+    }
+
+    private void processMedataData(MCRObjectID objectID, ArrayList<MCRHandleInfo> handleInfos) throws IOException {
+        if (transformerID != null && metadataType != null && metadataIndex != null) {
+            final int index = Integer.parseInt(metadataIndex, 10);
+            final Document xml = MCRMetadataManager.retrieve(objectID).createXML();
+            final MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transformerID);
+            final MCRContent result = transformer.transform(new MCRJDOMContent(xml));
+            final byte[] bytes = result.asByteArray();
+            final String encodedData = Base64.getEncoder().encodeToString(bytes);
+
+            final MCRHandleInfo metadataInfo = new MCRHandleInfo();
+            metadataInfo.setIdx(index);
+            metadataInfo.setData(encodedData);
+            metadataInfo.setType(metadataType);
+            handleInfos.add(metadataInfo);
         }
     }
 
