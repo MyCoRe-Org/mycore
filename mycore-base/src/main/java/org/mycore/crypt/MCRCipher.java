@@ -39,6 +39,8 @@ import org.mycore.access.MCRAccessManager;
 public abstract class MCRCipher {
     
     protected String cipherID;
+
+    private boolean aclEnabled = true;
     
     /**
      * Initialize the chipher by reading the key from file. If the cipher can't initialized an exception
@@ -73,7 +75,14 @@ public abstract class MCRCipher {
      * exsisting keyfile.   
      */
     abstract public void overwriteKeyFile() ;
-    
+
+    public boolean getAclEnabled() {
+        return aclEnabled;
+    }
+
+    protected void setAclEnabled(boolean enabled) {
+        this.aclEnabled = enabled;
+    }
     
     public String encrypt(String text) throws MCRCryptKeyNoPermissionException {
     	if (checkPermission( "encrypt" )) {
@@ -108,7 +117,10 @@ public abstract class MCRCipher {
     }
     
     private boolean checkPermission ( String action) {
-        return (MCRAccessManager.checkPermission("crypt:cipher:" + cipherID , action ));
+        if (aclEnabled) {
+            return MCRAccessManager.checkPermission("crypt:cipher:" + cipherID, action);
+        }
+        return true;
     }
     
     abstract protected String encryptImpl(String text);
