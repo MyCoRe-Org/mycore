@@ -74,12 +74,22 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     @MCRProperty(name = "BaseURL", required = false)
     public String baseURL;
 
+    /**
+     * This can be used to store metadata as a Handle Object. The Transformer will be used to convert the Object to an
+     * String.
+     */
     @MCRProperty(name = "Transformer", required = false)
     public String transformerID = null;
 
+    /**
+     * The Type which should be used in the Handle Object.
+     */
     @MCRProperty(name = "MetadataType", required = false)
     public String metadataType = null;
 
+    /**
+     * The Index which should be used in the handle object.
+     */
     @MCRProperty(name = "MetadataIndex", required = false)
     public String metadataIndex = null;
 
