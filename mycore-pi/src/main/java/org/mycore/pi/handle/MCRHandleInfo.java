@@ -28,9 +28,6 @@ public class MCRHandleInfo {
 
     private String timestamp;
 
-    @SuppressWarnings({"checkstyle:membername"}) // this is required because the json field is named parsed_data
-    private Object parsed_data;
-
     public MCRHandleInfo() {
     }
 
@@ -48,16 +45,6 @@ public class MCRHandleInfo {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    @SuppressWarnings({"checkstyle:methodname"})
-    public Object getParsed_data() {
-        return parsed_data;
-    }
-
-    @SuppressWarnings({"checkstyle:methodname"})
-    public void setParsed_data(Object parsedData) {
-        this.parsed_data = parsedData;
     }
 
     public String getData() {
