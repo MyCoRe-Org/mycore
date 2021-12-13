@@ -39,6 +39,10 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.crypt.MCRCipher;
+import org.mycore.crypt.MCRCipherManager;
+import org.mycore.crypt.MCRCryptKeyFileNotFoundException;
+import org.mycore.crypt.MCRCryptKeyNoPermissionException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyCollisionException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
@@ -54,13 +58,13 @@ public final class MCRAccessKeyManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String SECRET_HASHING_PROP_PREFX = "MCR.ACL.AccessKey.Secret.Hashing";
+    private static final String SECRET_STORAGE_MODE_PROP_PREFX = "MCR.ACL.AccessKey.Secret.Storage.Mode";
 
-    private static final boolean HASHING_ENABLED = MCRConfiguration2.getBoolean(SECRET_HASHING_PROP_PREFX)
-        .orElse(true);
+    private static final String SECRET_STORAGE_MODE = MCRConfiguration2
+        .getStringOrThrow(SECRET_STORAGE_MODE_PROP_PREFX);
 
-    private static final int HASHING_ITERATIONS = MCRConfiguration2.getInt(SECRET_HASHING_PROP_PREFX + ".Iterations")
-        .orElse(1000);
+    private static final int HASHING_ITERATIONS = MCRConfiguration2
+        .getInt(SECRET_STORAGE_MODE_PROP_PREFX + ".Hash.Iterations").orElse(1000);
 
     /**
      * Returns all access keys for given {@link MCRObjectID}.
@@ -108,13 +112,24 @@ public final class MCRAccessKeyManager {
      * @throws MCRException if encryption fails
      */
     public static String hashSecret(final String secret, final MCRObjectID objectId) throws MCRException {
-        if (!HASHING_ENABLED) {
-            return secret;
-        }
-        try {
-            return MCRUtils.asSHA256String(HASHING_ITERATIONS, objectId.toString().getBytes(UTF_8), secret);
-        } catch(NoSuchAlgorithmException e) {
-            throw new MCRException("Cannot hash secret.", e);
+        switch (SECRET_STORAGE_MODE) {
+            case "plain":
+                return secret;
+            case "crypt":
+                try {
+                    final MCRCipher cipher = MCRCipherManager.getCipher("accesskey");
+                    return cipher.encrypt(secret);
+                } catch (MCRCryptKeyFileNotFoundException | MCRCryptKeyNoPermissionException e) {
+                    throw new MCRException(e);
+                }
+            case "hash":
+                try {
+                    return MCRUtils.asSHA256String(HASHING_ITERATIONS, objectId.toString().getBytes(UTF_8), secret);
+                } catch(NoSuchAlgorithmException e) {
+                    throw new MCRException("Cannot hash secret.", e);
+                }
+            default:
+                throw new MCRException("Please configure a valid storage mode for secret.");
         }
     }
 
