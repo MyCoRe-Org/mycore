@@ -61,11 +61,6 @@ public class MCREpicClient {
         this.baseURL = baseURL;
     }
 
-    public static void main(String[] args) throws MCREpicException, IOException {
-
-
-    }
-
     public void delete(MCRHandle handle) throws MCREpicException, IOException {
         final HttpDelete httpDelete = new HttpDelete(baseURL + "handles/" + handle.toString());
         try (CloseableHttpClient httpClient = getHttpClient();
@@ -94,7 +89,7 @@ public class MCREpicClient {
         final MCRHandleInfo register = new MCRHandleInfo();
 
         register.setType("URL");
-        register.setParsed_data(url);
+        register.setData(url);
 
         final String handleInfoStr = new Gson()
             .toJson(Stream.concat(Stream.of(register), additionalInformation.stream()).collect(Collectors.toList()));
