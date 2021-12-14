@@ -57,7 +57,7 @@ public class MCRAESCipher extends MCRCipher {
         keyFile = path;
     }
 
-    @MCRProperty(name = "ACL", required = false)
+    @MCRProperty(name = "EnableACL", required = false)
     public void setAclEnabled(final String enabled) {
         if (!isInitialised()) {
             if ("true".equalsIgnoreCase(enabled) || "false".equalsIgnoreCase(enabled)) {
