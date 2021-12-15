@@ -59,14 +59,10 @@ public class MCRAESCipher extends MCRCipher {
 
     @MCRProperty(name = "EnableACL", required = false)
     public void setAclEnabled(final String enabled) {
-        if (!isInitialised()) {
-            if ("true".equalsIgnoreCase(enabled) || "false".equalsIgnoreCase(enabled)) {
-                setAclEnabled(Boolean.valueOf(enabled));
-            } else {
-                throw new MCRConfigurationException("MCRCrypt: " + enabled + " is not a valid boolean.");
-            }
+        if ("true".equalsIgnoreCase(enabled) || "false".equalsIgnoreCase(enabled)) {
+            setAclEnabled(Boolean.valueOf(enabled));
         } else {
-            throw new UnsupportedOperationException("Method is restricted.");
+            throw new MCRConfigurationException("MCRCrypt: " + enabled + " is not a valid boolean.");
         }
     }
     
