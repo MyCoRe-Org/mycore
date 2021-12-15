@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,7 +76,7 @@ public class MCREpicClient {
                 case HttpStatus.SC_UNAUTHORIZED:
                     throw new MCREpicUnauthorizedException("Error while create:" + statusLine.getReasonPhrase());
                 default:
-                    final String content = new String(entity.getContent().readAllBytes());
+                    final String content = new String(entity.getContent().readAllBytes(), StandardCharsets.UTF_8);
                     throw new MCREpicException("Unknown error: " + statusLine.getStatusCode() + " - "
                         + statusLine.getReasonPhrase() + " - " + content);
             }
@@ -112,7 +113,7 @@ public class MCREpicClient {
                 case HttpStatus.SC_UNAUTHORIZED:
                     throw new MCREpicUnauthorizedException("Error while create:" + statusLine.getReasonPhrase());
                 default:
-                    final String content = new String(entity.getContent().readAllBytes());
+                    final String content = new String(entity.getContent().readAllBytes(), StandardCharsets.UTF_8);
                     throw new MCREpicException("Unknown error: " + statusLine.getStatusCode() + " - "
                         + statusLine.getReasonPhrase() + " - " + content);
             }
@@ -130,7 +131,7 @@ public class MCREpicClient {
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
                     try (InputStream content = entity.getContent();
-                        Reader reader = new InputStreamReader(content)) {
+                        Reader reader = new InputStreamReader(content, StandardCharsets.UTF_8)) {
                         final Gson gson = new Gson();
 
                         final MCRHandleInfo[] handleInfos = gson.fromJson(reader, MCRHandleInfo[].class);
@@ -155,7 +156,7 @@ public class MCREpicClient {
             switch (statusLine.getStatusCode()) {
                 case HttpStatus.SC_OK:
                     try (InputStream content = entity.getContent();
-                        InputStreamReader inputStreamReader = new InputStreamReader(content);
+                        InputStreamReader inputStreamReader = new InputStreamReader(content, StandardCharsets.UTF_8);
                         BufferedReader br = new BufferedReader(inputStreamReader)) {
                         return br.lines().map(prefix2::concat).map(MCRHandle::new).collect(Collectors.toList());
                     }
