@@ -54,7 +54,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <jaxb.version>2.3.3</jaxb.version>
     <jersey.version>2.32</jersey.version>
     <jetty.version>9.4.14.v20181114</jetty.version>
-    <log4j.version>2.16.0</log4j.version>
+    <log4j.version>2.17.0</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
