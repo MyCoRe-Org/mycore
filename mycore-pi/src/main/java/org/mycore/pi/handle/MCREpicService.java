@@ -147,7 +147,6 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
     @Override
     protected void deleteJob(Map<String, String> parameters) throws MCRPersistentIdentifierException {
         String epic = parameters.get(EPIC_KEY);
-        String objId = parameters.get(OBJECT_ID_KEY);
 
         try {
             getClient().delete(new MCRHandle(epic));

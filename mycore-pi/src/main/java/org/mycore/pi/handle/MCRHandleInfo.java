@@ -28,9 +28,6 @@ public class MCRHandleInfo {
 
     private String timestamp;
 
-    public MCRHandleInfo() {
-    }
-
     public Integer getIdx() {
         return idx;
     }
