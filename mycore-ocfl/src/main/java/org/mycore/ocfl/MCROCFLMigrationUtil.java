@@ -54,82 +54,24 @@ public class MCROCFLMigrationUtil {
 
     private int i;
 
-    public final MCROCFLAdaptionRepositoryProvider adaptionRepo;
+    // public final MCROCFLAdaptionRepositoryProvider adaptionRepo;
+
+    private static MCROcflUtil util = new MCROcflUtil();
 
     private static final String SUCCESS = "success";
 
-    private static final String SUCCESS_BUT_WITHOUT_HISTORY = SUCCESS + " but without history";
+    private static final String SUCCESS_WITH_HISTORY = SUCCESS + " with history";
 
+    private static final String SUCCESS_WITHOUT_HISTORY = SUCCESS + " without history";
+    
     private static final String FAILED = "failed";
 
     private static final String FAILED_AND_NOW_INVALID_STATE = FAILED + " and now invalid state";
 
     private static final String BACKUP_CONFIG = "MCR.OCFL.Repository.Adapt.BackupDir";
 
-    /**
-     * Moves a directory from origin to target
-     * @param origin Origin Directory as Path
-     * @param target Target Directory as Path
-     * @throws IOException if an I/O error occurs
-     */
-    public static final void moveDir(Path origin, Path target) throws IOException {
-        if (target.toFile().exists()) {
-            Stream<Path> walker = Files.walk(target);
-            walker
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
-            walker.close();
-        }
-        Files.move(origin, target, StandardCopyOption.ATOMIC_MOVE);
-    }
-
-    /**
-     * Deletes a Directory
-     * @param dir Path for the Directory to delete
-     * @throws IOException if an I/O error occurs
-     */
-    public static final void delDir(Path dir) throws IOException {
-        if (dir.toFile().exists()) {
-            Stream<Path> walker = Files.walk(dir);
-            walker
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
-            walker.close();
-        } else {
-            throw new IOException("Directory " + dir.getFileName() + " does not exist!");
-        }
-    }
-
     public MCROCFLMigrationUtil(String repoKey) {
-        this.adaptionRepo = new MCROCFLAdaptionRepositoryProvider(repoKey);
-    }
-
-    /**
-     * Restore the {@code ocfl-root} from {@code ocfl-backup}
-     * @param repository RepositoryKey for config
-     * @throws IOException if an I/O error occurs
-     */
-    public static final void restoreRoot(String repository) throws IOException {
-        Path rootDir = Paths
-            .get(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository." + repository + ".RepositoryRoot"));
-        Path backupDir = Paths.get(MCRConfiguration2.getStringOrThrow(BACKUP_CONFIG));
-        if (!backupDir.toFile().exists()) {
-            throw new MCRPersistenceException("There is no backup to restore!");
-        }
-        moveDir(backupDir, rootDir);
-        LOGGER.info("Restored OCFL-Root from backup.");
-    }
-
-    /**
-     * Deletes the {@code ocfl-backup} directory
-     * @param repository <i>unused for now</i>
-     * @throws IOException if an I/O error occurs
-     */
-    public static final void clearBackup(String repository) throws IOException {
-        Path backupDir = Paths.get(MCRConfiguration2.getStringOrThrow(BACKUP_CONFIG));
-        delDir(backupDir);
+        // this.adaptionRepo = new MCROCFLAdaptionRepositoryProvider(repoKey);
     }
 
     /**
@@ -141,9 +83,10 @@ public class MCROCFLMigrationUtil {
 
         Path rootDir = Paths
             .get(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository." + repository + ".RepositoryRoot"));
-        Path backupDir = Paths.get(MCRConfiguration2.getStringOrThrow(BACKUP_CONFIG));
+        // Path backupDir = Paths.get(MCRConfiguration2.getStringOrThrow(BACKUP_CONFIG));
+        Path backupDir = MCROcflUtil.getBackupDir();
         if (rootDir.toFile().exists()) {
-            moveDir(rootDir, backupDir);
+            MCROcflUtil.moveDir(rootDir, backupDir);
         }
 
         MCROFCLMigration migration = new MCROFCLMigration(repository);
@@ -156,24 +99,24 @@ public class MCROCFLMigrationUtil {
         ArrayList<String> withoutHistory = migration.getWithoutHistory();
 
         LOGGER.info("The migration resulted in: \n" +
-            SUCCESS + ": {}, \n" +
+            SUCCESS_WITH_HISTORY + ": {} \n" +
+            SUCCESS_WITHOUT_HISTORY + ": {} \n" +
             FAILED + ": {} \n" +
-            FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n ",
+            FAILED_AND_NOW_INVALID_STATE + ": {} \n",
             String.join(", ", success),
+            String.join(", ", withoutHistory),
             String.join(", ", failed),
-            String.join(", ", invalidState),
-            String.join(", ", withoutHistory));
+            String.join(", ", invalidState));
 
         LOGGER.info("The migration resulted in: \n" +
-            SUCCESS + ": {}, \n" +
+            SUCCESS_WITH_HISTORY + ": {} \n" +
+            SUCCESS_WITHOUT_HISTORY + ": {} \n" +
             FAILED + ": {} \n" +
-            FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n ",
+            FAILED_AND_NOW_INVALID_STATE + ": {} \n",
             success.size(),
+            withoutHistory.size(),
             failed.size(),
-            invalidState.size(),
-            withoutHistory.size());
+            invalidState.size());
     }
 
     /**
@@ -181,16 +124,18 @@ public class MCROCFLMigrationUtil {
      * @apiNote due to how its implemented, if a Layout is not changed it just makes a backup
      * @throws IOException if an I/O error occurs
      */
-    public void convertOcflToOcfl() throws IOException {
-        if (null == adaptionRepo) {
+    public void convertOcflToOcfl(String repositoryKey) throws IOException {
+        if (null == util.getAdaptRepository()) {
             throw new MCRUsageException("Adapt Repository has not been initialized yet!");
         }
-        this.adaptionRepo.init();
-        this.adaptionRepo.exportRepository();
-        this.adaptionRepo.importRepository();
-        this.adaptionRepo.updateRoot();
-        this.adaptionRepo.reloadRepository();
-        this.adaptionRepo.getRepository().close();
+        util.setRepositoryKey(repositoryKey)
+            .updateMainRepo()
+            .exportRepository()
+            .importAdapt()
+            .updateRoot()
+            .reloadRepository()
+            .getAdaptRepository()
+            .close();
         LOGGER.info("Migration finished, please restart MyCoRe with the new Layout");
     }
 
@@ -201,25 +146,29 @@ public class MCROCFLMigrationUtil {
      * @throws MCRException Metadata Manager <strong>MUST NOT</strong> be {@code MCROCFLXMLMetadataManager}
      */
     public void convertOcflToXML(String repositoryKey) throws IOException, MCRException {
-        if (null == adaptionRepo) {
+        MCROCFLAdaptionRepositoryProvider adaptRepo = util.adaptClass;
+        // MCRSimpleOcflRepositoryProvider adaptRepo = util.adaptClass;
+        if (null == adaptRepo) {
             throw new MCRUsageException("Adapt Repository has not been initialized yet!");
         }
         String managerConfig = MCRConfiguration2.getString("MCR.Metadata.Manager").orElse("xml");
         MCRXMLMetadataManager manager = MCRXMLMetadataManager.instance();
-        MCROCFLXMLMetadataManager ocflManager = adaptionRepo.manager;
+        MCROCFLXMLMetadataManager ocflManager = new MCROCFLXMLMetadataManager();
+        ocflManager.setRepositoryKey(repositoryKey);
         if ("org.mycore.ocfl.MCROCFLXMLMetadataManager".equals(managerConfig)) {
             throw new MCRException(
                 "Cannot convert from OCFL to XML with the OCFL Metadata Manager!\n" +
                     "Change the Metadata setting to use the Native XML Metadata Manager: " +
                     "'MCR.Metadata.Manager' set to 'MCROCFLXMLMetadataManager'");
         }
-        adaptionRepo.setRepositoryRoot(
+        adaptRepo.setRepositoryRoot(
             MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository." + repositoryKey + ".RepositoryRoot"));
-        adaptionRepo.init();
+        adaptRepo.init();
+        // adaptRepo.init("");
         ArrayList<MCRObjectID> newObjects = new ArrayList<MCRObjectID>();
         ArrayList<MCRObjectID> existObjects = new ArrayList<MCRObjectID>();
         i = 0;
-        OcflRepository repo = adaptionRepo.getRepository();
+        OcflRepository repo = adaptRepo.getRepository();
         repo.listObjectIds()
             .filter(id -> id.startsWith(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX))
             .map(id -> id.substring(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX.length()))
@@ -270,6 +219,6 @@ public class MCROCFLMigrationUtil {
             }
         });
         LOGGER.info("Migrated {} Objects to XML", i);
-        this.adaptionRepo.getRepository().close();
+        util.getAdaptRepository().close();
     }
 }
