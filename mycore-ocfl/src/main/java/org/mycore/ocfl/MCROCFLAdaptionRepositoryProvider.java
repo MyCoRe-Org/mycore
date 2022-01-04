@@ -23,24 +23,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.ocfl.layout.MCRLayoutConfig;
 import org.mycore.ocfl.layout.MCRLayoutExtension;
 
 import edu.wisc.library.ocfl.api.MutableOcflRepository;
-import edu.wisc.library.ocfl.api.OcflOption;
 import edu.wisc.library.ocfl.api.OcflRepository;
-import edu.wisc.library.ocfl.api.model.ObjectVersionId;
 import edu.wisc.library.ocfl.core.OcflRepositoryBuilder;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionRegistry;
@@ -51,11 +47,11 @@ import edu.wisc.library.ocfl.core.extension.storage.layout.config.HashedNTupleId
  * @author Tobias Lenhardt [Hammer1279]
  * @version 1.0
  */
-public class MCROCFLAdaptionRepositoryProvider extends MCROCFLRepositoryProvider {
+public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryProvider {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public final MCROCFLXMLMetadataManager manager;
+    // public final MCROCFLXMLMetadataManager manager;
 
     // if anything ever extends this class,
     // the configurations dont have to be loaded again and can be called from child classes
@@ -63,17 +59,17 @@ public class MCROCFLAdaptionRepositoryProvider extends MCROCFLRepositoryProvider
 
     protected final OcflExtensionConfig mcrLayoutConfig = new MCRLayoutConfig();
 
+    // private MCROcflUtil util = new MCROcflUtil();
+
     private Path repositoryRoot;
 
     private Path mainRoot;
 
-    private Path exportDir;
+    private Path exportDir = MCROcflUtil.getExportDir();
 
-    private Path backupDir;
+    // private Path backupDir;
 
     private Path workDir;
-
-    private String layout;
 
     /**
      * New repository with new layout, this is for rewriting only
@@ -84,7 +80,7 @@ public class MCROCFLAdaptionRepositoryProvider extends MCROCFLRepositoryProvider
     /**
      * Currently loaded "old" repository
      */
-    private OcflRepository prevRepository;
+    // private OcflRepository prevRepository;
 
     Thread cleanDir = new Thread(() -> {
         if (repositoryRoot.equals(mainRoot)) {
@@ -108,29 +104,30 @@ public class MCROCFLAdaptionRepositoryProvider extends MCROCFLRepositoryProvider
         }
     });
 
-    public MCROCFLAdaptionRepositoryProvider(String repositoryKey) {
-        manager = new MCROCFLXMLMetadataManager();
-        manager.setRepositoryKey(repositoryKey);
-        setRepositoryRoot(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Adapt.RepositoryRoot"));
-        this.mainRoot = Paths.get(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Main.RepositoryRoot"));
-        setExportDir(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Adapt.ExportDir"));
-        this.backupDir = Paths.get(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Adapt.BackupDir"));
-        setWorkDir(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Adapt.WorkDir"));
-        this.layout = MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Adapt.Layout");
+    // make something that doesnt require property so it works with ocflUtil
+    public MCROCFLAdaptionRepositoryProvider(/* String repositoryKey */) {
+        // manager = new MCROCFLXMLMetadataManager();
+        // manager.setRepositoryKey(repositoryKey);
     }
 
+    // needed?
     @Override
     public OcflRepository getRepository() {
         return this.repository;
     }
 
+    @Override
+    @MCRPostConstruction
+    public void init(String property) throws IOException {
+        this.init();
+    }
+
     /**
      * Initiate Adaption Repository
-     * close after use to prevent memory leaks
-     * @throws IOException
+     * @throws IOException if an I/O Error occurs
      * @return Adapt Repository
      */
-    public OcflRepository init() throws IOException {
+    public MutableOcflRepository init() throws IOException {
 
         if (Files.notExists(workDir)) {
             Files.createDirectories(workDir).toFile().deleteOnExit();
@@ -142,7 +139,11 @@ public class MCROCFLAdaptionRepositoryProvider extends MCROCFLRepositoryProvider
             Files.createDirectories(repositoryRoot);
         }
 
-        Runtime.getRuntime().addShutdownHook(cleanDir);
+        try {
+            Runtime.getRuntime().addShutdownHook(cleanDir);
+        } catch (IllegalArgumentException err) {
+            // expected error after repository restart, so this is dropped
+        }
 
         OcflExtensionRegistry.register(MCRLayoutExtension.EXTENSION_NAME, MCRLayoutExtension.class);
 
@@ -152,108 +153,26 @@ public class MCROCFLAdaptionRepositoryProvider extends MCROCFLRepositoryProvider
             .workDir(workDir)
             .buildMutable();
 
-        this.prevRepository = manager.getRepository();
+        // this.prevRepository = manager.getRepository(); // java.util.NoSuchElementException: No value present
         return this.repository;
     }
 
-    /**
-     * This function exports the entire current repository into the ocfl-export directory
-     * @apiNote Make sure to Initiate the Repository before Use!
-     * @exception MCRUsageException if Repository not Initiated
-     */
-    public void exportRepository() {
-        if (prevRepository == null || repository == null) {
-            throw new MCRUsageException("Repository must be initialized before use!");
-        }
-        prevRepository.listObjectIds()
-            .filter(id -> id.startsWith(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX))
-            .forEach(objId -> {
-                LOGGER.info("Exporting Object with ID {}", objId);
-                prevRepository.exportObject(objId, Paths.get(exportDir + "/" + objId), OcflOption.NO_VALIDATION,
-                    OcflOption.OVERWRITE);
-            });
+    // !!! delete this before commit !!!
+    public void debugDump() {
+        LOGGER.debug("All Properties in AdaptRepoProv:\n");
+        LOGGER.debug("RepositoryRoot: {}\n", this.getRepositoryRoot());
+        LOGGER.debug("WorkDir: {}\n", this.getWorkDir());
+        LOGGER.debug("ExportDir: {}\n", this.getExportDir());
+        // LOGGER.debug("BackupDir: {}\n", this.getBackupDir());
+        LOGGER.debug("Layout: {}\n", this.getLayout());
     }
 
-    /**
-     * Exports entire Object from Initiated Repository
-     * @apiNote Make sure to Initiate the Repository before Use!
-     * @param mcrid
-     */
-    public void exportObject(String mcrid) {
-        if (prevRepository == null || repository == null) {
-            throw new MCRUsageException("Repository must be initialized before use!");
-        }
-        String prefixedMCRID = MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + mcrid;
-        prevRepository.exportObject(prefixedMCRID, Paths.get(exportDir + "/" + prefixedMCRID), OcflOption.NO_VALIDATION,
-            OcflOption.OVERWRITE);
-    }
-
-    /**
-     * Exports Object version from Initiated Repository
-     * @apiNote Make sure to Initiate the Repository before Use!
-     * @param mcrid
-     */
-    public void exportObjectVersion(String mcrid, String version) {
-        if (prevRepository == null || repository == null) {
-            throw new MCRUsageException("Repository must be initialized before use!");
-        }
-        String prefixedMcrid = MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + mcrid;
-        prevRepository.exportVersion(ObjectVersionId.version(prefixedMcrid, version),
-            Paths.get(exportDir + "/" + prefixedMcrid + "_" + version), OcflOption.NO_VALIDATION, OcflOption.OVERWRITE);
-    }
-
-    /**
-     * Imports all Objects from specified export directory
-     * @apiNote Make sure to Initiate the Repository before Use!
-     * @throws IOException
-     */
-    public void importRepository() throws IOException {
-        if (prevRepository == null || repository == null) {
-            throw new MCRUsageException("Repository must be initialized before use!");
-        }
-        Files.list(exportDir)
-            .filter(Files::isDirectory)
-            .forEach(dir -> {
-                repository.importObject(dir, OcflOption.MOVE_SOURCE, OcflOption.NO_VALIDATION);
-            });
-    }
-
-    /**
-     * Move Root to Backup and Adapt to Root
-     * @throws IOException
-     */
-    void updateRoot() throws IOException {
-        if (backupDir.toFile().exists()) {
-            Stream<Path> walker = Files.walk(backupDir);
-            walker
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
-            walker.close();
-        }
-        Files.move(mainRoot, backupDir, StandardCopyOption.ATOMIC_MOVE);
-        if (Files.notExists(mainRoot)) {
-            Files.createDirectories(mainRoot);
-        }
-        Files.move(repositoryRoot, mainRoot, StandardCopyOption.ATOMIC_MOVE);
-    }
-
-    /**
-     * Destroy the current Repository Instances and recreate them
-     * @throws IOException
-     */
-    public void reloadRepository() throws IOException {
-        repository.close();
-        prevRepository.close();
-        new MCRSimpleOcflRepositoryProvider().init("prop");
-        this.init();
-        LOGGER.info("Repositories Reloaded!");
-    }
-
+    // also just copy pasted (actually this is the original but its the same), needed?
     /**
      * Return the current Layout Config for this Repository
      * @return LayoutConfig
      */
+    @Override
     public OcflExtensionConfig getExtensionConfig() {
         switch (this.layout) {
             case "hash":
@@ -265,19 +184,61 @@ public class MCROCFLAdaptionRepositoryProvider extends MCROCFLRepositoryProvider
         }
     }
 
+    // is this needed?
+    @Override
     @MCRProperty(name = "RepositoryRoot")
-    public void setRepositoryRoot(String repositoryRoot) {
+    public MCROCFLAdaptionRepositoryProvider setRepositoryRoot(String repositoryRoot) {
         this.repositoryRoot = Paths.get(repositoryRoot);
+        return this;
     }
 
-    @MCRProperty(name = "ExportDir")
-    public void setExportDir(String exportDir) {
-        this.exportDir = Paths.get(exportDir);
-    }
-
+    // is this needed?
+    @Override
     @MCRProperty(name = "WorkDir")
-    public void setWorkDir(String workDir) {
+    public MCROCFLAdaptionRepositoryProvider setWorkDir(String workDir) {
         this.workDir = Paths.get(workDir);
+        return this;
+    }
+
+    // @MCRProperty(name = "ExportDir")
+    // public MCROCFLAdaptionRepositoryProvider setExportDir(String exportDir) {
+    //     this.exportDir = Paths.get(exportDir);
+    //     return this;
+    // }
+    
+    // @MCRProperty(name = "BackupDir")
+    // public MCROCFLAdaptionRepositoryProvider setBackupDir(String backupDir) {
+    //     this.backupDir = Paths.get(backupDir);
+    //     return this;
+    // }
+    
+    @MCRProperty(name = "Layout")
+    public MCROCFLAdaptionRepositoryProvider setLayout(String layout) {
+        this.layout = layout;
+        return this;
+    }
+    
+
+    @Override
+    public Path getRepositoryRoot() {
+        return this.repositoryRoot;
+    }
+
+    // @Override
+    // public Path getWorkDir() {
+    //     return workDir;
+    // }
+
+    public Path getExportDir() {
+        return exportDir;
+    }
+
+    // public Path getBackupDir() {
+    //     return backupDir;
+    // }
+
+    public String getLayout() {
+        return layout;
     }
 
 }
