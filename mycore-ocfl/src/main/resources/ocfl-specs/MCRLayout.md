@@ -10,12 +10,12 @@
 
 This storage root extension maps OCFL objects by segmenting their ID via the SlotLayout to bring back the original MyCoRe File Structure
 
-## Configuration:
+## Configuration
 
 `MCR.IFS2.Store.<Type>.SlotLayout`\
 default: `4-2-2`
 
-## Structure Sample:
+## Structure Sample
 
 ```yaml
 [storage root]
