@@ -26,8 +26,8 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.ocfl.MCROCFLAdaptionRepositoryProvider;
 import org.mycore.ocfl.MCROCFLMigrationUtil;
+import org.mycore.ocfl.MCROcflUtil;
 
 @MCRCommandGroup(name = "OCFL Commands")
 public class MCROCFLCommands {
@@ -37,55 +37,93 @@ public class MCROCFLCommands {
     private static final String CONFIGURED_REPOSITORY = MCRConfiguration2
         .getStringOrThrow("MCR.Metadata.Manager.Repository");
 
-    public static MCROCFLMigrationUtil baseClass;
+    private static final int WITH_REPOSITORY = 1;
+        
+    private static final int WITHOUT_REPOSITORY = 2;
+        
+    private static MCROCFLMigrationUtil migrationUtil;
 
-    @MCRCommand(syntax = "export repository {0}", help = "export repository {0} to ocfl-export")
+    private static MCROcflUtil ocflUtil = new MCROcflUtil();
+
+    @MCRCommand(syntax = "export repository {0}",
+        order = WITH_REPOSITORY,
+        help = "export repository {0} to ocfl-export")
     public static void exportRepository(String repositoryKey) throws IOException {
-        MCROCFLAdaptionRepositoryProvider adapter = new MCROCFLAdaptionRepositoryProvider(repositoryKey);
-        // MCROCFLAdaptionRepositoryProvider adapter = new MCROCFLAdaptionRepositoryProvider();
-        adapter.init();
-        adapter.exportRepository();
-        // MCROCFLAdaptionRepositoryProvider.getRepository("Adapt");
+        ocflUtil.setRepositoryKey(repositoryKey).updateMainRepo().exportRepository();
         LOGGER.info("Successfully exported repository {}", repositoryKey);
     }
 
     @MCRCommand(syntax = "export object {0} in repository {1}",
+        order = WITH_REPOSITORY,
         help = "export object {0} in repository {1} to ocfl-export")
     public static void exportObject(String mcrid, String repositoryKey) throws IOException {
-        MCROCFLAdaptionRepositoryProvider adapter = new MCROCFLAdaptionRepositoryProvider(repositoryKey);
-        adapter.init();
-        adapter.exportObject(mcrid);
-        LOGGER.info("Successfully exported object {}", mcrid);
+        ocflUtil.setRepositoryKey(repositoryKey).updateMainRepo().exportObject(mcrid);
+        LOGGER.info("Successfully exported object {} from repository {}", mcrid, repositoryKey);
     }
 
-    @MCRCommand(syntax = "import repository {0}", help = "import repository {0} from ocfl-export")
+    @MCRCommand(syntax = "export repository",
+        order = WITHOUT_REPOSITORY,
+        help = "export default repository to ocfl-export")
+    public static void exportRepository() throws IOException {
+        ocflUtil.exportRepository();
+        LOGGER.info("Successfully exported repository {}", CONFIGURED_REPOSITORY);
+    }
+
+    @MCRCommand(syntax = "export repository object {0}",
+        order = WITHOUT_REPOSITORY,
+        help = "export object {0} in default repository to ocfl-export")
+    public static void exportObject(String mcrid) throws IOException {
+        ocflUtil.exportObject(mcrid);
+        LOGGER.info("Successfully exported object {} from repository {}", mcrid, CONFIGURED_REPOSITORY);
+    }
+
+    @MCRCommand(syntax = "import repository {0}",
+        order = WITH_REPOSITORY,
+        help = "import repository {0} from ocfl-export")
     public static void importRepository(String repositoryKey) throws IOException {
-        MCROCFLAdaptionRepositoryProvider adapter = new MCROCFLAdaptionRepositoryProvider(repositoryKey);
-        adapter.init();
-        adapter.importRepository();
+        ocflUtil.setRepositoryKey(repositoryKey).updateMainRepo().importRepository();
         LOGGER.info("Successfully imported repository {}", repositoryKey);
     }
 
-    @MCRCommand(syntax = "restore repository", help = "restore ocfl repository from backup if available")
-    public static void restoreRepo() throws IOException {
-        MCROCFLMigrationUtil.restoreRoot(CONFIGURED_REPOSITORY);
+    @MCRCommand(syntax = "import repository",
+        order = WITHOUT_REPOSITORY,
+        help = "import default repository from ocfl-export")
+    public static void importRepository() throws IOException {
+        ocflUtil.importRepository();
+        LOGGER.info("Successfully imported repository {}", CONFIGURED_REPOSITORY);
     }
 
-    @MCRCommand(syntax = "purge repository backup", help = "clear the backup of a ocfl repository")
-    public static void purgeRepoBCK() throws IOException {
-        MCROCFLMigrationUtil.clearBackup(CONFIGURED_REPOSITORY);
+    @MCRCommand(syntax = "restore repository",
+        order = WITHOUT_REPOSITORY,
+        help = "restore default ocfl repository from backup if available")
+    public static void restoreRepo() throws IOException {
+        ocflUtil.restoreRoot();
+    }
+
+    @MCRCommand(syntax = "restore repository {0}",
+    order = WITH_REPOSITORY,
+    help = "restore ocfl repository {0} from backup if available")
+    public static void restoreRepo(String repositoryKey) throws IOException {
+        ocflUtil.setRepositoryKey(repositoryKey).updateMainRepo().restoreRoot();
+    }
+
+    @MCRCommand(syntax = "purge repository backup", order = 3, help = "clear the backup of a ocfl repository")
+    public static void purgeRepoBackup() throws IOException {
+        ocflUtil.clearBackup();
     }
 
     @MCRCommand(syntax = "migrate metadata from {0} to {1}",
-        help = "migrate metadata from {0} to {1} with repository Main")
+        order = WITHOUT_REPOSITORY,
+        help = "migrate metadata from {0} to {1} with default repository")
     public static void migrateMetadata(String from, String to) throws IOException {
         migrateMetadata(from, to, CONFIGURED_REPOSITORY);
     }
 
     @MCRCommand(syntax = "migrate metadata from {0} to {1} with {2}",
+        order = WITH_REPOSITORY,
         help = "migrate metadata from {0} to {1} with repository {2}")
     public static void migrateMetadata(String from, String to, String repositoryKey) throws IOException {
-        baseClass = new MCROCFLMigrationUtil(repositoryKey);
+        migrationUtil = new MCROCFLMigrationUtil(repositoryKey);
         switch (from) {
             case "xml":
             case "svn":
@@ -100,11 +138,11 @@ public class MCROCFLCommands {
             case "ocfl":
                 switch (to) {
                     case "ocfl":
-                        baseClass.convertOcflToOcfl();
+                        migrationUtil.convertOcflToOcfl(repositoryKey);
                         break;
                     case "xml":
                     case "svn":
-                        baseClass.convertOcflToXML(repositoryKey);
+                        migrationUtil.convertOcflToXML(repositoryKey);
                         break;
                     default:
                         throw new MCRUsageException("Invalid Command Parameter 'to'");
