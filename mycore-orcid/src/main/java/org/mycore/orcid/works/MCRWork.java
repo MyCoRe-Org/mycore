@@ -47,8 +47,6 @@ public class MCRWork {
 
     private MCRWorkSource source;
 
-    private MCRObjectID objectID;
-
     MCRWork(MCRORCIDProfile orcid, String putCode) {
         this.orcid = orcid;
         this.putCode = putCode;
@@ -70,18 +68,6 @@ public class MCRWork {
 
     void setSource(MCRWorkSource source) {
         this.source = source;
-    }
-
-    /**
-     * If this work's source is this MyCoRe application,
-     * returns the MCRObjectID of the publication the work was created from.
-     */
-    public MCRObjectID getObjectID() {
-        return objectID;
-    }
-
-    void setObjectID(MCRObjectID objectID) {
-        this.objectID = objectID;
     }
 
     /**
@@ -115,14 +101,14 @@ public class MCRWork {
      * If this work's source is this MyCoRe application,
      * updates the work in the remote ORCID profile from the local MyCoRe object
      */
-    public void update() throws IOException, SAXException, JDOMException {
+    public void update(MCRObjectID objectID) throws IOException, SAXException, JDOMException {
         if (!source.isThisApplication()) {
             throw new MCRORCIDException("can not update that work, is not from us");
         }
         if (!MCRMetadataManager.exists(objectID)) {
             throw new MCRORCIDException("can not update that work, object " + objectID + " does not exist locally");
         }
-        orcid.getPublisher().update(this);
+        orcid.getPublisher().update(this, objectID);
     }
 
     /** Deletes this work from the remote ORCID profile */

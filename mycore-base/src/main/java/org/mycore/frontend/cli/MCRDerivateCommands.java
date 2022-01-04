@@ -97,8 +97,9 @@ import org.xml.sax.SAXParseException;
  */
 @MCRCommandGroup(name = "Derivate Commands")
 public class MCRDerivateCommands extends MCRAbstractCommands {
+
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRDerivateCommands.class.getName());
+    private static Logger LOGGER = LogManager.getLogger(MCRDerivateCommands.class);
 
     /** The ACL interface */
     private static final MCRAccessInterface ACCESS_IMPL = MCRAccessManager.getAccessImpl();
@@ -159,7 +160,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      */
     @MCRCommand(syntax = "load all derivates from directory {0}",
-        help = "The command load all derivates form the directory {0} to the system.",
+        help = "Loads all MCRDerivates from the directory {0} to the system. " +
+            "If the numerical part of a provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 60)
     public static List<String> loadFromDirectory(String directory) {
         return processFromDirectory(directory, false);
@@ -226,7 +228,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @throws MCRAccessException see {@link MCRMetadataManager#create(MCRDerivate)}
      */
     @MCRCommand(syntax = "load derivate from file {0}",
-        help = "The command add a derivate form the file {0} to the system.",
+        help = "Loads an MCRDerivate from the file {0} to the system. " +
+            "If the numerical part of the provided ID is zero, a new ID with the same project ID and type is assigned.",
         order = 40)
     public static boolean loadFromFile(String file)
         throws SAXParseException, IOException, MCRPersistenceException, MCRAccessException {
@@ -280,12 +283,13 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Loads or updates an MCRDerivates from an XML file.
+     * Load or update an MCRDerivate from an XML file. If the numerical part of the contained ID is zero,
+     * a new ID with the same project ID and type is assigned.
      *
      * @param file
      *            the location of the xml file
      * @param update
-     *            if true, object will be updated, else object is created
+     *            if true, derivate will be updated, else derivate is created
      * @param importMode
      *            if true, servdates are taken from xml file
      * @throws SAXParseException
@@ -335,11 +339,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         if (update) {
             MCRMetadataManager.update(derivate);
             LOGGER.info("{} updated.", derivate.getId());
-            LOGGER.info("");
         } else {
             MCRMetadataManager.create(derivate);
             LOGGER.info("{} loaded.", derivate.getId());
-            LOGGER.info("");
         }
 
         return true;

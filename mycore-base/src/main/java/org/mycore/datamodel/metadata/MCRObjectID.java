@@ -107,7 +107,7 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
      * <em>project_id</em>_<em>type_id</em>. The number is computed by this
      * method. It is the next free number of an item in the database for the
      * given project ID and type ID, with the following additional restriction:
-     * The ID returned can be divided by idFormat.numberDistance without rest.
+     * The ID returned can be divided by idFormat.numberDistance without remainder.
      * The ID returned minus the last ID returned is at least idFormat.numberDistance.
      *
      * Example for number distance of 1 (default):
@@ -126,8 +126,31 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return getNextFreeId(baseId, 0);
     }
 
-    public static synchronized MCRObjectID getNextFreeId(String base, String type) {
-        return getNextFreeId(base + "_" + type);
+
+    /**
+     * Returns a MCRObjectID from a given the components of a base ID string. A base ID is
+     * <em>project_id</em>_<em>type_id</em>. The number is computed by this
+     * method. It is the next free number of an item in the database for the
+     * given project ID and type ID, with the following additional restriction:
+     * The ID returned can be divided by idFormat.numberDistance without remainder.
+     * The ID returned minus the last ID returned is at least idFormat.numberDistance.
+     *
+     * Example for number distance of 1 (default):
+     *   last ID = 7, next ID = 8
+     *   last ID = 8, next ID = 9
+     *
+     * Example for number distance of 2:
+     *   last ID = 7, next ID = 10
+     *   last ID = 8, next ID = 10
+     *   last ID = 10, next ID = 20
+     *
+     * @param projectId
+     *            The first component of <em>project_id</em>_<em>type_id</em>
+     * @param type
+     *            The second component of <em>project_id</em>_<em>type_id</em>
+     */
+    public static synchronized MCRObjectID getNextFreeId(String projectId, String type) {
+        return getNextFreeId(projectId + "_" + type);
     }
 
     /**
