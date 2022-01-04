@@ -95,12 +95,14 @@ public class MCRSimpleOcflRepositoryProvider extends MCROCFLRepositoryProvider {
     }
 
     @MCRProperty(name = "RepositoryRoot")
-    public void setRepositoryRoot(String repositoryRoot) {
+    public MCRSimpleOcflRepositoryProvider setRepositoryRoot(String repositoryRoot) {
         this.repositoryRoot = Paths.get(repositoryRoot);
+        return this;
     }
 
     @MCRProperty(name = "WorkDir")
-    public void setWorkDir(String workDir) {
+    public MCRSimpleOcflRepositoryProvider setWorkDir(String workDir) {
         this.workDir = Paths.get(workDir);
+        return this;
     }
 }
