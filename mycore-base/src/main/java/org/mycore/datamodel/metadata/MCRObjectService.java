@@ -1066,7 +1066,7 @@ public class MCRObjectService {
      */
     public final void replaceMessage(int index, String value) throws IndexOutOfBoundsException {
         MCRUtils.filterTrimmedNotEmpty(value)
-            .ifPresent(messageValue -> updateMessage(index, message -> message.setType(value)));
+            .ifPresent(messageValue -> updateMessage(index, message -> message.setText(value)));
     }
 
     /**
