@@ -123,7 +123,7 @@ public class MCROCFLCommands {
         order = WITH_REPOSITORY,
         help = "migrate metadata from {0} to {1} with repository {2}")
     public static void migrateMetadata(String from, String to, String repositoryKey) throws IOException {
-        migrationUtil = new MCROCFLMigrationUtil(repositoryKey);
+        migrationUtil = new MCROCFLMigrationUtil();
         switch (from) {
             case "xml":
             case "svn":

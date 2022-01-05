@@ -18,16 +18,9 @@
 
 package org.mycore.ocfl;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,8 +47,6 @@ public class MCROCFLMigrationUtil {
 
     private int i;
 
-    // public final MCROCFLAdaptionRepositoryProvider adaptionRepo;
-
     private static MCROcflUtil util = new MCROcflUtil();
 
     private static final String SUCCESS = "success";
@@ -70,9 +61,7 @@ public class MCROCFLMigrationUtil {
 
     private static final String BACKUP_CONFIG = "MCR.OCFL.Repository.Adapt.BackupDir";
 
-    public MCROCFLMigrationUtil(String repoKey) {
-        // this.adaptionRepo = new MCROCFLAdaptionRepositoryProvider(repoKey);
-    }
+    public MCROCFLMigrationUtil() {}
 
     /**
      * Convert from XML to OCFL using {@code MCROCFLMigration}
@@ -80,14 +69,6 @@ public class MCROCFLMigrationUtil {
      * @throws IOException if an I/O error occurs
      */
     public static void convertXMLToOcfl(String repository) throws IOException {
-
-        // Path rootDir = Paths
-        //     .get(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository." + repository + ".RepositoryRoot"));
-        // // Path backupDir = Paths.get(MCRConfiguration2.getStringOrThrow(BACKUP_CONFIG));
-        // Path backupDir = MCROcflUtil.getBackupDir();
-        // if (rootDir.toFile().exists()) {
-        //     MCROcflUtil.moveDir(rootDir, backupDir);
-        // }
 
         MCROFCLMigration migration = new MCROFCLMigration(repository);
 
@@ -147,7 +128,6 @@ public class MCROCFLMigrationUtil {
      */
     public void convertOcflToXML(String repositoryKey) throws IOException, MCRException {
         MCROCFLAdaptionRepositoryProvider adaptRepo = util.adaptClass;
-        // MCRSimpleOcflRepositoryProvider adaptRepo = util.adaptClass;
         if (null == adaptRepo) {
             throw new MCRUsageException("Adapt Repository has not been initialized yet!");
         }
@@ -164,7 +144,6 @@ public class MCROCFLMigrationUtil {
         adaptRepo.setRepositoryRoot(
             MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository." + repositoryKey + ".RepositoryRoot"));
         adaptRepo.init();
-        // adaptRepo.init("");
         ArrayList<MCRObjectID> newObjects = new ArrayList<MCRObjectID>();
         ArrayList<MCRObjectID> existObjects = new ArrayList<MCRObjectID>();
         i = 0;
@@ -174,16 +153,6 @@ public class MCROCFLMigrationUtil {
             .map(id -> id.substring(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX.length()))
             .forEach(objId -> {
                 MCRObjectID mcrid = MCRObjectID.getInstance(objId);
-                // MCRContent xml;
-                // Date lastModified;
-                // try {
-                //     xml = ocflManager.retrieveContent(mcrid);
-                //     lastModified = new Date(ocflManager.getLastModified(mcrid));
-                // } catch (IOException e) {
-                //     throw new MCRPersistenceException("Error while accessing MCRObject: ", e);
-                // }
-                // manager.update(mcrid, xml, lastModified);
-                // i++;
                 if (manager.exists(mcrid)) {
                     existObjects.add(mcrid);
                 } else {

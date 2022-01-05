@@ -34,7 +34,6 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
 
-import edu.wisc.library.ocfl.api.MutableOcflRepository;
 import edu.wisc.library.ocfl.api.OcflOption;
 import edu.wisc.library.ocfl.api.OcflRepository;
 import edu.wisc.library.ocfl.api.model.ObjectVersionId;
@@ -44,22 +43,24 @@ public class MCROcflUtil {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String REPO_INIT_ERR = "Repository must be initialized before use!";
-    
+
     public MCRSimpleOcflRepositoryProvider mainClass;
+
     public final MCROCFLAdaptionRepositoryProvider adaptClass;
     // public final MCRSimpleOcflRepositoryProvider adaptClass;
 
     private MCRSimpleOcflRepositoryProvider customClass;
-    
+
     private OcflRepository mainRepository;
+
     private OcflRepository adaptRepository;
-    
-    private Map<String,String> mainConfig;
-    
+
+    private Map<String, String> mainConfig;
+
     private Path mainRoot;
-    
+
     private Path adaptRoot; /* = Path.of(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Adapt.RepositoryRoot")); */
-    
+
     private static Path exportDir = Path.of(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Util.ExportDir"));
 
     private static Path backupDir = Path.of(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Util.BackupDir"));
@@ -67,14 +68,16 @@ public class MCROcflUtil {
     private String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository");
 
     public MCROcflUtil() {
-        mainClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository."+repositoryKey).map(MCRSimpleOcflRepositoryProvider.class::cast).get();
-        adaptClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository.Adapt").map(MCROCFLAdaptionRepositoryProvider.class::cast).get();
+        mainClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository." + repositoryKey)
+            .map(MCRSimpleOcflRepositoryProvider.class::cast).get();
+        adaptClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository.Adapt")
+            .map(MCROCFLAdaptionRepositoryProvider.class::cast).get();
         // adaptClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository.Adapt").map(MCRSimpleOcflRepositoryProvider.class::cast).get();
         mainRepository = mainClass.getRepository();
         adaptRepository = adaptClass.getRepository();
         adaptRoot = adaptClass.getRepositoryRoot();
         LOGGER.debug("AdaptRoot: {}", adaptRoot);
-        mainConfig = MCRConfiguration2.getSubPropertiesMap("MCR.OCFL.Repository."+repositoryKey);
+        mainConfig = MCRConfiguration2.getSubPropertiesMap("MCR.OCFL.Repository." + repositoryKey);
     }
 
     public static Path getExportDir() {
@@ -132,9 +135,10 @@ public class MCROcflUtil {
      * @throws IOException
      */
     public MCROcflUtil updateMainRepo() throws IOException {
-        mainClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository."+repositoryKey).map(MCRSimpleOcflRepositoryProvider.class::cast).get();
+        mainClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository." + repositoryKey)
+            .map(MCRSimpleOcflRepositoryProvider.class::cast).get();
         mainRepository = mainClass.getRepository();
-        mainConfig = MCRConfiguration2.getSubPropertiesMap("MCR.OCFL.Repository."+repositoryKey);
+        mainConfig = MCRConfiguration2.getSubPropertiesMap("MCR.OCFL.Repository." + repositoryKey);
         mainRoot = Path.of(mainConfig.get(".RepositoryRoot"));
         LOGGER.debug(mainConfig);
         adaptClass.layout = mainConfig.get(".Layout");
@@ -151,6 +155,7 @@ public class MCROcflUtil {
     public OcflRepository getMainRepository() {
         return this.mainRepository;
     }
+
     public OcflRepository getAdaptRepository() {
         return this.adaptRepository;
     }
@@ -186,7 +191,7 @@ public class MCROcflUtil {
                 repository.exportObject(objId, Paths.get(exportDir + "/" + objId), OcflOption.NO_VALIDATION,
                     OcflOption.OVERWRITE);
             });
-            return this;
+        return this;
     }
 
     /**
@@ -201,7 +206,7 @@ public class MCROcflUtil {
         String prefixedMCRID = MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + mcrid;
         mainRepository.exportObject(prefixedMCRID, Paths.get(exportDir + "/" + prefixedMCRID), OcflOption.NO_VALIDATION,
             OcflOption.OVERWRITE);
-            return this;
+        return this;
     }
 
     /**
@@ -217,7 +222,7 @@ public class MCROcflUtil {
         String prefixedMcrid = MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + mcrid;
         mainRepository.exportVersion(ObjectVersionId.version(prefixedMcrid, version),
             Paths.get(exportDir + "/" + prefixedMcrid + "_" + version), OcflOption.NO_VALIDATION, OcflOption.OVERWRITE);
-            return this;
+        return this;
     }
 
     /**
@@ -234,7 +239,7 @@ public class MCROcflUtil {
             .forEach(dir -> {
                 mainRepository.importObject(dir, OcflOption.MOVE_SOURCE, OcflOption.NO_VALIDATION);
             });
-            return this;
+        return this;
     }
 
     public MCROcflUtil importAdapt() throws IOException {
@@ -246,7 +251,7 @@ public class MCROcflUtil {
             .forEach(dir -> {
                 adaptRepository.importObject(dir, OcflOption.MOVE_SOURCE, OcflOption.NO_VALIDATION);
             });
-            return this;
+        return this;
     }
 
     /**

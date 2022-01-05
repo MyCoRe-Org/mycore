@@ -104,12 +104,6 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
         }
     });
 
-    // make something that doesnt require property so it works with ocflUtil
-    public MCROCFLAdaptionRepositoryProvider(/* String repositoryKey */) {
-        // manager = new MCROCFLXMLMetadataManager();
-        // manager.setRepositoryKey(repositoryKey);
-    }
-
     // needed?
     @Override
     public OcflRepository getRepository() {
@@ -155,16 +149,6 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
 
         // this.prevRepository = manager.getRepository(); // java.util.NoSuchElementException: No value present
         return this.repository;
-    }
-
-    // !!! delete this before commit !!!
-    public void debugDump() {
-        LOGGER.debug("All Properties in AdaptRepoProv:\n");
-        LOGGER.debug("RepositoryRoot: {}\n", this.getRepositoryRoot());
-        LOGGER.debug("WorkDir: {}\n", this.getWorkDir());
-        LOGGER.debug("ExportDir: {}\n", this.getExportDir());
-        // LOGGER.debug("BackupDir: {}\n", this.getBackupDir());
-        LOGGER.debug("Layout: {}\n", this.getLayout());
     }
 
     // also just copy pasted (actually this is the original but its the same), needed?
@@ -218,7 +202,7 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
         return this;
     }
     
-
+    // required
     @Override
     public Path getRepositoryRoot() {
         return this.repositoryRoot;
