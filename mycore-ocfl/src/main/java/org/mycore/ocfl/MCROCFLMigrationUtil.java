@@ -81,13 +81,13 @@ public class MCROCFLMigrationUtil {
      */
     public static void convertXMLToOcfl(String repository) throws IOException {
 
-        Path rootDir = Paths
-            .get(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository." + repository + ".RepositoryRoot"));
-        // Path backupDir = Paths.get(MCRConfiguration2.getStringOrThrow(BACKUP_CONFIG));
-        Path backupDir = MCROcflUtil.getBackupDir();
-        if (rootDir.toFile().exists()) {
-            MCROcflUtil.moveDir(rootDir, backupDir);
-        }
+        // Path rootDir = Paths
+        //     .get(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository." + repository + ".RepositoryRoot"));
+        // // Path backupDir = Paths.get(MCRConfiguration2.getStringOrThrow(BACKUP_CONFIG));
+        // Path backupDir = MCROcflUtil.getBackupDir();
+        // if (rootDir.toFile().exists()) {
+        //     MCROcflUtil.moveDir(rootDir, backupDir);
+        // }
 
         MCROFCLMigration migration = new MCROFCLMigration(repository);
 
