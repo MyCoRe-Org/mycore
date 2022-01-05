@@ -98,7 +98,8 @@ public class MCROCFLMigrationUtil {
 
     /**
      * Convert between OCFL Layouts or create backups of Repos
-     * @apiNote due to how its implemented, if a Layout is not changed it just makes a backup
+     * <p>Info: due to how its implemented, if a Layout is not changed it just makes a backup</p>
+     * @param repositoryKey Repository to migrate
      * @throws IOException if an I/O error occurs
      */
     public void convertOcflToOcfl(String repositoryKey) throws IOException {

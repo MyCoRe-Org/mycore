@@ -128,7 +128,7 @@ public class MCROcflUtil {
     /**
      * Update the Main Repository for the Ocfl Util
      * @return MCROcflUtil
-     * @throws IOException
+     * @throws IOException if an I/O error occurs
      */
     public MCROcflUtil updateMainRepo() throws IOException {
         mainClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository." + repositoryKey)
@@ -158,6 +158,8 @@ public class MCROcflUtil {
 
     /**
      * Destroy the current Repository Instances and recreate them
+     * @return MCROcflUtil
+     * @throws IOException if an I/O error occurs
      */
     public MCROcflUtil reloadRepository() throws IOException {
         mainRepository.close();
@@ -174,6 +176,7 @@ public class MCROcflUtil {
     /**
      * This function exports the entire current repository into the ocfl-export directory
      * @exception MCRUsageException if Repository not Initiated
+     * @return MCROcflUtil
      */
     public MCROcflUtil exportRepository() {
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
@@ -194,6 +197,7 @@ public class MCROcflUtil {
      * Exports entire Object from Initiated Repository
      * @exception MCRUsageException if Repository not Initiated
      * @param mcrid Object MyCoRe ID
+     * @return MCROcflUtil
      */
     public MCROcflUtil exportObject(String mcrid) {
         if (mainRepository == null || adaptRepository == null) {
@@ -210,6 +214,7 @@ public class MCROcflUtil {
      * @exception MCRUsageException if Repository not Initiated
      * @param mcrid Object MyCoRe ID
      * @param version Object Version
+     * @return MCROcflUtil
      */
     public MCROcflUtil exportObjectVersion(String mcrid, String version) {
         if (mainRepository == null || adaptRepository == null) {
@@ -225,6 +230,7 @@ public class MCROcflUtil {
      * Imports all Objects from specified export directory
      * @exception MCRUsageException if Repository not Initiated
      * @throws IOException if an I/O error occurs when opening the export directory
+     * @return MCROcflUtil
      */
     public MCROcflUtil importRepository() throws IOException {
         if (mainRepository == null || adaptRepository == null) {
@@ -273,8 +279,8 @@ public class MCROcflUtil {
 
     /**
      * Restore the {@code ocfl-root} from {@code ocfl-backup}
-     * @param repository RepositoryKey for config
      * @throws IOException if an I/O error occurs
+     * @return MCROcflUtil
      */
     public final MCROcflUtil restoreRoot() throws IOException {
         if (!backupDir.toFile().exists()) {
@@ -287,8 +293,8 @@ public class MCROcflUtil {
 
     /**
      * Deletes the {@code ocfl-backup} directory
-     * @param repository <i>unused for now</i>
      * @throws IOException if an I/O error occurs
+     * @return MCROcflUtil
      */
     public final MCROcflUtil clearBackup() throws IOException {
         delDir(backupDir);
