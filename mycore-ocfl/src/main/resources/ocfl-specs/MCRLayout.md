@@ -1,10 +1,10 @@
 # File Layout using the MyCoRe SlotLayers
--  Extension Name: MCRLayout
--  Author: Tobias Lenhardt
--  Minimum OCFL Version: 1.0
--  OCFL Community Extensions Version: n/a
--  Obsoletes: n/a
--  Obsoleted by: n/a
+  - Extension Name: MCRLayout
+  - Author: Tobias Lenhardt
+  - Minimum OCFL Version: 1.0
+  - OCFL Community Extensions Version: n/a
+  - Obsoletes: n/a
+  - Obsoleted by: n/a
 
 ## Overview
 

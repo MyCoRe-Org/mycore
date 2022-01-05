@@ -47,9 +47,6 @@ public class MCROcflUtil {
     public MCRSimpleOcflRepositoryProvider mainClass;
 
     public final MCROCFLAdaptionRepositoryProvider adaptClass;
-    // public final MCRSimpleOcflRepositoryProvider adaptClass;
-
-    private MCRSimpleOcflRepositoryProvider customClass;
 
     private OcflRepository mainRepository;
 
@@ -59,7 +56,7 @@ public class MCROcflUtil {
 
     private Path mainRoot;
 
-    private Path adaptRoot; /* = Path.of(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Adapt.RepositoryRoot")); */
+    private Path adaptRoot;
 
     private static Path exportDir = Path.of(MCRConfiguration2.getStringOrThrow("MCR.OCFL.Util.ExportDir"));
 
@@ -72,7 +69,6 @@ public class MCROcflUtil {
             .map(MCRSimpleOcflRepositoryProvider.class::cast).get();
         adaptClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository.Adapt")
             .map(MCROCFLAdaptionRepositoryProvider.class::cast).get();
-        // adaptClass = MCRConfiguration2.getInstanceOf("MCR.OCFL.Repository.Adapt").map(MCRSimpleOcflRepositoryProvider.class::cast).get();
         mainRepository = mainClass.getRepository();
         adaptRepository = adaptClass.getRepository();
         adaptRoot = adaptClass.getRepositoryRoot();

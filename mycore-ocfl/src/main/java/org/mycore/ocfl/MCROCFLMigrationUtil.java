@@ -59,10 +59,6 @@ public class MCROCFLMigrationUtil {
 
     private static final String FAILED_AND_NOW_INVALID_STATE = FAILED + " and now invalid state";
 
-    private static final String BACKUP_CONFIG = "MCR.OCFL.Repository.Adapt.BackupDir";
-
-    public MCROCFLMigrationUtil() {}
-
     /**
      * Convert from XML to OCFL using {@code MCROCFLMigration}
      * @param repository RepositoryKey
