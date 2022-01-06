@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreobject
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="....xsd"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+ID="ocfl_test_01"
+label="JUnit OCFL Repository Test object 1" >
+<metadata>
+    <element name="test" type="text"/>
+</metadata>
+</mycoreobject>

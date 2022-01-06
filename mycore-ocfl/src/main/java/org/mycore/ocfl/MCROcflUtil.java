@@ -72,8 +72,8 @@ public class MCROcflUtil {
         mainRepository = mainClass.getRepository();
         adaptRepository = adaptClass.getRepository();
         adaptRoot = adaptClass.getRepositoryRoot();
-        LOGGER.debug("AdaptRoot: {}", adaptRoot);
         mainConfig = MCRConfiguration2.getSubPropertiesMap("MCR.OCFL.Repository." + repositoryKey);
+        mainRoot = Path.of(mainConfig.get(".RepositoryRoot"));
     }
 
     public static Path getExportDir() {
