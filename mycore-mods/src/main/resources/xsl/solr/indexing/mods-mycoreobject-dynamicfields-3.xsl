@@ -13,32 +13,6 @@
   <xsl:param name="MCR.Solr.DynamicFields" select="'false'" />
   <xsl:param name="MCR.Solr.DynamicFields.excludes" select="''" />
 
-  <!-- defined in solr/indexing/mycoreobject-dynamicfields-3.xsl -->
-  <!-- 
-  <xsl:template name="check.excludes">
-    <xsl:param name="excludes" select="concat(normalize-space($MCR.Solr.DynamicFields.excludes), ',')" />
-    <xsl:variable name="exclude" select="substring-before($excludes, ',')" />
-    <xsl:variable name="otherExcludes" select="substring-after($excludes, ',')" />
-
-    <xsl:choose>
-      <xsl:when test="string-length(normalize-space($exclude))=0">
-        <xsl:text>false</xsl:text>
-      </xsl:when>
-      <xsl:when test="contains(@ID, $exclude)">
-        <xsl:text>true</xsl:text>
-      </xsl:when>
-      <xsl:when test="string-length(normalize-space($otherExcludes))=0">
-        <xsl:text>false</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:call-template name="check.excludes">
-          <xsl:with-param name="excludes" select="$otherExcludes" />
-        </xsl:call-template>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  -->
-
   <xsl:template match="mycoreobject">
     <xsl:apply-imports />
     <xsl:variable name="isExcluded">
