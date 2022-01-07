@@ -40,7 +40,7 @@ import edu.wisc.library.ocfl.api.model.VersionInfo;
 /**
  * @author Tobias Lenhardt [Hammer1279]
  */
-public class MCROCFLUtilTest extends MCROCFLTestCase {
+public class MCROCFLUtilTest extends MCROCFLTestUtil {
 
     public static MCROcflUtil ocflUtil;
 
