@@ -18,14 +18,19 @@
 
 package org.mycore.ocfl;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 
-import org.junit.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.mycore.common.config.MCRConfiguration2;
 
 import edu.wisc.library.ocfl.api.OcflOption;

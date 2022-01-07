@@ -18,7 +18,6 @@
 
 package org.mycore.ocfl;
 
-
 import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
@@ -48,12 +47,17 @@ public class MCROCFLTestBase {
 
         MCRConfiguration2.set("MCR.OCFL.Util.ExportDir", junitFolder.newFolder("ocfl-export").getAbsolutePath());
         MCRConfiguration2.set("MCR.OCFL.Util.BackupDir", junitFolder.newFolder("ocfl-backup").getAbsolutePath());
-        MCRConfiguration2.set("MCR.OCFL.Repository.Adapt.RepositoryRoot", junitFolder.newFolder("ocfl-adapt").getAbsolutePath());
-        MCRConfiguration2.set("MCR.OCFL.Repository.Adapt.WorkDir", junitFolder.newFolder("ocfl-temp").getAbsolutePath());
-        MCRConfiguration2.set("MCR.OCFL.Repository.JUnit.RepositoryRoot", junitFolder.newFolder("ocfl-root").getAbsolutePath());
-        MCRConfiguration2.set("MCR.OCFL.Repository.JUnit.WorkDir", MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Adapt.WorkDir") );
+        MCRConfiguration2.set("MCR.OCFL.Repository.Adapt.RepositoryRoot",
+            junitFolder.newFolder("ocfl-adapt").getAbsolutePath());
+        MCRConfiguration2.set("MCR.OCFL.Repository.Adapt.WorkDir",
+            junitFolder.newFolder("ocfl-temp").getAbsolutePath());
+        MCRConfiguration2.set("MCR.OCFL.Repository.JUnit.RepositoryRoot",
+            junitFolder.newFolder("ocfl-root").getAbsolutePath());
+        MCRConfiguration2.set("MCR.OCFL.Repository.JUnit.WorkDir",
+            MCRConfiguration2.getStringOrThrow("MCR.OCFL.Repository.Adapt.WorkDir"));
 
-        MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern", MCRConfiguration2.getStringOrThrow("MCR.OCFL.TestBase.NumberPattern"));
+        MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern",
+            MCRConfiguration2.getStringOrThrow("MCR.OCFL.TestBase.NumberPattern"));
     }
 
 }
