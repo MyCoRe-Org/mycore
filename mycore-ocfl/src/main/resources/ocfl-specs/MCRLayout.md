@@ -11,6 +11,8 @@
 This storage root extension maps OCFL objects by segmenting their ID via the SlotLayout to bring back the original MyCoRe File Structure
 
 ## Configuration
+`MCR.Metadata.ObjectID.NumberPattern`\
+default: `0000000000`
 
 `MCR.IFS2.Store.<Type>.SlotLayout`\
 default: `4-2-2`
