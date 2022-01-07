@@ -187,7 +187,7 @@ public class MCROcflUtil {
             .filter(id -> id.startsWith(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX))
             .forEach(objId -> {
                 LOGGER.info("Exporting Object with ID {}", objId);
-                repository.exportObject(objId, Paths.get(exportDir + "/" + objId), OcflOption.NO_VALIDATION,
+                repository.exportObject(objId, Paths.get(exportDir + "/" + objId.replace(":", "_")), OcflOption.NO_VALIDATION,
                     OcflOption.OVERWRITE);
             });
         return this;
@@ -204,7 +204,7 @@ public class MCROcflUtil {
             throw new MCRUsageException(REPO_INIT_ERR);
         }
         String prefixedMCRID = MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + mcrid;
-        mainRepository.exportObject(prefixedMCRID, Paths.get(exportDir + "/" + prefixedMCRID), OcflOption.NO_VALIDATION,
+        mainRepository.exportObject(prefixedMCRID, Paths.get(exportDir + "/" + prefixedMCRID.replace(":", "_")), OcflOption.NO_VALIDATION,
             OcflOption.OVERWRITE);
         return this;
     }
@@ -222,7 +222,7 @@ public class MCROcflUtil {
         }
         String prefixedMcrid = MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + mcrid;
         mainRepository.exportVersion(ObjectVersionId.version(prefixedMcrid, version),
-            Paths.get(exportDir + "/" + prefixedMcrid + "_" + version), OcflOption.NO_VALIDATION, OcflOption.OVERWRITE);
+            Paths.get(exportDir + "/" + prefixedMcrid.replace(":", "_") + "_" + version), OcflOption.NO_VALIDATION, OcflOption.OVERWRITE);
         return this;
     }
 

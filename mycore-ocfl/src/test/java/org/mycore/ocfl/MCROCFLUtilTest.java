@@ -99,16 +99,16 @@ public class MCROCFLUtilTest extends MCROCFLTestUtil {
         assertFalse(ocflUtil.getMainRepository().containsObject(objectId));
         ObjectVersionId versionIdMCR = ObjectVersionId.head(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId);
         ocflUtil.getMainRepository().putObject(versionIdMCR, xml, versionInfo, OcflOption.OVERWRITE);
-        assertTrue(ocflUtil.getMainRepository().containsObject(objectId));
+        assertTrue(ocflUtil.getMainRepository().containsObject(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId));
         ocflUtil.exportObject(objectId)
             .importAdapt();
-        assertTrue(ocflUtil.getAdaptRepository().containsObject(objectId));
+        assertTrue(ocflUtil.getAdaptRepository().containsObject(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId));
         ocflUtil.updateRoot()
             .exportRepository()
             .setRepositoryKey("Adapt")
             .updateMainRepo()
             .importRepository();
-        assertTrue(ocflUtil.getAdaptRepository().containsObject(objectId));
+        assertTrue(ocflUtil.getAdaptRepository().containsObject(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId));
     }
 
     @Test
