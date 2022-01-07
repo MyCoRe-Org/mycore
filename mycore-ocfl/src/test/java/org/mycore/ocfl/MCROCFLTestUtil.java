@@ -58,6 +58,8 @@ public class MCROCFLTestUtil {
 
         MCRConfiguration2.set("MCR.Metadata.ObjectID.NumberPattern",
             MCRConfiguration2.getStringOrThrow("MCR.OCFL.TestBase.NumberPattern"));
+        MCRConfiguration2.set("MCR.IFS2.Store.class.SlotLayout",
+            MCRConfiguration2.getStringOrThrow("MCR.Metadata.ObjectID.NumberPattern").length() - 4 + "-2-2");
     }
 
 }
