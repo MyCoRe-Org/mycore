@@ -88,7 +88,7 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
         }
         if (this.repositoryRoot.toFile().exists()) {
             LOGGER.info("Cleaning Directory on Exit...");
-            if (this.repositoryRoot.getFileName().equals("ocfl-root")) {
+            if (this.repositoryRoot.getFileName().toString().equals("ocfl-root")) {
                 return;
             }
             exportDir.toFile().delete();
@@ -189,19 +189,19 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
     //     this.exportDir = Paths.get(exportDir);
     //     return this;
     // }
-    
+
     // @MCRProperty(name = "BackupDir")
     // public MCROCFLAdaptionRepositoryProvider setBackupDir(String backupDir) {
     //     this.backupDir = Paths.get(backupDir);
     //     return this;
     // }
-    
+
     @MCRProperty(name = "Layout")
     public MCROCFLAdaptionRepositoryProvider setLayout(String layout) {
         this.layout = layout;
         return this;
     }
-    
+
     // required
     @Override
     public Path getRepositoryRoot() {
