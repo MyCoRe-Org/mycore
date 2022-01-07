@@ -64,7 +64,8 @@ public class MCROCFLUtilTest extends MCROCFLTestUtil {
     public void putSampleObject() {
         versionInfo.setCreated(OffsetDateTime.now());
         ocflUtil.getMainRepository().putObject(versionId, xml, versionInfo, OcflOption.OVERWRITE);
-        assertTrue(ocflUtil.getMainRepository().containsObject(objectId));
+        assertTrue("Object was not Inserted correctly into Repository",
+            ocflUtil.getMainRepository().containsObject(objectId));
     }
 
     @After
@@ -81,54 +82,67 @@ public class MCROCFLUtilTest extends MCROCFLTestUtil {
         VersionInfo versionInfo = new VersionInfo().setUser("JUnit", null).setMessage("OcflUtil Test")
             .setCreated(OffsetDateTime.now());
         ocflUtil.getMainRepository().putObject(versionId, xml, versionInfo, OcflOption.OVERWRITE);
-        assertTrue(ocflUtil.getMainRepository().containsObject(objectId));
-        assertNotNull(ocflUtil.getMainRepository().validateObject(objectId, true));
+        assertTrue("Object was not Inserted correctly into Main Repository",
+            ocflUtil.getMainRepository().containsObject(objectId));
+        assertNotNull("Object was Inserted empty into Main Repository",
+            ocflUtil.getMainRepository().validateObject(objectId, true));
         ocflUtil.getAdaptRepository().putObject(versionId, xml, versionInfo, OcflOption.OVERWRITE);
-        assertTrue(ocflUtil.getAdaptRepository().containsObject(objectId));
-        assertNotNull(ocflUtil.getAdaptRepository().validateObject(objectId, true));
+        assertTrue("Object was not Inserted correctly into Adapt Repository",
+            ocflUtil.getAdaptRepository().containsObject(objectId));
+        assertNotNull("Object was Inserted empty into Adapt Repository",
+            ocflUtil.getAdaptRepository().validateObject(objectId, true));
         ocflUtil.reloadRepository();
-        assertTrue(ocflUtil.getMainRepository().containsObject(objectId));
-        assertNotNull(ocflUtil.getMainRepository().validateObject(objectId, true));
-        assertTrue(ocflUtil.getAdaptRepository().containsObject(objectId));
-        assertNotNull(ocflUtil.getAdaptRepository().validateObject(objectId, true));
+        assertTrue("Object was not Inserted correctly into Main Repository",
+            ocflUtil.getMainRepository().containsObject(objectId));
+        assertNotNull("Object was Inserted empty into Main Repository",
+            ocflUtil.getMainRepository().validateObject(objectId, true));
+        assertTrue("Object was not Inserted correctly into Adapt Repository",
+            ocflUtil.getAdaptRepository().containsObject(objectId));
+        assertNotNull("Object was Inserted empty into Adapt Repository",
+            ocflUtil.getAdaptRepository().validateObject(objectId, true));
     }
 
     @Test
     public void exportAndImport() throws IOException {
         ocflUtil.getMainRepository().purgeObject(objectId);
-        assertFalse(ocflUtil.getMainRepository().containsObject(objectId));
+        assertFalse("Object Delete Failed", ocflUtil.getMainRepository().containsObject(objectId));
         ObjectVersionId versionIdMCR = ObjectVersionId.head(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId);
         ocflUtil.getMainRepository().putObject(versionIdMCR, xml, versionInfo, OcflOption.OVERWRITE);
-        assertTrue(ocflUtil.getMainRepository().containsObject(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId));
+        assertTrue("Object was not inserted correctly",
+            ocflUtil.getMainRepository().containsObject(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId));
         ocflUtil.exportObject(objectId)
             .importAdapt();
-        assertTrue(ocflUtil.getAdaptRepository().containsObject(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId));
+        assertTrue("Object did not get Imported to Adapt",
+            ocflUtil.getAdaptRepository().containsObject(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId));
         ocflUtil.updateRoot()
             .exportRepository()
             .setRepositoryKey("Adapt")
             .updateMainRepo()
             .importRepository();
-        assertTrue(ocflUtil.getAdaptRepository().containsObject(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId));
+        assertTrue("Object did not get Imported to Main",
+            ocflUtil.getAdaptRepository().containsObject(MCROCFLXMLMetadataManager.MCR_OBJECT_ID_PREFIX + objectId));
     }
 
     @Test
     public void delete() {
         ocflUtil.getMainRepository().purgeObject(objectId);
-        assertFalse(ocflUtil.getMainRepository().containsObject(objectId));
+        assertFalse("Object was not correctly deleted", ocflUtil.getMainRepository().containsObject(objectId));
     }
 
     @Test
     public void testBackup() throws IOException {
         ocflUtil.updateRoot();
         ocflUtil.reloadRepository();
-        assertFalse(ocflUtil.getMainRepository().containsObject(objectId));
+        assertFalse("Repository did not get switched or had preexisting data",
+            ocflUtil.getMainRepository().containsObject(objectId));
         ocflUtil.restoreRoot();
-        assertTrue(ocflUtil.getMainRepository().containsObject(objectId));
+        assertTrue("Backup was not restored on Main Repository", ocflUtil.getMainRepository().containsObject(objectId));
         ocflUtil.updateRoot();
         ocflUtil.setRepositoryKey("Adapt")
             .updateMainRepo()
             .restoreRoot();
-        assertTrue(ocflUtil.getAdaptRepository().containsObject(objectId));
+        assertTrue("Backup was not restored on non Main Repository",
+            ocflUtil.getAdaptRepository().containsObject(objectId));
     }
 
 }
