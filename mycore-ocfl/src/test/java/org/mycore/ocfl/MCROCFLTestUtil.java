@@ -32,7 +32,7 @@ import org.mycore.common.config.MCRDefaultConfigurationLoader;
 /**
  * @author Tobias Lenhardt [Hammer1279]
  */
-public class MCROCFLTestCase {
+public class MCROCFLTestUtil {
 
     @ClassRule
     public static TemporaryFolder junitFolder = new TemporaryFolder();
