@@ -270,9 +270,6 @@ public class MCROcflUtil {
             walker.close();
         }
         Files.move(mainRoot, backupDir, StandardCopyOption.ATOMIC_MOVE);
-        if (Files.notExists(mainRoot)) {
-            Files.createDirectories(mainRoot);
-        }
         Files.move(adaptRoot, mainRoot, StandardCopyOption.ATOMIC_MOVE);
         return this;
     }
