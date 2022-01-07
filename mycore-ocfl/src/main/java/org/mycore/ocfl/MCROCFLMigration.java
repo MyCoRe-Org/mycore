@@ -36,7 +36,7 @@ import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
-public class MCROFCLMigration {
+public class MCROCFLMigration {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -50,7 +50,7 @@ public class MCROFCLMigration {
 
     private final ArrayList<String> failed;
 
-    public MCROFCLMigration(String newRepoKey) {
+    public MCROCFLMigration(String newRepoKey) {
         target = new MCROCFLXMLMetadataManager();
         target.setRepositoryKey(newRepoKey);
 

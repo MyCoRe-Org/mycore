@@ -66,7 +66,7 @@ public class MCROCFLMigrationUtil {
      */
     public static void convertXMLToOcfl(String repository) throws IOException {
 
-        MCROFCLMigration migration = new MCROFCLMigration(repository);
+        MCROCFLMigration migration = new MCROCFLMigration(repository);
 
         migration.start();
 
