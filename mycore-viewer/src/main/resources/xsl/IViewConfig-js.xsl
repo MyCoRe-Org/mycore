@@ -107,7 +107,7 @@
   viewerLoader.addRequiredCss(configuration.resources.css);
   viewerLoader.addRequiredScripts(configuration.resources.script, configuration.properties.mobile);
   viewerLoader.addConstructorExecution(function(){
-          let container = jQuery("[data-viewer='"+configuration.properties.derivate+":"+configuration.properties.filePath+"']");
+          let container = jQuery("[data-viewer='"+configuration.properties.derivate+":"+configuration.properties.filePath.replace(/'/g,"\\'")+"']");
           new mycore.viewer.MyCoReViewer(container, configuration.properties);
   });
 

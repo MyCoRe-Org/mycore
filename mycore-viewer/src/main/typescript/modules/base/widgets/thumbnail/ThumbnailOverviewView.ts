@@ -80,7 +80,7 @@ namespace mycore.viewer.widgets.thumbnail {
         }
 
         public setThumnailSelected(id:string, selected:boolean) {
-            var thumb = this._container.find("[data-id='" + id + "']");
+            var thumb = this._container.find("[data-id='" + id.replace(/'/g,"\\'") + "']");
 
             if (selected) {
                 thumb.addClass("selected");
