@@ -2,14 +2,11 @@
 <xsl:stylesheet version="3.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
   xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:mods="http://www.loc.gov/mods/v3" 
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
-  xmlns:mcrmods="http://www.mycore.de/xslt/mods"
   xmlns:mcrsolr="http://www.mycore.de/xslt/solr">
   
   <xsl:import href="xslImport:solr-document-3:solr/indexing/mycoreobject-dynamicfields-3.xsl" />
 
-  <xsl:import href="resource:xsl/functions/mods.xsl" />
   <xsl:import href="resource:xsl/functions/solr.xsl" />
 
   <xsl:param name="MCR.Solr.DynamicFields" select="'false'" />
@@ -135,36 +132,6 @@
             </field>
           </xsl:if>
         </xsl:for-each>
-      </xsl:for-each>
-
-      <!-- and once again for mods -->
-      <xsl:for-each select="metadata//mods:*[@authority or @authorityURI]">
-        <xsl:if test="mcrmods:is-supported(.)">
-          <xsl:variable name="class" select="mcrmods:to-mycoreclass(., 'parent')" />
-          <xsl:variable name="classid" select="$class/@ID" />
-          <xsl:variable name="classTree" select="$class/categories//category" />
-          <xsl:variable name="withTopField" select="not(ancestor::mods:relatedItem)" />
-          <xsl:for-each select="$classTree">
-            <!-- classid as fieldname -->
-            <field name="{$classid}">
-              <!-- categid as value -->
-              <xsl:value-of select="@ID" />
-            </field>
-            <xsl:for-each select="label">
-              <field name="{$classid}_Label">
-                <xsl:value-of select="@text" />
-              </field>
-              <field name="{$classid}_Label.{@xml:lang}">
-                <xsl:value-of select="@text" />
-              </field>
-            </xsl:for-each>
-            <xsl:if test="$withTopField">
-              <field name="{$classid}.top">
-                <xsl:value-of select="@ID" />
-              </field>
-            </xsl:if>
-          </xsl:for-each>
-        </xsl:if>
       </xsl:for-each>
     </xsl:if>
   </xsl:template>
