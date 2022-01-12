@@ -19,6 +19,7 @@ This storage root extension maps OCFL Objects by segmenting their ID via the pre
     -   **Configuration:** `MCR.Metadata.ObjectID.NumberPattern`
     -   **Constraints:** zeros (`0`) only
     -   **Default:** `0000000000`
+
 -   **Name:** SlotLayout
     -   **Description:** The Structure of the Object ID for generating the Directory, separated by dashes (`-`)
     -   **Type:** string

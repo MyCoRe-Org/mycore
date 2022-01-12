@@ -21,7 +21,6 @@ package org.mycore.ocfl.layout;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mycore.common.config.MCRConfiguration2;
@@ -32,8 +31,6 @@ public class MCRLayoutTest extends MCROCFLTestUtil {
     private static MCRLayoutConfig layoutConfig;
 
     private static MCRLayoutExtension layoutExtension = new MCRLayoutExtension();
-
-    private static final String expectedDir = "ocfl/test/00/ocfl_test_0001";
 
     @BeforeClass
     public static void setUp() {
@@ -49,7 +46,7 @@ public class MCRLayoutTest extends MCROCFLTestUtil {
 
     @Test
     public void testLayoutShort() {
-        assertEquals(expectedDir,
+        assertEquals("ocfl/test/00/ocfl_test_0001",
             layoutExtension.mapObjectId(MCRConfiguration2.getStringOrThrow("MCR.OCFL.TestObject.Id")));
     }
 

@@ -38,6 +38,12 @@ import edu.wisc.library.ocfl.api.OcflOption;
 import edu.wisc.library.ocfl.api.OcflRepository;
 import edu.wisc.library.ocfl.api.model.ObjectVersionId;
 
+/**
+ * Base Class for directly interfacing with the OCFL Repositories.
+ * This Class allows changes to the Repositories without having to invoke the MetadataManager,
+ * preventing it from making changes to the Database for operations like Repository Migration.
+ * @author Tobias Lenhardt [Hammer1279]
+ */
 public class MCROcflUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -120,6 +126,12 @@ public class MCROcflUtil {
         }
     }
 
+    /**
+     * This sets the active Repository in the OcflUtil, note that after this has been
+     * changed the active repository setting has to be reloaded with {@link #updateMainRepo()}
+     * @param repositoryKey New Repository Key to be set
+     * @return MCROcflUtil
+     */
     public MCROcflUtil setRepositoryKey(String repositoryKey) {
         this.repositoryKey = repositoryKey;
         return this;
@@ -142,6 +154,12 @@ public class MCROcflUtil {
         return this;
     }
 
+    /**
+     * Set the per property configured active repository as active in the OcflUtil.
+     * This method will update the active repository settings itself.
+     * @return MCROcflUtil
+     * @throws IOException if an I/O error occurs
+     */
     public MCROcflUtil resetMainRepo() throws IOException {
         this.repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository");
         updateMainRepo();
@@ -247,6 +265,12 @@ public class MCROcflUtil {
         return this;
     }
 
+    /**
+     * Imports all Objects from specified export directory into the Adapt Repository
+     * @exception MCRUsageException if Repository not Initiated
+     * @throws IOException if an I/O error occurs when opening the export directory
+     * @return MCROcflUtil
+     */
     public MCROcflUtil importAdapt() throws IOException {
         if (mainRepository == null || adaptRepository == null) {
             throw new MCRUsageException(REPO_INIT_ERR);
