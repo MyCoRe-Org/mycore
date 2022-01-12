@@ -42,9 +42,9 @@ public class MCRLayoutExtension implements OcflStorageLayoutExtension {
      */
     @Override
     public String getDescription() {
-        return "OCFL object identifiers are seperated by their parts, "+
-        "the namespace gets removed and the ID Parts calculated from the "+
-        "MCR SlotLayout get used in nesting the paths under the OCFL Storage root.";
+        return "OCFL object identifiers are separated by their parts, " +
+            "the namespace gets removed and the ID Parts calculated from the " +
+            "MCR SlotLayout get used in nesting the paths under the OCFL Storage root.";
     }
 
     /**
@@ -57,7 +57,8 @@ public class MCRLayoutExtension implements OcflStorageLayoutExtension {
 
         MCRLayoutConfig castConfig = (MCRLayoutConfig) config;
 
-        // validate config
+        // add config validation
+
         this.config = castConfig;
     }
 
@@ -86,10 +87,14 @@ public class MCRLayoutExtension implements OcflStorageLayoutExtension {
             if (i == layers.length) {
                 break;
             }
-            int layernum = Integer.parseInt(layer);
-            String layerid = id.substring(position, position + layernum);
-            builder.append(layerid).append('/');
-            position += layernum;
+            int layerNum = Integer.parseInt(layer);
+            if (layerNum <= 0) {
+                i++;
+                continue;
+            }
+            String layerId = id.substring(position, position + layerNum);
+            builder.append(layerId).append('/');
+            position += layerNum;
             i++;
         }
         builder.append(mcrid);

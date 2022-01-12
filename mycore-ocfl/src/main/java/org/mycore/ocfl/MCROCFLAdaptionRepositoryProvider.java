@@ -31,7 +31,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.ocfl.layout.MCRLayoutConfig;
 import org.mycore.ocfl.layout.MCRLayoutExtension;
 
@@ -51,23 +50,17 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    // public final MCROCFLXMLMetadataManager manager;
-
     // if anything ever extends this class,
     // the configurations dont have to be loaded again and can be called from child classes
     protected final OcflExtensionConfig hashedNTupleConfig = new HashedNTupleIdEncapsulationLayoutConfig();
 
     protected final OcflExtensionConfig mcrLayoutConfig = new MCRLayoutConfig();
 
-    // private MCROcflUtil util = new MCROcflUtil();
-
     private Path repositoryRoot;
 
     private Path mainRoot;
 
     private Path exportDir = MCROcflUtil.getExportDir();
-
-    // private Path backupDir;
 
     private Path workDir;
 
@@ -76,11 +69,6 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
      * and should not be used as base repository in production
      */
     private MutableOcflRepository repository;
-
-    /**
-     * Currently loaded "old" repository
-     */
-    // private OcflRepository prevRepository;
 
     Thread cleanDir = new Thread(() -> {
         if (repositoryRoot.equals(mainRoot)) {
@@ -104,7 +92,6 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
         }
     });
 
-    // needed?
     @Override
     public OcflRepository getRepository() {
         return this.repository;
@@ -147,28 +134,9 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
             .workDir(workDir)
             .buildMutable();
 
-        // this.prevRepository = manager.getRepository(); // java.util.NoSuchElementException: No value present
         return this.repository;
     }
 
-    // also just copy pasted (actually this is the original but its the same), needed?
-    /**
-     * Return the current Layout Config for this Repository
-     * @return LayoutConfig
-     */
-    @Override
-    public OcflExtensionConfig getExtensionConfig() {
-        switch (this.layout) {
-            case "hash":
-                return this.hashedNTupleConfig;
-            case "mcr":
-                return this.mcrLayoutConfig;
-            default:
-                throw new MCRConfigurationException("Wrong Config for MCR.Metadata.Manager.Repository.Layout");
-        }
-    }
-
-    // is this needed?
     @Override
     @MCRProperty(name = "RepositoryRoot")
     public MCROCFLAdaptionRepositoryProvider setRepositoryRoot(String repositoryRoot) {
@@ -176,7 +144,6 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
         return this;
     }
 
-    // is this needed?
     @Override
     @MCRProperty(name = "WorkDir")
     public MCROCFLAdaptionRepositoryProvider setWorkDir(String workDir) {
@@ -184,45 +151,23 @@ public class MCROCFLAdaptionRepositoryProvider extends MCRSimpleOcflRepositoryPr
         return this;
     }
 
-    // @MCRProperty(name = "ExportDir")
-    // public MCROCFLAdaptionRepositoryProvider setExportDir(String exportDir) {
-    //     this.exportDir = Paths.get(exportDir);
-    //     return this;
-    // }
-
-    // @MCRProperty(name = "BackupDir")
-    // public MCROCFLAdaptionRepositoryProvider setBackupDir(String backupDir) {
-    //     this.backupDir = Paths.get(backupDir);
-    //     return this;
-    // }
-
     @MCRProperty(name = "Layout")
     public MCROCFLAdaptionRepositoryProvider setLayout(String layout) {
         this.layout = layout;
         return this;
     }
 
-    // required
     @Override
     public Path getRepositoryRoot() {
         return this.repositoryRoot;
     }
 
-    // @Override
-    // public Path getWorkDir() {
-    //     return workDir;
-    // }
-
     public Path getExportDir() {
-        return exportDir;
+        return this.exportDir;
     }
 
-    // public Path getBackupDir() {
-    //     return backupDir;
-    // }
-
     public String getLayout() {
-        return layout;
+        return this.layout;
     }
 
 }

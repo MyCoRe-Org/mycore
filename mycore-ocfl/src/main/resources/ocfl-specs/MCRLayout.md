@@ -1,4 +1,4 @@
-# File Layout using the MyCoRe SlotLayers
+# MCRLayout: native MyCoRe Directory for OCFL
 -   Extension Name: MCRLayout
 -   Author: Tobias Lenhardt
 -   Minimum OCFL Version: 1.0
@@ -8,17 +8,40 @@
 
 ## Overview
 
-This storage root extension maps OCFL objects by segmenting their ID via the SlotLayout to bring back the original MyCoRe File Structure
+This storage root extension maps OCFL Objects by segmenting their ID via the predefined SlotLayout or calculated from the NumberPattern, using the same storage hierarchies as the native MyCoRe XML Store.
 
-## Configuration
-`MCR.Metadata.ObjectID.NumberPattern`\
-default: `0000000000`
+## Parameters
+> Configuration is for the MyCoRe implementation only
 
-`MCR.IFS2.Store.<Type>.SlotLayout`\
-default: `4-2-2`
+-   **Name:** NumberPattern
+    -   **Description:** The Pattern of the ObjectIDs
+    -   **Type:** string
+    -   **Configuration:** `MCR.Metadata.ObjectID.NumberPattern`
+    -   **Constraints:** zeros (`0`) only
+    -   **Default:** `0000000000`
+-   **Name:** SlotLayout
+    -   **Description:** The Structure of the Object ID for generating the Directory, separated by dashes (`-`)
+    -   **Type:** string
+    -   **Configuration:** `MCR.IFS2.Store.class.SlotLayout`
+    -   **Constraints:** Layers must be separated by `-`
+    -   **Default:** `"(Length of NumberPattern - 4)-2-2"`
 
-## Structure Sample
+## Example
 
+### Configuration
+|   Parameter   | Setting  |
+| :-----------: | :------- |
+| NumberPattern | 00000000 |
+|  SlotLayout   | 4-2-2    |
+
+### Mappings
+|          Object ID          |      Object Root Path      |
+| :-------------------------: | :------------------------: |
+| DocPortal_document_00000001 | DocPortal/document/0000/00 |
+| DocPortal_document_12345678 | DocPortal/document/1234/56 |
+| DocPortal_derivate_00000002 | DocPortal/derivate/0000/00 |
+
+### Storage Hierarchy
 ```yaml
 [storage root]
 ├── 0=ocfl_1.0

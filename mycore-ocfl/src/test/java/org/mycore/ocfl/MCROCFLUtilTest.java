@@ -44,7 +44,7 @@ public class MCROCFLUtilTest extends MCROCFLTestUtil {
 
     public static MCROcflUtil ocflUtil;
 
-    private static String objectId = MCRConfiguration2.getStringOrThrow("MCR.OCFL.Util.Test.ObjectId");
+    private static String objectId = MCRConfiguration2.getStringOrThrow("MCR.OCFL.TestObject.Id");
 
     private ObjectVersionId versionId = ObjectVersionId.head(objectId);
 

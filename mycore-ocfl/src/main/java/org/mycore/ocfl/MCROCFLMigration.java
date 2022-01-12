@@ -80,7 +80,7 @@ public class MCROCFLMigration {
     public void start() {
         MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
         List<String> ids = instance.listIDs();
-
+    
         for (String id : ids) {
             LOGGER.info("Migrate {}", id);
             migrateID(id);
@@ -93,8 +93,8 @@ public class MCROCFLMigration {
             String[] idParts = baseId.split("_");
             int maxId = instance.getHighestStoredID(idParts[0], idParts[1]);
             List<String> possibleIds = IntStream.rangeClosed(1, maxId)
-                    .mapToObj(i -> MCRObjectID.formatID(baseId, i))
-                    .collect(Collectors.toList());
+                .mapToObj(i -> MCRObjectID.formatID(baseId, i))
+                .collect(Collectors.toList());
 
             for (String id : possibleIds) {
                 LOGGER.info("Try migrate {}", id);

@@ -54,7 +54,7 @@ public class MCROCFLMigrationUtil {
     private static final String SUCCESS_WITH_HISTORY = SUCCESS + " with history";
 
     private static final String SUCCESS_WITHOUT_HISTORY = SUCCESS + " without history";
-    
+
     private static final String FAILED = "failed";
 
     private static final String FAILED_AND_NOW_INVALID_STATE = FAILED + " and now invalid state";
@@ -64,7 +64,7 @@ public class MCROCFLMigrationUtil {
      * @param repository RepositoryKey
      * @throws IOException if an I/O error occurs
      */
-    public static void convertXMLToOcfl(String repository) throws IOException {
+    public static void migrateXMLToOcfl(String repository) throws IOException {
 
         MCROCFLMigration migration = new MCROCFLMigration(repository);
 
@@ -102,7 +102,7 @@ public class MCROCFLMigrationUtil {
      * @param repositoryKey Repository to migrate
      * @throws IOException if an I/O error occurs
      */
-    public void convertOcflToOcfl(String repositoryKey) throws IOException {
+    public void migrateOcflToOcfl(String repositoryKey) throws IOException {
         if (null == util.getAdaptRepository()) {
             throw new MCRUsageException("Adapt Repository has not been initialized yet!");
         }
@@ -123,7 +123,7 @@ public class MCROCFLMigrationUtil {
      * @throws IOException if an I/O error occurs
      * @throws MCRException Metadata Manager <strong>MUST NOT</strong> be {@code MCROCFLXMLMetadataManager}
      */
-    public void convertOcflToXML(String repositoryKey) throws IOException, MCRException {
+    public void migrateOcflToXML(String repositoryKey) throws IOException, MCRException {
         MCROCFLAdaptionRepositoryProvider adaptRepo = util.adaptClass;
         if (null == adaptRepo) {
             throw new MCRUsageException("Adapt Repository has not been initialized yet!");
