@@ -55,8 +55,8 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
+import org.mycore.restapi.v2.access.MCRRestAPIACLPermission;
 import org.mycore.restapi.v2.annotation.MCRRestRequiredPermission;
-import org.mycore.restapi.v2.common.MCRRestAPIACLPermission;
 
 @MCRApiDraft("MCRAccessKey")
 @Path("/objects/{" + PARAM_MCRID + "}/accesskeys")

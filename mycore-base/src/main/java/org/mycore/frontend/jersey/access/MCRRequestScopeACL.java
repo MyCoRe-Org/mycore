@@ -23,11 +23,10 @@ import java.util.function.Supplier;
 
 import javax.ws.rs.container.ContainerRequestContext;
 
-public interface MCRRequestScopeACL {
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.common.MCRUserInformation;
 
-    boolean checkPermission(String privilege);
-
-    boolean checkPermission(String id, String permission);
+public interface MCRRequestScopeACL extends MCRAccessInterface {
 
     boolean isPrivate();
 
@@ -41,6 +40,14 @@ public interface MCRRequestScopeACL {
             property = requestScopeACL;
         }
         return (MCRRequestScopeACL) property;
+    }
+
+    default boolean checkPermissionForUser(String permission, MCRUserInformation userInfo) {
+        throw new UnsupportedOperationException();
+    }
+
+    default boolean checkPermission(String id, String permission, MCRUserInformation userInfo) {
+        throw new UnsupportedOperationException();
     }
 
 }
