@@ -306,6 +306,10 @@ public class MCRAccessManager {
         ACCESS_CACHE.removePermission(id, permission);
     }
 
+    public static void invalidPermissionCacheByID(String id){
+        ACCESS_CACHE.removePermissionFromAllCachesById(id);
+    }
+
     /**
      * Invalidates the permission for current user on cache.
      *

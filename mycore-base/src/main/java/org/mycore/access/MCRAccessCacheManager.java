@@ -24,6 +24,9 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * @author Thomas Scheffler (yagee)
  *
@@ -59,7 +62,7 @@ class MCRAccessCacheManager implements MCRSessionListener {
                 break;
 
             case destroyed:
-                cache = (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
+                cache = getCacheFromSession(session);
                 if (cache != null) {
                     cache.close();
                 }
@@ -67,6 +70,10 @@ class MCRAccessCacheManager implements MCRSessionListener {
             default:
                 break;
         }
+    }
+
+    private MCRCache<MCRPermissionHandle, Boolean> getCacheFromSession(MCRSession session) {
+        return (MCRCache<MCRPermissionHandle, Boolean>) session.get(key);
     }
 
     private MCRCache<MCRPermissionHandle, Boolean> createCache(MCRSession session) {
@@ -94,6 +101,28 @@ class MCRAccessCacheManager implements MCRSessionListener {
         MCRPermissionHandle handle = new MCRPermissionHandle(id, permission);
         MCRCache<MCRPermissionHandle, Boolean> permissionCache = accessCache.get();
         permissionCache.remove(handle);
+    }
+
+    public void removePermission(String id) {
+        MCRCache<MCRPermissionHandle, Boolean> permissionCache = accessCache.get();
+        removePermissionFromCache(id, permissionCache);
+    }
+
+    private void removePermissionFromCache(String id, MCRCache<MCRPermissionHandle, Boolean> permissionCache) {
+        final List<MCRPermissionHandle> handlesToRemove = permissionCache.keys()
+            .stream()
+            .filter(hdl -> hdl.getId() != null && id.equals(hdl.getId()))
+            .collect(Collectors.toList());
+        handlesToRemove.forEach(permissionCache::remove);
+    }
+
+    public void removePermissionFromAllCachesById(String id) {
+        MCRSessionMgr.getAllSessions().forEach((sessionId, mcrSession) -> {
+            final MCRCache<MCRPermissionHandle, Boolean> cache = getCacheFromSession(mcrSession);
+            if (cache != null) {
+                removePermissionFromCache(id, cache);
+            }
+        });
     }
 
 }
