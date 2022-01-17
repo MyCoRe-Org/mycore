@@ -18,23 +18,27 @@
 
 package org.mycore.common.content;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.w3c.dom.Node;
+
+import javax.xml.bind.util.JAXBSource;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -75,6 +79,16 @@ public class MCRSourceContent extends MCRWrappedContent {
                         break;
                     }
                 }
+            }
+        } else if (source instanceof JAXBSource) {
+            TransformerFactory transformerFactory = TransformerFactory.newDefaultInstance();
+            try {
+                Transformer transformer = transformerFactory.newTransformer();
+                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                transformer.transform(source, new StreamResult(bout));
+                baseContent = new MCRByteContent(bout.toByteArray());
+            } catch (TransformerException e) {
+                throw new MCRException("Error while resolving JAXBSource", e);
             }
         } else if (source instanceof SAXSource) {
             SAXSource src = (SAXSource) source;
