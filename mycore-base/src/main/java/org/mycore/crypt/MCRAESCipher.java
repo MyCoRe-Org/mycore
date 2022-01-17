@@ -39,7 +39,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfigurationException ;
 import org.mycore.common.config.annotation.MCRProperty;
 
 public class MCRAESCipher extends MCRCipher {
@@ -57,15 +56,6 @@ public class MCRAESCipher extends MCRCipher {
         keyFile = path;
     }
 
-    @MCRProperty(name = "EnableACL", required = false)
-    public void setAclEnabled(final String enabled) {
-        if ("true".equalsIgnoreCase(enabled) || "false".equalsIgnoreCase(enabled)) {
-            setAclEnabled(Boolean.valueOf(enabled));
-        } else {
-            throw new MCRConfigurationException("MCRCrypt: " + enabled + " is not a valid boolean.");
-        }
-    }
-    
     public MCRAESCipher() {
         secretKey = null;
         encryptCipher = null;

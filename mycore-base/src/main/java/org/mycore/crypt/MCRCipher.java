@@ -22,6 +22,8 @@ import java.nio.file.FileAlreadyExistsException;
 import java.security.InvalidKeyException;
 
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRProperty;
 
 /**
  * Abstract class of a concrete cipherimplementation
@@ -80,10 +82,15 @@ public abstract class MCRCipher {
         return aclEnabled;
     }
 
-    protected void setAclEnabled(boolean enabled) {
-        this.aclEnabled = enabled;
+    @MCRProperty(name = "EnableACL", required = false)
+    public void setAclEnabled(final String enabled) {
+        if ("true".equalsIgnoreCase(enabled) || "false".equalsIgnoreCase(enabled)) {
+            aclEnabled = Boolean.valueOf(enabled);
+        } else {
+            throw new MCRConfigurationException("MCRCrypt: " + enabled + " is not a valid boolean.");
+        }
     }
-    
+
     public String encrypt(String text) throws MCRCryptKeyNoPermissionException {
     	if (checkPermission( "encrypt" )) {
     		return encryptImpl(text);
