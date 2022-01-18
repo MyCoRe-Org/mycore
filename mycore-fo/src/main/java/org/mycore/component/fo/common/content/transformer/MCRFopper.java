@@ -38,6 +38,8 @@ import org.mycore.component.fo.common.fo.MCRFoFormatterHelper;
  */
 public class MCRFopper extends MCRContentTransformer {
 
+    private static final String PDF_MIME_TYPE = "application/pdf";
+
     @Override
     public MCRContent transform(MCRContent source) throws IOException {
         MCRByteArrayOutputStream pdf = new MCRByteArrayOutputStream(32 * 1024);
@@ -46,7 +48,9 @@ public class MCRFopper extends MCRContentTransformer {
         } catch (TransformerException e) {
             throw new IOException(e);
         }
-        return new MCRByteContent(pdf.getBuffer(), 0, pdf.size(), source.lastModified());
+        MCRContent result = new MCRByteContent(pdf.getBuffer(), 0, pdf.size(), source.lastModified());
+        result.setMimeType(PDF_MIME_TYPE);
+        return result;
     }
 
     @Override
@@ -60,7 +64,7 @@ public class MCRFopper extends MCRContentTransformer {
 
     @Override
     public String getMimeType() {
-        return "application/pdf";
+        return PDF_MIME_TYPE;
     }
 
     @Override
