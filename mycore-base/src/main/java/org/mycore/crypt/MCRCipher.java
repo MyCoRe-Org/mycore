@@ -22,6 +22,8 @@ import java.nio.file.FileAlreadyExistsException;
 import java.security.InvalidKeyException;
 
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.config.MCRConfigurationException;
+import org.mycore.common.config.annotation.MCRProperty;
 
 /**
  * Abstract class of a concrete cipherimplementation
@@ -39,6 +41,8 @@ import org.mycore.access.MCRAccessManager;
 public abstract class MCRCipher {
     
     protected String cipherID;
+
+    private boolean aclEnabled = true;
     
     /**
      * Initialize the chipher by reading the key from file. If the cipher can't initialized an exception
@@ -73,8 +77,20 @@ public abstract class MCRCipher {
      * exsisting keyfile.   
      */
     abstract public void overwriteKeyFile() ;
-    
-    
+
+    public boolean getAclEnabled() {
+        return aclEnabled;
+    }
+
+    @MCRProperty(name = "EnableACL", required = false)
+    public void setAclEnabled(final String enabled) {
+        if ("true".equalsIgnoreCase(enabled) || "false".equalsIgnoreCase(enabled)) {
+            aclEnabled = Boolean.valueOf(enabled);
+        } else {
+            throw new MCRConfigurationException("MCRCrypt: " + enabled + " is not a valid boolean.");
+        }
+    }
+
     public String encrypt(String text) throws MCRCryptKeyNoPermissionException {
     	if (checkPermission( "encrypt" )) {
     		return encryptImpl(text);
@@ -108,7 +124,10 @@ public abstract class MCRCipher {
     }
     
     private boolean checkPermission ( String action) {
-        return (MCRAccessManager.checkPermission("crypt:cipher:" + cipherID , action ));
+        if (aclEnabled) {
+            return MCRAccessManager.checkPermission("crypt:cipher:" + cipherID, action);
+        }
+        return true;
     }
     
     abstract protected String encryptImpl(String text);

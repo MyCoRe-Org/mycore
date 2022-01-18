@@ -18,20 +18,16 @@
 
 package org.mycore.crypt;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.common.MCRException;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.StandardOpenOption; 
-import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -40,10 +36,14 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
+import org.mycore.common.config.annotation.MCRProperty;
 
 public class MCRAESCipher extends MCRCipher {
     
-    private static final Logger LOGGER = LogManager.getLogger(MCRAESCipher.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private String keyFile;
     private SecretKey secretKey;
@@ -55,7 +55,7 @@ public class MCRAESCipher extends MCRCipher {
     public void setKeyFile(String path) {
         keyFile = path;
     }
-    
+
     public MCRAESCipher() {
         secretKey = null;
         encryptCipher = null;
