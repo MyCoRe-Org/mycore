@@ -64,7 +64,7 @@ public class MCRAccessKeyFilter implements ContainerRequestFilter {
                         MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, secret);
                     }
                 } catch (MCRException e) {
-                    //
+                    LOGGER.debug("The access key could not be added to the current session: ", e);
                 }
             }
         }
