@@ -80,7 +80,9 @@ public class MCREditorSubmission {
     public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
         for (String xPath : xPaths2CheckResubmission) {
             MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-            binding.setValue("");
+            if(!binding.getBoundNodes().isEmpty()) {
+                binding.setValue("");
+            }
             binding.detach();
         }
     }
