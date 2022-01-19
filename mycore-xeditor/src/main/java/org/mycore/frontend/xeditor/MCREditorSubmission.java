@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.common.xml.MCRXMLFunctions;
@@ -36,6 +38,8 @@ public class MCREditorSubmission {
     public static final String PREFIX_DEFAULT_VALUE = "_xed_default_";
 
     public static final String PREFIX_CHECK_RESUBMISSION = "_xed_check";
+    
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Set<String> xPaths2CheckResubmission = new LinkedHashSet<>();
 
@@ -80,8 +84,10 @@ public class MCREditorSubmission {
     public void emptyNotResubmittedNodes() throws JDOMException, JaxenException {
         for (String xPath : xPaths2CheckResubmission) {
             MCRBinding binding = new MCRBinding(xPath, false, session.getRootBinding());
-            if(!binding.getBoundNodes().isEmpty()) {
+            if (!binding.getBoundNodes().isEmpty()) {
                 binding.setValue("");
+            } else {
+                LOGGER.warn("Binding does not contain a bound node [MCR-2558]");
             }
             binding.detach();
         }
