@@ -15,7 +15,7 @@
           <xsl:value-of select="substring-after($orChain, 'OR ')" />
           <xsl:value-of select="')'" />
         </xsl:variable>
-        <xsl:apply-templates select="document(concat('solr:fl=id,returnId,derivateMaindoc,iviewFile,derivateDisplay&amp;rows=',(count(result/doc|response[@subresult='groupOwner']/result/doc)*10),'&amp;q=', encoder:encode($query)))" mode="derivate"/>
+        <xsl:apply-templates select="document(concat('solr:fl=id,returnId,derivateMaindoc,iviewFile,derivateDisplay&amp;sort=derivateOrder%20asc&amp;rows=',(count(result/doc|response[@subresult='groupOwner']/result/doc)*10),'&amp;q=', encoder:encode($query)))" mode="derivate"/>
       </xsl:if>
     </xsl:copy>
   </xsl:template>
