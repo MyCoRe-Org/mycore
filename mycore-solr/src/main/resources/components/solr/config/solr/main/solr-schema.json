@@ -332,12 +332,6 @@
   },
   {
     "add-field": {
-      "name": "derivateDisplay",
-      "type": "boolean"
-    }
-  },
-  {
-    "add-field": {
       "name": "derivateTitle",
       "type": "text_general"
     }
