@@ -952,7 +952,7 @@ public class MCRObjectService {
      *              a type as string.
      * @return a list of message values
      */
-    protected final List<MCRMetaDateLangText> getMessagesAsMCRMetaLangText(String type) {
+    protected final List<MCRMetaDateLangText> getMessagesAsMCRMetaDateLangText(String type) {
         return messages.stream()
             .filter(metaLangText -> type.equals(metaLangText.getType()))
             .collect(Collectors.toCollection(ArrayList::new));
@@ -977,7 +977,7 @@ public class MCRObjectService {
      * @return a list of message values
      */
     public final List<String> getMessages(String type) {
-        return getMessagesAsMCRMetaLangText(type).stream()
+        return getMessagesAsMCRMetaDateLangText(type).stream()
             .map(MCRMetaDateLangText::getText)
             .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -1112,7 +1112,7 @@ public class MCRObjectService {
      *            a type as string
      */
     public final void removeMessages(String type) {
-        List<MCRMetaDateLangText> internalList = getMessagesAsMCRMetaLangText(type);
+        List<MCRMetaDateLangText> internalList = getMessagesAsMCRMetaDateLangText(type);
         messages.removeAll(internalList);
     }
 
