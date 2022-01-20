@@ -66,11 +66,12 @@ public class MCRAccessCacheEventHandler extends MCREventHandlerBase {
     private void clearPermissionCache(MCRObject obj) {
         LOGGER.info("Invalidate permission cache for obj {}", obj.getId());
         MCRAccessManager.invalidAllPermissionCachesById(obj.getId().toString());
-        final String[] ids = Stream.of(obj.getStructure().getChildren().stream(), obj.getStructure().getDerivates().stream())
-                .flatMap(s -> s)
-                .map(MCRMetaLinkID::getXLinkHrefID)
-                .map(MCRObjectID::toString)
-                .toArray(String[]::new);
+        final String[] ids = Stream
+            .of(obj.getStructure().getChildren().stream(), obj.getStructure().getDerivates().stream())
+            .flatMap(s -> s)
+            .map(MCRMetaLinkID::getXLinkHrefID)
+            .map(MCRObjectID::toString)
+            .toArray(String[]::new);
 
         MCRAccessManager.invalidAllPermissionCachesById(ids);
     }
