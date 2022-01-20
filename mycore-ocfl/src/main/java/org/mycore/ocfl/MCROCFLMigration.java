@@ -31,12 +31,12 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs2.MCRMetadataVersion;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
-public class MCROFCLMigration {
+public class MCROCFLMigration {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -50,7 +50,7 @@ public class MCROFCLMigration {
 
     private final ArrayList<String> failed;
 
-    public MCROFCLMigration(String newRepoKey) {
+    public MCROCFLMigration(String newRepoKey) {
         target = new MCROCFLXMLMetadataManager();
         target.setRepositoryKey(newRepoKey);
 
@@ -80,7 +80,7 @@ public class MCROFCLMigration {
     public void start() {
         MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
         List<String> ids = instance.listIDs();
-
+    
         for (String id : ids) {
             LOGGER.info("Migrate {}", id);
             migrateID(id);
@@ -93,8 +93,8 @@ public class MCROFCLMigration {
             String[] idParts = baseId.split("_");
             int maxId = instance.getHighestStoredID(idParts[0], idParts[1]);
             List<String> possibleIds = IntStream.rangeClosed(1, maxId)
-                    .mapToObj(i -> MCRObjectID.formatID(baseId, i))
-                    .collect(Collectors.toList());
+                .mapToObj(i -> MCRObjectID.formatID(baseId, i))
+                .collect(Collectors.toList());
 
             for (String id : possibleIds) {
                 LOGGER.info("Try migrate {}", id);
@@ -105,13 +105,13 @@ public class MCROFCLMigration {
     }
 
     private void migrateID(String id) {
-        List<MCRMetadataVersion> revisions;
+        List<? extends MCRAbstractMetadataVersion<?>> revisions;
         MCRObjectID objectID = MCRObjectID.getInstance(id);
         revisions = readRevisions(objectID);
         List<MigrationStep> steps = new ArrayList<>();
         if (revisions != null) {
             try {
-                for (MCRMetadataVersion rev : revisions) {
+                for (MCRAbstractMetadataVersion rev : revisions) {
                     MigrationStep step = migrateRevision(rev, objectID);
                     steps.add(step);
                 }
@@ -162,7 +162,7 @@ public class MCROFCLMigration {
         }
     }
 
-    private MigrationStep migrateRevision(MCRMetadataVersion rev, MCRObjectID objectID) throws IOException {
+    private MigrationStep migrateRevision(MCRAbstractMetadataVersion rev, MCRObjectID objectID) throws IOException {
         String user = rev.getUser();
         Date date = rev.getDate();
         LOGGER.info("Migrate revision {} of {}", rev.getRevision(), objectID);
@@ -179,7 +179,7 @@ public class MCROFCLMigration {
         }
     }
 
-    private MCRContent retriveActualContent(MCRMetadataVersion rev) throws IOException {
+    private MCRContent retriveActualContent(MCRAbstractMetadataVersion rev) throws IOException {
         MCRContent content = rev.retrieve();
         Document document;
 
@@ -191,13 +191,13 @@ public class MCROFCLMigration {
         return new MCRJDOMContent(document);
     }
 
-    private List<MCRMetadataVersion> readRevisions(MCRObjectID objectID) {
-        List<MCRMetadataVersion> revisions = null;
+    private List<? extends MCRAbstractMetadataVersion<?>> readRevisions(MCRObjectID objectID) {
+        List<? extends MCRAbstractMetadataVersion<?>> revisions = null;
         MCRXMLMetadataManager instance = MCRXMLMetadataManager.instance();
 
         try {
-            revisions = (List<MCRMetadataVersion>) instance.listRevisions(objectID);
-        } catch (IOException e) {
+            revisions = instance.listRevisions(objectID);
+        } catch (Exception e) {
             LOGGER.error("Could not read revisions of {}", objectID, e);
         }
         return revisions;
