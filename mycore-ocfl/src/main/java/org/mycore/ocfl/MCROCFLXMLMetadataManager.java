@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +78,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         Map.entry(MESSAGE_DELETED, MCROCFLMetadataVersion.DELETED)));
 
     public static final String MCR_OBJECT_ID_PREFIX = "mcrobject:";
+
+    public static final String MCR_DERIVATE_ID_PREFIX = "mcrderivate:";
 
     private String repositoryKey = "Default";
 
@@ -175,7 +178,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     private String getObjName(String mcrid) {
-        return MCR_OBJECT_ID_PREFIX + mcrid;
+        String objectType = MCRObjectID.getIDParts(mcrid.trim())[1].toLowerCase(Locale.ROOT).intern();
+        return "derivate".equals(objectType) ? MCR_DERIVATE_ID_PREFIX + mcrid : MCR_OBJECT_ID_PREFIX + mcrid;
     }
 
     private String buildFilePath(MCRObjectID objName) {
