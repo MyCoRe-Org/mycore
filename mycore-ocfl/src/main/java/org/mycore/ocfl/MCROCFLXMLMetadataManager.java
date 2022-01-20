@@ -63,7 +63,7 @@ import edu.wisc.library.ocfl.api.model.VersionNum;
 /**
  * Manages persistence of MCRObject and MCRDerivate xml metadata. Provides
  * methods to create, retrieve, update and delete object metadata using OCFL
- **/
+ */
 public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     private static final String MESSAGE_CREATED = "Created";
