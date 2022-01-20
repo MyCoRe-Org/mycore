@@ -48,9 +48,6 @@
         <xsl:value-of select="." />
       </field>
     </xsl:for-each>
-    <field name="derivateDisplay">
-      <xsl:value-of select="not(derivate/@display='false')" />
-    </field>
     <field name="derivateMaindoc">
       <xsl:value-of select="derivate/internals/internal/@maindoc" />
     </field>
