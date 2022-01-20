@@ -19,13 +19,11 @@
 package org.mycore.ocfl;
 
 import java.io.IOException;
-import java.nio.file.Files;
 
 import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.ocfl.layout.MCRStorageLayoutConfig;
 import org.mycore.ocfl.layout.MCRStorageLayoutExtension;
 
-import edu.wisc.library.ocfl.core.OcflRepositoryBuilder;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionRegistry;
 
@@ -38,19 +36,8 @@ public class MCROCFLMCRRepositoryProvider extends MCROCFLHashRepositoryProvider 
     @Override
     @MCRPostConstruction
     public void init(String prop) throws IOException {
-        if (Files.notExists(workDir)) {
-            Files.createDirectories(workDir);
-        }
-        if (Files.notExists(repositoryRoot)) {
-            Files.createDirectories(repositoryRoot);
-        }
-
         OcflExtensionRegistry.register(MCRStorageLayoutExtension.EXTENSION_NAME, MCRStorageLayoutExtension.class);
-
-        this.repository = new OcflRepositoryBuilder()
-            .defaultLayoutConfig(getExtensionConfig())
-            .storage(storage -> storage.fileSystem(repositoryRoot))
-            .workDir(workDir).build();
+        super.init(prop);
     }
 
     @Override
