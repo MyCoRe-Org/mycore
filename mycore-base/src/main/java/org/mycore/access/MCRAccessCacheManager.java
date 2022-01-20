@@ -25,7 +25,9 @@ import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -103,24 +105,26 @@ class MCRAccessCacheManager implements MCRSessionListener {
         permissionCache.remove(handle);
     }
 
-    public void removePermission(String id) {
+    public void removePermission(String... ids) {
         MCRCache<MCRPermissionHandle, Boolean> permissionCache = accessCache.get();
-        removePermissionFromCache(id, permissionCache);
+        removePermissionFromCache(permissionCache, ids);
     }
 
-    private void removePermissionFromCache(String id, MCRCache<MCRPermissionHandle, Boolean> permissionCache) {
+    private void removePermissionFromCache(MCRCache<MCRPermissionHandle, Boolean> permissionCache, String... ids) {
+        Set<String> idSet = Stream.of(ids).collect(Collectors.toSet());
         final List<MCRPermissionHandle> handlesToRemove = permissionCache.keys()
             .stream()
-            .filter(hdl -> hdl.getId() != null && id.equals(hdl.getId()))
+            .filter(hdl-> hdl.getId()!=null)
+            .filter(hdl -> idSet.contains(hdl.getId()))
             .collect(Collectors.toList());
         handlesToRemove.forEach(permissionCache::remove);
     }
 
-    public void removePermissionFromAllCachesById(String id) {
+    public void removePermissionFromAllCachesById(String... ids) {
         MCRSessionMgr.getAllSessions().forEach((sessionId, mcrSession) -> {
             final MCRCache<MCRPermissionHandle, Boolean> cache = getCacheFromSession(mcrSession);
             if (cache != null) {
-                removePermissionFromCache(id, cache);
+                removePermissionFromCache(cache, ids);
             }
         });
     }

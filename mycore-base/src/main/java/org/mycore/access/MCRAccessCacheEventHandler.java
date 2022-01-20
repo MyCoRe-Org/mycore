@@ -27,6 +27,8 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -44,7 +46,7 @@ public class MCRAccessCacheEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         LOGGER.info("Invalidate permission cache for derivate {}", der.getId());
-        MCRAccessManager.invalidPermissionCacheByID(der.getId().toString());
+        MCRAccessManager.invalidAllPermissionCachesById(der.getId().toString());
     }
 
     @Override
@@ -63,11 +65,13 @@ public class MCRAccessCacheEventHandler extends MCREventHandlerBase {
      */
     private void clearPermissionCache(MCRObject obj) {
         LOGGER.info("Invalidate permission cache for obj {}", obj.getId());
-        MCRAccessManager.invalidPermissionCacheByID(obj.getId().toString());
-        Stream.of(obj.getStructure().getChildren().stream(), obj.getStructure().getDerivates().stream())
-                .flatMap(s->s)
+        MCRAccessManager.invalidAllPermissionCachesById(obj.getId().toString());
+        final String[] ids = Stream.of(obj.getStructure().getChildren().stream(), obj.getStructure().getDerivates().stream())
+                .flatMap(s -> s)
                 .map(MCRMetaLinkID::getXLinkHrefID)
                 .map(MCRObjectID::toString)
-                .forEach(MCRAccessManager::invalidPermissionCacheByID);
+                .toArray(String[]::new);
+
+        MCRAccessManager.invalidAllPermissionCachesById(ids);
     }
 }
