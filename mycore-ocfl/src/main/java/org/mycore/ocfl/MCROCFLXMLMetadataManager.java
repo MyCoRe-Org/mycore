@@ -248,7 +248,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     @Override
-    public List<MCROCFLMetadataVersion> listRevisions(MCRObjectID id) throws IOException {
+    public List<MCROCFLMetadataVersion> listRevisions(MCRObjectID id) throws IOException, NotFoundException {
         String objName = getObjName(id);
         Map<VersionNum, VersionDetails> versionMap = getRepository().describeObject(objName).getVersionMap();
         return versionMap.entrySet().stream().map(v -> {

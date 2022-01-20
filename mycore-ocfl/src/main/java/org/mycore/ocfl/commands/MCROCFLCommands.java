@@ -24,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.ocfl.MCROFCLMigration;
+import org.mycore.ocfl.MCROCFLMigration;
 
 @MCRCommandGroup(name = "OCFL Commands")
 public class MCROCFLCommands {
@@ -43,7 +43,7 @@ public class MCROCFLCommands {
         help = "migrates all the metadata to the ocfl " +
             "repository with the id {0}")
     public static void migrateToOCFL(String repository) {
-        MCROFCLMigration migration = new MCROFCLMigration(repository);
+        MCROCFLMigration migration = new MCROCFLMigration(repository);
 
         migration.start();
 
@@ -56,7 +56,7 @@ public class MCROCFLCommands {
             SUCCESS + ": {}, \n" +
             FAILED + ": {} \n" +
             FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n ",
+            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n",
             String.join(", ", success),
             String.join(", ", failed),
             String.join(", ", invalidState),
@@ -66,7 +66,7 @@ public class MCROCFLCommands {
             SUCCESS + ": {}, \n" +
             FAILED + ": {} \n" +
             FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
-            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n ",
+            SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n",
             success.size(),
             failed.size(),
             invalidState.size(),
