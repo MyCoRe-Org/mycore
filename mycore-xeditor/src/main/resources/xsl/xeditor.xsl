@@ -144,6 +144,8 @@
   <!-- ========== <xed:bind xpath="" initially="value"|default="value"|set="value" name="" /> ========== -->
 
   <xsl:template match="xed:bind" mode="xeditor">
+    <xsl:call-template name="registerAdditionalNamespaces" />
+    
     <xsl:variable name="initialValue" select="transformer:replaceXPaths($transformer,@initially)" />
     <xsl:value-of select="transformer:bind($transformer,@xpath,$initialValue,@name)" />
     <xsl:apply-templates select="@set|@default" mode="xeditor" />
@@ -280,6 +282,8 @@
   <!-- ========== <xed:repeat xpath="" min="" max="" method="build|clone" /> ========== -->
 
   <xsl:template match="xed:repeat" mode="xeditor">
+    <xsl:call-template name="registerAdditionalNamespaces" />
+
     <xsl:variable name="xed_repeat" select="." />
 
     <xsl:for-each select="xalan:tokenize(transformer:repeat($transformer,@xpath,@min,@max,@method))">
