@@ -81,6 +81,8 @@ public class MCRAESCipher extends MCRCipher {
                     "Keyfile " + keyFile 
                     + " not found. Generate new one with cli command or copy file to path."
                     ) ;
+        } catch (IllegalArgumentException e) {
+           throw new InvalidKeyException("Error while decoding key from keyFile " + keyFile + "!", e);
         } catch (IOException e) {
             throw new MCRException ("Can't read keyFile " + keyFile + ".",e) ; 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
