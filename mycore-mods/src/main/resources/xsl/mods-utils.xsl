@@ -367,7 +367,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="concat($ServletsBaseURL,'solr/mods_nameIdentifier?q=', '+mods.name:&quot;')" />
-          <xsl:apply-templates select="." mode="nameString" />
+          <xsl:apply-templates select="." mode="queryableNameString" />
           <xsl:value-of select="concat('&quot;', '&amp;owner=createdby:', $owner)" />
         </xsl:otherwise>
       </xsl:choose>
@@ -416,7 +416,14 @@
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template match="mods:name" mode="queryableNameString">
+    <xsl:apply-templates select="." mode="nameString">
+      <xsl:with-param name="queryable" select="true()"/>
+    </xsl:apply-templates>
+  </xsl:template>
+
   <xsl:template match="mods:name" mode="nameString">
+    <xsl:param name="queryable" select="false()"/>
     <xsl:variable name="name">
       <xsl:choose>
         <xsl:when test="mods:displayForm">
@@ -439,7 +446,7 @@
           <xsl:if test="mods:namePart[@type='given']">
             <xsl:value-of select="concat(', ',mods:namePart[@type='given'])" />
           </xsl:if>
-          <xsl:if test="mods:namePart[@type='date']">
+          <xsl:if test="not($queryable) and mods:namePart[@type='date']">
             <xsl:value-of select="concat(' (',mods:namePart[@type='date'],')')" />
           </xsl:if>
         </xsl:otherwise>
@@ -451,7 +458,7 @@
   <xsl:template match="*" mode="copyNode">
     <xsl:copy-of select="node()" />
   </xsl:template>
-  
+
   <xsl:template match="*" mode="unescapeHtml">
     <xsl:copy>
       <xsl:apply-templates select="@*" />
