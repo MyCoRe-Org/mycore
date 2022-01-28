@@ -397,7 +397,7 @@
     <xsl:for-each select="$nameIdentifiers/category">
       <xsl:sort select="x-order" data-type="number" />
       <xsl:variable name="categId" select="@ID" />
-      <xsl:if test="(string-length(label[@xml:lang='x-uri']/@text) &gt; 0) and count($entity/mods:nameIdentifier[@type = $categId]) &gt; 0">
+      <xsl:if test="not(label[@xml:lang='x-display']/@text='false') and (string-length(label[@xml:lang='x-uri']/@text) &gt; 0) and count($entity/mods:nameIdentifier[@type = $categId]) &gt; 0">
         <nameIdentifier>
           <xsl:attribute name="label">
             <xsl:value-of select="label[@xml:lang='de']/@text" />
