@@ -90,7 +90,7 @@ public class MCREnricher {
 
     Map<String, MCRDataSourceCall> id2call = new HashMap<>();
 
-    MCREnricher(String configID) {
+    public MCREnricher(String configID) {
         xPath2FindNestedObjects = XPathFactory.instance().compile(XPATH_HOST_SERIES, Filters.element(), null,
             MCRConstants.getStandardNamespaces());
 
