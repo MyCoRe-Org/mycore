@@ -24,9 +24,11 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -36,6 +38,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * This servlet is used in the role sub select for when administrate a user.
@@ -87,6 +90,11 @@ public class MCRRoleServlet extends MCRServlet {
     @Override
     protected void think(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
+        if(!MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)){
+            final String errorMessage = MCRTranslation.translate("component.user2.message.notAllowedChangeRole");
+            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, errorMessage);
+        }
+
         String action = getProperty(request, "action");
         if ("chooseCategory".equals(action) || !roleClassificationsDefined) {
             chooseCategory(request);
