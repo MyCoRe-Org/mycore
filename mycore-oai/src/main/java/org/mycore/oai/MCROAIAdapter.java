@@ -105,7 +105,7 @@ public class MCROAIAdapter implements OAIAdapter {
         return this.setManager;
     }
 
-    public boolean moveNameSpaceToRoot() {
+    public boolean moveNamespaceDeclarationsToRoot() {
         return MCRConfiguration2.getString(this.configPrefix + "MoveNamespaceDeclarationsToRoot")
                 .map(Boolean::parseBoolean)
             .orElse(true);

@@ -109,7 +109,7 @@ public class MCROAIDataProvider extends MCRServlet {
         // build response
         Element xmlRespone = oaiResponse.toXML();
 
-        if(!(adapter instanceof MCROAIAdapter) || ((MCROAIAdapter) adapter).moveNameSpaceToRoot()) {
+        if(!(adapter instanceof MCROAIAdapter) || ((MCROAIAdapter) adapter).moveNamespaceDeclarationsToRoot()) {
             moveNamespacesUp(xmlRespone);
         }
 
