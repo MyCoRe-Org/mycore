@@ -18,16 +18,17 @@
 
 package org.mycore.access;
 
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Updates the access cache when a object is updated or deleted
@@ -63,14 +64,24 @@ public class MCRAccessCacheEventHandler extends MCREventHandlerBase {
      */
     private void clearPermissionCache(MCRObject obj) {
         LOGGER.info("Invalidate permission cache for obj {}", obj.getId());
-        MCRAccessManager.invalidAllPermissionCachesById(obj.getId().toString());
-        final String[] ids = Stream
-            .of(obj.getStructure().getChildren().stream(), obj.getStructure().getDerivates().stream())
-            .flatMap(s -> s)
-            .map(MCRMetaLinkID::getXLinkHrefID)
-            .map(MCRObjectID::toString)
-            .toArray(String[]::new);
+        MCRAccessManager.invalidAllPermissionCachesById();
 
-        MCRAccessManager.invalidAllPermissionCachesById(ids);
+        final ArrayList<String> idsToClear = new ArrayList<>();
+        idsToClear.add(obj.getId().toString());
+        collectDescendants(idsToClear, obj.getId().toString());
+        MCRAccessManager.invalidAllPermissionCachesById(idsToClear.toArray(new String[0]));
+    }
+
+    private void collectDescendants(List<String> descendantList, String parent) {
+        // get derivates
+        final MCRLinkTableManager ltManager = MCRLinkTableManager.instance();
+        descendantList.addAll(ltManager.getDestinationOf(parent, MCRLinkTableManager.ENTRY_TYPE_DERIVATE));
+
+        // get children
+        final Collection<String> children = ltManager.getSourceOf(parent, MCRLinkTableManager.ENTRY_TYPE_PARENT);
+        children.forEach(child -> {
+            descendantList.add(child);
+            collectDescendants(descendantList, child);
+        });
     }
 }
