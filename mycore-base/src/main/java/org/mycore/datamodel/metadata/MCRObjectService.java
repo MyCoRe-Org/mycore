@@ -1043,11 +1043,25 @@ public class MCRObjectService {
      *              the new message value as string
      */
     public final void addMessage(String type, String value) {
+        addMessage(type, value, null);
+    }
+
+    /**
+     * This method adds a message to the message list.
+     *
+     * @param type
+     *              a type as string
+     * @param value
+     *              the new message value as string
+     * @param format
+     *              a format as string, defaults to 'plain'
+     */
+    public final void addMessage(String type, String value, String format) {
         String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
         MCRUtils.filterTrimmedNotEmpty(value)
             .map(messageValue -> {
                 MCRMetaDateLangText message =
-                    new MCRMetaDateLangText("servmessage", null, lType, 0, null, messageValue);
+                    new MCRMetaDateLangText("servmessage", null, lType, 0, format, messageValue);
                 message.setDate(MCRISO8601Date.now());
                 return message;
             })
