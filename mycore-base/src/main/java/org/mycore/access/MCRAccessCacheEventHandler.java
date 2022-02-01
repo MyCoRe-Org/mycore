@@ -31,7 +31,9 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
- * Updates the access cache when a object is updated or deleted
+ * Clears the access cache when an object is updated or deleted.
+ * It invalidates all cache entries for the object, it's derivates and all it's descendants
+ * in all active MCRSessions.
  */
 public class MCRAccessCacheEventHandler extends MCREventHandlerBase {
 
