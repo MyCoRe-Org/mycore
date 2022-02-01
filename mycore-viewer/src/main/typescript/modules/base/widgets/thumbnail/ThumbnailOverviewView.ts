@@ -80,7 +80,7 @@ namespace mycore.viewer.widgets.thumbnail {
         }
 
         public setThumnailSelected(id:string, selected:boolean) {
-            var thumb = this._container.find("[data-id='" + id + "']");
+            var thumb = this._container.find("[data-id='" +  CSS.escape(id) + "']");
 
             if (selected) {
                 thumb.addClass("selected");
@@ -119,12 +119,11 @@ namespace mycore.viewer.widgets.thumbnail {
         }
 
         public updateTileHref(id:string, href:string) {
-            this._container.find("div[data-id='" + id + "'] img").attr("src", href);
+            this._container.find("div[data-id='" +  CSS.escape(id) + "'] img").attr("src", href);
         }
 
         public removeTile(id:string) {
-            this._container.find("div[data-id='" + id + "']").remove();
-
+            this._container.find("div[data-id='" +  CSS.escape(id) + "']").remove();
         }
 
         public updateTilePosition(id:string, position:Position2D) {
