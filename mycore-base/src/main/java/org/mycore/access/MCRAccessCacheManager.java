@@ -107,24 +107,24 @@ class MCRAccessCacheManager implements MCRSessionListener {
 
     public void removePermission(String... ids) {
         MCRCache<MCRPermissionHandle, Boolean> permissionCache = accessCache.get();
-        removePermissionFromCache(permissionCache, ids);
+        removePermissionFromCache(permissionCache, Stream.of(ids).collect(Collectors.toSet()));
     }
 
-    private void removePermissionFromCache(MCRCache<MCRPermissionHandle, Boolean> permissionCache, String... ids) {
-        Set<String> idSet = Stream.of(ids).collect(Collectors.toSet());
+    private void removePermissionFromCache(MCRCache<MCRPermissionHandle, Boolean> permissionCache, Set<String> ids) {
         final List<MCRPermissionHandle> handlesToRemove = permissionCache.keys()
             .stream()
             .filter(hdl-> hdl.getId()!=null)
-            .filter(hdl -> idSet.contains(hdl.getId()))
+            .filter(hdl -> ids.contains(hdl.getId()))
             .collect(Collectors.toList());
         handlesToRemove.forEach(permissionCache::remove);
     }
 
     public void removePermissionFromAllCachesById(String... ids) {
+        final Set<String> idSet = Stream.of(ids).collect(Collectors.toSet());
         MCRSessionMgr.getAllSessions().forEach((sessionId, mcrSession) -> {
             final MCRCache<MCRPermissionHandle, Boolean> cache = getCacheFromSession(mcrSession);
             if (cache != null) {
-                removePermissionFromCache(cache, ids);
+                removePermissionFromCache(cache, idSet);
             }
         });
     }
