@@ -118,7 +118,7 @@ public final class MCRAccessKeyManager {
             case "crypt":
                 try {
                     final MCRCipher cipher = MCRCipherManager.getCipher("accesskey");
-                    return cipher.encrypt(secret);
+                    return cipher.encrypt(objectId.toString() + secret);
                 } catch (MCRCryptKeyFileNotFoundException | MCRCryptKeyNoPermissionException e) {
                     throw new MCRException(e);
                 }
