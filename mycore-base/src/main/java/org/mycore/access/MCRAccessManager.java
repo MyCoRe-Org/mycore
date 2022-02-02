@@ -307,6 +307,22 @@ public class MCRAccessManager {
     }
 
     /**
+     * Invalidates all permissions for a specific id for current user on cache
+     * @param ids id of the cache handle
+     */
+    public static void invalidPermissionCacheByID(String... ids){
+        ACCESS_CACHE.removePermission(ids);
+    }
+
+    /**
+     * Invalidates all permissions for a specific id for all access caches in every session
+     * @param ids id of the cache handle
+     */
+    public static void invalidAllPermissionCachesById(String... ids){
+        ACCESS_CACHE.removePermissionFromAllCachesById(ids);
+    }
+
+    /**
      * Invalidates the permission for current user on cache.
      *
      * @param permission the access permission
