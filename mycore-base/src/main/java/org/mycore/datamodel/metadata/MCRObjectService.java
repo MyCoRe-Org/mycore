@@ -1053,15 +1053,15 @@ public class MCRObjectService {
      *              a type as string
      * @param value
      *              the new message value as string
-     * @param format
-     *              a format as string, defaults to 'plain'
+     * @param form
+     *              a form as string, defaults to 'plain'
      */
-    public final void addMessage(String type, String value, String format) {
+    public final void addMessage(String type, String value, String form) {
         String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
         MCRUtils.filterTrimmedNotEmpty(value)
             .map(messageValue -> {
                 MCRMetaDateLangText message =
-                    new MCRMetaDateLangText("servmessage", null, lType, 0, format, messageValue);
+                    new MCRMetaDateLangText("servmessage", null, lType, 0, form, messageValue);
                 message.setDate(MCRISO8601Date.now());
                 return message;
             })
