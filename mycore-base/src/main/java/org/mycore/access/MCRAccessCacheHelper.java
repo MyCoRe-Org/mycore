@@ -31,8 +31,8 @@ public class MCRAccessCacheHelper {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * removes all cached permissions for the object and all direct children and all direct derivates
-     * @param obj the object
+     * removes all cached permission for the object and its derivates including descendants
+     * @param id the object id
      */
     public static void clearPermissionCache(String id) {
         LOGGER.info("Invalidate permission cache for obj {}", id);
