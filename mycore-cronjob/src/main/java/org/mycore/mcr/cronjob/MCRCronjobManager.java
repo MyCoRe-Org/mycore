@@ -59,7 +59,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
     @Override
     public void close() {
         LOGGER.info("Closing " + this.getClass().getSimpleName());
-        executor.shutdown();
+        executor.shutdownNow();
     }
 
     void startUp() {
