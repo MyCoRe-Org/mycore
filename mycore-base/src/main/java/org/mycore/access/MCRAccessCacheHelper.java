@@ -26,12 +26,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 
+/**
+ * This class provides helper functions for access cache.
+ */
 public class MCRAccessCacheHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * removes all cached permission for the object and its derivates including descendants
+     * removes all cached permission for the object and its derivates including descendants.
      * @param id the object id
      */
     public static void clearPermissionCache(String id) {
