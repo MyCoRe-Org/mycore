@@ -33,32 +33,17 @@ public class MCRAccessCacheHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCRLinkTableManager LT_MANAGER = MCRLinkTableManager.instance();
-
     /**
-     * removes all cached permission for the object and its derivates including descendants.
+     * removes all cached permissions for the object and its derivates including descendants from local cache.
      * @param id the object id
      */
     public static void clearPermissionCache(String id) {
-        clearPermissionCache(id, true);
-    }
-
-    /**
-     * removes all cached permission for the object and its derivates.
-     * @param id the object id
-     * @param includeDescendants include descendants
-     */
-    public static void clearPermissionCache(String id, boolean includeDescendants) {
-        LOGGER.info("Invalidate permission cache for obj {}", id);
+        LOGGER.info("Invalidate all permissions for obj {} from local cache", id);
 
         final ArrayList<String> idsToClear = new ArrayList<>();
         idsToClear.add(id);
-        if (includeDescendants) {
-            collectDescendants(idsToClear, id);
-        } else {
-            collectDerivates(idsToClear, id);
-        }
-        MCRAccessManager.invalidAllPermissionCachesById(idsToClear.toArray(new String[0]));
+        collectDescendants(idsToClear, id);
+        MCRAccessManager.invalidPermissionCacheByID(idsToClear.toArray(new String[0]));
     }
 
     /**
@@ -66,37 +51,24 @@ public class MCRAccessCacheHelper {
      * @param id the object id
      */
     public static void clearAllPermissionCaches(String id) {
-        clearAllPermissionCaches(id, true);
-    }
-
-    /**
-     * removes all cached permission for the object and its derivates from all caches.
-     * @param id the object id
-     * @param includeDescendants include descendants
-     */
-    public static void clearAllPermissionCaches(String id, boolean includeDescendants) {
         LOGGER.info("Invalidate all permissions for obj {} from all caches", id);
 
         final ArrayList<String> idsToClear = new ArrayList<>();
         idsToClear.add(id);
-        if (includeDescendants) {
-            collectDescendants(idsToClear, id);
-        } else {
-            collectDerivates(idsToClear, id);
-        }
+        collectDescendants(idsToClear, id);
         MCRAccessManager.invalidAllPermissionCachesById(idsToClear.toArray(new String[0]));
     }
 
-    private static void collectDerivates(List<String> idsToClear, String parent) {
-        idsToClear.addAll(LT_MANAGER.getDestinationOf(parent, MCRLinkTableManager.ENTRY_TYPE_DERIVATE));
-    }
-
     private static void collectDescendants(List<String> idsToClear, String parent) {
-        collectDerivates(idsToClear, parent);
-        final Collection<String> children = LT_MANAGER.getSourceOf(parent, MCRLinkTableManager.ENTRY_TYPE_PARENT);
-        children.forEach(child -> {
-            idsToClear.add(child);
-            collectDescendants(idsToClear, child);
-        });
+         // get derivates
+         final MCRLinkTableManager ltManager = MCRLinkTableManager.instance();
+         idsToClear.addAll(ltManager.getDestinationOf(parent, MCRLinkTableManager.ENTRY_TYPE_DERIVATE));
+
+         // get children
+         final Collection<String> children = ltManager.getSourceOf(parent, MCRLinkTableManager.ENTRY_TYPE_PARENT);
+         children.forEach(child -> {
+             idsToClear.add(child);
+             collectDescendants(idsToClear, child);
+         });
     }
 }

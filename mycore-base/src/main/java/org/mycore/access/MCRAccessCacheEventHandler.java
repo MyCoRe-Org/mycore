@@ -52,6 +52,6 @@ public class MCRAccessCacheEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRAccessCacheHelper.clearPermissionCache(obj.getId().toString());
+        MCRAccessCacheHelper.clearAllPermissionCaches(obj.getId().toString());
     }
 }
