@@ -65,8 +65,8 @@ public class MCRAccessCacheHelper {
      * removes all cached permission for the object and its derivates including descendants from all caches.
      * @param id the object id
      */
-    public static void clearPermissionFromAllCaches(String id) {
-        clearPermissionFromAllCaches(id, true);
+    public static void clearAllPermissionCaches(String id) {
+        clearAllPermissionCaches(id, true);
     }
 
     /**
@@ -74,7 +74,7 @@ public class MCRAccessCacheHelper {
      * @param id the object id
      * @param includeDescendants include descendants
      */
-    public static void clearPermissionFromAllCaches(String id, boolean includeDescendants) {
+    public static void clearAllPermissionCaches(String id, boolean includeDescendants) {
         LOGGER.info("Invalidate all permissions for obj {} from all caches", id);
 
         final ArrayList<String> idsToClear = new ArrayList<>();
