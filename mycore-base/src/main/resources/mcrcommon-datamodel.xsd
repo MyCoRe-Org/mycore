@@ -45,8 +45,8 @@
   <xs:attributeGroup name="MCRMetaDateLangText">
     <xs:attribute ref="xml:lang" use="optional" />
     <xs:attribute name="form" type="xs:string" use="optional" />
-    <xs:attribute name="date" type="xs:string" use="optional" />
-    <xs:attribute name="format" type="xs:string" use="optional" />
+    <xs:attribute name="date" type="mycoreDate" use="optional" />
+    <xs:attribute name="format" type="iso8601DateFormat" use="optional" />
   </xs:attributeGroup>
   <xs:attributeGroup name="MCRMetaClassification">
     <xs:attribute name="categid" use="required" type="xs:normalizedString" />
