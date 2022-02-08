@@ -252,9 +252,16 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     @Override
-    public List<MCROCFLMetadataVersion> listRevisions(MCRObjectID id) throws IOException, NotFoundException {
+    public List<MCROCFLMetadataVersion> listRevisions(MCRObjectID id) {
         String objName = getObjName(id);
-        Map<VersionNum, VersionDetails> versionMap = getRepository().describeObject(objName).getVersionMap();
+        Map<VersionNum, VersionDetails> versionMap;
+
+        try {
+            versionMap = getRepository().describeObject(objName).getVersionMap();
+        } catch (NotFoundException e) {
+            throw new MCRUsageException("Object '" + objName + "' could not be found", e);
+        }
+
         return versionMap.entrySet().stream().map(v -> {
             VersionNum key = v.getKey();
             VersionDetails details = v.getValue();
@@ -272,7 +279,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return id.startsWith(MCR_OBJECT_ID_PREFIX) || id.startsWith(MCR_DERIVATE_ID_PREFIX);
     }
 
-    private String substrPrefix(String id) {
+    private String removePrefix(String id) {
         return id.startsWith(MCR_DERIVATE_ID_PREFIX) ? id.substring(MCR_DERIVATE_ID_PREFIX.length())
             : id.substring(MCR_OBJECT_ID_PREFIX.length());
     }
@@ -280,7 +287,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     public IntStream getStoredIDs(String project, String type) throws MCRPersistenceException {
         return getRepository().listObjectIds()
             .filter(this::isMetadata)
-            .map(this::substrPrefix)
+            .map(this::removePrefix)
             .filter(id -> id.startsWith(project + "_" + type))
             .mapToInt((fullId) -> Integer.parseInt(fullId.substring(project.length() + type.length() + 2))).sorted();
     }
@@ -301,7 +308,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return getRepository().listObjectIds()
             .filter(this::isMetadata)
             .filter(this::isNotDeleted)
-            .map(this::substrPrefix)
+            .map(this::removePrefix)
             .filter(s -> s.startsWith(base))
             .collect(Collectors.toList());
 
@@ -312,7 +319,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return getRepository().listObjectIds()
             .filter(this::isMetadata)
             .filter(this::isNotDeleted)
-            .map(this::substrPrefix)
+            .map(this::removePrefix)
             .filter(s -> type.equals(s.split("_")[1]))
             .collect(Collectors.toList());
     }
@@ -324,7 +331,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             .listObjectIds()
             .filter(this::isMetadata)
             .filter(this::isNotDeleted)
-            .map(this::substrPrefix)
+            .map(this::removePrefix)
             .collect(Collectors.toList());
     }
 
@@ -338,7 +345,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return getRepository()
             .listObjectIds()
             .filter(this::isMetadata)
-            .map(this::substrPrefix)
+            .map(this::removePrefix)
             .map(s -> s.split("_")[1])
             .distinct()
             .collect(Collectors.toList());
@@ -349,7 +356,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return getRepository()
             .listObjectIds()
             .filter(this::isMetadata)
-            .map(this::substrPrefix)
+            .map(this::removePrefix)
             .map(s -> s.substring(0, s.lastIndexOf("_")))
             .distinct()
             .collect(Collectors.toList());
@@ -360,7 +367,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return ids.stream()
             .filter(this::isMetadata)
             .filter(this::isNotDeleted)
-            .map(this::substrPrefix)
+            .map(this::removePrefix)
             .map(id -> new MCRObjectIDDateImpl(new Date(getLastModified(getObjName(id))), id))
             .collect(Collectors.toList());
     }
