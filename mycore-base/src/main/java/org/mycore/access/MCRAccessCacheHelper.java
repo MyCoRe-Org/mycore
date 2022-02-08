@@ -33,29 +33,44 @@ public class MCRAccessCacheHelper {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final MCRLinkTableManager LT_MANAGER = MCRLinkTableManager.instance();
+
     /**
      * removes all cached permission for the object and its derivates including descendants.
      * @param id the object id
      */
     public static void clearPermissionCache(String id) {
+        clearPermissionCache(id, true);
+    }
+
+    /**
+     * removes all cached permission for the object and its derivates.
+     * @param id the object id
+     * @param includeDescendants include descendants
+     */
+    public static void clearPermissionCache(String id, boolean includeDescendants) {
         LOGGER.info("Invalidate permission cache for obj {}", id);
 
         final ArrayList<String> idsToClear = new ArrayList<>();
         idsToClear.add(id);
-        collectDescendants(idsToClear, id);
+        if (includeDescendants) {
+            collectDescendants(idsToClear, id);
+        } else {
+            collectDerivates(idsToClear, id);
+        }
         MCRAccessManager.invalidAllPermissionCachesById(idsToClear.toArray(new String[0]));
     }
 
-    private static void collectDescendants(List<String> descendantList, String parent) {
-        // get derivates
-        final MCRLinkTableManager ltManager = MCRLinkTableManager.instance();
-        descendantList.addAll(ltManager.getDestinationOf(parent, MCRLinkTableManager.ENTRY_TYPE_DERIVATE));
+    private static void collectDerivates(List<String> idsToClear, String parent) {
+        idsToClear.addAll(LT_MANAGER.getDestinationOf(parent, MCRLinkTableManager.ENTRY_TYPE_DERIVATE));
+    }
 
-        // get children
-        final Collection<String> children = ltManager.getSourceOf(parent, MCRLinkTableManager.ENTRY_TYPE_PARENT);
+    private static void collectDescendants(List<String> idsToClear, String parent) {
+        collectDerivates(idsToClear, parent);
+        final Collection<String> children = LT_MANAGER.getSourceOf(parent, MCRLinkTableManager.ENTRY_TYPE_PARENT);
         children.forEach(child -> {
-            descendantList.add(child);
-            collectDescendants(descendantList, child);
+            idsToClear.add(child);
+            collectDescendants(idsToClear, child);
         });
     }
 }
