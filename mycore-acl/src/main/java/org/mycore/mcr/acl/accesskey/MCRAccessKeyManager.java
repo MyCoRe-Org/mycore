@@ -22,9 +22,6 @@ package org.mycore.mcr.acl.accesskey;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import static org.mycore.access.MCRAccessManager.PERMISSION_READ;
-import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +30,7 @@ import javax.persistence.EntityManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
@@ -90,7 +88,7 @@ public final class MCRAccessKeyManager {
      * @return true if valid or false
      */
     public static boolean isValidType(final String type) {
-        return (type.equals(PERMISSION_READ) || type.equals(PERMISSION_WRITE));
+        return (type.equals(MCRAccessManager.PERMISSION_READ) || type.equals(MCRAccessManager.PERMISSION_WRITE));
     }
 
     /**
@@ -231,16 +229,16 @@ public final class MCRAccessKeyManager {
      * @param objectId the {@link MCRObjectID}
      * @param secret the secret
      */
-    public static void removeAccessKey(final MCRObjectID objectId, final String secret)
+    public static synchronized void removeAccessKey(final MCRObjectID objectId, final String secret)
         throws MCRAccessKeyNotFoundException {
         final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
         if (accessKey == null) {
             LOGGER.debug("Key does not exist.");
             throw new MCRAccessKeyNotFoundException("Key does not exist.");
         } else {
+            MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.remove(em.contains(accessKey) ? accessKey : em.merge(accessKey));
-            MCRAccessManager.invalidPermissionCache(accessKey.getObjectId().toString(), accessKey.getType());
         }
     }
 
@@ -252,16 +250,15 @@ public final class MCRAccessKeyManager {
      * @param updatedAccessKey access key
      * @throws MCRException if update fails
      */
-    public static void updateAccessKey(final MCRObjectID objectId, final String secret,
+    public static synchronized void updateAccessKey(final MCRObjectID objectId, final String secret,
         final MCRAccessKey updatedAccessKey) throws MCRException {
         final MCRAccessKey accessKey = getAccessKeyWithSecret(objectId, secret);
         if (accessKey != null) {
             final String type = updatedAccessKey.getType();
             if (type != null && !accessKey.getType().equals(type)) {
                 if (isValidType(type)) {
-                    MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                    MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
                     accessKey.setType(type);
-                    MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
                 } else {
                     LOGGER.debug("Unkown Type.");
                     throw new MCRAccessKeyInvalidTypeException("Unknown permission type.");
@@ -269,12 +266,12 @@ public final class MCRAccessKeyManager {
             }
             final Boolean isActive = updatedAccessKey.getIsActive();
             if (isActive != null) {
-                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
                 accessKey.setIsActive(isActive);
             }
             final Date expiration = updatedAccessKey.getExpiration();
             if (expiration != null) {
-                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                MCRAccessCacheHelper.clearAllPermissionCaches(objectId.toString());
                 accessKey.setExpiration(expiration);
             }
             final String comment = updatedAccessKey.getComment();
