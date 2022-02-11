@@ -80,8 +80,10 @@ public class MCRMODSEmbargoCronjob extends TimerTask implements MCRStartupHandle
 
     @Override
     public void startUp(ServletContext servletContext) {
-        final Timer t = new Timer();
-        t.scheduleAtFixedRate(this, 0, TIMER_TASK_PERIOD);
+        if (servletContext != null) {
+            final Timer t = new Timer();
+            t.scheduleAtFixedRate(this, 0, TIMER_TASK_PERIOD);
+        }
     }
 
     private void searchDocumentsToRelease(Consumer<MCRObjectID> objectReleaser) {
