@@ -51,7 +51,6 @@ This storage root extension maps OCFL Objects by segmenting their ID via the nam
 | mcrderivate:DocPortal_derivate_00000002 | mcrderivate/DocPortal/derivate/0000/00 |
 | mcrclass:Project_Classification         | mcrclass/Project_Classification        |
 
-
 ### Storage Hierarchy
 ```yaml
 [storage root]
