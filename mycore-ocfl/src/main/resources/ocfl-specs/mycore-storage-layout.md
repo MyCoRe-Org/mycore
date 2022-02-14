@@ -8,7 +8,7 @@
 
 ## Overview
 
-This storage root extension maps OCFL Objects by segmenting their ID via the namespace and on Objects and Derivates, the predefined SlotLayout or calculated one from the NumberPattern. This Layout works mostly like the native XML Store.
+This storage root extension maps OCFL Objects by segmenting their ID via the namespace, and on Objects and Derivates, the predefined SlotLayout or calculated one from the NumberPattern. This Layout works mostly like the native XML Store.
 
 ## Parameters
 > Configuration is for the MyCoRe implementation only
