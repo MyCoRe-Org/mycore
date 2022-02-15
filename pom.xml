@@ -833,6 +833,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>com.cathive.fonts</groupId>
         <artifactId>fonts-roboto</artifactId>
         <version>2012023.1</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.cronutils</groupId>
