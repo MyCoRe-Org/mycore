@@ -14,7 +14,8 @@
   <xsl:param name="DefaultLang" />
   <xsl:param name="ServletsBaseURL" />
   <xsl:param name="MCR.MODS.Utils.shortenTitleLength" />
-    
+  <xsl:param name="MCR.MODS.Utils.addTermsOfAddressToDisplayForm" />
+
   <xsl:import href="resource:xsl/functions/stringutils.xsl" />
   <xsl:import href="resource:xsl/functions/i18n.xsl" />
 
@@ -430,6 +431,9 @@
     <xsl:variable name="name">
       <xsl:choose>
         <xsl:when test="mods:displayForm">
+          <xsl:if test="$MCR.MODS.Utils.addTermsOfAddressToDisplayForm='true' and not($queryable) and mods:namePart[@type='termsOfAddress']">
+            <xsl:value-of select="concat(mods:namePart[@type='termsOfAddress'], ' ')" />
+          </xsl:if>
           <xsl:value-of select="mods:displayForm" />
         </xsl:when>
         <xsl:when test="mods:namePart[not(@type)]">
@@ -445,6 +449,9 @@
           </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
+          <xsl:if test="not($queryable) and mods:namePart[@type='termsOfAddress']">
+            <xsl:value-of select="concat(mods:namePart[@type='termsOfAddress'], ' ')" />
+          </xsl:if>
           <xsl:value-of select="mods:namePart[@type='family']" />
           <xsl:if test="mods:namePart[@type='given']">
             <xsl:value-of select="concat(', ',mods:namePart[@type='given'])" />
