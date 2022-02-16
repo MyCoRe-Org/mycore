@@ -50,6 +50,8 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
     private MCRCronjobManager() {
         processableCollection = new MCRProcessableDefaultCollection(getClass().getSimpleName());
         MCRProcessableRegistry.getSingleInstance().register(processableCollection);
+        executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        executor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
     }
 
     public static MCRCronjobManager getInstance() {
@@ -57,9 +59,27 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
     }
 
     @Override
+    public void prepareClose() {
+        LOGGER.info("Shutdown {}", this.getClass().getSimpleName());
+        executor.shutdown();
+        try {
+            executor.awaitTermination(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOGGER.warn("Got interrupted while awaiting termination for MCRCronjobThreadPool");
+        }
+    }
+
+    @Override
     public void close() {
-        LOGGER.info("Closing " + this.getClass().getSimpleName());
-        executor.shutdownNow();
+        if(!executor.isTerminated()) {
+            LOGGER.info("Force shutdown {}", this.getClass().getSimpleName());
+            executor.shutdownNow();
+            try {
+                executor.awaitTermination(30, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                LOGGER.warn("Got interrupted while awaiting force termination for MCRCronjobThreadPool");
+            }
+        }
     }
 
     void startUp() {
