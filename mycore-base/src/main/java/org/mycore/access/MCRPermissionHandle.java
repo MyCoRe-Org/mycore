@@ -74,4 +74,11 @@ class MCRPermissionHandle {
         }
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
 }

@@ -59,7 +59,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <node.version>v12.18.3</node.version>
-    <oaipmh.version>2.1</oaipmh.version>
+    <oaipmh.version>2.2-SNAPSHOT</oaipmh.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
     <site.suffix />
@@ -912,6 +912,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>7.1.15</version>
       </dependency>
       <dependency>
+        <groupId>com.itextpdf</groupId>
+        <artifactId>layout</artifactId>
+        <version>7.1.15</version>
+      </dependency>
+      <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
         <version>1.15.0</version>
@@ -939,12 +944,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>edu.wisc.library.ocfl</groupId>
         <artifactId>ocfl-java-api</artifactId>
-        <version>1.2.0</version>
+        <version>1.4.1</version>
       </dependency>
       <dependency>
         <groupId>edu.wisc.library.ocfl</groupId>
         <artifactId>ocfl-java-core</artifactId>
-        <version>1.2.0</version>
+        <version>1.4.1</version>
       </dependency>
       <dependency>
         <groupId>io.bit3</groupId>
@@ -1462,7 +1467,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.2.20</version>
+        <version>42.3.3</version>
       </dependency>
       <dependency>
         <groupId>org.tmatesoft.svnkit</groupId>
@@ -1546,6 +1551,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <artifactId>jakarta.inject</artifactId>
         <version>${hk2.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.cathive.fonts</groupId>
+        <artifactId>fonts-roboto</artifactId>
+        <version>2012023.1</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>

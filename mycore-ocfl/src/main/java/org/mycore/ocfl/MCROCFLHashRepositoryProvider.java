@@ -37,13 +37,13 @@ import javax.inject.Singleton;
  * Simple way to provide a {@link OcflRepository}
  */
 @Singleton
-public class MCRSimpleOcflRepositoryProvider extends MCROCFLRepositoryProvider {
+public class MCROCFLHashRepositoryProvider extends MCROCFLRepositoryProvider {
 
-    private Path repositoryRoot;
+    protected Path repositoryRoot;
 
-    private Path workDir;
+    protected Path workDir;
 
-    private OcflRepository repository;
+    protected OcflRepository repository;
 
     @Override
     public OcflRepository getRepository() {
@@ -60,7 +60,7 @@ public class MCRSimpleOcflRepositoryProvider extends MCROCFLRepositoryProvider {
         }
         this.repository = new OcflRepositoryBuilder()
             .defaultLayoutConfig(getExtensionConfig())
-            .fileSystemStorage(storage -> storage.repositoryRoot(repositoryRoot))
+            .storage(storage -> storage.fileSystem(repositoryRoot))
             .workDir(workDir).build();
     }
 
@@ -77,12 +77,14 @@ public class MCRSimpleOcflRepositoryProvider extends MCROCFLRepositoryProvider {
     }
 
     @MCRProperty(name ="RepositoryRoot")
-    public void setRepositoryRoot(String repositoryRoot) {
+    public MCROCFLHashRepositoryProvider setRepositoryRoot(String repositoryRoot) {
         this.repositoryRoot = Paths.get(repositoryRoot);
+        return this;
     }
 
     @MCRProperty(name = "WorkDir")
-    public void setWorkDir(String workDir) {
+    public MCROCFLHashRepositoryProvider setWorkDir(String workDir) {
         this.workDir = Paths.get(workDir);
+        return this;
     }
 }

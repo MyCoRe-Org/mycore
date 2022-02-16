@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.mycore.access.MCRAccessCacheHelper;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -103,7 +104,7 @@ public class MCRAccessKeyUtils {
                 throw new MCRAccessKeyNotFoundException("Access key is invalid.");
             } else if (isAccessKeyForSessionAllowed(accessKey.getType())) {
                 session.put(getAttributeName(objectId), secret);
-                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                MCRAccessManager.invalidPermissionCacheByID(objectId.toString());
             } else {
                 throw new MCRAccessKeyException("Access key is not allowed.");
             }
@@ -169,7 +170,7 @@ public class MCRAccessKeyUtils {
             } else {
                 user.setUserAttribute(getAttributeName(objectId), secret);
                 MCRUserManager.updateUser(user);
-                MCRAccessManager.invalidPermissionCache(objectId.toString(), accessKey.getType());
+                MCRAccessManager.invalidPermissionCacheByID(objectId.toString());
             }
         } else {
             throw new MCRAccessKeyException("Access key is not allowed.");
@@ -402,8 +403,7 @@ public class MCRAccessKeyUtils {
      */
     public static synchronized void removeAccessKeySecret(final MCRSession session, final MCRObjectID objectId) {
         session.deleteObject(getAttributeName(objectId));
-        MCRAccessManager.invalidPermissionCache(objectId.toString(), MCRAccessManager.PERMISSION_READ);
-        MCRAccessManager.invalidPermissionCache(objectId.toString(), MCRAccessManager.PERMISSION_WRITE);
+        MCRAccessCacheHelper.clearPermissionCache(objectId.toString());
     }
 
     /**
@@ -415,8 +415,7 @@ public class MCRAccessKeyUtils {
     public static synchronized void removeAccessKeySecret(final MCRUser user, final MCRObjectID objectId) {
         user.getAttributes().removeIf(ua -> ua.getName().equals(getAttributeName(objectId)));
         MCRUserManager.updateUser(user);
-        MCRAccessManager.invalidPermissionCache(objectId.toString(), MCRAccessManager.PERMISSION_READ);
-        MCRAccessManager.invalidPermissionCache(objectId.toString(), MCRAccessManager.PERMISSION_WRITE);
+        MCRAccessCacheHelper.clearPermissionCache(objectId.toString());
     }
 
     /**

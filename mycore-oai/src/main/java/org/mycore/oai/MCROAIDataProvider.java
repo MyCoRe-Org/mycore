@@ -37,7 +37,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.jdom2.ProcessingInstruction;
+import org.jdom2.filter.ElementFilter;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.output.support.AbstractXMLOutputProcessor;
@@ -100,11 +102,17 @@ public class MCROAIDataProvider extends MCRServlet {
         OAIProvider oaiProvider = oaiAdapterServiceLoader
             .findFirst()
             .orElseThrow(() -> new ServletException("No implementation of " + OAIProvider.class + " found."));
-        oaiProvider.setAdapter(getOAIAdapter());
+        final OAIAdapter adapter = getOAIAdapter();
+        oaiProvider.setAdapter(adapter);
         // handle request
         OAIResponse oaiResponse = oaiProvider.handleRequest(oaiRequest);
         // build response
         Element xmlRespone = oaiResponse.toXML();
+
+        if(!(adapter instanceof MCROAIAdapter) || ((MCROAIAdapter) adapter).moveNamespaceDeclarationsToRoot()) {
+            moveNamespacesUp(xmlRespone);
+        }
+
         // fire
         job.getResponse().setContentType("text/xml; charset=UTF-8");
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat(), OAI_XML_OUTPUT_PROCESSOR);
@@ -172,6 +180,34 @@ public class MCROAIDataProvider extends MCRServlet {
             }
         }
         return oaiAdapter;
+    }
+
+
+    /**
+     * Moves all namespace declarations in the children of target to the target.
+     *
+     * @param target the namespace are bundled here
+     */
+    private void moveNamespacesUp(Element target) {
+        Map<String, Namespace> existingNamespaces = getNamespaceMap(target);
+        Map<String, Namespace> newNamespaces = new HashMap<>();
+        target.getDescendants(new ElementFilter()).forEach(child -> {
+            Map<String, Namespace> childNamespaces = getNamespaceMap(child);
+            childNamespaces.forEach((prefix, ns) -> {
+                if (existingNamespaces.containsKey(prefix) || newNamespaces.containsKey(prefix)) {
+                    return;
+                }
+                newNamespaces.put(prefix, ns);
+            });
+        });
+        newNamespaces.forEach((prefix, ns) -> target.addNamespaceDeclaration(ns));
+    }
+
+    private Map<String, Namespace> getNamespaceMap(Element element) {
+        Map<String, Namespace> map = new HashMap<>();
+        map.put(element.getNamespace().getPrefix(), element.getNamespace());
+        element.getAdditionalNamespaces().forEach(ns -> map.put(ns.getPrefix(), ns));
+        return map;
     }
 
     private static final class OAIXMLOutputProcessor extends AbstractXMLOutputProcessor {

@@ -54,10 +54,10 @@ namespace mycore.viewer.widgets.chaptertree {
         public getParent(parentId:string):JQuery {
             var parentElement:JQuery;
             if (parentId != null) {
-                parentElement = this.list.find("ol[data-id='" + parentId + "']");
+                parentElement = this.list.find("ol[data-id='" + CSS.escape(parentId) + "']");
                 // Creates ol for children if not exist
                 if (parentElement.length == 0) {
-                    parentElement = this.list.find("li[data-id='" + parentId + "']");
+                    parentElement = this.list.find("li[data-id='" + CSS.escape(parentId) + "']");
                     var childrenList = jQuery("<ol></ol>");
                     childrenList.attr("data-id", parentId);
                     childrenList.attr("data-opened", true);
@@ -93,10 +93,11 @@ namespace mycore.viewer.widgets.chaptertree {
 
 
         public setOpened(id:string, opened:boolean) {
-            var liElem = this.list.find("li[data-id='" + id + "']").attr("data-opened", opened.toString());
-            var olElem = this.list.find("ol[data-id='" + id + "']").attr("data-opened", opened.toString());
+            let escapedId = CSS.escape(id);
+            var liElem = this.list.find("li[data-id='" + escapedId + "']").attr("data-opened", opened.toString());
+            var olElem = this.list.find("ol[data-id='" + escapedId + "']").attr("data-opened", opened.toString());
 
-            var span = this.list.find("li[data-id='" + id + "'] span.expander");
+            var span = this.list.find("li[data-id='" + escapedId + "'] span.expander");
 
             if (opened) {
                 span.removeClass(DesktopChapterTreeView.CLOSE_ICON_CLASS);
@@ -108,11 +109,11 @@ namespace mycore.viewer.widgets.chaptertree {
         }
 
         public setSelected(id:string, selected:boolean) {
-            var elem = this.list.find("li[data-id='" + id + "']").attr("data-selected", selected.toString());
+            var elem = this.list.find("li[data-id='" + CSS.escape(id) + "']").attr("data-selected", selected.toString());
         }
 
         public jumpTo(id:string) {
-            var elem = this.list.find("li[data-id='" + id + "']");
+            var elem = this.list.find("li[data-id='" + CSS.escape(id) + "']");
 
             elem.addClass("blink");
             setTimeout(()=> {

@@ -2,6 +2,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:encoder="xalan://java.net.URLEncoder"
   xmlns:xalan="http://xml.apache.org/xalan" exclude-result-prefixes="xalan encoder">
 
+  <xsl:param name="MCR.Solr.AddDerivates.Fields" />
+
   <xsl:template match="/response">
     <xsl:copy>
       <xsl:copy-of select="@*|node()" />
@@ -15,7 +17,7 @@
           <xsl:value-of select="substring-after($orChain, 'OR ')" />
           <xsl:value-of select="')'" />
         </xsl:variable>
-        <xsl:apply-templates select="document(concat('solr:fl=id,returnId,derivateMaindoc,iviewFile,derivateDisplay&amp;rows=',(count(result/doc|response[@subresult='groupOwner']/result/doc)*10),'&amp;q=', encoder:encode($query)))" mode="derivate"/>
+        <xsl:apply-templates select="document(concat('solr:fl=', $MCR.Solr.AddDerivates.Fields, '&amp;sort=derivateOrder%20asc&amp;rows=',(count(result/doc|response[@subresult='groupOwner']/result/doc)*10),'&amp;q=', encoder:encode($query)))" mode="derivate"/>
       </xsl:if>
     </xsl:copy>
   </xsl:template>

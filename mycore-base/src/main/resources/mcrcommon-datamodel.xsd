@@ -40,7 +40,13 @@
   </xs:attributeGroup>
   <xs:attributeGroup name="MCRMetaLangText">
     <xs:attribute ref="xml:lang" use="optional" />
-    <xs:attribute name="form" fixed="plain" type="xs:string" />
+    <xs:attribute name="form" type="xs:string" use="optional" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="MCRMetaDateLangText">
+    <xs:attribute ref="xml:lang" use="optional" />
+    <xs:attribute name="form" type="xs:string" use="optional" />
+    <xs:attribute name="date" type="mycoreDate" use="optional" />
+    <xs:attribute name="format" type="iso8601DateFormat" use="optional" />
   </xs:attributeGroup>
   <xs:attributeGroup name="MCRMetaClassification">
     <xs:attribute name="categid" use="required" type="xs:normalizedString" />
@@ -68,29 +74,10 @@
     <xs:attribute type="xs:string" use="optional" name="ifsid" />
   </xs:attributeGroup>
   <xs:attributeGroup name="MCRMetaISO8601Date">
-    <xs:attribute name="format">
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="YYYY" />
-          <xs:enumeration value="YYYY-MM" />
-          <xs:enumeration value="YYYY-MM-DD" />
-          <xs:enumeration value="YYYY-MM-DDThh:mmTZD" />
-          <xs:enumeration value="YYYY-MM-DDThh:mm:ssTZD" />
-          <xs:enumeration value="YYYY-MM-DDThh:mm:ss.sTZD" />
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:attribute>
+    <xs:attribute name="format" type="iso8601DateFormat" />
   </xs:attributeGroup>
   <xs:attributeGroup name="MCRMetaHistoryDate">
-    <xs:attribute name="format">
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="YYYY" />
-          <xs:enumeration value="YYYY-MM" />
-          <xs:enumeration value="YYYY-MM-DD" />
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:attribute>
+    <xs:attribute name="format" type="historyDateFormat" />
   </xs:attributeGroup>
   <xs:attributeGroup name="MCRMetaPersonName">
     <xs:attributeGroup ref="baseMetaAttributes" />
@@ -100,8 +87,25 @@
     <xs:attribute name="dimension" type="xs:string"/>
     <xs:attribute name="measurement" type="xs:string"/>
   </xs:attributeGroup>
+  <xs:simpleType name="iso8601DateFormat">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="YYYY" />
+      <xs:enumeration value="YYYY-MM" />
+      <xs:enumeration value="YYYY-MM-DD" />
+      <xs:enumeration value="YYYY-MM-DDThh:mmTZD" />
+      <xs:enumeration value="YYYY-MM-DDThh:mm:ssTZD" />
+      <xs:enumeration value="YYYY-MM-DDThh:mm:ss.sTZD" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="historyDateFormat">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="YYYY" />
+      <xs:enumeration value="YYYY-MM" />
+      <xs:enumeration value="YYYY-MM-DD" />
+    </xs:restriction>
+  </xs:simpleType>
 
-  <!-- this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined elsewhere <service> is defined 
+  <!-- this is how a mycore object looks like: <structure> has to be defined elsewhere <metadata> has to be defined elsewhere <service> is defined
     below -->
   <xs:element name="mycoreobject">
     <xs:complexType>
@@ -179,6 +183,8 @@
         <xs:element ref="servdates" minOccurs="0" />
         <xs:element ref="servacls" minOccurs="0" />
         <xs:element ref="servflags" minOccurs="0" />
+        <xs:element ref="servmessages" minOccurs="0" />
+        <xs:element ref="servclasses" minOccurs="0" />
         <xs:element ref="servstates" minOccurs="0" />
       </xs:all>
     </xs:complexType>
@@ -261,7 +267,49 @@
       </xs:simpleContent>
     </xs:complexType>
   </xs:element>
-   <xs:element name="servstates">
+  <xs:element name="servmessages">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="servmessage" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute fixed="MCRMetaDateLangText" use="required" type="xs:string" name="class" />
+      <xs:attribute use="optional" type="xs:boolean" name="heritable" />
+      <xs:attribute use="optional" type="xs:boolean" name="notinherit" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servmessage">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="inherited" use="optional" type="xs:integer" fixed="0" />
+          <xs:attribute name="type" type="xs:string" />
+          <xs:attributeGroup ref="MCRMetaDateLangText" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servclasses">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="servclass" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute fixed="MCRMetaClassification" use="required" type="xs:string" name="class" />
+      <xs:attribute use="optional" type="xs:boolean" name="heritable" />
+      <xs:attribute use="optional" type="xs:boolean" name="notinherit" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servclass">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="inherited" use="optional" type="xs:integer" fixed="0" />
+          <xs:attribute name="type" type="xs:string" />
+          <xs:attributeGroup ref="MCRMetaClassification" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="servstates">
     <xs:complexType>
       <xs:sequence>
         <xs:element ref="servstate" maxOccurs="1" />
