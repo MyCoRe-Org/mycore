@@ -830,12 +830,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>3.16.0</version>
       </dependency>
       <dependency>
-        <groupId>com.cathive.fonts</groupId>
-        <artifactId>fonts-roboto</artifactId>
-        <version>2012023.1</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
         <groupId>com.cronutils</groupId>
         <artifactId>cron-utils</artifactId>
         <version>9.1.6</version>
@@ -1552,6 +1546,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <artifactId>jakarta.inject</artifactId>
         <version>${hk2.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.cathive.fonts</groupId>
+        <artifactId>fonts-roboto</artifactId>
+        <version>2012023.1</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
