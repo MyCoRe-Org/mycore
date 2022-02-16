@@ -912,6 +912,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <version>7.1.15</version>
       </dependency>
       <dependency>
+        <groupId>com.itextpdf</groupId>
+        <artifactId>layout</artifactId>
+        <version>7.1.15</version>
+      </dependency>
+      <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
         <version>1.15.0</version>
@@ -1546,6 +1551,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <artifactId>jakarta.inject</artifactId>
         <version>${hk2.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.cathive.fonts</groupId>
+        <artifactId>fonts-roboto</artifactId>
+        <version>2012023.1</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
