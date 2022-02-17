@@ -75,6 +75,7 @@ import org.xml.sax.SAXException;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRFile extends MCRFilesystemNode {
 
     private static Pattern MD5_HEX_PATTERN = Pattern.compile("[a-fA-F0-9]{32}");

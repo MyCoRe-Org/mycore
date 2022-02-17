@@ -92,6 +92,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.Attributes2Impl;
 
 @MCRCommandGroup(name = "IFS Maintenance Commands")
+@Deprecated
 public class MCRIFSCommands {
     public static final String MCRFILESYSTEMNODE_SIZE_FIELD_NAME = "size";
 

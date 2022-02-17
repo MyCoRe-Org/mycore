@@ -30,6 +30,7 @@ import org.jdom2.Element;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public interface MCRFileContentTypeDetector {
     /**
      * Adds a detection rule from the file content type definition XML file. The

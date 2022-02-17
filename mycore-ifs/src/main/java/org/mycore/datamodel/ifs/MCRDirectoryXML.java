@@ -39,6 +39,7 @@ import org.mycore.common.content.MCRContent;
  * 
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRDirectoryXML {
 
     static Logger LOGGER = LogManager.getLogger(MCRDirectoryXML.class);

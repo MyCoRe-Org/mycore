@@ -50,6 +50,7 @@ import org.mycore.datamodel.ifs.MCRFile;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
 
     /** The logger */

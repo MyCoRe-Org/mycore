@@ -53,6 +53,7 @@ import org.mycore.common.config.MCRConfiguration2;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRFileMetadataManager {
 
     /** The single instance of this class * */

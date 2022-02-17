@@ -40,6 +40,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * @author Thomas Scheffler
  *
  */
+@Deprecated
 abstract class MCRFileSystemUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRFileSystemUtils.class);

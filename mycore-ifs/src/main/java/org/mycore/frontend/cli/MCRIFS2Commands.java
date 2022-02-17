@@ -67,6 +67,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import com.google.common.io.ByteStreams;
 
 @MCRCommandGroup(name = "IFS2 Maintenance Commands")
+@Deprecated
 public class MCRIFS2Commands {
 
     private static Logger LOGGER = LogManager.getLogger();

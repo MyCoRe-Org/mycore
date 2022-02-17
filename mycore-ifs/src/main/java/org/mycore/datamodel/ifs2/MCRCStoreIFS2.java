@@ -59,6 +59,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * 
  * @author Frank L\u00FCtzenkirchen
  **/
+@Deprecated
 public class MCRCStoreIFS2 extends MCRContentStore {
 
     private String slotLayout;

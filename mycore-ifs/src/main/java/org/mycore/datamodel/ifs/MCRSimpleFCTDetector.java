@@ -55,6 +55,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
     private static Logger logger = LogManager.getLogger(MCRSimpleFCTDetector.class);
 

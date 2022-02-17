@@ -24,6 +24,7 @@ package org.mycore.datamodel.ifs;
  * 
  * @author Frank Lützenkirchen
  */
+@Deprecated
 public class MCRFileContentType {
     /** The unique ID of this file content type */
     protected String id;
