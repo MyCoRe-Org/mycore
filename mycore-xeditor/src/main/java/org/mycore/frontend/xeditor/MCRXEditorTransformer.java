@@ -95,10 +95,6 @@ public class MCRXEditorTransformer {
         this.parameters = parameters;
     }
 
-    boolean shouldBuildFilterXSL() {
-        return "true".equals(parameters.getParameter("buildFilterXSL", "false"));
-    }
-
     public MCRContent transform(MCRContent editorSource)
         throws IOException, JDOMException, SAXException {
         getEditorSession().getValidator().clearRules();
@@ -195,11 +191,6 @@ public class MCRXEditorTransformer {
 
     void setDefault(String value) throws JaxenException, JDOMException {
         String xPath = getAbsoluteXPath();
-        if (shouldBuildFilterXSL()) {
-            String suffix = (currentBinding.getBoundNode() instanceof Element ? "/@" : "") + "_values_";
-            new MCRBinding(xPath + suffix, value, null, getEditorSession().getRootBinding());
-        }
-
         currentBinding.setDefault(value);
         getEditorSession().getSubmission().markDefaultValue(xPath, value);
     }
@@ -749,7 +740,7 @@ class XedRepeat extends ElementTransformer {
     void transform(Element e) throws Exception {
         int minRepeats = Integer.parseInt(e.getAttributeValue("min", "1"));
         int maxRepeats = Integer.parseInt(e.getAttributeValue("max", "0"));
-        int numRepeatsToBuild = transformer.shouldBuildFilterXSL() ? 1 : minRepeats;
+        int numRepeatsToBuild = minRepeats;
 
         String xPath = e.getAttributeValue("xpath", "");
         String method = e.getAttributeValue("method", "");
