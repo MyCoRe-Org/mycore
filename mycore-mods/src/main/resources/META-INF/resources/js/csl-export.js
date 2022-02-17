@@ -22,9 +22,9 @@ const STANDALONE_FORMATS = ["mods", "bibtex", "endnote", "ris", "isi", "mods2csv
 const SOLR_STANDALONE_FORMATS = ["solr2csv"];
 const FORMAT_MAP = {
     "solr2csv": "csv",
-    "mods2csv": "mods2csv",
+    "mods2csv": "csv",
     "mods": "xml",
-    "bibtex": "xml"
+    "bibtex": "bib"
 };
 
 function isStandaloneFormat(format) {
