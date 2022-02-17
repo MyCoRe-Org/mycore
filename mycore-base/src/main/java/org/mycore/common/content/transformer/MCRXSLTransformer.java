@@ -26,7 +26,6 @@ import java.util.Base64;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.TooManyListenersException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -45,8 +44,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xalan.trace.TraceManager;
-import org.apache.xalan.transformer.TransformerImpl;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
