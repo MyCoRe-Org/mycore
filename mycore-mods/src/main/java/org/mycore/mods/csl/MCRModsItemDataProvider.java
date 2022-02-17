@@ -67,6 +67,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public static final String USABLE_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
         " or @xlink:type='simple')]";
 
+    public static final String SHORT_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)"  +
+            " or @xlink:type='simple') and @type='abbreviated']";
+
     public static final String MODS_RELATED_ITEM_XPATH = "mods:relatedItem/";
 
     public static final String MODS_ORIGIN_INFO_PUBLICATION = "mods:originInfo[@eventType='publication' or not" +
@@ -366,18 +369,26 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processTitles(CSLItemDataBuilder idb) {
-        final Element titleInfoElement = wrapper.getElement("mods:titleInfo[not(@altFormat) and (not(@xlink:type) " +
-                "or @xlink:type='simple')]");
+        final Element titleInfoElement = wrapper.getElement(USABLE_TITLE_XPATH);
         if (titleInfoElement != null) {
             idb.titleShort(buildShortTitle(titleInfoElement));
             idb.title(buildTitle(titleInfoElement));
         }
 
+        final Element titleInfoShortElement = wrapper.getElement(SHORT_TITLE_XPATH);
+        if(titleInfoShortElement != null){
+            idb.titleShort(buildShortTitle(titleInfoShortElement));
+        }
 
         Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + USABLE_TITLE_XPATH))
             .ifPresent((titleInfo) -> {
             idb.containerTitleShort(buildShortTitle(titleInfo));
             idb.containerTitle(buildTitle(titleInfo));
+        });
+
+        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + SHORT_TITLE_XPATH))
+            .ifPresent((titleInfo) -> {
+            idb.containerTitleShort(buildShortTitle(titleInfo));
         });
 
         wrapper.getElements(".//mods:relatedItem[@type='series']/" + USABLE_TITLE_XPATH).stream()
