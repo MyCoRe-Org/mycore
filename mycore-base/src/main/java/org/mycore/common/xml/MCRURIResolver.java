@@ -250,6 +250,7 @@ public final class MCRURIResolver implements URIResolver {
         supportedSchemes.put("http", restResolver);
         supportedSchemes.put("https", restResolver);
         supportedSchemes.put("file", new MCRFileResolver());
+        supportedSchemes.put("cache", new MCRCachingResolver());
         return supportedSchemes;
     }
 
@@ -258,6 +259,7 @@ public final class MCRURIResolver implements URIResolver {
      *
      * @see javax.xml.transform.URIResolver
      */
+    @Override
     public Source resolve(String href, String base) throws TransformerException {
         if (LOGGER.isDebugEnabled()) {
             if (base != null) {
@@ -443,6 +445,7 @@ public final class MCRURIResolver implements URIResolver {
                 .forEach(this::registerUriResolver);
         }
 
+        @Override
         public Map<String, URIResolver> getURIResolverMapping() {
             return resolverMap;
         }
@@ -875,6 +878,7 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * Returns access controll rules as XML
          */
+        @Override
         public Source resolve(String href, String base) throws TransformerException {
             String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Reading xml from query result using key :{}", key);
@@ -977,6 +981,7 @@ public final class MCRURIResolver implements URIResolver {
          * @return the root element of the XML document
          * @see MCRCategoryTransformer
          */
+        @Override
         public Source resolve(String href, String base) throws TransformerException {
             LOGGER.debug("start resolving {}", href);
             String cacheKey = getCacheKey(href);
@@ -1435,6 +1440,7 @@ public final class MCRURIResolver implements URIResolver {
         /**
          * Builds a simple xml node tree on basis of name value pair
          */
+        @Override
         public Source resolve(String href, String base) throws TransformerException {
             String key = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("Building xml from {}", key);
@@ -1693,6 +1699,7 @@ public final class MCRURIResolver implements URIResolver {
          * @return if you have the permission then the resolved uri otherwise an Exception
          * @see javax.xml.transform.URIResolver
          */
+        @Override
         public Source resolve(String href, String base) throws TransformerException {
             final String[] split = href.split(":", 4);
 
@@ -1734,6 +1741,7 @@ public final class MCRURIResolver implements URIResolver {
          * @return the root element "boolean" of the XML document with content string true of false
          * @see javax.xml.transform.URIResolver
          */
+        @Override
         public Source resolve(String href, String base) throws TransformerException {
             final String[] split = href.split(":");
             boolean permission;
