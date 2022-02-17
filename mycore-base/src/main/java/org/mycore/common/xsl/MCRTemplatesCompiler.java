@@ -30,7 +30,6 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xalan.trace.TraceManager;
 import org.apache.xml.utils.WrappedRuntimeException;
 import org.mycore.common.MCRExceptionCauseFinder;
 import org.mycore.common.config.MCRConfigurationException;
@@ -92,20 +91,7 @@ public class MCRTemplatesCompiler {
     /** Returns a new transformer for the compiled XSL templates 
      */
     public static Transformer getTransformer(Templates templates) throws TransformerConfigurationException {
-        Transformer tf = factory.newTransformerHandler(templates).getTransformer();
-
-        // In debug mode, add a TraceListener to log stylesheet execution
-        if (LOGGER.isDebugEnabled()) {
-            try {
-                TraceManager tm = ((org.apache.xalan.transformer.TransformerImpl) tf).getTraceManager();
-                tm.addTraceListener(new MCRTraceListener());
-
-            } catch (Exception ex) {
-                LOGGER.warn(ex);
-            }
-        }
-
-        return tf;
+        return factory.newTransformerHandler(templates).getTransformer();
     }
 
     private static String buildErrorMessage(String resource, Exception cause) {

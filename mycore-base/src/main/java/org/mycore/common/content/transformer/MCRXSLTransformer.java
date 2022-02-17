@@ -63,7 +63,6 @@ import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRTemplatesSource;
-import org.mycore.common.xsl.MCRTraceListener;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -85,10 +84,6 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
     private static final MCREntityResolver ENTITY_RESOLVER = MCREntityResolver.instance();
 
     private static Logger LOGGER = LogManager.getLogger(MCRXSLTransformer.class);
-
-    private static MCRTraceListener TRACE_LISTENER = new MCRTraceListener();
-
-    private static boolean TRACE_LISTENER_ENABLED = LogManager.getLogger(MCRTraceListener.class).isDebugEnabled();
 
     private static MCRCache<String, MCRXSLTransformer> INSTANCE_CACHE = new MCRCache<>(100,
         "MCRXSLTransformer instance cache");
@@ -304,16 +299,6 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
             TransformerHandler handler = tFactory.newTransformerHandler(template);
             parameterCollector.setParametersTo(handler.getTransformer());
             handler.getTransformer().setErrorListener(errorListener);
-            // trace listener only works with xalan
-            if (TRACE_LISTENER_ENABLED && handler.getTransformer() instanceof TransformerImpl) {
-                TransformerImpl transformer = (TransformerImpl) handler.getTransformer();
-                TraceManager traceManager = transformer.getTraceManager();
-                try {
-                    traceManager.addTraceListener(TRACE_LISTENER);
-                } catch (TooManyListenersException e) {
-                    LOGGER.warn("Could not add MCRTraceListener.", e);
-                }
-            }
             if (!xslSteps.isEmpty()) {
                 Result result = new SAXResult(handler);
                 xslSteps.getLast().setResult(result);
