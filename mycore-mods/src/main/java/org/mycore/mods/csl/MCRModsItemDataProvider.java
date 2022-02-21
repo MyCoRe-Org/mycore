@@ -109,6 +109,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         processPublicationData(idb);
         processAbstract(idb);
         processModsPart(idb);
+        processSubject(idb);
 
         CSLItemData build = idb.build();
         if(LOGGER.isDebugEnabled()){
@@ -118,6 +119,16 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         }
 
         return build;
+    }
+
+    private void processSubject(CSLItemDataBuilder idb) {
+        final String keyword = wrapper.getElements("mods:subject/mods:topic")
+            .stream()
+            .map(Element::getTextNormalize)
+            .collect(Collectors.joining(", "));
+        if (keyword.length() > 0) {
+            idb.keyword(keyword);
+        }
     }
 
     protected void processLanguage(CSLItemDataBuilder idb) {
@@ -342,30 +353,43 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processIdentifier(CSLItemDataBuilder idb) {
-        final List<Element> identifiers = wrapper.getElements("mods:identifier");
+        final List<Element> parentIdentifiers = wrapper.getElements("mods:relatedItem[@type='host']/mods:identifier");
 
-        identifiers.forEach(identifierElement -> {
-            final String type = identifierElement.getAttributeValue("type");
-            final String identifier = identifierElement.getTextNormalize();
-            switch (type) {
-                case "doi":
-                    idb.DOI(identifier);
-                    break;
-                case "isbn":
-                    idb.ISBN(identifier);
-                    break;
-                case "issn":
-                    idb.ISSN(identifier);
-                    break;
-                case "pmid":
-                    idb.PMID(identifier);
-                    break;
-                case "pmcid":
-                    idb.PMCID(identifier);
-                    break;
-            }
+        parentIdentifiers.forEach(parentIdentifier -> {
+            applyIdentifier(idb, parentIdentifier, true);
         });
 
+        final List<Element> identifiers = wrapper.getElements("mods:identifier");
+        identifiers.forEach(identifierElement -> {
+            applyIdentifier(idb, identifierElement, false);
+        });
+
+    }
+
+    private void applyIdentifier(CSLItemDataBuilder idb, Element identifierElement, boolean parent) {
+        final String type = identifierElement.getAttributeValue("type");
+        final String identifier = identifierElement.getTextNormalize();
+        switch (type) {
+            case "doi":
+                idb.DOI(identifier);
+                break;
+            case "isbn":
+                idb.ISBN(identifier);
+                break;
+            case "issn":
+                idb.ISSN(identifier);
+                break;
+            case "pmid":
+                if (!parent) {
+                    idb.PMID(identifier);
+                }
+                break;
+            case "pmcid":
+                if (!parent) {
+                    idb.PMCID(identifier);
+                }
+                break;
+        }
     }
 
     protected void processTitles(CSLItemDataBuilder idb) {
