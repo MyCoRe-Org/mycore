@@ -1762,4 +1762,52 @@ public final class MCRURIResolver implements URIResolver {
         }
     }
 
+    /**
+     * @author Frank L\u00FCtzenkirchen
+     */
+    private static class MCRCachingResolver implements URIResolver {
+
+        private final static Logger LOGGER = LogManager.getLogger();
+
+        private final static String CONFIG_PREFIX = "MCR.URIResolver.CachingResolver";
+
+        private long maxAge;
+
+        private MCRCache<String, Element> cache;
+
+        public MCRCachingResolver() {
+            int capacity = MCRConfiguration2.getOrThrow(CONFIG_PREFIX + ".Capacity", Integer::parseInt);
+            maxAge = MCRConfiguration2.getOrThrow(CONFIG_PREFIX + ".MaxAge", Long::parseLong);
+            cache = new MCRCache<String, Element>(capacity, MCRCachingResolver.class.getName());
+        }
+
+        /**
+         * Resolves XML content from a given URI and caches it for re-use.
+         *
+         * If the URI was already resolved within the last
+         * MCR.URIResolver.CachingResolver.MaxAge milliseconds, the cached version is returned.
+         * The default max age is one hour.
+         *
+         * The cache capacity is configured via MCR.URIResolver.CachingResolver.Capacity
+         * The default capacity is 100.
+         */
+        @Override public Source resolve(String href, String base) throws TransformerException {
+            String hrefToCache = href.substring(href.indexOf(":") + 1);
+            LOGGER.debug("resolving: " + hrefToCache);
+
+            long maxDateCached = System.currentTimeMillis() - maxAge;
+            Element resolvedXML = cache.getIfUpToDate(hrefToCache, maxDateCached);
+
+            if (resolvedXML == null) {
+                LOGGER.debug(hrefToCache + " not in cache, must resolve");
+                resolvedXML = MCRURIResolver.instance().resolve(hrefToCache);
+                cache.put(hrefToCache, resolvedXML);
+            } else {
+                LOGGER.debug(hrefToCache + " already in cache");
+            }
+
+            return new JDOMSource(resolvedXML);
+        }
+    }
+
 }
