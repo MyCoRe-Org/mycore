@@ -45,8 +45,6 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -256,10 +254,10 @@ public abstract class MCRTransferPackageUtil {
         MCRDerivate der = new MCRDerivate(sax.build(derivatePath.toFile()));
         MCRMetadataManager.update(der);
 
-        MCRDirectory dir = MCRDirectory.getRootDirectory(der.getId().toString());
-        if (dir == null) {
-            LOGGER.info("Creating missing {} {}", MCRFilesystemNode.class.getSimpleName(), der.getId());
-            dir = new MCRDirectory(der.getId().toString());
+        MCRPath derRoot = MCRPath.getPath(der.getId().toString(), "/");
+        if (!Files.isDirectory(derRoot)) {
+            LOGGER.info("Creating missing root directory for {}", der.getId());
+            derRoot.getFileSystem().createRoot(der.getId().toString());
         }
         try (Stream<Path> stream = Files.find(derivateDirectory, 5,
             (path, attr) -> !path.toString().endsWith(".md5") && Files.isRegularFile(path) && !path.equals(
