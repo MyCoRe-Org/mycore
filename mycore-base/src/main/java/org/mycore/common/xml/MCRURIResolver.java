@@ -1717,10 +1717,10 @@ public final class MCRURIResolver implements URIResolver {
 
         private MCRCache<String, Element> cache;
 
-        public MCRCachingResolver() {
+        MCRCachingResolver() {
             int capacity = MCRConfiguration2.getOrThrow(CONFIG_PREFIX + ".Capacity", Integer::parseInt);
             maxAge = MCRConfiguration2.getOrThrow(CONFIG_PREFIX + ".MaxAge", Long::parseLong);
-            cache = new MCRCache<String, Element>(capacity, MCRCachingResolver.class.getName());
+            cache = new MCRCache<>(capacity, MCRCachingResolver.class.getName());
         }
 
         /**
@@ -1733,7 +1733,8 @@ public final class MCRURIResolver implements URIResolver {
          * The cache capacity is configured via MCR.URIResolver.CachingResolver.Capacity
          * The default capacity is 100.
          */
-        @Override public Source resolve(String href, String base) throws TransformerException {
+        @Override
+        public Source resolve(String href, String base) throws TransformerException {
             String hrefToCache = href.substring(href.indexOf(":") + 1);
             LOGGER.debug("resolving: " + hrefToCache);
 
