@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mycoreclass 
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"	
+	xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="institutes">
+	
+	<label xml:lang="de" text="Fakultät / Institut" />
+    <label xml:lang="x-auth" text="UDE" />
+    
+	<categories>		
+		<category ID="ZWE">
+			<label xml:lang="de" text="Forschungszentren" />
+			<category ID="CCSS">
+				<label xml:lang="de" text="Center for Computational Sciences and Simulation (CCSS)"/>
+			</category>
+			<category ID="CEN">
+				<label xml:lang="de" text="Center for Nanointegration Duisburg-Essen (CENIDE)" />
+				 <category ID="ICAN">
+					<label xml:lang="de" text="ICAN - Interdisciplinary Center for Analytics on the Nanoscale"/>
+				</category>
+				<category ID="NETZ">
+					<label xml:lang="de" text="NanoEnergieTechnikZentrum (NETZ)"/>
+				</category>
+			</category>
+			<category ID="CINCH">
+       			<label xml:lang="de" text="Nationales Forschungszentrum für Gesundheitsökonomik (CINCH)"/>
+			</category>
+		</category>
+	</categories>
+</mycoreclass>
