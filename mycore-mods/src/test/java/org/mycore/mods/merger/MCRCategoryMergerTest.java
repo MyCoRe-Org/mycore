@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTransactionHelper;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -48,6 +49,7 @@ public class MCRCategoryMergerTest extends MCRJPATestCase {
         MCRTransactionHelper.isTransactionActive();
         loadCategory("institutes.xml");
         loadCategory("genre.xml");
+        loadCategory("oa.xml");
     }
 
     private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
@@ -111,5 +113,18 @@ public class MCRCategoryMergerTest extends MCRJPATestCase {
         String c = "[mods:genre[@authorityURI='" + uri + "'][@valueURI='" + uri + "#collection']]";
         String d = "[mods:genre[@authorityURI='" + uri + "'][@valueURI='" + uri + "#proceedings']]";
         MCRMergerTest.test(a + c, b + d, a + d + b);
+    }
+
+    @Test
+    public void testNonRepeatable() throws Exception {
+        MCRConfiguration2.set("MCR.MODS.Merger.CategoryMerger.Repeatable.oa", "false");
+
+        String uri = "http://www.mycore.org/classifications/oa";
+        String green = "[mods:genre[@authorityURI='" + uri + "'][@valueURI='" + uri + "#green']]";
+        String gold = "[mods:genre[@authorityURI='" + uri + "'][@valueURI='" + uri + "#gold']]";
+        MCRMergerTest.test(green, gold, green);
+
+        String platin = "[mods:genre[@authorityURI='" + uri + "'][@valueURI='" + uri + "#platin']]";
+        MCRMergerTest.test(gold, platin, platin);
     }
 }
