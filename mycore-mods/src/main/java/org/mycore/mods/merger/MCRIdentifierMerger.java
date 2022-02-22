@@ -22,14 +22,14 @@ import org.jdom2.Element;
 
 /**
  * Compares and merges mods:identifier elements.
- * This implementation assumes there is only one identifier per type.
- * So if the type is same, the identifiers are regarded to represent the same information.
+ * Two identifiers are assumed to be the same when they are equals, neglecting any hyphens.
  * At merge, the identifier containing hyphens wins, because it is regarded prettier ;-)
  *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRIdentifierMerger extends MCRMerger {
 
+    @Override
     public void setElement(Element element) {
         super.setElement(element);
     }
@@ -38,13 +38,19 @@ public class MCRIdentifierMerger extends MCRMerger {
         return this.element.getAttributeValue("type", "");
     }
 
+    private String getSimplifiedID() {
+        return this.element.getTextTrim().replace("-", "");
+    }
+
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
         if (!(other instanceof MCRIdentifierMerger)) {
             return false;
-        } else {
-            return this.getType().equals(((MCRIdentifierMerger) other).getType());
         }
+        
+        MCRIdentifierMerger oid = (MCRIdentifierMerger) other;
+        return this.getType().equals(oid.getType())
+            && this.getSimplifiedID().equals(oid.getSimplifiedID());
     }
 
     @Override
