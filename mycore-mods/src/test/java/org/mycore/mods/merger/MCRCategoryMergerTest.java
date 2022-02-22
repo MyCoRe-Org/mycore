@@ -47,6 +47,7 @@ public class MCRCategoryMergerTest extends MCRJPATestCase {
         MCRSessionMgr.getCurrentSession();
         MCRTransactionHelper.isTransactionActive();
         loadCategory("institutes.xml");
+        loadCategory("genre.xml");
     }
 
     private void loadCategory(String categoryFileName) throws URISyntaxException, JDOMException, IOException {
@@ -98,5 +99,17 @@ public class MCRCategoryMergerTest extends MCRJPATestCase {
         String b = "[mods:classification[@authority='UDE']='ICAN']";
         MCRMergerTest.test(a, b, b);
         MCRMergerTest.test(b, a, b);
+    }
+
+    @Test
+    public void testMixedClassificationsWithinSameMODSElement() throws Exception {
+        String a = "[mods:genre[@authority='marcgt']='article']";
+        String b = "[mods:genre[@authority='marcgt']='book']";
+        MCRMergerTest.test(a, b, a + b);
+
+        String uri = "http://www.mycore.org/classifications/mir_genres";
+        String c = "[mods:genre[@authorityURI='" + uri + "'][@valueURI='" + uri + "#collection']]";
+        String d = "[mods:genre[@authorityURI='" + uri + "'][@valueURI='" + uri + "#proceedings']]";
+        MCRMergerTest.test(a + c, b + d, a + d + b);
     }
 }
