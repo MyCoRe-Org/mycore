@@ -37,4 +37,12 @@ public class MCRIdentifierMergerTest extends MCRTestCase {
         String b = "[mods:identifier[@type='issn']='1234-5678']";
         MCRMergerTest.test(a, b, b);
     }
+
+    @Test
+    public void testMergeMultiple() throws Exception {
+        String a = "[mods:identifier[@type='isbn']='9783836287456'][mods:identifier[@type='isbn']='3836287455']";
+        String b = "[mods:identifier[@type='isbn']='978-3-8362-8745-6']";
+        String e = "[mods:identifier[@type='isbn']='978-3-8362-8745-6'][mods:identifier[@type='isbn']='3836287455']";
+        MCRMergerTest.test(a, b, e);
+    }
 }
