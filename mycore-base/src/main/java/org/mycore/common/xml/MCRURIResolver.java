@@ -1707,7 +1707,7 @@ public final class MCRURIResolver implements URIResolver {
             final boolean hasAccess;
 
             if (!split[1].isBlank()) {
-                hasAccess = MCRAccessManager.checkPermission(permission, split[1]);
+                hasAccess = MCRAccessManager.checkPermission(split[1], permission);
             } else {
                 hasAccess = MCRAccessManager.checkPermission(permission);
             }
