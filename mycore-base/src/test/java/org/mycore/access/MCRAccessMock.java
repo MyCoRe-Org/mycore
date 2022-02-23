@@ -35,16 +35,16 @@ import javax.inject.Singleton;
 @Singleton
 public class MCRAccessMock implements MCRAccessInterface {
 
-    private static final List<MCRCheckPermissionCall> calls = new LinkedList<>();
+    private static final List<MCRCheckPermissionCall> CALLS = new LinkedList<>();
     private static boolean checkPermissionReturn = true;
 
 
     public static List<MCRCheckPermissionCall> getCheckPermissionCalls() {
-        return Collections.unmodifiableList(calls);
+        return Collections.unmodifiableList(CALLS);
     }
 
     public static void clearCheckPermissionCallsList(){
-        calls.clear();
+        CALLS.clear();
     }
 
     public static boolean getMethodResult() {
@@ -58,12 +58,12 @@ public class MCRAccessMock implements MCRAccessInterface {
 
     @Override
     public boolean checkPermission(String permission) {
-        calls.add(new MCRCheckPermissionCall(null, permission));
+        CALLS.add(new MCRCheckPermissionCall(null, permission));
         return checkPermissionReturn;    }
 
     @Override
     public boolean checkPermission(String id, String permission) {
-        calls.add(new MCRCheckPermissionCall(id, permission));
+        CALLS.add(new MCRCheckPermissionCall(id, permission));
         return checkPermissionReturn;
     }
 
@@ -98,8 +98,12 @@ public class MCRAccessMock implements MCRAccessInterface {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             MCRCheckPermissionCall that = (MCRCheckPermissionCall) o;
             return Objects.equals(id, that.id) && permission.equals(that.permission);
         }

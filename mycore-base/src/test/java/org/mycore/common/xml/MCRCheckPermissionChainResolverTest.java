@@ -23,14 +23,13 @@ import org.jdom2.Element;
 import org.jdom2.transform.JDOMSource;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.access.MCRAccessMock;
 import org.mycore.common.MCRTestCase;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import java.util.Map;
-
-import static org.mycore.access.MCRAccessManager.*;
 
 public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
 
@@ -44,9 +43,10 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
 
     public static final String MOCK_CALL = MOCK_RESOLVER_PREFIX + ":nothing";
 
-    public static final String READ_CALL = RESOLVER_PREFIX + ":" + MOCK_ID + ":" + PERMISSION_READ + ":" + MOCK_CALL;
+    public static final String READ_CALL = RESOLVER_PREFIX + ":" + MOCK_ID + ":" + MCRAccessManager.PERMISSION_READ
+        + ":" + MOCK_CALL;
 
-    public static final String USE_STUFF_CALL = RESOLVER_PREFIX + "::"+ PERMISSION_USE_STUFF + ":" + MOCK_CALL;
+    public static final String USE_STUFF_CALL = RESOLVER_PREFIX + "::" + PERMISSION_USE_STUFF + ":" + MOCK_CALL;
 
     final JDOMSource resultSource = new JDOMSource(new Document(new Element("result")));
 
@@ -98,12 +98,12 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
         Assert.assertEquals("The result source should be returned", resultSource, result);
         Assert.assertEquals("The resolver should have been called", 1, MCRMockResolver.getCalls().size());
         Assert.assertEquals("The Mock resolver should have been called with the right uri", MOCK_CALL,
-                MCRMockResolver.getCalls().get(0).getHref());
+            MCRMockResolver.getCalls().get(0).getHref());
 
     }
 
     @Test
-    public void resolvePermissionForbidden(){
+    public void resolvePermissionForbidden() {
         MCRAccessMock.setMethodResult(false);
 
         Assert.assertThrows(TransformerException.class, () -> {
@@ -113,18 +113,19 @@ public class MCRCheckPermissionChainResolverTest extends MCRTestCase {
         Assert.assertEquals("The resolver should not have been called", 0, MCRMockResolver.getCalls().size());
     }
 
-    private void assertPermissionCall(){
+    private void assertPermissionCall() {
         Assert.assertEquals("There should be a call to the access strategy", 1,
-                MCRAccessMock.getCheckPermissionCalls().size());
+            MCRAccessMock.getCheckPermissionCalls().size());
         Assert.assertEquals("The call should be made with permission " + PERMISSION_USE_STUFF, PERMISSION_USE_STUFF,
-                MCRAccessMock.getCheckPermissionCalls().get(0).getPermission());
-        Assert.assertNull("The call should be made with null as id " , MCRAccessMock.getCheckPermissionCalls().get(0).getId());
+            MCRAccessMock.getCheckPermissionCalls().get(0).getPermission());
+        Assert.assertNull("The call should be made with null as id ",
+            MCRAccessMock.getCheckPermissionCalls().get(0).getId());
     }
 
     private void assertReadCall() {
         Assert.assertEquals("There should be a call to the access strategy", 1,
             MCRAccessMock.getCheckPermissionCalls().size());
-        Assert.assertEquals("The call should be made with permission read", PERMISSION_READ,
+        Assert.assertEquals("The call should be made with permission read", MCRAccessManager.PERMISSION_READ,
             MCRAccessMock.getCheckPermissionCalls().get(0).getPermission());
         Assert.assertEquals("The call should be made with the id " + MOCK_ID, MOCK_ID,
             MCRAccessMock.getCheckPermissionCalls().get(0).getId());
