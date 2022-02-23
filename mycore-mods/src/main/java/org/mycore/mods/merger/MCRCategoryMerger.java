@@ -103,7 +103,7 @@ public class MCRCategoryMerger extends MCRMerger {
         MCRCategoryID idThis = MCRClassMapper.getCategoryID(this.element);
         MCRCategoryID idOther = MCRClassMapper.getCategoryID(cmo.element);
 
-        if (idThis.equals(idOther) || !isRepeatable(idThis)) {
+        if (idThis.equals(idOther)) {
             return;
         }
 
