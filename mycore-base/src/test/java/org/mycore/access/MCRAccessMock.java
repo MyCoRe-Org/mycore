@@ -27,6 +27,11 @@ import org.mycore.common.MCRUserInformation;
 
 import javax.inject.Singleton;
 
+/**
+ * Can be used to write Tests against the {@link MCRAccessManager}.
+ * Just add MCR.Access.Class with MCRAccessMock.class.getName() to the test-properties in the overwritten
+ * {@link org.mycore.common.MCRTestCase} getTestProperties() method.
+ */
 @Singleton
 public class MCRAccessMock implements MCRAccessInterface {
 

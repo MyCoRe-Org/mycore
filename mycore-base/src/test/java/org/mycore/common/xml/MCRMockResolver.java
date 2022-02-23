@@ -25,6 +25,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Can be used to write test against the {@link MCRURIResolver}.
+ * Just add MCR.URIResolver.ModuleResolver.YOUR_PREFIX with MCRMockResolver.class.getName() to the overwritten
+ * {@link org.mycore.common.MCRTestCase} getTestProperties()
+ */
 public class MCRMockResolver implements URIResolver {
 
     private static final List<MCRMockResolverCall> CALLS = new LinkedList<>();
