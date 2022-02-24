@@ -864,12 +864,12 @@ class XedDisplayValidationMessages extends ElementTransformer {
     }
 }
 
-/** xed:cleanup-rule xpath="" relevantIf="" **/
+/** xed:cleanup-rule xpath="" relevant-if="" **/
 class XedCleanupRule extends ElementTransformer {
     @Override
     void transform(Element e) {
         String xPath = e.getAttributeValue("xpath");
-        String relevantIf = e.getAttributeValue("relevantIf");
+        String relevantIf = e.getAttributeValue("relevant-if");
         transformer.getEditorSession().getXMLCleaner().addRule(xPath, relevantIf);
     }
 }
