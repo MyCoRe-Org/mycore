@@ -76,7 +76,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             "(@eventType)]";
     public static final String NONE_TYPE = "none";
 
-    public static final String URN_RESOLVER_LINK = "https://nbn-resolving.org/resolver?identifier=";
+    public static final String URN_RESOLVER_LINK = "https://nbn-resolving.org/";
 
     private MCRMODSWrapper wrapper;
 
