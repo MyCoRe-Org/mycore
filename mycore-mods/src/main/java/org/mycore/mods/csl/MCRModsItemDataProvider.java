@@ -76,6 +76,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             "(@eventType)]";
     public static final String NONE_TYPE = "none";
 
+    public static final String URN_RESOLVER_LINK = "https://nbn-resolving.org/resolver?identifier=";
+
     private MCRMODSWrapper wrapper;
 
     private String id;
@@ -143,9 +145,12 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
 
     protected void processURL(String id, CSLItemDataBuilder idb) {
-        // use mods:url first
-        Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
+        // use 1. urn 2. mods:location/mods:url  3. receive if there is a fulltext  4. url of parent
+      Optional.ofNullable(wrapper.getElement("mods:identifier[@type='urn']"))
                 .map(Element::getTextNormalize)
+                .map((urn)-> URN_RESOLVER_LINK + urn)
+            .or(() ->  Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
+                    .map(Element::getTextNormalize))
             .or(() -> Optional.of(MCRFrontendUtil.getBaseURL() + "receive/" + id)
                 .filter(url -> this.wrapper.getMCRObject().getStructure().getDerivates().size() > 0))
             .or(()-> Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/mods:location/mods:url"))
