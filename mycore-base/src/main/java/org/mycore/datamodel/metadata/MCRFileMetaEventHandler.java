@@ -103,7 +103,7 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handlePathDeleted(MCREvent evt, Path path, BasicFileAttributes attrs) {
-        if (attrs.isDirectory()) {
+        if (attrs != null && attrs.isDirectory()) {
             return;
         }
         MCRPath mcrPath = MCRPath.toMCRPath(path);

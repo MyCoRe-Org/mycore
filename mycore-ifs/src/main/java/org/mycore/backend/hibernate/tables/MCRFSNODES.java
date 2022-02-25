@@ -30,6 +30,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+/**
+ * Do NOT use!
+ */
 @Entity
 @Table(
     uniqueConstraints = { @UniqueConstraint(columnNames = { "pid", "name" }, name = "mcrfsnodes_pid_name_idx") },

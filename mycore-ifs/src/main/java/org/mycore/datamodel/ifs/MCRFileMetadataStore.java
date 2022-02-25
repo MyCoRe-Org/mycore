@@ -37,6 +37,7 @@ import org.mycore.common.MCRPersistenceException;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public interface MCRFileMetadataStore {
     /**
      * Creates or updates the data of the given node in the persistent store.

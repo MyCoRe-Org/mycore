@@ -18,13 +18,16 @@
 
 package org.mycore.impex;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Container for derivate files.
@@ -36,7 +39,7 @@ public class MCRTransferPackageFileContainer {
 
     private MCRObjectID derivateId;
 
-    private List<MCRFile> fileList;
+    private List<MCRPath> fileList;
 
     public MCRTransferPackageFileContainer(MCRObjectID derivateId) {
         if (derivateId == null) {
@@ -59,34 +62,20 @@ public class MCRTransferPackageFileContainer {
     /**
      * @return the list of files hold by this container
      */
-    public List<MCRFile> getFiles() {
+    public List<MCRPath> getFiles() throws IOException {
         if (fileList == null) {
-            this.fileList = new ArrayList<>();
             this.createFileList();
         }
         return this.fileList;
     }
 
-    private void createFileList() {
-        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(this.derivateId.toString());
-        if (node instanceof MCRDirectory) {
-            processNode(node);
-        }
-    }
-
-    /**
-     * @param node the node to process
-     */
-    private void processNode(MCRFilesystemNode node) {
-        MCRDirectory dir = (MCRDirectory) node;
-        MCRFilesystemNode[] children = dir.getChildren();
-        for (MCRFilesystemNode child : children) {
-            if (child instanceof MCRDirectory) {
-                processNode(child);
-            }
-            if (child instanceof MCRFile) {
-                this.fileList.add((MCRFile) child);
-            }
+    private void createFileList() throws IOException {
+        final MCRPath derRoot = MCRPath.getPath(this.derivateId.toString(), "/");
+        try (Stream<Path> files = Files.find(derRoot, Integer.MAX_VALUE, (path, attr) -> attr.isRegularFile())) {
+            this.fileList = files.map(MCRPath::toMCRPath)
+                .sorted(Comparator.comparing(MCRPath::getNameCount)
+                    .thenComparing(MCRPath::toString))
+                .collect(Collectors.toList());
         }
     }
 

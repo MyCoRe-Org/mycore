@@ -67,11 +67,16 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public static final String USABLE_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
         " or @xlink:type='simple')]";
 
+    public static final String SHORT_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)"  +
+            " or @xlink:type='simple') and @type='abbreviated']";
+
     public static final String MODS_RELATED_ITEM_XPATH = "mods:relatedItem/";
 
     public static final String MODS_ORIGIN_INFO_PUBLICATION = "mods:originInfo[@eventType='publication' or not" +
             "(@eventType)]";
     public static final String NONE_TYPE = "none";
+
+    public static final String URN_RESOLVER_LINK = "https://nbn-resolving.org/";
 
     private MCRMODSWrapper wrapper;
 
@@ -106,6 +111,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         processPublicationData(idb);
         processAbstract(idb);
         processModsPart(idb);
+        processSubject(idb);
 
         CSLItemData build = idb.build();
         if(LOGGER.isDebugEnabled()){
@@ -115,6 +121,16 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         }
 
         return build;
+    }
+
+    private void processSubject(CSLItemDataBuilder idb) {
+        final String keyword = wrapper.getElements("mods:subject/mods:topic")
+            .stream()
+            .map(Element::getTextNormalize)
+            .collect(Collectors.joining(", "));
+        if (keyword.length() > 0) {
+            idb.keyword(keyword);
+        }
     }
 
     protected void processLanguage(CSLItemDataBuilder idb) {
@@ -129,9 +145,12 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
 
     protected void processURL(String id, CSLItemDataBuilder idb) {
-        // use mods:url first
-        Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
+        // use 1. urn 2. mods:location/mods:url  3. receive if there is a fulltext  4. url of parent
+      Optional.ofNullable(wrapper.getElement("mods:identifier[@type='urn']"))
                 .map(Element::getTextNormalize)
+                .map((urn)-> URN_RESOLVER_LINK + urn)
+            .or(() ->  Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
+                    .map(Element::getTextNormalize))
             .or(() -> Optional.of(MCRFrontendUtil.getBaseURL() + "receive/" + id)
                 .filter(url -> this.wrapper.getMCRObject().getStructure().getDerivates().size() > 0))
             .or(()-> Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/mods:location/mods:url"))
@@ -339,45 +358,66 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processIdentifier(CSLItemDataBuilder idb) {
-        final List<Element> identifiers = wrapper.getElements("mods:identifier");
+        final List<Element> parentIdentifiers = wrapper.getElements("mods:relatedItem[@type='host']/mods:identifier");
 
+        parentIdentifiers.forEach(parentIdentifier -> {
+            applyIdentifier(idb, parentIdentifier, true);
+        });
+
+        final List<Element> identifiers = wrapper.getElements("mods:identifier");
         identifiers.forEach(identifierElement -> {
-            final String type = identifierElement.getAttributeValue("type");
-            final String identifier = identifierElement.getTextNormalize();
-            switch (type) {
-                case "doi":
-                    idb.DOI(identifier);
-                    break;
-                case "isbn":
-                    idb.ISBN(identifier);
-                    break;
-                case "issn":
-                    idb.ISSN(identifier);
-                    break;
-                case "pmid":
-                    idb.PMID(identifier);
-                    break;
-                case "pmcid":
-                    idb.PMCID(identifier);
-                    break;
-            }
+            applyIdentifier(idb, identifierElement, false);
         });
 
     }
 
+    private void applyIdentifier(CSLItemDataBuilder idb, Element identifierElement, boolean parent) {
+        final String type = identifierElement.getAttributeValue("type");
+        final String identifier = identifierElement.getTextNormalize();
+        switch (type) {
+            case "doi":
+                idb.DOI(identifier);
+                break;
+            case "isbn":
+                idb.ISBN(identifier);
+                break;
+            case "issn":
+                idb.ISSN(identifier);
+                break;
+            case "pmid":
+                if (!parent) {
+                    idb.PMID(identifier);
+                }
+                break;
+            case "pmcid":
+                if (!parent) {
+                    idb.PMCID(identifier);
+                }
+                break;
+        }
+    }
+
     protected void processTitles(CSLItemDataBuilder idb) {
-        final Element titleInfoElement = wrapper.getElement("mods:titleInfo[not(@altFormat) and (not(@xlink:type) " +
-                "or @xlink:type='simple')]");
+        final Element titleInfoElement = wrapper.getElement(USABLE_TITLE_XPATH);
         if (titleInfoElement != null) {
             idb.titleShort(buildShortTitle(titleInfoElement));
             idb.title(buildTitle(titleInfoElement));
         }
 
+        final Element titleInfoShortElement = wrapper.getElement(SHORT_TITLE_XPATH);
+        if(titleInfoShortElement != null){
+            idb.titleShort(buildShortTitle(titleInfoShortElement));
+        }
 
         Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + USABLE_TITLE_XPATH))
             .ifPresent((titleInfo) -> {
             idb.containerTitleShort(buildShortTitle(titleInfo));
             idb.containerTitle(buildTitle(titleInfo));
+        });
+
+        Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + SHORT_TITLE_XPATH))
+            .ifPresent((titleInfo) -> {
+            idb.containerTitleShort(buildShortTitle(titleInfo));
         });
 
         wrapper.getElements(".//mods:relatedItem[@type='series']/" + USABLE_TITLE_XPATH).stream()

@@ -39,6 +39,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * @author Thomas Scheffler (yagee)
  *
  */
+@Deprecated
 public class MCRIFSFileSystem extends MCRAbstractFileSystem {
 
     private MCRFileSystemProvider provider;

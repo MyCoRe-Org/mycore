@@ -31,6 +31,7 @@ import org.mycore.datamodel.niofs.ifs1.MCRIFSFileSystem;
  * @author Thomas Scheffler (yagee)
  *
  */
+@Deprecated
 public class MCRFileEventHandlerBase extends MCREventHandlerBase {
 
     private static final String MCRFILE_EVENT_KEY = "file";

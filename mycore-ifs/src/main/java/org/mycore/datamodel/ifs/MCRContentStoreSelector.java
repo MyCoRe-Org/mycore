@@ -32,6 +32,7 @@ import org.mycore.common.MCRException;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
+@Deprecated
 public interface MCRContentStoreSelector {
     /**
      * Returns the ID of the file content store to be used to store the content

@@ -47,6 +47,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * @version $Revision$ $Date: 2010-11-08 15:05:28 +0100 (Mon, 08 Nov
  *          2010) $
  */
+@Deprecated
 public class MCRDirectory extends MCRFilesystemNode {
     /** Constant for choosing file nodes * */
     public static final int FILES = 1;

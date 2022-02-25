@@ -59,8 +59,6 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
@@ -73,6 +71,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.restapi.v1.errors.MCRRestAPIError;
 import org.mycore.restapi.v1.errors.MCRRestAPIException;
@@ -301,9 +300,9 @@ public class MCRRestAPIUploadHelper {
                 path = path.substring(1);
             }
 
-            MCRDirectory difs = MCRDirectory.getRootDirectory(derID.toString());
-            if (difs == null) {
-                difs = new MCRDirectory(derID.toString());
+            MCRPath derRoot = MCRPath.getPath(derID.toString(), "/");
+            if (Files.notExists(derRoot)) {
+                derRoot.getFileSystem().createRoot(derID.toString());
             }
 
             der.getDerivate().getInternals().setSourcePath(derDir.toString());
@@ -325,8 +324,7 @@ public class MCRRestAPIUploadHelper {
                     LOGGER.error(e);
                 }
 
-                MCRFileImportExport.importFiles(derDir.toFile(), difs);
-
+                Files.walkFileTree(derDir, new MCRTreeCopier(derDir, derRoot, true));
                 if (formParamMaindoc) {
                     der.getDerivate().getInternals().setMainDoc(maindoc);
                 }
@@ -334,8 +332,8 @@ public class MCRRestAPIUploadHelper {
                 java.nio.file.Path saveFile = derDir.resolve(path);
                 Files.createDirectories(saveFile.getParent());
                 Files.copy(uploadedInputStream, saveFile, StandardCopyOption.REPLACE_EXISTING);
-                //delete old file
-                MCRFileImportExport.importFiles(derDir.toFile(), difs);
+
+                Files.walkFileTree(derDir, new MCRTreeCopier(derDir, derRoot, true));
                 if (formParamMaindoc) {
                     der.getDerivate().getInternals().setMainDoc(path);
                 }

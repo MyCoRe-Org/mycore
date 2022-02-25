@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="mir_genres">
+  <label xml:lang="en" text="genre" description="A list of publication types" />
+  <label xml:lang="de" text="Genre" description="Liste der Publikationsarten" />
+  <label xml:lang="x-uri" text="http://www.mycore.org/classifications/mir_genres" />
+  <categories>
+    <category ID="article" counter="1">
+      <label xml:lang="en" text="Article / Chapter" />
+      <label xml:lang="x-mapping" text="diniPublType:article" />
+      <label xml:lang="de" text="Artikel / Aufsatz" />
+      <label xml:lang="x-hosts" text="journal newspaper collection festschrift proceedings standalone" />
+    </category>
+    <category ID="collection" counter="0">
+      <label xml:lang="de" text="Sammelwerk" />
+      <label xml:lang="x-hosts" text="series standalone" />
+      <label xml:lang="en" text="Collection" />
+      <category ID="festschrift" counter="0">
+        <label xml:lang="en" text="Festschrift" />
+        <label xml:lang="x-hosts" text="series standalone" />
+        <label xml:lang="de" text="Festschrift" />
+      </category>
+      <category ID="proceedings" counter="0">
+        <label xml:lang="en" text="Proceedings" />
+        <label xml:lang="de" text="Tagungsband" />
+        <label xml:lang="x-hosts" text="series standalone" />
+      </category>
+      <category ID="lexicon" counter="0">
+        <label xml:lang="x-hosts" text="series standalone" />
+        <label xml:lang="en" text="Lexicon" />
+        <label xml:lang="de" text="Lexikon" />
+      </category>
+    </category>
+  </categories>
+</mycoreclass>

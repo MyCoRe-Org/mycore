@@ -30,6 +30,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 
+@Deprecated
 abstract class MCRBasicFileAttributeViewImpl implements BasicFileAttributeView {
     private static Logger LOGGER = LogManager.getLogger(MCRBasicFileAttributeViewImpl.class);
 

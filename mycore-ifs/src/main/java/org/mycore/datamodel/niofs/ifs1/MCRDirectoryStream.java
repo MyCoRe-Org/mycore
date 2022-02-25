@@ -57,6 +57,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  *
  * @author Thomas Scheffler (yagee)
  */
+@Deprecated
 public class MCRDirectoryStream implements SecureDirectoryStream<Path> {
     static Logger LOGGER = LogManager.getLogger();
 

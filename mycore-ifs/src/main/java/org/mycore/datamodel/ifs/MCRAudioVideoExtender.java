@@ -47,6 +47,7 @@ import com.google.common.net.MediaType;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public abstract class MCRAudioVideoExtender {
 
     /** The bitrate of the asset in number of bits per second */

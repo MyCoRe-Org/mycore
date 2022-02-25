@@ -44,6 +44,7 @@ import org.mycore.common.content.MCRContent;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public abstract class MCRContentStore {
     /** DateFormat used to construct new unique IDs based on timecode */
     protected static DateFormat formatter = new SimpleDateFormat("yyMMdd-HHmmss-SSS", Locale.ROOT);
