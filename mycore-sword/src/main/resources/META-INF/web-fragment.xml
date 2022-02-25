@@ -2,34 +2,8 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0" metadata-complete="true">
 <!-- **************************************************************** -->
 <!-- Servlets and mappings of mycore-sword -->
+<!-- Multi-Part servlets are configured via org.mycore.sword.MCRSwordMultiPartServletDeployer -->
 <!-- **************************************************************** -->
-  <servlet>
-    <servlet-name>MCRSword2CollectionServlet</servlet-name>
-    <servlet-class>org.mycore.sword.servlets.MCRSwordCollectionServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MCRSword2CollectionServlet</servlet-name>
-    <url-pattern>/sword2/col/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>MCRSword2ContainerServlet</servlet-name>
-    <servlet-class>org.mycore.sword.servlets.MCRSwordContainerServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MCRSword2ContainerServlet</servlet-name>
-    <url-pattern>/sword2/edit/*</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>MCRSword2MediaResourceServlet</servlet-name>
-    <servlet-class>org.mycore.sword.servlets.MCRSwordMediaResourceServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MCRSword2MediaResourceServlet</servlet-name>
-    <url-pattern>/sword2/edit-media/*</url-pattern>
-  </servlet-mapping>
-
   <servlet>
     <servlet-name>MCRSword2ServiceDocumentServlet</servlet-name>
     <servlet-class>org.mycore.sword.servlets.MCRSwordServiceDocumentServlet</servlet-class>
