@@ -23,9 +23,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-import org.mycore.common.MCRUserInformation;
+import jakarta.inject.Singleton;
 
-import javax.inject.Singleton;
+import org.mycore.common.MCRUserInformation;
 
 /**
  * Can be used to write Tests against the {@link MCRAccessManager}.
