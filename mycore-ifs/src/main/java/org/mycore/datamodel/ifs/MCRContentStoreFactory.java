@@ -38,6 +38,7 @@ import org.mycore.common.config.MCRConfigurationException;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRContentStoreFactory {
     private static final String CLASS_SUFFIX = ".Class";
 

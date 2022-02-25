@@ -37,6 +37,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  * @author Thomas Scheffler (yagee)
  *
  */
+@Deprecated
 public class MCRFileTypeDetector extends FileTypeDetector {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRFileTypeDetector.class);

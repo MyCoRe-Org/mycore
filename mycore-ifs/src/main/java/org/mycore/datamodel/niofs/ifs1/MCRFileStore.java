@@ -39,6 +39,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+@Deprecated
 public class MCRFileStore extends MCRAbstractFileStore {
 
     private MCRContentStore contentStore;

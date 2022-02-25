@@ -47,6 +47,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * 
  * @author Frank Lützenkirchen
  */
+@Deprecated
 public class MCRFileContentTypeFactory {
 
     static final Logger LOGGER = LogManager.getLogger(MCRURIResolver.class);

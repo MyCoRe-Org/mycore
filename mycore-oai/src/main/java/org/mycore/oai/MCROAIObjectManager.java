@@ -29,7 +29,6 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
@@ -158,8 +157,9 @@ public class MCROAIObjectManager {
             exists = MCRMetadataManager.exists(mcrID);
             objectType = mcrID.getTypeId();
         } else {
-            MCRFilesystemNode node = MCRFilesystemNode.getNode(id);
-            exists = node != null;
+            //TODO remove this code path
+            LOGGER.warn("MCRFileSystemNodes are not supported anymore! id: " + id);
+            exists = false;
             objectType = "data_file";
         }
         return uri.replace("{id}", id).replace("{format}", metadataPrefix).replace("{objectType}", objectType).replace(

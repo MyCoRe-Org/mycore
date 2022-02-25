@@ -36,9 +36,9 @@ import org.jdom2.Element;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.common.content.MCRPathContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRClassificationUtils;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -46,6 +46,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectStructure;
 import org.mycore.datamodel.metadata.MCRObjectUtils;
+import org.mycore.datamodel.niofs.MCRPath;
 
 /**
  * Basic transfer package containing a {@link MCRObject}, all its descendants,
@@ -211,8 +212,9 @@ public class MCRTransferPackage {
             content.put(derivateFileName, new MCRJDOMContent(derivateXML));
 
             // files of derivate
-            for (MCRFile file : fc.getFiles()) {
-                content.put(folder + file.getAbsolutePath(), file.getContent());
+            for (MCRPath file : fc.getFiles()) {
+                //TODO: safe a IO operation to get file attributes with new MCRPathContent(path, attr);
+                content.put(folder + file.getOwnerRelativePath(), new MCRPathContent(file));
             }
         }
 

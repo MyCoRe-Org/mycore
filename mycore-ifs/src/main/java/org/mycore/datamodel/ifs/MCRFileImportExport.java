@@ -38,6 +38,7 @@ import org.mycore.common.content.streams.MCRMD5InputStream;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRFileImportExport {
 
     private static Logger LOGGER = LogManager.getLogger(MCRFileImportExport.class);

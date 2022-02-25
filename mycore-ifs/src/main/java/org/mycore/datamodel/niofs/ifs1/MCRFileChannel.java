@@ -37,6 +37,7 @@ import org.mycore.datamodel.ifs.MCRFile;
 /**
  * @author Thomas Scheffler (yagee)
  */
+@Deprecated
 public class MCRFileChannel extends FileChannel {
 
     private FileChannel baseChannel;

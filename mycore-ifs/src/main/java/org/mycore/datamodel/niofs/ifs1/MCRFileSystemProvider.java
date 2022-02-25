@@ -79,6 +79,7 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 /**
  * @author Thomas Scheffler (yagee)
  */
+@Deprecated
 public class MCRFileSystemProvider extends FileSystemProvider {
 
     public static final String SCHEME = "ifs";

@@ -35,6 +35,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
+@Deprecated
 public class MCRSimpleContentStoreSelector implements MCRContentStoreSelector {
     /** the default content store to use if no other rule matches */
     protected String defaultID;

@@ -48,6 +48,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  * This class implements the MCRFileMetadataStore.
  *
  */
+@Deprecated
 public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     // LOGGER
     private static Logger LOGGER = LogManager.getLogger(MCRHIBFileMetadataStore.class);

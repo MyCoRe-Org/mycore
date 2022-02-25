@@ -43,6 +43,7 @@ import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.cli.MCRIFSCommands;
 
+@Deprecated
 public class MCRContentStoreTestCase extends MCRJPATestCase {
 
     @Rule

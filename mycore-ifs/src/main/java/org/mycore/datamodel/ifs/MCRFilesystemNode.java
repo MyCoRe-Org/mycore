@@ -51,6 +51,7 @@ import org.mycore.datamodel.niofs.ifs1.MCRFileSystemProvider;
  * @author Stefan Freitag
  * @version $Revision$ $Date$
  */
+@Deprecated
 public abstract class MCRFilesystemNode {
     private static final Logger LOGGER = LogManager.getLogger(MCRFilesystemNode.class);
 
