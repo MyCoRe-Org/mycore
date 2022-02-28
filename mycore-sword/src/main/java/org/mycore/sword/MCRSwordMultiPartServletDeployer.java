@@ -117,8 +117,10 @@ public class MCRSwordMultiPartServletDeployer implements AutoExecutable {
         return new MultipartConfigElement(location, maxFileSize, maxFileSize, fileSizeThreshold);
     }
 
+    //TODO use Record with JDK17
     private static class ServletConfig {
-        String name, urlMapping;
+        String name;
+        String urlMapping;
 
         Class<? extends HttpServlet> servletClass;
 
