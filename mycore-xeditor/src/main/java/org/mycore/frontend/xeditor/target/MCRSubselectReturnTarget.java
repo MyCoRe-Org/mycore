@@ -20,8 +20,6 @@ package org.mycore.frontend.xeditor.target;
 
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jaxen.JaxenException;
@@ -32,6 +30,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.tracker.MCRChangeData;
+
+import jakarta.servlet.ServletContext;
 
 public class MCRSubselectReturnTarget implements MCREditorTarget {
 

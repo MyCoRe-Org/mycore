@@ -28,11 +28,11 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.zip.Deflater;
 
-import javax.servlet.ServletOutputStream;
-
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.mycore.datamodel.niofs.MCRPath;
+
+import jakarta.servlet.ServletOutputStream;
 
 /**
  * Uses ZIP format to deliver requested content.

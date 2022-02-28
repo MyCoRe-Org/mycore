@@ -35,9 +35,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.status.StatusLogger;
@@ -47,6 +44,9 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 import org.mycore.common.log4j2.MCRSessionThreadContext;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 
 /**
  * Called by {@link MCRStartupHandler} on start up to setup {@link MCRConfiguration2}.
@@ -177,7 +177,7 @@ public class MCRConfigurationDirSetup implements AutoExecutable {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#startUp(javax.servlet.ServletContext)
+     * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#startUp(jakarta.servlet.ServletContext)
      */
     @Override
     public void startUp(ServletContext servletContext) {

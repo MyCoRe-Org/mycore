@@ -20,7 +20,7 @@ package org.mycore.orcid.oauth;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Represents the response on a token request against the OAuth2 API of orcid.org.

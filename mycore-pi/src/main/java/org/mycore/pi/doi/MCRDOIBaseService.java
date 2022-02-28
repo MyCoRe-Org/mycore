@@ -25,7 +25,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.persistence.NoResultException;
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -50,6 +49,8 @@ import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import jakarta.persistence.NoResultException;
 
 /**
  * A doi Base Service which contains common DOI registration code.

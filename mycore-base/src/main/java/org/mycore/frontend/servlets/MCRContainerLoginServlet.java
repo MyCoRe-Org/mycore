@@ -21,8 +21,6 @@ package org.mycore.frontend.servlets;
 import java.security.Principal;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
@@ -30,6 +28,8 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.frontend.MCRFrontendUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Thomas Scheffler (yagee)

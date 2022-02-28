@@ -23,13 +23,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.events.MCRStartupHandler;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Checks deprecated properties and the configuration of {@link MCRPIService}s on startup

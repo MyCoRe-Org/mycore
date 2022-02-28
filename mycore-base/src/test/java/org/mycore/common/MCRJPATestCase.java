@@ -29,18 +29,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
-import javax.persistence.RollbackException;
-
 import org.apache.logging.log4j.LogManager;
 import org.junit.After;
 import org.junit.Before;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRJPABootstrapper;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.Query;
+import jakarta.persistence.RollbackException;
 
 public class MCRJPATestCase extends MCRTestCase {
 

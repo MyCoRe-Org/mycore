@@ -23,12 +23,12 @@ import java.io.UncheckedIOException;
 import java.util.concurrent.Flow;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.websocket.CloseReason;
-import javax.websocket.Session;
-
 import org.apache.logging.log4j.LogManager;
 
 import com.google.gson.JsonObject;
+
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.Session;
 
 public class MCRJSONSubscriber implements Flow.Subscriber<JsonObject> {
 

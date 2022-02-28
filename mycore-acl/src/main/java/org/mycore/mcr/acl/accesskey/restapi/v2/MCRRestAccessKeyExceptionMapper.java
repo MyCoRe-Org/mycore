@@ -20,16 +20,16 @@ package org.mycore.mcr.acl.accesskey.restapi.v2;
 
 import java.util.Optional;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyException;
 import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyNotFoundException;
 import org.mycore.restapi.v2.MCRErrorResponse;
+
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 @Provider
 public class MCRRestAccessKeyExceptionMapper implements ExceptionMapper<MCRAccessKeyException> {

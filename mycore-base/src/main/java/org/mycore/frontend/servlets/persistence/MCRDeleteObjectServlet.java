@@ -20,10 +20,6 @@ package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.config.MCRConfiguration2;
@@ -32,6 +28,10 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.xml.sax.SAXParseException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Handles DELETE operation on {@link MCRObject}.

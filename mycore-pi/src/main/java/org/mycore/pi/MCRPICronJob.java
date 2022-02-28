@@ -31,9 +31,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.persistence.EntityManager;
-import javax.servlet.ServletContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -48,6 +45,9 @@ import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRDNBURNParser;
 import org.mycore.pi.urn.MCRURNUtils;
 import org.mycore.util.concurrent.MCRFixedUserCallable;
+
+import jakarta.persistence.EntityManager;
+import jakarta.servlet.ServletContext;
 
 /**
  * Handles various tasks that need to be executed time based:

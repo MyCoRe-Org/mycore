@@ -20,13 +20,13 @@ package org.mycore.orcid;
 
 import java.io.IOException;
 
-import javax.ws.rs.client.WebTarget;
-
 import org.jdom2.JDOMException;
 import org.mycore.orcid.works.MCRWorksFetcher;
 import org.mycore.orcid.works.MCRWorksPublisher;
 import org.mycore.orcid.works.MCRWorksSection;
 import org.xml.sax.SAXException;
+
+import jakarta.ws.rs.client.WebTarget;
 
 /**
  * Represents the profile of a given ORCID ID.

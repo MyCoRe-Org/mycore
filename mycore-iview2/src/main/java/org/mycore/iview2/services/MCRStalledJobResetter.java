@@ -21,14 +21,14 @@ package org.mycore.iview2.services;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
 
 /**
  * Resets jobs that took to long to tile.

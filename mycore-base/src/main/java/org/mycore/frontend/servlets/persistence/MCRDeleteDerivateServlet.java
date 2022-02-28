@@ -20,16 +20,16 @@ package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.xml.sax.SAXParseException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Handles DELTE operation on {@link MCRDerivate}.

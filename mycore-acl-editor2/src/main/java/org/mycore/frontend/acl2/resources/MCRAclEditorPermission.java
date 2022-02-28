@@ -18,12 +18,12 @@
 
 package org.mycore.frontend.acl2.resources;
 
-import javax.ws.rs.container.ContainerRequestContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.jersey.filter.access.MCRResourceAccessChecker;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
 
 public class MCRAclEditorPermission implements MCRResourceAccessChecker {
 

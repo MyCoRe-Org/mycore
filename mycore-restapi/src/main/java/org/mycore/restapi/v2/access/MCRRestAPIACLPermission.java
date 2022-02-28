@@ -20,7 +20,7 @@ package org.mycore.restapi.v2.access;
 
 import java.util.Arrays;
 
-import javax.ws.rs.HttpMethod;
+import jakarta.ws.rs.HttpMethod;
 
 import org.mycore.access.MCRAccessManager;
 

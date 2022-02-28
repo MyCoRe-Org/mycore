@@ -29,8 +29,6 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
@@ -46,6 +44,8 @@ import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIService;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+
+import jakarta.persistence.EntityManager;
 
 /**
  * Service for assigning granular URNs to Derivate. You can call it with a Derivate-ID and it will assign a Base-URN for

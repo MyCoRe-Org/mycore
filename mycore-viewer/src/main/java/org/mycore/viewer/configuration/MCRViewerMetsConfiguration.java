@@ -20,11 +20,11 @@ package org.mycore.viewer.configuration;
 
 import java.nio.file.Files;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.servlets.MCRServlet;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class MCRViewerMetsConfiguration extends MCRViewerBaseConfiguration {
 

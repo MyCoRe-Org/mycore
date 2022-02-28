@@ -23,8 +23,6 @@ package org.mycore.restapi.v1;
 
 import java.util.stream.Stream;
 
-import javax.ws.rs.ApplicationPath;
-
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.jersey.resources.MCRJerseyExceptionMapper;
 import org.mycore.restapi.MCRJerseyRestApp;
@@ -35,6 +33,7 @@ import org.mycore.restapi.v1.errors.MCRNotAuthorizedExceptionMapper;
 import org.mycore.restapi.v1.errors.MCRRestAPIExceptionMapper;
 
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
+import jakarta.ws.rs.ApplicationPath;
 
 /**
  * @author Thomas Scheffler (yagee)

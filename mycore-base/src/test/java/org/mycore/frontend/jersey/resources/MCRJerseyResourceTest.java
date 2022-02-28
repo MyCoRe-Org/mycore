@@ -20,12 +20,12 @@ package org.mycore.frontend.jersey.resources;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 
 public class MCRJerseyResourceTest extends MCRJerseyTest {
 
@@ -51,6 +51,7 @@ public class MCRJerseyResourceTest extends MCRJerseyTest {
 
     @Test
     public void test() {
+        System.out.println("Running test");
         final String hello = target("hello").request().get(String.class);
         assertEquals("Hello World!", hello);
 

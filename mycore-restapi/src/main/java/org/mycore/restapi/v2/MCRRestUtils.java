@@ -21,9 +21,9 @@ package org.mycore.restapi.v2;
 import java.util.Date;
 import java.util.Optional;
 
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
 
 public final class MCRRestUtils {
 

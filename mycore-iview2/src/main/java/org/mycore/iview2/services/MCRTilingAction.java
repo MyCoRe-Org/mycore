@@ -23,9 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -36,6 +33,9 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTileEventHandler;
 import org.mycore.imagetiler.MCRTiledPictureProps;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 
 /**
  * A slave thread of {@link MCRImageTiler}

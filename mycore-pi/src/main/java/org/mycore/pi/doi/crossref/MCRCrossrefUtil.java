@@ -21,8 +21,6 @@ package org.mycore.pi.doi.crossref;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.constraints.NotNull;
-
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
@@ -31,6 +29,8 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.function.MCRThrowFunction;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Proivides Util functions for Crossref registration.

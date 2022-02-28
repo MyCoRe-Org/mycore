@@ -18,8 +18,6 @@
 
 package org.mycore.frontend.export;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRContent;
@@ -28,6 +26,8 @@ import org.mycore.frontend.basket.MCRBasket;
 import org.mycore.frontend.basket.MCRBasketManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Provides functionality to export content. 

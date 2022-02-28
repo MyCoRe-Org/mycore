@@ -18,11 +18,11 @@
 
 package org.mycore.iiif.common;
 
-import javax.ws.rs.ApplicationPath;
-
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.restapi.MCRJerseyRestApp;
+
+import jakarta.ws.rs.ApplicationPath;
 
 /**
  * @author Sebastian Hofmann

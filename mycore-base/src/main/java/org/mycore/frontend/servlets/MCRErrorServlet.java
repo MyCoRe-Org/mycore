@@ -22,11 +22,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Locale;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.Level;
@@ -46,6 +41,12 @@ import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.xml.sax.SAXException;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 /**
  * @author Thomas Scheffler (yagee)
  *
@@ -59,19 +60,19 @@ public class MCRErrorServlet extends HttpServlet {
     private static MCRLayoutService LAYOUT_SERVICE = MCRLayoutService.instance();
 
     /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see jakarta.servlet.http.HttpServlet#service(jakarta.servlet.http.HttpServletRequest, jakarta.servlet.http.HttpServletResponse)
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // Retrieve the possible error attributes, some may be null
-        Integer statusCode = (Integer) req.getAttribute("javax.servlet.error.status_code");
-        String message = (String) req.getAttribute("javax.servlet.error.message");
+        Integer statusCode = (Integer) req.getAttribute("jakarta.servlet.error.status_code");
+        String message = (String) req.getAttribute("jakarta.servlet.error.message");
         @SuppressWarnings("unchecked")
         Class<? extends Throwable> exceptionType = (Class<? extends Throwable>) req
-            .getAttribute("javax.servlet.error.exception_type");
-        Throwable exception = (Throwable) req.getAttribute("javax.servlet.error.exception");
-        String requestURI = (String) req.getAttribute("javax.servlet.error.request_uri");
-        String servletName = (String) req.getAttribute("javax.servlet.error.servletName");
+            .getAttribute("jakarta.servlet.error.exception_type");
+        Throwable exception = (Throwable) req.getAttribute("jakarta.servlet.error.exception");
+        String requestURI = (String) req.getAttribute("jakarta.servlet.error.request_uri");
+        String servletName = (String) req.getAttribute("jakarta.servlet.error.servletName");
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Handling error {} for request ''{}'' message: {}", statusCode, requestURI, message);
             LOGGER.debug("Has current session: {}", MCRSessionMgr.hasCurrentSession());

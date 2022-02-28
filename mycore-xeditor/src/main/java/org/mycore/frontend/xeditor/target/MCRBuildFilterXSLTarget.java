@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -37,6 +35,8 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
 import org.xml.sax.SAXException;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * Builds an XSL template that can be used to filter the XML content to

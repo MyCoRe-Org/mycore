@@ -59,7 +59,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
@@ -104,6 +103,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import jakarta.activation.MimetypesFileTypeMap;
 
 /**
  * @author Thomas Scheffler (yagee)

@@ -24,11 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
@@ -52,6 +47,12 @@ import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUser2Constants;
 import org.mycore.user2.MCRUserManager;
 import org.xml.sax.SAXException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * Provides functionality to select login method,

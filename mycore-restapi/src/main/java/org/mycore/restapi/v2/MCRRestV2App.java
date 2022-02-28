@@ -22,9 +22,6 @@ import java.net.URI;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.InternalServerErrorException;
-
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.MCRFrontendUtil;
@@ -38,7 +35,7 @@ import org.mycore.restapi.MCRRemoveMsgBodyFilter;
 import org.mycore.restapi.converter.MCRWrappedXMLWriter;
 import org.mycore.restapi.v1.MCRRestAPIAuthentication;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
@@ -48,6 +45,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.InternalServerErrorException;
 
 @ApplicationPath("/api/v2")
 public class MCRRestV2App extends MCRJerseyRestApp {
@@ -63,7 +62,7 @@ public class MCRRestV2App extends MCRJerseyRestApp {
         register(MCRExceptionMapper.class);
         register(MCRApiDraftFilter.class);
         //after removing the following line, test if json output from MCRRestClassification is still OK
-        register(JacksonJaxbJsonProvider.class); //jetty >= 2.31, do not use DefaultJacksonJaxbJsonProvider
+        register(JacksonXmlBindJsonProvider.class); //jetty >= 2.31, do not use DefaultJacksonJaxbJsonProvider
         setupOAS();
     }
 

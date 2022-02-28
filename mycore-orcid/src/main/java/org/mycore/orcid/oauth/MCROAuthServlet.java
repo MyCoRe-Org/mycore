@@ -21,8 +21,6 @@ package org.mycore.orcid.oauth;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
@@ -35,6 +33,8 @@ import org.mycore.orcid.user.MCRORCIDUser;
 import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Implements ORCID OAuth2 authorization.

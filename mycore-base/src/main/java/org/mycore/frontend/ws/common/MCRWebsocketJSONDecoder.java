@@ -18,12 +18,12 @@
 
 package org.mycore.frontend.ws.common;
 
-import javax.websocket.DecodeException;
-import javax.websocket.Decoder;
-import javax.websocket.EndpointConfig;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import jakarta.websocket.DecodeException;
+import jakarta.websocket.Decoder;
+import jakarta.websocket.EndpointConfig;
 
 /**
  * Decodes a json string to a gson object.

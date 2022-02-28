@@ -21,7 +21,7 @@ package org.mycore.viewer.configuration;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 public class MCRIviewDefaultACLProvider implements MCRIviewACLProvider {
 

@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -68,6 +67,8 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXParseException;
+
+import jakarta.persistence.EntityManager;
 
 /**
  * Commands for the classification system.

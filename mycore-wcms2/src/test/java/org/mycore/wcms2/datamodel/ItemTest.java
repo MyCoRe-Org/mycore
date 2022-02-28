@@ -20,9 +20,6 @@ package org.mycore.wcms2.datamodel;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -35,6 +32,9 @@ import org.mycore.wcms2.datamodel.MCRNavigationItem.Type;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 
 public class ItemTest {
 

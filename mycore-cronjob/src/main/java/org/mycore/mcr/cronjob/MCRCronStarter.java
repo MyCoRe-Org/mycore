@@ -20,9 +20,9 @@
 
 package org.mycore.mcr.cronjob;
 
-import javax.servlet.ServletContext;
-
 import org.mycore.common.events.MCRStartupHandler;
+
+import jakarta.servlet.ServletContext;
 
 public class MCRCronStarter implements MCRStartupHandler.AutoExecutable {
 

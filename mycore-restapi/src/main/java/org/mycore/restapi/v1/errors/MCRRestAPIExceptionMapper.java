@@ -17,10 +17,10 @@
  */
 package org.mycore.restapi.v1.errors;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-
 import org.mycore.frontend.jersey.MCRJerseyUtil;
+
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
 /**
  * maps a REST API exception to a proper response with message as JSON output

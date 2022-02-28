@@ -30,11 +30,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import javax.servlet.ServletContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRDeveloperTools;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * This helper class determines in which directory to look for addition configuration files.

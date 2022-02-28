@@ -22,30 +22,13 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.annotation.Priority;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.logging.log4j.LogManager;
@@ -68,6 +51,24 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+
+import jakarta.annotation.Priority;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.ext.Provider;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
@@ -112,7 +113,8 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                 responseContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, h);
                 //Authorization header may never be cached in public caches
                 Optional.ofNullable(requestContext.getHeaderString(HttpHeaders.CACHE_CONTROL))
-                    .map(CacheControl::valueOf)
+                    .map(RuntimeDelegate.getInstance()
+                        .createHeaderDelegate(CacheControl.class)::fromString)
                     .filter(cc -> !cc.isPrivate())
                     .ifPresent(cc -> {
                         cc.setPrivate(true);
@@ -147,7 +149,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             byte[] encodedAuth = authorization.substring(basicPrefix.length()).trim()
                 .getBytes(StandardCharsets.ISO_8859_1);
             String userPwd = new String(Base64.getDecoder().decode(encodedAuth), StandardCharsets.ISO_8859_1);
-            if (userPwd != null && userPwd.contains(":") && userPwd.length() > 1) {
+            if (userPwd.contains(":") && userPwd.length() > 1) {
                 String[] upSplit = userPwd.split(":");
                 String username = upSplit[0];
                 String password = upSplit[1];
@@ -220,7 +222,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
             }
         }
 
-        if (!userInformation.isPresent()) {
+        if (userInformation.isEmpty()) {
             LOGGER.warn(() -> "Unsupported " + HttpHeaders.AUTHORIZATION + " header: " + authorization);
         }
 
@@ -332,8 +334,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
 
         @Override
         public boolean isUserInRole(String role) {
-            return Stream.of(jwt.getClaim("mcr:roles").asArray(String.class))
-                .anyMatch(role::equals);
+            return Arrays.asList(jwt.getClaim("mcr:roles").asArray(String.class)).contains(role);
         }
 
         @Override

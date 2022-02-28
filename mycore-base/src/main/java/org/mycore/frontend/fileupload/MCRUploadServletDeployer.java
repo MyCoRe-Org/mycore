@@ -24,14 +24,14 @@ import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration.Dynamic;
-
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
+
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration.Dynamic;
 
 /**
  * Uses <code>mycore.properties</code> to configure {@link MCRUploadViaFormServlet}.
@@ -59,7 +59,7 @@ public class MCRUploadServletDeployer implements AutoExecutable {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#startUp(javax.servlet.ServletContext)
+     * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#startUp(jakarta.servlet.ServletContext)
      */
     @Override
     public void startUp(ServletContext servletContext) {

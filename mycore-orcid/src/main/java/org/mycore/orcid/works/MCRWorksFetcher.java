@@ -24,9 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +42,9 @@ import org.mycore.orcid.MCRORCIDConstants;
 import org.mycore.orcid.MCRORCIDProfile;
 import org.mycore.orcid.oauth.MCRReadPublicTokenFactory;
 import org.xml.sax.SAXException;
+
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.client.Invocation.Builder;
 
 /**
  * Provides functionality to fetch work groups, work summaries and work details

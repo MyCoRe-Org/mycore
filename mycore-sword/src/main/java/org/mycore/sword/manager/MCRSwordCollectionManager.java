@@ -20,8 +20,6 @@ package org.mycore.sword.manager;
 
 import java.util.Objects;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.abdera.Abdera;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Feed;
@@ -41,6 +39,8 @@ import org.swordapp.server.SwordConfiguration;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
 import org.swordapp.server.UriRegistry;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Sebastian Hofmann (mcrshofm)

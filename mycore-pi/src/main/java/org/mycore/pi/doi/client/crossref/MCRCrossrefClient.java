@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -44,6 +42,8 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.pi.exceptions.MCRDatacenterException;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+
+import jakarta.validation.constraints.NotNull;
 
 public class MCRCrossrefClient {
 

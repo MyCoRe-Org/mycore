@@ -146,23 +146,10 @@
                 <webInfIncludeJarPattern>doNotIncludeAnyJarsPattern</webInfIncludeJarPattern>
               </webApp>
               <systemProperties>
-                <force>true</force>
-                <systemProperty>
-                  <name>jetty.port</name>
-                  <value>${jetty.port}</value>
-                </systemProperty>
-                <systemProperty>
-                  <name>MCR.Home</name>
-                  <value>${project.build.testOutputDirectory}/mycore-home</value>
-                </systemProperty>
-                <systemProperty>
-                  <name>MCR.AppName</name>
-                  <value>${project.artifactId}</value>
-                </systemProperty>
-                <systemProperty>
-                  <name>MCRRuntimeComponentDetector.underTesting</name>
-                  <value>${project.artifactId}</value>
-                </systemProperty>
+                <jetty.port>${jetty.port}</jetty.port>
+                <MCR.Home>${project.build.testOutputDirectory}/mycore-home</MCR.Home>
+                <MCR.AppName>${project.artifactId}</MCR.AppName>
+                <MCRRuntimeComponentDetector.underTesting>${project.artifactId}</MCRRuntimeComponentDetector.underTesting>
               </systemProperties>
             </configuration>
             <executions>

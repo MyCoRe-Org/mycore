@@ -29,9 +29,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,6 +44,10 @@ import org.mycore.common.processing.MCRProcessableDefaultCollection;
 import org.mycore.common.processing.MCRProcessableRegistry;
 import org.mycore.util.concurrent.processing.MCRProcessableExecutor;
 import org.mycore.util.concurrent.processing.MCRProcessableFactory;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceException;
 
 /**
  * Master image tiler thread.

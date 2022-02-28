@@ -23,11 +23,6 @@ import static org.mycore.user2.login.MCRLoginServlet.LOCAL_LOGIN_SECURE_ONLY;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +35,12 @@ import org.mycore.frontend.servlets.MCRContainerLoginServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRRealm;
 import org.xml.sax.SAXException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * @author Thomas Scheffler (yagee)

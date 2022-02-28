@@ -22,16 +22,16 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionBindingListener;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.frontend.servlets.MCRServlet;
 
+import jakarta.servlet.http.HttpSessionBindingEvent;
+import jakarta.servlet.http.HttpSessionBindingListener;
+
 /**
- * This Class will be stored in the a {@link javax.servlet.http.HttpSession} and can be used to resolve the
- * {@link MCRSession}. We can not store {@link MCRSession} directly in the {@link javax.servlet.http.HttpSession}
+ * This Class will be stored in the a {@link jakarta.servlet.http.HttpSession} and can be used to resolve the
+ * {@link MCRSession}. We can not store {@link MCRSession} directly in the {@link jakarta.servlet.http.HttpSession}
  * because values need to be {@link java.io.Serializable}.
  */
 public final class MCRSessionResolver implements Serializable, HttpSessionBindingListener {

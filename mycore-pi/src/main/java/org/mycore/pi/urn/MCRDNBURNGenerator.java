@@ -20,12 +20,12 @@ package org.mycore.pi.urn;
 
 import java.util.Objects;
 
-import javax.validation.constraints.NotNull;
-
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIGenerator;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+
+import jakarta.validation.constraints.NotNull;
 
 public abstract class MCRDNBURNGenerator extends MCRPIGenerator<MCRDNBURN> {
 

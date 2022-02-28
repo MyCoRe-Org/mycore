@@ -26,10 +26,6 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.persistence.EntityTransaction;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSession;
@@ -40,6 +36,10 @@ import org.mycore.common.content.streams.MCRNotClosingInputStream;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+
+import jakarta.persistence.EntityTransaction;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 /**
  * This servlet handles form based file upload.

@@ -22,10 +22,10 @@ import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 import org.mycore.datamodel.common.MCRISO8601Format;
 import org.mycore.datamodel.common.MCRISO8601FormatChooser;
+
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * @author Thomas Scheffler (yagee)

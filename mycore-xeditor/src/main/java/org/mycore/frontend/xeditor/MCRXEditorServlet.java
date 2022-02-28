@@ -21,14 +21,14 @@ package org.mycore.frontend.xeditor;
 import java.util.Enumeration;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.target.MCREditorTarget;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Frank L\u00FCtzenkirchen

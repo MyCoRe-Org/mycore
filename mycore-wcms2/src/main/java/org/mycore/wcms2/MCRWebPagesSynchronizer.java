@@ -29,14 +29,14 @@ import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.Locale;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.io.output.TeeOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
+
+import jakarta.servlet.ServletContext;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -69,7 +69,7 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#startUp(javax.servlet.ServletContext)
+     * @see org.mycore.common.events.MCRStartupHandler.AutoExecutable#startUp(jakarta.servlet.ServletContext)
      */
     @Override
     public void startUp(ServletContext servletContext) {

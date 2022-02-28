@@ -18,11 +18,11 @@
 
 package org.mycore.orcid;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-
 import org.mycore.common.config.MCRConfiguration2;
+
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
 
 /**
  * Utility class to work with the REST API of orcid.org.
