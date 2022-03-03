@@ -223,6 +223,21 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         return cmds;
     }
+    
+    @MCRCommand(
+        syntax = "check for circles in topological order",
+        help = "Checks if there are circular dependencies in the parent child relationships of MCRObjects.",
+        order = 25)
+    public static void checkForCircles() {
+        final List<String> objectIds = MCRXMLMetadataManager.instance().listIDs();
+        String[] objects = objectIds.stream().filter(id -> !id.contains("_derivate_")).toArray(String[]::new);
+        MCRTopologicalSort ts = new MCRTopologicalSort();
+        ts.prepareMCRObjects(objects);
+        int[] order = ts.doTopoSort();
+        if (order == null) {
+            LOGGER.info("OK - No circles detected!");
+        }
+    }
 
     /**
      * Delete a MCRObject from the datastore.
