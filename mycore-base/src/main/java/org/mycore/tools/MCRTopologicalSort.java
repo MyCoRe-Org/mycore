@@ -261,14 +261,16 @@ public class MCRTopologicalSort {
             nodes.forcePut(i, mcrids[i]);
         }
         for (int i = 0; i < mcrids.length; i++) {
-            Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(mcrids[i], "parent");
+            Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(mcrids[i],
+                MCRLinkTableManager.ENTRY_TYPE_PARENT);
             for (String p : parents) {
                 Integer target = nodes.inverse().get(p);
                 if (target != null) {
                     addEdge(i, target);
                 }
             }
-            Collection<String> refs = MCRLinkTableManager.instance().getDestinationOf(mcrids[i], "reference");
+            Collection<String> refs = MCRLinkTableManager.instance().getDestinationOf(mcrids[i],
+                MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
             for (String r : refs) {
                 Integer target = nodes.inverse().get(r);
                 if (target != null) {
