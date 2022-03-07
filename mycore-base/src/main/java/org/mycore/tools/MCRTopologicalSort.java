@@ -18,14 +18,14 @@
 
 package org.mycore.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -65,15 +65,19 @@ import com.google.common.collect.HashBiMap;
  * @version $Revision: 28688 $ $Date: 2013-12-18 15:27:20 +0100 (Mi, 18 Dez 2013) $
  *
  */
-public class MCRTopologicalSort {
+public class MCRTopologicalSort<T> {
     private static final Logger LOGGER = LogManager.getLogger(MCRTopologicalSort.class);
 
-    /** store the edges as adjacent list
+    /** 
+     * store the edges as adjacent list
      *  for each target node a list of corresponding source node is stored
      */
     Map<Integer, TreeSet<Integer>> edgeSources = new TreeMap<>();
 
-    BiMap<Integer, String> nodes = HashBiMap.create();
+    /**
+     * store the position of elements to sort in BiMap
+     */
+    BiMap<Integer, T> nodes = HashBiMap.create();
 
     boolean dirty = false;
 
@@ -82,10 +86,13 @@ public class MCRTopologicalSort {
      * and creates the graph
      *
      * uses StAX cursor API (higher performance)
+     *
+     * @param ts - the topological sort data structure
+     * @param files - a list of file names
+     * @param dir - the directory where the files can be found 
      */
-    public void prepareData(String[] files, File dir) {
-        nodes = HashBiMap.create(files.length);
-        edgeSources.clear();
+    public static void prepareData(MCRTopologicalSort<String> ts, String[] files, Path dir) {
+        ts.reset();
 
         String file = null;
         Map<Integer, List<String>> parentNames = new HashMap<>();
@@ -93,13 +100,13 @@ public class MCRTopologicalSort {
         for (int i = 0; i < files.length; i++) {
             file = files[i];
 
-            try (FileInputStream fis = new FileInputStream(new File(dir, file))) {
-                XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(fis);
+            try (BufferedReader br = Files.newBufferedReader(dir.resolve(file))) {
+                XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(br);
                 while (xmlStreamReader.hasNext()) {
                     switch (xmlStreamReader.getEventType()) {
                         case XMLStreamConstants.START_ELEMENT:
                             if (xmlStreamReader.getLocalName().equals("mycoreobject")) {
-                                nodes.forcePut(i, xmlStreamReader
+                                ts.getNodes().forcePut(i, xmlStreamReader
                                     .getAttributeValue(null, "ID"));
                             } else {
                                 String href = xmlStreamReader
@@ -143,54 +150,65 @@ public class MCRTopologicalSort {
         for (int source : parentNames.keySet()) {
             parentNames.get(source)
                 .stream()
-                .map(nodes.inverse()::get)
+                .map(ts.getNodes().inverse()::get)
                 .filter(Objects::nonNull)
-                .forEach(target -> addEdge(source, target));
+                .forEach(target -> ts.addEdge(source, target));
         }
-
-        dirty = false;
     }
 
     /**
-     * reads MCRObjectIDs, retrieves parent links from MCRLinkTableManager
+     * reads MCRObjectIDs as Strings, retrieves parent links from MCRLinkTableManager
      * and creates the graph
      *
      * uses StAX cursor API (higher performance)
      */
-    public void prepareMCRObjects(String[] mcrids) {
-        nodes = HashBiMap.create(mcrids.length);
-        edgeSources.clear();
-
+    public static void prepareMCRObjects(MCRTopologicalSort<String> ts, String[] mcrids) {
+        ts.reset();
         for (int i = 0; i < mcrids.length; i++) {
-            nodes.forcePut(i, mcrids[i]);
+            ts.getNodes().forcePut(i, mcrids[i]);
         }
         for (int i = 0; i < mcrids.length; i++) {
-            Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(mcrids[i],
+            Collection<String> parents = MCRLinkTableManager.instance().getDestinationOf(String.valueOf(mcrids[i]),
                 MCRLinkTableManager.ENTRY_TYPE_PARENT);
             for (String p : parents) {
-                Integer target = nodes.inverse().get(p);
+                Integer target = ts.getNodes().inverse().get(p);
                 if (target != null) {
-                    addEdge(i, target);
+                    ts.addEdge(i, target);
                 }
             }
-            Collection<String> refs = MCRLinkTableManager.instance().getDestinationOf(mcrids[i],
+            Collection<String> refs = MCRLinkTableManager.instance().getDestinationOf(String.valueOf(mcrids[i]),
                 MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
             for (String r : refs) {
-                Integer target = nodes.inverse().get(r);
+                Integer target = ts.getNodes().inverse().get(r);
                 if (target != null) {
-                    addEdge(i, target);
+                    ts.addEdge(i, target);
                 }
             }
         }
-        dirty = false;
     }
 
+    /**
+     * resets the topological sort data structure
+     */
+    public void reset() {
+        nodes.clear();
+        edgeSources.clear();
+        dirty=false;
+    }
+    
+    /**
+     * return the Map of Integer to NodeObjects
+     */
+    public BiMap<Integer, T> getNodes() {
+        return nodes;
+    }
+    
     /**
      * add a node to the graph
      * @param name - the node name
      */
 
-    public void addNode(String name) {
+    public void addNode(T name) {
         if (!nodes.containsValue(name)) {
             nodes.put(nodes.size(), name);
         }
@@ -202,7 +220,7 @@ public class MCRTopologicalSort {
      * @param name - the node name
      * @return the node id
      */
-    public Integer getNodeID(String name) {
+    public Integer getNodeID(T name) {
         return nodes.inverse().get(name);
     }
 
@@ -211,7 +229,7 @@ public class MCRTopologicalSort {
      * @param id - the node id
      * @return the node name
      */
-    public String getNodeName(Integer id) {
+    public T getNodeName(Integer id) {
         return nodes.get(id);
     }
 
