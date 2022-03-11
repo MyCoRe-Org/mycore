@@ -39,7 +39,7 @@ public class MCRIdentifierMerger extends MCRMerger {
     }
 
     private String getSimplifiedID() {
-        return this.element.getTextTrim().replace("-", "");
+        return this.element.getTextTrim().replace("-", "").toUpperCase();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class MCRIdentifierMerger extends MCRMerger {
         if (!(other instanceof MCRIdentifierMerger)) {
             return false;
         }
-        
+
         MCRIdentifierMerger oid = (MCRIdentifierMerger) other;
         return this.getType().equals(oid.getType())
             && this.getSimplifiedID().equals(oid.getSimplifiedID());
@@ -55,7 +55,7 @@ public class MCRIdentifierMerger extends MCRMerger {
 
     @Override
     public void mergeFrom(MCRMerger other) {
-        if (other.element.getText().contains("-")) {
+        if (!this.element.getText().contains("-") && other.element.getText().contains("-")) {
             this.element.setText(other.element.getText());
         }
     }
