@@ -18,6 +18,8 @@
 
 package org.mycore.mods.merger;
 
+import java.util.Locale;
+
 import org.jdom2.Element;
 
 /**
@@ -39,7 +41,7 @@ public class MCRIdentifierMerger extends MCRMerger {
     }
 
     private String getSimplifiedID() {
-        return this.element.getTextTrim().replace("-", "").toUpperCase();
+        return this.element.getTextTrim().replace("-", "").toUpperCase(Locale.ENGLISH);
     }
 
     @Override
