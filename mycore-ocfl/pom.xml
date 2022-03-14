@@ -24,9 +24,9 @@
     <version>2021.06.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
+  <artifactId>mycore-ocfl</artifactId>
   <packaging>jar</packaging>
   <name>MyCoRe OCFL</name>
-  <artifactId>mycore-ocfl</artifactId>
 
   <dependencies>
     <dependency>
