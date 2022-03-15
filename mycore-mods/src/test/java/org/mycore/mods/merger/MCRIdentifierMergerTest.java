@@ -45,4 +45,11 @@ public class MCRIdentifierMergerTest extends MCRTestCase {
         String e = "[mods:identifier[@type='isbn']='978-3-8362-8745-6'][mods:identifier[@type='isbn']='3836287455']";
         MCRMergerTest.test(a, b, e);
     }
+
+    @Test
+    public void testCaseInsensitiveDOIs() throws Exception {
+        String a = "[mods:identifier[@type='doi']='10.1530/EJE-21-1086']";
+        String b = "[mods:identifier[@type='doi']='10.1530/eje-21-1086']";
+        MCRMergerTest.test(a, b, a);
+    }
 }
