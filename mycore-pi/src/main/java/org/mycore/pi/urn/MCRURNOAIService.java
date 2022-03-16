@@ -22,8 +22,6 @@ import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.pi.MCRPIService;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
@@ -51,10 +49,7 @@ public class MCRURNOAIService extends MCRPIService<MCRDNBURN> {
     @Override
     protected void delete(MCRDNBURN identifier, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
-        if (!MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-            .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
-            throw new MCRPersistentIdentifierException("Not supported!");
-        }
+        // no user information available
     }
 
     @Override
