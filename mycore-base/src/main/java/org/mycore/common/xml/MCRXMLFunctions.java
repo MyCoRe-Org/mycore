@@ -714,6 +714,27 @@ public class MCRXMLFunctions {
     }
 
     /**
+     * Returns the number of files of the given derivate.
+     *
+     * @param derivateId the id of the derivate
+     *
+     * @return the number of files
+     * */
+    public static long getFileCount(String derivateId) throws IOException {
+        var counter = new Object() {
+            long value = 0;
+        };
+        Files.walkFileTree(MCRPath.getPath(derivateId, "/"), new SimpleFileVisitor<>() {
+            @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                counter.value++;
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return counter.value;
+    }
+
+
+    /**
      * @param derivateID
      *            the derivate id
      * @return the id of the mycore object that contains the derivate with the
