@@ -54,6 +54,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -721,16 +722,14 @@ public class MCRXMLFunctions {
      * @return the number of files
      * */
     public static long getFileCount(String derivateId) throws IOException {
-        var counter = new Object() {
-            long value = 0;
-        };
+        AtomicInteger i = new AtomicInteger(0);
         Files.walkFileTree(MCRPath.getPath(derivateId, "/"), new SimpleFileVisitor<>() {
             @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                counter.value++;
+                i.addAndGet(1);
                 return FileVisitResult.CONTINUE;
             }
         });
-        return counter.value;
+        return i.get();
     }
 
 
