@@ -725,7 +725,7 @@ public class MCRXMLFunctions {
         AtomicInteger i = new AtomicInteger(0);
         Files.walkFileTree(MCRPath.getPath(derivateId, "/"), new SimpleFileVisitor<>() {
             @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                i.addAndGet(1);
+                i.incrementAndGet();
                 return FileVisitResult.CONTINUE;
             }
         });
