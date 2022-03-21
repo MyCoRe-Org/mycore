@@ -54,6 +54,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -712,6 +713,25 @@ public class MCRXMLFunctions {
         });
         return MCRUtils.getSizeFormatted(size.get());
     }
+
+    /**
+     * Returns the number of files of the given derivate.
+     *
+     * @param derivateId the id of the derivate
+     *
+     * @return the number of files
+     * */
+    public static long getFileCount(String derivateId) throws IOException {
+        AtomicInteger i = new AtomicInteger(0);
+        Files.walkFileTree(MCRPath.getPath(derivateId, "/"), new SimpleFileVisitor<>() {
+            @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                i.incrementAndGet();
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return i.get();
+    }
+
 
     /**
      * @param derivateID
