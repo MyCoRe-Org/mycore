@@ -161,6 +161,28 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     }
 
+    @MCRCommand(
+        syntax = "select descendants of object {0}",
+        help = "Selects MCRObjects that are descendants of {0} (children, grandchildren, ...) and {0} itself.",
+        order = 15)
+    public static void selectDescendantObjects(String id) throws Exception {
+        List<String> descendants = new ArrayList<String>();
+        if (MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
+            fillWithDescendants(id, descendants);
+        }
+        MCRObjectCommands.setSelectedObjectIDs(descendants);
+    }
+
+    private static void fillWithDescendants(String mcrObjID, List<String> descendants) {
+        descendants.add(mcrObjID);
+        //add child objects
+        for (String childID : MCRLinkTableManager.instance().getSourceOf(mcrObjID,
+            MCRLinkTableManager.ENTRY_TYPE_PARENT)) {
+            descendants.add(childID);
+            fillWithDescendants(childID, descendants);
+        }
+    }
+
     /**
      * Delete all MCRObject from the datastore for a given type.
      *
@@ -786,7 +808,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         LOGGER.info("List selected MCRObjects");
         if (getSelectedObjectIDs().isEmpty()) {
             LOGGER.info("No Resultset to work with, use command \"select objects with solr query {0} in core {1}\"" +
-                    " or \"select objects with xpath {0}\" to build one");
+                " or \"select objects with xpath {0}\" to build one");
             return;
         }
         StringBuilder out = new StringBuilder();
