@@ -133,6 +133,7 @@ public class MCRAccessKeyUtils {
             boolean success = false;
             try {
                 addAccessKeySecretForObject(session, objectId, value);
+                MCRAccessCacheHelper.clearPermissionCache(objectId.toString());
                 success = true;
             } catch (MCRAccessKeyException e) {
                 //
@@ -194,6 +195,7 @@ public class MCRAccessKeyUtils {
             boolean success = false;
             try {
                 addAccessKeySecretForObject(user, objectId, value);
+                MCRAccessCacheHelper.clearPermissionCache(objectId.toString());
                 success = true;
             } catch (MCRAccessKeyException e) {
                 //
