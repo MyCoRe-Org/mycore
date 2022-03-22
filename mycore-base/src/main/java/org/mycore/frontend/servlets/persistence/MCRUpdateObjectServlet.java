@@ -19,6 +19,7 @@
 package org.mycore.frontend.servlets.persistence;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,10 +30,12 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.support.MCRObjectIDLockTable;
 import org.xml.sax.SAXParseException;
@@ -48,6 +51,9 @@ public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
      * 
      */
     private static final long serialVersionUID = -7507356414480350102L;
+
+    public static final String MODIFY_DATE_XPATH = "/mycoreobject/service/servdates/servdate[@type='"
+        + MCRObjectService.DATE_TYPE_MODIFYDATE + "']";
 
     @Override
     void handlePersistenceOperation(HttpServletRequest request, HttpServletResponse response) throws MCRAccessException,
@@ -90,8 +96,16 @@ public class MCRUpdateObjectServlet extends MCRPersistenceServlet {
         MCRObject mcrObject = MCRPersistenceHelper.getMCRObject(doc);
         LogManager.getLogger().info("ID: {}", mcrObject.getId());
         try {
-            MCRMetadataManager.update(mcrObject);
-            return mcrObject.getId();
+            MCRObject oldObj = MCRMetadataManager.retrieveMCRObject(mcrObject.getId());
+            Date diskModifyDate = oldObj.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
+            Date editorModifyDate = mcrObject.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
+            if (diskModifyDate == null || editorModifyDate == null || !editorModifyDate.before(diskModifyDate)) {
+                MCRMetadataManager.update(mcrObject);
+                return mcrObject.getId();
+            }
+            throw new MCRPersistenceException(
+                "The object " + mcrObject.getId() + " was modified(" + diskModifyDate
+                    + ") during the time it was opened in the editor.");
         } finally {
             MCRObjectIDLockTable.unlock(mcrObject.getId());
         }

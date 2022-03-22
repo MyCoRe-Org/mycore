@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -289,8 +288,9 @@ public class MCREditorOutValidator {
             LOGGER.warn("Failure while parsing document:\n{}", xout.outputString(input));
             throw e;
         }
-        Date curTime = new Date();
-        obj.getService().setDate("modifydate", curTime);
+        // remove that, because its set in MCRMetadataManager, and we need the information (MCR-2603).
+        //Date curTime = new Date();
+        //obj.getService().setDate("modifydate", curTime);
 
         // return the XML tree
         input = obj.createXML();
