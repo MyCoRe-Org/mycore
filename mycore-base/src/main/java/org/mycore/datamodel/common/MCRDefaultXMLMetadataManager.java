@@ -167,6 +167,7 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
                 svnPath = Paths.get(MCRConfiguration2.getStringOrThrow("MCR.datadir"))
                     .resolve(DEFAULT_SVN_DIRECTORY_NAME);
                 checkPath(svnPath, "svn");
+                svnBase = svnPath.toUri();
             } else {
                 try {
                     String svnBaseValue = svnBaseOpt.get();
