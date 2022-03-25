@@ -18,6 +18,9 @@
 
 package org.mycore.mets.iiif;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -159,7 +162,8 @@ public class MCRMetsMods2IIIFConverter {
 
             String identifier = this.physicalIdentifierMap.get(physicalSubDiv);
             try {
-                MCRIIIFImageInformation information = imageImpl.getInformation(identifier);
+                MCRIIIFImageInformation information = imageImpl
+                    .getInformation(URLDecoder.decode(identifier, StandardCharsets.UTF_8.toString()));
                 MCRIIIFCanvas canvas = new MCRIIIFCanvas(identifier, label, information.width, information.height);
 
                 MCRIIIFAnnotation annotation = new MCRIIIFAnnotation(identifier, canvas);
@@ -176,7 +180,7 @@ public class MCRMetsMods2IIIFConverter {
                 annotation.setResource(resource);
 
                 return canvas;
-            } catch (MCRIIIFImageNotFoundException | MCRIIIFImageProvidingException e) {
+            } catch (MCRIIIFImageNotFoundException | MCRIIIFImageProvidingException | UnsupportedEncodingException e) {
                 throw new MCRException("Error while providing ImageInfo for " + identifier, e);
             } catch (MCRAccessException e) {
                 LOGGER.warn("User has no access to {}", identifier);
@@ -205,8 +209,7 @@ public class MCRMetsMods2IIIFConverter {
         complete.add(range);
         range.setLabel(divContainer.getLabel());
 
-        this.logicalIdIdentifiersMap.get(divContainer.getId()).stream().map(refId -> refId)
-            .forEach(canvasRef -> range.canvases.add(canvasRef));
+        range.canvases.addAll(this.logicalIdIdentifiersMap.getOrDefault(divContainer.getId(), Collections.emptyList()));
 
         divContainer.getChildren()
             .forEach(div -> {
