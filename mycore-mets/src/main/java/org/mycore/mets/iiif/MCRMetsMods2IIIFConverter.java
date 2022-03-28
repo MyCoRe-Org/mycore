@@ -163,7 +163,7 @@ public class MCRMetsMods2IIIFConverter {
             String identifier = this.physicalIdentifierMap.get(physicalSubDiv);
             try {
                 MCRIIIFImageInformation information = imageImpl
-                    .getInformation(URLDecoder.decode(identifier, StandardCharsets.UTF_8.toString()));
+                    .getInformation(URLDecoder.decode(identifier, StandardCharsets.UTF_8));
                 MCRIIIFCanvas canvas = new MCRIIIFCanvas(identifier, label, information.width, information.height);
 
                 MCRIIIFAnnotation annotation = new MCRIIIFAnnotation(identifier, canvas);
@@ -180,7 +180,7 @@ public class MCRMetsMods2IIIFConverter {
                 annotation.setResource(resource);
 
                 return canvas;
-            } catch (MCRIIIFImageNotFoundException | MCRIIIFImageProvidingException | UnsupportedEncodingException e) {
+            } catch (MCRIIIFImageNotFoundException | MCRIIIFImageProvidingException e) {
                 throw new MCRException("Error while providing ImageInfo for " + identifier, e);
             } catch (MCRAccessException e) {
                 LOGGER.warn("User has no access to {}", identifier);
