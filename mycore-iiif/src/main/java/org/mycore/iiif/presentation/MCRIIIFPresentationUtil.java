@@ -93,7 +93,8 @@ public class MCRIIIFPresentationUtil {
     }
 
     private static String getImplBaseURL(String impl, String identifier) {
-        return MCRFrontendUtil.getBaseURL() + "api/iiif/presentation/v2/" + impl + "/" + identifier + "/";
+        String impAndSlash = "".equals(impl) ? "" : impl + "/";
+        return MCRFrontendUtil.getBaseURL() + "api/iiif/presentation/v2/" + impAndSlash + identifier + "/";
     }
 
     private static String encodeUTF8(String c) {
