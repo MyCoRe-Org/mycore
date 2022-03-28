@@ -22,7 +22,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -32,7 +31,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRUUIDURNGenerator;
 import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
-import org.mycore.pi.urn.rest.MCREpicurLite;
+import org.mycore.pi.urn.rest.MCRURNJsonBundle;
 
 /**
  * Created by chi on 23.02.17.
@@ -40,7 +39,7 @@ import org.mycore.pi.urn.rest.MCREpicurLite;
  * @author Huu Chi Vu
  */
 public class MCRPIUtils {
-    private static Logger LOGGER = LogManager.getLogger();
+    final private static Logger LOGGER = LogManager.getLogger();
 
     public static MCRPI generateMCRPI(String fileName, String serviceID) throws MCRPersistentIdentifierException {
         MCRObjectID mycoreID = getNextFreeID();
@@ -55,7 +54,7 @@ public class MCRPIUtils {
     private static MCRDNBURN generateURNFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {
         String testGenerator = "testGenerator";
         MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator();
-        mcruuidurnGenerator.init(MCRPIService.GENERATOR_CONFIG_PREFIX+testGenerator);
+        mcruuidurnGenerator.init(MCRPIService.GENERATOR_CONFIG_PREFIX + testGenerator);
         MCRObject mcrObject1 = new MCRObject();
         mcrObject1.setId(mycoreID);
         return mcruuidurnGenerator.generate(mcrObject1, "");
@@ -80,11 +79,10 @@ public class MCRPIUtils {
     }
 
     public static MCRDNBURNRestClient getMCRURNClient() {
-        return new MCRDNBURNRestClient(MCRPIUtils::getEpicure);
+        return new MCRDNBURNRestClient(MCRPIUtils::getBundle);
     }
 
-    public static MCREpicurLite getEpicure(MCRPIRegistrationInfo urnInfo) {
-        return MCREpicurLite.instance(urnInfo, MCRPIUtils.getUrl(urnInfo))
-            .setCredentials(new UsernamePasswordCredentials("test", "test"));
+    public static MCRURNJsonBundle getBundle(MCRPIRegistrationInfo urnInfo) {
+        return MCRURNJsonBundle.instance(urnInfo, MCRPIUtils.getUrl(urnInfo));
     }
 }
