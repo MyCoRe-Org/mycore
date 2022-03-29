@@ -20,7 +20,10 @@ package org.mycore.iiif.presentation.resources;
 
 import static org.mycore.iiif.presentation.MCRIIIFPresentationUtil.correctIDs;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.GET;
@@ -73,7 +76,7 @@ public class MCRIIIFPresentationResource {
     public Response getManifest(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @HeaderParam("Cache-Control") String cacheControl) throws CloneNotSupportedException {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
-            ("no-cache").equals(cacheControl));
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String manifestAsJSON = getGson().toJson(quickAccess.getManifest());
         return addHeaders(Response.ok()).entity(manifestAsJSON).build();
     }
@@ -122,9 +125,9 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getSequence(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @PathParam(NAME_PARAM) String name,@HeaderParam("Cache-Control") String cacheControl) {
+        @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
-            ("no-cache").equals(cacheControl));
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String sequenceAsJSON = getGson().toJson(quickAccess.getSequence(name));
         return addHeaders(Response.ok()).entity(sequenceAsJSON).build();
     }
@@ -137,7 +140,7 @@ public class MCRIIIFPresentationResource {
     public Response getCanvas(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
-            ("no-cache").equals(cacheControl));
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String canvasAsJSON = getGson().toJson(quickAccess.getCanvas(name));
         return addHeaders(Response.ok()).entity(canvasAsJSON).build();
     }
@@ -150,7 +153,7 @@ public class MCRIIIFPresentationResource {
     public Response getAnnotation(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
-            ("no-cache").equals(cacheControl));
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String annotationAsJSON = getGson().toJson(quickAccess.getAnnotationBase(name));
         return addHeaders(Response.ok()).entity(annotationAsJSON).build();
     }
@@ -174,7 +177,7 @@ public class MCRIIIFPresentationResource {
     public Response getRange(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
-            ("no-cache").equals(cacheControl));
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String rangeAsJSON = getGson().toJson(quickAccess.getRange(name));
         return addHeaders(Response.ok()).entity(rangeAsJSON).build();
     }
@@ -198,6 +201,13 @@ public class MCRIIIFPresentationResource {
     public Response getContent(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name, @PathParam("format") String format) {
         return null;
+    }
+
+    private List<String> cacheHeaderAsList(String cacheHeader) {
+        if (cacheHeader == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(cacheHeader.toLowerCase().trim().split("\\s*,\\s*"));
     }
 
 }
