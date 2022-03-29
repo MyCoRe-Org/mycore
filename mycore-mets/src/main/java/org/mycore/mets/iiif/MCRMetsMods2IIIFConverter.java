@@ -18,8 +18,8 @@
 
 package org.mycore.mets.iiif;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -161,8 +161,7 @@ public class MCRMetsMods2IIIFConverter {
 
             String identifier = this.physicalIdentifierMap.get(physicalSubDiv);
             try {
-                MCRIIIFImageInformation information = imageImpl
-                    .getInformation(URLDecoder.decode(identifier, StandardCharsets.UTF_8));
+                MCRIIIFImageInformation information = imageImpl.getInformation(new URI(identifier).getPath());
                 MCRIIIFCanvas canvas = new MCRIIIFCanvas(identifier, label, information.width, information.height);
 
                 MCRIIIFAnnotation annotation = new MCRIIIFAnnotation(identifier, canvas);
@@ -179,7 +178,7 @@ public class MCRMetsMods2IIIFConverter {
                 annotation.setResource(resource);
 
                 return canvas;
-            } catch (MCRIIIFImageNotFoundException | MCRIIIFImageProvidingException e) {
+            } catch (MCRIIIFImageNotFoundException | MCRIIIFImageProvidingException | URISyntaxException e) {
                 throw new MCRException("Error while providing ImageInfo for " + identifier, e);
             } catch (MCRAccessException e) {
                 LOGGER.warn("User has no access to {}", identifier);
