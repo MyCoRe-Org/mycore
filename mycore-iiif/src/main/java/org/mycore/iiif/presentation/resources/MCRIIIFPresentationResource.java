@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.GET;
@@ -207,7 +208,7 @@ public class MCRIIIFPresentationResource {
         if (cacheHeader == null) {
             return Collections.emptyList();
         }
-        return Arrays.asList(cacheHeader.toLowerCase().trim().split("\\s*,\\s*"));
+        return Arrays.asList(cacheHeader.toLowerCase(Locale.ROOT).trim().split("\\s*,\\s*"));
     }
 
 }
