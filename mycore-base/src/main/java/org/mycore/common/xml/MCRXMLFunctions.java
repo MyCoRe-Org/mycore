@@ -812,15 +812,15 @@ public class MCRXMLFunctions {
         return returns;
     }
 
-    public static String shortenText(String text, int lenght) {
-        if (text.length() <= lenght) {
+    public static String shortenText(String text, int length) {
+        if (text.length() <= length) {
             return text;
         }
-        int i = text.indexOf(' ', lenght);
+        int i = text.indexOf(' ', length);
         if (i < 0) {
             return text;
         }
-        return text.substring(0, i) + "...";
+        return text.substring(0, i) + "…";
     }
 
     public static String shortenPersonLabel(String text) {
