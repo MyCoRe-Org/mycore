@@ -39,10 +39,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <forbiddenapis.version>3.2</forbiddenapis.version>
-    <frontend.maven.plugin.version>1.11.2</frontend.maven.plugin.version>
+    <frontend.maven.plugin.version>1.12.0</frontend.maven.plugin.version>
     <grizzly.version>3.0.1</grizzly.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
-    <hibernate.version>5.6.3.Final</hibernate.version>
+    <hibernate.version>5.6.7.Final</hibernate.version>
     <hk2.version>3.0.2</hk2.version>
     <httpcomponents.version>4.5.13</httpcomponents.version>
     <httpcore.version>4.4.15</httpcore.version>
@@ -50,19 +50,20 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <jakarta.mail.version>2.0.1</jakarta.mail.version>
     <java.target.version>11</java.target.version>
     <jaxb.version>3.0.2</jaxb.version>
-    <jersey.version>3.0.3</jersey.version>
+    <jersey.version>3.0.4</jersey.version>
     <jetty.version>11.0.8</jetty.version>
-    <log4j.version>2.17.1</log4j.version>
+    <log4j.version>2.17.2</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <node.version>v12.18.3</node.version>
     <oaipmh.version>2.2</oaipmh.version>
+    <ocfl-java.version>1.4.6</ocfl-java.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
     <site.suffix />
-    <swagger.version>2.1.12</swagger.version>
+    <swagger.version>2.1.13</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
     <yarn.version>v1.13.0</yarn.version>
@@ -296,7 +297,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
           <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-jpamodelgen-jakarta</artifactId>
-            <version>${hibernate.version}</version>
+            <version>5.6.5.Final</version>
           </dependency>
         </dependencies>
         <executions>
@@ -836,7 +837,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
-        <version>3.18.2</version>
+        <version>3.19.0</version>
       </dependency>
       <dependency>
         <groupId>com.cronutils</groupId>
@@ -857,12 +858,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.8.9</version>
+        <version>2.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>31.0.1-jre</version>
+        <version>31.1-jre</version>
       </dependency>
       <dependency>
         <groupId>com.google.zxing</groupId>
@@ -877,7 +878,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.itextpdf</groupId>
         <artifactId>html2pdf</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.bouncycastle</groupId>
@@ -892,7 +893,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.itextpdf</groupId>
         <artifactId>kernel</artifactId>
-        <version>7.2.0</version>
+        <version>7.2.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.bouncycastle</groupId>
@@ -907,7 +908,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.itextpdf</groupId>
         <artifactId>layout</artifactId>
-        <version>7.1.15</version>
+        <version>7.2.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.bouncycastle</groupId>
@@ -947,12 +948,12 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>edu.wisc.library.ocfl</groupId>
         <artifactId>ocfl-java-api</artifactId>
-        <version>1.4.1</version>
+        <version>${ocfl-java.version}</version>
       </dependency>
       <dependency>
         <groupId>edu.wisc.library.ocfl</groupId>
         <artifactId>ocfl-java-core</artifactId>
-        <version>1.4.1</version>
+        <version>${ocfl-java.version}</version>
       </dependency>
       <dependency>
         <groupId>io.bit3</groupId>
@@ -1105,7 +1106,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>8.11.0</version>
+        <version>8.11.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
@@ -1141,7 +1142,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>fop-core</artifactId>
-        <version>2.6</version>
+        <version>2.7</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -1168,7 +1169,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.6</version>
+        <version>2.7</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
@@ -1229,7 +1230,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.jbibtex</groupId>
         <artifactId>jbibtex</artifactId>
-        <version>1.0.19</version>
+        <version>1.0.20</version>
       </dependency>
       <dependency>
         <groupId>org.jdom</groupId>
@@ -1502,7 +1503,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-annotations</artifactId>
-        <version>4.5.2</version>
+        <version>4.6.0</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -1545,7 +1546,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
-        <version>6.2.7</version>
+        <version>6.2.8</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1574,7 +1575,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <!-- jna 5.7.0 - 5.10.0 do not work with M1 macs and SVNKit -->
+        <!-- jna 5.7.0 - 5.11.0 do not work with M1 macs and SVNKit -->
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
         <version>5.6.0</version>
@@ -1584,8 +1585,14 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>net.sf.saxon</groupId>
         <artifactId>Saxon-HE</artifactId>
-        <version>10.6</version>
+        <version>11.3</version>
         <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.abdera</groupId>
@@ -1620,7 +1627,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>jbig2-imageio</artifactId>
-        <version>3.0.3</version>
+        <version>3.0.4</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1632,13 +1639,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.citationstyles</groupId>
         <artifactId>locales</artifactId>
-        <version>21.11</version>
+        <version>22.2.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.citationstyles</groupId>
         <artifactId>styles</artifactId>
-        <version>21.11</version>
+        <version>22.2.1</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
@@ -1681,7 +1688,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
-        <version>5.0.0</version>
+        <version>5.0.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
