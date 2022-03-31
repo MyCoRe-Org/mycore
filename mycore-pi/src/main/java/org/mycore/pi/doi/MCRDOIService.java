@@ -45,8 +45,6 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
@@ -302,9 +300,7 @@ public class MCRDOIService extends MCRDOIBaseService {
     public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         if (hasRegistrationStarted(obj.getId(), additional) || this.isRegistered(obj.getId(), additional)) {
-            if (MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
-                .equals(MCRSystemUserInformation.getSuperUserInstance().getUserID())) {
-                LOGGER.warn("SuperUser deletes object {} with registered doi {}. Try to set DOI inactive.", obj.getId(),
+                LOGGER.warn("Object {} with registered doi {} got deleted. Try to set DOI inactive.", obj.getId(),
                     doi.asString());
                 if (this.isRegistered(obj.getId(), additional)) {
                     HashMap<String, String> contextParameters = new HashMap<>();
@@ -312,9 +308,6 @@ public class MCRDOIService extends MCRDOIBaseService {
                     contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
                     this.addDeleteJob(contextParameters);
                 }
-            } else {
-                throw new MCRPersistentIdentifierException("Object should not be deleted! (It has a registered DOI)");
-            }
         }
     }
 

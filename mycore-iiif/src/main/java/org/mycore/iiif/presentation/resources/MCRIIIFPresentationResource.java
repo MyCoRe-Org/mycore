@@ -20,7 +20,11 @@ package org.mycore.iiif.presentation.resources;
 
 import static org.mycore.iiif.presentation.MCRIIIFPresentationUtil.correctIDs;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -36,6 +40,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -69,17 +74,23 @@ public class MCRIIIFPresentationResource {
     @Path("{" + IDENTIFIER_PARAM + "}/manifest")
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
-    public Response getManifest(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier)
-        throws CloneNotSupportedException {
-        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
+    public Response getManifest(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
+        @HeaderParam("Cache-Control") String cacheControl) throws CloneNotSupportedException {
+        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String manifestAsJSON = getGson().toJson(quickAccess.getManifest());
         return addHeaders(Response.ok()).entity(manifestAsJSON).build();
     }
 
     protected MCRIIIFPresentationManifestQuickAccess getManifestQuickAccess(String impl, String identifier) {
+        return getManifestQuickAccess(impl, identifier, false);
+    }
+
+    protected MCRIIIFPresentationManifestQuickAccess getManifestQuickAccess(String impl, String identifier,
+        boolean noCache) {
         MCRIIIFPresentationManifestQuickAccess quickAccess = CACHE
             .getIfUpToDate(impl + identifier, TimeUnit.HOURS.toMillis(1));
-        if (quickAccess == null) {
+        if (quickAccess == null || noCache) {
             long startTime = new Date().getTime();
             MCRIIIFManifest manifest = MCRIIIFPresentationImpl.getInstance(impl).getManifest(identifier);
             long endTime = new Date().getTime();
@@ -115,8 +126,9 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getSequence(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @PathParam(NAME_PARAM) String name) {
-        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
+        @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
+        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String sequenceAsJSON = getGson().toJson(quickAccess.getSequence(name));
         return addHeaders(Response.ok()).entity(sequenceAsJSON).build();
     }
@@ -127,8 +139,9 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response getCanvas(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @PathParam(NAME_PARAM) String name) {
-        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
+        @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
+        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String canvasAsJSON = getGson().toJson(quickAccess.getCanvas(name));
         return addHeaders(Response.ok()).entity(canvasAsJSON).build();
     }
@@ -139,8 +152,9 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getAnnotation(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @PathParam(NAME_PARAM) String name) {
-        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
+        @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
+        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String annotationAsJSON = getGson().toJson(quickAccess.getAnnotationBase(name));
         return addHeaders(Response.ok()).entity(annotationAsJSON).build();
     }
@@ -151,8 +165,9 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getAnnotationList(@PathParam(IMPL_PARAM) String impl,
-        @PathParam(IDENTIFIER_PARAM) String identifier, @PathParam(NAME_PARAM) String name) {
-        return getAnnotation(impl, identifier, name);
+        @PathParam(IDENTIFIER_PARAM) String identifier, @PathParam(NAME_PARAM) String name,
+        @HeaderParam("Cache-Control") String cacheControl) {
+        return getAnnotation(impl, identifier, name, cacheControl);
     }
 
     @GET
@@ -161,8 +176,9 @@ public class MCRIIIFPresentationResource {
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     public Response getRange(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
-        @PathParam(NAME_PARAM) String name) {
-        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier);
+        @PathParam(NAME_PARAM) String name, @HeaderParam("Cache-Control") String cacheControl) {
+        MCRIIIFPresentationManifestQuickAccess quickAccess = getManifestQuickAccess(impl, identifier,
+            cacheHeaderAsList(cacheControl).contains("no-cache"));
         String rangeAsJSON = getGson().toJson(quickAccess.getRange(name));
         return addHeaders(Response.ok()).entity(rangeAsJSON).build();
     }
@@ -186,6 +202,13 @@ public class MCRIIIFPresentationResource {
     public Response getContent(@PathParam(IMPL_PARAM) String impl, @PathParam(IDENTIFIER_PARAM) String identifier,
         @PathParam(NAME_PARAM) String name, @PathParam("format") String format) {
         return null;
+    }
+
+    private List<String> cacheHeaderAsList(String cacheHeader) {
+        if (cacheHeader == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(cacheHeader.toLowerCase(Locale.ROOT).trim().split("\\s*,\\s*"));
     }
 
 }

@@ -22,9 +22,11 @@
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
     <version>2022.02-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
-
   <artifactId>mycore-ocfl</artifactId>
+  <packaging>jar</packaging>
+  <name>MyCoRe OCFL</name>
 
   <dependencies>
     <dependency>
