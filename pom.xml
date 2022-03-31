@@ -1575,9 +1575,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>runtime</scope>
       </dependency>
       <dependency>
+        <!-- jna 5.7.0 - 5.11.0 do not work with M1 macs and SVNKit -->
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.11.0</version>
+        <version>5.6.0</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
