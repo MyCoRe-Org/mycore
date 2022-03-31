@@ -173,6 +173,7 @@ public class MCRIIIFImageResource {
 
             Response.ResponseBuilder responseBuilder = Response.status(status);
             return responseBuilder
+                .header("Access-Control-Allow-Origin", "*")
                 .header("Link", buildCanonicalURL(impl, identifier))
                 .header("Profile", buildProfileURL())
                 .type("image/" + format)
