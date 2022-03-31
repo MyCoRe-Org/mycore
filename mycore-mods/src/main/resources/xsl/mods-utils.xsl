@@ -274,7 +274,9 @@
   <!--Template for generated link names and result titles: see mycoreobject.xsl, results.xsl, MyCoReLayout.xsl -->
   <xsl:template priority="1" mode="resulttitle" match="mycoreobject[contains(@ID,'_mods_')]">
     <xsl:variable name="completeTitle">
-      <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods" mode="mods.title" />
+      <xsl:apply-templates select="./metadata/def.modsContainer/modsContainer/mods:mods" mode="mods.title" >
+        <xsl:with-param name="withSubtitle" select="true()"/>
+      </xsl:apply-templates>
     </xsl:variable>
     <xsl:value-of select="mcrxml:shortenText($completeTitle,$MCR.MODS.Utils.shortenTitleLength)" />
   </xsl:template>
