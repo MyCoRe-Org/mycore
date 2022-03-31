@@ -116,7 +116,7 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
     @Test
     public void shortenText() {
         String test = "Foo bar";
-        String result = "Foo...";
+        String result = "Foo…";
         assertEquals("Shortened text did not match", result, MCRXMLFunctions.shortenText(test, 3));
         assertEquals("Shortened text did not match", result, MCRXMLFunctions.shortenText(test, 0));
         assertEquals("Shortened text did not match", test, MCRXMLFunctions.shortenText(test, test.length()));
