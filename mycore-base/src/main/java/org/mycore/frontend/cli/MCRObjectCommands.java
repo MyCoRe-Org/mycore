@@ -211,8 +211,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static List<String> deleteTopologicalAllObjects() {
         final List<String> objectIds = MCRXMLMetadataManager.instance().listIDs();
         String[] objects = objectIds.stream().filter(id -> !id.contains("_derivate_")).toArray(String[]::new);
-        MCRTopologicalSort ts = new MCRTopologicalSort();
-        ts.prepareMCRObjects(objects);
+        MCRTopologicalSort<String> ts = new MCRTopologicalSort<>();
+        MCRTopologicalSort.prepareMCRObjects(ts, objects);
         int[] order = ts.doTopoSort();
 
         List<String> cmds = new ArrayList<>(objectIds.size());
@@ -223,6 +223,21 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             }
         }
         return cmds;
+    }
+    
+    @MCRCommand(
+        syntax = "check for circles in topological order",
+        help = "Checks if there are circular dependencies in the parent child relationships of MCRObjects.",
+        order = 25)
+    public static void checkForCircles() {
+        final List<String> objectIds = MCRXMLMetadataManager.instance().listIDs();
+        String[] objects = objectIds.stream().filter(id -> !id.contains("_derivate_")).toArray(String[]::new);
+        MCRTopologicalSort<String> ts = new MCRTopologicalSort<>();
+        MCRTopologicalSort.prepareMCRObjects(ts, objects);
+        int[] order = ts.doTopoSort();
+        if (order == null) {
+            LOGGER.info("OK - No circles detected!");
+        }
     }
 
     /**
@@ -378,8 +393,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         Function<String, String> cmdFromFile = file -> (update ? "update" : "load") + " object from file "
             + new File(dir, file).getAbsolutePath();
         if (topological) {
-            MCRTopologicalSort ts = new MCRTopologicalSort();
-            ts.prepareData(list, dir);
+            MCRTopologicalSort<String> ts = new MCRTopologicalSort<>();
+            MCRTopologicalSort.prepareData(ts, list, dir.toPath());
             return Optional.ofNullable(ts.doTopoSort())
                 .map(Arrays::stream)
                 .map(is -> is.mapToObj(i -> list[i]))
