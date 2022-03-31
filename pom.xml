@@ -47,7 +47,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <hk2.version>2.6.1</hk2.version>
     <httpcomponents.version>4.5.13</httpcomponents.version>
     <httpcore.version>4.4.13</httpcore.version>
-    <jackson.version>2.11.3</jackson.version>
     <jakarta.activation.version>1.2.2</jakarta.activation.version>
     <jakarta.mail.version>1.6.5</jakarta.mail.version>
     <java.target.version>11</java.target.version>
@@ -787,36 +786,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <groupId>com.auth0</groupId>
         <artifactId>java-jwt</artifactId>
         <version>3.10.3</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.jaxrs</groupId>
-        <artifactId>jackson-jaxrs-base</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.jaxrs</groupId>
-        <artifactId>jackson-jaxrs-json-provider</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.module</groupId>
-        <artifactId>jackson-module-jaxb-annotations</artifactId>
-        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.closure-stylesheets</groupId>
@@ -1731,6 +1700,13 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <artifactId>oaipmh-dataprovider-impl</artifactId>
         <version>${oaipmh.version}</version>
         <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>2.13.2.20220328</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
