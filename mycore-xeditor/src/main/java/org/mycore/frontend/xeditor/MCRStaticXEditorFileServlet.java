@@ -90,6 +90,8 @@ public class MCRStaticXEditorFileServlet extends MCRStaticXMLFileServlet {
             if (session == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Editor session timed out.");
                 return null;
+            } else {
+                session.update(pc);
             }
         } else {
             session = new MCREditorSession(request.getParameterMap(), pc);
