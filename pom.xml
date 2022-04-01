@@ -620,7 +620,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
           </plugin>
           <plugin>
             <artifactId>maven-changes-plugin</artifactId>
-            <version>2.11</version>
+            <version>${maven-changes-plugin.version}</version>
             <inherited>false</inherited>
             <configuration>
               <fixVersionIds>${changes.version}</fixVersionIds>
@@ -755,9 +755,10 @@ Applications based on MyCoRe use a common core, which provides the functionality
               <reportSet>
                 <id>aggregate</id>
                 <reports>
-                  <report>aggregate</report>
-                  <report>test-aggregate</report>
+                  <report>aggregate-no-fork</report>
+                  <report>test-aggregate-no-fork</report>
                 </reports>
+                <inherited>false</inherited>
               </reportSet>
             </reportSets>
           </plugin>
@@ -766,6 +767,27 @@ Applications based on MyCoRe use a common core, which provides the functionality
             <configuration>
               <aggregate>true</aggregate>
             </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <reportSets>
+              <reportSet>
+                <id>aggregate</id>
+                <reports>
+                  <report>aggregate-pmd</report>
+                  <report>aggregate-cpd</report>
+                </reports>
+                <inherited>false</inherited>
+              </reportSet>
+              <reportSet>
+                <id>default</id>
+                <reports>
+                  <report>pmd</report>
+                  <report>cpd</report>
+                </reports>
+              </reportSet>
+            </reportSets>
           </plugin>
         </plugins>
       </reporting>
