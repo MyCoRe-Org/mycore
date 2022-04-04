@@ -4,10 +4,10 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>48-SNAPSHOT</version>
+    <version>48</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2022.02-SNAPSHOT</version>
+  <version>2022.02</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
@@ -29,7 +29,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>HEAD</tag>
+    <tag>v2022.02</tag>
   </scm>
   <properties>
     <argLine />
@@ -1448,7 +1448,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore.iview2</groupId>
         <artifactId>image-tiler</artifactId>
-        <version>3.0-SNAPSHOT</version>
+        <version>3.0</version>
       </dependency>
       <dependency>
         <groupId>org.mycore.mets</groupId>
@@ -1463,7 +1463,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.mycore.sword</groupId>
         <artifactId>easy-sword2-lib</artifactId>
-        <version>1.0.6-SNAPSHOT</version>
+        <version>1.0.6</version>
         <exclusions>
           <exclusion>
             <groupId>xml-apis</groupId>
