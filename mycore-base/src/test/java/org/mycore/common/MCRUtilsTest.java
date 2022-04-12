@@ -20,10 +20,14 @@ package org.mycore.common;
 
 import static org.junit.Assert.assertEquals;
 
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.logging.log4j.LogManager;
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -36,6 +40,13 @@ public class MCRUtilsTest extends MCRTestCase {
     private static final String TEST_SHA1 = "2ef7bde608ce5404e97d5f042f95f89f1c232871";
 
     private static final String TEST_MD5 = "ed076287532e86365e841e92bfc50d8c";
+
+    @Rule
+    public TemporaryFolder baseDir = new TemporaryFolder();
+
+    @Rule
+    public TemporaryFolder evilDir = new TemporaryFolder();
+
 
     /**
      * Test method for {@link org.mycore.common.MCRUtils#asSHA1String(int, byte[], String)}.
@@ -63,5 +74,17 @@ public class MCRUtilsTest extends MCRTestCase {
         } catch (NoSuchAlgorithmException e) {
             LogManager.getLogger(this.getClass()).warn("MD5 algorithm not available");
         }
+    }
+
+    @Test(expected = MCRException.class)
+    public final void testResolveEvil(){
+        MCRUtils.safeResolve(baseDir.getRoot().toPath(), evilDir.getRoot().toPath());
+    }
+
+    @Test
+    public final void testResolve(){
+        Path path = baseDir.getRoot().toPath();
+        Path resolve = MCRUtils.safeResolve(path, "foo", "bar");
+        Assert.assertEquals(path.resolve("foo").resolve("bar"), resolve);
     }
 }

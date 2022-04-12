@@ -48,6 +48,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.mycore.common.MCRUtils;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 import org.mycore.wcms2.MCRWebPagesSynchronizer;
@@ -88,6 +89,10 @@ public class MCRWCMSFileBrowserResource {
     @GET
     @Path("gui/{filename:.*}")
     public Response getResources(@PathParam("filename") String filename) {
+        if (filename.startsWith("/") || filename.contains("../")) {
+           return Response.status(Status.BAD_REQUEST).build();
+        }
+
         if (filename.endsWith(".js")) {
             return Response.ok(getClass()
                 .getResourceAsStream("/META-INF/resources/modules/wcms2/" + filename))
@@ -124,19 +129,24 @@ public class MCRWCMSFileBrowserResource {
     @POST
     @Path("/folder")
     public Response addFolder(@QueryParam("path") String path) throws IOException {
-        File wcmsDir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
-        File wepAppdir = new File(MCRWebPagesSynchronizer.getWebAppBaseDir().getPath() + path);
+        File wcmsDir = resolveDirWCMS(path);
+        File wepAppdir = resolveDirWebApp(path);
         if (wcmsDir.mkdir() && wepAppdir.mkdir()) {
             return Response.ok().build();
         }
         return Response.status(Status.CONFLICT).build();
     }
 
+    private File resolveDirWebApp(String path) throws IOException {
+        return MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWebAppBaseDir().toPath(),
+            removeLeadingSlash(path)).toFile();
+    }
+
     @DELETE
     @Path("/folder")
     public Response deleteFolder(@QueryParam("path") String path) throws IOException {
-        File wcmsDir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
-        File wepAppdir = new File(MCRWebPagesSynchronizer.getWebAppBaseDir().getPath() + path);
+        File wcmsDir = resolveDirWCMS(path);
+        File wepAppdir = resolveDirWebApp(path);
 
         if (wepAppdir.isDirectory()) {
             if (wepAppdir.list().length < 1) {
@@ -150,10 +160,15 @@ public class MCRWCMSFileBrowserResource {
         return Response.status(Status.CONFLICT).build();
     }
 
+    private File resolveDirWCMS(String path) {
+        return MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWCMSDataDirPath(), removeLeadingSlash(path)).toFile();
+    }
+
     @GET
     @Path("/files")
     public String getFiles(@QueryParam("path") String path, @QueryParam("type") String type) throws IOException {
-        File dir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
+        File dir = MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWCMSDataDirPath(), removeLeadingSlash(path))
+                .toFile();
         JsonObject jsonObj = new JsonObject();
         JsonArray jsonArray = new JsonArray();
         File[] fileArray = dir.listFiles();
@@ -194,8 +209,10 @@ public class MCRWCMSFileBrowserResource {
 
     @DELETE
     public Response deleteFile(@QueryParam("path") String path) throws IOException {
-        File wcmsDir = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + path);
-        File wepAppdir = new File(MCRWebPagesSynchronizer.getWebAppBaseDir().getPath() + path);
+        File wcmsDir = MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWCMSDataDirPath(), removeLeadingSlash(path))
+                .toFile();
+        File wepAppdir = MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWebAppBaseDir().toPath(),
+            removeLeadingSlash(path)).toFile();
         if (delete(wcmsDir) && delete(wepAppdir)) {
             return Response.ok().build();
         }
@@ -238,8 +255,10 @@ public class MCRWCMSFileBrowserResource {
     }
 
     protected String testIfFileExists(String path) {
-        String newPath = path;
-        File file = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + newPath);
+        String newPath = removeLeadingSlash(path);
+        java.nio.file.Path basePath = MCRWebPagesSynchronizer.getWCMSDataDirPath();
+        File file = MCRUtils.safeResolve(basePath, newPath)
+            .toFile();
         int i = 1;
         while (file.exists()) {
             String type = newPath.substring(newPath.lastIndexOf("."));
@@ -248,9 +267,13 @@ public class MCRWCMSFileBrowserResource {
                 name = name.substring(0, name.lastIndexOf("("));
             }
             newPath = name + "(" + i++ + ")" + type;
-            file = new File(MCRWebPagesSynchronizer.getWCMSDataDir().getPath() + newPath);
+            file = MCRUtils.safeResolve(basePath, newPath).toFile();
         }
         return newPath;
+    }
+
+    private String removeLeadingSlash(String newPath) {
+        return newPath.startsWith("/") ? newPath.substring(1) : newPath;
     }
 
     protected void getallowedPaths(Element element) {

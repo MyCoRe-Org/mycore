@@ -51,6 +51,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -279,7 +280,7 @@ public class MCRUploadResource {
 
         final MCRFileUploadBucket bucket = MCRFileUploadBucket.getOrCreateBucket(uploadID, objectID);
 
-        final java.nio.file.Path filePath = bucket.getRoot().resolve(path);
+        final java.nio.file.Path filePath = MCRUtils.safeResolve(bucket.getRoot(), path);
         if (filePath.getNameCount() > 1) {
             java.nio.file.Path parentDirectory = filePath.getParent();
             if (!Files.exists(parentDirectory)) {
