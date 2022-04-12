@@ -51,6 +51,7 @@ import org.jdom2.output.XMLOutputter;
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -308,7 +309,7 @@ public class MCRRestAPIUploadHelper {
                     ZipEntry entry;
                     while ((entry = zis.getNextEntry()) != null) {
                         LOGGER.debug("Unzipping: {}", entry.getName());
-                        java.nio.file.Path target = derDir.resolve(entry.getName());
+                        java.nio.file.Path target = MCRUtils.safeResolve(derDir, entry.getName());
                         Files.createDirectories(target.getParent());
                         Files.copy(zis, target, StandardCopyOption.REPLACE_EXISTING);
                         if (maindoc == null && !entry.isDirectory()) {
@@ -325,7 +326,7 @@ public class MCRRestAPIUploadHelper {
                     der.getDerivate().getInternals().setMainDoc(maindoc);
                 }
             } else {
-                java.nio.file.Path saveFile = derDir.resolve(path);
+                java.nio.file.Path saveFile = MCRUtils.safeResolve(derDir, path);
                 Files.createDirectories(saveFile.getParent());
                 Files.copy(uploadedInputStream, saveFile, StandardCopyOption.REPLACE_EXISTING);
                 //delete old file

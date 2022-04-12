@@ -27,6 +27,8 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 
 import javax.servlet.ServletContext;
@@ -36,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
 
 /**
@@ -96,6 +99,10 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
 
     public static File getWCMSDataDir() {
         return new File(MCRConfiguration.instance().getString("MCR.WCMS2.DataDir"));
+    }
+
+    public static Path getWCMSDataDirPath(){
+        return MCRConfiguration2.getOrThrow("MCR.WCMS2.DataDir", Paths::get);
     }
 
     public static File getWebAppBaseDir() throws IOException {
