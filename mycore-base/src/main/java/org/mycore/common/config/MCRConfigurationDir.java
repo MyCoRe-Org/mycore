@@ -33,6 +33,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRDeveloperTools;
+import org.mycore.common.MCRUtils;
 
 import jakarta.servlet.ServletContext;
 
@@ -203,7 +204,8 @@ public class MCRConfigurationDir {
         if (configurationDirectory == null || !configurationDirectory.isDirectory()) {
             return null;
         }
-        return new File(configurationDirectory, relativePath);
+
+        return MCRUtils.safeResolve(configurationDirectory.toPath(), relativePath).toFile();
     }
 
     /**

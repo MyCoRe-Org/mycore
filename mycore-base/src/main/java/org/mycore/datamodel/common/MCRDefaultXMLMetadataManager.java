@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -102,6 +103,8 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String DEFAULT_SVN_DIRECTORY_NAME = "versions-metadata";
+
     /** The singleton */
     private static MCRDefaultXMLMetadataManager SINGLETON;
 
@@ -159,27 +162,36 @@ public class MCRDefaultXMLMetadataManager implements MCRXMLMetadataManagerAdapte
         defaultClass = MCRConfiguration2.<MCRVersioningMetadataStore>getClass("MCR.Metadata.Store.DefaultClass")
             .orElse(MCRVersioningMetadataStore.class);
         if (MCRVersioningMetadataStore.class.isAssignableFrom(defaultClass)) {
-            try {
-                String svnBaseValue = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Store.SVNBase");
-                if (!svnBaseValue.endsWith("/")) {
-                    svnBaseValue += '/';
-                }
-                svnBase = new URI(svnBaseValue);
-                LOGGER.info("SVN Base: {}", svnBase);
-                if (svnBase.getScheme() == null) {
-                    String workingDirectory = (new File(".")).getAbsolutePath();
-                    URI root = new File(MCRConfiguration2.getString("MCR.datadir").orElse(workingDirectory)).toURI();
-                    URI resolved = root.resolve(svnBase);
-                    LOGGER.warn("Resolved {} to {}", svnBase, resolved);
-                    svnBase = resolved;
-                }
-            } catch (URISyntaxException ex) {
-                String msg = "Syntax error in MCR.Metadata.Store.SVNBase property: " + svnBase;
-                throw new MCRConfigurationException(msg, ex);
-            }
-            if (svnBase.getScheme().equals("file")) {
-                svnPath = Paths.get(svnBase);
+            Optional<String> svnBaseOpt = MCRConfiguration2.getString("MCR.Metadata.Store.SVNBase");
+            if (svnBaseOpt.isEmpty()) {
+                svnPath = Paths.get(MCRConfiguration2.getStringOrThrow("MCR.datadir"))
+                    .resolve(DEFAULT_SVN_DIRECTORY_NAME);
                 checkPath(svnPath, "svn");
+                svnBase = svnPath.toUri();
+            } else {
+                try {
+                    String svnBaseValue = svnBaseOpt.get();
+                    if (!svnBaseValue.endsWith("/")) {
+                        svnBaseValue += '/';
+                    }
+                    svnBase = new URI(svnBaseValue);
+                    LOGGER.info("SVN Base: {}", svnBase);
+                    if (svnBase.getScheme() == null) {
+                        String workingDirectory = (new File(".")).getAbsolutePath();
+                        URI root = new File(MCRConfiguration2.getString("MCR.datadir").orElse(workingDirectory))
+                            .toURI();
+                        URI resolved = root.resolve(svnBase);
+                        LOGGER.warn("Resolved {} to {}", svnBase, resolved);
+                        svnBase = resolved;
+                    }
+                } catch (URISyntaxException ex) {
+                    String msg = "Syntax error in MCR.Metadata.Store.SVNBase property: " + svnBase;
+                    throw new MCRConfigurationException(msg, ex);
+                }
+                if (svnBase.getScheme().equals("file")) {
+                    svnPath = Paths.get(svnBase);
+                    checkPath(svnPath, "svn");
+                }
             }
         }
         closeCreatedStores();

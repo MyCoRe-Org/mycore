@@ -29,6 +29,8 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.mycore.access.MCRAccessException;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.frontend.xeditor.MCREditorSession;
 import org.mycore.frontend.xeditor.tracker.MCRChangeTracker;
@@ -40,9 +42,14 @@ import jakarta.servlet.ServletContext;
  */
 public class MCRDebugTarget implements MCREditorTarget {
 
+    private static final String USE_DEBUG_PERMISSION = "use-xeditor-debug";
+
     @Override
     public void handleSubmission(ServletContext context, MCRServletJob job, MCREditorSession session, String parameter)
         throws Exception {
+        if (!MCRAccessManager.checkPermission(USE_DEBUG_PERMISSION)) {
+            throw MCRAccessException.missingPrivilege("use xeditor debug target", USE_DEBUG_PERMISSION);
+        }
         job.getResponse().setContentType("text/html; charset=UTF-8");
         PrintWriter out = job.getResponse().getWriter();
         out.println("<html><body>");

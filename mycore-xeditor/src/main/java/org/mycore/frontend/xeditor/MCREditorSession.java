@@ -95,6 +95,13 @@ public class MCREditorSession {
         return variables;
     }
 
+    public void update(MCRParameterCollector collector) {
+        String currentLang =  collector.getParameter("CurrentLang", null);
+        if (currentLang != null) {
+            variables.put("CurrentLang", currentLang);
+        }
+    }
+
     private void removeIllegalVariables() {
         for (Iterator<Entry<String, Object>> entries = variables.entrySet().iterator(); entries.hasNext();) {
             String name = entries.next().getKey();
@@ -232,4 +239,5 @@ public class MCREditorSession {
     protected void setPostProcessor(MCRXEditorPostProcessor postProcessor) {
         this.postProcessor = postProcessor;
     }
+
 }
