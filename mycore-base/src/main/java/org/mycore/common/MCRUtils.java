@@ -47,9 +47,11 @@ import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -513,5 +515,28 @@ public class MCRUtils {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw)); // closing string writer has no effect
         return sw.toString();
+    }
+
+    public static Path safeResolve(Path basePath, Path resolve) {
+        Path absoluteBasePath = Objects.requireNonNull(basePath)
+                .toAbsolutePath();
+        final Path resolved = absoluteBasePath
+                .resolve(Objects.requireNonNull(resolve))
+                .normalize();
+
+        if (resolved.startsWith(absoluteBasePath)) {
+            return resolved;
+        }
+        throw new MCRException("Bad path: " + resolve);
+    }
+
+    public static Path safeResolve(Path basePath, String ...resolve) {
+        if (resolve.length == 0) {
+            return basePath;
+        }
+
+        String[] more = Stream.of(resolve).skip(1).toArray(String[]::new);
+        final Path resolvePath = basePath.getFileSystem().getPath(resolve[0], more);
+        return safeResolve(basePath, resolvePath);
     }
 }
