@@ -19,6 +19,8 @@
 package org.mycore.frontend.basket;
 
 import java.net.URL;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -65,6 +68,11 @@ import org.mycore.frontend.servlets.MCRServletJob;
  **/
 public class MCRBasketServlet extends MCRServlet {
     private static final Logger LOGGER = LogManager.getLogger(MCRBasketServlet.class);
+    public static final String ALLOW_LIST_PROPERTY_NAME = "MCR.Basket.Resolver.AllowList";
+
+    private final List<String> URI_ALLOW_LIST = MCRConfiguration2
+        .getOrThrow(ALLOW_LIST_PROPERTY_NAME, MCRConfiguration2::splitValue)
+        .collect(Collectors.toList());
 
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
@@ -87,7 +95,11 @@ public class MCRBasketServlet extends MCRServlet {
                 throw new MCRException("Amount of URIs must match amount of IDs");
             }
             for (int i = 0; i < uris.length; i++) {
-                MCRBasketEntry entry = new MCRBasketEntry(ids[i], uris[i]);
+                String uri = uris[i];
+                if (URI_ALLOW_LIST.stream().noneMatch(uri::startsWith)) {
+                    throw new MCRException("The URI \"" + uri + "\" is forbidden ");
+                }
+                MCRBasketEntry entry = new MCRBasketEntry(ids[i], uri);
                 basket.add(entry);
                 if (resolveContent) {
                     entry.resolveContent();
