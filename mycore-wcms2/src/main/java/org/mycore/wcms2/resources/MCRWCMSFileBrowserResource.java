@@ -138,7 +138,8 @@ public class MCRWCMSFileBrowserResource {
     }
 
     private File resolveDirWebApp(String path) throws IOException {
-        return MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWebAppBaseDir().toPath(), removeLeadingSlash(path)).toFile();
+        return MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWebAppBaseDir().toPath(),
+            removeLeadingSlash(path)).toFile();
     }
 
     @DELETE
@@ -210,8 +211,8 @@ public class MCRWCMSFileBrowserResource {
     public Response deleteFile(@QueryParam("path") String path) throws IOException {
         File wcmsDir = MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWCMSDataDirPath(), removeLeadingSlash(path))
                 .toFile();
-        File wepAppdir = MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWebAppBaseDir().toPath(), removeLeadingSlash(path))
-                .toFile();
+        File wepAppdir = MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWebAppBaseDir().toPath(),
+            removeLeadingSlash(path)).toFile();
         if (delete(wcmsDir) && delete(wepAppdir)) {
             return Response.ok().build();
         }
