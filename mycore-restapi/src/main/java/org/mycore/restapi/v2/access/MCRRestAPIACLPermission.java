@@ -57,6 +57,7 @@ public enum MCRRestAPIACLPermission {
             case HttpMethod.DELETE:
                 return DELETE;
             case HttpMethod.POST:
+            case HttpMethod.PUT:
                 return WRITE;
             default:
                 return null;
