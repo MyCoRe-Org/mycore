@@ -21,6 +21,9 @@ public class MCRConfigHelperServlet extends MCRServlet {
 
     public static final String PROPERTIES_INIT_PARAM = "Properties";
 
+    private Date lastChange;
+    private String resultJson;
+    
     @Override
     public void init() throws ServletException {
         super.init();
@@ -59,10 +62,6 @@ public class MCRConfigHelperServlet extends MCRServlet {
             throw new ServletException(e);
         }
     }
-
-    private Date lastChange;
-
-    private String resultJson;
 
     private String createResultJson() throws IOException {
         Map<String, String> propertiesMap = new LinkedHashMap<>();
