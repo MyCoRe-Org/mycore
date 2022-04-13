@@ -109,14 +109,22 @@ public class MCRExtractRelatedItemsEventHandler extends MCREventHandlerBase {
                 }
             } else if (isParentExists(relatedItem)) {
                 MCRObjectID relatedID = MCRObjectID.getInstance(href);
-                if (object.getStructure().getParentID() == null) {
+                if (object.getStructure().getParentID() == null
+                    || !object.getStructure().getParentID().equals(relatedID)) {
                     LOGGER.info("Setting {} as parent of {}", href, oid);
                     object.getStructure().setParent(relatedID);
-                } else if (!object.getStructure().getParentID().equals(relatedID)) {
-                    LOGGER.info("Setting {} as parent of {}", href, oid);
-                    object.getStructure().setParent(relatedID);
+                    insertChildElement(object, relatedID);
                 }
             }
+        }
+    }
+
+    private void insertChildElement(MCRObject object, MCRObjectID relatedID) {
+        MCRObject newParent = MCRMetadataManager.retrieveMCRObject(relatedID);
+        if (newParent.getStructure().getChildren().stream().map(MCRMetaLinkID::getXLinkHrefID)
+            .noneMatch(object.getId()::equals)) {
+            newParent.getStructure().addChild(new MCRMetaLinkID("child", object.getId(), null, object.getLabel()));
+            MCRMetadataManager.fireUpdateEvent(newParent);
         }
     }
 
