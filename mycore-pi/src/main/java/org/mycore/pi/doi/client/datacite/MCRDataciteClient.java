@@ -433,7 +433,8 @@ public class MCRDataciteClient {
     }
 
     private CloseableHttpClient getHttpClient() {
-        return HttpClientBuilder.create().setDefaultCredentialsProvider(getCredentialsProvider()).build();
+        return HttpClientBuilder.create().useSystemProperties().setDefaultCredentialsProvider(getCredentialsProvider())
+            .build();
     }
 
     private BasicCredentialsProvider getCredentialsProvider() {
