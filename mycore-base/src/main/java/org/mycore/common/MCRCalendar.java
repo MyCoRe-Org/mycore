@@ -101,7 +101,7 @@ public class MCRCalendar {
     public static final List<String> CALENDARS_LIST = Collections
         .unmodifiableList(new ArrayList<>(
             Arrays.asList(TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC,
-                TAG_JAPANESE, TAG_ARMENIAN, TAG_EGYPTIAN)));
+                TAG_JAPANESE, TAG_ARMENIAN, TAG_EGYPTIAN, TAG_HEBREW)));
 
     /**
      * This method check a ancient date string for the given calendar. For
