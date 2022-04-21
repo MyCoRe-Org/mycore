@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.oneOf;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -578,17 +579,22 @@ public class MCRCalendarTest extends MCRTestCase {
     public void testParsePersianDate() {
         Calendar cal;
 
+        // depending on the current time of the day, the Persian calendar might start at March, 21 or 22 622 greg.
         // 01.01.0001  (persian)
         cal = MCRCalendar.getHistoryDateAsCalendar("1.1.1", false, MCRCalendar.TAG_PERSIC);
-        assertThat(cal.get(Calendar.DAY_OF_MONTH), is(22));
+        assertThat(cal.get(Calendar.DAY_OF_MONTH), is(oneOf(21, 22)));
         assertThat(cal.get(Calendar.MONTH), is(GregorianCalendar.MARCH));
         assertThat(cal.get(Calendar.YEAR), is(622));
 
-        // first day of Persian calendar is 22.3.622 in Gregorian/Julian calendar
-        Calendar firstPersGreg = MCRCalendar.getHistoryDateAsCalendar("22.3.622", false, MCRCalendar.TAG_GREGORIAN);
-        assertThat(MCRCalendar.getJulianDayNumber(cal), is(MCRCalendar.getJulianDayNumber(firstPersGreg)));
-        assertThat(MCRCalendar.getJulianDayNumber(cal), is(1948324));
-        assertThat(MCRCalendar.getJulianDayNumberAsString(cal), is("1948324"));
+        // first day of Persian calendar is 21/22.3.622 in Gregorian/Julian calendar
+        Calendar firstPersGreg1 = MCRCalendar.getHistoryDateAsCalendar("21.3.622", false, MCRCalendar.TAG_GREGORIAN);
+        Calendar firstPersGreg2 = MCRCalendar.getHistoryDateAsCalendar("22.3.622", false, MCRCalendar.TAG_GREGORIAN);
+        assertThat(MCRCalendar.getJulianDayNumber(cal),
+                is(oneOf(
+                        MCRCalendar.getJulianDayNumber(firstPersGreg1),
+                        MCRCalendar.getJulianDayNumber(firstPersGreg2))));
+        assertThat(MCRCalendar.getJulianDayNumber(cal), is(oneOf(1948323, 1948324)));
+        assertThat(MCRCalendar.getJulianDayNumberAsString(cal), is(oneOf("1948323", "1948324")));
 
         // 01.01.800 (persian)
         cal = MCRCalendar.getHistoryDateAsCalendar("1.800", false, MCRCalendar.TAG_PERSIC);
@@ -884,7 +890,7 @@ public class MCRCalendarTest extends MCRTestCase {
         /* check julian calendar implementation */
         // all entries are empty
         try {
-            cal = MCRCalendar.getHistoryDateAsCalendar(null, false, null);
+            cal = MCRCalendar.getHistoryDateAsCalendar(null, false, MCRCalendar.CalendarType.Islamic);
         } catch (MCRException e) {
             cal = new GregorianCalendar();
         }
