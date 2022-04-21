@@ -18,6 +18,7 @@
  *
  */
 const CSL_EXPORT_ROWS = "MCR.Export.CSL.Rows";
+const CSL_EXPORT_STANDALONE_ROWS = "MCR.Export.Standalone.Rows";
 const STANDALONE_FORMATS = ["mods", "bibtex", "endnote", "ris", "isi", "mods2csv"];
 const SOLR_STANDALONE_FORMATS = ["solr2csv"];
 const FORMAT_MAP = {
@@ -43,7 +44,7 @@ function getSolrDownloadLocation(transformer) {
         location = location.substring(0, hashIndex);
     }
 
-    let rows = CSL_EXPORT_ROWS in window ? window[CSL_EXPORT_ROWS] : "500";
+    let rows = CSL_EXPORT_STANDALONE_ROWS in window ? window[CSL_EXPORT_STANDALONE_ROWS] : "500";
     location = addRowsToURL(location, rows);
 
     return location + transformerQuery;

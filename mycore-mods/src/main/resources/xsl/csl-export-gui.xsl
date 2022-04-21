@@ -31,6 +31,7 @@
 
     <xsl:param name="MCR.Export.CSL.Styles"/>
     <xsl:param name="MCR.Export.CSL.Rows"/>
+    <xsl:param name="MCR.Export.Standalone.Rows"/>
     <xsl:param name="WebApplicationBaseURL"/>
     <xsl:param name="MCR.ContentTransformer.solr2csv.Stylesheet"/>
 
@@ -41,7 +42,10 @@
          object -> for single mycoreobject
          -->
         <xsl:param name="type"/>
-        <script type="text/javascript">window["MCR.Export.CSL.Rows"] = &quot;<xsl:value-of select="$MCR.Export.CSL.Rows"/>&quot;;</script>
+        <script type="text/javascript">
+            window["MCR.Export.CSL.Rows"] = &quot;<xsl:value-of select="$MCR.Export.CSL.Rows"/>&quot;;
+            window["MCR.Export.Standalone.Rows"] = &quot;<xsl:value-of select="$MCR.Export.Standalone.Rows"/>&quot;;
+        </script>
         <script src="{$WebApplicationBaseURL}js/csl-export.js"/>
         <div class="input-group mb-3 flex-wrap" data-export="{$type}">
             <select name="format" class="form-control">
