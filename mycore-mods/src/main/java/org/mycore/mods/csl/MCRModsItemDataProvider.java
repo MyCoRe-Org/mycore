@@ -180,6 +180,10 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                             strFN = idb::volume;
                             intFn = idb::volume;
                             break;
+                        case "article_number":
+                            intFn = idb::number;
+                            strFN = idb::number;
+                            break;
                         default:
                             LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
                             break;
