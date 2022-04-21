@@ -18,15 +18,6 @@
 
 package org.mycore.common;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.ibm.icu.text.SimpleDateFormat;
 import com.ibm.icu.util.BuddhistCalendar;
 import com.ibm.icu.util.Calendar;
@@ -36,6 +27,13 @@ import com.ibm.icu.util.GregorianCalendar;
 import com.ibm.icu.util.HebrewCalendar;
 import com.ibm.icu.util.IslamicCalendar;
 import com.ibm.icu.util.JapaneseCalendar;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * This class implements all methods for handling calendars in MyCoRe objects
@@ -48,92 +46,98 @@ import com.ibm.icu.util.JapaneseCalendar;
  */
 public class MCRCalendar {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     static Logger LOGGER = LogManager.getLogger(MCRCalendar.class.getName());
 
-    /** Tag for Buddhistic calendar */
+    /**
+     * Tag for Buddhistic calendar
+     */
     public static final String TAG_BUDDHIST = "buddhist";
 
-    /** Tag for Chinese calendar */
+    /**
+     * Tag for Chinese calendar
+     */
     public static final String TAG_CHINESE = "chinese";
 
-    /** Tag for Coptic calendar */
+    /**
+     * Tag for Coptic calendar
+     */
     public static final String TAG_COPTIC = "coptic";
 
-    /** Tag for Ethiopic calendar */
+    /**
+     * Tag for Ethiopic calendar
+     */
     public static final String TAG_ETHIOPIC = "ethiopic";
 
-    /** Tag for Gregorian calendar */
+    /**
+     * Tag for Gregorian calendar
+     */
     public static final String TAG_GREGORIAN = "gregorian";
 
-    /** Tag for Hebrew calendar */
+    /**
+     * Tag for Hebrew calendar
+     */
     public static final String TAG_HEBREW = "hebrew";
 
-    /** Tag for Islamic calendar */
+    /**
+     * Tag for Islamic calendar
+     */
     public static final String TAG_ISLAMIC = "islamic";
 
-    /** Tag for Japanese calendar */
+    /**
+     * Tag for Japanese calendar
+     */
     public static final String TAG_JAPANESE = "japanese";
 
-    /** Tag for Julian calendar */
+    /**
+     * Tag for Julian calendar
+     */
     public static final String TAG_JULIAN = "julian";
 
-    /** Tag for Persic calendar */
+    /**
+     * Tag for Persic calendar
+     */
     public static final String TAG_PERSIC = "persic";
 
-    /** Tag for Armenian calendar */
+    /**
+     * Tag for Armenian calendar
+     */
     public static final String TAG_ARMENIAN = "armenian";
 
-    /** Tag for Egyptian calendar */
+    /**
+     * Tag for Egyptian calendar
+     */
     public static final String TAG_EGYPTIAN = "egyptian";
 
-    /** Minimum Julian Day number is 0 = 01.01.4713 BC */
+    /**
+     * Minimum Julian Day number is 0 = 01.01.4713 BC
+     */
     public static final int MIN_JULIAN_DAY_NUMBER = 0;
 
-    /** Maximum Julian Day number is 3182057 = 28.01.4000 */
+    /**
+     * Maximum Julian Day number is 3182057 = 28.01.4000
+     */
     public static final int MAX_JULIAN_DAY_NUMBER = 3182057;
 
-    /** all available calendars of ICU as String area */
-    public static final String[] CALENDARS_ICU = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN,
-        TAG_HEBREW, TAG_ISLAMIC, TAG_JAPANESE };
-
-    /** a list of calendar tags they are supported in this class */
-    public static final List<String> CALENDARS_LIST = Collections
-        .unmodifiableList(new ArrayList<>(
-            Arrays.asList(TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC,
-                TAG_JAPANESE, TAG_ARMENIAN, TAG_EGYPTIAN, TAG_HEBREW)));
-
     /**
-     * This method check a ancient date string for the given calendar. For
-     * syntax of the date string see javadocs of calendar methods.
-     *
-     * @param dateString
-     *            the date as string.
-     * @param last
-     *            the value is true if the date should be filled with the
-     *            highest value of month or day like 12 or 31 else it fill the
-     *            date with the lowest value 1 for month and day.
-     * @param calendarString
-     *            the calendar name as String, kind of the calendars are
-     *            ('gregorian', 'julian', 'islamic', 'buddhist', 'coptic',
-     *            'ethiopic', 'persic', 'japanese', 'armenian' or 'egyptian' )
-     *
-     * @return the ICU Calendar instance of the concrete calendar type or null if an error was occurred.
-     * @exception MCRException if parsing has an error
+     * a list of calendar tags they are supported in this class
      */
-    public static Calendar getHistoryDateAsCalendar(String dateString, boolean last, String calendarString)
-        throws MCRException {
-        Calendar out = null;
+    public static final List<String> CALENDARS_LIST = List.of(
+            TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC, TAG_JAPANESE,
+            TAG_ARMENIAN, TAG_EGYPTIAN, TAG_HEBREW);
+
+    public static Calendar getHistoryDateAsCalendar(String input, boolean last, CalendarType calendarType) {
+        LOGGER.debug("Input of getHistoryDateAsCalendar: {}  {}  {}", input, calendarType, Boolean.toString(last));
+
+        final String dateString = StringUtils.trim(input);
         // check dateString
-        LOGGER.debug("Input of getHistoryDateAsCalendar: {}  {}  {}", dateString, calendarString,
-            Boolean.toString(last));
-        if (dateString == null || dateString.trim().length() == 0) {
+        if (StringUtils.isBlank(dateString)) {
             throw new MCRException("The ancient date string is null or empty");
         }
-        dateString = dateString.trim();
-        if (calendarString == null || calendarString.trim().length() == 0) {
-            throw new MCRException("The calendar string is null or empty");
-        }
+
+        final Calendar out;
         if (dateString.equals("4713-01-01 BC")) {
             LOGGER.debug("Date string contains MIN_JULIAN_DAY_NUMBER");
             out = new GregorianCalendar();
@@ -146,57 +150,88 @@ public class MCRCalendar {
             out.set(Calendar.JULIAN_DAY, MCRCalendar.MAX_JULIAN_DAY_NUMBER);
             return out;
         }
-        // Check calendar string
-        if (!CALENDARS_LIST.contains(calendarString)) {
-            throw new MCRException("The calendar string " + calendarString + " is not supported");
+
+        switch (calendarType) {
+            case Armenian: {
+                out = getCalendarFromArmenianDate(dateString, last);
+                break;
+            }
+            case Buddhist: {
+                out = getCalendarFromBuddhistDate(dateString, last);
+                break;
+            }
+            case Coptic: {
+                out = getCalendarFromCopticDate(dateString, last);
+                break;
+            }
+            case Egyptian: {
+                out = getCalendarFromEgyptianDate(dateString, last);
+                break;
+            }
+            case Ethiopic: {
+                out = getCalendarFromEthiopicDate(dateString, last);
+                break;
+            }
+            case Gregorian: {
+                out = getCalendarFromGregorianDate(dateString, last);
+                break;
+            }
+            case Hebrew: {
+                out = getCalendarFromHebrewDate(dateString, last);
+                break;
+            }
+            case Islamic: {
+                out = getCalendarFromIslamicDate(dateString, last);
+                break;
+            }
+            case Japanese: {
+                out = getCalendarFromJapaneseDate(dateString, last);
+                break;
+            }
+            case Julian: {
+                out = getCalendarFromJulianDate(dateString, last);
+                break;
+            }
+            case Persic: {
+                out = getCalendarFromPersicDate(dateString, last);
+                break;
+            }
+            default: {
+                throw new MCRException("Calendar type " + calendarType + " not supported!");
+            }
         }
-        // select for calendar
-        if (calendarString.equals(TAG_GREGORIAN)) {
-            out = getCalendarFromGregorianDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_JULIAN)) {
-            out = getCalendarFromJulianDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_ISLAMIC)) {
-            out = getCalendarFromIslamicDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_COPTIC)) {
-            out = getCalendarFromCopticDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_ETHIOPIC)) {
-            out = getCalendarFromEthiopicDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_BUDDHIST)) {
-            out = getCalendarFromBuddhistDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_PERSIC)) {
-            out = getCalendarFromPersicDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_ARMENIAN)) {
-            out = getCalendarFromArmenianDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_EGYPTIAN)) {
-            out = getCalendarFromEgyptianDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_JAPANESE)) {
-            out = getCalendarFromJapaneseDate(dateString, last);
-        }
-        if (calendarString.equals(TAG_HEBREW)) {
-            out = getCalendarFromHebrewDate(dateString, last);
-        }
+
         LOGGER.debug("Output of getHistoryDateAsCalendar: {}", getCalendarDateToFormattedString(out));
         return out;
+    }
+
+    /**
+     * This method check an ancient date string for the given calendar. For
+     * syntax of the date string see javadocs of calendar methods.
+     *
+     * @param dateString     the date as string.
+     * @param last           the value is true if the date should be filled with the
+     *                       highest value of month or day like 12 or 31 else it fill the
+     *                       date with the lowest value 1 for month and day.
+     * @param calendarString the calendar name as String, kind of the calendars are
+     *                       ('gregorian', 'julian', 'islamic', 'buddhist', 'coptic',
+     *                       'ethiopic', 'persic', 'japanese', 'armenian' or 'egyptian' )
+     * @return the ICU Calendar instance of the concrete calendar type or null if an error was occurred.
+     * @throws MCRException if parsing has an error
+     */
+    public static Calendar getHistoryDateAsCalendar(String dateString, boolean last, String calendarString)
+        throws MCRException {
+        return getHistoryDateAsCalendar(dateString, last, CalendarType.of(calendarString));
     }
 
     /**
      * Check the date string for julian or gregorian calendar
      *
      * @param dateString the date string
-     * @param last the flag for first / last day
+     * @param last       the flag for first / last day
      * @return an integer array with [0] = year; [1] = month; [2] = day; [3] = era : -1 = BC : +1 = AC
-     * @throws Exception
      */
-    private static int[] checkDateStringForJulianCalendar(String dateString, boolean last) throws Exception {
+    private static int[] checkDateStringForJulianCalendar(String dateString, boolean last) {
         int[] fields = new int[4];
         // look for BC
         dateString = dateString.toUpperCase(Locale.ROOT);
@@ -974,7 +1009,7 @@ public class MCRCalendar {
             return jcal;
 
         } catch (Exception e) {
-            throw new MCRException("The ancient jacanese date is false.", e);
+            throw new MCRException("The ancient japanese date is false.", e);
         }
     }
 
@@ -1760,9 +1795,8 @@ public class MCRCalendar {
     /**
      * This method returns the calendar type as string.
      *
-     * @param calendar
-     *            the Calendar date
-     * @return The clendar type as string. If Calendar is empty an empty string will be returned.
+     * @param calendar the Calendar date
+     * @return The calendar type as string. If Calendar is empty an empty string will be returned.
      */
     public static String getCalendarTypeString(Calendar calendar) {
         if (calendar == null) {
@@ -1778,6 +1812,37 @@ public class MCRCalendar {
             return TAG_GREGORIAN;
         } else {
             return TAG_JULIAN;
+        }
+    }
+
+    public enum CalendarType {
+        Buddhist(TAG_BUDDHIST),
+        Chinese(TAG_CHINESE),
+        Coptic(TAG_COPTIC),
+        Ethiopic(TAG_ETHIOPIC),
+        Gregorian(TAG_GREGORIAN),
+        Hebrew(TAG_HEBREW),
+        Islamic(TAG_ISLAMIC),
+        Japanese(TAG_JAPANESE),
+        Julian(TAG_JULIAN),
+        Persic(TAG_PERSIC),
+        Armenian(TAG_ARMENIAN),
+        Egyptian(TAG_EGYPTIAN);
+
+        private final String type;
+
+        CalendarType(String type) {
+            this.type = type;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public static CalendarType of(String type) {
+            return Arrays.stream(CalendarType.values())
+                    .filter(current -> StringUtils.equals(current.getType(), type))
+                    .findFirst().orElseThrow();
         }
     }
 }
