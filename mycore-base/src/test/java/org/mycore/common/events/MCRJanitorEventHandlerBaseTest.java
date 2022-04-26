@@ -3,7 +3,6 @@ package org.mycore.common.events;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRTestCase;
