@@ -18,6 +18,7 @@
 
 package org.mycore.common.events;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUserInformation;
@@ -30,12 +31,14 @@ public class MCRJanitorEventHandlerBase extends MCREventHandlerBase {
     @Override
     public void doHandleEvent(MCREvent evt) {
         MCRUserInformation prevUserInformation = MCRSessionMgr.getCurrentSession().getUserInformation();
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getJanitorInstance());
-        super.doHandleEvent(evt);
-        MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
-        MCRSessionMgr.getCurrentSession().setUserInformation(prevUserInformation);
-
+        // try {
+            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
+            MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getJanitorInstance());
+            super.doHandleEvent(evt);
+        // } finally {
+            //    MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
+            //   MCRSessionMgr.getCurrentSession().setUserInformation(prevUserInformation);
+            // }
     }
 
 }
