@@ -519,7 +519,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     private CSLName buildName(Element modsName) {
         final CSLNameBuilder nameBuilder = new CSLNameBuilder();
 
-        final boolean isInstitution = "corporate".equals(modsName.getAttributeValue("type"));
+        String nameType = modsName.getAttributeValue("type");
+        final boolean isInstitution = "corporate".equals(nameType) || "conference".equals(nameType);
         nameBuilder.isInstitution(isInstitution);
 
         if (!isInstitution) {
@@ -570,8 +571,13 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 nameBuilder.literal(displayForm.getTextNormalize());
             }
         } else {
-            Optional.ofNullable(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE))
-                .ifPresent((nameBuilder::literal));
+            String lit = Optional.ofNullable(modsName.getChildTextNormalize("displayForm", MODS_NAMESPACE))
+                .orElse(modsName.getChildren("namePart", MODS_NAMESPACE).stream().map(Element::getTextNormalize)
+                    .collect(Collectors.joining(" ")));
+
+            if (!lit.isBlank()) {
+                nameBuilder.literal(lit);
+            }
         }
 
         return nameBuilder.build();
