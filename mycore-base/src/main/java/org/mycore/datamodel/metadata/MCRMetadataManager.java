@@ -829,6 +829,12 @@ public final class MCRMetadataManager {
             throw MCRAccessException.missingPermission("Update object.", id.toString(), PERMISSION_WRITE);
         }
         MCRObject old = MCRMetadataManager.retrieveMCRObject(id);
+        Date diskModifyDate = old.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
+        Date updateModifyDate = mcrObject.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
+        if (diskModifyDate != null && updateModifyDate != null && updateModifyDate.before(diskModifyDate)) {
+            throw new MCRPersistenceException("The object " + mcrObject.getId() + " was modified(" + diskModifyDate
+                    + ") during the time it was opened in the editor.");
+        }
 
         // save the order of derivates and clean the structure
         final List<String> childOrder = mcrObject.getStructure()

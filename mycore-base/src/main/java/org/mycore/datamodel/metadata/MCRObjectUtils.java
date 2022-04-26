@@ -193,7 +193,7 @@ public abstract class MCRObjectUtils {
      */
     public static Stream<MCRObject> removeLinks(MCRObjectID sourceId) {
         return MCRLinkTableManager.instance().getSourceOf(sourceId).stream().filter(MCRObjectID::isValid)
-            .map(MCRObjectID::getInstance).map(MCRMetadataManager::retrieveMCRObject)
+            .map(MCRObjectID::getInstance).distinct().map(MCRMetadataManager::retrieveMCRObject)
             .flatMap(linkedObject -> MCRObjectUtils.removeLink(linkedObject, sourceId) ? Stream.of(linkedObject)
                 : Stream.empty());
     }
