@@ -37,7 +37,8 @@ import org.mycore.pi.MCRPIRegistrationInfo;
 import jakarta.servlet.ServletContext;
 
 /**
- * @author shermann
+ *  @author Huu Chi Vu
+ *  @author shermann
  */
 public class MCRURNGranularRESTRegistrationStarter
     implements MCRStartupHandler.AutoExecutable, MCRShutdownHandler.Closeable {
@@ -72,11 +73,10 @@ public class MCRURNGranularRESTRegistrationStarter
     @Override
     public void startUp(ServletContext servletContext) {
         MCRShutdownHandler.getInstance().addCloseable(this);
-        getUsernamePassword()
-            .map(this::getEpicureProvider)
-            .map(MCRDNBURNRestClient::new)
-            .map(MCRURNGranularRESTRegistrationTask::new)
-            .map(this::startTimerTask)
+
+        MCRDNBURNRestClient client = new MCRDNBURNRestClient(getBundleProvider(), getUsernamePasswordCredentials());
+        MCRURNGranularRESTRegistrationTask task = new MCRURNGranularRESTRegistrationTask(client);
+        Optional.of(startTimerTask(task))
             .orElseGet(this::couldNotStartTask)
             .accept(LOGGER);
     }
@@ -97,16 +97,33 @@ public class MCRURNGranularRESTRegistrationStarter
 
     private Consumer<Logger> startTimerTask(TimerTask task) {
         getScheduler().scheduleAtFixedRate(task, 0, period, timeUnit);
-        return logger -> logger.info("Started task {}, refresh every {}{}", task.getClass().getSimpleName(), period,
+        return logger -> logger.info("Started task {}, refresh every {} {}", task.getClass().getSimpleName(), period,
             timeUnit);
     }
 
+    /**
+     * @deprecated Use {@link MCRURNGranularRESTRegistrationStarter#getBundleProvider()}
+     * */
+    @Deprecated
     public Function<MCRPIRegistrationInfo, MCREpicurLite> getEpicureProvider(UsernamePasswordCredentials credentials) {
         return urn -> MCREpicurLite.instance(urn, MCRDerivateURNUtils.getURL(urn))
             .setCredentials(credentials);
     }
 
+    public Function<MCRPIRegistrationInfo, MCRURNJsonBundle> getBundleProvider() {
+        return urn -> MCRURNJsonBundle.instance(urn, MCRDerivateURNUtils.getURL(urn));
+    }
+
+    /**
+     * @deprecated Reading of properties moved to
+     * {@link MCRURNGranularRESTRegistrationStarter#getUsernamePasswordCredentials()}
+     * */
+    @Deprecated
     public Optional<UsernamePasswordCredentials> getUsernamePassword() {
+        return getUsernamePasswordCredentials();
+    }
+
+    public Optional<UsernamePasswordCredentials> getUsernamePasswordCredentials() {
         String username = MCRConfiguration2.getString("MCR.PI.DNB.Credentials.Login").orElse(null);
         String password = MCRConfiguration2.getString("MCR.PI.DNB.Credentials.Password").orElse(null);
 

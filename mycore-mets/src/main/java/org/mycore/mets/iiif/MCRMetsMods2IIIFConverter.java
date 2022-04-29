@@ -158,6 +158,7 @@ public class MCRMetsMods2IIIFConverter {
             String label = Stream.of(order, orderLabel, contentIds)
                 .filter(o -> o != null && !o.isEmpty())
                 .collect(Collectors.joining(" - "));
+            label = ("".equals(label)) ? physicalSubDiv.getId() : label;
 
             String identifier = this.physicalIdentifierMap.get(physicalSubDiv);
             try {
@@ -205,7 +206,7 @@ public class MCRMetsMods2IIIFConverter {
             range.setViewingHint(MCRIIIFViewingHint.top);
         }
         complete.add(range);
-        range.setLabel(divContainer.getLabel());
+        range.setLabel((divContainer.getLabel() != null) ? divContainer.getLabel() : divContainer.getType());
 
         range.canvases.addAll(this.logicalIdIdentifiersMap.getOrDefault(divContainer.getId(), Collections.emptyList()));
 

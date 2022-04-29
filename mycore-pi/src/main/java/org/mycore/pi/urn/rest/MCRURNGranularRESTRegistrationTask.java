@@ -44,7 +44,7 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
 
     public static final int BATCH_SIZE = 20;
 
-    protected static final Logger LOGGER = LogManager.getLogger();
+    protected static final Logger LOGGER = LogManager.getLogger(MCRURNGranularRESTRegistrationTask.class);
 
     private final MCRDNBURNRestClient dnburnClient;
 

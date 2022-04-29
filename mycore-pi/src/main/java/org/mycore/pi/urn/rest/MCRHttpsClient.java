@@ -21,15 +21,22 @@ package org.mycore.pi.urn.rest;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.concurrent.TimeUnit;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpRequest;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
@@ -40,12 +47,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
+ * Convinience class for sending http requests to the DNB urn service api.
+ *
  * Created by chi on 08.05.17.
  *
  * @author Huu Chi Vu
  */
 public class MCRHttpsClient {
-    private static Logger LOGGER = LogManager.getLogger();
+    final private static Logger LOGGER = LogManager.getLogger(MCRHttpsClient.class);
 
     private static RequestConfig noRedirect() {
         return RequestConfig
@@ -55,14 +64,20 @@ public class MCRHttpsClient {
     }
 
     public static CloseableHttpClient getHttpsClient() {
-        return HttpClientBuilder
-            .create()
-            .setConnectionTimeToLive(1, TimeUnit.MINUTES)
-            .setSSLContext(SSLContexts.createSystemDefault())
-            .build();
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        int timeout = 5;
+        RequestConfig config = RequestConfig.custom()
+            .setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
+            .setSocketTimeout(timeout * 1000).build();
+
+        return clientBuilder.setDefaultRequestConfig(config).setSSLContext(SSLContexts.createSystemDefault()).build();
     }
 
     public static CloseableHttpResponse head(String url) {
+        return MCRHttpsClient.head(url, Optional.empty());
+    }
+
+    public static CloseableHttpResponse head(String url, Optional<UsernamePasswordCredentials> credentials) {
         HttpHead httpHead = new HttpHead(url);
         try (CloseableHttpClient httpClient = getHttpsClient()) {
             return httpClient.execute(httpHead);
@@ -73,20 +88,78 @@ public class MCRHttpsClient {
         return null;
     }
 
+    public static CloseableHttpResponse get(String url, Optional<UsernamePasswordCredentials> credentials) {
+        HttpGet get = new HttpGet(url);
+
+        if (credentials.isPresent()) {
+            setAuthorizationHeader(get, credentials);
+        }
+        try (CloseableHttpClient httpsClient = getHttpsClient()) {
+            return httpsClient.execute(get);
+        } catch (IOException e) {
+            LOGGER.error(e);
+        }
+
+        return null;
+    }
+
     public static CloseableHttpResponse put(String url, String contentType, String data) {
-        return request(HttpPut::new, url, contentType, new StringEntity(data, "UTF-8"));
+        return MCRHttpsClient.put(url, contentType, data, Optional.empty());
+    }
+
+    public static CloseableHttpResponse put(String url, String contentType, String data,
+        Optional<UsernamePasswordCredentials> credentials) {
+        return request(HttpPut::new, url, contentType, new StringEntity(data, "UTF-8"), credentials);
     }
 
     public static CloseableHttpResponse post(String url, String contentType, String data) {
-        return request(HttpPost::new, url, contentType, new StringEntity(data, "UTF-8"));
+        return MCRHttpsClient.post(url, contentType, data, Optional.empty());
     }
 
-    public static <R extends HttpEntityEnclosingRequestBase> CloseableHttpResponse request(
-        Supplier<R> requestSupp, String url,
-        String contentType, HttpEntity entity) {
+    public static CloseableHttpResponse post(String url, String contentType, String data,
+        Optional<UsernamePasswordCredentials> credentials) {
+        return request(HttpPost::new, url, contentType, new StringEntity(data, "UTF-8"), credentials);
+    }
+
+    public static CloseableHttpResponse patch(String url, String contentType, String data) {
+        return MCRHttpsClient.patch(url, contentType, data, Optional.empty());
+    }
+
+    public static CloseableHttpResponse patch(String url, String contentType, String data,
+        Optional<UsernamePasswordCredentials> credentials) {
+        return request(HttpPatch::new, url, contentType, new StringEntity(data, "UTF-8"), credentials);
+    }
+
+    public static <R extends HttpEntityEnclosingRequestBase> CloseableHttpResponse request(Supplier<R> requestSupp,
+        String url, String contentType, HttpEntity entity) {
+        return MCRHttpsClient.request(requestSupp, url, contentType, entity, Optional.empty());
+    }
+
+    /**
+     * Sets the authorization header to the provided http request object.
+     *
+     * Unfortunately the procedure with {@link org.apache.http.client.CredentialsProvider} is not working with the
+     * DNB urn service api.
+     * */
+    private static HttpRequest setAuthorizationHeader(HttpRequest request,
+        Optional<UsernamePasswordCredentials> credentials) {
+
+        String auth = credentials.get().getUserName() + ":" + credentials.get().getPassword();
+        byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
+        String authHeader = "Basic " + new String(encodedAuth, StandardCharsets.UTF_8);
+        request.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+        return request;
+    }
+
+    public static <R extends HttpEntityEnclosingRequestBase> CloseableHttpResponse request(Supplier<R> requestSupp,
+        String url, String contentType, HttpEntity entity, Optional<UsernamePasswordCredentials> credentials) {
 
         try (CloseableHttpClient httpClient = getHttpsClient()) {
             R request = requestSupp.get();
+
+            if (credentials.isPresent()) {
+                setAuthorizationHeader(request, credentials);
+            }
             request.setURI(new URI(url));
             request.setHeader("content-type", contentType);
             request.setConfig(noRedirect());
@@ -94,7 +167,7 @@ public class MCRHttpsClient {
 
             return httpClient.execute(request);
         } catch (URISyntaxException e) {
-            LOGGER.error("Worng format for URL: {}", url, e);
+            LOGGER.error("Wrong format for URL: {}", url, e);
         } catch (ClientProtocolException e) {
             LOGGER.error("There is a HTTP protocol error for URL: {}", url, e);
         } catch (IOException e) {

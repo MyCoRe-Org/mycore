@@ -32,6 +32,7 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -50,7 +51,7 @@ import org.mycore.pi.MCRPIRegistrationInfo;
  * @author Huu Chi Vu
  */
 public class MCRDerivateURNUtils {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(MCRDerivateURNUtils.class);
 
     private static final String SUPPORTED_CONTENT_TYPE = MCRConfiguration2
         .getString("MCR.PI.URNGranular.SupportedContentTypes").orElse("");
@@ -87,7 +88,7 @@ public class MCRDerivateURNUtils {
 
                 return new URL(getViewerURL(file));
             }
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | MCRPersistenceException e) {
             LOGGER.error("Malformed URL for URN {}", piInfo.getIdentifier(), e);
         }
 
