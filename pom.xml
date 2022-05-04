@@ -453,6 +453,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                         <exclude>javax.validation:validation-api</exclude>
                         <exclude>javax.persistence:javax.persistence-api</exclude>
                         <exclude>javax.websocket:javax.websocket-api</exclude>
+                        <exclude>com.fasterxml.jackson.module:jackson-module-jaxb-annotations</exclude>
                         <exclude>com.sun.mail:javax.mail</exclude>
                         <exclude>com.sun.media:jai-codec</exclude>
                         <exclude>javax.media:jai-core</exclude>

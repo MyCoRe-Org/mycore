@@ -32,7 +32,7 @@ import java.util.stream.StreamSupport;
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModule;
 
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.GET;
@@ -149,7 +149,7 @@ public class MCRJobQueueResource {
         StringWriter sw = new StringWriter();
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JaxbAnnotationModule());
+        mapper.registerModule(new JakartaXmlBindAnnotationModule());
         mapper.writeValue(sw, entity);
 
         return sw.toString();
