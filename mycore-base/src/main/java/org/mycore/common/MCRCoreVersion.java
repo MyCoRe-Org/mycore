@@ -43,8 +43,6 @@ public class MCRCoreVersion {
 
     public static final String DESCRIBE = prop.getProperty("git.commit.id.describe");
 
-    public static final String ABBREV = prop.getProperty("git.commit.id.abbrev");
-
     public static final String COMPLETE = VERSION + " " + BRANCH + ":" + DESCRIBE;
 
     public static String getVersion() {
@@ -88,10 +86,6 @@ public class MCRCoreVersion {
 
     public static String getCompleteVersion() {
         return COMPLETE;
-    }
-
-    public static String getAbbrev() {
-        return ABBREV;
     }
 
     public static Map<String, String> getVersionProperties() {
