@@ -27,11 +27,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>@{argLine} -javaagent:${org.jmockit:jmockit:jar}</argLine>
-          <useSystemClassLoader>true</useSystemClassLoader>
-          <trimStackTrace>false</trimStackTrace>
-        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -111,12 +106,15 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- don't change order of jmockit and junit prior junit 5+ -->
-    <!-- jmockit have to be load before junit to run properly -->
     <dependency>
-      <groupId>org.jmockit</groupId>
-      <artifactId>jmockit</artifactId>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-inline</artifactId>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>

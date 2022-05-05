@@ -1756,9 +1756,15 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.jmockit</groupId>
-        <artifactId>jmockit</artifactId>
-        <version>1.49</version>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>4.5.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-inline</artifactId>
+        <version>4.5.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>

@@ -18,9 +18,10 @@
 
 package org.mycore.pi.urn.rest;
 
-import java.io.IOException;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,26 +37,19 @@ import java.util.stream.Stream;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRStoreTestCase;
 import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRFileMetadata;
-import org.mycore.datamodel.metadata.MCRMetaIFS;
-import org.mycore.datamodel.metadata.MCRObjectDerivate;
+import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIUtils;
-import org.mycore.pi.MockMetadataManager;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRUUIDURNGenerator;
-
-import mockit.Mock;
-import mockit.MockUp;
 
 /**
  * Created by chi on 09.03.17.
@@ -71,19 +65,12 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
 
     @Test
     public void fullRegister() throws Exception {
-        new MockContentTypes();
-        new MockFrontendUtil();
-        new MockFiles();
-        new MockAccessManager();
-        new MockObjectDerivate();
-        new MockDerivate();
-        MockMetadataManager mockMetadataManager = new MockMetadataManager();
-
         MCRDerivate derivate = new MCRDerivate();
         MCRObjectID mcrObjectID = MCRPIUtils.getNextFreeID();
         derivate.setId(mcrObjectID);
 
-        mockMetadataManager.put(mcrObjectID, derivate);
+        MCRAccessManager.addRule(mcrObjectID, "register-TestService", MCRAccessManager.getTrueRule(), "");
+        MCRAccessManager.addRule(mcrObjectID, "writedb", MCRAccessManager.getTrueRule(), "");
 
         Function<MCRDerivate, Stream<MCRPath>> foo = deriv -> IntStream
             .iterate(0, i -> i + 1)
@@ -95,7 +82,16 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         MCRURNGranularRESTService testService = new MCRURNGranularRESTService(foo);
         testService.init("MCR.PI.Service.TestService");
         testService.setProperties(getTestServiceProperties());
-        testService.register(derivate, "", true);
+        try (MockedStatic<Files> mockedFiles = Mockito.mockStatic(Files.class);
+            MockedStatic<MCRMetadataManager> mockedMetaDataMager = Mockito.mockStatic(MCRMetadataManager.class)
+        ) {
+            mockedFiles.when(() -> Files.exists(any(Path.class)))
+                   .thenReturn(true);
+            mockedMetaDataMager.when(() -> MCRMetadataManager.retrieveMCRDerivate(any(MCRObjectID.class)))
+                   .thenReturn(derivate);
+
+            testService.register(derivate, "", true);
+        }
         timerTask();
 
         List<MCRPIRegistrationInfo> registeredURNs = MCREntityManagerProvider
@@ -146,58 +142,4 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         super.tearDown();
     }
 
-    public class MockObjectDerivate extends MockUp<MCRObjectDerivate> {
-        @Mock
-        public MCRFileMetadata getOrCreateFileMetadata(MCRPath file, String urn) {
-            System.out.println("getOrCreateFileMetadata: " + file + " - " + urn);
-            return new MCRFileMetadata(file.getOwnerRelativePath(), urn, null);
-        }
-
-        @Mock
-        public MCRMetaIFS getInternals() {
-            MCRMetaIFS mcrMetaIFS = new MCRMetaIFS();
-            mcrMetaIFS.setMainDoc("mainDoc_" + UUID.randomUUID());
-            return mcrMetaIFS;
-        }
-    }
-
-    public class MockDerivate extends MockUp<MCRDerivate> {
-        @Mock
-        public void validate() throws MCRException {
-            // allways valid
-        }
-    }
-
-    public class MockAccessManager extends MockUp<MCRAccessManager> {
-        @Mock
-        public boolean checkPermission(MCRObjectID id, String permission) {
-            return true;
-        }
-    }
-
-    public class MockFiles extends MockUp<Files> {
-        @Mock
-        public boolean exists(Path path, LinkOption... options) {
-            return true;
-        }
-    }
-
-    public class MockFrontendUtil extends MockUp<MCRFrontendUtil> {
-        @Mock
-        public void prepareBaseURLs(String baseURL) {
-            System.out.println("prepare nothing");
-        }
-
-        @Mock
-        public String getBaseURL() {
-            return "http://localhost:8291/";
-        }
-    }
-
-    public class MockContentTypes extends MockUp<MCRContentTypes> {
-        @Mock
-        public String probeContentType(Path path) throws IOException {
-            return "";
-        }
-    }
 }
