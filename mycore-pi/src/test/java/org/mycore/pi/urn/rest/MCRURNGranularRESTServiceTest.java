@@ -19,7 +19,6 @@
 package org.mycore.pi.urn.rest;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
