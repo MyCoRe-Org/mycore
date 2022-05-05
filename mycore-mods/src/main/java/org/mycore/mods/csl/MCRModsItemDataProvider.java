@@ -21,6 +21,7 @@ package org.mycore.mods.csl;
 import static org.mycore.common.MCRConstants.MODS_NAMESPACE;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -445,6 +446,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
             switch (role) {
                 case "aut":
+                case "inv":
                     idb.author(cslNames);
                     break;
                 case "col":
@@ -470,6 +472,10 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                     break;
                 case "cmp":
                     idb.composer(cslNames);
+                    break;
+                case "conference-name":
+                case "pup":
+                    idb.event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
                     break;
                 default:
                     LOGGER.warn("Unknown person role " + role + " in " + this.id);
@@ -512,6 +518,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 final String role = roleTermElement.getTextNormalize();
                 final List<CSLName> cslNames = roleNameMap.computeIfAbsent(role, (s) -> new LinkedList<>());
                 cslNames.add(cslName);
+            }
+        } else {
+            String nameType = modsName.getAttributeValue("type");
+            if("conference".equals(nameType)){
+                roleNameMap.computeIfAbsent("conference-name", (s) -> new LinkedList<>()).add(cslName);
             }
         }
     }
