@@ -19,7 +19,7 @@
  */
 const CSL_EXPORT_ROWS = "MCR.Export.CSL.Rows";
 const CSL_EXPORT_STANDALONE_ROWS = "MCR.Export.Standalone.Rows";
-const STANDALONE_FORMATS = ["mods", "bibtex", "endnote", "ris", "isi", "mods2csv"];
+const STANDALONE_FORMATS = "MCR.Export.StandaloneFormats";
 const SOLR_STANDALONE_FORMATS = ["solr2csv"];
 const FORMAT_MAP = {
     "solr2csv": "csv",
@@ -29,7 +29,8 @@ const FORMAT_MAP = {
 };
 
 function isStandaloneFormat(format) {
-    return STANDALONE_FORMATS.indexOf(format) !== -1;
+    let standaloneFormats = STANDALONE_FORMATS in window ? window[STANDALONE_FORMATS] : "mods,bibtex,endnote,ris,isi,mods2csv";
+    return standaloneFormats.split(',').indexOf(format) !== -1;
 }
 
 function isSolrStandaloneFormat(format) {
