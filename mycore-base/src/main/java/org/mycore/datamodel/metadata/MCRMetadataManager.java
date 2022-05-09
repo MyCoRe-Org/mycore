@@ -25,10 +25,10 @@ package org.mycore.datamodel.metadata;
 import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -232,13 +232,13 @@ public final class MCRMetadataManager {
                 }
             } else {
                 final String sourcepath = mcrDerivate.getDerivate().getInternals().getSourcePath();
-                final File f = new File(sourcepath);
-                if (f.exists()) {
+                final Path f = Paths.get(sourcepath);
+                if (Files.exists(f)) {
                     try {
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("Starting File-Import");
                         }
-                        importDerivate(derivateId.toString(), f.toPath());
+                        importDerivate(derivateId.toString(), f);
                     } catch (final Exception e) {
                         if (Files.exists(rootPath)) {
                             deleteDerivate(derivateId.toString());
@@ -760,7 +760,7 @@ public final class MCRMetadataManager {
                     LOGGER.warn("{}: the directory {} was not found.", derivateId, fileSourceDirectory);
                     fileSourceDirectory = null;
                 }
-                //MCR-2637 
+                //MCR-2645 
                 internals.setSourcePath(null);
             }
         }
@@ -792,13 +792,12 @@ public final class MCRMetadataManager {
 
         // update to IFS
         if (fileSourceDirectory != null) {
-            Path sourcePath = fileSourceDirectory.toPath();
             MCRPath targetPath = MCRPath.getPath(derivateId.toString(), "/");
             try {
-                Files.walkFileTree(sourcePath, new MCRTreeCopier(sourcePath, targetPath));
+                Files.walkFileTree(fileSourceDirectory, new MCRTreeCopier(fileSourceDirectory, targetPath));
             } catch (Exception exc) {
                 throw new MCRPersistenceException(
-                    "Unable to update IFS. Copy failed from " + sourcePath.toAbsolutePath()
+                    "Unable to update IFS. Copy failed from " + fileSourceDirectory.toAbsolutePath()
                         + " to target " + targetPath.toAbsolutePath(),
                     exc);
             }
