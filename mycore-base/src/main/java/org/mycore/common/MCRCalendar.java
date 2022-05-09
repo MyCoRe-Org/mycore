@@ -356,63 +356,15 @@ public class MCRCalendar {
     protected static Calendar getCalendarFromJulianDate(String dateString, boolean last) throws MCRException {
         try {
             int[] fields = checkDateStringForJulianCalendar(dateString, last, CalendarType.Julian);
-            Calendar calendar = new GregorianCalendar();
+            final Calendar calendar = Calendar.getInstance(CalendarType.Julian.getLocale());
+            ((GregorianCalendar) calendar).setGregorianChange(new Date(Long.MAX_VALUE));
             calendar.set(fields[0], fields[1], fields[2]);
             if (fields[3] == -1) {
                 calendar.set(Calendar.ERA, GregorianCalendar.BC);
             } else {
                 calendar.set(Calendar.ERA, GregorianCalendar.AD);
             }
-            // correct data
-            int julianDay = calendar.get(Calendar.JULIAN_DAY);
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 6 && fields[3] == 1) {
-                julianDay = 2299162;
-            }
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 7 && fields[3] == 1) {
-                julianDay = 2299163;
-            }
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 8 && fields[3] == 1) {
-                julianDay = 2299164;
-            }
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 9 && fields[3] == 1) {
-                julianDay = 2299165;
-            }
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 10 && fields[3] == 1) {
-                julianDay = 2299166;
-            }
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 11 && fields[3] == 1) {
-                julianDay = 2299167;
-            }
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 12 && fields[3] == 1) {
-                julianDay = 2299168;
-            }
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 13 && fields[3] == 1) {
-                julianDay = 2299169;
-            }
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 14 && fields[3] == 1) {
-                julianDay = 2299170;
-            }
-            if (fields[0] == 1582 && fields[1] == 9 && fields[2] == 15 && fields[3] == 1) {
-                julianDay = 2299171;
-            }
-            if ((fields[0] > 1582 || (fields[0] == 1582 && fields[1] > 9)
-                    || (fields[0] == 1582 && fields[1] == 9 && fields[2] > 15))
-                    && fields[3] == 1) {
-                julianDay += 10;
-            }
-            if ((fields[0] > 1700 || (fields[0] == 1700 && fields[1] >= 2)) && fields[3] == 1) {
-                julianDay += 1;
-            }
-            if ((fields[0] > 1800 || (fields[0] == 1800 && fields[1] >= 2)) && fields[3] == 1) {
-                julianDay += 1;
-            }
-            if ((fields[0] > 1900 || (fields[0] == 1900 && fields[1] >= 2)) && fields[3] == 1) {
-                julianDay += 1;
-            }
-            if ((fields[0] > 2100 || (fields[0] == 2100 && fields[1] >= 2)) && fields[3] == 1) {
-                julianDay += 1;
-            }
-            calendar.set(Calendar.JULIAN_DAY, julianDay);
+
             return calendar;
         } catch (Exception e) {
             throw new MCRException("The ancient julian date is false.", e);
