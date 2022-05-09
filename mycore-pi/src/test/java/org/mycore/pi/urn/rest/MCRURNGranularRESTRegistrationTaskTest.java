@@ -59,7 +59,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
         super.setUp();
     }
 
-    @Ignore
+    @Ignore    
     @Test
     public void run() throws Exception {
         MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered);

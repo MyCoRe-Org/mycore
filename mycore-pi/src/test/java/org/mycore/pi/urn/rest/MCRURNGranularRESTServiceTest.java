@@ -33,6 +33,8 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,6 +57,7 @@ import org.mycore.pi.urn.MCRUUIDURNGenerator;
  * @author Huu Chi Vu
  */
 public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
+    private static Logger LOGGER = LogManager.getLogger();
     private int numOfDerivFiles = 15;
 
     @Override
@@ -75,7 +78,13 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
             .iterate(0, i -> i + 1)
             .mapToObj(i -> "/foo/" + UUID.randomUUID() + "_" + String
                 .format(Locale.getDefault(), "%02d", i))
-            .map(f -> MCRPath.getPath(derivate.getId().toString(), f))
+            .map(f -> {
+                LOGGER.info("Derivate: {}", deriv);
+                if (deriv != null) {
+                    LOGGER.info("Derivate ID: {}", deriv.getId());
+                }
+                return MCRPath.getPath(deriv.getId().toString(), f);
+            })
             .limit(numOfDerivFiles);
         String serviceID = "TestService";
         MCRURNGranularRESTService testService = new MCRURNGranularRESTService(foo);
