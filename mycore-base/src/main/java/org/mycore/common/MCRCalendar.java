@@ -965,10 +965,16 @@ public class MCRCalendar {
         }
         if (calendar instanceof IslamicCalendar) {
             return TAG_ISLAMIC;
+        } else if (calendar instanceof BuddhistCalendar) {
+            return TAG_BUDDHIST;
         } else if (calendar instanceof CopticCalendar) {
             return TAG_COPTIC;
         } else if (calendar instanceof EthiopicCalendar) {
             return TAG_ETHIOPIC;
+        } else if (calendar instanceof HebrewCalendar) {
+            return TAG_HEBREW;
+        } else if (calendar instanceof JapaneseCalendar) {
+            return TAG_JAPANESE;
         } else if (calendar instanceof GregorianCalendar) {
             return TAG_GREGORIAN;
         } else {
