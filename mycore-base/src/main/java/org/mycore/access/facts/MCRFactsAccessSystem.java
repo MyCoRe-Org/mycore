@@ -19,8 +19,10 @@ package org.mycore.access.facts;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +50,8 @@ import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -143,14 +147,15 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         return false;
     }
 
-    @Override
-    public boolean checkPermission(final String checkID, String permission, MCRUserInformation userInfo) {
+    public boolean checkPermission(String checkID, String permission, List<MCRFact> baseFacts){
         String action = permission.replaceAll("db$", ""); // writedb -> write
 
         String target; // metadata|files|webpage
         String cacheKey;
 
         MCRFactsHolder facts = new MCRFactsHolder(computers);
+
+        baseFacts.forEach(facts::add);
 
         if (checkID == null) {
             cacheKey = action;
@@ -176,6 +181,8 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
                 target = "webpage";
             } else if (checkID.startsWith("solr")) {
                 target = "solr";
+            } else if(isCategory(checkID)){
+                target = "category";
             } else {
                 target = "unknown";
             }
@@ -202,6 +209,19 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         LOGGER.info("Checked permission to {} := {}", cacheKey, result);
 
         return result;
+    }
+
+    private boolean isCategory(String checkID) {
+        try {
+            return MCRCategoryDAOFactory.getInstance().exist(MCRCategoryID.fromString(checkID));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean checkPermission(final String checkID, String permission, MCRUserInformation userInfo) {
+        return checkPermission(checkID, permission, new ArrayList<>());
     }
 
     @Override
