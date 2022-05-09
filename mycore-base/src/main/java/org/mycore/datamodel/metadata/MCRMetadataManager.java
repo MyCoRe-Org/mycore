@@ -750,14 +750,18 @@ public final class MCRMetadataManager {
         if (!MCRAccessManager.checkDerivateMetadataPermission(derivateId, PERMISSION_WRITE)) {
             throw MCRAccessException.missingPermission("Update derivate", derivateId.toString(), PERMISSION_WRITE);
         }
-        File fileSourceDirectory = null;
-        if (mcrDerivate.getDerivate().getInternals() != null
-            && mcrDerivate.getDerivate().getInternals().getSourcePath() != null) {
-            fileSourceDirectory = new File(mcrDerivate.getDerivate().getInternals().getSourcePath());
+        Path fileSourceDirectory = null;
+        MCRMetaIFS internals = mcrDerivate.getDerivate().getInternals();
+        if (internals != null) {
+            if(internals.getSourcePath() != null) {
+                fileSourceDirectory = Paths.get(internals.getSourcePath());
 
-            if (!fileSourceDirectory.exists()) {
-                LOGGER.warn("{}: the directory {} was not found.", derivateId, fileSourceDirectory);
-                fileSourceDirectory = null;
+                if (!Files.exists(fileSourceDirectory)) {
+                    LOGGER.warn("{}: the directory {} was not found.", derivateId, fileSourceDirectory);
+                    fileSourceDirectory = null;
+                }
+                //MCR-2637 
+                internals.setSourcePath(null);
             }
         }
         // get the old Item
