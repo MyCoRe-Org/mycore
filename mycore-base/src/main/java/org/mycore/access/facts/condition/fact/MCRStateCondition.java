@@ -34,7 +34,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * Examples:
  * 
  * &lt;status&gt;review&lt;/status&gt;  
- * &lt;status basefact="derid"&gt;published&lt;/status&gt;  
+ * &lt;status idfact="derid"&gt;published&lt;/status&gt;
  * 
  * @author Robert Stephan
  *
