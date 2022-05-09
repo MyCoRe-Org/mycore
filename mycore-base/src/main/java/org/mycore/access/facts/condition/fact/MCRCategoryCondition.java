@@ -85,6 +85,11 @@ public class MCRCategoryCondition extends MCRAbstractFactCondition<MCRCategoryID
     }
 
     @Override
+    public String getFactName() {
+        return super.getFactName() + "." + idFact;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
