@@ -1254,6 +1254,16 @@ Applications based on MyCoRe use a common core, which provides the functionality
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-c3p0</artifactId>
+        <version>${hibernate.core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-hikaricp</artifactId>
+        <version>${hibernate.core.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.jasig.cas</groupId>
         <artifactId>cas-client-core</artifactId>
         <version>3.1.10</version>
