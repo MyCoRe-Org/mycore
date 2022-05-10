@@ -1750,11 +1750,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-hikaricp</artifactId>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>org.hsqldb</groupId>
         <artifactId>hsqldb</artifactId>
         <version>2.6.0</version>
