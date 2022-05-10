@@ -79,9 +79,9 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
             .mapToObj(i -> "/foo/" + UUID.randomUUID() + "_" + String
                 .format(Locale.getDefault(), "%02d", i))
             .map(f -> {
-                LOGGER.info("Derivate: {}", deriv);
+                System.out.println("NULL check Derivate: " + deriv);
                 if (deriv != null) {
-                    LOGGER.info("Derivate ID: {}", deriv.getId());
+                    System.out.println("NULL check Derivate ID: " + deriv.getId());
                 }
                 return MCRPath.getPath(deriv.getId().toString(), f);
             })
