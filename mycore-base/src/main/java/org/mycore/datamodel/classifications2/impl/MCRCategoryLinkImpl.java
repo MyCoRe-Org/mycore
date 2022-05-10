@@ -18,7 +18,7 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
-import org.hibernate.annotations.QueryHints;
+import org.hibernate.jpa.AvailableHints;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryLink;
@@ -104,7 +104,7 @@ import jakarta.persistence.UniqueConstraint;
             + "    AND cat.id.rootID=:rootID"
             + "    AND cat.id.id=:categID"
             + "    AND cattree.left BETWEEN cat.left AND cat.right",
-        hints = { @QueryHint(name = QueryHints.READ_ONLY, value = "true") }),
+        hints = { @QueryHint(name = AvailableHints.HINT_READ_ONLY, value = "true") }),
     @NamedQuery(name = "MCRCategoryLink.linkedClassifications",
         query = "SELECT distinct node.id.rootID from MCRCategoryImpl as node, MCRCategoryLinkImpl as link "
             + "where node.internalID = link.category"),

@@ -60,9 +60,11 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <checkstyle.suppressions.location>${user.dir}/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     <forbiddenapis.version>3.2</forbiddenapis.version>
     <frontend.maven.plugin.version>1.12.0</frontend.maven.plugin.version>
+    <hibernate.base.version>6.3</hibernate.base.version>
+    <hibernate.version>${hibernate.base.version}.1.Final</hibernate.version>
     <java.target.version>17</java.target.version>
-    <jetty.version>11.0.16</jetty.version>
-    <log4j.version>2.20.0</log4j.version>
+    <jetty.version>11.0.8</jetty.version>
+    <log4j.version>2.19.0</log4j.version>
     <!-- lowest is 99, highest is 0 -->
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
@@ -204,7 +206,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
               <link>https://jakarta.ee/specifications/platform/9/apidocs/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-              <link>http://docs.jboss.org/hibernate/orm/5.6/javadocs/</link>
+              <link>http://docs.jboss.org/hibernate/orm/${hibernate.base.version}/javadocs/</link>
               <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
               <!--
               <link>https://solr.apache.org/docs/8_11_2/solr-solrj/</link>
@@ -269,9 +271,9 @@ Applications based on MyCoRe use a common core, which provides the functionality
             <version>3.0.1</version>
           </dependency>
           <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-jpamodelgen-jakarta</artifactId>
-            <version>5.6.15.Final</version>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>${hibernate.version}</version>
           </dependency>
         </dependencies>
         <executions>
@@ -734,7 +736,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <link>https://jakarta.ee/specifications/platform/9/apidocs/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-                <link>http://docs.jboss.org/hibernate/orm/5.6/javadocs/</link>
+                <link>http://docs.jboss.org/hibernate/orm/${hibernate.base.version}/javadocs/</link>
                 <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
                 <!--
                 <link>https://solr.apache.org/docs/8_11_2/solr-solrj/</link>

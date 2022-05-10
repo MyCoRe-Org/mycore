@@ -53,9 +53,10 @@ import jakarta.persistence.Table;
         query = "SELECT MAX(time) FROM MCRMetaHistoryItem i WHERE i.id=:id and i.eventType=:type"),
     @NamedQuery(name = "MCRMetaHistory.getLastEventByID",
         query = "SELECT a FROM MCRMetaHistoryItem a "
-            + "WHERE a.time in (SELECT max(time) as time FROM MCRMetaHistoryItem b "
-            + "WHERE a.id=b.id AND time BETWEEN :from AND :until) "
-            + "AND a.eventType=:eventType"),
+            + "WHERE a.time BETWEEN :from AND :until "
+            + "AND a.eventType=:eventType "
+            + "ORDER BY a.time DESC "
+            + "FETCH FIRST 1 ROWS ONLY"),
     @NamedQuery(name = "MCRMetaHistory.getFirstDate", query = "SELECT MIN(time) from MCRMetaHistoryItem"),
     @NamedQuery(name = "MCRMetaHistory.getHighestID",
         query = "SELECT MAX(id) from MCRMetaHistoryItem WHERE ID like :looksLike"),
