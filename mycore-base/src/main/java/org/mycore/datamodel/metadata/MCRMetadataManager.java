@@ -752,17 +752,16 @@ public final class MCRMetadataManager {
         }
         Path fileSourceDirectory = null;
         MCRMetaIFS internals = mcrDerivate.getDerivate().getInternals();
-        if (internals != null) {
-            if(internals.getSourcePath() != null) {
-                fileSourceDirectory = Paths.get(internals.getSourcePath());
+        if (internals != null && internals.getSourcePath() != null) {
+            fileSourceDirectory = Paths.get(internals.getSourcePath());
 
-                if (!Files.exists(fileSourceDirectory)) {
-                    LOGGER.warn("{}: the directory {} was not found.", derivateId, fileSourceDirectory);
-                    fileSourceDirectory = null;
-                }
-                //MCR-2645 
-                internals.setSourcePath(null);
+            if (!Files.exists(fileSourceDirectory)) {
+                LOGGER.warn("{}: the directory {} was not found.", derivateId, fileSourceDirectory);
+                fileSourceDirectory = null;
             }
+            //MCR-2645 
+            internals.setSourcePath(null);
+
         }
         // get the old Item
         MCRDerivate old = MCRMetadataManager.retrieveMCRDerivate(derivateId);
@@ -836,7 +835,7 @@ public final class MCRMetadataManager {
         Date updateModifyDate = mcrObject.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
         if (diskModifyDate != null && updateModifyDate != null && updateModifyDate.before(diskModifyDate)) {
             throw new MCRPersistenceException("The object " + mcrObject.getId() + " was modified(" + diskModifyDate
-                    + ") during the time it was opened in the editor.");
+                + ") during the time it was opened in the editor.");
         }
 
         // save the order of derivates and clean the structure
