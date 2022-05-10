@@ -23,15 +23,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.inject.Singleton;
+
 import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
 import edu.wisc.library.ocfl.core.OcflRepositoryBuilder;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
 import edu.wisc.library.ocfl.core.extension.storage.layout.config.HashedNTupleIdEncapsulationLayoutConfig;
-import org.mycore.common.config.annotation.MCRProperty;
-
-import javax.inject.Singleton;
 
 /**
  * Simple way to provide a {@link OcflRepository}
@@ -44,6 +44,8 @@ public class MCROCFLHashRepositoryProvider extends MCROCFLRepositoryProvider {
     protected Path workDir;
 
     protected OcflRepository repository;
+
+    protected boolean mutable = false;
 
     @Override
     public OcflRepository getRepository() {
@@ -58,10 +60,13 @@ public class MCROCFLHashRepositoryProvider extends MCROCFLRepositoryProvider {
         if(Files.notExists(repositoryRoot)){
             Files.createDirectories(repositoryRoot);
         }
-        this.repository = new OcflRepositoryBuilder()
-            .defaultLayoutConfig(getExtensionConfig())
-            .storage(storage -> storage.fileSystem(repositoryRoot))
-            .workDir(workDir).build();
+
+        OcflRepositoryBuilder builder = new OcflRepositoryBuilder()
+        .defaultLayoutConfig(getExtensionConfig())
+        .storage(storage -> storage.fileSystem(repositoryRoot))
+        .workDir(workDir);
+
+        this.repository = this.mutable ? builder.buildMutable() : builder.build();
     }
 
     public OcflExtensionConfig getExtensionConfig() {
@@ -85,6 +90,12 @@ public class MCROCFLHashRepositoryProvider extends MCROCFLRepositoryProvider {
     @MCRProperty(name = "WorkDir")
     public MCROCFLHashRepositoryProvider setWorkDir(String workDir) {
         this.workDir = Paths.get(workDir);
+        return this;
+    }
+
+    @MCRProperty(name = "Mutable", required = false)
+    public MCROCFLHashRepositoryProvider setMutable(String bool) {
+        this.mutable = Boolean.parseBoolean(bool);
         return this;
     }
 }

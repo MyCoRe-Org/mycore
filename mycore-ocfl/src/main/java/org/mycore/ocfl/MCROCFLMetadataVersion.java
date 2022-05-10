@@ -18,16 +18,17 @@
 
 package org.mycore.ocfl;
 
-import org.jdom2.JDOMException;
-import org.mycore.common.MCRUsageException;
-import org.mycore.common.content.MCRContent;
-import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+import java.io.IOException;
+import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.IOException;
-import java.util.Date;
+
+import org.jdom2.JDOMException;
+import org.mycore.common.MCRUsageException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 
 /**
  * Provides information about a stored version of metadata and allows to
@@ -38,6 +39,10 @@ import java.util.Date;
 @XmlRootElement(name = "revision")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class MCROCFLMetadataVersion extends MCRAbstractMetadataVersion<MCRContent> {
+
+    public static final char REPAIRED = 'R';
+
+    public static final char INITIALIZED = 'I';
 
     public MCROCFLMetadataVersion(MCRContent vm, String revision, String user, Date date, char type) {
         super(vm, revision, user, date, type);
