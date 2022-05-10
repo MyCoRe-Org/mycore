@@ -83,7 +83,12 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
                 if (deriv != null) {
                     System.out.println("NULL check Derivate ID: " + deriv.getId());
                 }
-                return MCRPath.getPath(deriv.getId().toString(), f);
+                return MCRPath
+                    .getPath(
+                        deriv
+                            .getId()
+                            .toString(),
+                        f);
             })
             .limit(numOfDerivFiles);
         String serviceID = "TestService";
