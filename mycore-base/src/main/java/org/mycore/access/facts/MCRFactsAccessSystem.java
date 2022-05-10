@@ -19,8 +19,8 @@ package org.mycore.access.facts;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -221,7 +221,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
 
     @Override
     public boolean checkPermission(final String checkID, String permission, MCRUserInformation userInfo) {
-        return checkPermission(checkID, permission, new ArrayList<>());
+        return checkPermission(checkID, permission, Collections.emptyList());
     }
 
     @Override
