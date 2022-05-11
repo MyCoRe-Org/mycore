@@ -234,7 +234,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRTopologicalSort<String> ts = new MCRTopologicalSort<>();
         MCRTopologicalSort.prepareMCRObjects(ts, objects);
         int[] order = ts.doTopoSort();
-        if (order == null) {
+        if (order != null) {
             LOGGER.info("OK - No circles detected!");
         }
     }
