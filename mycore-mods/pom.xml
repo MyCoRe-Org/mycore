@@ -44,6 +44,7 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
@@ -86,6 +87,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-hikaricp</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
