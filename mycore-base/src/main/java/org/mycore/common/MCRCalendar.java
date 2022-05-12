@@ -393,11 +393,16 @@ public class MCRCalendar {
     protected static IslamicCalendar getCalendarFromIslamicDate(String dateString, boolean last) {
         dateString = dateString.toUpperCase(Locale.ROOT);
 
+        final boolean before = beforeZero(dateString, CalendarType.Islamic);
         final String cleanDate = cleanDate(dateString, CalendarType.Islamic);
         final int[] fields = parseDateString(cleanDate, last, CalendarType.Islamic);
-        final int year = fields[0];
+        int year = fields[0];
         final int mon = fields[1];
         final int day = fields[2];
+
+        if (before) {
+            year = -year + 1;
+        }
 
         // test of the monthly
         if (mon > 11 || mon < 0) {
@@ -434,6 +439,11 @@ public class MCRCalendar {
     protected static HebrewCalendar getCalendarFromHebrewDate(String datestr, boolean last) {
         datestr = datestr.trim();
 
+        final boolean before = beforeZero(datestr, CalendarType.Hebrew);
+        if (before) {
+            throw new MCRException("Dates before 1 not supported in Hebrew calendar!");
+        }
+
         final String cleanDate = cleanDate(datestr, CalendarType.Hebrew);
         final int[] fields = parseDateString(cleanDate, last, CalendarType.Hebrew);
         final int year = fields[0];
@@ -459,10 +469,14 @@ public class MCRCalendar {
         final boolean bm = beforeZero(dateString, calendarType);
         final String cleanDate = cleanDate(dateString, calendarType);
         final int[] fields = parseDateString(cleanDate, last, calendarType);
-        final int year = fields[0];
+        int year = fields[0];
         final int mon = fields[1];
         final int day = fields[2];
         final int era = bm ? -1 : 1;
+
+        if (bm) {
+            year = -year + 1;
+        }
 
         // test of the monthly
         if (mon > 12 || mon < 0) {
@@ -538,10 +552,10 @@ public class MCRCalendar {
      * This method convert a JapaneseCalendar date to a JapaneseCalendar value.
      * The syntax for the japanese input is: <br>
      * <ul>
-     * <li> [[[t]t.][m]m.][H|M|S|T][yyy]y <br>
-     * H: Heisei; M: Meiji, S: Showa, T: Taiso
+     * <li> [[[t]t.][m]m.][H|M|S|T|R][yyy]y <br>
+     * H: Heisei; M: Meiji, S: Showa, T: Taiso, R: Reiwa
      * </li>
-     * <li> [H|M|S|T]y[yyy][-m[m][-t[t]]]</li>
+     * <li> [H|M|S|T|R]y[yyy][-m[m][-t[t]]]</li>
      * </ul>
      *
      * @param datestr
@@ -766,11 +780,16 @@ public class MCRCalendar {
     protected static GregorianCalendar getCalendarFromArmenianDate(String datestr, boolean last) {
         datestr = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
 
+        final boolean before = beforeZero(datestr, CalendarType.Armenian);
         final String cleanDate = cleanDate(datestr, CalendarType.Armenian);
         final int[] fields = parseDateString(cleanDate, last, CalendarType.Armenian);
         int year = fields[0];
         int mon = fields[1];
         int day = fields[2];
+
+        if (before) {
+            year = -year + 1;
+        }
 
         // Armenian calendar has every year an invariant of 365 days - these are added to the beginning of the
         // calendar defined in FIRST_ARMENIAN_DAY (13.7.552)
@@ -813,9 +832,13 @@ public class MCRCalendar {
         final boolean ba = beforeZero(datestr, CalendarType.Egyptian);
         final String cleanDate = cleanDate(datestr, CalendarType.Egyptian);
         final int[] fields = parseDateString(cleanDate, last, CalendarType.Egyptian);
-        final int year = fields[0];
+        int year = fields[0];
         final int mon = fields[1];
         final int day = fields[2];
+
+        if (ba) {
+            year = -year + 1;
+        }
 
         int addedDays = (year - 1) * 365;
         if (mon == 12) {
@@ -1362,13 +1385,29 @@ public class MCRCalendar {
         }
 
         switch (calendarType) {
+            case Buddhist: {
+                return StringUtils.contains(input, "B.E.");
+            }
             case Gregorian:
             case Julian: {
                 return StringUtils.contains(input, "BC") || StringUtils.contains(input, "V. CHR");
             }
+            case Coptic:
+            case Hebrew:
+            case Ethiopic:
+            case Persic:
+            case Chinese:
+            case Islamic:
+            case Armenian:
+            case Egyptian:
+            case Japanese: {
+                // these calendars do not allow for an era statement other than -
+                return false;
+            }
+            default: {
+                throw new MCRException(String.format(MSG_CALENDAR_UNSUPPORTED, calendarType));
+            }
         }
-
-        return false;
     }
 
     /**
@@ -1407,10 +1446,11 @@ public class MCRCalendar {
             case Hebrew: {
                 return HebrewCalendar.TISHRI;
             }
-            case Islamic:{
+            case Islamic: {
                 return IslamicCalendar.MUHARRAM;
             }
-            case Armenian: {
+            case Armenian:
+            case Persic: {
                 return 0;
             }
             default: {
