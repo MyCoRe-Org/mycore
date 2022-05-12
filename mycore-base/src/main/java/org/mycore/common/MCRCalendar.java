@@ -1010,7 +1010,8 @@ public class MCRCalendar {
      * and day as an array.
      *
      * @param dateString   the date to parse
-     * @param last         flag to determine if the last month or day of a month is to be used when no month or day is given
+     * @param last         flag to determine if the last month or day of a month is to be used when no month
+     *                     or day is given
      * @param calendarType the calendar type to parse the date string for
      * @return a field containing year, month and day statements
      */
