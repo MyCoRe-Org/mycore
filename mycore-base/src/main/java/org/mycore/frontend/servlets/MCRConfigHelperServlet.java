@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.mycore.common.MCRException;
@@ -40,7 +41,7 @@ import java.util.Map;
  * and the property value as value. The properties in the init param need to be comma separated and can end with * to
  * match all properties which start with the string before *.
  */
-public class MCRConfigHelperServlet extends MCRServlet {
+public class MCRConfigHelperServlet extends HttpServlet {
 
     public static final String PROPERTIES_INIT_PARAM = "Properties";
 
@@ -55,7 +56,7 @@ public class MCRConfigHelperServlet extends MCRServlet {
 
         MCRConfiguration2.addPropertyChangeEventLister((changedProperty) -> {
             String propertiesParameter = getPropertiesParameter();
-            for (String property : propertiesParameter.split(";")) {
+            for (String property : propertiesParameter.split(",")) {
                 if (property.endsWith("*")) {
                     String prefix = property.substring(0, property.length() - 1);
                     if (changedProperty.startsWith(prefix)) {
@@ -89,7 +90,7 @@ public class MCRConfigHelperServlet extends MCRServlet {
     private String createResultJson() throws IOException {
         Map<String, String> propertiesMap = new LinkedHashMap<>();
         String properties = getPropertiesParameter();
-        for (String property : properties.split(";")) {
+        for (String property : properties.split(",")) {
             if (property.endsWith("*")) {
                 String prefix = property.substring(0, property.length() - 1);
                 MCRConfiguration2.getSubPropertiesMap(prefix)
@@ -121,15 +122,15 @@ public class MCRConfigHelperServlet extends MCRServlet {
     }
 
     @Override
-    protected void doGetPost(MCRServletJob job) throws Exception {
-        job.getResponse().setHeader("Cache-Control","public");
-        job.getResponse().setHeader("Cache-Control","max-age=120");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Cache-Control","public");
+        resp.setHeader("Cache-Control","max-age=120");
 
-        if (job.getRequest().getDateHeader("If-Modified-Since") > lastChange.getTime()) {
-            job.getResponse().setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        if (req.getDateHeader("If-Modified-Since") > lastChange.getTime()) {
+            resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         } else {
-            job.getResponse().setDateHeader("Last-Modified", lastChange.getTime());
-            try (ServletOutputStream os = job.getResponse().getOutputStream()) {
+            resp.setDateHeader("Last-Modified", lastChange.getTime());
+            try (ServletOutputStream os = resp.getOutputStream()) {
                 os.print(resultJson);
             }
         }
