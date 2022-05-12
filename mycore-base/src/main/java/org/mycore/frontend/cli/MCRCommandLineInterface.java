@@ -101,16 +101,24 @@ public class MCRCommandLineInterface {
         system = MCRConfiguration2.getStringOrThrow("MCR.CommandLineInterface.SystemName") + ":";
 
         initSession();
-        output("");
-        output("Command Line Interface.");
-        output("");
+        
+        MCRSession session = MCRSessionMgr.getSession(sessionId.get());
+        MCRSessionMgr.setCurrentSession(session);
 
-        output("Initializing...");
-        knownCommands = new MCRCommandManager();
-        output("Initialization done.");
+        try {
+            output("");
+            output("Command Line Interface.");
+            output("");
 
-        output("Type 'help' to list all commands!");
-        output("");
+            output("Initializing...");
+            knownCommands = new MCRCommandManager();
+            output("Initialization done.");
+
+            output("Type 'help' to list all commands!");
+            output("");
+        } finally {
+            MCRSessionMgr.releaseCurrentSession();
+        }
 
         readCommandFromArguments(args);
 
