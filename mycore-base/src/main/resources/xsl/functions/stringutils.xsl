@@ -17,9 +17,14 @@
       <xsl:when test="string-length($input) &lt;=$length">
         <xsl:value-of select="$input" />
       </xsl:when>
+      <xsl:when test="substring($input, $length+1, 1) = ' '">
+        <xsl:value-of select="substring($input, 1, $length)" />
+      </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of
-          select="concat(substring($input, 1, $length),substring-before(substring($input,$length+1), ' '), '…')" />
+        <xsl:variable name="t" select="tokenize(substring($input, 1, $length),' ')" />
+        <xsl:value-of select="if (count($t) &lt;= 1) 
+                              then (substring($input, 1, $length)) 
+                              else (string-join(remove($t, count($t)), ' '))" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
