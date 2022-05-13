@@ -151,6 +151,9 @@ public class MCRCalendar {
         FIRST_EGYPTIAN_DAY = firstEgypt.get(Calendar.JULIAN_DAY);
     }
 
+    /**
+     * @see #getHistoryDateAsCalendar(String, boolean, String)
+     */
     public static Calendar getHistoryDateAsCalendar(String input, boolean last, CalendarType calendarType) {
         LOGGER.debug("Input of getHistoryDateAsCalendar: {}  {}  {}", input, calendarType, Boolean.toString(last));
 
@@ -631,7 +634,6 @@ public class MCRCalendar {
      * @return the BuddhistCalendar date value or null if an error was occurred.
      * @exception MCRException if parsing has an error
      */
-
     protected static BuddhistCalendar getCalendarFromBuddhistDate(String datestr, boolean last) {
         // test before Buddhas
         datestr = datestr.toUpperCase(Locale.ROOT).trim();
@@ -1143,7 +1145,7 @@ public class MCRCalendar {
                     break;
                 }
                 default: {
-                    throw new MCRException(String.format(MSG_CALENDAR_UNSUPPORTED, calendarType));
+                    throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
                 }
             }
 
@@ -1154,6 +1156,12 @@ public class MCRCalendar {
         return StringUtils.trim(StringUtils.substring(date, start, end));
     }
 
+    /**
+     * Calculates the borders of an egyptian date.
+     *
+     * @param datestr the egyptian date contain era statements like -, A.N.
+     * @return the indexes of the date string containing the date without era statements
+     */
     public static int[] calculateEgyptianDateBorders(String datestr) {
         final int start;
         final int ende;
@@ -1175,6 +1183,12 @@ public class MCRCalendar {
         return new int[]{start, ende};
     }
 
+    /**
+     * Calculates the borders of an armenian date.
+     *
+     * @param input the armenian date contain era statements like -
+     * @return the indexes of the date string containing the date without era statements
+     */
     public static int[] calculateArmenianDateBorders(String input) {
         final int start;
         if (StringUtils.startsWith(input, "-")) {
@@ -1186,6 +1200,12 @@ public class MCRCalendar {
         return new int[]{start, StringUtils.length(input)};
     }
 
+    /**
+     * Calculates the borders of a japanese date.
+     *
+     * @param input the japanese date contain era statements like -
+     * @return the indexes of the date string containing the date without era statements
+     */
     public static int[] calculateJapaneseDateBorders(String input) {
         final int start;
         if (StringUtils.startsWith(input, "-")) {
@@ -1197,6 +1217,12 @@ public class MCRCalendar {
         return new int[]{start, StringUtils.length(input)};
     }
 
+    /**
+     * Calculates the borders of a persian date.
+     *
+     * @param dateStr the persina date contain era statements like -
+     * @return the indexes of the date string containing the date without era statements
+     */
     public static int[] calculatePersianDateBorders(String dateStr) {
         final int start;
         if (StringUtils.startsWith(dateStr, "-")) {
@@ -1208,6 +1234,12 @@ public class MCRCalendar {
         return new int[]{start, StringUtils.length(dateStr)};
     }
 
+    /**
+     * Calculates the borders of a coptic/ethiopian date.
+     *
+     * @param input the coptic/ethiopian date contain era statements like -, A.M, A.E.
+     * @return the indexes of the date string containing the date without era statements
+     */
     public static int[] calculateCopticDateBorders(String input) {
         final int start;
         final int end;
@@ -1231,10 +1263,22 @@ public class MCRCalendar {
         return new int[]{start, end};
     }
 
+    /**
+     * Calculates the borders of a hebrew date.
+     *
+     * @param input the hebrew date contain era statements like -
+     * @return the indexes of the date string containing the date without era statements
+     */
     public static int[] calculateHebrewDateBorders(String input) {
         return new int[]{0, StringUtils.length(input)};
     }
 
+    /**
+     * Calculates the borders of an islamic date.
+     *
+     * @param dateString the islamic date contain era statements like -
+     * @return the indexes of the date string containing the date without era statements
+     */
     public static int[] calculateIslamicDateBorders(String dateString) {
         int start = 0;
         int ende = dateString.length();
@@ -1406,15 +1450,18 @@ public class MCRCalendar {
                 return false;
             }
             default: {
-                throw new MCRException(String.format(MSG_CALENDAR_UNSUPPORTED, calendarType));
+                throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
             }
         }
     }
 
     /**
-     * Returns the last day number for the given month, e.g. {@link GregorianCalendar#FEBRUARY} has 28.
+     * Returns the last day number for the given month, e.g. {@link GregorianCalendar#FEBRUARY} has 28 in normal years
+     * and 29 days in leap years.
      *
-     * @param month the month number
+     * @param month        the month number
+     * @param year         the year
+     * @param calendarType the calendar type to evaluate the last day for
      * @return the last day number for the given month
      */
     public static int getLastDayOfMonth(int month, int year, CalendarType calendarType) {
@@ -1430,6 +1477,12 @@ public class MCRCalendar {
         return cal.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 
+    /**
+     * Returns the first month of a year for the given calendar type, e.g. January for gregorian calendars.
+     *
+     * @param calendarType the calendar type to evaluate the first month for
+     * @return the first month of a year for the given calendar type
+     */
     public static int getFirstMonth(CalendarType calendarType) {
         switch (calendarType) {
             case Buddhist:
@@ -1455,11 +1508,18 @@ public class MCRCalendar {
                 return 0;
             }
             default: {
-                throw new MCRException(String.format(MSG_CALENDAR_UNSUPPORTED, calendarType));
+                throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
             }
         }
     }
 
+    /**
+     * Returns the last month number of the given year for the given calendar type.
+     *
+     * @param year         the year to calculate last month number for
+     * @param calendarType the calendar type
+     * @return the last month number of the given year for the given calendar type
+     */
     public static int getLastMonth(int year, CalendarType calendarType) {
         final Calendar cal = Calendar.getInstance(calendarType.getLocale());
         cal.set(Calendar.YEAR, year);
@@ -1467,6 +1527,13 @@ public class MCRCalendar {
         return cal.getActualMaximum(Calendar.MONTH);
     }
 
+    /**
+     * Returns true, if the given year is a leap year in the given calendar type.
+     *
+     * @param year         the year to analyse
+     * @param calendarType the calendar type
+     * @return true, if the given year is a leap year in the given calendar type; otherwise false
+     */
     public static boolean isLeapYear(int year, CalendarType calendarType) {
         switch (calendarType) {
             case Gregorian: {
@@ -1479,7 +1546,7 @@ public class MCRCalendar {
                 return cal.isLeapYear(year);
             }
             default: {
-                throw new MCRException(String.format(MSG_CALENDAR_UNSUPPORTED, calendarType));
+                throw new MCRException(String.format(Locale.ROOT, MSG_CALENDAR_UNSUPPORTED, calendarType));
             }
         }
     }
