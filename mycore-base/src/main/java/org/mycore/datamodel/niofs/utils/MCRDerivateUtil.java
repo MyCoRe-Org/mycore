@@ -32,6 +32,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCRDerivateUtil {
@@ -104,6 +105,16 @@ public class MCRDerivateUtil {
             LOGGER.error("The new name '{}' contains illegal characters!", replacement, e);
         }
         return newFilename;
+    }
+
+    /**
+     * Returns the root path for a given derivate id.
+     * 
+     * @param derivateId the id of the derivate
+     * @return the root path
+     */
+    public static MCRPath getRootPath(MCRObjectID derivateId) {
+        return MCRPath.getPath(derivateId.toString(), "/");
     }
 
 }
