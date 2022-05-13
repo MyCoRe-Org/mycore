@@ -25,10 +25,10 @@ package org.mycore.datamodel.metadata;
 import static org.mycore.access.MCRAccessManager.PERMISSION_DELETE;
 import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -232,13 +232,13 @@ public final class MCRMetadataManager {
                 }
             } else {
                 final String sourcepath = mcrDerivate.getDerivate().getInternals().getSourcePath();
-                final File f = new File(sourcepath);
-                if (f.exists()) {
+                final Path f = Paths.get(sourcepath);
+                if (Files.exists(f)) {
                     try {
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("Starting File-Import");
                         }
-                        importDerivate(derivateId.toString(), f.toPath());
+                        importDerivate(derivateId.toString(), f);
                     } catch (final Exception e) {
                         if (Files.exists(rootPath)) {
                             deleteDerivate(derivateId.toString());
@@ -750,15 +750,18 @@ public final class MCRMetadataManager {
         if (!MCRAccessManager.checkDerivateMetadataPermission(derivateId, PERMISSION_WRITE)) {
             throw MCRAccessException.missingPermission("Update derivate", derivateId.toString(), PERMISSION_WRITE);
         }
-        File fileSourceDirectory = null;
-        if (mcrDerivate.getDerivate().getInternals() != null
-            && mcrDerivate.getDerivate().getInternals().getSourcePath() != null) {
-            fileSourceDirectory = new File(mcrDerivate.getDerivate().getInternals().getSourcePath());
+        Path fileSourceDirectory = null;
+        MCRMetaIFS internals = mcrDerivate.getDerivate().getInternals();
+        if (internals != null && internals.getSourcePath() != null) {
+            fileSourceDirectory = Paths.get(internals.getSourcePath());
 
-            if (!fileSourceDirectory.exists()) {
+            if (!Files.exists(fileSourceDirectory)) {
                 LOGGER.warn("{}: the directory {} was not found.", derivateId, fileSourceDirectory);
                 fileSourceDirectory = null;
             }
+            //MCR-2645 
+            internals.setSourcePath(null);
+
         }
         // get the old Item
         MCRDerivate old = MCRMetadataManager.retrieveMCRDerivate(derivateId);
@@ -788,13 +791,12 @@ public final class MCRMetadataManager {
 
         // update to IFS
         if (fileSourceDirectory != null) {
-            Path sourcePath = fileSourceDirectory.toPath();
             MCRPath targetPath = MCRPath.getPath(derivateId.toString(), "/");
             try {
-                Files.walkFileTree(sourcePath, new MCRTreeCopier(sourcePath, targetPath));
+                Files.walkFileTree(fileSourceDirectory, new MCRTreeCopier(fileSourceDirectory, targetPath));
             } catch (Exception exc) {
                 throw new MCRPersistenceException(
-                    "Unable to update IFS. Copy failed from " + sourcePath.toAbsolutePath()
+                    "Unable to update IFS. Copy failed from " + fileSourceDirectory.toAbsolutePath()
                         + " to target " + targetPath.toAbsolutePath(),
                     exc);
             }
@@ -833,7 +835,7 @@ public final class MCRMetadataManager {
         Date updateModifyDate = mcrObject.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
         if (diskModifyDate != null && updateModifyDate != null && updateModifyDate.before(diskModifyDate)) {
             throw new MCRPersistenceException("The object " + mcrObject.getId() + " was modified(" + diskModifyDate
-                    + ") during the time it was opened in the editor.");
+                + ") during the time it was opened in the editor.");
         }
 
         // save the order of derivates and clean the structure
