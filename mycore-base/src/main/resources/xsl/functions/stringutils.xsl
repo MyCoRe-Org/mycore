@@ -17,9 +17,12 @@
       <xsl:when test="string-length($input) &lt;=$length">
         <xsl:value-of select="$input" />
       </xsl:when>
+      <xsl:when test="not(contains(substring($input, $length+1), ' '))">
+        <xsl:value-of select="$input" />
+      </xsl:when>
       <xsl:otherwise>
         <xsl:value-of
-          select="concat(substring($input, 1, $length),substring-before(substring($input,$length+1), ' '), '…')" />
+          select="concat(substring($input, 1, $length), substring-before(substring($input, $length+1), ' '), '…')" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
