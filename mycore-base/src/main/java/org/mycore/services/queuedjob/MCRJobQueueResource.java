@@ -17,10 +17,8 @@
  */
 package org.mycore.services.queuedjob;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,9 +28,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.mycore.frontend.jersey.filter.access.MCRRestrictedAccess;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.GET;
@@ -56,7 +51,7 @@ import jakarta.xml.bind.annotation.XmlValue;
 public class MCRJobQueueResource {
 
     @GET()
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @MCRRestrictedAccess(MCRJobQueuePermission.class)
     public Response listJSON() {
         try {
@@ -64,36 +59,25 @@ public class MCRJobQueueResource {
             queuesEntity.addAll(
                 MCRJobQueue.INSTANCES.keySet().stream().map(Queue::new).collect(Collectors.toList()));
 
-            return Response.ok().status(Response.Status.OK).entity(queuesEntity)
+            return Response
+                .ok()
+                .status(Response.Status.OK)
+                .entity(queuesEntity)
                 .build();
         } catch (Exception e) {
             final StreamingOutput so = (OutputStream os) -> e
                 .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
-        }
-    }
-
-    @GET()
-    @Produces(MediaType.APPLICATION_XML)
-    @MCRRestrictedAccess(MCRJobQueuePermission.class)
-    public Response listXML() {
-        try {
-            Queues queuesEntity = new Queues();
-            queuesEntity.addAll(
-                MCRJobQueue.INSTANCES.keySet().stream().map(Queue::new).collect(Collectors.toList()));
-
-            return Response.ok().status(Response.Status.OK).entity(toJSON(queuesEntity))
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .type(MediaType.TEXT_PLAIN_TYPE)
+                .entity(so)
                 .build();
-        } catch (Exception e) {
-            final StreamingOutput so = (OutputStream os) -> e
-                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
 
     @GET()
     @Path("{name:.+}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @MCRRestrictedAccess(MCRJobQueuePermission.class)
     public Response queueJSON(@PathParam("name") String name) {
         try {
@@ -109,53 +93,21 @@ public class MCRJobQueueResource {
                     return q;
                 }).orElse(null);
 
-            return Response.ok().status(Response.Status.OK).entity(toJSON(queue))
+            return Response
+                .ok()
+                .status(Response.Status.OK)
+                .entity(queue)
                 .build();
         } catch (Exception e) {
             final StreamingOutput so = (OutputStream os) -> e
                 .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
-        }
-    }
-
-    @GET()
-    @Path("{name:.+}")
-    @Produces(MediaType.APPLICATION_XML)
-    @MCRRestrictedAccess(MCRJobQueuePermission.class)
-    public Response queueXML(@PathParam("name") String name) {
-        try {
-            Queue queue = MCRJobQueue.INSTANCES.entrySet().stream().filter(e -> e.getKey().equals(name)).findFirst()
-                .map(e -> {
-                    Queue q = new Queue(e.getKey());
-
-                    MCRJobQueue jq = e.getValue();
-                    Iterable<MCRJob> iterable = () -> jq.iterator(null);
-                    q.jobs = StreamSupport.stream(iterable.spliterator(), false).map(Job::new)
-                        .collect(Collectors.toList());
-
-                    return q;
-                }).orElse(null);
-
-            return Response.ok().status(Response.Status.OK).entity(queue)
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .type(MediaType.TEXT_PLAIN_TYPE)
+                .entity(so)
                 .build();
-        } catch (Exception e) {
-            final StreamingOutput so = (OutputStream os) -> e
-                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.name()));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
-
-    private <T> String toJSON(T entity) throws IOException {
-        StringWriter sw = new StringWriter();
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JaxbAnnotationModule());
-        mapper.writeValue(sw, entity);
-
-        return sw.toString();
-    }
-
-    // JAXB Wrapper Classes
 
     @XmlRootElement(name = "queues")
     static class Queues {
