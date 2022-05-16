@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.client.WebTarget;
 
 import org.apache.commons.lang.StringUtils;
@@ -120,12 +121,28 @@ public class MCRWorksFetcher {
     }
 
     private Element fetchWorksXML(WebTarget target) throws JDOMException, IOException, SAXException {
-        LOGGER.info("get {}", target.getUri());
-        Builder b = target.request().accept(MCRORCIDConstants.ORCID_XML_MEDIA_TYPE)
-            .header("Authorization", "Bearer " + MCRReadPublicTokenFactory.getToken());
-        MCRContent response = new MCRStreamContent(b.get(InputStream.class));
+        Response r = getResponse(target, orcid.getAccessToken() != null);
+        MCRContent response = new MCRStreamContent(r.readEntity(InputStream.class));
         MCRContent transformed = T_WORK2MCR.transform(response);
         return transformed.asXML().detachRootElement();
+    }
+
+    private Response getResponse(WebTarget target, boolean usePersonalToken) {
+        LOGGER.info("get {}", target.getUri());
+        Response r = target.request().accept(MCRORCIDConstants.ORCID_XML_MEDIA_TYPE)
+            .header("Authorization",
+                    "Bearer " + (usePersonalToken ? orcid.getAccessToken() : MCRReadPublicTokenFactory.getToken()))
+            .get();
+        if(r.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
+            return r;
+        } else if(!usePersonalToken) {
+            LOGGER.warn("Bad request with public ORDiD token. "
+                    + "Please check respective setting in mycore.properties.");
+            return r;
+        } else {
+            LOGGER.info("Bad request with personal ORCiD token. Using public token instead.");
+            return getResponse(target, false);
+        }
     }
 
     /** Sets the work's properties from the pre-processed, transformed works XML */
