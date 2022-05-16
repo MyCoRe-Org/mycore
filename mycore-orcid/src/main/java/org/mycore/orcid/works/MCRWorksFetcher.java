@@ -39,7 +39,6 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.mods.bibtex.MCRBibTeX2MODSTransformer;
 import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid.MCRORCIDConstants;
 import org.mycore.orcid.MCRORCIDProfile;
@@ -64,7 +63,8 @@ public class MCRWorksFetcher {
     private static final MCRContentTransformer T_WORK2MCR = MCRContentTransformerFactory.getTransformer("Work2MyCoRe");
 
     /** Transformer used to parse bibTeX to MODS */
-    private static final MCRContentTransformer T_BIBTEX2MODS = new MCRBibTeX2MODSTransformer();
+    private static final MCRContentTransformer T_BIBTEX2MODS = MCRContentTransformerFactory
+        .getTransformer("BibTeX2MODS");
 
     private MCRORCIDProfile orcid;
 
