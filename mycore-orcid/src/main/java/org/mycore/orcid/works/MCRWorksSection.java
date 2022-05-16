@@ -179,10 +179,10 @@ public class MCRWorksSection {
         MCRMODSWrapper wrapper = new MCRMODSWrapper(obj);
         List<Element> objectIdentifiers = wrapper.getElements("mods:identifier");
         Set<String> objectKeys = buildIdentifierKeys(objectIdentifiers);
-        return works.stream().filter(work -> matches(work, obj.getId(), objectKeys));
+        return works.stream().filter(work -> matches(work, objectKeys));
     }
 
-    private boolean matches(MCRWork work, MCRObjectID oid, Set<String> objectIdentifiers) {
+    private boolean matches(MCRWork work, Set<String> objectIdentifiers) {
         Set<String> workIdentifiers = buildIdentifierKeys(work.getIdentifiers());
         workIdentifiers.retainAll(objectIdentifiers);
         return !workIdentifiers.isEmpty();

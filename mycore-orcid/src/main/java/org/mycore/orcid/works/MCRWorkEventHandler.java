@@ -31,7 +31,6 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid.user.MCRORCIDUser;
-import org.mycore.orcid.user.MCRPublicationStatus;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -81,7 +80,6 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
     private void publishToORCID(MCRObjectID oid, MCRORCIDUser user) {
         try {
             MCRWorksSection works = user.getProfile().getWorksSection();
-            MCRPublicationStatus status = user.getPublicationStatus(oid);
 
             Optional<MCRWork> work = works.findWork(oid);
             if (work.isPresent()) {
