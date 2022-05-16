@@ -13,18 +13,25 @@
   <xsl:function name="mcrstring:shorten" as="xs:string">
     <xsl:param name="input" as="xs:string" />
     <xsl:param name="length" as="xs:integer" />
+    <xsl:value-of select="mcrstring:shorten($input, $length, '…')" />
+  </xsl:function>
+  
+  <xsl:function name="mcrstring:shorten" as="xs:string">
+    <xsl:param name="input" as="xs:string" />
+    <xsl:param name="length" as="xs:integer" />
+    <xsl:param name="ellipsis" as="xs:string" />
     <xsl:choose>
       <xsl:when test="string-length($input) &lt;=$length">
         <xsl:value-of select="$input" />
       </xsl:when>
       <xsl:when test="substring($input, $length+1, 1) = ' '">
-        <xsl:value-of select="substring($input, 1, $length)" />
+        <xsl:value-of select="concat(substring($input, 1, $length), $ellipsis)" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:variable name="t" select="tokenize(substring($input, 1, $length),' ')" />
         <xsl:value-of select="if (count($t) &lt;= 1) 
-                              then (substring($input, 1, $length)) 
-                              else (string-join(remove($t, count($t)), ' '))" />
+                              then (concat(substring($input, 1, $length), $ellipsis)) 
+                              else (concat(string-join(remove($t, count($t)), ' '), $ellipsis))" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
