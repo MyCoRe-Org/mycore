@@ -78,7 +78,7 @@ public class MCRWorkEventHandler extends MCREventHandlerBase {
             .forEach(user -> publishToORCID(oid, user));
     }
 
-    private void publishToORCID(MCRObjectID oid, MCRORCIDUser user) {
+    protected void publishToORCID(MCRObjectID oid, MCRORCIDUser user) {
         try {
             MCRWorksSection works = user.getProfile().getWorksSection();
             MCRPublicationStatus status = user.getPublicationStatus(oid);
