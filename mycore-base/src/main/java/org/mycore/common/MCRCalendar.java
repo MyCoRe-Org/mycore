@@ -151,6 +151,9 @@ public class MCRCalendar {
         FIRST_EGYPTIAN_DAY = firstEgypt.get(Calendar.JULIAN_DAY);
     }
 
+    private static final String MSG_CALENDAR_UNSUPPORTED = "Calendar %s is not supported!";
+
+
     /**
      * @see #getHistoryDateAsCalendar(String, boolean, String)
      */
@@ -259,10 +262,10 @@ public class MCRCalendar {
      */
     private static int[] checkDateStringForJulianCalendar(String dateString, boolean last, CalendarType calendarType) {
         // look for BC
-        dateString = dateString.toUpperCase(Locale.ROOT);
+        final String dateTrimmed = StringUtils.trim(StringUtils.upperCase(dateString, Locale.ROOT));
 
-        final boolean bc = beforeZero(dateString, calendarType);
-        final String cleanDate = cleanDate(dateString, calendarType);
+        final boolean bc = beforeZero(dateTrimmed, calendarType);
+        final String cleanDate = cleanDate(dateTrimmed, calendarType);
         final int[] fields = parseDateString(cleanDate, last, calendarType);
         final int year = fields[0];
         final int mon = fields[1];
@@ -394,10 +397,10 @@ public class MCRCalendar {
      * @exception MCRException if parsing has an error
      */
     protected static IslamicCalendar getCalendarFromIslamicDate(String dateString, boolean last) {
-        dateString = dateString.toUpperCase(Locale.ROOT);
+        final String dateTrimmed = StringUtils.trim(StringUtils.upperCase(dateString, Locale.ROOT));
 
-        final boolean before = beforeZero(dateString, CalendarType.Islamic);
-        final String cleanDate = cleanDate(dateString, CalendarType.Islamic);
+        final boolean before = beforeZero(dateTrimmed, CalendarType.Islamic);
+        final String cleanDate = cleanDate(dateTrimmed, CalendarType.Islamic);
         final int[] fields = parseDateString(cleanDate, last, CalendarType.Islamic);
         int year = fields[0];
         final int mon = fields[1];
@@ -440,14 +443,14 @@ public class MCRCalendar {
      */
 
     protected static HebrewCalendar getCalendarFromHebrewDate(String datestr, boolean last) {
-        datestr = datestr.trim();
+        final String dateTrimmed = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
 
-        final boolean before = beforeZero(datestr, CalendarType.Hebrew);
+        final boolean before = beforeZero(dateTrimmed, CalendarType.Hebrew);
         if (before) {
             throw new MCRException("Dates before 1 not supported in Hebrew calendar!");
         }
 
-        final String cleanDate = cleanDate(datestr, CalendarType.Hebrew);
+        final String cleanDate = cleanDate(dateTrimmed, CalendarType.Hebrew);
         final int[] fields = parseDateString(cleanDate, last, CalendarType.Hebrew);
         final int year = fields[0];
         final int mon = fields[1];
@@ -467,10 +470,10 @@ public class MCRCalendar {
      * @return an integer array with [0] = year; [1] = month; [2] = day; [3] = era : -1 = B.M.: +1 = A.M.
      */
     private static int[] checkDateStringForCopticCalendar(String dateString, boolean last, CalendarType calendarType) {
-        dateString = dateString.trim();
+        final String dateTrimmed = StringUtils.trim(StringUtils.upperCase(dateString, Locale.ROOT));
 
-        final boolean bm = beforeZero(dateString, calendarType);
-        final String cleanDate = cleanDate(dateString, calendarType);
+        final boolean bm = beforeZero(dateTrimmed, calendarType);
+        final String cleanDate = cleanDate(dateTrimmed, calendarType);
         final int[] fields = parseDateString(cleanDate, last, calendarType);
         int year = fields[0];
         final int mon = fields[1];
@@ -572,9 +575,8 @@ public class MCRCalendar {
      * @exception MCRException if parsing has an error
      */
     protected static JapaneseCalendar getCalendarFromJapaneseDate(String datestr, boolean last) {
-        datestr = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
-
-        final String cleanDate = cleanDate(datestr, CalendarType.Japanese);
+        final String dateTrimmed = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
+        final String cleanDate = cleanDate(dateTrimmed, CalendarType.Japanese);
 
         // japanese dates contain the era statement directly in the year e.g. 1.1.H2
         // before parsing we have to remove this
@@ -636,10 +638,10 @@ public class MCRCalendar {
      */
     protected static BuddhistCalendar getCalendarFromBuddhistDate(String datestr, boolean last) {
         // test before Buddhas
-        datestr = datestr.toUpperCase(Locale.ROOT).trim();
+        final String dateTrimmed = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
 
-        final boolean bb = beforeZero(datestr, CalendarType.Buddhist);
-        final String cleanDate = cleanDate(datestr, CalendarType.Buddhist);
+        final boolean bb = beforeZero(dateTrimmed, CalendarType.Buddhist);
+        final String cleanDate = cleanDate(dateTrimmed, CalendarType.Buddhist);
         final int[] fields = parseDateString(cleanDate, last, CalendarType.Buddhist);
         int year = fields[0];
         int mon = fields[1];
@@ -681,10 +683,10 @@ public class MCRCalendar {
      */
     protected static GregorianCalendar getCalendarFromPersicDate(String datestr, boolean last) {
         try {
-            datestr = datestr.trim();
+            final String dateTrimmed = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
 
-            final boolean bb = beforeZero(datestr, CalendarType.Persic);
-            final String cleanDate = cleanDate(datestr, CalendarType.Persic);
+            final boolean bb = beforeZero(dateTrimmed, CalendarType.Persic);
+            final String cleanDate = cleanDate(dateTrimmed, CalendarType.Persic);
             final int[] fields = parseDateString(cleanDate, last, CalendarType.Persic);
             final int year = fields[0];
             final int mon = fields[1];
@@ -780,10 +782,10 @@ public class MCRCalendar {
      * @exception MCRException if parsing has an error
      */
     protected static GregorianCalendar getCalendarFromArmenianDate(String datestr, boolean last) {
-        datestr = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
+        final String dateTrimmed = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
 
-        final boolean before = beforeZero(datestr, CalendarType.Armenian);
-        final String cleanDate = cleanDate(datestr, CalendarType.Armenian);
+        final boolean before = beforeZero(dateTrimmed, CalendarType.Armenian);
+        final String cleanDate = cleanDate(dateTrimmed, CalendarType.Armenian);
         final int[] fields = parseDateString(cleanDate, last, CalendarType.Armenian);
         int year = fields[0];
         int mon = fields[1];
@@ -829,10 +831,10 @@ public class MCRCalendar {
      * occurred.
      */
     protected static GregorianCalendar getCalendarFromEgyptianDate(String datestr, boolean last) {
-        datestr = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
+        final String dateTrimmed = StringUtils.trim(StringUtils.upperCase(datestr, Locale.ROOT));
 
-        final boolean ba = beforeZero(datestr, CalendarType.Egyptian);
-        final String cleanDate = cleanDate(datestr, CalendarType.Egyptian);
+        final boolean ba = beforeZero(dateTrimmed, CalendarType.Egyptian);
+        final String cleanDate = cleanDate(dateTrimmed, CalendarType.Egyptian);
         final int[] fields = parseDateString(cleanDate, last, CalendarType.Egyptian);
         int year = fields[0];
         final int mon = fields[1];
@@ -1589,6 +1591,4 @@ public class MCRCalendar {
                     .findFirst().orElseThrow();
         }
     }
-
-    private static final String MSG_CALENDAR_UNSUPPORTED = "Calendar %s is not supported!";
 }
