@@ -107,16 +107,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-inline</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-ifs</artifactId>
       <scope>test</scope>
