@@ -18,7 +18,6 @@
 
 package org.mycore.mods.enrichment;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +29,6 @@ import org.mycore.mods.MCRMODSCommands;
 import org.mycore.mods.MCRMODSSorter;
 import org.mycore.mods.merger.MCRMerger;
 import org.mycore.mods.merger.MCRMergerFactory;
-import org.xml.sax.SAXException;
 
 /**
  * Used to request publication data from a given data source,
@@ -87,7 +85,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
 
         try {
             MCRXMLHelper.validate(doc, MCRMODSCommands.MODS_V3_XSD_URI);
-        } catch (SAXException | IOException e) {
+        } catch (Exception e) {
             LOGGER.warn(ds.getID() + " with " + id + " returned invalid mods!", e);
             return false;
         }
