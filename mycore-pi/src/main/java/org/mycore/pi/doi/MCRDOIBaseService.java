@@ -96,8 +96,8 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
             schemaFactory.setResourceResolver(MCREntityResolver.instance());
-            return schemaFactory.newSchema(MCRXMLHelper.getXSDSource(schemaURLString));
-        } catch (SAXException | TransformerException | IOException e) {
+            return schemaFactory.newSchema(MCRXMLHelper.resolveSource(schemaURLString));
+        } catch (SAXException | IOException e) {
             throw new MCRConfigurationException("Error while loading " + schemaURLString + " schema!", e);
         }
     }
