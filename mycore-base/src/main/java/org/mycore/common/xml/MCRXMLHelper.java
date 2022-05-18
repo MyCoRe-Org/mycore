@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -53,6 +54,8 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
+import org.mycore.common.xsl.MCRLazyStreamSource;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -111,7 +114,8 @@ public class MCRXMLHelper {
         sf.setResourceResolver(MCREntityResolver.instance());
         Schema schema;
         try {
-            schema = sf.newSchema(MCRURIResolver.instance().resolve(schemaURI, null));
+            Source source = getXSDSource(schemaURI);
+            schema = sf.newSchema(source);
         } catch (TransformerException e) {
             Throwable cause = e.getCause();
             if (cause == null) {
@@ -128,6 +132,24 @@ public class MCRXMLHelper {
         Validator validator = schema.newValidator();
         validator.setResourceResolver(MCREntityResolver.instance());
         validator.validate(new JDOMSource(doc));
+    }
+
+    /**
+     * Loads a XSD as source from an URI. If the uri has http or https scheme, the catalog.xml will be tried first,
+     * otherwise the URI resolver.
+     *
+     * @param schemaURI uri to the XSD
+     * @return a resolved xsd as source
+     * @throws IOException
+     * @throws TransformerException
+     */
+    public static Source getXSDSource(String schemaURI) throws IOException, TransformerException {
+        InputSource entity = MCREntityResolver.instance().resolveEntity(null, schemaURI);
+        if (entity != null) {
+            return new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
+        } else {
+            return MCRURIResolver.instance().resolve(schemaURI, null);
+        }
     }
 
     /**
