@@ -58,8 +58,11 @@ import org.mycore.pi.urn.MCRUUIDURNGenerator;
  */
 public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
     private static Logger LOGGER = LogManager.getLogger();
+
     private int numOfDerivFiles = 15;
+
     private MCRObject object;
+
     private MCRDerivate derivate;
 
     @Override
@@ -76,11 +79,11 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         derivate = createDerivate(object.getId());
         MCRMetadataManager.create(object);
         MCRMetadataManager.create(derivate);
-        
+
         List<MCRPath> fileList = new ArrayList<>();
-        
+
         for (int j = 0; j < numOfDerivFiles; j++) {
-            String fileName =  UUID.randomUUID() + "_" + String.format(Locale.getDefault(), "%02d", j);
+            String fileName = UUID.randomUUID() + "_" + String.format(Locale.getDefault(), "%02d", j);
             MCRPath path = MCRPath.getPath(derivate.getId().toString(), fileName);
             fileList.add(path);
             if (!Files.exists(path)) {
@@ -89,14 +92,13 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
             }
         }
 
-
         Function<MCRDerivate, Stream<MCRPath>> foo = deriv -> fileList.stream();
         String serviceID = "TestService";
         MCRURNGranularRESTService testService = new MCRURNGranularRESTService(foo);
         testService.init("MCR.PI.Service.TestService");
         testService.setProperties(getTestServiceProperties());
         testService.register(derivate, "", true);
-        
+
         timerTask();
 
         List<MCRPIRegistrationInfo> registeredURNs = MCREntityManagerProvider
@@ -109,7 +111,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
             .getResultList();
 
         registeredURNs.stream()
-        .forEach(pi -> LOGGER.info("URN: {}", pi));
+            .forEach(pi -> LOGGER.info("URN: {}", pi));
         Assert.assertEquals("Wrong number of registered URNs: ", numOfDerivFiles + 1, registeredURNs.size());
     }
 
@@ -124,7 +126,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
 
     }
 
-    protected Map<String, String> getTestServiceProperties(){
+    protected Map<String, String> getTestServiceProperties() {
         HashMap<String, String> serviceProps = new HashMap<>();
 
         serviceProps.put("Generator", "UUID");
@@ -138,17 +140,19 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         Map<String, String> testProperties = super.getTestProperties();
         testProperties.put("MCR.datadir", "%MCR.basedir%/data");
         testProperties
-        .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
+            .put("MCR.Persistence.LinkTable.Store.Class", "org.mycore.backend.hibernate.MCRHIBLinkTableStore");
         testProperties.put("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
         testProperties.put("MCR.Access.Strategy.Class", AlwaysTrueStrategy.class.getName());
         testProperties.put("MCR.Metadata.Type.object", "true");
         testProperties.put("MCR.Metadata.Type.derivate", "true");
 
-        testProperties.put("MCR.IFS2.Store.mycore_derivate.Class","org.mycore.datamodel.ifs2.MCRMetadataStore");
+        testProperties.put("MCR.IFS2.Store.mycore_derivate.Class", "org.mycore.datamodel.ifs2.MCRMetadataStore");
         //testProperties.put("MCR.IFS2.Store.mycore_derivate.BaseDir","/foo");
-        testProperties.put("MCR.IFS2.Store.mycore_derivate.SlotLayout","4-2-2");
-        testProperties.put("MCR.EventHandler.MCRDerivate.020.Class","org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
-        testProperties.put("MCR.EventHandler.MCRDerivate.030.Class","org.mycore.datamodel.common.MCRLinkTableEventHandler");
+        testProperties.put("MCR.IFS2.Store.mycore_derivate.SlotLayout", "4-2-2");
+        testProperties.put("MCR.EventHandler.MCRDerivate.020.Class",
+            "org.mycore.datamodel.common.MCRXMLMetadataEventHandler");
+        testProperties.put("MCR.EventHandler.MCRDerivate.030.Class",
+            "org.mycore.datamodel.common.MCRLinkTableEventHandler");
 
         testProperties.put("MCR.IFS.ContentStore.IFS2.BaseDir", getStoreBaseDir().toString());
         testProperties.put("MCR.PI.Generator.UUID", MCRUUIDURNGenerator.class.getName());
@@ -179,6 +183,13 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         return object;
     }
 
+    @After
+    public void tearDown() throws Exception {
+        MCRMetadataManager.delete(derivate);
+        MCRMetadataManager.delete(object);
+        super.tearDown();
+    }
+
     public static class AlwaysTrueStrategy implements MCRAccessCheckStrategy {
 
         @Override
@@ -187,12 +198,4 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         }
 
     }
-    
-    @After
-    public void tearDown() throws Exception {
-        MCRMetadataManager.delete(derivate);
-        MCRMetadataManager.delete(object);
-        super.tearDown();
-    }
-
 }
