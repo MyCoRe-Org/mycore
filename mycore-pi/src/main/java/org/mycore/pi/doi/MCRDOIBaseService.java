@@ -27,7 +27,6 @@ import java.util.Optional;
 
 import javax.persistence.NoResultException;
 import javax.xml.XMLConstants;
-import javax.xml.transform.TransformerException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
