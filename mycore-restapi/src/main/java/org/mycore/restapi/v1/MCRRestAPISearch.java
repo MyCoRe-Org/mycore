@@ -94,7 +94,7 @@ public class MCRRestAPISearch {
         MediaType.TEXT_PLAIN + ";charset=ISO-8859-1", MediaType.TEXT_PLAIN + ";charset=UTF-8" })
     public Response search(@Context UriInfo info, @Context HttpServletRequest request, @QueryParam("q") String query,
         @QueryParam("sort") String sort, @QueryParam("wt") @DefaultValue("xml") String wt,
-        @QueryParam("start") String start, @QueryParam("rows") String rows, @QueryParam("fq") String fq,
+        @QueryParam("start") String start, @QueryParam("rows") String rows, @QueryParam("fq") List<String> fq,
         @QueryParam("fl") String fl, @QueryParam("facet") String facet, @QueryParam("facet.sort") String facetSort,
         @QueryParam("facet.limit") String facetLimit, @QueryParam("facet.field") List<String> facetFields,
         @QueryParam("facet.mincount") String facetMinCount, @QueryParam("json.wrf") String jsonWrf)
@@ -118,7 +118,9 @@ public class MCRRestAPISearch {
             url.append("&rows=").append(rows);
         }
         if (fq != null) {
-            url.append("&fq=").append(URLEncoder.encode(fq, StandardCharsets.UTF_8));
+            for(String fqItem: fq) {
+                url.append("&fq=").append(URLEncoder.encode(fqItem, StandardCharsets.UTF_8));
+            }
         }
         if (fl != null) {
             url.append("&fl=").append(URLEncoder.encode(fl, StandardCharsets.UTF_8));
