@@ -3,7 +3,7 @@ name: test
 on: [ push, pull_request ]
 
 env:
-  MAVEN_OPTS: -Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled
+  MAVEN_OPTS: -Xmx1024M -Xss128M
   GECKODRIVER_VERSION: 0.27.0
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
-        java-version: 11
+        java-version: 17
         distribution: temurin
 
     - name: Fetch Geckodriver cache
