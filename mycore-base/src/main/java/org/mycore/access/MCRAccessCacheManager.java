@@ -21,6 +21,7 @@ package org.mycore.access;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 
@@ -34,7 +35,7 @@ import java.util.stream.Stream;
  *
  */
 class MCRAccessCacheManager implements MCRSessionListener {
-    private static final int CAPACITY = 200;
+    private static final int CAPACITY = MCRConfiguration2.getOrThrow("MCR.Access.Cache.Size", Integer::valueOf);
 
     private static String key = MCRAccessCacheManager.class.getCanonicalName();
 

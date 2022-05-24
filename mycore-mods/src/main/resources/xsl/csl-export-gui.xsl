@@ -22,13 +22,15 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:str="http://exslt.org/strings"
                 xmlns:xalan="http://xml.apache.org/xalan"
+                xmlns:exslt="http://exslt.org/common"
                 xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
                 xmlns:csl="http://purl.org/net/xbiblio/csl"
                 extension-element-prefixes="str"
-                exclude-result-prefixes="xsl xalan i18n"
+                exclude-result-prefixes="xsl xalan exslt i18n"
 >
 
 
+    <xsl:param name="MCR.Export.Transformers"/>
     <xsl:param name="MCR.Export.CSL.Styles"/>
     <xsl:param name="MCR.Export.CSL.Rows"/>
     <xsl:param name="MCR.Export.Standalone.Rows"/>
@@ -42,7 +44,22 @@
          object -> for single mycoreobject
          -->
         <xsl:param name="type"/>
+        <xsl:variable name="transformerTokens">
+            <xsl:call-template name="Tokenizer">
+                <xsl:with-param name="string" select="$MCR.Export.Transformers"/>
+                <xsl:with-param name="delimiter" select="','"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="transformers" select="exslt:node-set($transformerTokens)/token" />
+        <xsl:variable name="standaloneFormats">
+            <xsl:value-of select="substring-before($transformers[1],':')"/>
+            <xsl:for-each select="$transformers[position()>1]">
+                <xsl:text>,</xsl:text>
+                <xsl:value-of select="substring-before(.,':')"/>
+            </xsl:for-each>
+        </xsl:variable>
         <script type="text/javascript">
+            window["MCR.Export.StandaloneFormats"] = &quot;<xsl:value-of select="$standaloneFormats"/>&quot;;
             window["MCR.Export.CSL.Rows"] = &quot;<xsl:value-of select="$MCR.Export.CSL.Rows"/>&quot;;
             window["MCR.Export.Standalone.Rows"] = &quot;<xsl:value-of select="$MCR.Export.Standalone.Rows"/>&quot;;
         </script>
@@ -60,12 +77,11 @@
                     </xsl:if>
                 </xsl:if>
                 <xsl:if test="$type = 'basket'">
-                    <option value="mods">MODS</option>
-                    <option value="bibtex">BibTex</option>
-                    <option value="endnote">Endnote</option>
-                    <option value="ris">RIS</option>
-                    <option value="isi">ISI</option>
-                    <option value="mods2csv">CSV</option>
+                    <xsl:for-each select="$transformers">
+                        <option value="{substring-before(.,':')}">
+                            <xsl:value-of select="substring-after(.,':')"/>
+                        </option>
+                    </xsl:for-each>
                 </xsl:if>
             </select>
             <select name="style">

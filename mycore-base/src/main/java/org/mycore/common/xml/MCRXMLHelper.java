@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -53,6 +54,8 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.streams.MCRByteArrayOutputStream;
+import org.mycore.common.xsl.MCRLazyStreamSource;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -109,25 +112,39 @@ public class MCRXMLHelper {
     public static void validate(Document doc, String schemaURI) throws SAXException, IOException {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         sf.setResourceResolver(MCREntityResolver.instance());
-        Schema schema;
+        Source source = resolveSource(schemaURI);
+        Schema schema = sf.newSchema(source);
+        Validator validator = schema.newValidator();
+        validator.setResourceResolver(MCREntityResolver.instance());
+        validator.validate(new JDOMSource(doc));
+    }
+
+    /**
+     * Resolves XML Source against the supplied <code>schemaURI</code>.
+     * First {@link MCREntityResolver#resolveEntity(String, String)} is tried to resolve against XMLCatalog and if
+     * no {@link InputSource} is returned finally {@link MCRURIResolver#resolve(String, String)}
+     * is called as a fallback.
+     *
+     * @param schemaURI uri to the XML document, e.g. XSD file
+     * @return a resolved XML document as Source or null
+     */
+    public static Source resolveSource(String schemaURI) throws IOException, SAXException {
+        InputSource entity = MCREntityResolver.instance().resolveEntity(null, schemaURI);
+        if (entity != null) {
+            return new MCRLazyStreamSource(entity::getByteStream, entity.getSystemId());
+        }
         try {
-            schema = sf.newSchema(MCRURIResolver.instance().resolve(schemaURI, null));
+            return MCRURIResolver.instance().resolve(schemaURI, null);
         } catch (TransformerException e) {
             Throwable cause = e.getCause();
-            if (cause == null) {
-                throw new IOException(e);
+            if (cause instanceof IOException) {
+                throw (IOException) cause;
             }
             if (cause instanceof SAXException) {
                 throw (SAXException) cause;
             }
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
-            }
             throw new IOException(e);
         }
-        Validator validator = schema.newValidator();
-        validator.setResourceResolver(MCREntityResolver.instance());
-        validator.validate(new JDOMSource(doc));
     }
 
     /**
