@@ -193,7 +193,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
               <link>http://docs.jboss.org/hibernate/orm/5.5/javadocs/</link>
-              <link>http://docs.jboss.org/hibernate/jpa/3.0/api/</link>
+              <link>https://javadoc.io/static/jakarta.persistence/jakarta.persistence-api/3.0.0</link>
               <!--
               <link>http://lucene.apache.org/solr/8_6_0/solr-solrj/</link>
 -->
@@ -738,7 +738,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
                 <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
-                <link>http://docs.jboss.org/hibernate/jpa/2.2/api/</link>
+                <link>https://javadoc.io/static/jakarta.persistence/jakarta.persistence-api/3.0.0/</link>
                 <!--
                 <link>http://lucene.apache.org/solr/8_6_0/solr-solrj/</link>
 -->
