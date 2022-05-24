@@ -20,7 +20,6 @@ package org.mycore.pi.urn.rest;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +28,7 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,9 +66,13 @@ public class MCRDerivateURNUtils {
         try {
             // the base urn, links to frontpage (metadata + viewer)
             if (piInfo.getAdditional() == null || piInfo.getAdditional().trim().length() == 0) {
-                MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(MCRObjectID.getInstance(derivateID));
-                return new URL(
-                    MCRFrontendUtil.getBaseURL() + "receive/" + derivate.getOwnerID() + "?derivate=" + derivateID);
+                MCRObjectID derID = MCRObjectID.getInstance(derivateID);
+                final MCRObjectID objectId = MCRMetadataManager.getObjectId(derID, 0, TimeUnit.SECONDS);
+                if (objectId == null) {
+                    LOGGER.warn("Object for {} could NOT be found", derivateID);
+                    return null;
+                }
+                return new URL(MCRFrontendUtil.getBaseURL() + "receive/" + objectId + "?derivate=" + derID);
             } else /* an urn for a certain file, links to iview2 */ {
                 MCRPath file = MCRPath.getPath(derivateID, piInfo.getAdditional());
 
@@ -95,12 +99,6 @@ public class MCRDerivateURNUtils {
         return null;
     }
 
-    /**
-     * @param file
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
     private static String getViewerURL(MCRPath file) {
         return new MessageFormat("{0}rsc/viewer/{1}/{2}", Locale.ROOT).format(
             new Object[] { MCRFrontendUtil.getBaseURL(), file.getOwner(), file.getFileName().toString() });
@@ -117,7 +115,7 @@ public class MCRDerivateURNUtils {
                 .orElseThrow(() -> new RuntimeException(
                     "Could not get main doc for " + derivateId));
 
-            String spec = null;
+            String spec;
             String baseURL = MCRFrontendUtil.getBaseURL();
             String id = URLEncoder.encode(derivateId.toString(), StandardCharsets.UTF_8);
             if (mainDoc != null && mainDoc.length() > 0) {

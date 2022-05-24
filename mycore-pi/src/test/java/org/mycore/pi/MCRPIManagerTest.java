@@ -70,7 +70,6 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         Assert.assertEquals(mockIdentifierOptional.get().asString(), mockString);
 
         // test get(service, id, additional)
-        MockMetadataManager mockMetadataManager = new MockMetadataManager();
         MCRPIService<MCRMockIdentifier> registrationService = MCRPIServiceManager
             .getInstance()
             .getRegistrationService(MOCK_SERVICE);
@@ -78,7 +77,6 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         ((MCRMockIdentifierService) registrationService).reset();
 
         MCRObject mcrObject = buildMockObject();
-        mockMetadataManager.put(mcrObject.getId(), mcrObject);
         registrationService.register(mcrObject, null);
 
         MCRPI mcrpi = MCRPIManager.getInstance().get(MOCK_SERVICE, mcrObject.getId().toString(), null);
@@ -101,7 +99,6 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
     public void testRegistrationService()
         throws MCRAccessException, MCRActiveLinkException, MCRPersistentIdentifierException, ExecutionException,
         InterruptedException {
-        MockMetadataManager mockMetadataManager = new MockMetadataManager();
 
         MCRPIService<MCRMockIdentifier> registrationService = MCRPIServiceManager
             .getInstance()
@@ -115,7 +112,6 @@ public class MCRPIManagerTest extends MCRStoreTestCase {
         Assert.assertFalse("Update should not have been called!", casted.isUpdatedCalled());
 
         MCRObject mcrObject = buildMockObject();
-        mockMetadataManager.put(mcrObject.getId(), mcrObject);
         MCRMockIdentifier identifier = registrationService.register(mcrObject, "", true);
 
         Assert.assertFalse("Delete should not have been called!", casted.isDeleteCalled());
