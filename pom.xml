@@ -48,7 +48,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <httpcore.version>4.4.15</httpcore.version>
     <jakarta.activation.version>2.0.1</jakarta.activation.version>
     <jakarta.mail.version>2.0.1</jakarta.mail.version>
-    <java.target.version>11</java.target.version>
+    <java.target.version>17</java.target.version>
     <jaxb.version>3.0.2</jaxb.version>
     <jersey.version>3.0.4</jersey.version>
     <jetty.version>11.0.8</jetty.version>
