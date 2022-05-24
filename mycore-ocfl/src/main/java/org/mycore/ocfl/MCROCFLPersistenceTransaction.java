@@ -51,9 +51,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             managerOpt = MCRConfiguration2
                 .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager");
         } catch (Exception e) {
-            if (verboseLogging) {
-                LOGGER.debug("ClassificationManager could not be found, setting to empty.");
-            }
+            LOGGER.debug("ClassificationManager could not be found, setting to empty.");
             managerOpt = Optional.empty();
         }
     }
@@ -63,9 +61,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
      */
     @Override
     public boolean isReady() {
-        if (verboseLogging) {
-            LOGGER.debug("TRANSACTION READY CHECK - {}", managerOpt.isPresent());
-        }
+        LOGGER.debug("TRANSACTION READY CHECK - {}", managerOpt.isPresent());
         if (!managerOpt.isPresent()) {
             return false;
         } else {
@@ -78,9 +74,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
      */
     @Override
     public void begin() {
-        if (verboseLogging) {
-            LOGGER.debug("TRANSACTION BEGIN");
-        }
+        LOGGER.debug("TRANSACTION BEGIN");
         // if (isActive()) {
         //     throw new IllegalStateException("TRANSACTION ALREADY ACTIVE");
         // }
@@ -98,9 +92,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     @SuppressWarnings("unchecked")
     @Override
     public void commit() {
-        if (verboseLogging) {
-            LOGGER.debug("TRANSACTION COMMIT");
-        }
+        LOGGER.debug("TRANSACTION COMMIT");
         if (!isActive() || getRollbackOnly()) {
             throw new IllegalStateException("TRANSACTION NOT ACTIVE OR ONLY ROLLBACK");
         }
@@ -119,9 +111,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     @SuppressWarnings("unchecked")
     @Override
     public void rollback() {
-        if (verboseLogging) {
-            LOGGER.debug("TRANSACTION ROLLBACK");
-        }
+        LOGGER.debug("TRANSACTION ROLLBACK");
         if (!isActive()) {
             throw new IllegalStateException("TRANSACTION NOT ACTIVE");
         }
@@ -141,9 +131,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
      */
     @Override
     public boolean getRollbackOnly() {
-        if (verboseLogging) {
-            LOGGER.debug("TRANSACTION ROLLBACK CHECK - {}", rollbackOnly);
-        }
+        LOGGER.debug("TRANSACTION ROLLBACK CHECK - {}", rollbackOnly);
         if (!isActive()) {
             throw new IllegalStateException("TRANSACTION NOT ACTIVE");
         }
@@ -156,9 +144,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     @Override
     public boolean isActive() {
         boolean active = MCRSessionMgr.getCurrentSession().get("classQueue") != null;
-        if (verboseLogging) {
-            LOGGER.debug("TRANSACTION ACTIVE CHECK - {}", active);
-        }
+        LOGGER.debug("TRANSACTION ACTIVE CHECK - {}", active);
         return active;
     }
 
