@@ -18,18 +18,24 @@
 
 package org.mycore.ocfl;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
 import org.mycore.common.MCRPersistenceTransaction;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.events.MCREvent;
+import org.mycore.common.content.MCRJDOMContent;
+import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]
@@ -38,31 +44,29 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     private static final Logger LOGGER = LogManager.getLogger(MCROCFLPersistenceTransaction.class);
 
-    // TODO replace this with a setting
-    private static final String Q_DATA = "classQueue";
-
     protected MCRSession currentSession;
 
     protected Optional<MCROCFLXMLClassificationManager> managerOpt;
 
     // private ThreadLocal<Set<MCRCategoryID>> threadLocal;
-    private ThreadLocal<Map<MCRCategoryID, Boolean>> markForNewOCFLVersion;
+    private static final ThreadLocal<Map<MCRCategoryID, MCRCategory>> CATEGORY_WORKSPACE = new ThreadLocal<>();
 
-    private boolean rollbackOnly = false;
+    private boolean rollbackOnly;
 
-    private ArrayList<MCREvent> rollbackList;
+    private boolean active;
 
     // list of all things to commit, save them here instead of session
     // how do we write here?
 
     public MCROCFLPersistenceTransaction() {
         try {
-            managerOpt = MCRConfiguration2
-                .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager");
+            managerOpt = MCRConfiguration2.getSingleInstanceOf("MCR.Classification.Manager");
         } catch (Exception e) {
             LOGGER.debug("ClassificationManager could not be found, setting to empty.");
             managerOpt = Optional.empty();
         }
+        rollbackOnly = false;
+        active = false;
     }
 
     /**
@@ -71,11 +75,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     @Override
     public boolean isReady() {
         LOGGER.debug("TRANSACTION READY CHECK - {}", managerOpt.isPresent());
-        if (!managerOpt.isPresent()) {
-            return false;
-        } else {
-            return !isActive() && managerOpt.get().isMutable();
-        }
+        return managerOpt.isPresent() && !isActive() && managerOpt.get().isMutable();
     }
 
     /**
@@ -84,60 +84,61 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     @Override
     public void begin() {
         LOGGER.debug("TRANSACTION BEGIN");
-        // if (isActive()) {
-        //     throw new IllegalStateException("TRANSACTION ALREADY ACTIVE");
-        // }
         if (isActive()) {
-            LOGGER.warn("EXISTING TRANSACTION, ROLLING BACK FOR CLEAN STATE");
-            rollback();
+            throw new IllegalStateException("TRANSACTION ALREADY ACTIVE");
         }
+        active = true;
+        CATEGORY_WORKSPACE.set(new HashMap<>());
         currentSession = MCRSessionMgr.getCurrentSession();
-        currentSession.put(Q_DATA, new ArrayList<MCREvent>());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
     @Override
     public void commit() {
         LOGGER.debug("TRANSACTION COMMIT");
         if (!isActive() || getRollbackOnly()) {
             throw new IllegalStateException("TRANSACTION NOT ACTIVE OR ONLY ROLLBACK");
         }
+        active = false;
+        final Map<MCRCategoryID, MCRCategory> mapOfChanges = CATEGORY_WORKSPACE.get();
+        final MCROCFLXMLClassificationManager ocflClassficationManager = managerOpt.get();
+        //save new OCFL version of classifications
+        mapOfChanges.entrySet()
+            .stream()
+            .filter(e -> Objects.nonNull(e.getValue())) // value is category if classification should not be deleted
+            .map(Map.Entry::getValue)
+            .forEach(category -> MCRSessionMgr.getCurrentSession()
+                .onCommit(() -> {
+                    //TODO: read classification from just here
+                    final Document categoryXML = MCRCategoryTransformer.getMetaDataDocument(category, false);
+                    ocflClassficationManager.fileUpdate(category.getId(), category, new MCRJDOMContent(categoryXML),
+                        null);
+                }));
+        //delete classifications
+        mapOfChanges.entrySet()
+            .stream()
+            .filter(e -> Objects.isNull(e.getValue())) // value is category if classification should not be deleted
+            .forEach(entry -> MCRSessionMgr.getCurrentSession()
+                .onCommit(() -> ocflClassficationManager.fileDelete(entry.getKey(), null, null, null)));
+        //throw away:
         try {
             managerOpt.get().commitSession(currentSession);
         } catch (Exception e) {
             rollbackOnly = true;
-            rollbackList = (ArrayList<MCREvent>) currentSession.get(Q_DATA);
             throw e;
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
     @Override
     public void rollback() {
         LOGGER.debug("TRANSACTION ROLLBACK");
         if (!isActive()) {
             throw new IllegalStateException("TRANSACTION NOT ACTIVE");
         }
-        try {
-            if (rollbackOnly) {
-                ((ArrayList<MCREvent>) currentSession.get(Q_DATA)).addAll(rollbackList);
-            }
-        } catch (Exception e) {
-            currentSession.put(Q_DATA, rollbackList);
-        }
-        managerOpt.get().rollbackSession(currentSession);
+        active = false;
+        CATEGORY_WORKSPACE.remove();
         rollbackOnly = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean getRollbackOnly() {
         LOGGER.debug("TRANSACTION ROLLBACK CHECK - {}", rollbackOnly);
@@ -147,14 +148,17 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         return rollbackOnly;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isActive() {
-        boolean active = MCRSessionMgr.getCurrentSession().get(Q_DATA) != null;
         LOGGER.debug("TRANSACTION ACTIVE CHECK - {}", active);
         return active;
+    }
+
+    public static void addClassfication(MCRCategoryID id, @Nullable MCRCategory category) {
+        if (!Objects.requireNonNull(id).isRootID()) {
+            throw new IllegalArgumentException("Only root category ids are allowed: " + id);
+        }
+        CATEGORY_WORKSPACE.get().put(id, category);
     }
 
 }

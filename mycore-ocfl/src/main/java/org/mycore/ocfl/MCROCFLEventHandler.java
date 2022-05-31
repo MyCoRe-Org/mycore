@@ -35,17 +35,12 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 
-import edu.wisc.library.ocfl.api.exception.LockException;
-
 /**
  * @author Tobias Lenhardt [Hammer1279]
  */
 public class MCROCFLEventHandler implements MCREventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(MCROCFLEventHandler.class);
-
-    private static final boolean USE_COUNTER = MCRConfiguration2.getBoolean("MCR.OCFL.Classification.Counter")
-        .orElse(false);
 
     protected MCROCFLXMLClassificationManager manager = MCRConfiguration2
         .getSingleInstanceOf("MCR.Classification.Manager", MCROCFLXMLClassificationManager.class)
@@ -64,24 +59,16 @@ public class MCROCFLEventHandler implements MCREventHandler {
             switch (evt.getEventType()) {
                 case MCREvent.CREATE_EVENT:
                 case MCREvent.UPDATE_EVENT:
-                    if (MCROCFLCategoryIDLockTable.isLocked(mcrid)
-                        && !MCROCFLCategoryIDLockTable.isLockedByCurrentSession(mcrid)) {
-                        throw new LockException("The Object <" + mcrid + "> is currently locked by <"
-                            + MCROCFLCategoryIDLockTable.getLockingUserName(mcrid.getID()) + ">");
-                    }
-                    MCROCFLCategoryIDLockTable.lock(mcrid);
-                    if (!evt.containsKey("type")) {
-                        manager.fileUpdate(mcrid, mcrCg, clXml, cgXml, evt);
-                    } else {
-                        switch ((String) evt.get("type")) {
-                            case "move":
-                                manager.fileMove(data, evt);
-                                break;
-                        }
-                    }
+                    MCROCFLPersistenceTransaction.addClassfication(mcrCg.getId(), mcrCg.getRoot());
                     break;
                 case MCREvent.DELETE_EVENT:
-                    manager.fileDelete(mcrid, mcrCg, clXml, cgXml, evt);
+                    if (mcrCg.getId().isRootID()) {
+                        //delete complete classification
+                        MCROCFLPersistenceTransaction.addClassfication(mcrCg.getId(), null);
+                    } else {
+                        //update classification to new version
+                        MCROCFLPersistenceTransaction.addClassfication(mcrCg.getId(), mcrCg.getRoot());
+                    }
                     break;
                 default:
                     LOGGER.error("No Method available for {}", evt.getEventType());
@@ -108,24 +95,10 @@ public class MCROCFLEventHandler implements MCREventHandler {
      * <p>mid - MyCoRe ID</p>
      */
     public static final Map<String, Object> getEventData(MCREvent evt) {
-        return getEventData(evt, USE_COUNTER);
-    }
-
-    /**
-     * Returns Event Data in form of an Map. This is used to extract the category data from the MyCoRe Event
-     * @param evt MCREvent
-     * @param counter Append Usage Counters (Resource Intensive)
-     * @return Map &lt;String, Object&gt; :
-     * <p>ctg - Category / Classification</p>
-     * <p>rtx - Root Document</p>
-     * <p>cgx - Category Element</p>
-     * <p>mid - MyCoRe ID</p>
-     */
-    public static final Map<String, Object> getEventData(MCREvent evt, boolean counter) {
         MCRCategory cl = (MCRCategory) evt.get("class");
         MCRContent rtxml = new MCRJDOMContent(MCRCategoryTransformer
-            .getMetaDataDocument(MCRCategoryDAOFactory.getInstance().getCategory(cl.getRoot().getId(), -1), counter));
-        MCRContent cgxml = new MCRJDOMContent(MCRCategoryTransformer.getMetaDataElement(cl, counter));
+            .getMetaDataDocument(MCRCategoryDAOFactory.getInstance().getCategory(cl.getRoot().getId(), -1), false));
+        MCRContent cgxml = new MCRJDOMContent(MCRCategoryTransformer.getMetaDataElement(cl, false));
         MCRCategoryID mcrid = cl.getId();
         Map<String, Object> rtVal = new HashMap<>();
         // make these some static finals somewhere else to avoid "magic strings"
