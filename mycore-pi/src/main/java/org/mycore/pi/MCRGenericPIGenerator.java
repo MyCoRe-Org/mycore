@@ -61,7 +61,7 @@ import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
  *
  * Set a generic pattern.
  *
- * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$1-$2-$ObjectType-$objectProject-$ObjectNumber-$Count-
+ * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$CurrentDate-$1-$2-$ObjectType-$ObjectProject-$ObjectNumber-$Count-
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$ObjectType-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectDate-$Count
  * MCR.PI.Generator.myGenerator.GeneralPattern=urn:nbn:de:gbv:$ObjectType-$Count
