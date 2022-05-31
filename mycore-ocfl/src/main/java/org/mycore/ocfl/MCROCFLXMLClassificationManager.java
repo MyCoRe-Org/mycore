@@ -54,6 +54,7 @@ import org.xml.sax.SAXException;
 import edu.wisc.library.ocfl.api.MutableOcflRepository;
 import edu.wisc.library.ocfl.api.OcflOption;
 import edu.wisc.library.ocfl.api.OcflRepository;
+import edu.wisc.library.ocfl.api.exception.LockException;
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
 import edu.wisc.library.ocfl.api.model.ObjectVersionId;
 import edu.wisc.library.ocfl.api.model.VersionInfo;
@@ -67,6 +68,9 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     private static final Logger LOGGER = LogManager.getLogger(MCROCFLXMLClassificationManager.class);
 
     protected static final String CLASSIFICATION_PREFIX = "mcrclass:";
+
+    // TODO replace this with a setting
+    private static final String Q_DATA = "classQueue";
 
     // include the "/classification" directory
     private static final boolean INC_CLSDIR = MCRConfiguration2.getBoolean("MCR.OCFL.CM.UseClassSubDir").orElse(false);
@@ -129,13 +133,13 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     @SuppressWarnings("unchecked")
     public void rollbackSession(Optional<MCRSession> sessionOpt) {
         MCRSession session = sessionOpt.orElse(MCRSessionMgr.getCurrentSession());
-        ArrayList<MCREvent> list = (ArrayList<MCREvent>) session.get("classQueue");
+        ArrayList<MCREvent> list = (ArrayList<MCREvent>) session.get(Q_DATA);
         if (list == null) {
             LogManager.getLogger(MCRXMLClassificationManager.class).error("List is empty!");
             return;
         }
         list.forEach(this::dropChanges);
-        session.deleteObject("classQueue");
+        session.deleteObject(Q_DATA);
     }
 
     public void fileUpdate(MCRCategoryID mcrid, MCRCategory mcrCg, MCRContent clXml, MCRContent cgXml,
@@ -146,6 +150,13 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         Date lastModified = new Date();
         MCRContent xml = mcrCg.isClassification() ? clXml : cgXml;
         lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrid.getRootID()));
+
+        if (MCROCFLCategoryIDLockTable.isLocked(mcrid)
+            && !MCROCFLCategoryIDLockTable.isLockedByCurrentSession(mcrid)) {
+            throw new LockException("The Object <" + mcrid + "> is currently locked by <"
+                + MCROCFLCategoryIDLockTable.getLockingUserName(mcrid.getID()) + ">");
+        }
+        MCROCFLCategoryIDLockTable.lock(mcrid);
 
         try (InputStream objectAsStream = xml.getInputStream()) {
             VersionInfo versionInfo = buildVersionInfo(message, lastModified);
@@ -170,6 +181,12 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         String message = eventData.getEventType();
         Date lastModified = new Date();
         lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrid.getRootID()));
+        if (MCROCFLCategoryIDLockTable.isLocked(mcrid)
+            && !MCROCFLCategoryIDLockTable.isLockedByCurrentSession(mcrid)) {
+            throw new LockException("The Object <" + mcrid + "> is currently locked by <"
+                + MCROCFLCategoryIDLockTable.getLockingUserName(mcrid.getID()) + ">");
+        }
+        MCROCFLCategoryIDLockTable.lock(mcrid);
         VersionInfo versionInfo = buildVersionInfo(message, lastModified);
         getRepository().stageChanges(ObjectVersionId.head(objName), versionInfo, updater -> {
             updater.removeFile(buildFilePath(mcrCg));
@@ -177,11 +194,21 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     public void fileMove(Map<String, Object> data, MCREvent eventData) {
-        MCRCategoryImpl oldParent = (MCRCategoryImpl) data.get("ctg");
+        MCRCategoryImpl oldParent = (MCRCategoryImpl) data.get(MCROCFLEventDataTypes.CATEGORY);
         MCRCategoryImpl newParent = (MCRCategoryImpl) eventData.get("parent");
+        if (!(MCROCFLCategoryIDLockTable.isLockedByCurrentSession(oldParent.getId())
+            || !MCROCFLCategoryIDLockTable.isLocked(oldParent.getId()))
+            && (MCROCFLCategoryIDLockTable.isLockedByCurrentSession(newParent.getId())
+                || !MCROCFLCategoryIDLockTable.isLocked(newParent.getId()))) {
+            throw new LockException("The Object <" + oldParent.getId() + "> or <" + newParent.getId()
+                + "> is currently locked by <" + MCROCFLCategoryIDLockTable.getLockingUserName(oldParent.getId().getRootID())
+                + "> and <" + MCROCFLCategoryIDLockTable.getLockingUserName(newParent.getId().getRootID()) + ">");
+        }
+        MCROCFLCategoryIDLockTable.lock(oldParent.getId());
+        MCROCFLCategoryIDLockTable.lock(newParent.getId());
         int index = (int) eventData.get("index");
-        MCRCategoryImpl mcrCg = (MCRCategoryImpl) data.get("ctg");
-        fileDelete(mcrCg.getId(), mcrCg, (MCRContent) data.get("xml"), eventData);
+        MCRCategoryImpl mcrCg = (MCRCategoryImpl) data.get(MCROCFLEventDataTypes.CATEGORY);
+        fileDelete(mcrCg.getId(), mcrCg, (MCRContent) data.get(MCROCFLEventDataTypes.CATEGORY_ROOT_CONTENT), eventData);
         mcrCg.setParent(newParent);
         List<MCRCategory> children = newParent.getChildren();
         children.remove(mcrCg);
@@ -194,36 +221,33 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     public void commitChanges(MCREvent evt) {
         Map<String, Object> data = MCROCFLEventHandler.getEventData(evt);
-        MCRCategoryID mcrid = (MCRCategoryID) data.get("mid");
-        MCRCategory mcrCg = (MCRCategory) data.get("ctg");
-        MCRContent rtXml = (MCRContent) data.get("rtx"); // class
-        MCREvent event = (MCREvent) evt.get("event");
+        MCRCategoryID mcrid = (MCRCategoryID) data.get(MCROCFLEventDataTypes.CATEGORY_ID);
+        MCRCategory mcrCg = (MCRCategory) data.get(MCROCFLEventDataTypes.CATEGORY);
+        MCRContent rtXml = (MCRContent) data.get(MCROCFLEventDataTypes.CATEGORY_ROOT_CONTENT); // class
         Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrid.getRootID()));
-        if (event == null) {
-            event = evt;
-        }
         if (mcrCg.isCategory()) {
             fileUpdate(mcrCg.getRoot().getId(), mcrCg.getRoot(), rtXml, evt);
         }
         LOGGER.debug("Committing <{}> in Object <{}>", mcrid.getID(), mcrid.getRootID());
-        VersionInfo versionInfo = buildVersionInfo(event.getEventType(), lastModified);
+        VersionInfo versionInfo = buildVersionInfo(evt.getEventType(), lastModified);
         getRepository().commitStagedChanges(getName(mcrid), versionInfo);
+        MCROCFLCategoryIDLockTable.unlock(mcrid);
     }
 
     @SuppressWarnings("unchecked")
     public void commitSession(Optional<MCRSession> sessionOpt) {
         MCRSession session = sessionOpt.orElse(MCRSessionMgr.getCurrentSession());
-        ArrayList<MCREvent> list = (ArrayList<MCREvent>) session.get("classQueue");
+        ArrayList<MCREvent> list = (ArrayList<MCREvent>) session.get(Q_DATA);
         list.forEach(this::commitChanges);
-        session.deleteObject("classQueue");
+        session.deleteObject(Q_DATA);
     }
 
     public void dropChanges(MCREvent evt) {
-        dropChanges((MCRCategoryID) MCROCFLEventHandler.getEventData(evt).get("mid"));
+        dropChanges((MCRCategoryID) MCROCFLEventHandler.getEventData(evt).get(MCROCFLEventDataTypes.CATEGORY_ID));
     }
 
     public void dropChanges(MCREvent evt, Map<String, Object> data) {
-        MCRCategoryID mcrid = (MCRCategoryID) data.get("mid");
+        MCRCategoryID mcrid = (MCRCategoryID) data.get(MCROCFLEventDataTypes.CATEGORY_ID);
         dropChanges(mcrid);
     }
 
@@ -231,8 +255,10 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         if (getRepository().hasStagedChanges(getName(mcrid))) {
             getRepository().purgeStagedChanges(getName(mcrid));
             LOGGER.debug("Dropped changes of {}", getName(mcrid));
+            MCROCFLCategoryIDLockTable.unlock(mcrid);
         } else {
             LOGGER.debug("No changes to Drop for {}", getName(mcrid));
+            MCROCFLCategoryIDLockTable.unlock(mcrid);
         }
     }
 

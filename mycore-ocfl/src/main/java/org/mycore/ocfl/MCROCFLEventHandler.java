@@ -35,6 +35,8 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 
+import edu.wisc.library.ocfl.api.exception.LockException;
+
 /**
  * @author Tobias Lenhardt [Hammer1279]
  */
@@ -54,14 +56,20 @@ public class MCROCFLEventHandler implements MCREventHandler {
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (Objects.equals(evt.getObjectType(), MCREvent.CLASS_TYPE)) {
             Map<String, Object> data = getEventData(evt);
-            MCRCategoryID mcrid = (MCRCategoryID) data.get("mid");
-            MCRCategory mcrCg = (MCRCategory) data.get("ctg");
-            MCRContent clXml = (MCRContent) data.get("rtx");
-            MCRContent cgXml = (MCRContent) data.get("cgx");
+            MCRCategoryID mcrid = (MCRCategoryID) data.get(MCROCFLEventDataTypes.CATEGORY_ID);
+            MCRCategory mcrCg = (MCRCategory) data.get(MCROCFLEventDataTypes.CATEGORY);
+            MCRContent clXml = (MCRContent) data.get(MCROCFLEventDataTypes.CATEGORY_ROOT_CONTENT);
+            MCRContent cgXml = (MCRContent) data.get(MCROCFLEventDataTypes.CATEGORY_CONTENT);
             LOGGER.debug("{} handling {} {}", getClass().getName(), mcrid, evt.getEventType());
             switch (evt.getEventType()) {
                 case MCREvent.CREATE_EVENT:
                 case MCREvent.UPDATE_EVENT:
+                    if (MCROCFLCategoryIDLockTable.isLocked(mcrid)
+                        && !MCROCFLCategoryIDLockTable.isLockedByCurrentSession(mcrid)) {
+                        throw new LockException("The Object <" + mcrid + "> is currently locked by <"
+                            + MCROCFLCategoryIDLockTable.getLockingUserName(mcrid.getID()) + ">");
+                    }
+                    MCROCFLCategoryIDLockTable.lock(mcrid);
                     if (!evt.containsKey("type")) {
                         manager.fileUpdate(mcrid, mcrCg, clXml, cgXml, evt);
                     } else {
@@ -120,11 +128,12 @@ public class MCROCFLEventHandler implements MCREventHandler {
         MCRContent cgxml = new MCRJDOMContent(MCRCategoryTransformer.getMetaDataElement(cl, counter));
         MCRCategoryID mcrid = cl.getId();
         Map<String, Object> rtVal = new HashMap<>();
-        rtVal.put("ctg", cl);
+        // make these some static finals somewhere else to avoid "magic strings"
+        rtVal.put(MCROCFLEventDataTypes.CATEGORY, cl);
         rtVal.put("xml", rtxml); // compatibility
-        rtVal.put("rtx", rtxml);
-        rtVal.put("cgx", cgxml);
-        rtVal.put("mid", mcrid);
+        rtVal.put(MCROCFLEventDataTypes.CATEGORY_ROOT_CONTENT, rtxml);
+        rtVal.put(MCROCFLEventDataTypes.CATEGORY_CONTENT, cgxml);
+        rtVal.put(MCROCFLEventDataTypes.CATEGORY_ID, mcrid);
         return rtVal;
     }
 }

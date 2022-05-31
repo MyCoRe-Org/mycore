@@ -138,6 +138,7 @@ public class MCROCFLDevCommands {
         }
         List<MCRCategoryID> list = new MCRCategoryDAOImpl().getRootCategoryIDs();
         try {
+            // TODO make this a config
             String classQueue = "classQueue";
             MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             list.forEach(cId -> {

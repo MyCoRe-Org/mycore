@@ -19,6 +19,7 @@
 package org.mycore.ocfl;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +29,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]
@@ -36,15 +38,22 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     private static final Logger LOGGER = LogManager.getLogger(MCROCFLPersistenceTransaction.class);
 
+    // TODO replace this with a setting
+    private static final String Q_DATA = "classQueue";
+
     protected MCRSession currentSession;
 
     protected Optional<MCROCFLXMLClassificationManager> managerOpt;
+
+    // private ThreadLocal<Set<MCRCategoryID>> threadLocal;
+    private ThreadLocal<Map<MCRCategoryID, Boolean>> markForNewOCFLVersion;
 
     private boolean rollbackOnly = false;
 
     private ArrayList<MCREvent> rollbackList;
 
-    private final boolean verboseLogging = MCRConfiguration2.getBoolean("MCR.OCFL.PT.Verbose").orElse(false);
+    // list of all things to commit, save them here instead of session
+    // how do we write here?
 
     public MCROCFLPersistenceTransaction() {
         try {
@@ -83,7 +92,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             rollback();
         }
         currentSession = MCRSessionMgr.getCurrentSession();
-        currentSession.put("classQueue", new ArrayList<MCREvent>());
+        currentSession.put(Q_DATA, new ArrayList<MCREvent>());
     }
 
     /**
@@ -100,7 +109,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             managerOpt.get().commitSession(currentSession);
         } catch (Exception e) {
             rollbackOnly = true;
-            rollbackList = (ArrayList<MCREvent>) currentSession.get("classQueue");
+            rollbackList = (ArrayList<MCREvent>) currentSession.get(Q_DATA);
             throw e;
         }
     }
@@ -117,10 +126,10 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         }
         try {
             if (rollbackOnly) {
-                ((ArrayList<MCREvent>) currentSession.get("classQueue")).addAll(rollbackList);
+                ((ArrayList<MCREvent>) currentSession.get(Q_DATA)).addAll(rollbackList);
             }
         } catch (Exception e) {
-            currentSession.put("classQueue", rollbackList);
+            currentSession.put(Q_DATA, rollbackList);
         }
         managerOpt.get().rollbackSession(currentSession);
         rollbackOnly = false;
@@ -143,7 +152,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
      */
     @Override
     public boolean isActive() {
-        boolean active = MCRSessionMgr.getCurrentSession().get("classQueue") != null;
+        boolean active = MCRSessionMgr.getCurrentSession().get(Q_DATA) != null;
         LOGGER.debug("TRANSACTION ACTIVE CHECK - {}", active);
         return active;
     }
