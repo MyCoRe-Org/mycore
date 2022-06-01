@@ -27,8 +27,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.annotation.Nullable;
-
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
@@ -98,7 +96,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         fileUpdate(mcrCg, xml, MESSAGE_UPDATED);
     }
 
-    void fileUpdate(MCRCategory mcrCg, MCRContent xml, @Nullable String messageOpt) {
+    void fileUpdate(MCRCategory mcrCg, MCRContent xml, String messageOpt) {
         
         String objName = getName(mcrCg.getId());
         Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrCg.getId().getID()));
@@ -139,7 +137,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
      * @param revision Revision of the Category
      * @return Content of the Classification
      */
-    public MCRContent retrieveContent(MCRCategoryID mcrid, @Nullable String revision) {
+    public MCRContent retrieveContent(MCRCategoryID mcrid, String revision) {
         String objName = getName(mcrid);
         OcflRepository repo = getRepository();
         ObjectVersionId vId = revision != null ? ObjectVersionId.version(objName, revision)

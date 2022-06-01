@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -140,7 +138,13 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         return active;
     }
 
-    public static void addClassfication(MCRCategoryID id, @Nullable MCRCategory category) {
+    /**
+     * Add Classifications to get Updated/Deleted once the Transaction gets Committed
+     * @param id The ID of the Classification
+     * @param category The Root Category / Classification, set to {@code null} to delete 
+     * the Classification
+     */
+    public static void addClassfication(MCRCategoryID id, MCRCategory category) {
         if (!Objects.requireNonNull(id).isRootID()) {
             throw new IllegalArgumentException("Only root category ids are allowed: " + id);
         }
