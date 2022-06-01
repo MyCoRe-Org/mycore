@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "epubjs": "0.3.84",
+    "epubjs": "0.3.89",
     "es6-promise": "^4.2.8",
     "jquery": "^3.5.1",
     "jszip": "^3.2.1",
