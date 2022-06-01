@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -31,21 +30,16 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRTransactionHelper;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
-import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.ocfl.MCROCFLEventHandler;
+import org.mycore.ocfl.MCROCFLPersistenceTransaction;
 import org.mycore.ocfl.MCROCFLXMLClassificationManager;
 
 /**
@@ -75,7 +69,7 @@ public class MCROCFLDevCommands {
         createDir(EXPORT_DIR);
         Files.write(Path.of(EXPORT_DIR.toString(), mclass + ".xml"), content.asByteArray(), StandardOpenOption.CREATE,
             StandardOpenOption.TRUNCATE_EXISTING);
-        LOGGER.info("Exported Class <{}> with Revision <{}> to <{}>", mclass, rev, EXPORT_DIR.toString());
+        LOGGER.info("Exported Class <{}> with Revision <{}> to <{}>", mclass, rev, EXPORT_DIR);
 
     }
 
@@ -87,7 +81,7 @@ public class MCROCFLDevCommands {
         createDir(EXPORT_DIR);
         Files.write(Path.of(EXPORT_DIR.toString(), mclass + ".xml"), content.asByteArray(), StandardOpenOption.CREATE,
             StandardOpenOption.TRUNCATE_EXISTING);
-        LOGGER.info("Exported Class <{}> to <{}>", mclass, EXPORT_DIR.toString());
+        LOGGER.info("Exported Class <{}> to <{}>", mclass, EXPORT_DIR);
 
     }
 
@@ -103,25 +97,13 @@ public class MCROCFLDevCommands {
         LOGGER.info("Exported all Classes!");
     }
 
-    @MCRCommand(syntax = "rollback all ocfl classes",
-        help = "roll back all classes in the ocfl store to a clean state",
-        order = 2)
-    public static void rollbackAll() throws IOException {
-        List<MCRCategoryID> list = MCRCategoryDAOFactory.getInstance().getRootCategoryIDs();
-        for (MCRCategoryID cId : list) {
-            LOGGER.debug("Rolling '{}' back", cId.getRootID());
-            manager.dropChanges(cId);
-        }
-        LOGGER.info("Dropped all Staged changes.");
-    }
-
     private static void createDir(Path dir) throws IOException {
         if (Files.notExists(dir)) {
             Files.createDirectories(dir);
         }
     }
 
-    @SuppressWarnings("unchecked")
+    // maybe use "repair ocfl class store" instead, plus "repair ocfl class {0}" to replace single class
     @MCRCommand(syntax = "rebuild ocfl class store",
         help = "Clear the OCFL Store Classifications and reload them from the Database\nWILL WIPE MCRCLASS FOLDER",
         order = 2)
@@ -138,34 +120,14 @@ public class MCROCFLDevCommands {
         }
         List<MCRCategoryID> list = new MCRCategoryDAOImpl().getRootCategoryIDs();
         try {
-            // TODO make this a config
-            String classQueue = "classQueue";
-            MCRSession currentSession = MCRSessionMgr.getCurrentSession();
             list.forEach(cId -> {
                 MCREvent evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.CREATE_EVENT);
                 MCRCategory category = new MCRCategoryDAOImpl().getCategory(cId, -1);
                 evt.put("class", category);
-                manager.fileUpdate(category.getId(), category,
-                    new MCRJDOMContent(MCRCategoryTransformer.getMetaDataDocument(category, true)), evt);
-                ((ArrayList<MCREvent>) currentSession.get(classQueue)).add(evt);
+                MCROCFLPersistenceTransaction.addClassfication(cId, category);
             });
             LOGGER.info("Staged {} Objects for Update in OCFL Store", list.size());
         } catch (Exception e) {
-            LOGGER.error("Error occurred, rolling back...");
-            try {
-                MCRTransactionHelper.rollbackTransaction();
-            } catch (Exception err) {
-                manager.rollbackSession(MCRSessionMgr.getCurrentSession());
-            }
-            list.forEach(cId -> {
-                MCREvent evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.CREATE_EVENT);
-                MCRCategory category = new MCRCategoryDAOImpl().getCategory(cId, 0);
-                evt.put("class", category);
-                manager.undoAction(MCROCFLEventHandler.getEventData(evt), evt);
-            });
-            // Logging only would be better since the rollback has already occurred,
-            // however MyCoRe would show it was successfully, which it certainly was not
-            // LOGGER.error("Error Updating Class Storage:", e);
             throw new MCRException("Error Updating Class Storage:", e);
         }
     }

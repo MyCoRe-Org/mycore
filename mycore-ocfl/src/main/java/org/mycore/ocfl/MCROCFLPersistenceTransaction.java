@@ -29,34 +29,31 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.mycore.common.MCRPersistenceTransaction;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]
+ * @author Thomas Scheffler (yagee)
  */
 public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction {
 
     private static final Logger LOGGER = LogManager.getLogger(MCROCFLPersistenceTransaction.class);
 
-    protected MCRSession currentSession;
-
     protected Optional<MCROCFLXMLClassificationManager> managerOpt;
 
-    // private ThreadLocal<Set<MCRCategoryID>> threadLocal;
     private static final ThreadLocal<Map<MCRCategoryID, MCRCategory>> CATEGORY_WORKSPACE = new ThreadLocal<>();
+
+    private long threadId = Thread.currentThread().getId();
 
     private boolean rollbackOnly;
 
     private boolean active;
-
-    // list of all things to commit, save them here instead of session
-    // how do we write here?
 
     public MCROCFLPersistenceTransaction() {
         try {
@@ -69,36 +66,28 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         active = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isReady() {
-        LOGGER.debug("TRANSACTION READY CHECK - {}", managerOpt.isPresent());
-        return managerOpt.isPresent() && !isActive() && managerOpt.get().isMutable();
+        LOGGER.debug("TRANSACTION {} READY CHECK - {}", threadId, managerOpt.isPresent());
+        return managerOpt.isPresent() && !isActive();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void begin() {
-        LOGGER.debug("TRANSACTION BEGIN");
+        LOGGER.debug("TRANSACTION {} BEGIN", threadId);
         if (isActive()) {
             throw new IllegalStateException("TRANSACTION ALREADY ACTIVE");
         }
-        active = true;
         CATEGORY_WORKSPACE.set(new HashMap<>());
-        currentSession = MCRSessionMgr.getCurrentSession();
+        active = true;
     }
 
     @Override
     public void commit() {
-        LOGGER.debug("TRANSACTION COMMIT");
+        LOGGER.debug("TRANSACTION {} COMMIT", threadId);
         if (!isActive() || getRollbackOnly()) {
-            throw new IllegalStateException("TRANSACTION NOT ACTIVE OR ONLY ROLLBACK");
+            throw new IllegalStateException("TRANSACTION NOT ACTIVE OR MARKED FOR ROLLBACK");
         }
-        active = false;
         final Map<MCRCategoryID, MCRCategory> mapOfChanges = CATEGORY_WORKSPACE.get();
         final MCROCFLXMLClassificationManager ocflClassficationManager = managerOpt.get();
         //save new OCFL version of classifications
@@ -108,40 +97,37 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             .map(Map.Entry::getValue)
             .forEach(category -> MCRSessionMgr.getCurrentSession()
                 .onCommit(() -> {
+                    LOGGER.debug("[{}] UPDATING CLASS <{}>", threadId, category.getId());
                     //TODO: read classification from just here
-                    final Document categoryXML = MCRCategoryTransformer.getMetaDataDocument(category, false);
-                    ocflClassficationManager.fileUpdate(category.getId(), category, new MCRJDOMContent(categoryXML),
-                        null);
+                    final MCRCategory categoryRoot = MCRCategoryDAOFactory.getInstance()
+                        .getCategory(category.getRoot().getId(), -1);
+                    final Document categoryXML = MCRCategoryTransformer.getMetaDataDocument(categoryRoot, false);
+                    ocflClassficationManager.update(category, new MCRJDOMContent(categoryXML));
                 }));
         //delete classifications
         mapOfChanges.entrySet()
             .stream()
             .filter(e -> Objects.isNull(e.getValue())) // value is category if classification should not be deleted
             .forEach(entry -> MCRSessionMgr.getCurrentSession()
-                .onCommit(() -> ocflClassficationManager.fileDelete(entry.getKey(), null, null, null)));
-        //throw away:
-        try {
-            managerOpt.get().commitSession(currentSession);
-        } catch (Exception e) {
-            rollbackOnly = true;
-            throw e;
-        }
+                .onCommit(() -> ocflClassficationManager.fileDelete(entry.getKey())));
+        CATEGORY_WORKSPACE.remove();
+        active = false;
     }
 
     @Override
     public void rollback() {
-        LOGGER.debug("TRANSACTION ROLLBACK");
+        LOGGER.debug("TRANSACTION {} ROLLBACK", threadId);
         if (!isActive()) {
             throw new IllegalStateException("TRANSACTION NOT ACTIVE");
         }
-        active = false;
         CATEGORY_WORKSPACE.remove();
         rollbackOnly = false;
+        active = false;
     }
 
     @Override
     public boolean getRollbackOnly() {
-        LOGGER.debug("TRANSACTION ROLLBACK CHECK - {}", rollbackOnly);
+        LOGGER.debug("TRANSACTION {} ROLLBACK CHECK - {}", threadId, rollbackOnly);
         if (!isActive()) {
             throw new IllegalStateException("TRANSACTION NOT ACTIVE");
         }
@@ -150,7 +136,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     @Override
     public boolean isActive() {
-        LOGGER.debug("TRANSACTION ACTIVE CHECK - {}", active);
+        LOGGER.debug("TRANSACTION {} ACTIVE CHECK - {}", threadId, active);
         return active;
     }
 

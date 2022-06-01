@@ -18,22 +18,17 @@
 
 package org.mycore.ocfl;
 
-import java.util.HashMap;
-import java.util.Map;
+import static org.mycore.ocfl.MCROCFLPersistenceTransaction.addClassfication;
+
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]
@@ -47,31 +42,38 @@ public class MCROCFLEventHandler implements MCREventHandler {
         .orElse(new MCROCFLXMLClassificationManager());
 
     @Override
-    @SuppressWarnings(value = "PMD.SwitchStmtsShouldHaveDefault")
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (Objects.equals(evt.getObjectType(), MCREvent.CLASS_TYPE)) {
-            Map<String, Object> data = getEventData(evt);
-            MCRCategoryID mcrid = (MCRCategoryID) data.get(MCROCFLEventDataTypes.CATEGORY_ID);
-            MCRCategory mcrCg = (MCRCategory) data.get(MCROCFLEventDataTypes.CATEGORY);
-            MCRContent clXml = (MCRContent) data.get(MCROCFLEventDataTypes.CATEGORY_ROOT_CONTENT);
-            MCRContent cgXml = (MCRContent) data.get(MCROCFLEventDataTypes.CATEGORY_CONTENT);
-            LOGGER.debug("{} handling {} {}", getClass().getName(), mcrid, evt.getEventType());
+            MCRCategory mcrCg = (MCRCategory) evt.get("class");
+            LOGGER.debug("{} handling {} {}", getClass().getName(), mcrCg.getId(), evt.getEventType());
             switch (evt.getEventType()) {
                 case MCREvent.CREATE_EVENT:
                 case MCREvent.UPDATE_EVENT:
-                    MCROCFLPersistenceTransaction.addClassfication(mcrCg.getId(), mcrCg.getRoot());
+                    // if (Objects.nonNull(evt.get("type"))) {
+                    //     MCRCategoryImpl mcrCgImpl = (MCRCategoryImpl) mcrCg;
+                    //     MCRCategoryImpl parent = (MCRCategoryImpl) evt.get("parent");
+                    //     int index = (int) evt.get("index");
+                    //     mcrCgImpl.setParent(parent);
+                    //     List<MCRCategory> children = parent.getChildren();
+                    //     children.remove(mcrCgImpl);
+                    //     children.add(index, mcrCgImpl);
+                    //     addClassfication(mcrCgImpl.getRoot().getId(), mcrCgImpl.getRoot());
+                    // } else {
+                        addClassfication(mcrCg.getRoot().getId(), mcrCg.getRoot());
+                    // }
                     break;
                 case MCREvent.DELETE_EVENT:
                     if (mcrCg.getId().isRootID()) {
-                        //delete complete classification
-                        MCROCFLPersistenceTransaction.addClassfication(mcrCg.getId(), null);
+                        // delete complete classification
+                        addClassfication(mcrCg.getRoot().getId(), null);
                     } else {
-                        //update classification to new version
-                        MCROCFLPersistenceTransaction.addClassfication(mcrCg.getId(), mcrCg.getRoot());
+                        // update classification to new version
+                        addClassfication(mcrCg.getRoot().getId(), mcrCg.getRoot());
                     }
                     break;
                 default:
                     LOGGER.error("No Method available for {}", evt.getEventType());
+                    break;
             }
         }
     }
@@ -79,34 +81,10 @@ public class MCROCFLEventHandler implements MCREventHandler {
     @Override
     public void undoHandleEvent(MCREvent evt) throws MCRException {
         if (Objects.equals(evt.getObjectType(), MCREvent.CLASS_TYPE)) {
-            LOGGER.debug("{} handling {} {}", getClass().getName(), ((MCRCategory) evt.get("class")).getId(),
+            LOGGER.debug("{} handling undo of {} {}", getClass().getName(), ((MCRCategory) evt.get("class")).getId(),
                 evt.getEventType());
-            manager.undoAction(getEventData(evt), evt);
+            LOGGER.info("Doing nothing for undo of {} {}", ((MCRCategory) evt.get("class")).getId(),
+                evt.getEventType());
         }
-    }
-
-    /**
-     * Returns Event Data in form of an Map. This is used to extract the category data from the MyCoRe Event
-     * @param evt MCREvent
-     * @return Map &lt;String, Object&gt; :
-     * <p>ctg - Category / Classification</p>
-     * <p>rtx - Root Document</p>
-     * <p>cgx - Category Element</p>
-     * <p>mid - MyCoRe ID</p>
-     */
-    public static final Map<String, Object> getEventData(MCREvent evt) {
-        MCRCategory cl = (MCRCategory) evt.get("class");
-        MCRContent rtxml = new MCRJDOMContent(MCRCategoryTransformer
-            .getMetaDataDocument(MCRCategoryDAOFactory.getInstance().getCategory(cl.getRoot().getId(), -1), false));
-        MCRContent cgxml = new MCRJDOMContent(MCRCategoryTransformer.getMetaDataElement(cl, false));
-        MCRCategoryID mcrid = cl.getId();
-        Map<String, Object> rtVal = new HashMap<>();
-        // make these some static finals somewhere else to avoid "magic strings"
-        rtVal.put(MCROCFLEventDataTypes.CATEGORY, cl);
-        rtVal.put("xml", rtxml); // compatibility
-        rtVal.put(MCROCFLEventDataTypes.CATEGORY_ROOT_CONTENT, rtxml);
-        rtVal.put(MCROCFLEventDataTypes.CATEGORY_CONTENT, cgxml);
-        rtVal.put(MCROCFLEventDataTypes.CATEGORY_ID, mcrid);
-        return rtVal;
     }
 }

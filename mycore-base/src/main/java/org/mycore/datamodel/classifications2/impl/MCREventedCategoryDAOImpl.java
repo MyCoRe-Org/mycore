@@ -18,13 +18,10 @@
 
 package org.mycore.datamodel.classifications2.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -47,7 +44,6 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.CREATE_EVENT);
         evt.put("class", category);
         manager.handleEvent(evt);
-        queueForCommit(evt);
         return rv;
     }
 
@@ -60,7 +56,6 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCREvent evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.DELETE_EVENT);
         evt.put("class", category);
         manager.handleEvent(evt, MCREventManager.BACKWARD);
-        queueForCommit(evt);
         super.deleteCategory(id);
     }
 
@@ -74,7 +69,6 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         // originally named UType (Update Type), it is an Optional Value
         evt.put("type", "move");
         manager.handleEvent(evt);
-        queueForCommit(evt);
         super.moveCategory(id, newParentID, index);
     }
 
@@ -84,7 +78,6 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
         evt.put("class", super.getCategory(id, -1));
         manager.handleEvent(evt);
-        queueForCommit(evt);
         return rv;
     }
 
@@ -94,7 +87,6 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
         evt.put("class", newCategory);
         manager.handleEvent(evt);
-        queueForCommit(evt);
         return rv;
     }
 
@@ -104,7 +96,6 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
         evt.put("class", super.getCategory(id, -1));
         manager.handleEvent(evt);
-        queueForCommit(evt);
         return rv;
     }
 
@@ -114,14 +105,6 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
         evt.put("class", super.getCategory(id, -1));
         manager.handleEvent(evt);
-        queueForCommit(evt);
         return rv;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected void queueForCommit(MCREvent evt) {
-        String classQueue = "classQueue";
-        MCRSession currentSession = MCRSessionMgr.getCurrentSession();
-        ((ArrayList<MCREvent>) currentSession.get(classQueue)).add(evt);
     }
 }
