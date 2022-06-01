@@ -159,6 +159,7 @@
             <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded" />
           </xs:sequence>
           <xs:attribute name="inherited" type="xs:integer" use="required" fixed="0" />
+          <xs:attribute name="sequence" type="xs:integer" />
           <xs:attributeGroup ref="supportedXlinks" />
         </xs:complexType>
       </xs:element>
