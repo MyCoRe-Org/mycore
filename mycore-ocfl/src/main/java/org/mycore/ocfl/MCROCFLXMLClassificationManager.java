@@ -55,8 +55,6 @@ import edu.wisc.library.ocfl.api.model.VersionInfo;
  */
 public class MCROCFLXMLClassificationManager implements MCRXMLClassificationManager {
 
-    // private static final Logger LOGGER = LogManager.getLogger(MCROCFLXMLClassificationManager.class);
-
     protected static final String CLASSIFICATION_PREFIX = "mcrclass:";
 
     private static final boolean INC_CLSDIR = MCRConfiguration2.getBoolean(CLASSIFICATION_PREFIX).orElse(false);
@@ -114,9 +112,6 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
             throw new MCRPersistenceException("Failed to update object '" + objName + "'", e);
         } catch (IllegalArgumentException e) {
             // Issue seems to be with the OCFL Library trying to find a file it deleted itself
-            // LOGGER.warn("IllegalArgumentException happened, Ignoring...");
-
-            // dropChanges(mcrid);
             // LOGGER.error("Something has gone Wrong!", e);
         }
 

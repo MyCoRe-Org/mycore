@@ -49,18 +49,7 @@ public class MCROCFLEventHandler implements MCREventHandler {
             switch (evt.getEventType()) {
                 case MCREvent.CREATE_EVENT:
                 case MCREvent.UPDATE_EVENT:
-                    // if (Objects.nonNull(evt.get("type"))) {
-                    //     MCRCategoryImpl mcrCgImpl = (MCRCategoryImpl) mcrCg;
-                    //     MCRCategoryImpl parent = (MCRCategoryImpl) evt.get("parent");
-                    //     int index = (int) evt.get("index");
-                    //     mcrCgImpl.setParent(parent);
-                    //     List<MCRCategory> children = parent.getChildren();
-                    //     children.remove(mcrCgImpl);
-                    //     children.add(index, mcrCgImpl);
-                    //     addClassfication(mcrCgImpl.getRoot().getId(), mcrCgImpl.getRoot());
-                    // } else {
                         addClassfication(mcrCg.getRoot().getId(), mcrCg.getRoot());
-                    // }
                     break;
                 case MCREvent.DELETE_EVENT:
                     if (mcrCg.getId().isRootID()) {

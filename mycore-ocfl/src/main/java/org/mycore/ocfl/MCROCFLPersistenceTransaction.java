@@ -88,7 +88,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         }
         final Map<MCRCategoryID, MCRCategory> mapOfChanges = CATEGORY_WORKSPACE.get();
         final MCROCFLXMLClassificationManager ocflClassficationManager = managerOpt.get();
-        //save new OCFL version of classifications
+        // save new OCFL version of classifications
         mapOfChanges.entrySet()
             .stream()
             .filter(e -> Objects.nonNull(e.getValue())) // value is category if classification should not be deleted
@@ -96,13 +96,13 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             .forEach(category -> MCRSessionMgr.getCurrentSession()
                 .onCommit(() -> {
                     LOGGER.debug("[{}] UPDATING CLASS <{}>", threadId, category.getId());
-                    //TODO: read classification from just here
+                    // read classification from just here
                     final MCRCategory categoryRoot = MCRCategoryDAOFactory.getInstance()
                         .getCategory(category.getRoot().getId(), -1);
                     final Document categoryXML = MCRCategoryTransformer.getMetaDataDocument(categoryRoot, false);
                     ocflClassficationManager.update(category, new MCRJDOMContent(categoryXML));
                 }));
-        //delete classifications
+        // delete classifications
         mapOfChanges.entrySet()
             .stream()
             .filter(e -> Objects.isNull(e.getValue())) // value is category if classification should not be deleted
