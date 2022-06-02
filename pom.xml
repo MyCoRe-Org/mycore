@@ -58,7 +58,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
     <node.version>v12.18.3</node.version>
-    <oaipmh.version>2.3-SNAPSHOT</oaipmh.version>
+    <oaipmh.version>2.3</oaipmh.version>
     <ocfl-java.version>1.4.6</ocfl-java.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <selenium.version>3.141.59</selenium.version>
