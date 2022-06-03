@@ -78,4 +78,8 @@ class MCRIdentifierPool {
     List<MCRIdentifier> getIdentifiersOfType(MCRIdentifierType type) {
         return oldIdentifiers.stream().filter(id -> id.getType().equals(type)).collect(Collectors.toList());
     }
+
+    MCRIdentifier getCurrent() {
+        return newIdentifiers.iterator().next();
+    }
 }

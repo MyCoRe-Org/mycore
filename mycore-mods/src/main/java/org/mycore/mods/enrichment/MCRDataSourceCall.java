@@ -62,17 +62,15 @@ class MCRDataSourceCall implements Callable<Boolean> {
      * @return true, if the data source returned publication data
      */
     public Boolean call() {
-        if (!wasSuccessful()) {
-            for (MCRIdentifierResolver idResolver : ds.getResolvers()) {
-                MCRIdentifierType type = idResolver.getType();
-                for (MCRIdentifier id : idPool.getIdentifiersOfType(type)) {
-                    result = idResolver.resolve(id.getValue());
-                    LOGGER.info(ds.getID() + " with " + id + " returned " + (wasSuccessful() ? "" : "no ") + "data ");
-                    if (wasSuccessful() && validate(id.getValue())) {
-                        MCRMODSSorter.sort(result);
-                        idPool.addIdentifiersFrom(result);
-                        return true;
-                    }
+        MCRIdentifier id = idPool.getCurrent();
+        for (MCRIdentifierResolver idResolver : ds.getResolvers()) {
+            MCRIdentifierType type = idResolver.getType();
+            if(type == id.getType()) {
+                result = idResolver.resolve(id.getValue());
+                LOGGER.info(ds.getID() + " with " + id + " returned " + (wasSuccessful() ? "" : "no ") + "data ");
+                if (wasSuccessful() && validate(id.getValue())) {
+                    MCRMODSSorter.sort(result);
+                    return true;
                 }
             }
         }
