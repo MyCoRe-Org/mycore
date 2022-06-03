@@ -57,6 +57,7 @@ class MCRIdentifierPool {
             newIdentifiers.addAll(type.getIdentifiers(object));
         }
         newIdentifiers.removeAll(oldIdentifiers);
+        buildNewIdentifiersIn(object);
     }
 
     /** Returns true, if new identifiers were added in the current resolving round */
@@ -70,12 +71,16 @@ class MCRIdentifierPool {
 
     /** Merges all new identifies into the set of old identifiers */
     void continueWithNewIdentifiers() {
-        oldIdentifiers.clear();
         oldIdentifiers.addAll(newIdentifiers);
         newIdentifiers.clear();
     }
 
     List<MCRIdentifier> getIdentifiersOfType(MCRIdentifierType type) {
         return oldIdentifiers.stream().filter(id -> id.getType().equals(type)).collect(Collectors.toList());
+    }
+    
+    void moveToNext() {
+        oldIdentifiers.add(newIdentifiers.iterator().next());
+        newIdentifiers.remove(newIdentifiers.iterator().next());
     }
 }

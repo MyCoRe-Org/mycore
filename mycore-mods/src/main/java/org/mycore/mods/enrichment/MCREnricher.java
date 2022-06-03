@@ -104,13 +104,15 @@ public class MCREnricher {
         this.publication = publication;
         idPool.addIdentifiersFrom(publication);
 
-        resolveExternalData();
-        mergeExternalData();
-        MCRMODSSorter.sort(publication);
+        while(idPool.hasNewIdentifiers()) {
+            resolveExternalData();
+            mergeExternalData();
+            MCRMODSSorter.sort(publication);
+            idPool.addIdentifiersFrom(publication);
+        }
 
         for (Element nestedObject : xPath2FindNestedObjects.evaluate(publication)) {
             idPool.continueWithNewIdentifiers();
-            id2call.values().forEach(call -> call.reset());
             enrich(nestedObject);
         }
     }
@@ -125,17 +127,15 @@ public class MCREnricher {
     }
 
     private void resolveExternalData() {
+        id2call.values().forEach(call -> call.reset());
         Collection<MCRTransactionableCallable<Boolean>> calls = id2call.values()
             .stream()
             .map(MCRTransactionableCallable::new)
             .collect(Collectors.toList());
         ExecutorService executor = Executors.newFixedThreadPool(calls.size());
         try {
-            while (idPool.hasNewIdentifiers()) {
-                idPool.buildNewIdentifiersIn(publication);
-                idPool.continueWithNewIdentifiers();
-                executor.invokeAll(calls);
-            }
+            executor.invokeAll(calls);
+            idPool.moveToNext();
         } catch (InterruptedException ex) {
             LOGGER.warn(ex);
         } finally {
