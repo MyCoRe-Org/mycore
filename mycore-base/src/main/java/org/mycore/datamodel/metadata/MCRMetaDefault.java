@@ -141,7 +141,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         this(lang);
         setInherited(inherited);
         this.subtag = subtag;
-        this.type = null;
+        this.type = type;
         this.sequence = DEFAULT_SEQUENCE;
     }
 
