@@ -21,15 +21,15 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
@@ -110,16 +110,18 @@ import jakarta.persistence.TypedQuery;
  */
 @MCRCommandGroup(name = "Object Commands")
 public class MCRObjectCommands extends MCRAbstractCommands {
-    private static final String EXPORT_OBJECT_TO_DIRECTORY_COMMAND = "export object {0} to directory {1} with {2}";
+
+    private static final String EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND
+        = "export object {0} to directory {1} with stylesheet {2}";
 
     /** The logger */
-    private static Logger LOGGER = LogManager.getLogger(MCRObjectCommands.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRObjectCommands.class);
 
     /** Default transformer script */
-    public static final String DEFAULT_TRANSFORMER = "save-object.xsl";
+    public static final String DEFAULT_STYLE = "save-object.xsl";
 
-    /** static compiled transformer stylesheets */
-    private static Hashtable<String, Transformer> translist = new Hashtable<>();
+    /** Static compiled transformer stylesheets */
+    private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
 
     public static void setSelectedObjectIDs(List<String> selected) {
         LOGGER.info("{} objects selected", selected.size());
@@ -224,7 +226,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         return cmds;
     }
-    
+
     @MCRCommand(
         syntax = "check for circles in topological order",
         help = "Checks if there are circular dependencies in the parent child relationships of MCRObjects.",
@@ -554,8 +556,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Export an MCRObject to a file named <em>MCRObjectID</em> .xml in a directory. The method use the converter
-     * stylesheet mcr_<em>style</em>_object.xsl.
+     * Export an MCRObject to a file named <em>MCRObjectID</em>.xml in a directory named <em>dirname</em>.
+     * The method uses the converter stylesheet <em>style</em>.xsl.
      *
      * @param id
      *            the id of the MCRObject to be save.
@@ -565,18 +567,18 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     @MCRCommand(
-        syntax = EXPORT_OBJECT_TO_DIRECTORY_COMMAND,
+        syntax = EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND,
         help = "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl."
-            + " For {2} save is the default.",
+            + " For {2}, the default is xsl/save.",
         order = 110)
     public static void export(String id, String dirname, String style) {
         export(id, id, dirname, style);
     }
 
     /**
-     * Save any MCRObject's to files named <em>MCRObjectID</em> .xml in a directory. The saving starts with fromID and
-     * runs to toID. ID's they was not found will skiped. The method use the converter stylesheet mcr_<em>style</em>
-     * _object.xsl.
+     * Export any MCRObject's to files named <em>MCRObjectID</em>.xml in a directory named <em>dirname</em>.
+     * Exporting starts with <em>fromID</em> and ends with <em>toID</em>. IDs that aren't found will be skipped.
+     * The method uses the converter stylesheet <em>style</em>.xsl.
      *
      * @param fromID
      *            the ID of the MCRObject from be save.
@@ -588,9 +590,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     @MCRCommand(
-        syntax = "export object from {0} to {1} to directory {2} with {3}",
+        syntax = "export objects from {0} to {1} to directory {2} with stylesheet {3}",
         help = "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} "
-            + "with the stylesheet {3}-object.xsl. For {3} save is the default.",
+            + "with the stylesheet {3}-object.xsl. For {3}, the default is xsl/save.",
         order = 100)
     public static void export(String fromID, String toID, String dirname, String style) {
         MCRObjectID fid, tid;
@@ -606,7 +608,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         // check dirname
         File dir = new File(dirname);
         if (!dir.isDirectory()) {
-            LOGGER.error("{} is not a dirctory.", dirname);
+            LOGGER.error("{} is not a directory.", dirname);
             return;
         }
 
@@ -632,9 +634,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Save all MCRObject's to files named <em>MCRObjectID</em> .xml in a <em>dirname</em>directory for the data type
-     * <em>type</em>. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
-     *
+     * Export all MCRObject's with data type <em>type</em> to files named <em>MCRObjectID</em>.xml in a directory
+     * named <em>dirname</em>. The method uses the converter stylesheet <em>style</em>.xsl.
+     * 
      * @param type
      *            the MCRObjectID type
      * @param dirname
@@ -643,9 +645,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     @MCRCommand(
-        syntax = "export all objects of type {0} to directory {1} with {2}",
-        help = "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl."
-            + " For {2} save is the default.",
+        syntax = "export all objects of type {0} to directory {1} with stylesheet {2}",
+        help = "Stores all MCRObjects of type {0} to directory {1} with the stylesheet {2}-object.xsl."
+            + "For {2}, the default is xsl/save.",
         order = 120)
     public static List<String> exportAllObjectsOfType(String type, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
@@ -653,8 +655,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Save all MCRObject's to files named <em>MCRObjectID</em> .xml in a <em>dirname</em>directory for the data base
-     * <em>project_type</em>. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
+     * Export all MCRObject's with data base <em>base</em> to files named <em>MCRObjectID</em>.xml in a directory
+     * named <em>dirname</em>. The method uses the converter stylesheet <em>style</em>.xsl.
      *
      * @param base
      *            the MCRObjectID base
@@ -665,8 +667,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     @MCRCommand(
         syntax = "export all objects of base {0} to directory {1} with {2}",
-        help = "Stores all MCRObjects of base {0} to directory {1} with the stylesheet mcr_{2}-object.xsl."
-            + " For {2} save is the default.",
+        help = "Stores all MCRObjects of base {0} to directory {1} with the stylesheet {2}-object.xsl."
+            + " For {2}, the default is xsl/save.",
         order = 130)
     public static List<String> exportAllObjectsOfBase(String base, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsForBase(base);
@@ -680,7 +682,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         List<String> cmds = new ArrayList<>(objectIds.size());
         for (String id : objectIds) {
-            String command = new MessageFormat(EXPORT_OBJECT_TO_DIRECTORY_COMMAND, Locale.ROOT)
+            String command = new MessageFormat(EXPORT_OBJECT_TO_DIRECTORY_WITH_STYLESHEET_COMMAND, Locale.ROOT)
                 .format(new Object[] { id, dir.getAbsolutePath(), style });
             cmds.add(command);
         }
@@ -688,46 +690,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method search for a stylesheet mcr_<em>style</em>.xsl and build the transformer. Default is
-     * <em>mcr_save-object.xsl</em>.
+     * This method searches for the stylesheet <em>style</em>.xsl and builds the transformer. Default is
+     * <em>save-object.xsl</em> if no stylesheet is given or the stylesheet couldn't be resolved.
      *
      * @param style
-     *            the style attribute for the transformer stylesheet
+     *            the name of the style to be used when resolving the stylesheet
      * @return the transformer
      */
     private static Transformer getTransformer(String style) {
-        String xslfile = DEFAULT_TRANSFORMER;
-        if (style != null && style.trim().length() != 0) {
-            xslfile = style + ".xsl";
-        }
-        Transformer trans = translist.get(xslfile);
-        if (trans != null) {
-            return trans;
-        }
-        LOGGER.debug("Will load transformer stylesheet {} for export.", xslfile);
-
-        URL xslURL = MCRObjectCommands.class.getResource("/" + xslfile);
-        if (xslURL == null) {
-            xslURL = MCRObjectCommands.class.getResource("/xsl/" + DEFAULT_TRANSFORMER);
-        }
-        try {
-            if (xslURL != null) {
-                StreamSource source = new StreamSource(xslURL.toURI().toASCIIString());
-                TransformerFactory transfakt = TransformerFactory.newInstance();
-                transfakt.setURIResolver(MCRURIResolver.instance());
-                trans = transfakt.newTransformer(source);
-                translist.put(xslfile, trans);
-                return trans;
-            } else {
-                LOGGER.warn("Can't load transformer ressource {} or " + DEFAULT_TRANSFORMER + ".", xslfile);
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Error while load transformer ressource {} or " + DEFAULT_TRANSFORMER + ".", xslfile);
-            if (LOGGER.isDebugEnabled()) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        return MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
     }
 
     /**

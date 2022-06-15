@@ -2,16 +2,23 @@ package org.mycore.frontend.cli;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Element;
+import org.jdom2.transform.JDOMSource;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 
 /**
  * Utilities intended to reduce redundant code when writing variants of CLI commands.
@@ -132,5 +139,53 @@ public class MCRCommandUtils {
             LOGGER.warn("No IDs found in range [{} -> {}].", from, to);
         }
         return idList.stream();
+    }
+
+    /**
+     * This method search for the stylesheet <em>style</em>.xsl and builds a transformer. A fallback is
+     * used if no stylesheet is given or the stylesheet couldn't be resolved.
+     *
+     * @param style
+     *            the name of the style to be used when resolving the stylesheet.
+     * @param defaultStyle
+     *            the name of the default style to be used when resolving the stylesheet.
+     *            A corresponding file xsl/<em>defaultStyle</em>.xsl must exist.
+     * @param cache
+     *            The transformer cache to be used.
+     * @return the transformer
+     */
+    public static final Transformer getTransformer(String style, String defaultStyle, Map<String, Transformer> cache) {
+        String xslFilePath = defaultStyle;
+        if (style != null && style.trim().length() != 0) {
+            xslFilePath = style.trim() + ".xsl";
+        }
+        Transformer transformer = cache.get(style);
+        if (transformer != null) {
+            return transformer;
+        }
+
+        Element element = MCRURIResolver.instance().resolve("resource:" + xslFilePath);
+        if (element == null) {
+            LOGGER.warn("Couldn't find resource {} for style {}, using default.", xslFilePath, style);
+            xslFilePath = "xsl/" + defaultStyle;
+            element = MCRURIResolver.instance().resolve("resource:" + xslFilePath);
+        }
+
+        try {
+            if (element != null) {
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                transformerFactory.setURIResolver(MCRURIResolver.instance());
+                transformer = transformerFactory.newTransformer(new JDOMSource(element));
+                cache.put(style, transformer);
+                LOGGER.info("Loaded transformer from resource {} for style {}.", xslFilePath, style);
+                return transformer;
+            } else {
+                LOGGER.warn("Couldn't load transformer from resource {} for style {}.", xslFilePath, style);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Error while loading transformer from resource " + xslFilePath
+                + " for style " + style + ".", e);
+        }
+        return null;
     }
 }

@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,17 +31,16 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,7 +60,6 @@ import org.mycore.common.content.MCRPathContent;
 import org.mycore.common.content.transformer.MCRXSLTransformer;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -105,7 +102,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     private static final MCRAccessInterface ACCESS_IMPL = MCRAccessManager.getAccessImpl();
 
     /** Default transformer script */
-    public static final String DEFAULT_TRANSFORMER = "save-derivate.xsl";
+    public static final String DEFAULT_STYLE = "save-derivate.xsl";
+
+    /** Static compiled transformer stylesheets */
+    private static final Map<String, Transformer> TRANSFORMER_CACHE = new HashMap<>();
 
     /**
      * deletes all MCRDerivate from the datastore.
@@ -348,9 +348,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a
-     * directory with <em>dirname</em> and store the derivate objects in a
-     * directory under them named <em>MCRObjectID</em>. The IFS-Attribute of the
+     * Export an MCRDerivate to a file named <em>MCRObjectID</em>.xml in a
+     * directory named <em>dirname</em> and store the derivate files in a
+     * nested directory named <em>MCRObjectID</em>. The IFS-Attribute of the
      * derivate files aren't saved, for reloading purpose after deleting a
      * derivate in the datastore
      *
@@ -367,10 +367,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a
-     * directory with <em>dirname</em> and store the derivate objects in a
-     * directory under them named <em>MCRObjectID</em>. The method use the
-     * converter stylesheet mcr_<em>style</em>_object.xsl.
+     * Export an MCRDerivate to a file named <em>MCRObjectID</em>.xml in a
+     * directory named <em>dirname</em> and store the derivate files in a
+     * nested directory named <em>MCRObjectID</em>. The method uses the
+     * converter stylesheet <em>style</em>.xsl.
      *
      * @param id
      *            the ID of the MCRDerivate to be save.
@@ -379,20 +379,20 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param style
      *            the type of the stylesheet
      */
-    @MCRCommand(syntax = "export derivate {0} to directory {1} with {2}",
+    @MCRCommand(syntax = "export derivate {0} to directory {1} with stylesheet {2}",
         help = "The command store the derivate with the MCRObjectID {0} to the directory {1}"
-            + " with the stylesheet {2}-object.xsl. For {2} save is the default.",
+            + " with the stylesheet {2}-derivate.xsl. For {2}, the default is xsl/save.",
         order = 90)
     public static void export(String id, String dirname, String style) {
         export(id, id, dirname, style);
     }
 
     /**
-     * Export any MCRDerivate's to files named <em>MCRObjectID</em> .xml in a
-     * directory and the objects under them named <em>MCRObjectID</em>. The
-     * saving starts with fromID and runs to toID. ID's they was not found will
-     * skiped. The method use the converter stylesheet mcr_<em>style</em>
-     * _object.xsl.
+     * Export any MCRDerivate's to files named <em>MCRObjectID</em>.xml in a
+     * directory named <em>dirname</em> and the derivate files in nested directories
+     * named <em>MCRObjectID</em>. Exporting starts with <em>fromID</em> and ends with <em>toID</em>.
+     * IDs that aren't found will be skipped. The method use the converter
+     * stylesheet <em>style</em>.xsl.
      *
      * @param fromID
      *            the ID of the MCRObject from be save.
@@ -404,9 +404,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
 
-    @MCRCommand(syntax = "export derivate from {0} to {1} to directory {2} with {3}",
+    @MCRCommand(syntax = "export derivates from {0} to {1} to directory {2} with stylesheet {3}",
         help = "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2}"
-            + " with the stylesheet {3}-object.xsl. For {3} save is the default.",
+            + " with the stylesheet {3}-derivate.xsl. For {3}, the default is xsl/save.",
         order = 80)
     public static void export(String fromID, String toID, String dirname, String style) {
         // check fromID and toID
@@ -438,7 +438,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return;
         }
 
-        Transformer trans = getTransformer(style);
+        Transformer trans = getTransformer(style != null ? style + "-derivate" : null);
 
         int k = 0;
 
@@ -460,7 +460,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The command look for all derivates in the application and build export
+     * This command looks for all derivates in the application and builds export
      * commands.
      *
      * @param dirname
@@ -469,19 +469,19 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      * @return a list of export commands for each derivate
      */
-    @MCRCommand(syntax = "export all derivates to directory {0} with {1}",
-        help = "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl."
-            + " For {1} save is the default.",
+    @MCRCommand(syntax = "export all derivates to directory {0} with stylesheet {1}",
+        help = "Stores all derivates to the directory {0} with the stylesheet {1}-derivate.xsl."
+            + " For {1}, the default is xsl/save.",
         order = 100)
     public static List<String> exportAllDerivates(String dirname, String style) {
         return MCRCommandUtils.getIdsForType("derivate")
-            .map(id -> "export derivate " + id + " to directory " + dirname + " with " + style)
+            .map(id -> "export derivate " + id + " to directory " + dirname + " with stylesheet " + style)
             .collect(Collectors.toList());
     }
 
     /**
-     * The command look for all derivates starts with project name in the
-     * application and build export commands.
+     * This command looks for all derivates starting with project name in the
+     * application and builds export commands.
      *
      * @param dirname
      *            the filename to store the object
@@ -489,13 +489,13 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      * @return a list of export commands for derivates with project name
      */
-    @MCRCommand(syntax = "export all derivates of project {0} to directory {1} with {2}",
-        help = "Stores all derivates of project {0} to the directory {1} with the stylesheet mcr_{2}-derivate.xsl."
-            + " For {2} save is the default.",
+    @MCRCommand(syntax = "export all derivates of project {0} to directory {1} with stylesheet {2}",
+        help = "Stores all derivates of project {0} to the directory {1} with the stylesheet {2}-derivate.xsl."
+            + " For {2}, the default is xsl/save.",
         order = 110)
     public static List<String> exportAllDerivatesOfProject(String project, String dirname, String style) {
         return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
-            .map(id -> "export derivate " + id + " to directory " + dirname + " with " + style)
+            .map(id -> "export derivate " + id + " to directory " + dirname + " with stylesheet " + style)
             .collect(Collectors.toList());
     }
 
@@ -564,30 +564,15 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
+     * This method searches for the stylesheet <em>style</em>.xsl and builds the transformer. Default is
+     * <em>save-derivate.xsl</em> if no stylesheet is given or the stylesheet couldn't be resolved.
+     *
      * @param style
-     * @return
-     * @throws TransformerFactoryConfigurationError
+     *            the name of the style to be used when resolving the stylesheet
+     * @return the transformer
      */
-    private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError {
-        String xslfile = DEFAULT_TRANSFORMER;
-        if (style != null && style.trim().length() != 0) {
-            xslfile = style + "-derivate.xsl";
-        }
-        Transformer trans = null;
-
-        try {
-            URL xslURL = MCRDerivateCommands.class.getResource("/" + xslfile);
-
-            if (xslURL != null) {
-                StreamSource source = new StreamSource(xslURL.toURI().toASCIIString());
-                TransformerFactory transfakt = TransformerFactory.newInstance();
-                transfakt.setURIResolver(MCRURIResolver.instance());
-                trans = transfakt.newTransformer(source);
-            }
-        } catch (Exception e) {
-            LOGGER.debug("Cannot build Transformer.", e);
-        }
-        return trans;
+    private static Transformer getTransformer(String style) {
+        return MCRCommandUtils.getTransformer(style, DEFAULT_STYLE, TRANSFORMER_CACHE);
     }
 
     /**
