@@ -21,6 +21,7 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -51,6 +53,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.xml.utils.WrappedRuntimeException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
@@ -69,6 +72,8 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRSourceContent;
+import org.mycore.common.content.transformer.MCRContentTransformer;
+import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -571,8 +576,27 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl."
             + " For {2}, the default is xsl/save.",
         order = 110)
-    public static void export(String id, String dirname, String style) {
-        export(id, id, dirname, style);
+    public static void exportWithStylesheet(String id, String dirname, String style) {
+        exportWithStylesheet(id, id, dirname, style);
+    }
+
+    /**
+     * Export an MCRObject to a file named <em>MCRObjectID</em>.xml in a directory named <em>dirname</em>.
+     * The method use the content transformer <em>transname</em>xsl.
+     *
+     * @param id
+     *            the id of the MCRObject to be save.
+     * @param dirname
+     *            the dirname to store the object
+     * @param transname
+     *            the name of the transformer
+     */
+    @MCRCommand(
+        syntax = "export object {0} to directory {1} with transformer {2}",
+        help = "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the transformer {2}.",
+        order = 110)
+    public static void exportWithTransformer(String id, String dirname, String transname) {
+        exportWithTransformer(id, id, dirname, transname);
     }
 
     /**
@@ -594,7 +618,53 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} "
             + "with the stylesheet {3}-object.xsl. For {3}, the default is xsl/save.",
         order = 100)
-    public static void export(String fromID, String toID, String dirname, String style) {
+    public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
+        Transformer transformer = getTransformer(style != null ? style + "-object" : null);
+        BiConsumer<MCRContent, OutputStream> trans = (content, out) -> {
+            try {
+                StreamResult sr = new StreamResult(out);
+                JDOMSource doc = new JDOMSource(MCRXMLParserFactory.getNonValidatingParser().parseXML(content));
+                transformer.transform(doc, sr);
+            } catch (TransformerException | SAXParseException e) {
+                throw new WrappedRuntimeException(e);
+            }
+        };
+        exportWith(fromID, toID, dirname, trans);
+    }
+
+    /**
+     * Export any MCRObject's to files named <em>MCRObjectID</em>.xml in a directory named <em>dirname</em>.
+     * Exporting starts with <em>fromID</em> and ends with <em>toID</em>. IDs that aren't found will be skipped.
+     * The method use the content transformer <em>transname</em>xsl.
+     *
+     * @param fromID
+     *            the ID of the MCRObject from be save.
+     * @param toID
+     *            the ID of the MCRObject to be save.
+     * @param dirname
+     *            the filename to store the object
+     * @param transname
+     *            the name of the transformer
+     */
+    @MCRCommand(
+        syntax = "export objects from {0} to {1} to directory {2} with transformer {3}",
+        help = "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} "
+            + "with the transformer {3}.",
+        order = 100)
+    public static void exportWithTransformer(String fromID, String toID, String dirname, String transname) {
+        MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transname);
+        BiConsumer<MCRContent, OutputStream> trans = (content, out) -> {
+            try {
+                transformer.transform(content, out);
+            } catch (IOException e) {
+                throw new WrappedRuntimeException(e);
+            }
+        };
+        exportWith(fromID, toID, dirname, trans);
+    }
+
+    private static void exportWith(String fromID, String toID, String dirname,
+                                   BiConsumer<MCRContent, OutputStream> trans) {
         MCRObjectID fid, tid;
 
         // check fromID and toID
@@ -614,7 +684,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         int k = 0;
         try {
-            Transformer trans = getTransformer(style != null ? style + "-object" : null);
             for (int i = fid.getNumberAsInteger(); i < tid.getNumberAsInteger() + 1; i++) {
                 String id = MCRObjectID.formatID(fid.getProjectId(), fid.getTypeId(), i);
                 if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
@@ -649,7 +718,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         help = "Stores all MCRObjects of type {0} to directory {1} with the stylesheet {2}-object.xsl."
             + "For {2}, the default is xsl/save.",
         order = 120)
-    public static List<String> exportAllObjectsOfType(String type, String dirname, String style) {
+    public static List<String> exportAllObjectsOfTypeWithStylesheet(String type, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsOfType(type);
         return buildExportCommands(new File(dirname), style, objectIds);
     }
@@ -666,11 +735,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     @MCRCommand(
-        syntax = "export all objects of base {0} to directory {1} with {2}",
+        syntax = "export all objects of base {0} to directory {1} with stylesheet {2}",
         help = "Stores all MCRObjects of base {0} to directory {1} with the stylesheet {2}-object.xsl."
             + " For {2}, the default is xsl/save.",
         order = 130)
-    public static List<String> exportAllObjectsOfBase(String base, String dirname, String style) {
+    public static List<String> exportAllObjectsOfBaseWithStylesheet(String base, String dirname, String style) {
         List<String> objectIds = MCRXMLMetadataManager.instance().listIDsForBase(base);
         return buildExportCommands(new File(dirname), style, objectIds);
     }
@@ -702,36 +771,34 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method read a MCRObject and use the transformer to write the data to a file. They are any steps to handel
-     * errors and save the damaged data.
+     * The method read a MCRObject and use a transformation to write the data to a file. There aren't any steps to
+     * handel errors and save the damaged data.
      * <ul>
-     * <li>Read data for object ID in the MCRObject, add ACL's and store it as checked and transformed XML. Return true.
+     * <li>Read data for object ID in the MCRObject, add ACLs and store it as checked and transformed XML. Return true.
      * </li>
-     * <li>If it can't find a transformer instance (no script file found) it store the checked data with ACL's native in
+     * <li>If it can't find a transformer instance (no script file found) it store the checked data with ACLs native in
      * the file. Warning and return true.</li>
-     * <li>If it get an exception while build the MCRObject, it try to read the XML blob and stor it without check and
-     * ACL's to the file. Warning and return true.</li>
-     * <li>If it get an exception while store the native data without check, ACÖ's and transformation it return a
+     * <li>If it get an exception while build the MCRObject, it try to read the XML blob and store it without check and
+     * ACLs to the file. Warning and return true.</li>
+     * <li>If it get an exception while store the native data without check, ACLs and transformation it return a
      * warning and false.</li>
      * </ul>
      *
      * @param dir
      *            the file instance to store
      * @param trans
-     *            the XML transformer
+     *            the transformation
      * @param nid
      *            the MCRObjectID
      * @return true if the store was okay (see description), else return false
-     * @throws TransformerException
      * @throws IOException
      * @throws MCRException
-     * @throws SAXParseException
      */
-    private static boolean exportMCRObject(File dir, Transformer trans, String nid)
-        throws TransformerException, IOException, MCRException, SAXParseException {
+    private static boolean exportMCRObject(File dir, BiConsumer<MCRContent, OutputStream> trans, String nid) throws
+        IOException, MCRException {
         MCRContent content;
         try {
-            // if object do'snt exist - no exception is catched!
+            // if object doesn't exist - no exception is caught!
             content = MCRXMLMetadataManager.instance().retrieveContent(MCRObjectID.getInstance(nid));
         } catch (MCRException ex) {
             return false;
@@ -741,9 +808,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         if (trans != null) {
             FileOutputStream out = new FileOutputStream(xmlOutput);
-            StreamResult sr = new StreamResult(out);
-            Document doc = MCRXMLParserFactory.getNonValidatingParser().parseXML(content);
-            trans.transform(new JDOMSource(doc), sr);
+            trans.accept(content, out);
         } else {
             content.sendTo(xmlOutput);
         }
