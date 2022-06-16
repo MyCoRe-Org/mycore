@@ -36,14 +36,19 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  *
- * First a check is done if user is in role "submitter", the given object is in
- * status "submitted" and current user is creator. If not
- * it will be tried to check the permission against the rule ID
+ * First, a check is done if the user is in the submitter role, if the user is the creator of the object and if the
+ * creator ist permitted to perform the requested action in the object's current state (two groups of states, submitted,
+ * and review, are checked). If not it will be tried to check the permission against the rule ID
  * <code>default_&lt;ObjectType&gt;</code> if it exists. If not the last
  * fallback is done against <code>default</code>.
  *
- * Specify classification and category for status "submitted":
- * MCR.Access.Strategy.SubmittedCategory=state:submitted
+ * Specify classification and category for submitted and review states:
+ * MCR.Access.Strategy.SubmittedCategories=state:submitted
+ * MCR.Access.Strategy.ReviewCategories=state:review
+ *
+ * Specify permissions for submitted and review states:
+ * MCR.Access.Strategy.CreatorSubmittedPermissions=writedb,deletedb
+ * MCR.Access.Strategy.CreatorReviewPermissions=read
  *
  * You can also specify a comma separated list of categories like: <code>state:submitted,state:new</code>
  *
@@ -55,16 +60,29 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy {
     private static final Logger LOGGER = LogManager.getLogger(MCRCreatorRuleStrategy.class);
 
-    private static final String SUBMITTED_CATEGORY = MCRConfiguration2
-        .getString("MCR.Access.Strategy.SubmittedCategory").orElse("state:submitted");
+    private static final List<String> SUBMITTED_CATEGORY_IDS = MCRConfiguration2
+        .getString("MCR.Access.Strategy.SubmittedCategories")
+        .map(MCRConfiguration2::splitValue)
+        .map(s -> s.collect(Collectors.toList()))
+        .orElse(List.of("state:submitted"));
+
+    private static final List<String> REVIEW_CATEGORY_IDS = MCRConfiguration2
+        .getString("MCR.Access.Strategy.ReviewCategories")
+        .map(MCRConfiguration2::splitValue)
+        .map(s -> s.collect(Collectors.toList()))
+        .orElse(List.of("state:review"));
 
     private static final List<String> CREATOR_ROLES = MCRConfiguration2
         .getOrThrow("MCR.Access.Strategy.CreatorRole", MCRConfiguration2::splitValue)
         .collect(Collectors.toList());
 
-    private static final List<String> CREATOR_PERMISSIONS = MCRConfiguration2
-            .getOrThrow("MCR.Access.Strategy.CreatorPermissions", MCRConfiguration2::splitValue)
-            .collect(Collectors.toList());
+    private static final List<String> CREATOR_SUBMITTED_PERMISSIONS = MCRConfiguration2
+        .getOrThrow("MCR.Access.Strategy.CreatorSubmittedPermissions", MCRConfiguration2::splitValue)
+        .collect(Collectors.toList());
+
+    private static final List<String> CREATOR_REVIEW_PERMISSIONS = MCRConfiguration2
+        .getOrThrow("MCR.Access.Strategy.CreatorReviewPermissions", MCRConfiguration2::splitValue)
+        .collect(Collectors.toList());
 
     private static final MCRCategLinkService LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
 
@@ -86,23 +104,32 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
     }
 
     private static boolean objectStatusIsSubmitted(MCRObjectID mcrObjectID) {
-        MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
-        boolean isSubmitted = false;
-        if (SUBMITTED_CATEGORY == null) {
-            return false;
-        }
-        String[] submittedCategoriesSplitted = SUBMITTED_CATEGORY.split(",");
-        for (String submittedCategoryID : submittedCategoriesSplitted) {
-            String categoryId = submittedCategoryID.trim();
-            MCRCategoryID submittedCategory = MCRCategoryID.fromString(categoryId);
-            if (LINK_SERVICE.isInCategory(reference, submittedCategory)) {
-                isSubmitted = true;
-            }
-        }
-        return isSubmitted;
+        return objectStatusIsAnyOf(mcrObjectID, SUBMITTED_CATEGORY_IDS);
     }
 
-    private static boolean isCurrentUserCreator(MCRObjectID mcrObjectID, MCRUserInformation currentUser) {
+    private static boolean objectStatusIsReview(MCRObjectID mcrObjectID) {
+        return objectStatusIsAnyOf(mcrObjectID, REVIEW_CATEGORY_IDS);
+    }
+
+    private static boolean objectStatusIsAnyOf(MCRObjectID mcrObjectID, List<String> categoryIds) {
+        MCRCategLinkReference reference = new MCRCategLinkReference(mcrObjectID);
+        if (categoryIds == null) {
+            return false;
+        }
+        for (String categoryId : categoryIds) {
+            MCRCategoryID category = MCRCategoryID.fromString(categoryId);
+            if (LINK_SERVICE.isInCategory(reference, category)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean userHasCreatorRole(MCRUserInformation currentUser) {
+        return CREATOR_ROLES.stream().anyMatch(currentUser::isUserInRole);
+    }
+
+    private static boolean userIsCreatorOf(MCRUserInformation currentUser, MCRObjectID mcrObjectID) {
         try {
             String creator = MCRCreatorCache.getCreator(mcrObjectID);
             return currentUser.getUserID().equals(creator);
@@ -118,24 +145,19 @@ public class MCRCreatorRuleStrategy implements MCRCombineableAccessCheckStrategy
     }
 
     public boolean isCreatorRuleAvailable(String id, String permission) {
-        if (CREATOR_PERMISSIONS.contains(permission)) {
-            MCRObjectID mcrObjectId = null;
-            try {
-                mcrObjectId = MCRObjectID.getInstance(id);
-                MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
-                if (CREATOR_ROLES.stream().anyMatch(currentUser::isUserInRole)
-                    && objectStatusIsSubmitted(mcrObjectId)) {
-                    if (isCurrentUserCreator(mcrObjectId, currentUser)) {
-                        return true;
-                    }
+        try {
+            MCRObjectID mcrObjectId = MCRObjectID.getInstance(id);
+            MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
+            if (userHasCreatorRole(currentUser) && userIsCreatorOf(currentUser, mcrObjectId)) {
+                if (objectStatusIsSubmitted(mcrObjectId) && CREATOR_SUBMITTED_PERMISSIONS.contains(permission)) {
+                    return true;
                 }
-            } catch (RuntimeException e) {
-                if (mcrObjectId == null) {
-                    LOGGER.debug("id is not a valid object ID", e);
-                } else {
-                    LOGGER.warn("Eror while checking permission.", e);
+                if (objectStatusIsReview(mcrObjectId) && CREATOR_REVIEW_PERMISSIONS.contains(permission)) {
+                    return true;
                 }
             }
+        } catch (RuntimeException e) {
+            LOGGER.warn("Error while checking permission.", e);
         }
         return false;
     }
