@@ -36,6 +36,7 @@ import javax.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -124,12 +125,12 @@ public class MCRJPAAccessStore extends MCRAccessStore {
      */
     @Override
     public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
-
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.createQuery(
             "delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '"
                 + rulemapping.getObjId() + "'")
             .executeUpdate();
+        MCRAccessManager.invalidAllPermissionCachesById(rulemapping.getObjId());
     }
 
     /**
@@ -148,6 +149,7 @@ public class MCRJPAAccessStore extends MCRAccessStore {
         accdef.setRule(accessRule);
         accdef.setCreator(rulemapping.getCreator());
         accdef.setCreationdate(Timestamp.valueOf(dateFormat.format(rulemapping.getCreationdate())));
+        MCRAccessManager.invalidAllPermissionCachesById(rulemapping.getObjId());
     }
 
     /**
