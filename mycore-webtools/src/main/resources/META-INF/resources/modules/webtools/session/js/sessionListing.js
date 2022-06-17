@@ -95,10 +95,10 @@ mycore.session.listing = {
 
   render: function() {
     var spinner = $("#sessionListingLoadingSpinner");
-    spinner.addClass("d-sm-none");
+    spinner.addClass("d-none");
     var contentDiv = $("#sessionListingContent");
     var table = $("#sessionListingTable");
-    contentDiv.removeClass("d-sm-none");
+    contentDiv.removeClass("d-none");
 
     var dateOptions = {
       year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
