@@ -129,7 +129,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     /**
      * Load a Classification from the OCFL Store.
      * @param mcrid ID of the Category
-     * @param revision Revision of the Category
+     * @param revision Revision of the Category or <code>null</code> for HEAD
      * @return Content of the Classification
      */
     public MCRContent retrieveContent(MCRCategoryID mcrid, String revision) {

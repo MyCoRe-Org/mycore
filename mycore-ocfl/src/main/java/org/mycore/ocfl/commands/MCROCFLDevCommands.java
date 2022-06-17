@@ -22,9 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -53,7 +54,7 @@ public class MCROCFLDevCommands {
 
     private static final Path EXPORT_DIR = Path.of(MCRConfiguration2.getStringOrThrow("MCR.savedir"), "class-export");
 
-    private static MCROCFLXMLClassificationManager manager = MCRConfiguration2
+    private static final MCROCFLXMLClassificationManager OCFL_XML_CLASSIFICATION_MANAGER = MCRConfiguration2
         .getSingleInstanceOf("MCR.Classification.Manager", MCROCFLXMLClassificationManager.class)
         .orElseThrow();
 
@@ -64,43 +65,32 @@ public class MCROCFLDevCommands {
     @MCRCommand(syntax = "export ocfl class {0} rev {1}",
         help = "export ocfl class {0} rev {1}",
         order = 2)
-    public static void readVerClass(String mclass, String rev) throws IOException {
-        MCRContent content = manager.retrieveContent(MCRCategoryID.fromString(mclass), rev);
-        createDir(EXPORT_DIR);
-        Files.write(Path.of(EXPORT_DIR.toString(), mclass + ".xml"), content.asByteArray(), StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING);
-        LOGGER.info("Exported Class <{}> with Revision <{}> to <{}>", mclass, rev, EXPORT_DIR);
+    public static void exportClassificationFromOCFL(String mclass, String rev) throws IOException {
+        final MCRCategoryID classID = MCRCategoryID.rootID(mclass);
+        MCRContent content = OCFL_XML_CLASSIFICATION_MANAGER.retrieveContent(classID, rev);
+        Files.createDirectories(EXPORT_DIR);
+        content.sendTo(EXPORT_DIR.resolve(classID + ".xml"), StandardCopyOption.REPLACE_EXISTING);
+        LOGGER.info("Exported Class <{}> with Revision <{}> to <{}>", mclass, (rev == null) ? "HEAD" : rev, EXPORT_DIR);
 
     }
 
     @MCRCommand(syntax = "export ocfl class {0}",
         help = "export ocfl class {0}",
         order = 4)
-    public static void readVerClass(String mclass) throws IOException {
-        MCRContent content = manager.retrieveContent(MCRCategoryID.fromString(mclass));
-        createDir(EXPORT_DIR);
-        Files.write(Path.of(EXPORT_DIR.toString(), mclass + ".xml"), content.asByteArray(), StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING);
-        LOGGER.info("Exported Class <{}> to <{}>", mclass, EXPORT_DIR);
-
+    public static void exportClassificationFromOCFL(String mclass) throws IOException {
+        exportClassificationFromOCFL(mclass, null);
     }
 
     @MCRCommand(syntax = "export all ocfl classes",
         help = "export all ocfl classes",
         order = 2)
-    public static void readAllClass() throws IOException {
-        List<MCRCategoryID> list = MCRCategoryDAOFactory.getInstance().getRootCategoryIDs();
-        for (MCRCategoryID cId : list) {
-            LOGGER.debug("Exporting: {}", cId.getRootID());
-            readVerClass(cId.getRootID());
-        }
-        LOGGER.info("Exported all Classes!");
-    }
-
-    private static void createDir(Path dir) throws IOException {
-        if (Files.notExists(dir)) {
-            Files.createDirectories(dir);
-        }
+    public static List<String> exportAllClassificationsFromOCFL() throws IOException {
+        return MCRCategoryDAOFactory.getInstance()
+            .getRootCategoryIDs()
+            .stream()
+            .map(MCRCategoryID::toString)
+            .map(id -> "export ocfl class " + id)
+            .collect(Collectors.toList());
     }
 
     // maybe use "repair ocfl class store" instead, plus "repair ocfl class {0}" to replace single class
