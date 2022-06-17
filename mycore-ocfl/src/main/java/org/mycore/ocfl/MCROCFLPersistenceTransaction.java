@@ -21,7 +21,6 @@ package org.mycore.ocfl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,33 +40,29 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
  */
 public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCROCFLPersistenceTransaction.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    protected Optional<MCROCFLXMLClassificationManager> managerOpt;
+    protected MCROCFLXMLClassificationManager manager;
 
     private static final ThreadLocal<Map<MCRCategoryID, MCRCategory>> CATEGORY_WORKSPACE = new ThreadLocal<>();
 
-    private long threadId = Thread.currentThread().getId();
+    private final long threadId = Thread.currentThread().getId();
 
     private boolean rollbackOnly;
 
     private boolean active;
 
     public MCROCFLPersistenceTransaction() {
-        try {
-            managerOpt = MCRConfiguration2.getSingleInstanceOf("MCR.Classification.Manager");
-        } catch (Exception e) {
-            LOGGER.debug("ClassificationManager could not be found, setting to empty.");
-            managerOpt = Optional.empty();
-        }
+        manager = MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager")
+            .orElse(null);
         rollbackOnly = false;
         active = false;
     }
 
     @Override
     public boolean isReady() {
-        LOGGER.debug("TRANSACTION {} READY CHECK - {}", threadId, managerOpt.isPresent());
-        return managerOpt.isPresent() && !isActive();
+        LOGGER.debug("TRANSACTION {} READY CHECK - {}", threadId, manager != null);
+        return manager != null && !isActive();
     }
 
     @Override
@@ -87,12 +82,12 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             throw new IllegalStateException("TRANSACTION NOT ACTIVE OR MARKED FOR ROLLBACK");
         }
         final Map<MCRCategoryID, MCRCategory> mapOfChanges = CATEGORY_WORKSPACE.get();
-        final MCROCFLXMLClassificationManager ocflClassficationManager = managerOpt.get();
+        final MCROCFLXMLClassificationManager ocflClassficationManager = manager;
         // save new OCFL version of classifications
-        mapOfChanges.entrySet()
+        // value is category if classification should not be deleted
+        mapOfChanges.values()
             .stream()
-            .filter(e -> Objects.nonNull(e.getValue())) // value is category if classification should not be deleted
-            .map(Map.Entry::getValue)
+            .filter(Objects::nonNull)
             .forEach(category -> MCRSessionMgr.getCurrentSession()
                 .onCommit(() -> {
                     LOGGER.debug("[{}] UPDATING CLASS <{}>", threadId, category.getId());
