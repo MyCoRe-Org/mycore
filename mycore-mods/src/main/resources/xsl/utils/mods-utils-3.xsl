@@ -117,7 +117,9 @@
         <xsl:apply-templates select="$alternateContent/title/node()" mode="unescapeHtml" />
         <xsl:if test="$withSubtitle and $alternateContent/subTitle">
           <span class="subtitle">
-            <xsl:text> : </xsl:text>
+            <span class="delimiter">
+              <xsl:text> : </xsl:text>
+            </span>
             <xsl:apply-templates select="$alternateContent/subTitle/node()" mode="unescapeHtml" />
           </span>
         </xsl:if>
@@ -129,7 +131,9 @@
         <xsl:value-of select="mods:title" />
         <xsl:if test="$withSubtitle and mods:subTitle">
           <span class="subtitle">
-            <xsl:text> : </xsl:text>
+            <span class="delimiter">
+              <xsl:text> : </xsl:text>
+            </span>
             <xsl:value-of select="mods:subTitle" />
           </span>
         </xsl:if>
