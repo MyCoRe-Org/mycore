@@ -62,9 +62,19 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     protected static final String DEFAULT_LANGUAGE = MCRConfiguration2.getString("MCR.Metadata.DefaultLang")
         .orElse(MCRConstants.DEFAULT_LANG);
 
-    protected static final String DEFAULT_DATAPART = "metadata";
+    protected static final String DEFAULT_ELEMENT_DATAPART = "metadata";
+    
+    protected static final String DEFAULT_ATTRIBUTE_INHERITED = "inherited";
+    
+    protected static final String DEFAULT_ATTRIBUTE_LANG = "lang";
+
+    protected static final String DEFAULT_ATTRIBUTE_SEQUENCE = "sequence";
+
+    protected static final String DEFAULT_ATTRIBUTE_TYPE = "type";
 
     protected static final int DEFAULT_INHERITED = 0;
+
+    protected static final int DEFAULT_SEQUENCE = -1;
 
     // logger
     private static Logger LOGGER = LogManager.getLogger();
@@ -75,6 +85,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     protected String lang;
 
     protected String type;
+
+    protected int sequence;
 
     protected int inherited;
 
@@ -88,7 +100,8 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      */
     public MCRMetaDefault() {
         inherited = DEFAULT_INHERITED;
-        datapart = DEFAULT_DATAPART;
+        sequence = DEFAULT_SEQUENCE;
+        datapart = DEFAULT_ELEMENT_DATAPART;
     }
 
     /**
@@ -116,7 +129,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      * to the type element. The datapart element was set. If the value of
      * <em>datapart,</em> is null or empty the default was set.
      * @param subtag       the name of the subtag
-     * @param lang     the language
+     * @param lang         the language
      * @param type         the optional type string
      * @param inherited     a int value , &gt; 0 if the data are inherited,
      *                         else = 0.
@@ -129,6 +142,34 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         setInherited(inherited);
         this.subtag = subtag;
         this.type = type;
+        this.sequence = DEFAULT_SEQUENCE;
+    }
+
+    /**
+     * This is the constructor. <br>
+     * The language element was set. If the value of <em>lang</em> is
+     * null, empty or false <b>en </b> was set. The subtag element was set to
+     * the value of <em>subtag</em>. If the value of <em>subtag</em>
+     * is null or empty an exception was throwed. The type element was set to
+     * the value of <em>type</em>, if it is null, an empty string was set
+     * to the type element. The datapart element was set. If the value of
+     * <em>datapart,</em> is null or empty the default was set.
+     * @param subtag       the name of the subtag
+     * @param lang         the language
+     * @param type         the optional type string
+     * @param sequence     the optional sequence attribute as integer
+     * @param inherited     a int value , &gt; 0 if the data are inherited,
+     *                         else = 0.
+     *
+     * @exception MCRException if the subtag value is null or empty
+     */
+    public MCRMetaDefault(String subtag, String lang, String type, int sequence, int inherited)
+        throws MCRException {
+        this(lang);
+        setInherited(inherited);
+        this.subtag = subtag;
+        this.type = type;
+        setSequence(sequence);
     }
 
     /**
@@ -192,6 +233,17 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     }
 
     /**
+     * This method set the sequence element. If the value of <em>sequence</em> is
+     * null or empty nothing was changed.
+     * 
+     * @param sequence
+     *            the optional sequence attribute
+     */
+    public final void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
+
+    /**
      * This method get the inherited element.
      * 
      * @return the inherited flag as int
@@ -230,6 +282,15 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     }
 
     /**
+     * This method get the sequence element.
+     * 
+     * @return the sequence element
+     */
+    public int getSequence() {
+        return sequence;
+    }
+
+    /**
      * This method read the XML input stream part from a DOM part for the
      * metadata of the document.
      * 
@@ -245,11 +306,14 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
         subtag = element.getName();
 
-        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue("lang", Namespace.XML_NAMESPACE))
+        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue(DEFAULT_ATTRIBUTE_LANG, Namespace.XML_NAMESPACE))
             .ifPresent(tempLang -> lang = tempLang);
-        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue("type"))
+        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue(DEFAULT_ATTRIBUTE_TYPE))
             .ifPresent(tempType -> type = tempType);
-        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue("inherited"))
+        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue(DEFAULT_ATTRIBUTE_SEQUENCE))
+            .map(Integer::parseInt)
+            .ifPresent(tempSequence -> sequence = tempSequence);
+        MCRUtils.filterTrimmedNotEmpty(element.getAttributeValue(DEFAULT_ATTRIBUTE_INHERITED))
             .map(Integer::parseInt)
             .ifPresent(tempInherited -> inherited = tempInherited);
     }
@@ -271,12 +335,15 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         }
         Element elm = new Element(subtag);
         if (getLang() != null && getLang().length() > 0) {
-            elm.setAttribute("lang", getLang(), Namespace.XML_NAMESPACE);
+            elm.setAttribute(DEFAULT_ATTRIBUTE_LANG, getLang(), Namespace.XML_NAMESPACE);
         }
         if (getType() != null && getType().length() > 0) {
-            elm.setAttribute("type", getType());
+            elm.setAttribute(DEFAULT_ATTRIBUTE_TYPE, getType());
         }
-        elm.setAttribute("inherited", Integer.toString(getInherited()));
+        if (getSequence() >= 0) { 
+            elm.setAttribute(DEFAULT_ATTRIBUTE_SEQUENCE, Integer.toString(getSequence()));
+        }
+        elm.setAttribute(DEFAULT_ATTRIBUTE_INHERITED, Integer.toString(getInherited()));
         return elm;
     }
 
@@ -286,6 +353,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
      *   {
      *     lang: "de",
      *     type: "title",
+     *     sequence: "0001"
      *     inherited: 0
      *   }
      * </pre>
@@ -294,12 +362,15 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     public JsonObject createJSON() {
         JsonObject obj = new JsonObject();
         if (getLang() != null) {
-            obj.addProperty("lang", getLang());
+            obj.addProperty(DEFAULT_ATTRIBUTE_LANG, getLang());
         }
         if (getType() != null) {
-            obj.addProperty("type", getType());
+            obj.addProperty(DEFAULT_ATTRIBUTE_TYPE, getType());
         }
-        obj.addProperty("inherited", getInherited());
+        if (getSequence() >= 0) { 
+            obj.addProperty(DEFAULT_ATTRIBUTE_SEQUENCE, getSequence());
+        }
+        obj.addProperty(DEFAULT_ATTRIBUTE_INHERITED, getInherited());
         return obj;
     }
 
@@ -350,7 +421,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
 
     @Override
     public int hashCode() {
-        return Objects.hash(datapart, inherited, lang, subtag, type);
+        return Objects.hash(datapart, inherited, lang, subtag, type, sequence);
     }
 
     @Override
@@ -364,7 +435,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         MCRMetaDefault other = (MCRMetaDefault) obj;
         return Objects.equals(datapart, other.datapart) && Objects.equals(inherited, other.inherited)
             && Objects.equals(lang, other.lang) && Objects.equals(subtag, other.subtag)
-            && Objects.equals(type, other.type);
+            && Objects.equals(type, other.type) && Objects.equals(sequence, other.sequence);
     }
 
     /**
@@ -385,6 +456,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             LOGGER.debug("SubTag             = {}", subtag);
             LOGGER.debug("Language           = {}", lang);
             LOGGER.debug("Type               = {}", type);
+            LOGGER.debug("Sequence           = {}", String.valueOf(sequence));
             LOGGER.debug("DataPart           = {}", datapart);
             LOGGER.debug("Inhreited          = {}", String.valueOf(inherited));
         }
@@ -398,6 +470,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
             clone.subtag = this.subtag;
             clone.lang = this.lang;
             clone.type = this.type;
+            clone.sequence = this.sequence;
             clone.datapart = this.datapart;
             clone.inherited = this.inherited;
 
