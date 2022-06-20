@@ -58,7 +58,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
         URISyntaxException, TransformerException {
-        String ruleID = MCRLayoutUtilities.getWebpageACLID(job.getRequest().getServletPath());
+        String ruleID = MCRLayoutUtilities.getWebpageACLID(getWebpageString(job.getRequest()));
         if (MCRAccessManager.hasRule(ruleID, READ_WEBPAGE_PERMISSION)
             && !MCRAccessManager.checkPermission(ruleID, READ_WEBPAGE_PERMISSION)) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -72,6 +72,16 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
             MCRContent content = getResourceContent(request, response, resource);
             getLayoutService().doLayout(request, response, content);
         }
+    }
+
+    private String getWebpageString(HttpServletRequest request) {
+        String servletPath = request.getServletPath();
+        String queryString = request.getQueryString();
+        StringBuilder builder = new StringBuilder(servletPath);
+        if (queryString != null && !queryString.isEmpty()) {
+            builder.append('?').append(queryString);
+        }
+        return builder.toString();
     }
 
     private void setXSLParameters(URL resource, HttpServletRequest request)
