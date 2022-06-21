@@ -30,7 +30,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
@@ -58,9 +57,9 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     @Override
     public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXException, JDOMException,
         URISyntaxException, TransformerException {
-        String ruleID = MCRLayoutUtilities.getWebpageACLID(getWebpageString(job.getRequest()));
-        if (MCRAccessManager.hasRule(ruleID, READ_WEBPAGE_PERMISSION)
-            && !MCRAccessManager.checkPermission(ruleID, READ_WEBPAGE_PERMISSION)) {
+        String webpageID = getWebpageId(job.getRequest());
+        boolean hasAccess = MCRLayoutUtilities.webpageAccess(READ_WEBPAGE_PERMISSION, webpageID, true);
+        if (!hasAccess) {
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -74,7 +73,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         }
     }
 
-    private String getWebpageString(HttpServletRequest request) {
+    private String getWebpageId(HttpServletRequest request) {
         String servletPath = request.getServletPath();
         String queryString = request.getQueryString();
         StringBuilder builder = new StringBuilder(servletPath);
