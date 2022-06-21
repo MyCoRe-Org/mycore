@@ -27,7 +27,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -297,7 +299,8 @@ public class MCRLayoutUtilities {
     }
 
     /**
-     * Verifies a single item on access according to $permission
+     * Verifies a single item on access according to $permission Falls back to version without query
+     * if no rule for exact query string exists.
      *
      * @param permission an ACL permission
      * @param item element to check
@@ -305,16 +308,37 @@ public class MCRLayoutUtilities {
      *            initial value
      */
     public static boolean itemAccess(String permission, Element item, boolean access) {
-        String objID = getWebpageACLID(item);
-        if (MCRAccessManager.hasRule(objID, permission)) {
-            return MCRAccessManager.checkPermission(objID, permission);
-        }
-        return access;
+        return webpageAccess(permission, getWebpageID(item), access);
     }
 
+    /**
+     * Verifies a single webpage on access according to $permission. Falls back to version without query
+     * if no rule for exact query string exists.
+     *
+     * @param permission an ACL permission
+     * @param webpageId webpage to check
+     * @param access
+     *            initial value
+     */
+    public static boolean webpageAccess(String permission, String webpageId, boolean access) {
+        List<String> ruleIDs = getAllWebpageACLIDs(webpageId);
+        return ruleIDs.stream()
+            .filter(objID -> MCRAccessManager.hasRule(objID, permission))
+            .findFirst()
+            .map(objID -> MCRAccessManager.checkPermission(objID, permission))
+            .orElse(access);
+    }
 
-    private static String getWebpageACLID(Element item) {
-        return OBJIDPREFIX_WEBPAGE + getWebpageID(item);
+    private static List<String> getAllWebpageACLIDs(String webpageID) {
+        String webpageACLID = getWebpageACLID(webpageID);
+        List<String> webpageACLIDs = new ArrayList<>(2);
+        webpageACLIDs.add(webpageACLID);
+        int queryIndex = webpageACLID.indexOf('?');
+        if (queryIndex != -1) {
+            String baseWebpageACLID = webpageACLID.substring(0, queryIndex);
+            webpageACLIDs.add(baseWebpageACLID);
+        }
+        return webpageACLIDs;
     }
 
     public static String getWebpageACLID(String webpageID) {
