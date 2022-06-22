@@ -121,7 +121,14 @@ public class MCRFileMetaEventHandler extends MCREventHandlerBase {
             .filter(m -> m.getUrn() == null && m.getHandle() == null)
             .findAny();
 
-        if (fileMetaWithoutURN.isPresent() && objectDerivate.deleteFileMetaData(filePath)) {
+        boolean isMainDocDeleted = filePath.substring(1).equals(objectDerivate.getInternals().getMainDoc());
+        if(isMainDocDeleted) {
+            objectDerivate.getInternals().setMainDoc("");
+            LOGGER.warn("The maindoc '{}' was deleted.", path);
+        }
+        
+        if (isMainDocDeleted 
+            || (fileMetaWithoutURN.isPresent() && objectDerivate.deleteFileMetaData(filePath))) {
             try {
                 MCRMetadataManager.update(derivate);
             } catch (MCRPersistenceException | MCRAccessException e) {
