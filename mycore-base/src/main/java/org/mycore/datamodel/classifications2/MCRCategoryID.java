@@ -179,6 +179,10 @@ public class MCRCategoryID implements Serializable {
         }
         this.id = id;
     }
+    
+    public static boolean isValid(String id) {
+        return id != null && id.length() > 0 && id.length() <= CATEG_ID_LENGTH && VALID_ID.matcher(id).matches();
+    }
 
     /**
      * @return the rootID
