@@ -127,13 +127,12 @@ public class MCROCFLCommands {
             .map(MCRCategoryID::toString)
             .collect(Collectors.toList());
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
-        List<String> outOfSync = repository.listObjectIds()
+        return repository.listObjectIds()
             .filter(obj -> obj.startsWith("mcrclass:"))
             .filter(obj -> !MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
                 .getHeadVersion().getVersionInfo().getMessage()))
             .map(obj -> obj.replace("mcrclass:", ""))
             .filter(Predicate.not(classDAOList::contains))
             .collect(Collectors.toList());
-        return outOfSync;
     }
 }
