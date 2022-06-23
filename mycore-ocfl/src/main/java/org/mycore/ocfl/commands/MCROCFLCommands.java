@@ -32,6 +32,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.MCROCFLMigration;
+import org.mycore.ocfl.MCROCFLObjectIDPrefixes;
 import org.mycore.ocfl.MCROCFLPersistenceTransaction;
 import org.mycore.ocfl.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.MCROCFLXMLClassificationManager;
@@ -128,10 +129,10 @@ public class MCROCFLCommands {
             .collect(Collectors.toList());
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
         return repository.listObjectIds()
-            .filter(obj -> obj.startsWith("mcrclass:"))
+            .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixes.CLASSIFICATION))
             .filter(obj -> !MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
                 .getHeadVersion().getVersionInfo().getMessage()))
-            .map(obj -> obj.replace("mcrclass:", ""))
+            .map(obj -> obj.replace(MCROCFLObjectIDPrefixes.CLASSIFICATION, ""))
             .filter(Predicate.not(classDAOList::contains))
             .collect(Collectors.toList());
     }

@@ -52,8 +52,6 @@ import edu.wisc.library.ocfl.api.model.VersionInfo;
  */
 public class MCROCFLXMLClassificationManager implements MCRXMLClassificationManager {
 
-    protected static final String CLASSIFICATION_PREFIX = "mcrclass:";
-
     public static final String MESSAGE_CREATED = "Created";
 
     public static final String MESSAGE_UPDATED = "Updated";
@@ -155,7 +153,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     protected String getName(MCRCategoryID mcrid) {
-        return CLASSIFICATION_PREFIX + mcrid.getRootID();
+        return MCROCFLObjectIDPrefixes.CLASSIFICATION + mcrid.getRootID();
     }
 
     /**
