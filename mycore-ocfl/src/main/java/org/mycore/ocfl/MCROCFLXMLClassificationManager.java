@@ -21,7 +21,6 @@ package org.mycore.ocfl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -29,10 +28,8 @@ import java.util.Objects;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -57,15 +54,13 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     protected static final String CLASSIFICATION_PREFIX = "mcrclass:";
 
-    private static final boolean INC_CLSDIR = MCRConfiguration2.getBoolean(CLASSIFICATION_PREFIX).orElse(false);
-
     public static final String MESSAGE_CREATED = "Created";
 
     public static final String MESSAGE_UPDATED = "Updated";
 
     public static final String MESSAGE_DELETED = "Deleted";
 
-    private String rootFolder = INC_CLSDIR ? "classification/" : "";
+    private static final String ROOT_FOLDER = "classification/";
 
     @MCRProperty(name = "Repository", required = true)
     public String repositoryKey;
@@ -172,7 +167,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
      */
     protected String buildFilePath(MCRCategoryID mcrid) {
         if (mcrid.isRootID()) {
-            return rootFolder + mcrid.toString() + ".xml";
+            return ROOT_FOLDER + mcrid.toString() + ".xml";
         } else {
             throw new MCRUsageException("For Categories, use with MCRCategory instead of MCRCategoryID!");
             // return rootFolder + mcrid.getRootID() + '/' + mcrid.toString() + ".xml";
@@ -181,29 +176,10 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     protected String buildFilePath(MCRCategory mcrCg) {
-        StringBuilder builder = new StringBuilder(rootFolder);
-        if (mcrCg.isClassification()) {
-            builder.append(mcrCg.getId()).append(".xml");
-        } else if (mcrCg.isCategory()) {
-            ArrayList<String> list = new ArrayList<>();
-            list.add(".xml");
-            MCRCategory cg = mcrCg;
-            int level = mcrCg.getLevel();
-            while (level > 0) {
-                MCRCategory cgt = cg;
-                list.add(cg.getId().toString());
-                list.add("/");
-                cg = cgt.getParent();
-                level = cg.getLevel();
-            }
-            list.add(cg.getId().toString());
-            for (int i = list.size() - 1; i >= 0; i--) {
-                builder.append(list.get(i));
-            }
-        } else {
-            throw new MCRException("The MCRClass is of Invalid Type, it must be either a Class or Category");
+        if (mcrCg.isCategory()) {
+            throw new IllegalArgumentException("Only root categories are allowed: " + mcrCg);
         }
-        return builder.toString();
+        return ROOT_FOLDER + mcrCg.getId() + ".xml";
     }
 
     protected VersionInfo buildVersionInfo(String message, Date versionDate) {
