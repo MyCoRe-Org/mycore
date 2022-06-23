@@ -169,9 +169,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         if (mcrid.isRootID()) {
             return ROOT_FOLDER + mcrid.toString() + ".xml";
         } else {
-            throw new MCRUsageException("For Categories, use with MCRCategory instead of MCRCategoryID!");
-            // return rootFolder + mcrid.getRootID() + '/' + mcrid.toString() + ".xml";
-            // not getting a new Category cause it might have already been deleted at this point
+            throw new IllegalArgumentException("For Categories, use with MCRCategory instead of MCRCategoryID!");
         }
     }
 
