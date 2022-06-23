@@ -112,18 +112,17 @@ public class MCROCFLCommands {
     @MCRCommand(syntax = "repair ocfl classifications",
         help = "Update all classifications and remove deleted Classifications to resync OCFL Store to the Database")
     public static List<String> syncClassificationRepository() {
-        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
         List<String> commands = new ArrayList<>();
-
         commands.add("update ocfl classifications");
-        List<String> outOfSync = getStaleOCFLClassificationIDs(repositoryKey);
+        List<String> outOfSync = getStaleOCFLClassificationIDs();
         commands.addAll(
             outOfSync.stream()
                 .map(id -> "delete ocfl classification " + id).collect(Collectors.toList()));
         return commands;
     }
 
-    private static List<String> getStaleOCFLClassificationIDs(String repositoryKey) {
+    private static List<String> getStaleOCFLClassificationIDs() {
+        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
         List<String> classDAOList = new MCRCategoryDAOImpl().getRootCategoryIDs().stream()
             .map(MCRCategoryID::toString)
             .collect(Collectors.toList());
