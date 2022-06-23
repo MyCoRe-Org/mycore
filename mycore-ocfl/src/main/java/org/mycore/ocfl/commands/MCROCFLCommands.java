@@ -109,7 +109,7 @@ public class MCROCFLCommands {
         MCROCFLPersistenceTransaction.addClassfication(rootID, null);
     }
 
-    @MCRCommand(syntax = "repair ocfl classifications",
+    @MCRCommand(syntax = "sync ocfl classifications",
         help = "Update all classifications and remove deleted Classifications to resync OCFL Store to the Database")
     public static List<String> syncClassificationRepository() {
         List<String> commands = new ArrayList<>();
