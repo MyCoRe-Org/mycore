@@ -82,7 +82,6 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             throw new IllegalStateException("TRANSACTION NOT ACTIVE OR MARKED FOR ROLLBACK");
         }
         final Map<MCRCategoryID, MCRCategory> mapOfChanges = CATEGORY_WORKSPACE.get();
-        final MCROCFLXMLClassificationManager ocflClassficationManager = manager;
         // save new OCFL version of classifications
         // value is category if classification should not be deleted
         mapOfChanges.values()
@@ -95,14 +94,14 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
                     final MCRCategory categoryRoot = MCRCategoryDAOFactory.getInstance()
                         .getCategory(category.getRoot().getId(), -1);
                     final Document categoryXML = MCRCategoryTransformer.getMetaDataDocument(categoryRoot, false);
-                    ocflClassficationManager.update(category, new MCRJDOMContent(categoryXML));
+                    manager.update(category, new MCRJDOMContent(categoryXML));
                 }));
         // delete classifications
         mapOfChanges.entrySet()
             .stream()
             .filter(e -> Objects.isNull(e.getValue())) // value is category if classification should not be deleted
             .forEach(entry -> MCRSessionMgr.getCurrentSession()
-                .onCommit(() -> ocflClassficationManager.fileDelete(entry.getKey())));
+                .onCommit(() -> manager.delete(entry.getKey())));
         CATEGORY_WORKSPACE.remove();
         active = false;
     }

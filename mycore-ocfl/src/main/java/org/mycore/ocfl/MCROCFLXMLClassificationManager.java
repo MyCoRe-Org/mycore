@@ -95,11 +95,11 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     void fileUpdate(MCRCategory mcrCg, MCRContent xml, String messageOpt) {
-        
+
         String objName = getName(mcrCg.getId());
         Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrCg.getId().getID()));
         String message = messageOpt; // PMD Fix - AvoidReassigningParameters
-        if(Objects.isNull(message)) {
+        if (Objects.isNull(message)) {
             message = MESSAGE_UPDATED;
         }
 
@@ -117,7 +117,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     }
 
-    public void fileDelete(MCRCategoryID mcrid) {
+    public void delete(MCRCategoryID mcrid) {
         String objName = getName(mcrid);
         Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrid.getRootID()));
         VersionInfo versionInfo = buildVersionInfo(MESSAGE_DELETED, lastModified);
@@ -164,16 +164,19 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     /**
-     * Build file path from ID, use for classifications only!
+     * Build file path from ID, <em>use for root classifications only!</em>
      * <p><b>Use {@link #buildFilePath(MCRCategory)} when possible instead</b></p>
      * @param mcrid The ID to the Classification
      * @return The Path to the File.
+     * @throws MCRUsageException if the Category is not a root classification
      */
     protected String buildFilePath(MCRCategoryID mcrid) {
         if (mcrid.isRootID()) {
             return rootFolder + mcrid.toString() + ".xml";
         } else {
-            return rootFolder + mcrid.getRootID() + '/' + mcrid.toString() + ".xml";
+            throw new MCRUsageException("For Categories, use with MCRCategory instead of MCRCategoryID!");
+            // return rootFolder + mcrid.getRootID() + '/' + mcrid.toString() + ".xml";
+            // not getting a new Category cause it might have already been deleted at this point
         }
     }
 

@@ -19,12 +19,25 @@
 package org.mycore.ocfl.commands;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.MCROCFLMigration;
+import org.mycore.ocfl.MCROCFLPersistenceTransaction;
+import org.mycore.ocfl.MCROCFLRepositoryProvider;
+import org.mycore.ocfl.MCROCFLXMLClassificationManager;
+
+import edu.wisc.library.ocfl.api.OcflRepository;
 
 @MCRCommandGroup(name = "OCFL Commands")
 public class MCROCFLCommands {
@@ -71,5 +84,58 @@ public class MCROCFLCommands {
             failed.size(),
             invalidState.size(),
             withoutHistory.size());
+    }
+
+    @MCRCommand(syntax = "update ocfl classifications",
+        help = "Update all Classifications in the OCFL Store from Database")
+    public static void updateOCFLClassifications() {
+        List<MCRCategoryID> list = new MCRCategoryDAOImpl().getRootCategoryIDs();
+        try {
+            list.forEach(cId -> {
+                MCRCategory category = new MCRCategoryDAOImpl().getCategory(cId, -1);
+                MCROCFLPersistenceTransaction.addClassfication(cId, category);
+            });
+            LOGGER.info("Staged {} Classifications for Update in OCFL Store", list.size());
+        } catch (Exception e) {
+            throw new MCRException("Error Updating OCFL Storage:", e);
+        }
+    }
+
+    @MCRCommand(syntax = "repair ocfl classifications",
+        help = "Update all Classifications and delete deleted Classifications to resync OCFL Store to the Database")
+    public static void syncClassificationRepository() {
+        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
+        List<MCRCategoryID> list = new MCRCategoryDAOImpl().getRootCategoryIDs();
+
+        try {
+            list.forEach(cId -> {
+                MCRCategory category = new MCRCategoryDAOImpl().getCategory(cId, -1);
+                MCROCFLPersistenceTransaction.addClassfication(cId, category);
+            });
+            LOGGER.info("Staged {} Classifications for Update in OCFL Store {}", list.size(), repositoryKey);
+        } catch (Exception e) {
+            throw new MCRException("Error Updating OCFL Storage:", e);
+        }
+
+        List<String> classDAOList = list.stream().map(MCRCategoryID::toString)
+            .collect(Collectors.toList());
+        OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        List<String> outOfSync = repository.listObjectIds()
+            .filter(obj -> obj.contains("mcrclass"))
+            .filter(obj -> !MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
+                .getHeadVersion().getVersionInfo().getMessage()))
+            .map(obj -> obj.replace("mcrclass:", ""))
+            // .filter(obj -> !classDAOList.contains(obj))
+            .filter(Predicate.not(classDAOList::contains))
+            .collect(Collectors.toList());
+
+        try {
+            outOfSync
+                .forEach(cId -> MCROCFLPersistenceTransaction.addClassfication(MCRCategoryID.fromString(cId), null));
+            LOGGER.info("Staged {} Classifications for Deletion in OCFL Store {}", outOfSync.size(), repositoryKey);
+        } catch (Exception e) {
+            throw new MCRException("Error Updating OCFL Storage:", e);
+        }
+
     }
 }
