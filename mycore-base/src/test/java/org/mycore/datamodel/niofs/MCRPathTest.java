@@ -50,12 +50,12 @@ public class MCRPathTest {
         public static final MCRAbstractFileSystem MCR_ABSTRACT_FILE_SYSTEM = new MCRAbstractFileSystem() {
             @Override
             public void createRoot(String owner) {
-
+                //no implementation needed for test
             }
 
             @Override
             public void removeRoot(String owner) {
-
+                //no implementation needed for test
             }
 
             @Override
