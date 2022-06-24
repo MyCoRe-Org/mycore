@@ -71,7 +71,7 @@ public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
         }
         StringBuilder builder = new StringBuilder();
         String type = objectId.substring(0, objectId.indexOf(':') + 1);
-        builder.append(type).append('/');
+        builder.append(type.substring(0, type.length() - 1)).append('/');
         switch (type) {
             case MCROCFLObjectIDPrefixHelper.MCROBJECT:
             case MCROCFLObjectIDPrefixHelper.MCRDERIVATE: {
@@ -99,7 +99,7 @@ public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
             }
             // add more switch cases for own type behaviour
             default:
-                return type + "/" + objectId.replaceAll(".*:", "");
+                return type.substring(0, type.length() - 1) + "/" + objectId.replaceAll(".*:", "");
         }
     }
 }
