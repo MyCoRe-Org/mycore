@@ -18,8 +18,9 @@
 
 package org.mycore.ocfl.layout;
 
-import edu.wisc.library.ocfl.api.exception.OcflExtensionException;
+import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
 
+import edu.wisc.library.ocfl.api.exception.OcflExtensionException;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
 import edu.wisc.library.ocfl.core.extension.storage.layout.OcflStorageLayoutExtension;
 
@@ -52,14 +53,7 @@ public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
      */
     @Override
     public synchronized void init(OcflExtensionConfig config) {
-
-        // add check if correct config when used outside of MyCoRe
-
-        MCRStorageLayoutConfig castConfig = (MCRStorageLayoutConfig) config;
-
-        // add config validation
-
-        this.config = castConfig;
+        this.config = (MCRStorageLayoutConfig) config;
     }
 
     @Override
@@ -76,11 +70,11 @@ public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
             throw new OcflExtensionException("Extension must be initialized before usage!");
         }
         StringBuilder builder = new StringBuilder();
-        String type = objectId.substring(0, objectId.indexOf(':'));
-        builder.append(type).append('/');
+        String type = objectId.substring(0, objectId.indexOf(':') + 1);
+        builder.append(type.substring(0, type.length() - 1)).append('/');
         switch (type) {
-            case "mcrobject":
-            case "mcrderivate": {
+            case MCROCFLObjectIDPrefixHelper.MCROBJECT:
+            case MCROCFLObjectIDPrefixHelper.MCRDERIVATE: {
                 String mcrid = objectId.replaceAll(".*:", "");
                 String[] idParts = mcrid.split("_");
                 builder.append(idParts[0]).append('/').append(idParts[1]).append('/');
@@ -105,7 +99,7 @@ public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
             }
             // add more switch cases for own type behaviour
             default:
-                return type + "/" + objectId.replaceAll(".*:", "");
+                return type.substring(0, type.length() - 1) + "/" + objectId.replaceAll(".*:", "");
         }
     }
 }

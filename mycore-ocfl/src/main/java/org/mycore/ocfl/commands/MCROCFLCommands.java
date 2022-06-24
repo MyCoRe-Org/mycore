@@ -19,12 +19,25 @@
 package org.mycore.ocfl.commands;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.MCROCFLMigration;
+import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
+import org.mycore.ocfl.MCROCFLPersistenceTransaction;
+import org.mycore.ocfl.MCROCFLRepositoryProvider;
+import org.mycore.ocfl.MCROCFLXMLClassificationManager;
+
+import edu.wisc.library.ocfl.api.OcflRepository;
 
 @MCRCommandGroup(name = "OCFL Commands")
 public class MCROCFLCommands {
@@ -71,5 +84,55 @@ public class MCROCFLCommands {
             failed.size(),
             invalidState.size(),
             withoutHistory.size());
+    }
+
+    @MCRCommand(syntax = "update ocfl classifications",
+        help = "Update all classifications in the OCFL store from database")
+    public static List<String> updateOCFLClassifications() {
+        List<MCRCategoryID> list = new MCRCategoryDAOImpl().getRootCategoryIDs();
+        return list.stream()
+            .map(id -> "update ocfl classification " + id)
+            .collect(Collectors.toList());
+    }
+
+    @MCRCommand(syntax = "update ocfl classification {0}",
+        help = "Update classification {0} in the OCFL Store from database")
+    public static void updateOCFLClassification(String classId) {
+        final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
+        MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.UPDATED);
+    }
+
+    @MCRCommand(syntax = "delete ocfl classification {0}",
+        help = "Delete classification {0} in the OCFL Store")
+    public static void deleteOCFLClassification(String classId) {
+        final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
+        MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.DELETED);
+    }
+
+    @MCRCommand(syntax = "sync ocfl classifications",
+        help = "Update all classifications and remove deleted Classifications to resync OCFL Store to the Database")
+    public static List<String> syncClassificationRepository() {
+        List<String> commands = new ArrayList<>();
+        commands.add("update ocfl classifications");
+        List<String> outOfSync = getStaleOCFLClassificationIDs();
+        commands.addAll(
+            outOfSync.stream()
+                .map(id -> "delete ocfl classification " + id).collect(Collectors.toList()));
+        return commands;
+    }
+
+    private static List<String> getStaleOCFLClassificationIDs() {
+        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
+        List<String> classDAOList = new MCRCategoryDAOImpl().getRootCategoryIDs().stream()
+            .map(MCRCategoryID::toString)
+            .collect(Collectors.toList());
+        OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        return repository.listObjectIds()
+            .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
+            .filter(obj -> !MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
+                .getHeadVersion().getVersionInfo().getMessage()))
+            .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
+            .filter(Predicate.not(classDAOList::contains))
+            .collect(Collectors.toList());
     }
 }

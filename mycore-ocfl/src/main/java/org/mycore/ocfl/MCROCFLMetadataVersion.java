@@ -18,16 +18,15 @@
 
 package org.mycore.ocfl;
 
-import org.jdom2.JDOMException;
-import org.mycore.common.MCRUsageException;
-import org.mycore.common.content.MCRContent;
-import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+import java.io.IOException;
+import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.IOException;
-import java.util.Date;
+
+import org.mycore.common.content.MCRContent;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 
 /**
  * Provides information about a stored version of metadata and allows to
@@ -47,11 +46,9 @@ public class MCROCFLMetadataVersion extends MCRAbstractMetadataVersion<MCRConten
      * Retrieves this version of the metadata
      * 
      * @return the metadata document as it was in this version
-     * @throws MCRUsageException
-     *             if this is a deleted version, which can not be retrieved
      */
     @Override
-    public MCRContent retrieve() throws IOException {
+    public MCRContent retrieve() {
         return vm;
     }
 
@@ -62,7 +59,7 @@ public class MCROCFLMetadataVersion extends MCRAbstractMetadataVersion<MCRConten
      * the metadata.
      */
     @Override
-    public void restore() throws IOException, JDOMException {
+    public void restore() throws IOException {
         throw new IOException("Can not restore a version!");
     }
 }
