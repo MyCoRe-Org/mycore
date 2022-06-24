@@ -409,17 +409,15 @@ public class MCRRestDerivates {
         LOGGER.debug(der);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
         boolean modified = false;
-        if (der.getOrder() != -1) {
-            if (derivate.getOrder() != der.getOrder()) {
-                modified = true;
-                derivate.setOrder(der.getOrder());
-            }
+        if (der.getOrder() != -1
+            && derivate.getOrder() != der.getOrder()) {
+            modified = true;
+            derivate.setOrder(der.getOrder());
         }
-        if (der.getMainDoc() != null) {
-            if (!der.getMainDoc().equals(derivate.getDerivate().getInternals().getMainDoc())) {
-                modified = true;
-                derivate.getDerivate().getInternals().setMainDoc(der.getMainDoc());
-            }
+        if (der.getMainDoc() != null
+            && !der.getMainDoc().equals(derivate.getDerivate().getInternals().getMainDoc())) {
+            modified = true;
+            derivate.getDerivate().getInternals().setMainDoc(der.getMainDoc());
         }
 
         if (!der.getClassifications().isEmpty()) {
