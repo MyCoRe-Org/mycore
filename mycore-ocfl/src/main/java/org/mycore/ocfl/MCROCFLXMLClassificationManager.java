@@ -86,7 +86,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     void fileUpdate(MCRCategoryID mcrCg, MCRContent xml, String messageOpt) throws IOException {
-        String objName = getName(mcrCg);
+        String ocflObjectID = getOCFLObjectID(mcrCg);
         Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrCg.getRootID()));
         String message = messageOpt; // PMD Fix - AvoidReassigningParameters
         if (Objects.isNull(message)) {
@@ -95,16 +95,16 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
         try (InputStream objectAsStream = xml.getInputStream()) {
             VersionInfo versionInfo = buildVersionInfo(message, lastModified);
-            getRepository().updateObject(ObjectVersionId.head(objName), versionInfo,
+            getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo,
                 updater -> updater.writeFile(objectAsStream, buildFilePath(mcrCg), OcflOption.OVERWRITE));
         }
     }
 
     public void delete(MCRCategoryID mcrid) {
-        String objName = getName(mcrid);
+        String ocflObjectID = getOCFLObjectID(mcrid);
         Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrid.getRootID()));
         VersionInfo versionInfo = buildVersionInfo(MESSAGE_DELETED, lastModified);
-        getRepository().updateObject(ObjectVersionId.head(objName), versionInfo,
+        getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo,
             updater -> updater.removeFile(buildFilePath(mcrid)));
     }
 
@@ -115,19 +115,19 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
      * @return Content of the Classification
      */
     public MCRContent retrieveContent(MCRCategoryID mcrid, String revision) {
-        String objName = getName(mcrid);
+        String ocflObjectID = getOCFLObjectID(mcrid);
         OcflRepository repo = getRepository();
-        ObjectVersionId vId = revision != null ? ObjectVersionId.version(objName, revision)
-            : ObjectVersionId.head(objName);
+        ObjectVersionId vId = revision != null ? ObjectVersionId.version(ocflObjectID, revision)
+            : ObjectVersionId.head(ocflObjectID);
 
         try {
             repo.getObject(vId);
         } catch (NotFoundException e) {
-            throw new MCRUsageException("Object '" + objName + "' could not be found", e);
+            throw new MCRUsageException("Object '" + ocflObjectID + "' could not be found", e);
         }
 
         if (convertMessageToType(repo.getObject(vId).getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
-            throw new MCRUsageException("Cannot read already deleted object '" + objName + "'");
+            throw new MCRUsageException("Cannot read already deleted object '" + ocflObjectID + "'");
         }
 
         try (InputStream storedContentStream = repo.getObject(vId).getFile(buildFilePath(mcrid)).getStream()) {
@@ -141,7 +141,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         }
     }
 
-    protected String getName(MCRCategoryID mcrid) {
+    protected String getOCFLObjectID(MCRCategoryID mcrid) {
         return MCROCFLObjectIDPrefixHelper.CLASSIFICATION + mcrid.getRootID();
     }
 
