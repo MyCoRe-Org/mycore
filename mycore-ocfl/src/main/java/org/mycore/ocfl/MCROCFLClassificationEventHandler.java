@@ -33,9 +33,9 @@ import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 /**
  * @author Tobias Lenhardt [Hammer1279]
  */
-public class MCROCFLEventHandler implements MCREventHandler {
+public class MCROCFLClassificationEventHandler implements MCREventHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCROCFLEventHandler.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void doHandleEvent(MCREvent evt) throws MCRException {
