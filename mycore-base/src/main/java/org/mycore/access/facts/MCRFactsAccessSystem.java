@@ -42,7 +42,6 @@ import org.mycore.access.facts.model.MCRCondition;
 import org.mycore.access.facts.model.MCRFact;
 import org.mycore.access.facts.model.MCRFactComputable;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.MCRConfiguration2;
