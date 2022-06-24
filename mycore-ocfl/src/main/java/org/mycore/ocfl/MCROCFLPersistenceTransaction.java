@@ -32,6 +32,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
@@ -114,8 +115,13 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     private static void createOrUpdateOCFLClassification(MCRCategoryID categoryID, Character eventType)
         throws IOException {
         // read classification from just here
-        final MCRCategory categoryRoot = MCRCategoryDAOFactory.getInstance()
+        final MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        final MCRCategory categoryRoot = categoryDAO
             .getCategory(categoryID, -1);
+        if (categoryID == null) {
+            throw new IOException(
+                "Could not get classification " + categoryID + " from " + categoryDAO.getClass().getName());
+        }
         final Document categoryXML = MCRCategoryTransformer.getMetaDataDocument(categoryRoot, false);
         final MCRJDOMContent classContent = new MCRJDOMContent(categoryXML);
         try {
