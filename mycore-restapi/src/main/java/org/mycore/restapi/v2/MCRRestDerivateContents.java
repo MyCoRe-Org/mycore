@@ -411,8 +411,7 @@ public class MCRRestDerivateContents {
 
     @DELETE
     @Operation(summary = "Deletes file or directory.",
-        responses = { @ApiResponse(responseCode = "204", description = "if deletion exists"),
-            @ApiResponse(responseCode = "400", description = "if directory is not empty"),
+        responses = { @ApiResponse(responseCode = "204", description = "if deletion was successful")
         },
         tags = MCRRestUtils.TAG_MYCORE_FILE)
     @MCRRequireTransaction
