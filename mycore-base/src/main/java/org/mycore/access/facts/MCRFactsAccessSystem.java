@@ -218,7 +218,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         }
         try {
             return MCRCategoryDAOFactory.getInstance().exist(MCRCategoryID.fromString(checkID));
-        } catch (IllegalArgumentException | MCRException e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
