@@ -375,6 +375,11 @@ public class MCRRestDerivateContents {
         if (mcrPath.getNameCount() > 1) {
             MCRPath parentDirectory = mcrPath.getParent();
             try {
+                if (!Files.exists(parentDirectory)
+                    && parentDirectory.toAbsolutePath().startsWith(
+                        MCRPath.getPath(derid.toString(), "/").toAbsolutePath())) {
+                    Files.createDirectories(parentDirectory);
+                }
                 BasicFileAttributes parentAttrs = Files.readAttributes(parentDirectory, BasicFileAttributes.class);
                 if (!parentAttrs.isDirectory()) {
                     throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
