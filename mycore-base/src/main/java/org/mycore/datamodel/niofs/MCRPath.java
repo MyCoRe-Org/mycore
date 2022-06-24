@@ -590,10 +590,10 @@ public abstract class MCRPath implements Path {
         final int thisOffsetCount = offsets.length;
 
         //checks required by Path.startsWidth()
-        if (thatOffsetCount > thisOffsetCount || path.length() > that.path.length()) {
+        if (thatOffsetCount > thisOffsetCount || that.path.length() > path.length()) {
             return false;
         }
-        if (thatOffsetCount == thisOffsetCount && path.length() != that.path.length()) {
+        if (thatOffsetCount == thisOffsetCount && that.path.length() != path.length()) {
             return false;
         }
         if (!Objects.deepEquals(root, that.root)) {
@@ -612,7 +612,7 @@ public abstract class MCRPath implements Path {
         }
         final int thatPathLength = that.path.length();
         // return false if this.path==/foo/bar and that.path==/path
-        return thatPathLength >= path.length() || path.charAt(thatPathLength) == SEPARATOR;
+        return thatPathLength <= path.length() || path.charAt(thatPathLength) == SEPARATOR;
     }
 
     /* (non-Javadoc)
