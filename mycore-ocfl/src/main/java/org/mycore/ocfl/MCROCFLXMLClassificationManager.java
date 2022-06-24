@@ -33,7 +33,6 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLClassificationManager;
 import org.xml.sax.SAXException;
@@ -88,14 +87,13 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     void fileUpdate(MCRCategoryID mcrCg, MCRContent xml, String messageOpt) throws IOException {
         String ocflObjectID = getOCFLObjectID(mcrCg);
-        Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrCg.getRootID()));
         String message = messageOpt; // PMD Fix - AvoidReassigningParameters
         if (Objects.isNull(message)) {
             message = MESSAGE_UPDATED;
         }
 
         try (InputStream objectAsStream = xml.getInputStream()) {
-            VersionInfo versionInfo = buildVersionInfo(message, lastModified);
+            VersionInfo versionInfo = buildVersionInfo(message, new Date());
             getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo,
                 updater -> updater.writeFile(objectAsStream, buildFilePath(mcrCg), OcflOption.OVERWRITE));
         }
@@ -103,8 +101,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     public void delete(MCRCategoryID mcrid) throws IOException {
         String ocflObjectID = getOCFLObjectID(mcrid);
-        Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrid.getRootID()));
-        VersionInfo versionInfo = buildVersionInfo(MESSAGE_DELETED, lastModified);
+        VersionInfo versionInfo = buildVersionInfo(MESSAGE_DELETED, new Date());
         try {
             getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo,
                 updater -> updater.removeFile(buildFilePath(mcrid)));
