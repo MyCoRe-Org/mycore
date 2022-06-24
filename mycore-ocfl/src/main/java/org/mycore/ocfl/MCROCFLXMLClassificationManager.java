@@ -41,6 +41,7 @@ import org.xml.sax.SAXException;
 import edu.wisc.library.ocfl.api.OcflOption;
 import edu.wisc.library.ocfl.api.OcflRepository;
 import edu.wisc.library.ocfl.api.exception.NotFoundException;
+import edu.wisc.library.ocfl.api.exception.ObjectOutOfSyncException;
 import edu.wisc.library.ocfl.api.model.ObjectVersionId;
 import edu.wisc.library.ocfl.api.model.VersionInfo;
 
@@ -100,12 +101,16 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         }
     }
 
-    public void delete(MCRCategoryID mcrid) {
+    public void delete(MCRCategoryID mcrid) throws IOException {
         String ocflObjectID = getOCFLObjectID(mcrid);
         Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrid.getRootID()));
         VersionInfo versionInfo = buildVersionInfo(MESSAGE_DELETED, lastModified);
-        getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo,
-            updater -> updater.removeFile(buildFilePath(mcrid)));
+        try {
+            getRepository().updateObject(ObjectVersionId.head(ocflObjectID), versionInfo,
+                updater -> updater.removeFile(buildFilePath(mcrid)));
+        } catch (NotFoundException | ObjectOutOfSyncException e) {
+            throw new IOException(e);
+        }
     }
 
     /**
@@ -114,7 +119,8 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
      * @param revision Revision of the Category or <code>null</code> for HEAD
      * @return Content of the Classification
      */
-    public MCRContent retrieveContent(MCRCategoryID mcrid, String revision) {
+    @Override
+    public MCRContent retrieveContent(MCRCategoryID mcrid, String revision) throws IOException {
         String ocflObjectID = getOCFLObjectID(mcrid);
         OcflRepository repo = getRepository();
         ObjectVersionId vId = revision != null ? ObjectVersionId.version(ocflObjectID, revision)
@@ -123,11 +129,11 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         try {
             repo.getObject(vId);
         } catch (NotFoundException e) {
-            throw new MCRUsageException("Object '" + ocflObjectID + "' could not be found", e);
+            throw new IOException("Object '" + ocflObjectID + "' could not be found", e);
         }
 
         if (convertMessageToType(repo.getObject(vId).getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
-            throw new MCRUsageException("Cannot read already deleted object '" + ocflObjectID + "'");
+            throw new IOException("Cannot read already deleted object '" + ocflObjectID + "'");
         }
 
         try (InputStream storedContentStream = repo.getObject(vId).getFile(buildFilePath(mcrid)).getStream()) {
@@ -136,8 +142,8 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
                 xml.getRootElement().setAttribute("rev", revision);
             }
             return new MCRJDOMContent(xml);
-        } catch (JDOMException | SAXException | IOException e) {
-            throw new MCRPersistenceException("Can not parse XML from OCFL-Store", e);
+        } catch (JDOMException | SAXException e) {
+            throw new IOException("Can not parse XML from OCFL-Store", e);
         }
     }
 

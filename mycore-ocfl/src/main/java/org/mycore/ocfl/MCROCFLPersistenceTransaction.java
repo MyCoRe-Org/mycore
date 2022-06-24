@@ -90,24 +90,29 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         mapOfChanges.forEach((categoryID, eventType) -> MCRSessionMgr.getCurrentSession()
             .onCommit(() -> {
                 LOGGER.debug("[{}] UPDATING CLASS <{}>", threadId, categoryID);
-                switch (eventType) {
-                    case MCRAbstractMetadataVersion.CREATED:
-                    case MCRAbstractMetadataVersion.UPDATED:
-                        createOrUpdateOCFLClassification(categoryID, eventType);
-                        break;
-                    case MCRAbstractMetadataVersion.DELETED:
-                        MANAGER.delete(categoryID);
-                        break;
-                    default:
-                        throw new IllegalStateException(
-                            "Unsupported type in classification found: " + eventType + ", " + categoryID);
+                try {
+                    switch (eventType) {
+                        case MCRAbstractMetadataVersion.CREATED:
+                        case MCRAbstractMetadataVersion.UPDATED:
+                            createOrUpdateOCFLClassification(categoryID, eventType);
+                            break;
+                        case MCRAbstractMetadataVersion.DELETED:
+                            MANAGER.delete(categoryID);
+                            break;
+                        default:
+                            throw new IllegalStateException(
+                                "Unsupported type in classification found: " + eventType + ", " + categoryID);
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
                 }
             }));
         CATEGORY_WORKSPACE.remove();
         active = false;
     }
 
-    private static void createOrUpdateOCFLClassification(MCRCategoryID categoryID, Character eventType) {
+    private static void createOrUpdateOCFLClassification(MCRCategoryID categoryID, Character eventType)
+        throws IOException {
         // read classification from just here
         final MCRCategory categoryRoot = MCRCategoryDAOFactory.getInstance()
             .getCategory(categoryID, -1);

@@ -20,6 +20,7 @@ package org.mycore.ocfl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Collections;
@@ -189,19 +190,19 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         try {
             storeObject = getRepository().getObject(ObjectVersionId.head(ocflObjectID));
         } catch (NotFoundException e) {
-            throw new MCRUsageException("Object '" + ocflObjectID + "' could not be found", e);
+            throw new IOException("Object '" + ocflObjectID + "' could not be found", e);
         }
 
         if (convertMessageToType(
             storeObject.getVersionInfo().getMessage()) == MCROCFLMetadataVersion.DELETED) {
-            throw new MCRUsageException("Cannot read already deleted object '" + ocflObjectID + "'");
+            throw new IOException("Cannot read already deleted object '" + ocflObjectID + "'");
         }
 
         // "metadata/" +
         try (InputStream storedContentStream = storeObject.getFile(buildFilePath(mcrid)).getStream()) {
             return new MCRJDOMContent(new MCRStreamContent(storedContentStream).asXML());
         } catch (JDOMException | SAXException e) {
-            throw new MCRPersistenceException("Can not parse XML from OCFL-Store", e);
+            throw new IOException("Can not parse XML from OCFL-Store", e);
         }
     }
 
@@ -216,13 +217,13 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         try {
             storeObject = repo.getObject(ObjectVersionId.version(ocflObjectID, revision));
         } catch (NotFoundException e) {
-            throw new MCRUsageException("Object '" + ocflObjectID + "' could not be found", e);
+            throw new IOException("Object '" + ocflObjectID + "' could not be found", e);
         }
 
         // maybe use .head(ocflObjectID) instead to prevent requests of old versions of deleted objects
         if (convertMessageToType(repo.getObject(ObjectVersionId.version(ocflObjectID, revision)).getVersionInfo()
             .getMessage()) == MCROCFLMetadataVersion.DELETED) {
-            throw new MCRUsageException("Cannot read already deleted object '" + ocflObjectID + "'");
+            throw new IOException("Cannot read already deleted object '" + ocflObjectID + "'");
         }
 
         try (InputStream storedContentStream = storeObject.getFile(buildFilePath(mcrid)).getStream()) {
@@ -230,7 +231,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             xml.getRootElement().setAttribute("rev", revision);
             return new MCRJDOMContent(xml);
         } catch (JDOMException | SAXException e) {
-            throw new MCRPersistenceException("Can not parse XML from OCFL-Store", e);
+            throw new IOException("Can not parse XML from OCFL-Store", e);
         }
     }
 
@@ -263,7 +264,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
             VersionDetails details = v.getValue();
             VersionInfo versionInfo = details.getVersionInfo();
 
-            MCROCFLContent content = new MCROCFLContent(getRepository(), ocflObjectID, buildFilePath(id), key.toString());
+            MCROCFLContent content = new MCROCFLContent(getRepository(), ocflObjectID, buildFilePath(id),
+                key.toString());
             return new MCROCFLMetadataVersion(content,
                 key.toString(),
                 versionInfo.getUser().getName(),
@@ -362,12 +364,22 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     @Override
     public List<MCRObjectIDDate> retrieveObjectDates(List<String> ids) throws IOException {
-        return ids.stream()
-            .filter(this::isMetadata)
-            .filter(this::isNotDeleted)
-            .map(this::removePrefix)
-            .map(id -> new MCRObjectIDDateImpl(new Date(getLastModified(getOCFLObjectID(id))), id))
-            .collect(Collectors.toList());
+        try {
+            return ids.stream()
+                .filter(this::isMetadata)
+                .filter(this::isNotDeleted)
+                .map(this::removePrefix)
+                .map(id -> {
+                    try {
+                        return new MCRObjectIDDateImpl(new Date(getLastModified(getOCFLObjectID(id))), id);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
     @Override
@@ -375,13 +387,17 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return getLastModified(getOCFLObjectID(id));
     }
 
-    public long getLastModified(String ocflObjectId) {
-        return Date.from(getRepository()
-            .getObject(ObjectVersionId.head(ocflObjectId))
-            .getVersionInfo()
-            .getCreated()
-            .toInstant())
-            .getTime();
+    public long getLastModified(String ocflObjectId) throws IOException {
+        try {
+            return Date.from(getRepository()
+                .getObject(ObjectVersionId.head(ocflObjectId))
+                .getVersionInfo()
+                .getCreated()
+                .toInstant())
+                .getTime();
+        } catch (NotFoundException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override

@@ -18,6 +18,8 @@
 
 package org.mycore.datamodel.common;
 
+import java.io.IOException;
+
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 
@@ -32,7 +34,7 @@ public interface MCRXMLClassificationManager {
      * @param mcrid ID of the Category
      * @return MCRContent
      */
-    default MCRContent retrieveContent(MCRCategoryID mcrid) {
+    default MCRContent retrieveContent(MCRCategoryID mcrid) throws IOException {
         return retrieveContent(mcrid, null);
     }
 
@@ -42,6 +44,6 @@ public interface MCRXMLClassificationManager {
      * @param revision Revision of the Category
      * @return MCRContent
      */
-    MCRContent retrieveContent(MCRCategoryID mcrid, String revision);
+    MCRContent retrieveContent(MCRCategoryID mcrid, String revision) throws IOException;
 
 }
