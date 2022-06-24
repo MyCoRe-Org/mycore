@@ -38,6 +38,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -387,6 +388,64 @@ public class MCRRestDerivates {
             }
         }
         return Response.created(uriInfo.getAbsolutePathBuilder().path(derId.toString()).build()).build();
+    }
+    
+    @PATCH
+    @Operation(
+        summary = "Updates the metadata (or partial metadata) of the given derivate",
+        responses = @ApiResponse(responseCode = "201",
+            headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new derivate")),
+        tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @RequestBody(required = true,
+        content = @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED,
+            schema = @Schema(implementation = DerivateMetadata.class)))
+    @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
+    @Path("/{" + PARAM_DERID + "}")
+    public Response patchDerivate(@BeanParam DerivateMetadata der,
+        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
+        return doPatchDerivate(derid, der);
+    }
+
+    private Response doPatchDerivate(MCRObjectID derid, DerivateMetadata der) {
+        LOGGER.debug(der);
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
+        boolean modified = true;
+        if (der.getOrder() != -1) {
+            derivate.setOrder(der.getOrder());
+        }
+        if(der.getMainDoc()!=null) {
+            derivate.getDerivate().getInternals().setMainDoc(der.getMainDoc());
+        }
+
+        if (!der.getClassifications().isEmpty()) {
+            derivate.getDerivate().getClassifications().clear();
+            derivate.getDerivate().getClassifications()
+                .addAll(der.getClassifications().stream()
+                    .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
+                    .collect(Collectors.toList()));
+        }
+        if (!der.getTitles().isEmpty()) {
+            derivate.getDerivate().getTitles().clear();
+            derivate.getDerivate().getTitles()
+                .addAll(der.getTitles().stream()
+                    .map(DerivateTitle::toMetaLangText)
+                    .collect(Collectors.toList()));
+        }
+        if (modified) {
+            try {
+                MCRMetadataManager.update(derivate);
+            } catch (MCRAccessException e) {
+                throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+                    .withMessage("You may not update MCRDerivate " + derivate.getId() + ".")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
+            }
+        }
+        return Response.noContent().build();
     }
 
     @PUT
