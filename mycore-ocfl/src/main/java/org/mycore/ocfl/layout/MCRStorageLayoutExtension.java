@@ -18,7 +18,7 @@
 
 package org.mycore.ocfl.layout;
 
-import org.mycore.ocfl.MCROCFLObjectIDPrefixes;
+import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
 
 import edu.wisc.library.ocfl.api.exception.OcflExtensionException;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;
@@ -73,8 +73,8 @@ public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
         String type = objectId.substring(0, objectId.indexOf(':') + 1);
         builder.append(type).append('/');
         switch (type) {
-            case MCROCFLObjectIDPrefixes.MCROBJECT:
-            case MCROCFLObjectIDPrefixes.MCRDERIVATE: {
+            case MCROCFLObjectIDPrefixHelper.MCROBJECT:
+            case MCROCFLObjectIDPrefixHelper.MCRDERIVATE: {
                 String mcrid = objectId.replaceAll(".*:", "");
                 String[] idParts = mcrid.split("_");
                 builder.append(idParts[0]).append('/').append(idParts[1]).append('/');

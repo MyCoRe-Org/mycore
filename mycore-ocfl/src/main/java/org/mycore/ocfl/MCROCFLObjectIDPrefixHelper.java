@@ -21,7 +21,7 @@ package org.mycore.ocfl;
 /**
  * Prefixes to map MyCoRe IDs to OCFL object IDs.
  */
-public class MCROCFLObjectIDPrefixes {
+public class MCROCFLObjectIDPrefixHelper {
     public static final String MCROBJECT = "mcrobject:";
 
     public static final String MCRDERIVATE = "mcrderivate:";

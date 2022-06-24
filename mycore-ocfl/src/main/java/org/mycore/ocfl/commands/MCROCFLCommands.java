@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.MCROCFLMigration;
-import org.mycore.ocfl.MCROCFLObjectIDPrefixes;
+import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
 import org.mycore.ocfl.MCROCFLPersistenceTransaction;
 import org.mycore.ocfl.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.MCROCFLXMLClassificationManager;
@@ -99,15 +99,14 @@ public class MCROCFLCommands {
         help = "Update classification {0} in the OCFL Store from database")
     public static void updateOCFLClassification(String classId) {
         final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
-        MCRCategory category = new MCRCategoryDAOImpl().getCategory(rootID, -1);
-        MCROCFLPersistenceTransaction.addClassfication(rootID, category);
+        MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.UPDATED);
     }
 
     @MCRCommand(syntax = "delete ocfl classification {0}",
         help = "Delete classification {0} in the OCFL Store")
     public static void deleteOCFLClassification(String classId) {
         final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
-        MCROCFLPersistenceTransaction.addClassfication(rootID, null);
+        MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.DELETED);
     }
 
     @MCRCommand(syntax = "sync ocfl classifications",
@@ -129,10 +128,10 @@ public class MCROCFLCommands {
             .collect(Collectors.toList());
         OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
         return repository.listObjectIds()
-            .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixes.CLASSIFICATION))
+            .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
             .filter(obj -> !MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
                 .getHeadVersion().getVersionInfo().getMessage()))
-            .map(obj -> obj.replace(MCROCFLObjectIDPrefixes.CLASSIFICATION, ""))
+            .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
             .filter(Predicate.not(classDAOList::contains))
             .collect(Collectors.toList());
     }

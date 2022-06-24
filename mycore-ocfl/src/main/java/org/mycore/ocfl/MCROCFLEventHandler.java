@@ -18,17 +18,17 @@
 
 package org.mycore.ocfl;
 
-import static org.mycore.ocfl.MCROCFLPersistenceTransaction.addClassfication;
+import static org.mycore.ocfl.MCROCFLPersistenceTransaction.addClassficationEvent;
 
 import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]
@@ -37,10 +37,6 @@ public class MCROCFLEventHandler implements MCREventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger(MCROCFLEventHandler.class);
 
-    protected MCROCFLXMLClassificationManager manager = MCRConfiguration2
-        .getSingleInstanceOf("MCR.Classification.Manager", MCROCFLXMLClassificationManager.class)
-        .orElse(new MCROCFLXMLClassificationManager());
-
     @Override
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (Objects.equals(evt.getObjectType(), MCREvent.CLASS_TYPE)) {
@@ -48,16 +44,18 @@ public class MCROCFLEventHandler implements MCREventHandler {
             LOGGER.debug("{} handling {} {}", getClass().getName(), mcrCg.getId(), evt.getEventType());
             switch (evt.getEventType()) {
                 case MCREvent.CREATE_EVENT:
+                    addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
+                    break;
                 case MCREvent.UPDATE_EVENT:
-                        addClassfication(mcrCg.getRoot().getId(), mcrCg.getRoot());
+                        addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
                     break;
                 case MCREvent.DELETE_EVENT:
                     if (mcrCg.getId().isRootID()) {
                         // delete complete classification
-                        addClassfication(mcrCg.getRoot().getId(), null);
+                        addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
                     } else {
                         // update classification to new version
-                        addClassfication(mcrCg.getRoot().getId(), mcrCg.getRoot());
+                        addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
                     }
                     break;
                 default:

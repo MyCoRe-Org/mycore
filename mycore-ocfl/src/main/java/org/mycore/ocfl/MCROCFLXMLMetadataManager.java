@@ -174,7 +174,8 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     private String getObjName(String mcrid) {
         String objectType = MCRObjectID.getInstance(mcrid).getTypeId();
-        return "derivate".equals(objectType) ? MCROCFLObjectIDPrefixes.MCRDERIVATE + mcrid : MCROCFLObjectIDPrefixes.MCROBJECT + mcrid;
+        return "derivate".equals(objectType) ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE + mcrid
+            : MCROCFLObjectIDPrefixHelper.MCROBJECT + mcrid;
     }
 
     private String buildFilePath(MCRObjectID objName) {
@@ -271,12 +272,14 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     private boolean isMetadata(String id) {
-        return id.startsWith(MCROCFLObjectIDPrefixes.MCROBJECT) || id.startsWith(MCROCFLObjectIDPrefixes.MCRDERIVATE);
+        return id.startsWith(MCROCFLObjectIDPrefixHelper.MCROBJECT)
+            || id.startsWith(MCROCFLObjectIDPrefixHelper.MCRDERIVATE);
     }
 
     private String removePrefix(String id) {
-        return id.startsWith(MCROCFLObjectIDPrefixes.MCRDERIVATE) ? id.substring(MCROCFLObjectIDPrefixes.MCRDERIVATE.length())
-            : id.substring(MCROCFLObjectIDPrefixes.MCROBJECT.length());
+        return id.startsWith(MCROCFLObjectIDPrefixHelper.MCRDERIVATE)
+            ? id.substring(MCROCFLObjectIDPrefixHelper.MCRDERIVATE.length())
+            : id.substring(MCROCFLObjectIDPrefixHelper.MCROBJECT.length());
     }
 
     public IntStream getStoredIDs(String project, String type) throws MCRPersistenceException {

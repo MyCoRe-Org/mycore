@@ -18,6 +18,8 @@
 
 package org.mycore.ocfl;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +35,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
+import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]
@@ -42,9 +45,11 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    protected MCROCFLXMLClassificationManager manager;
+    private static final MCROCFLXMLClassificationManager MANAGER = MCRConfiguration2
+        .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager")
+        .orElse(null);
 
-    private static final ThreadLocal<Map<MCRCategoryID, MCRCategory>> CATEGORY_WORKSPACE = new ThreadLocal<>();
+    private static final ThreadLocal<Map<MCRCategoryID, Character>> CATEGORY_WORKSPACE = new ThreadLocal<>();
 
     private final long threadId = Thread.currentThread().getId();
 
@@ -53,16 +58,14 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     private boolean active;
 
     public MCROCFLPersistenceTransaction() {
-        manager = MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager")
-            .orElse(null);
         rollbackOnly = false;
         active = false;
     }
 
     @Override
     public boolean isReady() {
-        LOGGER.debug("TRANSACTION {} READY CHECK - {}", threadId, manager != null);
-        return manager != null && !isActive();
+        LOGGER.debug("TRANSACTION {} READY CHECK - {}", threadId, MANAGER != null);
+        return MANAGER != null && !isActive();
     }
 
     @Override
@@ -81,29 +84,44 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         if (!isActive() || getRollbackOnly()) {
             throw new IllegalStateException("TRANSACTION NOT ACTIVE OR MARKED FOR ROLLBACK");
         }
-        final Map<MCRCategoryID, MCRCategory> mapOfChanges = CATEGORY_WORKSPACE.get();
+        final Map<MCRCategoryID, Character> mapOfChanges = CATEGORY_WORKSPACE.get();
         // save new OCFL version of classifications
         // value is category if classification should not be deleted
-        mapOfChanges.values()
-            .stream()
-            .filter(Objects::nonNull)
-            .forEach(category -> MCRSessionMgr.getCurrentSession()
-                .onCommit(() -> {
-                    LOGGER.debug("[{}] UPDATING CLASS <{}>", threadId, category.getId());
-                    // read classification from just here
-                    final MCRCategory categoryRoot = MCRCategoryDAOFactory.getInstance()
-                        .getCategory(category.getRoot().getId(), -1);
-                    final Document categoryXML = MCRCategoryTransformer.getMetaDataDocument(categoryRoot, false);
-                    manager.update(category, new MCRJDOMContent(categoryXML));
-                }));
-        // delete classifications
-        mapOfChanges.entrySet()
-            .stream()
-            .filter(e -> Objects.isNull(e.getValue())) // value is category if classification should not be deleted
-            .forEach(entry -> MCRSessionMgr.getCurrentSession()
-                .onCommit(() -> manager.delete(entry.getKey())));
+        mapOfChanges.forEach((categoryID, eventType) -> MCRSessionMgr.getCurrentSession()
+            .onCommit(() -> {
+                LOGGER.debug("[{}] UPDATING CLASS <{}>", threadId, categoryID);
+                switch (eventType) {
+                    case MCRAbstractMetadataVersion.CREATED:
+                    case MCRAbstractMetadataVersion.UPDATED:
+                        createOrUpdateOCFLClassification(categoryID, eventType);
+                        break;
+                    case MCRAbstractMetadataVersion.DELETED:
+                        MANAGER.delete(categoryID);
+                        break;
+                    default:
+                        throw new IllegalStateException(
+                            "Unsupported type in classification found: " + eventType + ", " + categoryID);
+                }
+            }));
         CATEGORY_WORKSPACE.remove();
         active = false;
+    }
+
+    private static void createOrUpdateOCFLClassification(MCRCategoryID categoryID, Character eventType) {
+        // read classification from just here
+        final MCRCategory categoryRoot = MCRCategoryDAOFactory.getInstance()
+            .getCategory(categoryID, -1);
+        final Document categoryXML = MCRCategoryTransformer.getMetaDataDocument(categoryRoot, false);
+        final MCRJDOMContent classContent = new MCRJDOMContent(categoryXML);
+        try {
+            if (eventType == MCRAbstractMetadataVersion.CREATED) {
+                MANAGER.create(categoryID, classContent);
+            } else {
+                MANAGER.update(categoryID, classContent);
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     @Override
@@ -135,14 +153,36 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     /**
      * Add Classifications to get Updated/Deleted once the Transaction gets Committed
      * @param id The ID of the Classification
-     * @param category The Root Category / Classification, set to {@code null} to delete 
-     * the Classification
+     * @param type 'A' for created, 'M' for modified, 'D' deleted
      */
-    public static void addClassfication(MCRCategoryID id, MCRCategory category) {
+    public static void addClassficationEvent(MCRCategoryID id, char type) {
         if (!Objects.requireNonNull(id).isRootID()) {
             throw new IllegalArgumentException("Only root category ids are allowed: " + id);
         }
-        CATEGORY_WORKSPACE.get().put(id, category);
+        switch (type) {
+            case MCRAbstractMetadataVersion.CREATED:
+            case MCRAbstractMetadataVersion.DELETED:
+                CATEGORY_WORKSPACE.get().put(id, type);
+                break;
+            case MCRAbstractMetadataVersion.UPDATED:
+                final char oldType = CATEGORY_WORKSPACE.get().getOrDefault(id, '0');
+                switch (oldType) {
+                    case MCRAbstractMetadataVersion.CREATED:
+                    case MCRAbstractMetadataVersion.UPDATED:
+                        break;
+                    case '0':
+                        CATEGORY_WORKSPACE.get().put(id, type);
+                        break;
+                    case MCRAbstractMetadataVersion.DELETED:
+                        throw new IllegalArgumentException("Cannot update a deleted classification: " + id);
+                    default:
+                        throw new IllegalStateException(
+                            "Unsupported type in classification found: " + oldType + ", " + id);
+                }
+                break;
+            default:
+                throw new IllegalStateException("Unsupported event type for classification found: " + type + ", " + id);
+        }
     }
 
 }

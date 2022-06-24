@@ -21,7 +21,6 @@ package org.mycore.ocfl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZoneOffset;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +33,6 @@ import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
-import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLClassificationManager;
@@ -60,13 +58,13 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     private static final String ROOT_FOLDER = "classification/";
 
-    @MCRProperty(name = "Repository", required = true)
+    @MCRProperty(name = "Repository")
     public String repositoryKey;
 
-    protected static final Map<String, Character> MESSAGE_TYPE_MAPPING = Collections.unmodifiableMap(Map.ofEntries(
+    protected static final Map<String, Character> MESSAGE_TYPE_MAPPING = Map.ofEntries(
         Map.entry(MESSAGE_CREATED, MCROCFLMetadataVersion.CREATED),
         Map.entry(MESSAGE_UPDATED, MCROCFLMetadataVersion.UPDATED),
-        Map.entry(MESSAGE_DELETED, MCROCFLMetadataVersion.DELETED)));
+        Map.entry(MESSAGE_DELETED, MCROCFLMetadataVersion.DELETED));
 
     protected static char convertMessageToType(String message) throws MCRPersistenceException {
         if (!MESSAGE_TYPE_MAPPING.containsKey(message)) {
@@ -79,18 +77,17 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         return MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
 
-    public void create(MCRCategory mcrCg, MCRContent xml) {
+    public void create(MCRCategoryID mcrCg, MCRContent xml) throws IOException {
         fileUpdate(mcrCg, xml, MESSAGE_CREATED);
     }
 
-    public void update(MCRCategory mcrCg, MCRContent xml) {
+    public void update(MCRCategoryID mcrCg, MCRContent xml) throws IOException {
         fileUpdate(mcrCg, xml, MESSAGE_UPDATED);
     }
 
-    void fileUpdate(MCRCategory mcrCg, MCRContent xml, String messageOpt) {
-
-        String objName = getName(mcrCg.getId());
-        Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrCg.getId().getID()));
+    void fileUpdate(MCRCategoryID mcrCg, MCRContent xml, String messageOpt) throws IOException {
+        String objName = getName(mcrCg);
+        Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrCg.getRootID()));
         String message = messageOpt; // PMD Fix - AvoidReassigningParameters
         if (Objects.isNull(message)) {
             message = MESSAGE_UPDATED;
@@ -98,25 +95,17 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
         try (InputStream objectAsStream = xml.getInputStream()) {
             VersionInfo versionInfo = buildVersionInfo(message, lastModified);
-            getRepository().updateObject(ObjectVersionId.head(objName), versionInfo, updater -> {
-                updater.writeFile(objectAsStream, buildFilePath(mcrCg), OcflOption.OVERWRITE);
-            });
-        } catch (IOException e) {
-            throw new MCRPersistenceException("Failed to update object '" + objName + "'", e);
-        } catch (IllegalArgumentException e) {
-            // Issue seems to be with the OCFL Library trying to find a file it deleted itself
-            // LOGGER.error("Something has gone Wrong!", e);
+            getRepository().updateObject(ObjectVersionId.head(objName), versionInfo,
+                updater -> updater.writeFile(objectAsStream, buildFilePath(mcrCg), OcflOption.OVERWRITE));
         }
-
     }
 
     public void delete(MCRCategoryID mcrid) {
         String objName = getName(mcrid);
         Date lastModified = new Date(MCRCategoryDAOFactory.getInstance().getLastModified(mcrid.getRootID()));
         VersionInfo versionInfo = buildVersionInfo(MESSAGE_DELETED, lastModified);
-        getRepository().updateObject(ObjectVersionId.head(objName), versionInfo, updater -> {
-            updater.removeFile(buildFilePath(mcrid));
-        });
+        getRepository().updateObject(ObjectVersionId.head(objName), versionInfo,
+            updater -> updater.removeFile(buildFilePath(mcrid)));
     }
 
     /**
@@ -153,29 +142,20 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     protected String getName(MCRCategoryID mcrid) {
-        return MCROCFLObjectIDPrefixes.CLASSIFICATION + mcrid.getRootID();
+        return MCROCFLObjectIDPrefixHelper.CLASSIFICATION + mcrid.getRootID();
     }
 
     /**
      * Build file path from ID, <em>use for root classifications only!</em>
-     * <p><b>Use {@link #buildFilePath(MCRCategory)} when possible instead</b></p>
      * @param mcrid The ID to the Classification
      * @return The Path to the File.
      * @throws MCRUsageException if the Category is not a root classification
      */
     protected String buildFilePath(MCRCategoryID mcrid) {
-        if (mcrid.isRootID()) {
-            return ROOT_FOLDER + mcrid.toString() + ".xml";
-        } else {
-            throw new IllegalArgumentException("For Categories, use with MCRCategory instead of MCRCategoryID!");
+        if (!mcrid.isRootID()) {
+            throw new IllegalArgumentException("Only root categories are allowed: " + mcrid);
         }
-    }
-
-    protected String buildFilePath(MCRCategory mcrCg) {
-        if (mcrCg.isCategory()) {
-            throw new IllegalArgumentException("Only root categories are allowed: " + mcrCg);
-        }
-        return ROOT_FOLDER + mcrCg.getId() + ".xml";
+        return ROOT_FOLDER + mcrid + ".xml";
     }
 
     protected VersionInfo buildVersionInfo(String message, Date versionDate) {
