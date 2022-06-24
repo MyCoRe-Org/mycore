@@ -183,19 +183,17 @@ public class MCRCategoryID implements Serializable {
         }
         this.id = id;
     }
-    
-    
+
     /**
      * @param id
      *              the ID to check
      * @return true, if the given String is a valid categoryID
      */
     public static boolean isValid(String id) {
-        try{
+        try {
             MCRCategoryID.fromString(id);
             return true;
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }
