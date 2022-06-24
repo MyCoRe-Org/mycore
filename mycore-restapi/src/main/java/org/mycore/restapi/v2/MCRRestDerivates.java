@@ -389,7 +389,7 @@ public class MCRRestDerivates {
         }
         return Response.created(uriInfo.getAbsolutePathBuilder().path(derId.toString()).build()).build();
     }
-    
+
     @PATCH
     @Operation(
         summary = "Updates the metadata (or partial metadata) of the given derivate",
@@ -405,34 +405,49 @@ public class MCRRestDerivates {
     @Path("/{" + PARAM_DERID + "}")
     public Response patchDerivate(@BeanParam DerivateMetadata der,
         @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
-        return doPatchDerivate(derid, der);
-    }
 
-    private Response doPatchDerivate(MCRObjectID derid, DerivateMetadata der) {
         LOGGER.debug(der);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
-        boolean modified = true;
+        boolean modified = false;
         if (der.getOrder() != -1) {
-            derivate.setOrder(der.getOrder());
+            if (derivate.getOrder() != der.getOrder()) {
+                modified = true;
+                derivate.setOrder(der.getOrder());
+            }
         }
-        if(der.getMainDoc()!=null) {
-            derivate.getDerivate().getInternals().setMainDoc(der.getMainDoc());
+        if (der.getMainDoc() != null) {
+            if (!der.getMainDoc().equals(derivate.getDerivate().getInternals().getMainDoc())) {
+                modified = true;
+                derivate.getDerivate().getInternals().setMainDoc(der.getMainDoc());
+            }
         }
 
         if (!der.getClassifications().isEmpty()) {
-            derivate.getDerivate().getClassifications().clear();
-            derivate.getDerivate().getClassifications()
-                .addAll(der.getClassifications().stream()
-                    .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
-                    .collect(Collectors.toList()));
+            List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
+                .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
+                .collect(Collectors.toList());
+            if (oldClassifications.size() != der.getClassifications().size()
+                || !oldClassifications.containsAll(der.getClassifications())) {
+                modified = true;
+                derivate.getDerivate().getClassifications().clear();
+                derivate.getDerivate().getClassifications()
+                    .addAll(der.getClassifications().stream()
+                        .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
+                        .collect(Collectors.toList()));
+            }
         }
         if (!der.getTitles().isEmpty()) {
-            derivate.getDerivate().getTitles().clear();
-            derivate.getDerivate().getTitles()
-                .addAll(der.getTitles().stream()
-                    .map(DerivateTitle::toMetaLangText)
-                    .collect(Collectors.toList()));
+            List<MCRMetaLangText> newTitles = der.getTitles().stream()
+                .map(DerivateTitle::toMetaLangText)
+                .collect(Collectors.toList());
+            if (derivate.getDerivate().getTitleSize() != newTitles.size()
+                || !derivate.getDerivate().getTitles().containsAll(newTitles)) {
+                modified = true;
+                derivate.getDerivate().getTitles().clear();
+                derivate.getDerivate().getTitles().addAll(newTitles);
+            }
         }
+
         if (modified) {
             try {
                 MCRMetadataManager.update(derivate);
