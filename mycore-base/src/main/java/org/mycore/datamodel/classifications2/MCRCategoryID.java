@@ -46,6 +46,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
  *          2008) $
  * @since 2.0
  */
+/**
+ * @author mcradmin
+ *
+ */
 @Embeddable
 @Access(AccessType.FIELD)
 @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -180,8 +184,20 @@ public class MCRCategoryID implements Serializable {
         this.id = id;
     }
     
+    
+    /**
+     * @param id
+     *              the ID to check
+     * @return true, if the given String is a valid categoryID
+     */
     public static boolean isValid(String id) {
-        return id != null && id.length() > 0 && id.length() <= CATEG_ID_LENGTH && VALID_ID.matcher(id).matches();
+        try{
+            MCRCategoryID.fromString(id);
+            return true;
+        }
+        catch(Exception e) {
+            return false;
+        }
     }
 
     /**
