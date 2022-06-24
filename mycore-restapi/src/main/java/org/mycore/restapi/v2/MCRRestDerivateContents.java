@@ -377,13 +377,6 @@ public class MCRRestDerivateContents {
             MCRPath parentDirectory = mcrPath.getParent();
             try {
                 Files.createDirectories(parentDirectory);
-                BasicFileAttributes parentAttrs = Files.readAttributes(parentDirectory, BasicFileAttributes.class);
-                if (!parentAttrs.isDirectory()) {
-                    throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                        .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_DIRECTORY)
-                        .withMessage(parentDirectory + " is not a directory.")
-                        .toException();
-                }
             } catch (FileAlreadyExistsException e) {
                 throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_DIRECTORY)
