@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.SecureDirectoryStream;
 import java.nio.file.StandardOpenOption;
@@ -375,13 +376,14 @@ public class MCRRestDerivateContents {
         if (mcrPath.getNameCount() > 1) {
             MCRPath parentDirectory = mcrPath.getParent();
             try {
-                BasicFileAttributes parentAttrs = Files.readAttributes(parentDirectory, BasicFileAttributes.class);
-                if (!parentAttrs.isDirectory()) {
-                    throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                        .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_DIRECTORY)
-                        .withMessage(parentDirectory + " is not a directory.")
-                        .toException();
-                }
+                Files.createDirectories(parentDirectory);
+            } catch (FileAlreadyExistsException e) {
+                throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_DIRECTORY)
+                    .withMessage("A file " + parentDirectory + " exists and can not be used as parent directory.")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
             } catch (IOException e) {
                 throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_NOT_FOUND)
