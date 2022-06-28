@@ -46,7 +46,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -73,7 +72,6 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCoreVersion;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
@@ -105,7 +103,6 @@ import org.xml.sax.SAXParseException;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.annotation.JacksonFeatures;
-import com.google.gson.Gson;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -129,8 +126,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class MCRRestObjects {
 
     private static Logger LOGGER = LogManager.getLogger();
-
-    private static Gson GSON = MCRJSONUtils.createGSON();
 
     @Context
     Request request;
@@ -226,8 +221,7 @@ public class MCRRestObjects {
     @Operation(
         summary = "Returns MCRObject with the given " + PARAM_MCRID + ".",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
-    public Response getObject(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id,
-        @HeaderParam("accept") String acceptHeader)
+    public Response getObject(@Parameter(example = "mir_mods_00004711") @PathParam(PARAM_MCRID) MCRObjectID id)
         throws IOException {
         long modified = MCRXMLMetadataManager.instance().getLastModified(id);
         if (modified < 0) {
@@ -237,11 +231,6 @@ public class MCRRestObjects {
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
-        }
-        if (MediaType.APPLICATION_JSON.equals(acceptHeader)) {
-            MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(id);
-            return Response.ok().entity(GSON.toJson(mcrObj.createJSON())).lastModified(lastModified)
-                .build();
         }
 
         MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id);
