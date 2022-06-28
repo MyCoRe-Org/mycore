@@ -24,6 +24,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,9 +59,12 @@ import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRFileCollectingFileVisitor;
 import org.mycore.datamodel.niofs.utils.MCRTreeCopier;
 import org.mycore.frontend.fileupload.MCRPostUploadFileProcessor;
+import org.mycore.services.i18n.MCRTranslation;
 
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -67,6 +72,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
 
 @Path("files/upload/")
 public class MCRUploadResource {
@@ -79,6 +85,8 @@ public class MCRUploadResource {
 
     @Context
     ContainerRequestContext request;
+
+    private Predicate<String> fileNameAllowedPredicate = null;
 
     private static List<MCRPostUploadFileProcessor> initProcessorList() {
         List<String> fileProcessorList = MCRConfiguration2.getString(FILE_PROCESSOR_PROPERTY)
@@ -139,6 +147,19 @@ public class MCRUploadResource {
         } catch (IOException e) {
             LOGGER.error("Could not set main file!", e);
         }
+    }
+
+    public Predicate<String> getFileNameAllowedPredicate() {
+        if (fileNameAllowedPredicate == null) {
+            initializeFileNameAllowedPredicate();
+        }
+        return fileNameAllowedPredicate;
+    }
+
+    private void initializeFileNameAllowedPredicate() {
+        String fileNamePattern = MCRConfiguration2.getStringOrThrow("MCR.FileUpload.FileNamePattern");
+        Pattern pattern = Pattern.compile(fileNamePattern);
+        fileNameAllowedPredicate = (str) -> pattern.matcher(str).matches();
     }
 
     @PUT
@@ -264,6 +285,33 @@ public class MCRUploadResource {
         }
     }
 
+    @GET
+    @Path("{objectID}/{path:.+}")
+    public Response validateFile(@PathParam("path") String path,
+        @PathParam("objectID") String objectID,
+        @QueryParam("size") String size) {
+        String actualStringFileName = Paths.get(path).getFileName().toString();
+        if (!getFileNameAllowedPredicate().test(actualStringFileName)) {
+            String translation = MCRTranslation.translate("component.webtools.upload.invalid.fileName",
+                actualStringFileName);
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
+                translation).entity(translation).build();
+
+        }
+
+        long sizeL = Long.parseLong(size);
+        long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
+
+        if (sizeL > maxSize) {
+            String translation = MCRTranslation.translate("component.webtools.upload.invalid.fileSize",
+                actualStringFileName, MCRUtils.getSizeFormatted(sizeL), MCRUtils.getSizeFormatted(maxSize));
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
+                translation).entity(translation).build();
+        }
+
+        return Response.ok().build();
+    }
+
     @PUT
     @Path("{objectID}/{path:.+}")
     public void uploadFile(@PathParam("path") String path,
@@ -286,6 +334,12 @@ public class MCRUploadResource {
             if (!Files.exists(parentDirectory)) {
                 Files.createDirectories(parentDirectory);
             }
+        }
+
+        String actualStringFileName = bucket.getRoot().relativize(filePath).getFileName().toString();
+        if (!getFileNameAllowedPredicate().test(actualStringFileName)) {
+            throw new ClientErrorException(actualStringFileName + " is not a valid file Name!",
+                Response.Status.BAD_REQUEST);
         }
 
         long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);

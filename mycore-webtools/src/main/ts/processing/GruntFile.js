@@ -1,19 +1,19 @@
 /*
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ *  This file is part of ***  M y C o R e  ***
+ *  See http://www.mycore.de/ for details.
  *
- * MyCoRe is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  MyCoRe is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * MyCoRe is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  MyCoRe is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 module.exports = function (grunt) {
@@ -29,13 +29,7 @@ module.exports = function (grunt) {
                     fast: 'never'
                 },
                 processing: {
-                    tsconfig: './src/main/ts/processing/tsconfig.json'
-                },
-                uploadApi: {
-                    tsconfig: './src/main/ts/upload/tsconfig-api.json'
-                },
-                uploadGui: {
-                    tsconfig: './src/main/ts/upload/tsconfig-gui.json'
+                    tsconfig: 'tsconfig.json'
                 }
             },
             copy: {
@@ -44,7 +38,7 @@ module.exports = function (grunt) {
                         {
                             expand: true,
                             cwd: './node_modules',
-                            dest: './target/classes/META-INF/resources/modules/webtools/node_modules',
+                            dest: '../../../../target/classes/META-INF/resources/modules/webtools/node_modules',
                             flatten: true,
                             src: [
                               './core-js/client/shim.js',
@@ -56,7 +50,7 @@ module.exports = function (grunt) {
                         {
                             expand: true,
                             cwd: './node_modules/@angular',
-                            dest: './target/classes/META-INF/resources/modules/webtools/node_modules/@angular',
+                            dest: '../../../../target/classes/META-INF/resources/modules/webtools/node_modules/@angular',
                             src: [
                                 '**'
                             ]
@@ -64,7 +58,7 @@ module.exports = function (grunt) {
                         {
                             expand: true,
                             cwd: './node_modules/rxjs',
-                            dest: './target/classes/META-INF/resources/modules/webtools/node_modules/rxjs',
+                            dest: '../../../../target/classes/META-INF/resources/modules/webtools/node_modules/rxjs',
                             src: [
                                 '**'
                             ]
@@ -72,7 +66,7 @@ module.exports = function (grunt) {
                         {
                             expand: true,
                             cwd: './node_modules/moment',
-                            dest: './target/classes/META-INF/resources/modules/webtools/node_modules/moment',
+                            dest: '../../../../target/classes/META-INF/resources/modules/webtools/node_modules/moment',
                             src: [
                                 '**'
                             ]
@@ -80,7 +74,7 @@ module.exports = function (grunt) {
                         {
                           expand: true,
                           cwd: './node_modules/angular2-moment',
-                          dest: './target/classes/META-INF/resources/modules/webtools/node_modules/angular2-moment',
+                          dest: '../../../../target/classes/META-INF/resources/modules/webtools/node_modules/angular2-moment',
                           src: [
                               '**'
                           ]
@@ -88,7 +82,7 @@ module.exports = function (grunt) {
                         {
                           expand: true,
                           cwd: './node_modules/ngx-bootstrap/bundles',
-                          dest: './target/classes/META-INF/resources/modules/webtools/node_modules/ngx-bootstrap',
+                          dest: '../../../../target/classes/META-INF/resources/modules/webtools/node_modules/ngx-bootstrap',
                           src: [
                               '**'
                           ]

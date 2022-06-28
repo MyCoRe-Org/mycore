@@ -17,6 +17,66 @@
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>yarn-install</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>grunt-build</id>
+            <phase>none</phase>
+          </execution>
+          <execution>
+            <id>install-node-and-yarn</id>
+            <goals>
+              <goal>install-node-and-yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+          <execution>
+            <id>yarn-install-processing</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/ts/processing</workingDirectory>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>grunt-build-processing</id>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/ts/processing</workingDirectory>
+            </configuration>
+            <goals>
+              <goal>grunt</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+          <execution>
+            <id>yarn-install-upload</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/ts/upload</workingDirectory>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-build-upload</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/ts/upload</workingDirectory>
+              <arguments>build</arguments>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
