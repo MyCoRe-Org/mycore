@@ -232,7 +232,6 @@ public class MCRRestObjects {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-
         MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(id);
         return Response.ok()
             .entity(mcrContent,

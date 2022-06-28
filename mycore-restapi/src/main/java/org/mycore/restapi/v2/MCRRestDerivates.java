@@ -97,7 +97,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 public class MCRRestDerivates {
 
     public static final Logger LOGGER = LogManager.getLogger();
-    
+
     @Context
     Request request;
 
