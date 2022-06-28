@@ -46,13 +46,13 @@
           </execution>
           <execution>
             <id>grunt-build-processing</id>
-            <configuration>
-              <workingDirectory>${basedir}/src/main/ts/processing</workingDirectory>
-            </configuration>
             <goals>
               <goal>grunt</goal>
             </goals>
             <phase>generate-resources</phase>
+            <configuration>
+              <workingDirectory>${basedir}/src/main/ts/processing</workingDirectory>
+            </configuration>
           </execution>
           <execution>
             <id>yarn-install-upload</id>
