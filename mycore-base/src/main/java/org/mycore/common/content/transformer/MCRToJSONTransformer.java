@@ -50,7 +50,7 @@ public class MCRToJSONTransformer extends MCRContentTransformer {
         return result;
     }
 
-    private static JsonObject toJSON(MCRContent source) throws IOException {
+    protected JsonObject toJSON(MCRContent source) throws IOException {
         try {
             Document xml = source.asXML();
             return MCRXMLHelper.jsonSerialize(xml.getRootElement());
