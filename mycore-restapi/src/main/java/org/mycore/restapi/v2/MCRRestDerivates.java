@@ -38,6 +38,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -57,6 +58,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRJSONUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -82,6 +84,7 @@ import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.Gson;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -97,6 +100,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 public class MCRRestDerivates {
 
     public static final Logger LOGGER = LogManager.getLogger();
+
+    private static Gson GSON = MCRJSONUtils.createGSON();
 
     @Context
     Request request;
@@ -174,7 +179,8 @@ public class MCRRestDerivates {
         summary = "Returns given derivate in the given object",
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
     @Path("/{" + PARAM_DERID + "}")
-    public Response getDerivate(@Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid)
+    public Response getDerivate(@Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid,
+        @HeaderParam("accept") String acceptHeader)
         throws IOException {
         validateDerivateRelation(mcrId, derid);
         long modified = MCRXMLMetadataManager.instance().getLastModified(derid);
@@ -183,6 +189,13 @@ public class MCRRestDerivates {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
+
+        if (MediaType.APPLICATION_JSON.equals(acceptHeader)) {
+            MCRDerivate mcrDer = MCRMetadataManager.retrieveMCRDerivate(derid);
+            return Response.ok().entity(GSON.toJson(mcrDer.createJSON())).lastModified(lastModified)
+                .build();
+        }
+
         MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(derid);
         return Response.ok()
             .entity(mcrContent,
