@@ -183,7 +183,6 @@ public class MCRRestDerivates {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-
         MCRContent mcrContent = MCRXMLMetadataManager.instance().retrieveContent(derid);
         return Response.ok()
             .entity(mcrContent,
