@@ -21,7 +21,6 @@ package org.mycore.common.content.transformer;
 import java.io.IOException;
 
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.xml.sax.SAXException;
@@ -40,8 +39,8 @@ public class MCRDerivate2JSONTransformer extends MCRToJSONTransformer {
         try {
             MCRDerivate mcrDer = new MCRDerivate(source.asXML());
             return mcrDer.createJSON();
-        } catch (SAXException | NullPointerException | JDOMException e) {
-            throw new MCRException(
+        } catch (SAXException | JDOMException e) {
+            throw new IOException(
                 "Could not generate JSON from " + source.getClass().getSimpleName() + ": " + source.getSystemId(), e);
         }
     }
