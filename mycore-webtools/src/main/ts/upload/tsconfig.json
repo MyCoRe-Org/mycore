@@ -1,15 +1,13 @@
 {
 	"compilerOptions": {
-		"rootDir": "src/main/ts/upload",
+		"rootDir": "./src",
 		"outDir": "../../../../target/classes/META-INF/resources/modules/webtools/upload/js",
-		"mapRoot": ".",
-		"sourceRoot": ".",
+		"module": "es6",
 		"target": "es5",
-		"module": "commonjs",
 		"sourceMap": true,
 		"removeComments": false,
+		"moduleResolution": "node",
     "noImplicitAny": false,
     "declaration": true
-  },
-  "files": [ "upload-api.ts" ]
+  }
 }

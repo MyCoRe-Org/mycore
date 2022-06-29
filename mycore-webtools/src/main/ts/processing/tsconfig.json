@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"rootDir": "src/main/ts/processing",
+		"rootDir": "./",
 		"outDir": "../../../../target/classes/META-INF/resources/modules/webtools/processing/js",
 		"mapRoot": ".",
 		"sourceRoot": ".",
