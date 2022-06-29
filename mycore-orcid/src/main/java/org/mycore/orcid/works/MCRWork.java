@@ -93,7 +93,7 @@ public class MCRWork {
      * Fetches the work's details with the complete publication data from the ORCID profile.
      * Initially, only the work summary was fetched.
      */
-    void fetchDetails() throws JDOMException, IOException, SAXException {
+    public void fetchDetails() throws JDOMException, IOException, SAXException {
         orcid.getFetcher().fetchDetails(this);
     }
 
