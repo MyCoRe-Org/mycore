@@ -619,7 +619,7 @@ public class MCRRestObjects {
 
     @PUT
     @Consumes(MediaType.TEXT_PLAIN)
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     @Path("/{" + PARAM_MCRID + "}/service/state")
     @Operation(summary = "change state of object {" + PARAM_MCRID + "}",
         tags = MCRRestUtils.TAG_MYCORE_OBJECT,

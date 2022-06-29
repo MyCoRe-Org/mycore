@@ -158,7 +158,7 @@ public class MCRMetaEnrichedLinkID extends MCRMetaLinkID {
         final List<MCRCategoryID> categories = getClassifications();
         JsonArray classifications = new JsonArray(categories.size());
         categories.stream().map(MCRCategoryID::toString).forEach(classifications::add);
-        json.add("classifiations", classifications);
+        json.add("classifications", classifications);
         return json;
     }
 

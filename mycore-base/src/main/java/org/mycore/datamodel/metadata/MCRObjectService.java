@@ -836,7 +836,7 @@ public class MCRObjectService {
         }
 
         // messages
-        if (!getFlags().isEmpty()) {
+        if (!getMessages().isEmpty()) {
             JsonArray messages = new JsonArray();
             getMessagesAsList()
                 .stream()
@@ -846,7 +846,7 @@ public class MCRObjectService {
         }
 
         // classifications
-        if (!getFlags().isEmpty()) {
+        if (!getClassifications().isEmpty()) {
             JsonArray classifications = new JsonArray();
             getClassificationsAsList()
                 .stream()
