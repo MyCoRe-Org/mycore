@@ -83,6 +83,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 
@@ -411,16 +412,19 @@ public class MCRRestDerivateContents {
     }
 
     @DELETE
-    @Operation(summary = "Deletes file or empty directory.",
-        responses = { @ApiResponse(responseCode = "204", description = "if deletion exists"),
-            @ApiResponse(responseCode = "400", description = "if directory is not empty"),
+    @Operation(summary = "Deletes file or directory.",
+        responses = { @ApiResponse(responseCode = "204", description = "if deletion was successful")
         },
         tags = MCRRestUtils.TAG_MYCORE_FILE)
     @MCRRequireTransaction
     public Response deleteFileOrDirectory() {
         MCRPath mcrPath = getPath();
         try {
-            if (Files.deleteIfExists(mcrPath)) {
+            if (Files.exists(mcrPath) && Files.isDirectory(mcrPath)) {
+                //delete (sub-)directory and all its containing files and dirs 
+                Files.walkFileTree(mcrPath, MCRRecursiveDeleter.instance());
+                return Response.noContent().build();
+            } else if (Files.deleteIfExists(mcrPath)) {
                 return Response.noContent().build();
             }
         } catch (DirectoryNotEmptyException e) {
