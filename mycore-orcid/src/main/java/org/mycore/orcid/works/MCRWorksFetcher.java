@@ -108,6 +108,7 @@ public class MCRWorksFetcher {
 
             for (Element workXML : bulk.getChildren("work", MCRORCIDConstants.NS_WORK)) {
                 String putCode = workXML.getAttributeValue("put-code");
+                workXML.setAttribute("path", "/" + orcid.getORCID() + "/work/" + putCode + "/");
                 MCRWork work = worksSection.getWork(putCode);
                 setFromWorkXML(work, workXML);
             }
