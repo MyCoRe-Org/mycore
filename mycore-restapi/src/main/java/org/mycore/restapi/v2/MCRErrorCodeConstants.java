@@ -44,6 +44,8 @@ final class MCRErrorCodeConstants {
 
     //MCRDerivate
     public static final String MCRDERIVATE_NO_PERMISSION = "MCRDERIVATE_NO_PERMISSION";
+    
+    public static final String MCRDERIVATE_INVALID_JSON_PATCH_SYNTAX = "MCRDERIVATE_INVALID_JSON_PATCH_SYNTAX";
 
     public static final String MCRDERIVATE_NOT_FOUND = "MCRDERIVATE_NOT_FOUND";
 
