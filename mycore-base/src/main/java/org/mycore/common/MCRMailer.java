@@ -123,6 +123,13 @@ public class MCRMailer extends MCRServlet {
                 auth = new SMTPAuthenticator();
                 mailProperties.setProperty("mail.smtp.auth", "true");
             }
+            String starttsl = MCRConfiguration2.getString("MCR.Mail.STARTTLS").orElse("disabled");
+            if ("enabled".equals(starttsl)) {
+                mailProperties.setProperty("mail.smtp.starttls.enabled", "true");
+            } else if ("required".equals(starttsl)) {
+                mailProperties.setProperty("mail.smtp.starttls.enabled", "true");
+                mailProperties.setProperty("mail.smtp.starttls.required", "true");
+            }
             mailProperties.setProperty("mail.smtp.host", MCRConfiguration2.getStringOrThrow("MCR.Mail.Server"));
             mailProperties.setProperty("mail.transport.protocol",
                 MCRConfiguration2.getStringOrThrow("MCR.Mail.Protocol"));
