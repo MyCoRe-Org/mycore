@@ -71,6 +71,7 @@ import jakarta.servlet.ServletContext;
  * <ol>
  *  <li>System property <code>MCR.AppName</code></li>
  *  <li>System property <code>MCR.NameOfProject</code></li>
+ *  <li>Servlet Context Init Parameter <code>appName</code>
  *  <li>Servlet Context Path (if not root context, {@link ServletContext#getContextPath()})</li>
  *  <li>Servlet Context Name ({@link ServletContext#getServletContextName()}) with space characters removed</li>
  *  <li>base name of jar including this class</li>
@@ -145,6 +146,10 @@ public class MCRConfigurationDir {
             return nameOfProject;
         }
         if (SERVLET_CONTEXT != null) {
+            String servletAppName = SERVLET_CONTEXT.getInitParameter("appName");
+            if (servletAppName != null && !servletAppName.isEmpty()) {
+                return servletAppName;
+            }
             String contextPath = SERVLET_CONTEXT.getContextPath();
             if (!contextPath.isEmpty()) {
                 return contextPath.substring(1);//remove leading '/'
