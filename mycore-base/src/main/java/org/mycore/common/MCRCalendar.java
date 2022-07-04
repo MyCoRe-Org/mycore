@@ -127,8 +127,8 @@ public class MCRCalendar {
      * a list of calendar tags they are supported in this class
      */
     public static final List<String> CALENDARS_LIST = List.of(
-            TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC, TAG_JAPANESE,
-            TAG_ARMENIAN, TAG_EGYPTIAN, TAG_HEBREW);
+        TAG_GREGORIAN, TAG_JULIAN, TAG_ISLAMIC, TAG_BUDDHIST, TAG_COPTIC, TAG_ETHIOPIC, TAG_PERSIC, TAG_JAPANESE,
+        TAG_ARMENIAN, TAG_EGYPTIAN, TAG_HEBREW);
 
     /**
      * the Julian day of the first day in the armenian calendar, 1.1.1 arm = 13.7.552 greg
@@ -152,7 +152,6 @@ public class MCRCalendar {
     }
 
     private static final String MSG_CALENDAR_UNSUPPORTED = "Calendar %s is not supported!";
-
 
     /**
      * @see #getHistoryDateAsCalendar(String, boolean, String)
@@ -249,7 +248,7 @@ public class MCRCalendar {
      * @throws MCRException if parsing has an error
      */
     public static Calendar getHistoryDateAsCalendar(String dateString, boolean last, String calendarString)
-            throws MCRException {
+        throws MCRException {
         return getHistoryDateAsCalendar(dateString, last, CalendarType.of(calendarString));
     }
 
@@ -281,7 +280,7 @@ public class MCRCalendar {
         if (day > 31) {
             throw new MCRException("The day of the date is inadmissible.");
         } else if ((day > 30) && (mon == GregorianCalendar.APRIL || mon == GregorianCalendar.JUNE ||
-                mon == GregorianCalendar.SEPTEMBER || mon == GregorianCalendar.NOVEMBER)) {
+            mon == GregorianCalendar.SEPTEMBER || mon == GregorianCalendar.NOVEMBER)) {
             throw new MCRException("The day of the date is inadmissible.");
         } else if ((day > 29) && (mon == GregorianCalendar.FEBRUARY)) {
             throw new MCRException("The day of the date is inadmissible.");
@@ -289,7 +288,7 @@ public class MCRCalendar {
             throw new MCRException("The day of the date is inadmissible.");
         }
 
-        return new int[]{year, mon, day, era};
+        return new int[] { year, mon, day, era };
     }
 
     /**
@@ -318,7 +317,7 @@ public class MCRCalendar {
      * @exception MCRException if parsing has an error
      */
     protected static GregorianCalendar getCalendarFromGregorianDate(String dateString, boolean last)
-            throws MCRException {
+        throws MCRException {
         try {
             int[] fields = checkDateStringForJulianCalendar(dateString, last, CalendarType.Gregorian);
             GregorianCalendar calendar = new GregorianCalendar();
@@ -493,7 +492,7 @@ public class MCRCalendar {
             throw new MCRException("The day of the date is inadmissible.");
         }
 
-        return new int[]{year, mon, day, era};
+        return new int[] { year, mon, day, era };
     }
 
     /**
@@ -654,7 +653,6 @@ public class MCRCalendar {
         if (year == 2125 && mon == 9 && day >= 5 && day < 15) {
             day = 15;
         }
-
 
         BuddhistCalendar budcal = new BuddhistCalendar();
         budcal.set(year, mon, day);
@@ -964,13 +962,13 @@ public class MCRCalendar {
             Calendar calendar = MCRCalendar.getHistoryDateAsCalendar(date, useLastValue, calendarName);
             GregorianCalendar gregorianCalendar = MCRCalendar.getGregorianCalendarOfACalendar(calendar);
             formattedDate = MCRCalendar.getCalendarDateToFormattedString(gregorianCalendar, "yyyy-MM-dd")
-                    + "T00:00:00.000Z";
+                + "T00:00:00.000Z";
             if (gregorianCalendar.get(Calendar.ERA) == GregorianCalendar.BC) {
                 formattedDate = "-" + formattedDate;
             }
         } catch (Exception e) {
             String errorMsg = "Error while converting date string : " + date + " - " + useLastValue +
-                    " - " + calendarName;
+                " - " + calendarName;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(errorMsg, e);
             }
@@ -1076,7 +1074,7 @@ public class MCRCalendar {
             }
         }
 
-        return new int[]{year, mon, day};
+        return new int[] { year, mon, day };
     }
 
     /**
@@ -1181,8 +1179,7 @@ public class MCRCalendar {
             ende = length;
         }
 
-
-        return new int[]{start, ende};
+        return new int[] { start, ende };
     }
 
     /**
@@ -1199,7 +1196,7 @@ public class MCRCalendar {
             start = 0;
         }
 
-        return new int[]{start, StringUtils.length(input)};
+        return new int[] { start, StringUtils.length(input) };
     }
 
     /**
@@ -1216,7 +1213,7 @@ public class MCRCalendar {
             start = 0;
         }
 
-        return new int[]{start, StringUtils.length(input)};
+        return new int[] { start, StringUtils.length(input) };
     }
 
     /**
@@ -1233,7 +1230,7 @@ public class MCRCalendar {
             start = 0;
         }
 
-        return new int[]{start, StringUtils.length(dateStr)};
+        return new int[] { start, StringUtils.length(dateStr) };
     }
 
     /**
@@ -1262,7 +1259,7 @@ public class MCRCalendar {
             }
         }
 
-        return new int[]{start, end};
+        return new int[] { start, end };
     }
 
     /**
@@ -1272,7 +1269,7 @@ public class MCRCalendar {
      * @return the indexes of the date string containing the date without era statements
      */
     public static int[] calculateHebrewDateBorders(String input) {
-        return new int[]{0, StringUtils.length(input)};
+        return new int[] { 0, StringUtils.length(input) };
     }
 
     /**
@@ -1300,7 +1297,7 @@ public class MCRCalendar {
             }
         }
 
-        return new int[]{start, ende};
+        return new int[] { start, ende };
     }
 
     /**
@@ -1365,7 +1362,7 @@ public class MCRCalendar {
             end = length;
         }
 
-        return new int[]{start, end};
+        return new int[] { start, end };
     }
 
     /**
@@ -1392,7 +1389,7 @@ public class MCRCalendar {
             }
         }
 
-        return new int[]{start, end};
+        return new int[] { start, end };
     }
 
     /**
@@ -1570,6 +1567,7 @@ public class MCRCalendar {
         Egyptian(TAG_EGYPTIAN, new ULocale("@calendar=coptic"));
 
         private final String type;
+
         private final ULocale locale;
 
         CalendarType(String type, ULocale locale) {
@@ -1587,8 +1585,8 @@ public class MCRCalendar {
 
         public static CalendarType of(String type) {
             return Arrays.stream(CalendarType.values())
-                    .filter(current -> StringUtils.equals(current.getType(), type))
-                    .findFirst().orElseThrow();
+                .filter(current -> StringUtils.equals(current.getType(), type))
+                .findFirst().orElseThrow();
         }
     }
 }
