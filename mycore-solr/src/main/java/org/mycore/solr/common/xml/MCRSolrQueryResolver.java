@@ -68,9 +68,7 @@ public class MCRSolrQueryResolver implements URIResolver {
             Optional<String> requestHandler = Optional.ofNullable(matcher.group(REQUEST_HANDLER_GROUP_NAME));
             Optional<String> query = Optional.ofNullable(matcher.group(QUERY_GROUP_NAME));
 
-            HttpSolrClient client = core.map(MCRSolrClientFactory::get)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+            HttpSolrClient client = core.flatMap(MCRSolrClientFactory::get)
                 .map(MCRSolrCore::getClient)
                 .orElse((HttpSolrClient) MCRSolrClientFactory.getMainSolrClient());
 
