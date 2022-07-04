@@ -49,7 +49,7 @@ public class MCRSolrQueryResolver implements URIResolver {
 
     private static final String REQUEST_HANDLER_QUALIFIER = "requestHandler";
 
-    public static final String REQUEST_HANDLER_GROUP_NAME = "requesthandler";
+    public static final String REQUEST_HANDLER_GROUP_NAME = REQUEST_HANDLER_QUALIFIER;
 
     public static final String QUERY_GROUP_NAME = "query";
 
@@ -85,6 +85,6 @@ public class MCRSolrQueryResolver implements URIResolver {
                 }
             }
         }
-        throw new IllegalArgumentException("Didnt understand uri: " + href);
+        throw new IllegalArgumentException("Didn't understand uri: " + href);
     }
 }
