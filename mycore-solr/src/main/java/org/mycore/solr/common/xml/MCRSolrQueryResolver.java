@@ -83,6 +83,6 @@ public class MCRSolrQueryResolver implements URIResolver {
                 }
             }
         }
-        throw new IllegalArgumentException("Didn't understand uri: " + href);
+        throw new IllegalArgumentException("Did not understand uri: " + href);
     }
 }
