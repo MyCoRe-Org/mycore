@@ -81,7 +81,7 @@ public class MCRNormalizeMCRObjectIDsFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) throws IOException {
         UriInfo uriInfo = requestContext.getUriInfo();
         String path = uriInfo.getPath().toString();
-        String[] pathParts = path.split("/");
+        String[] pathParts = path.split("/", -1);
         if (pathParts.length >= 2 && "objects".equals(pathParts[0])) {
             String mcrid = pathParts[1];
 

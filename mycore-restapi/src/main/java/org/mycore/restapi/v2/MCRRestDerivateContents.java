@@ -486,6 +486,7 @@ public class MCRRestDerivateContents {
         //as per https://tools.ietf.org/html/rfc7230#section-3.3
         MultivaluedMap<String, String> headers = request.getHeaders();
         return ((!"true".equalsIgnoreCase(headers.getFirst(HTTP_HEADER_IS_DIRECTORY))))
+            && !request.getUriInfo().getPath().endsWith("/")
             && (headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding"));
     }
 
