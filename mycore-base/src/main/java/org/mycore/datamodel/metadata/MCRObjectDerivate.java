@@ -511,14 +511,11 @@ public class MCRObjectDerivate {
 
         // titles
         if (!getTitles().isEmpty()) {
-            JsonObject jsonTitles = new JsonObject();
+            JsonArray jsonTitles = new JsonArray();
             getTitles()
                 .stream()
-                .forEachOrdered(title -> {
-                    JsonObject jsonTitle = title.createJSON();
-                    jsonTitle.remove("lang");
-                    jsonTitles.add(title.getLang(), jsonTitle);
-                });
+                .map(MCRMetaLangText::createJSON)
+                .forEachOrdered(jsonTitles::add);
             json.add("titles", jsonTitles);
         }
 
