@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -51,9 +51,9 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang3.function.FailableBiConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.xml.utils.WrappedRuntimeException;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
@@ -620,16 +620,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 100)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
         Transformer transformer = getTransformer(style != null ? style + "-object" : null);
-        BiConsumer<MCRContent, OutputStream> trans = (content, out) -> {
-            try {
-                StreamResult sr = new StreamResult(out);
-                JDOMSource doc = new JDOMSource(MCRXMLParserFactory.getNonValidatingParser().parseXML(content));
-                transformer.transform(doc, sr);
-            } catch (TransformerException | SAXParseException e) {
-                throw new WrappedRuntimeException(e);
-            }
-        };
-        exportWith(fromID, toID, dirname, trans);
+        exportWith(fromID, toID, dirname, (content, out) -> {
+            StreamResult sr = new StreamResult(out);
+            JDOMSource doc = new JDOMSource(MCRXMLParserFactory.getNonValidatingParser().parseXML(content));
+            transformer.transform(doc, sr);
+        });
     }
 
     /**
@@ -653,18 +648,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 100)
     public static void exportWithTransformer(String fromID, String toID, String dirname, String transname) {
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transname);
-        BiConsumer<MCRContent, OutputStream> trans = (content, out) -> {
-            try {
-                transformer.transform(content, out);
-            } catch (IOException e) {
-                throw new WrappedRuntimeException(e);
-            }
-        };
-        exportWith(fromID, toID, dirname, trans);
+        exportWith(fromID, toID, dirname, transformer::transform);
     }
 
     private static void exportWith(String fromID, String toID, String dirname,
-                                   BiConsumer<MCRContent, OutputStream> trans) {
+                                   FailableBiConsumer<MCRContent, OutputStream, Exception> trans) {
         MCRObjectID fid, tid;
 
         // check fromID and toID
@@ -705,7 +693,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Export all MCRObject's with data type <em>type</em> to files named <em>MCRObjectID</em>.xml in a directory
      * named <em>dirname</em>. The method uses the converter stylesheet <em>style</em>.xsl.
-     * 
+     *
      * @param type
      *            the MCRObjectID type
      * @param dirname
@@ -794,8 +782,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws IOException
      * @throws MCRException
      */
-    private static boolean exportMCRObject(File dir, BiConsumer<MCRContent, OutputStream> trans, String nid) throws
-        IOException, MCRException {
+    private static boolean exportMCRObject(File dir, FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
+                                           String nid) throws IOException, MCRException {
         MCRContent content;
         try {
             // if object doesn't exist - no exception is caught!
@@ -808,7 +796,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         if (trans != null) {
             FileOutputStream out = new FileOutputStream(xmlOutput);
-            trans.accept(content, out);
+            try {
+                trans.accept(content, out);
+            } catch (UncheckedIOException e) {
+                throw e.getCause();
+            } catch (IOException | RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new MCRException(e);
+            }
         } else {
             content.sendTo(xmlOutput);
         }
@@ -1151,7 +1147,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Checks objects of the specified base ID for validity against their specified schemas.
-     * 
+     *
      * @param baseID
      *            the base part of a MCRObjectID e.g. DocPortal_document
      */
@@ -1167,7 +1163,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Checks objects of the specified type for validity against their specified schemas.
-     * 
+     *
      * @param type
      *            the type of a MCRObjectID e.g. document
      */
@@ -1183,7 +1179,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Check if an object validates against its specified schema.
-     * 
+     *
      * @param objectID
      *            the ID of an object to check
      */
@@ -1197,7 +1193,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * Check if an object validates against its specified schema.
-     * 
+     *
      * @param objectID
      *            the ID of an object to check
      * @param transformerType
