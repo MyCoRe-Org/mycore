@@ -95,11 +95,14 @@ import com.google.common.collect.Ordering;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{" + PARAM_DER_PATH + ":(/[^/]+)*}")
 public class MCRRestDerivateContents {
+    private static final String HTTP_HEADER_IS_DIRECTORY = "X-MCR-IsDirectory";
 
     private static final int BUFFER_SIZE = 8192;
 
@@ -364,7 +367,13 @@ public class MCRRestDerivateContents {
 
     @PUT
     @Consumes(MediaType.WILDCARD)
-    @Operation(summary = "Creates directory or file. Parent must exists.",
+    @Operation(summary = "Creates directory or file. Parent directories will be created if they do not exist.",
+        parameters = {
+            @Parameter(in = ParameterIn.HEADER,
+                name = HTTP_HEADER_IS_DIRECTORY,
+                description = "set to 'true' if a new directory should be created",
+                required = false,
+                schema = @Schema(type = "boolean")) },
         responses = {
             @ApiResponse(responseCode = "204", description = "if directory already exists or while was updated"),
             @ApiResponse(responseCode = "201", description = "if directory or file was created"),
@@ -476,7 +485,9 @@ public class MCRRestDerivateContents {
     private boolean isFile() {
         //as per https://tools.ietf.org/html/rfc7230#section-3.3
         MultivaluedMap<String, String> headers = request.getHeaders();
-        return headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding");
+        return ((!"true".equalsIgnoreCase(headers.getFirst(HTTP_HEADER_IS_DIRECTORY))))
+            && !request.getUriInfo().getPath().endsWith("/")
+            && (headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding"));
     }
 
     private Response serveDirectory(MCRPath mcrPath, MCRFileAttributes dirAttrs) {
