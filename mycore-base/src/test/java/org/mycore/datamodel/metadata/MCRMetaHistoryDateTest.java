@@ -19,13 +19,11 @@
 package org.mycore.datamodel.metadata;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.jdom2.Element;
 import org.junit.Test;
 import org.mycore.common.MCRCalendar;
 import org.mycore.common.MCRTestCase;
-import org.mycore.common.xml.MCRXMLHelper;
 
 import com.ibm.icu.util.GregorianCalendar;
 
@@ -71,7 +69,6 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
         julian_date.setVonDate("22.02.1964", julian_date.getCalendar());
         julian_date.setBisDate("22.02.1964", julian_date.getCalendar());
         julian_date.addText("mein Tag", "de");
-        julian_date.setCalendar(MCRCalendar.TAG_GREGORIAN);
 
         MCRMetaHistoryDate gregorian_date = new MCRMetaHistoryDate("subtag", "type", 0);
         gregorian_date.setCalendar(MCRCalendar.TAG_GREGORIAN);
@@ -81,7 +78,18 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
 
         Element julian_date_xml = julian_date.createXML();
         Element gregorian_date_xml = gregorian_date.createXML();
-        assertTrue("XML elements should be equal", MCRXMLHelper.deepEqual(julian_date_xml, gregorian_date_xml));
+
+        assertEquals(julian_date_xml.getChildText("text"), gregorian_date_xml.getChildText("text"));
+        assertEquals(julian_date_xml.getChildText("ivon"), gregorian_date_xml.getChildText("ivon"));
+        assertEquals(julian_date_xml.getChildText("ibis"), gregorian_date_xml.getChildText("ibis"));
+
+        assertEquals(julian_date_xml.getChildText("calendar"), MCRCalendar.TAG_JULIAN);
+        assertEquals(julian_date_xml.getChildText("von"), "1964-02-22 AD");
+        assertEquals(julian_date_xml.getChildText("bis"), "1964-02-22 AD");
+
+        assertEquals(gregorian_date_xml.getChildText("calendar"), MCRCalendar.TAG_GREGORIAN);
+        assertEquals(gregorian_date_xml.getChildText("von"), "1964-03-06 AD");
+        assertEquals(gregorian_date_xml.getChildText("bis"), "1964-03-06 AD");
 
         MCRMetaHistoryDate julian_date_read = new MCRMetaHistoryDate();
         julian_date_read.setFromDOM(julian_date_xml);
