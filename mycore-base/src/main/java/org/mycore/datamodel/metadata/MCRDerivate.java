@@ -272,10 +272,14 @@ public final class MCRDerivate extends MCRBase {
 
     @Override
     public JsonObject createJSON() {
-        JsonObject base = super.createJSON();
+        JsonObject json = super.createJSON();
         if (mcrLabel != null) {
-            base.addProperty("label", mcrLabel);
+            json.addProperty("label", mcrLabel);
         }
-        return base;
+        json.addProperty("order", order);
+        json.add("derivate", mcrDerivate.createJSON());
+        json.add("service", mcrService.createJSON());
+        
+        return json;
     }
 }

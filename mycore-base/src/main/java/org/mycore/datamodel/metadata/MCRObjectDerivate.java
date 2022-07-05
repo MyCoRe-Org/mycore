@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +32,9 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.niofs.MCRPath;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * This class implements all methode for handling one derivate data.
@@ -479,5 +483,54 @@ public class MCRObjectDerivate {
 
     public ArrayList<MCRMetaLangText> getTitles() {
         return titles;
+    }
+    
+    public final JsonObject createJSON() {
+        JsonObject json = new JsonObject();
+        
+        // linkmeta
+        Optional.ofNullable(linkmeta).ifPresent(linkmeta -> {
+            json.add("linkmeta", linkmeta.createJSON());
+        });
+        
+        // externals
+        if (!externals.isEmpty()) {
+            JsonArray jsonExternals = new JsonArray();
+            externals
+                .stream()
+                .forEachOrdered(ext -> {
+                   jsonExternals.add(ext.createJSON());
+                });
+            json.add("externals", jsonExternals);
+        }
+        
+        //internals
+        Optional.ofNullable(internals).ifPresent(internals -> {
+            json.add("internal", internals.createJSON());
+        });
+
+        // titles
+        if (!getTitles().isEmpty()) {
+            JsonObject jsonTitles = new JsonObject();
+            getTitles()
+                .stream()
+                .forEachOrdered(title -> {
+                    JsonObject jsonTitle = title.createJSON();
+                    jsonTitle.remove("lang");
+                    jsonTitles.add(title.getLang(), jsonTitle);
+                });
+            json.add("titles", jsonTitles);
+        }
+
+        // classifications
+        if (!getClassifications().isEmpty()) {
+            JsonArray jsonClassifications = new JsonArray();
+            getClassifications()
+                .stream()
+                .map(MCRMetaClassification::createJSON)
+                .forEachOrdered(jsonClassifications::add);
+            json.add("classifications", jsonClassifications);
+        }
+        return json;
     }
 }
