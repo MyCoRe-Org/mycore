@@ -18,6 +18,15 @@
 
 package org.mycore.common;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.ibm.icu.text.SimpleDateFormat;
 import com.ibm.icu.util.BuddhistCalendar;
 import com.ibm.icu.util.Calendar;
@@ -28,14 +37,6 @@ import com.ibm.icu.util.HebrewCalendar;
 import com.ibm.icu.util.IslamicCalendar;
 import com.ibm.icu.util.JapaneseCalendar;
 import com.ibm.icu.util.ULocale;
-import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * This class implements all methods for handling calendars in MyCoRe objects
