@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.mycore.datamodel.common.MCRObjectIDDate;
+import org.mycore.datamodel.metadata.history.MCRMetaHistoryItem;
 import org.mycore.restapi.converter.MCRInstantXMLAdapter;
 
 /**
@@ -51,6 +52,12 @@ public class MCRRestObjectIDDate {
         super();
         id = idDate.getId();
         lastModified = idDate.getLastModified().toInstant();
+    }
+    
+    public MCRRestObjectIDDate(MCRMetaHistoryItem histItem) {
+        super();
+        id = histItem.getId().toString();
+        lastModified = histItem.getTime();
     }
 
     @XmlAttribute(required = true)

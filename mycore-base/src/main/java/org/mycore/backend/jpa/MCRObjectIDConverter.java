@@ -33,7 +33,7 @@ public class MCRObjectIDConverter implements AttributeConverter<MCRObjectID, Str
 
     @Override
     public String convertToDatabaseColumn(MCRObjectID id) {
-        return id.toString();
+        return id == null ? null : id.toString();
     }
 
     @Override

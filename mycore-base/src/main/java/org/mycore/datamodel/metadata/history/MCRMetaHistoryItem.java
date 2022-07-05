@@ -58,7 +58,30 @@ import org.mycore.datamodel.metadata.MCRObjectID;
             + "AND a.eventType=:eventType"),
     @NamedQuery(name = "MCRMetaHistory.getFirstDate", query = "SELECT MIN(time) from MCRMetaHistoryItem"),
     @NamedQuery(name = "MCRMetaHistory.getHighestID",
-        query = "SELECT MAX(id) from MCRMetaHistoryItem WHERE ID like :looksLike")
+        query = "SELECT MAX(id) from MCRMetaHistoryItem WHERE ID like :looksLike"),
+    /*SQL Query:
+     * SELECT c.id, c.time, d.deltime FROM rosdok.mcrmetahistory c
+       LEFT JOIN
+         (SELECT id, max("time") as delTime
+          FROM rosdok.mcrmetahistory WHERE eventType='d' GROUP BY id) d
+       ON c.id = d.id
+       WHERE c.id > ''
+       GROUP BY c.id, c.time, d.deltime
+       HAVING (d.deltime IS null OR c.time > d.deltime)
+       ORDER by c.id
+       LIMIT 1000
+     */
+    //TODO: Parameter um zwischen Object und Derivate zu unterscheiden
+    @NamedQuery(name = "MCRMetaHistory.getNextActiveIDs",
+        query= "SELECT c"
+            + " FROM MCRMetaHistoryItem c"
+            + " WHERE (:afterID is null or c.id >:afterID)"
+            + "   AND c.eventType='c'"
+            + "   AND (:kind!='object' OR c.id NOT LIKE '%\\_derivate\\_%')"
+            + "   AND (:kind!='derivate' OR c.id LIKE '%\\_derivate\\_%')"
+            + "   AND (NOT EXISTS (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventType='d' AND c.id=d.id)"
+            + "        OR c.time > ALL (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventType='d' AND c.id=d.id))"
+            + " ORDER by c.id")
 })
 public class MCRMetaHistoryItem implements Serializable {
 
