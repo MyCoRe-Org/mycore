@@ -155,7 +155,7 @@
       </xsl:if>
 
       <!-- author -->
-      <xsl:variable name="authors" select="mods:name[@type='personal' and contains(mods:role/mods:roleTerm, 'aut')]" />
+      <xsl:variable name="authors" select="mods:name[@type='personal' and mods:role/mods:roleTerm[@authority='marcrelator']/text()='aut']" />
       <xsl:if test="count($authors) &gt; 0">
         <xsl:variable name="personal">
           <xsl:for-each select="$authors">
@@ -179,7 +179,7 @@
       </xsl:if>
 
       <!-- sponsor -->
-      <xsl:variable name="sponsors" select="mods:name[@type='personal' and contains(mods:role/mods:roleTerm, 'fnd')]" />
+      <xsl:variable name="sponsors" select="mods:name[@type='personal' and mods:role/mods:roleTerm[@authority='marcrelator']/text()='fnd']" />
       <xsl:if test="count($sponsors) &gt; 0">
         <fn:array key="sponsor">
           <xsl:for-each select="$sponsors">
@@ -239,7 +239,7 @@
       </xsl:if>
 
       <!-- provider -->
-      <xsl:variable name="provider" select="mods:name[@type='personal' and contains(mods:role/mods:roleTerm, 'orm')]" />
+      <xsl:variable name="provider" select="mods:name[@type='personal' and mods:role/mods:roleTerm[@authority='marcrelator']/text()='orm']" />
       <xsl:if test="count($provider) &gt; 0">
         <fn:array key="provider">
           <xsl:for-each select="$provider">
@@ -302,7 +302,7 @@
 
         <!-- illustrator -->
         <xsl:variable name="illustrators"
-                      select="mods:name[@type='personal' and contains(mods:role/mods:roleTerm, 'ill')]" />
+                      select="mods:name[@type='personal' and mods:role/mods:roleTerm[@authority='marcrelator']/text()='ill']" />
         <xsl:if test="count($illustrators) &gt; 0">
           <fn:array key="illustrator">
             <xsl:for-each select="$illustrators">
