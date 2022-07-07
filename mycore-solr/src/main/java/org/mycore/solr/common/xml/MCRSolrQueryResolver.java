@@ -56,8 +56,9 @@ public class MCRSolrQueryResolver implements URIResolver {
     public static final String CORE_GROUP_NAME = "core";
 
     private static final Pattern URI_PATTERN = Pattern
-        .compile("\\Asolr:((?<" + CORE_GROUP_NAME + ">[a-zA-Z0-9-]+):)?(" + REQUEST_HANDLER_QUALIFIER + ":(?<"
-            + REQUEST_HANDLER_GROUP_NAME + ">[a-zA-Z0-9-]+):)?(?<" + QUERY_GROUP_NAME + ">.+)\\z");
+        .compile("\\Asolr:((?!" + REQUEST_HANDLER_QUALIFIER + ")(?<" + CORE_GROUP_NAME + ">[a-zA-Z0-9-]+):)?("
+            + REQUEST_HANDLER_QUALIFIER + ":(?<" + REQUEST_HANDLER_GROUP_NAME + ">[a-zA-Z0-9-]+):)?(?<"
+            + QUERY_GROUP_NAME + ">.+)\\z");
 
     @Override
     public Source resolve(String href, String base) throws TransformerException {
