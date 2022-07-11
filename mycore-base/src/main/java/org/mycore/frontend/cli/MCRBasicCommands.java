@@ -18,22 +18,36 @@
 
 package org.mycore.frontend.cli;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Comment;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -216,6 +230,51 @@ public class MCRBasicCommands {
             }
             IOUtils.copy(templateResource, fout);
             LOGGER.info("Created template for {} in {}", path, configurationDirectory);
+        }
+    }
+
+    @MCRCommand(syntax = "reload mappings in jpa configuration",
+        help = "retrieves the mapping files from MyCoRe jars and adds them to the jpa configuration file.",
+        order = 140)
+    public static void reloadJPAMappings() throws IOException {
+        try {
+            File persistenceXMLFile = MCRConfigurationDir.getConfigFile("resources/META-INF/persistence.xml");
+            if (Files.exists(persistenceXMLFile.toPath())) {
+                SAXBuilder sb = new SAXBuilder();
+                Document doc = sb.build(persistenceXMLFile);
+                Namespace nsPersistence = Namespace.getNamespace("http://xmlns.jcp.org/xml/ns/persistence");
+                Element ePersistenceUnit = doc.getRootElement().getChild("persistence-unit", nsPersistence);
+                ePersistenceUnit.getContent(Filters.element("mapping-file", nsPersistence))
+                    .removeIf(e -> e.getTextNormalize().startsWith("META-INF/mycore-")
+                        && e.getTextNormalize().endsWith("-mappings.xml"));
+
+                Comment c = new Comment(" mapping files, detected by command 'reload mappings in jpa configuration' ");
+                ePersistenceUnit.getContent(Filters.comment()).removeIf(x -> x.getText().equals(c.getText()));
+                ePersistenceUnit.addContent(0, c);
+
+                int pos = 0;
+                for (MCRComponent cmp : MCRRuntimeComponentDetector.getAllComponents()) {
+                    try (ZipInputStream zip = new ZipInputStream(Files.newInputStream(cmp.getJarFile().toPath()))) {
+                        ZipEntry ze = null;
+                        while ((ze = zip.getNextEntry()) != null) {
+                            String zeName = ze.getName();
+                            if (zeName.startsWith("META-INF/mycore-") && zeName.endsWith("-mappings.xml")) {
+                                Element eMappingFile = new Element("mapping-file", nsPersistence).setText(zeName);
+                                ePersistenceUnit.addContent(++pos, eMappingFile);
+                            }
+                        }
+                    }
+                }
+                XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+                try (BufferedWriter bw = Files.newBufferedWriter(persistenceXMLFile.toPath())) {
+                    out.output(doc, bw);
+                }
+                LOGGER.info(pos + " mapping files added to '" + persistenceXMLFile.toString() + "'.");
+            } else {
+                LOGGER.info("The config file '" + persistenceXMLFile.toString() + "' does not exist yet!");
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
