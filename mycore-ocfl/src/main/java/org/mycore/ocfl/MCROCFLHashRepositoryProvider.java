@@ -57,10 +57,12 @@ public class MCROCFLHashRepositoryProvider extends MCROCFLRepositoryProvider {
         if(Files.notExists(repositoryRoot)){
             Files.createDirectories(repositoryRoot);
         }
+
         this.repository = new OcflRepositoryBuilder()
             .defaultLayoutConfig(getExtensionConfig())
             .storage(storage -> storage.fileSystem(repositoryRoot))
-            .workDir(workDir).build();
+            .workDir(workDir)
+            .build();
     }
 
     public OcflExtensionConfig getExtensionConfig() {

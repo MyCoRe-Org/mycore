@@ -23,7 +23,6 @@ import java.io.OutputStream;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -50,12 +49,12 @@ public class MCRToJSONTransformer extends MCRContentTransformer {
         return result;
     }
 
-    private static JsonObject toJSON(MCRContent source) throws IOException {
+    protected JsonObject toJSON(MCRContent source) throws IOException {
         try {
             Document xml = source.asXML();
             return MCRXMLHelper.jsonSerialize(xml.getRootElement());
         } catch (JDOMException | SAXException e) {
-            throw new MCRException(
+            throw new IOException(
                 "Could not generate JSON from " + source.getClass().getSimpleName() + ": " + source.getSystemId(), e);
         }
     }

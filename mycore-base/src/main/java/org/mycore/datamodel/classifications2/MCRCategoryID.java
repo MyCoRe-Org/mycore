@@ -46,6 +46,10 @@ import jakarta.persistence.Transient;
  *          2008) $
  * @since 2.0
  */
+/**
+ * @author mcradmin
+ *
+ */
 @Embeddable
 @Access(AccessType.FIELD)
 @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -178,6 +182,20 @@ public class MCRCategoryID implements Serializable {
             }
         }
         this.id = id;
+    }
+
+    /**
+     * @param id
+     *              the ID to check
+     * @return true, if the given String is a valid categoryID
+     */
+    public static boolean isValid(String id) {
+        try {
+            MCRCategoryID.fromString(id);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

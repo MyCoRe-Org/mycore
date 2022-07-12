@@ -18,6 +18,8 @@
 
 package org.mycore.mods.merger;
 
+import java.nio.charset.StandardCharsets;
+import java.net.URLDecoder;
 import java.util.Locale;
 
 import org.jdom2.Element;
@@ -41,7 +43,8 @@ public class MCRIdentifierMerger extends MCRMerger {
     }
 
     private String getSimplifiedID() {
-        return this.element.getTextTrim().replace("-", "").toUpperCase(Locale.ENGLISH);
+        return URLDecoder.decode(this.element.getTextNormalize().toLowerCase(Locale.ENGLISH),StandardCharsets.UTF_8)
+            .replace("-","");
     }
 
     @Override

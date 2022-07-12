@@ -13,7 +13,7 @@
         </h3>
       </div>
 
-      <div id="sessionListingContent" class="hidden">
+      <div id="sessionListingContent" class="d-none">
         <div class="card">
           <div class="card-header">
             <h3>

@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.SecureDirectoryStream;
 import java.nio.file.StandardOpenOption;
@@ -57,6 +58,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 
@@ -68,7 +70,9 @@ import com.google.common.collect.Ordering;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.Consumes;
@@ -97,6 +101,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 @Path("/objects/{" + PARAM_MCRID + "}/derivates/{" + PARAM_DERID + "}/contents{" + PARAM_DER_PATH + ":(/[^/]+)*}")
 public class MCRRestDerivateContents {
+    private static final String HTTP_HEADER_IS_DIRECTORY = "X-MCR-IsDirectory";
 
     private static final int BUFFER_SIZE = 8192;
 
@@ -361,7 +366,13 @@ public class MCRRestDerivateContents {
 
     @PUT
     @Consumes(MediaType.WILDCARD)
-    @Operation(summary = "Creates directory or file. Parent must exists.",
+    @Operation(summary = "Creates directory or file. Parent directories will be created if they do not exist.",
+        parameters = {
+            @Parameter(in = ParameterIn.HEADER,
+                name = HTTP_HEADER_IS_DIRECTORY,
+                description = "set to 'true' if a new directory should be created",
+                required = false,
+                schema = @Schema(type = "boolean")) },
         responses = {
             @ApiResponse(responseCode = "204", description = "if directory already exists or while was updated"),
             @ApiResponse(responseCode = "201", description = "if directory or file was created"),
@@ -374,13 +385,14 @@ public class MCRRestDerivateContents {
         if (mcrPath.getNameCount() > 1) {
             MCRPath parentDirectory = mcrPath.getParent();
             try {
-                BasicFileAttributes parentAttrs = Files.readAttributes(parentDirectory, BasicFileAttributes.class);
-                if (!parentAttrs.isDirectory()) {
-                    throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
-                        .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_DIRECTORY)
-                        .withMessage(parentDirectory + " is not a directory.")
-                        .toException();
-                }
+                Files.createDirectories(parentDirectory);
+            } catch (FileAlreadyExistsException e) {
+                throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NOT_DIRECTORY)
+                    .withMessage("A file " + parentDirectory + " exists and can not be used as parent directory.")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
             } catch (IOException e) {
                 throw MCRErrorResponse.fromStatus(Response.Status.NOT_FOUND.getStatusCode())
                     .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_FILE_NOT_FOUND)
@@ -408,16 +420,19 @@ public class MCRRestDerivateContents {
     }
 
     @DELETE
-    @Operation(summary = "Deletes file or empty directory.",
-        responses = { @ApiResponse(responseCode = "204", description = "if deletion exists"),
-            @ApiResponse(responseCode = "400", description = "if directory is not empty"),
+    @Operation(summary = "Deletes file or directory.",
+        responses = { @ApiResponse(responseCode = "204", description = "if deletion was successful")
         },
         tags = MCRRestUtils.TAG_MYCORE_FILE)
     @MCRRequireTransaction
     public Response deleteFileOrDirectory() {
         MCRPath mcrPath = getPath();
         try {
-            if (Files.deleteIfExists(mcrPath)) {
+            if (Files.exists(mcrPath) && Files.isDirectory(mcrPath)) {
+                //delete (sub-)directory and all its containing files and dirs 
+                Files.walkFileTree(mcrPath, MCRRecursiveDeleter.instance());
+                return Response.noContent().build();
+            } else if (Files.deleteIfExists(mcrPath)) {
                 return Response.noContent().build();
             }
         } catch (DirectoryNotEmptyException e) {
@@ -469,7 +484,9 @@ public class MCRRestDerivateContents {
     private boolean isFile() {
         //as per https://tools.ietf.org/html/rfc7230#section-3.3
         MultivaluedMap<String, String> headers = request.getHeaders();
-        return headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding");
+        return ((!"true".equalsIgnoreCase(headers.getFirst(HTTP_HEADER_IS_DIRECTORY))))
+            && !request.getUriInfo().getPath().endsWith("/")
+            && (headers.containsKey(HttpHeaders.CONTENT_LENGTH) || headers.containsKey("Transfer-Encoding"));
     }
 
     private Response serveDirectory(MCRPath mcrPath, MCRFileAttributes dirAttrs) {

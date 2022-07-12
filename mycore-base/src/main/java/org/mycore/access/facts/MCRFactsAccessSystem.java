@@ -212,6 +212,9 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     }
 
     private boolean isCategory(String checkID) {
+        if(!MCRCategoryID.isValid(checkID)) {
+            return false;
+        }
         try {
             return MCRCategoryDAOFactory.getInstance().exist(MCRCategoryID.fromString(checkID));
         } catch (IllegalArgumentException e) {

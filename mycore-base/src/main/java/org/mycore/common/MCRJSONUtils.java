@@ -26,6 +26,7 @@ import java.util.Map;
 import org.mycore.services.i18n.MCRTranslation;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonPrimitive;
 
@@ -34,6 +35,12 @@ import com.google.gson.JsonPrimitive;
  *
  */
 public class MCRJSONUtils {
+    
+    public static Gson createGSON() {
+        return  new GsonBuilder()
+            .setPrettyPrinting()
+            .create();
+    }
 
     public static JsonArray getJsonArray(Collection<String> list) {
         JsonArray ja = new JsonArray();
@@ -51,7 +58,7 @@ public class MCRJSONUtils {
                 MCRTranslation.getLocale(lang)))
             .forEach(transMap::putAll);
 
-        Gson gson = new Gson();
+        Gson gson = createGSON();
         return gson.toJson(transMap);
     }
 

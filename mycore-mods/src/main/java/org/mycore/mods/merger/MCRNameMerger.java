@@ -42,6 +42,8 @@ public class MCRNameMerger extends MCRMerger {
 
     private Set<String> initials = new HashSet<>();
 
+    private Set<String> allNames = new HashSet<>();
+
     public void setElement(Element element) {
         super.setElement(element);
 
@@ -62,13 +64,14 @@ public class MCRNameMerger extends MCRMerger {
     private void setFromNameParts(Element modsName) {
         for (Element namePart : modsName.getChildren("namePart", MCRConstants.MODS_NAMESPACE)) {
             String type = namePart.getAttributeValue("type");
-            String nameFragment = namePart.getText().replaceAll("\\s+", " ");
+            String nameFragment = namePart.getText().replaceAll("\\p{Zs}+", " ");
 
             if ("family".equals(type)) {
                 setFamilyName(nameFragment);
             } else if ("given".equals(type)) {
                 addGivenNames(nameFragment);
                 addInitials(nameFragment);
+                allNames.addAll(initials);
             } else if ("date".equals(type)) {
                 continue;
             } else if ("termsOfAddress".equals(type)) {
@@ -100,6 +103,7 @@ public class MCRNameMerger extends MCRMerger {
         setFamilyName(familyName);
         addGivenNames(rest);
         addInitials(rest);
+        allNames.addAll(initials);
     }
 
     private void setFamilyName(String nameFragment) {
@@ -107,6 +111,7 @@ public class MCRNameMerger extends MCRMerger {
             return;
         }
         this.familyName = normalize(nameFragment);
+        allNames.add(normalize(nameFragment));
     }
 
     private void addGivenNames(String nameFragment) {
@@ -117,6 +122,7 @@ public class MCRNameMerger extends MCRMerger {
             String normalizedToken = normalize(token);
             if (normalizedToken.length() > 1 &&  !isEmptyOrNull(normalizedToken)) {
                 givenNames.add(normalizedToken);
+                allNames.add(normalizedToken);
             }
         }
     }
@@ -157,20 +163,22 @@ public class MCRNameMerger extends MCRMerger {
 
         MCRNameMerger other = (MCRNameMerger) e;
 
-        if (!Objects.equals(familyName, other.familyName)) {
+        if (this.allNames.equals(other.allNames)) {
+            return true;
+        } else if (!Objects.equals(familyName, other.familyName)) {
             return false;
         } else if (initials.isEmpty() && other.initials.isEmpty()) {
             return true; // same family name, no given name, no initals, then assumed same
-        } else if (!haveAtLeaseOneCommon(this.initials, other.initials)) {
+        } else if (!haveAtLeastOneCommon(this.initials, other.initials)) {
             return false;
         } else if (this.givenNames.isEmpty() || other.givenNames.isEmpty()) {
             return true;
         } else {
-            return haveAtLeaseOneCommon(this.givenNames, other.givenNames);
+            return haveAtLeastOneCommon(this.givenNames, other.givenNames);
         }
     }
 
-    private boolean haveAtLeaseOneCommon(Set<String> a, Set<String> b) {
+    private boolean haveAtLeastOneCommon(Set<String> a, Set<String> b) {
         Set<String> intersection = new HashSet<>(a);
         intersection.retainAll(b);
         return !intersection.isEmpty();

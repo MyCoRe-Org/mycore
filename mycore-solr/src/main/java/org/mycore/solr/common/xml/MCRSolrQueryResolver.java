@@ -20,16 +20,17 @@ package org.mycore.solr.common.xml;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.solr.MCRSolrClientFactory;
+import org.mycore.solr.MCRSolrCore;
 import org.mycore.solr.search.MCRSolrURL;
 
 /**
@@ -42,43 +43,47 @@ import org.mycore.solr.search.MCRSolrURL;
  *           solr:mysolrcore:requestHandler:browse-inventory:q=%2BobjectType%3Ajpjournal
  * </pre>
  *
- * @author Matthias Eichner
- * @author mcrsherm
+ * @author Sebastian Hofmann
  */
 public class MCRSolrQueryResolver implements URIResolver {
 
     private static final String REQUEST_HANDLER_QUALIFIER = "requestHandler";
 
+    public static final String REQUEST_HANDLER_GROUP_NAME = REQUEST_HANDLER_QUALIFIER;
+
+    public static final String QUERY_GROUP_NAME = "query";
+
+    public static final String CORE_GROUP_NAME = "core";
+
+    private static final Pattern URI_PATTERN = Pattern
+        .compile("\\Asolr:((?!" + REQUEST_HANDLER_QUALIFIER + ")(?<" + CORE_GROUP_NAME + ">[a-zA-Z0-9-]+):)?("
+            + REQUEST_HANDLER_QUALIFIER + ":(?<" + REQUEST_HANDLER_GROUP_NAME + ">[a-zA-Z0-9-]+):)?(?<"
+            + QUERY_GROUP_NAME + ">.+)\\z");
+
     @Override
     public Source resolve(String href, String base) throws TransformerException {
-        AtomicReference<String> urlQuery = new AtomicReference<>(href.substring(href.indexOf(":") + 1));
-        AtomicReference<SolrClient> solrClient = new AtomicReference<>(MCRSolrClientFactory.getMainSolrClient());
+        Matcher matcher = URI_PATTERN.matcher(href);
 
-        int clientIndex = urlQuery.get().indexOf(":");
-        if (clientIndex != -1 && !(urlQuery.get().substring(0, clientIndex + REQUEST_HANDLER_QUALIFIER.length())
-            .contains(REQUEST_HANDLER_QUALIFIER))) {
-            String coreID = urlQuery.get().substring(0, clientIndex);
-            MCRSolrClientFactory.get(coreID).ifPresent(core -> {
-                solrClient.set(core.getClient());
-            });
-        }
-        String untilFirstParamValue = href.substring(0,
-            Optional.of(href.indexOf('=')) // first parameter
-                .filter(i -> i > 0)        // OR
-                .orElseGet(href::length)); // end of uri
-        urlQuery.set(href.substring(untilFirstParamValue.lastIndexOf(":") + 1));
-        MCRSolrURL solrURL = new MCRSolrURL((HttpSolrClient) solrClient.get(), urlQuery.get());
+        if (matcher.matches()) {
+            Optional<String> core = Optional.ofNullable(matcher.group(CORE_GROUP_NAME));
+            Optional<String> requestHandler = Optional.ofNullable(matcher.group(REQUEST_HANDLER_GROUP_NAME));
+            Optional<String> query = Optional.ofNullable(matcher.group(QUERY_GROUP_NAME));
 
-        int handlerIndex = href.indexOf(REQUEST_HANDLER_QUALIFIER);
-        if (handlerIndex > -1) {
-            solrURL.setRequestHandler("/" + href.substring(handlerIndex).split(":")[1]);
-        }
+            HttpSolrClient client = core.flatMap(MCRSolrClientFactory::get)
+                .map(MCRSolrCore::getClient)
+                .orElse((HttpSolrClient) MCRSolrClientFactory.getMainSolrClient());
 
-        try {
-            MCRURLContent result = new MCRURLContent(solrURL.getUrl());
-            return result.getSource();
-        } catch (IOException e) {
-            throw new TransformerException("Unable to get input stream from solr: " + solrURL.getUrl(), e);
+            if (query.isPresent()) {
+                MCRSolrURL solrURL = new MCRSolrURL(client, query.get());
+                requestHandler.map("/"::concat).ifPresent(solrURL::setRequestHandler);
+
+                try {
+                    return new MCRURLContent(solrURL.getUrl()).getSource();
+                } catch (IOException e) {
+                    throw new TransformerException("Unable to get input stream from solr: " + solrURL.getUrl(), e);
+                }
+            }
         }
+        throw new IllegalArgumentException("Did not understand uri: " + href);
     }
 }
