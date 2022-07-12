@@ -76,7 +76,6 @@ public class MCRObjectIDPoolTest extends MCRTestCase {
             }
             runs++;
             System.gc();
-            System.runFinalization();
             succeed = test.get();
         }
         if (!succeed) {
