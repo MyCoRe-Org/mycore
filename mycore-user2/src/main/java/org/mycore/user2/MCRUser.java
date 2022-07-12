@@ -32,8 +32,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.SortNatural;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
@@ -84,8 +82,6 @@ import jakarta.xml.bind.annotation.XmlType;
 @Table(name = "MCRUser", uniqueConstraints = @UniqueConstraint(columnNames = { "userName", "realmID" }))
 @NamedQueries(@NamedQuery(name = "MCRUser.byPropertyValue",
     query = "SELECT u FROM MCRUser u JOIN FETCH u.attributes ua WHERE ua.name = :name  AND ua.value = :value"))
-// TODO use @Cacheable instead
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @XmlRootElement(name = "user")
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = { "ownerId", "realName", "eMail", "lastLogin", "validUntil", "roles", "attributes",
