@@ -24,17 +24,16 @@ import static org.mycore.access.MCRAccessManager.PERMISSION_WRITE;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Locale;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+import org.mycore.frontend.fileupload.MCRUploadHelper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,14 +47,6 @@ public class MCRDerivateServlet extends MCRServlet {
 
     public static final String TODO_SMOVFILE = "smovfile";
 
-    public static final String FILE_NAME_PATTERN = "MCR.FileUpload.FileNamePattern";
-
-    public static final Predicate<String> FILE_NAME_PREDICATE = initializePredicate();
-
-    private static Predicate<String> initializePredicate() {
-        String patternString = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN);
-        return Pattern.compile(patternString).asMatchPredicate();
-    }
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -181,15 +172,15 @@ public class MCRDerivateServlet extends MCRServlet {
         }
 
         String newName = pathTo.getFileName().toString();
-        if (!FILE_NAME_PREDICATE.test(newName)) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format(Locale.ENGLISH,
-                "The new file name %s does not match the pattern %s!", newName,
-                MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN)));
+        try{
+            MCRUploadHelper.checkPathName(newName);
+        } catch (MCRException ex) {
+            String message = ex.getMessage();
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
 
         Files.move(pathFrom, pathTo);
-
     }
 
 }

@@ -20,7 +20,9 @@ package org.mycore.frontend.fileupload;
 
 import java.io.File;
 import java.nio.CharBuffer;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -32,6 +34,7 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 
 import jakarta.persistence.EntityTransaction;
+import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Common helper class for all services handling file upload.
@@ -45,6 +48,16 @@ public abstract class MCRUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRUploadHelper.class);
 
     private static final Pattern PATH_SEPERATOR = Pattern.compile(Pattern.quote(File.separator.replace('\\', '/')));
+
+    public static final Predicate<String> FILE_NAME_PREDICATE = initializePredicate();
+
+    public static final String FILE_NAME_PATTERN = "MCR.FileUpload.FileNamePattern";
+
+
+    private static Predicate<String> initializePredicate() {
+        String patternString = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN);
+        return Pattern.compile(patternString).asMatchPredicate();
+    }
 
     /**
      * reserved URI characters should not be in uploaded filenames. See RFC3986,
@@ -75,7 +88,8 @@ public abstract class MCRUploadHelper {
         if (path.contains("../") || path.contains("..\\")) {
             throw new MCRException("File path " + path + " may not contain \"../\".");
         }
-        splitPath(path).forEach(pathElement -> {
+        List<String> pathPart = splitPath(path).collect(Collectors.toList());
+        pathPart.forEach(pathElement -> {
             checkNotEmpty(path, pathElement);
             checkOnlyDots(path, pathElement);
             checkTrimmed(pathElement);
@@ -83,6 +97,10 @@ public abstract class MCRUploadHelper {
             checkReservedNames(pathElement);
             checkInvalidCharacters(pathElement);
         });
+        String actualFileName = pathPart.get(pathPart.size() - 1);
+        if(!FILE_NAME_PREDICATE.test(actualFileName)){
+            throw  new MCRException("File name does not match " + FILE_NAME_PATTERN + "!");
+        }
     }
 
     private static Stream<String> splitPath(String path) {
