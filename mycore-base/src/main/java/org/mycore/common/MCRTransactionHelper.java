@@ -18,21 +18,25 @@
 
 package org.mycore.common;
 
-import org.mycore.common.config.MCRConfiguration2;
-
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
+import org.mycore.common.config.MCRConfiguration2;
+
 public class MCRTransactionHelper implements Cloneable {
 
-
-    public static final ServiceLoader<MCRPersistenceTransaction> TRANSACTION_SERVICE_LOADER = ServiceLoader
-            .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader());
-
+    private static final boolean DB_ACCESS_ENABLED = MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable")
+        .orElse(true)
+        && ServiceLoader
+            .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader())
+            .stream()
+            .findAny()
+            .isPresent();
 
     private static ThreadLocal<List<MCRPersistenceTransaction>> transaction = ThreadLocal
-            .withInitial(() -> TRANSACTION_SERVICE_LOADER
+        .withInitial(() -> ServiceLoader
+            .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader())
                     .stream()
                     .map(ServiceLoader.Provider::get)
                     .filter(MCRPersistenceTransaction::isReady)
@@ -41,8 +45,7 @@ public class MCRTransactionHelper implements Cloneable {
 
 
     public static boolean isDatabaseAccessEnabled(){
-        return MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
-                && TRANSACTION_SERVICE_LOADER.stream().findAny().isPresent();
+        return DB_ACCESS_ENABLED;
     }
 
     /**
