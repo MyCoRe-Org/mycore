@@ -21,6 +21,7 @@ package org.mycore.mods.csl;
 import static org.mycore.common.MCRConstants.MODS_NAMESPACE;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -626,8 +627,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     @Override
-    public String[] getIds() {
-        return new String[] { id };
+    public Collection<String> getIds() {
+        return List.of(id);
     }
 
     @Override

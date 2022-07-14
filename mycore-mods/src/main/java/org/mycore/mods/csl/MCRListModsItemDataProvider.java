@@ -33,8 +33,10 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Does the same as @{@link MCRModsItemDataProvider} but you can provide multiple objects
@@ -78,7 +80,7 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
     }
 
     @Override
-    public String[] getIds() {
-        return this.store.keySet().toArray(new String[0]);
+    public Collection<String> getIds() {
+        return Set.copyOf(this.store.keySet());
     }
 }

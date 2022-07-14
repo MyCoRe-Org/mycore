@@ -20,6 +20,7 @@ package org.mycore.csl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 import org.jbibtex.BibTeXDatabase;
 import org.jbibtex.ParseException;
@@ -42,7 +43,7 @@ public class MCRBibtextItemDataProvider extends MCRItemDataProvider {
     }
 
     @Override
-    public String[] getIds() {
+    public Collection<String> getIds() {
         return wrappedProvider.getIds();
     }
 
