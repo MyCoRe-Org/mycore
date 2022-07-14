@@ -31,9 +31,9 @@ import java.util.function.Supplier;
 public class MCRPool<T> {
     private final BlockingQueue<T> pool;
 
-    private final Semaphore semaphore;
+    private final Semaphore objectCreationPermit;
 
-    private final Supplier<T> supplier;
+    private final Supplier<T> objectCreator;
 
     /**
      * Creates an MCRPool of the given size
@@ -42,8 +42,8 @@ public class MCRPool<T> {
      */
     public MCRPool(int size, Supplier<T> supplier) {
         this.pool = new ArrayBlockingQueue<>(size, true);
-        this.semaphore = new Semaphore(size, false);
-        this.supplier = supplier;
+        this.objectCreationPermit = new Semaphore(size, false);
+        this.objectCreator = supplier;
     }
 
     /**
@@ -56,9 +56,9 @@ public class MCRPool<T> {
         if (earlyTry != null) {
             return earlyTry;
         }
-        if (semaphore.tryAcquire(0, TimeUnit.NANOSECONDS)) {
+        if (objectCreationPermit.tryAcquire(0, TimeUnit.NANOSECONDS)) {
             //create up to 'size' objects
-            return createObject();
+            return objectCreator.get();
         }
         return pool.take();
     }
@@ -68,10 +68,6 @@ public class MCRPool<T> {
      */
     public void release(T resource) {
         pool.add(resource);
-    }
-
-    private T createObject() {
-        return supplier.get();
     }
 
 }
