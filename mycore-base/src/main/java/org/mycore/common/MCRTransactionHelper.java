@@ -20,32 +20,51 @@ package org.mycore.common;
 
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.util.concurrent.MCRPool;
 
-public class MCRTransactionHelper implements Cloneable {
+public class MCRTransactionHelper {
 
-    private static final boolean DB_ACCESS_ENABLED = MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable")
-        .orElse(true)
-        && ServiceLoader
-            .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader())
-            .stream()
-            .findAny()
-            .isPresent();
+    private static final MCRPool<ServiceLoader<MCRPersistenceTransaction>> SERVICE_LOADER_POOL = new MCRPool<>(
+        Runtime.getRuntime().availableProcessors(), () -> ServiceLoader
+            .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader()));
 
-    private static ThreadLocal<List<MCRPersistenceTransaction>> transaction = ThreadLocal
-        .withInitial(() -> ServiceLoader
-            .load(MCRPersistenceTransaction.class, MCRClassTools.getClassLoader())
-                    .stream()
-                    .map(ServiceLoader.Provider::get)
-                    .filter(MCRPersistenceTransaction::isReady)
-                    .collect(Collectors.toUnmodifiableList()));
+    private static final ThreadLocal<List<MCRPersistenceTransaction>> TRANSACTION = ThreadLocal
+        .withInitial(MCRTransactionHelper::getPersistenceTransactions);
 
+    /**
+     * performs a safe operation on the serviceLoader backed by an internal ServiceLoader pool
+     * @param f function that runs with the service loader
+     * @param defaultValue a fallback default if a service loader could not be acquired
+     * @return result of operation <code>f</code>
+     */
+    private static <V> V applyServiceLoader(Function<ServiceLoader<MCRPersistenceTransaction>, V> f, V defaultValue) {
+        final ServiceLoader<MCRPersistenceTransaction> serviceLoader;
+        try {
+            serviceLoader = SERVICE_LOADER_POOL.acquire();
+        } catch (InterruptedException e) {
+            return defaultValue;
+        }
+        try {
+            return f.apply(serviceLoader);
+        } finally {
+            SERVICE_LOADER_POOL.release(serviceLoader);
+        }
+    }
 
+    private static List<MCRPersistenceTransaction> getPersistenceTransactions() {
+        return applyServiceLoader(sl -> sl.stream()
+            .map(ServiceLoader.Provider::get)
+            .filter(MCRPersistenceTransaction::isReady)
+            .collect(Collectors.toUnmodifiableList()), List.of());
+    }
 
     public static boolean isDatabaseAccessEnabled(){
-        return DB_ACCESS_ENABLED;
+        return MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
+            && applyServiceLoader(sl -> sl.stream().findAny().isPresent(), false); //impl present
     }
 
     /**
@@ -53,8 +72,8 @@ public class MCRTransactionHelper implements Cloneable {
      */
     public static void commitTransaction() {
         if (isTransactionActive()) {
-            transaction.get().forEach(MCRPersistenceTransaction::commit);
-            transaction.remove();
+            TRANSACTION.get().forEach(MCRPersistenceTransaction::commit);
+            TRANSACTION.remove();
         }
         MCRSessionMgr.getCurrentSession().submitOnCommitTasks();
     }
@@ -65,8 +84,8 @@ public class MCRTransactionHelper implements Cloneable {
      */
     public static void rollbackTransaction() {
         if (isTransactionActive()) {
-            transaction.get().forEach(MCRPersistenceTransaction::rollback);
-            transaction.remove();
+            TRANSACTION.get().forEach(MCRPersistenceTransaction::rollback);
+            TRANSACTION.remove();
         }
     }
 
@@ -76,7 +95,7 @@ public class MCRTransactionHelper implements Cloneable {
      * @return true if the transaction is still alive
      */
     public static boolean isTransactionActive() {
-        return isDatabaseAccessEnabled() && transaction.get().stream().anyMatch(MCRPersistenceTransaction::isActive);
+        return isDatabaseAccessEnabled() && TRANSACTION.get().stream().anyMatch(MCRPersistenceTransaction::isActive);
     }
 
 
@@ -85,7 +104,7 @@ public class MCRTransactionHelper implements Cloneable {
      * @return boolean indicating whether the transaction has been marked for rollback
      */
     public static boolean transactionRequiresRollback() {
-        return isTransactionActive() && transaction.get().stream().anyMatch(MCRPersistenceTransaction::getRollbackOnly);
+        return isTransactionActive() && TRANSACTION.get().stream().anyMatch(MCRPersistenceTransaction::getRollbackOnly);
     }
 
 
@@ -94,7 +113,7 @@ public class MCRTransactionHelper implements Cloneable {
      */
     public static void beginTransaction() {
         if (isDatabaseAccessEnabled()) {
-            transaction.get().forEach(MCRPersistenceTransaction::begin);
+            TRANSACTION.get().forEach(MCRPersistenceTransaction::begin);
         }
     }
 }
