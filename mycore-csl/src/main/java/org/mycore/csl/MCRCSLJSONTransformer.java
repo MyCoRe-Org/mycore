@@ -20,7 +20,6 @@ package org.mycore.csl;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
@@ -71,7 +70,7 @@ public class MCRCSLJSONTransformer extends MCRContentTransformer {
         } catch (JDOMException | SAXException e) {
             throw new IOException(e);
         }
-        final String jsonArray = Stream.of(dataProvider.getIds())
+        final String jsonArray = dataProvider.getIds().stream()
             .map(dataProvider::retrieveItem)
             .map(jsonBuilder::toJson)
             .map(Object::toString)
