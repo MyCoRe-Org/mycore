@@ -57,7 +57,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <manifest.priority>99</manifest.priority>
     <maven.compiler.arg>-Werror</maven.compiler.arg>
     <maven.compiler.target>${java.target.version}</maven.compiler.target>
-    <node.version>v12.18.3</node.version>
     <oaipmh.version>2.3</oaipmh.version>
     <ocfl-java.version>1.4.6</ocfl-java.version>
     <pmd.failOnViolation>true</pmd.failOnViolation>
@@ -66,7 +65,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <swagger.version>2.1.13</swagger.version>
     <uniqueVersion>false</uniqueVersion>
     <xalan.version>2.7.2</xalan.version>
-    <yarn.version>v1.13.0</yarn.version>
   </properties>
   <build>
     <pluginManagement>
