@@ -233,7 +233,7 @@ public class MCRBasicCommands {
         }
     }
 
-    @MCRCommand(syntax = "reload mappings in jpa configuration",
+    @MCRCommand(syntax = "reload mappings in jpa configuration file",
         help = "retrieves the mapping files from MyCoRe jars and adds them to the jpa configuration file.",
         order = 140)
     public static void reloadJPAMappings() throws IOException {
@@ -242,36 +242,59 @@ public class MCRBasicCommands {
             if (Files.exists(persistenceXMLFile.toPath())) {
                 SAXBuilder sb = new SAXBuilder();
                 Document doc = sb.build(persistenceXMLFile);
-                Namespace nsPersistence = Namespace.getNamespace("http://xmlns.jcp.org/xml/ns/persistence");
+                Namespace nsPersistence = doc.getRootElement().getNamespace();
                 Element ePersistenceUnit = doc.getRootElement().getChild("persistence-unit", nsPersistence);
-                ePersistenceUnit.getContent(Filters.element("mapping-file", nsPersistence))
-                    .removeIf(e -> e.getTextNormalize().startsWith("META-INF/mycore-")
-                        && e.getTextNormalize().endsWith("-mappings.xml"));
+                List<Element> mappingElements = ePersistenceUnit
+                    .getContent(Filters.element("mapping-file", nsPersistence));
+                List<String> oldMappings = mappingElements.stream()
+                    .map(x -> x.getTextNormalize())
+                    .collect(Collectors.toList());
 
-                Comment c = new Comment(" mapping files, detected by command 'reload mappings in jpa configuration' ");
-                ePersistenceUnit.getContent(Filters.comment()).removeIf(x -> x.getText().equals(c.getText()));
-                ePersistenceUnit.addContent(0, c);
+                mappingElements
+                    .removeIf(e -> e.getTextNormalize().endsWith("-mappings.xml")
+                        && MCRBasicCommands.class.getResource(
+                            (e.getTextNormalize().startsWith("/") ? "" : "/") + e.getTextNormalize()) == null);
 
-                int pos = 0;
+                if (oldMappings.size() > mappingElements.size()) {
+                    LOGGER.warn(Integer.toString(oldMappings.size() - mappingElements.size())
+                        + " unknown mapping files removed from '" + persistenceXMLFile.toString() + "'.");
+                }
+
+                List<String> newMappings = new ArrayList<String>();
                 for (MCRComponent cmp : MCRRuntimeComponentDetector.getAllComponents()) {
                     try (ZipInputStream zip = new ZipInputStream(Files.newInputStream(cmp.getJarFile().toPath()))) {
                         ZipEntry ze = null;
                         while ((ze = zip.getNextEntry()) != null) {
                             String zeName = ze.getName();
-                            if (zeName.startsWith("META-INF/mycore-") && zeName.endsWith("-mappings.xml")) {
-                                Element eMappingFile = new Element("mapping-file", nsPersistence).setText(zeName);
-                                ePersistenceUnit.addContent(++pos, eMappingFile);
+                            if (zeName.startsWith("META-INF/") && zeName.endsWith("-mappings.xml")
+                                && !oldMappings.contains(zeName)) {
+                                newMappings.add(zeName);
                             }
                         }
                     }
                 }
+                if (newMappings.size() > 0) {
+                    Comment c = new Comment(
+                        " mapping files, added by command 'reload mappings in jpa configuration file' ");
+                    ePersistenceUnit.getContent(Filters.comment()).removeIf(x -> x.getText().equals(c.getText()));
+                    ePersistenceUnit.addContent(0, c);
+
+                    int pos = 0;
+                    for (String mappingFile : newMappings) {
+                        Element eMappingFile = new Element("mapping-file", nsPersistence).setText(mappingFile);
+                        ePersistenceUnit.addContent(++pos, eMappingFile);
+                    }
+                    LOGGER
+                        .warn(newMappings.size() + " mapping files added to '" + persistenceXMLFile.toString() + "'.");
+                }
+
                 XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
                 try (BufferedWriter bw = Files.newBufferedWriter(persistenceXMLFile.toPath())) {
                     out.output(doc, bw);
                 }
-                LOGGER.info(pos + " mapping files added to '" + persistenceXMLFile.toString() + "'.");
+
             } else {
-                LOGGER.info("The config file '" + persistenceXMLFile.toString() + "' does not exist yet!");
+                LOGGER.warn("The config file '" + persistenceXMLFile.toString() + "' does not exist yet!");
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
