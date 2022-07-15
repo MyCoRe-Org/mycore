@@ -201,7 +201,7 @@ public class MCRRestObjects {
                     + "?after_id=" + idDates.get(idDates.size() - 1).getId()
                     + "&limit=" + theLimit;
                 respOK.link(nextURL, "next");
-                //alternativ: .header("Link", nextURL == null ? null : "<" + nextURL + ">; rel=\"next\"")
+                respOK.header("X-Total-Count",  MCRMetadataHistoryManager.countObjectIDs());
             }
             return respOK.build();
         }

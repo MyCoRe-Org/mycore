@@ -98,6 +98,22 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
         return query.getResultList();
     }
 
+    public static Long countObjectIDs() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<Long> query = em.createNamedQuery("MCRMetaHistory.countActiveIDs",
+            Long.class);
+        query.setParameter("kind", "object");
+        return query.getSingleResult();
+    }
+
+    public static Long countDerivateIDs() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<Long> query = em.createNamedQuery("MCRMetaHistory.countActiveIDs",
+            Long.class);
+        query.setParameter("kind", "derivate");
+        return query.getSingleResult();
+    }
+
     private void createNow(MCRObjectID id) {
         store(MCRMetaHistoryItem.createdNow(id));
     }
