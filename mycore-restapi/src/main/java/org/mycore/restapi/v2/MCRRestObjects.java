@@ -132,8 +132,11 @@ public class MCRRestObjects {
 
     private static Logger LOGGER = LogManager.getLogger();
 
-    private static int LIST_OBJECTS_PAGE_SIZE = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize")
+    private static int PAGE_SIZE_MAX = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Max")
         .orElseThrow();
+
+    private static int PAGE_SIZE_DEFAULT = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Default")
+        .orElse(1000);
 
     @Context
     Request request;
@@ -162,10 +165,11 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @XmlElementWrapper(name = "mycoreobjects")
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
-    public Response listObjects(@QueryParam("after_id") String afterID) throws IOException {
+    public Response listObjects(@QueryParam("after_id") String afterID, @QueryParam("limit") Integer limit)
+        throws IOException {
         Date lastModified = new Date(MCRXMLMetadataManager.instance().getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
-        
+
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
@@ -183,17 +187,19 @@ public class MCRRestObjects {
                 .lastModified(lastModified)
                 .build();
         } else {
+            int theLimit = Integer.min(PAGE_SIZE_MAX, limit == null ? PAGE_SIZE_DEFAULT : limit);
             MCRObjectID afterMcrObjID = StringUtils.isEmpty(afterID) ? null : MCRObjectID.getInstance(afterID);
             List<MCRRestObjectIDDate> idDates = MCRMetadataHistoryManager
-                .listNextObjectIDs(afterMcrObjID, LIST_OBJECTS_PAGE_SIZE).stream()
+                .listNextObjectIDs(afterMcrObjID, theLimit).stream()
                 .map(x -> new MCRRestObjectIDDate(x))
                 .collect(Collectors.toList());
-            String nextURL = idDates.size() < LIST_OBJECTS_PAGE_SIZE ? null
-                : MCRFrontendUtil.getBaseURL() + "api/v2/objects?after_id=" + idDates.get(idDates.size() - 1).getId();
             ResponseBuilder respOK = Response.ok(new GenericEntity<List<MCRRestObjectIDDate>>(idDates) {
             })
                 .lastModified(lastModified);
-            if (nextURL != null) {
+            if (idDates.size() <= theLimit) {
+                String nextURL = MCRFrontendUtil.getBaseURL() + "api/v2/objects"
+                    + "?after_id=" + idDates.get(idDates.size() - 1).getId()
+                    + "&limit=" + theLimit;
                 respOK.link(nextURL, "next");
                 //alternativ: .header("Link", nextURL == null ? null : "<" + nextURL + ">; rel=\"next\"")
             }

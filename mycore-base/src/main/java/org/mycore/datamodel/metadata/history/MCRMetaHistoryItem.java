@@ -60,7 +60,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
     @NamedQuery(name = "MCRMetaHistory.getHighestID",
         query = "SELECT MAX(id) from MCRMetaHistoryItem WHERE ID like :looksLike"),
     @NamedQuery(name = "MCRMetaHistory.getNextActiveIDs",
-        query= "SELECT c"
+        query = "SELECT c"
             + " FROM MCRMetaHistoryItem c"
             + " WHERE (:afterID is null or c.id >:afterID)"
             + "   AND c.eventType='c'"
