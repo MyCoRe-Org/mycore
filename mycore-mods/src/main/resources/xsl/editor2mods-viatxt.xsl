@@ -25,6 +25,7 @@
 
   <xsl:template name="parse">
     <xsl:param name="str" select="." />
+
     <xsl:choose>
       <xsl:when test="contains($str,'&lt;')">
         <xsl:variable name="tag"
@@ -107,22 +108,37 @@
           </xsl:when>
           <xsl:when test="substring-before($attrlist,&quot;= &apos;&quot;)">
             <xsl:value-of
-              select="substring-before(substring-after($attrlist,&quot;=&apos;&quot;),&quot;&apos;&quot;)" />
+              select="substring-before(substring-after($attrlist,&quot;= &apos;&quot;),&quot;&apos;&quot;)" />
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="length">
+        <xsl:choose>
+          <xsl:when test="substring-before($attrlist,'=&quot;')">
+            <xsl:value-of select="string-length($name)+2+string-length($value)+1" />
+          </xsl:when>
+          <xsl:when test="substring-before($attrlist,'= &quot;')">
+            <xsl:value-of select="string-length($name)+3+string-length($value)+1" />
+          </xsl:when>
+          <xsl:when test="substring-before($attrlist,&quot;=&apos;&quot;)">
+            <xsl:value-of select="string-length($name)+4+string-length($value)+3" />
+          </xsl:when>
+          <xsl:when test="substring-before($attrlist,&quot;= &apos;&quot;)">
+            <xsl:value-of select="string-length($name)+5+string-length($value)+3" />
           </xsl:when>
         </xsl:choose>
       </xsl:variable>
       <xsl:attribute name="{$name}">
         <xsl:value-of select="$value" />
       </xsl:attribute>
+      <xsl:choose>
+        <xsl:when test="string-length($attrlist)&gt;$length">
+          <xsl:call-template name="attribs">
+            <xsl:with-param name="attrlist" select="substring($attrlist,$length+2)"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
     </xsl:if>
-    <xsl:choose>
-      <xsl:when test="contains($attrlist,' ')">
-        <xsl:call-template name="attribs">
-          <xsl:with-param name="attrlist"
-            select="substring-after($attrlist,' ')" />
-        </xsl:call-template>
-      </xsl:when>
-    </xsl:choose>
   </xsl:template>
   
   <xsl:template name="normalize-text">
