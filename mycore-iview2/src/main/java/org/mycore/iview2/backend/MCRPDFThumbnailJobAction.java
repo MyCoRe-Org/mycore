@@ -68,6 +68,10 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
     public void execute() {
         final String derivateIDString = this.job.getParameter(DERIVATE_PARAMETER);
         final MCRObjectID derivateID = MCRObjectID.getInstance(derivateIDString);
+        if (!MCRMetadataManager.exists(derivateID)) {
+            // Derivate was deleted, so nothing todo
+            return;
+        }
         final MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateID);
         MCRTileInfo tileInfo = new MCRTileInfo(derivate.getId().toString(),
             derivate.getDerivate().getInternals().getMainDoc(), null);
