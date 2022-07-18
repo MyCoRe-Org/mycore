@@ -65,10 +65,7 @@
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <!-- xsl:value-of select="$str" / -->
-        <xsl:call-template name="normalize-text">
-          <xsl:with-param name="text" select="$str" />
-        </xsl:call-template>
+        <xsl:value-of disable-output-escaping="yes" select="$str" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -123,27 +120,6 @@
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
-  </xsl:template>
-  
-  <xsl:template name="normalize-text">
-    <xsl:param name="text" />
-      <xsl:choose>
-        <xsl:when test="contains($text,'&amp;')">
-          <xsl:variable name="vAfter" select="substring-after($text,'&amp;')" />
-          <xsl:value-of
-            select="concat(substring-before($text,'&amp;'),
-                                                   document('')/*/char:*
-                                                   [@ent =
-                                                   substring-before($vAfter,';')])"
-            disable-output-escaping="yes" />
-          <xsl:call-template name="normalize-text">
-            <xsl:with-param name="text" select="substring-after($vAfter,';')" />
-          </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$text" />
-        </xsl:otherwise>
-      </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
