@@ -21,6 +21,7 @@ package org.mycore.restapi.v2.model;
 import java.time.Instant;
 
 import org.mycore.datamodel.common.MCRObjectIDDate;
+import org.mycore.datamodel.metadata.history.MCRMetaHistoryItem;
 import org.mycore.restapi.converter.MCRInstantXMLAdapter;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -51,6 +52,12 @@ public class MCRRestObjectIDDate {
         super();
         id = idDate.getId();
         lastModified = idDate.getLastModified().toInstant();
+    }
+    
+    public MCRRestObjectIDDate(MCRMetaHistoryItem histItem) {
+        super();
+        id = histItem.getId().toString();
+        lastModified = histItem.getTime();
     }
 
     @XmlAttribute(required = true)
