@@ -19,6 +19,7 @@
 package org.mycore.datamodel.metadata.history;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -75,6 +76,42 @@ public class MCRMetadataHistoryManager extends MCREventHandlerBase {
         query.setParameter("id", identifier);
         query.setParameter("type", MCRMetadataHistoryEventType.Delete);
         return Optional.ofNullable(query.getSingleResult());
+    }
+
+    public static List<MCRMetaHistoryItem> listNextObjectIDs(MCRObjectID afterID, int maxResults) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRMetaHistoryItem> query = em.createNamedQuery("MCRMetaHistory.getNextActiveIDs",
+            MCRMetaHistoryItem.class);
+        query.setParameter("afterID", afterID);
+        query.setParameter("kind", "object");
+        query.setMaxResults(maxResults);
+        return query.getResultList();
+    }
+
+    public static List<MCRMetaHistoryItem> listNextDerivateIDs(MCRObjectID afterID, int maxResults) {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<MCRMetaHistoryItem> query = em.createNamedQuery("MCRMetaHistory.getNextActiveIDs",
+            MCRMetaHistoryItem.class);
+        query.setParameter("afterID", afterID);
+        query.setParameter("kind", "derivate");
+        query.setMaxResults(maxResults);
+        return query.getResultList();
+    }
+
+    public static Long countObjectIDs() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<Long> query = em.createNamedQuery("MCRMetaHistory.countActiveIDs",
+            Long.class);
+        query.setParameter("kind", "object");
+        return query.getSingleResult();
+    }
+
+    public static Long countDerivateIDs() {
+        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
+        TypedQuery<Long> query = em.createNamedQuery("MCRMetaHistory.countActiveIDs",
+            Long.class);
+        query.setParameter("kind", "derivate");
+        return query.getSingleResult();
     }
 
     private void createNow(MCRObjectID id) {

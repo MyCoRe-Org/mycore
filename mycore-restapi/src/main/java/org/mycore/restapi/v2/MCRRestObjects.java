@@ -53,15 +53,18 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,7 +91,9 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.media.services.MCRThumbnailGenerator;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
@@ -127,6 +132,12 @@ public class MCRRestObjects {
 
     private static Logger LOGGER = LogManager.getLogger();
 
+    private static int PAGE_SIZE_MAX = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Max")
+        .orElseThrow();
+
+    private static int PAGE_SIZE_DEFAULT = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Default")
+        .orElse(1000);
+
     @Context
     Request request;
 
@@ -154,20 +165,46 @@ public class MCRRestObjects {
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @XmlElementWrapper(name = "mycoreobjects")
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
-    public Response listObjects() throws IOException {
+    public Response listObjects(@QueryParam("after_id") String afterID, @QueryParam("limit") Integer limit)
+        throws IOException {
         Date lastModified = new Date(MCRXMLMetadataManager.instance().getLastModified());
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
+
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        List<MCRRestObjectIDDate> idDates = MCRXMLMetadataManager.instance().listObjectDates().stream()
-            .filter(oid -> !oid.getId().contains("_derivate_"))
-            .map(x -> new MCRRestObjectIDDate(x))
-            .collect(Collectors.toList());
-        return Response.ok(new GenericEntity<List<MCRRestObjectIDDate>>(idDates) {
-        })
-            .lastModified(lastModified)
-            .build();
+        //TODO Cleanup in 2022.06 LTS 
+        // make this the default behaviour, also if afterID param is not set
+
+        if (afterID == null) {
+            //old behaviour 
+            List<MCRRestObjectIDDate> idDates = MCRXMLMetadataManager.instance().listObjectDates().stream()
+                .filter(oid -> !oid.getId().contains("_derivate_"))
+                .map(x -> new MCRRestObjectIDDate(x))
+                .collect(Collectors.toList());
+            return Response.ok(new GenericEntity<List<MCRRestObjectIDDate>>(idDates) {
+            })
+                .lastModified(lastModified)
+                .build();
+        } else {
+            int theLimit = Integer.min(PAGE_SIZE_MAX, limit == null ? PAGE_SIZE_DEFAULT : limit);
+            MCRObjectID afterMcrObjID = StringUtils.isEmpty(afterID) ? null : MCRObjectID.getInstance(afterID);
+            List<MCRRestObjectIDDate> idDates = MCRMetadataHistoryManager
+                .listNextObjectIDs(afterMcrObjID, theLimit).stream()
+                .map(x -> new MCRRestObjectIDDate(x))
+                .collect(Collectors.toList());
+            ResponseBuilder respOK = Response.ok(new GenericEntity<List<MCRRestObjectIDDate>>(idDates) {
+            })
+                .lastModified(lastModified);
+            if (idDates.size() <= theLimit) {
+                String nextURL = MCRFrontendUtil.getBaseURL() + "api/v2/objects"
+                    + "?after_id=" + idDates.get(idDates.size() - 1).getId()
+                    + "&limit=" + theLimit;
+                respOK.link(nextURL, "next");
+                respOK.header("X-Total-Count",  MCRMetadataHistoryManager.countObjectIDs());
+            }
+            return respOK.build();
+        }
     }
 
     @POST

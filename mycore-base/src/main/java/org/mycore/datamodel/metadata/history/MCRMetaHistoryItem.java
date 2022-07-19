@@ -58,7 +58,25 @@ import org.mycore.datamodel.metadata.MCRObjectID;
             + "AND a.eventType=:eventType"),
     @NamedQuery(name = "MCRMetaHistory.getFirstDate", query = "SELECT MIN(time) from MCRMetaHistoryItem"),
     @NamedQuery(name = "MCRMetaHistory.getHighestID",
-        query = "SELECT MAX(id) from MCRMetaHistoryItem WHERE ID like :looksLike")
+        query = "SELECT MAX(id) from MCRMetaHistoryItem WHERE ID like :looksLike"),
+    @NamedQuery(name = "MCRMetaHistory.getNextActiveIDs",
+        query = "SELECT c"
+            + " FROM MCRMetaHistoryItem c"
+            + " WHERE (:afterID is null or c.id >:afterID)"
+            + "   AND c.eventType='c'"
+            + "   AND (:kind!='object' OR c.id NOT LIKE '%\\_derivate\\_%')"
+            + "   AND (:kind!='derivate' OR c.id LIKE '%\\_derivate\\_%')"
+            + "   AND (NOT EXISTS (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventType='d' AND c.id=d.id)"
+            + "        OR c.time > ALL (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventType='d' AND c.id=d.id))"
+            + " ORDER by c.id"),
+    @NamedQuery(name = "MCRMetaHistory.countActiveIDs",
+        query = "SELECT count(c)"
+            + " FROM MCRMetaHistoryItem c"
+            + " WHERE c.eventType='c'"
+            + "   AND (:kind!='object' OR c.id NOT LIKE '%\\_derivate\\_%')"
+            + "   AND (:kind!='derivate' OR c.id LIKE '%\\_derivate\\_%')"
+            + "   AND (NOT EXISTS (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventType='d' AND c.id=d.id)"
+            + "        OR c.time > ALL (SELECT d.time FROM MCRMetaHistoryItem d WHERE d.eventType='d' AND c.id=d.id))")
 })
 public class MCRMetaHistoryItem implements Serializable {
 
