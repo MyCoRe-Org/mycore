@@ -363,7 +363,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         help = "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata",
         order = 130)
     public static void show(String id, String dirname) {
-        export(id, id, dirname, "save");
+        exportWithStylesheet(id, id, dirname, "save");
     }
 
     /**
@@ -380,11 +380,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     @MCRCommand(syntax = "export derivate {0} to directory {1} with stylesheet {2}",
-        help = "The command store the derivate with the MCRObjectID {0} to the directory {1}"
+        help = "Stores the derivate with the MCRObjectID {0} to the directory {1}"
             + " with the stylesheet {2}-derivate.xsl. For {2}, the default is xsl/save.",
         order = 90)
-    public static void export(String id, String dirname, String style) {
-        export(id, id, dirname, style);
+    public static void exportWithStylesheet(String id, String dirname, String style) {
+        exportWithStylesheet(id, id, dirname, style);
     }
 
     /**
@@ -405,10 +405,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
 
     @MCRCommand(syntax = "export derivates from {0} to {1} to directory {2} with stylesheet {3}",
-        help = "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2}"
+        help = "Stores all derivates with MCRObjectID's between {0} and {1} to the directory {2}"
             + " with the stylesheet {3}-derivate.xsl. For {3}, the default is xsl/save.",
         order = 80)
-    public static void export(String fromID, String toID, String dirname, String style) {
+    public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
         // check fromID and toID
         MCRObjectID fid = null;
         MCRObjectID tid = null;
@@ -473,7 +473,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         help = "Stores all derivates to the directory {0} with the stylesheet {1}-derivate.xsl."
             + " For {1}, the default is xsl/save.",
         order = 100)
-    public static List<String> exportAllDerivates(String dirname, String style) {
+    public static List<String> exportAllDerivatesWithStylesheet(String dirname, String style) {
         return MCRCommandUtils.getIdsForType("derivate")
             .map(id -> "export derivate " + id + " to directory " + dirname + " with stylesheet " + style)
             .collect(Collectors.toList());
@@ -493,7 +493,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         help = "Stores all derivates of project {0} to the directory {1} with the stylesheet {2}-derivate.xsl."
             + " For {2}, the default is xsl/save.",
         order = 110)
-    public static List<String> exportAllDerivatesOfProject(String project, String dirname, String style) {
+    public static List<String> exportAllDerivatesOfProjectWithStylesheet(String project, String dirname, String style) {
         return MCRCommandUtils.getIdsForProjectAndType(project, "derivate")
             .map(id -> "export derivate " + id + " to directory " + dirname + " with stylesheet " + style)
             .collect(Collectors.toList());
