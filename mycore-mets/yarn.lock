@@ -30,17 +30,10 @@
   dependencies:
     "@types/angular" "*"
 
-"@types/angular@*":
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.7.3.tgz#138c2f2f688e9dcb413c6052d9483d773ce7f627"
-  integrity sha512-rr40P9yHTlLuY6y+PUfwHeoBWO8uEJTazcs89o83fheyH/b9OZW7p7EsvFMriCPam3p6VSD57zkgn+nAQCvfUw==
-
-"@types/angular@1.6.18":
-  version "1.6.18"
-  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.18.tgz#1df57e3c8b1f1fe629f58f4f1f2269bf57be91a8"
-  integrity sha512-BZW2QjWyr6mbji1liIceUeryvmrpX37fC6Rel6MG9s0BeWMpvOrTHcHcB/8f2oII9R/k/ZNXDBorp+tDhTWTBg==
-  dependencies:
-    "@types/jquery" "*"
+"@types/angular@*", "@types/angular@1.8.4":
+  version "1.8.4"
+  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.8.4.tgz#a2cc163e508389c51d4c4119ebff6b9395cec472"
+  integrity sha512-wPS/ncJWhyxJsndsW1B6Ta8D4mi97x1yItSu+rkLDytU3oRIh2CFAjMuJceYwFAh9+DIohndWM0QBA9OU2Hv0g==
 
 "@types/babel-types@*", "@types/babel-types@^7.0.0":
   version "7.0.9"
@@ -63,18 +56,6 @@
   version "2.5.52"
   resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-2.5.52.tgz#6ea5435d5c71562296e63ef27a4718f94f2fbb13"
   integrity sha512-UPh5iFLlmAJ0W1jbzKyVMAC4CmvZAA6wxA9ES+SrzWvUxi5ZZfptxiIAdC6JeYlwRJLDilL3ckq4pzW1J3mngg==
-
-"@types/jquery@*":
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.1.tgz#cebb057acf5071c40e439f30e840c57a30d406c3"
-  integrity sha512-Tyctjh56U7eX2b9udu3wG853ASYP0uagChJcQJXLUXEU6C/JiW5qt5dl8ao01VRj1i5pgXPAf8f1mq4+FDLRQg==
-  dependencies:
-    "@types/sizzle" "*"
-
-"@types/sizzle@*":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
-  integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
 
 JSONStream@^1.3.4:
   version "1.3.5"
@@ -191,10 +172,10 @@ angular-resource@1.6.0:
   resolved "https://registry.yarnpkg.com/angular-resource/-/angular-resource-1.6.0.tgz#b8c162de7839c5e58fa6b55e901469ec654af0e6"
   integrity sha1-uMFi3ng5xeWPprVekBRp7GVK8OY=
 
-angular@1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.0.tgz#16c5edebd0a342046bd5281cca2decf04c40df76"
-  integrity sha1-FsXt69CjQgRr1Sgcyi3s8ExA33Y=
+angular@1.8.3:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.3.tgz#851ad75d5163c105a7e329555ef70c90aa706894"
+  integrity sha512-5qjkWIQQVsHj4Sb5TcEs4WZWpFeVFHXwxEBHUhrny41D8UrBAd6T/6nPPAsLngJCReIOqi95W3mxdveveutpZw==
 
 ansi-escapes@^4.2.1:
   version "4.3.1"

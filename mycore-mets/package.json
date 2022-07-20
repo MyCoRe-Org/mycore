@@ -9,10 +9,10 @@
   "author": "Sebastian Hofmann <hofmann.s@uni-jena.de>",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@types/angular": "1.6.18",
+    "@types/angular": "1.8.4",
     "@types/angular-ui-bootstrap": "0.13.42",
     "@types/jasmine": "2.5.52",
-    "angular": "1.6.0",
+    "angular": "1.8.3",
     "angular-bootstrap": "0.12.2",
     "angular-borderlayout2": "0.9.1",
     "angular-hotkeys": "1.6.0",
