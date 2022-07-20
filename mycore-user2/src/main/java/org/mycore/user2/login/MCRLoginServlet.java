@@ -21,8 +21,10 @@ package org.mycore.user2.login;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import javax.xml.transform.TransformerException;
 
@@ -68,6 +70,8 @@ public class MCRLoginServlet extends MCRServlet {
 
     static final String HTTPS_ONLY_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginHttpsOnly";
 
+    static final String ALLOWED_ROLES_PROPERTY = MCRUser2Constants.CONFIG_PREFIX + "LoginAllowedRoles";
+
     private static final long serialVersionUID = 1L;
 
     private static final String LOGIN_REDIRECT_URL_PARAMETER = "url";
@@ -76,6 +80,12 @@ public class MCRLoginServlet extends MCRServlet {
 
     protected static final boolean LOCAL_LOGIN_SECURE_ONLY = MCRConfiguration2
         .getOrThrow(HTTPS_ONLY_PROPERTY, Boolean::parseBoolean);
+
+    private static final List<String> ALLOWED_ROLES = MCRConfiguration2
+        .getString(MCRLoginServlet.ALLOWED_ROLES_PROPERTY)
+        .map(MCRConfiguration2::splitValue)
+        .map(s -> s.collect(Collectors.toList()))
+        .orElse(Collections.emptyList());
 
     private static Logger LOGGER = LogManager.getLogger();
 
@@ -173,7 +183,7 @@ public class MCRLoginServlet extends MCRServlet {
         String uid = getProperty(req, "uid");
         String pwd = getProperty(req, "pwd");
         if (uid != null) {
-            MCRUser user = MCRUserManager.login(uid, pwd);
+            MCRUser user = MCRUserManager.login(uid, pwd, ALLOWED_ROLES);
             if (user == null) {
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 loginForm.setLoginFailed(true);
