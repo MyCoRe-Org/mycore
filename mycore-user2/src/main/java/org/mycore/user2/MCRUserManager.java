@@ -23,6 +23,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -530,9 +531,29 @@ public class MCRUserManager {
      * @return true, if the password matches.
      */
     public static MCRUser login(String userName, String password) {
+        return login(userName, password, Collections.emptyList());
+    }
+
+    /**
+     * Checks the password of a login user and if the user has at least one of the allowed roles in the default realm.
+     *
+     * @param userName the login user name
+     * @param password the password entered in the GUI
+     * @param allowedRoles list of allowed roles
+     * @return true, if the password matches.
+     */
+    public static MCRUser login(String userName, String password, List<String> allowedRoles) {
         MCRUser user = checkPassword(userName, password);
         if (user == null) {
             return null;
+        }
+        if (!allowedRoles.isEmpty()) {
+            Collection<String> userRoles = user.getSystemRoleIDs();
+            LOGGER.info("Comparing user roles " + userRoles + " against list of allowed roles " + allowedRoles);
+            boolean hasAnyAllowedRole = userRoles.stream().anyMatch(allowedRoles::contains);
+            if (!hasAnyAllowedRole) {
+                return null;
+            }
         }
         user.setLastLogin();
         updateUser(user);
