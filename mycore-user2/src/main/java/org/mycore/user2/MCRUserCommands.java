@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -122,6 +123,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     public static List<String> initSuperuser() {
         final String suser = MCRConfiguration2.getStringOrThrow("MCR.Users.Superuser.UserName");
         final String spasswd = MCRConfiguration2.getStringOrThrow("MCR.Users.Superuser.UserPasswd");
+        final Optional<String> semail = MCRConfiguration2.getString("MCR.Users.Superuser.UserEmail");
         final String srole = MCRConfiguration2.getStringOrThrow("MCR.Users.Superuser.GroupName");
 
         if (MCRUserManager.exists(suser)) {
@@ -146,6 +148,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         try {
             MCRUser mcrUser = new MCRUser(suser);
             mcrUser.setRealName("Superuser");
+            semail.ifPresent(mcrUser::setEMail);
             mcrUser.assignRole(srole);
             MCRUserManager.updatePasswordHashToSHA256(mcrUser, spasswd);
             MCRUserManager.createUser(mcrUser);
