@@ -16,70 +16,61 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.tools.query.jpa;
+package org.mycore.backend.jpa;
 
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import jakarta.persistence.criteria.Predicate;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.backend.jpa.MCRObjectEntity;
-import org.mycore.backend.jpa.MCRObjectEntity_;
+import org.mycore.datamodel.classifications2.MCRCategLinkReference_;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRCategoryID_;
+import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
+import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl_;
+import org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl;
+import org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl_;
 import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
-import org.mycore.tools.query.MCRObjectQuery;
-import org.mycore.tools.query.MCRObjectQueryResolver;
+import org.mycore.datamodel.common.MCRObjectQuery;
+import org.mycore.datamodel.common.MCRObjectQueryResolver;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.SingularAttribute;
 
 public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
 
-    public TypedQuery<MCRObjectEntity> translateQuery(MCRObjectQuery query) {
+    private static final MCRObjectQuery.SortBy SORT_BY_DEFAULT = MCRObjectQuery.SortBy.created;
+
+    protected TypedQuery<MCRObjectEntity> convertQuery(MCRObjectQuery query) {
+        Objects.requireNonNull(query, "The Query cant be null");
+        int offset = query.offset();
+
+        if (offset != -1 && query.afterId() != null) {
+            throw new IllegalArgumentException("offset and after_id should not be combined!");
+        }
+
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<MCRObjectEntity> criteriaQuery = criteriaBuilder.createQuery(MCRObjectEntity.class);
-        Root<MCRObjectEntity> source = criteriaQuery.from(MCRObjectEntity.class);
-        criteriaQuery.select(source);
+        Root<MCRObjectEntity> oe = criteriaQuery.from(MCRObjectEntity.class);
+        criteriaQuery.select(oe);
 
-        List<Predicate> filters = getFilter(query, criteriaBuilder, source);
+        List<Predicate> filters = getFilter(query, criteriaBuilder, oe);
 
-        if (query.lastId() != null) {
-            if (query.sortBy() != MCRObjectQuery.SortField.ID && query.sortBy() != null) {
-                throw new UnsupportedOperationException("last id can not be used with " + query.sortBy());
-            }
-            if (query.sortAsc() == null && query.sortAsc() == MCRObjectQuery.SortDirection.ASC) {
-                if (!query.lastId().equals("")) {
-                    filters.add(criteriaBuilder.greaterThan(source.get(MCRObjectEntity_.objectId), query.lastId()));
-                }
-                criteriaQuery.orderBy(criteriaBuilder.asc(source.get(MCRObjectEntity_.objectId)));
-            } else {
-                if (!query.lastId().equals("")) {
-                    filters.add(criteriaBuilder.lessThan(source.get(MCRObjectEntity_.objectId), query.lastId()));
-                }
-                criteriaQuery.orderBy(criteriaBuilder.desc(source.get(MCRObjectEntity_.objectId)));
-            }
+        applyClassificationFilter(query, criteriaBuilder, criteriaQuery, oe, filters, em);
+
+        if (query.afterId() != null) {
+            applyLastId(query, criteriaBuilder, criteriaQuery, oe, filters);
         } else {
-            MCRObjectQuery.SortField sf = query.sortBy() == null ? MCRObjectQuery.SortField.CREATED : query.sortBy();
-
-            SingularAttribute<MCRObjectEntity, ?> attribute = switch (sf) {
-                case ID -> MCRObjectEntity_.objectId;
-                case CREATED -> MCRObjectEntity_.createDate;
-                case MODIFIED -> MCRObjectEntity_.modifyDate;
-            };
-
-            if (query.sortAsc() == null && query.sortAsc() == MCRObjectQuery.SortDirection.ASC) {
-                criteriaQuery.orderBy(criteriaBuilder.asc(source.get(attribute)));
-            } else {
-                criteriaQuery.orderBy(criteriaBuilder.desc(source.get(attribute)));
-            }
+            applySort(query, criteriaBuilder, criteriaQuery, oe);
         }
 
         if (filters.size() > 0) {
@@ -88,7 +79,6 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
 
         TypedQuery<MCRObjectEntity> typedQuery = em.createQuery(criteriaQuery);
 
-        int offset = query.offset();
         if (offset != -1) {
             typedQuery.setFirstResult(offset);
         }
@@ -99,6 +89,93 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
         }
 
         return typedQuery;
+    }
+
+    private <T> void applyClassificationFilter(MCRObjectQuery query, CriteriaBuilder criteriaBuilder,
+        CriteriaQuery<T> criteriaQuery, Root<MCRObjectEntity> oe, List<Predicate> filters, EntityManager em) {
+        if (query.getIncludeCategories().size() > 0) {
+            List<MCRCategoryImpl> idImplMap = getCategories(query, em);
+
+            if (idImplMap.size() != query.getIncludeCategories().size()) {
+                throw new IllegalArgumentException(
+                    "some of " + String.join(", ", query.getIncludeCategories()) + " do not exist!");
+            }
+
+            // TODO: add child categories
+            Predicate[] categoryPredicates = idImplMap.stream().map(cat -> {
+                Root<MCRCategoryLinkImpl> cl = criteriaQuery.from(MCRCategoryLinkImpl.class);
+                Root<MCRCategoryImpl> c = criteriaQuery.from(MCRCategoryImpl.class);
+
+                Predicate linkToObject = criteriaBuilder.equal(
+                    cl.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.OBJECT_ID),
+                    oe.get(MCRObjectEntity_.OBJECT_ID));
+
+                Predicate categoryToLink = criteriaBuilder.equal(cl.get(MCRCategoryLinkImpl_.CATEGORY),
+                    c.get(MCRCategoryImpl_.INTERNAL_ID));
+
+                Predicate between = criteriaBuilder.between(
+                    c.get(MCRCategoryImpl_.LEFT),
+                    cat.getLeft(),
+                    cat.getRight());
+
+                Predicate rootIdEqual = criteriaBuilder
+                    .equal(c.get(MCRCategoryImpl_.id).get(MCRCategoryID_.ROOT_ID), cat.getRootID());
+
+                return criteriaBuilder.and(linkToObject, categoryToLink, rootIdEqual, between);
+            }).toArray(Predicate[]::new);
+
+            filters.add(criteriaBuilder.and(categoryPredicates));
+        }
+    }
+
+    private List<MCRCategoryImpl> getCategories(MCRObjectQuery query, EntityManager em) {
+        CriteriaBuilder categCb = em.getCriteriaBuilder();
+        CriteriaQuery<MCRCategoryImpl> categQuery = categCb.createQuery(MCRCategoryImpl.class);
+        Root<MCRCategoryImpl> classRoot = categQuery.from(MCRCategoryImpl.class);
+        categQuery.select(classRoot);
+        List<MCRCategoryID> categoryIDList = query.getIncludeCategories().stream()
+            .map(MCRCategoryID::fromString)
+            .collect(Collectors.toList());
+
+        categQuery.where(classRoot.get("id").in(categoryIDList));
+        TypedQuery<MCRCategoryImpl> typedQuery = em.createQuery(categQuery);
+
+        return typedQuery.getResultList();
+    }
+
+    protected void applySort(MCRObjectQuery query, CriteriaBuilder criteriaBuilder,
+        CriteriaQuery<MCRObjectEntity> criteriaQuery, Root<MCRObjectEntity> source) {
+        MCRObjectQuery.SortBy sf = query.sortBy() == null ? SORT_BY_DEFAULT : query.sortBy();
+
+        SingularAttribute<MCRObjectEntity, ?> attribute = switch (sf) {
+            case id -> MCRObjectEntity_.objectId;
+            case created -> MCRObjectEntity_.createDate;
+            case modified -> MCRObjectEntity_.modifyDate;
+        };
+
+        if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.asc) {
+            criteriaQuery.orderBy(criteriaBuilder.asc(source.get(attribute)));
+        } else {
+            criteriaQuery.orderBy(criteriaBuilder.desc(source.get(attribute)));
+        }
+    }
+
+    protected void applyLastId(MCRObjectQuery query, CriteriaBuilder criteriaBuilder,
+        CriteriaQuery<MCRObjectEntity> criteriaQuery, Root<MCRObjectEntity> source, List<Predicate> filters) {
+        if (query.sortBy() != MCRObjectQuery.SortBy.id && query.sortBy() != null) {
+            throw new UnsupportedOperationException("last id can not be used with " + query.sortBy());
+        }
+        if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.asc) {
+            if (!query.afterId().equals("")) {
+                filters.add(criteriaBuilder.greaterThan(source.get(MCRObjectEntity_.objectId), query.afterId()));
+            }
+            criteriaQuery.orderBy(criteriaBuilder.asc(source.get(MCRObjectEntity_.objectId)));
+        } else {
+            if (!query.afterId().equals("")) {
+                filters.add(criteriaBuilder.lessThan(source.get(MCRObjectEntity_.objectId), query.afterId()));
+            }
+            criteriaQuery.orderBy(criteriaBuilder.desc(source.get(MCRObjectEntity_.objectId)));
+        }
     }
 
     private List<Predicate> getFilter(MCRObjectQuery query, CriteriaBuilder criteriaBuilder,
@@ -156,10 +233,9 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
             .ifPresent(predicates::add);
 
         Optional.of(query.numberLess())
-                .filter(numberLess -> numberLess > -1)
-                .map(numberLess -> criteriaBuilder.lessThan(source.get(MCRObjectEntity_.objectNumber),
-                        numberLess))
-                .ifPresent(predicates::add);
+            .filter(numberLess -> numberLess > -1)
+            .map(numberLess -> criteriaBuilder.lessThan(source.get(MCRObjectEntity_.objectNumber), numberLess))
+            .ifPresent(predicates::add);
         /*
          per default we only query not deleted objects, but if the use queries one of the deleted fields
          then deleted objects are included
@@ -176,7 +252,7 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
 
     @Override
     public List<String> getIds(MCRObjectQuery objectQuery) {
-        TypedQuery<MCRObjectEntity> typedQuery = translateQuery(objectQuery);
+        TypedQuery<MCRObjectEntity> typedQuery = convertQuery(objectQuery);
         return typedQuery.getResultList()
             .stream()
             .map(MCRObjectEntity::getObjectId)
@@ -185,7 +261,7 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
 
     @Override
     public List<MCRObjectIDDate> getIdDates(MCRObjectQuery objectQuery) {
-        TypedQuery<MCRObjectEntity> typedQuery = translateQuery(objectQuery);
+        TypedQuery<MCRObjectEntity> typedQuery = convertQuery(objectQuery);
         return typedQuery.getResultList()
             .stream()
             .map(entity -> new MCRObjectIDDateImpl(Date.from(entity.getModifyDate()), entity.getObjectId()))
@@ -201,6 +277,8 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
         criteriaQuery.select(criteriaBuilder.count(source));
 
         List<Predicate> filters = getFilter(objectQuery, criteriaBuilder, source);
+        applyClassificationFilter(objectQuery, criteriaBuilder, criteriaQuery, source, filters, em);
+
         if (filters.size() > 0) {
             criteriaQuery.where(criteriaBuilder.and(filters.toArray(new Predicate[0])));
         }

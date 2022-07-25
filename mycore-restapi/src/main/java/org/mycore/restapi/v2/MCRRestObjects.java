@@ -34,12 +34,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import jakarta.ws.rs.DefaultValue;
@@ -81,8 +80,8 @@ import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
-import org.mycore.tools.query.MCRObjectQuery;
-import org.mycore.tools.query.MCRObjectQueryResolver;
+import org.mycore.datamodel.common.MCRObjectQuery;
+import org.mycore.datamodel.common.MCRObjectQueryResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -163,22 +162,27 @@ public class MCRRestObjects {
 
     public static final String PARAM_DELETED_BY = "deleted_by";
 
-    public static final String PARAM_ASC = "asc";
+    public static final String PARAM_SORT_ORDER = "sort_order";
 
-    public static final String PARAM_SORT = "sort";
-    private static Logger LOGGER = LogManager.getLogger();
+    public static final String PARAM_SORT_BY = "sort_by";
 
-    private static int PAGE_SIZE_MAX = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Max")
+    public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
+        .unmodifiableList(MCRConfiguration2
+            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
+            .map(MCRConfiguration2::instantiateClass)
+            .map(MCRThumbnailGenerator.class::cast)
+            .collect(Collectors.toList()));
+
+    private static final String PARAM_CATEGORIES = "category";
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final int PAGE_SIZE_MAX = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Max")
         .orElseThrow();
 
-    private static int PAGE_SIZE_DEFAULT = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Default")
+    private static final int PAGE_SIZE_DEFAULT = MCRConfiguration2
+        .getInt("MCR.RestAPI.V2.ListObjects.PageSize.Default")
         .orElse(1000);
-
-    private static final MCRObjectQueryResolver QUERY_RESOLVER = loadQueryResolver();
-
-    private static synchronized MCRObjectQueryResolver loadQueryResolver() {
-        return ServiceLoader.load(MCRObjectQueryResolver.class).findFirst().get();
-    }
 
     @Context
     Request request;
@@ -188,13 +192,6 @@ public class MCRRestObjects {
 
     @Context
     UriInfo uriInfo;
-
-    public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
-        .unmodifiableList(MCRConfiguration2
-            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
-            .map(MCRConfiguration2::instantiateClass)
-            .map(MCRThumbnailGenerator.class::cast)
-            .collect(Collectors.toList()));
 
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
@@ -245,11 +242,11 @@ public class MCRRestObjects {
                 name = PARAM_MODIFIED_BEFORE,
                 description = "objects last modified before this date"),
             @Parameter(
-                name = PARAM_ASC,
-                description = "sort results ascending or descending"),
+                name = PARAM_SORT_ORDER,
+                description = "sort results 'asc' or 'desc'"),
             @Parameter(
-                name = PARAM_SORT,
-                description = "sort objects by id, created or modified")
+                name = PARAM_SORT_BY,
+                description = "sort objects by 'id', 'created' (default) or 'modified'")
         },
         responses = @ApiResponse(
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRObjectIDDate.class)))),
@@ -258,7 +255,7 @@ public class MCRRestObjects {
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
     public Response listObjects(
         @QueryParam(PARAM_AFTER_ID) String afterID,
-        @QueryParam(PARAM_OFFSET) @DefaultValue("0") Integer offset,
+        @QueryParam(PARAM_OFFSET) Integer offset,
         @QueryParam(PARAM_LIMIT) Integer limit,
         @QueryParam(PARAM_TYPE) String type,
         @QueryParam(PARAM_PROJECT) String project,
@@ -273,8 +270,9 @@ public class MCRRestObjects {
         @QueryParam(PARAM_CREATED_BY) String createdBy,
         @QueryParam(PARAM_MODIFIED_BY) String modifiedBy,
         @QueryParam(PARAM_DELETED_BY) String deletedBy,
-        @QueryParam(PARAM_ASC) @DefaultValue("true") Boolean asc,
-        @QueryParam(PARAM_SORT) @DefaultValue("id") String sort) throws IOException {
+        @QueryParam(PARAM_SORT_BY) @DefaultValue("id") MCRObjectQuery.SortBy sortBy,
+        @QueryParam(PARAM_SORT_ORDER) @DefaultValue("asc") MCRObjectQuery.SortOrder sortOrder,
+        @QueryParam(PARAM_CATEGORIES) List<String> categories) throws IOException {
 
         MCRObjectQuery query = new MCRObjectQuery();
         int limitInt = Optional.ofNullable(limit)
@@ -284,7 +282,7 @@ public class MCRRestObjects {
         query.limit(limitInt);
 
         Optional.ofNullable(offset).ifPresent(query::offset);
-        Optional.ofNullable(afterID).ifPresent(query::lastId);
+        Optional.ofNullable(afterID).ifPresent(query::afterId);
 
         Optional.ofNullable(type).ifPresent(query::type);
         Optional.ofNullable(project).ifPresent(query::project);
@@ -305,25 +303,23 @@ public class MCRRestObjects {
         Optional.ofNullable(numberGreater).ifPresent(query::numberGreater);
         Optional.ofNullable(numberLess).ifPresent(query::numberLess);
 
-        MCRObjectQuery.SortField sortField = switch (sort.toLowerCase(Locale.ROOT)) {
-            case "created" -> MCRObjectQuery.SortField.CREATED;
-            case "modified" -> MCRObjectQuery.SortField.MODIFIED;
-            default -> MCRObjectQuery.SortField.ID;
-        };
+        List<String> includeCategories = query.getIncludeCategories();
+        categories.stream()
+            .filter(Predicate.not(String::isBlank))
+            .forEach(includeCategories::add);
 
-        if (asc) {
-            query.sort(sortField, MCRObjectQuery.SortDirection.ASC);
-        } else {
-            query.sort(sortField, MCRObjectQuery.SortDirection.DESC);
-        }
+        query.sort(sortBy, sortOrder);
 
-        List<MCRObjectIDDate> idDates = QUERY_RESOLVER.getIdDates(query);
+        MCRObjectQueryResolver queryResolver = MCRObjectQueryResolver.getInstance();
+
+        List<MCRObjectIDDate> idDates = limitInt == 0 ? Collections.emptyList() : queryResolver.getIdDates(query);
+
         List<MCRRestObjectIDDate> restIdDate = idDates.stream().map(MCRRestObjectIDDate::new)
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
 
-        int count = QUERY_RESOLVER.count(query);
+        int count = queryResolver.count(query);
         UriBuilder nextBuilder = null;
-        if (query.lastId() != null && idDates.size() == limitInt) {
+        if (query.afterId() != null && idDates.size() == limitInt) {
             nextBuilder = uriInfo.getRequestUriBuilder();
             nextBuilder.replaceQueryParam(PARAM_AFTER_ID, idDates.get(idDates.size() - 1).getId());
         } else {
@@ -341,8 +337,7 @@ public class MCRRestObjects {
             responseBuilder.link("next", nextBuilder.toString());
         }
 
-        return responseBuilder
-                .build();
+        return responseBuilder.build();
     }
 
     @POST

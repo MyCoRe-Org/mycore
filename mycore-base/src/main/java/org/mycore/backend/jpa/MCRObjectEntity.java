@@ -52,9 +52,6 @@ public class MCRObjectEntity {
 
     private Instant deleteddate;
 
-    public MCRObjectEntity() {
-    }
-
     @Id
     @Column(name = "objectid", length = MCRObjectID.MAX_LENGTH, nullable = false)
     @Basic

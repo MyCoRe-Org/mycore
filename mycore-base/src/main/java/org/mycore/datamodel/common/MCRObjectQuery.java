@@ -16,44 +16,36 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.tools.query;
+package org.mycore.datamodel.common;
 
 import java.time.Instant;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Used to Query a collection of mycore objects.
  */
 public class MCRObjectQuery {
 
-    public enum SortField {
-        ID,
-        MODIFIED,
-        CREATED
-    }
+    private String afterId = null;
 
-    public enum SortDirection {
-        ASC, DESC
-    }
-
-
-    public MCRObjectQuery() {
-    }
-
-    private String lastId = null;
     private int offset = -1;
+
     private int limit = -1;
 
     private int numberGreater = -1;
 
     private int numberLess = -1;
+
     private String type = null;
+
     private String project = null;
+
     private String status = null;
 
-    private SortField sortBy;
+    private SortBy sortBy;
 
-    private SortDirection sortAsc;
+    private SortOrder sortOrder;
 
     private Instant modifiedBefore;
 
@@ -73,12 +65,14 @@ public class MCRObjectQuery {
 
     private String deletedBy;
 
-    public String lastId() {
-        return lastId;
+    private final List<String> includeCategories = new ArrayList<>();
+
+    public String afterId() {
+        return afterId;
     }
 
-    public MCRObjectQuery lastId(String lastId) {
-        this.lastId = lastId;
+    public MCRObjectQuery afterId(String lastId) {
+        this.afterId = lastId;
         return this;
     }
 
@@ -127,18 +121,18 @@ public class MCRObjectQuery {
         return this;
     }
 
-    public MCRObjectQuery sort(SortField sortBy, SortDirection asc){
-        this.sortAsc = asc;
+    public MCRObjectQuery sort(SortBy sortBy, SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
         this.sortBy = sortBy;
         return this;
     }
 
-    public SortField sortBy() {
+    public SortBy sortBy() {
         return sortBy;
     }
 
-    public SortDirection sortAsc() {
-        return sortAsc;
+    public SortOrder sortAsc() {
+        return sortOrder;
     }
 
     public Instant modifiedBefore() {
@@ -213,7 +207,6 @@ public class MCRObjectQuery {
         return this;
     }
 
-
     public String deletedBy() {
         return deletedBy;
     }
@@ -239,5 +232,20 @@ public class MCRObjectQuery {
     public MCRObjectQuery numberLess(int numberLess) {
         this.numberLess = numberLess;
         return this;
+    }
+
+    public List<String> getIncludeCategories() {
+        return includeCategories;
+    }
+
+    public enum SortBy {
+        id,
+        modified,
+        created
+    }
+
+    public enum SortOrder {
+        asc,
+        desc
     }
 }

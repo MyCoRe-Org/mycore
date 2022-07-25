@@ -16,9 +16,9 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.tools.query;
+package org.mycore.datamodel.common;
 
-import org.mycore.datamodel.common.MCRObjectIDDate;
+import org.mycore.common.config.MCRConfiguration2;
 
 import java.util.List;
 
@@ -29,4 +29,16 @@ public interface MCRObjectQueryResolver {
     List<MCRObjectIDDate> getIdDates(MCRObjectQuery objectQuery);
 
     int count(MCRObjectQuery objectQuery);
+
+    static MCRObjectQueryResolver getInstance() {
+        return InstanceHolder.RESOLVER;
+    }
+
+    class InstanceHolder {
+        private static final String QUERY_RESOLVER_CLASS_PROPERTY = "MCR.Object.QueryResolver.Class";
+
+        private static final MCRObjectQueryResolver RESOLVER =
+                MCRConfiguration2.<MCRObjectQueryResolver>getSingleInstanceOf(QUERY_RESOLVER_CLASS_PROPERTY)
+                .orElseThrow(() -> MCRConfiguration2.createConfigurationException(QUERY_RESOLVER_CLASS_PROPERTY));
+    }
 }
