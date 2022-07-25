@@ -22,6 +22,9 @@ import org.mycore.common.config.MCRConfiguration2;
 
 import java.util.List;
 
+/**
+ * Allows to query objects using {@link MCRObjectQuery}.
+ */
 public interface MCRObjectQueryResolver {
 
     List<String> getIds(MCRObjectQuery objectQuery);
