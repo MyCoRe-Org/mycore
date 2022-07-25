@@ -108,8 +108,8 @@ public class MCRObjectEntityManager {
 
         entity.setCreateDate(service.getDate(MCRObjectService.DATE_TYPE_CREATEDATE).toInstant());
         entity.setModifyDate(service.getDate(MCRObjectService.DATE_TYPE_MODIFYDATE).toInstant());
-        entity.setCreatedBy(service.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY).stream().findFirst().get());
-        entity.setModifiedBy(service.getFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY).stream().findFirst().get());
+        service.getFlags(MCRObjectService.FLAG_TYPE_CREATEDBY).stream().findFirst().ifPresent(entity::setCreatedBy);
+        service.getFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY).stream().findFirst().ifPresent(entity::setModifiedBy);
         entity.setState(Optional.ofNullable(service.getState()).map(MCRCategoryID::toString).orElse(null));
         entity.setDeletedBy(null);
         entity.setDeleteddate(null);
