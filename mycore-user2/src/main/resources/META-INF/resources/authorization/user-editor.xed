@@ -77,6 +77,13 @@
     <mcruser:template name="cancelButton" i18n="component.user2.button.cancel" />
   </xed:template>
 
+  <xed:template id="buttons.password">
+    <xed:if test="string-length(@realm)=0 or @realm='local'">
+      <mcruser:template name="submitButton" i18n="component.user2.button.save" target="servlet" href="MCRUserServlet" />
+    </xed:if>
+    <mcruser:template name="cancelButton" i18n="component.user2.button.cancel" />
+  </xed:template>
+
   <!-- editor elements -->
 
   <xed:template id="userAccount">
@@ -108,16 +115,25 @@
   </xed:template>
 
   <xed:template id="passwords">
-    <mcruser:template name="passwordInput" xpath="password" id="password" i18n="component.user2.admin.password" i18n.error="component.user2.admin.inputhints.password"
-      required="true" matches="[\S]*" />
-    <mcruser:template name="passwordInput" xpath="password2" id="password2" i18n="component.user2.admin.passwordRepeat" i18n.error="component.user2.admin.inputhints.password"
-      required="true" matches="[\S]*" />
+    <xed:choose>
+      <xed:when test="string-length(@realm)=0 or @realm='local'">
+        <mcruser:template name="passwordInput" xpath="password" id="password" i18n="component.user2.admin.password" i18n.error="component.user2.admin.inputhints.password"
+          required="true" matches="[\S]*" />
+        <mcruser:template name="passwordInput" xpath="password2" id="password2" i18n="component.user2.admin.passwordRepeat" i18n.error="component.user2.admin.inputhints.password"
+          required="true" matches="[\S]*" />
 
-    <xed:validate xpath="user/password" display="global"
-      test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (. = ../password2 ) and (. != ../@name))"
-      i18n="component.user2.admin.inputhints.passwordLocalUsers" />
-    <xed:validate xpath="user/password2" display="global"
-      test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (../password = . ) and (. != ../@name))" />
+        <xed:validate xpath="user/password" display="global"
+          test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (. = ../password2 ) and (. != ../@name))"
+          i18n="component.user2.admin.inputhints.passwordLocalUsers" />
+        <xed:validate xpath="user/password2" display="global"
+          test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (../password = . ) and (. != ../@name))" />
+      </xed:when>
+      <xed:otherwise>
+        <div class="alert alert-info">
+          <xed:output i18n="component.user2.changePassword.unavailable" />
+        </div>
+      </xed:otherwise>
+    </xed:choose>
   </xed:template>
 
   <xed:template id="passwordHint">
