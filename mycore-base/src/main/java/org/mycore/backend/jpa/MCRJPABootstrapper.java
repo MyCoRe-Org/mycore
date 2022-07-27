@@ -115,7 +115,7 @@ public class MCRJPABootstrapper implements AutoExecutable {
             .collect(Collectors.toList());
         if (!unMappedEntities.isEmpty()) {
             LogManager.getLogger()
-                .error(() -> "JPA Mapping is inclomplete. Could not find a mapping for these classes: "
+                .error(() -> "JPA Mapping is incomplete. Could not find a mapping for these classes: "
                     + unMappedEntities);
             LogManager.getLogger()
                 .error(() -> "Could not initialize JPA. Database access is disabled in this session.");
