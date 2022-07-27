@@ -51,11 +51,11 @@ public abstract class MCRUploadHelper {
 
     public static final Predicate<String> FILE_NAME_PREDICATE = initializePredicate();
 
-    public static final String FILE_NAME_PATTERN = "MCR.FileUpload.FileNamePattern";
+    public static final String FILE_NAME_PATTERN_PROPERTY = "MCR.FileUpload.FileNamePattern";
 
 
     private static Predicate<String> initializePredicate() {
-        String patternString = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN);
+        String patternString = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN_PROPERTY);
         return Pattern.compile(patternString).asMatchPredicate();
     }
 
@@ -74,17 +74,21 @@ public abstract class MCRUploadHelper {
 
     private static final int SAVE_LENGTH = Stream.of(RESERVED_NAMES).mapToInt(String::length).max().getAsInt();
 
+
+
     /**
      * checks if path contains reserved URI characters or path starts or ends with whitespace. There are some characters
      * that are maybe allowed in file names but are reserved in URIs.
-     * 
+     *
      * @see <a href="http://tools.ietf.org/html/rfc3986#section-2.2">RFC3986, Section 2.2</a>
      * @param path
      *            complete path name
+     * @param checkFilePattern
+     *            checks if the file matches the pattern defined in the property {@link #FILE_NAME_PATTERN_PROPERTY}
      * @throws MCRException
      *             if path contains reserved character
      */
-    public static void checkPathName(String path) throws MCRException {
+    public static void checkPathName(String path, boolean checkFilePattern) throws MCRException {
         if (path.contains("../") || path.contains("..\\")) {
             throw new MCRException("File path " + path + " may not contain \"../\".");
         }
@@ -98,9 +102,18 @@ public abstract class MCRUploadHelper {
             checkInvalidCharacters(pathElement);
         });
         String actualFileName = pathPart.get(pathPart.size() - 1);
-        if(!FILE_NAME_PREDICATE.test(actualFileName)){
-            throw  new MCRException("File name does not match " + FILE_NAME_PATTERN + "!");
+        if(checkFilePattern && !FILE_NAME_PREDICATE.test(actualFileName)){
+            throw  new MCRException("File name does not match " + FILE_NAME_PATTERN_PROPERTY + "!");
         }
+    }
+
+    /**
+     * see {@link #checkPathName(String, boolean)} checkFilePattern=true
+     * @param path
+     * @throws MCRException
+     */
+    public static void checkPathName(String path) throws MCRException {
+        checkPathName(path, true);
     }
 
     private static Stream<String> splitPath(String path) {
