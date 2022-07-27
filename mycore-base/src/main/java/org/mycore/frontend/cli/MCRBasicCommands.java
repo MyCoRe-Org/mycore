@@ -240,6 +240,7 @@ public class MCRBasicCommands {
         try {
             File persistenceXMLFile = MCRConfigurationDir.getConfigFile("resources/META-INF/persistence.xml");
             if (Files.exists(persistenceXMLFile.toPath())) {
+                boolean modified = false;
                 SAXBuilder sb = new SAXBuilder();
                 Document doc = sb.build(persistenceXMLFile);
                 Namespace nsPersistence = doc.getRootElement().getNamespace();
@@ -258,6 +259,7 @@ public class MCRBasicCommands {
                 if (oldMappings.size() > mappingElements.size()) {
                     LOGGER.warn(Integer.toString(oldMappings.size() - mappingElements.size())
                         + " unknown mapping files removed from '" + persistenceXMLFile.toString() + "'.");
+                    modified = true;
                 }
 
                 List<String> newMappings = new ArrayList<String>();
@@ -284,13 +286,17 @@ public class MCRBasicCommands {
                         Element eMappingFile = new Element("mapping-file", nsPersistence).setText(mappingFile);
                         ePersistenceUnit.addContent(++pos, eMappingFile);
                     }
+
                     LOGGER
                         .warn(newMappings.size() + " mapping files added to '" + persistenceXMLFile.toString() + "'.");
+                    modified = true;
                 }
 
-                XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-                try (BufferedWriter bw = Files.newBufferedWriter(persistenceXMLFile.toPath())) {
-                    out.output(doc, bw);
+                if (modified) {
+                    XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+                    try (BufferedWriter bw = Files.newBufferedWriter(persistenceXMLFile.toPath())) {
+                        out.output(doc, bw);
+                    }
                 }
 
             } else {
