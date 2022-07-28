@@ -409,41 +409,42 @@ public class MCRRestDerivates {
         LOGGER.debug(der);
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
         boolean modified = false;
+
         if (der.getOrder() != -1
             && derivate.getOrder() != der.getOrder()) {
             modified = true;
             derivate.setOrder(der.getOrder());
         }
+        
         if (der.getMainDoc() != null
             && !der.getMainDoc().equals(derivate.getDerivate().getInternals().getMainDoc())) {
             modified = true;
             derivate.getDerivate().getInternals().setMainDoc(der.getMainDoc());
         }
 
-        if (!der.getClassifications().isEmpty()) {
-            List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
-                .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
-                .collect(Collectors.toList());
-            if (oldClassifications.size() != der.getClassifications().size()
-                || !oldClassifications.containsAll(der.getClassifications())) {
-                modified = true;
-                derivate.getDerivate().getClassifications().clear();
-                derivate.getDerivate().getClassifications()
-                    .addAll(der.getClassifications().stream()
-                        .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
-                        .collect(Collectors.toList()));
-            }
+        List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
+            .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
+            .collect(Collectors.toList());
+        if (!der.getClassifications().isEmpty()
+            && (oldClassifications.size() != der.getClassifications().size()
+                || !oldClassifications.containsAll(der.getClassifications()))) {
+            modified = true;
+            derivate.getDerivate().getClassifications().clear();
+            derivate.getDerivate().getClassifications()
+                .addAll(der.getClassifications().stream()
+                    .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
+                    .collect(Collectors.toList()));
         }
-        if (!der.getTitles().isEmpty()) {
-            List<MCRMetaLangText> newTitles = der.getTitles().stream()
-                .map(DerivateTitle::toMetaLangText)
-                .collect(Collectors.toList());
-            if (derivate.getDerivate().getTitleSize() != newTitles.size()
-                || !derivate.getDerivate().getTitles().containsAll(newTitles)) {
-                modified = true;
-                derivate.getDerivate().getTitles().clear();
-                derivate.getDerivate().getTitles().addAll(newTitles);
-            }
+
+        List<MCRMetaLangText> newTitles = der.getTitles().stream()
+            .map(DerivateTitle::toMetaLangText)
+            .collect(Collectors.toList());
+        if (!newTitles.isEmpty()
+            && (derivate.getDerivate().getTitleSize() != newTitles.size()
+                || !derivate.getDerivate().getTitles().containsAll(newTitles))) {
+            modified = true;
+            derivate.getDerivate().getTitles().clear();
+            derivate.getDerivate().getTitles().addAll(newTitles);
         }
 
         if (modified) {
