@@ -27,11 +27,13 @@ import java.util.Locale;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.datamodel.niofs.utils.MCRRecursiveDeleter;
+import org.mycore.frontend.fileupload.MCRUploadHelper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,6 +45,9 @@ public class MCRDerivateServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
+    public static final String TODO_SMOVFILE = "smovfile";
+
+
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
@@ -52,7 +57,8 @@ public class MCRDerivateServlet extends MCRServlet {
             return;
         }
         String derivateId = getProperty(request, "derivateid");
-        if (performTask(job, getProperty(request, "todo"), derivateId, getProperty(request, "file"))) {
+        if (performTask(job, getProperty(request, "todo"), derivateId, getProperty(request, "file"),
+            getProperty(request, "file2"))) {
             String url = request.getParameter("url");
             if (url != null && ("".equals(url))) {
                 response.sendError(HttpServletResponse.SC_NO_CONTENT, "Parameter 'url' is set but empty!");
@@ -74,10 +80,12 @@ public class MCRDerivateServlet extends MCRServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter \"derivateid\" is not provided");
         } else if (getProperty(request, "file") == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter \"file\" is not provided");
+        } else if (getProperty(request, "todo").equals(TODO_SMOVFILE) && getProperty(request, "file2") == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter \"file2\" is not provided");
         }
     }
 
-    private boolean performTask(MCRServletJob job, String task, String myCoreDerivateId, String file)
+    private boolean performTask(MCRServletJob job, String task, String myCoreDerivateId, String file, String file2)
         throws IOException, MCRAccessException {
         switch (task) {
             case "ssetfile":
@@ -85,6 +93,9 @@ public class MCRDerivateServlet extends MCRServlet {
                 break;
             case "sdelfile":
                 deleteFile(myCoreDerivateId, file, job.getResponse());
+                break;
+            case TODO_SMOVFILE:
+                moveFile(myCoreDerivateId, file, file2, job.getResponse());
                 break;
             default:
                 job.getResponse()
@@ -130,6 +141,46 @@ public class MCRDerivateServlet extends MCRServlet {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, String.format(Locale.ENGLISH, "User has not the \""
                 + PERMISSION_DELETE + "\" permission on object %s.", derivateId));
         }
+    }
+
+    private void moveFile(String derivateId, String file, String target, HttpServletResponse response)
+        throws IOException {
+        if (!MCRAccessManager.checkPermission(derivateId, PERMISSION_DELETE)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, String.format(Locale.ENGLISH,
+                "User has not the \"%s\" permission on object %s.", PERMISSION_DELETE, derivateId));
+            return;
+        }
+
+        if (!MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, String.format(Locale.ENGLISH,
+                "User has not the \"%s\" permission on object %s.", PERMISSION_WRITE, derivateId));
+            return;
+        }
+        MCRPath pathFrom = MCRPath.getPath(derivateId, file);
+        MCRPath pathTo = MCRPath.getPath(derivateId, target);
+
+        if (Files.exists(pathTo)) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format(Locale.ENGLISH,
+                "The File %s already exists!", pathTo));
+            return;
+        }
+
+        if (Files.isDirectory(pathFrom)) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format(Locale.ENGLISH,
+                "Renaming directory %s is not supported!", pathFrom));
+            return;
+        }
+
+        String newName = pathTo.getFileName().toString();
+        try{
+            MCRUploadHelper.checkPathName(newName);
+        } catch (MCRException ex) {
+            String message = ex.getMessage();
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            return;
+        }
+
+        Files.move(pathFrom, pathTo);
     }
 
 }

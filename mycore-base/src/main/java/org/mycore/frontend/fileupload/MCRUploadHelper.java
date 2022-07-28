@@ -20,7 +20,9 @@ package org.mycore.frontend.fileupload;
 
 import java.io.File;
 import java.nio.CharBuffer;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -30,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 
 import jakarta.persistence.EntityTransaction;
 
@@ -45,6 +48,13 @@ public abstract class MCRUploadHelper {
     private static final Logger LOGGER = LogManager.getLogger(MCRUploadHelper.class);
 
     private static final Pattern PATH_SEPERATOR = Pattern.compile(Pattern.quote(File.separator.replace('\\', '/')));
+
+
+    public static final String FILE_NAME_PATTERN_PROPERTY = "MCR.FileUpload.FileNamePattern";
+
+    public static final String FILE_NAME_PATTERN = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN_PROPERTY);
+
+    public static final Predicate<String> FILE_NAME_PREDICATE = Pattern.compile(FILE_NAME_PATTERN).asMatchPredicate();
 
     /**
      * reserved URI characters should not be in uploaded filenames. See RFC3986,
@@ -64,18 +74,22 @@ public abstract class MCRUploadHelper {
     /**
      * checks if path contains reserved URI characters or path starts or ends with whitespace. There are some characters
      * that are maybe allowed in file names but are reserved in URIs.
-     * 
+     *
      * @see <a href="http://tools.ietf.org/html/rfc3986#section-2.2">RFC3986, Section 2.2</a>
      * @param path
      *            complete path name
+     * @param checkFilePattern
+     *            checks if the last path element matches the pattern
+     *            defined in the property {@link #FILE_NAME_PATTERN_PROPERTY}
      * @throws MCRException
      *             if path contains reserved character
      */
-    public static void checkPathName(String path) throws MCRException {
+    public static void checkPathName(String path, boolean checkFilePattern) throws MCRException {
         if (path.contains("../") || path.contains("..\\")) {
             throw new MCRException("File path " + path + " may not contain \"../\".");
         }
-        splitPath(path).forEach(pathElement -> {
+        List<String> pathParts = splitPath(path).collect(Collectors.toList());
+        pathParts.forEach(pathElement -> {
             checkNotEmpty(path, pathElement);
             checkOnlyDots(path, pathElement);
             checkTrimmed(pathElement);
@@ -83,6 +97,20 @@ public abstract class MCRUploadHelper {
             checkReservedNames(pathElement);
             checkInvalidCharacters(pathElement);
         });
+        String actualFileName = pathParts.get(pathParts.size() - 1);
+        if(checkFilePattern && !FILE_NAME_PREDICATE.test(actualFileName)){
+            throw new MCRException(
+                "File name does not match " + FILE_NAME_PATTERN + " defined in " + FILE_NAME_PATTERN_PROPERTY + "!");
+        }
+    }
+
+    /**
+     * see {@link #checkPathName(String, boolean)} checkFilePattern=true
+     * @param path
+     * @throws MCRException
+     */
+    public static void checkPathName(String path) throws MCRException {
+        checkPathName(path, true);
     }
 
     private static Stream<String> splitPath(String path) {
