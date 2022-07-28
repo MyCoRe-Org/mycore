@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -74,6 +76,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
+import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
@@ -82,6 +85,10 @@ import org.mycore.restapi.converter.MCRObjectIDParamConverterProvider;
 import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -387,6 +394,286 @@ public class MCRRestDerivates {
             }
         }
         return Response.created(uriInfo.getAbsolutePathBuilder().path(derId.toString()).build()).build();
+    }
+
+    /**
+     * This method updates a derivate.
+     * It uses a list of update statements in JSON Patch format. 
+     * JSON Patch is described in RFC 6902 (https://doi.org/10.17487/RFC6902)
+     * 
+     * Currently onyl the "add" method is implemented for the pathes
+     * "/maindoc", "/order", "/titles", "/classifications".
+     * 
+     * If a title or classification should be updated, the complete JSONArray
+     * has to be submitted again.
+     * 
+     * We may provide more operations to modify single elements in the list of
+     * titles or classifications.
+     * 
+     * @param operations - the body of the request in JSON Patch syntax
+     * @param derid - the ID of the MCRDerivate
+     * @return the HTTP response
+     * 
+     * @author Robert Stephan
+     */
+    @PATCH
+    @Operation(
+        summary = "Updates the metadata (or partial metadata) of the given derivate via JSON Patch (RFC 6902)",
+        responses = @ApiResponse(responseCode = "204",
+            headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the patched derivate")),
+        tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
+    @Consumes(MediaType.APPLICATION_JSON_PATCH_JSON)
+    @RequestBody(required = true,
+        content = @Content(mediaType = MediaType.APPLICATION_JSON_PATCH_JSON))
+    @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
+    @Path("/{" + PARAM_DERID + "}")
+    @MCRApiDraft("PartialMetadataUpdates")
+    public Response patchDerivate(String operations,
+        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
+        boolean modified = false;
+        try {
+            JsonArray patch = JsonParser.parseString(operations).getAsJsonArray();
+            for (JsonElement elOp : patch) {
+                JsonObject o = elOp.getAsJsonObject();
+                String opp = o.has("op") ? o.getAsJsonPrimitive("op").getAsString() : null;
+                String path = o.has("path") ? o.getAsJsonPrimitive("path").getAsString() : null;
+
+                if ("add".equals(opp)) {
+                    if ("/order".equals(path) && o.has("value")) {
+                        int order = o.getAsJsonPrimitive("value").getAsInt();
+                        if (order != derivate.getOrder()) {
+                            modified = true;
+                            derivate.setOrder(order);
+                        }
+                        continue;
+                    }
+                }
+                if ("/maindoc".equals(path) && o.has("value")) {
+                    String maindoc = o.getAsJsonPrimitive("value").getAsString();
+                    if (!maindoc.equals(derivate.getDerivate().getInternals().getMainDoc())) {
+                        modified = true;
+                        derivate.getDerivate().getInternals().setMainDoc(maindoc);
+                    }
+                    continue;
+                }
+                if ("/classifications".equals(path) && o.has("value")) {
+                    JsonArray jsonClassifications = o.getAsJsonArray("value");
+                    List<MCRCategoryID> newClassifications = new ArrayList<>();
+                    for (JsonElement elCl : jsonClassifications) {
+                        newClassifications
+                            .add(MCRCategoryID
+                                .fromString(elCl.getAsJsonObject().getAsJsonPrimitive("classid").getAsString()
+                                    + ":" + elCl.getAsJsonObject().getAsJsonPrimitive("categid").getAsString()));
+                    }
+                    if (!newClassifications.isEmpty()) {
+                        List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
+                            .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
+                            .collect(Collectors.toList());
+                        if (oldClassifications.size() != newClassifications.size()
+                            || !oldClassifications.containsAll(newClassifications)) {
+                            modified = true;
+                            derivate.getDerivate().getClassifications().clear();
+                            derivate.getDerivate().getClassifications()
+                                .addAll(newClassifications.stream()
+                                    .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
+                                    .collect(Collectors.toList()));
+                        }
+                    }
+                    continue;
+                }
+
+                if ("/titles".equals(path) && o.has("value")) {
+                    JsonArray jsonTitles = o.getAsJsonArray("value");
+                    List<MCRMetaLangText> newTitles = new ArrayList<>();
+                    for (JsonElement elTitle : jsonTitles) {
+                        newTitles
+                            .add(new MCRMetaLangText("title",
+                                elTitle.getAsJsonObject().getAsJsonPrimitive("lang").getAsString(),
+                                null, 0, null, elTitle.getAsJsonObject().getAsJsonPrimitive("text").getAsString()));
+                    }
+                    if (!newTitles.isEmpty()) {
+                        if (derivate.getDerivate().getTitleSize() != newTitles.size()
+                            || !derivate.getDerivate().getTitles().containsAll(newTitles)) {
+                            modified = true;
+                            derivate.getDerivate().getTitles().clear();
+                            derivate.getDerivate().getTitles().addAll(newTitles);
+                        }
+                    }
+                    continue;
+                }
+
+                //finally: if no operation has matched -> return an error
+                throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_INVALID_JSON_PATCH_SYNTAX)
+                    .withMessage("The patch for MCRDerivate " + derivate.getId() + " failed.")
+                    .withDetail("The following operation could not be processed: " + elOp.toString())
+                    .toException();
+            }
+        } catch (Exception e) {
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_INVALID_JSON_PATCH_SYNTAX)
+                .withMessage("The patch for MCRDerivate " + derivate.getId() + " failed.")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
+        }
+        if (modified) {
+            try {
+                MCRMetadataManager.update(derivate);
+            } catch (MCRAccessException e) {
+                throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+                    .withMessage("You may not update MCRDerivate " + derivate.getId() + ".")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
+            }
+        }
+        return Response.noContent().build();
+    }
+
+    /**
+     * This method updates a derivate.
+     * It uses an update object following the conventions of JSON Merge Patch format. 
+     * JSON Merge Patch is described in RFC 7386 (https://doi.org/10.17487/RFC7386)
+     * 
+     * Currently onyl the update of the following properties are implemented
+     * "maindoc", "order", "titles", "classifications".
+     * 
+     * If a title or classification should be updated, the complete JSONArray
+     * has to be submitted again.
+     * 
+     * @param updateObject - the body of the request in JSON Merge Patch syntax
+     * @param derid - the ID of the MCRDerivate
+     * @return the HTTP response
+     * 
+     * @author Robert Stephan
+     */
+    @PATCH
+    @Operation(
+        summary = "Updates the metadata (or partial metadata) of the given derivate via JSON Merge Patch (RFC 7386)",
+        responses = @ApiResponse(responseCode = "204",
+            headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the patched derivate")),
+        tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
+    @Consumes("application/merge-patch+json")
+    @RequestBody(required = true,
+        content = @Content(mediaType = "application/merge-patch+json"))
+    @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
+    @Path("/{" + PARAM_DERID + "}")
+    @MCRApiDraft("PartialMetadataUpdates")
+    public Response mergePatchDerivate(String updateObject,
+        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
+        boolean modified = false;
+        try {
+            JsonObject patch = JsonParser.parseString(updateObject).getAsJsonObject();
+            if (patch.has("order")) {
+                if (patch.get("order").isJsonNull()) {
+                    //set default value
+                    modified = true;
+                    derivate.setOrder(1);
+
+                } else {
+                    int order = patch.getAsJsonPrimitive("order").getAsInt();
+                    if (order != derivate.getOrder()) {
+                        modified = true;
+                        derivate.setOrder(order);
+                    }
+                }
+            }
+            if (patch.has("maindoc")) {
+                if (patch.get("maindoc").isJsonNull()) {
+                    //delete
+                    modified = true;
+                    derivate.getDerivate().getInternals().setMainDoc(null);
+
+                } else {
+                    String maindoc = patch.getAsJsonPrimitive("maindoc").getAsString();
+                    if (!maindoc.equals(derivate.getDerivate().getInternals().getMainDoc())) {
+                        modified = true;
+                        derivate.getDerivate().getInternals().setMainDoc(maindoc);
+                    }
+                }
+            }
+            if (patch.has("classifications")) {
+                if (patch.get("classifications").isJsonNull()) {
+                    //delete
+                    modified = true;
+                    derivate.getDerivate().getClassifications().clear();
+                } else {
+                    JsonArray jsonClassifications = patch.getAsJsonArray("classifications");
+                    List<MCRCategoryID> newClassifications = new ArrayList<>();
+                    for (JsonElement elCl : jsonClassifications) {
+                        newClassifications
+                            .add(MCRCategoryID
+                                .fromString(elCl.getAsJsonObject().getAsJsonPrimitive("classid").getAsString()
+                                    + ":" + elCl.getAsJsonObject().getAsJsonPrimitive("categid").getAsString()));
+                    }
+                    if (!newClassifications.isEmpty()) {
+                        List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
+                            .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
+                            .collect(Collectors.toList());
+                        if (oldClassifications.size() != newClassifications.size()
+                            || !oldClassifications.containsAll(newClassifications)) {
+                            modified = true;
+                            derivate.getDerivate().getClassifications().clear();
+                            derivate.getDerivate().getClassifications()
+                                .addAll(newClassifications.stream()
+                                    .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
+                                    .collect(Collectors.toList()));
+                        }
+                    }
+                }
+            }
+
+            if (patch.has("titles")) {
+                if (patch.get("titles").isJsonNull()) {
+                    //delete
+                    modified = true;
+                    derivate.getDerivate().getTitles().clear();
+                } else {
+                    JsonArray jsonTitles = patch.getAsJsonArray("titles");
+                    List<MCRMetaLangText> newTitles = new ArrayList<>();
+                    for (JsonElement elTitle : jsonTitles) {
+                        newTitles
+                            .add(new MCRMetaLangText("title",
+                                elTitle.getAsJsonObject().getAsJsonPrimitive("lang").getAsString(),
+                                null, 0, null, elTitle.getAsJsonObject().getAsJsonPrimitive("text").getAsString()));
+                    }
+                    if (!newTitles.isEmpty()) {
+                        if (derivate.getDerivate().getTitleSize() != newTitles.size()
+                            || !derivate.getDerivate().getTitles().containsAll(newTitles)) {
+                            modified = true;
+                            derivate.getDerivate().getTitles().clear();
+                            derivate.getDerivate().getTitles().addAll(newTitles);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw MCRErrorResponse.fromStatus(Response.Status.BAD_REQUEST.getStatusCode())
+                .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_INVALID_JSON_PATCH_SYNTAX)
+                .withMessage("The merge patch for MCRDerivate " + derivate.getId() + " failed.")
+                .withDetail(e.getMessage())
+                .withCause(e)
+                .toException();
+        }
+        if (modified) {
+            try {
+                MCRMetadataManager.update(derivate);
+            } catch (MCRAccessException e) {
+                throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+                    .withMessage("You may not update MCRDerivate " + derivate.getId() + ".")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
+            }
+        }
+        return Response.noContent().build();
     }
 
     @PUT
