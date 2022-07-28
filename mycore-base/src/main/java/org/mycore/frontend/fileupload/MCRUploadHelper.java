@@ -32,9 +32,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 
 import jakarta.persistence.EntityTransaction;
-import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Common helper class for all services handling file upload.
@@ -49,15 +49,12 @@ public abstract class MCRUploadHelper {
 
     private static final Pattern PATH_SEPERATOR = Pattern.compile(Pattern.quote(File.separator.replace('\\', '/')));
 
-    public static final Predicate<String> FILE_NAME_PREDICATE = initializePredicate();
 
     public static final String FILE_NAME_PATTERN_PROPERTY = "MCR.FileUpload.FileNamePattern";
 
+    public static final String FILE_NAME_PATTERN = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN_PROPERTY);
 
-    private static Predicate<String> initializePredicate() {
-        String patternString = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN_PROPERTY);
-        return Pattern.compile(patternString).asMatchPredicate();
-    }
+    public static final Predicate<String> FILE_NAME_PREDICATE = Pattern.compile(FILE_NAME_PATTERN).asMatchPredicate();
 
     /**
      * reserved URI characters should not be in uploaded filenames. See RFC3986,
@@ -74,8 +71,6 @@ public abstract class MCRUploadHelper {
 
     private static final int SAVE_LENGTH = Stream.of(RESERVED_NAMES).mapToInt(String::length).max().getAsInt();
 
-
-
     /**
      * checks if path contains reserved URI characters or path starts or ends with whitespace. There are some characters
      * that are maybe allowed in file names but are reserved in URIs.
@@ -84,7 +79,8 @@ public abstract class MCRUploadHelper {
      * @param path
      *            complete path name
      * @param checkFilePattern
-     *            checks if the file matches the pattern defined in the property {@link #FILE_NAME_PATTERN_PROPERTY}
+     *            checks if the last path element matches the pattern
+     *            defined in the property {@link #FILE_NAME_PATTERN_PROPERTY}
      * @throws MCRException
      *             if path contains reserved character
      */
@@ -92,8 +88,8 @@ public abstract class MCRUploadHelper {
         if (path.contains("../") || path.contains("..\\")) {
             throw new MCRException("File path " + path + " may not contain \"../\".");
         }
-        List<String> pathPart = splitPath(path).collect(Collectors.toList());
-        pathPart.forEach(pathElement -> {
+        List<String> pathParts = splitPath(path).collect(Collectors.toList());
+        pathParts.forEach(pathElement -> {
             checkNotEmpty(path, pathElement);
             checkOnlyDots(path, pathElement);
             checkTrimmed(pathElement);
@@ -101,9 +97,10 @@ public abstract class MCRUploadHelper {
             checkReservedNames(pathElement);
             checkInvalidCharacters(pathElement);
         });
-        String actualFileName = pathPart.get(pathPart.size() - 1);
+        String actualFileName = pathParts.get(pathParts.size() - 1);
         if(checkFilePattern && !FILE_NAME_PREDICATE.test(actualFileName)){
-            throw  new MCRException("File name does not match " + FILE_NAME_PATTERN_PROPERTY + "!");
+            throw new MCRException(
+                "File name does not match " + FILE_NAME_PATTERN + " defined in " + FILE_NAME_PATTERN_PROPERTY + "!");
         }
     }
 
