@@ -248,7 +248,7 @@ public class MCRBasicCommands {
                 List<Element> mappingElements = ePersistenceUnit
                     .getContent(Filters.element("mapping-file", nsPersistence));
                 List<String> oldMappings = mappingElements.stream()
-                    .map(x -> x.getTextNormalize())
+                    .map(Element::getTextNormalize)
                     .collect(Collectors.toList());
 
                 mappingElements
@@ -257,15 +257,15 @@ public class MCRBasicCommands {
                             (e.getTextNormalize().startsWith("/") ? "" : "/") + e.getTextNormalize()) == null);
 
                 if (oldMappings.size() > mappingElements.size()) {
-                    LOGGER.warn(Integer.toString(oldMappings.size() - mappingElements.size())
-                        + " unknown mapping files removed from '" + persistenceXMLFile.toString() + "'.");
+                    LOGGER.warn((oldMappings.size() - mappingElements.size())
+                        + " unknown mapping files removed from '" + persistenceXMLFile + "'.");
                     modified = true;
                 }
 
-                List<String> newMappings = new ArrayList<String>();
+                List<String> newMappings = new ArrayList<>();
                 for (MCRComponent cmp : MCRRuntimeComponentDetector.getAllComponents()) {
                     try (ZipInputStream zip = new ZipInputStream(Files.newInputStream(cmp.getJarFile().toPath()))) {
-                        ZipEntry ze = null;
+                        ZipEntry ze;
                         while ((ze = zip.getNextEntry()) != null) {
                             String zeName = ze.getName();
                             if (zeName.startsWith("META-INF/") && zeName.endsWith("-mappings.xml")
@@ -287,8 +287,7 @@ public class MCRBasicCommands {
                         ePersistenceUnit.addContent(++pos, eMappingFile);
                     }
 
-                    LOGGER
-                        .warn(newMappings.size() + " mapping files added to '" + persistenceXMLFile.toString() + "'.");
+                    LOGGER.warn(newMappings.size() + " mapping files added to '" + persistenceXMLFile + "'.");
                     modified = true;
                 }
 
@@ -300,8 +299,10 @@ public class MCRBasicCommands {
                 }
 
             } else {
-                LOGGER.warn("The config file '" + persistenceXMLFile.toString() + "' does not exist yet!");
+                LOGGER.warn("The config file '" + persistenceXMLFile + "' does not exist yet!");
             }
+        } catch (IOException ioe) {
+            throw ioe;
         } catch (Exception e) {
             throw new MCRException("Something went wrong updating the jpa configuration file", e);
         }
