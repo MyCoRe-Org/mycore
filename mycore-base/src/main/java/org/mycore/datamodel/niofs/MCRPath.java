@@ -96,6 +96,16 @@ public abstract class MCRPath implements Path {
     }
 
     /**
+     * Returns the root directory for a given derivate.
+     * 
+     * @param owner the file owner (usually the id of a derivate)
+     * @return the root path
+     */
+    public static MCRPath getRootPath(String owner) {
+        return getPath(owner, "/");
+    }
+
+    /**
      * removes redundant slashes and checks for invalid characters
      * @param uncleanPath path to check
      * @return normalized path
