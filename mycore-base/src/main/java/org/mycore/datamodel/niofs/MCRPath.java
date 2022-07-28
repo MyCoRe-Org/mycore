@@ -680,6 +680,7 @@ public abstract class MCRPath implements Path {
         throw new IOException("Cannot get real path from relative path.");
     }
 
+    @SuppressWarnings("resource")
     public Path toPhysicalPath() throws IOException {
         if (isAbsolute()) {
             for (FileStore fs : getFileSystem().getFileStores()) {
