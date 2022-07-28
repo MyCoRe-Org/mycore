@@ -45,7 +45,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 import com.google.common.primitives.Ints;
 
@@ -95,15 +94,15 @@ public abstract class MCRPath implements Path {
         Path resolved = MCRPaths.getPath(owner, path);
         return toMCRPath(resolved);
     }
-    
+
     /**
-     * Returns the root path for a given derivate.
+     * Returns the root directory for a given derivate.
      * 
-     * @param derivateId the id of the derivate
+     * @param owner the file owner (usually the id of a derivate)
      * @return the root path
      */
-    public static MCRPath getRootPathOfDerivate(MCRObjectID derivateId) {
-        return getPath(derivateId.toString(), "/");
+    public static MCRPath getRootPath(String owner) {
+        return getPath(owner, "/");
     }
 
     /**
