@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileStore;
+import java.nio.file.FileSystem;
 import java.nio.file.InvalidPathException;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -682,11 +683,13 @@ public abstract class MCRPath implements Path {
 
     public Path toPhysicalPath() throws IOException {
         if (isAbsolute()) {
-            for (FileStore fs : getFileSystem().getFileStores()) {
-                if (fs instanceof MCRAbstractFileStore) {
-                    Path physicalPath = ((MCRAbstractFileStore) fs).getPhysicalPath(this);
-                    if (physicalPath != null) {
-                        return physicalPath;
+            try (FileSystem fileSystem = getFileSystem()) {
+                for (FileStore fs : fileSystem.getFileStores()) {
+                    if (fs instanceof MCRAbstractFileStore) {
+                        Path physicalPath = ((MCRAbstractFileStore) fs).getPhysicalPath(this);
+                        if (physicalPath != null) {
+                            return physicalPath;
+                        }
                     }
                 }
             }
