@@ -37,6 +37,7 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.Comment;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
@@ -236,29 +237,23 @@ public class MCRBasicCommands {
     @MCRCommand(syntax = "reload mappings in jpa configuration file",
         help = "retrieves the mapping files from MyCoRe jars and adds them to the jpa configuration file.",
         order = 140)
-    public static void reloadJPAMappings() throws MCRException, IOException {
-        try {
-            File persistenceXMLFile = MCRConfigurationDir.getConfigFile("resources/META-INF/persistence.xml");
-            if (Files.exists(persistenceXMLFile.toPath())) {
-                SAXBuilder sb = new SAXBuilder();
-                Document persistenceDoc = sb.build(persistenceXMLFile);
-                boolean modified = updatePersistenceIfNeeded(persistenceDoc);
+    public static void reloadJPAMappings() throws IOException, JDOMException {
+        File persistenceXMLFile = MCRConfigurationDir.getConfigFile("resources/META-INF/persistence.xml");
+        if (Files.exists(persistenceXMLFile.toPath())) {
+            SAXBuilder sb = new SAXBuilder();
+            Document persistenceDoc = sb.build(persistenceXMLFile);
+            boolean modified = updatePersistenceIfNeeded(persistenceDoc);
 
-                if (modified) {
-                    LOGGER.warn("Updating " + persistenceXMLFile + " with new mappings.");
-                    XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-                    try (BufferedWriter bw = Files.newBufferedWriter(persistenceXMLFile.toPath())) {
-                        out.output(persistenceDoc, bw);
-                    }
+            if (modified) {
+                LOGGER.warn("Updating " + persistenceXMLFile + " with new mappings.");
+                XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+                try (BufferedWriter bw = Files.newBufferedWriter(persistenceXMLFile.toPath())) {
+                    out.output(persistenceDoc, bw);
                 }
-
-            } else {
-                LOGGER.warn("The config file '" + persistenceXMLFile + "' does not exist yet!");
             }
-        } catch (IOException ioe) {
-            throw ioe;
-        } catch (Exception e) {
-            throw new MCRException("Something went wrong updating the jpa configuration file", e);
+
+        } else {
+            LOGGER.warn("The config file '" + persistenceXMLFile + "' does not exist yet!");
         }
     }
 
