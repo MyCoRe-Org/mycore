@@ -34,7 +34,6 @@ import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.backend.hibernate.MCRHibernateConfigHelper;
-import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRStartupHandler.AutoExecutable;
@@ -115,8 +114,12 @@ public class MCRJPABootstrapper implements AutoExecutable {
             .filter(cName -> !mappedEntities.contains(cName))
             .collect(Collectors.toList());
         if (!unMappedEntities.isEmpty()) {
-            throw new MCRException(
-                "JPA Mapping is inclomplete. Could not find a mapping for these classes: " + unMappedEntities);
+            LogManager.getLogger()
+                .error(() -> "JPA Mapping is incomplete. Could not find a mapping for these classes: "
+                    + unMappedEntities);
+            LogManager.getLogger()
+                .error(() -> "Could not initialize JPA. Database access is disabled in this session.");
+            MCRConfiguration2.set("MCR.Persistence.Database.Enable", String.valueOf(false));
         }
     }
 

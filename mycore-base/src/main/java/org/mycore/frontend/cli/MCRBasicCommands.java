@@ -18,22 +18,37 @@
 
 package org.mycore.frontend.cli;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Comment;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRClassTools;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRComponent;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationDir;
+import org.mycore.common.config.MCRRuntimeComponentDetector;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRFileContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -217,6 +232,79 @@ public class MCRBasicCommands {
             IOUtils.copy(templateResource, fout);
             LOGGER.info("Created template for {} in {}", path, configurationDirectory);
         }
+    }
+
+    @MCRCommand(syntax = "reload mappings in jpa configuration file",
+        help = "retrieves the mapping files from MyCoRe jars and adds them to the jpa configuration file.",
+        order = 140)
+    public static void reloadJPAMappings() throws IOException, JDOMException {
+        File persistenceXMLFile = MCRConfigurationDir.getConfigFile("resources/META-INF/persistence.xml");
+        if (Files.exists(persistenceXMLFile.toPath())) {
+            SAXBuilder sb = new SAXBuilder();
+            Document persistenceDoc = sb.build(persistenceXMLFile);
+            boolean modified = updatePersistenceIfNeeded(persistenceDoc);
+
+            if (modified) {
+                LOGGER.warn("Updating " + persistenceXMLFile + " with new mappings.");
+                XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
+                try (BufferedWriter bw = Files.newBufferedWriter(persistenceXMLFile.toPath())) {
+                    out.output(persistenceDoc, bw);
+                }
+            }
+
+        } else {
+            LOGGER.warn("The config file '" + persistenceXMLFile + "' does not exist yet!");
+        }
+    }
+
+    private static boolean updatePersistenceIfNeeded(Document persistenceDoc) throws IOException {
+        Namespace nsPersistence = persistenceDoc.getRootElement().getNamespace();
+        Element ePersistenceUnit = persistenceDoc.getRootElement().getChild("persistence-unit", nsPersistence);
+        List<Element> mappingElements = ePersistenceUnit
+            .getContent(Filters.element("mapping-file", nsPersistence));
+        List<String> oldMappings = mappingElements.stream()
+            .map(Element::getTextNormalize)
+            .collect(Collectors.toList());
+
+        boolean modified = mappingElements
+            .removeIf(e -> e.getTextNormalize().endsWith("-mappings.xml")
+                && MCRBasicCommands.class.getResource(
+                    (e.getTextNormalize().startsWith("/") ? "" : "/") + e.getTextNormalize()) == null);
+
+        if (modified) {
+            LOGGER.warn((oldMappings.size() - mappingElements.size())
+                + " unknown mapping files removed.");
+        }
+
+        List<String> newMappings = new ArrayList<>();
+        for (MCRComponent cmp : MCRRuntimeComponentDetector.getAllComponents()) {
+            try (ZipInputStream zip = new ZipInputStream(Files.newInputStream(cmp.getJarFile().toPath()))) {
+                ZipEntry ze;
+                while ((ze = zip.getNextEntry()) != null) {
+                    String zeName = ze.getName();
+                    if (zeName.startsWith("META-INF/") && zeName.endsWith("-mappings.xml")
+                        && !oldMappings.contains(zeName)) {
+                        newMappings.add(zeName);
+                    }
+                }
+            }
+        }
+        if (!newMappings.isEmpty()) {
+            Comment c = new Comment(
+                " mapping files, added by command 'reload mappings in jpa configuration file' ");
+            ePersistenceUnit.getContent(Filters.comment()).removeIf(x -> x.getText().equals(c.getText()));
+            ePersistenceUnit.addContent(0, c);
+
+            int pos = 0;
+            for (String mappingFile : newMappings) {
+                Element eMappingFile = new Element("mapping-file", nsPersistence).setText(mappingFile);
+                ePersistenceUnit.addContent(++pos, eMappingFile);
+            }
+
+            LOGGER.warn(newMappings.size() + " mapping files added.");
+            modified = true;
+        }
+        return modified;
     }
 
     /**
