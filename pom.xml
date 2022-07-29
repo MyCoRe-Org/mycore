@@ -4,10 +4,10 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore-parent</artifactId>
-    <version>49</version>
+    <version>50-SNAPSHOT</version>
   </parent>
   <artifactId>mycore</artifactId>
-  <version>2022.05</version>
+  <version>2022.06.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>MyCoRe</name>
   <description xml:space="preserve">
@@ -29,7 +29,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <connection>scm:git:https://github.com/MyCoRe-Org/mycore.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/mycore.git</developerConnection>
     <url>https://github.com/MyCoRe-Org/mycore</url>
-    <tag>v2022.05</tag>
+    <tag>HEAD</tag>
   </scm>
   <properties>
     <argLine />
