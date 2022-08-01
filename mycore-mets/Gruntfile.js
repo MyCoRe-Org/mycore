@@ -155,7 +155,10 @@ module.exports = function (grunt) {
                     '<%= properties.webVisiblePath %>/shared/angular-mocks/angular-mocks.js',
                     '<%= properties.outputPath %>/js/MetsEditor.js'],
                 options: {
-                    specs: '<%= properties.outputPath %>/js/MetsEditor-tests.js'
+                    specs: '<%= properties.outputPath %>/js/MetsEditor-tests.js',
+                    sandboxArgs: {
+                        args: ['--no-sandbox', '--disable-setuid-sandbox']
+                    }
                 }
             }
         },
