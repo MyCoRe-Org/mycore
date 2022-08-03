@@ -75,6 +75,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
+import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
@@ -403,6 +404,7 @@ public class MCRRestDerivates {
     @MCRRequireTransaction
     @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
     @Path("/{" + PARAM_DERID + "}")
+    @MCRApiDraft("MCRPatchDerivate")
     public Response patchDerivate(@BeanParam DerivateMetadata der,
         @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
 
