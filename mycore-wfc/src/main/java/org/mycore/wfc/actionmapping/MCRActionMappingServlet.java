@@ -36,7 +36,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  *
  */
-@WebServlet(name = "Action Mapping", urlPatterns = { "/servlets/MCRActionMappingServlet/*" })
 public class MCRActionMappingServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
