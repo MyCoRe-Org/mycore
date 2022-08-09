@@ -1,5 +1,8 @@
-<web-fragment xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd" version="3.0" metadata-complete="true">
+<web-fragment version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
+  metadata-complete="true">
+
   <servlet id="MCRUserServlet">
     <servlet-name>MCRUserServlet</servlet-name>
     <servlet-class>org.mycore.user2.MCRUserServlet</servlet-class>
@@ -35,7 +38,7 @@
     <servlet-name>MCRServlet3LoginServlet</servlet-name>
     <url-pattern>/servlets/MCRServlet3LoginServlet</url-pattern>
   </servlet-mapping>
-  
+
   <servlet id="MCRShibbolethLoginServlet">
     <servlet-name>MCRShibbolethLoginServlet</servlet-name>
     <servlet-class>org.mycore.user2.login.MCRShibbolethLoginServlet</servlet-class>
@@ -44,5 +47,5 @@
     <servlet-name>MCRShibbolethLoginServlet</servlet-name>
     <url-pattern>/servlets/MCRShibbolethLoginServlet</url-pattern>
   </servlet-mapping>
-  
+
 </web-fragment>
