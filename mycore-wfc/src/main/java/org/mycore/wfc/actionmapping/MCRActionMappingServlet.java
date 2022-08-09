@@ -26,7 +26,6 @@ import org.mycore.frontend.servlets.MCRServletJob;
 
 import com.google.common.base.Splitter;
 
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
