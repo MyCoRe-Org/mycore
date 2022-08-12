@@ -20,6 +20,8 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -30,6 +32,9 @@ import org.apache.logging.log4j.Logger;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRDeveloperTools;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.frontend.MCRLayoutUtilities;
@@ -57,16 +62,28 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         String webpageID = getWebpageId(job.getRequest());
         boolean hasAccess = MCRLayoutUtilities.webpageAccess(READ_WEBPAGE_PERMISSION, webpageID, true);
         if (!hasAccess) {
-            job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
-        URL resource = resolveResource(job);
-        if (resource != null) {
-            HttpServletRequest request = job.getRequest();
             HttpServletResponse response = job.getResponse();
-            setXSLParameters(resource, request);
-            MCRContent content = getResourceContent(request, response, resource);
-            getLayoutService().doLayout(request, response, content);
+            MCRUserInformation currentUser = MCRSessionMgr.getCurrentSession().getUserInformation();
+            if (currentUser.equals(MCRSystemUserInformation.getGuestInstance())) {
+                String redirectTarget = "/servlets/MCRLoginServlet?url="
+                    + URLEncoder.encode(webpageID, StandardCharsets.UTF_8)
+                    + "&XSL.Status.Message=component.base.webpage.notLoggedIn"
+                    + "&XSL.Status.Style=danger";
+                String redirectUrl = response.encodeRedirectURL(redirectTarget);
+                response.setStatus(403);
+                response.sendRedirect(redirectUrl);
+            } else {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            }
+        } else {
+            URL resource = resolveResource(job);
+            if (resource != null) {
+                HttpServletRequest request = job.getRequest();
+                HttpServletResponse response = job.getResponse();
+                setXSLParameters(resource, request);
+                MCRContent content = getResourceContent(request, response, resource);
+                getLayoutService().doLayout(request, response, content);
+            }
         }
     }
 
