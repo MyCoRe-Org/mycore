@@ -30,13 +30,7 @@ import jakarta.persistence.Id;
 @Entity
 public class MCRObjectEntity {
 
-    private String objectId;
-
-    private String objectProject;
-
-    private String objectType;
-
-    private int objectNumber;
+    private MCRObjectID objectID;
 
     private String state;
 
@@ -56,38 +50,38 @@ public class MCRObjectEntity {
     @Column(name = "objectid", length = MCRObjectID.MAX_LENGTH, nullable = false)
     @Basic
     public String getObjectId() {
-        return objectId;
+        return objectID.toString();
     }
 
     public void setObjectId(String objectId) {
-        this.objectId = objectId;
+        this.objectID = MCRObjectID.getInstance(objectId);
     }
 
     @Column(name = "objectproject")
     public String getObjectProject() {
-        return objectProject;
+        return this.objectID.getProjectId();
     }
 
     public void setObjectProject(String objectProject) {
-        this.objectProject = objectProject;
+        // read only value
     }
 
     @Column(name = "objecttype")
     public String getObjectType() {
-        return objectType;
+        return this.objectID.getTypeId();
     }
 
     public void setObjectType(String objectType) {
-        this.objectType = objectType;
+        // read only value
     }
 
     @Column(name = "objectnumber")
     public int getObjectNumber() {
-        return objectNumber;
+        return this.objectID.getNumberAsInteger();
     }
 
     public void setObjectNumber(int objectNumber) {
-        this.objectNumber = objectNumber;
+        // read only value
     }
 
     @Column(name = "createdate")
