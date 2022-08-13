@@ -27,9 +27,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
+import org.mycore.pi.MCRPIServiceManager;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
 
@@ -46,6 +49,8 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
     private static final String PURL_USER_CONFIG = "Username";
 
     private static final String PURL_PASSWORD_CONFIG = "Password";
+
+    private static final String PURL_MANAGER_CLASS = "PURLManager";
 
     private static final String PURL_BASE_URL = "RegisterBaseURL";
 
@@ -67,8 +72,8 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
 
         doWithPURLManager(
             manager -> manager
-                .registerNewPURL(purl.getUrl().getPath(), buildTargetURL(idString), "302", getProperties().getOrDefault(
-                    PURL_MAINTAINER_CONFIG, "test")));
+                .registerNewPURL(purl.getUrl().getPath(), buildTargetURL(idString), "302",
+                    getProperties().getOrDefault(PURL_MAINTAINER_CONFIG, "test")));
         this.updateStartRegistrationDate(MCRObjectID.getInstance(idString), "", new Date());
     }
 
@@ -186,14 +191,26 @@ public class MCRPURLService extends MCRPIJobService<MCRPURL> {
         String serverURL = props.get(PURL_SERVER_CONFIG);
         String username = props.get(PURL_USER_CONFIG);
         String password = props.get(PURL_PASSWORD_CONFIG);
-
-        MCRPURLManager manager = new MCRPURLManager();
+        MCRPURLManager manager = instantiatePURLManager();
         manager.login(serverURL, username, password);
 
         try {
             action.accept(manager);
         } finally {
             manager.logout();
+        }
+    }
+
+    MCRPURLManager instantiatePURLManager() {
+        final String prop = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX
+            + getServiceID() + "." + PURL_MANAGER_CLASS;
+        final String propDefault = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX
+            + "DefaultPURL." + PURL_MANAGER_CLASS;
+        try {
+            return (MCRPURLManager) MCRConfiguration2.getInstanceOf(prop)
+                .orElse(MCRConfiguration2.getInstanceOf(propDefault).orElseThrow());
+        } catch (Exception e) {
+            throw new MCRException("Could not instantiate PURLManager for " + prop, e);
         }
     }
 }
