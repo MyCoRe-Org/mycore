@@ -394,8 +394,7 @@ public class MCRRestDerivates {
     @PATCH
     @Operation(
         summary = "Updates the metadata (or partial metadata) of the given derivate",
-        responses = @ApiResponse(responseCode = "201",
-            headers = @Header(name = HttpHeaders.LOCATION, description = "URL of the new derivate")),
+        responses = @ApiResponse(responseCode = "204"),
         tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @RequestBody(required = true,
