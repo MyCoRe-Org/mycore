@@ -49,11 +49,7 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
         final List<String> services = registered.stream().map(MCRPIRegistrationInfo::getService)
             .collect(Collectors.toList());
 
-        //collect all services, which want to create new PIs and are allowed to do so
-        //this avoids cases  where one service does modifications 
-        //which could change the result of the filter method for other services
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        List<MCRPIJobService> listOfServicesWithCreatablePIs = MCRPIServiceManager.getInstance()
+        List<MCRPIJobService<MCRPersistentIdentifier>> listOfServicesWithCreatablePIs = MCRPIServiceManager.getInstance()
             .getAutoCreationList().stream()
             .filter(Predicate.not(s -> services.contains(s.getServiceID())))
             .filter(s -> s.getCreationPredicate().test(obj))
