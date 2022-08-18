@@ -35,26 +35,37 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        this.handleObjectUpdated(evt, obj);
+        processPIServices(obj);
     }
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        processPIServices(obj);
+    }
+
+    private void processPIServices(MCRObject obj) {
         List<MCRPIRegistrationInfo> registered = MCRPIManager.getInstance().getRegistered(obj);
 
         final List<String> services = registered.stream().map(MCRPIRegistrationInfo::getService)
             .collect(Collectors.toList());
 
-        MCRPIServiceManager.getInstance().getAutoCreationList().stream()
-            .filter(Predicate.not(services::contains))
+        //collect all services, which want to create new PIs and are allowed to do so
+        //this avoids cases  where one service does modifications 
+        //which could change the result of the filter method for other services
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        List<MCRPIJobService> listOfServicesWithCreatablePIs = MCRPIServiceManager.getInstance()
+            .getAutoCreationList().stream()
+            .filter(Predicate.not(s -> services.contains(s.getServiceID())))
             .filter(s -> s.getCreationPredicate().test(obj))
-            .forEach((serviceToRegister) -> {
-                try {
+            .collect(Collectors.toList());
+
+        listOfServicesWithCreatablePIs.forEach((serviceToRegister) -> {
+            try {
                     serviceToRegister.register(obj, "", false);
-                } catch (MCRAccessException | MCRActiveLinkException | MCRPersistentIdentifierException
-                    | ExecutionException | InterruptedException e) {
-                    throw new MCRException("Error while register pi for object " + obj.getId().toString(), e);
-                }
-            });
+            } catch (MCRAccessException | MCRActiveLinkException | MCRPersistentIdentifierException
+                | ExecutionException | InterruptedException e) {
+                throw new MCRException("Error while register pi for object " + obj.getId().toString(), e);
+            }
+        });
     }
 }
