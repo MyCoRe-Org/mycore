@@ -42,8 +42,10 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         List<MCRPIRegistrationInfo> registered = MCRPIManager.getInstance().getRegistered(obj);
 
-        final List<String> services = registered.stream().map(MCRPIRegistrationInfo::getService)
-            .collect(Collectors.toList());
+        final List<MCRPIService> services = registered.stream()
+                .map(MCRPIRegistrationInfo::getService)
+                .map(MCRPIServiceManager.getInstance()::getRegistrationService)
+                .collect(Collectors.toList());
 
         MCRPIServiceManager.getInstance().getAutoCreationList().stream()
             .filter(Predicate.not(services::contains))
