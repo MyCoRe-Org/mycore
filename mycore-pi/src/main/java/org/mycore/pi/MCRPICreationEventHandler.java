@@ -59,13 +59,14 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
             .filter(s -> s.getCreationPredicate().test(obj))
             .collect(Collectors.toList());
 
-        listOfServicesWithCreatablePIs.forEach((serviceToRegister) -> {
-            try {
+        listOfServicesWithCreatablePIs
+            .forEach((serviceToRegister) -> {
+                try {
                     serviceToRegister.register(obj, "", false);
-            } catch (MCRAccessException | MCRActiveLinkException | MCRPersistentIdentifierException
-                | ExecutionException | InterruptedException e) {
-                throw new MCRException("Error while register pi for object " + obj.getId().toString(), e);
-            }
-        });
+                } catch (MCRAccessException | MCRActiveLinkException | MCRPersistentIdentifierException
+                    | ExecutionException | InterruptedException e) {
+                    throw new MCRException("Error while register pi for object " + obj.getId().toString(), e);
+                }
+            });
     }
 }
