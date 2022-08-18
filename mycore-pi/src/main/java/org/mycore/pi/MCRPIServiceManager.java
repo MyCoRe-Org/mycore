@@ -35,8 +35,8 @@ public class MCRPIServiceManager {
 
     public List<String> getServiceIDList() {
         return MCRConfiguration2.getInstantiatablePropertyKeys(REGISTRATION_SERVICE_CONFIG_PREFIX)
-                .map(s->s.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
-                .collect(Collectors.toList());
+            .map(s -> s.substring(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX.length()))
+            .collect(Collectors.toList());
     }
 
     public List<MCRPIService<MCRPersistentIdentifier>> getServiceList() {
@@ -50,7 +50,7 @@ public class MCRPIServiceManager {
         return getServiceList()
             .stream()
             .filter(service -> service instanceof MCRPIJobService)
-            .map(s->(MCRPIJobService<MCRPersistentIdentifier>) s)
+            .map(s -> (MCRPIJobService<MCRPersistentIdentifier>) s)
             .filter(service -> MCRConfiguration2
                 .getString(REGISTRATION_SERVICE_CONFIG_PREFIX + service.getServiceID() + "." +
                     CREATION_PREDICATE)
@@ -59,7 +59,8 @@ public class MCRPIServiceManager {
     }
 
     public <T extends MCRPersistentIdentifier> MCRPIService<T> getRegistrationService(String id) {
-        return MCRConfiguration2.<MCRPIService<T>>getSingleInstanceOf(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + id).get();
+        return MCRConfiguration2
+            .<MCRPIService<T>>getSingleInstanceOf(MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX + id).get();
     }
 
     private static class InstanceHolder {
