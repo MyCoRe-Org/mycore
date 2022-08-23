@@ -19,25 +19,28 @@
 package org.mycore.services.queuedjob;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.processing.MCRAbstractProcessable;
-import org.mycore.common.processing.MCRProcessableStatus;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRSystemUserInformation;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.processing.MCRAbstractProcessable;
+import org.mycore.common.processing.MCRProcessableStatus;
 
 /**
  * A slave thread of {@link MCRJobMaster}.
- * 
- * This class execute the specified action for {@link MCRJob} and performs {@link MCRJobAction#rollback()} 
+ *
+ * This class execute the specified action for {@link MCRJob} and performs {@link MCRJobAction#rollback()}
  * if an error occurs. 
  *
  * @author Ren\u00E9 Adler
@@ -51,12 +54,28 @@ public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
 
     protected MCRJob job = null;
 
+    private List<MCRJobStatusListener> listeners;
+
     public MCRJobThread(MCRJob job) {
         this.job = job;
         setName(this.job.getId() + " - " + this.job.getAction().getSimpleName());
         setStatus(MCRProcessableStatus.created);
         this.queue = MCRJobQueue.getInstance(job.getAction());
         job.getParameters().forEach((k, v) -> this.getProperties().put(k, v));
+
+        listeners = new ArrayList<>();
+        MCRConfiguration2.getString("MCR.QueuedJob." + job.getAction().getSimpleName() + ".Listeners")
+            .ifPresent(classNames -> {
+                for (String className : classNames.split(",")) {
+                    try {
+                        MCRJobStatusListener instance = (MCRJobStatusListener) MCRClassTools.forName(className)
+                            .getDeclaredConstructor().newInstance();
+                        listeners.add(instance);
+                    } catch (Exception e) {
+                        LOGGER.error("Could not load class {}", className, e);
+                    }
+                }
+            });
     }
 
     public void run() {
@@ -75,19 +94,23 @@ public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
             try {
                 setStatus(MCRProcessableStatus.processing);
                 job.setStart(new Date());
+                listeners.forEach(l -> l.onProcessing(job));
 
                 action.execute();
 
                 job.setFinished(new Date());
                 job.setStatus(MCRJobStatus.FINISHED);
                 setStatus(MCRProcessableStatus.successful);
+                listeners.forEach(l -> l.onFinish(job));
             } catch (ExecutionException ex) {
                 LOGGER.error("Exception occured while try to start job. Perform rollback.", ex);
                 setError(ex);
                 action.rollback();
+                listeners.forEach(l -> l.onError(job));
             } catch (Exception ex) {
                 LOGGER.error("Exception occured while try to start job.", ex);
                 setError(ex);
+                listeners.forEach(l -> l.onError(job));
             }
             em.merge(job);
             transaction.commit();
