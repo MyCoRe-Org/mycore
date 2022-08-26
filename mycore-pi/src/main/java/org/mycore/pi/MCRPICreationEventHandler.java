@@ -35,19 +35,27 @@ public class MCRPICreationEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        this.handleObjectUpdated(evt, obj);
+        processPIServices(obj);
     }
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
+        processPIServices(obj);
+    }
+
+    private void processPIServices(MCRObject obj) {
         List<MCRPIRegistrationInfo> registered = MCRPIManager.getInstance().getRegistered(obj);
 
         final List<String> services = registered.stream().map(MCRPIRegistrationInfo::getService)
             .collect(Collectors.toList());
 
-        MCRPIServiceManager.getInstance().getAutoCreationList().stream()
-            .filter(Predicate.not(services::contains))
+        List<MCRPIJobService<MCRPersistentIdentifier>> listOfServicesWithCreatablePIs = MCRPIServiceManager
+            .getInstance().getAutoCreationList().stream()
+            .filter(Predicate.not(s -> services.contains(s.getServiceID())))
             .filter(s -> s.getCreationPredicate().test(obj))
+            .collect(Collectors.toList());
+
+        listOfServicesWithCreatablePIs
             .forEach((serviceToRegister) -> {
                 try {
                     serviceToRegister.register(obj, "", false);
