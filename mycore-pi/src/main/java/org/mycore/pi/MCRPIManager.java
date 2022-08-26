@@ -320,6 +320,10 @@ public class MCRPIManager {
             .getResultList();
     }
 
+    public Optional<MCRPIRegistrationInfo> getInfo(MCRPersistentIdentifier identifier, String type) {
+        return getInfo(identifier.asString(), type);
+    }
+
     public Optional<MCRPIRegistrationInfo> getInfo(String identifier, String type) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();

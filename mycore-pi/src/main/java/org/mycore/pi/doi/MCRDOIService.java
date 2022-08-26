@@ -401,7 +401,7 @@ public class MCRDOIService extends MCRDOIBaseService {
      * @return the parsed DOI
      * @throws MCRPersistentIdentifierException if the DOI can not be parsed
      */
-    private MCRDigitalObjectIdentifier getDOIFromJob(Map<String, String> parameters)
+    protected MCRDigitalObjectIdentifier getDOIFromJob(Map<String, String> parameters)
         throws MCRPersistentIdentifierException {
         String doiString = parameters.get(CONTEXT_DOI);
         return parseIdentifier(doiString)
