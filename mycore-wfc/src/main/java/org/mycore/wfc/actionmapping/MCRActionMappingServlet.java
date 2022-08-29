@@ -26,7 +26,6 @@ import org.mycore.frontend.servlets.MCRServletJob;
 
 import com.google.common.base.Splitter;
 
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -36,7 +35,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Thomas Scheffler (yagee)
  *
  */
-@WebServlet(name = "Action Mapping", urlPatterns = { "/servlets/MCRActionMappingServlet/*" })
 public class MCRActionMappingServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
