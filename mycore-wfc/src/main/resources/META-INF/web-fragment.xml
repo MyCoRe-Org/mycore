@@ -4,15 +4,14 @@
   metadata-complete="true">
   
 <!-- **************************************************************** -->
-<!-- Servlets and mappings of mycore-sword -->
-<!-- Multi-Part servlets are configured via org.mycore.sword.MCRSwordMultiPartServletDeployer -->
+<!-- Servlets and mappings of mycore-wfc                              -->
 <!-- **************************************************************** -->
   <servlet>
-    <servlet-name>MCRSword2ServiceDocumentServlet</servlet-name>
-    <servlet-class>org.mycore.sword.servlets.MCRSwordServiceDocumentServlet</servlet-class>
+    <servlet-name>MCRActionMappingServlet</servlet-name>
+    <servlet-class>org.mycore.wfc.actionmapping.MCRActionMappingServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>MCRSword2ServiceDocumentServlet</servlet-name>
-    <url-pattern>/sword2/sd/</url-pattern>
+    <servlet-name>MCRActionMappingServlet</servlet-name>
+    <url-pattern>/servlets/MCRActionMappingServlet/*</url-pattern>
   </servlet-mapping>
 </web-fragment>

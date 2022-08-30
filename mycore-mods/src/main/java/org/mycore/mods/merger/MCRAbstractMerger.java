@@ -64,8 +64,12 @@ public class MCRAbstractMerger extends MCRMerger {
 
         String textOther = ((MCRAbstractMerger) other).text;
         int length = Math.min(text.length(), textOther.length());
+
+        if (length == 0) {
+            return false;
+        }
+
         int distance = StringUtils.getLevenshteinDistance(text, textOther);
-        System.out.println(distance);
         return (distance * 100 / length) < MAX_DISTANCE_PERCENT;
     }
 }
