@@ -191,11 +191,20 @@ export class UploadTarget {
         });
     }
 
+    /**
+     * Returns the file size if the browser api supports it or -1 if not.
+     * @param fileEntry the file entry
+     * @private
+     */
     private async getEntrySize(fileEntry: any): Promise<number> {
         return new Promise((accept, reject) => {
-            fileEntry.getMetadata((metadata) => {
-                accept(metadata.size);
-            }, (err) => reject(err));
+            if("getMetadata" in fileEntry){
+                fileEntry.getMetadata((metadata) => {
+                    accept(metadata.size);
+                }, (err) => reject(err));
+            } else {
+                accept(-1);
+            }
         });
     }
 
