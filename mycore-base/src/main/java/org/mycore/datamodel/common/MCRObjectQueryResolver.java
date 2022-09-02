@@ -19,6 +19,7 @@
 package org.mycore.datamodel.common;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public interface MCRObjectQueryResolver {
 
-    List<String> getIds(MCRObjectQuery objectQuery);
+    List<MCRObjectID> getIds(MCRObjectQuery objectQuery);
 
     List<MCRObjectIDDate> getIdDates(MCRObjectQuery objectQuery);
 

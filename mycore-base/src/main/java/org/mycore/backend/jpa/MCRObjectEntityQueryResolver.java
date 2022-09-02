@@ -33,9 +33,10 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl_;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl_;
 import org.mycore.datamodel.common.MCRObjectIDDate;
-import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.common.MCRObjectQuery;
 import org.mycore.datamodel.common.MCRObjectQueryResolver;
+import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -108,7 +109,7 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
 
                 Predicate linkToObject = criteriaBuilder.equal(
                     cl.get(MCRCategoryLinkImpl_.objectReference).get(MCRCategLinkReference_.OBJECT_ID),
-                    oe.get(MCRObjectEntity_.OBJECT_ID));
+                    oe.get(MCRObjectEntity_.ID));
 
                 Predicate categoryToLink = criteriaBuilder.equal(cl.get(MCRCategoryLinkImpl_.CATEGORY),
                     c.get(MCRCategoryImpl_.INTERNAL_ID));
@@ -148,7 +149,7 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
         MCRObjectQuery.SortBy sf = query.sortBy() == null ? SORT_BY_DEFAULT : query.sortBy();
 
         SingularAttribute<MCRObjectEntity, ?> attribute = switch (sf) {
-            case id -> MCRObjectEntity_.objectId;
+            case id -> MCRObjectEntity_.id;
             case created -> MCRObjectEntity_.createDate;
             case modified -> MCRObjectEntity_.modifyDate;
         };
@@ -167,14 +168,14 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
         }
         if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.asc) {
             if (!query.afterId().equals("")) {
-                filters.add(criteriaBuilder.greaterThan(source.get(MCRObjectEntity_.objectId), query.afterId()));
+                filters.add(criteriaBuilder.greaterThan(source.get(MCRObjectEntity_.id), query.afterId()));
             }
-            criteriaQuery.orderBy(criteriaBuilder.asc(source.get(MCRObjectEntity_.objectId)));
+            criteriaQuery.orderBy(criteriaBuilder.asc(source.get(MCRObjectEntity_.id)));
         } else {
             if (!query.afterId().equals("")) {
-                filters.add(criteriaBuilder.lessThan(source.get(MCRObjectEntity_.objectId), query.afterId()));
+                filters.add(criteriaBuilder.lessThan(source.get(MCRObjectEntity_.id), query.afterId()));
             }
-            criteriaQuery.orderBy(criteriaBuilder.desc(source.get(MCRObjectEntity_.objectId)));
+            criteriaQuery.orderBy(criteriaBuilder.desc(source.get(MCRObjectEntity_.id)));
         }
     }
 
@@ -219,11 +220,11 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
             .ifPresent(predicates::add);
 
         Optional.ofNullable(query.deletedAfter())
-            .map(date -> criteriaBuilder.greaterThanOrEqualTo(source.get(MCRObjectEntity_.deleteddate), date))
+            .map(date -> criteriaBuilder.greaterThanOrEqualTo(source.get(MCRObjectEntity_.deleteDate), date))
             .ifPresent(predicates::add);
 
         Optional.ofNullable(query.deletedBefore())
-            .map(date -> criteriaBuilder.lessThanOrEqualTo(source.get(MCRObjectEntity_.deleteddate), date))
+            .map(date -> criteriaBuilder.lessThanOrEqualTo(source.get(MCRObjectEntity_.deleteDate), date))
             .ifPresent(predicates::add);
 
         Optional.of(query.numberGreater())
@@ -243,7 +244,7 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
         if (Optional.ofNullable(query.deletedBy()).isEmpty() &&
             Optional.ofNullable(query.deletedBefore()).isEmpty() &&
             Optional.ofNullable(query.deletedAfter()).isEmpty()) {
-            predicates.add(criteriaBuilder.isNull(source.get(MCRObjectEntity_.deleteddate)));
+            predicates.add(criteriaBuilder.isNull(source.get(MCRObjectEntity_.deleteDate)));
             predicates.add(criteriaBuilder.isNull(source.get(MCRObjectEntity_.deletedBy)));
         }
 
@@ -251,11 +252,11 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
     }
 
     @Override
-    public List<String> getIds(MCRObjectQuery objectQuery) {
+    public List<MCRObjectID> getIds(MCRObjectQuery objectQuery) {
         TypedQuery<MCRObjectEntity> typedQuery = convertQuery(objectQuery);
         return typedQuery.getResultList()
             .stream()
-            .map(MCRObjectEntity::getObjectId)
+            .map(MCRObjectEntity::getId)
             .collect(Collectors.toList());
     }
 
@@ -264,7 +265,7 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
         TypedQuery<MCRObjectEntity> typedQuery = convertQuery(objectQuery);
         return typedQuery.getResultList()
             .stream()
-            .map(entity -> new MCRObjectIDDateImpl(Date.from(entity.getModifyDate()), entity.getObjectId()))
+            .map(entity -> new MCRObjectIDDateImpl(Date.from(entity.getModifyDate()), entity.getId().toString()))
             .collect(Collectors.toList());
     }
 

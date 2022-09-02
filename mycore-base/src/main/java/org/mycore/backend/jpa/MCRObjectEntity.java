@@ -22,15 +22,16 @@ import java.time.Instant;
 
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 
 @Entity
+@IdClass(MCRObjectIDPK.class)
 public class MCRObjectEntity {
 
-    private MCRObjectID objectID;
+    private MCRObjectID id;
 
     private String state;
 
@@ -44,22 +45,20 @@ public class MCRObjectEntity {
 
     private Instant modifyDate;
 
-    private Instant deleteddate;
+    private Instant deleteDate;
 
     @Id
-    @Column(name = "objectid", length = MCRObjectID.MAX_LENGTH, nullable = false)
-    @Basic
-    public String getObjectId() {
-        return objectID.toString();
+    public MCRObjectID getId() {
+        return id;
     }
 
-    public void setObjectId(String objectId) {
-        this.objectID = MCRObjectID.getInstance(objectId);
+    public void setId(MCRObjectID id) {
+        this.id = id;
     }
 
     @Column(name = "objectproject")
     public String getObjectProject() {
-        return this.objectID.getProjectId();
+        return this.id.getProjectId();
     }
 
     public void setObjectProject(String objectProject) {
@@ -68,7 +67,7 @@ public class MCRObjectEntity {
 
     @Column(name = "objecttype")
     public String getObjectType() {
-        return this.objectID.getTypeId();
+        return this.id.getTypeId();
     }
 
     public void setObjectType(String objectType) {
@@ -77,7 +76,7 @@ public class MCRObjectEntity {
 
     @Column(name = "objectnumber")
     public int getObjectNumber() {
-        return this.objectID.getNumberAsInteger();
+        return this.id.getNumberAsInteger();
     }
 
     public void setObjectNumber(int objectNumber) {
@@ -140,11 +139,25 @@ public class MCRObjectEntity {
     }
 
     @Column(name = "deletedate")
-    public Instant getDeleteddate() {
-        return deleteddate;
+    public Instant getDeleteDate() {
+        return deleteDate;
     }
 
-    public void setDeleteddate(Instant deleteddate) {
-        this.deleteddate = deleteddate;
+    public void setDeleteDate(Instant deleteddate) {
+        this.deleteDate = deleteddate;
+    }
+
+    @Override
+    public String toString() {
+        return "MCRObjectEntity{" +
+            "id=" + id +
+            ", state='" + state + '\'' +
+            ", createdBy='" + createdBy + '\'' +
+            ", modifiedBy='" + modifiedBy + '\'' +
+            ", deletedBy='" + deletedBy + '\'' +
+            ", createDate=" + createDate +
+            ", modifyDate=" + modifyDate +
+            ", deleteDate=" + deleteDate +
+            '}';
     }
 }

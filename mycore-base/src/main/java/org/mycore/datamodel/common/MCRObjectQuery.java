@@ -22,12 +22,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mycore.datamodel.metadata.MCRObjectID;
+
 /**
  * Used to Query a collection of mycore objects.
  */
 public class MCRObjectQuery {
 
-    private String afterId = null;
+    private MCRObjectID afterId = null;
 
     private int offset = -1;
 
@@ -67,11 +69,11 @@ public class MCRObjectQuery {
 
     private final List<String> includeCategories = new ArrayList<>();
 
-    public String afterId() {
+    public MCRObjectID afterId() {
         return afterId;
     }
 
-    public MCRObjectQuery afterId(String lastId) {
+    public MCRObjectQuery afterId(MCRObjectID lastId) {
         this.afterId = lastId;
         return this;
     }

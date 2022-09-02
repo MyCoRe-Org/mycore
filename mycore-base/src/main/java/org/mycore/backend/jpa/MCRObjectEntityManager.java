@@ -18,19 +18,16 @@
 
 package org.mycore.backend.jpa;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
+import java.time.Instant;
+import java.util.Optional;
+
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
-import java.time.Instant;
-import java.util.Optional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 
 public class MCRObjectEntityManager {
 
@@ -41,14 +38,7 @@ public class MCRObjectEntityManager {
 
     static MCRObjectEntity getByID(MCRObjectID id) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<MCRObjectEntity> getQuery = cb.createQuery(MCRObjectEntity.class);
-        Root<MCRObjectEntity> object = getQuery.from(MCRObjectEntity.class);
-        CriteriaQuery<MCRObjectEntity> objectByIDCriteriaQuery = getQuery.select(object)
-            .where(cb.equal(object.get(MCRObjectEntity_.objectId), id.toString()));
-        TypedQuery<MCRObjectEntity> typedQuery = em.createQuery(objectByIDCriteriaQuery);
-
-        return typedQuery.getSingleResult();
+        return em.find(MCRObjectEntity.class, new MCRObjectIDPK(id));
     }
 
     /**
@@ -57,11 +47,9 @@ public class MCRObjectEntityManager {
      */
     static void update(MCRObject obj) {
         MCRObjectID id = obj.getId();
-        MCRObjectEntity entity = null;
         try {
-            entity = getByID(id);
+            MCRObjectEntity entity = getByID(id);
             applyMetadataToEntity(obj, entity);
-            MCREntityManagerProvider.getCurrentEntityManager().persist(entity);
         } catch (NoResultException noResultException) {
             create(obj);
         }
@@ -95,12 +83,11 @@ public class MCRObjectEntityManager {
         MCRObjectEntity entity = getByID(id);
         applyMetadataToEntity(object, entity);
         applyDeleted(deletedDate, deletedBy, entity);
-        MCREntityManagerProvider.getCurrentEntityManager().persist(entity);
     }
 
     private static void applyMetadataToEntity(MCRObject obj, MCRObjectEntity entity) {
         MCRObjectID id = obj.getId();
-        entity.setObjectId(id.toString());
+        entity.setId(id);
         entity.setObjectProject(id.getProjectId());
         entity.setObjectType(id.getTypeId());
         entity.setObjectNumber(id.getNumberAsInteger());
@@ -112,11 +99,11 @@ public class MCRObjectEntityManager {
         service.getFlags(MCRObjectService.FLAG_TYPE_MODIFIEDBY).stream().findFirst().ifPresent(entity::setModifiedBy);
         entity.setState(Optional.ofNullable(service.getState()).map(MCRCategoryID::toString).orElse(null));
         entity.setDeletedBy(null);
-        entity.setDeleteddate(null);
+        entity.setDeleteDate(null);
     }
 
     private static void applyDeleted(Instant deletionDate, String deletedBy, MCRObjectEntity entity) {
-        entity.setDeleteddate(deletionDate);
+        entity.setDeleteDate(deletionDate);
         entity.setDeletedBy(deletedBy);
     }
 }
