@@ -266,5 +266,35 @@ constructs, e.g.
   <xs:group ref="xlink:arcModel"/>
   <xs:attributeGroup ref="xlink:arcAttrs"/>
  </xs:complexType>
+  
+<!--
+********************************************************************************
+  Extension (by MyCoRe Community):
+  added attributeGroups which are defined in the XLink schema definition of the 
+  Library of Congress (LoC) The LoC uses in its MOD schema definition only 
+  simpleLink, but we define them all.
+********************************************************************************
+-->
+  <xs:attributeGroup name="simpleLink">
+    <xs:attributeGroup ref="xlink:simpleAttrs" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="extendedLink">
+    <xs:attributeGroup ref="xlink:extendedAttrs" /> 
+  </xs:attributeGroup>
+  <xs:attributeGroup name="locatorLink">
+    <xs:attributeGroup ref="xlink:locatorAttrs" /> 
+  </xs:attributeGroup>
+  <xs:attributeGroup name="arcLink">
+   <xs:attributeGroup ref="xlink:arcAttrs" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="resourceLink">
+    <xs:attributeGroup ref="xlink:resourceAttrs" />
+  </xs:attributeGroup>
+  <xs:attributeGroup name="titleLink">
+    <xs:attributeGroup ref="xlink:titleAttrs" /> 
+  </xs:attributeGroup>
+  <xs:attributeGroup name="emptyLink">
+   <xs:attribute name="type" type="xs:token" fixed="none" use="required" /> 
+  </xs:attributeGroup>
 
 </xs:schema>
