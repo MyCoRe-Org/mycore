@@ -250,4 +250,30 @@ public class MCRObjectQuery {
         asc,
         desc
     }
+
+    @Override
+    public String toString() {
+        return "MCRObjectQuery{" +
+            "afterId=" + afterId +
+            ", offset=" + offset +
+            ", limit=" + limit +
+            ", numberGreater=" + numberGreater +
+            ", numberLess=" + numberLess +
+            ", type='" + type + '\'' +
+            ", project='" + project + '\'' +
+            ", status='" + status + '\'' +
+            ", sortBy=" + sortBy +
+            ", sortOrder=" + sortOrder +
+            ", modifiedBefore=" + modifiedBefore +
+            ", modifiedAfter=" + modifiedAfter +
+            ", createdBefore=" + createdBefore +
+            ", createdAfter=" + createdAfter +
+            ", deletedBefore=" + deletedBefore +
+            ", deletedAfter=" + deletedAfter +
+            ", createdBy='" + createdBy + '\'' +
+            ", modifiedBy='" + modifiedBy + '\'' +
+            ", deletedBy='" + deletedBy + '\'' +
+            ", includeCategories=" + includeCategories +
+            '}';
+    }
 }
