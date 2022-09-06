@@ -167,14 +167,10 @@ public class MCRObjectEntityQueryResolver implements MCRObjectQueryResolver {
             throw new UnsupportedOperationException("last id can not be used with " + query.sortBy());
         }
         if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.asc) {
-            if (!query.afterId().equals("")) {
-                filters.add(criteriaBuilder.greaterThan(source.get(MCRObjectEntity_.id), query.afterId()));
-            }
+            filters.add(criteriaBuilder.greaterThan(source.get(MCRObjectEntity_.id), query.afterId()));
             criteriaQuery.orderBy(criteriaBuilder.asc(source.get(MCRObjectEntity_.id)));
         } else {
-            if (!query.afterId().equals("")) {
-                filters.add(criteriaBuilder.lessThan(source.get(MCRObjectEntity_.id), query.afterId()));
-            }
+            filters.add(criteriaBuilder.lessThan(source.get(MCRObjectEntity_.id), query.afterId()));
             criteriaQuery.orderBy(criteriaBuilder.desc(source.get(MCRObjectEntity_.id)));
         }
     }
