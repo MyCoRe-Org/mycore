@@ -27,7 +27,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 
 public class MCRObjectEntityManager {
 
@@ -36,6 +35,10 @@ public class MCRObjectEntityManager {
         em.createQuery("delete from MCRObjectEntity").executeUpdate();
     }
 
+    /**
+     * find MCRObjectEntity by Id
+     * @return null if MCRObjectEntity is not found
+     */
     static MCRObjectEntity getByID(MCRObjectID id) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         return em.find(MCRObjectEntity.class, new MCRObjectIDPK(id));
@@ -47,10 +50,10 @@ public class MCRObjectEntityManager {
      */
     static void update(MCRObject obj) {
         MCRObjectID id = obj.getId();
-        try {
-            MCRObjectEntity entity = getByID(id);
+        MCRObjectEntity entity = getByID(id);
+        if (entity != null) {
             applyMetadataToEntity(obj, entity);
-        } catch (NoResultException noResultException) {
+        } else {
             create(obj);
         }
     }
@@ -71,6 +74,9 @@ public class MCRObjectEntityManager {
      */
     static void remove(MCRObject object) {
         MCRObjectEntity byID = getByID(object.getId());
+        if (byID == null) {
+            return;
+        }
         MCREntityManagerProvider.getCurrentEntityManager().remove(byID);
     }
 
@@ -81,6 +87,11 @@ public class MCRObjectEntityManager {
     public static void delete(MCRObject object, Instant deletedDate, String deletedBy) {
         MCRObjectID id = object.getId();
         MCRObjectEntity entity = getByID(id);
+        if (entity == null) {
+            entity = new MCRObjectEntity();
+            entity.setId(object.getId());
+            MCREntityManagerProvider.getCurrentEntityManager().persist(entity);
+        }
         applyMetadataToEntity(object, entity);
         applyDeleted(deletedDate, deletedBy, entity);
     }

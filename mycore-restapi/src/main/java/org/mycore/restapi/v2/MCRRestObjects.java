@@ -254,7 +254,7 @@ public class MCRRestObjects {
     @XmlElementWrapper(name = "mycoreobjects")
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
     public Response listObjects(
-        @QueryParam(PARAM_AFTER_ID) String afterID,
+        @QueryParam(PARAM_AFTER_ID) MCRObjectID afterID,
         @QueryParam(PARAM_OFFSET) Integer offset,
         @QueryParam(PARAM_LIMIT) Integer limit,
         @QueryParam(PARAM_TYPE) String type,
