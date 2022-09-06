@@ -20,6 +20,8 @@ package org.mycore.backend.jpa;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,50 +41,75 @@ public class MCRObjectEntityCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @MCRCommand(syntax = "create object entities",
-        help = "reads all objects and creates the corresponding entities")
-    public static void createObjectEntities() {
+    @MCRCommand(syntax = "remove object entities",
+        help = "removes all object entities")
+    public static void deleteEntities() {
         MCRObjectEntityManager.removeAll();
+    }
 
+    @MCRCommand(syntax = "create object entities",
+        help = "reads all objects and creates the corresponding entities",
+        order = 10)
+    public static List<String> createObjectEntities() {
         MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
-        for (String baseId : mm.getObjectBaseIds()) {
-            String[] idParts = baseId.split("_");
-            int maxID = mm.getHighestStoredID(idParts[0], idParts[1]);
+        return mm.getObjectBaseIds()
+            .stream().filter(b -> !b.endsWith("derivate"))
+            .map(b -> "create object entities for base " + b)
+            .collect(Collectors.toList());
+    }
 
-            if(idParts[1].equals("derivate")){
-                continue; // we do not want derivates
-            }
+    @MCRCommand(syntax = "create object entities for base {0}",
+        help = "reads all objects with base id {0} and creates the corresponding entities")
+    public static List<String> createObjectEntities(String baseId) {
+        String[] idParts = baseId.split("_");
+        MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
+        if (idParts[1].equals("derivate")) {
+            return List.of();
+        }
 
-            for (int i = 1; i < maxID; i++) {
-                String idStr = MCRObjectID.formatID(idParts[0], idParts[1], i);
-                MCRObjectID id = MCRObjectID.getInstance(idStr);
-                try {
-                    if (MCRMetadataManager.exists(id)) {
-                        MCRObjectEntityManager.update(MCRMetadataManager.retrieveMCRObject(id));
-                    } else {
-                        List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
-                            .listRevisions(id);
-                        if (versions == null || versions.isEmpty()) {
-                            // we do not know if the object ever existed
-                            LOGGER.warn("Could not determine what happened to " + id);
-                        } else {
-                            MCRAbstractMetadataVersion<?> deleted = versions.get(versions.size() - 1);
-                            MCRAbstractMetadataVersion<?> lastExisting = versions.get(versions.size() - 2);
-                            try {
-                                Document doc = lastExisting.retrieve().asXML();
-                                MCRObject obj = new MCRObject(doc);
-                                MCRObjectEntityManager.update(obj);
-                                MCRObjectEntityManager.delete(obj,
-                                    deleted.getDate().toInstant(), deleted.getUser());
-                            } catch (JDOMException | SAXException e) {
-                                LOGGER.warn("Could not determine what happened to " + id, e);
-                            }
-                        }
+        int maxID = mm.getHighestStoredID(idParts[0], idParts[1]);
+        return IntStream.rangeClosed(1, maxID)
+            .mapToObj(n -> MCRObjectID.formatID(baseId, n))
+            .map(id -> "create object entity for object " + id)
+            .collect(Collectors.toList());
+    }
+
+    @MCRCommand(syntax = "create object entity for object {0}",
+        help = "creates the corresponding entity for MCRObject {0}")
+    public static void createObjectEntity(String idStr) {
+        MCRObjectID id = MCRObjectID.getInstance(idStr);
+        LogManager.getLogger().info("create entity for object " + idStr);
+        if (id.getTypeId().equals("derivate")) {
+            return;
+        }
+        try {
+            if (MCRMetadataManager.exists(id)) {
+                MCRObjectEntityManager.update(MCRMetadataManager.retrieveMCRObject(id));
+                LogManager.getLogger().info("object entity for object " + idStr + " created.");
+
+            } else {
+                List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
+                    .listRevisions(id);
+                if (versions == null || versions.isEmpty()) {
+                    // we do not know if the object ever existed
+                    LOGGER.warn("Could not determine what happened to " + id);
+                } else {
+                    MCRAbstractMetadataVersion<?> deleted = versions.get(versions.size() - 1);
+                    MCRAbstractMetadataVersion<?> lastExisting = versions.get(versions.size() - 2);
+                    try {
+                        Document doc = lastExisting.retrieve().asXML();
+                        MCRObject obj = new MCRObject(doc);
+                        MCRObjectEntityManager.update(obj);
+                        MCRObjectEntityManager.delete(obj,
+                            deleted.getDate().toInstant(), deleted.getUser());
+                        LogManager.getLogger().info("object entity for object " + idStr + " created.");
+                    } catch (JDOMException | SAXException e) {
+                        LOGGER.warn("Could not determine what happened to " + id, e);
                     }
-                } catch (IOException e) {
-                    LOGGER.error("Error while getting history of {}", id);
                 }
             }
+        } catch (IOException e) {
+            LOGGER.error("Error while getting history of {}", id);
         }
     }
 }
