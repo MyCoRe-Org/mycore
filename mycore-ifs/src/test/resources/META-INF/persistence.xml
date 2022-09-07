@@ -6,7 +6,6 @@
   <persistence-unit name="mycore-ifs" transaction-type="RESOURCE_LOCAL">
     <!-- http://stackoverflow.com/questions/15026302/multiple-jars-single-persistence-unit-solution -->
     <mapping-file>META-INF/mycore-base-mappings.xml</mapping-file>
-    <mapping-file>META-INF/mycore-ifs-mappings.xml</mapping-file>
     <properties>
       <!-- h2 -->
       <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />

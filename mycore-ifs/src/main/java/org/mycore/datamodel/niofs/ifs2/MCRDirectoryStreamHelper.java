@@ -59,7 +59,7 @@ import org.mycore.datamodel.niofs.MCRPath;
  *
  * @author Thomas Scheffler (yagee)
  */
-public class MCRDirectoryStream {
+class MCRDirectoryStreamHelper {
     static Logger LOGGER = LogManager.getLogger();
 
     static DirectoryStream<Path> getInstance(MCRDirectory dir, MCRPath path) throws IOException {
@@ -78,7 +78,7 @@ public class MCRDirectoryStream {
 
     private static class AcceptAllFilter
         implements DirectoryStream.Filter<Path> {
-        static final MCRDirectoryStream.AcceptAllFilter FILTER = new AcceptAllFilter();
+        static final MCRDirectoryStreamHelper.AcceptAllFilter FILTER = new AcceptAllFilter();
 
         @Override
         public boolean accept(Path entry) {
@@ -88,7 +88,7 @@ public class MCRDirectoryStream {
 
     private static class MCRFileCollectionFilter
         implements DirectoryStream.Filter<Path> {
-        static final MCRDirectoryStream.MCRFileCollectionFilter FILTER = new MCRFileCollectionFilter();
+        static final MCRDirectoryStreamHelper.MCRFileCollectionFilter FILTER = new MCRFileCollectionFilter();
 
         @Override
         public boolean accept(Path entry) {
@@ -147,7 +147,7 @@ public class MCRDirectoryStream {
                 throw new NotDirectoryException(nodeByPath.getPath());
             }
             MCRDirectory newDir = (MCRDirectory) nodeByPath;
-            return (java.nio.file.SecureDirectoryStream<Path>) MCRDirectoryStream.getInstance(newDir,
+            return (java.nio.file.SecureDirectoryStream<Path>) MCRDirectoryStreamHelper.getInstance(newDir,
                 getCurrentSecurePath(newDir));
         }
 

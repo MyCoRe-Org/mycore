@@ -7,11 +7,8 @@
     <version>2022.06.0-SNAPSHOT</version>
   </parent>
   <artifactId>mycore-ifs</artifactId>
-  <name>MyCoRe IFS1</name>
-  <description>Our old implementation of an internal file system for mycore. Use it as a runtime dependency and migrate your code to NIOFS (part of mycore-base)</description>
-  <properties>
-    <pmd.failOnViolation>false</pmd.failOnViolation>
-  </properties>
+  <name>MyCoRe IFS</name>
+  <description>Implementation of an internal file system for mycore. Use it as a runtime dependency only.</description>
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -22,24 +19,12 @@
       <artifactId>h2</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.persistence</groupId>
-      <artifactId>jakarta.persistence-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom2</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
