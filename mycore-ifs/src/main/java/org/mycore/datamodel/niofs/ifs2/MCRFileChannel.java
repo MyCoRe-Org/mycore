@@ -79,7 +79,8 @@ public class MCRFileChannel extends FileChannel {
         MessageDigest md5Digest = MCRMD5InputStream.buildMD5Digest();
         FileChannel md5Channel = (FileChannel) Files.newByteChannel(file.getLocalPath(), StandardOpenOption.READ);
         try {
-            long position = 0, size = md5Channel.size();
+            long position = 0;
+            long size = md5Channel.size();
             while (position < size) {
                 long remainingSize = size - position;
                 final ByteBuffer byteBuffer = md5Channel.map(MapMode.READ_ONLY, position,
@@ -90,7 +91,7 @@ public class MCRFileChannel extends FileChannel {
                 position += byteBuffer.limit();
             }
         } finally {
-            if (md5Channel != baseChannel) {
+            if (!md5Channel.equals(baseChannel)) {
                 md5Channel.close();
             }
         }
