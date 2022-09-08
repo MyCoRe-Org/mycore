@@ -29,6 +29,35 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 
+/**
+ * Use this wrapper if you want a {@link MCRObjectID} as a primary key with name <code>id</code>
+ * in your JPA mapping.
+ *
+ * <pre>{@code
+ * @Entity
+ * @IdClass(MCRObjectIDPK.class)
+ * public class EntityClass {
+ *
+ *     private MCRObjectID id;
+ *
+ *     […]
+ *
+ *     @Id
+ *     public MCRObjectID getId() {
+ *         return id;
+ *     }
+ *
+ *     public void setId(MCRObjectID id) {
+ *         this.id = id;
+ *     }
+ *
+ *     […]
+ *
+ * }
+ * }</pre>
+ *
+ * @see MCRObjectEntity
+ */
 @Access(AccessType.FIELD)
 public class MCRObjectIDPK implements Serializable {
     @Convert(converter = MCRObjectIDConverter.class)
@@ -36,12 +65,22 @@ public class MCRObjectIDPK implements Serializable {
     @Column(length = MCRObjectID.MAX_LENGTH)
     public MCRObjectID id;
 
+    /**
+     * Use this constructor for quick queries.
+     *
+     * Sample-Code:<br>
+     * <pre>{@code
+     *     EntityManager em = […];
+     *     em.find(EntityClass.class, new MCRObjectIDPK(MCRObjectID.getInstance('mir_mods_00004711')));
+     * }</pre>
+     * @see jakarta.persistence.EntityManager#find(Class, Object)
+     */
     public MCRObjectIDPK(MCRObjectID id) {
         this.id = id;
     }
 
     public MCRObjectIDPK() {
-
+        //empty for JPA implementations
     }
 
     @Override
