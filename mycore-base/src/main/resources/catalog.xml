@@ -4,8 +4,10 @@
   <system systemId="http://www.w3.org/2001/xml.xsd" uri="xml-2009.xsd" />
   <system systemId="http://www.w3.org/2009/01/xml.xsd" uri="xml-2009.xsd" />
   <systemSuffix systemIdSuffix="xml-2001.xsd" uri="xml-2009.xsd" />
-  <system systemId="http://www.w3.org/XML/2008/06/xlink.xsd" uri="xlink-2008-06.xsd" />
-  <system systemId="http://www.w3.org/1999/xlink.xsd" uri="xlink-2008-06.xsd" />
+  <system systemId="http://www.loc.gov/standards/xlink/xlink.xsd" uri="xlink-1999_mycore.xsd" />
+  <system systemId="http://www.w3.org/XML/2008/06/xlink.xsd" uri="xlink-1999_mycore.xsd" />
+  <system systemId="http://www.w3.org/1999/xlink.xsd" uri="xlink-1999_mycore.xsd" />
+  <systemSuffix systemIdSuffix="xlink-2008-06.xsd" uri="xlink-1999_mycore.xsd" />
   <system systemId="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" uri="xhtml1-transitional.dtd" />
 
 </catalog>
