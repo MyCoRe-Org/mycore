@@ -198,7 +198,7 @@ public class MCRObjectInfoEntity implements MCRObjectInfo {
 
     @Override
     public String toString() {
-        return "MCRObjectEntity{" +
+        return "MCRObjectInfoEntity{" +
             "id=" + id +
             ", state='" + state + '\'' +
             ", createdBy='" + createdBy + '\'' +
