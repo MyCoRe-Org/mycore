@@ -26,9 +26,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 
 @Entity
 @IdClass(MCRObjectIDPK.class)
+@Table(name = "MCRObjectInfo")
 public class MCRObjectInfoEntity implements MCRObjectInfo {
 
     private MCRObjectID id;

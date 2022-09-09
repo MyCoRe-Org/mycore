@@ -18,9 +18,9 @@
 
 package org.mycore.backend.jpa;
 
-import org.mycore.datamodel.metadata.MCRObjectID;
-
 import java.time.Instant;
+
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 public interface MCRObjectInfo {
     /**
