@@ -29,24 +29,24 @@ public class MCRObjectEntityEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        MCRObjectEntityManager.update(obj);
+        MCRObjectInfoEntityManager.update(obj);
     }
 
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        MCRObjectEntityManager.update(obj);
+        MCRObjectInfoEntityManager.update(obj);
     }
 
     @Override
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        MCRObjectEntityManager.remove(obj);
-        MCRObjectEntityManager.create(obj);
+        MCRObjectInfoEntityManager.remove(obj);
+        MCRObjectInfoEntityManager.create(obj);
     }
 
     @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRObjectEntityManager.delete(obj, Instant.now(),
+        MCRObjectInfoEntityManager.delete(obj, Instant.now(),
                 MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
     }
 

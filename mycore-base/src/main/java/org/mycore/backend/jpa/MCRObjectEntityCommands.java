@@ -44,7 +44,7 @@ public class MCRObjectEntityCommands {
     @MCRCommand(syntax = "remove object entities",
         help = "removes all object entities")
     public static void deleteEntities() {
-        MCRObjectEntityManager.removeAll();
+        MCRObjectInfoEntityManager.removeAll();
     }
 
     @MCRCommand(syntax = "create object entities",
@@ -84,7 +84,7 @@ public class MCRObjectEntityCommands {
         }
         try {
             if (MCRMetadataManager.exists(id)) {
-                MCRObjectEntityManager.update(MCRMetadataManager.retrieveMCRObject(id));
+                MCRObjectInfoEntityManager.update(MCRMetadataManager.retrieveMCRObject(id));
                 LogManager.getLogger().info("object entity for object " + idStr + " created.");
 
             } else {
@@ -99,8 +99,8 @@ public class MCRObjectEntityCommands {
                     try {
                         Document doc = lastExisting.retrieve().asXML();
                         MCRObject obj = new MCRObject(doc);
-                        MCRObjectEntityManager.update(obj);
-                        MCRObjectEntityManager.delete(obj,
+                        MCRObjectInfoEntityManager.update(obj);
+                        MCRObjectInfoEntityManager.delete(obj,
                             deleted.getDate().toInstant(), deleted.getUser());
                         LogManager.getLogger().info("object entity for object " + idStr + " created.");
                     } catch (JDOMException | SAXException e) {

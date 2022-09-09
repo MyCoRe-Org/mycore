@@ -56,7 +56,7 @@ import jakarta.persistence.Convert;
  * }
  * }</pre>
  *
- * @see MCRObjectEntity
+ * @see MCRObjectInfoEntity
  */
 @Access(AccessType.FIELD)
 public class MCRObjectIDPK implements Serializable {

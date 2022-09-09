@@ -33,7 +33,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 
-public class MCRObjectEntityManagerTest extends MCRJPATestCase {
+public class MCRObjectInfoEntityManagerTest extends MCRJPATestCase {
     @Override
     protected Map<String, String> getTestProperties() {
         final Map<String, String> testProperties = super.getTestProperties();
@@ -53,47 +53,47 @@ public class MCRObjectEntityManagerTest extends MCRJPATestCase {
 
     @Test
     public void removeAll() {
-        MCRObjectEntity entity = new MCRObjectEntity();
+        MCRObjectInfoEntity entity = new MCRObjectInfoEntity();
         entity.setId(MCRObjectID.getInstance("junit_test_00000001"));
         final EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         entityManager.persist(entity);
         startNewTransaction();
         Assert.assertNotEquals(0, getObjectEntities().size());
-        MCRObjectEntityManager.removeAll();
+        MCRObjectInfoEntityManager.removeAll();
         startNewTransaction();
         Assert.assertEquals(0, getObjectEntities().size());
     }
 
-    private static List<MCRObjectEntity> getObjectEntities() {
-        final TypedQuery<MCRObjectEntity> listEntities = MCREntityManagerProvider.getCurrentEntityManager().createQuery(
-            "FROM MCRObjectEntity", MCRObjectEntity.class);
-        final List<MCRObjectEntity> entities = listEntities.getResultList();
+    private static List<MCRObjectInfoEntity> getObjectEntities() {
+        final TypedQuery<MCRObjectInfoEntity> listEntities = MCREntityManagerProvider.getCurrentEntityManager().createQuery(
+            "FROM MCRObjectInfoEntity", MCRObjectInfoEntity.class);
+        final List<MCRObjectInfoEntity> entities = listEntities.getResultList();
         return entities;
     }
 
     @Test
     public void getByID() {
-        MCRObjectEntity entity = new MCRObjectEntity();
+        MCRObjectInfoEntity entity = new MCRObjectInfoEntity();
         entity.setId(MCRObjectID.getInstance("junit_test_00000001"));
         MCREntityManagerProvider.getCurrentEntityManager().persist(entity);
-        final MCRObjectEntity byID = MCRObjectEntityManager.getByID(entity.getId());
+        final MCRObjectInfoEntity byID = MCRObjectInfoEntityManager.getByID(entity.getId());
         Assert.assertNotNull(byID);
         Assert.assertEquals(entity.getId(), byID.getId());
     }
 
     @Test
     public void update() {
-        MCRObjectEntity entity = new MCRObjectEntity();
+        MCRObjectInfoEntity entity = new MCRObjectInfoEntity();
         entity.setId(MCRObjectID.getInstance("junit_test_00000001"));
         MCREntityManagerProvider.getCurrentEntityManager().persist(entity);
-        final MCRObjectEntity loadedEntity = MCREntityManagerProvider.getCurrentEntityManager()
-            .find(MCRObjectEntity.class, new MCRObjectIDPK(entity.getId()));
+        final MCRObjectInfoEntity loadedEntity = MCREntityManagerProvider.getCurrentEntityManager()
+            .find(MCRObjectInfoEntity.class, new MCRObjectIDPK(entity.getId()));
         startNewTransaction();
         MCRObject obj = new MCRObject();
         obj.setId(entity.getId());
-        MCRObjectEntityManager.update(obj);
-        final MCRObjectEntity updatedEntity = MCREntityManagerProvider.getCurrentEntityManager()
-            .find(MCRObjectEntity.class, new MCRObjectIDPK(entity.getId()));
+        MCRObjectInfoEntityManager.update(obj);
+        final MCRObjectInfoEntity updatedEntity = MCREntityManagerProvider.getCurrentEntityManager()
+            .find(MCRObjectInfoEntity.class, new MCRObjectIDPK(entity.getId()));
         Assert.assertNotEquals(loadedEntity.getCreateDate(), updatedEntity.getCreateDate());
         Assert.assertNotEquals(loadedEntity.getModifyDate(), updatedEntity.getModifyDate());
     }
@@ -102,30 +102,30 @@ public class MCRObjectEntityManagerTest extends MCRJPATestCase {
     public void create() {
         MCRObject obj = new MCRObject();
         obj.setId(MCRObjectID.getInstance("junit_test_00000001"));
-        MCRObjectEntityManager.create(obj);
-        final MCRObjectEntity entity = MCREntityManagerProvider.getCurrentEntityManager()
-            .find(MCRObjectEntity.class, new MCRObjectIDPK(obj.getId()));
+        MCRObjectInfoEntityManager.create(obj);
+        final MCRObjectInfoEntity entity = MCREntityManagerProvider.getCurrentEntityManager()
+            .find(MCRObjectInfoEntity.class, new MCRObjectIDPK(obj.getId()));
         Assert.assertNotNull(entity);
     }
 
     @Test
     public void remove() {
-        MCRObjectEntity entity = new MCRObjectEntity();
+        MCRObjectInfoEntity entity = new MCRObjectInfoEntity();
         entity.setId(MCRObjectID.getInstance("junit_test_00000001"));
         final EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         entityManager.persist(entity);
         startNewTransaction();
         MCRObject obj = new MCRObject();
         obj.setId(entity.getId());
-        MCRObjectEntityManager.remove(obj);
-        final MCRObjectEntity removedEntity = MCREntityManagerProvider.getCurrentEntityManager()
-            .find(MCRObjectEntity.class, new MCRObjectIDPK(obj.getId()));
+        MCRObjectInfoEntityManager.remove(obj);
+        final MCRObjectInfoEntity removedEntity = MCREntityManagerProvider.getCurrentEntityManager()
+            .find(MCRObjectInfoEntity.class, new MCRObjectIDPK(obj.getId()));
         Assert.assertNull(removedEntity);
     }
 
     @Test
     public void delete() {
-        MCRObjectEntity entity = new MCRObjectEntity();
+        MCRObjectInfoEntity entity = new MCRObjectInfoEntity();
         entity.setId(MCRObjectID.getInstance("junit_test_00000001"));
         final EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         entityManager.persist(entity);
@@ -133,9 +133,9 @@ public class MCRObjectEntityManagerTest extends MCRJPATestCase {
         MCRObject obj = new MCRObject();
         obj.setId(entity.getId());
         final Instant now = Instant.now();
-        MCRObjectEntityManager.delete(obj, now, "junit");
-        final MCRObjectEntity deletedEntity = MCREntityManagerProvider.getCurrentEntityManager()
-            .find(MCRObjectEntity.class, new MCRObjectIDPK(obj.getId()));
+        MCRObjectInfoEntityManager.delete(obj, now, "junit");
+        final MCRObjectInfoEntity deletedEntity = MCREntityManagerProvider.getCurrentEntityManager()
+            .find(MCRObjectInfoEntity.class, new MCRObjectIDPK(obj.getId()));
         Assert.assertNotNull(deletedEntity);
         Assert.assertEquals(now, deletedEntity.getDeleteDate());
         Assert.assertEquals("junit", deletedEntity.getDeletedBy());

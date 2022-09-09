@@ -18,6 +18,7 @@
 
 package org.mycore.datamodel.common;
 
+import org.mycore.backend.jpa.MCRObjectInfo;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -28,10 +29,32 @@ import java.util.List;
  */
 public interface MCRObjectQueryResolver {
 
+    /**
+     * Gets all object info which match the restrictions of the query
+     * @param objectQuery the query
+     * @return the ids of the objects
+     */
     List<MCRObjectID> getIds(MCRObjectQuery objectQuery);
 
+    /**
+     * Gets all the object info which match the restrictions of the query
+     * @param objectQuery the query
+     * @return the ids and dates of the object info
+     */
     List<MCRObjectIDDate> getIdDates(MCRObjectQuery objectQuery);
 
+    /**
+     * Gets all the object info which match the restrictions of the query
+     * @param objectQuery the query
+     * @return the info
+     */
+    List<MCRObjectInfo> getInfos(MCRObjectQuery objectQuery);
+
+    /**
+     * Gets the count of object info which match the restrictions of query ignoring limit and offset
+     * @param objectQuery the query
+     * @return the count of the object info
+     */
     int count(MCRObjectQuery objectQuery);
 
     static MCRObjectQueryResolver getInstance() {
