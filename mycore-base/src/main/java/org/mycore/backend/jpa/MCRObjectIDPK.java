@@ -21,6 +21,7 @@ package org.mycore.backend.jpa;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import jakarta.persistence.Access;

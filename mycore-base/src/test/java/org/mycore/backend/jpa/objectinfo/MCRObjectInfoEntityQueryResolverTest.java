@@ -16,13 +16,15 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.backend.jpa;
+package org.mycore.backend.jpa.objectinfo;
 
 import jakarta.persistence.EntityManager;
 import org.jdom2.Document;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.datamodel.common.MCRObjectInfo;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -120,12 +122,12 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
     }
 
     public MCRObjectInfoEntity storeObjectInfo(String id,
-        Instant createdDate,
-        Instant modifiedDate,
-        String createdBy,
-        String modifiedBy,
-        String state,
-        List<String> linkedCategoryIds) {
+                                               Instant createdDate,
+                                               Instant modifiedDate,
+                                               String createdBy,
+                                               String modifiedBy,
+                                               String state,
+                                               List<String> linkedCategoryIds) {
         MCRObjectInfoEntity infoEntity = new MCRObjectInfoEntity();
 
         infoEntity.setId(MCRObjectID.getInstance(id));

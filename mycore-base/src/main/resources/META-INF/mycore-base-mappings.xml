@@ -9,6 +9,6 @@
   <entity class="org.mycore.backend.jpa.dnbtransfer.MCRDNBTRANSFERRESULTS" />
   <entity class="org.mycore.datamodel.classifications2.impl.MCRCategoryImpl" />
   <entity class="org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl" />
-  <entity class="org.mycore.backend.jpa.MCRObjectInfoEntity" />
+  <entity class="org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity" />
   <entity class="org.mycore.services.queuedjob.MCRJob" />
 </entity-mappings>

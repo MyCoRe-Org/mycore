@@ -16,11 +16,13 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.backend.jpa;
+package org.mycore.backend.jpa.objectinfo;
 
 import java.time.Instant;
 import java.util.Optional;
 
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.backend.jpa.MCRObjectIDPK;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -32,7 +34,7 @@ public class MCRObjectInfoEntityManager {
 
     static void removeAll(){
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        em.createQuery("delete from MCRObjectInfoEntity").executeUpdate();
+        em.createQuery("delete from MCRObjectInfoEntity ").executeUpdate();
     }
 
     /**

@@ -16,10 +16,12 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.backend.jpa;
+package org.mycore.backend.jpa.objectinfo;
 
 import java.time.Instant;
 
+import org.mycore.backend.jpa.MCRObjectIDPK;
+import org.mycore.datamodel.common.MCRObjectInfo;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import jakarta.persistence.Column;

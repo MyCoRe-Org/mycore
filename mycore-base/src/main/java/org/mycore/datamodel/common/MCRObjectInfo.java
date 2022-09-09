@@ -16,7 +16,7 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.backend.jpa;
+package org.mycore.datamodel.common;
 
 import java.time.Instant;
 

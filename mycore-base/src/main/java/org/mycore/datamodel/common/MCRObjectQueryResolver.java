@@ -18,7 +18,6 @@
 
 package org.mycore.datamodel.common;
 
-import org.mycore.backend.jpa.MCRObjectInfo;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
 

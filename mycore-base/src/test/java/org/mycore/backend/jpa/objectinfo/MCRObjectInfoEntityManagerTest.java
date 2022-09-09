@@ -16,7 +16,7 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.backend.jpa;
+package org.mycore.backend.jpa.objectinfo;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,6 +26,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.backend.jpa.MCRObjectIDPK;
+import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity;
+import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntityManager;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
