@@ -18,73 +18,63 @@
 
 package org.mycore.backend.jpa;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 import java.time.Instant;
 
 public interface MCRObjectInfo {
-    @Id
+    /**
+     * @return the object id
+     */
     MCRObjectID getId();
 
     /**
      * @return the project encoded in the object id
      */
-    @Column(name = "objectproject")
     String getObjectProject();
 
     /**
      * @return the type encoded in the object id
      */
-    @Column(name = "objecttype")
     String getObjectType();
 
     /**
      * @return the number encoded in the object id
      */
-    @Column(name = "objectnumber")
     int getObjectNumber();
 
     /**
      * @return the creation date of the object
      */
-    @Column(name = "createdate")
     Instant getCreateDate();
 
     /**
      * @return the last modify date of the object
      */
-    @Column(name = "modifydate")
     Instant getModifyDate();
 
     /**
      * @return the user which last modified the object
      */
-    @Column(name = "modifiedby")
     String getModifiedBy();
 
     /**
      * @return returns the user which created the object.
      */
-    @Column(name = "createdby")
     String getCreatedBy();
 
     /**
      * @return returns the user which deleted the object.
      */
-    @Column(name = "deletedby")
     String getDeletedBy();
 
     /**
      * @return the state classification category id e.G. state:submitted
      */
-    @Column(name = "state")
     String getState();
 
     /**
      * @return the date when the object was deleted.
      */
-    @Column(name = "deletedate")
     Instant getDeleteDate();
 }
