@@ -30,7 +30,7 @@ package org.mycore.services.queuedjob;
 public interface MCRJobStatusListener {
     void onError(MCRJob job);
 
-    void onFinish(MCRJob job);
+    void onSuccess(MCRJob job);
 
     void onProcessing(MCRJob job);
 }

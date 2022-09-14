@@ -101,7 +101,7 @@ public class MCRJobThread extends MCRAbstractProcessable implements Runnable {
                 job.setFinished(new Date());
                 job.setStatus(MCRJobStatus.FINISHED);
                 setStatus(MCRProcessableStatus.successful);
-                listeners.forEach(l -> l.onFinish(job));
+                listeners.forEach(l -> l.onSuccess(job));
             } catch (ExecutionException ex) {
                 LOGGER.error("Exception occured while try to start job. Perform rollback.", ex);
                 setError(ex);

@@ -36,7 +36,7 @@ public class MCRDefaultJobStatusListener implements MCRJobStatusListener {
     }
 
     @Override
-    public void onFinish(MCRJob job) {
+    public void onSuccess(MCRJob job) {
         LOGGER.debug("Finished {}", job.getAction().getName());
     }
 
