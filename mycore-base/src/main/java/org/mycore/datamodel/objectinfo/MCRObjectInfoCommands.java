@@ -36,31 +36,31 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXException;
 
-@MCRCommandGroup(name = "Object Entity Commands")
+@MCRCommandGroup(name = "Object Info Commands")
 public class MCRObjectInfoCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    @MCRCommand(syntax = "remove object entities",
-        help = "removes all object entities")
-    public static void deleteEntities() {
+    @MCRCommand(syntax = "remove all objectinfo",
+        help = "deletes the objectinfo for all objects")
+    public static void deleteAllObjectInfo() {
         MCRObjectInfoEntityManager.removeAll();
     }
 
-    @MCRCommand(syntax = "create object entities",
-        help = "reads all objects and creates the corresponding entities",
+    @MCRCommand(syntax = "create all objectinfo",
+        help = "reads all objects and creates the corresponding objectinfo",
         order = 10)
-    public static List<String> createObjectEntities() {
+    public static List<String> createAllObjectInfo() {
         MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
         return mm.getObjectBaseIds()
             .stream().filter(b -> !b.endsWith("derivate"))
-            .map(b -> "create object entities for base " + b)
+            .map(b -> "create objectinfo for base " + b)
             .collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "create object entities for base {0}",
-        help = "reads all objects with base id {0} and creates the corresponding entities")
-    public static List<String> createObjectEntities(String baseId) {
+    @MCRCommand(syntax = "create objectinfo for base {0}",
+        help = "reads all objects with base id {0} and creates the corresponding objectinfo")
+    public static List<String> createObjectInfoForBase(String baseId) {
         String[] idParts = baseId.split("_");
         MCRXMLMetadataManager mm = MCRXMLMetadataManager.instance();
         if (idParts[1].equals("derivate")) {
@@ -70,22 +70,22 @@ public class MCRObjectInfoCommands {
         int maxID = mm.getHighestStoredID(idParts[0], idParts[1]);
         return IntStream.rangeClosed(1, maxID)
             .mapToObj(n -> MCRObjectID.formatID(baseId, n))
-            .map(id -> "create object entity for object " + id)
+            .map(id -> "create objectinfo for object " + id)
             .collect(Collectors.toList());
     }
 
-    @MCRCommand(syntax = "create object entity for object {0}",
-        help = "creates the corresponding entity for MCRObject {0}")
-    public static void createObjectEntity(String idStr) {
+    @MCRCommand(syntax = "create objectinfo for object {0}",
+        help = "creates the corresponding objectinfo for MCRObject {0}")
+    public static void createObjectInfoForObject(String idStr) {
         MCRObjectID id = MCRObjectID.getInstance(idStr);
-        LogManager.getLogger().info("create entity for object " + idStr);
+        LogManager.getLogger().info("create objectinfo for object " + idStr);
         if (id.getTypeId().equals("derivate")) {
             return;
         }
         try {
             if (MCRMetadataManager.exists(id)) {
                 MCRObjectInfoEntityManager.update(MCRMetadataManager.retrieveMCRObject(id));
-                LogManager.getLogger().info("object entity for object " + idStr + " created.");
+                LogManager.getLogger().info("objectinfo for object " + idStr + " created.");
 
             } else {
                 List<? extends MCRAbstractMetadataVersion<?>> versions = MCRXMLMetadataManager.instance()
@@ -102,7 +102,7 @@ public class MCRObjectInfoCommands {
                         MCRObjectInfoEntityManager.update(obj);
                         MCRObjectInfoEntityManager.delete(obj,
                             deleted.getDate().toInstant(), deleted.getUser());
-                        LogManager.getLogger().info("object entity for object " + idStr + " created.");
+                        LogManager.getLogger().info("objectinfo for object " + idStr + " created.");
                     } catch (JDOMException | SAXException e) {
                         LOGGER.warn("Could not determine what happened to " + id, e);
                     }
