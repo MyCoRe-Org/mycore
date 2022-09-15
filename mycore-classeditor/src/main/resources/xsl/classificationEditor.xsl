@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <xsl:param name="MCR.classeditor.xlanguages"/>
+  <xsl:param name="MCR.classeditor.additionalLanguages"/>
 
   <xsl:include href="classificationEditorBase.xsl" />
   <xsl:output method="html" encoding="UTF-8" indent="yes" />
@@ -22,7 +22,7 @@
         <div id="classificationEditorWrapper"></div>
 
         <script type="text/javascript">
-          window["MCR.classeditor.xlanguages"] = &quot;<xsl:value-of select="$MCR.classeditor.xlanguages"/>&quot;;
+          window["MCR.classeditor.additionalLanguages"] = &quot;<xsl:value-of select="$MCR.classeditor.additionalLanguages"/>&quot;;
           require(["dojo/ready"], function(ready) {
             ready(function() {
               require([

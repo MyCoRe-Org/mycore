@@ -116,11 +116,11 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
 
     updateLanguages: function() {
     	var languages = i18n.getLanguages();
-    	var xLanguages = (window["MCR.classeditor.xlanguages"] || "").split(",");
-    	for (i = 0; i < xLanguages.length; i++) {
-    		var xLanguage = "x-" + xLanguages[i];
-    		if(languages.indexOf(xLanguage) === -1) {
-    			languages.push(xLanguage);
+    	var additionalLanguages = (window["MCR.classeditor.additionalLanguages"] || "").split(",");
+    	for (i = 0; i < additionalLanguages.length; i++) {
+    		var additionalLanguage = additionalLanguages[i];
+    		if (languages.indexOf(additionalLanguage) === -1) {
+    			languages.push(additionalLanguage);
     		}
     	}
     	this.labelEditor.row.args.languages = languages;
