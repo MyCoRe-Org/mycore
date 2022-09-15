@@ -16,7 +16,7 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.backend.jpa.objectinfo;
+package org.mycore.datamodel.objectinfo;
 
 import java.time.Instant;
 
@@ -25,7 +25,7 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
 
-public class MCRObjectEntityEventHandler extends MCREventHandlerBase {
+public class MCRObjectInfoEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {

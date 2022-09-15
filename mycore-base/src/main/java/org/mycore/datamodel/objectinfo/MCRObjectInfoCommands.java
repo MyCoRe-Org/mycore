@@ -16,7 +16,7 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.backend.jpa.objectinfo;
+package org.mycore.datamodel.objectinfo;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,7 +37,7 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.xml.sax.SAXException;
 
 @MCRCommandGroup(name = "Object Entity Commands")
-public class MCRObjectEntityCommands {
+public class MCRObjectInfoCommands {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

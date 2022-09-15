@@ -16,14 +16,24 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.backend.jpa.objectinfo;
+package org.mycore.datamodel.objectinfo;
 
-import jakarta.persistence.EntityManager;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.jdom2.Document;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -37,18 +47,9 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRObjectQuery;
 import org.mycore.datamodel.common.MCRObjectQueryResolver;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.objectinfo.MCRObjectInfo;
 import org.xml.sax.SAXParseException;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import jakarta.persistence.EntityManager;
 
 public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
 
