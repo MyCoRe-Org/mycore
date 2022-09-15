@@ -34,11 +34,11 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl_;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl_;
 import org.mycore.datamodel.common.MCRObjectIDDate;
-import org.mycore.datamodel.common.MCRObjectInfo;
 import org.mycore.datamodel.common.MCRObjectQuery;
 import org.mycore.datamodel.common.MCRObjectQueryResolver;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.objectinfo.MCRObjectInfo;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;

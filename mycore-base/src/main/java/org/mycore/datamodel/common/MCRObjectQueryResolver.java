@@ -20,6 +20,7 @@ package org.mycore.datamodel.common;
 
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.objectinfo.MCRObjectInfo;
 
 import java.util.List;
 

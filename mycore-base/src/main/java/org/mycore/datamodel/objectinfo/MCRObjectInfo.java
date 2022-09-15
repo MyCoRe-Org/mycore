@@ -16,7 +16,7 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.common;
+package org.mycore.datamodel.objectinfo;
 
 import java.time.Instant;
 

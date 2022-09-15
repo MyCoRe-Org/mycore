@@ -21,8 +21,8 @@ package org.mycore.backend.jpa.objectinfo;
 import java.time.Instant;
 
 import org.mycore.backend.jpa.MCRObjectIDPK;
-import org.mycore.datamodel.common.MCRObjectInfo;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.objectinfo.MCRObjectInfo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

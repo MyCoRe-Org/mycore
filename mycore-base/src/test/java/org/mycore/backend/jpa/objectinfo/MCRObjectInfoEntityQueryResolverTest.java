@@ -24,7 +24,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.datamodel.common.MCRObjectInfo;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.common.content.MCRURLContent;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -38,6 +37,7 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRObjectQuery;
 import org.mycore.datamodel.common.MCRObjectQueryResolver;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.objectinfo.MCRObjectInfo;
 import org.xml.sax.SAXParseException;
 
 import java.net.MalformedURLException;
