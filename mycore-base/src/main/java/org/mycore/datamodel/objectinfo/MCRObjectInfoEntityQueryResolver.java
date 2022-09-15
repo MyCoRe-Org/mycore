@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity;
+import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity_;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference_;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryID_;
