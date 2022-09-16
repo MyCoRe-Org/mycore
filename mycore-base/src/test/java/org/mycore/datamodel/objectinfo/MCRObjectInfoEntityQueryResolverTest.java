@@ -122,12 +122,12 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
     }
 
     public MCRObjectInfoEntity storeObjectInfo(String id,
-                                               Instant createdDate,
-                                               Instant modifiedDate,
-                                               String createdBy,
-                                               String modifiedBy,
-                                               String state,
-                                               List<String> linkedCategoryIds) {
+        Instant createdDate,
+        Instant modifiedDate,
+        String createdBy,
+        String modifiedBy,
+        String state,
+        List<String> linkedCategoryIds) {
         MCRObjectInfoEntity infoEntity = new MCRObjectInfoEntity();
 
         infoEntity.setId(MCRObjectID.getInstance(id));
@@ -317,20 +317,21 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         result = instance.getInfos(category3);
 
         Assert.assertEquals("The first result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-                result.get(0).getId());
+            result.get(0).getId());
         Assert.assertEquals("The second result should be " + TEST_ID_2, MCRObjectID.getInstance(TEST_ID_2),
-                result.get(1).getId());
+            result.get(1).getId());
 
         count = instance.count(category3);
         Assert.assertEquals("both object should match", 2, count);
 
-        MCRObjectQuery category1and3 = new MCRObjectQuery().sort(MCRObjectQuery.SortBy.id, MCRObjectQuery.SortOrder.asc);
+        MCRObjectQuery category1and3 = new MCRObjectQuery().sort(MCRObjectQuery.SortBy.id,
+            MCRObjectQuery.SortOrder.asc);
         category1and3.getIncludeCategories().add(TEST_CATEGORY_1);
         category1and3.getIncludeCategories().add(TEST_CATEGORY_3);
         result = instance.getInfos(category1and3);
 
         Assert.assertEquals("The only result should be " + TEST_ID_1, MCRObjectID.getInstance(TEST_ID_1),
-                result.get(0).getId());
+            result.get(0).getId());
 
         count = instance.count(category1and3);
         Assert.assertEquals("Only one object should match", 1, count);
