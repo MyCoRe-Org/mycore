@@ -1,38 +1,47 @@
 # MyCoRe Storage Layout
--   Extension Name: mycore-storage-layout
--   Author: Robert Stephan, Tobias Lenhardt
--   Minimum OCFL Version: 1.0
--   OCFL Community Extensions Version: n/a
--   Obsoletes: MCRLayout
--   Obsoleted by: n/a
+*   **Extension Name:** mycore-storage-layout
+*   **Author:** Robert Stephan, Tobias Lenhardt
+*   **Minimum OCFL Version:** 1.0
+*   **OCFL Community Extensions Version:** n/a
+*   **Obsoletes:** n/a
+*   **Obsoleted by:** n/a
 
 ## Overview
 
-This storage root extension maps OCFL Objects by segmenting their ID via the namespace, and on Objects and Derivates, the predefined SlotLayout or calculated one from the NumberPattern. This Layout works mostly like the native XML Store.
+This storage root extension describes how to map MyCoRe identifiers to OCFL object root directories.
+The first sub path is equal to the prefix of the identifier.
+The creation of the following sub pathes depends on the object type.
+IDs of MyCoRe metadata objects and derivates are further segmented by project_id, type_id 
+and a slot layout derived from the numeric part of the id.
+IDs of utility objects like users or classifications are no further segmented. 
+
+MyCoRe users may recognize the result as a human readable directory structure, 
+which looks similar to the current MyCoRe file system implementation ("IFS2").
+
 
 ## Parameters
 > Configuration is for the MyCoRe implementation only
 
--   **Name:** NumberPattern
-    -   **Description:** The Pattern of the ObjectIDs
-    -   **Type:** string
-    -   **Configuration:** `MCR.Metadata.ObjectID.NumberPattern`
-    -   **Constraints:** zeros (`0`) only
-    -   **Default:** `0000000000`
+*  **Name:** NumberPattern
+   *  **Description:** The Pattern of the ObjectIDs
+   *  **Type:** string
+   *  **Configuration:** `MCR.Metadata.ObjectID.NumberPattern`
+   *  **Constraints:** zeros (`0`) only
+   *  **Default:** `0000000000`
 
--   **Name:** SlotLayoutClass
-    -   **Description:** The Structure of the Object ID for generating the Directory, separated by dashes (`-`)
-    -   **Type:** string
-    -   **Configuration:** `MCR.IFS2.Store.class.SlotLayout`
-    -   **Constraints:** Layers must be separated by `-`
-    -   **Default:** `"(Length of NumberPattern - 4)-2-2"`
+*   **Name:** SlotLayoutClass
+   *  **Description:** The Structure of the Object ID for generating the Directory, separated by dashes (`-`)
+   *  **Type:** string
+   *  **Configuration:** `MCR.IFS2.Store.class.SlotLayout`
+   *  **Constraints:** Layers must be separated by `-`
+   *  **Default:** `"(Length of NumberPattern - 4)-2-2"`
 
--   **Name:** SlotLayoutDerivate
-    -   **Description:** The Structure of the Object ID for generating the Directory, separated by dashes (`-`)
-    -   **Type:** string
-    -   **Configuration:** `MCR.IFS2.Store.derivate.SlotLayout`
-    -   **Constraints:** Layers must be separated by `-`
-    -   **Default:** `"(Length of NumberPattern - 4)-2-2"`
+*  **Name:** SlotLayoutDerivate
+   *  **Description:** The Structure of the Object ID for generating the Directory, separated by dashes (`-`)
+   *  **Type:** string
+   *  **Configuration:** `MCR.IFS2.Store.derivate.SlotLayout`
+   *  **Constraints:** Layers must be separated by `-`
+   *  **Default:** `"(Length of NumberPattern - 4)-2-2"`
 
 ## Example
 
@@ -52,7 +61,7 @@ This storage root extension maps OCFL Objects by segmenting their ID via the nam
 | mcrclass:Project_Classification         | mcrclass/Project_Classification        |
 
 ### Storage Hierarchy
-```yaml
+```
 [storage root]
 ├── 0=ocfl_1.0
 ├── extensions
