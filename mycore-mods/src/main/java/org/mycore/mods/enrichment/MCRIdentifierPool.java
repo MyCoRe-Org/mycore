@@ -51,36 +51,20 @@ class MCRIdentifierPool {
         return oldIdentifiers.size();
     }
 
-    /** Add all new identifiers that can be found in the given MODS object */
-    synchronized void addIdentifiersFrom(Element object) {
+    boolean newIdentifiersFoundIn(Element publication) {
+        // remember all currently known identifiers, mark them as "old"
+        oldIdentifiers.addAll(newIdentifiers);
+        newIdentifiers.clear();
+
+        // look if they are any new identifiers
         for (MCRIdentifierType type : MCRIdentifierTypeFactory.instance().getTypes()) {
-            newIdentifiers.addAll(type.getIdentifiers(object));
+            newIdentifiers.addAll(type.getIdentifiers(publication));
         }
         newIdentifiers.removeAll(oldIdentifiers);
-        buildNewIdentifiersIn(object);
-    }
-
-    /** Returns true, if new identifiers were added in the current resolving round */
-    boolean hasNewIdentifiers() {
         return !newIdentifiers.isEmpty();
     }
 
-    void buildNewIdentifiersIn(Element object) {
-        newIdentifiers.forEach(id -> id.buildElement(object));
-    }
-
-    /** Merges all new identifies into the set of old identifiers */
-    void continueWithNewIdentifiers() {
-        oldIdentifiers.addAll(newIdentifiers);
-        newIdentifiers.clear();
-    }
-
-    List<MCRIdentifier> getIdentifiersOfType(MCRIdentifierType type) {
-        return oldIdentifiers.stream().filter(id -> id.getType().equals(type)).collect(Collectors.toList());
-    }
-    
-    void moveToNext() {
-        oldIdentifiers.add(newIdentifiers.iterator().next());
-        newIdentifiers.remove(newIdentifiers.iterator().next());
+    List<MCRIdentifier> getNewIdentifiersOfType(MCRIdentifierType type) {
+        return newIdentifiers.stream().filter(id -> id.getType().equals(type)).collect(Collectors.toList());
     }
 }

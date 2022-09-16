@@ -63,7 +63,7 @@ class MCRIdentifier {
 
     @Override
     public String toString() {
-        return type.getTypeID() + ":" + value;
+        return type.getTypeID() + " " + value;
     }
 
     /**

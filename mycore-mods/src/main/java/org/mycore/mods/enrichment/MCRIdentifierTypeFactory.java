@@ -52,9 +52,9 @@ class MCRIdentifierTypeFactory {
     }
 
     private MCRIdentifierType buildIdentifierType(String typeID) {
+        String configProperty = "MCR.MODS.EnrichmentResolver.IdentifierType." + typeID;
         String defaultXPath = String.format(Locale.ROOT, DEFAULT_XPATH, typeID);
-        String xPath = MCRConfiguration2.getString("MCR.MODS.EnrichmentResolver.IdentifierType." + typeID)
-            .orElse(defaultXPath);
+        String xPath = MCRConfiguration2.getString(configProperty).orElse(defaultXPath);
         return new MCRIdentifierType(typeID, xPath);
     }
 

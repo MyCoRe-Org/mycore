@@ -37,10 +37,17 @@ class MCRDataSource {
 
     private String sourceID;
 
+    private boolean stopOnFirstResult = true;
+
     private List<MCRIdentifierResolver> resolvers = new ArrayList<>();
 
-    MCRDataSource(String sourceID) {
+    MCRDataSource(String sourceID, boolean stopOnFirstResult) {
         this.sourceID = sourceID;
+        this.stopOnFirstResult = stopOnFirstResult;
+    }
+
+    boolean shouldStopOnFirstResult() {
+        return stopOnFirstResult;
     }
 
     void addResolver(MCRIdentifierResolver resolver) {

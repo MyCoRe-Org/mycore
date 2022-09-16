@@ -18,15 +18,15 @@
 
 package org.mycore.mods.enrichment;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.mods.MCRMODSCommands;
-import org.mycore.mods.MCRMODSSorter;
 import org.mycore.mods.merger.MCRMerger;
 import org.mycore.mods.merger.MCRMergerFactory;
 
@@ -46,7 +46,9 @@ class MCRDataSourceCall implements Callable<Boolean> {
 
     private MCRIdentifierPool idPool;
 
-    private Element result;
+    private Set<MCRIdentifier> consumedIDs = new HashSet<MCRIdentifier>();
+
+    private List<Element> results = new ArrayList<Element>();
 
     MCRDataSourceCall(MCRDataSource ds, MCRIdentifierPool idPool) {
         this.ds = ds;
@@ -59,60 +61,53 @@ class MCRDataSourceCall implements Callable<Boolean> {
      * When the data source returns publication data for an identifier,
      * the call is marked successful and the other identifiers are skipped.
      *
-     * @return true, if the data source returned publication data
+     * @return true, if the data source returned valid publication data
      */
     public Boolean call() {
-        if (!wasSuccessful()) {
-            for (MCRIdentifierResolver idResolver : ds.getResolvers()) {
-                MCRIdentifierType type = idResolver.getType();
-                for (MCRIdentifier id : idPool.getIdentifiersOfType(type)) {
-                    result = idResolver.resolve(id.getValue());
-                    LOGGER.info(ds.getID() + " with " + id + " returned " + (wasSuccessful() ? "" : "no ") + "data ");
-                    if (wasSuccessful() && validate(id.getValue())) {
-                        MCRMODSSorter.sort(result);
-                        idPool.addIdentifiersFrom(result);
-                        return true;
+        if (!isFinished()) {
+            loop: for (MCRIdentifierResolver idResolver : ds.getResolvers()) {
+                for (MCRIdentifier id : idPool.getNewIdentifiersOfType(idResolver.getType())) {
+                    if (isFinished())
+                        break loop;
+
+                    if (!consumedIDs.contains(id)) {
+                        consumedIDs.add(id);
+                        Element result = idResolver.resolve(id.getValue());
+                        if (result != null) {
+                            results.add(result);
+                        }
+
+                        LOGGER.info(ds + " with " + id + " returned " + (result != null ? "" : "no ") + "valid data");
                     }
                 }
             }
         }
-        return false;
-    }
 
-    protected Boolean validate(String id) {
-        final Document doc = new Document();
-        doc.addContent(this.result.detach());
-
-        try {
-            MCRXMLHelper.validate(doc, MCRMODSCommands.MODS_V3_XSD_URI);
-        } catch (Exception e) {
-            LOGGER.warn(ds.getID() + " with " + id + " returned invalid mods!", e);
-            return false;
-        }
-
-        return true;
+        return wasSuccessful();
     }
 
     boolean wasSuccessful() {
-        return result != null;
+        return !results.isEmpty();
+    }
+
+    private boolean isFinished() {
+        return ds.shouldStopOnFirstResult() ? wasSuccessful() : false;
     }
 
     /**
      * Merges the publication data returned by the data source with the existing data
      */
     void mergeResultWith(Element existingData) {
-        if (existingData.getName().equals("relatedItem")) {
-            // resolved is always mods:mods, transform to mods:relatedItem to be mergeable
-            result.setName("relatedItem");
-            result.setAttribute(existingData.getAttribute("type").clone());
+        for (Element result : results) {
+            if (existingData.getName().equals("relatedItem")) {
+                // resolved is always mods:mods, transform to mods:relatedItem to be mergeable
+                result.setName("relatedItem");
+                result.setAttribute(existingData.getAttribute("type").clone());
+            }
+
+            MCRMerger a = MCRMergerFactory.buildFrom(existingData);
+            MCRMerger b = MCRMergerFactory.buildFrom(result);
+            a.mergeFrom(b);
         }
-
-        MCRMerger a = MCRMergerFactory.buildFrom(existingData);
-        MCRMerger b = MCRMergerFactory.buildFrom(result);
-        a.mergeFrom(b);
-    }
-
-    void reset() {
-        this.result = null;
     }
 }

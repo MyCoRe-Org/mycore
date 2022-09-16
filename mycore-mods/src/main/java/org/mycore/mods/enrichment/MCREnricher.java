@@ -80,54 +80,50 @@ public class MCREnricher {
 
     private static final String XPATH_HOST_SERIES = "mods:relatedItem[@type='host' or @type='series']";
 
+    private static final String DELIMITERS = " ()";
+
     private XPathExpression<Element> xPath2FindNestedObjects;
 
     private String dsConfig;
 
-    Element publication;
+    private MCRIdentifierPool idPool;
 
-    MCRIdentifierPool idPool;
-
-    Map<String, MCRDataSourceCall> id2call = new HashMap<>();
+    private Map<String, MCRDataSourceCall> id2call;
 
     public MCREnricher(String configID) {
         xPath2FindNestedObjects = XPathFactory.instance().compile(XPATH_HOST_SERIES, Filters.element(), null,
             MCRConstants.getStandardNamespaces());
 
         dsConfig = MCRConfiguration2.getStringOrThrow("MCR.MODS.EnrichmentResolver.DataSources." + configID);
-
-        idPool = new MCRIdentifierPool();
-        prepareDataSourceCalls(dsConfig);
     }
 
-    public void enrich(Element publication) {
-        this.publication = publication;
-        idPool.addIdentifiersFrom(publication);
+    public synchronized void enrich(Element publication) {
+        idPool = new MCRIdentifierPool();
+        id2call = prepareDataSourceCalls();
 
-        while(idPool.hasNewIdentifiers()) {
+        while (idPool.newIdentifiersFoundIn(publication)) {
             resolveExternalData();
-            mergeExternalData();
+            mergeExternalData(publication);
             MCRMODSSorter.sort(publication);
-            idPool.addIdentifiersFrom(publication);
         }
 
         for (Element nestedObject : xPath2FindNestedObjects.evaluate(publication)) {
-            idPool.continueWithNewIdentifiers();
             enrich(nestedObject);
         }
     }
 
-    private void prepareDataSourceCalls(String dsConfig) {
-        for (StringTokenizer st = new StringTokenizer(dsConfig, " ()", false); st.hasMoreTokens();) {
+    private Map<String, MCRDataSourceCall> prepareDataSourceCalls() {
+        id2call = new HashMap<>();
+        for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, false); st.hasMoreTokens();) {
             String dataSourceID = st.nextToken();
             MCRDataSource dataSource = MCRDataSourceFactory.instance().getDataSource(dataSourceID);
             MCRDataSourceCall call = new MCRDataSourceCall(dataSource, idPool);
             id2call.put(dataSourceID, call);
         }
+        return id2call;
     }
 
     private void resolveExternalData() {
-        id2call.values().forEach(call -> call.reset());
         Collection<MCRTransactionableCallable<Boolean>> calls = id2call.values()
             .stream()
             .map(MCRTransactionableCallable::new)
@@ -135,7 +131,6 @@ public class MCREnricher {
         ExecutorService executor = Executors.newFixedThreadPool(calls.size());
         try {
             executor.invokeAll(calls);
-            idPool.moveToNext();
         } catch (InterruptedException ex) {
             LOGGER.warn(ex);
         } finally {
@@ -143,12 +138,11 @@ public class MCREnricher {
         }
     }
 
-    private void mergeExternalData() {
+    private void mergeExternalData(Element publication) {
         boolean withinGroup = false;
-        String delimiters = " ()";
 
-        for (StringTokenizer st = new StringTokenizer(dsConfig, delimiters, true); st.hasMoreTokens();) {
-            String token = st.nextToken(delimiters).trim();
+        for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, true); st.hasMoreTokens();) {
+            String token = st.nextToken().trim();
             if (token.isEmpty()) {
                 continue;
             } else if ("(".equals(token)) {
@@ -160,6 +154,7 @@ public class MCREnricher {
                 if (call.wasSuccessful()) {
                     LOGGER.info("merging data from " + token);
                     call.mergeResultWith(publication);
+
                     if (withinGroup) {
                         st.nextToken(")"); // skip forward to end of group
                         withinGroup = false;
