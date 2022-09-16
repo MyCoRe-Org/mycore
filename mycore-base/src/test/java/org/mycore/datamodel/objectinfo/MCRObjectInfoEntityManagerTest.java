@@ -69,8 +69,8 @@ public class MCRObjectInfoEntityManagerTest extends MCRJPATestCase {
     }
 
     private static List<MCRObjectInfoEntity> getObjectEntities() {
-        final TypedQuery<MCRObjectInfoEntity> listEntities = MCREntityManagerProvider.getCurrentEntityManager().createQuery(
-            "FROM MCRObjectInfoEntity", MCRObjectInfoEntity.class);
+        final TypedQuery<MCRObjectInfoEntity> listEntities = MCREntityManagerProvider.getCurrentEntityManager()
+            .createQuery("FROM MCRObjectInfoEntity", MCRObjectInfoEntity.class);
         final List<MCRObjectInfoEntity> entities = listEntities.getResultList();
         return entities;
     }
