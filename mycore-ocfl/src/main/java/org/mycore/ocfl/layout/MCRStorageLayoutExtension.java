@@ -79,8 +79,7 @@ public class MCRStorageLayoutExtension implements OcflStorageLayoutExtension {
                 String[] idParts = mcrid.split("_");
                 builder.append(idParts[0]).append('/').append(idParts[1]).append('/');
                 String id = idParts[2];
-                String[] layers = "derivate".equals(idParts[1]) ? config.getSlotLayoutDerivate().split("-")
-                    : config.getSlotLayoutClass().split("-");
+                String[] layers = config.getSlotLayout().split("-");
                 int position = 0;
                 for (int i = 0; i < layers.length; i++) {
                     if (i == layers.length - 1) {

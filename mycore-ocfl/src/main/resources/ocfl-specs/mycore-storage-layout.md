@@ -13,24 +13,10 @@ This storage root extension maps OCFL Objects by segmenting their ID via the nam
 ## Parameters
 > Configuration is for the MyCoRe implementation only
 
--   **Name:** NumberPattern
-    -   **Description:** The Pattern of the ObjectIDs
-    -   **Type:** string
-    -   **Configuration:** `MCR.Metadata.ObjectID.NumberPattern`
-    -   **Constraints:** zeros (`0`) only
-    -   **Default:** `0000000000`
-
--   **Name:** SlotLayoutClass
+-   **Name:** SlotLayout
     -   **Description:** The Structure of the Object ID for generating the Directory, separated by dashes (`-`)
     -   **Type:** string
-    -   **Configuration:** `MCR.IFS2.Store.class.SlotLayout`
-    -   **Constraints:** Layers must be separated by `-`
-    -   **Default:** `"(Length of NumberPattern - 4)-2-2"`
-
--   **Name:** SlotLayoutDerivate
-    -   **Description:** The Structure of the Object ID for generating the Directory, separated by dashes (`-`)
-    -   **Type:** string
-    -   **Configuration:** `MCR.IFS2.Store.derivate.SlotLayout`
+    -   **Configuration:** `MCR.OCFL.MCRStorageLayout.SlotLayout`
     -   **Constraints:** Layers must be separated by `-`
     -   **Default:** `"(Length of NumberPattern - 4)-2-2"`
 

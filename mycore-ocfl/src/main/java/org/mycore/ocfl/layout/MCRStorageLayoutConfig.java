@@ -27,17 +27,13 @@ public class MCRStorageLayoutConfig implements OcflExtensionConfig {
 
     public String extensionName;
 
-    private String pattern;
-
-    private String slotLayoutClass;
-
-    private String slotLayoutDerivate;
+    private String slotLayout;
 
     public MCRStorageLayoutConfig() {
-        pattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern").orElse("0000000000");
-        String defaultLayout = pattern.length() - 4 + "-2-2";
-        slotLayoutClass = MCRConfiguration2.getString("MCR.IFS2.Store.class.SlotLayout").orElse(defaultLayout);
-        slotLayoutDerivate = MCRConfiguration2.getString("MCR.IFS2.Store.derivate.SlotLayout").orElse(defaultLayout);
+        slotLayout = MCRConfiguration2.getString("MCR.OCFL.MyCoReStorageLayout.SlotLayout").orElseGet(() -> {
+            String pattern = MCRConfiguration2.getString("MCR.Metadata.ObjectID.NumberPattern").orElse("0000000000");
+            return Integer.toString(pattern.length() - 4) + "-2-2";
+        });
     }
 
     @Override
@@ -56,51 +52,16 @@ public class MCRStorageLayoutConfig implements OcflExtensionConfig {
      * @param slotLayout MyCoRe Class SlotLayout, see MCRStore for more info
      * @return MCRLayoutConfig
      */
-    public MCRStorageLayoutConfig setSlotLayoutClass(String slotLayout) {
-        this.slotLayoutClass = Enforce.notNull(slotLayout, "Class SlotLayout cannot be null!");
+    public MCRStorageLayoutConfig setSlotLayout(String slotLayout) {
+        this.slotLayout = Enforce.notNull(slotLayout, "Class SlotLayout cannot be null!");
         return this;
     }
 
     /**
-     * Overwrites the Derivate SlotLayout for the OCFL Repository
-     * 
-     * @param slotLayout MyCoRe Class SlotLayout, see MCRStore for more info
-     * @return MCRLayoutConfig
+     * @return Current SlotLayout
      */
-    public MCRStorageLayoutConfig setSlotLayoutDerivate(String slotLayout) {
-        this.slotLayoutDerivate = Enforce.notNull(slotLayout, "Derivate SlotLayout cannot be null!");
-        return this;
+    public String getSlotLayout() {
+        return this.slotLayout;
     }
 
-    /**
-     * @return Current Class SlotLayout
-     */
-    public String getSlotLayoutClass() {
-        return this.slotLayoutClass;
-    }
-
-    /**
-     * @return Current Derivate SlotLayout
-     */
-    public String getSlotLayoutDerivate() {
-        return this.slotLayoutDerivate;
-    }
-
-    /**
-     * Overwrites the Pattern for the OCFL Repository
-     * 
-     * @param pattern MyCoRe Pattern, see MCRStore for more info
-     * @return MCRLayoutConfig
-     */
-    public MCRStorageLayoutConfig setPattern(String pattern) {
-        this.pattern = Enforce.notNull(pattern, "Pattern cannot be null!");
-        return this;
-    }
-
-    /**
-     * @return Current Pattern
-     */
-    public String getPattern() {
-        return this.pattern;
-    }
 }
