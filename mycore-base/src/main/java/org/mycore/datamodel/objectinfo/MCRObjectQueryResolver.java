@@ -16,11 +16,11 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.common;
+package org.mycore.datamodel.objectinfo;
 
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.objectinfo.MCRObjectInfo;
 
 import java.util.List;
 

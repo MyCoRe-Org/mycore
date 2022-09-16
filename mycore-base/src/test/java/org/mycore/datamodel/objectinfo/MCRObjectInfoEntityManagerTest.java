@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRObjectIDPK;
 import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity;
+import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntityManager;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;

@@ -71,6 +71,8 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.datamodel.objectinfo.MCRObjectQuery;
+import org.mycore.datamodel.objectinfo.MCRObjectQueryResolver;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.media.services.MCRThumbnailGenerator;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
@@ -80,8 +82,6 @@ import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRContentAbstractWriter;
 import org.mycore.restapi.v2.model.MCRRestObjectIDDate;
-import org.mycore.datamodel.common.MCRObjectQuery;
-import org.mycore.datamodel.common.MCRObjectQueryResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 

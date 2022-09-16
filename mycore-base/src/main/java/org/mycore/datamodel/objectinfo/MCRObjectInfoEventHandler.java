@@ -20,6 +20,7 @@ package org.mycore.datamodel.objectinfo;
 
 import java.time.Instant;
 
+import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntityManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;

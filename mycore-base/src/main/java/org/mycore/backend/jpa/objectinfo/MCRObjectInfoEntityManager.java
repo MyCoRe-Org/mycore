@@ -16,14 +16,13 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.objectinfo;
+package org.mycore.backend.jpa.objectinfo;
 
 import java.time.Instant;
 import java.util.Optional;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.backend.jpa.MCRObjectIDPK;
-import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -33,7 +32,7 @@ import jakarta.persistence.EntityManager;
 
 public class MCRObjectInfoEntityManager {
 
-    static void removeAll(){
+    public static void removeAll(){
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.createQuery("delete from MCRObjectInfoEntity ").executeUpdate();
     }
@@ -43,7 +42,7 @@ public class MCRObjectInfoEntityManager {
      * @param id the id of the {@link MCRObjectInfoEntity}
      * @return null if MCRObjectEntity is not found
      */
-    static MCRObjectInfoEntity getByID(MCRObjectID id) {
+    public static MCRObjectInfoEntity getByID(MCRObjectID id) {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         return em.find(MCRObjectInfoEntity.class, new MCRObjectIDPK(id));
     }
@@ -53,7 +52,7 @@ public class MCRObjectInfoEntityManager {
      * created
      * @param obj the object which info should be updated
      */
-    static void update(MCRObject obj) {
+    public static void update(MCRObject obj) {
         MCRObjectID id = obj.getId();
         MCRObjectInfoEntity entity = getByID(id);
         if (entity != null) {
@@ -67,7 +66,7 @@ public class MCRObjectInfoEntityManager {
      * creates a new {@link MCRObjectInfoEntity} for an object
      * @param obj the object
      */
-    static void create(MCRObject obj) {
+    public static void create(MCRObject obj) {
         MCRObjectInfoEntity entity = new MCRObjectInfoEntity();
         applyMetadataToInfo(obj, entity);
         MCREntityManagerProvider.getCurrentEntityManager().persist(entity);
@@ -77,7 +76,7 @@ public class MCRObjectInfoEntityManager {
      * Removes object information from the Database
      * @param object the object info which should be removed from the database
      */
-    static void remove(MCRObject object) {
+    public static void remove(MCRObject object) {
         MCRObjectInfoEntity byID = getByID(object.getId());
         if (byID == null) {
             return;

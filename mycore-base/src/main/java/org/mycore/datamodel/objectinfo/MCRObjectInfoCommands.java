@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
+import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntityManager;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;

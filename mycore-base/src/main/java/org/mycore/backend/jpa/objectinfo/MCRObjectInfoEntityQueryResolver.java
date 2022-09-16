@@ -16,7 +16,7 @@
  *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.datamodel.objectinfo;
+package org.mycore.backend.jpa.objectinfo;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -26,8 +26,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity;
-import org.mycore.backend.jpa.objectinfo.MCRObjectInfoEntity_;
 import org.mycore.datamodel.classifications2.MCRCategLinkReference_;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryID_;
@@ -36,10 +34,11 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl_;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryLinkImpl_;
 import org.mycore.datamodel.common.MCRObjectIDDate;
-import org.mycore.datamodel.common.MCRObjectQuery;
-import org.mycore.datamodel.common.MCRObjectQueryResolver;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.objectinfo.MCRObjectInfo;
+import org.mycore.datamodel.objectinfo.MCRObjectQuery;
+import org.mycore.datamodel.objectinfo.MCRObjectQueryResolver;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
