@@ -32,7 +32,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @IdClass(MCRObjectIDPK.class)
-@Table(name = "MCRObjectInfo")
+@Table(name = "MCRObject")
 public class MCRObjectInfoEntity implements MCRObjectInfo {
 
     private MCRObjectID id;
