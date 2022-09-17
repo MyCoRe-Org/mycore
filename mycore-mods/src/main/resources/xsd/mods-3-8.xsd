@@ -4,39 +4,29 @@
 	
 Editor: Ray Denenberg	raydenenberg@gmail.com 
  -->
-<xs:schema xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://www.loc.gov/mods/v3" targetNamespace="http://www.loc.gov/mods/v3"
-	elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.loc.gov/mods/v3" targetNamespace="http://www.loc.gov/mods/v3" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!-- -->
-	<xs:import namespace="http://www.w3.org/XML/1998/namespace"
-		schemaLocation="http://www.loc.gov/mods/xml.xsd"/>
-	<xs:import namespace="http://www.w3.org/1999/xlink"
-		schemaLocation="http://www.loc.gov/standards/xlink/xlink.xsd"/>
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.loc.gov/mods/xml.xsd"/>
+	<xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="http://www.loc.gov/standards/xlink/xlink.xsd"/>
 	<!-- 
 MODS: Metadata Object Description Schema. See http://www.loc.gov/standards/mods/
 
           *******************************************************************
          *                                                                                
-         *                           DRAFT MODS 3.8
+         *                          MODS 3.8
          *         
-         ******* DRAFT ******* DRAFT ******* DRAFT ******* DRAFT ******* DRAFT 
-         
-         *    ***********   updated: June 20, 2022 *****************
-         *
-         * PLEASE NOTE, this draft (6-20) contains no substative changes from previous
-         * draft (6-18) only cosmetic changes. 
-         *
-         *
+         *                     September 16, 2022
+         *             
           *********************************************************************
 
 
 
-*************** Changes in version 3.
+*************** Changes in version 3.8
 
 1. Controlled-list restriction removed on authority attribute 
    for <placeTerm> <geographic Code> and <languageTerm>.	
 
-2.  Attributes @otherTypeAuth,  @otherTypeAuthURI,  and @otherTypeURI added for <titleInfo> 
+2.  Attributes @otherTypeAuth,  @otherTypeAuthURI,  and @otherTypeURI added for <titleInfo>.
 
 3. Element <agent>  added, subelement of <originInfo>.
    
