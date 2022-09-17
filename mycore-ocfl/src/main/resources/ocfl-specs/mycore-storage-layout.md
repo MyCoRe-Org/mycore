@@ -16,7 +16,7 @@ This storage root extension maps OCFL Objects by segmenting their ID via the nam
 -   **Name:** SlotLayout
     -   **Description:** The Structure of the Object ID for generating the Directory, separated by dashes (`-`)
     -   **Type:** string
-    -   **Configuration:** `MCR.OCFL.MCRStorageLayout.SlotLayout`
+    -   **Configuration:** `MCR.OCFL.MyCoReStorageLayout.SlotLayout`
     -   **Constraints:** Layers must be separated by `-`
     -   **Default:** `"(Length of NumberPattern - 4)-2-2"`
 
