@@ -6,5 +6,6 @@
   <mods:relatedItem type="host">
     <mods:note>host from data source B</mods:note>
     <mods:identifier type="issn">1234-5678</mods:identifier>
+    <mods:identifier type="issn">1234-6789</mods:identifier>
   </mods:relatedItem>
 </mods:mods>
