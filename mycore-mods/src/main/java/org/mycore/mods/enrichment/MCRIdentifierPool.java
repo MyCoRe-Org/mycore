@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 
 /**
@@ -37,6 +39,8 @@ import org.jdom2.Element;
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRIdentifierPool {
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRIdentifierPool.class);
 
     /** Set of already known identifiers resolved in the last round */
     private Set<MCRIdentifier> oldIdentifiers = new HashSet<>();
@@ -58,14 +62,18 @@ class MCRIdentifierPool {
         }
         newIdentifiers.removeAll(oldIdentifiers);
     }
-    
+
     boolean newIdentifiersFoundIn(Element publication) {
         // remember all currently known identifiers, mark them as "old"
         oldIdentifiers.addAll(newIdentifiers);
         newIdentifiers.clear();
 
         addIdentifiersFrom(publication);
-        
+
+        for (MCRIdentifier id : newIdentifiers) {
+            LOGGER.info("new identifier " + id);
+        }
+
         // look if they are any new identifiers
         return !newIdentifiers.isEmpty();
     }

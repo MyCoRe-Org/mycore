@@ -18,8 +18,6 @@
 
 package org.mycore.mods.enrichment;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -31,8 +29,6 @@ import org.mycore.common.xml.MCRNodeBuilder;
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRIdentifier {
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRIdentifier.class);
 
     private MCRIdentifierType type;
 
@@ -72,7 +68,6 @@ class MCRIdentifier {
     void buildElement(Element parent) {
         MCRNodeBuilder builder = new MCRNodeBuilder();
         try {
-            LOGGER.info("building new identifier " + this);
             builder.buildElement(type.getXPath(), value, parent);
         } catch (JaxenException ex) {
             throw new MCRException(ex);
