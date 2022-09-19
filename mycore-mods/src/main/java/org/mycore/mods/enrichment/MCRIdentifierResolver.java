@@ -61,6 +61,7 @@ class MCRIdentifierResolver {
     private String uriPattern;
 
     MCRIdentifierResolver(MCRDataSource ds, MCRIdentifierType idType, String uriPattern) {
+        this.ds = ds;
         this.idType = idType;
         this.uriPattern = uriPattern;
     }
@@ -89,7 +90,7 @@ class MCRIdentifierResolver {
 
         // Normalize various error/not found cases
         if (resolved == null || !"mods".equals(resolved.getName()) || resolved.getChildren().isEmpty()) {
-            LOGGER.warn(ds.getID() + " returned none or empty MODS for " + identifier);
+            LOGGER.warn(ds + " returned none or empty MODS for " + identifier);
             return null;
         }
 
@@ -97,7 +98,7 @@ class MCRIdentifierResolver {
             ensureIsValidMODS(resolved);
             return resolved;
         } catch (Exception ex) {
-            LOGGER.warn(ds.getID() + " returned invalid MODS for " + identifier, ex);
+            LOGGER.warn(ds + " returned invalid MODS for " + identifier + ":" + ex.getMessage());
             return null;
         }
     }
