@@ -19,16 +19,12 @@
 package org.mycore.mods.enrichment;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.mods.merger.MCRMerger;
-import org.mycore.mods.merger.MCRMergerFactory;
 
 /**
  * Used to request publication data from a given data source,
@@ -45,8 +41,6 @@ class MCRDataSourceCall implements Callable<Boolean> {
     private MCRDataSource ds;
 
     private MCRIdentifierPool idPool;
-
-    private Set<MCRIdentifier> consumedIDs = new HashSet<MCRIdentifier>();
 
     private List<Element> results = new ArrayList<Element>();
 
@@ -70,15 +64,13 @@ class MCRDataSourceCall implements Callable<Boolean> {
                     if (isFinished())
                         break loop;
 
-                    if (!consumedIDs.contains(id)) {
-                        consumedIDs.add(id);
-                        Element result = idResolver.resolve(id.getValue());
-                        if (result != null) {
-                            results.add(result);
-                        }
-
-                        LOGGER.info(ds + " with " + id + " returned " + (result != null ? "" : "no ") + "valid data");
+                    Element result = idResolver.resolve(id.getValue());
+                    if (result != null) {
+                        results.add(result);
+                        idPool.addIdentifiersFrom(result);
                     }
+
+                    LOGGER.info(ds + " with " + id + " returned " + (result != null ? "" : "no ") + "valid data");
                 }
             }
         }
@@ -94,20 +86,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
         return ds.shouldStopOnFirstResult() ? wasSuccessful() : false;
     }
 
-    /**
-     * Merges the publication data returned by the data source with the existing data
-     */
-    void mergeResultWith(Element existingData) {
-        for (Element result : results) {
-            if (existingData.getName().equals("relatedItem")) {
-                // resolved is always mods:mods, transform to mods:relatedItem to be mergeable
-                result.setName("relatedItem");
-                result.setAttribute(existingData.getAttribute("type").clone());
-            }
-
-            MCRMerger a = MCRMergerFactory.buildFrom(existingData);
-            MCRMerger b = MCRMergerFactory.buildFrom(result);
-            a.mergeFrom(b);
-        }
+    List<Element> getResults() {
+        return results;
     }
 }

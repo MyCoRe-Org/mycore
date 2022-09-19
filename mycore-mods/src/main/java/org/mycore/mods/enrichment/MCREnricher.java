@@ -35,6 +35,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mods.MCRMODSSorter;
+import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.util.concurrent.MCRTransactionableCallable;
 
 /**
@@ -103,6 +104,7 @@ public class MCREnricher {
 
         while (idPool.newIdentifiersFoundIn(publication)) {
             resolveExternalData();
+            mergeNewIdentifiers(publication);
             mergeExternalData(publication);
             MCRMODSSorter.sort(publication);
         }
@@ -110,6 +112,12 @@ public class MCREnricher {
         for (Element nestedObject : xPath2FindNestedObjects.evaluate(publication)) {
             enrich(nestedObject);
         }
+    }
+
+    private void mergeNewIdentifiers(Element publication) {
+        Element container = new Element(publication.getName(), publication.getNamespace());
+        idPool.getNewIdentifiers().forEach(id -> id.buildElement(container));
+        MCREnricher.merge(publication, container);
     }
 
     private Map<String, MCRDataSourceCall> prepareDataSourceCalls() {
@@ -153,7 +161,7 @@ public class MCREnricher {
                 MCRDataSourceCall call = id2call.get(token);
                 if (call.wasSuccessful()) {
                     LOGGER.info("merging data from " + token);
-                    call.mergeResultWith(publication);
+                    call.getResults().forEach(result -> merge(publication, result));
 
                     if (withinGroup) {
                         st.nextToken(")"); // skip forward to end of group
@@ -162,5 +170,15 @@ public class MCREnricher {
                 }
             }
         }
+    }
+
+    static void merge(Element publication, Element toMergeWith) {
+        if (publication.getName().equals("relatedItem")) {
+            // resolved is always mods:mods, transform to mods:relatedItem to be mergeable
+            toMergeWith.setName("relatedItem");
+            toMergeWith.setAttribute(publication.getAttribute("type").clone());
+        }
+
+        MCRMergeTool.merge(publication, toMergeWith);
     }
 }

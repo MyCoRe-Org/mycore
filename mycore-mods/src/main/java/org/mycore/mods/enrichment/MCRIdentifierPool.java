@@ -51,17 +51,27 @@ class MCRIdentifierPool {
         return oldIdentifiers.size();
     }
 
+    /** Add all new identifiers that can be found in the given MODS object */
+    synchronized void addIdentifiersFrom(Element object) {
+        for (MCRIdentifierType type : MCRIdentifierTypeFactory.instance().getTypes()) {
+            newIdentifiers.addAll(type.getIdentifiers(object));
+        }
+        newIdentifiers.removeAll(oldIdentifiers);
+    }
+    
     boolean newIdentifiersFoundIn(Element publication) {
         // remember all currently known identifiers, mark them as "old"
         oldIdentifiers.addAll(newIdentifiers);
         newIdentifiers.clear();
 
+        addIdentifiersFrom(publication);
+        
         // look if they are any new identifiers
-        for (MCRIdentifierType type : MCRIdentifierTypeFactory.instance().getTypes()) {
-            newIdentifiers.addAll(type.getIdentifiers(publication));
-        }
-        newIdentifiers.removeAll(oldIdentifiers);
         return !newIdentifiers.isEmpty();
+    }
+
+    Set<MCRIdentifier> getNewIdentifiers() {
+        return newIdentifiers;
     }
 
     List<MCRIdentifier> getNewIdentifiersOfType(MCRIdentifierType type) {
