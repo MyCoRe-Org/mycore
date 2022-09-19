@@ -49,7 +49,7 @@ public class MCRStorageLayoutConfig implements OcflExtensionConfig {
     /**
      * Overwrites the Class SlotLayout for the OCFL Repository
      * 
-     * @param slotLayout MyCoRe Class SlotLayout, see MCRStore for more info
+     * @param slotLayout MyCoRe SlotLayout, see MCRStore for more info
      * @return MCRLayoutConfig
      */
     public MCRStorageLayoutConfig setSlotLayout(String slotLayout) {
