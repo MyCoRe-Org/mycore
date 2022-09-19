@@ -63,6 +63,7 @@ class MCRIdentifierPool {
         newIdentifiers.removeAll(oldIdentifiers);
     }
 
+    /** Will look for new identifiers in the given publication, and remember them */
     boolean newIdentifiersFoundIn(Element publication) {
         // remember all currently known identifiers, mark them as "old"
         oldIdentifiers.addAll(newIdentifiers);

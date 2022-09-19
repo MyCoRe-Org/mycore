@@ -29,8 +29,16 @@ import org.jdom2.Element;
 /**
  * Used to request publication data from a given data source,
  * trying the identifiers supported by this data source one by one.
- * When the data source returns publication data for an identifier,
- * the call is marked successful and the other identifiers are skipped.
+ * 
+ * Depending on the configuration properties  
+ * MCR.MODS.EnrichmentResolver.DefaultStopOnFirstResult=true|false
+ * and
+ * MCR.MODS.EnrichmentResolver.DataSource.[ID].StopOnFirstResult=true|false
+ * the data source will stop trying to resolve publication data after 
+ * the first successful call with a given identifier and skip others, 
+ * or will try to retrieve data for all given identifiers.
+ * 
+ * @see MCRDataSource
  *
  * @author Frank L\u00FCtzenkirchen
  */

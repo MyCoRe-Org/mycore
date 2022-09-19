@@ -33,6 +33,12 @@ import org.mycore.common.config.MCRConfiguration2;
  * that defines the URI to get the data for this type of identifier
  *
  * @see MCRIdentifierResolver
+ * 
+ * As a global parameter, or per data source, it can be configured whether 
+ * the data source will stop after the first successful call, or retrieve all data
+ * for all identifiers.
+ * 
+ * @see MCRDataSource
  *
  * @author Frank L\u00FCtzenkirchen
  */
