@@ -90,7 +90,7 @@ class MCRIdentifierResolver {
 
         // Normalize various error/not found cases
         if (resolved == null || !"mods".equals(resolved.getName()) || resolved.getChildren().isEmpty()) {
-            LOGGER.warn(ds + " returned none or empty MODS for " + identifier);
+            LOGGER.warn(ds + " returned none or empty MODS for " + idType + " " + identifier);
             return null;
         }
 
