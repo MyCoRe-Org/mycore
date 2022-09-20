@@ -98,7 +98,7 @@ class MCRIdentifierResolver {
             ensureIsValidMODS(resolved);
             return resolved;
         } catch (Exception ex) {
-            LOGGER.warn(ds + " returned invalid MODS for " + identifier + ": " + ex.getMessage());
+            LOGGER.warn(ds + " returned invalid MODS for " + identifier + ": " + ex.getMessage(), ex);
             return null;
         }
     }
