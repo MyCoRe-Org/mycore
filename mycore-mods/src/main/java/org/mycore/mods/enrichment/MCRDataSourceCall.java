@@ -69,8 +69,9 @@ class MCRDataSourceCall implements Callable<Boolean> {
         if (!isFinished()) {
             loop: for (MCRIdentifierResolver idResolver : ds.getResolvers()) {
                 for (MCRIdentifier id : idPool.getNewIdentifiersOfType(idResolver.getType())) {
-                    if (isFinished())
+                    if (isFinished()) {
                         break loop;
+                    }
 
                     Element result = idResolver.resolve(id.getValue());
                     if (result != null) {
