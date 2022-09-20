@@ -44,6 +44,9 @@ public class MCRObjectIDParamConverterProvider implements ParamConverterProvider
             return new ParamConverter<>() {
                 @Override
                 public T fromString(String value) {
+                    if (value == null) {
+                        throw new IllegalArgumentException("value may not be null");
+                    }
                     try {
                         return rawType.cast(MCRObjectID.getInstance(value));
                     } catch (MCRException e) {

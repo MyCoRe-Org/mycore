@@ -38,10 +38,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.QueryParam;
-import org.apache.commons.lang3.StringUtils;
+import jakarta.ws.rs.core.UriBuilder;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,9 +70,9 @@ import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.history.MCRMetadataHistoryManager;
 import org.mycore.datamodel.niofs.MCRPath;
-import org.mycore.frontend.MCRFrontendUtil;
+import org.mycore.datamodel.objectinfo.MCRObjectQuery;
+import org.mycore.datamodel.objectinfo.MCRObjectQueryResolver;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.media.services.MCRThumbnailGenerator;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
@@ -128,12 +130,58 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 })
 public class MCRRestObjects {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    public static final String PARAM_AFTER_ID = "after_id";
 
-    private static int PAGE_SIZE_MAX = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Max")
+    public static final String PARAM_OFFSET = "offset";
+
+    public static final String PARAM_LIMIT = "limit";
+
+    public static final String PARAM_TYPE = "type";
+
+    public static final String PARAM_PROJECT = "project";
+
+    public static final String PARAM_NUMBER_GREATER = "number_greater";
+
+    public static final String PARAM_NUMBER_LESS = "number_less";
+
+    public static final String PARAM_CREATED_AFTER = "created_after";
+
+    public static final String PARAM_CREATED_BEFORE = "created_before";
+
+    public static final String PARAM_MODIFIED_AFTER = "modified_after";
+
+    public static final String PARAM_MODIFIED_BEFORE = "modified_before";
+
+    public static final String PARAM_DELETED_AFTER = "deleted_after";
+
+    public static final String PARAM_DELETED_BEFORE = "deleted_before";
+
+    public static final String PARAM_CREATED_BY = "created_by";
+
+    public static final String PARAM_MODIFIED_BY = "modified_by";
+
+    public static final String PARAM_DELETED_BY = "deleted_by";
+
+    public static final String PARAM_SORT_ORDER = "sort_order";
+
+    public static final String PARAM_SORT_BY = "sort_by";
+
+    public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
+        .unmodifiableList(MCRConfiguration2
+            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
+            .map(MCRConfiguration2::instantiateClass)
+            .map(MCRThumbnailGenerator.class::cast)
+            .collect(Collectors.toList()));
+
+    private static final String PARAM_CATEGORIES = "category";
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private static final int PAGE_SIZE_MAX = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Max")
         .orElseThrow();
 
-    private static int PAGE_SIZE_DEFAULT = MCRConfiguration2.getInt("MCR.RestAPI.V2.ListObjects.PageSize.Default")
+    private static final int PAGE_SIZE_DEFAULT = MCRConfiguration2
+        .getInt("MCR.RestAPI.V2.ListObjects.PageSize.Default")
         .orElse(1000);
 
     @Context
@@ -145,64 +193,151 @@ public class MCRRestObjects {
     @Context
     UriInfo uriInfo;
 
-    public static final List<MCRThumbnailGenerator> THUMBNAIL_GENERATORS = Collections
-        .unmodifiableList(MCRConfiguration2
-            .getOrThrow("MCR.Media.Thumbnail.Generators", MCRConfiguration2::splitValue)
-            .map(MCRConfiguration2::instantiateClass)
-            .map(MCRThumbnailGenerator.class::cast)
-            .collect(Collectors.toList()));
-
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     @Operation(
         summary = "Lists all objects in this repository",
+        parameters = {
+            @Parameter(
+                name = PARAM_AFTER_ID,
+                description = "the id after which the results should be listed. Do not use after_id and offset " +
+                    "together."),
+            @Parameter(
+                name = PARAM_OFFSET,
+                description = "dictates the number of rows to skip from the beginning of the returned data before " +
+                    "presenting the results. Do not use after_id and offset together."),
+            @Parameter(
+                name = PARAM_LIMIT,
+                description = "limits the number of result returned"),
+            @Parameter(
+                name = PARAM_TYPE,
+                description = "objects with have the type in the id"),
+            @Parameter(
+                name = PARAM_PROJECT,
+                description = "only objects that have the project in the id"),
+            @Parameter(
+                name = PARAM_NUMBER_GREATER,
+                description = "only objects which id have a number greater than this"),
+            @Parameter(
+                name = PARAM_NUMBER_LESS,
+                description = "only objects which id have a number less than this"),
+            @Parameter(
+                name = PARAM_CREATED_AFTER,
+                description = "objects created after this date"),
+            @Parameter(
+                name = PARAM_CREATED_BEFORE,
+                description = "objects created before this date"),
+            @Parameter(
+                name = PARAM_MODIFIED_AFTER,
+                description = "objects last modified after this date"),
+            @Parameter(
+                name = PARAM_MODIFIED_BEFORE,
+                description = "objects last modified before this date"),
+            @Parameter(
+                name = PARAM_MODIFIED_AFTER,
+                description = "objects last modified after this date"),
+            @Parameter(
+                name = PARAM_MODIFIED_BEFORE,
+                description = "objects last modified before this date"),
+            @Parameter(
+                name = PARAM_SORT_ORDER,
+                description = "sort results 'asc' or 'desc'"),
+            @Parameter(
+                name = PARAM_SORT_BY,
+                description = "sort objects by 'id', 'created' (default) or 'modified'")
+        },
         responses = @ApiResponse(
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = MCRObjectIDDate.class)))),
         tags = MCRRestUtils.TAG_MYCORE_OBJECT)
     @XmlElementWrapper(name = "mycoreobjects")
     @JacksonFeatures(serializationDisable = { SerializationFeature.WRITE_DATES_AS_TIMESTAMPS })
-    public Response listObjects(@QueryParam("after_id") String afterID, @QueryParam("limit") Integer limit)
-        throws IOException {
-        Date lastModified = new Date(MCRXMLMetadataManager.instance().getLastModified());
-        Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request, lastModified);
+    public Response listObjects(
+        @QueryParam(PARAM_AFTER_ID) MCRObjectID afterID,
+        @QueryParam(PARAM_OFFSET) Integer offset,
+        @QueryParam(PARAM_LIMIT) Integer limit,
+        @QueryParam(PARAM_TYPE) String type,
+        @QueryParam(PARAM_PROJECT) String project,
+        @QueryParam(PARAM_NUMBER_GREATER) Integer numberGreater,
+        @QueryParam(PARAM_NUMBER_LESS) Integer numberLess,
+        @QueryParam(PARAM_CREATED_AFTER) Date createdAfter,
+        @QueryParam(PARAM_CREATED_BEFORE) Date createdBefore,
+        @QueryParam(PARAM_MODIFIED_AFTER) Date modifiedAfter,
+        @QueryParam(PARAM_MODIFIED_BEFORE) Date modifiedBefore,
+        @QueryParam(PARAM_DELETED_AFTER) Date deletedAfter,
+        @QueryParam(PARAM_DELETED_BEFORE) Date deletedBefore,
+        @QueryParam(PARAM_CREATED_BY) String createdBy,
+        @QueryParam(PARAM_MODIFIED_BY) String modifiedBy,
+        @QueryParam(PARAM_DELETED_BY) String deletedBy,
+        @QueryParam(PARAM_SORT_BY) @DefaultValue("id") MCRObjectQuery.SortBy sortBy,
+        @QueryParam(PARAM_SORT_ORDER) @DefaultValue("asc") MCRObjectQuery.SortOrder sortOrder,
+        @QueryParam(PARAM_CATEGORIES) List<String> categories) throws IOException {
 
-        if (cachedResponse.isPresent()) {
-            return cachedResponse.get();
-        }
-        //TODO Cleanup in 2022.06 LTS 
-        // make this the default behaviour, also if afterID param is not set
+        MCRObjectQuery query = new MCRObjectQuery();
+        int limitInt = Optional.ofNullable(limit)
+            .map(l -> Integer.min(l, PAGE_SIZE_MAX))
+            .orElse(PAGE_SIZE_DEFAULT);
 
-        if (afterID == null) {
-            //old behaviour 
-            List<MCRRestObjectIDDate> idDates = MCRXMLMetadataManager.instance().listObjectDates().stream()
-                .filter(oid -> !oid.getId().contains("_derivate_"))
-                .map(x -> new MCRRestObjectIDDate(x))
-                .collect(Collectors.toList());
-            return Response.ok(new GenericEntity<List<MCRRestObjectIDDate>>(idDates) {
-            })
-                .lastModified(lastModified)
-                .build();
+        query.limit(limitInt);
+
+        Optional.ofNullable(offset).ifPresent(query::offset);
+        Optional.ofNullable(afterID).ifPresent(query::afterId);
+
+        Optional.ofNullable(type).ifPresent(query::type);
+        Optional.ofNullable(project).ifPresent(query::project);
+
+        Optional.ofNullable(modifiedAfter).map(Date::toInstant).ifPresent(query::modifiedAfter);
+        Optional.ofNullable(modifiedBefore).map(Date::toInstant).ifPresent(query::modifiedBefore);
+
+        Optional.ofNullable(createdAfter).map(Date::toInstant).ifPresent(query::createdAfter);
+        Optional.ofNullable(createdBefore).map(Date::toInstant).ifPresent(query::createdBefore);
+
+        Optional.ofNullable(deletedAfter).map(Date::toInstant).ifPresent(query::deletedAfter);
+        Optional.ofNullable(deletedBefore).map(Date::toInstant).ifPresent(query::deletedBefore);
+
+        Optional.ofNullable(createdBy).ifPresent(query::createdBy);
+        Optional.ofNullable(modifiedBy).ifPresent(query::modifiedBy);
+        Optional.ofNullable(deletedBy).ifPresent(query::deletedBy);
+
+        Optional.ofNullable(numberGreater).ifPresent(query::numberGreater);
+        Optional.ofNullable(numberLess).ifPresent(query::numberLess);
+
+        List<String> includeCategories = query.getIncludeCategories();
+        categories.stream()
+            .filter(Predicate.not(String::isBlank))
+            .forEach(includeCategories::add);
+
+        query.sort(sortBy, sortOrder);
+
+        MCRObjectQueryResolver queryResolver = MCRObjectQueryResolver.getInstance();
+
+        List<MCRObjectIDDate> idDates = limitInt == 0 ? Collections.emptyList() : queryResolver.getIdDates(query);
+
+        List<MCRRestObjectIDDate> restIdDate = idDates.stream().map(MCRRestObjectIDDate::new)
+            .collect(Collectors.toList());
+
+        int count = queryResolver.count(query);
+        UriBuilder nextBuilder = null;
+        if (query.afterId() != null && idDates.size() == limitInt) {
+            nextBuilder = uriInfo.getRequestUriBuilder();
+            nextBuilder.replaceQueryParam(PARAM_AFTER_ID, idDates.get(idDates.size() - 1).getId());
         } else {
-            int theLimit = Integer.min(PAGE_SIZE_MAX, limit == null ? PAGE_SIZE_DEFAULT : limit);
-            MCRObjectID afterMcrObjID = StringUtils.isEmpty(afterID) ? null : MCRObjectID.getInstance(afterID);
-            List<MCRRestObjectIDDate> idDates = MCRMetadataHistoryManager
-                .listNextObjectIDs(afterMcrObjID, theLimit).stream()
-                .map(x -> new MCRRestObjectIDDate(x))
-                .collect(Collectors.toList());
-            Response.ResponseBuilder respOK = Response.ok(new GenericEntity<List<MCRRestObjectIDDate>>(idDates) {
-            })
-                .lastModified(lastModified);
-            if (idDates.size() <= theLimit) {
-                String nextURL = MCRFrontendUtil.getBaseURL() + "api/v2/objects"
-                    + "?after_id=" + idDates.get(idDates.size() - 1).getId()
-                    + "&limit=" + theLimit;
-                respOK.link(nextURL, "next");
-                respOK.header("X-Total-Count",  MCRMetadataHistoryManager.countObjectIDs());
+            if (query.offset() + query.limit() < count) {
+                nextBuilder = uriInfo.getRequestUriBuilder();
+                nextBuilder.replaceQueryParam(PARAM_OFFSET, String.valueOf(query.offset() + limitInt));
             }
-            return respOK.build();
         }
+
+        Response.ResponseBuilder responseBuilder = Response.ok(new GenericEntity<>(restIdDate) {
+        })
+            .header("X-Total-Count", count);
+
+        if (nextBuilder != null) {
+            responseBuilder.link("next", nextBuilder.toString());
+        }
+
+        return responseBuilder.build();
     }
 
     @POST
