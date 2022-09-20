@@ -170,8 +170,11 @@ public class MCREnricher {
             } else {
                 MCRDataSourceCall call = id2call.get(token);
                 if (call.wasSuccessful()) {
-                    LOGGER.info("merging data from " + token);
-                    call.getResults().forEach(result -> merge(publication, result));
+                    call.getResults().forEach(result -> {
+                        LOGGER.info("merging data from " + token);
+                        merge(publication, result);
+                    });
+                    call.clearResults();
 
                     if (withinGroup) {
                         st.nextToken(")"); // skip forward to end of group

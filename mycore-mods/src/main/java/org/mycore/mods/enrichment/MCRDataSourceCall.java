@@ -51,6 +51,8 @@ class MCRDataSourceCall implements Callable<Boolean> {
     private MCRIdentifierPool idPool;
 
     private List<Element> results = new ArrayList<Element>();
+    
+    private boolean gotResults = false;
 
     MCRDataSourceCall(MCRDataSource ds, MCRIdentifierPool idPool) {
         this.ds = ds;
@@ -60,8 +62,6 @@ class MCRDataSourceCall implements Callable<Boolean> {
     /**
      * Used to request publication data from a given data source,
      * trying the identifiers supported by this data source one by one.
-     * When the data source returns publication data for an identifier,
-     * the call is marked successful and the other identifiers are skipped.
      *
      * @return true, if the data source returned valid publication data
      */
@@ -75,6 +75,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
 
                     Element result = idResolver.resolve(id.getValue());
                     if (result != null) {
+                        gotResults = true;
                         results.add(result);
                         idPool.addIdentifiersFrom(result);
                     }
@@ -88,7 +89,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
     }
 
     boolean wasSuccessful() {
-        return !results.isEmpty();
+        return gotResults;
     }
 
     private boolean isFinished() {
@@ -97,5 +98,9 @@ class MCRDataSourceCall implements Callable<Boolean> {
 
     List<Element> getResults() {
         return results;
+    }
+    
+    void clearResults() {
+        results.clear();
     }
 }
