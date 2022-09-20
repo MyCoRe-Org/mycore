@@ -160,7 +160,7 @@ public class MCREnricher {
         boolean withinGroup = false;
 
         for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, true); st.hasMoreTokens();) {
-            String token = st.nextToken().trim();
+            String token = st.nextToken(DELIMITERS).trim();
             if (token.isEmpty()) {
                 continue;
             } else if ("(".equals(token)) {
