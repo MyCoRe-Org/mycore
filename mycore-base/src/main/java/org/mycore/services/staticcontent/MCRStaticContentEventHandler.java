@@ -18,8 +18,6 @@
 
 package org.mycore.services.staticcontent;
 
-import java.io.IOException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.events.MCREvent;
@@ -48,7 +46,7 @@ public class MCRStaticContentEventHandler extends MCREventHandlerBase {
             .forEach(cg -> {
                 try {
                     cg.generate(obj);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     LOGGER.error(
                         "Error while creating static content " + cg.getTransformer() + " for " + obj.getId() + "!", e);
                 }
