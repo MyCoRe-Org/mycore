@@ -42,7 +42,7 @@ public class MCRStaticContentEventHandler extends MCREventHandlerBase {
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         MCRObjectStaticContentGenerator.getContentGenerators()
             .stream()
-            .map(MCRObjectStaticContentGenerator::new)
+            .map(MCRObjectStaticContentGenerator::get)
             .forEach(cg -> {
                 try {
                     cg.generate(obj);
