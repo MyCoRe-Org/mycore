@@ -116,6 +116,13 @@ return declare("mycore.classification.CategoryEditorPane", [_Widget, Evented, _T
 
     updateLanguages: function() {
     	var languages = i18n.getLanguages();
+    	var additionalLanguages = (window["MCR.classeditor.additionalLanguages"] || "").split(",");
+    	for (i = 0; i < additionalLanguages.length; i++) {
+    		var additionalLanguage = additionalLanguages[i];
+    		if (languages.indexOf(additionalLanguage) === -1) {
+    			languages.push(additionalLanguage);
+    		}
+    	}
     	this.labelEditor.row.args.languages = languages;
     	this.labelEditor.broadcast({id: "resetLang", languages: languages});
     },
