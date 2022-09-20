@@ -37,6 +37,14 @@ public class MCREnrichmentTest extends MCRTestCase {
         resultFile = "testMergePriority-result2.xml";
         assertTrue(test(enricherID, xPath, resultFile));
     }
+    
+    @Test
+    public void testResolvingIteration() throws JaxenException, IOException {
+        String enricherID = "ResolvingIterationTest";
+        String xPath = "mods:mods[mods:identifier[@type='issn']='1521-3765']";
+        String resultFile = "testResolvingIteration-result.xml";
+        assertTrue(test(enricherID, xPath, resultFile));
+    }
 
     @Ignore
     public boolean test(String enricherID, String xPath, String resultFile) throws JaxenException, IOException {

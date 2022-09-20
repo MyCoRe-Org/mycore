@@ -112,12 +112,13 @@ public class MCREnricher {
         idPool = new MCRIdentifierPool();
         id2call = prepareDataSourceCalls();
 
-        while (idPool.newIdentifiersFoundIn(publication)) {
+        idPool.addIdentifiersFrom(publication);
+        while (idPool.hasNewIdentifiers()) {
+            idPool.prepareNextIteration();
             resolveExternalData();
             mergeNewIdentifiers(publication);
             mergeExternalData(publication);
             MCRMODSSorter.sort(publication);
-            id2call.values().forEach(dsc -> dsc.reset());
         }
 
         for (Element nestedObject : xPath2FindNestedObjects.evaluate(publication)) {

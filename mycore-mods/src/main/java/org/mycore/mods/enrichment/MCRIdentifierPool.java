@@ -40,42 +40,39 @@ import org.jdom2.Element;
  */
 class MCRIdentifierPool {
 
-    private static final Logger LOGGER = LogManager.getLogger(MCRIdentifierPool.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     /** Set of already known identifiers resolved in the last round */
     private Set<MCRIdentifier> oldIdentifiers = new HashSet<>();
 
+    /** Set of currently processed identifiers */
+    private Set<MCRIdentifier> currentIdentifiers = new HashSet<>();
+
     /** Set of new identifiers returned with data from external sources in the current resolving round */
     private Set<MCRIdentifier> newIdentifiers = new HashSet<>();
-
-    MCRIdentifierPool() {
-    }
-
-    int size() {
-        return oldIdentifiers.size();
-    }
 
     /** Add all new identifiers that can be found in the given MODS object */
     synchronized void addIdentifiersFrom(Element object) {
         for (MCRIdentifierType type : MCRIdentifierTypeFactory.instance().getTypes()) {
             newIdentifiers.addAll(type.getIdentifiers(object));
         }
+        newIdentifiers.removeAll(currentIdentifiers);
         newIdentifiers.removeAll(oldIdentifiers);
     }
 
-    /** Will look for new identifiers in the given publication, and remember them */
-    boolean newIdentifiersFoundIn(Element publication) {
-        // remember all currently known identifiers, mark them as "old"
+    /** Remember all currently known identifiers, mark them as "old" **/
+    void prepareNextIteration() {
+        currentIdentifiers.clear();
+        currentIdentifiers.addAll(newIdentifiers);
         oldIdentifiers.addAll(newIdentifiers);
         newIdentifiers.clear();
+    }
 
-        addIdentifiersFrom(publication);
-
+    boolean hasNewIdentifiers() {
         for (MCRIdentifier id : newIdentifiers) {
             LOGGER.info("new identifier " + id);
         }
-
-        // look if they are any new identifiers
+        
         return !newIdentifiers.isEmpty();
     }
 
@@ -83,7 +80,7 @@ class MCRIdentifierPool {
         return newIdentifiers;
     }
 
-    List<MCRIdentifier> getNewIdentifiersOfType(MCRIdentifierType type) {
-        return newIdentifiers.stream().filter(id -> id.getType().equals(type)).collect(Collectors.toList());
+    List<MCRIdentifier> getCurrentIdentifiersOfType(MCRIdentifierType type) {
+        return currentIdentifiers.stream().filter(id -> id.getType().equals(type)).collect(Collectors.toList());
     }
 }
