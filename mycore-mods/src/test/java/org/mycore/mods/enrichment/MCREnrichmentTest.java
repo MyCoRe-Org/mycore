@@ -19,11 +19,31 @@ public class MCREnrichmentTest extends MCRTestCase {
 
     @Test
     public void testBasicEnrichment() throws JaxenException, IOException {
+        String enricherID = "BasicTest";
         String xPath = "mods:mods[mods:identifier[@type='doi']='10.123/456']";
-        Element publication = new MCRNodeBuilder().buildElement(xPath, null, null);
-        new MCREnricher("Test").enrich(publication);
+        String resultFile = "testBasicEnrichment-result.xml";
+        assertTrue(test(enricherID, xPath, resultFile));
+    }
 
-        String uri = "resource:MCREnrichmentTest/testBasicEnrichment-result.xml";
+    @Test
+    public void testMergePriority() throws JaxenException, IOException {
+        String enricherID = "MergePriorityTest";
+
+        String xPath = "mods:mods[mods:identifier[@type='foo']='1']";
+        String resultFile = "testMergePriority-result1.xml";
+        assertTrue(test(enricherID, xPath, resultFile));
+        
+        xPath = "mods:mods[mods:identifier[@type='foo']='2']";
+        resultFile = "testMergePriority-result2.xml";
+        assertTrue(test(enricherID, xPath, resultFile));
+    }
+
+    @Ignore
+    public boolean test(String enricherID, String xPath, String resultFile) throws JaxenException, IOException {
+        Element publication = new MCRNodeBuilder().buildElement(xPath, null, null);
+        new MCREnricher(enricherID).enrich(publication);
+
+        String uri = "resource:MCREnrichmentTest/" + resultFile;
         Element expected = MCRURIResolver.instance().resolve(uri);
 
         boolean asExpected = MCRXMLHelper.deepEqual(publication, expected);
@@ -35,7 +55,7 @@ public class MCREnrichmentTest extends MCRTestCase {
             logXML(expected);
         }
 
-        assertTrue(asExpected);
+        return asExpected;
     }
 
     @Ignore

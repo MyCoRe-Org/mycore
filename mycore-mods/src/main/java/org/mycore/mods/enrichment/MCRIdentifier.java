@@ -65,12 +65,13 @@ class MCRIdentifier {
     /**
      * Builds the XML representation of this identifier within MODS.
      */
-    void buildElement(Element parent) {
-        MCRNodeBuilder builder = new MCRNodeBuilder();
+    void mergeInto(Element publication) {
+        Element container = new Element(publication.getName(), publication.getNamespace());
         try {
-            builder.buildElement(type.getXPath(), value, parent);
+            new MCRNodeBuilder().buildElement(type.getXPath(), value, container);
         } catch (JaxenException ex) {
             throw new MCRException(ex);
         }
+        MCREnricher.merge(publication, container);
     }
 }

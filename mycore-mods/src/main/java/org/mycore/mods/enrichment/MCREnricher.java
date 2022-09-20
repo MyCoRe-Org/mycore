@@ -125,9 +125,7 @@ public class MCREnricher {
     }
 
     private void mergeNewIdentifiers(Element publication) {
-        Element container = new Element(publication.getName(), publication.getNamespace());
-        idPool.getNewIdentifiers().forEach(id -> id.buildElement(container));
-        MCREnricher.merge(publication, container);
+        idPool.getNewIdentifiers().forEach(id -> id.mergeInto(publication));
     }
 
     private Map<String, MCRDataSourceCall> prepareDataSourceCalls() {
