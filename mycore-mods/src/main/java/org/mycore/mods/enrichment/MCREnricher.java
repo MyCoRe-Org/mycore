@@ -117,6 +117,7 @@ public class MCREnricher {
             mergeNewIdentifiers(publication);
             mergeExternalData(publication);
             MCRMODSSorter.sort(publication);
+            id2call.values().forEach(dsc -> dsc.reset());
         }
 
         for (Element nestedObject : xPath2FindNestedObjects.evaluate(publication)) {

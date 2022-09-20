@@ -94,6 +94,10 @@ class MCRDataSourceCall implements Callable<Boolean> {
     private boolean isFinished() {
         return ds.shouldStopOnFirstResult() ? wasSuccessful() : false;
     }
+    
+    void reset() {
+        results.clear();
+    }
 
     List<Element> getResults() {
         return results;
