@@ -76,6 +76,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
                     Element result = idResolver.resolve(id.getValue());
                     if (result != null) {
                         results.add(result);
+                        idPool.addIdentifiersFrom(result);
                     }
 
                     LOGGER.info(ds + " with " + id + " returned " + (result != null ? "" : "no ") + "valid data");
