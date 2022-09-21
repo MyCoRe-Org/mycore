@@ -13,13 +13,11 @@ import org.mycore.datamodel.niofs.MCRPath;
 
 public class MCRFileNameCheckTest extends MCRIFSTest {
 
-    private MCRObject root;
-
     private MCRDerivate derivate;
 
     @Before
     public void setup() throws MCRAccessException {
-        root = createObject();
+        MCRObject root = createObject();
         derivate = createDerivate(root.getId());
         MCRMetadataManager.create(root);
         MCRMetadataManager.create(derivate);
