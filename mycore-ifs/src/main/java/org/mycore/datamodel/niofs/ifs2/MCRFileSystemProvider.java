@@ -58,6 +58,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.ifs2.MCRFileCollection;
@@ -67,6 +69,7 @@ import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.frontend.fileupload.MCRUploadHelper;
 
 import com.google.common.collect.Sets;
 
@@ -159,6 +162,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         boolean create = options.contains(StandardOpenOption.CREATE);
         boolean createNew = options.contains(StandardOpenOption.CREATE_NEW);
         if (create || createNew) {
+            checkNewPathName(ifsPath);
             for (OpenOption option : fileOpenOptions) {
                 //check before we create any file instance
                 checkOpenOption(option);
@@ -172,6 +176,17 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         boolean write = options.contains(StandardOpenOption.WRITE) || options.contains(StandardOpenOption.APPEND);
         FileChannel baseChannel = (FileChannel) Files.newByteChannel(mcrFile.getLocalPath(), fileOpenOptions);
         return new MCRFileChannel(ifsPath, mcrFile, baseChannel, write, channelCreateEvent);
+    }
+
+    private static void checkNewPathName(MCRPath ifsPath) throws IOException {
+        //check property lazy as on initialization of this class MCRConfiguration2 is not ready
+        if (MCRConfiguration2.getBoolean("MCR.NIO.PathCreateNameCheck").orElse(true)) {
+            try {
+                MCRUploadHelper.checkPathName(ifsPath.getFileName().toString(), true);
+            } catch (MCRException e) {
+                throw new IOException(e.getMessage(), e);
+            }
+        }
     }
 
     static void checkOpenOption(OpenOption option) {
@@ -212,6 +227,9 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             }
             store.create(derId.getNumberAsInteger());
             return;
+        } else {
+            //not root directory
+            checkNewPathName(mcrPath);
         }
         rootDirectory = MCRFileSystemUtils.getFileCollection(mcrPath.getOwner());
         MCRPath parentPath = mcrPath.getParent();
