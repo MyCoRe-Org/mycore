@@ -28,7 +28,7 @@ import org.mycore.common.xml.MCRNodeBuilder;
  *
  * @author Frank L\u00FCtzenkirchen
  */
-class MCRIdentifier {
+public class MCRIdentifier {
 
     private MCRIdentifierType type;
 
@@ -39,11 +39,11 @@ class MCRIdentifier {
         this.value = value;
     }
 
-    MCRIdentifierType getType() {
+    public MCRIdentifierType getType() {
         return type;
     }
 
-    String getValue() {
+    public String getValue() {
         return value;
     }
 

@@ -101,6 +101,8 @@ public class MCREnricher {
 
     private Map<String, MCRDataSourceCall> id2call;
 
+    private MCREnrichmentDebugger debugger = new MCRNoOpEnrichmentDebugger();
+
     public MCREnricher(String configID) {
         xPath2FindNestedObjects = XPathFactory.instance().compile(XPATH_HOST_SERIES, Filters.element(), null,
             MCRConstants.getStandardNamespaces());
@@ -108,17 +110,29 @@ public class MCREnricher {
         dsConfig = MCRConfiguration2.getStringOrThrow("MCR.MODS.EnrichmentResolver.DataSources." + configID);
     }
 
+    public void setDebugger(MCREnrichmentDebugger debugger) {
+        this.debugger = debugger;
+    }
+
     public synchronized void enrich(Element publication) {
+        debugger.debugPublication("before", publication);
+        
         idPool = new MCRIdentifierPool();
         id2call = prepareDataSourceCalls();
 
         idPool.addIdentifiersFrom(publication);
         while (idPool.hasNewIdentifiers()) {
+            debugger.startIteration();
+            debugger.debugNewIdentifiers(idPool.getNewIdentifiers());
+
             idPool.prepareNextIteration();
+
             resolveExternalData();
             mergeNewIdentifiers(publication);
             mergeExternalData(publication);
             MCRMODSSorter.sort(publication);
+
+            debugger.endIteration();
         }
 
         for (Element nestedObject : xPath2FindNestedObjects.evaluate(publication)) {
@@ -173,6 +187,8 @@ public class MCREnricher {
                     call.getResults().forEach(result -> {
                         LOGGER.info("merging data from " + token);
                         merge(publication, result);
+                        debugger.debugResolved(token, result);
+                        debugger.debugPublication("afterMerge", publication);
                     });
                     call.clearResults();
 
