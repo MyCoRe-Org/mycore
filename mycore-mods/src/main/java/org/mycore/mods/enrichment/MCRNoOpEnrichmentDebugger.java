@@ -14,17 +14,22 @@ import org.jdom2.Element;
 public class MCRNoOpEnrichmentDebugger implements MCREnrichmentDebugger {
 
     public void startIteration() {
+        // Do nothing here
     }
 
     public void endIteration() {
+        // Do nothing here
     }
 
     public void debugPublication(String label, Element publication) {
+        // Do nothing here
     }
 
     public void debugNewIdentifiers(Set<MCRIdentifier> ids) {
+        // Do nothing here
     }
 
     public void debugResolved(String token, Element result) {
+        // Do nothing here
     }
 }

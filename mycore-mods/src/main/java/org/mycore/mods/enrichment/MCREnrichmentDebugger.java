@@ -13,13 +13,13 @@ import org.jdom2.Element;
  */
 public interface MCREnrichmentDebugger {
 
-    public void startIteration();
+    void startIteration();
 
-    public void endIteration();
+    void endIteration();
 
-    public void debugPublication(String label, Element publication);
+    void debugPublication(String label, Element publication);
 
-    public void debugNewIdentifiers(Set<MCRIdentifier> ids);
+    void debugNewIdentifiers(Set<MCRIdentifier> ids);
 
-    public void debugResolved(String token, Element result);
+    void debugResolved(String token, Element result);
 }
