@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:note>from data source A</mods:note>
+  <mods:identifier type="doi">10.123/456</mods:identifier>
+  <mods:relatedItem type="host">
+    <mods:note>host from data source A</mods:note>
+    <mods:identifier type="issn">1000-9999</mods:identifier>
+  </mods:relatedItem>
+</mods:mods>

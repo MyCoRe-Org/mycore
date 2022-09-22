@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<debugEnrichment xmlns:mods="http://www.loc.gov/mods/v3">
+  <before>
+    <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+      <mods:identifier type="issn">1521-3765</mods:identifier>
+    </mods:mods>
+  </before>
+  <enrichmentIteration>
+    <newIdentifiersFound>
+      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1521-3765</mods:identifier>
+    </newIdentifiersFound>
+    <resolved from="GBV">
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:note>from data source GBV via ISSN</mods:note>
+        <mods:identifier type="issn">1521-3765</mods:identifier>
+        <mods:identifier type="doi">10.1002/(ISSN)1521-3765</mods:identifier>
+      </mods:mods>
+    </resolved>
+    <afterMerge>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:identifier type="issn">1521-3765</mods:identifier>
+        <mods:identifier type="doi">10.1002/(ISSN)1521-3765</mods:identifier>
+        <mods:note>from data source GBV via ISSN</mods:note>
+      </mods:mods>
+    </afterMerge>
+  </enrichmentIteration>
+  <enrichmentIteration>
+    <newIdentifiersFound>
+      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="doi">10.1002/(ISSN)1521-3765</mods:identifier>
+    </newIdentifiersFound>
+    <resolved from="CrossRef">
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:note>from data source CrossRef via DOI</mods:note>
+        <mods:identifier type="issn">1521-3765</mods:identifier>
+        <mods:identifier type="doi">10.1002/(ISSN)1521-3765</mods:identifier>
+      </mods:mods>
+    </resolved>
+    <afterMerge>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:note>from data source GBV via ISSN</mods:note>
+        <mods:identifier type="issn">1521-3765</mods:identifier>
+        <mods:identifier type="doi">10.1002/(ISSN)1521-3765</mods:identifier>
+        <mods:note>from data source CrossRef via DOI</mods:note>
+      </mods:mods>
+    </afterMerge>
+    <resolved from="GBV">
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:note>from data source GBV via DOI</mods:note>
+        <mods:identifier type="issn">1521-3765</mods:identifier>
+        <mods:identifier type="doi">10.1002/(ISSN)1521-3765</mods:identifier>
+      </mods:mods>
+    </resolved>
+    <afterMerge>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:note>from data source GBV via ISSN</mods:note>
+        <mods:identifier type="issn">1521-3765</mods:identifier>
+        <mods:identifier type="doi">10.1002/(ISSN)1521-3765</mods:identifier>
+        <mods:note>from data source CrossRef via DOI</mods:note>
+        <mods:note>from data source GBV via DOI</mods:note>
+      </mods:mods>
+    </afterMerge>
+  </enrichmentIteration>
+</debugEnrichment>

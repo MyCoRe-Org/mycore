@@ -18,8 +18,6 @@
 
 package org.mycore.mods.enrichment;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jaxen.JaxenException;
 import org.jdom2.Element;
 import org.mycore.common.MCRException;
@@ -30,9 +28,7 @@ import org.mycore.common.xml.MCRNodeBuilder;
  *
  * @author Frank L\u00FCtzenkirchen
  */
-class MCRIdentifier {
-
-    private static final Logger LOGGER = LogManager.getLogger(MCRIdentifier.class);
+public class MCRIdentifier {
 
     private MCRIdentifierType type;
 
@@ -43,11 +39,11 @@ class MCRIdentifier {
         this.value = value;
     }
 
-    MCRIdentifierType getType() {
+    public MCRIdentifierType getType() {
         return type;
     }
 
-    String getValue() {
+    public String getValue() {
         return value;
     }
 
@@ -63,19 +59,19 @@ class MCRIdentifier {
 
     @Override
     public String toString() {
-        return type.getTypeID() + ":" + value;
+        return type.getTypeID() + " " + value;
     }
 
     /**
      * Builds the XML representation of this identifier within MODS.
      */
-    void buildElement(Element parent) {
-        MCRNodeBuilder builder = new MCRNodeBuilder();
+    void mergeInto(Element publication) {
+        Element container = new Element(publication.getName(), publication.getNamespace());
         try {
-            LOGGER.info("building new identifier " + this);
-            builder.buildElement(type.getXPath(), value, parent);
+            new MCRNodeBuilder().buildElement(type.getXPath(), value, container);
         } catch (JaxenException ex) {
             throw new MCRException(ex);
         }
+        MCREnricher.merge(publication, container);
     }
 }
