@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:note>from data source GBV via ISSN</mods:note>
+  <mods:note>from data source CrossRef via DOI</mods:note>
+  <mods:note>from data source GBV via DOI</mods:note>
+  <mods:identifier type="issn">1521-3765</mods:identifier>
+  <mods:identifier type="doi">10.1002/(ISSN)1521-3765</mods:identifier>
+</mods:mods>

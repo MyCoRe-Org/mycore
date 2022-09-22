@@ -29,37 +29,53 @@ import org.mycore.common.config.MCRConfiguration2;
  * e.g.
  * MCR.MODS.EnrichmentResolver.DataSource.PubMed.IdentifierTypes=doi pubmed
  *
- * Per data source, for each identifier there must be a pattern configured that
- * defines the URI to get the data for this type of identifier
+ * Per data source, for each identifier type, there must be a pattern configured
+ * that defines the URI to get the data for this type of identifier
  *
  * @see MCRIdentifierResolver
+ * 
+ * As a global parameter, or per data source, it can be configured whether 
+ * the data source will stop after the first successful call, or retrieve all data
+ * for all identifiers.
+ * 
+ * @see MCRDataSource
  *
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRDataSourceFactory {
 
+    private static final String CONFIG_PREFIX = "MCR.MODS.EnrichmentResolver.";
+
     private static MCRDataSourceFactory INSTANCE = new MCRDataSourceFactory();
 
     private MCRCache<String, MCRDataSource> dataSources = new MCRCache<>(30, "data sources");
+
+    private Boolean defaultStopOnFirstResult;
 
     static MCRDataSourceFactory instance() {
         return INSTANCE;
     }
 
     private MCRDataSourceFactory() {
+        String cfgProperty = CONFIG_PREFIX + "DefaultStopOnFirstResult";
+        defaultStopOnFirstResult = MCRConfiguration2.getBoolean(cfgProperty).orElse(Boolean.TRUE);
     }
 
     private MCRDataSource buildDataSource(String sourceID) {
-        MCRDataSource dataSource = new MCRDataSource(sourceID);
+        String configPrefix = CONFIG_PREFIX + "DataSource." + sourceID + ".";
+        String modeProperty = configPrefix + "StopOnFirstResult";
+        boolean stopOnFirstResult = MCRConfiguration2.getBoolean(modeProperty).orElse(defaultStopOnFirstResult);
 
-        String[] identifierTypes = MCRConfiguration2
-            .getStringOrThrow("MCR.MODS.EnrichmentResolver.DataSource." + sourceID + ".IdentifierTypes").split("\\s");
+        MCRDataSource dataSource = new MCRDataSource(sourceID, stopOnFirstResult);
+
+        String typesProperty = configPrefix + "IdentifierTypes";
+        String[] identifierTypes = MCRConfiguration2.getStringOrThrow(typesProperty).split("\\s");
         for (String typeID : identifierTypes) {
-            String prefix = "MCR.MODS.EnrichmentResolver.DataSource." + sourceID + "." + typeID + ".";
-            String uri = MCRConfiguration2.getStringOrThrow(prefix + "URI");
+            String property = configPrefix + typeID + ".URI";
+            String uri = MCRConfiguration2.getStringOrThrow(property);
 
             MCRIdentifierType idType = MCRIdentifierTypeFactory.instance().getType(typeID);
-            MCRIdentifierResolver resolver = new MCRIdentifierResolver(idType, uri);
+            MCRIdentifierResolver resolver = new MCRIdentifierResolver(dataSource, idType, uri);
             dataSource.addResolver(resolver);
         }
         return dataSource;

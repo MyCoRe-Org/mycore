@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<debugEnrichment xmlns:mods="http://www.loc.gov/mods/v3">
+  <before>
+    <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+      <mods:identifier type="doi">10.123/456</mods:identifier>
+    </mods:mods>
+  </before>
+  <enrichmentIteration>
+    <newIdentifiersFound>
+      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="doi">10.123/456</mods:identifier>
+    </newIdentifiersFound>
+    <resolved from="DSA">
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:note>from data source A</mods:note>
+        <mods:identifier type="doi">10.123/456</mods:identifier>
+        <mods:relatedItem type="host">
+          <mods:note>host from data source A</mods:note>
+          <mods:identifier type="issn">1000-9999</mods:identifier>
+        </mods:relatedItem>
+      </mods:mods>
+    </resolved>
+    <afterMerge>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:identifier type="doi">10.123/456</mods:identifier>
+        <mods:note>from data source A</mods:note>
+        <mods:relatedItem type="host">
+          <mods:note>host from data source A</mods:note>
+          <mods:identifier type="issn">1000-9999</mods:identifier>
+        </mods:relatedItem>
+      </mods:mods>
+    </afterMerge>
+    <resolved from="DSB">
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:note>from data source B</mods:note>
+        <mods:identifier type="doi">10.123/456</mods:identifier>
+        <mods:relatedItem type="host">
+          <mods:note>host from data source B</mods:note>
+          <mods:identifier type="issn">1234-5678</mods:identifier>
+          <mods:identifier type="issn">1234-6789</mods:identifier>
+        </mods:relatedItem>
+      </mods:mods>
+    </resolved>
+    <afterMerge>
+      <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+        <mods:identifier type="doi">10.123/456</mods:identifier>
+        <mods:note>from data source A</mods:note>
+        <mods:relatedItem type="host">
+          <mods:note>host from data source A</mods:note>
+          <mods:identifier type="issn">1000-9999</mods:identifier>
+          <mods:note>host from data source B</mods:note>
+          <mods:identifier type="issn">1234-5678</mods:identifier>
+          <mods:identifier type="issn">1234-6789</mods:identifier>
+        </mods:relatedItem>
+        <mods:note>from data source B</mods:note>
+      </mods:mods>
+    </afterMerge>
+  </enrichmentIteration>
+  <before>
+    <mods:relatedItem xmlns:mods="http://www.loc.gov/mods/v3" type="host">
+      <mods:note>host from data source A</mods:note>
+      <mods:identifier type="issn">1000-9999</mods:identifier>
+      <mods:note>host from data source B</mods:note>
+      <mods:identifier type="issn">1234-5678</mods:identifier>
+      <mods:identifier type="issn">1234-6789</mods:identifier>
+    </mods:relatedItem>
+  </before>
+  <enrichmentIteration>
+    <newIdentifiersFound>
+      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1234-5678</mods:identifier>
+      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1234-6789</mods:identifier>
+      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1000-9999</mods:identifier>
+    </newIdentifiersFound>
+    <resolved from="DSC">
+      <mods:relatedItem xmlns:mods="http://www.loc.gov/mods/v3" type="host">
+        <mods:note>from data source C for ISSN 1234-5678</mods:note>
+        <mods:identifier type="issn">1234-5678</mods:identifier>
+      </mods:relatedItem>
+    </resolved>
+    <afterMerge>
+      <mods:relatedItem xmlns:mods="http://www.loc.gov/mods/v3" type="host">
+        <mods:note>host from data source A</mods:note>
+        <mods:identifier type="issn">1000-9999</mods:identifier>
+        <mods:note>host from data source B</mods:note>
+        <mods:identifier type="issn">1234-5678</mods:identifier>
+        <mods:identifier type="issn">1234-6789</mods:identifier>
+        <mods:note>from data source C for ISSN 1234-5678</mods:note>
+      </mods:relatedItem>
+    </afterMerge>
+    <resolved from="DSC">
+      <mods:relatedItem xmlns:mods="http://www.loc.gov/mods/v3" type="host">
+        <mods:note>from data source C for ISSN 1234-6789</mods:note>
+        <mods:identifier type="issn">1234-6789</mods:identifier>
+      </mods:relatedItem>
+    </resolved>
+    <afterMerge>
+      <mods:relatedItem xmlns:mods="http://www.loc.gov/mods/v3" type="host">
+        <mods:note>host from data source A</mods:note>
+        <mods:identifier type="issn">1000-9999</mods:identifier>
+        <mods:note>host from data source B</mods:note>
+        <mods:identifier type="issn">1234-5678</mods:identifier>
+        <mods:identifier type="issn">1234-6789</mods:identifier>
+        <mods:note>from data source C for ISSN 1234-5678</mods:note>
+        <mods:note>from data source C for ISSN 1234-6789</mods:note>
+      </mods:relatedItem>
+    </afterMerge>
+  </enrichmentIteration>
+</debugEnrichment>

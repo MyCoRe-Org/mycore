@@ -110,13 +110,28 @@ public class MCRXMLHelper {
      * @throws IOException if resolving resources fails
      */
     public static void validate(Document doc, String schemaURI) throws SAXException, IOException {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        sf.setResourceResolver(MCREntityResolver.instance());
-        Source source = resolveSource(schemaURI);
-        Schema schema = sf.newSchema(source);
+        Schema schema = resolveSchema(schemaURI, false);
         Validator validator = schema.newValidator();
         validator.setResourceResolver(MCREntityResolver.instance());
         validator.validate(new JDOMSource(doc));
+    }
+
+    /**
+     * Resolve the schema from the schemaURI honoring the catalog.xml
+     * @param schemaURI URI of XML Schema document
+     * @param disableSchemaFullCheckingFeature if true disable the feature
+     *                                         http://apache.org/xml/features/validation/schema-full-checking
+     * @return the schema
+     */
+    public static synchronized Schema resolveSchema(String schemaURI, boolean disableSchemaFullCheckingFeature)
+        throws IOException, SAXException {
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        if (disableSchemaFullCheckingFeature) {
+            sf.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
+        }
+        sf.setResourceResolver(MCREntityResolver.instance());
+        Source source = resolveSource(schemaURI);
+        return sf.newSchema(source);
     }
 
     /**

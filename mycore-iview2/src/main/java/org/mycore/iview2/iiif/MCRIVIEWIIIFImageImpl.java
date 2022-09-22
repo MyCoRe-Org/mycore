@@ -68,9 +68,11 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
     public static final java.util.List<String> SUPPORTED_FORMATS = Arrays.asList(ImageIO.getReaderFileSuffixes());
 
-    public static final String MAX_BYTES = "MaxImageBytes";
+    public static final String MAX_BYTES_PROPERTY = "MaxImageBytes";
 
     private static final String TILE_FILE_PROVIDER_PROPERTY = "TileFileProvider";
+    
+    private static final String IDENTIFIER_SEPARATOR_PROPERTY = "IdentifierSeparator"; 
 
     private static final Logger LOGGER = LogManager.getLogger(MCRIVIEWIIIFImageImpl.class);
 
@@ -115,8 +117,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         long resultingSize = (long) targetSize.getHeight() * targetSize.getWidth()
             * (imageQuality.equals(MCRIIIFImageQuality.color) ? 3 : 1);
 
-        long maxImageSize = Optional.ofNullable(getProperties().get(MAX_BYTES)).map(Long::parseLong)
-            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(getConfigPrefix() + MAX_BYTES));
+        long maxImageSize = Optional.ofNullable(getProperties().get(MAX_BYTES_PROPERTY)).map(Long::parseLong)
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(getConfigPrefix() + MAX_BYTES_PROPERTY));
         if (resultingSize > maxImageSize) {
             throw new MCRIIIFImageProvidingException("Maximal image size is " + (maxImageSize / 1024 / 1024) + "MB. ["
                 + resultingSize + "/" + maxImageSize + "]");
@@ -299,7 +301,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     protected MCRTileInfo createTileInfo(String identifier) throws MCRIIIFImageNotFoundException {
         MCRTileInfo tileInfo = null;
         String id = identifier.contains(":/") ? identifier.replaceFirst(":/", "/") : identifier;
-        String[] splittedIdentifier = id.split("/", 2);
+        String separator = getProperties().getOrDefault(IDENTIFIER_SEPARATOR_PROPERTY, "/");
+        String[] splittedIdentifier = id.split(separator, 2);
         switch (splittedIdentifier.length) {
             case 1:
                 tileInfo = new MCRTileInfo(null, identifier, null);

@@ -78,6 +78,19 @@ public abstract class MCRIIIFPresentationImpl {
     private String getConfigPrefix() {
         return MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName + ".";
     }
+    
+    /**
+     * For consistency and security reasons it may become necessary to
+     * to cleanup the identifier, which is an otherwise unchecked URL path parameter.
+     * 
+     * Subclasses may override.
+     * 
+     * @param identifier - the IIIF manifest identifier, which should be normalized
+     * @return the normalized identifier
+     */
+    public String normalizeIdentifier(String identifier) {
+        return identifier;
+    }
 
     public abstract MCRIIIFManifest getManifest(String id);
 

@@ -40,7 +40,7 @@ import org.mycore.common.MCRConstants;
  *
  * @author Frank L\u00FCtzenkirchen
  */
-class MCRIdentifierType {
+public class MCRIdentifierType {
 
     private String typeID;
 
@@ -55,11 +55,11 @@ class MCRIdentifierType {
             MCRConstants.getStandardNamespaces());
     }
 
-    String getTypeID() {
+    public String getTypeID() {
         return typeID;
     }
 
-    String getXPath() {
+    public String getXPath() {
         return xPath;
     }
 

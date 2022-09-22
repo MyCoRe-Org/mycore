@@ -25,9 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.xml.XMLConstants;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.jdom2.Document;
 import org.jdom2.transform.JDOMSource;
@@ -35,7 +33,6 @@ import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
-import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -93,10 +90,7 @@ public abstract class MCRDOIBaseService extends MCRPIJobService<MCRDigitalObject
 
     public static Schema resolveSchema(final String schemaURLString) {
         try {
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", false);
-            schemaFactory.setResourceResolver(MCREntityResolver.instance());
-            return schemaFactory.newSchema(MCRXMLHelper.resolveSource(schemaURLString));
+            return MCRXMLHelper.resolveSchema(schemaURLString, true);
         } catch (SAXException | IOException e) {
             throw new MCRConfigurationException("Error while loading " + schemaURLString + " schema!", e);
         }

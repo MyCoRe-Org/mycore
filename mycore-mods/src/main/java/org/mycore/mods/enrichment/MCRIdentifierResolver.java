@@ -18,6 +18,7 @@
 
 package org.mycore.mods.enrichment;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
@@ -25,8 +26,12 @@ import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.mods.MCRMODSCommands;
+import org.xml.sax.SAXException;
 
 /**
  * Returns publication data in MODS format for a given identifier.
@@ -49,11 +54,14 @@ class MCRIdentifierResolver {
 
     private static final Logger LOGGER = LogManager.getLogger(MCRIdentifierResolver.class);
 
+    private MCRDataSource ds;
+
     private MCRIdentifierType idType;
 
     private String uriPattern;
 
-    MCRIdentifierResolver(MCRIdentifierType idType, String uriPattern) {
+    MCRIdentifierResolver(MCRDataSource ds, MCRIdentifierType idType, String uriPattern) {
+        this.ds = ds;
         this.idType = idType;
         this.uriPattern = uriPattern;
     }
@@ -69,24 +77,33 @@ class MCRIdentifierResolver {
      * @return the publication data in MODS format, or null if the data source did not return data for this identifier
      */
     Element resolve(String identifier) {
+        Object[] params = new Object[] { identifier, URLEncoder.encode(identifier, StandardCharsets.UTF_8) };
+        String uri = new MessageFormat(uriPattern, Locale.ROOT).format(params);
+
         Element resolved = null;
         try {
-            String uri = new MessageFormat(uriPattern, Locale.ROOT)
-                .format(new Object[] { identifier, URLEncoder.encode(identifier, StandardCharsets.UTF_8) });
             resolved = MCRURIResolver.instance().resolve(uri);
         } catch (Exception ex) {
-            LOGGER.error("Exception resolving " + identifier, ex);
+            LOGGER.warn("Exception resolving " + uri, ex);
+            return null;
         }
 
-        // Normalize various error/not found cases:
-        if (resolved == null) {
+        // Normalize various error/not found cases
+        if (resolved == null || !"mods".equals(resolved.getName()) || resolved.getChildren().isEmpty()) {
+            LOGGER.warn(ds + " returned none or empty MODS for " + idType + " " + identifier);
             return null;
-        } else if (!"mods".equals(resolved.getName())) {
-            return null;
-        } else if (resolved.getChildren().isEmpty()) {
-            return null;
-        } else {
-            return resolved;
         }
+
+        try {
+            ensureIsValidMODS(resolved);
+            return resolved;
+        } catch (Exception ex) {
+            LOGGER.warn(ds + " returned invalid MODS for " + identifier + ": " + ex.getMessage(), ex);
+            return null;
+        }
+    }
+
+    void ensureIsValidMODS(Element mods) throws SAXException, IOException {
+        MCRXMLHelper.validate(new Document().addContent(mods.detach()), MCRMODSCommands.MODS_V3_XSD_URI);
     }
 }

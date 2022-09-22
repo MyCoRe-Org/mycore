@@ -18,23 +18,27 @@
 
 package org.mycore.mods.enrichment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.mods.MCRMODSCommands;
-import org.mycore.mods.MCRMODSSorter;
-import org.mycore.mods.merger.MCRMerger;
-import org.mycore.mods.merger.MCRMergerFactory;
 
 /**
  * Used to request publication data from a given data source,
  * trying the identifiers supported by this data source one by one.
- * When the data source returns publication data for an identifier,
- * the call is marked successful and the other identifiers are skipped.
+ * 
+ * Depending on the configuration properties  
+ * MCR.MODS.EnrichmentResolver.DefaultStopOnFirstResult=true|false
+ * and
+ * MCR.MODS.EnrichmentResolver.DataSource.[ID].StopOnFirstResult=true|false
+ * the data source will stop trying to resolve publication data after 
+ * the first successful call with a given identifier and skip others, 
+ * or will try to retrieve data for all given identifiers.
+ * 
+ * @see MCRDataSource
  *
  * @author Frank L\u00FCtzenkirchen
  */
@@ -46,7 +50,9 @@ class MCRDataSourceCall implements Callable<Boolean> {
 
     private MCRIdentifierPool idPool;
 
-    private Element result;
+    private List<Element> results = new ArrayList<Element>();
+    
+    private boolean gotResults = false;
 
     MCRDataSourceCall(MCRDataSource ds, MCRIdentifierPool idPool) {
         this.ds = ds;
@@ -56,63 +62,45 @@ class MCRDataSourceCall implements Callable<Boolean> {
     /**
      * Used to request publication data from a given data source,
      * trying the identifiers supported by this data source one by one.
-     * When the data source returns publication data for an identifier,
-     * the call is marked successful and the other identifiers are skipped.
      *
-     * @return true, if the data source returned publication data
+     * @return true, if the data source returned valid publication data
      */
     public Boolean call() {
-        if (!wasSuccessful()) {
-            for (MCRIdentifierResolver idResolver : ds.getResolvers()) {
-                MCRIdentifierType type = idResolver.getType();
-                for (MCRIdentifier id : idPool.getIdentifiersOfType(type)) {
-                    result = idResolver.resolve(id.getValue());
-                    LOGGER.info(ds.getID() + " with " + id + " returned " + (wasSuccessful() ? "" : "no ") + "data ");
-                    if (wasSuccessful() && validate(id.getValue())) {
-                        MCRMODSSorter.sort(result);
-                        idPool.addIdentifiersFrom(result);
-                        return true;
+        if (!isFinished()) {
+            loop: for (MCRIdentifierResolver idResolver : ds.getResolvers()) {
+                for (MCRIdentifier id : idPool.getCurrentIdentifiersOfType(idResolver.getType())) {
+                    if (isFinished()) {
+                        break loop;
                     }
+
+                    Element result = idResolver.resolve(id.getValue());
+                    if (result != null) {
+                        gotResults = true;
+                        results.add(result);
+                        idPool.addIdentifiersFrom(result);
+                    }
+
+                    LOGGER.info(ds + " with " + id + " returned " + (result != null ? "" : "no ") + "valid data");
                 }
             }
         }
-        return false;
-    }
 
-    protected Boolean validate(String id) {
-        final Document doc = new Document();
-        doc.addContent(this.result.detach());
-
-        try {
-            MCRXMLHelper.validate(doc, MCRMODSCommands.MODS_V3_XSD_URI);
-        } catch (Exception e) {
-            LOGGER.warn(ds.getID() + " with " + id + " returned invalid mods!", e);
-            return false;
-        }
-
-        return true;
+        return wasSuccessful();
     }
 
     boolean wasSuccessful() {
-        return result != null;
+        return gotResults;
     }
 
-    /**
-     * Merges the publication data returned by the data source with the existing data
-     */
-    void mergeResultWith(Element existingData) {
-        if (existingData.getName().equals("relatedItem")) {
-            // resolved is always mods:mods, transform to mods:relatedItem to be mergeable
-            result.setName("relatedItem");
-            result.setAttribute(existingData.getAttribute("type").clone());
-        }
-
-        MCRMerger a = MCRMergerFactory.buildFrom(existingData);
-        MCRMerger b = MCRMergerFactory.buildFrom(result);
-        a.mergeFrom(b);
+    private boolean isFinished() {
+        return ds.shouldStopOnFirstResult() ? wasSuccessful() : false;
     }
 
-    void reset() {
-        this.result = null;
+    List<Element> getResults() {
+        return results;
+    }
+    
+    void clearResults() {
+        results.clear();
     }
 }

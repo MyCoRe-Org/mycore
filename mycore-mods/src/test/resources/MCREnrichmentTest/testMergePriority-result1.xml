@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+  <mods:note>from data source A</mods:note>
+  <mods:note>from data source B</mods:note>
+  <mods:note>from data source D</mods:note>
+  <mods:identifier type="foo">1</mods:identifier>
+  <mods:identifier type="foo">fromC</mods:identifier>
+</mods:mods>
