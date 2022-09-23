@@ -120,7 +120,7 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value or not allowed.
      */
-    public static synchronized void addAccessKeySecret(final MCRSession session, final MCRObjectID objectId, 
+    public static synchronized void addAccessKeySecret(final MCRSession session, final MCRObjectID objectId,
         final String value) throws MCRException {
         if (!isAccessKeyForSessionAllowed()) {
             throw new MCRAccessKeyException("Access keys is not allowed.");
@@ -232,7 +232,7 @@ public class MCRAccessKeyUtils {
      * @param value the value of a {@link MCRAccessKey}
      * @throws MCRException if there is no matching {@link MCRAccessKey} with the same value.
      */
-    public static synchronized void addAccessKeySecretToCurrentUser(final MCRObjectID objectId, final String value) 
+    public static synchronized void addAccessKeySecretToCurrentUser(final MCRObjectID objectId, final String value)
         throws MCRException {
         addAccessKeySecret(MCRUserManager.getCurrentUser(), objectId, value);
     }
@@ -282,8 +282,7 @@ public class MCRAccessKeyUtils {
                 }
             }
             offset += limit;
-        }
-        while (users.size() == limit);
+        } while (users.size() == limit);
     }
 
     /**
@@ -308,7 +307,7 @@ public class MCRAccessKeyUtils {
      * @param objectId the {@link MCRObjectID}
      * @return secret or null
      */
-    public static synchronized String getAccessKeySecret(final MCRUserInformation userInformation, 
+    public static synchronized String getAccessKeySecret(final MCRUserInformation userInformation,
         final MCRObjectID objectId) {
         return userInformation.getUserAttribute(getAttributeName(objectId));
     }
@@ -338,7 +337,7 @@ public class MCRAccessKeyUtils {
      *
      * @param objectId the {@link MCRObjectID}
      * @return the attribute name
-     */ 
+     */
     private static String getAttributeName(final MCRObjectID objectId) {
         return ACCESS_KEY_PREFIX + objectId.toString();
     }
@@ -366,7 +365,7 @@ public class MCRAccessKeyUtils {
      * @param objectId of a {@link MCRObjectID}
      * @return access key
      */
-    public static MCRAccessKey getLinkedAccessKey(final MCRUserInformation userInformation, 
+    public static MCRAccessKey getLinkedAccessKey(final MCRUserInformation userInformation,
         final MCRObjectID objectId) {
         final String secret = getAccessKeySecret(userInformation, objectId);
         if (secret != null) {

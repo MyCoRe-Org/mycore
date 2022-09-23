@@ -67,7 +67,7 @@ public class MCROAIIdentify extends SimpleIdentify {
         this.setEarliestDatestamp(calculateEarliestTimestamp());
         this.getAdminEmailList().add(adminMail);
         this.getDescriptionList().add(getIdentifierDescription());
-        if(!getFriendsDescription().getFriendsList().isEmpty()) {
+        if (!getFriendsDescription().getFriendsList().isEmpty()) {
             this.getDescriptionList().add(getFriendsDescription());
         }
 

@@ -62,7 +62,8 @@ public class MCRMetsFileIndexAccumulator implements MCRSolrFileIndexAccumulator 
 
             List<Attribute> attributeList = XPATH_FACTORY
                 .compile("/mets:mets/mets:structMap[@TYPE='LOGICAL']//*/@LABEL", Filters.attribute(), null,
-                    MCRConstants.METS_NAMESPACE).evaluate(mets);
+                    MCRConstants.METS_NAMESPACE)
+                .evaluate(mets);
 
             // collect all label attributes
             for (Attribute a : attributeList) {

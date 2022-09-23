@@ -224,7 +224,7 @@ public class MCRXMLFunctions {
      * @param calendarName the name if the calendar defined in MCRCalendar
      * @return the date in format yyyy-MM-ddThh:mm:ssZ
      */
-    public static String getISODateFromMCRHistoryDate(String date, String fieldName, String calendarName){
+    public static String getISODateFromMCRHistoryDate(String date, String fieldName, String calendarName) {
         if (fieldName == null || fieldName.trim().length() == 0) {
             return "";
         }
@@ -720,14 +720,14 @@ public class MCRXMLFunctions {
     public static long getFileCount(String derivateId) throws IOException {
         AtomicInteger i = new AtomicInteger(0);
         Files.walkFileTree(MCRPath.getPath(derivateId, "/"), new SimpleFileVisitor<>() {
-            @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 i.incrementAndGet();
                 return FileVisitResult.CONTINUE;
             }
         });
         return i.get();
     }
-
 
     /**
      * @param derivateID

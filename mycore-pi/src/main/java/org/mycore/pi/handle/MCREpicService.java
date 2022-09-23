@@ -176,20 +176,20 @@ public class MCREpicService extends MCRPIJobService<MCRHandle> {
         final MCRHandle mcrHandle = new MCRHandle(epic);
         final String urlForObject = getURLForObject(objId);
 
-            try {
-                final ArrayList<MCRHandleInfo> handleInfos = new ArrayList<>();
-                processMedataData(objectID, handleInfos);
+        try {
+            final ArrayList<MCRHandleInfo> handleInfos = new ArrayList<>();
+            processMedataData(objectID, handleInfos);
 
-                ReentrantLock reentrantLock = idLockMap.computeIfAbsent(epic, (l) -> new ReentrantLock());
-                try {
-                    reentrantLock.lock();
-                    getClient().create(urlForObject, mcrHandle, handleInfos);
-                } finally {
-                    reentrantLock.unlock();
-                }
-            } catch (IOException e) {
-                throw new MCRPersistentIdentifierException("Error while communicating with EPIC Service", e);
+            ReentrantLock reentrantLock = idLockMap.computeIfAbsent(epic, (l) -> new ReentrantLock());
+            try {
+                reentrantLock.lock();
+                getClient().create(urlForObject, mcrHandle, handleInfos);
+            } finally {
+                reentrantLock.unlock();
             }
+        } catch (IOException e) {
+            throw new MCRPersistentIdentifierException("Error while communicating with EPIC Service", e);
+        }
 
     }
 

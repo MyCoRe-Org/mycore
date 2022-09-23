@@ -134,17 +134,17 @@ public class MCRRestAuthorizationFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) throws IOException {
         MCRRestAPIACLPermission permission;
         switch (requestContext.getMethod()) {
-            case HttpMethod.OPTIONS:
-                return;
-            case HttpMethod.GET:
-            case HttpMethod.HEAD:
-                permission = MCRRestAPIACLPermission.READ;
-                break;
-            case HttpMethod.DELETE:
-                permission = MCRRestAPIACLPermission.DELETE;
-                break;
-            default:
-                permission = MCRRestAPIACLPermission.WRITE;
+        case HttpMethod.OPTIONS:
+            return;
+        case HttpMethod.GET:
+        case HttpMethod.HEAD:
+            permission = MCRRestAPIACLPermission.READ;
+            break;
+        case HttpMethod.DELETE:
+            permission = MCRRestAPIACLPermission.DELETE;
+            break;
+        default:
+            permission = MCRRestAPIACLPermission.WRITE;
         }
         Optional.ofNullable(resourceInfo.getResourceClass().getAnnotation(Path.class))
             .map(Path::value)

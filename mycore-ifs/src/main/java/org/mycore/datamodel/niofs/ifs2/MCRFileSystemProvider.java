@@ -455,12 +455,12 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     private void checkDirectoryAccessModes(AccessMode... modes) throws AccessDeniedException {
         for (AccessMode mode : modes) {
             switch (mode) {
-                case READ:
-                case WRITE:
-                case EXECUTE:
-                    break;
-                default:
-                    throw new AccessDeniedException("Unsupported AccessMode: " + mode);
+            case READ:
+            case WRITE:
+            case EXECUTE:
+                break;
+            default:
+                throw new AccessDeniedException("Unsupported AccessMode: " + mode);
             }
         }
     }
@@ -468,14 +468,14 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     private void checkFile(MCRFile file, AccessMode... modes) throws AccessDeniedException {
         for (AccessMode mode : modes) {
             switch (mode) {
-                case READ:
-                case WRITE:
-                    break;
-                case EXECUTE:
-                    throw new AccessDeniedException(MCRFileSystemUtils.toPath(file).toString(), null,
-                        "Unsupported AccessMode: " + mode);
-                default:
-                    throw new AccessDeniedException("Unsupported AccessMode: " + mode);
+            case READ:
+            case WRITE:
+                break;
+            case EXECUTE:
+                throw new AccessDeniedException(MCRFileSystemUtils.toPath(file).toString(), null,
+                    "Unsupported AccessMode: " + mode);
+            default:
+                throw new AccessDeniedException("Unsupported AccessMode: " + mode);
             }
         }
     }
@@ -525,14 +525,14 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         }
         BasicFileAttributeViewImpl view = null;
         switch (s[0]) {
-            case "basic":
-                view = new BasicFileAttributeViewImpl(mcrPath);
-                break;
-            case "md5":
-                view = new MD5FileAttributeViewImpl(mcrPath);
-                break;
-            default:
-                throw new UnsupportedOperationException("View '" + s[0] + "' not available");
+        case "basic":
+            view = new BasicFileAttributeViewImpl(mcrPath);
+            break;
+        case "md5":
+            view = new MD5FileAttributeViewImpl(mcrPath);
+            break;
+        default:
+            throw new UnsupportedOperationException("View '" + s[0] + "' not available");
         }
         return view.getAttributeMap(s[1].split(","));
     }
@@ -619,36 +619,36 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             HashMap<String, Object> map = new HashMap<>();
             for (String attr : map.keySet()) {
                 switch (attr) {
-                    case SIZE_NAME:
-                        map.put(attr, attrs.size());
-                        break;
-                    case CREATION_TIME_NAME:
-                        map.put(attr, attrs.creationTime());
-                        break;
-                    case LAST_ACCESS_TIME_NAME:
-                        map.put(attr, attrs.lastAccessTime());
-                        break;
-                    case LAST_MODIFIED_TIME_NAME:
-                        map.put(attr, attrs.lastModifiedTime());
-                        break;
-                    case FILE_KEY_NAME:
-                        map.put(attr, attrs.fileKey());
-                        break;
-                    case IS_DIRECTORY_NAME:
-                        map.put(attr, attrs.isDirectory());
-                        break;
-                    case IS_REGULAR_FILE_NAME:
-                        map.put(attr, attrs.isRegularFile());
-                        break;
-                    case IS_SYMBOLIC_LINK_NAME:
-                        map.put(attr, attrs.isSymbolicLink());
-                        break;
-                    case IS_OTHER_NAME:
-                        map.put(attr, attrs.isOther());
-                        break;
-                    default:
-                        //ignored
-                        break;
+                case SIZE_NAME:
+                    map.put(attr, attrs.size());
+                    break;
+                case CREATION_TIME_NAME:
+                    map.put(attr, attrs.creationTime());
+                    break;
+                case LAST_ACCESS_TIME_NAME:
+                    map.put(attr, attrs.lastAccessTime());
+                    break;
+                case LAST_MODIFIED_TIME_NAME:
+                    map.put(attr, attrs.lastModifiedTime());
+                    break;
+                case FILE_KEY_NAME:
+                    map.put(attr, attrs.fileKey());
+                    break;
+                case IS_DIRECTORY_NAME:
+                    map.put(attr, attrs.isDirectory());
+                    break;
+                case IS_REGULAR_FILE_NAME:
+                    map.put(attr, attrs.isRegularFile());
+                    break;
+                case IS_SYMBOLIC_LINK_NAME:
+                    map.put(attr, attrs.isSymbolicLink());
+                    break;
+                case IS_OTHER_NAME:
+                    map.put(attr, attrs.isOther());
+                    break;
+                default:
+                    //ignored
+                    break;
                 }
             }
             return map;
@@ -660,25 +660,25 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 throw new IllegalArgumentException("'" + name + "' not recognized");
             }
             switch (name) {
-                case CREATION_TIME_NAME:
-                    this.setTimes(null, null, (FileTime) value);
-                    break;
-                case LAST_ACCESS_TIME_NAME:
-                    this.setTimes(null, (FileTime) value, null);
-                    break;
-                case LAST_MODIFIED_TIME_NAME:
-                    this.setTimes((FileTime) value, null, null);
-                    break;
-                case SIZE_NAME:
-                case FILE_KEY_NAME:
-                case IS_DIRECTORY_NAME:
-                case IS_REGULAR_FILE_NAME:
-                case IS_SYMBOLIC_LINK_NAME:
-                case IS_OTHER_NAME:
-                    throw new IllegalArgumentException("'" + name + "' is a read-only attribute.");
-                default:
-                    //ignored
-                    break;
+            case CREATION_TIME_NAME:
+                this.setTimes(null, null, (FileTime) value);
+                break;
+            case LAST_ACCESS_TIME_NAME:
+                this.setTimes(null, (FileTime) value, null);
+                break;
+            case LAST_MODIFIED_TIME_NAME:
+                this.setTimes((FileTime) value, null, null);
+                break;
+            case SIZE_NAME:
+            case FILE_KEY_NAME:
+            case IS_DIRECTORY_NAME:
+            case IS_REGULAR_FILE_NAME:
+            case IS_SYMBOLIC_LINK_NAME:
+            case IS_OTHER_NAME:
+                throw new IllegalArgumentException("'" + name + "' is a read-only attribute.");
+            default:
+                //ignored
+                break;
             }
 
         }

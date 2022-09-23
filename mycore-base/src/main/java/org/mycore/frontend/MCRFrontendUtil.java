@@ -176,8 +176,8 @@ public class MCRFrontendUtil {
         setAsCurrent(session, servletJob);
         // language
         getProperty(request, "lang")
-                .filter(MCRTranslation.getAvailableLanguages()::contains)
-                .ifPresent(session::setCurrentLanguage);
+            .filter(MCRTranslation.getAvailableLanguages()::contains)
+            .ifPresent(session::setCurrentLanguage);
 
         // Set the IP of the current session
         if (session.getCurrentIP().length() == 0) {
@@ -426,14 +426,14 @@ public class MCRFrontendUtil {
     private static Boolean hasIPVersion(InetAddress ip, int version) {
         int byteLength;
         switch (version) {
-            case 4:
-                byteLength = 4;
-                break;
-            case 6:
-                byteLength = 16;
-                break;
-            default:
-                throw new IndexOutOfBoundsException("Unknown ip version: " + version);
+        case 4:
+            byteLength = 4;
+            break;
+        case 6:
+            byteLength = 16;
+            break;
+        default:
+            throw new IndexOutOfBoundsException("Unknown ip version: " + version);
         }
         return ip.getAddress().length == byteLength;
     }
@@ -441,12 +441,12 @@ public class MCRFrontendUtil {
     private static void addSessionListener() {
         MCRSessionMgr.addSessionListener(event -> {
             switch (event.getType()) {
-                case passivated:
-                case destroyed:
-                    CURRENT_SERVLET_JOB.remove();
-                    break;
-                default:
-                    break;
+            case passivated:
+            case destroyed:
+                CURRENT_SERVLET_JOB.remove();
+                break;
+            default:
+                break;
             }
         });
     }

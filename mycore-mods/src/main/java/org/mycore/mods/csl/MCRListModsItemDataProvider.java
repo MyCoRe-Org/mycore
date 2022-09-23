@@ -43,7 +43,7 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
 
     protected static MCRCache<String, CSLItemData> cslCache = new MCRCache<>(2000, "CSL Mods Data");
 
-    private LinkedHashMap<String , CSLItemData> store = new LinkedHashMap<>();
+    private LinkedHashMap<String, CSLItemData> store = new LinkedHashMap<>();
 
     @Override
     public void addContent(MCRContent content) throws IOException, JDOMException, SAXException {

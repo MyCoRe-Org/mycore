@@ -276,16 +276,16 @@ abstract class MCRFileSystemUtils {
             throw new IllegalArgumentException("path is absolute");
         }
         switch (path.getNameCount()) {
-            case 0:
-                return fs.getPath("");
-            case 1:
-                return fs.getPath(path.toString());
-            default:
-                String[] pathComp = new String[path.getNameCount() - 1];
-                for (int i = 1; i < pathComp.length; i++) {
-                    pathComp[i] = path.getName(i).toString();
-                }
-                return fs.getPath(path.getName(0).toString(), pathComp);
+        case 0:
+            return fs.getPath("");
+        case 1:
+            return fs.getPath(path.toString());
+        default:
+            String[] pathComp = new String[path.getNameCount() - 1];
+            for (int i = 1; i < pathComp.length; i++) {
+                pathComp[i] = path.getName(i).toString();
+            }
+            return fs.getPath(path.getName(0).toString(), pathComp);
         }
     }
 

@@ -83,10 +83,12 @@ public class ImageSectionIT extends ViewerTestBase {
         int greenPixelCountZoomed = getColorCount(zoomed, Color.GREEN);
         int bluePixelCountZoomed = getColorCount(zoomed, Color.BLUE);
 
-        String message1Pattern = "There should be less red pixels in the zoomed screenshot than in the not zoomed ({0} > {1})";
+        String message1Pattern
+            = "There should be less red pixels in the zoomed screenshot than in the not zoomed ({0} > {1})";
         assertLess(redPixelCountNotZoomed, redPixelCountZoomed, message1Pattern);
 
-        String message2Pattern = "There should be less green pixels in the not zoomed screenshot than in the zoomed ({0} < {1})";
+        String message2Pattern
+            = "There should be less green pixels in the not zoomed screenshot than in the zoomed ({0} < {1})";
         assertLess(greenPixelCountZoomed, greenPixelCountNotZoomed, message2Pattern);
 
         //-
@@ -98,10 +100,12 @@ public class ImageSectionIT extends ViewerTestBase {
         int greenPixelCountZoomed2 = getColorCount(zoomed2, Color.GREEN);
         int bluePixelCountZoomed2 = getColorCount(zoomed2, Color.BLUE);
 
-        String message3Pattern = "There should be less blue pixels in the zoomed screenshot than in the zoomed2 ({0} > {1})";
+        String message3Pattern
+            = "There should be less blue pixels in the zoomed screenshot than in the zoomed2 ({0} > {1})";
         assertLess(bluePixelCountZoomed2, bluePixelCountZoomed, message3Pattern);
 
-        String message4Pattern = "There should be less green pixels in the zoomed2 screenshot than in the zoomed ({0} > {1})";
+        String message4Pattern
+            = "There should be less green pixels in the zoomed2 screenshot than in the zoomed ({0} > {1})";
         assertLess(greenPixelCountZoomed, greenPixelCountZoomed2, message4Pattern);
 
         //-
@@ -114,10 +118,12 @@ public class ImageSectionIT extends ViewerTestBase {
         int bluePixelCountZoomed3 = getColorCount(zoomed3, Color.BLUE);
         int redPixelCountZoomed3 = getColorCount(zoomed3, Color.RED);
 
-        String message5Pattern = "There should be less green pixels in the zoomed2 screenshot than in the zoomed3 ({0} > {1})";
+        String message5Pattern
+            = "There should be less green pixels in the zoomed2 screenshot than in the zoomed3 ({0} > {1})";
         assertLess(greenPixelCountZoomed3, greenPixelCountZoomed2, message5Pattern);
 
-        String message6Pattern = "There should be less blue pixels in the zoomed3 screenshot than in the zoomed2 ({0} > {1})";
+        String message6Pattern
+            = "There should be less blue pixels in the zoomed3 screenshot than in the zoomed2 ({0} > {1})";
         assertLess(bluePixelCountZoomed2, bluePixelCountZoomed3, message6Pattern);
 
         //-
@@ -133,13 +139,16 @@ public class ImageSectionIT extends ViewerTestBase {
         tbController.pressButton(ToolBarController.BUTTON_ID_ZOOM_OUT);
         Thread.sleep(DELAY_TIME);
 
-        String message7Pattern = "There should be less blue pixels in the zoomed4 screenshot than in the zoomed3 ({0} > {1})";
+        String message7Pattern
+            = "There should be less blue pixels in the zoomed4 screenshot than in the zoomed3 ({0} > {1})";
         assertLess(bluePixelCountZoomed3, bluePixelCountZoomed4, message7Pattern);
 
-        String message8Pattern = "There should be less green pixels in the zoomed4 screenshot than in the zoomed3 ({0} > {1})";
+        String message8Pattern
+            = "There should be less green pixels in the zoomed4 screenshot than in the zoomed3 ({0} > {1})";
         assertLess(greenPixelCountZoomed3, greenPixelCountZoomed4, message8Pattern);
 
-        String message9Pattern = "There should be less red pixels in the zoomed3 screenshot than in the zoomed4 ({0} > {1})";
+        String message9Pattern
+            = "There should be less red pixels in the zoomed3 screenshot than in the zoomed4 ({0} > {1})";
         assertLess(redPixelCountZoomed4, redPixelCountZoomed3, message9Pattern);
 
     }

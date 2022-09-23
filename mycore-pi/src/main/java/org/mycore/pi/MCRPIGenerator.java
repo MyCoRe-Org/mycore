@@ -38,7 +38,7 @@ public abstract class MCRPIGenerator<T extends MCRPersistentIdentifier> {
     }
 
     @MCRPostConstruction
-    public void init(String property){
+    public void init(String property) {
         generatorID = property.substring(GENERATOR_CONFIG_PREFIX.length());
     }
 

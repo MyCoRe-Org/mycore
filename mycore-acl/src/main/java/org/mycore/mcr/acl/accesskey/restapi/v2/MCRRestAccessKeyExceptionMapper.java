@@ -39,7 +39,7 @@ public class MCRRestAccessKeyExceptionMapper implements ExceptionMapper<MCRAcces
 
     @Override
     public Response toResponse(MCRAccessKeyException exception) {
-            return fromException(exception);
+        return fromException(exception);
     }
 
     public static Response fromException(MCRAccessKeyException e) {

@@ -144,7 +144,7 @@ public class MCRCommandUtils {
                 startId + " and " + endId + " have different base IDs (" + fromBase + " and " + toBase
                     + "), same base required to enumerate IDs!");
         }
-        
+
         int fromID = from.getNumberAsInteger();
         int toID = to.getNumberAsInteger();
         int lowerBound = fromID < toID ? fromID : toID;

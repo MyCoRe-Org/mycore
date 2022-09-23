@@ -58,7 +58,7 @@ import jakarta.persistence.Table;
         query = "DELETE"
             + "  FROM MCRAccessKey k"),
 })
- 
+
 /**
  * Access keys for a {@link MCRObject}.
  * An access keys contains a secret and a type.
@@ -75,7 +75,7 @@ public class MCRAccessKey {
     private int id;
 
     /** The access key information */
-    private MCRObjectID objectId; 
+    private MCRObjectID objectId;
 
     /** The secret */
     private String secret;

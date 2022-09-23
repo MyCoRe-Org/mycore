@@ -56,7 +56,7 @@ public class MCRORCIDUser {
     private static final String ATTR_ORCID_TOKEN = "token_orcid";
 
     private static final String MATCH_ONLY_NAME_IDENTIFIER = MCRConfiguration2
-	    .getString("MCR.ORCID.User.NameIdentifier").orElse("");
+        .getString("MCR.ORCID.User.NameIdentifier").orElse("");
 
     private MCRUser user;
 

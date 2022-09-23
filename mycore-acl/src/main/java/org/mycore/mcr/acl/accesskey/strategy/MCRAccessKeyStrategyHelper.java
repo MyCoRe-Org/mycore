@@ -65,7 +65,7 @@ public class MCRAccessKeyStrategyHelper {
                 return false;
             }
             if ((sanitizedPermission.equals(PERMISSION_READ)
-                && accessKey.getType().equals(PERMISSION_READ)) 
+                && accessKey.getType().equals(PERMISSION_READ))
                 || accessKey.getType().equals(PERMISSION_WRITE)) {
                 LOGGER.debug("Access granted.");
                 return true;

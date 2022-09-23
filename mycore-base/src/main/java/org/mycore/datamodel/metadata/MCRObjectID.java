@@ -121,7 +121,6 @@ public final class MCRObjectID implements Comparable<MCRObjectID> {
         return getNextFreeId(baseId, 0);
     }
 
-
     /**
      * Returns a MCRObjectID from a given the components of a base ID string. A base ID is
      * <em>project_id</em>_<em>type_id</em>. The number is computed by this

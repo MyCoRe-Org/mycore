@@ -35,11 +35,11 @@ public class MCRCryptKeyNoPermissionException extends MCRCatchException {
     /*public MCRCryptKeyNoPermissionException(Throwable cause) {
         super(cause);
     }*/
-    
+
     public MCRCryptKeyNoPermissionException(String message, Throwable cause) {
         super(message, cause);
     }
-    
+
     public String getErrorCode() {
         return errorCode;
     }

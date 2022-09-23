@@ -60,7 +60,7 @@ public class MCRMODSGenreConditionTest extends MCRTestCase {
 
         MCRMODSGenreCondition genreCondition = new MCRMODSGenreCondition();
         genreCondition.parse(new Element("genre").setText("article"));
-        Assert.assertTrue("object should be in genre article",genreCondition.matches(holder));
+        Assert.assertTrue("object should be in genre article", genreCondition.matches(holder));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class MCRMODSGenreConditionTest extends MCRTestCase {
 
         MCRMODSGenreCondition genreCondition = new MCRMODSGenreCondition();
         genreCondition.parse(new Element("genre").setText("article"));
-        Assert.assertFalse("object should not be in genre article",genreCondition.matches(holder));
+        Assert.assertFalse("object should not be in genre article", genreCondition.matches(holder));
     }
 
 }

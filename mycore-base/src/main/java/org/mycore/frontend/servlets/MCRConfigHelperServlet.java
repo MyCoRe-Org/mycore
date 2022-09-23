@@ -29,7 +29,6 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Date;
@@ -47,7 +46,7 @@ public class MCRConfigHelperServlet extends HttpServlet {
 
     private Date lastChange;
     private String resultJson;
-    
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -123,8 +122,8 @@ public class MCRConfigHelperServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setHeader("Cache-Control","public");
-        resp.setHeader("Cache-Control","max-age=120");
+        resp.setHeader("Cache-Control", "public");
+        resp.setHeader("Cache-Control", "max-age=120");
 
         if (req.getDateHeader("If-Modified-Since") > lastChange.getTime()) {
             resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);

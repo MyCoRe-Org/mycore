@@ -70,7 +70,7 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
         assertEquals("1964-03-08T00:00:00.000Z",
             MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02-24", "von", "julian"));
         assertEquals("1964-02-29T00:00:00.000Z",
-                MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02", "bis", "gregorian"));
+            MCRXMLFunctions.getISODateFromMCRHistoryDate("1964-02", "bis", "gregorian"));
         assertEquals("-0100-12-31T00:00:00.000Z",
             MCRXMLFunctions.getISODateFromMCRHistoryDate("100 BC", "bis", "gregorian"));
     }

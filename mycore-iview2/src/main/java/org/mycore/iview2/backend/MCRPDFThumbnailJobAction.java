@@ -93,7 +93,7 @@ public class MCRPDFThumbnailJobAction extends MCRJobAction {
                     //DELETE_ON_CLOSE on the outer try{} does not work 
                     //because ImageIO.write() closes the stream and the file will be deleted to early
                     try (InputStream is = Files.newInputStream(pImg, StandardOpenOption.DELETE_ON_CLOSE)) {
-                        is.read();  // read one byte
+                        is.read(); // read one byte
                     }
                 }
             } catch (IOException e) {

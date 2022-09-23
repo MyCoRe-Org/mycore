@@ -168,12 +168,12 @@ public class MCRMETSServlet extends MCRServlet {
         boolean running = true;
         for (int i = (pathInfo.charAt(0) == '/') ? 1 : 0; (i < pathInfo.length() && running); i++) {
             switch (pathInfo.charAt(i)) {
-                case '/':
-                    running = false;
-                    break;
-                default:
-                    ownerID.append(pathInfo.charAt(i));
-                    break;
+            case '/':
+                running = false;
+                break;
+            default:
+                ownerID.append(pathInfo.charAt(i));
+                break;
             }
         }
         return ownerID.toString();

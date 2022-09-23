@@ -45,50 +45,50 @@ public class MCRIIIFPresentationUtil {
      */
     public static void correctIDs(MCRIIIFBase base, String impl, String identifier) {
         switch (base.getType()) {
-            case MCRIIIFCanvas.TYPE:
-                base.setId(getImplBaseURL(impl, identifier) + "canvas/" + encodeUTF8(base.getId()));
-                if (base instanceof MCRIIIFCanvas) {
-                    ((MCRIIIFCanvas) base).images.forEach(annotation -> correctIDs(annotation, impl, identifier));
-                }
-                break;
-            case MCRIIIFAnnotation.TYPE:
-                base.setId(getImplBaseURL(impl, identifier) + "annotation/" + encodeUTF8(base.getId()));
-                if (base instanceof MCRIIIFAnnotationBase && base instanceof MCRIIIFAnnotation) {
-                    ((MCRIIIFAnnotation) base).refresh();
-                    correctIDs(((MCRIIIFAnnotation) base).getResource(), impl, identifier);
-                }
+        case MCRIIIFCanvas.TYPE:
+            base.setId(getImplBaseURL(impl, identifier) + "canvas/" + encodeUTF8(base.getId()));
+            if (base instanceof MCRIIIFCanvas) {
+                ((MCRIIIFCanvas) base).images.forEach(annotation -> correctIDs(annotation, impl, identifier));
+            }
+            break;
+        case MCRIIIFAnnotation.TYPE:
+            base.setId(getImplBaseURL(impl, identifier) + "annotation/" + encodeUTF8(base.getId()));
+            if (base instanceof MCRIIIFAnnotationBase && base instanceof MCRIIIFAnnotation) {
+                ((MCRIIIFAnnotation) base).refresh();
+                correctIDs(((MCRIIIFAnnotation) base).getResource(), impl, identifier);
+            }
 
-                break;
-            case MCRIIIFSequence.TYPE:
-                base.setId(getImplBaseURL(impl, identifier) + "sequence/" + encodeUTF8(base.getId()));
-                if (base instanceof MCRIIIFSequence) {
-                    ((MCRIIIFSequence) base).canvases.forEach(canvas -> correctIDs(canvas, impl, identifier));
-                }
-                break;
-            case MCRIIIFRange.TYPE:
-                base.setId(getImplBaseURL(impl, identifier) + "range/" + encodeUTF8(base.getId()));
-                if (base instanceof MCRIIIFRange) {
-                    ((MCRIIIFRange) base).canvases = ((MCRIIIFRange) base).canvases.stream()
-                        .map(c -> getImplBaseURL(impl, identifier) + "canvas/" + encodeUTF8(c))
-                        .collect(Collectors.toList());
-                    ((MCRIIIFRange) base).ranges = ((MCRIIIFRange) base).ranges.stream()
-                        .map(r -> getImplBaseURL(impl, identifier) + "range/" + encodeUTF8(r))
-                        .collect(Collectors.toList());
-                }
-                break;
-            case MCRIIIFManifest.TYPE:
-                base.setId(getImplBaseURL(impl, identifier) + "manifest");
-                if (base instanceof MCRIIIFManifest) {
-                    ((MCRIIIFManifest) base).sequences.forEach(seq -> correctIDs(seq, impl, identifier));
-                    ((MCRIIIFManifest) base).structures.forEach(seq -> correctIDs(seq, impl, identifier));
-                }
-                break;
-            default:
-                if (base.getType().equals(MCRDCMIType.Image.toString())) {
-                    return;
-                }
+            break;
+        case MCRIIIFSequence.TYPE:
+            base.setId(getImplBaseURL(impl, identifier) + "sequence/" + encodeUTF8(base.getId()));
+            if (base instanceof MCRIIIFSequence) {
+                ((MCRIIIFSequence) base).canvases.forEach(canvas -> correctIDs(canvas, impl, identifier));
+            }
+            break;
+        case MCRIIIFRange.TYPE:
+            base.setId(getImplBaseURL(impl, identifier) + "range/" + encodeUTF8(base.getId()));
+            if (base instanceof MCRIIIFRange) {
+                ((MCRIIIFRange) base).canvases = ((MCRIIIFRange) base).canvases.stream()
+                    .map(c -> getImplBaseURL(impl, identifier) + "canvas/" + encodeUTF8(c))
+                    .collect(Collectors.toList());
+                ((MCRIIIFRange) base).ranges = ((MCRIIIFRange) base).ranges.stream()
+                    .map(r -> getImplBaseURL(impl, identifier) + "range/" + encodeUTF8(r))
+                    .collect(Collectors.toList());
+            }
+            break;
+        case MCRIIIFManifest.TYPE:
+            base.setId(getImplBaseURL(impl, identifier) + "manifest");
+            if (base instanceof MCRIIIFManifest) {
+                ((MCRIIIFManifest) base).sequences.forEach(seq -> correctIDs(seq, impl, identifier));
+                ((MCRIIIFManifest) base).structures.forEach(seq -> correctIDs(seq, impl, identifier));
+            }
+            break;
+        default:
+            if (base.getType().equals(MCRDCMIType.Image.toString())) {
+                return;
+            }
 
-                base.setId(getImplBaseURL(impl, identifier) + "res/" + base.getId());
+            base.setId(getImplBaseURL(impl, identifier) + "res/" + base.getId());
         }
     }
 

@@ -44,5 +44,5 @@ public class MCRObject2JSONTransformer extends MCRToJSONTransformer {
                 "Could not generate JSON from " + source.getClass().getSimpleName() + ": " + source.getSystemId(), e);
         }
     }
-   
+
 }

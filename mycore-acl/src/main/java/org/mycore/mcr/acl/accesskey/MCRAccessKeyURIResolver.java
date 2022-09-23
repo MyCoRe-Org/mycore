@@ -36,7 +36,7 @@ import org.mycore.mcr.acl.accesskey.exception.MCRAccessKeyTransformationExceptio
  * </ul>
  */
 public class MCRAccessKeyURIResolver implements URIResolver {
-    
+
     /* (non-Javadoc)
      * @see javax.xml.transform.URIResolver#resolve(java.lang.String, java.lang.String)
      */

@@ -305,18 +305,18 @@ public class MCRLoginServlet extends MCRServlet {
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             switch (token) {
-                case " ":
-                    result.append("%20");
-                    break;
-                case "/":
-                case "?":
-                case "&":
-                case "=":
-                    result.append(token);
-                    break;
-                default:
-                    result.append(java.net.URLEncoder.encode(token, StandardCharsets.UTF_8));
-                    break;
+            case " ":
+                result.append("%20");
+                break;
+            case "/":
+            case "?":
+            case "&":
+            case "=":
+                result.append(token);
+                break;
+            default:
+                result.append(java.net.URLEncoder.encode(token, StandardCharsets.UTF_8));
+                break;
             }
         }
 

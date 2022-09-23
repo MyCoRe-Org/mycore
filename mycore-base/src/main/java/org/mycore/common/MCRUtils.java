@@ -563,10 +563,10 @@ public class MCRUtils {
 
     public static Path safeResolve(Path basePath, Path resolve) {
         Path absoluteBasePath = Objects.requireNonNull(basePath)
-                .toAbsolutePath();
+            .toAbsolutePath();
         final Path resolved = absoluteBasePath
-                .resolve(Objects.requireNonNull(resolve))
-                .normalize();
+            .resolve(Objects.requireNonNull(resolve))
+            .normalize();
 
         if (resolved.startsWith(absoluteBasePath)) {
             return resolved;
@@ -574,7 +574,7 @@ public class MCRUtils {
         throw new MCRException("Bad path: " + resolve);
     }
 
-    public static Path safeResolve(Path basePath, String ...resolve) {
+    public static Path safeResolve(Path basePath, String... resolve) {
         if (resolve.length == 0) {
             return basePath;
         }

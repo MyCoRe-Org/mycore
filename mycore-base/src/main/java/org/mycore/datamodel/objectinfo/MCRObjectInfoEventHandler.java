@@ -33,7 +33,6 @@ public class MCRObjectInfoEventHandler extends MCREventHandlerBase {
         MCRObjectInfoEntityManager.update(obj);
     }
 
-
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         MCRObjectInfoEntityManager.update(obj);
@@ -48,7 +47,7 @@ public class MCRObjectInfoEventHandler extends MCREventHandlerBase {
     @Override
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         MCRObjectInfoEntityManager.delete(obj, Instant.now(),
-                MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
+            MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
     }
 
 }

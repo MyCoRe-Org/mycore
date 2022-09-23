@@ -79,9 +79,9 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
     private static final String PROP_RENEW_JWT = "mcr:renewJWT";
 
     private static final List<String> ALLOWED_JWT_SESSION_ATTRIBUTES = MCRConfiguration2
-            .getString("MCR.RestAPI.JWT.AllowedSessionAttributePrefixes").stream()
-            .flatMap(MCRConfiguration2::splitValue)
-            .collect(Collectors.toList());
+        .getString("MCR.RestAPI.JWT.AllowedSessionAttributePrefixes").stream()
+        .flatMap(MCRConfiguration2::splitValue)
+        .collect(Collectors.toList());
 
     @Context
     HttpServletRequest httpServletRequest;
@@ -186,15 +186,15 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                     .findAny();
                 if (audience.isPresent()) {
                     switch (audience.get()) {
-                        case MCRJWTResource.AUDIENCE:
-                            MCRJWTResource.validate(token);
-                            break;
-                        case MCRRestAPIAuthentication.AUDIENCE:
-                            requestContext.setProperty(PROP_RENEW_JWT, true);
-                            MCRRestAPIAuthentication.validate(token);
-                            break;
-                        default:
-                            LOGGER.warn("Cannot validate JWT for '{}' audience.", audience.get());
+                    case MCRJWTResource.AUDIENCE:
+                        MCRJWTResource.validate(token);
+                        break;
+                    case MCRRestAPIAuthentication.AUDIENCE:
+                        requestContext.setProperty(PROP_RENEW_JWT, true);
+                        MCRRestAPIAuthentication.validate(token);
+                        break;
+                    default:
+                        LOGGER.warn("Cannot validate JWT for '{}' audience.", audience.get());
                     }
                 }
                 userInformation = Optional.of(new MCRJWTUserInformation(jwt));
@@ -208,7 +208,7 @@ public class MCRSessionFilter implements ContainerRequestFilter, ContainerRespon
                                     currentSession.put(key, entry.getValue().asString());
                                     break;
                                 }
-                            }                            
+                            }
                         }
                     }
                 }

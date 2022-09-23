@@ -56,7 +56,7 @@ public class MCRCommandCronJobTest extends MCRJPATestCase {
         commandRun = true;
         message = msg;
 
-        if(message.equals("Welt")){
+        if (message.equals("Welt")) {
             return null;
         } else {
             return Stream.of("test command Welt").collect(Collectors.toList());

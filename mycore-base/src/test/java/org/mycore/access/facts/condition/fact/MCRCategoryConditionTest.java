@@ -48,7 +48,6 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
     MCRCategoryImpl clazz2;
     MCRCategoryImpl clazz1;
 
-
     @Override
     protected Map<String, String> getTestProperties() {
         Map<String, String> testProperties = super.getTestProperties();
@@ -97,7 +96,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
 
         categoryCondition.parse(new Element("classification").setText("clazz:clazz1"));
         Assert.assertTrue("Object should be linked with clazz1",
-                categoryCondition.matches(holder));
+            categoryCondition.matches(holder));
 
     }
 
@@ -119,7 +118,7 @@ public class MCRCategoryConditionTest extends MCRJPATestCase {
 
         categoryCondition.parse(new Element("classification").setText("clazz:clazz2"));
         Assert.assertFalse("Object not should be linked with clazz2",
-                categoryCondition.matches(holder));
+            categoryCondition.matches(holder));
 
     }
 

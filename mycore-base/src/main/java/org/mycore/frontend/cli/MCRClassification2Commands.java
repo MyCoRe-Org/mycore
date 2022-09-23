@@ -138,8 +138,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     }
 
     @MCRCommand(syntax = "load classification from uri {0}",
-            help = "The command adds a new classification from URI {0} to the system.",
-            order = 17)
+        help = "The command adds a new classification from URI {0} to the system.",
+        order = 17)
     public static void loadFromURI(String fileURI) throws SAXParseException, URISyntaxException, TransformerException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
@@ -182,7 +182,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         help = "The command updates a classification from URI {0} to the system.",
         order = 27)
     public static void updateFromURI(String fileURI) throws SAXParseException, URISyntaxException,
-            TransformerException {
+        TransformerException {
         Document xml = MCRXMLParserFactory.getParser().parseXML(MCRSourceContent.getInstance(fileURI));
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
@@ -459,7 +459,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
 
         for (List<Object[]> parentWithErrorsList = em.createNativeQuery(sqlQuery)
             .getResultList(); !parentWithErrorsList
-                .isEmpty(); parentWithErrorsList = em.createNativeQuery(sqlQuery).getResultList()) {
+                .isEmpty();
+            parentWithErrorsList = em.createNativeQuery(sqlQuery).getResultList()) {
             for (Object[] parentWithErrors : parentWithErrorsList) {
                 Number parentID = (Number) parentWithErrors[0];
                 Number firstErrorPositionInParent = (Number) parentWithErrors[1];

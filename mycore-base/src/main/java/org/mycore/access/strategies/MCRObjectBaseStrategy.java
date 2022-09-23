@@ -74,7 +74,7 @@ public class MCRObjectBaseStrategy implements MCRCombineableAccessCheckStrategy 
 
     private boolean hasBasePermission(String objectBase, String permission) {
         return objectBase != null && MCRAccessManager.requireRulesInterface()
-                .hasRule("default_" + objectBase, permission);
+            .hasRule("default_" + objectBase, permission);
     }
 
     private static String getObjectBase(String id) {

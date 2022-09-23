@@ -40,7 +40,7 @@ import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 @MCRCommandGroup(
     name = "Access keys")
 public class MCRAccessKeyCommands {
-    
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     @MCRCommand(syntax = "clear all access keys",
@@ -88,7 +88,7 @@ public class MCRAccessKeyCommands {
         LOGGER.info("Updated access key ({}) for {}.", secret, objectIdString);
     }
 
-    @MCRCommand(syntax = "delete access key for {0} with secret {1}" ,
+    @MCRCommand(syntax = "delete access key for {0} with secret {1}",
         help = "Deletes an access key for MCRObject/Derivate {0} with (hashed) secret {1}")
     public static void removeAccessKey(final String objectIdString, final String secret) throws MCRException {
         final MCRObjectID objectId = MCRObjectID.getInstance(objectIdString);

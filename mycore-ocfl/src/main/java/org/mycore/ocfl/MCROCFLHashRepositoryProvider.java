@@ -51,10 +51,10 @@ public class MCROCFLHashRepositoryProvider extends MCROCFLRepositoryProvider {
 
     @MCRPostConstruction
     public void init(String prop) throws IOException {
-        if(Files.notExists(workDir)){
+        if (Files.notExists(workDir)) {
             Files.createDirectories(workDir);
         }
-        if(Files.notExists(repositoryRoot)){
+        if (Files.notExists(repositoryRoot)) {
             Files.createDirectories(repositoryRoot);
         }
 
@@ -77,7 +77,7 @@ public class MCROCFLHashRepositoryProvider extends MCROCFLRepositoryProvider {
         return workDir;
     }
 
-    @MCRProperty(name ="RepositoryRoot")
+    @MCRProperty(name = "RepositoryRoot")
     public MCROCFLHashRepositoryProvider setRepositoryRoot(String repositoryRoot) {
         this.repositoryRoot = Paths.get(repositoryRoot);
         return this;

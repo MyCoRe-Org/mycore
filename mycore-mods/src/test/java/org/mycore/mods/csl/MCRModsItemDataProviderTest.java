@@ -93,7 +93,6 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
 
         Assert.assertEquals("Volumes should equal", "11875", build2.getVolume());
 
-
     }
 
     @Test
@@ -115,7 +114,6 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
             "  </metadata>\n" +
             "</mycoreobject>\n";
 
-
         CSLItemData build1 = testModsNames(testData);
         Assert.assertEquals("Conference should be equal", conferenceTitle, build1.getEvent());
     }
@@ -125,28 +123,27 @@ public class MCRModsItemDataProviderTest extends MCRTestCase {
         String familyName = "Rolfer";
         String givenName = "Rolf";
         String testData2 = "<mycoreobject xmlns:xlink=\"http://www.w3.org/1999/xlink\" " +
-                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
-                " xsi:noNamespaceSchemaLocation=\"datamodel-mods.xsd\" ID=\"bibthk_mods_00001056\">\n" +
-                "  <metadata>\n" +
-                "    <def.modsContainer class=\"MCRMetaXML\" heritable=\"false\" notinherit=\"true\">\n" +
-                "      <modsContainer inherited=\"0\">\n" +
-                "        <mods:mods xmlns:mods=\"http://www.loc.gov/mods/v3\">\n" +
-                "<mods:name type=\"personal\">\n" +
-                "<mods:role>\n" +
-                "<mods:roleTerm type=\"code\" authority=\"marcrelator\">inv</mods:roleTerm>\n" +
-                "</mods:role>\n" +
-                "<mods:namePart type=\"given\">"+givenName+"</mods:namePart>\n" +
-                "<mods:namePart type=\"family\">"+familyName+"</mods:namePart>\n" +
-                "</mods:name>" + "        </mods:mods>\n" +
-                "      </modsContainer>\n" +
-                "    </def.modsContainer>\n" +
-                "  </metadata>\n" +
-                "</mycoreobject>\n";
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
+            " xsi:noNamespaceSchemaLocation=\"datamodel-mods.xsd\" ID=\"bibthk_mods_00001056\">\n" +
+            "  <metadata>\n" +
+            "    <def.modsContainer class=\"MCRMetaXML\" heritable=\"false\" notinherit=\"true\">\n" +
+            "      <modsContainer inherited=\"0\">\n" +
+            "        <mods:mods xmlns:mods=\"http://www.loc.gov/mods/v3\">\n" +
+            "<mods:name type=\"personal\">\n" +
+            "<mods:role>\n" +
+            "<mods:roleTerm type=\"code\" authority=\"marcrelator\">inv</mods:roleTerm>\n" +
+            "</mods:role>\n" +
+            "<mods:namePart type=\"given\">" + givenName + "</mods:namePart>\n" +
+            "<mods:namePart type=\"family\">" + familyName + "</mods:namePart>\n" +
+            "</mods:name>" + "        </mods:mods>\n" +
+            "      </modsContainer>\n" +
+            "    </def.modsContainer>\n" +
+            "  </metadata>\n" +
+            "</mycoreobject>\n";
         CSLItemData build2 = testModsNames(testData2);
         Assert.assertEquals("Pantent Inventor should author (family)", familyName, build2.getAuthor()[0].getFamily());
         Assert.assertEquals("Pantent Inventor should author (given)", givenName, build2.getAuthor()[0].getGiven());
     }
-
 
     private CSLItemData testModsPart(String testData) throws JDOMException, IOException {
         MCRModsItemDataProvider midp = new MCRModsItemDataProvider();

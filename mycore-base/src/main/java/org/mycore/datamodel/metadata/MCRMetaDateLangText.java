@@ -102,7 +102,7 @@ public class MCRMetaDateLangText extends MCRMetaLangText {
 
         String tempDate = element.getAttributeValue("date");
 
-        if(tempDate != null) {
+        if (tempDate != null) {
 
             MCRISO8601Date tempIsoDate = new MCRISO8601Date();
 
@@ -131,7 +131,7 @@ public class MCRMetaDateLangText extends MCRMetaLangText {
     public Element createXML() throws MCRException {
         Element elm = super.createXML();
 
-        if(isoDate != null) {
+        if (isoDate != null) {
             elm.setAttribute("date", isoDate.getISOString());
             MCRISO8601Format isoFormat = isoDate.getIsoFormat();
             if (isoFormat != null && isoFormat != MCRISO8601Format.COMPLETE_HH_MM_SS_SSS) {
@@ -168,8 +168,6 @@ public class MCRMetaDateLangText extends MCRMetaLangText {
         }
         return obj;
     }
-
-
 
     /**
      * clone of this instance

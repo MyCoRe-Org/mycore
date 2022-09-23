@@ -44,13 +44,13 @@ import jakarta.servlet.http.HttpServletResponse;
  * an attribute into the session
  */
 public class MCRAccessKeyFilter implements Filter {
-   
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         if (MCRAccessKeyUtils.isAccessKeyForSessionAllowed()) {
-            LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: {}", 
+            LOGGER.info("MCRAccessKeyFilter is enabled and the following permssions are allowed: {}",
                 String.join(",", MCRAccessKeyUtils.getAllowedSessionPermissionTypes()));
         }
     }
@@ -66,7 +66,7 @@ public class MCRAccessKeyFilter implements Filter {
                 if (value != null) {
                     try {
                         MCRServlet.initializeMCRSession(httpServletRequest, getFilterName());
-                        MCRFrontendUtil.configureSession(MCRSessionMgr.getCurrentSession(), httpServletRequest, 
+                        MCRFrontendUtil.configureSession(MCRSessionMgr.getCurrentSession(), httpServletRequest,
                             (HttpServletResponse) response);
                         MCRAccessKeyUtils.addAccessKeySecretToCurrentSession(objectId, value);
                     } catch (Exception e) {

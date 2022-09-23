@@ -95,17 +95,17 @@ public class MCRMediaSourceProvider {
     public static void updateWowzaSettings(String propertyName, Optional<String> oldValue,
         Optional<String> newValue) {
         switch (propertyName) {
-            case "MCR.Media.Wowza.BaseURL":
-                wowzaBaseURL = newValue;
-                break;
-            case "MCR.Media.Wowza.RTMPBaseURL":
-                wowzaRTMPBaseURL = newValue;
-                break;
-            case "MCR.Media.Wowza.HashParameter":
-                wowzaHashParameter = newValue.orElse("wowzatokenhash");
-                break;
-            default:
-                break;
+        case "MCR.Media.Wowza.BaseURL":
+            wowzaBaseURL = newValue;
+            break;
+        case "MCR.Media.Wowza.RTMPBaseURL":
+            wowzaRTMPBaseURL = newValue;
+            break;
+        case "MCR.Media.Wowza.HashParameter":
+            wowzaHashParameter = newValue.orElse("wowzatokenhash");
+            break;
+        default:
+            break;
         }
     }
 

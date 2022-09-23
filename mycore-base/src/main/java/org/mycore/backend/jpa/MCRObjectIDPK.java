@@ -62,7 +62,7 @@ import jakarta.persistence.Convert;
 @Access(AccessType.FIELD)
 public class MCRObjectIDPK implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     @Convert(converter = MCRObjectIDConverter.class)
     @Basic
     @Column(length = MCRObjectID.MAX_LENGTH)

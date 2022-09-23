@@ -63,13 +63,13 @@ public class MCRRestDerivateAccessKeys {
 
     @Context
     UriInfo uriInfo;
- 
+
     @GET
     @Operation(
         summary = "Lists all access keys for a derivate",
         responses = {
-            @ApiResponse(responseCode = "200", content = {@Content(mediaType = MediaType.APPLICATION_JSON,
-                array = @ArraySchema(schema = @Schema(implementation = MCRAccessKey.class)))}),
+            @ApiResponse(responseCode = "200", content = { @Content(mediaType = MediaType.APPLICATION_JSON,
+                array = @ArraySchema(schema = @Schema(implementation = MCRAccessKey.class))) }),
             @ApiResponse(responseCode = "" + MCRObjectIDParamConverterProvider.CODE_INVALID, // 400
                 description = MCRObjectIDParamConverterProvider.MSG_INVALID,
                 content = { @Content(mediaType = MediaType.APPLICATION_JSON) }),

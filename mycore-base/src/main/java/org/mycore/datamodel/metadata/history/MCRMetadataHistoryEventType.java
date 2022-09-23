@@ -30,13 +30,13 @@ public enum MCRMetadataHistoryEventType {
 
     public static MCRMetadataHistoryEventType fromAbbr(char abbr) {
         switch (abbr) {
-            case 'c':
-                return MCRMetadataHistoryEventType.Create;
-            case 'd':
-                return MCRMetadataHistoryEventType.Delete;
-            default:
-                throw new IllegalArgumentException(
-                    "No such " + MCRMetadataHistoryEventType.class.getSimpleName() + ": " + abbr);
+        case 'c':
+            return MCRMetadataHistoryEventType.Create;
+        case 'd':
+            return MCRMetadataHistoryEventType.Delete;
+        default:
+            throw new IllegalArgumentException(
+                "No such " + MCRMetadataHistoryEventType.class.getSimpleName() + ": " + abbr);
         }
     }
 

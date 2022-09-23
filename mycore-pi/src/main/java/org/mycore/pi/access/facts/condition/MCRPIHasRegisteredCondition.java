@@ -31,7 +31,6 @@ import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPIServiceManager;
 
-
 /**
  * condition for fact-based access system,
  * that checks if a persistent identifier was registered for the given object.

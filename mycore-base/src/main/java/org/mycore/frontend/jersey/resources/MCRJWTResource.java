@@ -72,7 +72,7 @@ public class MCRJWTResource {
         return MCRJWTUtil.getJWTLoginSuccessResponse(jwt);
     }
 
-    private String getToken(MCRSession mcrSession, String[] userAttributes, String[] sessionAttributes) 
+    private String getToken(MCRSession mcrSession, String[] userAttributes, String[] sessionAttributes)
         throws UnsupportedEncodingException {
         String issuer = request.getRequestURL().toString();
         return MCRJWTUtil.getJWTBuilder(mcrSession, userAttributes, sessionAttributes)

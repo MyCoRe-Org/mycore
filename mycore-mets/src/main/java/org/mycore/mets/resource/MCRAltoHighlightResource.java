@@ -172,13 +172,13 @@ public class MCRAltoHighlightResource {
             for (int i = wordIndex; i < wordIndex + wordCount; i++) {
                 String altoWord = altoWords.get(i);
 
-                if(!altoWord.equals("")){
+                if (!altoWord.equals("")) {
                     JsonObject positionObject = buildPositionObject(altoWord);
 
-                    if(!positionObject.entrySet().isEmpty()){
+                    if (!positionObject.entrySet().isEmpty()) {
                         positions.add(positionObject);
                     }
-                } else if(wordCount < altoWords.size()){
+                } else if (wordCount < altoWords.size()) {
                     wordCount++;
                 }
             }
@@ -197,7 +197,7 @@ public class MCRAltoHighlightResource {
         JsonObject positionObject = new JsonObject();
         String plainWord = altoWord.replaceAll("<em>|</em>", "");
         String[] split = plainWord.split("\\|");
-        if(split.length == 5){
+        if (split.length == 5) {
             positionObject.addProperty("content", split[0]);
             positionObject.addProperty("xpos", Integer.parseInt(split[1]));
             positionObject.addProperty("vpos", Integer.parseInt(split[2]));

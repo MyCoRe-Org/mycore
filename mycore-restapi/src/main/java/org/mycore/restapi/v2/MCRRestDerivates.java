@@ -415,7 +415,7 @@ public class MCRRestDerivates {
             modified = true;
             derivate.setOrder(der.getOrder());
         }
-        
+
         if (der.getMainDoc() != null
             && !der.getMainDoc().equals(derivate.getDerivate().getInternals().getMainDoc())) {
             modified = true;

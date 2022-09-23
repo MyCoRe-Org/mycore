@@ -73,7 +73,8 @@ public abstract class MCRCronjob implements Runnable {
         this.processable = new MCRAbstractProcessable();
         this.processable.setStatus(MCRProcessableStatus.created);
         this.processable.setName(getClass().getSimpleName() + " - " + getDescription());
-        this.processable.setProgressText("Wait for " + getCronDescription() + "..");    }
+        this.processable.setProgressText("Wait for " + getCronDescription() + "..");
+    }
 
     public Cron getCron() {
         return cron;

@@ -44,7 +44,7 @@ public class MCRAccessKeyTransformer {
      * Name of servflags element.
      */
     private static final String ROOT_SERV_FLAGS = "servflags";
-    
+
     /**
      * Name of servflag element.
      */
@@ -62,7 +62,7 @@ public class MCRAccessKeyTransformer {
      * @return the {@link MCRAccessKey}
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static MCRAccessKey accessKeyFromJson(final String json) 
+    public static MCRAccessKey accessKeyFromJson(final String json)
         throws MCRAccessKeyTransformationException {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -79,7 +79,7 @@ public class MCRAccessKeyTransformer {
      * @return the {@link MCRAccessKey} list
      * @throws MCRAccessKeyTransformationException if the transformation fails
      */
-    public static List<MCRAccessKey> accessKeysFromJson(final String json) 
+    public static List<MCRAccessKey> accessKeysFromJson(final String json)
         throws MCRAccessKeyTransformationException {
         final ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -194,5 +194,5 @@ public class MCRAccessKeyTransformer {
         final Element element = new Element(ACCESS_KEY_TYPE);
         element.setText(json);
         return element;
-    } 
+    }
 }

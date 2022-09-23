@@ -32,7 +32,7 @@ import jakarta.persistence.EntityManager;
 
 public class MCRObjectInfoEntityManager {
 
-    public static void removeAll(){
+    public static void removeAll() {
         EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         em.createQuery("delete from MCRObjectInfoEntity ").executeUpdate();
     }

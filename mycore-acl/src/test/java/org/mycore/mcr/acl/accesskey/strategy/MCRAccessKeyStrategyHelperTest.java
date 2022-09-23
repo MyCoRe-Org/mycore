@@ -35,7 +35,7 @@ import org.mycore.common.MCRTestCase;
 import org.mycore.mcr.acl.accesskey.model.MCRAccessKey;
 
 public class MCRAccessKeyStrategyHelperTest extends MCRTestCase {
-    
+
     private static MCRAccessKey accessKey;
 
     @Override

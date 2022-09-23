@@ -93,16 +93,16 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
                 LOGGER.debug("[{}] UPDATING CLASS <{}>", threadId, categoryID);
                 try {
                     switch (eventType) {
-                        case MCRAbstractMetadataVersion.CREATED:
-                        case MCRAbstractMetadataVersion.UPDATED:
-                            createOrUpdateOCFLClassification(categoryID, eventType);
-                            break;
-                        case MCRAbstractMetadataVersion.DELETED:
-                            MANAGER.delete(categoryID);
-                            break;
-                        default:
-                            throw new IllegalStateException(
-                                "Unsupported type in classification found: " + eventType + ", " + categoryID);
+                    case MCRAbstractMetadataVersion.CREATED:
+                    case MCRAbstractMetadataVersion.UPDATED:
+                        createOrUpdateOCFLClassification(categoryID, eventType);
+                        break;
+                    case MCRAbstractMetadataVersion.DELETED:
+                        MANAGER.delete(categoryID);
+                        break;
+                    default:
+                        throw new IllegalStateException(
+                            "Unsupported type in classification found: " + eventType + ", " + categoryID);
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
@@ -171,28 +171,28 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
             throw new IllegalArgumentException("Only root category ids are allowed: " + id);
         }
         switch (type) {
+        case MCRAbstractMetadataVersion.CREATED:
+        case MCRAbstractMetadataVersion.DELETED:
+            CATEGORY_WORKSPACE.get().put(id, type);
+            break;
+        case MCRAbstractMetadataVersion.UPDATED:
+            final char oldType = CATEGORY_WORKSPACE.get().getOrDefault(id, '0');
+            switch (oldType) {
             case MCRAbstractMetadataVersion.CREATED:
-            case MCRAbstractMetadataVersion.DELETED:
+            case MCRAbstractMetadataVersion.UPDATED:
+                break;
+            case '0':
                 CATEGORY_WORKSPACE.get().put(id, type);
                 break;
-            case MCRAbstractMetadataVersion.UPDATED:
-                final char oldType = CATEGORY_WORKSPACE.get().getOrDefault(id, '0');
-                switch (oldType) {
-                    case MCRAbstractMetadataVersion.CREATED:
-                    case MCRAbstractMetadataVersion.UPDATED:
-                        break;
-                    case '0':
-                        CATEGORY_WORKSPACE.get().put(id, type);
-                        break;
-                    case MCRAbstractMetadataVersion.DELETED:
-                        throw new IllegalArgumentException("Cannot update a deleted classification: " + id);
-                    default:
-                        throw new IllegalStateException(
-                            "Unsupported type in classification found: " + oldType + ", " + id);
-                }
-                break;
+            case MCRAbstractMetadataVersion.DELETED:
+                throw new IllegalArgumentException("Cannot update a deleted classification: " + id);
             default:
-                throw new IllegalStateException("Unsupported event type for classification found: " + type + ", " + id);
+                throw new IllegalStateException(
+                    "Unsupported type in classification found: " + oldType + ", " + id);
+            }
+            break;
+        default:
+            throw new IllegalStateException("Unsupported event type for classification found: " + type + ", " + id);
         }
     }
 

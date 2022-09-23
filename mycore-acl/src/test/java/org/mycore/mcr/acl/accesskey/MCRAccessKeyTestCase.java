@@ -38,7 +38,8 @@ public class MCRAccessKeyTestCase extends MCRStoreTestCase {
 
     protected static final String ALLOWED_OBJECT_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP + ".AllowedObjectTypes";
 
-    protected static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP = ACCESS_KEY_STRATEGY_PROP + ".AllowedSessionPermissionTypes";
+    protected static final String ALLOWED_SESSION_PERMISSION_TYPES_PROP
+        = ACCESS_KEY_STRATEGY_PROP + ".AllowedSessionPermissionTypes";
 
     private static final String OBJECT_ID = "mcr_object_00000001";
 

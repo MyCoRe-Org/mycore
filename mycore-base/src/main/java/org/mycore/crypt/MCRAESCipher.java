@@ -24,7 +24,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.StandardOpenOption; 
+import java.nio.file.StandardOpenOption;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -42,15 +42,14 @@ import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRProperty;
 
 public class MCRAESCipher extends MCRCipher {
-    
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private String keyFile;
     private SecretKey secretKey;
     private Cipher encryptCipher;
     private Cipher decryptCipher;
-    
-    
+
     @MCRProperty(name = "KeyFile", required = true)
     public void setKeyFile(String path) {
         keyFile = path;
@@ -61,13 +60,13 @@ public class MCRAESCipher extends MCRCipher {
         encryptCipher = null;
         decryptCipher = null;
     }
-    
-    public void init (String id) throws MCRCryptKeyFileNotFoundException,InvalidKeyException {
+
+    public void init(String id) throws MCRCryptKeyFileNotFoundException, InvalidKeyException {
         cipherID = id;
-        
+
         String encodedKey = null;
         try {
-            LOGGER.info("Get key from file {}.", keyFile );
+            LOGGER.info("Get key from file {}.", keyFile);
             encodedKey = Files.readString(FileSystems.getDefault().getPath(keyFile));
             byte[] decodedKey = java.util.Base64.getDecoder().decode(encodedKey);
             LOGGER.info("Set secret key");
@@ -77,93 +76,95 @@ public class MCRAESCipher extends MCRCipher {
             decryptCipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             decryptCipher.init(Cipher.DECRYPT_MODE, secretKey);
         } catch (NoSuchFileException e) {
-            throw new MCRCryptKeyFileNotFoundException ( 
-                    "Keyfile " + keyFile 
-                    + " not found. Generate new one with cli command or copy file to path."
-                    ) ;
+            throw new MCRCryptKeyFileNotFoundException(
+                "Keyfile " + keyFile
+                    + " not found. Generate new one with cli command or copy file to path.");
         } catch (IllegalArgumentException e) {
-           throw new InvalidKeyException("Error while decoding key from keyFile " + keyFile + "!", e);
+            throw new InvalidKeyException("Error while decoding key from keyFile " + keyFile + "!", e);
         } catch (IOException e) {
-            throw new MCRException ("Can't read keyFile " + keyFile + ".",e) ; 
+            throw new MCRException("Can't read keyFile " + keyFile + ".", e);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new MCRCryptCipherConfigurationException (
-                    "The algorithm AES/ECB/PKCS5PADDING ist not provided by this javaversion."
-                    + "Update Java or configure an other chipher in mycore.properties.", e);
-        } 
+            throw new MCRCryptCipherConfigurationException(
+                "The algorithm AES/ECB/PKCS5PADDING ist not provided by this javaversion."
+                    + "Update Java or configure an other chipher in mycore.properties.",
+                e);
+        }
     }
-    
+
     public boolean isInitialised() {
         return (secretKey != null && encryptCipher != null && decryptCipher != null);
     }
-    
+
     public void reset() {
         secretKey = null;
         encryptCipher = null;
         decryptCipher = null;
     }
-    
-    public void generateKeyFile () throws FileAlreadyExistsException {
+
+    public void generateKeyFile() throws FileAlreadyExistsException {
         try {
             LOGGER.info("generate Key File");
-            String cryptKey = generateKey ();
+            String cryptKey = generateKey();
             Files.writeString(FileSystems.getDefault().getPath(keyFile), cryptKey, StandardOpenOption.CREATE_NEW);
         } catch (NoSuchAlgorithmException e) {
             throw new MCRCryptCipherConfigurationException(
-            		"Error while generating keyfile: The configured algorithm is not available.", e);
+                "Error while generating keyfile: The configured algorithm is not available.", e);
         } catch (FileAlreadyExistsException e) {
-            throw new FileAlreadyExistsException(keyFile,null,
-            		"A cryptKey shouldn't generated if it allready exists. "
-            		+" If you aware of the consequences use overwrite keyfile.");
+            throw new FileAlreadyExistsException(keyFile, null,
+                "A cryptKey shouldn't generated if it allready exists. "
+                    + " If you aware of the consequences use overwrite keyfile.");
         } catch (IOException e) {
             throw new MCRException("Error while write key to file.", e);
         }
     }
-    
-    public void overwriteKeyFile () {
+
+    public void overwriteKeyFile() {
         try {
             LOGGER.info("overwrite Key File");
-            String cryptKey = generateKey (); 
+            String cryptKey = generateKey();
             Files.writeString(FileSystems.getDefault().getPath(keyFile), cryptKey);
         } catch (NoSuchAlgorithmException e) {
             throw new MCRCryptCipherConfigurationException(
-            		"Error while generating keyfile. The configured algorithm is not available.", e);
+                "Error while generating keyfile. The configured algorithm is not available.", e);
         } catch (IOException e) {
             throw new MCRException("Error while write key to file.", e);
         }
     }
-    
-    private String generateKey () throws NoSuchAlgorithmException {
+
+    private String generateKey() throws NoSuchAlgorithmException {
         SecretKey tmpSecretKey = KeyGenerator.getInstance("AES").generateKey();
         return java.util.Base64.getEncoder().encodeToString(tmpSecretKey.getEncoded());
     }
-    
+
     protected String encryptImpl(String text) throws MCRCryptCipherConfigurationException {
-        byte[] encryptedBytes = encryptImpl (text.getBytes(StandardCharsets.UTF_8));
+        byte[] encryptedBytes = encryptImpl(text.getBytes(StandardCharsets.UTF_8));
         String encryptedString = java.util.Base64.getEncoder().encodeToString(encryptedBytes);
         return encryptedString;
     }
+
     protected String decryptImpl(String text) throws MCRCryptCipherConfigurationException {
         byte[] encryptedBytes = java.util.Base64.getDecoder().decode(text);
         byte[] decryptedBytes = decryptImpl(encryptedBytes);
         String decryptedText = new String(decryptedBytes, StandardCharsets.UTF_8);
         return decryptedText;
     }
-    
+
     protected byte[] encryptImpl(byte[] bytes) throws MCRCryptCipherConfigurationException {
         try {
             byte[] encryptedBytes = encryptCipher.doFinal(bytes);
             return encryptedBytes;
-        } catch ( BadPaddingException | IllegalBlockSizeException e ) {
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new MCRCryptCipherConfigurationException("Can't encrypt value - wrong configuration.", e);
         }
     }
+
     protected byte[] decryptImpl(byte[] bytes) throws MCRCryptCipherConfigurationException {
         try {
             byte[] decryptedBytes = decryptCipher.doFinal(bytes);
             return decryptedBytes;
-        } catch ( BadPaddingException| IllegalBlockSizeException e ) {
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new MCRCryptCipherConfigurationException("Can't decrypt value - "
-                    +" possible issues: corrupted crypted value, wrong configuration or bad key.",e);
+                + " possible issues: corrupted crypted value, wrong configuration or bad key.", e);
         }
     }
 

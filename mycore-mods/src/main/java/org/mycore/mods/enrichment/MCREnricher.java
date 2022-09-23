@@ -116,7 +116,7 @@ public class MCREnricher {
 
     public synchronized void enrich(Element publication) {
         debugger.debugPublication("before", publication);
-        
+
         idPool = new MCRIdentifierPool();
         id2call = prepareDataSourceCalls();
 

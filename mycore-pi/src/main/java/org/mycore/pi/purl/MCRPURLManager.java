@@ -352,7 +352,7 @@ public class MCRPURLManager {
         }
         return false;
     }
-    
+
     /**
      * return the PURL metadata
      *

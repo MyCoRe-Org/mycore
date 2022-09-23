@@ -32,9 +32,9 @@ public class MCRRestAccessManager {
         final String permStr = permission.toString();
         if (aclProvider.checkPermission(REST_API_OBJECT_ID, permStr)) {
             final String objectId = path.startsWith("/") ? REST_API_OBJECT_ID + path.substring(1)
-                    : REST_API_OBJECT_ID + path;
+                : REST_API_OBJECT_ID + path;
             if (!(acl instanceof MCRRuleAccessInterface)
-                    || ((MCRRuleAccessInterface) acl).hasRule(objectId, permStr)) {
+                || ((MCRRuleAccessInterface) acl).hasRule(objectId, permStr)) {
                 if (aclProvider.checkPermission(objectId, permStr)) {
                     return true;
                 }

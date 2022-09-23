@@ -60,15 +60,15 @@ public class MCRAccessCacheHelper {
     }
 
     private static void collectDescendants(List<String> idsToClear, String parent) {
-         // get derivates
-         final MCRLinkTableManager ltManager = MCRLinkTableManager.instance();
-         idsToClear.addAll(ltManager.getDestinationOf(parent, MCRLinkTableManager.ENTRY_TYPE_DERIVATE));
+        // get derivates
+        final MCRLinkTableManager ltManager = MCRLinkTableManager.instance();
+        idsToClear.addAll(ltManager.getDestinationOf(parent, MCRLinkTableManager.ENTRY_TYPE_DERIVATE));
 
-         // get children
-         final Collection<String> children = ltManager.getSourceOf(parent, MCRLinkTableManager.ENTRY_TYPE_PARENT);
-         children.forEach(child -> {
-             idsToClear.add(child);
-             collectDescendants(idsToClear, child);
-         });
+        // get children
+        final Collection<String> children = ltManager.getSourceOf(parent, MCRLinkTableManager.ENTRY_TYPE_PARENT);
+        children.forEach(child -> {
+            idsToClear.add(child);
+            collectDescendants(idsToClear, child);
+        });
     }
 }

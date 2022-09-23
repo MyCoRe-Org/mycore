@@ -321,7 +321,7 @@ public class MCRWebCLIContainer {
          * @return true if command processed successfully
          */
         private boolean processCommand(String command) {
-            if(command.trim().startsWith("#")) {
+            if (command.trim().startsWith("#")) {
                 // ignore comment
                 return true;
             }

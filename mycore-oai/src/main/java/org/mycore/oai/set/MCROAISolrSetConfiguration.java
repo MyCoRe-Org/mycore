@@ -75,7 +75,8 @@ public class MCROAISolrSetConfiguration implements MCROAISetConfiguration<SolrQu
         String classProperty = configPrefix + SETS_PREFIX + setId + ".Classification";
         if (MCRConfiguration2.getString(classProperty)
             .orElse(MCRConfiguration2.getString(configPrefix + "MapSetToClassification." + setId)
-                .orElse(null)) != null) {
+                .orElse(null))
+            != null) {
             return MCROAIClassificationToSetHandler.class.getName();
         }
         if (MCRConfiguration2.getString(configPrefix + SETS_PREFIX + setId + ".Handler").orElse(null) == null) {

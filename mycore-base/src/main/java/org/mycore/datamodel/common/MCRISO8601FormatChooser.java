@@ -87,71 +87,71 @@ public final class MCRISO8601FormatChooser {
 
     private static DateTimeFormatter getFormatterForFormat(MCRISO8601Format isoFormat) {
         switch (isoFormat) {
-            case YEAR:
-                return YEAR_FORMAT;
-            case YEAR_MONTH:
-                return YEAR_MONTH_FORMAT;
-            case COMPLETE:
-                return COMPLETE_FORMAT;
-            case COMPLETE_HH_MM:
-                return COMPLETE_HH_MM_FORMAT;
-            case COMPLETE_HH_MM_SS:
-                return COMPLETE_HH_MM_SS_FORMAT;
-            case COMPLETE_HH_MM_SS_SSS:
-                return COMPLETE_HH_MM_SS_SSS_FORMAT;
-            case YEAR_ERA:
-                return YEAR_FORMAT;
-            case YEAR_MONTH_ERA:
-                return YEAR_MONTH_FORMAT;
-            case COMPLETE_ERA:
-                return COMPLETE_FORMAT;
-            case COMPLETE_HH_MM_ERA:
-                return COMPLETE_HH_MM_FORMAT;
-            case COMPLETE_HH_MM_SS_ERA:
-                return COMPLETE_HH_MM_SS_FORMAT;
-            case COMPLETE_HH_MM_SS_SSS_ERA:
-                return COMPLETE_HH_MM_SS_SSS_FORMAT;
-            default:
-                return COMPLETE_HH_MM_SS_SSS_FORMAT;
+        case YEAR:
+            return YEAR_FORMAT;
+        case YEAR_MONTH:
+            return YEAR_MONTH_FORMAT;
+        case COMPLETE:
+            return COMPLETE_FORMAT;
+        case COMPLETE_HH_MM:
+            return COMPLETE_HH_MM_FORMAT;
+        case COMPLETE_HH_MM_SS:
+            return COMPLETE_HH_MM_SS_FORMAT;
+        case COMPLETE_HH_MM_SS_SSS:
+            return COMPLETE_HH_MM_SS_SSS_FORMAT;
+        case YEAR_ERA:
+            return YEAR_FORMAT;
+        case YEAR_MONTH_ERA:
+            return YEAR_MONTH_FORMAT;
+        case COMPLETE_ERA:
+            return COMPLETE_FORMAT;
+        case COMPLETE_HH_MM_ERA:
+            return COMPLETE_HH_MM_FORMAT;
+        case COMPLETE_HH_MM_SS_ERA:
+            return COMPLETE_HH_MM_SS_FORMAT;
+        case COMPLETE_HH_MM_SS_SSS_ERA:
+            return COMPLETE_HH_MM_SS_SSS_FORMAT;
+        default:
+            return COMPLETE_HH_MM_SS_SSS_FORMAT;
         }
     }
 
     private static DateTimeFormatter getFormatterForDuration(String isoString) {
         boolean test = false;
         switch (isoString.length()) {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                return YEAR_FORMAT;
-            case 6:
-            case 7:
-            case 8:
-                return YEAR_MONTH_FORMAT;
-            case 10:
-            case 11:
-                return COMPLETE_FORMAT;
-            case 17: // YYYY-MM-DDThh:mm'Z'
-                test = true;
-            case 22:
-                if (test || !isoString.endsWith("Z")) {
-                    // YYYY-MM-DDThh:mm[+-]hh:mm
-                    return COMPLETE_HH_MM_FORMAT;
-                }
-                // YYYY-MM-DDThh:mm:ss.s'Z'
-                return COMPLETE_HH_MM_SS_SSS_FORMAT;
-            case 20: // YYYY-MM-DDThh:mm:ss'Z'
-            case 25: // YYYY-MM-DDThh:mm:ss[+-]hh:mm
-                return COMPLETE_HH_MM_SS_FORMAT;
-            case 23: // YYYY-MM-DDThh:mm:ss.ss'Z'
-            case 24: // YYYY-MM-DDThh:mm:ss.sss'Z'
-            case 27: // YYYY-MM-DDThh:mm:ss.s[+-]hh:mm
-            case 28: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
-            case 29: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
-                return COMPLETE_HH_MM_SS_SSS_FORMAT;
-            default:
-                return COMPLETE_HH_MM_SS_SSS_FORMAT;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            return YEAR_FORMAT;
+        case 6:
+        case 7:
+        case 8:
+            return YEAR_MONTH_FORMAT;
+        case 10:
+        case 11:
+            return COMPLETE_FORMAT;
+        case 17: // YYYY-MM-DDThh:mm'Z'
+            test = true;
+        case 22:
+            if (test || !isoString.endsWith("Z")) {
+                // YYYY-MM-DDThh:mm[+-]hh:mm
+                return COMPLETE_HH_MM_FORMAT;
+            }
+            // YYYY-MM-DDThh:mm:ss.s'Z'
+            return COMPLETE_HH_MM_SS_SSS_FORMAT;
+        case 20: // YYYY-MM-DDThh:mm:ss'Z'
+        case 25: // YYYY-MM-DDThh:mm:ss[+-]hh:mm
+            return COMPLETE_HH_MM_SS_FORMAT;
+        case 23: // YYYY-MM-DDThh:mm:ss.ss'Z'
+        case 24: // YYYY-MM-DDThh:mm:ss.sss'Z'
+        case 27: // YYYY-MM-DDThh:mm:ss.s[+-]hh:mm
+        case 28: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
+        case 29: // YYYY-MM-DDThh:mm:ss.ss[+-]hh:mm
+            return COMPLETE_HH_MM_SS_SSS_FORMAT;
+        default:
+            return COMPLETE_HH_MM_SS_SSS_FORMAT;
         }
     }
 

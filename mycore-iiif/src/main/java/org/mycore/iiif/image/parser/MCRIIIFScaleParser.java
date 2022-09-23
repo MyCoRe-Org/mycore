@@ -139,27 +139,27 @@ public class MCRIIIFScaleParser {
         boolean first = true;
         for (char currentChar : chars) {
             switch (currentChar) {
-                case ',':
-                    first = false;
-                    if (!writeW) {
-                        throw new IllegalArgumentException("second , found in scale!");
-                    }
-                    writeW = false;
-                    break;
-                case '!':
-                    if (!first) {
-                        throw new IllegalArgumentException("! should be located only in the first position of scale!");
-                    }
-                    first = false;
-                    break;
-                default:
-                    first = false;
-                    if (writeW) {
-                        wBuilder.append(currentChar);
-                    } else {
-                        hBuilder.append(currentChar);
-                    }
-                    break;
+            case ',':
+                first = false;
+                if (!writeW) {
+                    throw new IllegalArgumentException("second , found in scale!");
+                }
+                writeW = false;
+                break;
+            case '!':
+                if (!first) {
+                    throw new IllegalArgumentException("! should be located only in the first position of scale!");
+                }
+                first = false;
+                break;
+            default:
+                first = false;
+                if (writeW) {
+                    wBuilder.append(currentChar);
+                } else {
+                    hBuilder.append(currentChar);
+                }
+                break;
             }
         }
 

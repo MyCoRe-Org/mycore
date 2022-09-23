@@ -26,7 +26,7 @@ public class MCRCryptCipherConfigurationException extends MCRConfigurationExcept
     public MCRCryptCipherConfigurationException(String errorMessage) {
         super(errorMessage);
     }
-    
+
     public MCRCryptCipherConfigurationException(String message, Throwable cause) {
         super(message, cause);
     }

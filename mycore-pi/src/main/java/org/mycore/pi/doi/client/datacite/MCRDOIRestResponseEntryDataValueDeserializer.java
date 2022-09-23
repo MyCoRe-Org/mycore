@@ -37,19 +37,19 @@ public class MCRDOIRestResponseEntryDataValueDeserializer
         JsonElement value = dataObject.get("value");
 
         switch (format) {
-            case "string":
-                return new MCRDataciteRestResponseEntryData(format,
-                    new MCRDataciteRestResponseEntryDataStringValue(value.getAsJsonPrimitive().getAsString()));
-            case "base64":
-                return new MCRDataciteRestResponseEntryData(format,
-                    new MCRDataciteRestResponseEntryDataBase64Value(value.getAsJsonPrimitive().getAsString()));
-            case "hex":
-            case "admin":
-            case "vlist":
-            case "site":
-            default:
-                // currently not supported
-                return new MCRDataciteRestResponseEntryData(format, new MCRDataciteRestResponseEntryDataValue());
+        case "string":
+            return new MCRDataciteRestResponseEntryData(format,
+                new MCRDataciteRestResponseEntryDataStringValue(value.getAsJsonPrimitive().getAsString()));
+        case "base64":
+            return new MCRDataciteRestResponseEntryData(format,
+                new MCRDataciteRestResponseEntryDataBase64Value(value.getAsJsonPrimitive().getAsString()));
+        case "hex":
+        case "admin":
+        case "vlist":
+        case "site":
+        default:
+            // currently not supported
+            return new MCRDataciteRestResponseEntryData(format, new MCRDataciteRestResponseEntryDataValue());
         }
     }
 }

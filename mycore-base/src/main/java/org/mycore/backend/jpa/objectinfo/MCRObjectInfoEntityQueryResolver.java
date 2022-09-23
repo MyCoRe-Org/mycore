@@ -151,9 +151,9 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
         MCRObjectQuery.SortBy sf = query.sortBy() == null ? SORT_BY_DEFAULT : query.sortBy();
 
         SingularAttribute<MCRObjectInfoEntity, ?> attribute = switch (sf) {
-            case id -> MCRObjectInfoEntity_.id;
-            case created -> MCRObjectInfoEntity_.createDate;
-            case modified -> MCRObjectInfoEntity_.modifyDate;
+        case id -> MCRObjectInfoEntity_.id;
+        case created -> MCRObjectInfoEntity_.createDate;
+        case modified -> MCRObjectInfoEntity_.modifyDate;
         };
 
         if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.asc) {
@@ -237,8 +237,8 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
             .ifPresent(predicates::add);
 
         Optional.ofNullable(query.status())
-                .map(state -> criteriaBuilder.equal(source.get(MCRObjectInfoEntity_.state), state))
-                .ifPresent(predicates::add);
+            .map(state -> criteriaBuilder.equal(source.get(MCRObjectInfoEntity_.state), state))
+            .ifPresent(predicates::add);
         /*
          per default, we only query not deleted objects, but if the use queries one of the deleted fields
          then deleted objects are included

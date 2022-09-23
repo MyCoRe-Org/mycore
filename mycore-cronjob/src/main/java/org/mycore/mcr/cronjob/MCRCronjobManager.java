@@ -69,7 +69,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
 
     @Override
     public void close() {
-        if(!executor.isTerminated()) {
+        if (!executor.isTerminated()) {
             LOGGER.info("Force shutdown {}", this.getClass().getSimpleName());
             executor.shutdownNow();
             try {
@@ -84,7 +84,7 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
         MCRShutdownHandler.getInstance().addCloseable(this);
         LOGGER.info("Cron schedule:");
         List<String> properties = MCRConfiguration2.getInstantiatablePropertyKeys(JOBS_CONFIG_PREFIX)
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
         for (String id : properties) {
             MCRCronjob job = (MCRCronjob) MCRConfiguration2.getInstanceOf(id).orElseThrow();
             LOGGER.info(job.getDescription() + " " + job.getCronDescription());

@@ -41,7 +41,6 @@ import org.mycore.datamodel.niofs.MCRPath;
 public class MCRMaindocEventHandler extends MCREventHandlerBase {
     private static Logger LOGGER = LogManager.getLogger(MCRMaindocEventHandler.class);
 
-    
     @Override
     protected void handlePathDeleted(MCREvent evt, Path path, BasicFileAttributes attrs) {
         if (attrs != null && attrs.isDirectory()) {
@@ -56,7 +55,7 @@ public class MCRMaindocEventHandler extends MCREventHandlerBase {
         MCRObjectDerivate objectDerivate = derivate.getDerivate();
         String filePath = path.subpath(0, path.getNameCount()).toString();
         boolean wasMainDocDeleted = filePath.equals(objectDerivate.getInternals().getMainDoc());
-        if(wasMainDocDeleted) {
+        if (wasMainDocDeleted) {
             objectDerivate.getInternals().setMainDoc("");
             try {
                 MCRMetadataManager.update(derivate);

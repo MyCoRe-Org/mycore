@@ -71,7 +71,8 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
 
     private static final String WORLD_CLASS2_RESOURCE_NAME = "/worldclass2.xml";
 
-    static final String CATEGORY_MAPPING_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml";
+    static final String CATEGORY_MAPPING_RESOURCE_NAME
+        = "/org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml";
 
     static final MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
