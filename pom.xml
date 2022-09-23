@@ -1127,7 +1127,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
-        <version>8.11.1</version>
+        <version>8.11.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
