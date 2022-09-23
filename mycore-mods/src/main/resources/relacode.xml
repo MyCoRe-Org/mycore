@@ -40,7 +40,7 @@
   <code key="cas" value="Caster" />
   <code key="ccp" value="Conceptor" />
   <code key="chr" value="Choreographer" />
-  <code key="-clb" value="Collaborator" />
+  <code key="clb" value="Collaborator" />
   <code key="cli" value="Client" />
   <code key="cll" value="Calligrapher" />
   <code key="clr" value="Colorist" />
@@ -125,7 +125,7 @@
   <code key="fpy" value="First party" />
   <code key="frg" value="Forger" />
   <code key="gis" value="Geographic information specialist" />
-  <code key="-grt" value="Graphic technician" />
+  <code key="grt" value="Graphic technician" />
   <code key="his" value="Host institution" />
   <code key="hnr" value="Honoree" />
   <code key="hst" value="Host" />
@@ -262,7 +262,7 @@
   <code key="uvp" value="University place" />
   <code key="vac" value="Voice actor" />
   <code key="vdg" value="Videographer" />
-  <code key="-voc" value="Vocalist" />
+  <code key="voc" value="Vocalist" />
   <code key="wac" value="Writer of added commentary" />
   <code key="wal" value="Writer of added lyrics" />
   <code key="wam" value="Writer of accompanying material" />
