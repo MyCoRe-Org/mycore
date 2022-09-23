@@ -1,13 +1,17 @@
 <relacode>
-  <!-- From http://www.loc.gov/marc/relators/relacode.html 2012-06-19 -->
+  <!-- From http://www.loc.gov/marc/relators/relacode.html 2022-09-23 -->
+  <code key="abr" value="Abridger" />
   <code key="acp" value="Art copyist" />
   <code key="act" value="Actor" />
+  <code key="adi" value="Art director" />
   <code key="adp" value="Adapter" />
   <code key="aft" value="Author of afterword, colophon, etc." />
   <code key="anl" value="Analyst" />
   <code key="anm" value="Animator" />
   <code key="ann" value="Annotator" />
   <code key="ant" value="Bibliographic antecedent" />
+  <code key="ape" value="Appellee" />
+  <code key="apl" value="Appellant" />
   <code key="app" value="Applicant" />
   <code key="aqt" value="Author in quotations or text abstracts" />
   <code key="arc" value="Architect" />
@@ -16,11 +20,12 @@
   <code key="art" value="Artist" />
   <code key="asg" value="Assignee" />
   <code key="asn" value="Associated name" />
+  <code key="ato" value="Autographer" />
   <code key="att" value="Attributed name" />
   <code key="auc" value="Auctioneer" />
   <code key="aud" value="Author of dialog" />
-  <code key="aui" value="Author of introduction" />
-  <code key="aus" value="Author of screenplay" />
+  <code key="aui" value="Author of introduction, etc." />
+  <code key="aus" value="Screenwriter" />
   <code key="aut" value="Author" />
   <code key="bdd" value="Binding designer" />
   <code key="bjd" value="Bookjacket designer" />
@@ -29,10 +34,13 @@
   <code key="blw" value="Blurb writer" />
   <code key="bnd" value="Binder" />
   <code key="bpd" value="Bookplate designer" />
+  <code key="brd" value="Broadcaster" />
+  <code key="brl" value="Braille embosser" />
   <code key="bsl" value="Bookseller" />
+  <code key="cas" value="Caster" />
   <code key="ccp" value="Conceptor" />
   <code key="chr" value="Choreographer" />
-  <code key="clb" value="Collaborator" />
+  <code key="-clb" value="Collaborator" />
   <code key="cli" value="Client" />
   <code key="cll" value="Calligrapher" />
   <code key="clr" value="Colorist" />
@@ -40,15 +48,17 @@
   <code key="cmm" value="Commentator" />
   <code key="cmp" value="Composer" />
   <code key="cmt" value="Compositor" />
-  <code key="cng" value="Cinematographer" />
   <code key="cnd" value="Conductor" />
+  <code key="cng" value="Cinematographer" />
   <code key="cns" value="Censor" />
-  <code key="coe" value="Contestant -appellee" />
+  <code key="coe" value="Contestant-appellee" />
   <code key="col" value="Collector" />
   <code key="com" value="Compiler" />
   <code key="con" value="Conservator" />
+  <code key="cor" value="Collection registrar" />
   <code key="cos" value="Contestant" />
-  <code key="cot" value="Contestant -appellant" />
+  <code key="cot" value="Contestant-appellant" />
+  <code key="cou" value="Court governed" />
   <code key="cov" value="Cover designer" />
   <code key="cpc" value="Copyright claimant" />
   <code key="cpe" value="Complainant-appellee" />
@@ -58,6 +68,7 @@
   <code key="cre" value="Creator" />
   <code key="crp" value="Correspondent" />
   <code key="crr" value="Corrector" />
+  <code key="crt" value="Court reporter" />
   <code key="csl" value="Consultant" />
   <code key="csp" value="Consultant to a project" />
   <code key="cst" value="Costume designer" />
@@ -69,15 +80,17 @@
   <code key="ctt" value="Contestee-appellant" />
   <code key="cur" value="Curator" />
   <code key="cwt" value="Commentator for written text" />
+  <code key="dbp" value="Distribution place" />
   <code key="dfd" value="Defendant" />
   <code key="dfe" value="Defendant-appellee" />
   <code key="dft" value="Defendant-appellant" />
-  <code key="dgg" value="Degree grantor" />
+  <code key="dgc" value="Degree committee member" />
+  <code key="dgg" value="Degree granting institution" />
+  <code key="dgs" value="Degree supervisor" />
   <code key="dis" value="Dissertant" />
   <code key="dln" value="Delineator" />
   <code key="dnc" value="Dancer" />
   <code key="dnr" value="Donor" />
-  <code key="dpb" value="Distribution place" />
   <code key="dpc" value="Depicted" />
   <code key="dpt" value="Depositor" />
   <code key="drm" value="Draftsman" />
@@ -89,32 +102,43 @@
   <code key="dtm" value="Data manager" />
   <code key="dto" value="Dedicator" />
   <code key="dub" value="Dubious author" />
+  <code key="edc" value="Editor of compilation" />
+  <code key="edm" value="Editor of moving image work" />
   <code key="edt" value="Editor" />
   <code key="egr" value="Engraver" />
   <code key="elg" value="Electrician" />
   <code key="elt" value="Electrotyper" />
   <code key="eng" value="Engineer" />
+  <code key="enj" value="Enacting jurisdiction" />
   <code key="etr" value="Etcher" />
   <code key="evp" value="Event place" />
   <code key="exp" value="Expert" />
   <code key="fac" value="Facsimilist" />
+  <code key="fds" value="Film distributor" />
   <code key="fld" value="Field director" />
   <code key="flm" value="Film editor" />
+  <code key="fmd" value="Film director" />
+  <code key="fmk" value="Filmmaker" />
   <code key="fmo" value="Former owner" />
-  <code key="fpy" value="First party" />
+  <code key="fmp" value="Film producer" />
   <code key="fnd" value="Funder" />
+  <code key="fpy" value="First party" />
   <code key="frg" value="Forger" />
   <code key="gis" value="Geographic information specialist" />
   <code key="-grt" value="Graphic technician" />
+  <code key="his" value="Host institution" />
   <code key="hnr" value="Honoree" />
   <code key="hst" value="Host" />
   <code key="ill" value="Illustrator" />
   <code key="ilu" value="Illuminator" />
   <code key="ins" value="Inscriber" />
   <code key="inv" value="Inventor" />
+  <code key="isb" value="Issuing body" />
   <code key="itr" value="Instrumentalist" />
   <code key="ive" value="Interviewee" />
   <code key="ivr" value="Interviewer" />
+  <code key="jud" value="Judge" />
+  <code key="jug" value="Jurisdiction governed" />
   <code key="lbr" value="Laboratory" />
   <code key="lbt" value="Librettist" />
   <code key="ldr" value="Laboratory director" />
@@ -133,22 +157,27 @@
   <code key="ltg" value="Lithographer" />
   <code key="lyr" value="Lyricist" />
   <code key="mcp" value="Music copyist" />
+  <code key="mdc" value="Metadata contact" />
+  <code key="med" value="Medium" />
   <code key="mfp" value="Manufacture place" />
   <code key="mfr" value="Manufacturer" />
-  <code key="mdc" value="Metadata contact" />
   <code key="mod" value="Moderator" />
   <code key="mon" value="Monitor" />
   <code key="mrb" value="Marbler" />
   <code key="mrk" value="Markup editor" />
   <code key="msd" value="Musical director" />
   <code key="mte" value="Metal-engraver" />
+  <code key="mtk" value="Minute taker" />
   <code key="mus" value="Musician" />
   <code key="nrt" value="Narrator" />
   <code key="opn" value="Opponent" />
   <code key="org" value="Originator" />
-  <code key="orm" value="Organizer of meeting" />
+  <code key="orm" value="Organizer" />
+  <code key="osp" value="Onscreen presenter" />
   <code key="oth" value="Other" />
   <code key="own" value="Owner" />
+  <code key="pad" value="Place of address" />
+  <code key="pan" value="Panelist" />
   <code key="pat" value="Patron" />
   <code key="pbd" value="Publishing director" />
   <code key="pbl" value="Publisher" />
@@ -161,33 +190,42 @@
   <code key="pop" value="Printer of plates" />
   <code key="ppm" value="Papermaker" />
   <code key="ppt" value="Puppeteer" />
+  <code key="pra" value="Praeses" />
   <code key="prc" value="Process contact" />
   <code key="prd" value="Production personnel" />
+  <code key="pre" value="Presenter" />
   <code key="prf" value="Performer" />
   <code key="prg" value="Programmer" />
   <code key="prm" value="Printmaker" />
+  <code key="prn" value="Production company" />
   <code key="pro" value="Producer" />
   <code key="prp" value="Production place" />
+  <code key="prs" value="Production designer" />
   <code key="prt" value="Printer" />
+  <code key="prv" value="Provider" />
   <code key="pta" value="Patent applicant" />
-  <code key="pte" value="Plaintiff -appellee" />
+  <code key="pte" value="Plaintiff-appellee" />
   <code key="ptf" value="Plaintiff" />
   <code key="pth" value="Patent holder" />
   <code key="ptt" value="Plaintiff-appellant" />
   <code key="pup" value="Publication place" />
   <code key="rbr" value="Rubricator" />
+  <code key="rcd" value="Recordist" />
   <code key="rce" value="Recording engineer" />
-  <code key="rcp" value="Recipient" />
-  <code key="red" value="Redactor" />
+  <code key="rcp" value="Addressee" />
+  <code key="rdd" value="Radio director" />
+  <code key="red" value="Redaktor" />
   <code key="ren" value="Renderer" />
   <code key="res" value="Researcher" />
   <code key="rev" value="Reviewer" />
+  <code key="rpc" value="Radio producer" />
   <code key="rps" value="Repository" />
   <code key="rpt" value="Reporter" />
   <code key="rpy" value="Responsible party" />
   <code key="rse" value="Respondent-appellee" />
   <code key="rsg" value="Restager" />
   <code key="rsp" value="Respondent" />
+  <code key="rsr" value="Restorationist" />
   <code key="rst" value="Respondent-appellant" />
   <code key="rth" value="Research team head" />
   <code key="rtm" value="Research team member" />
@@ -197,14 +235,17 @@
   <code key="scr" value="Scribe" />
   <code key="sds" value="Sound designer" />
   <code key="sec" value="Secretary" />
+  <code key="sgd" value="Stage director" />
   <code key="sgn" value="Signer" />
   <code key="sht" value="Supporting host" />
+  <code key="sll" value="Seller" />
   <code key="sng" value="Singer" />
   <code key="spk" value="Speaker" />
   <code key="spn" value="Sponsor" />
   <code key="spy" value="Second party" />
   <code key="srv" value="Surveyor" />
   <code key="std" value="Set designer" />
+  <code key="stg" value="Setting" />
   <code key="stl" value="Storyteller" />
   <code key="stm" value="Stage manager" />
   <code key="stn" value="Standards body" />
@@ -212,15 +253,24 @@
   <code key="tcd" value="Technical director" />
   <code key="tch" value="Teacher" />
   <code key="ths" value="Thesis advisor" />
+  <code key="tld" value="Television director" />
+  <code key="tlp" value="Television producer" />
   <code key="trc" value="Transcriber" />
   <code key="trl" value="Translator" />
   <code key="tyd" value="Type designer" />
   <code key="tyg" value="Typographer" />
   <code key="uvp" value="University place" />
+  <code key="vac" value="Voice actor" />
   <code key="vdg" value="Videographer" />
-  <code key="voc" value="Vocalist" />
+  <code key="-voc" value="Vocalist" />
+  <code key="wac" value="Writer of added commentary" />
+  <code key="wal" value="Writer of added lyrics" />
   <code key="wam" value="Writer of accompanying material" />
+  <code key="wat" value="Writer of added text" />
   <code key="wdc" value="Woodcutter" />
-  <code key="wde" value="Wood-engraver" />
+  <code key="wde" value="Wood engraver" />
+  <code key="win" value="Writer of introduction" />
   <code key="wit" value="Witness" />
+  <code key="wpr" value="Writer of preface" />
+  <code key="wst" value="Writer of supplementary textual content" />
 </relacode>
