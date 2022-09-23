@@ -889,7 +889,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
       <dependency>
         <groupId>com.google.zxing</groupId>
         <artifactId>core</artifactId>
-        <version>3.4.1</version>
+        <version>3.5.0</version>
       </dependency>
       <dependency>
         <groupId>com.ibm.icu</groupId>
