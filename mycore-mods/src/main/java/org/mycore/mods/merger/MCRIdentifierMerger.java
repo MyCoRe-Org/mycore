@@ -20,9 +20,9 @@ package org.mycore.mods.merger;
 
 import java.nio.charset.StandardCharsets;
 import java.net.URLDecoder;
-import java.util.Locale;
 
 import org.jdom2.Element;
+import org.mycore.mods.enrichment.MCRIdentifier;
 
 /**
  * Compares and merges mods:identifier elements.
@@ -43,8 +43,7 @@ public class MCRIdentifierMerger extends MCRMerger {
     }
 
     private String getSimplifiedID() {
-        return URLDecoder.decode(this.element.getTextNormalize().toLowerCase(Locale.ENGLISH),StandardCharsets.UTF_8)
-            .replace("-","");
+        return MCRIdentifier.simplifyID(this.element.getTextNormalize());
     }
 
     @Override
@@ -60,7 +59,9 @@ public class MCRIdentifierMerger extends MCRMerger {
 
     @Override
     public void mergeFrom(MCRMerger other) {
-        if (!this.element.getText().contains("-") && other.element.getText().contains("-")) {
+        if ((!this.element.getText().contains("-") && other.element.getText().contains("-")) ||
+            (!URLDecoder.decode(this.element.getText(),StandardCharsets.UTF_8).equals(this.element.getText())
+             && URLDecoder.decode(other.element.getText(),StandardCharsets.UTF_8).equals(other.element.getText()))) {
             this.element.setText(other.element.getText());
         }
     }
