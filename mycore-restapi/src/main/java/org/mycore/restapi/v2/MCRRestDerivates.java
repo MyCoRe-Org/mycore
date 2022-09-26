@@ -54,6 +54,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRAccessControlExposeHeaders;
+import org.mycore.restapi.annotations.MCRApiDraft;
 import org.mycore.restapi.annotations.MCRParam;
 import org.mycore.restapi.annotations.MCRParams;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
@@ -80,6 +81,7 @@ import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -386,6 +388,78 @@ public class MCRRestDerivates {
             }
         }
         return Response.created(uriInfo.getAbsolutePathBuilder().path(derId.toString()).build()).build();
+    }
+
+    @PATCH
+    @Operation(
+        summary = "Updates the metadata (or partial metadata) of the given derivate",
+        responses = @ApiResponse(responseCode = "204"),
+        tags = MCRRestUtils.TAG_MYCORE_DERIVATE)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @RequestBody(required = true,
+        content = @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED,
+            schema = @Schema(implementation = DerivateMetadata.class)))
+    @MCRRequireTransaction
+    @MCRAccessControlExposeHeaders(HttpHeaders.LOCATION)
+    @Path("/{" + PARAM_DERID + "}")
+    @MCRApiDraft("MCRPatchDerivate")
+    public Response patchDerivate(@BeanParam DerivateMetadata der,
+        @Parameter(example = "mir_derivate_00004711") @PathParam(PARAM_DERID) MCRObjectID derid) {
+
+        LOGGER.debug(der);
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derid);
+        boolean modified = false;
+
+        if (der.getOrder() != -1
+            && derivate.getOrder() != der.getOrder()) {
+            modified = true;
+            derivate.setOrder(der.getOrder());
+        }
+        
+        if (der.getMainDoc() != null
+            && !der.getMainDoc().equals(derivate.getDerivate().getInternals().getMainDoc())) {
+            modified = true;
+            derivate.getDerivate().getInternals().setMainDoc(der.getMainDoc());
+        }
+
+        List<MCRCategoryID> oldClassifications = derivate.getDerivate().getClassifications().stream()
+            .map(x -> MCRCategoryID.fromString(x.getClassId() + ":" + x.getCategId()))
+            .collect(Collectors.toList());
+        if (!der.getClassifications().isEmpty()
+            && (oldClassifications.size() != der.getClassifications().size()
+                || !oldClassifications.containsAll(der.getClassifications()))) {
+            modified = true;
+            derivate.getDerivate().getClassifications().clear();
+            derivate.getDerivate().getClassifications()
+                .addAll(der.getClassifications().stream()
+                    .map(categId -> new MCRMetaClassification("classification", 0, null, categId))
+                    .collect(Collectors.toList()));
+        }
+
+        List<MCRMetaLangText> newTitles = der.getTitles().stream()
+            .map(DerivateTitle::toMetaLangText)
+            .collect(Collectors.toList());
+        if (!newTitles.isEmpty()
+            && (derivate.getDerivate().getTitleSize() != newTitles.size()
+                || !derivate.getDerivate().getTitles().containsAll(newTitles))) {
+            modified = true;
+            derivate.getDerivate().getTitles().clear();
+            derivate.getDerivate().getTitles().addAll(newTitles);
+        }
+
+        if (modified) {
+            try {
+                MCRMetadataManager.update(derivate);
+            } catch (MCRAccessException e) {
+                throw MCRErrorResponse.fromStatus(Response.Status.FORBIDDEN.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRDERIVATE_NO_PERMISSION)
+                    .withMessage("You may not update MCRDerivate " + derivate.getId() + ".")
+                    .withDetail(e.getMessage())
+                    .withCause(e)
+                    .toException();
+            }
+        }
+        return Response.noContent().build();
     }
 
     @PUT

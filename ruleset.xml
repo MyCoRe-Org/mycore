@@ -80,7 +80,6 @@
   <rule ref="category/java/codestyle.xml/NoPackage" />
   <rule ref="category/java/codestyle.xml/PackageCase" />
   <rule ref="category/java/errorprone.xml/AvoidCatchingThrowable" />
-  <rule ref="category/java/design.xml/AvoidRethrowingException" />
   <rule ref="category/java/design.xml/AvoidThrowingNewInstanceOfSameException" />
   <rule ref="category/java/design.xml/AvoidThrowingNullPointerException" />
   <rule ref="category/java/design.xml/AvoidThrowingRawExceptionTypes" />

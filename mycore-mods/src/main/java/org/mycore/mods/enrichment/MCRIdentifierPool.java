@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 
 /**
@@ -38,44 +40,47 @@ import org.jdom2.Element;
  */
 class MCRIdentifierPool {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     /** Set of already known identifiers resolved in the last round */
     private Set<MCRIdentifier> oldIdentifiers = new HashSet<>();
 
+    /** Set of currently processed identifiers */
+    private Set<MCRIdentifier> currentIdentifiers = new HashSet<>();
+
     /** Set of new identifiers returned with data from external sources in the current resolving round */
     private Set<MCRIdentifier> newIdentifiers = new HashSet<>();
-
-    MCRIdentifierPool() {
-    }
-
-    int size() {
-        return oldIdentifiers.size();
-    }
 
     /** Add all new identifiers that can be found in the given MODS object */
     synchronized void addIdentifiersFrom(Element object) {
         for (MCRIdentifierType type : MCRIdentifierTypeFactory.instance().getTypes()) {
             newIdentifiers.addAll(type.getIdentifiers(object));
         }
+        newIdentifiers.removeAll(currentIdentifiers);
         newIdentifiers.removeAll(oldIdentifiers);
     }
 
-    /** Returns true, if new identifiers were added in the current resolving round */
-    boolean hasNewIdentifiers() {
-        return !newIdentifiers.isEmpty();
-    }
-
-    void buildNewIdentifiersIn(Element object) {
-        newIdentifiers.forEach(id -> id.buildElement(object));
-    }
-
-    /** Merges all new identifies into the set of old identifiers */
-    void continueWithNewIdentifiers() {
-        oldIdentifiers.clear();
+    /** Remember all currently known identifiers, mark them as "old" **/
+    void prepareNextIteration() {
+        currentIdentifiers.clear();
+        currentIdentifiers.addAll(newIdentifiers);
         oldIdentifiers.addAll(newIdentifiers);
         newIdentifiers.clear();
     }
 
-    List<MCRIdentifier> getIdentifiersOfType(MCRIdentifierType type) {
-        return oldIdentifiers.stream().filter(id -> id.getType().equals(type)).collect(Collectors.toList());
+    boolean hasNewIdentifiers() {
+        for (MCRIdentifier id : newIdentifiers) {
+            LOGGER.info("new identifier " + id);
+        }
+        
+        return !newIdentifiers.isEmpty();
+    }
+
+    Set<MCRIdentifier> getNewIdentifiers() {
+        return newIdentifiers;
+    }
+
+    List<MCRIdentifier> getCurrentIdentifiersOfType(MCRIdentifierType type) {
+        return currentIdentifiers.stream().filter(id -> id.getType().equals(type)).collect(Collectors.toList());
     }
 }

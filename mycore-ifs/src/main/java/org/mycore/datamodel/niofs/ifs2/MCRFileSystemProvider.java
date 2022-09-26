@@ -58,6 +58,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.ifs2.MCRDirectory;
 import org.mycore.datamodel.ifs2.MCRFile;
 import org.mycore.datamodel.ifs2.MCRFileCollection;
@@ -67,6 +69,7 @@ import org.mycore.datamodel.niofs.MCRAbstractFileSystem;
 import org.mycore.datamodel.niofs.MCRFileAttributes;
 import org.mycore.datamodel.niofs.MCRMD5AttributeView;
 import org.mycore.datamodel.niofs.MCRPath;
+import org.mycore.frontend.fileupload.MCRUploadHelper;
 
 import com.google.common.collect.Sets;
 
@@ -87,13 +90,6 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     private static final Set<? extends OpenOption> SUPPORTED_OPEN_OPTIONS = EnumSet.of(StandardOpenOption.APPEND,
         StandardOpenOption.DSYNC, StandardOpenOption.READ, StandardOpenOption.SPARSE, StandardOpenOption.SYNC,
         StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
-
-    /**
-     *
-     */
-    public MCRFileSystemProvider() {
-        //TODO: One filesystem enough?
-    }
 
     /* (non-Javadoc)
      * @see java.nio.file.spi.FileSystemProvider#getScheme()
@@ -147,11 +143,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             }
 
         }
-        return MCRAbstractFileSystem.getPath(owner, path, getFileSystemFromPathURI(FS_URI));
-    }
-
-    private MCRIFSFileSystem getFileSystemFromPathURI(final URI uri) {
-        return getMCRIFSFileSystem();
+        return MCRAbstractFileSystem.getPath(owner, path, getMCRIFSFileSystem());
     }
 
     /* (non-Javadoc)
@@ -170,6 +162,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         boolean create = options.contains(StandardOpenOption.CREATE);
         boolean createNew = options.contains(StandardOpenOption.CREATE_NEW);
         if (create || createNew) {
+            checkNewPathName(ifsPath);
             for (OpenOption option : fileOpenOptions) {
                 //check before we create any file instance
                 checkOpenOption(option);
@@ -183,6 +176,17 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         boolean write = options.contains(StandardOpenOption.WRITE) || options.contains(StandardOpenOption.APPEND);
         FileChannel baseChannel = (FileChannel) Files.newByteChannel(mcrFile.getLocalPath(), fileOpenOptions);
         return new MCRFileChannel(ifsPath, mcrFile, baseChannel, write, channelCreateEvent);
+    }
+
+    private static void checkNewPathName(MCRPath ifsPath) throws IOException {
+        //check property lazy as on initialization of this class MCRConfiguration2 is not ready
+        if (MCRConfiguration2.getBoolean("MCR.NIO.PathCreateNameCheck").orElse(true)) {
+            try {
+                MCRUploadHelper.checkPathName(ifsPath.getFileName().toString(), true);
+            } catch (MCRException e) {
+                throw new IOException(e.getMessage(), e);
+            }
+        }
     }
 
     static void checkOpenOption(OpenOption option) {
@@ -200,7 +204,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(dir);
         MCRStoredNode node = MCRFileSystemUtils.resolvePath(mcrPath);
         if (node instanceof MCRDirectory) {
-            return MCRDirectoryStream.getInstance((MCRDirectory) node, mcrPath);
+            return MCRDirectoryStreamHelper.getInstance((MCRDirectory) node, mcrPath);
         }
         throw new NotDirectoryException(dir.toString());
     }
@@ -223,6 +227,9 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             }
             store.create(derId.getNumberAsInteger());
             return;
+        } else {
+            //not root directory
+            checkNewPathName(mcrPath);
         }
         rootDirectory = MCRFileSystemUtils.getFileCollection(mcrPath.getOwner());
         MCRPath parentPath = mcrPath.getParent();
@@ -258,10 +265,8 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     public void delete(Path path) throws IOException {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
         MCRStoredNode child = MCRFileSystemUtils.resolvePath(mcrPath);
-        if (child instanceof MCRDirectory) {
-            if (child.hasChildren()) {
-                throw new DirectoryNotEmptyException(mcrPath.toString());
-            }
+        if (child instanceof MCRDirectory && child.hasChildren()) {
+            throw new DirectoryNotEmptyException(mcrPath.toString());
         }
         try {
             child.delete();
@@ -269,31 +274,6 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         } catch (RuntimeException e) {
             throw new IOException("Could not delete: " + mcrPath, e);
         }
-    }
-
-    private static MCRDirectory getParentDirectory(MCRPath mcrPath) throws IOException {
-        if (mcrPath.getNameCount() == 0) {
-            throw new IllegalArgumentException("Root component has no parent: " + mcrPath);
-        }
-        MCRDirectory rootDirectory = MCRFileSystemUtils.getFileCollection(mcrPath.getOwner());
-        if (mcrPath.getNameCount() == 1) {
-            return rootDirectory;
-        }
-        MCRPath parentPath = mcrPath.getParent();
-        MCRStoredNode parentNode = (MCRStoredNode) rootDirectory
-            .getNodeByPath(getAbsolutePathFromRootComponent(parentPath).toString());
-        if (parentNode == null) {
-            throw new NoSuchFileException(MCRFileSystemUtils.toPath(rootDirectory).toString(),
-                getAbsolutePathFromRootComponent(mcrPath).toString(), "Parent directory does not exists.");
-        }
-        if (parentNode instanceof MCRFile) {
-            throw new NotDirectoryException(MCRFileSystemUtils.toPath(parentNode).toString());
-        }
-        MCRDirectory parentDir = (MCRDirectory) parentNode;
-        //warm-up cache
-        parentDir.getChildren().close();
-
-        return parentDir;
     }
 
     /* (non-Javadoc)
@@ -327,43 +307,53 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             }
             return; //created new root component
         }
-        MCRDirectory tgtParentDir = MCRFileSystemUtils.resolvePath(tgt.getParent());
         if (srcNode instanceof MCRFile) {
-            MCRFile srcFile = (MCRFile) srcNode;
-            boolean fireCreateEvent = createNew || Files.notExists(tgt);
-            MCRFile targetFile = MCRFileSystemUtils.getMCRFile(tgt, true, createNew, !fireCreateEvent);
-            targetFile.setContent(srcFile.getContent());
-            if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
-                copyFileAttributes(srcFile, targetFile);
-            }
-            if (fireCreateEvent) {
-                MCRPathEventHelper.fireFileCreateEvent(tgt, targetFile.getBasicFileAttributes());
-            } else {
-                MCRPathEventHelper.fireFileUpdateEvent(tgt, targetFile.getBasicFileAttributes());
-            }
+            copyFile((MCRFile) srcNode, tgt, copyOptions, createNew);
         } else if (srcNode instanceof MCRDirectory) {
-            MCRStoredNode child = (MCRStoredNode) tgtParentDir.getChild(tgt.getFileName().toString());
-            if (child != null) {
-                if (!copyOptions.contains(StandardCopyOption.REPLACE_EXISTING)) {
-                    throw new FileAlreadyExistsException(tgtParentDir.toString(), tgt.getFileName().toString(), null);
-                }
-                if (child instanceof MCRFile) {
-                    throw new NotDirectoryException(tgt.toString());
-                }
-                MCRDirectory tgtDir = (MCRDirectory) child;
-                if (tgtDir.hasChildren() && copyOptions.contains(StandardCopyOption.REPLACE_EXISTING)) {
-                    throw new DirectoryNotEmptyException(tgt.toString());
-                }
-                if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
-                    copyDirectoryAttributes((MCRDirectory) srcNode, tgtDir);
-                }
-            } else {
-                //simply create directory
-                @SuppressWarnings("unused")
-                MCRDirectory tgtDir = tgtParentDir.createDir(tgt.getFileName().toString());
-                if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
-                    copyDirectoryAttributes((MCRDirectory) srcNode, tgtDir);
-                }
+            copyDirectory((MCRDirectory) srcNode, tgt, copyOptions);
+        }
+    }
+
+    private static void copyFile(MCRFile srcNode, MCRPath target, HashSet<CopyOption> copyOptions, boolean createNew)
+        throws IOException {
+        MCRFile srcFile = srcNode;
+        boolean fireCreateEvent = createNew || Files.notExists(target);
+        MCRFile targetFile = MCRFileSystemUtils.getMCRFile(target, true, createNew, !fireCreateEvent);
+        targetFile.setContent(srcFile.getContent());
+        if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
+            copyFileAttributes(srcFile, targetFile);
+        }
+        if (fireCreateEvent) {
+            MCRPathEventHelper.fireFileCreateEvent(target, targetFile.getBasicFileAttributes());
+        } else {
+            MCRPathEventHelper.fireFileUpdateEvent(target, targetFile.getBasicFileAttributes());
+        }
+    }
+
+    private static void copyDirectory(MCRDirectory srcNode, MCRPath target, HashSet<CopyOption> copyOptions)
+        throws IOException {
+        MCRDirectory tgtParentDir = MCRFileSystemUtils.resolvePath(target.getParent());
+        MCRStoredNode child = (MCRStoredNode) tgtParentDir.getChild(target.getFileName().toString());
+        if (child != null) {
+            if (!copyOptions.contains(StandardCopyOption.REPLACE_EXISTING)) {
+                throw new FileAlreadyExistsException(tgtParentDir.toString(), target.getFileName().toString(), null);
+            }
+            if (child instanceof MCRFile) {
+                throw new NotDirectoryException(target.toString());
+            }
+            MCRDirectory tgtDir = (MCRDirectory) child;
+            if (tgtDir.hasChildren() && copyOptions.contains(StandardCopyOption.REPLACE_EXISTING)) {
+                throw new DirectoryNotEmptyException(target.toString());
+            }
+            if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
+                copyDirectoryAttributes(srcNode, tgtDir);
+            }
+        } else {
+            //simply create directory
+            @SuppressWarnings("unused")
+            MCRDirectory tgtDir = tgtParentDir.createDir(target.getFileName().toString());
+            if (copyOptions.contains(StandardCopyOption.COPY_ATTRIBUTES)) {
+                copyDirectoryAttributes(srcNode, tgtDir);
             }
         }
     }
@@ -456,13 +446,13 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             throw new NoSuchFileException(mcrPath.toString());
         }
         if (node instanceof MCRDirectory) {
-            checkDirectory((MCRDirectory) node, modes);
+            checkDirectoryAccessModes(modes);
         } else {
             checkFile((MCRFile) node, modes);
         }
     }
 
-    private void checkDirectory(MCRDirectory rootDirectory, AccessMode... modes) throws AccessDeniedException {
+    private void checkDirectoryAccessModes(AccessMode... modes) throws AccessDeniedException {
         for (AccessMode mode : modes) {
             switch (mode) {
                 case READ:
@@ -470,7 +460,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 case EXECUTE:
                     break;
                 default:
-                    throw new UnsupportedOperationException("Unsupported AccessMode: " + mode);
+                    throw new AccessDeniedException("Unsupported AccessMode: " + mode);
             }
         }
     }
@@ -485,7 +475,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                     throw new AccessDeniedException(MCRFileSystemUtils.toPath(file).toString(), null,
                         "Unsupported AccessMode: " + mode);
                 default:
-                    throw new UnsupportedOperationException("Unsupported AccessMode: " + mode);
+                    throw new AccessDeniedException("Unsupported AccessMode: " + mode);
             }
         }
     }
@@ -497,9 +487,6 @@ public class MCRFileSystemProvider extends FileSystemProvider {
     @Override
     public <V extends FileAttributeView> V getFileAttributeView(Path path, Class<V> type, LinkOption... options) {
         MCRPath mcrPath = MCRFileSystemUtils.checkPathAbsolute(path);
-        if (type == null) {
-            throw new NullPointerException();
-        }
         //must support BasicFileAttributeView
         if (type == BasicFileAttributeView.class) {
             return (V) new BasicFileAttributeViewImpl(mcrPath);
@@ -544,9 +531,8 @@ public class MCRFileSystemProvider extends FileSystemProvider {
             case "md5":
                 view = new MD5FileAttributeViewImpl(mcrPath);
                 break;
-        }
-        if (view == null) {
-            throw new UnsupportedOperationException("View '" + s[0] + "' not available");
+            default:
+                throw new UnsupportedOperationException("View '" + s[0] + "' not available");
         }
         return view.getAttributeMap(s[1].split(","));
     }
@@ -621,7 +607,7 @@ public class MCRFileSystemProvider extends FileSystemProvider {
                 if (!allowed.contains(attr)) {
                     throw new IllegalArgumentException("'" + attr + "' not recognized");
                 }
-                if (attr.equals("*")) {
+                if ("*".equals(attr)) {
                     copyAll = true;
                 }
             }

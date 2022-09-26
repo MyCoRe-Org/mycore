@@ -35,6 +35,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.mods.MCRMODSSorter;
+import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.util.concurrent.MCRTransactionableCallable;
 
 /**
@@ -51,7 +52,15 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  * MCR.MODS.EnrichmentResolver.DataSources.import=(Scopus PubMed IEEE CrossRef DataCite) OADOI (LOBID GBV SWB) ZDB
  *
  * All data sources that support one of the identifiers present in the publication are queried.
- * A data source that successfully returned publication data will no longer be tried with one of other identifiers.
+ * 
+ * Depending on the configuration properties  
+ * MCR.MODS.EnrichmentResolver.DefaultStopOnFirstResult=true|false
+ * and
+ * MCR.MODS.EnrichmentResolver.DataSource.[ID].StopOnFirstResult=true|false
+ * the data source will stop trying to resolve publication data after 
+ * the first successful call with a given identifier and skip others, 
+ * or will try to retrieve data for all given identifiers.
+ * 
  * Should a data source return new, additional identifiers,
  * other data sources that support these identifiers will be tried again.
  *
@@ -60,17 +69,19 @@ import org.mycore.util.concurrent.MCRTransactionableCallable;
  * and series level is enriched with external data.
  *
  * The order of the data source IDs in configuration determines the order of merging the publication data.
- * If some data sources are grouped using braces, merging is skipped after the first successul data source.
+ * If some data sources are grouped using braces, merging is skipped after the first successful data source.
  * For example, when
  *
  * MCR.MODS.EnrichmentResolver.DataSources.sample=A (B C) D
  *
- * all four data sources are queried until all returned data or all identifiers habe been tried.
+ * all four data sources are queried until all returned data or all identifiers have been tried.
  * Afterwards, the data returned from A is merged into the original data.
  * Next, if B returned data, the data of B is merged and the data of C will be ignored.
  * If B did not return data and C returned data, the data of C is merged.
  * At the end, the data of D is merged.
  * So building groups of data sources with braces can be used to express data source priority.
+ *
+ * @see MCRDataSource
  *
  * @author Frank L\u00FCtzenkirchen
  */
@@ -80,48 +91,68 @@ public class MCREnricher {
 
     private static final String XPATH_HOST_SERIES = "mods:relatedItem[@type='host' or @type='series']";
 
+    private static final String DELIMITERS = " ()";
+
     private XPathExpression<Element> xPath2FindNestedObjects;
 
     private String dsConfig;
 
-    Element publication;
+    private MCRIdentifierPool idPool;
 
-    MCRIdentifierPool idPool;
+    private Map<String, MCRDataSourceCall> id2call;
 
-    Map<String, MCRDataSourceCall> id2call = new HashMap<>();
+    private MCREnrichmentDebugger debugger = new MCRNoOpEnrichmentDebugger();
 
     public MCREnricher(String configID) {
         xPath2FindNestedObjects = XPathFactory.instance().compile(XPATH_HOST_SERIES, Filters.element(), null,
             MCRConstants.getStandardNamespaces());
 
         dsConfig = MCRConfiguration2.getStringOrThrow("MCR.MODS.EnrichmentResolver.DataSources." + configID);
-
-        idPool = new MCRIdentifierPool();
-        prepareDataSourceCalls(dsConfig);
     }
 
-    public void enrich(Element publication) {
-        this.publication = publication;
-        idPool.addIdentifiersFrom(publication);
+    public void setDebugger(MCREnrichmentDebugger debugger) {
+        this.debugger = debugger;
+    }
 
-        resolveExternalData();
-        mergeExternalData();
-        MCRMODSSorter.sort(publication);
+    public synchronized void enrich(Element publication) {
+        debugger.debugPublication("before", publication);
+        
+        idPool = new MCRIdentifierPool();
+        id2call = prepareDataSourceCalls();
+
+        idPool.addIdentifiersFrom(publication);
+        while (idPool.hasNewIdentifiers()) {
+            debugger.startIteration();
+            debugger.debugNewIdentifiers(idPool.getNewIdentifiers());
+
+            idPool.prepareNextIteration();
+
+            resolveExternalData();
+            mergeNewIdentifiers(publication);
+            mergeExternalData(publication);
+            MCRMODSSorter.sort(publication);
+
+            debugger.endIteration();
+        }
 
         for (Element nestedObject : xPath2FindNestedObjects.evaluate(publication)) {
-            idPool.continueWithNewIdentifiers();
-            id2call.values().forEach(call -> call.reset());
             enrich(nestedObject);
         }
     }
 
-    private void prepareDataSourceCalls(String dsConfig) {
-        for (StringTokenizer st = new StringTokenizer(dsConfig, " ()", false); st.hasMoreTokens();) {
+    private void mergeNewIdentifiers(Element publication) {
+        idPool.getNewIdentifiers().forEach(id -> id.mergeInto(publication));
+    }
+
+    private Map<String, MCRDataSourceCall> prepareDataSourceCalls() {
+        id2call = new HashMap<>();
+        for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, false); st.hasMoreTokens();) {
             String dataSourceID = st.nextToken();
             MCRDataSource dataSource = MCRDataSourceFactory.instance().getDataSource(dataSourceID);
             MCRDataSourceCall call = new MCRDataSourceCall(dataSource, idPool);
             id2call.put(dataSourceID, call);
         }
+        return id2call;
     }
 
     private void resolveExternalData() {
@@ -131,11 +162,7 @@ public class MCREnricher {
             .collect(Collectors.toList());
         ExecutorService executor = Executors.newFixedThreadPool(calls.size());
         try {
-            while (idPool.hasNewIdentifiers()) {
-                idPool.buildNewIdentifiersIn(publication);
-                idPool.continueWithNewIdentifiers();
-                executor.invokeAll(calls);
-            }
+            executor.invokeAll(calls);
         } catch (InterruptedException ex) {
             LOGGER.warn(ex);
         } finally {
@@ -143,12 +170,11 @@ public class MCREnricher {
         }
     }
 
-    private void mergeExternalData() {
+    private void mergeExternalData(Element publication) {
         boolean withinGroup = false;
-        String delimiters = " ()";
 
-        for (StringTokenizer st = new StringTokenizer(dsConfig, delimiters, true); st.hasMoreTokens();) {
-            String token = st.nextToken(delimiters).trim();
+        for (StringTokenizer st = new StringTokenizer(dsConfig, DELIMITERS, true); st.hasMoreTokens();) {
+            String token = st.nextToken(DELIMITERS).trim();
             if (token.isEmpty()) {
                 continue;
             } else if ("(".equals(token)) {
@@ -158,8 +184,14 @@ public class MCREnricher {
             } else {
                 MCRDataSourceCall call = id2call.get(token);
                 if (call.wasSuccessful()) {
-                    LOGGER.info("merging data from " + token);
-                    call.mergeResultWith(publication);
+                    call.getResults().forEach(result -> {
+                        LOGGER.info("merging data from " + token);
+                        merge(publication, result);
+                        debugger.debugResolved(token, result);
+                        debugger.debugPublication("afterMerge", publication);
+                    });
+                    call.clearResults();
+
                     if (withinGroup) {
                         st.nextToken(")"); // skip forward to end of group
                         withinGroup = false;
@@ -167,5 +199,15 @@ public class MCREnricher {
                 }
             }
         }
+    }
+
+    static void merge(Element publication, Element toMergeWith) {
+        if (publication.getName().equals("relatedItem")) {
+            // resolved is always mods:mods, transform to mods:relatedItem to be mergeable
+            toMergeWith.setName("relatedItem");
+            toMergeWith.setAttribute(publication.getAttribute("type").clone());
+        }
+
+        MCRMergeTool.merge(publication, toMergeWith);
     }
 }

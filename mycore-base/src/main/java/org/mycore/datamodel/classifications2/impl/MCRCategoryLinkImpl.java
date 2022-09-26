@@ -114,7 +114,7 @@ import jakarta.persistence.UniqueConstraint;
     @NamedQuery(name = "MCRCategoryLink.links",
         query = "FROM MCRCategoryLinkImpl WHERE objectReference.type=:type")
 })
-class MCRCategoryLinkImpl implements MCRCategoryLink {
+public class MCRCategoryLinkImpl implements MCRCategoryLink {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -127,7 +127,7 @@ class MCRCategoryLinkImpl implements MCRCategoryLink {
     @Embedded
     private MCRCategLinkReference objectReference;
 
-    MCRCategoryLinkImpl() {
+    public MCRCategoryLinkImpl() {
         this(null, null);
     }
 
