@@ -54,6 +54,7 @@ public class MCRTitleInfoMergerTest extends MCRTestCase {
         String b = "[mods:titleInfo[mods:title='first']"
             + "][mods:titleInfo[mods:title='second'][@xml:lang='en'][@type='alternative']]";
         String e = "[mods:titleInfo[mods:title='first'][@xml:lang='de']]"
+            + "[mods:titleInfo[mods:title='second']]"
             + "[mods:titleInfo[mods:title='second'][@xml:lang='en'][@type='alternative']]";
         MCRMergerTest.test(a, b, e);
     }
@@ -70,5 +71,21 @@ public class MCRTitleInfoMergerTest extends MCRTestCase {
     public void testMergingIdentical() throws JaxenException, IOException {
         String a = "[mods:titleInfo[mods:title='test']]";
         MCRMergerTest.test(a, a, a);
+    }
+
+    @Test
+    public void testMergingSameAttribute() throws JaxenException, IOException {
+        String a = "[mods:titleInfo[mods:title='Chemistry - A European Journal'][@type='abbreviated']]";
+        String b = "[mods:titleInfo[mods:title='Chemistry'][@type='abbreviated']]";
+        String e = "[mods:titleInfo[mods:title='Chemistry - A European Journal'][@type='abbreviated']]";
+        MCRMergerTest.test(a, b, e);
+    }
+
+    @Test
+    public void testMergingOneAttribute() throws JaxenException, IOException {
+        String a = "[mods:titleInfo[mods:title='Chemistry - A European Journal']]";
+        String b = "[mods:titleInfo[mods:title='Chemistry'][@type='abbreviated']]";
+        String e = "[mods:titleInfo[mods:title='Chemistry - A European Journal']][mods:titleInfo[mods:title='Chemistry'][@type='abbreviated']]";
+        MCRMergerTest.test(a, b, e);
     }
 }
