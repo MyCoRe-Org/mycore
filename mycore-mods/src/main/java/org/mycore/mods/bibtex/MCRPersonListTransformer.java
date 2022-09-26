@@ -45,6 +45,9 @@ class MCRPersonListTransformer extends MCRFieldTransformer {
 
     @SuppressWarnings("unchecked")
     void buildField(BibtexAbstractValue value, Element parent) {
+        if (!(value instanceof BibtexPersonList)) {
+            return;
+        }
         BibtexPersonList personList = (BibtexPersonList) value;
         for (BibtexPerson person : (List<BibtexPerson>) (personList.getList())) {
             (person.isOthers() ? andOthers : personTransformer).buildField(person, parent);
