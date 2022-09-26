@@ -1,19 +1,19 @@
 /*
- *  This file is part of ***  M y C o R e  ***
- *  See http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
- *  MyCoRe is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  MyCoRe is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.backend.jpa.objectinfo;
@@ -151,9 +151,9 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
         MCRObjectQuery.SortBy sf = query.sortBy() == null ? SORT_BY_DEFAULT : query.sortBy();
 
         SingularAttribute<MCRObjectInfoEntity, ?> attribute = switch (sf) {
-            case id -> MCRObjectInfoEntity_.id;
-            case created -> MCRObjectInfoEntity_.createDate;
-            case modified -> MCRObjectInfoEntity_.modifyDate;
+        case id -> MCRObjectInfoEntity_.id;
+        case created -> MCRObjectInfoEntity_.createDate;
+        case modified -> MCRObjectInfoEntity_.modifyDate;
         };
 
         if (query.sortAsc() == null || query.sortAsc() == MCRObjectQuery.SortOrder.asc) {
@@ -237,8 +237,8 @@ public class MCRObjectInfoEntityQueryResolver implements MCRObjectQueryResolver 
             .ifPresent(predicates::add);
 
         Optional.ofNullable(query.status())
-                .map(state -> criteriaBuilder.equal(source.get(MCRObjectInfoEntity_.state), state))
-                .ifPresent(predicates::add);
+            .map(state -> criteriaBuilder.equal(source.get(MCRObjectInfoEntity_.state), state))
+            .ifPresent(predicates::add);
         /*
          per default, we only query not deleted objects, but if the use queries one of the deleted fields
          then deleted objects are included

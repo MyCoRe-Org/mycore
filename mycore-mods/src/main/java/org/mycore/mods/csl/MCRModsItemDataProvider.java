@@ -68,13 +68,13 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     public static final String USABLE_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
         " or @xlink:type='simple')]";
 
-    public static final String SHORT_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)"  +
-            " or @xlink:type='simple') and @type='abbreviated']";
+    public static final String SHORT_TITLE_XPATH = "mods:titleInfo[not(@altFormat) and (not(@xlink:type)" +
+        " or @xlink:type='simple') and @type='abbreviated']";
 
     public static final String MODS_RELATED_ITEM_XPATH = "mods:relatedItem/";
 
     public static final String MODS_ORIGIN_INFO_PUBLICATION = "mods:originInfo[@eventType='publication' or not" +
-            "(@eventType)]";
+        "(@eventType)]";
     public static final String NONE_TYPE = "none";
 
     public static final String URN_RESOLVER_LINK = "https://nbn-resolving.org/";
@@ -89,9 +89,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         .collect(Collectors.toSet());
 
     private final Set<String> droppingParticles = MCRConfiguration2.getString("MCR.CSL.DroppingParticles")
-            .stream()
-            .flatMap(str -> Stream.of(str.split(",")))
-            .collect(Collectors.toSet());
+        .stream()
+        .flatMap(str -> Stream.of(str.split(",")))
+        .collect(Collectors.toSet());
 
     private static Stream<String> getModsElementTextStream(Element element, String elementName) {
         return element.getChildren(elementName, MODS_NAMESPACE)
@@ -115,7 +115,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         processSubject(idb);
 
         CSLItemData build = idb.build();
-        if(LOGGER.isDebugEnabled()){
+        if (LOGGER.isDebugEnabled()) {
             JsonBuilder jsonBuilder = new StringJsonBuilderFactory().createJsonBuilder();
             String str = (String) build.toJson(jsonBuilder);
             LOGGER.debug("Created json object: {}", str);
@@ -136,26 +136,25 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     protected void processLanguage(CSLItemDataBuilder idb) {
         Optional.ofNullable(
-                wrapper.getElement("mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']"))
-                .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
+            wrapper.getElement("mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']"))
+            .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
                 "mods:language/mods:languageTerm[@authority='rfc5646' or @authority='rfc4646']")))
-                .ifPresent(el -> {
-                    idb.language(el.getTextNormalize());
-                });
+            .ifPresent(el -> {
+                idb.language(el.getTextNormalize());
+            });
     }
-
 
     protected void processURL(String id, CSLItemDataBuilder idb) {
         // use 1. urn 2. mods:location/mods:url  3. receive if there is a fulltext  4. url of parent
-      Optional.ofNullable(wrapper.getElement("mods:identifier[@type='urn']"))
-                .map(Element::getTextNormalize)
-                .map((urn)-> URN_RESOLVER_LINK + urn)
-            .or(() ->  Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
-                    .map(Element::getTextNormalize))
+        Optional.ofNullable(wrapper.getElement("mods:identifier[@type='urn']"))
+            .map(Element::getTextNormalize)
+            .map((urn) -> URN_RESOLVER_LINK + urn)
+            .or(() -> Optional.ofNullable(wrapper.getElement("mods:location/mods:url"))
+                .map(Element::getTextNormalize))
             .or(() -> Optional.of(MCRFrontendUtil.getBaseURL() + "receive/" + id)
                 .filter(url -> this.wrapper.getMCRObject().getStructure().getDerivates().size() > 0))
-            .or(()-> Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/mods:location/mods:url"))
-                        .map(Element::getTextNormalize))
+            .or(() -> Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/mods:location/mods:url"))
+                .map(Element::getTextNormalize))
             .ifPresent(idb::URL);
     }
 
@@ -173,21 +172,21 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                     Consumer<String> strFN = null;
                     Consumer<Integer> intFn = null;
                     switch (type) {
-                        case "issue":
-                            strFN = idb::issue;
-                            intFn = idb::issue;
-                            break;
-                        case "volume":
-                            strFN = idb::volume;
-                            intFn = idb::volume;
-                            break;
-                        case "article_number":
-                            intFn = idb::number;
-                            strFN = idb::number;
-                            break;
-                        default:
-                            LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
-                            break;
+                    case "issue":
+                        strFN = idb::issue;
+                        intFn = idb::issue;
+                        break;
+                    case "volume":
+                        strFN = idb::volume;
+                        intFn = idb::volume;
+                        break;
+                    case "article_number":
+                        intFn = idb::number;
+                        strFN = idb::number;
+                        break;
+                    default:
+                        LOGGER.warn("Unknown type " + type + " in mods:detail in " + this.id);
+                        break;
                     }
 
                     try {
@@ -205,7 +204,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         });
 
         final Element modsExtentElement = wrapper
-                .getElement("mods:relatedItem[@type='host']/mods:part/mods:extent[@unit='pages']");
+            .getElement("mods:relatedItem[@type='host']/mods:part/mods:extent[@unit='pages']");
         if (modsExtentElement != null) {
             final String start = modsExtentElement.getChildTextNormalize("start", MODS_NAMESPACE);
             final String end = modsExtentElement.getChildTextNormalize("end", MODS_NAMESPACE);
@@ -239,7 +238,6 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         }
 
     }
-
 
     protected void processGenre(CSLItemDataBuilder idb) {
         final List<Element> elements = wrapper.getElements("mods:genre");
@@ -315,9 +313,9 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected String getGenreStringFromElement(Element genre) {
-        if(genre.getAttributeValue("authorityURI")!=null){
+        if (genre.getAttributeValue("authorityURI") != null) {
             MCRCategoryID categoryID = MCRClassMapper.getCategoryID(genre);
-            if(categoryID==null){
+            if (categoryID == null) {
                 return null;
             }
             return categoryID.getID();
@@ -335,28 +333,28 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     protected void processPublicationData(CSLItemDataBuilder idb) {
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:place/mods:placeTerm"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
-                    MODS_ORIGIN_INFO_PUBLICATION + "/mods:place/mods:placeTerm")))
+                MODS_ORIGIN_INFO_PUBLICATION + "/mods:place/mods:placeTerm")))
             .ifPresent(el -> {
                 idb.publisherPlace(el.getTextNormalize());
             });
 
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:publisher"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
-                    MODS_ORIGIN_INFO_PUBLICATION + "/mods:publisher")))
+                MODS_ORIGIN_INFO_PUBLICATION + "/mods:publisher")))
             .ifPresent(el -> {
                 idb.publisher(el.getTextNormalize());
             });
 
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:edition"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
-                    MODS_ORIGIN_INFO_PUBLICATION + "/mods:edition")))
+                MODS_ORIGIN_INFO_PUBLICATION + "/mods:edition")))
             .ifPresent(el -> {
                 idb.edition(el.getTextNormalize());
             });
 
         Optional.ofNullable(wrapper.getElement(MODS_ORIGIN_INFO_PUBLICATION + "/mods:dateIssued"))
             .or(() -> Optional.ofNullable(wrapper.getElement(MODS_RELATED_ITEM_XPATH +
-                    MODS_ORIGIN_INFO_PUBLICATION + "/mods:dateIssued")))
+                MODS_ORIGIN_INFO_PUBLICATION + "/mods:dateIssued")))
             .ifPresent(el -> {
                 idb.issued(new CSLDateBuilder().raw(el.getTextNormalize()).build());
             });
@@ -380,25 +378,25 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         final String type = identifierElement.getAttributeValue("type");
         final String identifier = identifierElement.getTextNormalize();
         switch (type) {
-            case "doi":
-                idb.DOI(identifier);
-                break;
-            case "isbn":
-                idb.ISBN(identifier);
-                break;
-            case "issn":
-                idb.ISSN(identifier);
-                break;
-            case "pmid":
-                if (!parent) {
-                    idb.PMID(identifier);
-                }
-                break;
-            case "pmcid":
-                if (!parent) {
-                    idb.PMCID(identifier);
-                }
-                break;
+        case "doi":
+            idb.DOI(identifier);
+            break;
+        case "isbn":
+            idb.ISBN(identifier);
+            break;
+        case "issn":
+            idb.ISSN(identifier);
+            break;
+        case "pmid":
+            if (!parent) {
+                idb.PMID(identifier);
+            }
+            break;
+        case "pmcid":
+            if (!parent) {
+                idb.PMCID(identifier);
+            }
+            break;
         }
     }
 
@@ -410,25 +408,25 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         }
 
         final Element titleInfoShortElement = wrapper.getElement(SHORT_TITLE_XPATH);
-        if(titleInfoShortElement != null){
+        if (titleInfoShortElement != null) {
             idb.titleShort(buildShortTitle(titleInfoShortElement));
         }
 
         Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + USABLE_TITLE_XPATH))
             .ifPresent((titleInfo) -> {
-            idb.containerTitleShort(buildShortTitle(titleInfo));
-            idb.containerTitle(buildTitle(titleInfo));
-        });
+                idb.containerTitleShort(buildShortTitle(titleInfo));
+                idb.containerTitle(buildTitle(titleInfo));
+            });
 
         Optional.ofNullable(wrapper.getElement("mods:relatedItem[@type='host']/" + SHORT_TITLE_XPATH))
             .ifPresent((titleInfo) -> {
-            idb.containerTitleShort(buildShortTitle(titleInfo));
-        });
+                idb.containerTitleShort(buildShortTitle(titleInfo));
+            });
 
         wrapper.getElements(".//mods:relatedItem[@type='series']/" + USABLE_TITLE_XPATH).stream()
-                .findFirst().ifPresent((relatedItem)-> {
-            idb.collectionTitle(buildTitle(relatedItem));
-        });
+            .findFirst().ifPresent((relatedItem) -> {
+                idb.collectionTitle(buildTitle(relatedItem));
+            });
     }
 
     protected void processNames(CSLItemDataBuilder idb) {
@@ -436,7 +434,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         HashMap<String, List<CSLName>> roleNameMap = new HashMap<>();
         for (Element modsName : modsNameElements) {
             final CSLName cslName = buildName(modsName);
-            if(isNameEmpty(cslName)) {
+            if (isNameEmpty(cslName)) {
                 continue;
             }
             fillRoleMap(roleNameMap, modsName, cslName);
@@ -445,51 +443,50 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         roleNameMap.forEach((role, list) -> {
             final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
             switch (role) {
-                case "aut":
-                case "inv":
-                    idb.author(cslNames);
-                    break;
-                case "col":
-                    idb.collectionEditor(cslNames);
-                    break;
-                case "edt":
-                    idb.editor(cslNames);
-                    break;
-                case "fmd":
-                    idb.director(cslNames);
-                    break;
-                case "ivr":
-                    idb.interviewer(cslNames);
-                    break;
-                case "ive":
-                    idb.author(cslNames);
-                    break;
-                case "ill":
-                    idb.illustrator(cslNames);
-                    break;
-                case "trl":
-                    idb.translator(cslNames);
-                    break;
-                case "cmp":
-                    idb.composer(cslNames);
-                    break;
-                case "conference-name":
-                case "pup":
-                    idb.event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
-                    break;
-                default:
-                    LOGGER.warn("Unknown person role " + role + " in " + this.id);
-                    break;
+            case "aut":
+            case "inv":
+                idb.author(cslNames);
+                break;
+            case "col":
+                idb.collectionEditor(cslNames);
+                break;
+            case "edt":
+                idb.editor(cslNames);
+                break;
+            case "fmd":
+                idb.director(cslNames);
+                break;
+            case "ivr":
+                idb.interviewer(cslNames);
+                break;
+            case "ive":
+                idb.author(cslNames);
+                break;
+            case "ill":
+                idb.illustrator(cslNames);
+                break;
+            case "trl":
+                idb.translator(cslNames);
+                break;
+            case "cmp":
+                idb.composer(cslNames);
+                break;
+            case "conference-name":
+            case "pup":
+                idb.event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
+                break;
+            default:
+                LOGGER.warn("Unknown person role " + role + " in " + this.id);
+                break;
             }
         });
-
 
         HashMap<String, List<CSLName>> parentRoleMap = new HashMap<>();
         final List<Element> parentModsNameElements = wrapper.getElements("mods:relatedItem/mods:name");
 
         for (Element modsName : parentModsNameElements) {
             final CSLName cslName = buildName(modsName);
-            if(isNameEmpty(cslName)) {
+            if (isNameEmpty(cslName)) {
                 continue;
             }
             fillRoleMap(parentRoleMap, modsName, cslName);
@@ -497,15 +494,15 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         parentRoleMap.forEach((role, list) -> {
             final CSLName[] cslNames = list.toArray(list.toArray(new CSLName[0]));
             switch (role) {
-                case "aut":
-                    idb.containerAuthor(cslNames);
-                    break;
-                case "edt":
-                    idb.collectionEditor(cslNames);
-                    break;
-                default:
-                    // we dont care
-                    break;
+            case "aut":
+                idb.containerAuthor(cslNames);
+                break;
+            case "edt":
+                idb.collectionEditor(cslNames);
+                break;
+            default:
+                // we dont care
+                break;
             }
         });
     }
@@ -521,7 +518,7 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
             }
         } else {
             String nameType = modsName.getAttributeValue("type");
-            if("conference".equals(nameType)){
+            if ("conference".equals(nameType)) {
                 roleNameMap.computeIfAbsent("conference-name", (s) -> new LinkedList<>()).add(cslName);
             }
         }
@@ -544,13 +541,13 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                     final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
                         (t) -> new LinkedList<>());
                     contents.add(content);
-                } else if(("family".equals(type) || "given".equals(type)) && droppingParticles.contains(content)) {
+                } else if (("family".equals(type) || "given".equals(type)) && droppingParticles.contains(content)) {
                     final List<String> contents = typeContentsMap.computeIfAbsent(NON_DROPPING_PARTICLE,
-                            (t) -> new LinkedList<>());
+                        (t) -> new LinkedList<>());
                     contents.add(content);
-                }else {
+                } else {
                     final List<String> contents = typeContentsMap.computeIfAbsent(Optional.ofNullable(type)
-                            .orElse(NONE_TYPE), (t) -> new LinkedList<>());
+                        .orElse(NONE_TYPE), (t) -> new LinkedList<>());
                     contents.add(content);
                 }
             });
@@ -612,8 +609,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
         StringBuilder titleBuilder = new StringBuilder();
 
         titleBuilder.append(Stream.of("nonSort", "title")
-                .flatMap(n -> getModsElementTextStream(titleInfoElement, n))
-                .collect(Collectors.joining(" ")));
+            .flatMap(n -> getModsElementTextStream(titleInfoElement, n))
+            .collect(Collectors.joining(" ")));
 
         final String subTitle = getModsElementTextStream(titleInfoElement, "subTitle").collect(Collectors.joining(" "));
         if (subTitle.length() > 0) {

@@ -85,7 +85,6 @@ public class MCRStateConditionTest extends MCRJPATestCase {
         Assert.assertTrue("State should be 'published'!", mcrStateCondition.matches(holder));
     }
 
-
     @Test
     public void testConditionNotMatch() throws NoSuchFieldException, IllegalAccessException {
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getSuperUserInstance());

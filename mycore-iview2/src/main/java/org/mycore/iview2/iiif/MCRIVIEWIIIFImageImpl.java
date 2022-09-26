@@ -71,8 +71,8 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
     public static final String MAX_BYTES_PROPERTY = "MaxImageBytes";
 
     private static final String TILE_FILE_PROVIDER_PROPERTY = "TileFileProvider";
-    
-    private static final String IDENTIFIER_SEPARATOR_PROPERTY = "IdentifierSeparator"; 
+
+    private static final String IDENTIFIER_SEPARATOR_PROPERTY = "IdentifierSeparator";
 
     private static final Logger LOGGER = LogManager.getLogger(MCRIVIEWIIIFImageImpl.class);
 
@@ -151,19 +151,19 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
 
         BufferedImage targetImage;
         switch (imageQuality) {
-            case bitonal:
-                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
-                break;
-            case gray:
-                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-                break;
-            case color:
-            default:
-                if (transparentFormats.contains(format)) {
-                    targetImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-                } else {
-                    targetImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-                }
+        case bitonal:
+            targetImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
+            break;
+        case gray:
+            targetImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+            break;
+        case color:
+        default:
+            if (transparentFormats.contains(format)) {
+                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+            } else {
+                targetImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+            }
         }
 
         // this value determines the zoom level!
@@ -304,14 +304,14 @@ public class MCRIVIEWIIIFImageImpl extends MCRIIIFImageImpl {
         String separator = getProperties().getOrDefault(IDENTIFIER_SEPARATOR_PROPERTY, "/");
         String[] splittedIdentifier = id.split(separator, 2);
         switch (splittedIdentifier.length) {
-            case 1:
-                tileInfo = new MCRTileInfo(null, identifier, null);
-                break;
-            case 2:
-                tileInfo = new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
-                break;
-            default:
-                throw new MCRIIIFImageNotFoundException(identifier);
+        case 1:
+            tileInfo = new MCRTileInfo(null, identifier, null);
+            break;
+        case 2:
+            tileInfo = new MCRTileInfo(splittedIdentifier[0], splittedIdentifier[1], null);
+            break;
+        default:
+            throw new MCRIIIFImageNotFoundException(identifier);
         }
         return tileInfo;
     }

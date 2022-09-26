@@ -91,7 +91,7 @@ public class MCRWCMSFileBrowserResource {
     @Path("gui/{filename:.*}")
     public Response getResources(@PathParam("filename") String filename) {
         if (filename.startsWith("/") || filename.contains("../")) {
-           return Response.status(Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         if (filename.endsWith(".js")) {
@@ -169,7 +169,7 @@ public class MCRWCMSFileBrowserResource {
     @Path("/files")
     public String getFiles(@QueryParam("path") String path, @QueryParam("type") String type) throws IOException {
         File dir = MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWCMSDataDirPath(), removeLeadingSlash(path))
-                .toFile();
+            .toFile();
         JsonObject jsonObj = new JsonObject();
         JsonArray jsonArray = new JsonArray();
         File[] fileArray = dir.listFiles();
@@ -211,7 +211,7 @@ public class MCRWCMSFileBrowserResource {
     @DELETE
     public Response deleteFile(@QueryParam("path") String path) throws IOException {
         File wcmsDir = MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWCMSDataDirPath(), removeLeadingSlash(path))
-                .toFile();
+            .toFile();
         File wepAppdir = MCRUtils.safeResolve(MCRWebPagesSynchronizer.getWebAppBaseDir().toPath(),
             removeLeadingSlash(path)).toFile();
         if (delete(wcmsDir) && delete(wepAppdir)) {

@@ -39,7 +39,7 @@ import org.mycore.user2.MCRUser;
 public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
 
     private static final String READ_VALUE = "bla";
-    
+
     private static final String WRITE_VALUE = "blu";
 
     private MCRAccessKeyStrategy strategy;
@@ -221,7 +221,7 @@ public class MCRAccessKeyStrategyTest extends MCRAccessKeyTestCase {
         assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_READ));
         assertTrue(strategy.checkPermission(derivateId.toString(), PERMISSION_WRITE));
     }
-    
+
     @Test
     public void testDerivateUser() {
         MCRUser user = new MCRUser("junit");

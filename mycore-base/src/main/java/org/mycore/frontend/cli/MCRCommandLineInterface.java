@@ -101,7 +101,7 @@ public class MCRCommandLineInterface {
         system = MCRConfiguration2.getStringOrThrow("MCR.CommandLineInterface.SystemName") + ":";
 
         initSession();
-        
+
         MCRSession session = MCRSessionMgr.getSession(sessionId.get());
         MCRSessionMgr.setCurrentSession(session);
 
@@ -344,10 +344,10 @@ public class MCRCommandLineInterface {
             throw new IOException("Resource URL is null!");
         }
         try (InputStream is = resourceURL.openStream();
-             InputStreamReader isr = new InputStreamReader(is,  StandardCharsets.UTF_8);
-             BufferedReader reader = new BufferedReader(isr)) {
-                output("Reading commands from resource " + resource);
-                return readCommandsFromBufferedReader(reader);
+            InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+            BufferedReader reader = new BufferedReader(isr)) {
+            output("Reading commands from resource " + resource);
+            return readCommandsFromBufferedReader(reader);
         }
     }
 

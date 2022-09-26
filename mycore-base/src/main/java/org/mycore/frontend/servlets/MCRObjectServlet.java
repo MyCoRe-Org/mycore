@@ -79,7 +79,7 @@ public class MCRObjectServlet extends MCRContentServlet {
             rev = revision;
         }
         MCRContent localObject = (rev == null) ? requestLocalObject(mcrid, resp) : requestVersionedObject(mcrid,
-                resp, rev);
+            resp, rev);
         if (localObject == null) {
             return null;
         }

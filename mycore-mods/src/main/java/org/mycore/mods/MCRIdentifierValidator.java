@@ -34,12 +34,12 @@ public class MCRIdentifierValidator {
             return true;
         }
         switch (type) {
-            case "isbn":
-                return checkISBN(value);
-            case "doi":
-                return checkDOI(value);
-            default:
-                return true;
+        case "isbn":
+            return checkISBN(value);
+        case "doi":
+            return checkDOI(value);
+        default:
+            return true;
         }
     }
 

@@ -134,17 +134,17 @@ public class MCRUserManagerTest extends MCRUserTestCase {
         assertTrue("User is not in group " + groupName, user.getSystemRoleIDs().contains(groupName));
 
         final List<MCRUserAttribute> attributes = user.getAttributes()
-                .stream()
-                .filter(attr -> attr.getName().equals("id_key1"))
-                .collect(Collectors.toList());
+            .stream()
+            .filter(attr -> attr.getName().equals("id_key1"))
+            .collect(Collectors.toList());
 
         assertEquals("There should be two (id_key1) attributes", 2, attributes.size());
 
         final MCRUserAttribute value2Attr = attributes
-                .stream()
-                .filter(attr-> attr.getValue().equals("value2"))
-                .findFirst()
-                .get();
+            .stream()
+            .filter(attr -> attr.getValue().equals("value2"))
+            .findFirst()
+            .get();
 
         user.getAttributes().retainAll(List.of(value2Attr));
         MCRUserManager.updateUser(user);

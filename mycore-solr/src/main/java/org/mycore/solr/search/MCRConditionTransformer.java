@@ -96,20 +96,20 @@ public class MCRConditionTransformer {
         String operator = qCond.getOperator();
         usedFields.add(field);
         switch (operator) {
-            case "like":
-            case "contains":
-                return getTermQuery(field, value.trim());
-            case "=":
-            case "phrase":
-                return getPhraseQuery(field, value);
-            case "<":
-                return getLTQuery(field, value);
-            case "<=":
-                return getLTEQuery(field, value);
-            case ">":
-                return getGTQuery(field, value);
-            case ">=":
-                return getGTEQuery(field, value);
+        case "like":
+        case "contains":
+            return getTermQuery(field, value.trim());
+        case "=":
+        case "phrase":
+            return getPhraseQuery(field, value);
+        case "<":
+            return getLTQuery(field, value);
+        case "<=":
+            return getLTEQuery(field, value);
+        case ">":
+            return getGTQuery(field, value);
+        case ">=":
+            return getGTEQuery(field, value);
         }
         throw new UnsupportedOperationException("Do not know how to handle operator: " + operator);
     }
@@ -126,7 +126,7 @@ public class MCRConditionTransformer {
 
     @SuppressWarnings("rawtypes")
     private static StringBuilder handleSetConditionExplicit(MCRSetCondition<MCRCondition> setCond,
-                                                            Set<String> usedFields) {
+        Set<String> usedFields) {
         List<MCRCondition<MCRCondition>> children = setCond.getChildren();
         if (children.isEmpty()) {
             return null;
@@ -147,8 +147,8 @@ public class MCRConditionTransformer {
 
     @SuppressWarnings("rawtypes")
     private static StringBuilder handleSetConditionDefault(MCRSetCondition<MCRCondition> setCond,
-                                                           Set<String> usedFields,
-                                                           boolean subCondition) {
+        Set<String> usedFields,
+        boolean subCondition) {
         boolean stripPlus;
         if (setCond instanceof MCROrCondition) {
             stripPlus = true;
@@ -187,7 +187,7 @@ public class MCRConditionTransformer {
         StringBuilder sb = new StringBuilder();
         sb.append("-");
         StringBuilder solrQueryString = toSolrQueryString(child, usedFields, true);
-        if(!explicitAndOrMapping()) {
+        if (!explicitAndOrMapping()) {
             stripPlus(solrQueryString);
         }
         if (solrQueryString == null || solrQueryString.length() == 0) {
@@ -234,7 +234,7 @@ public class MCRConditionTransformer {
             return null;
         }
         StringBuilder sb = new StringBuilder();
-        if(!explicitAndOrMapping()) {
+        if (!explicitAndOrMapping()) {
             sb.append('+');
         }
         sb.append(field);
@@ -252,7 +252,7 @@ public class MCRConditionTransformer {
 
     public static StringBuilder getPhraseQuery(String field, String value) {
         StringBuilder sb = new StringBuilder();
-        if(!explicitAndOrMapping()) {
+        if (!explicitAndOrMapping()) {
             sb.append('+');
         }
         sb.append(field);

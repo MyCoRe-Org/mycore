@@ -14,8 +14,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
  */
 
 package org.mycore.mods.csl;
@@ -45,7 +43,7 @@ public class MCRListModsItemDataProvider extends MCRItemDataProvider {
 
     protected static MCRCache<String, CSLItemData> cslCache = new MCRCache<>(2000, "CSL Mods Data");
 
-    private LinkedHashMap<String , CSLItemData> store = new LinkedHashMap<>();
+    private LinkedHashMap<String, CSLItemData> store = new LinkedHashMap<>();
 
     @Override
     public void addContent(MCRContent content) throws IOException, JDOMException, SAXException {

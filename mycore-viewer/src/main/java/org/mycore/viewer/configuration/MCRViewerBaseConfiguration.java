@@ -59,7 +59,7 @@ public abstract class MCRViewerBaseConfiguration extends MCRViewerConfiguration 
         setProperty("adminMail", MCRConfiguration2.getString("MCR.Mail.Recipients").orElse(""));
 
         final String canvasOverviewEnabled = MCRConfiguration2.getString("MCR.Viewer.canvas.overview.enabled")
-                .orElse("true");
+            .orElse("true");
         setProperty("canvas.overview.enabled", Boolean.valueOf(canvasOverviewEnabled));
 
         final String canvasOverviewCanvasOverviewMinVisibleSize = MCRConfiguration2

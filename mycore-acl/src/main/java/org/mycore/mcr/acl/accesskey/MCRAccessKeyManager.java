@@ -2,20 +2,18 @@
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.mcr.acl.accesskey;
@@ -111,23 +109,23 @@ public final class MCRAccessKeyManager {
      */
     public static String hashSecret(final String secret, final MCRObjectID objectId) throws MCRException {
         switch (SECRET_STORAGE_MODE) {
-            case "plain":
-                return secret;
-            case "crypt":
-                try {
-                    final MCRCipher cipher = MCRCipherManager.getCipher("accesskey");
-                    return cipher.encrypt(objectId.toString() + secret);
-                } catch (MCRCryptKeyFileNotFoundException | MCRCryptKeyNoPermissionException e) {
-                    throw new MCRException(e);
-                }
-            case "hash":
-                try {
-                    return MCRUtils.asSHA256String(HASHING_ITERATIONS, objectId.toString().getBytes(UTF_8), secret);
-                } catch(NoSuchAlgorithmException e) {
-                    throw new MCRException("Cannot hash secret.", e);
-                }
-            default:
-                throw new MCRException("Please configure a valid storage mode for secret.");
+        case "plain":
+            return secret;
+        case "crypt":
+            try {
+                final MCRCipher cipher = MCRCipherManager.getCipher("accesskey");
+                return cipher.encrypt(objectId.toString() + secret);
+            } catch (MCRCryptKeyFileNotFoundException | MCRCryptKeyNoPermissionException e) {
+                throw new MCRException(e);
+            }
+        case "hash":
+            try {
+                return MCRUtils.asSHA256String(HASHING_ITERATIONS, objectId.toString().getBytes(UTF_8), secret);
+            } catch (NoSuchAlgorithmException e) {
+                throw new MCRException("Cannot hash secret.", e);
+            }
+        default:
+            throw new MCRException("Please configure a valid storage mode for secret.");
         }
     }
 
@@ -164,7 +162,7 @@ public final class MCRAccessKeyManager {
      * @param accessKey access key with hashed secret
      * @throws MCRException key is not valid
      */
-    private static synchronized void addAccessKey(final MCRObjectID objectId, final MCRAccessKey accessKey) 
+    private static synchronized void addAccessKey(final MCRObjectID objectId, final MCRAccessKey accessKey)
         throws MCRException {
         final String secret = accessKey.getSecret();
         if (secret == null) {
@@ -195,7 +193,7 @@ public final class MCRAccessKeyManager {
      * @param accessKeys the {@link MCRAccessKey} list
      * @throws MCRAccessKeyException key is not valid
      */
-    public static synchronized void addAccessKeys(final MCRObjectID objectId, final List<MCRAccessKey> accessKeys) 
+    public static synchronized void addAccessKeys(final MCRObjectID objectId, final List<MCRAccessKey> accessKeys)
         throws MCRAccessKeyException {
         for (MCRAccessKey accessKey : accessKeys) { //Transaktion
             addAccessKey(objectId, accessKey);
@@ -282,7 +280,7 @@ public final class MCRAccessKeyManager {
             accessKey.setLastModified(new Date());
             final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
             em.merge(accessKey);
-        } else { 
+        } else {
             LOGGER.debug("Key does not exist.");
             throw new MCRAccessKeyNotFoundException("Key does not exist.");
         }
@@ -305,7 +303,7 @@ public final class MCRAccessKeyManager {
             .findFirst()
             .orElse(null);
         if (accessKey != null) {
-          em.detach(accessKey);
+            em.detach(accessKey);
         }
         return accessKey;
     }
@@ -317,7 +315,7 @@ public final class MCRAccessKeyManager {
      * @param type the type
      * @return {@link MCRAccessKey} list
      */
-    public static synchronized List<MCRAccessKey> listAccessKeysWithType(final MCRObjectID objectId, 
+    public static synchronized List<MCRAccessKey> listAccessKeysWithType(final MCRObjectID objectId,
         final String type) {
         final EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
         final List<MCRAccessKey> accessKeys = em.createNamedQuery("MCRAccessKey.getWithType", MCRAccessKey.class)

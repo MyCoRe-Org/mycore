@@ -49,7 +49,6 @@ public abstract class MCRUploadHelper {
 
     private static final Pattern PATH_SEPERATOR = Pattern.compile(Pattern.quote(File.separator.replace('\\', '/')));
 
-
     public static final String FILE_NAME_PATTERN_PROPERTY = "MCR.FileUpload.FileNamePattern";
 
     public static final String FILE_NAME_PATTERN = MCRConfiguration2.getStringOrThrow(FILE_NAME_PATTERN_PROPERTY);
@@ -98,7 +97,7 @@ public abstract class MCRUploadHelper {
             checkInvalidCharacters(pathElement);
         });
         String actualFileName = pathParts.get(pathParts.size() - 1);
-        if(checkFilePattern && !FILE_NAME_PREDICATE.test(actualFileName)){
+        if (checkFilePattern && !FILE_NAME_PREDICATE.test(actualFileName)) {
             throw new MCRException(
                 "File name does not match " + FILE_NAME_PATTERN + " defined in " + FILE_NAME_PATTERN_PROPERTY + "!");
         }

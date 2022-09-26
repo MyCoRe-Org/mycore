@@ -100,28 +100,28 @@ public class MCRModsClassificationURIResolver implements URIResolver {
             .toArray(String[]::new);
         MCRAuthorityInfo authInfo = null;
         switch (decodedPathSegments[0]) {
-            case "uri":
-                if (decodedPathSegments.length == 3) {
-                    authInfo = new MCRAuthorityWithURI(decodedPathSegments[1], decodedPathSegments[2]);
-                }
-                break;
-            case "authority":
-                if (decodedPathSegments.length == 3) {
-                    authInfo = new MCRAuthorityAndCode(decodedPathSegments[1], decodedPathSegments[2]);
-                }
-                break;
-            case "accessCondition":
-                if (decodedPathSegments.length == 2) {
-                    authInfo = new MCRAccessCondition(decodedPathSegments[1]);
-                }
-                break;
-            case "typeOfResource":
-                if (decodedPathSegments.length == 2) {
-                    authInfo = new MCRTypeOfResource(decodedPathSegments[1]);
-                }
-                break;
-            default:
-                authInfo = null;
+        case "uri":
+            if (decodedPathSegments.length == 3) {
+                authInfo = new MCRAuthorityWithURI(decodedPathSegments[1], decodedPathSegments[2]);
+            }
+            break;
+        case "authority":
+            if (decodedPathSegments.length == 3) {
+                authInfo = new MCRAuthorityAndCode(decodedPathSegments[1], decodedPathSegments[2]);
+            }
+            break;
+        case "accessCondition":
+            if (decodedPathSegments.length == 2) {
+                authInfo = new MCRAccessCondition(decodedPathSegments[1]);
+            }
+            break;
+        case "typeOfResource":
+            if (decodedPathSegments.length == 2) {
+                authInfo = new MCRTypeOfResource(decodedPathSegments[1]);
+            }
+            break;
+        default:
+            authInfo = null;
         }
         LOGGER.debug("authinfo {}", authInfo);
         return Optional.ofNullable(authInfo);

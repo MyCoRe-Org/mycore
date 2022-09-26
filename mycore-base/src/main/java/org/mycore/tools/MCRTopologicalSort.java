@@ -104,39 +104,39 @@ public class MCRTopologicalSort<T> {
                 XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(br);
                 while (xmlStreamReader.hasNext()) {
                     switch (xmlStreamReader.getEventType()) {
-                        case XMLStreamConstants.START_ELEMENT:
-                            if (xmlStreamReader.getLocalName().equals("mycoreobject")) {
-                                ts.getNodes().forcePut(i, xmlStreamReader
-                                    .getAttributeValue(null, "ID"));
-                            } else {
-                                String href = xmlStreamReader
-                                    .getAttributeValue("http://www.w3.org/1999/xlink", "href");
-                                if (xmlStreamReader.getLocalName().equals("parent")) {
-                                    List<String> dependencyList = parentNames.computeIfAbsent(i,
-                                        e -> new ArrayList<>());
+                    case XMLStreamConstants.START_ELEMENT:
+                        if (xmlStreamReader.getLocalName().equals("mycoreobject")) {
+                            ts.getNodes().forcePut(i, xmlStreamReader
+                                .getAttributeValue(null, "ID"));
+                        } else {
+                            String href = xmlStreamReader
+                                .getAttributeValue("http://www.w3.org/1999/xlink", "href");
+                            if (xmlStreamReader.getLocalName().equals("parent")) {
+                                List<String> dependencyList = parentNames.computeIfAbsent(i,
+                                    e -> new ArrayList<>());
+                                dependencyList.add(
+                                    href);
+                            } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
+                                if (MCRObjectID.isValid(
+                                    href)) {
+                                    List<String> dependencyList = parentNames
+                                        .computeIfAbsent(i, e -> new ArrayList<>());
                                     dependencyList.add(
                                         href);
-                                } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
-                                    if (MCRObjectID.isValid(
-                                        href)) {
-                                        List<String> dependencyList = parentNames
-                                            .computeIfAbsent(i, e -> new ArrayList<>());
-                                        dependencyList.add(
-                                            href);
-                                    }
-                                } else if (xmlStreamReader.getLocalName().equals("metadata")) {
-                                    break;
                                 }
+                            } else if (xmlStreamReader.getLocalName().equals("metadata")) {
+                                break;
                             }
-                            break;
+                        }
+                        break;
 
-                        case XMLStreamConstants.END_ELEMENT:
-                            if (xmlStreamReader.getLocalName().equals("parents")) {
-                                break;
-                            } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
-                                break;
-                            }
+                    case XMLStreamConstants.END_ELEMENT:
+                        if (xmlStreamReader.getLocalName().equals("parents")) {
                             break;
+                        } else if (xmlStreamReader.getLocalName().equals("relatedItem")) {
+                            break;
+                        }
+                        break;
                     }
                     xmlStreamReader.next();
                 }
@@ -193,16 +193,16 @@ public class MCRTopologicalSort<T> {
     public void reset() {
         nodes.clear();
         edgeSources.clear();
-        dirty=false;
+        dirty = false;
     }
-    
+
     /**
      * return the Map of Integer to NodeObjects
      */
     public BiMap<Integer, T> getNodes() {
         return nodes;
     }
-    
+
     /**
      * add a node to the graph
      * @param name - the node name

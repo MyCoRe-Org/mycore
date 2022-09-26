@@ -149,28 +149,28 @@ public class MCRTileCombineServlet extends MCRServlet {
                 LOGGER.info("IView2 file: {}", iviewFile);
                 int zoomLevel = 0;
                 switch (zoomAlias) {
-                    case "MIN":
-                        zoomLevel = 1;
-                        break;
-                    case "MID":
-                        zoomLevel = 2;
-                        break;
-                    case "MAX":
-                        zoomLevel = 3;
-                        break;
+                case "MIN":
+                    zoomLevel = 1;
+                    break;
+                case "MID":
+                    zoomLevel = 2;
+                    break;
+                case "MAX":
+                    zoomLevel = 3;
+                    break;
                 }
                 HttpServletResponse response = job.getResponse();
                 if (zoomLevel > maxZoomLevel) {
                     switch (maxZoomLevel) {
-                        case 2:
-                            zoomAlias = "MID";
-                            break;
-                        case 1:
-                            zoomAlias = "MIN";
-                            break;
-                        default:
-                            zoomAlias = "THUMB";
-                            break;
+                    case 2:
+                        zoomAlias = "MID";
+                        break;
+                    case 1:
+                        zoomAlias = "MIN";
+                        break;
+                    default:
+                        zoomAlias = "THUMB";
+                        break;
                     }
                     if (!imagePath.startsWith("/")) {
                         imagePath = "/" + imagePath;

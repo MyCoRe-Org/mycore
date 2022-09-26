@@ -300,14 +300,14 @@ public class MCRDOIService extends MCRDOIBaseService {
     public void delete(MCRDigitalObjectIdentifier doi, MCRBase obj, String additional)
         throws MCRPersistentIdentifierException {
         if (hasRegistrationStarted(obj.getId(), additional) || this.isRegistered(obj.getId(), additional)) {
-                LOGGER.warn("Object {} with registered doi {} got deleted. Try to set DOI inactive.", obj.getId(),
-                    doi.asString());
-                if (this.isRegistered(obj.getId(), additional)) {
-                    HashMap<String, String> contextParameters = new HashMap<>();
-                    contextParameters.put(CONTEXT_DOI, doi.asString());
-                    contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
-                    this.addDeleteJob(contextParameters);
-                }
+            LOGGER.warn("Object {} with registered doi {} got deleted. Try to set DOI inactive.", obj.getId(),
+                doi.asString());
+            if (this.isRegistered(obj.getId(), additional)) {
+                HashMap<String, String> contextParameters = new HashMap<>();
+                contextParameters.put(CONTEXT_DOI, doi.asString());
+                contextParameters.put(CONTEXT_OBJ, obj.getId().toString());
+                this.addDeleteJob(contextParameters);
+            }
         }
     }
 

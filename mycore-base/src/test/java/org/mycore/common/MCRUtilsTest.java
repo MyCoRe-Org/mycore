@@ -47,7 +47,6 @@ public class MCRUtilsTest extends MCRTestCase {
     @Rule
     public TemporaryFolder evilDir = new TemporaryFolder();
 
-
     /**
      * Test method for {@link org.mycore.common.MCRUtils#asSHA1String(int, byte[], String)}.
      */
@@ -77,12 +76,12 @@ public class MCRUtilsTest extends MCRTestCase {
     }
 
     @Test(expected = MCRException.class)
-    public final void testResolveEvil(){
+    public final void testResolveEvil() {
         MCRUtils.safeResolve(baseDir.getRoot().toPath(), evilDir.getRoot().toPath());
     }
 
     @Test
-    public final void testResolve(){
+    public final void testResolve() {
         Path path = baseDir.getRoot().toPath();
         Path resolve = MCRUtils.safeResolve(path, "foo", "bar");
         Assert.assertEquals(path.resolve("foo").resolve("bar"), resolve);

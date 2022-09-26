@@ -1,19 +1,19 @@
 /*
- *  This file is part of ***  M y C o R e  ***
- *  See http://www.mycore.de/ for details.
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
  *
- *  MyCoRe is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * MyCoRe is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  MyCoRe is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * MyCoRe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.mycore.frontend.servlets;
@@ -28,7 +28,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
-
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -47,7 +46,7 @@ public class MCRConfigHelperServlet extends HttpServlet {
 
     private Date lastChange;
     private String resultJson;
-    
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -123,8 +122,8 @@ public class MCRConfigHelperServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setHeader("Cache-Control","public");
-        resp.setHeader("Cache-Control","max-age=120");
+        resp.setHeader("Cache-Control", "public");
+        resp.setHeader("Cache-Control", "max-age=120");
 
         if (req.getDateHeader("If-Modified-Since") > lastChange.getTime()) {
             resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);

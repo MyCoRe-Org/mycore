@@ -154,17 +154,17 @@ public class MCRRestAPISearch {
 
                 String contentType;
                 switch (wt) {
-                    case FORMAT_XML:
-                        contentType = "application/xml; charset=UTF-8";
-                        break;
-                    case FORMAT_JSON:
-                        contentType = "application/json; charset=UTF-8";
-                        break;
-                    case FORMAT_CSV:
-                        contentType = "text/comma-separated-values; charset=UTF-8";
-                        break;
-                    default:
-                        contentType = "text";
+                case FORMAT_XML:
+                    contentType = "application/xml; charset=UTF-8";
+                    break;
+                case FORMAT_JSON:
+                    contentType = "application/json; charset=UTF-8";
+                    break;
+                case FORMAT_CSV:
+                    contentType = "text/comma-separated-values; charset=UTF-8";
+                    break;
+                default:
+                    contentType = "text";
                 }
                 return Response.ok(text)
                     .type(contentType)

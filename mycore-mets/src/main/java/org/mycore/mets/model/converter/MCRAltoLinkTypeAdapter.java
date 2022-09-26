@@ -52,15 +52,15 @@ public class MCRAltoLinkTypeAdapter extends TypeAdapter<MCRMetsAltoLink> {
         jsonReader.beginObject();
         while (jsonReader.hasNext()) {
             switch (jsonReader.nextName()) {
-                case "altoFile":
-                    fileID = jsonReader.nextString();
-                    break;
-                case "begin":
-                    begin = jsonReader.nextString();
-                    break;
-                case "end":
-                    end = jsonReader.nextString();
-                    break;
+            case "altoFile":
+                fileID = jsonReader.nextString();
+                break;
+            case "begin":
+                begin = jsonReader.nextString();
+                break;
+            case "end":
+                end = jsonReader.nextString();
+                break;
             }
         }
         jsonReader.endObject();

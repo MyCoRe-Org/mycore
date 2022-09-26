@@ -121,7 +121,8 @@ public class MCRUserTransformerTest extends MCRUserTestCase {
         m.marshal(mp, System.out);
 
         Unmarshaller u = jc.createUnmarshaller();
-        String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><root><entry key=\"key2\">value2</entry><entry key=\"key1\">value1</entry></root>";
+        String xmlStr
+            = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><root><entry key=\"key2\">value2</entry><entry key=\"key1\">value1</entry></root>";
         HashMapTest2 mp2 = (HashMapTest2) u.unmarshal(new StreamSource(new StringReader(xmlStr)));
         m.marshal(mp2, System.out);
     }

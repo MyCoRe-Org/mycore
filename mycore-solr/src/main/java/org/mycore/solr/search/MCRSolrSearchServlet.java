@@ -117,14 +117,14 @@ public class MCRSolrSearchServlet extends MCRServlet {
                 continue;
             }
             switch (queryType) {
-                case term:
-                    query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
-                    break;
-                case phrase:
-                    query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
-                    break;
-                default:
-                    throw new ServletException("Query type is unsupported: " + queryType);
+            case term:
+                query.append(MCRConditionTransformer.getTermQuery(fieldName, fieldValue));
+                break;
+            case phrase:
+                query.append(MCRConditionTransformer.getPhraseQuery(fieldName, fieldValue));
+                break;
+            default:
+                throw new ServletException("Query type is unsupported: " + queryType);
             }
             query.append(' ');
         }
@@ -303,26 +303,26 @@ public class MCRSolrSearchServlet extends MCRServlet {
             SolrParameterGroup parameterGroup = getParameterType(parameterName);
 
             switch (parameterGroup) {
-                case SolrParameter:
-                    solrParameter.put(parameterName, currentEntry.getValue());
-                    break;
-                case TypeParameter:
-                    typeParameter.put(parameterName, currentEntry.getValue());
-                    break;
-                case QueryParameter:
-                    String[] strings = currentEntry.getValue();
-                    for (String v : strings) {
-                        if (v != null && v.length() > 0) {
-                            queryParameter.put(parameterName, currentEntry.getValue());
-                        }
+            case SolrParameter:
+                solrParameter.put(parameterName, currentEntry.getValue());
+                break;
+            case TypeParameter:
+                typeParameter.put(parameterName, currentEntry.getValue());
+                break;
+            case QueryParameter:
+                String[] strings = currentEntry.getValue();
+                for (String v : strings) {
+                    if (v != null && v.length() > 0) {
+                        queryParameter.put(parameterName, currentEntry.getValue());
                     }
-                    break;
-                case SortParameter:
-                    sortParameter.put(parameterName, currentEntry.getValue());
-                    break;
-                default:
-                    LOGGER.warn("Unknown parameter group. That should not happen.");
-                    continue;
+                }
+                break;
+            case SortParameter:
+                sortParameter.put(parameterName, currentEntry.getValue());
+                break;
+            default:
+                LOGGER.warn("Unknown parameter group. That should not happen.");
+                continue;
             }
         }
     }

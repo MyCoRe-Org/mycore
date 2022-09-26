@@ -51,17 +51,17 @@ public enum MCRRestAPIACLPermission {
 
     public static MCRRestAPIACLPermission fromMethod(final String method) {
         switch (method) {
-            case HttpMethod.GET:
-            case HttpMethod.HEAD:
-                return READ;
-            case HttpMethod.DELETE:
-                return DELETE;
-            case HttpMethod.POST:
-            case HttpMethod.PUT:
-            case HttpMethod.PATCH:
-                return WRITE;
-            default:
-                return null;
+        case HttpMethod.GET:
+        case HttpMethod.HEAD:
+            return READ;
+        case HttpMethod.DELETE:
+            return DELETE;
+        case HttpMethod.POST:
+        case HttpMethod.PUT:
+        case HttpMethod.PATCH:
+            return WRITE;
+        default:
+            return null;
         }
     }
 }

@@ -35,9 +35,9 @@ import com.google.gson.JsonPrimitive;
  *
  */
 public class MCRJSONUtils {
-    
+
     public static Gson createGSON() {
-        return  new GsonBuilder()
+        return new GsonBuilder()
             .setPrettyPrinting()
             .create();
     }

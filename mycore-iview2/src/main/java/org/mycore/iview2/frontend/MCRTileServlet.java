@@ -154,10 +154,10 @@ public class MCRTileServlet extends HttpServlet {
             int cnt = 0;
             while (--pos > 0 && cnt < 3) {
                 switch (imagePath.charAt(pos)) {
-                    case '/':
-                        cnt++;
-                        break;
-                    default:
+                case '/':
+                    cnt++;
+                    break;
+                default:
                 }
             }
             tile = imagePath.substring(pos + 2);

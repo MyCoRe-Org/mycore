@@ -147,7 +147,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
         return false;
     }
 
-    public boolean checkPermission(String checkID, String permission, List<MCRFact> baseFacts){
+    public boolean checkPermission(String checkID, String permission, List<MCRFact> baseFacts) {
         String action = permission.replaceAll("db$", ""); // writedb -> write
 
         String target; // metadata|files|webpage
@@ -181,7 +181,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
                 target = "webpage";
             } else if (checkID.startsWith("solr")) {
                 target = "solr";
-            } else if(isCategory(checkID)){
+            } else if (isCategory(checkID)) {
                 target = "category";
             } else {
                 target = "unknown";
@@ -212,7 +212,7 @@ public class MCRFactsAccessSystem implements MCRAccessInterface, MCRAccessCheckS
     }
 
     private boolean isCategory(String checkID) {
-        if(!MCRCategoryID.isValid(checkID)) {
+        if (!MCRCategoryID.isValid(checkID)) {
             return false;
         }
         try {

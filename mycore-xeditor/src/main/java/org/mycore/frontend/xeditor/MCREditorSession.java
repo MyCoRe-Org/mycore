@@ -96,7 +96,7 @@ public class MCREditorSession {
     }
 
     public void update(MCRParameterCollector collector) {
-        String currentLang =  collector.getParameter("CurrentLang", null);
+        String currentLang = collector.getParameter("CurrentLang", null);
         if (currentLang != null) {
             variables.put("CurrentLang", currentLang);
         }

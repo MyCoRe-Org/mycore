@@ -34,7 +34,8 @@ public class MCRAbstractMergerTest extends MCRTestCase {
     @Test
     public void testXLink() throws Exception {
         String a = "[mods:abstract[@xlink:href='foo']]";
-        String b = "[mods:abstract[@xml:lang='de'][@xlink:href='foo']][mods:abstract[@xml:lang='en'][@xlink:href='bar']]";
+        String b
+            = "[mods:abstract[@xml:lang='de'][@xlink:href='foo']][mods:abstract[@xml:lang='en'][@xlink:href='bar']]";
         MCRMergerTest.test(a, b, b);
     }
 

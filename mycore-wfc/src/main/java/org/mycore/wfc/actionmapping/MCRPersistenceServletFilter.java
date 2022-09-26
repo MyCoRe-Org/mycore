@@ -70,16 +70,16 @@ public class MCRPersistenceServletFilter implements Filter {
         Map<String, String[]> parameterMap = req.getParameterMap();
         for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
             switch (entry.getValue().length) {
-                case 0:
-                    break;
-                case 1:
-                    if (!entry.getKey().equals("layout")) {
-                        req.setAttribute(entry.getKey(), entry.getValue()[0]);
-                    }
-                    break;
-                default:
-                    req.setAttribute(entry.getKey(), entry.getValue());
-                    break;
+            case 0:
+                break;
+            case 1:
+                if (!entry.getKey().equals("layout")) {
+                    req.setAttribute(entry.getKey(), entry.getValue()[0]);
+                }
+                break;
+            default:
+                req.setAttribute(entry.getKey(), entry.getValue());
+                break;
             }
         }
     }

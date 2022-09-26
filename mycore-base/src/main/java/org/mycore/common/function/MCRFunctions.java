@@ -49,38 +49,38 @@ public class MCRFunctions {
         while (nextPos < globPattern.length()) {
             final char c = globPattern.charAt(nextPos++);
             switch (c) {
-                //Character handling
-                case '\\':
-                    nextPos = escapeCharacter(regex, globPattern, nextPos);
-                    break;
-                case '[':
-                    nextPos = addCharacterClass(regex, globPattern, nextPos);
-                    break;
-                case '*':
-                    nextPos = handleWildcard(regex, globPattern, nextPos);
-                    break;
-                case '?':
-                    regex.append("[^/]");
-                    break;
-                //Group handling
-                case '{':
-                    isInGroup = startGroup(regex, globPattern, nextPos, isInGroup);
-                    break;
-                case '}':
-                    isInGroup = endGroup(regex, isInGroup);
-                    break;
-                case ',':
-                    if (isInGroup) {
-                        regex.append(")|(?:");//separate values
-                    } else {
-                        regex.append(',');
-                    }
-                    break;
-                default:
-                    if (isRegexReserved(c)) {
-                        regex.append('\\');
-                    }
-                    regex.append(c);
+            //Character handling
+            case '\\':
+                nextPos = escapeCharacter(regex, globPattern, nextPos);
+                break;
+            case '[':
+                nextPos = addCharacterClass(regex, globPattern, nextPos);
+                break;
+            case '*':
+                nextPos = handleWildcard(regex, globPattern, nextPos);
+                break;
+            case '?':
+                regex.append("[^/]");
+                break;
+            //Group handling
+            case '{':
+                isInGroup = startGroup(regex, globPattern, nextPos, isInGroup);
+                break;
+            case '}':
+                isInGroup = endGroup(regex, isInGroup);
+                break;
+            case ',':
+                if (isInGroup) {
+                    regex.append(")|(?:");//separate values
+                } else {
+                    regex.append(',');
+                }
+                break;
+            default:
+                if (isRegexReserved(c)) {
+                    regex.append('\\');
+                }
+                regex.append(c);
             }
         }
 

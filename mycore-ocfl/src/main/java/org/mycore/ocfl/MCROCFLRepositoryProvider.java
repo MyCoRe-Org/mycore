@@ -29,11 +29,11 @@ public abstract class MCROCFLRepositoryProvider {
 
     public static final String REPOSITORY_PROPERTY_PREFIX = "MCR.OCFL.Repository.";
 
-    public static OcflRepository getRepository(String id){
+    public static OcflRepository getRepository(String id) {
         return MCRConfiguration2.getSingleInstanceOf(REPOSITORY_PROPERTY_PREFIX + id)
-                .map(MCROCFLRepositoryProvider.class::cast)
-                .get()
-                .getRepository();
+            .map(MCROCFLRepositoryProvider.class::cast)
+            .get()
+            .getRepository();
     }
 
     public abstract OcflRepository getRepository();

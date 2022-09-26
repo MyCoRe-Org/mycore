@@ -90,7 +90,7 @@ public class MCRRoleServlet extends MCRServlet {
     @Override
     protected void think(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
-        if(!MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)){
+        if (!MCRAccessManager.checkPermission(MCRUser2Constants.USER_ADMIN_PERMISSION)) {
             final String errorMessage = MCRTranslation.translate("component.user2.message.notAllowedChangeRole");
             job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, errorMessage);
         }

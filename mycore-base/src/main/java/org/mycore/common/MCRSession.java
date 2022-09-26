@@ -144,7 +144,6 @@ public class MCRSession implements Cloneable {
         });
     }
 
-
     /**
      * The constructor of a MCRSession. As default the user ID is set to the value of the property variable named
      * 'MCR.Users.Guestuser.UserName'.

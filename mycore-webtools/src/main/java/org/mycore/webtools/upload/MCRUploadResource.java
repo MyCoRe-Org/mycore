@@ -278,8 +278,8 @@ public class MCRUploadResource {
         String actualStringFileName = Paths.get(path).getFileName().toString();
         try {
             MCRUploadHelper.checkPathName(actualStringFileName);
-        } catch (MCRException e){
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(),e.getMessage()).build();
+        } catch (MCRException e) {
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage()).build();
         }
 
         long sizeL = Long.parseLong(size);
@@ -322,7 +322,7 @@ public class MCRUploadResource {
         String actualStringFileName = bucket.getRoot().relativize(filePath).getFileName().toString();
         try {
             MCRUploadHelper.checkPathName(actualStringFileName);
-        } catch (MCRException e){
+        } catch (MCRException e) {
             throw new ClientErrorException(e.getMessage(), Response.Status.BAD_REQUEST.getStatusCode());
         }
 

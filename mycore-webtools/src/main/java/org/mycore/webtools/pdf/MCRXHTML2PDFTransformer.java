@@ -83,7 +83,6 @@ public class MCRXHTML2PDFTransformer extends MCRContentTransformer {
         return fontProvider;
     }
 
-
     @Override
     public String getFileExtension() throws Exception {
         return "pdf";

@@ -63,9 +63,9 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         .orElse(MCRConstants.DEFAULT_LANG);
 
     protected static final String DEFAULT_ELEMENT_DATAPART = "metadata";
-    
+
     protected static final String DEFAULT_ATTRIBUTE_INHERITED = "inherited";
-    
+
     protected static final String DEFAULT_ATTRIBUTE_LANG = "lang";
 
     protected static final String DEFAULT_ATTRIBUTE_SEQUENCE = "sequence";
@@ -340,7 +340,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         if (getType() != null && getType().length() > 0) {
             elm.setAttribute(DEFAULT_ATTRIBUTE_TYPE, getType());
         }
-        if (getSequence() >= 0) { 
+        if (getSequence() >= 0) {
             elm.setAttribute(DEFAULT_ATTRIBUTE_SEQUENCE, Integer.toString(getSequence()));
         }
         elm.setAttribute(DEFAULT_ATTRIBUTE_INHERITED, Integer.toString(getInherited()));
@@ -367,7 +367,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
         if (getType() != null) {
             obj.addProperty(DEFAULT_ATTRIBUTE_TYPE, getType());
         }
-        if (getSequence() >= 0) { 
+        if (getSequence() >= 0) {
             obj.addProperty(DEFAULT_ATTRIBUTE_SEQUENCE, getSequence());
         }
         obj.addProperty(DEFAULT_ATTRIBUTE_INHERITED, getInherited());

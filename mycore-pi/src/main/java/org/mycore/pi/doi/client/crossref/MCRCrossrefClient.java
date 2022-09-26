@@ -128,27 +128,27 @@ public class MCRCrossrefClient {
                 String message = "";
 
                 switch (statusCode) {
-                    case 200:
-                        if (entity != null) {
-                            try (InputStream inputStream = entity.getContent()) {
-                                List<String> doc = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
-                                message = doc.stream().collect(Collectors.joining(System.lineSeparator()));
-                                LOGGER.debug(message);
-                            }
+                case 200:
+                    if (entity != null) {
+                        try (InputStream inputStream = entity.getContent()) {
+                            List<String> doc = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
+                            message = doc.stream().collect(Collectors.joining(System.lineSeparator()));
+                            LOGGER.debug(message);
                         }
-                        return; // everything OK!
-                    case 503:
-                        LOGGER.error("Seems like the quota of 10000 Entries is exceeded!");
-                    default:
-                        if (entity != null) {
-                            try (InputStream inputStream = entity.getContent()) {
-                                List<String> doc = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
-                                message = doc.stream().collect(Collectors.joining(System.lineSeparator()));
-                            }
+                    }
+                    return; // everything OK!
+                case 503:
+                    LOGGER.error("Seems like the quota of 10000 Entries is exceeded!");
+                default:
+                    if (entity != null) {
+                        try (InputStream inputStream = entity.getContent()) {
+                            List<String> doc = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
+                            message = doc.stream().collect(Collectors.joining(System.lineSeparator()));
                         }
-                        throw new MCRDatacenterException(
-                            String.format(Locale.ROOT, "Error while doMDUpload: (%d)%s%s%s", statusCode,
-                                response.getStatusLine().getReasonPhrase(), System.lineSeparator(), message));
+                    }
+                    throw new MCRDatacenterException(
+                        String.format(Locale.ROOT, "Error while doMDUpload: (%d)%s%s%s", statusCode,
+                            response.getStatusLine().getReasonPhrase(), System.lineSeparator(), message));
                 }
             }
         } catch (IOException e) {

@@ -159,7 +159,6 @@ public interface MCRRuleAccessInterface extends MCRAccessInterface {
      */
     void updateRule(String permission, Element rule, String description) throws MCRException;
 
-
     /**
      * returns a MCRAccessRule which could be validated
      *
@@ -183,8 +182,6 @@ public interface MCRRuleAccessInterface extends MCRAccessInterface {
      */
     MCRAccessRule getAccessRule(String id, String permission);
 
-
-
     /**
      * determines whether a given user has the permission to perform a
      * certain action. no session data will be checked here.
@@ -202,8 +199,6 @@ public interface MCRRuleAccessInterface extends MCRAccessInterface {
      */
     @Deprecated
     boolean checkPermissionForUser(String permission, String userID);
-
-
 
     /**
      * determines whether the current user has the permission to perform a

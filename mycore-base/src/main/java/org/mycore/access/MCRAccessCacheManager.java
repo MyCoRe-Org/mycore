@@ -57,21 +57,21 @@ class MCRAccessCacheManager implements MCRSessionListener {
         MCRCache<MCRPermissionHandle, Boolean> cache;
         MCRSession session = event.getSession();
         switch (event.getType()) {
-            case created:
-            case activated:
-                break;
-            case passivated:
-                accessCache.remove();
-                break;
+        case created:
+        case activated:
+            break;
+        case passivated:
+            accessCache.remove();
+            break;
 
-            case destroyed:
-                cache = getCacheFromSession(session);
-                if (cache != null) {
-                    cache.close();
-                }
-                break;
-            default:
-                break;
+        case destroyed:
+            cache = getCacheFromSession(session);
+            if (cache != null) {
+                cache.close();
+            }
+            break;
+        default:
+            break;
         }
     }
 
@@ -114,7 +114,7 @@ class MCRAccessCacheManager implements MCRSessionListener {
     private void removePermissionFromCache(MCRCache<MCRPermissionHandle, Boolean> permissionCache, Set<String> ids) {
         final List<MCRPermissionHandle> handlesToRemove = permissionCache.keys()
             .stream()
-            .filter(hdl-> hdl.getId()!=null)
+            .filter(hdl -> hdl.getId() != null)
             .filter(hdl -> ids.contains(hdl.getId()))
             .collect(Collectors.toList());
         handlesToRemove.forEach(permissionCache::remove);

@@ -43,10 +43,10 @@ public class MCRMetaLangTextTest extends MCRTestCase {
         MCRMetaLangText langtext_read = new MCRMetaLangText();
         langtext_read.setFromDOM(langtext_xml);
         assertEquals("read objects from XML should be equal", langtext, langtext_read);
-        
+
         langtext.setSequence(3);
         langtext_read.setSequence(langtext.getSequence());
-        assertEquals("sequence of objects should be equal", langtext, langtext_read);        
+        assertEquals("sequence of objects should be equal", langtext, langtext_read);
 
         MCRMetaLangText langtext_clone = langtext_read.clone();
         assertEquals("cloned object should be equal with original", langtext_read, langtext_clone);

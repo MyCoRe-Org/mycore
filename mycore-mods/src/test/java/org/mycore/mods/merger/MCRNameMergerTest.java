@@ -132,8 +132,10 @@ public class MCRNameMergerTest extends MCRTestCase {
     @Test
     public void testMergeSubElements() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:affiliation='UDE']]";
-        String b = "[mods:name[@type='personal'][mods:namePart='Mueller, T'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
-        String e = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:affiliation='UDE'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
+        String b
+            = "[mods:name[@type='personal'][mods:namePart='Mueller, T'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
+        String e
+            = "[mods:name[@type='personal'][mods:namePart='Thomas Müller'][mods:affiliation='UDE'][mods:affiliation='UB der UDE'][mods:nameIdentifier[@type='gnd']='2']]";
         MCRMergerTest.test(a, b, e);
     }
 
@@ -147,7 +149,8 @@ public class MCRNameMergerTest extends MCRTestCase {
     @Test
     public void testPreferFamilyGiven() throws JaxenException, IOException {
         String a = "[mods:name[@type='personal'][mods:namePart='Thomas Müller']]";
-        String b = "[mods:name[@type='personal'][mods:namePart[@type='family']='Müller'][mods:namePart[@type='given']='T.']]";
+        String b
+            = "[mods:name[@type='personal'][mods:namePart[@type='family']='Müller'][mods:namePart[@type='given']='T.']]";
         MCRMergerTest.test(a, b, b);
     }
 

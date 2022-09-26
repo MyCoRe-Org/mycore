@@ -148,7 +148,8 @@ public class MCRBindingTest extends MCRTestCase {
 
     @Test
     public void testGroupByReferencedID() throws JDOMException, JaxenException {
-        String builder = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
+        String builder
+            = "document[name/@id='n1'][note/@href='#n1'][location/@href='#n1'][name[@id='n2']][location[@href='#n2']]";
         Element document = new MCRNodeBuilder().buildElement(builder, null, null);
         MCRBinding rootBinding = new MCRBinding(new Document(document));
         MCRBinding documentBinding = new MCRBinding("document", true, rootBinding);

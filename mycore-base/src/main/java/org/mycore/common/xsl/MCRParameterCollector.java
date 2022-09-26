@@ -196,7 +196,7 @@ public class MCRParameterCollector {
      */
     private void setFromConfiguration() {
         for (Map.Entry<String, String> property : MCRConfiguration2.getPropertiesMap().entrySet()) {
-            String key = property.getKey().replace(":","_");
+            String key = property.getKey().replace(":", "_");
             parameters.put(key, property.getValue());
         }
     }

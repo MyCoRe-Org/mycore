@@ -61,7 +61,6 @@ public class MCRCreatedByConditionTest extends MCRTestCase {
         Assert.assertTrue("current user should be creator", createdByCondition.matches(holder));
     }
 
-
     @Test
     public void testNotMatch() throws NoSuchFieldException, IllegalAccessException {
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
@@ -78,6 +77,5 @@ public class MCRCreatedByConditionTest extends MCRTestCase {
 
         Assert.assertFalse("current user should not be the creator", createdByCondition.matches(holder));
     }
-
 
 }

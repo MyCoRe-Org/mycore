@@ -34,7 +34,7 @@ import java.security.InvalidKeyException;
  */
 public class MCRCipherManager {
     private static Logger LOGGER = LogManager.getLogger(MCRCipherManager.class.getName());
-    
+
     /**
      * Create a single instance of a MCRCipher and initialize it. If the cipher can't initialized an exception
      * will thrown. Common issue is an missing key. In this case the methods throws 
@@ -43,28 +43,26 @@ public class MCRCipherManager {
      * @param id ID of cipher as configured
      * @return instance of cipher
      */
-    
+
     public static MCRCipher getCipher(String id) throws MCRCryptKeyFileNotFoundException {
-        LOGGER.debug("getCipher for id {} .", id );
+        LOGGER.debug("getCipher for id {} .", id);
         String propertiy = "MCR.Crypt.Cipher." + id + ".class";
         MCRCipher cipher = MCRConfiguration2.<MCRCipher>getSingleInstanceOf(propertiy)
-                .orElseThrow( 
-                    () -> new MCRCryptCipherConfigurationException (
-                        "Property " + propertiy + "not configured or class not found."
-                        )
-                );
-        if (! cipher.isInitialised()) { 
-            LOGGER.debug("init Cipher for id {} .", id );
+            .orElseThrow(
+                () -> new MCRCryptCipherConfigurationException(
+                    "Property " + propertiy + "not configured or class not found."));
+        if (!cipher.isInitialised()) {
+            LOGGER.debug("init Cipher for id {} .", id);
             try {
                 cipher.init(id);
             } catch (InvalidKeyException e) {
-                throw new MCRCryptCipherConfigurationException ("Can't initialize cipher. Key is invalid." , e);
+                throw new MCRCryptCipherConfigurationException("Can't initialize cipher. Key is invalid.", e);
             }
         }
-        
+
         return cipher;
     }
-    
+
     /**
      * Create a single instance of a MCRCipher without initialising it.
      * The resulting instance can used to generate an new key.
@@ -72,17 +70,14 @@ public class MCRCipherManager {
      * @param id ID of cipher as configured
      * @return instance of cipher
      */
-    
-    
+
     public static MCRCipher getUnIntitialisedCipher(String id) {
-        LOGGER.debug("getCipher for id {} .", id );
+        LOGGER.debug("getCipher for id {} .", id);
         String propertiy = "MCR.Crypt.Cipher." + id + ".class";
         MCRCipher cipher = MCRConfiguration2.<MCRCipher>getSingleInstanceOf(propertiy)
-                .orElseThrow( 
-                    () -> new MCRCryptCipherConfigurationException (
-                        "Property " + propertiy + "not configured or class not found."
-                        )
-                );
+            .orElseThrow(
+                () -> new MCRCryptCipherConfigurationException(
+                    "Property " + propertiy + "not configured or class not found."));
         cipher.reset();
         return cipher;
     }

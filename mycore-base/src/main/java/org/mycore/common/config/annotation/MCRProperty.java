@@ -50,7 +50,6 @@ public @interface MCRProperty {
      */
     boolean required() default true;
 
-
     /**
      * @return true if the property is absolute and not specific for this instance e.G. MCR.NameOfProject
      */

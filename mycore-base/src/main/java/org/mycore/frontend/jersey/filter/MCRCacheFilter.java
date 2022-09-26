@@ -95,8 +95,8 @@ public class MCRCacheFilter implements ContainerResponseFilter {
                 return;
             }
             cc = RuntimeDelegate.getInstance()
-                    .createHeaderDelegate(CacheControl.class)
-                    .fromString(currentCacheControl);
+                .createHeaderDelegate(CacheControl.class)
+                .fromString(currentCacheControl);
         } else {
             //from https://developer.mozilla.org/en-US/docs/Glossary/cacheable
             if (!requestContext.getMethod().equals(HttpMethod.GET)

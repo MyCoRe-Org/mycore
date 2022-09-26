@@ -518,20 +518,20 @@ public class MCRUser implements MCRUserInformation, Cloneable, Serializable {
     @Override
     public String getUserAttribute(String attribute) {
         switch (attribute) {
-            case MCRUserInformation.ATT_REAL_NAME:
-                return getRealName();
-            case MCRUserInformation.ATT_EMAIL:
-                return getEMailAddress();
-            default:
-                Set<MCRUserAttribute> attrs = attributes.stream()
-                    .filter(a -> a.getName().equals(attribute))
-                    .collect(Collectors.toSet());
-                if (attrs.size() > 1) {
-                    throw new MCRException(getUserID() + ": user attribute " + attribute + " is not unique");
-                }
-                return attrs.stream()
-                    .map(MCRUserAttribute::getValue)
-                    .findAny().orElse(null);
+        case MCRUserInformation.ATT_REAL_NAME:
+            return getRealName();
+        case MCRUserInformation.ATT_EMAIL:
+            return getEMailAddress();
+        default:
+            Set<MCRUserAttribute> attrs = attributes.stream()
+                .filter(a -> a.getName().equals(attribute))
+                .collect(Collectors.toSet());
+            if (attrs.size() > 1) {
+                throw new MCRException(getUserID() + ": user attribute " + attribute + " is not unique");
+            }
+            return attrs.stream()
+                .map(MCRUserAttribute::getValue)
+                .findAny().orElse(null);
         }
     }
 

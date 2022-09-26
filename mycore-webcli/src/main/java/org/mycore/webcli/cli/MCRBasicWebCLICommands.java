@@ -33,7 +33,7 @@ public class MCRBasicWebCLICommands {
 
     @MCRCommand(syntax = "process resource {0}",
         help = "Execute the commands listed in the resource file {0}.",
-            order = 10)
+        order = 10)
     public static List<String> readCommandsResource(String resource) throws IOException {
         return MCRCommandLineInterface.readCommandsRessource(resource);
     }

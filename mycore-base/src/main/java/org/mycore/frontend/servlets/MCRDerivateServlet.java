@@ -47,7 +47,6 @@ public class MCRDerivateServlet extends MCRServlet {
 
     public static final String TODO_SMOVFILE = "smovfile";
 
-
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest request = job.getRequest();
@@ -88,20 +87,20 @@ public class MCRDerivateServlet extends MCRServlet {
     private boolean performTask(MCRServletJob job, String task, String myCoreDerivateId, String file, String file2)
         throws IOException, MCRAccessException {
         switch (task) {
-            case "ssetfile":
-                setMainFile(myCoreDerivateId, file, job.getResponse());
-                break;
-            case "sdelfile":
-                deleteFile(myCoreDerivateId, file, job.getResponse());
-                break;
-            case TODO_SMOVFILE:
-                moveFile(myCoreDerivateId, file, file2, job.getResponse());
-                break;
-            default:
-                job.getResponse()
-                    .sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        String.format(Locale.ENGLISH, "The task \"%s\" is not supported.", task));
-                break;
+        case "ssetfile":
+            setMainFile(myCoreDerivateId, file, job.getResponse());
+            break;
+        case "sdelfile":
+            deleteFile(myCoreDerivateId, file, job.getResponse());
+            break;
+        case TODO_SMOVFILE:
+            moveFile(myCoreDerivateId, file, file2, job.getResponse());
+            break;
+        default:
+            job.getResponse()
+                .sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    String.format(Locale.ENGLISH, "The task \"%s\" is not supported.", task));
+            break;
         }
         return !job.getResponse().isCommitted();
     }
@@ -172,7 +171,7 @@ public class MCRDerivateServlet extends MCRServlet {
         }
 
         String newName = pathTo.getFileName().toString();
-        try{
+        try {
             MCRUploadHelper.checkPathName(newName);
         } catch (MCRException ex) {
             String message = ex.getMessage();

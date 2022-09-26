@@ -14,8 +14,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
  */
 
 package org.mycore.mcr.cronjob;
@@ -75,7 +73,8 @@ public abstract class MCRCronjob implements Runnable {
         this.processable = new MCRAbstractProcessable();
         this.processable.setStatus(MCRProcessableStatus.created);
         this.processable.setName(getClass().getSimpleName() + " - " + getDescription());
-        this.processable.setProgressText("Wait for " + getCronDescription() + "..");    }
+        this.processable.setProgressText("Wait for " + getCronDescription() + "..");
+    }
 
     public Cron getCron() {
         return cron;
