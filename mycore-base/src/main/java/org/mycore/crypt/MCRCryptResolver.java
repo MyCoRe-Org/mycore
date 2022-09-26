@@ -46,47 +46,46 @@ import javax.xml.transform.URIResolver;
 public class MCRCryptResolver implements URIResolver {
 
     public static final String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
-    
+
     private static final Logger LOGGER = LogManager.getLogger(MCRCryptResolver.class);
-    
-    private static final Set<String> ACTIONS = Set.of("encrypt","decrypt");
-    
+
+    private static final Set<String> ACTIONS = Set.of("encrypt", "decrypt");
+
     @Override
     public Source resolve(String s, String s1) throws TransformerException {
         String[] parts = s.split(":", 4);
         if (parts.length != 4) {
-            throw new TransformerException (
-                    "Malformed CrypResolver uri. Must be crypt:{encrypt/decrypt}:{cipherid}:{value}"
-                );
+            throw new TransformerException(
+                "Malformed CrypResolver uri. Must be crypt:{encrypt/decrypt}:{cipherid}:{value}");
         }
-        if (! ACTIONS.contains(parts[1]))  {
+        if (!ACTIONS.contains(parts[1])) {
             throw new TransformerException("The crypt action must be one of encrypt or decrypt.");
         }
         String action = parts[1];
-        
+
         String cipherID = parts[2];
         String value = parts[3];
-        
+
         String returnString = "";
         try {
             MCRCipher cipher = MCRCipherManager.getCipher(cipherID);
-            returnString =  action.equals("encrypt") ? cipher.encrypt(value) : cipher.decrypt(value);
+            returnString = action.equals("encrypt") ? cipher.encrypt(value) : cipher.decrypt(value);
         } catch (MCRCryptKeyFileNotFoundException e) {
-        	LOGGER.error(MCRException.getStackTraceAsString(e));
-        	returnString =  action.equals("encrypt") ? "" : value;
-        } catch ( MCRCryptKeyNoPermissionException e) {
-        	LOGGER.info("No permission to read cryptkey" + cipherID + ".");
-        	returnString =  action.equals("encrypt") ? "" : value;
-        } catch ( MCRCryptCipherConfigurationException e) {
-        	LOGGER.error(e.getStackTraceAsString());
-        	LOGGER.error("Invalid configuration or key.");
-        	returnString =  action.equals("encrypt") ? "" : value;
+            LOGGER.error(MCRException.getStackTraceAsString(e));
+            returnString = action.equals("encrypt") ? "" : value;
+        } catch (MCRCryptKeyNoPermissionException e) {
+            LOGGER.info("No permission to read cryptkey" + cipherID + ".");
+            returnString = action.equals("encrypt") ? "" : value;
+        } catch (MCRCryptCipherConfigurationException e) {
+            LOGGER.error(e.getStackTraceAsString());
+            LOGGER.error("Invalid configuration or key.");
+            returnString = action.equals("encrypt") ? "" : value;
         }
-        
+
         final Element root = new Element("value");
         root.setText(returnString);
-        
+
         return new JDOMSource(root);
     }
-    
+
 }

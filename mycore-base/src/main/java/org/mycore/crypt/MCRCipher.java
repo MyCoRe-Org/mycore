@@ -39,11 +39,11 @@ import org.mycore.common.config.annotation.MCRProperty;
  */
 
 public abstract class MCRCipher {
-    
+
     protected String cipherID;
 
     private boolean aclEnabled = true;
-    
+
     /**
      * Initialize the chipher by reading the key from file. If the cipher can't initialized an exception
      * will thrown. Common issue is an missing key. In this case the methods throws 
@@ -55,28 +55,28 @@ public abstract class MCRCipher {
      * @param id ID of cipher as configured
      */
     abstract public void init(String id) throws MCRCryptKeyFileNotFoundException, InvalidKeyException;
-    
+
     /**
      * Return whether cipher has been initialized. 
      */
     abstract public boolean isInitialised();
-    
+
     /**
      * Revert init process. 
      */
     abstract public void reset();
-    
+
     /**
      * If no keyfile exsits, generate the secret key an write it 
      * to the keyfile.  
      */
     abstract public void generateKeyFile() throws FileAlreadyExistsException;
-    
+
     /**
      * Generate the secret key an write it to the keyfile. Overwrites
      * exsisting keyfile.   
      */
-    abstract public void overwriteKeyFile() ;
+    abstract public void overwriteKeyFile();
 
     public boolean getAclEnabled() {
         return aclEnabled;
@@ -92,47 +92,50 @@ public abstract class MCRCipher {
     }
 
     public String encrypt(String text) throws MCRCryptKeyNoPermissionException {
-    	if (checkPermission( "encrypt" )) {
-    		return encryptImpl(text);
-    	} else {
-    		throw new MCRCryptKeyNoPermissionException("No Permission to encrypt with the chiper "+cipherID+".");
-    	}
+        if (checkPermission("encrypt")) {
+            return encryptImpl(text);
+        } else {
+            throw new MCRCryptKeyNoPermissionException("No Permission to encrypt with the chiper " + cipherID + ".");
+        }
     }
-    
+
     public byte[] encrypt(byte[] bytes) throws MCRCryptKeyNoPermissionException {
-    	if (checkPermission( "encrypt" )) {
-    		return encryptImpl(bytes);
-    	} else {
-    		throw new MCRCryptKeyNoPermissionException("No Permission to encrypt with the chiper "+cipherID+".");
-    	}
+        if (checkPermission("encrypt")) {
+            return encryptImpl(bytes);
+        } else {
+            throw new MCRCryptKeyNoPermissionException("No Permission to encrypt with the chiper " + cipherID + ".");
+        }
     }
-    
+
     public String decrypt(String text) throws MCRCryptKeyNoPermissionException {
-    	if (checkPermission( "decrypt" )) {
-    		return decryptImpl(text);
-    	} else {
-    		throw new MCRCryptKeyNoPermissionException("No Permission to decrypt with the chiper "+cipherID+".");
-    	}
+        if (checkPermission("decrypt")) {
+            return decryptImpl(text);
+        } else {
+            throw new MCRCryptKeyNoPermissionException("No Permission to decrypt with the chiper " + cipherID + ".");
+        }
     }
-    
+
     public byte[] decrypt(byte[] bytes) throws MCRCryptKeyNoPermissionException {
-    	if (checkPermission( "decrypt" )) {
-    		return decryptImpl(bytes);
-    	} else {
-    		throw new MCRCryptKeyNoPermissionException("No Permission to decrypt with the chiper "+cipherID+".");
-    	}
+        if (checkPermission("decrypt")) {
+            return decryptImpl(bytes);
+        } else {
+            throw new MCRCryptKeyNoPermissionException("No Permission to decrypt with the chiper " + cipherID + ".");
+        }
     }
-    
-    private boolean checkPermission ( String action) {
+
+    private boolean checkPermission(String action) {
         if (aclEnabled) {
             return MCRAccessManager.checkPermission("crypt:cipher:" + cipherID, action);
         }
         return true;
     }
-    
+
     abstract protected String encryptImpl(String text);
+
     abstract protected String decryptImpl(String text);
+
     abstract protected byte[] encryptImpl(byte[] bytes);
+
     abstract protected byte[] decryptImpl(byte[] bytes);
-    
+
 }

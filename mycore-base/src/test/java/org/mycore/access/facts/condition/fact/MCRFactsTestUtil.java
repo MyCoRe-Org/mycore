@@ -28,7 +28,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRFactsTestUtil {
 
     public static void hackObjectIntoCache(MCRObject object, MCRObjectID testId) throws NoSuchFieldException,
-            IllegalAccessException {
+        IllegalAccessException {
         MCRObjectCacheFactory instance = MCRObjectCacheFactory.instance();
         Field objectCacheField = instance.getClass().getDeclaredField("objectCache");
         objectCacheField.setAccessible(true);

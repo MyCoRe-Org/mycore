@@ -78,7 +78,7 @@ public abstract class MCRIIIFPresentationImpl {
     private String getConfigPrefix() {
         return MCR_IIIF_PRESENTATION_CONFIG_PREFIX + implName + ".";
     }
-    
+
     /**
      * For consistency and security reasons it may become necessary to
      * to cleanup the identifier, which is an otherwise unchecked URL path parameter.

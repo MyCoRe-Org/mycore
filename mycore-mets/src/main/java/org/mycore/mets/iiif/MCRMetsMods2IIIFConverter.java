@@ -246,12 +246,12 @@ public class MCRMetsMods2IIIFConverter {
                 MDTYPE mdtype = mdWrap.getMdtype();
                 MCRMetsIIIFModsMetadataExtractor extractor;
                 switch (mdtype) {
-                    case MODS:
-                        extractor = new MCRMetsIIIFModsMetadataExtractor();
-                        break;
-                    default:
-                        LOGGER.info("No extractor found for mdType: {}", mdtype);
-                        return Collections.emptyList();
+                case MODS:
+                    extractor = new MCRMetsIIIFModsMetadataExtractor();
+                    break;
+                default:
+                    LOGGER.info("No extractor found for mdType: {}", mdtype);
+                    return Collections.emptyList();
                 }
 
                 return extractor

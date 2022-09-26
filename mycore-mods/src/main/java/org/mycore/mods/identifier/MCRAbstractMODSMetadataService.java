@@ -110,7 +110,7 @@ public class MCRAbstractMODSMetadataService
         xPathBuilder.append("mods:identifier[@type='").append(getIdentifierType()).append('\'');
         if (getProperties().containsKey(PREFIX_PROPERTY_KEY)) {
             String[] prefixes = getProperties().get(PREFIX_PROPERTY_KEY).split(",");
-            if(prefixes.length != 0) {
+            if (prefixes.length != 0) {
                 xPathBuilder.append(" and (starts-with(text(), '").append(prefixes[0]).append("')");
                 for (int i = 1; i < prefixes.length; i++) {
                     xPathBuilder.append(" or starts-with(text(), '").append(prefixes[i]).append("')");

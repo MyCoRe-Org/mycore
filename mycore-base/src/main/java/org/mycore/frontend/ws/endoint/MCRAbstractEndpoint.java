@@ -80,7 +80,7 @@ public abstract class MCRAbstractEndpoint {
         String mcrSessionKey = MCRServlet.ATTR_MYCORE_SESSION;
         Optional<MCRSession> optionalSession = ((MCRSessionResolver) session.getUserProperties()
             .get(mcrSessionKey))
-                .resolveSession();
+            .resolveSession();
         if (optionalSession.isPresent()) {
             MCRSession mcrSession = optionalSession.get();
             MCRSessionMgr.setCurrentSession(mcrSession);

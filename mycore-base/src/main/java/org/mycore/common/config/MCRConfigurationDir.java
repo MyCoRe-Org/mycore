@@ -186,10 +186,10 @@ public class MCRConfigurationDir {
      * @return null if System property {@value #DISABLE_CONFIG_DIR_PROPERTY} is set.
      */
     public static File getConfigurationDirectory() {
-        if(System.getProperties().containsKey(CONFIGURATION_DIRECTORY_PROPERTY)){
+        if (System.getProperties().containsKey(CONFIGURATION_DIRECTORY_PROPERTY)) {
             return new File(System.getProperties().getProperty(CONFIGURATION_DIRECTORY_PROPERTY));
         }
-        if(System.getenv().containsKey(CONFIGURATION_DIRECTORY_PROPERTY)){
+        if (System.getenv().containsKey(CONFIGURATION_DIRECTORY_PROPERTY)) {
             return new File(System.getenv(CONFIGURATION_DIRECTORY_PROPERTY));
         }
         if (!System.getProperties().containsKey(DISABLE_CONFIG_DIR_PROPERTY)) {

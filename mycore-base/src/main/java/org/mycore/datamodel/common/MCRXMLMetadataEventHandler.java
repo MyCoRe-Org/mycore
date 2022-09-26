@@ -135,31 +135,31 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
         MCRObjectID id = obj.getId();
         try {
             switch (eventType) {
+            case MCREvent.REPAIR_EVENT:
+            case MCREvent.UPDATE_EVENT:
+            case MCREvent.CREATE_EVENT:
+                MCRBaseContent content = new MCRBaseContent(obj);
+                Date modified = obj.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
+                switch (eventType) {
                 case MCREvent.REPAIR_EVENT:
-                case MCREvent.UPDATE_EVENT:
-                case MCREvent.CREATE_EVENT:
-                    MCRBaseContent content = new MCRBaseContent(obj);
-                    Date modified = obj.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
-                    switch (eventType) {
-                        case MCREvent.REPAIR_EVENT:
-                            MCRContent retrieveContent = metaDataManager.retrieveContent(id);
-                            if (isUptodate(retrieveContent, content)) {
-                                return;
-                            }
-                        case MCREvent.UPDATE_EVENT:
-                            metaDataManager.update(id, content, modified);
-                            break;
-                        case MCREvent.CREATE_EVENT:
-                            metaDataManager.create(id, content, modified);
-                            break;
+                    MCRContent retrieveContent = metaDataManager.retrieveContent(id);
+                    if (isUptodate(retrieveContent, content)) {
+                        return;
                     }
-                    evt.put("content", content);
+                case MCREvent.UPDATE_EVENT:
+                    metaDataManager.update(id, content, modified);
                     break;
-                case MCREvent.DELETE_EVENT:
-                    metaDataManager.delete(id);
+                case MCREvent.CREATE_EVENT:
+                    metaDataManager.create(id, content, modified);
                     break;
-                default:
-                    throw new IllegalArgumentException("Invalid event type " + eventType + " for object " + id);
+                }
+                evt.put("content", content);
+                break;
+            case MCREvent.DELETE_EVENT:
+                metaDataManager.delete(id);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid event type " + eventType + " for object " + id);
             }
         } catch (IOException e) {
             throw new MCRPersistenceException("Error while handling '" + eventType + "' event of '" + id + "'", e);

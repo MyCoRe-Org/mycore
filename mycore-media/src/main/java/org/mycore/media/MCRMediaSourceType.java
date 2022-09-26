@@ -29,16 +29,16 @@ public enum MCRMediaSourceType {
 
     public String getMimeType() {
         switch (this) {
-            case mp4:
-                return "video/mp4";
-            case hls_stream:
-                return "application/x-mpegURL";
-            case rtmp_stream:
-                return "rtmp/mp4";
-            case dash_stream:
-                return "application/dash+xml";
-            default:
-                throw new RuntimeException(this + " has no MIME type defined.");
+        case mp4:
+            return "video/mp4";
+        case hls_stream:
+            return "application/x-mpegURL";
+        case rtmp_stream:
+            return "rtmp/mp4";
+        case dash_stream:
+            return "application/dash+xml";
+        default:
+            throw new RuntimeException(this + " has no MIME type defined.");
         }
     }
 }

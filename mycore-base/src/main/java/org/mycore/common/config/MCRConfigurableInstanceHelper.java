@@ -85,7 +85,7 @@ class MCRConfigurableInstanceHelper {
             });
     }
 
-    public static String getIDFromClassProperty(String property){
+    public static String getIDFromClassProperty(String property) {
         String propertyWOClass = property;
         if (property.endsWith(".Class") || property.endsWith(".class")) {
             propertyWOClass = property.substring(0, property.length() - "Class".length());

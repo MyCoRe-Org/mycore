@@ -155,7 +155,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         updateRule(POOL_PRIVILEGE_ID, permission, rule, description);
     }
 
-
     @Override
     public boolean checkPermission(String id, String permission, MCRUserInformation userInfo) {
         return checkAccess(id, permission, userInfo, null);

@@ -74,7 +74,7 @@ public class MCRConfigurableInstanceHelperTest extends MCRTestCase {
 
         Map<String, Callable<ConfigurableTestInstance>> instances = MCRConfiguration2.getInstances("MCR.CI.");
         Assert.assertEquals("Except two instances!", 2, instances.size());
-        instances.values().forEach(v-> {
+        instances.values().forEach(v -> {
             try {
                 ConfigurableTestInstance cti = v.call();
                 validate(cti);

@@ -72,12 +72,12 @@ public class MCRObjectIDLockTable implements MCRSessionListener {
     @Override
     public void sessionEvent(MCRSessionEvent event) {
         switch (event.getType()) {
-            case destroyed:
-                clearTable(event.getSession());
-                break;
-            default:
-                LOGGER.debug("Skipping event: {}", event.getType());
-                break;
+        case destroyed:
+            clearTable(event.getSession());
+            break;
+        default:
+            LOGGER.debug("Skipping event: {}", event.getType());
+            break;
         }
     }
 

@@ -47,10 +47,9 @@ public class MCRDeveloperCommands {
     private static final Logger LOGGER = LogManager.getLogger(MCRDeveloperCommands.class);
 
     @MCRCommand(
-            syntax = "show message {0} for {1}",
-            help = "Show message with key {0} for locale {1}",
-            order = 10
-    )
+        syntax = "show message {0} for {1}",
+        help = "Show message with key {0} for locale {1}",
+        order = 10)
     public static void showMessage(String key, String lang) {
         String value = MCRTranslation.translate(key, MCRTranslation.getLocale(lang));
         if (value == null || (value.startsWith("???") && value.endsWith("???"))) {
@@ -61,10 +60,9 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-            syntax = "show messages {0} for {1}",
-            help = "Show messages with key prefix {0} for locale {1}",
-            order = 20
-    )
+        syntax = "show messages {0} for {1}",
+        help = "Show messages with key prefix {0} for locale {1}",
+        order = 20)
     public static void showMessages(String keyPrefix, String lang) {
         Map<String, String> values = MCRTranslation.translatePrefix(keyPrefix, MCRTranslation.getLocale(lang));
         if (values.isEmpty()) {
@@ -77,10 +75,9 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-            syntax = "show all messages for {0}",
-            help = "Show all messages for locale {0}",
-            order = 30
-    )
+        syntax = "show all messages for {0}",
+        help = "Show all messages for locale {0}",
+        order = 30)
     public static void showMessages(String lang) {
         Map<String, String> values = MCRTranslation.translatePrefix("", MCRTranslation.getLocale(lang));
         if (values.isEmpty()) {
@@ -93,10 +90,9 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-            syntax = "show property {0}",
-            help = "Show configuration property with key {0}",
-            order = 40
-    )
+        syntax = "show property {0}",
+        help = "Show configuration property with key {0}",
+        order = 40)
     public static void showProperty(String key) {
         String value = MCRConfiguration2.getPropertiesMap().get(key);
         if (value == null) {
@@ -107,10 +103,9 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-            syntax = "show properties {0}",
-            help = "Show configuration properties starting with key prefix {0}",
-            order = 50
-    )
+        syntax = "show properties {0}",
+        help = "Show configuration properties starting with key prefix {0}",
+        order = 50)
     public static void showProperties(String keyPrefix) {
         Map<String, String> values = MCRConfiguration2.getSubPropertiesMap(keyPrefix);
         if (values.isEmpty()) {
@@ -123,10 +118,9 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-            syntax = "show all properties",
-            help = "Show all configuration properties",
-            order = 60
-    )
+        syntax = "show all properties",
+        help = "Show all configuration properties",
+        order = 60)
     public static void showAllProperties() {
         Map<String, String> values = MCRConfiguration2.getPropertiesMap();
         if (values.isEmpty()) {
@@ -139,10 +133,9 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-            syntax = "show resource {0}",
-            help = "Show resource with uri {0}",
-            order = 70
-    )
+        syntax = "show resource {0}",
+        help = "Show resource with uri {0}",
+        order = 70)
     public static void showResource(String uri) {
         try {
             Element resource = MCRURIResolver.instance().resolve(uri);
@@ -153,12 +146,10 @@ public class MCRDeveloperCommands {
         }
     }
 
-
     @MCRCommand(
-            syntax = "touch object {0}",
-            help = "Load and update object with id {0} without making any modifications",
-            order = 80
-    )
+        syntax = "touch object {0}",
+        help = "Load and update object with id {0} without making any modifications",
+        order = 80)
     public static void touchObject(String id) {
         try {
             MCRObjectID objectId = MCRObjectID.getInstance(id);
@@ -171,10 +162,9 @@ public class MCRDeveloperCommands {
     }
 
     @MCRCommand(
-            syntax = "touch derivate {0}",
-            help = "Load and update derivate with id {0} without making any modifications",
-            order = 90
-    )
+        syntax = "touch derivate {0}",
+        help = "Load and update derivate with id {0} without making any modifications",
+        order = 90)
     public static void touchDerivate(String id) {
         try {
             MCRObjectID derivateId = MCRObjectID.getInstance(id);

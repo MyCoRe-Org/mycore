@@ -38,7 +38,7 @@ public class MCREditorSubmission {
     public static final String PREFIX_DEFAULT_VALUE = "_xed_default_";
 
     public static final String PREFIX_CHECK_RESUBMISSION = "_xed_check";
-    
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private Set<String> xPaths2CheckResubmission = new LinkedHashSet<>();

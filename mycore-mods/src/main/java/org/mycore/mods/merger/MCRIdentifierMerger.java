@@ -43,8 +43,8 @@ public class MCRIdentifierMerger extends MCRMerger {
     }
 
     private String getSimplifiedID() {
-        return URLDecoder.decode(this.element.getTextNormalize().toLowerCase(Locale.ENGLISH),StandardCharsets.UTF_8)
-            .replace("-","");
+        return URLDecoder.decode(this.element.getTextNormalize().toLowerCase(Locale.ENGLISH), StandardCharsets.UTF_8)
+            .replace("-", "");
     }
 
     @Override

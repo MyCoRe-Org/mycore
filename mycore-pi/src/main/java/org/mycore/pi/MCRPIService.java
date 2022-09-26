@@ -177,7 +177,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
 
         String generatorPropertyKey = GENERATOR_CONFIG_PREFIX + generatorName;
         MCRPIGenerator<T> generator = (MCRPIGenerator<T>) MCRConfiguration2.getInstanceOf(generatorPropertyKey)
-                .orElseThrow(()-> MCRConfiguration2.createConfigurationException(generatorPropertyKey));
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException(generatorPropertyKey));
         return generator;
     }
 
@@ -361,20 +361,20 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         MCREntityManagerProvider.getCurrentEntityManager().persist(databaseEntry);
         return databaseEntry;
     }
-    
+
     public static void updateFlagsInDatabase(MCRBase obj) {
         Gson gson = MCRPIService.getGson();
         obj.getService().getFlags(MCRPIService.PI_FLAG).stream()
-        .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
-        .filter(entry -> !MCRPIManager.getInstance().exist(entry))
-        .forEach(entry -> {
-            // disabled: Git does not provide a revision number as integer (see MCR-1393)
-            //           entry.setMcrRevision(MCRCoreVersion.getRevision());
-            entry.setMcrVersion(MCRCoreVersion.getVersion());
-            entry.setMycoreID(obj.getId().toString());
-            LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
-            MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
-        });
+            .map(piFlag -> gson.fromJson(piFlag, MCRPI.class))
+            .filter(entry -> !MCRPIManager.getInstance().exist(entry))
+            .forEach(entry -> {
+                // disabled: Git does not provide a revision number as integer (see MCR-1393)
+                //           entry.setMcrRevision(MCRCoreVersion.getRevision());
+                entry.setMcrVersion(MCRCoreVersion.getVersion());
+                entry.setMycoreID(obj.getId().toString());
+                LOGGER.info("Add PI : {} with service {} to database!", entry.getIdentifier(), entry.getService());
+                MCREntityManagerProvider.getCurrentEntityManager().persist(entry);
+            });
     }
 
     public final String getType() {
@@ -504,7 +504,7 @@ public abstract class MCRPIService<T extends MCRPersistentIdentifier> {
         }
         return properties.get(propertyName);
     }
-    
+
     protected Predicate<MCRBase> getCreationPredicate() {
         final String predicateProperty = MCRPIServiceManager.REGISTRATION_SERVICE_CONFIG_PREFIX +
             getServiceID() + "." + MCRPIJobService.CREATION_PREDICATE;

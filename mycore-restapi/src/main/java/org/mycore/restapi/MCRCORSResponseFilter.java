@@ -103,12 +103,12 @@ public class MCRCORSResponseFilter implements ContainerResponseFilter {
                 exposedHeaders.add(HttpHeaders.AUTHORIZATION);
             }
             Optional.ofNullable(resourceInfo)
-                    .map(ResourceInfo::getResourceMethod)
-                    .map(method->method.getAnnotation(MCRAccessControlExposeHeaders.class))
-                    .map(MCRAccessControlExposeHeaders::value)
-                    .map(Stream::of)
-                    .orElse(Stream.empty())
-                    .forEach(exposedHeaders::add);
+                .map(ResourceInfo::getResourceMethod)
+                .map(method -> method.getAnnotation(MCRAccessControlExposeHeaders.class))
+                .map(MCRAccessControlExposeHeaders::value)
+                .map(Stream::of)
+                .orElse(Stream.empty())
+                .forEach(exposedHeaders::add);
             if (!exposedHeaders.isEmpty()) {
                 responseHeaders.putSingle(ACCESS_CONTROL_EXPOSE_HEADERS,
                     exposedHeaders.stream().collect(Collectors.joining(",")));

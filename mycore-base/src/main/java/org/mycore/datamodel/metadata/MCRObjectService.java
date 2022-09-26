@@ -73,7 +73,7 @@ import org.mycore.datamodel.common.MCRISO8601Date;
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
-    
+
     private static final Logger LOGGER = LogManager.getLogger(MCRObjectService.class);
 
     /**
@@ -134,7 +134,7 @@ public class MCRObjectService {
      *            a list of relevant DOM elements for the metadata
      */
     public final void setFromDOM(Element service) {
-        
+
         // date part
         Element datesElement = service.getChild("servdates");
         dates.clear();
@@ -1060,8 +1060,8 @@ public class MCRObjectService {
         String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
         MCRUtils.filterTrimmedNotEmpty(value)
             .map(messageValue -> {
-                MCRMetaDateLangText message =
-                    new MCRMetaDateLangText("servmessage", null, lType, 0, form, messageValue);
+                MCRMetaDateLangText message
+                    = new MCRMetaDateLangText("servmessage", null, lType, 0, form, messageValue);
                 message.setDate(MCRISO8601Date.now());
                 return message;
             })
@@ -1214,7 +1214,6 @@ public class MCRObjectService {
         return classifications.get(index).getType();
     }
 
-
     /**
      * This method get a single classification from the classification list as.
      *
@@ -1229,7 +1228,6 @@ public class MCRObjectService {
         }
         return classifications.get(index);
     }
-
 
     /**
      * This method adds a classification to the classification list.
@@ -1251,7 +1249,7 @@ public class MCRObjectService {
      */
     public final void addClassification(String type, MCRCategoryID value) {
         String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
-        classifications.add( new MCRMetaClassification("servclass", 0, lType, value));
+        classifications.add(new MCRMetaClassification("servclass", 0, lType, value));
     }
 
     /**
@@ -1265,8 +1263,8 @@ public class MCRObjectService {
      *                throw this exception, if the index is invalid
      */
     public final void replaceClassification(int index, MCRCategoryID value) throws IndexOutOfBoundsException {
-        updateClassification(index, classificationValue ->
-            classificationValue.setValue(value.getRootID(), value.getID()));
+        updateClassification(index,
+            classificationValue -> classificationValue.setValue(value.getRootID(), value.getID()));
     }
 
     /**
@@ -1281,8 +1279,8 @@ public class MCRObjectService {
      */
     public final void replaceClassificationType(int index, String value) throws IndexOutOfBoundsException {
         MCRUtils.filterTrimmedNotEmpty(value)
-            .ifPresent(classificationValue -> updateClassification(index, classification ->
-                classification.setType(classificationValue)));
+            .ifPresent(classificationValue -> updateClassification(index,
+                classification -> classification.setType(classificationValue)));
     }
 
     private void updateClassification(int index, Consumer<MCRMetaClassification> classificationUpdater) {

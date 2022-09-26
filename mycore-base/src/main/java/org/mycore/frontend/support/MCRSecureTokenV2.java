@@ -83,12 +83,12 @@ public class MCRSecureTokenV2 {
             .chars()
             .map(x -> {
                 switch (x) {
-                    case '+':
-                        return '-';
-                    case '/':
-                        return '_';
-                    default:
-                        return x;
+                case '+':
+                    return '-';
+                case '/':
+                    return '_';
+                default:
+                    return x;
                 }
             })
             .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)

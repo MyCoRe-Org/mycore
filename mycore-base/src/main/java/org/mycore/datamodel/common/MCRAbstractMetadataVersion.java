@@ -59,7 +59,7 @@ public abstract class MCRAbstractMetadataVersion<T> {
                 .orElseThrow(IllegalArgumentException::new);
         }
     }
-    
+
     /**
      * The metadata document this version belongs to
      */

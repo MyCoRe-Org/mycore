@@ -58,7 +58,7 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
         String currentID;
         MCRRuleAccessInterface mcrRuleAccessInterface = MCRAccessManager.requireRulesInterface();
         for (currentID = id; currentID != null && !mcrRuleAccessInterface.hasRule(currentID, permission);
-             currentID = getParentID(currentID)) {
+            currentID = getParentID(currentID)) {
             LOGGER.debug("No access rule specified for: {}. Trying to use parent ID.", currentID);
         }
         LOGGER.debug("Using access rule defined for: {}", currentID);

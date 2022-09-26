@@ -76,7 +76,8 @@ public class MCRClassificationMappingEventHandlerTest extends MCRJPATestCase {
         MCRClassificationMappingEventHandler mapper = new MCRClassificationMappingEventHandler();
         mapper.handleObjectUpdated(null, mcro);
 
-        String expression = "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
+        String expression
+            = "//mods:classification[contains(@generator,'-mycore') and contains(@valueURI, 'StudyThesis')]";
         XPathExpression<Element> expressionObject = XPathFactory.instance()
             .compile(expression, Filters.element(), null, MCRConstants.MODS_NAMESPACE, MCRConstants.XLINK_NAMESPACE);
         Document xml = mcro.createXML();

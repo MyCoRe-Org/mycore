@@ -60,7 +60,7 @@ public class MCRMODSCollectionConditionTest extends MCRTestCase {
 
         MCRMODSCollectionCondition collectionCondition = new MCRMODSCollectionCondition();
         collectionCondition.parse(new Element("collection").setText("exampleCollection"));
-        Assert.assertTrue("object should be in collection",collectionCondition.matches(holder));
+        Assert.assertTrue("object should be in collection", collectionCondition.matches(holder));
     }
 
     @Test
@@ -80,6 +80,6 @@ public class MCRMODSCollectionConditionTest extends MCRTestCase {
 
         MCRMODSCollectionCondition collectionCondition = new MCRMODSCollectionCondition();
         collectionCondition.parse(new Element("collection").setText("exampleCollection"));
-        Assert.assertFalse("object should be in collection",collectionCondition.matches(holder));
+        Assert.assertFalse("object should be in collection", collectionCondition.matches(holder));
     }
 }

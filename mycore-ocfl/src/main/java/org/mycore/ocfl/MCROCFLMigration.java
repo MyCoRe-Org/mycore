@@ -168,14 +168,14 @@ public class MCROCFLMigration {
         LOGGER.info("Migrate revision {} of {}", rev.getRevision(), objectID);
 
         switch (rev.getType()) {
-            case 'A':
-                return new CreateMigrationStep(retriveActualContent(rev), user, date, objectID);
-            case 'D':
-                return new DeleteMigrationStep(user, date, objectID);
-            case 'M':
-                return new UpdateMigrationStep(retriveActualContent(rev), user, date, objectID);
-            default:
-                return null;
+        case 'A':
+            return new CreateMigrationStep(retriveActualContent(rev), user, date, objectID);
+        case 'D':
+            return new DeleteMigrationStep(user, date, objectID);
+        case 'M':
+            return new UpdateMigrationStep(retriveActualContent(rev), user, date, objectID);
+        default:
+            return null;
         }
     }
 

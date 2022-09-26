@@ -14,8 +14,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
  */
 
 package org.mycore.mcr.cronjob;
@@ -58,7 +56,7 @@ public class MCRCommandCronJobTest extends MCRJPATestCase {
         commandRun = true;
         message = msg;
 
-        if(message.equals("Welt")){
+        if (message.equals("Welt")) {
             return null;
         } else {
             return Stream.of("test command Welt").collect(Collectors.toList());

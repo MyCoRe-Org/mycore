@@ -150,13 +150,13 @@ public class MCRRestClassifications {
 
         MCRCategoryID categoryID = new MCRCategoryID(classId, categId);
         switch (detailLevel) {
-            case detailed:
-                return getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
-            case summary:
-                return getClassification(classId, dao -> dao.getCategory(categoryID, 0));
-            case normal: //default case
-            default:
-                return getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
+        case detailed:
+            return getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
+        case summary:
+            return getClassification(classId, dao -> dao.getCategory(categoryID, 0));
+        case normal: //default case
+        default:
+            return getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
         }
     }
 

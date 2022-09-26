@@ -40,11 +40,11 @@ public class MCRMockResolver implements URIResolver {
         return Collections.unmodifiableList(CALLS);
     }
 
-    public static void clearCalls(){
+    public static void clearCalls() {
         CALLS.clear();
     }
 
-    public static void setResultSource(Source source){
+    public static void setResultSource(Source source) {
         resultSource = source;
     }
 

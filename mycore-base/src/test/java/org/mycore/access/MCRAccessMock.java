@@ -38,12 +38,11 @@ public class MCRAccessMock implements MCRAccessInterface {
     private static final List<MCRCheckPermissionCall> CALLS = new LinkedList<>();
     private static boolean checkPermissionReturn = true;
 
-
     public static List<MCRCheckPermissionCall> getCheckPermissionCalls() {
         return Collections.unmodifiableList(CALLS);
     }
 
-    public static void clearCheckPermissionCallsList(){
+    public static void clearCheckPermissionCallsList() {
         CALLS.clear();
     }
 
@@ -55,11 +54,11 @@ public class MCRAccessMock implements MCRAccessInterface {
         checkPermissionReturn = methodResult;
     }
 
-
     @Override
     public boolean checkPermission(String permission) {
         CALLS.add(new MCRCheckPermissionCall(null, permission));
-        return checkPermissionReturn;    }
+        return checkPermissionReturn;
+    }
 
     @Override
     public boolean checkPermission(String id, String permission) {

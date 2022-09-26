@@ -143,27 +143,27 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     @MCRCommand(
-            syntax = "select objects with xpath {0}",
-            help = "Selects MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list" +
-                " (this command may take a while, use with care in case of a large number of objects)",
-            order = 10)
+        syntax = "select objects with xpath {0}",
+        help = "Selects MCRObjects with XPath {0}, if that XPath evaluates to a non-empty result list" +
+            " (this command may take a while, use with care in case of a large number of objects)",
+        order = 10)
     public static void selectObjectsWithXpath(String xPath) throws Exception {
 
         XPathExpression<Object> xPathExpression = XPathFactory
-                .instance()
-                .compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
+            .instance()
+            .compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
 
-        List<String> selectedObjectIds  = MCRXMLMetadataManager
-                .instance()
-                .listIDs()
-                .stream()
-                .filter(id -> !id.contains("_derivate_"))
-                .map(MCRObjectID::getInstance)
-                .map(MCRMetadataManager::retrieveMCRObject)
-                .filter(mcrObject -> !xPathExpression.evaluate(mcrObject.createXML()).isEmpty())
-                .map(MCRObject::getId)
-                .map(MCRObjectID::toString)
-                .collect(Collectors.toList());
+        List<String> selectedObjectIds = MCRXMLMetadataManager
+            .instance()
+            .listIDs()
+            .stream()
+            .filter(id -> !id.contains("_derivate_"))
+            .map(MCRObjectID::getInstance)
+            .map(MCRMetadataManager::retrieveMCRObject)
+            .filter(mcrObject -> !xPathExpression.evaluate(mcrObject.createXML()).isEmpty())
+            .map(MCRObject::getId)
+            .map(MCRObjectID::toString)
+            .collect(Collectors.toList());
 
         MCRObjectCommands.setSelectedObjectIDs(selectedObjectIds);
 
@@ -652,7 +652,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     private static void exportWith(String fromID, String toID, String dirname,
-                                   FailableBiConsumer<MCRContent, OutputStream, Exception> trans) {
+        FailableBiConsumer<MCRContent, OutputStream, Exception> trans) {
         MCRObjectID fid, tid;
 
         // check fromID and toID
@@ -783,7 +783,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRException
      */
     private static boolean exportMCRObject(File dir, FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
-                                           String nid) throws IOException, MCRException {
+        String nid) throws IOException, MCRException {
         MCRContent content;
         try {
             // if object doesn't exist - no exception is caught!
@@ -1037,15 +1037,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
         switch (resultName) {
-            case MCRObject.ROOT_NAME:
-                MCRMetadataManager.update(new MCRObject(resultDocument));
-                break;
-            case MCRDerivate.ROOT_NAME:
-                MCRMetadataManager.update(new MCRDerivate(resultDocument));
-                break;
-            default:
-                LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
-                break;
+        case MCRObject.ROOT_NAME:
+            MCRMetadataManager.update(new MCRObject(resultDocument));
+            break;
+        case MCRDerivate.ROOT_NAME:
+            MCRMetadataManager.update(new MCRDerivate(resultDocument));
+            break;
+        default:
+            LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
+            break;
         }
     }
 

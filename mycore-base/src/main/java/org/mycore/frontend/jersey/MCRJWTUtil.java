@@ -49,7 +49,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
     public static final String JWT_CLAIM_ROLES = "mcr:roles";
 
     public static final String JWT_CLAIM_IP = "mcr:ip";
-    
+
     public static final String JWT_USER_ATTRIBUTE_PREFIX = "mcr:ua:";
 
     public static final String JWT_SESSION_ATTRIBUTE_PREFIX = "mcr:sa:";
@@ -64,7 +64,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
         return getJWTBuilder(mcrSession, null, null);
     }
 
-    public static JWTCreator.Builder getJWTBuilder(MCRSession mcrSession, 
+    public static JWTCreator.Builder getJWTBuilder(MCRSession mcrSession,
         String[] userAttributes, String[] sessionAttributes) {
         MCRUserInformation userInformation = mcrSession.getUserInformation();
         String[] roles = MCRConfiguration2.getOrThrow(ROLES_PROPERTY, MCRConfiguration2::splitValue)
@@ -90,7 +90,7 @@ public class MCRJWTUtil implements MCRStartupHandler.AutoExecutable {
         if (sessionAttributes != null) {
             for (String sessionAttribute : sessionAttributes) {
                 Object object = mcrSession.get(sessionAttribute);
-                Optional.ofNullable(object).map(Object::toString).ifPresent((value)-> {
+                Optional.ofNullable(object).map(Object::toString).ifPresent((value) -> {
                     builder.withClaim(JWT_SESSION_ATTRIBUTE_PREFIX + sessionAttribute, value);
                 });
             }

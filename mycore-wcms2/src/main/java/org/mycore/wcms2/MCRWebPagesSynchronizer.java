@@ -100,7 +100,7 @@ public class MCRWebPagesSynchronizer implements AutoExecutable {
         return new File(MCRConfiguration2.getStringOrThrow("MCR.WCMS2.DataDir"));
     }
 
-    public static Path getWCMSDataDirPath(){
+    public static Path getWCMSDataDirPath() {
         return MCRConfiguration2.getOrThrow("MCR.WCMS2.DataDir", Paths::get);
     }
 

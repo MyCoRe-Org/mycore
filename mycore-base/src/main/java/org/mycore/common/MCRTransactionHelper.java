@@ -62,7 +62,7 @@ public class MCRTransactionHelper {
             .collect(Collectors.toUnmodifiableList()), List.of());
     }
 
-    public static boolean isDatabaseAccessEnabled(){
+    public static boolean isDatabaseAccessEnabled() {
         return MCRConfiguration2.getBoolean("MCR.Persistence.Database.Enable").orElse(true)
             && applyServiceLoader(sl -> sl.stream().findAny().isPresent(), false); //impl present
     }
@@ -98,7 +98,6 @@ public class MCRTransactionHelper {
         return isDatabaseAccessEnabled() && TRANSACTION.get().stream().anyMatch(MCRPersistenceTransaction::isActive);
     }
 
-
     /**
      * Determine whether the current resource transaction has been marked for rollback.
      * @return boolean indicating whether the transaction has been marked for rollback
@@ -106,7 +105,6 @@ public class MCRTransactionHelper {
     public static boolean transactionRequiresRollback() {
         return isTransactionActive() && TRANSACTION.get().stream().anyMatch(MCRPersistenceTransaction::getRollbackOnly);
     }
-
 
     /**
      * starts a new database transaction.

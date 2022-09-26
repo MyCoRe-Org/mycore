@@ -51,7 +51,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
     private MCRIdentifierPool idPool;
 
     private List<Element> results = new ArrayList<Element>();
-    
+
     private boolean gotResults = false;
 
     MCRDataSourceCall(MCRDataSource ds, MCRIdentifierPool idPool) {
@@ -99,7 +99,7 @@ class MCRDataSourceCall implements Callable<Boolean> {
     List<Element> getResults() {
         return results;
     }
-    
+
     void clearResults() {
         results.clear();
     }

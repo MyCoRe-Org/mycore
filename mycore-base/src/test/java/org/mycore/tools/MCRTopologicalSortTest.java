@@ -28,7 +28,7 @@ import org.mycore.common.MCRTestCase;
  *       Topological Sort, S. 550
  */
 public class MCRTopologicalSortTest extends MCRTestCase {
-    
+
     @Test
     public void dressOK() {
         MCRTopologicalSort<String> ts = new MCRTopologicalSort<>();

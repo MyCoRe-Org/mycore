@@ -39,7 +39,6 @@ public class MCRRoleConditionTest extends MCRTestCase {
         Assert.assertTrue("User should have editor role", userCondition.matches(holder));
     }
 
-
     @Test
     public void testConditionNotMatch() {
         MCRSessionMgr.getCurrentSession().setUserInformation(MCRSystemUserInformation.getGuestInstance());
