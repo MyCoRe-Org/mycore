@@ -20,6 +20,8 @@ package org.mycore.mods.bibtex;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 
 import bibtex.dom.BibtexAbstractValue;
@@ -32,6 +34,8 @@ import bibtex.dom.BibtexPersonList;
  * @author Frank L\u00FCtzenkirchen
  */
 class MCRPersonListTransformer extends MCRFieldTransformer {
+
+    private static final Logger LOGGER = LogManager.getLogger(MCRPersonListTransformer.class);
 
     private MCRPersonTransformer personTransformer;
 
@@ -46,6 +50,8 @@ class MCRPersonListTransformer extends MCRFieldTransformer {
     @SuppressWarnings("unchecked")
     void buildField(BibtexAbstractValue value, Element parent) {
         if (!(value instanceof BibtexPersonList)) {
+            LOGGER.error("Cannot not cast {} ({}) to {}", BibtexAbstractValue.class.getName(), value,
+                BibtexPersonList.class.getName());
             return;
         }
         BibtexPersonList personList = (BibtexPersonList) value;
