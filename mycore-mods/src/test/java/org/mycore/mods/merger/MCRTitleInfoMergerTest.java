@@ -85,7 +85,8 @@ public class MCRTitleInfoMergerTest extends MCRTestCase {
     public void testMergingOneAttribute() throws JaxenException, IOException {
         String a = "[mods:titleInfo[mods:title='Chemistry - A European Journal']]";
         String b = "[mods:titleInfo[mods:title='Chemistry'][@type='abbreviated']]";
-        String e = "[mods:titleInfo[mods:title='Chemistry - A European Journal']][mods:titleInfo[mods:title='Chemistry'][@type='abbreviated']]";
+        String e = "[mods:titleInfo[mods:title='Chemistry - A European Journal']]"
+            + "[mods:titleInfo[mods:title='Chemistry'][@type='abbreviated']]";
         MCRMergerTest.test(a, b, e);
     }
 }
