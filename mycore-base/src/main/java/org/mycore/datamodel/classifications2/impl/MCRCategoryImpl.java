@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.annotations.SortNatural;
 import org.mycore.backend.jpa.MCRURIConverter;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -213,6 +214,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         joinColumns = @JoinColumn(name = "category"),
         uniqueConstraints = {
             @UniqueConstraint(columnNames = { "category", "lang" }) })
+    @SortNatural
     public SortedSet<MCRLabel> getLabels() {
         return super.getLabels();
     }
