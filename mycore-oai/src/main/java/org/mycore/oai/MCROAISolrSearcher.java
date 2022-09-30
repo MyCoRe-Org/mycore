@@ -54,7 +54,7 @@ import org.mycore.solr.MCRSolrUtils;
 
 /**
  * Solr searcher implementation. Uses cursors.
- * 
+ *
  * @author Matthias Eichner
  */
 public class MCROAISolrSearcher extends MCROAISearcher {
@@ -195,9 +195,17 @@ public class MCROAISolrSearcher extends MCROAISearcher {
     }
 
     Header toHeader(SolrDocument doc, Collection<MCROAISetResolver<String, SolrDocument>> setResolver) {
-        Date modified = (Date) doc.getFieldValue(getModifiedField());
         String docId = doc.getFieldValue("id").toString();
-        Header header = new Header(getObjectManager().getOAIId(docId), modified.toInstant());
+        Date modified = (Date) doc.getFieldValue(getModifiedField());
+
+        if (modified == null) {
+            throw new IllegalArgumentException("'" + getModifiedField() + "' is null for '" + docId + "'");
+        }
+
+        MCROAIObjectManager objectManager = getObjectManager();
+        String oaiId = objectManager.getOAIId(docId);
+        Header header = new Header(oaiId, modified.toInstant());
+
         setResolver.parallelStream()
             .map(r -> r.getSets(docId))
             .flatMap(Collection::stream)
