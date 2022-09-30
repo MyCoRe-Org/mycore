@@ -24,7 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.mycore.common.MCRConstants;
@@ -50,7 +51,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     protected MCRCategory parent;
 
-    protected Set<MCRLabel> labels;
+    protected SortedSet<MCRLabel> labels;
 
     protected List<MCRCategory> children;
 
@@ -74,7 +75,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         if (defaultLang == null) {
             defaultLang = MCRConfiguration2.getString("MCR.Metadata.DefaultLang").orElse(MCRConstants.DEFAULT_LANG);
         }
-        labels = new HashSet<>();
+        labels = new TreeSet<>();
     }
 
     public List<MCRCategory> getChildren() {
@@ -99,7 +100,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         this.id = id;
     }
 
-    public Set<MCRLabel> getLabels() {
+    public SortedSet<MCRLabel> getLabels() {
         return labels;
     }
 

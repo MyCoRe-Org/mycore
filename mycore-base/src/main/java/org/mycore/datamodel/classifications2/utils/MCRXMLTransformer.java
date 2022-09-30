@@ -23,9 +23,9 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -84,9 +84,9 @@ public class MCRXMLTransformer {
         return children;
     }
 
-    public static Set<MCRLabel> getLabels(List<Element> elements)
+    public static SortedSet<MCRLabel> getLabels(List<Element> elements)
         throws NullPointerException, IllegalArgumentException {
-        Set<MCRLabel> labels = new HashSet<>(elements.size(), 1L);
+        SortedSet<MCRLabel> labels = new TreeSet<MCRLabel>();
         for (Element labelElement : elements) {
             MCRLabel label = getLabel(labelElement);
             labels.add(label);

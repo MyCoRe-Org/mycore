@@ -32,10 +32,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -132,7 +132,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategLinkServiceFactory.getInstance().getLinksFromCategory(secondCateg.getId());
         assertTrue(secondCateg.getId() + " should exist.", DAO.exist(secondCateg.getId()));
         //re-set labels
-        DAO.setLabels(secondCateg.getId(), secondCateg.getLabels().stream().collect(Collectors.toSet()));
+        DAO.setLabels(secondCateg.getId(), new TreeSet<>(secondCateg.getLabels().stream().collect(Collectors.toSet())));
         //re-set URI
         entityManager.detach(DAO.setURI(secondCateg.getId(), secondCateg.getURI()));
         //move to new index
@@ -149,7 +149,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         assertTrue("Exist check failed for Category " + category.getId(), DAO.exist(category.getId()));
         MCRCategoryImpl india = new MCRCategoryImpl();
         india.setId(new MCRCategoryID(category.getId().getRootID(), "India"));
-        india.setLabels(new HashSet<>());
+        india.setLabels(new TreeSet<>());
         india.getLabels().add(new MCRLabel("de", "Indien", null));
         india.getLabels().add(new MCRLabel("en", "India", null));
         DAO.addCategory(new MCRCategoryID(category.getId().getRootID(), "Asia"), india);
@@ -220,7 +220,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategoryImpl america = new MCRCategoryImpl();
         MCRCategoryID categoryID = new MCRCategoryID(category.getId().getRootID(), "America");
         america.setId(categoryID);
-        america.setLabels(new HashSet<>());
+        america.setLabels(new TreeSet<>());
         america.getLabels().add(new MCRLabel("de", "Amerika", null));
         america.getLabels().add(new MCRLabel("en", "America", null));
         DAO.addCategory(category.getId(), america, 1);
@@ -523,7 +523,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     private MCRCategoryImpl newCategory(MCRCategoryID id, String description) {
         MCRCategoryImpl newCateg = new MCRCategoryImpl();
         newCateg.setId(id);
-        Set<MCRLabel> labels = new HashSet<>();
+        SortedSet<MCRLabel> labels = new TreeSet<>();
         labels.add(new MCRLabel("en", id.toString(), description));
         newCateg.setLabels(labels);
         return newCateg;
@@ -613,11 +613,11 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         startNewTransaction();
         MCRCategory germany = DAO.getCategory(MCRCategoryID.fromString("World:Germany"), 0);
         MCRCategory france = DAO.getCategory(MCRCategoryID.fromString("World:France"), 0);
-        Set<MCRLabel> labels1 = new HashSet<>();
+        SortedSet<MCRLabel> labels1 = new TreeSet<>();
         labels1.add(new MCRLabel("de", "deutschland", null));
         DAO.setLabels(germany.getId(), labels1);
         startNewTransaction();
-        Set<MCRLabel> labels2 = new HashSet<>();
+        SortedSet<MCRLabel> labels2 = new TreeSet<>();
         labels2.add(new MCRLabel("de", "frankreich", null));
         DAO.setLabels(france.getId(), labels2);
         startNewTransaction();
@@ -672,7 +672,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl test = new MCRCategoryImpl();
         test.setId(new MCRCategoryID(category.getId().getRootID(), "test"));
-        test.setLabels(new HashSet<>());
+        test.setLabels(new TreeSet<>());
         test.getLabels().add(new MCRLabel("de", "JUnit testcase", null));
         category.getChildren().add(test);
         category.getChildren().remove(0);

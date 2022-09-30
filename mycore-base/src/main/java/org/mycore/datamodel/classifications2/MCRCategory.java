@@ -21,7 +21,7 @@ package org.mycore.datamodel.classifications2;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -78,7 +78,7 @@ public interface MCRCategory {
     /**
      * @return the labels
      */
-    Set<MCRLabel> getLabels();
+    SortedSet<MCRLabel> getLabels();
 
     /**
      * @return the label in the current language (if available), default language (if available), any language in

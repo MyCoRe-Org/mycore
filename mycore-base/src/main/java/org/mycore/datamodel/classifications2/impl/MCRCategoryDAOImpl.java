@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -526,7 +526,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     @Override
-    public MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
+    public MCRCategory setLabels(MCRCategoryID id, SortedSet<MCRLabel> labels) {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
         MCRCategoryImpl category = getByNaturalID(entityManager, id);
         category.setLabels(labels);
