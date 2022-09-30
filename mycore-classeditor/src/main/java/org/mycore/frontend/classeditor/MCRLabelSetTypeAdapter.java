@@ -23,7 +23,6 @@ import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_LA
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_TEXT;
 
 import java.lang.reflect.Type;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -49,7 +48,7 @@ public class MCRLabelSetTypeAdapter extends MCRJSONTypeAdapter<MCRLabelSetWrappe
         return labelsToJsonArray(labelSetWrapper.getSet());
     }
 
-    private JsonArray labelsToJsonArray(Set<MCRLabel> labels) {
+    private JsonArray labelsToJsonArray(SortedSet<MCRLabel> labels) {
         JsonArray labelJsonArray = new JsonArray();
         for (MCRLabel label : labels) {
             JsonObject labelJsonObj = labelToJsonObj(label);
