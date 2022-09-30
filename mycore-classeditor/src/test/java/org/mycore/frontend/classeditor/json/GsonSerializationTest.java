@@ -18,8 +18,8 @@
 
 package org.mycore.frontend.classeditor.json;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.junit.Before;
 import org.mycore.common.config.MCRConfiguration2;
@@ -43,7 +43,7 @@ public class GsonSerializationTest {
         MCRCategoryImpl mcrCategoryImpl = new MCRCategoryImpl();
         MCRCategoryID id = new MCRCategoryID(rootID, id2);
         mcrCategoryImpl.setId(id);
-        Set<MCRLabel> labels = new HashSet<>();
+        SortedSet<MCRLabel> labels = new TreeSet<>();
         labels.add(new MCRLabel("de", text + "_de", "desc_" + text + "_de"));
         labels.add(new MCRLabel("en", text + "_en", "desc_" + text + "_en"));
         mcrCategoryImpl.setLabels(labels);

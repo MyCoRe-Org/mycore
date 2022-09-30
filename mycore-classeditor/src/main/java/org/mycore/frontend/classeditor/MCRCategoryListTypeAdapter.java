@@ -29,7 +29,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.mycore.common.MCRJSONTypeAdapter;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -78,7 +78,7 @@ public class MCRCategoryListTypeAdapter extends MCRJSONTypeAdapter<MCRCategoryLi
     private JsonElement createCategRefJSONObj(MCRCategory categ, Boolean hasLink) {
         JsonObject categRefJsonObject = new JsonObject();
         categRefJsonObject.add(PROP_ID, serializationContext.serialize(categ.getId()));
-        Set<MCRLabel> labels = categ.getLabels();
+        SortedSet<MCRLabel> labels = categ.getLabels();
         categRefJsonObject.add(PROP_LABELS, serializationContext.serialize(new MCRLabelSetWrapper(labels)));
         URI uri = categ.getURI();
         if (uri != null) {

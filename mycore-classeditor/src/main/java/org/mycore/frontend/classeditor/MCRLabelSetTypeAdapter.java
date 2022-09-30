@@ -23,8 +23,9 @@ import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_LA
 import static org.mycore.frontend.classeditor.json.MCRJSONCategoryHelper.PROP_TEXT;
 
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,7 +72,7 @@ public class MCRLabelSetTypeAdapter extends MCRJSONTypeAdapter<MCRLabelSetWrappe
     @Override
     public MCRLabelSetWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
-        Set<MCRLabel> labels = new HashSet<>();
+        SortedSet<MCRLabel> labels = new TreeSet<>();
         for (JsonElement jsonElement : json.getAsJsonArray()) {
             JsonObject labelJsonObject = jsonElement.getAsJsonObject();
             MCRLabel label = jsonLabelToMCRLabel(labelJsonObject);
