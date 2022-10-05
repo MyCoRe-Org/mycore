@@ -20,6 +20,8 @@ package org.mycore.restapi.v2;
 
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_CLASSID;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -36,6 +44,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.model.MCRClass;
 import org.mycore.datamodel.classifications2.model.MCRClassCategory;
 import org.mycore.datamodel.classifications2.model.MCRClassURL;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRDetailLevel;
@@ -109,7 +118,7 @@ public class MCRRestClassifications {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8", "application/rdf+xml" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}")
@@ -123,7 +132,7 @@ public class MCRRestClassifications {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8", "application/rdf+xml" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}/{" + PARAM_CATEGID + "}")
@@ -150,13 +159,13 @@ public class MCRRestClassifications {
 
         MCRCategoryID categoryID = new MCRCategoryID(classId, categId);
         switch (detailLevel) {
-        case detailed:
-            return getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
-        case summary:
-            return getClassification(classId, dao -> dao.getCategory(categoryID, 0));
-        case normal: //default case
-        default:
-            return getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
+            case detailed:
+                return getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
+            case summary:
+                return getClassification(classId, dao -> dao.getCategory(categoryID, 0));
+            case normal: //default case
+            default:
+                return getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
         }
     }
 
@@ -174,11 +183,90 @@ public class MCRRestClassifications {
                 .withMessage("Could not find classification or category in " + classId + ".")
                 .toException();
         }
+        if (request.getAcceptableMediaTypes().contains(MediaType.valueOf("application/rdf+xml"))) {
+            //classification.getLevel()
+            StringWriter sw = new StringWriter();
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+
+            Element eRDF = new Element("RDF", MCRConstants.RDF_NAMESPACE);
+            eRDF.addNamespaceDeclaration(MCRConstants.SKOS_NAMESPACE);
+            createSkosConcept(classification, eRDF);
+            try {
+                Document docOut = new Document(eRDF);
+                xout.output(docOut, sw);
+                return Response.ok(sw.toString()).type("application/rdf+xml; charset=UTF-8").build();
+            } catch (IOException e) {
+                throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRCLASS_NOT_FOUND)
+                    .withMessage("Could not find classification or category in " + classId + ".")
+                    .toException();
+            }
+        }
+
         return Response.ok()
             .entity(classification.isClassification() ? MCRClass.getClassification(classification)
                 : MCRClassCategory.getInstance(classification))
             .lastModified(lastModified)
             .build();
+    }
+
+    /**
+     * creates a rdf element skos:Concept and its XML structure with attributes and child elements
+     * @param categ - the MyCoRe category object
+     * @param eRDF the RDF root elements which collects all concepts
+     */
+    private void createSkosConcept(MCRCategory categ, Element eRDF) {
+        if (categ != null) {
+            Element eConcept = new Element("Concept", MCRConstants.SKOS_NAMESPACE);
+            eRDF.addContent(eConcept);
+
+            eConcept.setAttribute("about", retrieveURI(categ), MCRConstants.RDF_NAMESPACE);
+            for (MCRLabel lbl : categ.getLabels()) {
+                eConcept.addContent(new Element("prefLabel", MCRConstants.SKOS_NAMESPACE)
+                    .setAttribute("lang", lbl.getLang(), MCRConstants.XML_NAMESPACE)
+                    .setText(lbl.getText()));
+            }
+            for (MCRLabel lbl : categ.getLabels()) {
+                if (StringUtils.isNotEmpty(lbl.getDescription())) {
+                    eConcept.addContent(new Element("definition", MCRConstants.SKOS_NAMESPACE)
+                        .setAttribute("lang", lbl.getLang(), MCRConstants.XML_NAMESPACE)
+                        .setText(lbl.getDescription()));
+                }
+            }
+            if (categ.getParent() != null) {
+                eConcept.addContent(new Element("broader", MCRConstants.SKOS_NAMESPACE)
+                    .setAttribute("resource", retrieveURI(categ.getParent()), MCRConstants.RDF_NAMESPACE));
+            }
+            for (MCRCategory child : categ.getChildren()) {
+                eConcept.addContent(new Element("narrower", MCRConstants.SKOS_NAMESPACE)
+                    .setAttribute("resource", retrieveURI(child), MCRConstants.RDF_NAMESPACE));
+                createSkosConcept(child, eRDF);
+            }
+        }
+    }
+
+    /**
+     * retrieves the URI for the SKOS concept
+     * with same reasonable fallbacks
+     * 
+     * Details of the implementation needs to be discussed within the community
+     * 
+     * @param categ the MCRCategory object
+     * 
+     * @return the URI as String
+     */
+    private String retrieveURI(MCRCategory categ) {
+        if (categ.getURI() != null) {
+            return categ.getURI().toString();
+        }
+        if (categ.getLabel("x-uri").isPresent()) {
+            return categ.getLabel("x-uri").get().getText();
+        }
+        if (categ.isClassification()) {
+            return MCRFrontendUtil.getBaseURL() + "classifications/" + categ.getId().getRootID();
+        }
+        return MCRFrontendUtil.getBaseURL() + "classifications/" + categ.getId().getRootID() + "#"
+            + categ.getId().getID();
     }
 
     private static Date getLastModifiedDate(@PathParam(PARAM_CLASSID) String classId, MCRCategoryDAO categoryDAO) {

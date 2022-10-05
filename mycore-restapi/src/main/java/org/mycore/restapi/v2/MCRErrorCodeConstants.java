@@ -26,6 +26,9 @@ final class MCRErrorCodeConstants {
     public static final String MCRCLASS_NOT_FOUND = "MCRCLASS_NOT_FOUND";
 
     public static final String MCRCLASS_ID_MISMATCH = "MCRCLASS_ID_MISMATCH";
+    
+    public static final String MCRCLASS_SERIALIZATION_ERROR = "MCRCLASS_SERIALIZATION_ERROR";
+
 
     //MCRObject
     public static final String MCROBJECT_NO_PERMISSION = "MCROBJECT_NO_PERMISSION";
