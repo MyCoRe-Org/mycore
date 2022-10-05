@@ -55,7 +55,9 @@ public class MCRContentNegotiationViaExtensionFilter implements ContainerRequest
 
     private static final Map<String, MediaType> MEDIA_TYPE_MAPPINGS = Map.ofEntries(
         Map.entry("json", MediaType.APPLICATION_JSON_TYPE),
-        Map.entry("xml", MediaType.APPLICATION_XML_TYPE));
+        Map.entry("xml", MediaType.APPLICATION_XML_TYPE),
+        Map.entry("rdf", MediaType.valueOf("application/rdf+xml")));
+    
 
     private UriConnegFilter uriConnegFilter = new UriConnegFilter(MEDIA_TYPE_MAPPINGS, Map.of());
 
