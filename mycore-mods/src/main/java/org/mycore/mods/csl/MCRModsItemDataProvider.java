@@ -79,6 +79,12 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
 
     public static final String URN_RESOLVER_LINK = "https://nbn-resolving.org/";
 
+    private static final Set<String> KNOWN_UNMAPPED_PERSON_ROLES = MCRConfiguration2
+        .getString("MCR.CSL.KnownUnmappedPersonRoles")
+        .stream()
+        .flatMap(str -> Stream.of(str.split(",")))
+        .collect(Collectors.toUnmodifiableSet());
+
     private MCRMODSWrapper wrapper;
 
     private String id;
@@ -476,7 +482,11 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 idb.event(Stream.of(cslNames).map(CSLName::getLiteral).collect(Collectors.joining(", ")));
                 break;
             default:
-                LOGGER.warn("Unknown person role " + role + " in " + this.id);
+                if (KNOWN_UNMAPPED_PERSON_ROLES.contains(role)) {
+                    LOGGER.trace("Unmapped person role " + role + " in " + this.id);
+                } else {
+                    LOGGER.warn("Unknown person role " + role + " in " + this.id);
+                }
                 break;
             }
         });
