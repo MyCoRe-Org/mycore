@@ -199,7 +199,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         Date modified = (Date) doc.getFieldValue(getModifiedField());
 
         if (modified == null) {
-            throw new IllegalArgumentException("'" + getModifiedField() + "' is null for '" + docId + "'");
+            throw new NullPointerException("'" + getModifiedField() + "' is null for '" + docId + "'");
         }
 
         MCROAIObjectManager objectManager = getObjectManager();
