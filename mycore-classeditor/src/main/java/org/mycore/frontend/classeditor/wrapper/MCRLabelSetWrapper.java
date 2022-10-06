@@ -18,19 +18,19 @@
 
 package org.mycore.frontend.classeditor.wrapper;
 
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 public class MCRLabelSetWrapper {
 
-    private Set<MCRLabel> labelSet;
+    private SortedSet<MCRLabel> labelSet;
 
-    public MCRLabelSetWrapper(Set<MCRLabel> labels) {
+    public MCRLabelSetWrapper(SortedSet<MCRLabel> labels) {
         this.labelSet = labels;
     }
 
-    public Set<MCRLabel> getSet() {
+    public SortedSet<MCRLabel> getSet() {
         return labelSet;
     }
 

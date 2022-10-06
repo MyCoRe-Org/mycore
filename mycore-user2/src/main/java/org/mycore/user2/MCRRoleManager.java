@@ -22,9 +22,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -219,7 +220,7 @@ public class MCRRoleManager {
         if (!DAO.exist(rootID)) {
             MCRCategoryImpl category = new MCRCategoryImpl();
             category.setId(rootID);
-            HashSet<MCRLabel> labels = new HashSet<>();
+            SortedSet<MCRLabel> labels = new TreeSet<>();
             labels.add(new MCRLabel("de", "Systemrollen", null));
             labels.add(new MCRLabel("en", "system roles", null));
             category.setLabels(labels);

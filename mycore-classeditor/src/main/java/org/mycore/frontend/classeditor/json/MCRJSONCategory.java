@@ -20,7 +20,7 @@ package org.mycore.frontend.classeditor.json;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -92,7 +92,7 @@ public class MCRJSONCategory implements MCRCategory {
         return category.getId();
     }
 
-    public Set<MCRLabel> getLabels() {
+    public SortedSet<MCRLabel> getLabels() {
         return category.getLabels();
     }
 
@@ -120,7 +120,7 @@ public class MCRJSONCategory implements MCRCategory {
         return category.getCurrentLabel();
     }
 
-    public void setLabels(Set<MCRLabel> labels) {
+    public void setLabels(SortedSet<MCRLabel> labels) {
         category.setLabels(labels);
     }
 

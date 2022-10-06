@@ -30,7 +30,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.mycore.common.MCRJSONTypeAdapter;
 import org.mycore.common.config.MCRConfiguration2;
@@ -98,7 +98,7 @@ public class MCRCategoryTypeAdapter extends MCRJSONTypeAdapter<MCRJSONCategory> 
             rubricJsonObject.add(PROP_ID, contextSerialization.serialize(id));
         }
 
-        Set<MCRLabel> labels = category.getLabels();
+        SortedSet<MCRLabel> labels = category.getLabels();
         rubricJsonObject.add(PROP_LABELS, contextSerialization.serialize(new MCRLabelSetWrapper(labels)));
         URI uri = category.getURI();
         if (uri != null) {

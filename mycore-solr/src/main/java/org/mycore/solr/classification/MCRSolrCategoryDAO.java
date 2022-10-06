@@ -21,7 +21,7 @@ package org.mycore.solr.classification;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,7 +60,7 @@ public class MCRSolrCategoryDAO extends MCRCategoryDAOImpl {
     }
 
     @Override
-    public MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
+    public MCRCategory setLabels(MCRCategoryID id, SortedSet<MCRLabel> labels) {
         MCRCategory category = super.setLabels(id, labels);
         MCRSolrClassificationUtil.reindex(category);
         return category;

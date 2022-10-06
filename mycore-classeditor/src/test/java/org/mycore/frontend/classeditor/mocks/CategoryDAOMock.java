@@ -22,9 +22,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -72,7 +73,7 @@ public class CategoryDAOMock implements MCRCategoryDAO {
 
     private MCRJSONCategory createCategory(String rootID, String categID, MCRCategoryID parentID) {
         MCRCategoryID id = new MCRCategoryID(rootID, categID);
-        Set<MCRLabel> labels = new HashSet<>();
+        SortedSet<MCRLabel> labels = new TreeSet<>();
         labels.add(new MCRLabel("de", id + "_text", id + "_descr"));
         labels.add(new MCRLabel("en", id + "_text", id + "_descr"));
         MCRJSONCategory newCategory = new MCRJSONCategory();
@@ -177,7 +178,7 @@ public class CategoryDAOMock implements MCRCategoryDAO {
     }
 
     @Override
-    public MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
+    public MCRCategory setLabels(MCRCategoryID id, SortedSet<MCRLabel> labels) {
         return categMap.get(id);
     }
 

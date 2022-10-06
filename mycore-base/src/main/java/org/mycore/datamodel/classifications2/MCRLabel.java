@@ -43,7 +43,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 @Embeddable
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-public class MCRLabel implements Cloneable, Serializable {
+public class MCRLabel implements Cloneable, Serializable, Comparable<MCRLabel> {
 
     private static final long serialVersionUID = -843799854929361194L;
 
@@ -194,4 +194,21 @@ public class MCRLabel implements Cloneable, Serializable {
         return getDescription().equals(other.getDescription());
     }
 
+    @Override
+    public int compareTo(MCRLabel other) {
+            if (other == null) {
+                return 1;
+            }
+            //both are not null
+            if (this.getLang() == other.getLang()) { // this intentionally uses == to allow for both null
+                return 0;
+            }
+            if (this.getLang() == null) {
+                return -1;
+            }
+            if (other.getLang() == null) {
+                return 1;
+            }
+            return this.getLang().compareTo(other.getLang());
+    }
 }

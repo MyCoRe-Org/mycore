@@ -21,7 +21,7 @@ package org.mycore.datamodel.classifications2;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Interface of the Data Access Object for Classifications.
@@ -246,7 +246,7 @@ public interface MCRCategoryDAO {
      *            to be set
      * @return category where the labels was set
      */
-    MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels);
+    MCRCategory setLabels(MCRCategoryID id, SortedSet<MCRLabel> labels);
 
     /**
      * Sets or updates the URI from a Category.
