@@ -29,8 +29,8 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-bom</artifactId>
-  <name>MyCoRe Bill of Materials (BOM)</name>
   <packaging>pom</packaging>
+  <name>MyCoRe Bill of Materials (BOM)</name>
 
   <properties>
     <grizzly.version>3.0.1</grizzly.version>
