@@ -198,9 +198,7 @@ public class MCROAISolrSearcher extends MCROAISearcher {
         String docId = doc.getFieldValue("id").toString();
         Date modified = (Date) doc.getFieldValue(getModifiedField());
 
-        if (modified == null) {
-            throw new NullPointerException("'" + getModifiedField() + "' is null for '" + docId + "'");
-        }
+        LOGGER.debug("'{}' is '{}' for {}", getModifiedField(), modified, docId);
 
         MCROAIObjectManager objectManager = getObjectManager();
         String oaiId = objectManager.getOAIId(docId);
