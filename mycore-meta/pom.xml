@@ -11,6 +11,17 @@
   <packaging>pom</packaging>
   <name>MyCoRe Complete POM package</name>
   <description>pom packaging of MyCoRe containing mycore-base and all components</description>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <build>
     <plugins>
       <plugin>

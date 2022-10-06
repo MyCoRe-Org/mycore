@@ -28,6 +28,17 @@
   </parent>
   <artifactId>mycore-csl</artifactId>
   <name>MyCoRe CSL</name>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>de.undercouch</groupId>
