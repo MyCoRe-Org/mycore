@@ -509,7 +509,7 @@ public class MCRObjectService {
      */
     public final boolean isFlagSet(String value) {
         return MCRUtils.filterTrimmedNotEmpty(value)
-            .map(flagValue -> flags.stream().anyMatch(flag -> flag.getText().equals(flagValue)))
+            .map(flagValue -> flags.stream().anyMatch(flag -> flagValue.equals(flag.getText())))
             .orElse(false);
     }
 
@@ -522,7 +522,7 @@ public class MCRObjectService {
      */
     public final boolean isFlagTypeSet(String type) {
         return MCRUtils.filterTrimmedNotEmpty(type)
-            .map(flagType -> flags.stream().anyMatch(flag -> flag.getType().equals(flagType)))
+            .map(flagType -> flags.stream().anyMatch(flag -> flagType.equals(flag.getType())))
             .orElse(false);
     }
 
