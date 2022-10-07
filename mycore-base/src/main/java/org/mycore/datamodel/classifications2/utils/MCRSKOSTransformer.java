@@ -26,6 +26,12 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.MCRFrontendUtil;
 
+/**
+ * Transforms MyCoRe classification and category objects into SKOS resources
+ * 
+ * @author Robert Stephan
+ *
+ */
 public class MCRSKOSTransformer {
 
     public static Document getSKOSasRDFXML(MCRCategory categ) {
@@ -150,9 +156,9 @@ public class MCRSKOSTransformer {
         }
         */
         if (categ.isClassification()) {
-            return MCRFrontendUtil.getBaseURL() + "entity/classification/" + categ.getId().getRootID();
+            return MCRFrontendUtil.getBaseURL() + "open-data/classification/" + categ.getId().getRootID();
         }
-        return MCRFrontendUtil.getBaseURL() + "entity/classification/" + categ.getId().getRootID() + "/"
+        return MCRFrontendUtil.getBaseURL() + "open-data/classification/" + categ.getId().getRootID() + "/"
             + categ.getId().getID();
     }
 
