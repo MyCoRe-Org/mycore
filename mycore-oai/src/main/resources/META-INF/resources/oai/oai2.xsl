@@ -335,6 +335,29 @@ p.intro {
 
 
 <!--
+   Identify / Rights
+-->
+
+<xsl:template match="ri:rightsManifest" xmlns:ri="http://www.openarchives.org/OAI/2.0/rights/">
+  <h2>Rights Manifest</h2>
+  <xsl:variable name="appliesTo" select="substring-after(@appliesTo,'#')" />
+  <xsl:for-each select="ri:rights">
+    <h2 class="oaiRecordTitle">Applies to: <xsl:value-of select="$appliesTo"/></h2>
+    <div class="oaiRecord">
+      <xsl:if test="ri:rightsReference">
+        <h3>Reference</h3>
+        <xsl:variable name="rightsReference" select="ri:rightsReference/@ref" />
+        <div><a href="{$rightsReference}"><xsl:value-of select="$rightsReference" /></a></div>
+      </xsl:if>
+      <xsl:if test="ri:rightsDefinition">
+        <xsl:apply-templates select="ri:rightsDefinition/*" />
+      </xsl:if>
+    </div>
+  </xsl:for-each>
+</xsl:template>
+
+
+<!--
    Identify / Friends
 -->
 
