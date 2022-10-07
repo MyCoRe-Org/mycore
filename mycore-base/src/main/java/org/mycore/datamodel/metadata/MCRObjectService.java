@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -34,10 +35,10 @@ import org.mycore.common.MCRUtils;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRISO8601Date;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.mycore.datamodel.common.MCRISO8601Date;
 
 /**
  * This class implements all methods for handling MCRObject service data.
@@ -407,7 +408,7 @@ public class MCRObjectService {
      *              the new flag value as string
      */
     public final void addFlag(String type, String value) {
-        String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
+        String lType = StringUtils.trim(type);
         MCRUtils.filterTrimmedNotEmpty(value)
             .map(flagValue -> new MCRMetaLangText("servflag", null, lType, 0, null, flagValue))
             .ifPresent(flags::add);
@@ -446,7 +447,7 @@ public class MCRObjectService {
      */
     protected final ArrayList<MCRMetaLangText> getFlagsAsMCRMetaLangText(String type) {
         return flags.stream()
-            .filter(metaLangText -> type.equals(metaLangText.getType()))
+            .filter(metaLangText -> StringUtils.equals(type, metaLangText.getType()))
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -521,9 +522,7 @@ public class MCRObjectService {
      *          otherwise false
      */
     public final boolean isFlagTypeSet(String type) {
-        return MCRUtils.filterTrimmedNotEmpty(type)
-            .map(flagType -> flags.stream().anyMatch(flag -> flagType.equals(flag.getType())))
-            .orElse(false);
+        return flags.stream().anyMatch(flag -> StringUtils.equals(type, flag.getType()));
     }
 
     /**
@@ -550,8 +549,7 @@ public class MCRObjectService {
      *            a type as string
      */
     public final void removeFlags(String type) {
-        ArrayList<MCRMetaLangText> internalList = getFlagsAsMCRMetaLangText(type);
-        flags.removeAll(internalList);
+        flags.removeIf(f -> StringUtils.equals(type,  f.getType()));
     }
 
     /**
@@ -579,14 +577,14 @@ public class MCRObjectService {
      *
      * @param index
      *            a index in the list
-     * @param value
-     *            the value of a flag as string
+     * @param type
+     *            the type a flag as string
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is invalid
      */
-    public final void replaceFlagType(int index, String value) throws IndexOutOfBoundsException {
-        MCRUtils.filterTrimmedNotEmpty(value)
-            .ifPresent(flagValue -> updateFlag(index, flag -> flag.setType(flagValue)));
+    public final void replaceFlagType(int index, String type) throws IndexOutOfBoundsException {
+        String lType = StringUtils.trim(type);
+        updateFlag(index, flag -> flag.setType(lType));
     }
 
     /**
@@ -1057,7 +1055,7 @@ public class MCRObjectService {
      *              a form as string, defaults to 'plain'
      */
     public final void addMessage(String type, String value, String form) {
-        String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
+        String lType = StringUtils.trim(type);
         MCRUtils.filterTrimmedNotEmpty(value)
             .map(messageValue -> {
                 MCRMetaDateLangText message
@@ -1088,14 +1086,14 @@ public class MCRObjectService {
      *
      * @param index
      *            a index in the list
-     * @param value
-     *            the value of a message as string
+     * @param type
+     *            the type of a message as string
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is invalid
      */
-    public final void replaceMessageType(int index, String value) throws IndexOutOfBoundsException {
-        MCRUtils.filterTrimmedNotEmpty(value)
-            .ifPresent(messageValue -> updateMessage(index, message -> message.setType(messageValue)));
+    public final void replaceMessageType(int index, String type) throws IndexOutOfBoundsException {
+        String lType = StringUtils.trim(type);
+        updateMessage(index, message -> message.setType(lType));
     }
 
     private void updateMessage(int index, Consumer<MCRMetaDateLangText> messageUpdater) {
@@ -1248,7 +1246,7 @@ public class MCRObjectService {
      *              the new classification value as {@link MCRCategoryID}
      */
     public final void addClassification(String type, MCRCategoryID value) {
-        String lType = MCRUtils.filterTrimmedNotEmpty(type).orElse(null);
+        String lType = StringUtils.trim(type);
         classifications.add(new MCRMetaClassification("servclass", 0, lType, value));
     }
 
@@ -1272,15 +1270,14 @@ public class MCRObjectService {
      *
      * @param index
      *            a index in the list
-     * @param value
-     *            the value of a flag as string
+     * @param type
+     *            the type of a flag as string
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is invalid
      */
-    public final void replaceClassificationType(int index, String value) throws IndexOutOfBoundsException {
-        MCRUtils.filterTrimmedNotEmpty(value)
-            .ifPresent(classificationValue -> updateClassification(index,
-                classification -> classification.setType(classificationValue)));
+    public final void replaceClassificationType(int index, String type) throws IndexOutOfBoundsException {
+        String lType = StringUtils.trim(type);
+        updateClassification(index, classification -> classification.setType(lType));
     }
 
     private void updateClassification(int index, Consumer<MCRMetaClassification> classificationUpdater) {
@@ -1311,8 +1308,8 @@ public class MCRObjectService {
      *            a type as string
      */
     public final void removeClassifications(String type) {
-        List<MCRMetaClassification> internalList = getClassificationsAsMCRMetaClassification(type);
-        classifications.removeAll(internalList);
+        String lType = StringUtils.trim(type);
+        classifications.removeIf(c -> StringUtils.equals(lType,  c.getType()));
     }
 
 }
