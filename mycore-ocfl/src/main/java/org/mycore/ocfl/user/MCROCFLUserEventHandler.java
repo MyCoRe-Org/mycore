@@ -21,7 +21,6 @@ package org.mycore.ocfl.user;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.user2.MCRUser;
@@ -34,8 +33,7 @@ public class MCROCFLUserEventHandler implements MCREventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCROCFLXMLUserManager MANAGER = new MCROCFLXMLUserManager(
-        MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository"));
+    private static final MCROCFLXMLUserManager MANAGER = new MCROCFLXMLUserManager();
 
     @Override
     public void doHandleEvent(MCREvent evt) throws MCRException {

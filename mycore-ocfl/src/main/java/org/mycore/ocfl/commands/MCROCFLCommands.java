@@ -142,15 +142,13 @@ public class MCROCFLCommands {
         if (MCRUserManager.getUser(userId) == null) {
             throw new MCRUsageException("The User '" + userId + "' does not exist!");
         }
-        new MCROCFLXMLUserManager(MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository"))
-            .updateUser(MCRUserManager.getUser(userId));
+        new MCROCFLXMLUserManager().updateUser(MCRUserManager.getUser(userId));
     }
 
     @MCRCommand(syntax = "delete ocfl user {0}",
         help = "Delete user {0} in the OCFL Store")
     public static void deleteOCFLUser(String userId) {
-        new MCROCFLXMLUserManager(MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository"))
-            .deleteUser(userId);
+        new MCROCFLXMLUserManager().deleteUser(userId);
     }
 
     @MCRCommand(syntax = "sync ocfl users",
@@ -168,8 +166,7 @@ public class MCROCFLCommands {
     @MCRCommand(syntax = "restore database user {0} with version {1} from ocfl",
         help = "restore a specified revision of a ocfl user backup to the database")
     public static void writeUserToDb(String userId, String revision) throws IOException {
-        MCRUser user = new MCROCFLXMLUserManager(MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository"))
-            .retrieveContent(userId, revision);
+        MCRUser user = new MCROCFLXMLUserManager().retrieveContent(userId, revision);
         MCRUserManager.updateUser(user);
     }
 

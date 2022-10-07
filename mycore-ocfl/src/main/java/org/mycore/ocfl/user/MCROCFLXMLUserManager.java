@@ -20,8 +20,9 @@ package org.mycore.ocfl.user;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Date;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +31,8 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.content.MCRJAXBContent;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
 import org.mycore.ocfl.MCROCFLRepositoryProvider;
@@ -52,6 +54,8 @@ import edu.wisc.library.ocfl.api.model.VersionInfo;
  */
 public class MCROCFLXMLUserManager {
 
+    private static final String THE_USER = "The User '";
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String MESSAGE_CREATED = "Created";
@@ -64,6 +68,18 @@ public class MCROCFLXMLUserManager {
 
     private final OcflRepository repository;
 
+    /**
+     * Initializes the UserManager with the in the config defined repository.
+     */
+    public MCROCFLXMLUserManager() {
+        this.repository = MCROCFLRepositoryProvider.getRepository(
+            MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository"));
+    }
+
+    /**
+     * Initializes the UserManager with the given repositoryKey.
+     * @param repositoryKey the ID for the repository to be used
+     */
     public MCROCFLXMLUserManager(String repositoryKey) {
         this.repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
@@ -72,11 +88,19 @@ public class MCROCFLXMLUserManager {
         MCRUser currentUser = MCRUserManager.getCurrentUser();
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + user.getUserID();
 
+        /*
+         * On every Login, a update event gets called to update the "lastLogin" of a user.
+         * This would create many unnecessary versions/copies every time someone logs in.
+         * To prevent this, the update event gets ignored if the current user is a guest.
+         * Usually guests do not have rights to modify users, so the only time they trigger this event
+         * is during the update of "lastLogin", since the user switch has not happened yet.
+         */
         if (MCRSystemUserInformation.getGuestInstance().getUserID().equals(currentUser.getUserID())) {
             LOGGER.debug("Login Detected, ignoring...");
             return;
         }
 
+        // Transient users are not MyCoRe managed users, but rather from external sources
         if (user instanceof MCRTransientUser) {
             LOGGER.debug(IGNORING_TRANSIENT_USER);
             return;
@@ -89,9 +113,9 @@ public class MCROCFLXMLUserManager {
 
         VersionInfo info = new VersionInfo()
             .setMessage(MESSAGE_UPDATED)
-            .setCreated((new Date()).toInstant().atOffset(ZoneOffset.UTC))
-            .setUser(currentUser.getUserName(), currentUser.getEMailAddress());
-        MCRJAXBContent<MCRUser> content = new MCRJAXBContent<>(MCRUserTransformer.JAXB_CONTEXT, user);
+            .setCreated(OffsetDateTime.now(ZoneOffset.UTC))
+            .setUser(currentUser.getUserName(), buildEmail(currentUser));
+        MCRJDOMContent content = new MCRJDOMContent(MCRUserTransformer.buildExportableXML(user));
         try (InputStream userAsStream = content.getInputStream()) {
             repository.updateObject(ObjectVersionId.head(ocflUserID), info,
                 updater -> {
@@ -112,14 +136,14 @@ public class MCROCFLXMLUserManager {
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + user.getUserID();
 
         if (exists(ocflUserID)) {
-            throw new MCRUsageException("The User '" + user.getUserID() + "' already exists in OCFL Repository");
+            throw new MCRUsageException(THE_USER + user.getUserID() + "' already exists in OCFL Repository");
         }
 
         VersionInfo info = new VersionInfo()
             .setMessage(MESSAGE_CREATED)
-            .setCreated((new Date()).toInstant().atOffset(ZoneOffset.UTC))
-            .setUser(currentUser.getUserName(), currentUser.getEMailAddress());
-        MCRJAXBContent<MCRUser> content = new MCRJAXBContent<>(MCRUserTransformer.JAXB_CONTEXT, user);
+            .setCreated(OffsetDateTime.now(ZoneOffset.UTC))
+            .setUser(currentUser.getUserName(), buildEmail(currentUser));
+        MCRJDOMContent content = new MCRJDOMContent(MCRUserTransformer.buildExportableXML(user));
         try (InputStream userAsStream = content.getInputStream()) {
             repository.updateObject(ObjectVersionId.head(ocflUserID), info,
                 updater -> {
@@ -144,31 +168,35 @@ public class MCROCFLXMLUserManager {
 
         if (!exists(ocflUserID)) {
             throw new MCRUsageException(
-                "The User '" + userId + "' does not exist or has already been deleted!");
+                THE_USER + userId + "' does not exist or has already been deleted!");
         }
 
         VersionInfo info = new VersionInfo()
             .setMessage(MESSAGE_DELETED)
-            .setCreated((new Date()).toInstant().atOffset(ZoneOffset.UTC))
-            .setUser(currentUser.getUserName(), currentUser.getEMailAddress());
+            .setCreated(OffsetDateTime.now(ZoneOffset.UTC))
+            .setUser(currentUser.getUserName(), buildEmail(currentUser));
         repository.updateObject(ObjectVersionId.head(ocflUserID), info,
             updater -> {
                 updater.removeFile(userId + ".xml");
             });
     }
 
+    private String buildEmail(MCRUser currentUser) {
+        return Optional.ofNullable(currentUser.getEMailAddress()).map(email -> "mailto:" + email).orElse(null);
+    }
+
     public MCRUser retrieveContent(String userId, String revision) throws IOException {
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + userId;
 
         if (!repository.containsObject(ocflUserID)) {
-            throw new MCRUsageException("The User '" + ocflUserID + "' does not exist!");
+            throw new MCRUsageException(THE_USER + ocflUserID + "' does not exist!");
         }
 
         ObjectVersionId version = revision == null ? ObjectVersionId.head(ocflUserID)
             : ObjectVersionId.version(ocflUserID, revision);
 
         if (isDeleted(version)) {
-            throw new MCRUsageException("The User '" + ocflUserID + "' with version '" + revision
+            throw new MCRUsageException(THE_USER + ocflUserID + "' with version '" + revision
                 + "' has been deleted!");
         }
 
@@ -186,13 +214,11 @@ public class MCROCFLXMLUserManager {
 
     boolean exists(String ocflUserID) {
         return repository.containsObject(ocflUserID)
-            && !repository.describeVersion(ObjectVersionId.head(ocflUserID)).getVersionInfo().getMessage()
-                .equals(MESSAGE_DELETED);
+            && !isDeleted(ObjectVersionId.head(ocflUserID));
     }
 
     boolean exists(String ocflUserID, String revision) {
         return repository.containsObject(ocflUserID)
-            && !repository.describeVersion(ObjectVersionId.version(ocflUserID, revision)).getVersionInfo().getMessage()
-                .equals(MESSAGE_DELETED);
+            && !isDeleted(ObjectVersionId.version(ocflUserID, revision));
     }
 }
