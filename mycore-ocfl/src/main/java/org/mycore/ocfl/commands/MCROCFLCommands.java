@@ -31,11 +31,11 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.ocfl.MCROCFLMigration;
 import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
 import org.mycore.ocfl.MCROCFLPersistenceTransaction;
 import org.mycore.ocfl.MCROCFLRepositoryProvider;
-import org.mycore.ocfl.MCROCFLXMLClassificationManager;
+import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
+import org.mycore.ocfl.metadata.MCROCFLMigration;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
 

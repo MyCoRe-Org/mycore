@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl;
+package org.mycore.ocfl.classification;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +35,9 @@ import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLClassificationManager;
+import org.mycore.ocfl.MCROCFLMetadataVersion;
+import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
+import org.mycore.ocfl.MCROCFLRepositoryProvider;
 import org.xml.sax.SAXException;
 
 import edu.wisc.library.ocfl.api.OcflOption;

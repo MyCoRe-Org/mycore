@@ -37,6 +37,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
 
 /**
  * @author Tobias Lenhardt [Hammer1279]

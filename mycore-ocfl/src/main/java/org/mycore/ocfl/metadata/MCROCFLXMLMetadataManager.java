@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl;
+package org.mycore.ocfl.metadata;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +48,9 @@ import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLMetadataManagerAdapter;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.ocfl.MCROCFLMetadataVersion;
+import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
+import org.mycore.ocfl.MCROCFLRepositoryProvider;
 import org.xml.sax.SAXException;
 
 import edu.wisc.library.ocfl.api.OcflOption;
