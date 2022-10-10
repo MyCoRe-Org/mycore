@@ -311,15 +311,15 @@ wcms.navigation.Tree = function() {
 	 * Adds a new item as child of the selected one.
 	 */
 	function addNewItem() {
-		var item = {
+		let item = {
 			wcmsType: "item",
-			href: "/content/folder/myfile.xml",
+			href: "/content/folder/content_" + generateUID() + ".xml",
 			labelMap: {
 				de: "neuer Eintrag",
 				en: "new entry"
 			}
 		};
-		var addTreeItemFunc = dojo.hitch(this, addTreeItem);
+		let addTreeItemFunc = dojo.hitch(this, addTreeItem);
 		addTreeItemFunc(item);
 	}
 
