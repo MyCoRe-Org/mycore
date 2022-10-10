@@ -54,8 +54,6 @@ import edu.wisc.library.ocfl.api.model.VersionInfo;
  */
 public class MCROCFLXMLUserManager {
 
-    private static final String THE_USER = "The User '";
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String MESSAGE_CREATED = "Created";
@@ -136,7 +134,7 @@ public class MCROCFLXMLUserManager {
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + user.getUserID();
 
         if (exists(ocflUserID)) {
-            throw new MCRUsageException(THE_USER + user.getUserID() + "' already exists in OCFL Repository");
+            throw new MCRUsageException("The User '" + user.getUserID() + "' already exists in OCFL Repository");
         }
 
         VersionInfo info = new VersionInfo()
@@ -168,7 +166,7 @@ public class MCROCFLXMLUserManager {
 
         if (!exists(ocflUserID)) {
             throw new MCRUsageException(
-                THE_USER + userId + "' does not exist or has already been deleted!");
+                "The User '" + userId + "' does not exist or has already been deleted!");
         }
 
         VersionInfo info = new VersionInfo()
@@ -189,14 +187,14 @@ public class MCROCFLXMLUserManager {
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + userId;
 
         if (!repository.containsObject(ocflUserID)) {
-            throw new MCRUsageException(THE_USER + ocflUserID + "' does not exist!");
+            throw new MCRUsageException("The User '" + ocflUserID + "' does not exist!");
         }
 
         ObjectVersionId version = revision == null ? ObjectVersionId.head(ocflUserID)
             : ObjectVersionId.version(ocflUserID, revision);
 
         if (isDeleted(version)) {
-            throw new MCRUsageException(THE_USER + ocflUserID + "' with version '" + revision
+            throw new MCRUsageException("The User '" + ocflUserID + "' with version '" + revision
                 + "' has been deleted!");
         }
 
