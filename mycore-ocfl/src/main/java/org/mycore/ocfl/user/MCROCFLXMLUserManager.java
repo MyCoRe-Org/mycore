@@ -183,6 +183,13 @@ public class MCROCFLXMLUserManager {
         return Optional.ofNullable(currentUser.getEMailAddress()).map(email -> "mailto:" + email).orElse(null);
     }
 
+    /**
+     * Retrieve a MCRUser from the ocfl store.
+     * @param userId the userId of the requested user
+     * @param revision the version in ocfl store or <code>null</code> for latest
+     * @return the requested MCRUser
+     * @throws IOException if a error occurs during retrieval
+     */
     public MCRUser retrieveContent(String userId, String revision) throws IOException {
         String ocflUserID = MCROCFLObjectIDPrefixHelper.USER + userId;
 
