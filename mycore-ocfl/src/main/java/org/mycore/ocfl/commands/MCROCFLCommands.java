@@ -165,8 +165,15 @@ public class MCROCFLCommands {
 
     @MCRCommand(syntax = "restore user {0} from ocfl with version {1}",
         help = "restore a specified revision of a ocfl user backup to the primary user store")
-    public static void writeUserToDb(String userId, String revision) throws IOException {
+    public static void writeUserToDbVersioned(String userId, String revision) throws IOException {
         MCRUser user = new MCROCFLXMLUserManager().retrieveContent(userId, revision);
+        MCRUserManager.updateUser(user);
+    }
+
+    @MCRCommand(syntax = "restore user {0} from ocfl",
+        help = "restore the latest revision of a ocfl user backup to the primary user store")
+    public static void writeUserToDb(String userId) throws IOException {
+        MCRUser user = new MCROCFLXMLUserManager().retrieveContent(userId, null);
         MCRUserManager.updateUser(user);
     }
 
