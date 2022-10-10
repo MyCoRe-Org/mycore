@@ -136,7 +136,7 @@ public class MCRWCMSContentManager {
      * </p>
      * 
      * <p>
-     * If one or more files could'nt be saved because of an error the returning
+     * If one or more files couldn't be saved because of an error the returning
      * json looks like:<br>
      * {
      *   type: "error",
