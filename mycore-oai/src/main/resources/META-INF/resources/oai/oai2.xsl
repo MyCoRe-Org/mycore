@@ -274,6 +274,16 @@ p.intro {
 
 
 <!--
+   Identify / Dublin Core Description
+-->
+
+<xsl:template match="oai:description[oai_dc:dc]" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+  <h2>Description</h2>
+  <xsl:apply-templates select="oai_dc:dc"/>
+</xsl:template>
+
+
+<!--
    Identify / OAI-Identifier
 -->
 
@@ -339,20 +349,17 @@ p.intro {
 -->
 
 <xsl:template match="ri:rightsManifest" xmlns:ri="http://www.openarchives.org/OAI/2.0/rights/">
-  <h2>Rights Manifest</h2>
   <xsl:variable name="appliesTo" select="substring-after(@appliesTo,'#')" />
+  <h2>Rights Manifest for <xsl:value-of select="$appliesTo" /></h2>
   <xsl:for-each select="ri:rights">
-    <h2 class="oaiRecordTitle">Applies to: <xsl:value-of select="$appliesTo"/></h2>
-    <div class="oaiRecord">
-      <xsl:if test="ri:rightsReference">
-        <h3>Reference</h3>
-        <xsl:variable name="rightsReference" select="ri:rightsReference/@ref" />
-        <div><a href="{$rightsReference}"><xsl:value-of select="$rightsReference" /></a></div>
-      </xsl:if>
-      <xsl:if test="ri:rightsDefinition">
-        <xsl:apply-templates select="ri:rightsDefinition/*" />
-      </xsl:if>
-    </div>
+    <xsl:if test="ri:rightsReference">
+      <h3>Reference</h3>
+      <xsl:variable name="rightsReference" select="ri:rightsReference/@ref" />
+      <div><a href="{$rightsReference}"><xsl:value-of select="$rightsReference" /></a></div>
+    </xsl:if>
+    <xsl:if test="ri:rightsDefinition">
+      <xsl:apply-templates select="ri:rightsDefinition/*" />
+    </xsl:if>
   </xsl:for-each>
 </xsl:template>
 
@@ -628,7 +635,7 @@ p.intro {
 
 <!-- oai_dc record -->
 
-<xsl:template match="oai_dc:dc"  xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" >
+<xsl:template match="oai_dc:dc" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
   <div class="dcdata">
     <h3>Dublin Core Metadata (oai_dc)</h3>
     <table class="dcdata">
