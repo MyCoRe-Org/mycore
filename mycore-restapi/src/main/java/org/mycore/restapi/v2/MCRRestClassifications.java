@@ -39,7 +39,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.model.MCRClass;
 import org.mycore.datamodel.classifications2.model.MCRClassCategory;
 import org.mycore.datamodel.classifications2.model.MCRClassURL;
-import org.mycore.datamodel.classifications2.utils.MCRSKOSTransformer;
+import org.mycore.datamodel.classifications2.utils.MCRSkosTransformer;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRDetailLevel;
@@ -179,7 +179,7 @@ public class MCRRestClassifications {
                 .toException();
         }
         if (request.getAcceptableMediaTypes().contains(MediaType.valueOf("application/rdf+xml"))) {
-            Document docSKOS = MCRSKOSTransformer.getSKOSasRDFXML(classification);
+            Document docSKOS = MCRSkosTransformer.getSkosInRDFXML(classification);
             MCRJDOMContent content = new MCRJDOMContent(docSKOS);
             try {
                 return Response.ok(content.asString()).type("application/rdf+xml; charset=UTF-8").build();

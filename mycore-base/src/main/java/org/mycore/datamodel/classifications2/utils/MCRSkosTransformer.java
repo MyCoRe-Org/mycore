@@ -32,9 +32,9 @@ import org.mycore.frontend.MCRFrontendUtil;
  * @author Robert Stephan
  *
  */
-public class MCRSKOSTransformer {
+public class MCRSkosTransformer {
 
-    public static Document getSKOSasRDFXML(MCRCategory categ) {
+    public static Document getSkosInRDFXML(MCRCategory categ) {
         Element eRDF = new Element("RDF", MCRConstants.RDF_NAMESPACE);
         eRDF.addNamespaceDeclaration(MCRConstants.SKOS_NAMESPACE);
         if (categ.isClassification()) {
