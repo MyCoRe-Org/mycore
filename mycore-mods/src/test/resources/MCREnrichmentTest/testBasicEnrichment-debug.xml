@@ -67,14 +67,14 @@
   </before>
   <enrichmentIteration>
     <newIdentifiersFound>
-      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1234-5678</mods:identifier>
-      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1234-6789</mods:identifier>
       <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1000-9999</mods:identifier>
+      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1234-6789</mods:identifier>
+      <mods:identifier xmlns:mods="http://www.loc.gov/mods/v3" type="issn">1234-5678</mods:identifier>
     </newIdentifiersFound>
     <resolved from="DSC">
       <mods:relatedItem xmlns:mods="http://www.loc.gov/mods/v3" type="host">
-        <mods:note>from data source C for ISSN 1234-5678</mods:note>
-        <mods:identifier type="issn">1234-5678</mods:identifier>
+        <mods:note>from data source C for ISSN 1234-6789</mods:note>
+        <mods:identifier type="issn">1234-6789</mods:identifier>
       </mods:relatedItem>
     </resolved>
     <afterMerge>
@@ -84,13 +84,13 @@
         <mods:note>host from data source B</mods:note>
         <mods:identifier type="issn">1234-5678</mods:identifier>
         <mods:identifier type="issn">1234-6789</mods:identifier>
-        <mods:note>from data source C for ISSN 1234-5678</mods:note>
+        <mods:note>from data source C for ISSN 1234-6789</mods:note>
       </mods:relatedItem>
     </afterMerge>
     <resolved from="DSC">
       <mods:relatedItem xmlns:mods="http://www.loc.gov/mods/v3" type="host">
-        <mods:note>from data source C for ISSN 1234-6789</mods:note>
-        <mods:identifier type="issn">1234-6789</mods:identifier>
+        <mods:note>from data source C for ISSN 1234-5678</mods:note>
+        <mods:identifier type="issn">1234-5678</mods:identifier>
       </mods:relatedItem>
     </resolved>
     <afterMerge>
@@ -100,8 +100,8 @@
         <mods:note>host from data source B</mods:note>
         <mods:identifier type="issn">1234-5678</mods:identifier>
         <mods:identifier type="issn">1234-6789</mods:identifier>
-        <mods:note>from data source C for ISSN 1234-5678</mods:note>
         <mods:note>from data source C for ISSN 1234-6789</mods:note>
+        <mods:note>from data source C for ISSN 1234-5678</mods:note>
       </mods:relatedItem>
     </afterMerge>
   </enrichmentIteration>

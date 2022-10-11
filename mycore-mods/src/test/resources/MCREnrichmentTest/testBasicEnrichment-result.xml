@@ -4,8 +4,8 @@
   <mods:relatedItem type="host">
     <mods:note>host from data source A</mods:note>
     <mods:note>host from data source B</mods:note>
-    <mods:note>from data source C for ISSN 1234-5678</mods:note>
     <mods:note>from data source C for ISSN 1234-6789</mods:note>
+    <mods:note>from data source C for ISSN 1234-5678</mods:note>
     <mods:identifier type="issn">1000-9999</mods:identifier>
     <mods:identifier type="issn">1234-5678</mods:identifier>
     <mods:identifier type="issn">1234-6789</mods:identifier>
