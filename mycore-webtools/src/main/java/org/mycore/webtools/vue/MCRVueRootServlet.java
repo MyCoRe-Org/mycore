@@ -128,7 +128,7 @@ public class MCRVueRootServlet extends MCRContentServlet {
             org.jdom2.Document jdom = new SAXBuilder().build(new StringReader(document.outerHtml()));
             Element jdomRoot = jdom.getRootElement();
             List<Element> scriptAndLinks = jdomRoot.getChild("head").getChildren().stream()
-                .filter(el -> el.getName().equals("script") || el.getName().equals("link"))
+                .filter(el -> "script".equals(el.getName()) || "link".equals(el.getName()))
                 .collect(Collectors.toList())
                 .stream().map(Element::detach).peek(el -> {
                     String hrefAttr = el.getAttributeValue("href");

@@ -112,7 +112,7 @@ public class MCRWCMSContentManager {
             doc = new MCRURLContent(resourceURL).asXML();
         }
         Element rootElement = doc.getRootElement();
-        if (!rootElement.getName().equals("MyCoReWebPage")) {
+        if (!"MyCoReWebPage".equals(rootElement.getName())) {
             throwError(ErrorType.notMyCoReWebPage, webpageId);
         }
         // return content
