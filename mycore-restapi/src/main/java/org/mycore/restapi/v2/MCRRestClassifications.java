@@ -20,6 +20,7 @@ package org.mycore.restapi.v2;
 
 import static org.mycore.restapi.v2.MCRRestAuthorizationFilter.PARAM_CLASSID;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.jdom2.Document;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -36,6 +39,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.model.MCRClass;
 import org.mycore.datamodel.classifications2.model.MCRClassCategory;
 import org.mycore.datamodel.classifications2.model.MCRClassURL;
+import org.mycore.datamodel.classifications2.utils.MCRSkosTransformer;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.restapi.annotations.MCRRequireTransaction;
 import org.mycore.restapi.converter.MCRDetailLevel;
@@ -109,7 +113,7 @@ public class MCRRestClassifications {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8", "application/rdf+xml" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}")
@@ -123,7 +127,7 @@ public class MCRRestClassifications {
     }
 
     @GET
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8" })
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON + ";charset=UTF-8", "application/rdf+xml" })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}/{" + PARAM_CATEGID + "}")
@@ -150,13 +154,13 @@ public class MCRRestClassifications {
 
         MCRCategoryID categoryID = new MCRCategoryID(classId, categId);
         switch (detailLevel) {
-        case detailed:
-            return getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
-        case summary:
-            return getClassification(classId, dao -> dao.getCategory(categoryID, 0));
-        case normal: //default case
-        default:
-            return getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
+            case detailed:
+                return getClassification(classId, dao -> dao.getRootCategory(categoryID, -1));
+            case summary:
+                return getClassification(classId, dao -> dao.getCategory(categoryID, 0));
+            case normal: //default case
+            default:
+                return getClassification(classId, dao -> dao.getRootCategory(categoryID, 0));
         }
     }
 
@@ -174,6 +178,19 @@ public class MCRRestClassifications {
                 .withMessage("Could not find classification or category in " + classId + ".")
                 .toException();
         }
+        if (request.getAcceptableMediaTypes().contains(MediaType.valueOf("application/rdf+xml"))) {
+            Document docSKOS = MCRSkosTransformer.getSkosInRDFXML(classification);
+            MCRJDOMContent content = new MCRJDOMContent(docSKOS);
+            try {
+                return Response.ok(content.asString()).type("application/rdf+xml; charset=UTF-8").build();
+            } catch (IOException e) {
+                throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                    .withErrorCode(MCRErrorCodeConstants.MCRCLASS_NOT_FOUND)
+                    .withMessage("Could not find classification or category in " + classId + ".")
+                    .toException();
+            }
+        }
+
         return Response.ok()
             .entity(classification.isClassification() ? MCRClass.getClassification(classification)
                 : MCRClassCategory.getInstance(classification))
