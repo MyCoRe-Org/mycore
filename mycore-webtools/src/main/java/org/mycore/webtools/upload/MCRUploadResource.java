@@ -161,7 +161,7 @@ public class MCRUploadResource {
         final java.nio.file.Path root = bucket.getRoot();
 
         MCRObjectID objOrDerivateID = MCRObjectID.getInstance(bucket.getObjectID());
-        final boolean isDerivate = objOrDerivateID.getTypeId().equals("derivate");
+        final boolean isDerivate = "derivate".equals(objOrDerivateID.getTypeId());
 
         final MCRPath targetDerivateRoot;
 

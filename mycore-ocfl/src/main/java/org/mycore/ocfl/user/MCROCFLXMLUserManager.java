@@ -214,7 +214,7 @@ public class MCROCFLXMLUserManager {
     }
 
     private boolean isDeleted(ObjectVersionId version) {
-        return repository.describeVersion(version).getVersionInfo().getMessage().equals(MESSAGE_DELETED);
+        return MESSAGE_DELETED.equals(repository.describeVersion(version).getVersionInfo().getMessage());
     }
 
     boolean exists(String ocflUserID) {
