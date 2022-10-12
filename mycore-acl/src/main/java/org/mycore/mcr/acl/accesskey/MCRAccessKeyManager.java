@@ -86,7 +86,7 @@ public final class MCRAccessKeyManager {
      * @return true if valid or false
      */
     public static boolean isValidType(final String type) {
-        return (type.equals(MCRAccessManager.PERMISSION_READ) || type.equals(MCRAccessManager.PERMISSION_WRITE));
+        return (MCRAccessManager.PERMISSION_READ.equals(type) || MCRAccessManager.PERMISSION_WRITE.equals(type));
     }
 
     /**
