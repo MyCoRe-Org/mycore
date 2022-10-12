@@ -92,7 +92,7 @@ class MCRDirectoryStreamHelper {
 
         @Override
         public boolean accept(Path entry) {
-            return !entry.getFileName().toString().equals(MCRFileCollection.DATA_FILE);
+            return !MCRFileCollection.DATA_FILE.equals(entry.getFileName().toString());
         }
     }
 
