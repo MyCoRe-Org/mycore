@@ -77,12 +77,12 @@
   <rule ref="category/java/errorprone.xml/EmptySynchronizedBlock" />
   <rule ref="category/java/errorprone.xml/EmptyTryBlock" />
   <rule ref="category/java/errorprone.xml/EqualsNull" />
+  <rule ref="category/java/errorprone.xml/ImplicitSwitchFallThrough" /> 
   <rule ref="category/java/errorprone.xml/JumbledIncrementer" />
   <rule ref="category/java/errorprone.xml/JUnitSpelling" />
   <rule ref="category/java/errorprone.xml/JUnitStaticSuite" />
   <rule ref="category/java/errorprone.xml/MethodWithSameNameAsEnclosingClass" />
   <rule ref="category/java/errorprone.xml/MisplacedNullCheck" />
-  <rule ref="category/java/errorprone.xml/MissingBreakInSwitch" />
   <rule ref="category/java/errorprone.xml/MissingStaticMethodInNonInstantiatableClass" />
   <rule ref="category/java/errorprone.xml/NonCaseLabelInSwitchStatement" />
   <rule ref="category/java/errorprone.xml/ProperLogger" />
