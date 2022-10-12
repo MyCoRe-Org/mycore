@@ -61,10 +61,10 @@
   <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
   <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause" />
   <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators" />
-  <rule ref="category/java/errorprone.xml/BadComparison" />
   <rule ref="category/java/errorprone.xml/BrokenNullCheck" />
   <rule ref="category/java/errorprone.xml/CheckSkipResult" />
   <rule ref="category/java/errorprone.xml/CompareObjectsWithEquals" />
+  <rule ref="category/java/errorprone.xml/ComparisonWithNaN" /> 
   <rule ref="category/java/errorprone.xml/DoNotCallSystemExit" />
   <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices" />
   <rule ref="category/java/errorprone.xml/EmptyFinalizer" />
