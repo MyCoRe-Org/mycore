@@ -14,6 +14,7 @@
   <rule ref="category/java/bestpractices.xml/LiteralsFirstInComparisons" />
   <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine" />
   <rule ref="category/java/bestpractices.xml/PrimitiveWrapperInstantiation" />
+  <rule ref="category/java/bestpractices.xml/SimplifiableTestAssertion" />
   <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault" />
   <rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
   <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
@@ -45,7 +46,6 @@
   <rule ref="category/java/design.xml/ExcessiveParameterList" />
   <rule ref="category/java/design.xml/LogicInversion" />
   <rule ref="category/java/design.xml/NPathComplexity" />
-  <rule ref="category/java/design.xml/SimplifyBooleanAssertion" />
   <rule ref="category/java/design.xml/SimplifyBooleanExpressions" />
   <rule ref="category/java/design.xml/SimplifyBooleanReturns" />
   <rule ref="category/java/design.xml/SimplifyConditional" />
