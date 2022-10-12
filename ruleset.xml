@@ -4,46 +4,69 @@
   <description>
     This ruleset applies MyCoRe standard rules
   </description>
-  <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" />
-  <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
-  <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators" />
-  <rule ref="category/java/multithreading.xml/AvoidThreadGroup" />
-  <rule ref="category/java/performance.xml/BooleanInstantiation" />
-  <rule ref="category/java/errorprone.xml/BrokenNullCheck" />
+
+  <rule ref="category/ecmascript/codestyle.xml" />
+  
+  <rule ref="category/java/bestpractices.xml/AvoidPrintStackTrace" />
+  <rule ref="category/java/bestpractices.xml/AvoidReassigningParameters" />
   <rule ref="category/java/bestpractices.xml/CheckResultSet" />
-  <rule ref="category/java/errorprone.xml/CheckSkipResult" />
-  <rule ref="category/java/design.xml/CollapsibleIfStatements" />
-  <rule ref="category/java/multithreading.xml/DontCallThreadRun" />
-  <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices" />
+  <rule ref="category/java/bestpractices.xml/JUnitTestsShouldIncludeAssert" />
+  <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine" />
+  <rule ref="category/java/bestpractices.xml/PositionLiteralsFirstInComparisons" />
+  <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault" />
+  <rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
+  <rule ref="category/java/bestpractices.xml/UnusedImports" />
+  <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
+  <rule ref="category/java/bestpractices.xml/UnusedPrivateField" />
+  <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
+  
+  <rule ref="category/java/codestyle.xml/ClassNamingConventions">
+    <properties>
+      <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]+(Utils?|Helper|Manager|Commands)" />
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/DontImportJavaLang" />
   <rule ref="category/java/codestyle.xml/ExtendsObject" />
-  <rule ref="category/java/errorprone.xml/JumbledIncrementer" />
-  <rule ref="category/java/errorprone.xml/MisplacedNullCheck" />
-  <rule ref="category/java/errorprone.xml/ReturnFromFinallyBlock" />
-  <rule ref="category/java/errorprone.xml/UnconditionalIfStatement" />
+  <rule ref="category/java/codestyle.xml/FieldDeclarationsShouldBeAtStartOfClass" />
+  <rule ref="category/java/codestyle.xml/GenericsNaming" />
+  <rule ref="category/java/codestyle.xml/MethodNamingConventions" />
+  <rule ref="category/java/codestyle.xml/NoPackage" />
+  <rule ref="category/java/codestyle.xml/PackageCase" />
+  <rule ref="category/java/codestyle.xml/UnnecessaryConstructor" />
+  <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName" />
+  <rule ref="category/java/codestyle.xml/UnnecessaryReturn" />
+  
+  <rule ref="category/java/design.xml/AvoidThrowingNewInstanceOfSameException" />
+  <rule ref="category/java/design.xml/AvoidThrowingNullPointerException" />
+  <rule ref="category/java/design.xml/AvoidThrowingRawExceptionTypes" />
+  <rule ref="category/java/design.xml/CollapsibleIfStatements" />
   <rule ref="category/java/design.xml/ExcessiveClassLength" />
   <rule ref="category/java/design.xml/ExcessiveMethodLength" />
   <rule ref="category/java/design.xml/ExcessiveParameterList" />
-  <rule ref="category/java/design.xml/NPathComplexity" />
-  <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine" />
-  <rule ref="category/java/codestyle.xml/UnnecessaryConstructor" />
-  <rule ref="category/java/errorprone.xml/AssignmentToNonFinalStatic" />
-  <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause" />
-  <rule ref="category/java/bestpractices.xml/AvoidReassigningParameters" />
-  <rule ref="category/java/errorprone.xml/BadComparison" />
-  <rule ref="category/java/errorprone.xml/CompareObjectsWithEquals" />
-  <rule ref="category/java/errorprone.xml/EqualsNull" />
-  <rule ref="category/java/codestyle.xml/FieldDeclarationsShouldBeAtStartOfClass" />
   <rule ref="category/java/design.xml/LogicInversion" />
-  <rule ref="category/java/errorprone.xml/MissingBreakInSwitch" />
-  <rule ref="category/java/errorprone.xml/MissingStaticMethodInNonInstantiatableClass" />
-  <rule ref="category/java/errorprone.xml/NonCaseLabelInSwitchStatement" />
-  <rule ref="category/java/bestpractices.xml/PositionLiteralsFirstInComparisons" />
+  <rule ref="category/java/design.xml/NPathComplexity" />
+  <rule ref="category/java/design.xml/SimplifyBooleanAssertion" />
   <rule ref="category/java/design.xml/SimplifyBooleanExpressions" />
   <rule ref="category/java/design.xml/SimplifyBooleanReturns" />
   <rule ref="category/java/design.xml/SimplifyConditional" />
   <rule ref="category/java/design.xml/SingularField" />
-  <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault" />
+  
   <rule ref="category/java/documentation.xml/UncommentedEmptyMethodBody" />
+  
+  <rule ref="category/java/errorprone.xml/AssignmentToNonFinalStatic" />
+  <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" />
+  <rule ref="category/java/errorprone.xml/AvoidCallingFinalize" />
+  <rule ref="category/java/errorprone.xml/AvoidCatchingThrowable" />
+  <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
+  <rule ref="category/java/errorprone.xml/AvoidInstanceofChecksInCatchClause" />
+  <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators" />
+  <rule ref="category/java/errorprone.xml/BadComparison" />
+  <rule ref="category/java/errorprone.xml/BrokenNullCheck" />
+  <rule ref="category/java/errorprone.xml/CheckSkipResult" />
+  <rule ref="category/java/errorprone.xml/CompareObjectsWithEquals" />
+  <rule ref="category/java/errorprone.xml/DoNotCallSystemExit" />
+  <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices" />
+  <rule ref="category/java/errorprone.xml/EmptyFinalizer" />
   <rule ref="category/java/errorprone.xml/EmptyFinallyBlock" />
   <rule ref="category/java/errorprone.xml/EmptyIfStmt" />
   <rule ref="category/java/errorprone.xml/EmptyInitializer" />
@@ -52,52 +75,38 @@
   <rule ref="category/java/errorprone.xml/EmptySwitchStatements" />
   <rule ref="category/java/errorprone.xml/EmptySynchronizedBlock" />
   <rule ref="category/java/errorprone.xml/EmptyTryBlock" />
-  <rule ref="category/java/errorprone.xml/AvoidCallingFinalize" />
-  <rule ref="category/java/errorprone.xml/EmptyFinalizer" />
-  <rule ref="category/java/codestyle.xml/DontImportJavaLang" />
-  <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName" />
-  <rule ref="category/java/bestpractices.xml/UnusedImports" />
-  <rule ref="category/java/errorprone.xml/DoNotCallSystemExit" />
+  <rule ref="category/java/errorprone.xml/EqualsNull" />
+  <rule ref="category/java/errorprone.xml/JumbledIncrementer" />
   <rule ref="category/java/errorprone.xml/JUnitSpelling" />
   <rule ref="category/java/errorprone.xml/JUnitStaticSuite" />
-  <rule ref="category/java/bestpractices.xml/JUnitTestsShouldIncludeAssert" />
-  <rule ref="category/java/design.xml/SimplifyBooleanAssertion" />
-  <rule ref="category/java/errorprone.xml/UnnecessaryBooleanAssertion" />
+  <rule ref="category/java/errorprone.xml/MethodWithSameNameAsEnclosingClass" />
+  <rule ref="category/java/errorprone.xml/MisplacedNullCheck" />
+  <rule ref="category/java/errorprone.xml/MissingBreakInSwitch" />
+  <rule ref="category/java/errorprone.xml/MissingStaticMethodInNonInstantiatableClass" />
+  <rule ref="category/java/errorprone.xml/NonCaseLabelInSwitchStatement" />
   <rule ref="category/java/errorprone.xml/ProperLogger" />
-  <rule ref="category/java/bestpractices.xml/AvoidPrintStackTrace" />
+  <rule ref="category/java/errorprone.xml/ReturnFromFinallyBlock" />
+  <rule ref="category/java/errorprone.xml/UnconditionalIfStatement" />
+  <rule ref="category/java/errorprone.xml/UnnecessaryBooleanAssertion" />
+  <rule ref="category/java/errorprone.xml/UnnecessaryCaseChange" />
+  <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings" />
+  <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable" />
+  
+  <rule ref="category/java/multithreading.xml/AvoidThreadGroup" />
+  <rule ref="category/java/multithreading.xml/DontCallThreadRun" />
+  
+  <rule ref="category/java/performance.xml/AppendCharacterWithChar" />
+  <rule ref="category/java/performance.xml/BooleanInstantiation" />
   <rule ref="category/java/performance.xml/ByteInstantiation" />
+  <rule ref="category/java/performance.xml/InefficientStringBuffering" />
   <rule ref="category/java/performance.xml/IntegerInstantiation" />
   <rule ref="category/java/performance.xml/LongInstantiation" />
   <rule ref="category/java/performance.xml/ShortInstantiation" />
-  <rule ref="category/java/codestyle.xml/ClassNamingConventions">
-    <properties>
-      <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]+(Utils?|Helper|Manager|Commands)" />
-    </properties>
-  </rule>
-  <rule ref="category/java/codestyle.xml/GenericsNaming" />
-  <rule ref="category/java/codestyle.xml/MethodNamingConventions" />
-  <rule ref="category/java/errorprone.xml/MethodWithSameNameAsEnclosingClass" />
-  <rule ref="category/java/codestyle.xml/NoPackage" />
-  <rule ref="category/java/codestyle.xml/PackageCase" />
-  <rule ref="category/java/errorprone.xml/AvoidCatchingThrowable" />
-  <rule ref="category/java/design.xml/AvoidThrowingNewInstanceOfSameException" />
-  <rule ref="category/java/design.xml/AvoidThrowingNullPointerException" />
-  <rule ref="category/java/design.xml/AvoidThrowingRawExceptionTypes" />
-  <rule ref="category/java/performance.xml/AppendCharacterWithChar" />
-  <!--<rule ref="rulesets/java/strings.xml/AvoidDuplicateLiterals" />-->
-  <rule ref="category/java/performance.xml/InefficientStringBuffering" />
   <rule ref="category/java/performance.xml/StringInstantiation" />
   <rule ref="category/java/performance.xml/StringToString" />
-  <rule ref="category/java/errorprone.xml/UnnecessaryCaseChange" />
-  <rule ref="category/java/errorprone.xml/UseEqualsToCompareStrings" />
   <rule ref="category/java/performance.xml/UseStringBufferLength" />
-  <rule ref="category/java/codestyle.xml/UnnecessaryReturn" />
-  <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable" />
-  <rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
-  <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
-  <rule ref="category/java/bestpractices.xml/UnusedPrivateField" />
-  <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
+  
   <rule ref="category/xml/errorprone.xml" />
   <rule ref="category/xsl/codestyle.xml/UseConcatOnce" />
-  <rule ref="category/ecmascript/codestyle.xml" />
+
 </ruleset>
