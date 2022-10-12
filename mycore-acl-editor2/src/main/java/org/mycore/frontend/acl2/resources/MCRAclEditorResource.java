@@ -186,7 +186,7 @@ public class MCRAclEditorResource {
             if (ACCESS_STORE.existsRule(accessID, accessPool)) {
                 MCRRuleMapping accessRule = ACCESS_STORE.getAccessDefinition(accessPool, accessID);
 
-                if (!accessRule.getObjId().equals("")) {
+                if (!"".equals(accessRule.getObjId())) {
                     ACCESS_STORE.deleteAccessDefinition(accessRule);
                     accessAsJsonObject.addProperty(JSON_SUCCESS, "1");
                 } else {
