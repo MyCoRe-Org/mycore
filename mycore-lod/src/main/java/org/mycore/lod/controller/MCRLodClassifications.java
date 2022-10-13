@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.jdom2.Document;
+import org.jdom2.Element;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
@@ -35,6 +37,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.model.MCRClass;
 import org.mycore.datamodel.classifications2.model.MCRClassCategory;
 import org.mycore.datamodel.classifications2.utils.MCRSkosTransformer;
+import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.frontend.jersey.MCRCacheControl;
 import org.mycore.lod.MCRJerseyLodApp;
 import org.mycore.restapi.converter.MCRDetailLevel;
@@ -48,7 +51,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -81,7 +83,6 @@ public class MCRLodClassifications {
      * or remove this endpoint completely?
      */
     @GET
-    @Produces({ MediaType.APPLICATION_XML })
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))
     public Response outputLODClassificationRoot() {
@@ -91,9 +92,19 @@ public class MCRLodClassifications {
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }
-        return Response.ok("<lod></lod>")
-            .lastModified(lastModified)
-            .build();
+
+        try {
+            Document classRdfxml = createClassList();
+            String rdfxmlString = new MCRJDOMContent(classRdfxml).asString();
+            List<String> mimeTypes = request.getAcceptableMediaTypes().parallelStream().map(x -> x.toString()).toList();
+            URI uri = request.getUriInfo().getBaseUri();
+            return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
+        } catch (IOException e) {
+            throw MCRErrorResponse.fromStatus(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode())
+                .withErrorCode(ERROR_MCRCLASS_TRANSFORMATION)
+                .withMessage("Could create classification list.")
+                .toException();
+        }
     }
 
     @GET
@@ -155,6 +166,18 @@ public class MCRLodClassifications {
                 .withMessage("Could not find classification or category in " + classId + ".")
                 .toException();
         }
+    }
+
+    private Document createClassList() {
+        Element eBag = new Element("Bag", MCRConstants.RDF_NAMESPACE);
+        MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        for (MCRCategory categ : categoryDAO.getRootCategories()) {
+            eBag.addContent(new Element("li", MCRConstants.RDF_NAMESPACE)
+                .setAttribute("resource",
+                    MCRFrontendUtil.getBaseURL() + "open-data/classifications/" + categ.getId().toString(),
+                    MCRConstants.RDF_NAMESPACE));
+        }
+        return new Document(eBag);
     }
 
     private static Date getLastModifiedDate(@PathParam(PARAM_CLASSID) String classId, MCRCategoryDAO categoryDAO) {
