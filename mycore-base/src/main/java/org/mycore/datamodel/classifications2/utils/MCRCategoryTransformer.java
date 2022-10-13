@@ -133,11 +133,11 @@ public class MCRCategoryTransformer {
             cd.getRootElement().setAttribute("ID", cl.getId().getRootID());
             cd.getRootElement().addNamespaceDeclaration(XLINK_NAMESPACE);
             MCRCategory root = cl.isClassification() ? cl : cl.getRoot();
-            if (root.getURI() != null) {
-                cd.getRootElement().addContent(getElement(root.getURI()));
-            }
             for (MCRLabel label : root.getLabels()) {
                 cd.getRootElement().addContent(MCRLabelTransformer.getElement(label));
+            }
+            if (root.getURI() != null) {
+                cd.getRootElement().addContent(getElement(root.getURI()));
             }
             Element categories = new Element("categories");
             cd.getRootElement().addContent(categories);
