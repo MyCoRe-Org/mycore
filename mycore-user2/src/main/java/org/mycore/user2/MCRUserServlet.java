@@ -255,7 +255,10 @@ public class MCRUserServlet extends MCRServlet {
 
         Document doc = (Document) (req.getAttribute("MCRXEditorSubmission"));
         Element u = doc.getRootElement();
-        String userName = u.getAttributeValue("name");
+
+        String userNameOfRequest = req.getParameter("id");
+        String userNameOfForm = u.getAttributeValue("name");
+        String userName = userNameOfRequest != null ? userNameOfRequest : userNameOfForm;
 
         String realmID = MCRRealmFactory.getLocalRealm().getID();
         if (hasAdminPermission) {
@@ -279,6 +282,7 @@ public class MCRUserServlet extends MCRServlet {
                 res.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
+            user.setUserName(userNameOfForm);
         }
 
         XPathExpression<Attribute> hintPath = XPathFactory.instance().compile("password/@hint", Filters.attribute());
