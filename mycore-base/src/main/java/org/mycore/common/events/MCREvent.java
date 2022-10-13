@@ -52,6 +52,8 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
 
     public static final String PATH_TYPE = "MCRPath";
 
+    public static final String USER_TYPE = "MCRUser";
+
     public static final String MOVE_EVENT = "move";
 
     public static final String PATH_KEY = PATH_TYPE;
@@ -65,6 +67,10 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
     public static final String DERIVATE_KEY = "derivate";
 
     public static final String DERIVATE_OLD_KEY = "derivate.old";
+
+    public static final String USER_KEY = "user";
+
+    public static final String USER_OLD_KEY = "user.old";
 
     /** The object type like object or file * */
     private String objType;

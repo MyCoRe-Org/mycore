@@ -20,6 +20,7 @@
       adduri="{true|false, whether to include URI from classification data}"
       adddescription="{true|false, whether to include description from category label}"
       addclassid="{true|false, adds classification ID to category, default false}"
+      excludeCategories="{CategoryIDs to be excluded}"
       class="{CSS class, default is 'classificationBrowser'}"
       style="{XSL.Style to use, default is classificationBrowserData.xsl}"
     />
@@ -50,6 +51,7 @@
       <xsl:with-param name="adduri" select="@adduri"/>
       <xsl:with-param name="adddescription" select="@adddescription"/>
       <xsl:with-param name="addclassid" select="@addclassid"/>
+      <xsl:with-param name="excludeCategories" select="@excludeCategories"/>
       <xsl:with-param name="style" select="@style"/>
       <xsl:with-param name="filterCategory" select="@filterCategory='true'"/>
       <xsl:with-param name="addParameter" select="@addParameter"/>
@@ -71,6 +73,7 @@
     <xsl:param name="adduri" />
     <xsl:param name="adddescription" />
     <xsl:param name="addclassid" />
+    <xsl:param name="excludeCategories" />
     <xsl:param name="style" />
     <!-- SOLR: if true join returnId to id, ignored with lucene -->
     <xsl:param name="filterCategory" select="false()"/>
@@ -99,22 +102,23 @@
           </xsl:if>
 
           var requestParam = {
-            classification : '<xsl:value-of select="$classification" />',
-            category       : categID,
-            sortby         : '<xsl:value-of select="$sortby" />',
-            objecttype     : '<xsl:value-of select="$objecttype" />',
-            field          : '<xsl:value-of select="$field" />',
-            parameters     : '<xsl:value-of select="$parameters" />',
-            restriction    : '<xsl:value-of select="$restriction" />',
-            countresults   : '<xsl:value-of select="$countresults" />',
-            countlinks     : '<xsl:value-of select="$countlinks" />',
-            emptyleaves    : '<xsl:value-of select="$emptyleaves" />',
-            adduri         : '<xsl:value-of select="$adduri" />',
-            adddescription : '<xsl:value-of select="$adddescription" />',
-            addclassid     : '<xsl:value-of select="$addclassid" />',
-            style          : '<xsl:value-of select="$style" />',
-            filterCategory : '<xsl:value-of select="$filterCategory" />',
-            webpage        : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
+            classification    : '<xsl:value-of select="$classification" />',
+            category          : categID,
+            sortby            : '<xsl:value-of select="$sortby" />',
+            objecttype        : '<xsl:value-of select="$objecttype" />',
+            field             : '<xsl:value-of select="$field" />',
+            parameters        : '<xsl:value-of select="$parameters" />',
+            restriction       : '<xsl:value-of select="$restriction" />',
+            countresults      : '<xsl:value-of select="$countresults" />',
+            countlinks        : '<xsl:value-of select="$countlinks" />',
+            emptyleaves       : '<xsl:value-of select="$emptyleaves" />',
+            adduri            : '<xsl:value-of select="$adduri" />',
+            adddescription    : '<xsl:value-of select="$adddescription" />',
+            addclassid        : '<xsl:value-of select="$addclassid" />',
+            excludeCategories : '<xsl:value-of select="$excludeCategories" />',
+            style             : '<xsl:value-of select="$style" />',
+            filterCategory    : '<xsl:value-of select="$filterCategory" />',
+            webpage           : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
           };
           <xsl:variable name="addParam">
             <xsl:if test="string-length($addParameter)&gt;0">

@@ -20,6 +20,7 @@ package org.mycore.datamodel.metadata;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -280,6 +281,8 @@ public abstract class MCRObjectUtils {
         try {
             mcrBase.setFromJDOM(content.asXML());
             if (MCRMetadataManager.exists(mcrId)) {
+                // set modified date to now() to force update
+                mcrBase.getService().setDate(MCRObjectService.DATE_TYPE_MODIFYDATE, new Date());
                 MCRMetadataManager.update(mcrBase);
             } else {
                 if (mcrBase instanceof MCRObject) {

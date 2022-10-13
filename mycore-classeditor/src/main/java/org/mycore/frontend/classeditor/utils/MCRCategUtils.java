@@ -19,7 +19,7 @@
 package org.mycore.frontend.classeditor.utils;
 
 import java.util.HashMap;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -33,7 +33,7 @@ import com.google.gson.JsonStreamParser;
 
 public class MCRCategUtils {
 
-    public static MCRCategory newCategory(MCRCategoryID id, Set<MCRLabel> labels, MCRCategoryID mcrCategoryID) {
+    public static MCRCategory newCategory(MCRCategoryID id, SortedSet<MCRLabel> labels, MCRCategoryID mcrCategoryID) {
         MCRJSONCategory category = new MCRJSONCategory();
         category.setId(id);
         category.setLabels(labels);

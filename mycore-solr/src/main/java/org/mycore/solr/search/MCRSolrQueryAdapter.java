@@ -91,7 +91,8 @@ public class MCRSolrQueryAdapter implements MCRQueryAdapter {
     @Override
     public String getQueryAsString() {
         configureSolrQuery();
-        return solrQuery.toString();
+        String queryString = solrQuery.toQueryString();
+        return queryString.isEmpty() ? "" : queryString.substring("?".length());
     }
 
     public void prepareQuery() {

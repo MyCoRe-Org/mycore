@@ -19,7 +19,7 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
@@ -100,7 +100,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     }
 
     @Override
-    public MCRCategory setLabels(MCRCategoryID id, Set<MCRLabel> labels) {
+    public MCRCategory setLabels(MCRCategoryID id, SortedSet<MCRLabel> labels) {
         MCRCategory rv = super.setLabels(id, labels);
         MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
         evt.put("class", super.getCategory(id, -1));

@@ -311,15 +311,15 @@ wcms.navigation.Tree = function() {
 	 * Adds a new item as child of the selected one.
 	 */
 	function addNewItem() {
-		var item = {
+		let item = {
 			wcmsType: "item",
-			href: "/content/folder/myfile.xml",
+			href: "/content/folder/content_" + generateUID() + ".xml",
 			labelMap: {
 				de: "neuer Eintrag",
 				en: "new entry"
 			}
 		};
-		var addTreeItemFunc = dojo.hitch(this, addTreeItem);
+		let addTreeItemFunc = dojo.hitch(this, addTreeItem);
 		addTreeItemFunc(item);
 	}
 
@@ -555,46 +555,25 @@ wcms.navigation.Tree = function() {
 
 	function updatePopupMenu(/* JSON */ item) {			
 		// popup item
-		var mainChildren = this.popupMenu.getChildren();
-		var addChildren = mainChildren[0].popup.getChildren();
+		let mainChildren = this.popupMenu.getChildren();
+		let addChildren = mainChildren[0].popup.getChildren();
 
 		// add item
-		if(item == null || item.wcmsType == "root") {
-			addChildren[0].set("disabled", true);
-		} else {
-			addChildren[0].set("disabled", false);
-		}
+		addChildren[0].set("disabled", item == null || item.wcmsType === "root" || item.wcmsType === "item");
 		// add menu
-		if(item == null || item.wcmsType != "root") {
-			addChildren[2].set("disabled", true);
-		} else {
-			addChildren[2].set("disabled", false);
-		}
-		if(item == null || item.wcmsType == "insert") {
-			mainChildren[0].set("disabled", true);
-		} else {
-			mainChildren[0].set("disabled", false);
-		}
+		addChildren[2].set("disabled", item == null || item.wcmsType !== "root");
+		mainChildren[0].set("disabled", item == null || item.wcmsType === "insert");
 		// add group
-		addChildren[3].set("disabled", (item == null || item.wcmsType != "menu"));
-
+		addChildren[3].set("disabled", (item == null || item.wcmsType !== "menu"));
 		// restore item
-		if(item == null || item.dirty == undefined || item.dirty == false) {
-			mainChildren[3].set("disabled", true);
-		} else {
-			mainChildren[3].set("disabled", false);
-		}
+		mainChildren[3].set("disabled", item == null || item.dirty == null || item.dirty === false);
 		// remove item
-		if(item == null || item.wcmsType == "root") {
-			mainChildren[1].set("disabled", true);
-		} else {
-			mainChildren[1].set("disabled", false);
-		}
+		mainChildren[1].set("disabled", item == null || item.wcmsType === "root");
 	}
 
 	function updateToolbar(/* JSON */ item) {
 		// restore button
-		var itemDirty = (item != null) ? !item.dirty : true;
+		let itemDirty = (item != null) ? !item.dirty : true;
 		this.restoreTreeItemButton.set("disabled", itemDirty);
 		if(this.restoreTreeItemButton.disabled) {
 			this.restoreTreeItemButton.set("iconClass", "icon16 restoreDisabledIcon16");
@@ -602,7 +581,7 @@ wcms.navigation.Tree = function() {
 			this.restoreTreeItemButton.set("iconClass", "icon16 restoreIcon16");
 		}
 		// remove button
-		var removeDisabled = (item == null || item.wcmsType == "root") ? true : false;
+		let removeDisabled = (item == null || item.wcmsType === "root");
 		this.removeTreeItemButton.set("disabled", removeDisabled);
 		if(this.removeTreeItemButton.disabled) {
 			this.removeTreeItemButton.set("iconClass", "icon16 removeDisabledIcon16");
@@ -610,7 +589,7 @@ wcms.navigation.Tree = function() {
 			this.removeTreeItemButton.set("iconClass", "icon16 removeIcon16");
 		}
 		// add button
-		var addDisabled = (item == null || item.wcmsType == "insert") ? true : false;
+		let addDisabled = (item == null || item.wcmsType === "insert");
 		dojo.attr(this.addTreeItemPopupButton, "disabled", addDisabled);
 		if(addDisabled) {
 			this.addTreeItemPopupButton.set("iconClass", "icon16 addDisabledIcon16");
@@ -622,11 +601,11 @@ wcms.navigation.Tree = function() {
 			dojo.addClass(this.addTreeItemPopupButton.domNode, "dijitUpArrowButton");
 		}
 		// add menu
-		this.addTreeMenuItemButton.set("disabled", (item == null || item.wcmsType != "root"));
+		this.addTreeMenuItemButton.set("disabled", (item == null || item.wcmsType !== "root"));
 		// add item
-		this.addTreeItemButton.set("disabled", (item == null || item.wcmsType == "root"));
+		this.addTreeItemButton.set("disabled", (item == null || item.wcmsType === "root" || item.wcmsType === "item"));
 		// add group
-		this.addTreeGroupItemButton.set("disabled", (item == null || item.wcmsType != "menu"));
+		this.addTreeGroupItemButton.set("disabled", (item == null || item.wcmsType !== "menu"));
 	}
 
 	/**

@@ -18,11 +18,8 @@
 
 package org.mycore.iview2.services;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
@@ -34,8 +31,11 @@ import org.mycore.imagetiler.MCRImage;
 import org.mycore.imagetiler.MCRTileEventHandler;
 import org.mycore.imagetiler.MCRTiledPictureProps;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A slave thread of {@link MCRImageTiler}
@@ -47,7 +47,7 @@ import jakarta.persistence.EntityTransaction;
  *
  */
 public class MCRTilingAction implements Runnable {
-    private static Logger LOGGER = LogManager.getLogger(MCRTilingAction.class);
+    private static final Logger LOGGER = LogManager.getLogger(MCRTilingAction.class);
 
     protected MCRTileJob tileJob = null;
 
@@ -74,23 +74,23 @@ public class MCRTilingAction implements Runnable {
         MCRSessionMgr.unlock();
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         mcrSession.setUserInformation(MCRSystemUserInformation.getSystemUserInstance());
-        EntityTransaction transaction = null;
-        EntityManager em = MCREntityManagerProvider.getCurrentEntityManager();
-        try {
+        AtomicReference<EntityTransaction> imageReaderTransactionReference = new AtomicReference<>();
+        EntityTransaction mergeTransaction = null;
+
+        try (EntityManager em = MCREntityManagerProvider.getCurrentEntityManager()) {
             MCRTileEventHandler tileEventHandler = new MCRTileEventHandler() {
-                EntityTransaction transaction;
 
                 @Override
                 public void preImageReaderCreated() {
-                    transaction = em.getTransaction();
-                    transaction.begin();
+                    imageReaderTransactionReference.set(em.getTransaction());
+                    imageReaderTransactionReference.get().begin();
                 }
 
                 @Override
                 public void postImageReaderCreated() {
                     em.clear(); //beside tileJob, no write access so far
-                    if (transaction.isActive()) {
-                        transaction.commit();
+                    if (imageReaderTransactionReference.get().isActive()) {
+                        imageReaderTransactionReference.get().commit();
                     }
                 }
 
@@ -107,14 +107,18 @@ public class MCRTilingAction implements Runnable {
                 LOGGER.error("IOException occured while tiling a queued picture", e);
                 throw e;
             }
-            transaction = em.getTransaction();
-            transaction.begin();
+            mergeTransaction = em.getTransaction();
+            mergeTransaction.begin();
             em.merge(tileJob);
-            transaction.commit();
+            mergeTransaction.commit();
         } catch (Exception e) {
             LOGGER.error("Error while getting next tiling job.", e);
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
+            EntityTransaction imageReaderTransaction = imageReaderTransactionReference.get();
+            if (imageReaderTransaction != null && imageReaderTransaction.isActive()) {
+                imageReaderTransaction.rollback();
+            }
+            if (mergeTransaction != null && mergeTransaction.isActive()) {
+                mergeTransaction.rollback();
             }
             try {
                 Files.deleteIfExists(MCRImage.getTiledFile(tileDir, tileJob.getDerivate(), tileJob.getPath()));
@@ -123,7 +127,6 @@ public class MCRTilingAction implements Runnable {
             }
 
         } finally {
-            em.close();
             MCRSessionMgr.releaseCurrentSession();
             mcrSession.close();
         }

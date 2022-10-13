@@ -133,19 +133,19 @@ public class MCRAccessKeyTransformer {
      */
     public static List<MCRAccessKey> accessKeysFromElement(MCRObjectID objectId, Element element)
         throws MCRAccessKeyTransformationException {
-        if (element.getName().equals(ROOT_SERVICE)) {
+        if (ROOT_SERVICE.equals(element.getName())) {
             Element servFlagsRoot = element.getChild(ROOT_SERV_FLAGS);
             if (servFlagsRoot != null) {
                 final List<Element> servFlags = servFlagsRoot.getChildren(SERV_FLAG);
                 for (Element servFlag : servFlags) {
-                    if (servFlag.getAttributeValue("type").equals(ACCESS_KEY_TYPE)) {
+                    if (ACCESS_KEY_TYPE.equals(servFlag.getAttributeValue("type"))) {
                         return accessKeysFromAccessKeyElement(objectId, servFlag);
                     }
                 }
             }
         } else if (SERV_FLAG.equals(element.getName()) && ACCESS_KEY_TYPE.equals(element.getAttributeValue("type"))) {
             return accessKeysFromAccessKeyElement(objectId, element);
-        } else if (element.getName().equals(ACCESS_KEY_TYPE)) {
+        } else if (ACCESS_KEY_TYPE.equals(element.getName())) {
             return accessKeysFromAccessKeyElement(objectId, element);
         }
         return new ArrayList<>();

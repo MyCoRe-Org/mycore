@@ -20,6 +20,7 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -111,7 +112,11 @@ public class MCRClassificationBrowser2 extends MCRServlet {
                 .filter(qa -> settings.countResults())
                 .map(MCRQueryAdapter::getResultCount)
                 .orElse(0L);
+
             if ((settings.removeEmptyLeaves()) && (numResults < 1)) {
+                continue;
+            }
+            if(settings.excludeCategories().contains(child.getId().getID())) {
                 continue;
             }
 
@@ -255,6 +260,8 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         private boolean addClassId;
 
+        private List<String> excludeCategories;
+
         private boolean addUri;
 
         private boolean removeEmptyLeaves;
@@ -279,6 +286,9 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             s.categID = req.getParameter("category");
             s.countResults = Boolean.parseBoolean(req.getParameter("countresults"));
             s.addClassId = Boolean.parseBoolean(req.getParameter("addclassid"));
+            s.excludeCategories = Arrays.asList(
+                    Optional.ofNullable(req.getParameter("excludeCategories")).orElse("").split(",")
+            );
             s.addUri = Boolean.parseBoolean(req.getParameter("adduri"));
             s.removeEmptyLeaves = !MCRUtils.filterTrimmedNotEmpty(req.getParameter("emptyleaves"))
                 .map(Boolean::valueOf)
@@ -321,6 +331,10 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             return addClassId;
         }
 
+        List<String> excludeCategories() {
+            return excludeCategories;
+        }
+
         boolean addUri() {
             return addUri;
         }
@@ -352,6 +366,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
                 ", categID='" + categID + '\'' +
                 ", countResults=" + countResults +
                 ", addClassId=" + addClassId +
+                ", excludeCategories=" + excludeCategories +
                 ", addUri=" + addUri +
                 ", removeEmptyLeaves=" + removeEmptyLeaves +
                 ", webpage='" + webpage + '\'' +

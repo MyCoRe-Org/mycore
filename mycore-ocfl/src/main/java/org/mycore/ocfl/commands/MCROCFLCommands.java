@@ -18,6 +18,7 @@
 
 package org.mycore.ocfl.commands;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
@@ -36,6 +38,9 @@ import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
 import org.mycore.ocfl.MCROCFLPersistenceTransaction;
 import org.mycore.ocfl.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.MCROCFLXMLClassificationManager;
+import org.mycore.ocfl.user.MCROCFLXMLUserManager;
+import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserManager;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
 
@@ -121,6 +126,57 @@ public class MCROCFLCommands {
         return commands;
     }
 
+    @MCRCommand(syntax = "update ocfl users",
+        help = "Update all users in the OCFL store from database")
+    public static List<String> updateOCFLUsers() {
+        List<MCRUser> list = MCRUserManager.listUsers("*", null, null, null);
+
+        return list.stream()
+            .map(usr -> "update ocfl user " + usr.getUserID())
+            .collect(Collectors.toList());
+    }
+
+    @MCRCommand(syntax = "update ocfl user {0}",
+        help = "Update user {0} in the OCFL Store from database")
+    public static void updateOCFLUser(String userId) {
+        if (MCRUserManager.getUser(userId) == null) {
+            throw new MCRUsageException("The User '" + userId + "' does not exist!");
+        }
+        new MCROCFLXMLUserManager().updateUser(MCRUserManager.getUser(userId));
+    }
+
+    @MCRCommand(syntax = "delete ocfl user {0}",
+        help = "Delete user {0} in the OCFL Store")
+    public static void deleteOCFLUser(String userId) {
+        new MCROCFLXMLUserManager().deleteUser(userId);
+    }
+
+    @MCRCommand(syntax = "sync ocfl users",
+        help = "Update all users and remove deleted users to resync OCFL Store to the Database")
+    public static List<String> syncUserRepository() {
+        List<String> commands = new ArrayList<>();
+        commands.add("update ocfl users");
+        List<String> outOfSync = getStaleOCFLUserIDs();
+        commands.addAll(
+            outOfSync.stream()
+                .map(id -> "delete ocfl user " + id).collect(Collectors.toList()));
+        return commands;
+    }
+
+    @MCRCommand(syntax = "restore user {0} from ocfl with version {1}",
+        help = "restore a specified revision of a ocfl user backup to the primary user store")
+    public static void writeUserToDbVersioned(String userId, String revision) throws IOException {
+        MCRUser user = new MCROCFLXMLUserManager().retrieveContent(userId, revision);
+        MCRUserManager.updateUser(user);
+    }
+
+    @MCRCommand(syntax = "restore user {0} from ocfl",
+        help = "restore the latest revision of a ocfl user backup to the primary user store")
+    public static void writeUserToDb(String userId) throws IOException {
+        MCRUser user = new MCROCFLXMLUserManager().retrieveContent(userId, null);
+        MCRUserManager.updateUser(user);
+    }
+
     private static List<String> getStaleOCFLClassificationIDs() {
         String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
         List<String> classDAOList = new MCRCategoryDAOImpl().getRootCategoryIDs().stream()
@@ -133,6 +189,21 @@ public class MCROCFLCommands {
                 .getHeadVersion().getVersionInfo().getMessage()))
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
             .filter(Predicate.not(classDAOList::contains))
+            .collect(Collectors.toList());
+    }
+
+    private static List<String> getStaleOCFLUserIDs() {
+        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository");
+        List<String> userEMList = MCRUserManager.listUsers("*", null, null, null).stream()
+            .map(MCRUser::getUserID)
+            .collect(Collectors.toList());
+        OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        return repository.listObjectIds()
+            .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
+            .filter(obj -> !MCROCFLXMLUserManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
+                .getHeadVersion().getVersionInfo().getMessage()))
+            .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
+            .filter(Predicate.not(userEMList::contains))
             .collect(Collectors.toList());
     }
 }

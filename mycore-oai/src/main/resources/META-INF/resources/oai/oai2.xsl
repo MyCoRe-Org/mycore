@@ -298,21 +298,26 @@ p.intro {
 
 <xsl:template match="ep:eprints" xmlns:ep="http://www.openarchives.org/OAI/1.1/eprints">
   <h2>EPrints Description</h2>
-  <h3>Content</h3>
-  <xsl:apply-templates select="ep:content"/>
+  <xsl:if test="ep:content">
+    <h3>Content</h3>
+   <xsl:apply-templates select="ep:content"/>
+  </xsl:if>
   <xsl:if test="ep:submissionPolicy">
     <h3>Submission Policy</h3>
     <xsl:apply-templates select="ep:submissionPolicy"/>
   </xsl:if>
-  <h3>Metadata Policy</h3>
-  <xsl:apply-templates select="ep:metadataPolicy"/>
-  <h3>Data Policy</h3>
-  <xsl:apply-templates select="ep:dataPolicy"/>
-  <xsl:if test="ep:content">
-    <h3>Content</h3>
-    <xsl:apply-templates select="ep:content"/>
+  <xsl:if test="ep:metadataPolicy">
+    <h3>Metadata Policy</h3>
+    <xsl:apply-templates select="ep:metadataPolicy"/>
   </xsl:if>
-  <xsl:apply-templates select="ep:comment"/>
+  <xsl:if test="ep:dataPolicy">
+    <h3>Data Policy</h3>
+    <xsl:apply-templates select="ep:dataPolicy"/>
+  </xsl:if>
+  <xsl:if test="ep:comment">
+    <h3>Comment</h3>
+   <xsl:apply-templates select="ep:comment"/>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template match="ep:content|ep:dataPolicy|ep:metadataPolicy|ep:submissionPolicy" xmlns:ep="http://www.openarchives.org/OAI/1.1/eprints">
@@ -325,8 +330,30 @@ p.intro {
 </xsl:template>
 
 <xsl:template match="ep:comment" xmlns:ep="http://www.openarchives.org/OAI/1.1/eprints">
-  <h3>Comment</h3>
   <div><xsl:value-of select="."/></div>
+</xsl:template>
+
+
+<!--
+   Identify / Rights
+-->
+
+<xsl:template match="ri:rightsManifest" xmlns:ri="http://www.openarchives.org/OAI/2.0/rights/">
+  <h2>Rights Manifest</h2>
+  <xsl:variable name="appliesTo" select="substring-after(@appliesTo,'#')" />
+  <xsl:for-each select="ri:rights">
+    <h2 class="oaiRecordTitle">Applies to: <xsl:value-of select="$appliesTo"/></h2>
+    <div class="oaiRecord">
+      <xsl:if test="ri:rightsReference">
+        <h3>Reference</h3>
+        <xsl:variable name="rightsReference" select="ri:rightsReference/@ref" />
+        <div><a href="{$rightsReference}"><xsl:value-of select="$rightsReference" /></a></div>
+      </xsl:if>
+      <xsl:if test="ri:rightsDefinition">
+        <xsl:apply-templates select="ri:rightsDefinition/*" />
+      </xsl:if>
+    </div>
+  </xsl:for-each>
 </xsl:template>
 
 

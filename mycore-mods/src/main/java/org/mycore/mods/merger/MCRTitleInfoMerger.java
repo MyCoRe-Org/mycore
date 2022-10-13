@@ -40,9 +40,17 @@ public class MCRTitleInfoMerger extends MCRMerger {
         text = MCRTextNormalizer.normalizeText(text.trim());
     }
 
+    private String getType() {
+        return this.element.getAttributeValue("type", "");
+    }
+
     @Override
     public boolean isProbablySameAs(MCRMerger other) {
         if (!(other instanceof MCRTitleInfoMerger)) {
+            return false;
+        }
+
+        if (!this.getType().equals(((MCRTitleInfoMerger) other).getType())) {
             return false;
         }
 
