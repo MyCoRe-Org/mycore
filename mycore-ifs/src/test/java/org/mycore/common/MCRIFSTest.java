@@ -37,7 +37,8 @@ public abstract class MCRIFSTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCREventManager.instance().clear().addEventHandler(MCREvent.ObjectType.OBJECT, new MCRXMLMetadataEventHandler());
+        MCREventManager.instance().clear().addEventHandler(MCREvent.ObjectType.OBJECT,
+            new MCRXMLMetadataEventHandler());
     }
 
     @Override

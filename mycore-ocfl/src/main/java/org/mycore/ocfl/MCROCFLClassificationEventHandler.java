@@ -41,24 +41,24 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
             MCRCategory mcrCg = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
             LOGGER.debug("{} handling {} {}", getClass().getName(), mcrCg.getId(), evt.getEventType());
             switch (evt.getEventType()) {
-            case CREATE:
-                addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
-                break;
-            case UPDATE:
-                addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
-                break;
-            case DELETE:
-                if (mcrCg.getId().isRootID()) {
-                    // delete complete classification
-                    addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
-                } else {
-                    // update classification to new version
+                case CREATE:
+                    addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
+                    break;
+                case UPDATE:
                     addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
-                }
-                break;
-            default:
-                LOGGER.error("No Method available for {}", evt.getEventType());
-                break;
+                    break;
+                case DELETE:
+                    if (mcrCg.getId().isRootID()) {
+                        // delete complete classification
+                        addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
+                    } else {
+                        // update classification to new version
+                        addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
+                    }
+                    break;
+                default:
+                    LOGGER.error("No Method available for {}", evt.getEventType());
+                    break;
             }
         }
     }
@@ -66,7 +66,8 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
     @Override
     public void undoHandleEvent(MCREvent evt) throws MCRException {
         if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
-            LOGGER.debug("{} handling undo of {} {}", getClass().getName(), ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
+            LOGGER.debug("{} handling undo of {} {}", getClass().getName(),
+                ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
                 evt.getEventType());
             LOGGER.info("Doing nothing for undo of {} {}", ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
                 evt.getEventType());

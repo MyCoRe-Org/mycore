@@ -69,7 +69,8 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        MCREventManager.instance().clear().addEventHandler(MCREvent.ObjectType.OBJECT, new MCRXMLMetadataEventHandler());
+        MCREventManager.instance().clear().addEventHandler(MCREvent.ObjectType.OBJECT,
+            new MCRXMLMetadataEventHandler());
     }
 
     @Test
