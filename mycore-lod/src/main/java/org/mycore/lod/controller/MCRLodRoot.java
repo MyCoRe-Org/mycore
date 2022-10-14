@@ -55,6 +55,11 @@ public class MCRLodRoot {
     @Context
     ContainerRequestContext request;
 
+    /**
+     * provide some basic information about the linked open data endpoint
+     * 
+     * @return a short description using FOAF vocabulary
+     */
     @GET
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS))

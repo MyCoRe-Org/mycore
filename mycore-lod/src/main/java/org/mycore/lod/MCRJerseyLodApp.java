@@ -59,6 +59,9 @@ public class MCRJerseyLodApp extends ResourceConfig {
     //RDFXML is the default/fallback format an does not have to be on this list
     private static List<RDFFormat> RDF_OUTPUT_FORMATS = List.of(RDFFormat.TURTLE, RDFFormat.JSONLD);
 
+    /**
+     * Constructor
+     */
     public MCRJerseyLodApp() {
         super();
         initAppName();
@@ -73,11 +76,18 @@ public class MCRJerseyLodApp extends ResourceConfig {
         register(MCRIgnoreClientAbortInterceptor.class);
     }
 
+    /**
+     * read name for the Jersey App from properties or generate a default one
+     */
     protected void initAppName() {
         setApplicationName(MCRConfiguration2.getString("MCR.NameOfProject").orElse("MyCoRe") + " LOD-Endpoint");
         LogManager.getLogger().info("Initiialize {}", getApplicationName());
     }
 
+    /**
+     * read packages with Rest controllers and configuration
+     * @return an array of package names
+     */
     protected String[] getRestPackages() {
         return Stream
             .concat(
@@ -87,6 +97,17 @@ public class MCRJerseyLodApp extends ResourceConfig {
             .toArray(String[]::new);
     }
 
+    /**
+     * create a Response object that contains the linked data in the given format
+     * 
+     * @param rdfxmlString - the linked data as String in RDFXML format
+     * @param uri - the base URI of the document
+     * @param mimeTypes - the mime types, sent with the request
+     * @return the Jersey Response with the requested Linked Data format
+     * @throws RDFParseException
+     * @throws UnsupportedRDFormatException
+     * @throws IOException
+     */
     public static Response returnLinkedData(String rdfxmlString, URI uri, List<String> mimeTypes)
         throws RDFParseException, UnsupportedRDFormatException, IOException {
         try {

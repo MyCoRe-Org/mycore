@@ -64,21 +64,27 @@ import jakarta.ws.rs.core.Response;
 @Path("/classifications")
 public class MCRLodClassifications {
 
-    //Classification
+    /** error code for error response */
     public static final String ERROR_MCRCLASS_NOT_FOUND = "MCRCLASS_NOT_FOUND";
 
+    /** error code for error response */
     public static final String ERROR_MCRCLASS_ID_MISMATCH = "MCRCLASS_ID_MISMATCH";
 
+    /** error code for error response */
     public static final String ERROR_MCRCLASS_TRANSFORMATION = "MCRCLASS_TRANSFORMATION";
 
+    /** parameter key in request url paths */
     private static final String PARAM_CLASSID = "classid";
 
+    /** parameter key in request url paths */
     private static final String PARAM_CATEGID = "categid";
 
     @Context
     ContainerRequestContext request;
 
-    /*
+    /**
+     * return the list of available classifications as Linked Open Data 
+     * 
      * TODO Is there a reasonable response on the base path of an LOD URI,
      * or remove this endpoint completely?
      */
@@ -107,17 +113,28 @@ public class MCRLodClassifications {
         }
     }
 
+    /**
+     * return a classification (with its categories on the first hierarchy level as linked open data)
+     * @param classId - the classification ID
+     * @return
+     */
     @GET
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
     @Path("/{" + PARAM_CLASSID + "}")
-
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId) {
         List<MediaType> mediaTypes = request.getAcceptableMediaTypes();
         return getClassification(classId, dao -> dao.getCategory(MCRCategoryID.rootID(classId), 1), mediaTypes,
             request.getUriInfo().getBaseUri());
     }
 
+    /**
+     * return a category and its children on the first hierarchy level as linked open data
+     * 
+     * @param classId - the class
+     * @param categId
+     * @return
+     */
     @GET
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
         sMaxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS))
