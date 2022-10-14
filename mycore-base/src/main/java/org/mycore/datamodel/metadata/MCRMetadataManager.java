@@ -632,8 +632,8 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Fires {@link MCREvent.EventType#UPDATE} for given object. If {@link MCRObject#isImportMode()} modifydate will not be
-     * updated.
+     * Fires {@link MCREvent.EventType#UPDATE} for given object. If {@link MCRObject#isImportMode()} modifydate 
+     * will not be updated.
      * 
      * @param mcrObject
      *            mycore object which is updated
