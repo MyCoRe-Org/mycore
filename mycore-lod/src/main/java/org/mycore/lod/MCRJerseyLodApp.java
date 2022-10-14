@@ -27,10 +27,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
-import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandlerException;
 import org.eclipse.rdf4j.rio.RDFParseException;
+import org.eclipse.rdf4j.rio.RDFParser;
+import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
 import org.eclipse.rdf4j.rio.UnsupportedRDFormatException;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -91,9 +92,12 @@ public class MCRJerseyLodApp extends ResourceConfig {
         try {
             for (RDFFormat rdfOutFormat : RDF_OUTPUT_FORMATS) {
                 if (!Collections.disjoint(mimeTypes, rdfOutFormat.getMIMETypes())) {
-                    Model model = Rio.parse(new StringReader(rdfxmlString), uri.toString(), RDFFormat.RDFXML);
+                    RDFParser rdfParser = Rio.createParser(RDFFormat.RDFXML);
                     StringWriter sw = new StringWriter();
-                    Rio.write(model, sw, rdfOutFormat);
+                    RDFWriter rdfWriter = Rio.createWriter(rdfOutFormat, sw);
+                    rdfParser.setRDFHandler(rdfWriter);
+                    rdfParser.parse(new StringReader(rdfxmlString), uri.toString());
+                    
                     return Response.ok(sw.toString()).type(rdfOutFormat.getDefaultMIMEType() + ";charset=UTF-8")
                         .build();
                 }
