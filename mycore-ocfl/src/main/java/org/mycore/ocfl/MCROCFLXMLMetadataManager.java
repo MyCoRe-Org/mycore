@@ -94,7 +94,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         return repositoryKey;
     }
 
-    @MCRProperty(name = "Repository", required = false)
+    @MCRProperty(name = "MCR.OCFL.Metadata.Repository", absolute = true, required = false)
     public void setRepositoryKey(String repositoryKey) {
         this.repositoryKey = repositoryKey;
     }

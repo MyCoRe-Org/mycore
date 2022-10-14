@@ -18,7 +18,7 @@
 
 package org.mycore.ocfl;
 
-import static org.mycore.ocfl.MCROCFLPersistenceTransaction.addClassficationEvent;
+import static org.mycore.ocfl.MCROCFLPersistenceTransaction.addClassificationEvent;
 
 import java.util.Objects;
 
@@ -44,18 +44,18 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
             LOGGER.debug("{} handling {} {}", getClass().getName(), mcrCg.getId(), evt.getEventType());
             switch (evt.getEventType()) {
             case MCREvent.CREATE_EVENT:
-                addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
+                addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
                 break;
             case MCREvent.UPDATE_EVENT:
-                addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
+                addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
                 break;
             case MCREvent.DELETE_EVENT:
                 if (mcrCg.getId().isRootID()) {
                     // delete complete classification
-                    addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
+                    addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
                 } else {
                     // update classification to new version
-                    addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
+                    addClassificationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
                 }
                 break;
             default:

@@ -47,7 +47,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCROCFLXMLClassificationManager MANAGER = MCRConfiguration2
-        .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager")
+        .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.OCFL.Classification.Manager")
         .orElse(null);
 
     private static final ThreadLocal<Map<MCRCategoryID, Character>> CATEGORY_WORKSPACE = new ThreadLocal<>();
@@ -166,7 +166,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
      * @param id The ID of the Classification
      * @param type 'A' for created, 'M' for modified, 'D' deleted
      */
-    public static void addClassficationEvent(MCRCategoryID id, char type) {
+    public static void addClassificationEvent(MCRCategoryID id, char type) {
         if (!Objects.requireNonNull(id).isRootID()) {
             throw new IllegalArgumentException("Only root category ids are allowed: " + id);
         }

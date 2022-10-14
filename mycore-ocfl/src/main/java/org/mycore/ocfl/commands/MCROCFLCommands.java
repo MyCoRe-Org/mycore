@@ -104,14 +104,14 @@ public class MCROCFLCommands {
         help = "Update classification {0} in the OCFL Store from database")
     public static void updateOCFLClassification(String classId) {
         final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
-        MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.UPDATED);
+        MCROCFLPersistenceTransaction.addClassificationEvent(rootID, MCRAbstractMetadataVersion.UPDATED);
     }
 
     @MCRCommand(syntax = "delete ocfl classification {0}",
         help = "Delete classification {0} in the OCFL Store")
     public static void deleteOCFLClassification(String classId) {
         final MCRCategoryID rootID = MCRCategoryID.rootID(classId);
-        MCROCFLPersistenceTransaction.addClassficationEvent(rootID, MCRAbstractMetadataVersion.DELETED);
+        MCROCFLPersistenceTransaction.addClassificationEvent(rootID, MCRAbstractMetadataVersion.DELETED);
     }
 
     @MCRCommand(syntax = "sync ocfl classifications",
@@ -178,7 +178,7 @@ public class MCROCFLCommands {
     }
 
     private static List<String> getStaleOCFLClassificationIDs() {
-        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
+        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.OCFL.Classification.Repository");
         List<String> classDAOList = new MCRCategoryDAOImpl().getRootCategoryIDs().stream()
             .map(MCRCategoryID::toString)
             .collect(Collectors.toList());
@@ -193,7 +193,7 @@ public class MCROCFLCommands {
     }
 
     private static List<String> getStaleOCFLUserIDs() {
-        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository");
+        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.OCFL.Users.Repository");
         List<String> userEMList = MCRUserManager.listUsers("*", null, null, null).stream()
             .map(MCRUser::getUserID)
             .collect(Collectors.toList());

@@ -58,7 +58,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     private static final String ROOT_FOLDER = "classification/";
 
-    @MCRProperty(name = "Repository")
+    @MCRProperty(name = "MCR.OCFL.Classification.Repository", absolute = true)
     public String repositoryKey;
 
     protected static final Map<String, Character> MESSAGE_TYPE_MAPPING = Map.ofEntries(
