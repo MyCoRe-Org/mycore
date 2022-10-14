@@ -18,6 +18,10 @@
 
 package org.mycore.common.events;
 
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Represents an event that occured in the MyCoRe system. Events are of a
  * predefined event type like create, update, delete and an object type like
@@ -27,38 +31,40 @@ package org.mycore.common.events;
  * 
  * @author Frank Lützenkirchen
  */
-public class MCREvent extends java.util.Hashtable<String, Object> {
-    /**
-     * Default version ID
-     */
-    private static final long serialVersionUID = 1L;
+public class MCREvent {
 
     /** Pre-defined event types * */
-    public static final String CREATE_EVENT = "create";
+    public enum EventType{
+        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE
+    }
 
-    public static final String UPDATE_EVENT = "update";
+    /** Pre-defined event objects * */
+    public enum ObjectType {
+        OBJECT("MCRObject"), DERIVATE("MCRDerivate"), CLASS("MCRClassification"), PATH("MCRPath"), USER("MCRUser");
+        
+        private String className;
 
-    public static final String DELETE_EVENT = "delete";
+        ObjectType(String className) {
+            this.className = className;
+        }
 
-    public static final String REPAIR_EVENT = "repair";
+        public String getClassName() {
+            return this.className;
+        }
 
-    public static final String INDEX_EVENT = "index";
+        public static ObjectType fromClassName(String className) {
+            for (ObjectType b : ObjectType.values()) {
+                if (b.className.equalsIgnoreCase(className)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+    }
 
-    public static final String OBJECT_TYPE = "MCRObject";
+    public static final String PATH_KEY = "MCRPath";
 
-    public static final String DERIVATE_TYPE = "MCRDerivate";
-
-    public static final String CLASS_TYPE = "MCRClassification";
-
-    public static final String PATH_TYPE = "MCRPath";
-
-    public static final String USER_TYPE = "MCRUser";
-
-    public static final String MOVE_EVENT = "move";
-
-    public static final String PATH_KEY = PATH_TYPE;
-
-    public static final String FILEATTR_KEY = PATH_TYPE + ":attr";
+    public static final String FILEATTR_KEY = PATH_KEY + ":attr";
 
     public static final String OBJECT_KEY = "object";
 
@@ -71,18 +77,25 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
     public static final String USER_KEY = "user";
 
     public static final String USER_OLD_KEY = "user.old";
+    
+    public static final String CLASS_KEY = "class";
+
+    public static final String CLASS_OLD_KEY = "class.old";
 
     /** The object type like object or file * */
-    private String objType;
+    private ObjectType objType;
 
     /** The event type like create, update or delete * */
-    private String evtType;
+    private EventType evtType;
+    
+    /** A hashtable to store event related, additional data */
+    private Hashtable<String, Object> data = new Hashtable<>();
 
     /**
      * Creates a new event object of the given object type (object, file) and
      * event type (create, update, delete)
      */
-    public MCREvent(String objType, String evtType) {
+    public MCREvent(ObjectType objType, EventType evtType) {
         this.objType = objType;
         this.evtType = evtType;
     }
@@ -92,7 +105,7 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
      * 
      * @return the object type of this event
      */
-    public String getObjectType() {
+    public ObjectType getObjectType() {
         return objType;
     }
 
@@ -101,7 +114,35 @@ public class MCREvent extends java.util.Hashtable<String, Object> {
      * 
      * @return the event type of this event
      */
-    public String getEventType() {
+    public EventType getEventType() {
         return evtType;
+    }
+    
+    /**
+     * returns an object from event data
+     * 
+     * @param key - the object key
+     * @return an object from event data
+     */
+    public Object get(String key) {
+        return data.get(key);
+    }
+    
+    /**
+     * adds an object to the event data
+     * @param key - the key for the object
+     * @param value - the object itself
+     */
+    public void put(String key, Object value) {
+        data.put(key, value);
+    }
+    
+    /**
+     * return the entries of the event data
+     * (1x called in wfc.mail.MCRMailEventhandler) 
+     * @return the entrySet of the the data of the event
+     */
+    public Set<Map.Entry<String, Object>> entrySet(){
+        return  data.entrySet();
     }
 }
