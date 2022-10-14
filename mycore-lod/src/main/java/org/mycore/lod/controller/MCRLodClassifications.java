@@ -87,6 +87,8 @@ public class MCRLodClassifications {
      * 
      * TODO Is there a reasonable response on the base path of an LOD URI,
      * or remove this endpoint completely?
+     * 
+     * @return a jersey response with the list of classifications
      */
     @GET
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.HOURS),
@@ -116,7 +118,7 @@ public class MCRLodClassifications {
     /**
      * return a classification (with its categories on the first hierarchy level as linked open data)
      * @param classId - the classification ID
-     * @return
+     * @return the Response with the classification as linked open data 
      */
     @GET
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),
@@ -131,9 +133,9 @@ public class MCRLodClassifications {
     /**
      * return a category and its children on the first hierarchy level as linked open data
      * 
-     * @param classId - the class
-     * @param categId
-     * @return
+     * @param classId - the class ID
+     * @param categId - the category ID
+     * @return the Response with the category as linked open data
      */
     @GET
     @MCRCacheControl(maxAge = @MCRCacheControl.Age(time = 1, unit = TimeUnit.DAYS),

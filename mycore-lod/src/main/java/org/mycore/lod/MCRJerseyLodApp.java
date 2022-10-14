@@ -33,7 +33,6 @@ import org.eclipse.rdf4j.rio.RDFParseException;
 import org.eclipse.rdf4j.rio.RDFParser;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
-import org.eclipse.rdf4j.rio.UnsupportedRDFormatException;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.mycore.common.config.MCRConfiguration2;
@@ -104,12 +103,8 @@ public class MCRJerseyLodApp extends ResourceConfig {
      * @param uri - the base URI of the document
      * @param mimeTypes - the mime types, sent with the request
      * @return the Jersey Response with the requested Linked Data format
-     * @throws RDFParseException
-     * @throws UnsupportedRDFormatException
-     * @throws IOException
      */
-    public static Response returnLinkedData(String rdfxmlString, URI uri, List<String> mimeTypes)
-        throws RDFParseException, UnsupportedRDFormatException, IOException {
+    public static Response returnLinkedData(String rdfxmlString, URI uri, List<String> mimeTypes) {
         try {
             for (RDFFormat rdfOutFormat : RDF_OUTPUT_FORMATS) {
                 if (!Collections.disjoint(mimeTypes, rdfOutFormat.getMIMETypes())) {
