@@ -596,7 +596,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Fires {@link MCREvent#REPAIR_EVENT} for given derivate.
+     * Fires {@link MCREvent.EventType#REPAIR} for given derivate.
      * 
      */
     public static void fireRepairEvent(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
@@ -605,7 +605,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Fires {@link MCREvent#REPAIR_EVENT} for given object.
+     * Fires {@link MCREvent.EventType#REPAIR} for given object.
      * 
      */
     public static void fireRepairEvent(final MCRBase mcrBaseObj) throws MCRPersistenceException {
@@ -617,7 +617,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Fires {@link MCREvent#REPAIR_EVENT} for given object.
+     * Fires {@link MCREvent.EventType#REPAIR} for given object.
      * 
      */
     public static void fireRepairEvent(final MCRObject mcrObject) throws MCRPersistenceException {
@@ -632,7 +632,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Fires {@link MCREvent#UPDATE_EVENT} for given object. If {@link MCRObject#isImportMode()} modifydate will not be
+     * Fires {@link MCREvent.EventType#UPDATE} for given object. If {@link MCRObject#isImportMode()} modifydate will not be
      * updated.
      * 
      * @param mcrObject
