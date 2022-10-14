@@ -53,7 +53,7 @@ public class MCRLodFeature extends MCRJerseyDefaultFeature {
     }
 
     /**
-     * Checks if the class/method is annotated by {@link MCRLodRequireTransaction}.
+     * Checks if the class/method is annotated by {@link MCRRequireTransaction}.
      *
      * @param resourceClass the class to check
      * @param resourceMethod the method to check
