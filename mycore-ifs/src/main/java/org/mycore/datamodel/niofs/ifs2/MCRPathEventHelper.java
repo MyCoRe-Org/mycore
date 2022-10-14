@@ -27,8 +27,8 @@ import org.mycore.common.events.MCREventManager;
 
 class MCRPathEventHelper {
 
-    private static void fireFileEvent(String event, Path file, BasicFileAttributes attrs) {
-        MCREvent fileEvent = new MCREvent(MCREvent.PATH_TYPE, event);
+    private static void fireFileEvent(MCREvent.EventType event, Path file, BasicFileAttributes attrs) {
+        MCREvent fileEvent = new MCREvent(MCREvent.ObjectType.PATH, event);
         fileEvent.put(MCREvent.PATH_KEY, file);
         if (attrs != null) {
             fileEvent.put(MCREvent.FILEATTR_KEY, attrs);
@@ -37,15 +37,15 @@ class MCRPathEventHelper {
     }
 
     static void fireFileCreateEvent(Path file, BasicFileAttributes attrs) {
-        fireFileEvent(MCREvent.CREATE_EVENT, file, Objects.requireNonNull(attrs));
+        fireFileEvent(MCREvent.EventType.CREATE, file, Objects.requireNonNull(attrs));
     }
 
     static void fireFileUpdateEvent(Path file, BasicFileAttributes attrs) {
-        fireFileEvent(MCREvent.UPDATE_EVENT, file, Objects.requireNonNull(attrs));
+        fireFileEvent(MCREvent.EventType.UPDATE, file, Objects.requireNonNull(attrs));
     }
 
     static void fireFileDeleteEvent(Path file) {
-        fireFileEvent(MCREvent.DELETE_EVENT, file, null);
+        fireFileEvent(MCREvent.EventType.DELETE, file, null);
     }
 
 }

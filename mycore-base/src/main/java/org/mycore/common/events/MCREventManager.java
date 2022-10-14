@@ -56,7 +56,7 @@ public class MCREventManager {
     private static MCREventManager instance;
 
     /** Table of all configured event handlers * */
-    private Hashtable<String, List<MCREventHandler>> handlers;
+    private Hashtable<MCREvent.ObjectType, List<MCREventHandler>> handlers;
 
     private MCREventManager() {
         handlers = new Hashtable<>();
@@ -79,7 +79,7 @@ public class MCREventManager {
         for (String propertyKey : propertyKeyList) {
             EventHandlerProperty eventHandlerProperty = new EventHandlerProperty(propertyKey);
 
-            String type = eventHandlerProperty.getType();
+            MCREvent.ObjectType type = eventHandlerProperty.getType();
             String mode = eventHandlerProperty.getMode();
 
             logger.debug("EventManager instantiating handler {} for type {}", props.get(propertyKey), type);
@@ -107,7 +107,7 @@ public class MCREventManager {
         return MCRConfiguration2.getString(propertyKey).isPresent();
     }
 
-    private List<MCREventHandler> getOrCreateEventHandlerListOfType(String type) {
+    private List<MCREventHandler> getOrCreateEventHandlerListOfType(MCREvent.ObjectType type) {
         return handlers.computeIfAbsent(type, k -> new ArrayList<>());
     }
 
@@ -186,7 +186,7 @@ public class MCREventManager {
      *
      * @param type type of event e.g. MCRObject
      */
-    public MCREventManager addEventHandler(String type, MCREventHandler handler) {
+    public MCREventManager addEventHandler(MCREvent.ObjectType type, MCREventHandler handler) {
         getOrCreateEventHandlerListOfType(type).add(handler);
         return this;
     }
@@ -197,7 +197,7 @@ public class MCREventManager {
      * @param type type of event e.g. MCRObject
      * @param index index at which the specified element is to be inserted
      */
-    public MCREventManager addEventHandler(String type, MCREventHandler handler, int index) {
+    public MCREventManager addEventHandler(MCREvent.ObjectType type, MCREventHandler handler, int index) {
         getOrCreateEventHandlerListOfType(type).add(index, handler);
         return this;
     }
@@ -208,7 +208,7 @@ public class MCREventManager {
      * @param type type of event handler
      * @param handler the event handler to remove
      */
-    public MCREventManager removeEventHandler(String type, MCREventHandler handler) {
+    public MCREventManager removeEventHandler(MCREvent.ObjectType type, MCREventHandler handler) {
         List<MCREventHandler> handlerList = this.handlers.get(type);
         handlerList.remove(handler);
         if (handlerList.isEmpty()) {
@@ -222,7 +222,7 @@ public class MCREventManager {
      *
      * @param type type to removed
      */
-    public MCREventManager removeEventHandler(String type) {
+    public MCREventManager removeEventHandler(MCREvent.ObjectType type) {
         this.handlers.remove(type);
         return this;
     }
@@ -261,7 +261,7 @@ public class MCREventManager {
      */
     private class EventHandlerProperty {
 
-        private String type;
+        private MCREvent.ObjectType type;
 
         private String mode;
 
@@ -271,15 +271,15 @@ public class MCREventManager {
                 throw new MCRConfigurationException("Property key " + propertyKey + " for event handler not valid.");
             }
 
-            this.setType(splitedKey[2]);
+            this.setType(MCREvent.ObjectType.fromClassName(splitedKey[2]));
             this.setMode(splitedKey[4]);
         }
 
-        public String getType() {
+        public MCREvent.ObjectType getType() {
             return type;
         }
 
-        private void setType(String type) {
+        private void setType(MCREvent.ObjectType type) {
             this.type = type;
         }
 

@@ -49,7 +49,7 @@ public class MCRObjectCacheFactory extends MCREventHandlerBase {
 
     private MCRObjectCacheFactory() {
         objectCache = new MCRCache<MCRObjectID, MCRObject>(CACHE_MAX_SIZE, this.getClass().getName());
-        MCREventManager.instance().addEventHandler(MCREvent.OBJECT_TYPE, this);
+        MCREventManager.instance().addEventHandler(MCREvent.ObjectType.OBJECT, this);
     }
 
     public static MCRObjectCacheFactory instance() {

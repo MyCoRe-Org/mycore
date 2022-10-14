@@ -57,7 +57,7 @@ public class MCRMODSEmbargoUtils {
     private static MCRCache<MCRObjectID, String> embargoCache = new MCRCache<>(CAPACITY, "MODS embargo filter cache");
 
     static {
-        MCREventManager.instance().addEventHandler(MCREvent.OBJECT_TYPE, new MCREventHandlerBase() {
+        MCREventManager.instance().addEventHandler(MCREvent.ObjectType.OBJECT, new MCREventHandlerBase() {
             @Override
             protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
                 embargoCache.remove(obj.getId());

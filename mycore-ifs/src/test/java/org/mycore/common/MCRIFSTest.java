@@ -23,6 +23,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
+import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -36,7 +37,7 @@ public abstract class MCRIFSTest extends MCRStoreTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        MCREventManager.instance().clear().addEventHandler("MCRObject", new MCRXMLMetadataEventHandler());
+        MCREventManager.instance().clear().addEventHandler(MCREvent.ObjectType.OBJECT, new MCRXMLMetadataEventHandler());
     }
 
     @Override
