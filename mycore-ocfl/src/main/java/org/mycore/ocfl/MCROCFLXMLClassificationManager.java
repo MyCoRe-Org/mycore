@@ -88,7 +88,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         this.repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
 
-    public OcflRepository getRepository() throws ClassCastException {
+    public OcflRepository getRepository() {
         return repository;
     }
     
