@@ -71,7 +71,7 @@ public class MCROCFLXMLUserManager {
      */
     public MCROCFLXMLUserManager() {
         this.repository = MCROCFLRepositoryProvider.getRepository(
-            MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository"));
+            MCRConfiguration2.getStringOrThrow("MCR.OCFL.Users.Repository"));
     }
 
     /**
@@ -80,6 +80,10 @@ public class MCROCFLXMLUserManager {
      */
     public MCROCFLXMLUserManager(String repositoryKey) {
         this.repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+    }
+    
+    public OcflRepository getRepository() {
+        return repository;
     }
 
     public void updateUser(MCRUser user) {

@@ -36,7 +36,6 @@ import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.MCROCFLMigration;
 import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
 import org.mycore.ocfl.MCROCFLPersistenceTransaction;
-import org.mycore.ocfl.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.MCROCFLXMLClassificationManager;
 import org.mycore.ocfl.user.MCROCFLXMLUserManager;
 import org.mycore.user2.MCRUser;
@@ -178,11 +177,12 @@ public class MCROCFLCommands {
     }
 
     private static List<String> getStaleOCFLClassificationIDs() {
-        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
         List<String> classDAOList = new MCRCategoryDAOImpl().getRootCategoryIDs().stream()
             .map(MCRCategoryID::toString)
             .collect(Collectors.toList());
-        OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        MCROCFLXMLClassificationManager ocflClassificationManager
+            = MCRConfiguration2.getSingleInstanceOf(MCROCFLXMLClassificationManager.class).orElseThrow();
+        OcflRepository repository = ocflClassificationManager.getRepository();
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
             .filter(obj -> !MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
@@ -193,11 +193,12 @@ public class MCROCFLCommands {
     }
 
     private static List<String> getStaleOCFLUserIDs() {
-        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository");
         List<String> userEMList = MCRUserManager.listUsers("*", null, null, null).stream()
             .map(MCRUser::getUserID)
             .collect(Collectors.toList());
-        OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        MCROCFLXMLUserManager ocflUserManager
+            = MCRConfiguration2.getSingleInstanceOf(MCROCFLXMLUserManager.class).orElseThrow();
+        OcflRepository repository = ocflUserManager.getRepository();
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
             .filter(obj -> !MCROCFLXMLUserManager.MESSAGE_DELETED.equals(repository.describeObject(obj)

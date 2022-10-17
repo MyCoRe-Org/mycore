@@ -29,7 +29,7 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -57,9 +57,8 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     public static final String MESSAGE_DELETED = "Deleted";
 
     private static final String ROOT_FOLDER = "classification/";
-
-    @MCRProperty(name = "Repository")
-    public String repositoryKey;
+    
+    private final OcflRepository repository;
 
     protected static final Map<String, Character> MESSAGE_TYPE_MAPPING = Map.ofEntries(
         Map.entry(MESSAGE_CREATED, MCROCFLMetadataVersion.CREATED),
@@ -73,10 +72,26 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         return MESSAGE_TYPE_MAPPING.get(message);
     }
 
-    protected OcflRepository getRepository() throws ClassCastException {
-        return MCROCFLRepositoryProvider.getRepository(repositoryKey);
+    /**
+     * Initializes the ClassificationManager with the in the config defined repository.
+     */
+    public MCROCFLXMLClassificationManager() {
+        this.repository = MCROCFLRepositoryProvider.getRepository(
+            MCRConfiguration2.getStringOrThrow("MCR.OCFL.Classification.Repository"));
     }
 
+    /**
+     * Initializes the ClassificationManager with the given repositoryKey.
+     * @param repositoryKey the ID for the repository to be used
+     */
+    public MCROCFLXMLClassificationManager(String repositoryKey) {
+        this.repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+    }
+
+    public OcflRepository getRepository() throws ClassCastException {
+        return repository;
+    }
+    
     public void create(MCRCategoryID mcrCg, MCRContent xml) throws IOException {
         fileUpdate(mcrCg, xml, MESSAGE_CREATED);
     }

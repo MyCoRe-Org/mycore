@@ -40,7 +40,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -71,13 +71,13 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     private static final String MESSAGE_UPDATED = "Updated";
 
     private static final String MESSAGE_DELETED = "Deleted";
+    
+    private final OcflRepository repository;
 
     private static final Map<String, Character> MESSAGE_TYPE_MAPPING = Collections.unmodifiableMap(Map.ofEntries(
         Map.entry(MESSAGE_CREATED, MCROCFLMetadataVersion.CREATED),
         Map.entry(MESSAGE_UPDATED, MCROCFLMetadataVersion.UPDATED),
         Map.entry(MESSAGE_DELETED, MCROCFLMetadataVersion.DELETED)));
-
-    private String repositoryKey = "Default";
 
     private static char convertMessageToType(String message) throws MCRPersistenceException {
         if (!MESSAGE_TYPE_MAPPING.containsKey(message)) {
@@ -85,18 +85,25 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         }
         return MESSAGE_TYPE_MAPPING.get(message);
     }
+    
+    /**
+     * Initializes the MetadataManager with the in the config defined repository.
+     */
+    public MCROCFLXMLMetadataManager() {
+        this.repository = MCROCFLRepositoryProvider.getRepository(
+            MCRConfiguration2.getStringOrThrow("MCR.OCFL.Metadata.Repository"));
+    }
+
+    /**
+     * Initializes the MetadataManager with the given repositoryKey.
+     * @param repositoryKey the ID for the repository to be used
+     */
+    public MCROCFLXMLMetadataManager(String repositoryKey) {
+        this.repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+    }
 
     public OcflRepository getRepository() {
-        return MCROCFLRepositoryProvider.getRepository(getRepositoryKey());
-    }
-
-    public String getRepositoryKey() {
-        return repositoryKey;
-    }
-
-    @MCRProperty(name = "Repository", required = false)
-    public void setRepositoryKey(String repositoryKey) {
-        this.repositoryKey = repositoryKey;
+        return repository;
     }
 
     @Override

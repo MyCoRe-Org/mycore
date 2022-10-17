@@ -51,8 +51,7 @@ public class MCROCFLMigration {
     private final ArrayList<String> failed;
 
     public MCROCFLMigration(String newRepoKey) {
-        target = new MCROCFLXMLMetadataManager();
-        target.setRepositoryKey(newRepoKey);
+        target = new MCROCFLXMLMetadataManager(newRepoKey);
 
         invalidState = new ArrayList<>();
         withoutHistory = new ArrayList<>();
