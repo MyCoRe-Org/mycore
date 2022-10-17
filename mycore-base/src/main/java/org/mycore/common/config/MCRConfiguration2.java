@@ -174,7 +174,7 @@ public class MCRConfiguration2 {
      *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
      * </pre>
      *
-     * @param name
+     * @param clazz
      *            non-null class object
      * @return the instance for the given class object
      * @throws MCRConfigurationException
