@@ -119,7 +119,7 @@ class MCREventHandler {
 
         @Override
         public void doHandleEvent(MCREvent evt) throws MCRException {
-            if (evt.getObjectType()!= MCREvent.ObjectType.OBJECT) {
+            if (evt.getObjectType() != MCREvent.ObjectType.OBJECT) {
                 return;
             }
             MCRObject obj = (MCRObject) evt.get(MCREvent.OBJECT_KEY);

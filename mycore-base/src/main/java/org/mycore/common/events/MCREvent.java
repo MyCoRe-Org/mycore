@@ -34,14 +34,14 @@ import java.util.Set;
 public class MCREvent {
 
     /** Pre-defined event types * */
-    public enum EventType{
+    public enum EventType {
         CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE
     }
 
     /** Pre-defined event objects * */
     public enum ObjectType {
         OBJECT("MCRObject"), DERIVATE("MCRDerivate"), CLASS("MCRClassification"), PATH("MCRPath"), USER("MCRUser");
-        
+
         private String className;
 
         ObjectType(String className) {
@@ -77,7 +77,7 @@ public class MCREvent {
     public static final String USER_KEY = "user";
 
     public static final String USER_OLD_KEY = "user.old";
-    
+
     public static final String CLASS_KEY = "class";
 
     public static final String CLASS_OLD_KEY = "class.old";
@@ -87,7 +87,7 @@ public class MCREvent {
 
     /** The event type like create, update or delete * */
     private EventType evtType;
-    
+
     /** A hashtable to store event related, additional data */
     private Hashtable<String, Object> data = new Hashtable<>();
 
@@ -117,7 +117,7 @@ public class MCREvent {
     public EventType getEventType() {
         return evtType;
     }
-    
+
     /**
      * returns an object from event data
      * 
@@ -127,7 +127,7 @@ public class MCREvent {
     public Object get(String key) {
         return data.get(key);
     }
-    
+
     /**
      * adds an object to the event data
      * @param key - the key for the object
@@ -136,13 +136,13 @@ public class MCREvent {
     public void put(String key, Object value) {
         data.put(key, value);
     }
-    
+
     /**
      * return the entries of the event data
      * (1x called in wfc.mail.MCRMailEventhandler) 
      * @return the entrySet of the the data of the event
      */
-    public Set<Map.Entry<String, Object>> entrySet(){
-        return  data.entrySet();
+    public Set<Map.Entry<String, Object>> entrySet() {
+        return data.entrySet();
     }
 }

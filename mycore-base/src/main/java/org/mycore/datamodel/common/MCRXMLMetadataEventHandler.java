@@ -152,7 +152,7 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
                 case CREATE:
                     metaDataManager.create(id, content, modified);
                     break;
-                
+
                 default:
                     break;
                 }
