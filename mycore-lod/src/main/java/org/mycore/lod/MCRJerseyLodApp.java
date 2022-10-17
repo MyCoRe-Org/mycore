@@ -113,7 +113,7 @@ public class MCRJerseyLodApp extends ResourceConfig {
                     RDFWriter rdfWriter = Rio.createWriter(rdfOutFormat, sw);
                     rdfParser.setRDFHandler(rdfWriter);
                     rdfParser.parse(new StringReader(rdfxmlString), uri.toString());
-                    
+
                     return Response.ok(sw.toString()).type(rdfOutFormat.getDefaultMIMEType() + ";charset=UTF-8")
                         .build();
                 }
