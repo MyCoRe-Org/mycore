@@ -68,7 +68,7 @@ public class MCROCFLXMLUserManager {
     private OcflRepository repository;
 
     @MCRProperty(name = "OCFL.Repository", required = true)
-    private String repositoryKey;
+    public String repositoryKey;
 
     /**
      * Initializes the UserManager
@@ -88,7 +88,7 @@ public class MCROCFLXMLUserManager {
 
     @MCRPostConstruction
     @SuppressWarnings("PMD")
-    private void init(String property) {
+    public void init(String property) {
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
 

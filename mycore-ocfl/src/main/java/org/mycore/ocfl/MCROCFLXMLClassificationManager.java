@@ -60,7 +60,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     private static final String ROOT_FOLDER = "classification/";
 
     @MCRProperty(name = "OCFL.Repository", required = true)
-    private String repositoryKey;
+    public String repositoryKey;
 
     private OcflRepository repository;
 
@@ -94,7 +94,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     @MCRPostConstruction
     @SuppressWarnings("PMD")
-    private void init(String property) {
+    public void init(String property) {
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
 
