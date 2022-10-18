@@ -34,6 +34,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
+import org.jdom2.Text;
 import org.jdom2.input.SAXBuilder;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.xml.sax.InputSource;
@@ -139,11 +140,11 @@ public class MyCoReWebPageProvider {
     /**
      * Adds a section to the MyCoRe webpage
      * @param title the title of the section
-     * @param content list of content added to the section
+     * @param contentList list of content added to the section
      * @param lang the language of the section specified by a language key.
      * @return added section
      */
-    public Element addSection(String title, List<Content> content, String lang) {
+    public Element addSection(String title, List<Content> contentList, String lang) {
         Element section = new Element(XML_SECTION);
         if (lang != null) {
             section.setAttribute(XML_LANG, lang, Namespace.XML_NAMESPACE);
@@ -151,7 +152,14 @@ public class MyCoReWebPageProvider {
         if (title != null && !title.equals("")) {
             section.setAttribute(XML_TITLE, title);
         }
-        section.addContent(content);
+        for(Content content : contentList) {
+            if(content instanceof Text) {
+                // MyCoReWebPage.xsl ignores single text content -> wrap it in a p
+                section.addContent(new Element("p").addContent(content));
+            } else {
+                section.addContent(content);
+            }
+        }
         this.xml.getRootElement().addContent(section);
         return section;
     }

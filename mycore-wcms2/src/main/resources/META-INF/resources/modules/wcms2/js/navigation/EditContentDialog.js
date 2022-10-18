@@ -209,39 +209,44 @@ wcms.navigation.EditContentDialog = function() {
 	function loadContent(/*JSON*/ webpageContent) {
 		this.webpageContent = dojo.clone(webpageContent);
 
-		var addOptionFunc = dojo.hitch(this, addOption);
+		let addOptionFunc = dojo.hitch(this, addOption);
 		// update section
 		this.sectionCount = 0;
-		for(var i = 0; i < this.webpageContent.length; i++) {
+		for(let i = 0; i < this.webpageContent.length; i++) {
 			this.webpageContent[i].id = this.sectionCount++;
 			addOptionFunc(this.webpageContent[i]);
 		}
 		// select option
-		if(this.sectionSelect.domNode.hasChildNodes())
-			dojo.attr(this.sectionSelect.domNode.firstChild,"selected", "selected");
+		if(this.sectionSelect.domNode.hasChildNodes()) {
+			dojo.attr(this.sectionSelect.domNode.firstChild, "selected", "selected");
+		}
 
 		// set current content
 		this.selectedSection = null;
-		if(this.webpageContent.length > 0)
+		if(this.webpageContent.length > 0) {
 			this.selectedSection = this.webpageContent[0];
+		}
 
 		// set ck editor content
-		var contentData = "";
-		if(this.selectedSection != null && this.selectedSection.data)
+		let contentData = "";
+		if(this.selectedSection != null && this.selectedSection.data) {
 			contentData = this.selectedSection.data;
+		}
 		// ck editor settings
-		var lang=I18nManager.getInstance().getLang();
-		var folderHref = this.href.substring(0, this.href.lastIndexOf("/"));
-		var context = window.location.pathname.substring(0, window.location.pathname.indexOf("/modules"));
+		let lang = I18nManager.getInstance().getLang();
+		let folderHref = this.href.substring(0, this.href.lastIndexOf("/"));
+		let context = window.location.pathname.substring(0, window.location.pathname.indexOf("/modules"));
 		this.editor = CKEDITOR.appendTo(this.editorDiv.domNode, {
 			toolbar : contentToolbar,
 			uiColor : '#9AB8F3',
 			language: lang,
 			height:"495px", width:"98%",
 			entities: false,
-			basicEntities: true,
 			allowedContent: true,
 			autoParagraph: false,
+			protectedSource: [
+				/<head[\s\S]*?head>/gi
+			],
 			filebrowserBrowseUrl: context + '/rsc/wcms2/filebrowser?href=' + folderHref + "&type=files" + "&basehref=" + context + folderHref + "/",
 			filebrowserUploadUrl: context + '/rsc/wcms2/filebrowser/upload?href=' + folderHref + "&type=files" + "&basehref=" + context + folderHref + "/",
 			filebrowserImageBrowseUrl: context + '/rsc/wcms2/filebrowser?href=' + folderHref + "&type=images",

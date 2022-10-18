@@ -18,13 +18,10 @@
 
 package org.mycore.wcms2.navigation;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import jakarta.ws.rs.WebApplicationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Content;
@@ -32,18 +29,18 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.Text;
-import org.jdom2.filter.ElementFilter;
 import org.jdom2.output.XMLOutputter;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.tools.MyCoReWebPageProvider;
 import org.xml.sax.SAXParseException;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import jakarta.ws.rs.WebApplicationException;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The default implementation to convert MyCoRe Webpage sections
@@ -65,13 +62,13 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
         "optgroup", "option", "textarea", "keygen", "output", "progress", "meter", "details", "summary", "menuitem",
         "menu", "font");
 
-    private List<String> mycoreTagList = new ArrayList<>();
+    private final List<String> tagList = new ArrayList<>();
 
     public MCRWCMSDefaultSectionProvider() {
-        String mycoreTagListString = MCRConfiguration2.getString("MCR.WCMS2.mycoreTagList").orElse("");
-        for (String tag : mycoreTagListString.split(",")) {
-            mycoreTagList.add(tag.trim());
-        }
+        tagList.addAll(HTML_TAG_LIST);
+        MCRConfiguration2.getString("MCR.WCMS2.mycoreTagList").stream()
+            .flatMap(MCRConfiguration2::splitValue)
+            .forEach(tagList::add);
     }
 
     public JsonArray toJSON(Element rootElement) {
@@ -80,16 +77,9 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
             // get infos of element
             String title = section.getAttributeValue(MyCoReWebPageProvider.XML_TITLE);
             String lang = section.getAttributeValue(MyCoReWebPageProvider.XML_LANG, Namespace.XML_NAMESPACE);
-            String data = null;
-            if (section.getContent(new ElementFilter()).size() > 1) {
-                Element div = new Element("div");
-                while (section.getChildren().size() > 0) {
-                    div.addContent(section.getChildren().get(0).detach());
-                }
-                section.addContent(div);
-            }
+            String sectionAsString = null;
             try {
-                data = getContent(section);
+                sectionAsString = getContentAsString(section);
             } catch (IOException ioExc) {
                 LOGGER.error("while reading section data.", ioExc);
                 continue;
@@ -108,7 +98,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
                 jsonObject.addProperty("hidden", "true");
                 jsonObject.addProperty("invalidElement", invalidElementName);
             }
-            jsonObject.addProperty(JSON_DATA, data);
+            jsonObject.addProperty(JSON_DATA, sectionAsString);
             // add to array
             sectionArray.add(jsonObject);
         }
@@ -123,7 +113,7 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
      */
     private String validateElement(Element element) {
         String elementName = element.getName().toLowerCase(Locale.ROOT);
-        if (!(HTML_TAG_LIST.contains(elementName) || mycoreTagList.contains(elementName))) {
+        if (!tagList.contains(elementName)) {
             return elementName;
         }
         for (Element el : element.getChildren()) {
@@ -139,18 +129,17 @@ public class MCRWCMSDefaultSectionProvider implements MCRWCMSSectionProvider {
      * Returns the content of an element as string. The element itself
      * is ignored.
      * 
-     * @param e the element to get the content from
+     * @param element the element to get the content from
      * @return the content as string
      */
-    protected String getContent(Element e) throws IOException {
+    protected String getContentAsString(Element element) throws IOException {
         XMLOutputter out = new XMLOutputter();
         StringWriter writer = new StringWriter();
-        for (Content child : e.getContent()) {
+        for (Content child : element.getContent()) {
             if (child instanceof Element) {
                 out.output((Element) child, writer);
-            } else if (child instanceof Text) {
-                Text t = (Text) child;
-                String trimmedText = t.getTextTrim();
+            } else if (child instanceof Text text) {
+                String trimmedText = text.getTextTrim();
                 if (!"".equals(trimmedText)) {
                     Text newText = new Text(trimmedText);
                     out.output(newText, writer);
