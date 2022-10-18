@@ -93,6 +93,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     @MCRPostConstruction
+    @SuppressWarnings("PMD")
     private void init(String property) {
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }

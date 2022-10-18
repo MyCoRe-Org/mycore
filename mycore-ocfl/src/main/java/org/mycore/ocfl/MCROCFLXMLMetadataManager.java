@@ -96,6 +96,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     @MCRPostConstruction
+    @SuppressWarnings("PMD")
     private void init(String property) {
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }

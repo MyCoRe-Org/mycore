@@ -87,6 +87,7 @@ public class MCROCFLXMLUserManager {
     }
 
     @MCRPostConstruction
+    @SuppressWarnings("PMD")
     private void init(String property) {
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
