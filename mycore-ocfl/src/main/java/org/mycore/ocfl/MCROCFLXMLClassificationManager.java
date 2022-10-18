@@ -29,7 +29,8 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.config.annotation.MCRPostConstruction;
+import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -57,8 +58,11 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     public static final String MESSAGE_DELETED = "Deleted";
 
     private static final String ROOT_FOLDER = "classification/";
-    
-    private final OcflRepository repository;
+
+    @MCRProperty(name = "OCFL.Repository", required = true)
+    private String repositoryKey;
+
+    private OcflRepository repository;
 
     protected static final Map<String, Character> MESSAGE_TYPE_MAPPING = Map.ofEntries(
         Map.entry(MESSAGE_CREATED, MCROCFLMetadataVersion.CREATED),
@@ -73,25 +77,30 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     /**
-     * Initializes the ClassificationManager with the in the config defined repository.
+     * Initializes the ClassificationManager
      */
     public MCROCFLXMLClassificationManager() {
-        this.repository = MCROCFLRepositoryProvider.getRepository(
-            MCRConfiguration2.getStringOrThrow("MCR.OCFL.Classification.Repository"));
+
     }
 
     /**
-     * Initializes the ClassificationManager with the given repositoryKey.
-     * @param repositoryKey the ID for the repository to be used
-     */
+    * Initializes the ClassificationManager with the given repositoryKey.
+    * @param repositoryKey the ID for the repository to be used
+    */
     public MCROCFLXMLClassificationManager(String repositoryKey) {
-        this.repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        this.repositoryKey = repositoryKey;
+        repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+    }
+
+    @MCRPostConstruction
+    private void init(String property) {
+        repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
 
     public OcflRepository getRepository() {
         return repository;
     }
-    
+
     public void create(MCRCategoryID mcrCg, MCRContent xml) throws IOException {
         fileUpdate(mcrCg, xml, MESSAGE_CREATED);
     }

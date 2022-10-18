@@ -21,6 +21,7 @@ package org.mycore.ocfl.user;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.user2.MCRUser;
@@ -33,28 +34,30 @@ public class MCROCFLUserEventHandler implements MCREventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCROCFLXMLUserManager MANAGER = new MCROCFLXMLUserManager();
+    private static final MCROCFLXMLUserManager MANAGER
+        = MCRConfiguration2.<MCROCFLXMLUserManager>getSingleInstanceOf("MCR.OCFL.User.Manager")
+            .orElseThrow();
 
     @Override
     public void doHandleEvent(MCREvent evt) throws MCRException {
         if (MCREvent.USER_TYPE.equals(evt.getObjectType())) {
-            MCRUser user = (MCRUser)evt.get(MCREvent.USER_KEY);
+            MCRUser user = (MCRUser) evt.get(MCREvent.USER_KEY);
             LOGGER.debug("{} handling {} {}", getClass().getName(), user.getUserID(),
                 evt.getEventType());
             switch (evt.getEventType()) {
-                case MCREvent.UPDATE_EVENT:
-                    MANAGER.updateUser(user);
-                    break;
-                case MCREvent.CREATE_EVENT:
-                    MANAGER.createUser(user);
-                    break;
-                case MCREvent.DELETE_EVENT:
-                    MANAGER.deleteUser(user);
-                    break;
+            case MCREvent.UPDATE_EVENT:
+                MANAGER.updateUser(user);
+                break;
+            case MCREvent.CREATE_EVENT:
+                MANAGER.createUser(user);
+                break;
+            case MCREvent.DELETE_EVENT:
+                MANAGER.deleteUser(user);
+                break;
 
-                default:
-                    LOGGER.info("Event Type '{}' is not valid for {}", evt.getEventType(), getClass().getName());
-                    break;
+            default:
+                LOGGER.info("Event Type '{}' is not valid for {}", evt.getEventType(), getClass().getName());
+                break;
             }
         }
     }

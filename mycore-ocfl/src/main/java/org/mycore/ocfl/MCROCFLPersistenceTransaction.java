@@ -47,7 +47,8 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final MCROCFLXMLClassificationManager MANAGER
-        = MCRConfiguration2.getSingleInstanceOf(MCROCFLXMLClassificationManager.class).orElse(null);
+        = MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.OCFL.Classification.Manager")
+            .orElseThrow();
 
     private static final ThreadLocal<Map<MCRCategoryID, Character>> CATEGORY_WORKSPACE = new ThreadLocal<>();
 
@@ -64,8 +65,8 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     @Override
     public boolean isReady() {
-        LOGGER.debug("TRANSACTION {} READY CHECK - {}", threadId, MANAGER != null);
-        return MANAGER != null && !isActive();
+        LOGGER.debug("TRANSACTION {} READY CHECK", threadId);
+        return !isActive();
     }
 
     @Override
