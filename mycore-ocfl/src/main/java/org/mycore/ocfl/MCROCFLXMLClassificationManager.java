@@ -91,7 +91,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     /**
      * initializes the OCFL repository with the given repositoryKey
      * 
-     * @param respositoryKey
+     * @param repositoryKey
      */
     @MCRProperty(name = "OCFL.Repository")
     public void initOCFLRepository(String repositoryKey) {
