@@ -64,8 +64,6 @@ public class MCROCFLXMLUserManager {
 
     private static final String IGNORING_TRANSIENT_USER = "Got TransientUser, ignoring...";
 
-    private String repositoryKey;
-    
     private OcflRepository repository;
 
     /**
@@ -82,18 +80,17 @@ public class MCROCFLXMLUserManager {
     public MCROCFLXMLUserManager(String repositoryKey) {
         initOCFLRepository(repositoryKey);
     }
-    
+
     /**
      * initializes the OCFL repository with the given repositoryKey
      * 
      * @param respositoryKey
      */
     @MCRProperty(name = "OCFL.Repository")
-    public void initOCFLRepository(String respositoryKey) {
-        this.repositoryKey = respositoryKey;
+    public void initOCFLRepository(String repositoryKey) {
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
-    
+
     public OcflRepository getRepository() {
         return repository;
     }

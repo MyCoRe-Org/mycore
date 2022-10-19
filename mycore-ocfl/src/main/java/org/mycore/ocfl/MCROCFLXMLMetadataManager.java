@@ -79,8 +79,6 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     private OcflRepository repository;
 
-    public String repositoryKey;
-
     /**
      * Initializes the MetadataManager
      */
@@ -98,8 +96,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
      * @param respositoryKey
      */
     @MCRProperty(name = "OCFL.Repository")
-    public void initOCFLRepository(String respositoryKey) {
-        this.repositoryKey = respositoryKey;
+    public void initOCFLRepository(String repositoryKey) {
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
 

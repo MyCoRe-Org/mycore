@@ -58,8 +58,6 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     private static final String ROOT_FOLDER = "classification/";
 
-    private String repositoryKey;
-
     private OcflRepository repository;
 
     protected static final Map<String, Character> MESSAGE_TYPE_MAPPING = Map.ofEntries(
@@ -96,8 +94,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
      * @param respositoryKey
      */
     @MCRProperty(name = "OCFL.Repository")
-    public void initOCFLRepository(String respositoryKey) {
-        this.repositoryKey = respositoryKey;
+    public void initOCFLRepository(String repositoryKey) {
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
 
