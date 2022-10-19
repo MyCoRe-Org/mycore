@@ -63,6 +63,9 @@ public class MCRSassCompilerManager {
 
     private Map<String, String> fileMD5Map = new ConcurrentHashMap<>();
 
+    /**
+     * @return the singleton instance of this class
+     */
     public static MCRSassCompilerManager getInstance() {
         return MCRSASSCompilerManagerHolder.INSTANCE;
     }
@@ -75,6 +78,7 @@ public class MCRSassCompilerManager {
      * @param importer a additional list of importers
      * @return Optional with the compiled css as string. Empty optional if the fileName is not valid.
      * @throws CompilationException if {@link Compiler#compile(FileContext)} throws
+     * @throws IOException if {@link Compiler#compile(FileContext)} throws
      */
     public synchronized Optional<String> getCSSFile(String file, List<Importer> importer)
         throws CompilationException, IOException {
@@ -161,6 +165,10 @@ public class MCRSassCompilerManager {
 
     }
 
+    /**
+     * 
+     * @return true if the SASS compiler is run in developer mode
+     */
     public boolean isDeveloperMode() {
         return MCRConfiguration2.getBoolean(DEVELOPER_MODE_CONFIG_KEY).orElse(false);
     }
