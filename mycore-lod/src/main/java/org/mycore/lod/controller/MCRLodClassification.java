@@ -61,8 +61,8 @@ import jakarta.ws.rs.core.Response;
  * 
  * @author Robert Stephan
  */
-@Path("/classifications")
-public class MCRLodClassifications {
+@Path("/classification")
+public class MCRLodClassification {
 
     /** error code for error response */
     public static final String ERROR_MCRCLASS_NOT_FOUND = "MCRCLASS_NOT_FOUND";
