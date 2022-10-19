@@ -36,7 +36,6 @@ wcms.navigation.EditContentDialog = function() {
 	// ck editor
 	this.editorDiv = null;
 	this.editor = null;
-	this.canNotEdit = null;
 
 	// section
 	this.sectionSelect = null;
@@ -55,6 +54,7 @@ wcms.navigation.EditContentDialog = function() {
 	// internal dialogs
 	this.removeSectionDialog = null;
 	this.editSectionDialog = null;
+	this.shouldNotEditDialog = null;
 };
 
 ( function() {
@@ -90,6 +90,9 @@ wcms.navigation.EditContentDialog = function() {
 				"component.wcms.navigation.itemEditor.editContent.deleteSectionTitle",
 				"component.wcms.navigation.itemEditor.editContent.deleteSection");
 		this.editSectionDialog = new wcms.navigation.EditContentSectionDialog();
+		this.shouldNotEditDialog = new wcms.gui.SimpleDialog("Ok",
+			"component.wcms.general.warning",
+			"component.wcms.navigation.itemEditor.shouldNotEdit");
 
 		// change ok button text
 		this.okButton.i18n = "component.wcms.navigation.itemEditor.editContent.markChanges";
@@ -103,13 +106,11 @@ wcms.navigation.EditContentDialog = function() {
         	splitter: true,
         	gutters: false
         });
-        this.canNotEdit = new dijit.layout.ContentPane({region:"center",style: "border:none;padding:0px; display:none", content: ""});
-        
+
         leftBC.addChild(this.sectionSelect);
         leftBC.addChild(this.sectionToolbar);
 		bc.addChild(leftBC);
 		bc.addChild(this.editorDiv);
-		bc.addChild(this.canNotEdit);
 
 		// add toolbar items
         this.sectionToolbar.addChild(this.addSection);
@@ -192,17 +193,12 @@ wcms.navigation.EditContentDialog = function() {
 		wcms.gui.AbstractDialog.prototype.show.call(this);
 		// load content
 		this.href = href;
-		var loadContentFunc = dojo.hitch(this, loadContent);
+		let loadContentFunc = dojo.hitch(this, loadContent);
 		loadContentFunc(content);
-		
-		dojo.removeClass(this.editorDiv.id,"hidden");
-		dojo.removeClass(this.canNotEdit.id, "visible");
-		if(this.selectedSection == null || this.selectedSection.hidden == "true") {
-			dojo.addClass(this.editorDiv.id, "hidden");
-      var invalidText = I18nManager.getInstance().getI18nTextAsString("component.wcms.navigation.itemEditor.canNotEdit");
-      var canNotEditLabel = "<p>" + invalidText + " '" + this.selectedSection.invalidElement + "'</p>";
-      this.canNotEdit.set("content", canNotEditLabel);
-			dojo.addClass(this.canNotEdit.id, "visible");
+
+		if (this.selectedSection !== null && this.selectedSection.unknownHTMLTags !== null && this.selectedSection.unknownHTMLTags.length > 0) {
+			console.log(this.selectedSection.unknownHTMLTags);
+			this.shouldNotEditDialog.show();
 		}
 	}
 
@@ -273,25 +269,18 @@ wcms.navigation.EditContentDialog = function() {
 
 	function changeSection() {
 		// save old content data
-		if(this.selectedSection != null && this.selectedSection.hidden != "true")
+		if(this.selectedSection != null) {
 			this.selectedSection.data = this.editor.getData();
-		
+		}
 		// switch to new content
 		dojo.removeClass(this.editorDiv.id,"hidden");
-		dojo.removeClass(this.canNotEdit.id, "visible");
-		var id = this.sectionSelect.get("value")[0];
-		var content = this.getSectionById(id);
-		if(!content.data)
+		let id = this.sectionSelect.get("value")[0];
+		let content = this.getSectionById(id);
+		if(!content.data) {
 			content.data = "";
+		}
 		this.selectedSection = content;
-		
-		if(content.hidden != "true"){
-			this.editor.setData(content.data);
-		}
-		else{
-			dojo.addClass(this.editorDiv.id,"hidden");
-			dojo.addClass(this.canNotEdit.id, "visible");
-		}
+		this.editor.setData(content.data);
 	}
 
 	function getSectionById(/*int*/ id) {
@@ -409,14 +398,12 @@ wcms.navigation.EditContentDialog = function() {
 	 */
 	function onBeforeOk() {
 		// sort content array
-		var orderSectionsFunc = dojo.hitch(this, orderSections);
+		let orderSectionsFunc = dojo.hitch(this, orderSections);
 		orderSectionsFunc();
 		// save content data
-		if (this.selectedSection.hidden != "true"){
-			this.selectedSection.data = this.editor.getData();
-		}
+		this.selectedSection.data = this.editor.getData();
 		// remove internal id from content
-		for(var i = 0; i < this.webpageContent.length; i++) {
+		for(let i = 0; i < this.webpageContent.length; i++) {
 			delete(this.webpageContent[i].id);
 		}
 	}
