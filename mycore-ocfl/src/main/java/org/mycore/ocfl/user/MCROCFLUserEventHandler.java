@@ -18,6 +18,8 @@
 
 package org.mycore.ocfl.user;
 
+import java.util.Optional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -34,25 +36,27 @@ public class MCROCFLUserEventHandler implements MCREventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCROCFLXMLUserManager MANAGER
-        = MCRConfiguration2.<MCROCFLXMLUserManager>getSingleInstanceOf("MCR.OCFL.User.Manager")
-            .orElseThrow();
+    private static final Optional<MCROCFLXMLUserManager> MANAGER
+        = MCRConfiguration2.<MCROCFLXMLUserManager>getSingleInstanceOf("MCR.OCFL.User.Manager");
 
     @Override
     public void doHandleEvent(MCREvent evt) throws MCRException {
+        if (MANAGER.isEmpty()) {
+            throw MCRConfiguration2.createConfigurationException("MCR.OCFL.User.Manager");
+        }
         if (MCREvent.USER_TYPE.equals(evt.getObjectType())) {
             MCRUser user = (MCRUser) evt.get(MCREvent.USER_KEY);
             LOGGER.debug("{} handling {} {}", getClass().getName(), user.getUserID(),
                 evt.getEventType());
             switch (evt.getEventType()) {
             case MCREvent.UPDATE_EVENT:
-                MANAGER.updateUser(user);
+                MANAGER.get().updateUser(user);
                 break;
             case MCREvent.CREATE_EVENT:
-                MANAGER.createUser(user);
+                MANAGER.get().createUser(user);
                 break;
             case MCREvent.DELETE_EVENT:
-                MANAGER.deleteUser(user);
+                MANAGER.get().deleteUser(user);
                 break;
 
             default:

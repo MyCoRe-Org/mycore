@@ -23,6 +23,7 @@ import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,9 +47,8 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final MCROCFLXMLClassificationManager MANAGER
-        = MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.OCFL.Classification.Manager")
-            .orElseThrow();
+    private static final Optional<MCROCFLXMLClassificationManager> MANAGER
+        = MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.OCFL.Classification.Manager");
 
     private static final ThreadLocal<Map<MCRCategoryID, Character>> CATEGORY_WORKSPACE = new ThreadLocal<>();
 
@@ -65,8 +65,8 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
 
     @Override
     public boolean isReady() {
-        LOGGER.debug("TRANSACTION {} READY CHECK", threadId);
-        return !isActive();
+        LOGGER.debug("TRANSACTION {} READY CHECK - {}", threadId, MANAGER.isPresent());
+        return MANAGER.isPresent() && !isActive();
     }
 
     @Override
@@ -98,7 +98,7 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
                         createOrUpdateOCFLClassification(categoryID, eventType);
                         break;
                     case MCRAbstractMetadataVersion.DELETED:
-                        MANAGER.delete(categoryID);
+                        MANAGER.get().delete(categoryID);
                         break;
                     default:
                         throw new IllegalStateException(
@@ -126,9 +126,9 @@ public class MCROCFLPersistenceTransaction implements MCRPersistenceTransaction 
         final MCRJDOMContent classContent = new MCRJDOMContent(categoryXML);
         try {
             if (eventType == MCRAbstractMetadataVersion.CREATED) {
-                MANAGER.create(categoryID, classContent);
+                MANAGER.get().create(categoryID, classContent);
             } else {
-                MANAGER.update(categoryID, classContent);
+                MANAGER.get().update(categoryID, classContent);
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
