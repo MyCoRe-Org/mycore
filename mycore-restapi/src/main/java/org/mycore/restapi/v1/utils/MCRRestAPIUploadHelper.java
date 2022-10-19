@@ -305,9 +305,7 @@ public class MCRRestAPIUploadHelper {
             if (Files.notExists(derRoot)) {
                 derRoot.getFileSystem().createRoot(derID.toString());
             }
-
-            der.getDerivate().getInternals().setSourcePath(derDir.toString());
-
+            
             if (formParamUnzip) {
                 String maindoc = null;
                 try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(uploadedInputStream))) {
