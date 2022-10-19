@@ -193,7 +193,7 @@ public class MCRLodClassification {
         for (MCRCategory categ : categoryDAO.getRootCategories()) {
             eBag.addContent(new Element("li", MCRConstants.RDF_NAMESPACE)
                 .setAttribute("resource",
-                    MCRFrontendUtil.getBaseURL() + "open-data/classifications/" + categ.getId().toString(),
+                    MCRFrontendUtil.getBaseURL() + "open-data/classification/" + categ.getId().toString(),
                     MCRConstants.RDF_NAMESPACE));
         }
         return new Document(eBag);
