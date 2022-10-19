@@ -208,11 +208,11 @@ public class MCROCFLCommands {
 
     private static MCROCFLXMLUserManager getOCFLUserManagerInstance() {
         return MCRConfiguration2.<MCROCFLXMLUserManager>getSingleInstanceOf("MCR.OCFL.User.Manager")
-            .orElseThrow();
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException("MCR.OCFL.User.Manager"));
     }
 
     private static MCROCFLXMLClassificationManager getOCFLClassificationManagerInstance() {
         return MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.OCFL.Classification.Manager")
-            .orElseThrow();
+            .orElseThrow(() -> MCRConfiguration2.createConfigurationException("MCR.OCFL.Classification.Manager"));
     }
 }
