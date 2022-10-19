@@ -31,7 +31,6 @@ import org.jdom2.JDOMException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRStreamContent;
@@ -65,10 +64,9 @@ public class MCROCFLXMLUserManager {
 
     private static final String IGNORING_TRANSIENT_USER = "Got TransientUser, ignoring...";
 
+    private String repositoryKey;
+    
     private OcflRepository repository;
-
-    @MCRProperty(name = "OCFL.Repository", required = true)
-    public String repositoryKey;
 
     /**
      * Initializes the UserManager
@@ -82,16 +80,20 @@ public class MCROCFLXMLUserManager {
      * @param repositoryKey the ID for the repository to be used
      */
     public MCROCFLXMLUserManager(String repositoryKey) {
-        this.repositoryKey = repositoryKey;
+        initOCFLRepository(repositoryKey);
+    }
+    
+    /**
+     * initializes the OCFL repository with the given repositoryKey
+     * 
+     * @param respositoryKey
+     */
+    @MCRProperty(name = "OCFL.Repository")
+    public void initOCFLRepository(String respositoryKey) {
+        this.repositoryKey = respositoryKey;
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
-
-    @MCRPostConstruction
-    @SuppressWarnings("PMD")
-    public void init(String property) {
-        repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
-    }
-
+    
     public OcflRepository getRepository() {
         return repository;
     }

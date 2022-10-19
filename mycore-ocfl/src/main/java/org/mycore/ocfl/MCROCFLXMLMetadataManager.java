@@ -40,7 +40,6 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUserInformation;
-import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -80,7 +79,6 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     private OcflRepository repository;
 
-    @MCRProperty(name = "OCFL.Repository", required = true)
     public String repositoryKey;
 
     /**
@@ -91,13 +89,17 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     public MCROCFLXMLMetadataManager(String repositoryKey) {
-        this.repositoryKey = repositoryKey;
-        repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        initOCFLRepository(repositoryKey);
     }
 
-    @MCRPostConstruction
-    @SuppressWarnings("PMD")
-    public void init(String property) {
+    /**
+     * initializes the OCFL repository with the given repositoryKey
+     * 
+     * @param respositoryKey
+     */
+    @MCRProperty(name = "OCFL.Repository")
+    public void initOCFLRepository(String respositoryKey) {
+        this.repositoryKey = respositoryKey;
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
 

@@ -29,7 +29,6 @@ import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
-import org.mycore.common.config.annotation.MCRPostConstruction;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -59,8 +58,7 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
 
     private static final String ROOT_FOLDER = "classification/";
 
-    @MCRProperty(name = "OCFL.Repository", required = true)
-    public String repositoryKey;
+    private String repositoryKey;
 
     private OcflRepository repository;
 
@@ -88,13 +86,18 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     * @param repositoryKey the ID for the repository to be used
     */
     public MCROCFLXMLClassificationManager(String repositoryKey) {
-        this.repositoryKey = repositoryKey;
-        repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        initOCFLRepository(repositoryKey);
+        
     }
-
-    @MCRPostConstruction
-    @SuppressWarnings("PMD")
-    public void init(String property) {
+    
+    /**
+     * initializes the OCFL repository with the given repositoryKey
+     * 
+     * @param respositoryKey
+     */
+    @MCRProperty(name = "OCFL.Repository")
+    public void initOCFLRepository(String respositoryKey) {
+        this.repositoryKey = respositoryKey;
         repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
     }
 
