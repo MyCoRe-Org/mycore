@@ -85,7 +85,6 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     */
     public MCROCFLXMLClassificationManager(String repositoryKey) {
         initOCFLRepository(repositoryKey);
-        
     }
     
     /**

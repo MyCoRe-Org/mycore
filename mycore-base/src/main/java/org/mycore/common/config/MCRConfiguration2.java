@@ -164,28 +164,6 @@ public class MCRConfiguration2 {
             .map(key -> (T) instanceHolder.computeIfAbsent(key,
                 k -> MCRConfigurableInstanceHelper.getInstance(name).orElse(null)));
     }
-    
-    /**
-     * Returns a instance of the class specified by the given class object. If the class was
-     * previously instantiated by this method this instance is returned.
-     * If you call a method on the returned Optional directly you need to set the type like this:
-     * <pre>
-     * MCRConfiguration.&lt;MCRMyType&gt; getSingleInstanceOf(clazz)
-     *     .ifPresent(myTypeObj -&gt; myTypeObj.method());
-     * </pre>
-     *
-     * @param clazz
-     *            non-null class object
-     * @return the instance for the given class object
-     * @throws MCRConfigurationException
-     *             if the class can not be loaded or instantiated
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> Optional<T> getSingleInstanceOf(Class<? extends T> clazz) {
-        return Optional.ofNullable((T) instanceHolder.computeIfAbsent(new SingletonKey(null, clazz.getName()),
-                k -> MCRConfigurableInstanceHelper.getInstance(clazz, Collections.emptyMap(), null)));
-    }
-
 
     /**
      * Returns a instance of the class specified in the configuration property with the given name. If the class was
