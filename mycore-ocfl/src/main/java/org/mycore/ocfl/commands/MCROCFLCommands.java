@@ -56,14 +56,6 @@ public class MCROCFLCommands {
 
     public static final String FAILED_AND_NOW_INVALID_STATE = FAILED + " and now invalid state";
 
-    private static final MCROCFLXMLUserManager OCFL_USER_MANAGER
-        = MCRConfiguration2.<MCROCFLXMLUserManager>getSingleInstanceOf("MCR.OCFL.User.Manager")
-            .orElseThrow();
-
-    private static final MCROCFLXMLClassificationManager OCFL_CLASSIFICATION_MANAGER
-        = MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.OCFL.Classification.Manager")
-            .orElseThrow();
-
     @MCRCommand(syntax = "migrate metadata to repository {0}",
         help = "migrates all the metadata to the ocfl " +
             "repository with the id {0}")
@@ -149,13 +141,13 @@ public class MCROCFLCommands {
         if (MCRUserManager.getUser(userId) == null) {
             throw new MCRUsageException("The User '" + userId + "' does not exist!");
         }
-        OCFL_USER_MANAGER.updateUser(MCRUserManager.getUser(userId));
+        getOCFLUserManagerInstance().updateUser(MCRUserManager.getUser(userId));
     }
 
     @MCRCommand(syntax = "delete ocfl user {0}",
         help = "Delete user {0} in the OCFL Store")
     public static void deleteOCFLUser(String userId) {
-        OCFL_USER_MANAGER.deleteUser(userId);
+        getOCFLUserManagerInstance().deleteUser(userId);
     }
 
     @MCRCommand(syntax = "sync ocfl users",
@@ -173,14 +165,14 @@ public class MCROCFLCommands {
     @MCRCommand(syntax = "restore user {0} from ocfl with version {1}",
         help = "restore a specified revision of a ocfl user backup to the primary user store")
     public static void writeUserToDbVersioned(String userId, String revision) throws IOException {
-        MCRUser user = OCFL_USER_MANAGER.retrieveContent(userId, revision);
+        MCRUser user = getOCFLUserManagerInstance().retrieveContent(userId, revision);
         MCRUserManager.updateUser(user);
     }
 
     @MCRCommand(syntax = "restore user {0} from ocfl",
         help = "restore the latest revision of a ocfl user backup to the primary user store")
     public static void writeUserToDb(String userId) throws IOException {
-        MCRUser user = OCFL_USER_MANAGER.retrieveContent(userId, null);
+        MCRUser user = getOCFLUserManagerInstance().retrieveContent(userId, null);
         MCRUserManager.updateUser(user);
     }
 
@@ -189,7 +181,7 @@ public class MCROCFLCommands {
             .map(MCRCategoryID::toString)
             .collect(Collectors.toList());
 
-        OcflRepository repository = OCFL_CLASSIFICATION_MANAGER.getRepository();
+        OcflRepository repository = getOCFLClassificationManagerInstance().getRepository();
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
             .filter(obj -> !MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
@@ -204,7 +196,7 @@ public class MCROCFLCommands {
             .map(MCRUser::getUserID)
             .collect(Collectors.toList());
 
-        OcflRepository repository = OCFL_USER_MANAGER.getRepository();
+        OcflRepository repository = getOCFLUserManagerInstance().getRepository();
         return repository.listObjectIds()
             .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
             .filter(obj -> !MCROCFLXMLUserManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
@@ -212,5 +204,15 @@ public class MCROCFLCommands {
             .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
             .filter(Predicate.not(userEMList::contains))
             .collect(Collectors.toList());
+    }
+
+    private static MCROCFLXMLUserManager getOCFLUserManagerInstance() {
+        return MCRConfiguration2.<MCROCFLXMLUserManager>getSingleInstanceOf("MCR.OCFL.User.Manager")
+            .orElseThrow();
+    }
+
+    private static MCROCFLXMLClassificationManager getOCFLClassificationManagerInstance() {
+        return MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.OCFL.Classification.Manager")
+            .orElseThrow();
     }
 }
