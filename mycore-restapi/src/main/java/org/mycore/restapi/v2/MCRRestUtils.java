@@ -44,13 +44,13 @@ public final class MCRRestUtils {
     private MCRRestUtils() {
     }
 
-    static Optional<Response> getCachedResponse(Request request, Date lastModified) {
+    public static Optional<Response> getCachedResponse(Request request, Date lastModified) {
         return Optional.ofNullable(request)
             .map(r -> r.evaluatePreconditions(lastModified))
             .map(Response.ResponseBuilder::build);
     }
 
-    static Optional<Response> getCachedResponse(Request request, Date lastModified, EntityTag eTag) {
+    public static Optional<Response> getCachedResponse(Request request, Date lastModified, EntityTag eTag) {
         return Optional.ofNullable(request)
             .map(r -> r.evaluatePreconditions(lastModified, eTag))
             .map(Response.ResponseBuilder::build);

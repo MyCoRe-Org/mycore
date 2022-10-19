@@ -48,6 +48,7 @@
     <!-- <log4j.version>2.19.0</log4j.version> -->
     <oaipmh.version>3.0</oaipmh.version>
     <ocfl-java.version>1.4.6</ocfl-java.version>
+    <rdf4j.version>4.2.0</rdf4j.version>
     <selenium.version>3.141.59</selenium.version>
     <xalan.version>2.7.2</xalan.version>
   </properties>
@@ -65,6 +66,13 @@
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
         <version>${log4j.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-bom</artifactId>
+        <version>${rdf4j.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -575,6 +583,11 @@
       <dependency>
         <groupId>org.mycore</groupId>
         <artifactId>mycore-iview2</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
+        <artifactId>mycore-lod</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
