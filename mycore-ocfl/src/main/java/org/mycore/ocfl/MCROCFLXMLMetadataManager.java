@@ -79,6 +79,13 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     private OcflRepository repository;
 
+    private static char convertMessageToType(String message) throws MCRPersistenceException {
+        if (!MESSAGE_TYPE_MAPPING.containsKey(message)) {
+            throw new MCRPersistenceException("Cannot identify version type from message '" + message + "'");
+        }
+        return MESSAGE_TYPE_MAPPING.get(message);
+    }
+
     /**
      * Initializes the MetadataManager
      */
@@ -102,13 +109,6 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
     public OcflRepository getRepository() {
         return repository;
-    }
-
-    private static char convertMessageToType(String message) throws MCRPersistenceException {
-        if (!MESSAGE_TYPE_MAPPING.containsKey(message)) {
-            throw new MCRPersistenceException("Cannot identify version type from message '" + message + "'");
-        }
-        return MESSAGE_TYPE_MAPPING.get(message);
     }
 
     @Override
