@@ -61,8 +61,8 @@ import jakarta.ws.rs.core.Response;
  * 
  * @author Robert Stephan
  */
-@Path("/classifications")
-public class MCRLodClassifications {
+@Path("/classification")
+public class MCRLodClassification {
 
     /** error code for error response */
     public static final String ERROR_MCRCLASS_NOT_FOUND = "MCRCLASS_NOT_FOUND";
@@ -193,7 +193,7 @@ public class MCRLodClassifications {
         for (MCRCategory categ : categoryDAO.getRootCategories()) {
             eBag.addContent(new Element("li", MCRConstants.RDF_NAMESPACE)
                 .setAttribute("resource",
-                    MCRFrontendUtil.getBaseURL() + "open-data/classifications/" + categ.getId().toString(),
+                    MCRFrontendUtil.getBaseURL() + "open-data/classification/" + categ.getId().toString(),
                     MCRConstants.RDF_NAMESPACE));
         }
         return new Document(eBag);
