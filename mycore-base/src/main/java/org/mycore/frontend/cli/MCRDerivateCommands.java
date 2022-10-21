@@ -316,7 +316,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         // Replace relative path with absolute path of files
         if (derivate.getDerivate().getInternals() != null) {
             String path = derivate.getDerivate().getInternals().getSourcePath();
-            path = path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            if (path == null) {
+                path = "";
+            } else {
+                path = path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            }
             if (path.trim().length() <= 1) {
                 // the path is the path name plus the name of the derivate -
                 path = derivate.getId().toString();
