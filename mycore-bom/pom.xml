@@ -197,6 +197,11 @@
         <version>2.6</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>1.10.0</version>
+      </dependency>
+      <dependency>
         <groupId>de.undercouch</groupId>
         <artifactId>citeproc-java</artifactId>
         <version>3.0.0-alpha.6</version>
