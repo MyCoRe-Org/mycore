@@ -18,7 +18,7 @@
 
 package org.mycore.mods.merger;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
@@ -69,7 +69,7 @@ public class MCRAbstractMerger extends MCRMerger {
             return false;
         }
 
-        int distance = StringUtils.getLevenshteinDistance(text, textOther);
+        int distance = LevenshteinDistance.getDefaultInstance().apply(text, textOther);
         return (distance * 100 / length) < MAX_DISTANCE_PERCENT;
     }
 }
