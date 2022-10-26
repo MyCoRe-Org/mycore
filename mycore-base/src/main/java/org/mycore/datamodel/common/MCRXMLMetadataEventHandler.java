@@ -131,31 +131,34 @@ public class MCRXMLMetadataEventHandler extends MCREventHandlerBase {
     }
 
     private void handleStoreEvent(MCREvent evt, MCRBase obj) {
-        String eventType = evt.getEventType();
+        MCREvent.EventType eventType = evt.getEventType();
         MCRObjectID id = obj.getId();
         try {
             switch (eventType) {
-            case MCREvent.REPAIR_EVENT:
-            case MCREvent.UPDATE_EVENT:
-            case MCREvent.CREATE_EVENT:
+            case REPAIR:
+            case UPDATE:
+            case CREATE:
                 MCRBaseContent content = new MCRBaseContent(obj);
                 Date modified = obj.getService().getDate(MCRObjectService.DATE_TYPE_MODIFYDATE);
                 switch (eventType) {
-                case MCREvent.REPAIR_EVENT:
+                case REPAIR:
                     MCRContent retrieveContent = metaDataManager.retrieveContent(id);
                     if (isUptodate(retrieveContent, content)) {
                         return;
                     }
-                case MCREvent.UPDATE_EVENT:
+                case UPDATE:
                     metaDataManager.update(id, content, modified);
                     break;
-                case MCREvent.CREATE_EVENT:
+                case CREATE:
                     metaDataManager.create(id, content, modified);
+                    break;
+
+                default:
                     break;
                 }
                 evt.put("content", content);
                 break;
-            case MCREvent.DELETE_EVENT:
+            case DELETE:
                 metaDataManager.delete(id);
                 break;
             default:

@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.events.MCREvent.ObjectType;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRLinkTableEventHandler;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
@@ -59,8 +60,8 @@ public class MCRObjectUtilsTest extends MCRStoreTestCase {
     public void setUp() throws Exception {
         super.setUp();
         MCREventManager.instance().clear();
-        MCREventManager.instance().addEventHandler("MCRObject", new MCRXMLMetadataEventHandler());
-        MCREventManager.instance().addEventHandler("MCRObject", new MCRLinkTableEventHandler());
+        MCREventManager.instance().addEventHandler(ObjectType.OBJECT, new MCRXMLMetadataEventHandler());
+        MCREventManager.instance().addEventHandler(ObjectType.OBJECT, new MCRLinkTableEventHandler());
         root = createObject("test_document_00000001", null);
         l11 = createObject("test_document_00000002", root.getId());
         l12 = createObject("test_document_00000003", root.getId());

@@ -214,7 +214,7 @@ public final class MCRMetadataManager {
         }
 
         // handle events
-        fireEvent(mcrDerivate, null, MCREvent.CREATE_EVENT);
+        fireEvent(mcrDerivate, null, MCREvent.EventType.CREATE);
 
         // create data in IFS
         if (mcrDerivate.getDerivate().getInternals() != null) {
@@ -345,7 +345,7 @@ public final class MCRMetadataManager {
         }
 
         // handle events
-        fireEvent(mcrObject, null, MCREvent.CREATE_EVENT);
+        fireEvent(mcrObject, null, MCREvent.EventType.CREATE);
 
         // add the MCRObjectID to the child list in the parent object
         if (parentId != null) {
@@ -397,7 +397,7 @@ public final class MCRMetadataManager {
         }
 
         // handle events
-        fireEvent(mcrDerivate, null, MCREvent.DELETE_EVENT);
+        fireEvent(mcrDerivate, null, MCREvent.EventType.DELETE);
 
         // remove mark
         MCRMarkManager.instance().remove(id);
@@ -493,7 +493,7 @@ public final class MCRMetadataManager {
         }
 
         // handle events
-        fireEvent(mcrObject, null, MCREvent.DELETE_EVENT);
+        fireEvent(mcrObject, null, MCREvent.EventType.DELETE);
 
         // remove mark
         MCRMarkManager.instance().remove(id);
@@ -596,16 +596,16 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Fires {@link MCREvent#REPAIR_EVENT} for given derivate.
+     * Fires {@link MCREvent.EventType#REPAIR} for given derivate.
      * 
      */
     public static void fireRepairEvent(final MCRDerivate mcrDerivate) throws MCRPersistenceException {
         // handle events
-        fireEvent(mcrDerivate, null, MCREvent.REPAIR_EVENT);
+        fireEvent(mcrDerivate, null, MCREvent.EventType.REPAIR);
     }
 
     /**
-     * Fires {@link MCREvent#REPAIR_EVENT} for given object.
+     * Fires {@link MCREvent.EventType#REPAIR} for given object.
      * 
      */
     public static void fireRepairEvent(final MCRBase mcrBaseObj) throws MCRPersistenceException {
@@ -617,7 +617,7 @@ public final class MCRMetadataManager {
     }
 
     /**
-     * Fires {@link MCREvent#REPAIR_EVENT} for given object.
+     * Fires {@link MCREvent.EventType#REPAIR} for given object.
      * 
      */
     public static void fireRepairEvent(final MCRObject mcrObject) throws MCRPersistenceException {
@@ -628,12 +628,12 @@ public final class MCRMetadataManager {
             }
         }
         // handle events
-        fireEvent(mcrObject, null, MCREvent.REPAIR_EVENT);
+        fireEvent(mcrObject, null, MCREvent.EventType.REPAIR);
     }
 
     /**
-     * Fires {@link MCREvent#UPDATE_EVENT} for given object. If {@link MCRObject#isImportMode()} modifydate will not be
-     * updated.
+     * Fires {@link MCREvent.EventType#UPDATE} for given object. If {@link MCRObject#isImportMode()} modifydate 
+     * will not be updated.
      * 
      * @param mcrObject
      *            mycore object which is updated
@@ -645,7 +645,7 @@ public final class MCRMetadataManager {
         // remove ACL if it is set from data source
         mcrObject.getService().getRules().clear();
         // handle events
-        fireEvent(mcrObject, retrieveMCRObject(mcrObject.getId()), MCREvent.UPDATE_EVENT);
+        fireEvent(mcrObject, retrieveMCRObject(mcrObject.getId()), MCREvent.EventType.UPDATE);
     }
 
     /**
@@ -920,7 +920,7 @@ public final class MCRMetadataManager {
         if (!mcrDerivate.isImportMode() || mcrDerivate.getService().getDate("modifydate") == null) {
             mcrDerivate.getService().setDate("modifydate");
         }
-        fireEvent(mcrDerivate, retrieveMCRDerivate(mcrDerivate.getId()), MCREvent.UPDATE_EVENT);
+        fireEvent(mcrDerivate, retrieveMCRDerivate(mcrDerivate.getId()), MCREvent.EventType.UPDATE);
     }
 
     /**
@@ -974,13 +974,13 @@ public final class MCRMetadataManager {
             LOGGER.warn("Error while restoring {}", mcrObjectId, e1);
         } finally {
             // remove derivate
-            fireEvent(mcrDerivate, null, MCREvent.DELETE_EVENT);
+            fireEvent(mcrDerivate, null, MCREvent.EventType.DELETE);
         }
     }
 
-    private static void fireEvent(MCRBase base, MCRBase oldBase, String eventType) {
+    private static void fireEvent(MCRBase base, MCRBase oldBase, MCREvent.EventType eventType) {
         boolean objectEvent = base instanceof MCRObject;
-        String type = objectEvent ? MCREvent.OBJECT_TYPE : MCREvent.DERIVATE_TYPE;
+        MCREvent.ObjectType type = objectEvent ? MCREvent.ObjectType.OBJECT : MCREvent.ObjectType.DERIVATE;
         final MCREvent evt = new MCREvent(type, eventType);
         if (objectEvent) {
             evt.put(MCREvent.OBJECT_KEY, base);
@@ -989,7 +989,7 @@ public final class MCRMetadataManager {
         }
         Optional.ofNullable(oldBase)
             .ifPresent(b -> evt.put(objectEvent ? MCREvent.OBJECT_OLD_KEY : MCREvent.DERIVATE_OLD_KEY, b));
-        if (MCREvent.DELETE_EVENT.equals(eventType)) {
+        if (MCREvent.EventType.DELETE == eventType) {
             MCREventManager.instance().handleEvent(evt, MCREventManager.BACKWARD);
         } else {
             MCREventManager.instance().handleEvent(evt);

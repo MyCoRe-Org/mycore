@@ -20,8 +20,6 @@ package org.mycore.ocfl;
 
 import static org.mycore.ocfl.MCROCFLPersistenceTransaction.addClassficationEvent;
 
-import java.util.Objects;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
@@ -39,17 +37,17 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
 
     @Override
     public void doHandleEvent(MCREvent evt) throws MCRException {
-        if (Objects.equals(evt.getObjectType(), MCREvent.CLASS_TYPE)) {
-            MCRCategory mcrCg = (MCRCategory) evt.get("class");
+        if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
+            MCRCategory mcrCg = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
             LOGGER.debug("{} handling {} {}", getClass().getName(), mcrCg.getId(), evt.getEventType());
             switch (evt.getEventType()) {
-            case MCREvent.CREATE_EVENT:
+            case CREATE:
                 addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.CREATED);
                 break;
-            case MCREvent.UPDATE_EVENT:
+            case UPDATE:
                 addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.UPDATED);
                 break;
-            case MCREvent.DELETE_EVENT:
+            case DELETE:
                 if (mcrCg.getId().isRootID()) {
                     // delete complete classification
                     addClassficationEvent(mcrCg.getRoot().getId(), MCRAbstractMetadataVersion.DELETED);
@@ -67,10 +65,11 @@ public class MCROCFLClassificationEventHandler implements MCREventHandler {
 
     @Override
     public void undoHandleEvent(MCREvent evt) throws MCRException {
-        if (Objects.equals(evt.getObjectType(), MCREvent.CLASS_TYPE)) {
-            LOGGER.debug("{} handling undo of {} {}", getClass().getName(), ((MCRCategory) evt.get("class")).getId(),
+        if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
+            LOGGER.debug("{} handling undo of {} {}", getClass().getName(),
+                ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
                 evt.getEventType());
-            LOGGER.info("Doing nothing for undo of {} {}", ((MCRCategory) evt.get("class")).getId(),
+            LOGGER.info("Doing nothing for undo of {} {}", ((MCRCategory) evt.get(MCREvent.CLASS_KEY)).getId(),
                 evt.getEventType());
         }
     }

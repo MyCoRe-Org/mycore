@@ -49,7 +49,7 @@ public class MCRJanitorEventHandlerBaseTest extends MCRTestCase {
 
         boolean exceptionCatched = false;
         try {
-            MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.CREATE_EVENT);
+            MCREvent evt = new MCREvent(MCREvent.ObjectType.OBJECT, MCREvent.EventType.CREATE);
             evt.put(MCREvent.OBJECT_KEY, new MCRObject());
             eventHandler.doHandleEvent(evt);
         } catch (MCRException e) {

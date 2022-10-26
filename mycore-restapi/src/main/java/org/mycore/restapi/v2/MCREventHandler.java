@@ -119,7 +119,7 @@ class MCREventHandler {
 
         @Override
         public void doHandleEvent(MCREvent evt) throws MCRException {
-            if (!evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
+            if (evt.getObjectType() != MCREvent.ObjectType.OBJECT) {
                 return;
             }
             MCRObject obj = (MCRObject) evt.get(MCREvent.OBJECT_KEY);
@@ -180,7 +180,7 @@ class MCREventHandler {
 
         @Override
         public void doHandleEvent(MCREvent evt) throws MCRException {
-            if (!evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
+            if (evt.getObjectType() != MCREvent.ObjectType.DERIVATE) {
                 return;
             }
             MCRDerivate der = (MCRDerivate) evt.get(MCREvent.DERIVATE_KEY);
@@ -240,7 +240,7 @@ class MCREventHandler {
 
         @Override
         public void doHandleEvent(MCREvent evt) throws MCRException {
-            if (!evt.getObjectType().equals(MCREvent.PATH_TYPE)) {
+            if (evt.getObjectType() != MCREvent.ObjectType.PATH) {
                 return;
             }
             super.doHandleEvent(evt);

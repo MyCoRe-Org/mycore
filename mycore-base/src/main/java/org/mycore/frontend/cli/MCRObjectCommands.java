@@ -69,12 +69,14 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRStreamUtils;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRBaseContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.MCRSourceContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.common.xml.MCREntityResolver;
+import org.mycore.common.xml.MCRLayoutTransformerFactory;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
@@ -1046,6 +1048,32 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         default:
             LOGGER.error("Unable to transform '{}' because unknown result root name '{}'.", objectId, resultName);
             break;
+        }
+    }
+
+    @MCRCommand(syntax = "transform object {0} with transformer {1}",
+        help = "Transforms the object with the id {0} using the transformer with the id {1} and" +
+                " updates the object with the result")
+    public static void transformObject(String objectIDStr, String transformer)
+        throws IOException, JDOMException, SAXException, MCRAccessException {
+        MCRObjectID objectID = MCRObjectID.getInstance(objectIDStr);
+        if (!MCRMetadataManager.exists(objectID)) {
+            LOGGER.error("The object {} does not exist!", objectID);
+            return;
+        }
+
+        MCRObject mcrObject = MCRMetadataManager.retrieveMCRObject(objectID);
+
+        MCRBaseContent baseContent = new MCRBaseContent(mcrObject);
+        MCRContent result = new MCRLayoutTransformerFactory().getTransformer(transformer).transform(baseContent);
+        Document resultXML = result.asXML();
+        MCRObject resulting = new MCRObject(resultXML);
+
+        if (!MCRXMLHelper.deepEqual(mcrObject.createXML(), resultXML)) {
+            LOGGER.info("The Object changed with the transformation. Execute Update.");
+            MCRMetadataManager.update(resulting);
+        } else {
+            LOGGER.info("The Object did not change with the transformation. Skip Update.");
         }
     }
 

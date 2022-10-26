@@ -316,7 +316,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         // Replace relative path with absolute path of files
         if (derivate.getDerivate().getInternals() != null) {
             String path = derivate.getDerivate().getInternals().getSourcePath();
-            path = path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            if (path == null) {
+                path = "";
+            } else {
+                path = path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            }
             if (path.trim().length() <= 1) {
                 // the path is the path name plus the name of the derivate -
                 path = derivate.getId().toString();
@@ -630,7 +634,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 // handle events
-                MCREvent evt = new MCREvent(MCREvent.PATH_TYPE, MCREvent.REPAIR_EVENT);
+                MCREvent evt = new MCREvent(MCREvent.ObjectType.PATH, MCREvent.EventType.REPAIR);
                 evt.put(MCREvent.PATH_KEY, file);
                 evt.put(MCREvent.FILEATTR_KEY, attrs);
                 MCREventManager.instance().handleEvent(evt);

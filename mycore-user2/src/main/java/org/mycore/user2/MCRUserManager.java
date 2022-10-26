@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
@@ -221,7 +221,7 @@ public class MCRUserManager {
         em.persist(user);
         LOGGER.info(() -> "user saved: " + user.getUserID());
         MCRRoleManager.storeRoleAssignments(user);
-        MCREvent evt = new MCREvent(MCREvent.USER_TYPE, MCREvent.CREATE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.USER, MCREvent.EventType.CREATE);
         evt.put(MCREvent.USER_KEY, user);
         MCREventManager.instance().handleEvent(evt);
     }
@@ -276,7 +276,7 @@ public class MCRUserManager {
             em.merge(user);
             MCRRoleManager.unassignRoles(user);
             MCRRoleManager.storeRoleAssignments(user);
-            MCREvent evt = new MCREvent(MCREvent.USER_TYPE, MCREvent.UPDATE_EVENT);
+            MCREvent evt = new MCREvent(MCREvent.ObjectType.USER, MCREvent.EventType.UPDATE);
             evt.put(MCREvent.USER_KEY, user);
             MCREventManager.instance().handleEvent(evt);
         });
@@ -314,7 +314,7 @@ public class MCRUserManager {
      */
     public static void deleteUser(String userName, String realmId) {
         MCRUser user = getUser(userName, realmId);
-        MCREvent evt = new MCREvent(MCREvent.USER_TYPE, MCREvent.DELETE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.USER, MCREvent.EventType.DELETE);
         evt.put(MCREvent.USER_KEY, user);
         MCREventManager.instance().handleEvent(evt);
         MCRRoleManager.unassignRoles(user);

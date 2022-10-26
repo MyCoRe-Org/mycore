@@ -56,8 +56,8 @@ public class MCRMailEventHandler extends MCREventHandlerBase {
         for (Map.Entry<String, Object> entry : evt.entrySet()) {
             parameters.put(entry.getKey(), entry.getValue().toString());
         }
-        parameters.put("action", evt.getEventType());
-        parameters.put("type", evt.getObjectType());
+        parameters.put("action", evt.getEventType().toString());
+        parameters.put("type", evt.getObjectType().toString());
 
         MCRMailer.sendMail(doc.asXML(), "e-mail-events", parameters);
     }
