@@ -215,8 +215,7 @@ public class MCRRestAPIUploadHelper {
                 mcrDerivate.setId(derID);
                 mcrDerivate.setSchema("datamodel-derivate.xsd");
                 mcrDerivate.getDerivate().setLinkMeta(new MCRMetaLinkID("linkmeta", mcrObjIDObj, null, null));
-                mcrDerivate.getDerivate()
-                    .setInternals(new MCRMetaIFS("internal", UPLOAD_DIR.resolve(derID.toString()).toString()));
+                mcrDerivate.getDerivate().setInternals(new MCRMetaIFS("internal", null));
 
                 if (classifications != null && classifications.length() > 0) {
                     final List<MCRMetaClassification> currentClassifications;
@@ -305,9 +304,7 @@ public class MCRRestAPIUploadHelper {
             if (Files.notExists(derRoot)) {
                 derRoot.getFileSystem().createRoot(derID.toString());
             }
-
-            der.getDerivate().getInternals().setSourcePath(derDir.toString());
-
+            
             if (formParamUnzip) {
                 String maindoc = null;
                 try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(uploadedInputStream))) {
