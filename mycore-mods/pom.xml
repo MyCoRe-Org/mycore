@@ -62,10 +62,6 @@
       <artifactId>rome</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
       <groupId>de.undercouch</groupId>
       <artifactId>citeproc-java</artifactId>
       <optional>true</optional>
@@ -86,6 +82,10 @@
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>

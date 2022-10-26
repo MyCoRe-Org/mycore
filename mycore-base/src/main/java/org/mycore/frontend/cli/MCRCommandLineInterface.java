@@ -38,7 +38,7 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
@@ -222,7 +222,7 @@ public class MCRCommandLineInterface {
      * @return expanded command
      */
     public static String expandCommand(final String command) {
-        StrSubstitutor strSubstitutor = new StrSubstitutor(MCRConfiguration2.getPropertiesMap());
+        StringSubstitutor strSubstitutor = new StringSubstitutor(MCRConfiguration2.getPropertiesMap());
         String expandedCommand = strSubstitutor.replace(command);
         if (!expandedCommand.equals(command)) {
             LOGGER.info("{} --> {}", command, expandedCommand);

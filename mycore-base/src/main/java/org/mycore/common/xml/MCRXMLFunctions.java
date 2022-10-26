@@ -62,7 +62,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xml.utils.XMLChar;
@@ -853,7 +853,7 @@ public class MCRXMLFunctions {
             res.delete(m.start(), m.end());
             res.insert(m.start(), stripHtml(m.group(m.groupCount() - 1)));
         }
-        return StringEscapeUtils.unescapeHtml(res.toString()).replaceAll(TAG_SELF_CLOSING, "");
+        return StringEscapeUtils.unescapeHtml4(res.toString()).replaceAll(TAG_SELF_CLOSING, "");
     }
 
     /**

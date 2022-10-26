@@ -20,8 +20,8 @@ package org.mycore.frontend.xeditor.validation;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.reflect.MethodUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.xml.MCRXPathBuilder;
