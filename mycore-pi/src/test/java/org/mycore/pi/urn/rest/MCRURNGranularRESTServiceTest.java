@@ -39,6 +39,7 @@ import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
+import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.datamodel.common.MCRXMLMetadataEventHandler;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -68,7 +69,8 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        MCREventManager.instance().clear().addEventHandler("MCRObject", new MCRXMLMetadataEventHandler());
+        MCREventManager.instance().clear().addEventHandler(MCREvent.ObjectType.OBJECT,
+            new MCRXMLMetadataEventHandler());
     }
 
     @Test

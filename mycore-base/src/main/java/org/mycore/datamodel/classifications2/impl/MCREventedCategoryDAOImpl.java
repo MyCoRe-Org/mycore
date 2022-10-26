@@ -36,12 +36,10 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
 
     private static MCREventManager manager = MCREventManager.instance();
 
-    private static final String EVENT_OBJECT = MCREvent.CLASS_TYPE;
-
     @Override
     public MCRCategory addCategory(MCRCategoryID parentID, MCRCategory category, int position) {
         MCRCategory rv = super.addCategory(parentID, category, position);
-        MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.CREATE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.CREATE);
         evt.put("class", category);
         manager.handleEvent(evt);
         return rv;
@@ -53,7 +51,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
         if (category == null) {
             throw new MCRPersistenceException("Category " + id + " was not found. Delete aborted.");
         }
-        MCREvent evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.DELETE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.DELETE);
         evt.put("class", category);
         manager.handleEvent(evt, MCREventManager.BACKWARD);
         super.deleteCategory(id);
@@ -61,7 +59,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
 
     @Override
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
-        MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put("class", super.getCategory(id, -1));
         evt.put("parent", super.getCategory(newParentID, -1));
         evt.put("index", index);
@@ -75,7 +73,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     @Override
     public MCRCategory removeLabel(MCRCategoryID id, String lang) {
         MCRCategory rv = super.removeLabel(id, lang);
-        MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put("class", super.getCategory(id, -1));
         manager.handleEvent(evt);
         return rv;
@@ -84,7 +82,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     @Override
     public Collection<MCRCategoryImpl> replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
         Collection<MCRCategoryImpl> rv = super.replaceCategory(newCategory);
-        MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put("class", newCategory);
         manager.handleEvent(evt);
         return rv;
@@ -93,7 +91,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     @Override
     public MCRCategory setLabel(MCRCategoryID id, MCRLabel label) {
         MCRCategory rv = super.setLabel(id, label);
-        MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put("class", super.getCategory(id, -1));
         manager.handleEvent(evt);
         return rv;
@@ -102,7 +100,7 @@ public class MCREventedCategoryDAOImpl extends MCRCategoryDAOImpl {
     @Override
     public MCRCategory setLabels(MCRCategoryID id, SortedSet<MCRLabel> labels) {
         MCRCategory rv = super.setLabels(id, labels);
-        MCREvent evt = new MCREvent(EVENT_OBJECT, MCREvent.UPDATE_EVENT);
+        MCREvent evt = new MCREvent(MCREvent.ObjectType.CLASS, MCREvent.EventType.UPDATE);
         evt.put("class", super.getCategory(id, -1));
         manager.handleEvent(evt);
         return rv;

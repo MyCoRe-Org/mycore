@@ -69,13 +69,13 @@ public class MCRFileSystemEventTest extends MCRTestCase {
     public void setUp() throws Exception {
         super.setUp();
         register = new EventRegister();
-        MCREventManager.instance().addEventHandler(MCREvent.PATH_TYPE, register);
+        MCREventManager.instance().addEventHandler(MCREvent.ObjectType.PATH, register);
         derivateRoot = Paths.get(URI.create("ifs2:/junit_derivate_00000001:/"));
     }
 
     @Override
     public void tearDown() throws Exception {
-        MCREventManager.instance().removeEventHandler(MCREvent.PATH_TYPE, register);
+        MCREventManager.instance().removeEventHandler(MCREvent.ObjectType.PATH, register);
         register.clear();
         MCRStoreManager.removeStore("IFS2_junit_derivate");
         super.tearDown();
@@ -94,7 +94,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
         return true;
     }
 
-    private long countEvents(String type) {
+    private long countEvents(MCREvent.EventType type) {
         return register.getEntries().stream()
             .map(EventRegisterEntry::getEventType)
             .filter(type::equals)
@@ -120,26 +120,26 @@ public class MCRFileSystemEventTest extends MCRTestCase {
         Assert.assertTrue(register.getEntries().isEmpty());
         Files.createFile(file);
         Assert.assertEquals(1, register.getEntries().size());
-        Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+        Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
         register.clear();
         Files.writeString(file, "Hello World!", StandardCharsets.UTF_8);
         Assert.assertEquals(1, register.getEntries().size());
-        Assert.assertEquals(1, countEvents(MCREvent.UPDATE_EVENT));
+        Assert.assertEquals(1, countEvents(MCREvent.EventType.UPDATE));
         register.clear();
         Files.delete(file);
         Assert.assertEquals(1, register.getEntries().size());
-        Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+        Assert.assertEquals(1, countEvents(MCREvent.EventType.DELETE));
         register.clear();
         Files.writeString(file, "Hello World!", StandardCharsets.UTF_8);
         Assert.assertEquals(1, register.getEntries().size());
-        Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+        Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
         register.clear();
         final Path newFile = file.getParent().resolve("File.old");
         Files.move(file, newFile);
         //register.getEntries().forEach(System.out::println);
         Assert.assertEquals(2, register.getEntries().size());
-        Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
-        Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+        Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
+        Assert.assertEquals(1, countEvents(MCREvent.EventType.DELETE));
         register.clear();
         final byte[] bytes = Files.readAllBytes(newFile);
         Assert.assertTrue(register.getEntries().isEmpty());
@@ -158,7 +158,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
         Assert.assertTrue(register.getEntries().isEmpty());
         Files.writeString(file, "Hello World!", StandardCharsets.UTF_8);
         Assert.assertEquals(1, register.getEntries().size());
-        Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+        Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
         register.clear();
         try (DirectoryStream<Path> dir1Stream = Files.newDirectoryStream(dir1);
             DirectoryStream<Path> dir2Stream = Files.newDirectoryStream(dir2)) {
@@ -173,36 +173,36 @@ public class MCRFileSystemEventTest extends MCRTestCase {
             //relative -> relative
             sDir1Stream.move(file.getFileName(), sDir2Stream, file.getFileName());
             Assert.assertEquals(2, register.getEntries().size());
-            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
-            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.DELETE));
             sDir2Stream.move(file.getFileName(), sDir1Stream, file.getFileName());
             register.clear();
             //absolute -> relative
             sDir1Stream.move(file, sDir2Stream, file.getFileName());
             Assert.assertEquals(2, register.getEntries().size());
-            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
-            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.DELETE));
             sDir2Stream.move(file.getFileName(), sDir1Stream, file.getFileName());
             register.clear();
             //relative -> absolute
             sDir1Stream.move(file.getFileName(), sDir2Stream, dir2.resolve(file.getFileName()));
             Assert.assertEquals(2, register.getEntries().size());
-            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
-            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.DELETE));
             sDir2Stream.move(file.getFileName(), sDir1Stream, file.getFileName());
             register.clear();
             //absolute -> absolute
             sDir1Stream.move(file, sDir2Stream, dir2.resolve(file.getFileName()));
             Assert.assertEquals(2, register.getEntries().size());
-            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
-            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.DELETE));
             sDir2Stream.move(file.getFileName(), sDir1Stream, file.getFileName());
             register.clear();
             //rename
             sDir1Stream.move(file.getFileName(), sDir1Stream, dir1.resolve("Junit.txt").getFileName());
             Assert.assertEquals(2, register.getEntries().size());
-            Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
-            Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
+            Assert.assertEquals(1, countEvents(MCREvent.EventType.DELETE));
             sDir1Stream.move(dir1.resolve("Junit.txt").getFileName(), sDir1Stream, file.getFileName());
             register.clear();
             //move to local dir
@@ -214,7 +214,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
                         file.getFileName());
                     sDir1Stream.move(file.getFileName(), sExportDirStream, localFilePath);
                     Assert.assertEquals(1, register.getEntries().size());
-                    Assert.assertEquals(1, countEvents(MCREvent.DELETE_EVENT));
+                    Assert.assertEquals(1, countEvents(MCREvent.EventType.DELETE));
                     register.clear();
                     try (
                         SeekableByteChannel targetChannel = sDir1Stream.newByteChannel(file.getFileName(), Set.of(
@@ -227,7 +227,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
                         }
                     }
                     Assert.assertEquals(1, register.getEntries().size());
-                    Assert.assertEquals(1, countEvents(MCREvent.CREATE_EVENT));
+                    Assert.assertEquals(1, countEvents(MCREvent.EventType.CREATE));
                     register.clear();
                 }
             }
@@ -273,7 +273,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
 
         private Instant time;
 
-        private String eventType;
+        private MCREvent.EventType eventType;
 
         private Path path;
 
@@ -281,7 +281,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
 
         private final StackTraceElement[] stackTrace;
 
-        public EventRegisterEntry(String eventType, Path path, BasicFileAttributes attrs) {
+        public EventRegisterEntry(MCREvent.EventType eventType, Path path, BasicFileAttributes attrs) {
             this.time = Instant.now();
             this.eventType = eventType;
             this.path = path;
@@ -293,7 +293,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
             return time;
         }
 
-        public String getEventType() {
+        public MCREvent.EventType getEventType() {
             return eventType;
         }
 

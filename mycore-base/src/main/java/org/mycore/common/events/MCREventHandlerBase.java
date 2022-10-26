@@ -49,70 +49,70 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      */
     public void doHandleEvent(MCREvent evt) {
 
-        if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
+        if (evt.getObjectType() == MCREvent.ObjectType.OBJECT) {
             MCRObject obj = (MCRObject) evt.get("object");
             if (obj != null) {
                 logger.debug("{} handling {} {}", getClass().getName(), obj.getId(), evt.getEventType());
                 switch (evt.getEventType()) {
-                case MCREvent.CREATE_EVENT:
-                    handleObjectCreated(evt, obj);
-                    break;
-                case MCREvent.UPDATE_EVENT:
-                    handleObjectUpdated(evt, obj);
-                    break;
-                case MCREvent.DELETE_EVENT:
-                    handleObjectDeleted(evt, obj);
-                    break;
-                case MCREvent.REPAIR_EVENT:
-                    handleObjectRepaired(evt, obj);
-                    break;
-                case MCREvent.INDEX_EVENT:
-                    handleObjectIndex(evt, obj);
-                    break;
-                default:
-                    logger
-                        .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
-                    break;
+                    case CREATE:
+                        handleObjectCreated(evt, obj);
+                        break;
+                    case UPDATE:
+                        handleObjectUpdated(evt, obj);
+                        break;
+                    case DELETE:
+                        handleObjectDeleted(evt, obj);
+                        break;
+                    case REPAIR:
+                        handleObjectRepaired(evt, obj);
+                        break;
+                    case INDEX:
+                        handleObjectIndex(evt, obj);
+                        break;
+                    default:
+                        logger
+                            .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
+                        break;
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.OBJECT_TYPE + " for event type {}", evt.getEventType());
+            logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
             return;
         }
 
-        if (evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
+        if (evt.getObjectType() == MCREvent.ObjectType.DERIVATE) {
             MCRDerivate der = (MCRDerivate) evt.get("derivate");
             if (der != null) {
                 logger.debug("{} handling {} {}", getClass().getName(), der.getId(), evt.getEventType());
                 switch (evt.getEventType()) {
-                case MCREvent.CREATE_EVENT:
-                    handleDerivateCreated(evt, der);
-                    break;
-                case MCREvent.UPDATE_EVENT:
-                    handleDerivateUpdated(evt, der);
-                    break;
-                case MCREvent.DELETE_EVENT:
-                    handleDerivateDeleted(evt, der);
-                    break;
-                case MCREvent.REPAIR_EVENT:
-                    handleDerivateRepaired(evt, der);
-                    break;
-                case MCREvent.INDEX_EVENT:
-                    updateDerivateFileIndex(evt, der);
-                    break;
-                default:
-                    logger
-                        .warn("Can't find method for a derivate data handler for event type {}",
-                            evt.getEventType());
-                    break;
+                    case CREATE:
+                        handleDerivateCreated(evt, der);
+                        break;
+                    case UPDATE:
+                        handleDerivateUpdated(evt, der);
+                        break;
+                    case DELETE:
+                        handleDerivateDeleted(evt, der);
+                        break;
+                    case REPAIR:
+                        handleDerivateRepaired(evt, der);
+                        break;
+                    case INDEX:
+                        updateDerivateFileIndex(evt, der);
+                        break;
+                    default:
+                        logger
+                            .warn("Can't find method for a derivate data handler for event type {}",
+                                evt.getEventType());
+                        break;
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.DERIVATE_TYPE + " for event type {}", evt.getEventType());
+            logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
             return;
         }
 
-        if (evt.getObjectType().equals(MCREvent.PATH_TYPE)) {
+        if (evt.getObjectType() == MCREvent.ObjectType.PATH) {
             Path path = (Path) evt.get(MCREvent.PATH_KEY);
             if (path != null) {
                 if (!path.isAbsolute()) {
@@ -120,7 +120,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 }
                 logger.debug("{} handling {} {}", getClass().getName(), path, evt.getEventType());
                 BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
-                if (attrs == null && !evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
+                if (attrs == null && evt.getEventType() != MCREvent.EventType.DELETE) {
                     logger.warn("BasicFileAttributes for {} was not given. Resolving now.", path);
                     try {
                         attrs = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
@@ -129,56 +129,56 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     }
                 }
                 switch (evt.getEventType()) {
-                case MCREvent.CREATE_EVENT:
-                    handlePathCreated(evt, path, attrs);
-                    break;
-                case MCREvent.UPDATE_EVENT:
-                    handlePathUpdated(evt, path, attrs);
-                    break;
-                case MCREvent.DELETE_EVENT:
-                    handlePathDeleted(evt, path, attrs);
-                    break;
-                case MCREvent.REPAIR_EVENT:
-                    handlePathRepaired(evt, path, attrs);
-                    break;
-                case MCREvent.INDEX_EVENT:
-                    updatePathIndex(evt, path, attrs);
-                    break;
-                default:
-                    logger.warn("Can't find method for Path data handler for event type {}", evt.getEventType());
-                    break;
+                    case CREATE:
+                        handlePathCreated(evt, path, attrs);
+                        break;
+                    case UPDATE:
+                        handlePathUpdated(evt, path, attrs);
+                        break;
+                    case DELETE:
+                        handlePathDeleted(evt, path, attrs);
+                        break;
+                    case REPAIR:
+                        handlePathRepaired(evt, path, attrs);
+                        break;
+                    case INDEX:
+                        updatePathIndex(evt, path, attrs);
+                        break;
+                    default:
+                        logger.warn("Can't find method for Path data handler for event type {}", evt.getEventType());
+                        break;
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.PATH_TYPE + " for event type {}", evt.getEventType());
+            logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
             return;
         }
 
-        if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
+        if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
             MCRCategory cl = (MCRCategory) evt.get("class");
             if (cl != null) {
                 logger.debug("{} handling {} {}", getClass().getName(), cl.getId(), evt.getEventType());
                 switch (evt.getEventType()) {
-                case MCREvent.CREATE_EVENT:
-                    handleClassificationCreated(evt, cl);
-                    break;
-                case MCREvent.UPDATE_EVENT:
-                    handleClassificationUpdated(evt, cl);
-                    break;
-                case MCREvent.DELETE_EVENT:
-                    handleClassificationDeleted(evt, cl);
-                    break;
-                case MCREvent.REPAIR_EVENT:
-                    handleClassificationRepaired(evt, cl);
-                    break;
-                default:
-                    logger.warn("Can't find method for a classification data handler for event type {}",
-                        evt.getEventType());
-                    break;
+                    case CREATE:
+                        handleClassificationCreated(evt, cl);
+                        break;
+                    case UPDATE:
+                        handleClassificationUpdated(evt, cl);
+                        break;
+                    case DELETE:
+                        handleClassificationDeleted(evt, cl);
+                        break;
+                    case REPAIR:
+                        handleClassificationRepaired(evt, cl);
+                        break;
+                    default:
+                        logger.warn("Can't find method for a classification data handler for event type {}",
+                            evt.getEventType());
+                        break;
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.CLASS_TYPE + " for event type {}", evt.getEventType());
+            logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
         }
 
     }
@@ -192,64 +192,64 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      */
     public void undoHandleEvent(MCREvent evt) {
 
-        if (evt.getObjectType().equals(MCREvent.OBJECT_TYPE)) {
+        if (evt.getObjectType() == MCREvent.ObjectType.OBJECT) {
             MCRObject obj = (MCRObject) evt.get("object");
             if (obj != null) {
                 logger.debug("{} handling {} {}", getClass().getName(), obj.getId(), evt.getEventType());
                 switch (evt.getEventType()) {
-                case MCREvent.CREATE_EVENT:
-                    undoObjectCreated(evt, obj);
-                    break;
-                case MCREvent.UPDATE_EVENT:
-                    undoObjectUpdated(evt, obj);
-                    break;
-                case MCREvent.DELETE_EVENT:
-                    undoObjectDeleted(evt, obj);
-                    break;
-                case MCREvent.REPAIR_EVENT:
-                    undoObjectRepaired(evt, obj);
-                    break;
-                default:
-                    logger
-                        .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
-                    break;
+                    case CREATE:
+                        undoObjectCreated(evt, obj);
+                        break;
+                    case UPDATE:
+                        undoObjectUpdated(evt, obj);
+                        break;
+                    case DELETE:
+                        undoObjectDeleted(evt, obj);
+                        break;
+                    case REPAIR:
+                        undoObjectRepaired(evt, obj);
+                        break;
+                    default:
+                        logger
+                            .warn("Can't find method for an object data handler for event type {}", evt.getEventType());
+                        break;
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.OBJECT_TYPE + " for event type {}", evt.getEventType());
+            logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
             return;
         }
 
-        if (evt.getObjectType().equals(MCREvent.DERIVATE_TYPE)) {
+        if (evt.getObjectType() == MCREvent.ObjectType.DERIVATE) {
             MCRDerivate der = (MCRDerivate) evt.get("derivate");
             if (der != null) {
                 logger.debug("{} handling {}{}", getClass().getName(), der.getId(), evt.getEventType());
                 switch (evt.getEventType()) {
-                case MCREvent.CREATE_EVENT:
-                    undoDerivateCreated(evt, der);
-                    break;
-                case MCREvent.UPDATE_EVENT:
-                    undoDerivateUpdated(evt, der);
-                    break;
-                case MCREvent.DELETE_EVENT:
-                    undoDerivateDeleted(evt, der);
-                    break;
-                case MCREvent.REPAIR_EVENT:
-                    undoDerivateRepaired(evt, der);
-                    break;
-                default:
-                    logger
-                        .warn("Can't find method for a derivate data handler for event type {}",
-                            evt.getEventType());
-                    break;
+                    case CREATE:
+                        undoDerivateCreated(evt, der);
+                        break;
+                    case UPDATE:
+                        undoDerivateUpdated(evt, der);
+                        break;
+                    case DELETE:
+                        undoDerivateDeleted(evt, der);
+                        break;
+                    case REPAIR:
+                        undoDerivateRepaired(evt, der);
+                        break;
+                    default:
+                        logger
+                            .warn("Can't find method for a derivate data handler for event type {}",
+                                evt.getEventType());
+                        break;
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.DERIVATE_TYPE + " for event type {}", evt.getEventType());
+            logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
             return;
         }
 
-        if (evt.getObjectType().equals(MCREvent.PATH_TYPE)) {
+        if (evt.getObjectType() == MCREvent.ObjectType.PATH) {
             Path path = (Path) evt.get(MCREvent.PATH_KEY);
             if (path != null) {
                 if (!path.isAbsolute()) {
@@ -257,7 +257,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 }
                 logger.debug("{} handling {} {}", getClass().getName(), path, evt.getEventType());
                 BasicFileAttributes attrs = (BasicFileAttributes) evt.get(MCREvent.FILEATTR_KEY);
-                if (attrs == null && !evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
+                if (attrs == null && evt.getEventType() != MCREvent.EventType.DELETE) {
                     logger.warn("BasicFileAttributes for {} was not given. Resolving now.", path);
                     try {
                         attrs = Files.getFileAttributeView(path, BasicFileAttributeView.class).readAttributes();
@@ -266,53 +266,53 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     }
                 }
                 switch (evt.getEventType()) {
-                case MCREvent.CREATE_EVENT:
-                    undoPathCreated(evt, path, attrs);
-                    break;
-                case MCREvent.UPDATE_EVENT:
-                    undoPathUpdated(evt, path, attrs);
-                    break;
-                case MCREvent.DELETE_EVENT:
-                    undoPathDeleted(evt, path, attrs);
-                    break;
-                case MCREvent.REPAIR_EVENT:
-                    undoPathRepaired(evt, path, attrs);
-                    break;
-                default:
-                    logger.warn("Can't find method for Path data handler for event type {}", evt.getEventType());
-                    break;
+                    case CREATE:
+                        undoPathCreated(evt, path, attrs);
+                        break;
+                    case UPDATE:
+                        undoPathUpdated(evt, path, attrs);
+                        break;
+                    case DELETE:
+                        undoPathDeleted(evt, path, attrs);
+                        break;
+                    case REPAIR:
+                        undoPathRepaired(evt, path, attrs);
+                        break;
+                    default:
+                        logger.warn("Can't find method for Path data handler for event type {}", evt.getEventType());
+                        break;
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.PATH_TYPE + " for event type {}", evt.getEventType());
+            logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
             return;
         }
 
-        if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
-            MCRCategory obj = (MCRCategory) evt.get("class");
+        if (evt.getObjectType() == MCREvent.ObjectType.CLASS) {
+            MCRCategory obj = (MCRCategory) evt.get(MCREvent.CLASS_KEY);
             if (obj != null) {
                 logger.debug("{} handling {} {}", getClass().getName(), obj.getId(), evt.getEventType());
                 switch (evt.getEventType()) {
-                case MCREvent.CREATE_EVENT:
-                    undoClassificationCreated(evt, obj);
-                    break;
-                case MCREvent.UPDATE_EVENT:
-                    undoClassificationUpdated(evt, obj);
-                    break;
-                case MCREvent.DELETE_EVENT:
-                    undoClassificationDeleted(evt, obj);
-                    break;
-                case MCREvent.REPAIR_EVENT:
-                    undoClassificationRepaired(evt, obj);
-                    break;
-                default:
-                    logger.warn("Can't find method for an classification data handler for event type {}",
-                        evt.getEventType());
-                    break;
+                    case CREATE:
+                        undoClassificationCreated(evt, obj);
+                        break;
+                    case UPDATE:
+                        undoClassificationUpdated(evt, obj);
+                        break;
+                    case DELETE:
+                        undoClassificationDeleted(evt, obj);
+                        break;
+                    case REPAIR:
+                        undoClassificationRepaired(evt, obj);
+                        break;
+                    default:
+                        logger.warn("Can't find method for an classification data handler for event type {}",
+                            evt.getEventType());
+                        break;
                 }
                 return;
             }
-            logger.warn("Can't find method for " + MCREvent.CLASS_TYPE + " for event type {}", evt.getEventType());
+            logger.warn("Can't find method for " + evt.getObjectType() + " for event type {}", evt.getEventType());
         }
 
     }

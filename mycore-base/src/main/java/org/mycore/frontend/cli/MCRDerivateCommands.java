@@ -630,7 +630,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 // handle events
-                MCREvent evt = new MCREvent(MCREvent.PATH_TYPE, MCREvent.REPAIR_EVENT);
+                MCREvent evt = new MCREvent(MCREvent.ObjectType.PATH, MCREvent.EventType.REPAIR);
                 evt.put(MCREvent.PATH_KEY, file);
                 evt.put(MCREvent.FILEATTR_KEY, attrs);
                 MCREventManager.instance().handleEvent(evt);
