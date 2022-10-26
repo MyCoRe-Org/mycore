@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl;
+package org.mycore.ocfl.metadata;
 
 import java.io.IOException;
 import java.io.InputStream;

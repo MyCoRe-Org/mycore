@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl;
+package org.mycore.ocfl.util;
 
 import java.io.IOException;
 import java.util.Date;
@@ -59,7 +59,7 @@ public class MCROCFLMetadataVersion extends MCRAbstractMetadataVersion<MCRConten
      * the metadata.
      */
     @Override
-    public void restore() throws IOException {
+    public void restore() throws IOException { // TODO see where this is used
         throw new IOException("Can not restore a version!");
     }
 }
