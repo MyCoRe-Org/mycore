@@ -179,7 +179,7 @@ public class MCRRestClassifications {
                 .toException();
         }
         if (request.getAcceptableMediaTypes().contains(MediaType.valueOf("application/rdf+xml"))) {
-            Document docSKOS = MCRSkosTransformer.getSkosInRDFXML(classification);
+            Document docSKOS = MCRSkosTransformer.getSkosInRDFXML(classification, MCRCategoryID.fromString(classId));
             MCRJDOMContent content = new MCRJDOMContent(docSKOS);
             try {
                 return Response.ok(content.asString()).type("application/rdf+xml; charset=UTF-8").build();

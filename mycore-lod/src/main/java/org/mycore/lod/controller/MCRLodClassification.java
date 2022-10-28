@@ -126,7 +126,8 @@ public class MCRLodClassification {
     @Path("/{" + PARAM_CLASSID + "}")
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId) {
         List<MediaType> mediaTypes = request.getAcceptableMediaTypes();
-        return getClassification(classId, dao -> dao.getCategory(MCRCategoryID.rootID(classId), 1), mediaTypes,
+        return getClassification(MCRCategoryID.rootID(classId),
+            dao -> dao.getCategory(MCRCategoryID.rootID(classId), 1), mediaTypes,
             request.getUriInfo().getBaseUri());
     }
 
@@ -154,14 +155,16 @@ public class MCRLodClassification {
     public Response getClassification(@PathParam(PARAM_CLASSID) String classId,
         @PathParam(PARAM_CATEGID) String categId) {
 
-        MCRCategoryID categoryID = new MCRCategoryID(classId, categId);
-        return getClassification(classId, dao -> dao.getRootCategory(categoryID, 0), request.getAcceptableMediaTypes(),
+        MCRCategoryID categoryId = new MCRCategoryID(classId, categId);
+        return getClassification(categoryId, dao -> dao.getRootCategory(categoryId, 0),
+            request.getAcceptableMediaTypes(),
             request.getUriInfo().getBaseUri());
     }
 
-    private Response getClassification(String classId, Function<MCRCategoryDAO, MCRCategory> categorySupplier,
+    private Response getClassification(MCRCategoryID categId, Function<MCRCategoryDAO, MCRCategory> categorySupplier,
         List<MediaType> acceptMediaTypes, URI uri) {
         MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+        String classId = categId.getRootID();
         Date lastModified = getLastModifiedDate(classId, categoryDAO);
         Optional<Response> cachedResponse = MCRRestUtils.getCachedResponse(request.getRequest(), lastModified);
         if (cachedResponse.isPresent()) {
@@ -175,7 +178,7 @@ public class MCRLodClassification {
                 .toException();
         }
         try {
-            Document classRdfXml = MCRSkosTransformer.getSkosInRDFXML(classification);
+            Document classRdfXml = MCRSkosTransformer.getSkosInRDFXML(classification, categId);
             String rdfxmlString = new MCRJDOMContent(classRdfXml).asString();
             List<String> mimeTypes = acceptMediaTypes.parallelStream().map(x -> x.toString()).toList();
             return MCRJerseyLodApp.returnLinkedData(rdfxmlString, uri, mimeTypes);
