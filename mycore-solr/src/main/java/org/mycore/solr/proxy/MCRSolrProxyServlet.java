@@ -75,13 +75,13 @@ import org.xml.sax.SAXException;
 
 /**
  * This class implements a proxy for access to the SOLR backend.<br><br>
- * 
+ *
  * With the following configuration properties 
  * you can manipulate the response header. The entries will be replace the attributes of the incomming header.
  * If the new attribute text is empty, it will be remove the attribute.<br><br>
  * MCR.Solr.HTTPResponseHeader.{response_header_attribute_name}={new_response_header_attribute}
  * MCR.Solr.HTTPResponseHeader....=<br><br>
- * 
+ *
  * You can set the maximum of connections to the SOLR server with the property<br><br>
  * MCR.Solr.SelectProxy.MaxConnections={number}
  */
@@ -226,6 +226,7 @@ public class MCRSolrProxyServlet extends MCRServlet {
     private void handleQuery(String queryHandlerPath, HttpServletRequest request, HttpServletResponse resp)
         throws IOException, TransformerException, SAXException {
         ModifiableSolrParams solrParameter = getSolrQueryParameter(request);
+        filterParams(solrParameter);
         HttpGet solrHttpMethod = MCRSolrProxyServlet.getSolrHttpMethod(queryHandlerPath, solrParameter,
             Optional.ofNullable(request.getParameter(QUERY_CORE_PARAMETER)).orElse(MCRSolrConstants.MAIN_CORE_TYPE));
         try {
@@ -273,6 +274,15 @@ public class MCRSolrProxyServlet extends MCRServlet {
             throw ex;
         }
         solrHttpMethod.releaseConnection();
+    }
+
+    private void filterParams(ModifiableSolrParams solrParameter) {
+        MCRConfiguration2.getString("MCR.Solr.Disallowed.Facets").ifPresent(df -> {
+            String[] disallowedFacets = df.split(" *, *");
+            for (String f : disallowedFacets) {
+                solrParameter.remove("facet.field", f);
+            }
+        });
     }
 
     private void updateQueryHandlerMap(HttpServletResponse resp) throws IOException, SolrServerException {
