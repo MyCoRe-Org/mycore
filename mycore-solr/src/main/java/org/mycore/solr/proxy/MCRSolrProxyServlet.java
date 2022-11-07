@@ -277,11 +277,10 @@ public class MCRSolrProxyServlet extends MCRServlet {
     }
 
     private void filterParams(ModifiableSolrParams solrParameter) {
-        MCRConfiguration2.getString("MCR.Solr.Disallowed.Facets").ifPresent(df -> {
-            String[] disallowedFacets = df.split(" *, *");
-            for (String f : disallowedFacets) {
-                solrParameter.remove("facet.field", f);
-            }
+        MCRConfiguration2.getString("MCR.Solr.Disallowed.Facets").ifPresent(disallowedFacets -> {
+            MCRConfiguration2.splitValue(disallowedFacets).forEach(disallowedFacet -> {
+                solrParameter.remove("facet.field", disallowedFacet);
+            });
         });
     }
 
