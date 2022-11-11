@@ -161,7 +161,7 @@ public class MCRLayoutService {
             return extractFileName(req.getPathInfo());
         }
         return new MessageFormat("{0}-{1}", Locale.ROOT).format(
-            new Object[] { extractFileName(req.getServletPath()), System.currentTimeMillis() });
+            new Object[] { extractFileName(req.getServletPath()), String.valueOf(System.currentTimeMillis())});
     }
 
     private String extractFileName(String filename) {
