@@ -132,6 +132,10 @@
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
+      <artifactId>mycore-orcid2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
       <artifactId>mycore-pandoc</artifactId>
     </dependency>
     <dependency>

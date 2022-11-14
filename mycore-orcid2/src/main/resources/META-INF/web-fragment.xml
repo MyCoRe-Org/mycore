@@ -1,0 +1,19 @@
+<web-fragment version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
+  metadata-complete="true">
+  
+  <!-- **************************************************************** -->
+  <!--                     MyCoRe ORCID integration                     -->
+  <!-- **************************************************************** -->
+
+  <servlet id="OAuthServlet">
+    <servlet-name>OAuthServlet</servlet-name>
+    <servlet-class>org.mycore.orcid2.auth.MCRORCIDOAuthServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OAuthServlet</servlet-name>
+    <url-pattern>/orcid</url-pattern>
+  </servlet-mapping>
+
+</web-fragment>
