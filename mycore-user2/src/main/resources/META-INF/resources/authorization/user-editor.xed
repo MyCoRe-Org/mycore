@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xed:template xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcruser="http://www.mycore.de/components/mcruser">
+<xed:template xmlns:xed="http://www.mycore.de/xeditor" xmlns:mcruser="http://www.mycore.de/components/mcruser"
+              xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+  <xsl:param name="MCR.User.Local.PasswordPattern" select="[\S]{6,}"/>
+
   <xed:template id="failed-validation-messages">
     <xed:if test="$xed-validation-failed">
       <div class="alert alert-danger">
@@ -118,15 +122,26 @@
     <xed:choose>
       <xed:when test="string-length(@realm)=0 or @realm='local'">
         <mcruser:template name="passwordInput" xpath="password" id="password" i18n="component.user2.admin.password" i18n.error="component.user2.admin.inputhints.password"
-          required="true" matches="[\S]*" />
+          required="true" />
         <mcruser:template name="passwordInput" xpath="password2" id="password2" i18n="component.user2.admin.passwordRepeat" i18n.error="component.user2.admin.inputhints.password"
-          required="true" matches="[\S]*" />
+          required="true" />
 
-        <xed:validate xpath="user/password" display="global"
-          test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (. = ../password2 ) and (. != ../@name))"
-          i18n="component.user2.admin.inputhints.passwordLocalUsers" />
-        <xed:validate xpath="user/password2" display="global"
-          test="(../realm/@id != 'local') or ((string-length(.) &gt; 6) and (../password = . ) and (. != ../@name))" />
+        <xed:bind xpath="password">
+          <xed:validate display="global" relevant-if="../@realm='local'" enable-replacements="true" matches="{$MCR.User.Local.PasswordPattern}"
+            i18n="component.user2.admin.inputhints.password" />
+          <xed:validate display="global" test="not(contains(.,../@name))"
+            i18n="component.user2.admin.inputhints.password" />
+          <xed:validate display="global" test=".=../password2"
+            i18n="component.user2.admin.inputhints.passwordLocalUsers" />
+        </xed:bind>
+        <xed:bind xpath="password2">
+          <xed:validate display="global" relevant-if="../@realm='local'" enable-replacements="true" matches="{$MCR.User.Local.PasswordPattern}"
+            i18n="component.user2.admin.inputhints.password" />
+          <xed:validate display="global" test="not(contains(.,../@name))"
+            i18n="component.user2.admin.inputhints.password" />
+          <xed:validate display="global" test=".=../password"
+            i18n="component.user2.admin.inputhints.passwordLocalUsers" />
+        </xed:bind>
       </xed:when>
       <xed:otherwise>
         <div class="alert alert-info">
