@@ -151,10 +151,22 @@
 
   <xsl:template match="mcruser:template[contains('textInput|passwordInput|selectInput|checkboxList|radioList|textArea', @name)]" mode="validation">
     <xsl:if test="@required = 'true' or @validate = 'true'">
-      <xed:if test="contains($xed-validation-marker, $MCR.XEditor.Validation.Marker.error)">
-        <span class="fas fa-exclamation-triangle form-control-feedback" data-toggle="tooltip" data-placement="top" title="{concat('{i18n:', @i18n.error, '}')}"></span>
-      </xed:if>
-      <xed:validate display="local" required="{@required}">
+      <xsl:variable name="display">
+        <xsl:choose>
+          <xsl:when test="@display">
+            <xsl:value-of select="@display"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="'local'"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:if test="not($display='global')">
+        <xed:if test="contains($xed-validation-marker, $MCR.XEditor.Validation.Marker.error)">
+          <span class="fas fa-exclamation-triangle form-control-feedback" data-toggle="tooltip" data-placement="top" title="{concat('{i18n:', @i18n.error, '}')}"></span>
+        </xed:if>
+      </xsl:if>
+      <xed:validate display="{$display}" required="{@required}">
         <xsl:copy-of select="@*[contains('matches|test|format|type', name())]" />
         <xed:output i18n="{@i18n.error}" />
       </xed:validate>
