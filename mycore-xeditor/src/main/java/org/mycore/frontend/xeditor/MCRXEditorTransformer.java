@@ -76,12 +76,9 @@ public class MCRXEditorTransformer {
 
     private boolean withinSelectMultiple = false;
 
-    private boolean buildFilterXSL;
-
     public MCRXEditorTransformer(MCREditorSession editorSession, MCRParameterCollector transformationParameters) {
         this.editorSession = editorSession;
         this.transformationParameters = transformationParameters;
-        this.buildFilterXSL = "true".equals(transformationParameters.getParameter("buildFilterXSL", "false"));
     }
 
     public MCRContent transform(MCRContent editorSource) throws IOException, JDOMException, SAXException {
@@ -183,18 +180,8 @@ public class MCRXEditorTransformer {
     }
 
     public void setDefault(String value) throws JaxenException, JDOMException {
-        if (buildFilterXSL) {
-            storeValueForFilterBuilder(value);
-        }
-
         currentBinding.setDefault(value);
         editorSession.getSubmission().markDefaultValue(currentBinding.getAbsoluteXPath(), value);
-    }
-
-    private void storeValueForFilterBuilder(String value) throws JDOMException, JaxenException {
-        String xPath = currentBinding.getAbsoluteXPath();
-        String suffix = (currentBinding.getBoundNode() instanceof Element ? "/@" : "") + "_values_";
-        new MCRBinding(xPath + suffix, value, null, editorSession.getRootBinding());
     }
 
     public void unbind() {
@@ -253,8 +240,7 @@ public class MCRXEditorTransformer {
 
     public String repeat(String xPath, int minRepeats, int maxRepeats, String method)
         throws JDOMException, JaxenException {
-        int numRepeatsToBuild = buildFilterXSL ? 1 : minRepeats;
-        MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, numRepeatsToBuild, maxRepeats, method);
+        MCRRepeatBinding repeat = new MCRRepeatBinding(xPath, currentBinding, minRepeats, maxRepeats, method);
         setCurrentBinding(repeat);
         return StringUtils.repeat("a ", repeat.getBoundNodes().size());
     }
