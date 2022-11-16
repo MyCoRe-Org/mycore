@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -124,14 +125,16 @@ public class MCRQuery {
      *            the maximum number of results as String
      */
     public void setMaxResults(String maxResultsString) {
-        if (maxResultsString == null || maxResultsString.length() == 0) {
+        if (StringUtils.isEmpty(maxResultsString)) {
             this.maxResults = 0;
-        }
-        try {
-            this.maxResults = Integer.parseInt(maxResultsString);
-        } catch (NumberFormatException e) {
-            LOGGER.warn("The Results maxstring " + maxResultsString + " contains not an integer, 0 as default is set");
-            this.maxResults = 0;
+        } else {
+            try {
+                this.maxResults = Integer.parseInt(maxResultsString);
+            } catch (NumberFormatException e) {
+                LOGGER.warn(
+                    "The Results maxstring " + maxResultsString + " contains not an integer, 0 as default is set");
+                this.maxResults = 0;
+            }
         }
         doc = null;
     }
@@ -167,14 +170,16 @@ public class MCRQuery {
      *            the number of results per page as String
      */
     public void setNumPerPage(String numPerPageString) {
-        if (numPerPageString == null || numPerPageString.length() == 0) {
+        if (StringUtils.isEmpty(numPerPageString)) {
             this.numPerPage = 10;
-        }
-        try {
-            this.numPerPage = Integer.parseInt(numPerPageString);
-        } catch (NumberFormatException e) {
-            LOGGER.warn("The numPerPage string " + numPerPageString + " contains not an integer, 10 as default is set");
-            this.numPerPage = 10;
+        } else {
+            try {
+                this.numPerPage = Integer.parseInt(numPerPageString);
+            } catch (NumberFormatException e) {
+                LOGGER.warn(
+                    "The numPerPage string " + numPerPageString + " contains not an integer, 10 as default is set");
+                this.numPerPage = 10;
+            }
         }
         doc = null;
     }
@@ -253,10 +258,11 @@ public class MCRQuery {
      *            a CSV-list of SOLR return fields, may be empty
      */
     public void setReturnFields(String returnFields) {
-        if (returnFields == null || returnFields.length() == 0) {
+        if (StringUtils.isEmpty(returnFields)) {
             this.returnFields = new ArrayList<>();
+        } else {
+            this.returnFields = Arrays.asList(returnFields.split(","));
         }
-        this.returnFields = Arrays.asList(returnFields.split(","));
     }
 
     /**
@@ -324,11 +330,10 @@ public class MCRQuery {
         Element sortByElem = xml.getChild("sortBy");
 
         if (sortByElem != null) {
-            List children = sortByElem.getChildren();
+            List<Element> children = sortByElem.getChildren();
             sortBy = new ArrayList<>(children.size());
 
-            for (Object aChildren : children) {
-                Element sortByChild = (Element) aChildren;
+            for (Element sortByChild : children) {
                 String name = sortByChild.getAttributeValue("name");
                 String ad = sortByChild.getAttributeValue("order");
 
