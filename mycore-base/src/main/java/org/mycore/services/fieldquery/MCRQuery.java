@@ -132,8 +132,7 @@ public class MCRQuery {
         try {
             this.maxResults = Integer.parseInt(maxResultsString);
         } catch (NumberFormatException e) {
-            LOGGER.warn(
-                "The Results maxstring " + maxResultsString + " contains not an integer, 0 as default is set");
+            LOGGER.warn("The Results maxstring " + maxResultsString + " contains not an integer, 0 as default is set");
             this.maxResults = 0;
         }
     }
@@ -177,8 +176,7 @@ public class MCRQuery {
         try {
             this.numPerPage = Integer.parseInt(numPerPageString);
         } catch (NumberFormatException e) {
-            LOGGER.warn(
-                "The numPerPage string " + numPerPageString + " contains not an integer, 10 as default is set");
+            LOGGER.warn("The numPerPage string " + numPerPageString + " contains not an integer, 10 as default is set");
             this.numPerPage = 10;
         }
     }
@@ -257,11 +255,11 @@ public class MCRQuery {
      *            a CSV-list of SOLR return fields, may be empty
      */
     public void setReturnFields(String returnFields) {
-        if (returnFields == null || returnFields.length() == 0){
+        if (returnFields == null || returnFields.length() == 0) {
             this.returnFields = new ArrayList<>();
-        } else {
-            this.returnFields = Arrays.asList(returnFields.split(","));
+            return;
         }
+        this.returnFields = Arrays.asList(returnFields.split(","));
     }
 
     /**
