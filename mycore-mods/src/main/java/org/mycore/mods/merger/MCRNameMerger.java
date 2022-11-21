@@ -145,7 +145,7 @@ public class MCRNameMerger extends MCRMerger {
 
     private String normalize(String nameFragment) {
         String text = nameFragment.toLowerCase(Locale.getDefault());
-        text = new MCRHyphenNormalizer().normalize(text).replace("-", " ");
+        text = MCRHyphenNormalizer.normalizeHyphen(text, ' ');
         // canonical decomposition, then remove accents
         text = Normalizer.normalize(text, Form.NFD).replaceAll("\\p{M}", "");
         text = text.replace("ue", "u").replace("oe", "o").replace("ae", "a").replace("ß", "s").replace("ss", "s");
