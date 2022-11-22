@@ -150,6 +150,9 @@ public class MCRORCIDUser {
                 LOGGER.info("found name identifier in publication: " + key);
                 identifierKeys.add(key);
             }
+            else {
+                LOGGER.info("found empty name identifier or without type, skipping");
+            }
         }
         return identifierKeys;
     }
