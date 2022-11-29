@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="mir_licenses">
+  <label xml:lang="en" text="Licenses" />
+  <label xml:lang="de" text="Lizenzen" />
+  <label xml:lang="x-uri" text="http://www.mycore.org/classifications/mir_licenses" />
+  <categories>
+    <category ID="rights_reserved">
+      <label xml:lang="de" text="Alle Rechte vorbehalten" />
+      <label xml:lang="en" text="all rights reserved" />
+      <label xml:lang="x-dnb-other" text="otherScheme:Urheberrechtsschutz"/>
+    </category>
+    <category ID="oa_nlz">
+      <label xml:lang="en" text="Open Access related to alliance or national license" />
+      <label xml:lang="de" text="Open-Access im Zuge einer Allianz- bzw. Nationallizenz" />
+    </category>
+    <category ID="cc_3.0">
+      <label xml:lang="en" text="Creative Commons 3.0 International Lizences" />
+      <label xml:lang="de" text="Creative Commons 3.0 International Lizenzen" />
+      <label xml:lang="x-group" text="true" />
+      <url xlink:href="https://creativecommons.org/licenses/" xlink:type="locator" />
+      <category ID="cc_by_3.0">
+        <label xml:lang="en" text="CC BY 3.0" description="Attribution 3.0" />
+        <label xml:lang="de" text="CC BY 3.0" description="Namensnennung 3.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-3.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by/3.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-sa_3.0">
+        <label xml:lang="de" text="CC BY-SA 3.0" description="Namensnennung - Weitergabe unter gleichen Bedingungen 3.0" />
+        <label xml:lang="en" text="CC BY-SA 3.0" description="Attribution-ShareAlike 3.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-sa-3.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-sa/3.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-nd_3.0">
+        <label xml:lang="en" text="CC BY-ND 3.0" description="Attribution-NoDerivatives 3.0" />
+        <label xml:lang="de" text="CC BY-ND 3.0" description="Namensnennung - Keine Bearbeitungen 3.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-nd-3.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-nd/3.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-nc_3.0">
+        <label xml:lang="en" text="CC BY-NC 3.0" description="Attribution-NonCommercial 3.0" />
+        <label xml:lang="de" text="CC BY-NC 3.0" description="Namensnennung-Nicht kommerziell 3.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-nc-3.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-nc/3.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-nc-sa_3.0">
+        <label xml:lang="de" text="CC BY-NC-SA 3.0" description="Namensnennung - Nicht-kommerziell - Weitergabe unter gleichen Bedingungen 3.0" />
+        <label xml:lang="en" text="CC BY-NC-SA 3.0" description="Attribution-NonCommercial-ShareAlike 3.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-nc-sa-3.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-nc-sa/3.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-nc-nd_3.0">
+        <label xml:lang="de" text="CC BY-NC-ND 3.0" description="Namensnennung - Nicht kommerziell - Keine Bearbeitungen 3.0" />
+        <label xml:lang="en" text="CC BY-NC-ND 3.0" description="Attribution-NonCommercial-NoDerivatives 3.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-nc-nd-3.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-nc-nd/3.0/" xlink:type="locator" />
+      </category>
+    </category>
+    <category ID="cc_4.0">
+      <label xml:lang="en" text="Creative Commons 4.0 International Lizences" />
+      <label xml:lang="de" text="Creative Commons 4.0 International Lizenzen" />
+      <label xml:lang="x-group" text="true" />
+      <url xlink:href="https://creativecommons.org/licenses/" xlink:type="locator" />
+      <category ID="cc_by_4.0">
+        <label xml:lang="en" text="CC BY 4.0" description="Attribution 4.0" />
+        <label xml:lang="de" text="CC BY 4.0" description="Namensnennung 4.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-4.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by/4.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-sa_4.0">
+        <label xml:lang="de" text="CC BY-SA 4.0" description="Namensnennung - Weitergabe unter gleichen Bedingungen 4.0" />
+        <label xml:lang="en" text="CC BY-SA 4.0" description="Attribution-ShareAlike 4.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-sa-4.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-sa/4.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-nd_4.0">
+        <label xml:lang="en" text="CC BY-ND 4.0" description="Attribution-NoDerivatives 4.0" />
+        <label xml:lang="de" text="CC BY-ND 4.0" description="Namensnennung - Keine Bearbeitungen 4.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-nd-4.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-nd/4.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-nc_4.0">
+        <label xml:lang="en" text="CC BY-NC 4.0" description="Attribution-NonCommercial 4.0" />
+        <label xml:lang="de" text="CC BY-NC 4.0" description="Namensnennung-Nicht kommerziell 4.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-nc-4.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-nc/4.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-nc-sa_4.0">
+        <label xml:lang="de" text="CC BY-NC-SA 4.0" description="Namensnennung - Nicht-kommerziell - Weitergabe unter gleichen Bedingungen 4.0" />
+        <label xml:lang="en" text="CC BY-NC-SA 4.0" description="Attribution-NonCommercial-ShareAlike 4.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-nc-sa-4.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-nc-sa/4.0/" xlink:type="locator" />
+      </category>
+      <category ID="cc_by-nc-nd_4.0">
+        <label xml:lang="de" text="CC BY-NC-ND 4.0" description="Namensnennung - Nicht kommerziell - Keine Bearbeitungen 4.0" />
+        <label xml:lang="en" text="CC BY-NC-ND 4.0" description="Attribution-NonCommercial-NoDerivatives 4.0" />
+        <label xml:lang="x-dnb-cc" text="cc:cc-by-nc-nd-4.0"/>
+        <url xlink:href="https://creativecommons.org/licenses/by-nc-nd/4.0/" xlink:type="locator" />
+      </category>
+    </category>
+    <category ID="odc_pddl">
+      <label xml:lang="en" text="PDDL - Public Domain Dedication and License" />
+      <label xml:lang="de" text="PDDL - Public Domain Dedication and License" />
+    </category>
+    <category ID="odc_by">
+      <label xml:lang="de" text="ODC-By - Attribution License" />
+      <label xml:lang="en" text="ODC-By - Attribution License" />
+    </category>
+    <category ID="odc_odbl">
+      <label xml:lang="de" text="ODC-ODbL - Open Database License" />
+      <label xml:lang="en" text="ODC-ODbL - Open Database License" />
+    </category>
+    <category ID="ogl">
+      <label xml:lang="en" text="Open Government Licence" />
+      <label xml:lang="de" text="Open Government Licence" />
+      <url xlink:href="http://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/open-government-licence/" xlink:type="locator" />
+      <category ID="ogl_3.0">
+        <label xml:lang="de" text="OGL 3.0" />
+        <label xml:lang="en" text="OGL 3.0" />
+        <url xlink:href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" xlink:type="locator" />
+      </category>
+      <category ID="ogl_2.0">
+        <label xml:lang="de" text="OGL 2.0" />
+        <label xml:lang="en" text="OGL 2.0" />
+        <url xlink:href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/" xlink:type="locator" />
+      </category>
+      <category ID="ogl_1.0">
+        <label xml:lang="de" text="OGL 1.0" />
+        <label xml:lang="en" text="OGL 1.0" />
+        <url xlink:href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/1/" xlink:type="locator" />
+      </category>
+    </category>
+  </categories>
+</mycoreclass>

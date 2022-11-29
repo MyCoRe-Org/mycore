@@ -88,8 +88,9 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         DAO = new MCRCategoryDAOImpl();
         CLS = MCRCategLinkServiceFactory.getInstance();
 
-        Document xml = MCRXMLParserFactory.getParser()
-            .parseXML(new MCRURLContent(new URL("https://mycore.de/classifications/mir_licenses.xml")));
+        Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(
+            MCRObjectInfoEntityQueryResolverTest.class.getResource(
+                "/" + MCRObjectInfoEntityQueryResolverTest.class.getSimpleName() + "/mir_licenses.xml")));
         MCRCategory licenses = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, licenses);
     }
