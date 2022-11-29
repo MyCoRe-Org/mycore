@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="MCRClassification.xsd" ID="nameIdentifier">
+  <label xml:lang="en" text="Name Identifier" />
+  <label xml:lang="de" text="Namens Identifikator" />
+  <label xml:lang="x-uri" text="http://www.mycore.org/classifications/nameIdentifier" />
+  <categories>
+    <category ID="gnd">
+      <label xml:lang="en" text="GND" />
+      <label xml:lang="de" text="GND" />
+      <label xml:lang="x-uri" text="http://d-nb.info/gnd/" />
+    </category>
+    <category ID="viaf">
+      <label xml:lang="en" text="VIAF" />
+      <label xml:lang="de" text="VIAF" />
+      <label xml:lang="x-uri" text="http://www.viaf.org/" />
+    </category>
+    <category ID="orcid">
+      <label xml:lang="en" text="ORCID" />
+      <label xml:lang="de" text="ORCID" />
+      <label xml:lang="x-uri" text="http://orcid.org/" />
+    </category>
+  </categories>
+</mycoreclass>
