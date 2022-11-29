@@ -116,9 +116,7 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
 
     @Test
     public void testLicenses() throws Exception {
-        Document xml = MCRXMLParserFactory.getParser()
-            .parseXML(new MCRURLContent(new URL("https://mycore.de/classifications/mir_licenses.xml")));
-        MCRCategory licenses = MCRXMLTransformer.getCategory(xml);
+        MCRCategory licenses = loadClassificationResource("/" + getClass().getSimpleName() + "/mir_licenses.xml");
         DAO.addCategory(null, licenses);
         MCRCategoryID cc_30 = new MCRCategoryID(licenses.getId().getRootID(), "cc_3.0");
         DAO.deleteCategory(cc_30);
@@ -128,9 +126,8 @@ public class MCRCategoryDAOImplTest extends MCRJPATestCase {
     @Test
     public void testClassEditorBatch() throws Exception {
         EntityManager entityManager = MCREntityManagerProvider.getCurrentEntityManager();
-        Document xml = MCRXMLParserFactory.getParser()
-            .parseXML(new MCRURLContent(new URL("https://mycore.de/classifications/nameIdentifier.xml")));
-        MCRCategory nameIdentifier = MCRXMLTransformer.getCategory(xml);
+        MCRCategory nameIdentifier = loadClassificationResource(
+            "/" + getClass().getSimpleName() + "/nameIdentifier.xml");
         MCRCategory secondCateg = nameIdentifier.getChildren().get(1);
         DAO.addCategory(null, nameIdentifier);
         startNewTransaction();
