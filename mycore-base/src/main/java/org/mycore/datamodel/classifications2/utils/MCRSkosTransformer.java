@@ -23,6 +23,9 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.MCRFrontendUtil;
 
@@ -34,14 +37,21 @@ import org.mycore.frontend.MCRFrontendUtil;
  */
 public class MCRSkosTransformer {
 
-    public static Document getSkosInRDFXML(MCRCategory categ) {
+    /**
+     * return a classification tree as SKOS XML
+     * 
+     * @param categ - an extract of the classification that should be returned via SKOS
+     *   currently this is the hierarchy from the requested category to the root category
+     * @param current - the MCRCategoryID of the requested category  
+     */
+    public static Document getSkosInRDFXML(MCRCategory categ, MCRCategoryID current) {
         Element eRDF = new Element("RDF", MCRConstants.RDF_NAMESPACE);
         eRDF.addNamespaceDeclaration(MCRConstants.SKOS_NAMESPACE);
         if (categ.isClassification()) {
-            createSkosConceptScheme(categ, eRDF);
+            createSkosConceptScheme(categ, current, eRDF);
         }
         if (categ.isCategory()) {
-            createSkosConcept(categ, eRDF);
+            createSkosConcept(categ, current, eRDF);
         }
 
         return new Document(eRDF);
@@ -52,7 +62,7 @@ public class MCRSkosTransformer {
      * @param categ - the MyCoRe category object
      * @param eRDF the RDF root elements which collects all concepts
      */
-    private static void createSkosConceptScheme(MCRCategory categ, Element eRDF) {
+    private static void createSkosConceptScheme(MCRCategory categ, MCRCategoryID current, Element eRDF) {
         if (categ != null) {
             Element eConcept = new Element("ConceptScheme", MCRConstants.SKOS_NAMESPACE);
             eRDF.addContent(eConcept);
@@ -63,7 +73,7 @@ public class MCRSkosTransformer {
             for (MCRCategory child : categ.getChildren()) {
                 eConcept.addContent(new Element("hasTopConcept", MCRConstants.SKOS_NAMESPACE)
                     .setAttribute("resource", retrieveURI(child), MCRConstants.RDF_NAMESPACE));
-                createSkosConcept(child, eRDF);
+                createSkosConcept(child, current, eRDF);
             }
         }
     }
@@ -73,7 +83,7 @@ public class MCRSkosTransformer {
     * @param categ - the MyCoRe category object
     * @param eRDF the RDF root elements which collects all concepts
     */
-    private static void createSkosConcept(MCRCategory categ, Element eRDF) {
+    private static void createSkosConcept(MCRCategory categ, MCRCategoryID current, Element eRDF) {
         if (categ != null) {
             Element eConcept = new Element("Concept", MCRConstants.SKOS_NAMESPACE);
             eRDF.addContent(eConcept);
@@ -98,7 +108,17 @@ public class MCRSkosTransformer {
             for (MCRCategory child : categ.getChildren()) {
                 eConcept.addContent(new Element("narrower", MCRConstants.SKOS_NAMESPACE)
                     .setAttribute("resource", retrieveURI(child), MCRConstants.RDF_NAMESPACE));
-                createSkosConcept(child, eRDF);
+                createSkosConcept(child, current, eRDF);
+            }
+
+            // on reimplementation / consolidation we could try to integrate this additional query
+            // into the main query
+            if (categ.getId().equals(current)) {
+                MCRCategoryDAO categoryDAO = MCRCategoryDAOFactory.getInstance();
+                for (MCRCategory c : categoryDAO.getChildren(current)) {
+                    eConcept.addContent(new Element("narrower", MCRConstants.SKOS_NAMESPACE)
+                        .setAttribute("resource", retrieveURI(c), MCRConstants.RDF_NAMESPACE));
+                }
             }
         }
     }

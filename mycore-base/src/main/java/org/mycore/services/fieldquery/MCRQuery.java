@@ -124,8 +124,10 @@ public class MCRQuery {
      *            the maximum number of results as String
      */
     public void setMaxResults(String maxResultsString) {
+        doc = null;
         if (maxResultsString == null || maxResultsString.length() == 0) {
             this.maxResults = 0;
+            return;
         }
         try {
             this.maxResults = Integer.parseInt(maxResultsString);
@@ -133,7 +135,6 @@ public class MCRQuery {
             LOGGER.warn("The Results maxstring " + maxResultsString + " contains not an integer, 0 as default is set");
             this.maxResults = 0;
         }
-        doc = null;
     }
 
     /**
@@ -167,8 +168,10 @@ public class MCRQuery {
      *            the number of results per page as String
      */
     public void setNumPerPage(String numPerPageString) {
+        doc = null;
         if (numPerPageString == null || numPerPageString.length() == 0) {
             this.numPerPage = 10;
+            return;
         }
         try {
             this.numPerPage = Integer.parseInt(numPerPageString);
@@ -176,7 +179,6 @@ public class MCRQuery {
             LOGGER.warn("The numPerPage string " + numPerPageString + " contains not an integer, 10 as default is set");
             this.numPerPage = 10;
         }
-        doc = null;
     }
 
     /**
@@ -255,6 +257,7 @@ public class MCRQuery {
     public void setReturnFields(String returnFields) {
         if (returnFields == null || returnFields.length() == 0) {
             this.returnFields = new ArrayList<>();
+            return;
         }
         this.returnFields = Arrays.asList(returnFields.split(","));
     }
@@ -324,11 +327,10 @@ public class MCRQuery {
         Element sortByElem = xml.getChild("sortBy");
 
         if (sortByElem != null) {
-            List children = sortByElem.getChildren();
+            List<Element> children = sortByElem.getChildren();
             sortBy = new ArrayList<>(children.size());
 
-            for (Object aChildren : children) {
-                Element sortByChild = (Element) aChildren;
+            for (Element sortByChild : children) {
                 String name = sortByChild.getAttributeValue("name");
                 String ad = sortByChild.getAttributeValue("order");
 

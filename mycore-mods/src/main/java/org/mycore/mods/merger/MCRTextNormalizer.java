@@ -18,32 +18,91 @@
 
 package org.mycore.mods.merger;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.Locale;
 
 /**
- * Normalizes text to be fault tolerant when matching for duplicates.
+ * Normalizes text to be fault-tolerant when matching for duplicates.
  * Accents, umlauts, case are normalized. Punctuation and non-alphabetic/non-digit characters are removed.
  *
  * @author Frank L\u00FCtzenkirchen
  */
 public class MCRTextNormalizer {
 
+    private static final char LATIN_SMALL_LETTER_SHARP_S = '\u00DF';
+
+    private static final char LATIN_SMALL_LIGATURE_FF = '\uFB00';
+
+    private static final char LATIN_SMALL_LIGATURE_FFI = '\uFB03';
+
+    private static final char LATIN_SMALL_LIGATURE_FFL = '\uFB04';
+
+    private static final char LATIN_SMALL_LIGATURE_FI = '\uFB01';
+
+    private static final char LATIN_SMALL_LIGATURE_FL = '\uFB02';
+
+    private static final char LATIN_SMALL_LIGATURE_IJ = '\u0133';
+
+    private static final char LATIN_SMALL_LIGATURE_ST = '\uFB06';
+
+    private static final char LATIN_SMALL_LIGATURE_LONG_ST = '\uFB05';
+
+    /**
+     * Normalizes text to be fault-tolerant when matching for duplicates.
+     * Accents, umlauts, case are normalized. Punctuation and non-alphabetic/non-digit characters are removed.
+     **/
+    public String normalize(String text) {
+        return normalizeText(text);
+    }
+
+    /**
+     * Normalizes text to be fault-tolerant when matching for duplicates.
+     * Accents, umlauts, case are normalized. Punctuation and non-alphabetic/non-digit characters are removed.
+     **/
     public static String normalizeText(String text) {
-        String normalizedText = text.toLowerCase(Locale.getDefault());
-        normalizedText = new MCRHyphenNormalizer().normalize(normalizedText).replace("-", " ");
-        //canonical decomposition, remove accents
-        normalizedText = Normalizer.normalize(normalizedText, Form.NFD).replaceAll("\\p{M}", "");
-        normalizedText = normalizedText.replace("ue", "u")
-            .replace("oe", "o").replace("ae", "a")
-            .replace("ß", "s").replace("ss", "s");
-        //remove all non-alphabetic characters
-        normalizedText = normalizedText.replaceAll("[^a-z0-9]\\s]", "");
-        // remove all words with fewer than four characters
-        // normalizedText = normalizedText.replaceAll("\\b.{1,3}\\b", " ").trim();
-        normalizedText = normalizedText.replaceAll("\\p{Punct}", " ").trim(); // remove all punctuation
-        normalizedText = normalizedText.replaceAll("\\s+", " "); // normalize whitespace
+
+        String normalizedText = text;
+
+        // make lowercase
+        normalizedText = normalizedText.toLowerCase(Locale.getDefault());
+
+        // replace all hyphen-like characters with a single space
+        normalizedText = MCRHyphenNormalizer.normalizeHyphen(normalizedText, ' ');
+
+        // canonical decomposition
+        normalizedText = Normalizer.normalize(normalizedText, Form.NFD);
+
+        // strip accents
+        normalizedText = StringUtils.stripAccents(normalizedText);
+
+        // replace sharp s and double s with normal s
+        normalizedText = normalizedText.replace(Character.toString(LATIN_SMALL_LETTER_SHARP_S), "s");
+        normalizedText = normalizedText.replace("ss", "s");
+
+        // decompose ligatures
+        normalizedText = normalizedText.replace(Character.toString(LATIN_SMALL_LIGATURE_FF), "ff");
+        normalizedText = normalizedText.replace(Character.toString(LATIN_SMALL_LIGATURE_FFI), "ffi");
+        normalizedText = normalizedText.replace(Character.toString(LATIN_SMALL_LIGATURE_FFL), "ffl");
+        normalizedText = normalizedText.replace(Character.toString(LATIN_SMALL_LIGATURE_FI), "fi");
+        normalizedText = normalizedText.replace(Character.toString(LATIN_SMALL_LIGATURE_FL), "fl");
+        normalizedText = normalizedText.replace(Character.toString(LATIN_SMALL_LIGATURE_IJ), "ij");
+        normalizedText = normalizedText.replace(Character.toString(LATIN_SMALL_LIGATURE_ST), "st");
+        normalizedText = normalizedText.replace(Character.toString(LATIN_SMALL_LIGATURE_LONG_ST), "st");
+
+        // remove all non-alphabetic/non-digit characters
+        normalizedText = normalizedText.replaceAll("[^\\p{Alpha}\\p{Digit}\\p{Space}]", " ");
+
+        // replace all sequences of space-like characters with a single space
+        normalizedText = normalizedText.replaceAll("\\p{Space}+", " ");
+
+        // remove leading and trailing spaces
+        normalizedText = normalizedText.trim();
+
         return normalizedText;
     }
+
+
 }

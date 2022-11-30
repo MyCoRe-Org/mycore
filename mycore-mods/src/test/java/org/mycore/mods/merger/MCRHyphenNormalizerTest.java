@@ -18,16 +18,12 @@
 
 package org.mycore.mods.merger;
 
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import org.junit.Test;
+import org.mycore.common.MCRTestCase;
 
-/**
- * Normalizes the different variants of hyphens in a given input text to the given character; defaults
- * to a simple "minus".
- *
- * @author Frank L\u00FCtzenkirchen
- **/
-public class MCRHyphenNormalizer {
+import static org.junit.Assert.assertEquals;
+
+public class MCRHyphenNormalizerTest extends MCRTestCase {
 
     private static final char HYPHEN_MINUS = '\u002D';
 
@@ -61,37 +57,27 @@ public class MCRHyphenNormalizer {
 
     private static final char FULLWIDTH_HYPHEN_MINUS = '\uFF0D';
 
-    private static final char[] ALL_HYPHEN_VARIANTS = {HYPHEN_MINUS, SOFT_HYPHEN, ARMENIAN_HYPHEN,
+    public static final char[] ALL_HYPHEN_VARIANTS = {HYPHEN_MINUS, SOFT_HYPHEN, ARMENIAN_HYPHEN,
             HEBREW_PUNCTUATION_MAQAF, HYPHEN, NON_BREAKING_HYPHEN, FIGURE_DASH, EN_DASH, EM_DASH, HORIZONTAL_BAR,
             MINUS_SIGN, TWO_EM_DASH, THREE_EM_DASH, SMALL_EM_DASH, SMALL_HYPHEN_MINUS, FULLWIDTH_HYPHEN_MINUS};
 
-    private static final String ALL_HYPHEN_VARIANTS_REGEX =
-            new String(ALL_HYPHEN_VARIANTS)
-                    .chars()
-                    .mapToObj(variant -> Pattern.quote(Character.toString((char) variant)))
-                    .collect(Collectors.joining("", "[", "]"));
-
-    private static final Pattern ALL_HYPHEN_VARIANTS_PATTERN = Pattern.compile(ALL_HYPHEN_VARIANTS_REGEX);
-
-    /**
-     * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.
-     **/
-    public String normalize(String input) {
-        return normalizeHyphen(input);
+    @Test
+    public void testNormalize() {
+        for (char variant : ALL_HYPHEN_VARIANTS) {
+            assertEquals("A-B-C", MCRHyphenNormalizer.normalizeHyphen(getTestString(variant)));
+        }
     }
 
-    /**
-     * Normalizes the different variants of hyphens in a given input text to a simple "minus" character.
-     **/
-    public static String normalizeHyphen(String input) {
-        return normalizeHyphen(input, HYPHEN_MINUS);
+    @Test
+    public void testNormalizeWithReplacement() {
+        for (char variant : ALL_HYPHEN_VARIANTS) {
+            assertEquals("A~B~C", MCRHyphenNormalizer.normalizeHyphen(getTestString(variant), '~'));
+        }
     }
 
-    /**
-     * Normalizes the different variants of hyphens in a given input text to the given character.
-     **/
-    public static String normalizeHyphen(String input, char replacement) {
-        return ALL_HYPHEN_VARIANTS_PATTERN.matcher(input).replaceAll(Character.toString(replacement));
+    private String getTestString(char testCharacter) {
+        String characterString = Character.toString(testCharacter);
+        return "A" + characterString + "B" + characterString + "C";
     }
 
 }

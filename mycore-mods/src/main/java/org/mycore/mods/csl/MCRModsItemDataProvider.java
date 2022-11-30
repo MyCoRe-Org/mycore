@@ -165,7 +165,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
     }
 
     protected void processModsPart(CSLItemDataBuilder idb) {
-        String issueVolumeXP = "mods:relatedItem/mods:part[count(mods:detail[@type='issue' or @type='volume'])>0]";
+        String issueVolumeXP = "mods:relatedItem/mods:part[count(mods:detail[@type='issue' or @type='volume'"
+            + " or @type='article_number'])>0]";
         final Optional<Element> parentPartOpt = Optional.ofNullable(wrapper.getElement(issueVolumeXP))
             .or(() -> Optional.ofNullable(wrapper.getElement(".//" + issueVolumeXP)));
         parentPartOpt.ifPresent((modsPartElement) -> {
@@ -429,7 +430,8 @@ public class MCRModsItemDataProvider extends MCRItemDataProvider {
                 idb.containerTitleShort(buildShortTitle(titleInfo));
             });
 
-        wrapper.getElements(".//mods:relatedItem[@type='series']/" + USABLE_TITLE_XPATH).stream()
+        wrapper.getElements(".//mods:relatedItem[@type='series' or (@type='host' and "
+            + "mods:genre[@type='intern'] = 'series')]/" + USABLE_TITLE_XPATH).stream()
             .findFirst().ifPresent((relatedItem) -> {
                 idb.collectionTitle(buildTitle(relatedItem));
             });

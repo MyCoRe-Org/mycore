@@ -6,9 +6,11 @@
   <xsl:output method="xml" encoding="UTF-8" />
   <xsl:param name="MCR.Metadata.DefaultLang" />
 
+  <xsl:variable name="filterDisabledCategories" select="document('property:MCR.OAIDataProvider.OAI2.FilterDisabledCategories.*')/properties"/>
+
   <xsl:template match="/mycoreclass">
     <ListSets>
-      <xsl:apply-templates select="categories//category">
+      <xsl:apply-templates select="categories/category">
         <xsl:with-param name="prefix" select="@ID" />
       </xsl:apply-templates>
     </ListSets>
@@ -17,27 +19,34 @@
   <xsl:template match="category">
     <xsl:param name="prefix" />
     <xsl:variable name="id" select="concat($prefix,':',@ID)" />
-    <set>
-      <setSpec>
-        <xsl:value-of select="$id" />
-      </setSpec>
-      <xsl:choose>
-        <xsl:when test="label[lang('en')]">
-          <!-- preferred for DINI 2013 -->
-          <xsl:apply-templates select="label[lang('en')]" />
-        </xsl:when>
-        <xsl:when test="label[lang($MCR.Metadata.DefaultLang)]">
-          <xsl:apply-templates select="label[lang($MCR.Metadata.DefaultLang)]" />
-        </xsl:when>
-        <xsl:when test="label[lang('de')]">
-          <!-- MyCoRe default -->
-          <xsl:apply-templates select="label[lang('de')]" />
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="label[1]" />
-        </xsl:otherwise>
-      </xsl:choose>
-    </set>
+    <xsl:variable name="enabled" select="not(label[lang('x-disable')]/@text='true')" />
+    <xsl:variable name="keepDisabledCategories" select="not($filterDisabledCategories//entry[@key=concat('MCR.OAIDataProvider.OAI2.FilterDisabledCategories.',$prefix)]='true')"/>
+    <xsl:if test="$enabled or $keepDisabledCategories">
+      <set>
+        <setSpec>
+          <xsl:value-of select="$id" />
+        </setSpec>
+        <xsl:choose>
+          <xsl:when test="label[lang('en')]">
+            <!-- preferred for DINI 2013 -->
+            <xsl:apply-templates select="label[lang('en')]" />
+          </xsl:when>
+          <xsl:when test="label[lang($MCR.Metadata.DefaultLang)]">
+            <xsl:apply-templates select="label[lang($MCR.Metadata.DefaultLang)]" />
+          </xsl:when>
+          <xsl:when test="label[lang('de')]">
+            <!-- MyCoRe default -->
+            <xsl:apply-templates select="label[lang('de')]" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="label[1]" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </set>
+      <xsl:apply-templates select="category">
+        <xsl:with-param name="prefix" select="$prefix" />
+      </xsl:apply-templates>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="label">
