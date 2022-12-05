@@ -92,7 +92,7 @@ public class MCRMODSLinksEventHandler extends MCREventHandlerBase {
             if (MCRMetadataManager.exists(childID)) {
                 MCREvent childEvent
                     = new MCREvent(MCREvent.ObjectType.OBJECT, MCREvent.EventType.INDEX);
-                childEvent.put("object", MCRMetadataManager.retrieve(childID));
+                childEvent.put(MCREvent.OBJECT_KEY, MCRMetadataManager.retrieve(childID));
                 MCREventManager.instance().handleEvent(childEvent);
             }
         }
