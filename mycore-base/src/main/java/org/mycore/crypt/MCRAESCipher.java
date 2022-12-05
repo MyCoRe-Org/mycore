@@ -24,6 +24,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -105,14 +106,16 @@ public class MCRAESCipher extends MCRCipher {
         try {
             LOGGER.info("generate Key File");
             String cryptKey = generateKey();
-            Files.writeString(FileSystems.getDefault().getPath(keyFile), cryptKey, StandardOpenOption.CREATE_NEW);
+            Path keyPath = FileSystems.getDefault().getPath(keyFile);
+            Files.createDirectories(keyPath.getParent());
+            Files.writeString(keyPath, cryptKey, StandardOpenOption.CREATE_NEW);
         } catch (NoSuchAlgorithmException e) {
             throw new MCRCryptCipherConfigurationException(
                 "Error while generating keyfile: The configured algorithm is not available.", e);
         } catch (FileAlreadyExistsException e) {
             throw new FileAlreadyExistsException(keyFile, null,
-                "A cryptKey shouldn't generated if it allready exists. "
-                    + " If you aware of the consequences use overwrite keyfile.");
+                "A crypt key shouldn't be generated if it allready exists. "
+                    + " If you aware of the consequences use overwriteKeyFile().");
         } catch (IOException e) {
             throw new MCRException("Error while write key to file.", e);
         }
@@ -122,7 +125,9 @@ public class MCRAESCipher extends MCRCipher {
         try {
             LOGGER.info("overwrite Key File");
             String cryptKey = generateKey();
-            Files.writeString(FileSystems.getDefault().getPath(keyFile), cryptKey);
+            Path keyPath = FileSystems.getDefault().getPath(keyFile);
+            Files.createDirectories(keyPath.getParent());
+            Files.writeString(keyPath, cryptKey);
         } catch (NoSuchAlgorithmException e) {
             throw new MCRCryptCipherConfigurationException(
                 "Error while generating keyfile. The configured algorithm is not available.", e);
