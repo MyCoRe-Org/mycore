@@ -44,7 +44,6 @@ import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImplTest;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.xml.sax.SAXParseException;
@@ -89,7 +88,7 @@ public class MCRObjectInfoEntityQueryResolverTest extends MCRJPATestCase {
         DAO = new MCRCategoryDAOImpl();
         CLS = MCRCategLinkServiceFactory.getInstance();
 
-        URL classResourceUrl = MCRCategoryDAOImplTest.class.getResource("/mycore-classifications/mir_licenses.xml");
+        URL classResourceUrl = MCRObjectInfoEntityQueryResolverTest.class.getResource("/mycore-classifications/mir_licenses.xml");
         Document xml = MCRXMLParserFactory.getParser().parseXML(new MCRURLContent(classResourceUrl));
         MCRCategory licenses = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, licenses);
