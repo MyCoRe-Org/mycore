@@ -217,6 +217,21 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
     }
 
     @Test
+    public void testMatchesNotRule() throws JaxenException, JDOMException {
+        MCREditorSession session = buildSession("document[text='12345']");
+        addRule(session, "/document", "xpath", "//text", "matches-not", "[a-z]+");
+        assertTrue(session.getValidator().isValid());
+        assertEquals("false", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/text", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[text='12345']");
+        addRule(session, "/document", "xpath", "//text", "matches-not", "[0-9]+");
+        assertFalse(session.getValidator().isValid());
+        assertEquals("true", session.getVariables().get(MCRXEditorValidator.XED_VALIDATION_FAILED));
+        checkResult(session, "/document/text", MCRValidationResults.MARKER_ERROR);
+    }
+
+    @Test
     public void testXPathTestRule() throws JaxenException, JDOMException {
         MCREditorSession session = buildSession("document[author='Jim'][author='Charles'][author='John']");
         addRule(session, "/document/author", "test", "contains(.,'J')");

@@ -52,6 +52,7 @@ public class MCRXEditorValidator {
         addIfConfigured(new MCRMinLengthValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMaxLengthValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMatchesValidator(), baseXPath, ruleElement);
+        addIfConfigured(new MCRMatchesNotValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRXPathTestValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRDateValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMinDateValidator(), baseXPath, ruleElement);
