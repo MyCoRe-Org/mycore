@@ -104,16 +104,18 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         redirectURI = BASE_URL + job.getRequest().getServletPath().substring(1);
         userProfileURL = MCRServlet.getServletBaseURL() + USER_SERVLET_PATH;
         final String action = job.getRequest().getParameter("action");
-        if (action != null) {
+        if (job.getRequest().getParameter("code") != null) {
+            handleCode(req, res);
+        } else if (action != null) {
             if ("auth".equalsIgnoreCase(action)) {
                 handleAuth(req, res);
             } else if ("revoke".equalsIgnoreCase(action)) {
                 handleRevoke(res);
             } else {
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown action");
             }
         } else {
-            handleCode(req, res);
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "An action must be specified");
         }
     }
 
