@@ -80,8 +80,6 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
     private static final boolean IS_PREFILL_REGISTRATION_FORM = MCRConfiguration2
         .getOrThrow(MCRORCIDConstants.CONFIG_PREFIX + "PreFillRegistrationForm", Boolean::parseBoolean);
 
-    private static final String BASE_URL = MCRFrontendUtil.getBaseURL();
-
     /**
      * Servlet url.
      */
@@ -101,7 +99,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         }
         final HttpServletRequest req = job.getRequest();
         final HttpServletResponse res = job.getResponse();
-        redirectURI = BASE_URL + job.getRequest().getServletPath().substring(1);
+        redirectURI = MCRFrontendUtil.getBaseURL() + job.getRequest().getServletPath().substring(1);
         userProfileURL = MCRServlet.getServletBaseURL() + USER_SERVLET_PATH;
         final String action = job.getRequest().getParameter("action");
         if (job.getRequest().getParameter("code") != null) {
@@ -202,7 +200,6 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         builder.queryParam("response_type", "code");
         builder.queryParam("scope", scope);
         builder.queryParam("prompt", "login");
-        builder.queryParam("redirect_uri", redirectURI);
         builder.queryParam("lang", "en"); // hard coded because german is not support
         builder.queryParam("state", buildStateParam());
         if (IS_PREFILL_REGISTRATION_FORM) {
