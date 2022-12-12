@@ -193,6 +193,7 @@ public class MCRORCIDUser {
     protected static String serializeCredentials(MCRORCIDCredentials credentials) throws MCRORCIDException {
         try {
             final MCRORCIDCredentials cloned = (MCRORCIDCredentials) credentials.clone();
+            cloned.setExpiresIn(null);
             cloned.setName(null);
             cloned.setORCID(null);
             final ObjectMapper mapper = new ObjectMapper();
