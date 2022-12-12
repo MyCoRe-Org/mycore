@@ -175,7 +175,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
             LOGGER.info("No scope param, using default scope ({}) as fallback.", SCOPE);
             res.sendRedirect(buildRequestCodeURL(SCOPE).toString());
         } else {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Scope is required");
         }
     }
 
