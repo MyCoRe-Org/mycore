@@ -39,8 +39,8 @@ public class BaseTestConstants {
         }
 
         @Override
-        public URL getZipLocation() throws IOException {
-            return new URL("https://www.mycore.de/tests/derivate_0000005.zip");
+        public URL getZipLocation() {
+            return BaseTestConstants.class.getResource("/BaseTestConstants/derivate_0000005.zip");
         }
 
     };
@@ -58,8 +58,8 @@ public class BaseTestConstants {
         }
 
         @Override
-        public URL getZipLocation() throws IOException {
-            return new URL("https://www.mycore.de/tests/PDF-Test.pdf");
+        public URL getZipLocation() {
+            return BaseTestConstants.class.getResource("/BaseTestConstants//PDF-Test.pdf");
         }
 
     };
