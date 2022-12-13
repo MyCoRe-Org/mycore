@@ -18,20 +18,17 @@
 
 package org.mycore.iview.tests.controller;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -39,7 +36,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.selenium.MCRSeleniumTestBase;
-import org.mycore.iview.tests.TestProperties;
 import org.mycore.iview.tests.model.TestDerivate;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -54,11 +50,6 @@ public class DefaultApplicationController extends ApplicationController {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static Properties PROPERTIES = TestProperties.getInstance();
-
-    private static Boolean SKIP_DOWNLOAD = Boolean
-        .parseBoolean(PROPERTIES.getProperty("test.viewer.skipDownload", "False"));
-
     @Override
     public void init() {
         DefaultApplicationController.derivateHTMLMapping = new HashMap<>();
@@ -66,13 +57,21 @@ public class DefaultApplicationController extends ApplicationController {
 
     @Override
     public void setUpDerivate(WebDriver webdriver, TestDerivate testDerivate) {
+        Path target = Paths.get(webpath);
+        if(!Files.exists(target)){
+            try(InputStream is = MCRSeleniumTestBase.class.getClassLoader().getResourceAsStream("testFiles.zip");
+                ZipInputStream zis = new ZipInputStream(is)){
+                extractZip(target.getParent().toAbsolutePath().toString(), zis);
+            } catch (IOException e) {
+                LOGGER.error("Could not unzip testFiles.zip", e);
+            }
+
+        }
         if (!derivateHTMLMapping.containsKey(testDerivate)) {
             try {
-                URL zipLocation = testDerivate.getZipLocation();
                 String name = testDerivate.getName();
-                download(zipLocation, webpath);
 
-                if (zipLocation.toString().endsWith(".pdf")) {
+                if (testDerivate.getStartFile().endsWith(".pdf")) {
                     buildHTMLFile(name, testDerivate.getStartFile(), "MyCoRePDFViewer");
                 } else {
                     buildHTMLFile(name, testDerivate.getStartFile(), "MyCoReImageViewer");
@@ -106,60 +105,6 @@ public class DefaultApplicationController extends ApplicationController {
         return name + ".html";
     }
 
-    protected void download(URL fileLocation, String dest) throws IOException {
-        if (!SKIP_DOWNLOAD) {
-            createTestFolder(webpath);
-            InputStream openStream = new BufferedInputStream(fileLocation.openStream(), 1024 * 1024 * 16);
-
-            String pathToFile = fileLocation.getFile();
-            if (pathToFile.endsWith(".pdf")) {
-                String[] token = pathToFile.split("/");
-                String fileName = token[token.length - 1];
-                String destination = dest + "/" + fileName;
-
-                LOGGER.info("Downloading pdf file to {}", destination);
-                IOUtils.copy(openStream, new FileOutputStream(destination));
-            } else {
-                LOGGER.info("Downloading test files to : {}", dest);
-                byte[] bytes = IOUtils.toByteArray(openStream);
-                extractZip(dest, new ArrayList<>(), new ZipInputStream(new ByteArrayInputStream(bytes)));
-            }
-        }
-    }
-
-    private void extractZip(String dest, List<String> relativePaths, ZipInputStream zipInputStream)
-        throws IOException {
-        ZipEntry nextEntry;
-        zipInputStream.available();
-        while ((nextEntry = zipInputStream.getNextEntry()) != null) {
-            String entryName = nextEntry.getName();
-            String fileName = dest + "/" + entryName;
-            File localFile = new File(fileName);
-
-            if (nextEntry.isDirectory()) {
-                localFile.mkdir();
-            } else {
-                relativePaths.add(entryName);
-                localFile.createNewFile();
-                FileOutputStream localFileOutputStream = new FileOutputStream(localFile);
-                IOUtils.copyLarge(zipInputStream, localFileOutputStream, 0, nextEntry.getSize());
-
-                localFileOutputStream.flush();
-                localFileOutputStream.close();
-            }
-            zipInputStream.closeEntry();
-        }
-        zipInputStream.close();
-        LOGGER.info("File download complete!");
-    }
-
-    private void createTestFolder(String dest) {
-        File destFolder = new File(dest);
-        if (!destFolder.exists()) {
-            destFolder.mkdirs();
-        }
-    }
-
     @Override
     public void shutDownDerivate(WebDriver webdriver, TestDerivate testDerivate) {
 
@@ -177,6 +122,29 @@ public class DefaultApplicationController extends ApplicationController {
         wait.until(ExpectedConditions
             .presenceOfAllElementsLocatedBy(By.xpath("/.//ol[contains(@class, 'chapterTreeDesktop')]")));
 
+    }
+
+    private void extractZip(String dest, ZipInputStream zipInputStream) throws IOException {
+        ZipEntry nextEntry;
+        zipInputStream.available();
+        while ((nextEntry = zipInputStream.getNextEntry()) != null) {
+            String entryName = nextEntry.getName();
+            String fileName = dest + "/" + entryName;
+            File localFile = new File(fileName);
+
+            if (nextEntry.isDirectory()) {
+                localFile.mkdir();
+            } else {
+                localFile.createNewFile();
+                try(FileOutputStream localFileOutputStream = new FileOutputStream(localFile)){
+                    IOUtils.copyLarge(zipInputStream, localFileOutputStream, 0, nextEntry.getSize());
+                }
+
+            }
+            zipInputStream.closeEntry();
+        }
+        zipInputStream.close();
+        LOGGER.info("File download complete!");
     }
 
 }
