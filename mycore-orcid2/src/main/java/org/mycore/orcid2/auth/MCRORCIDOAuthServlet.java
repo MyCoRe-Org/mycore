@@ -131,7 +131,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
             try {
                 final MCRORCIDCredentials credentials
                     = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
-                handleExpiration(credentials);
+                setExpiration(credentials);
                 MCRORCIDSessionUtils.getCurrentUser().storeCredentials(credentials);
                 res.sendRedirect(userProfileURL);
             } catch (MCRORCIDRequestException e) {
@@ -140,7 +140,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         }
     }
 
-    private void handleExpiration(MCRORCIDCredentials credentials) {
+    private void setExpiration(MCRORCIDCredentials credentials) {
         final Calendar cal = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
         cal.setTime(new Date());
         cal.add(Calendar.SECOND, Integer.parseInt(credentials.getExpiresIn()));
@@ -155,7 +155,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
             try {
                 final String token = credentials.getAccessToken();
                 MCRORCIDOAuthClient.getInstance().revokeToken(token);
-                orcidUser.removeCredentials();
+                orcidUser.removeAllCredentials();
                 res.sendRedirect(userProfileURL);
             } catch (Exception e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST);

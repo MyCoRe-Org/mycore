@@ -120,7 +120,7 @@ public class MCRORCIDUser {
     /**
      * Removes all MCRORCIDCredentials attributes if exists.
      */
-    public void removeCredentials() {
+    public void removeAllCredentials() {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
         final SortedSet<MCRUserAttribute> toKeep = new TreeSet<MCRUserAttribute>();
         for (MCRUserAttribute attribute : attributes) {
