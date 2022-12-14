@@ -18,9 +18,6 @@
 
 package org.mycore.iview.tests.base;
 
-import java.io.IOException;
-import java.net.URL;
-
 import org.mycore.iview.tests.model.TestDerivate;
 
 public class BaseTestConstants {
@@ -38,11 +35,6 @@ public class BaseTestConstants {
             return "derivate_0000005";
         }
 
-        @Override
-        public URL getZipLocation() throws IOException {
-            return new URL("https://www.mycore.de/tests/derivate_0000005.zip");
-        }
-
     };
 
     protected static final TestDerivate PDF_TEST_DERIVATE = new TestDerivate() {
@@ -55,11 +47,6 @@ public class BaseTestConstants {
         @Override
         public String getName() {
             return "derivate_0000004";
-        }
-
-        @Override
-        public URL getZipLocation() throws IOException {
-            return new URL("https://www.mycore.de/tests/PDF-Test.pdf");
         }
 
     };

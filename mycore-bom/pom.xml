@@ -1012,6 +1012,12 @@
       </dependency>
       <dependency>
         <groupId>org.mycore</groupId>
+        <artifactId>mycore-classifications</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mycore</groupId>
         <artifactId>selenium-utils</artifactId>
         <version>0.9</version>
         <scope>test</scope>
