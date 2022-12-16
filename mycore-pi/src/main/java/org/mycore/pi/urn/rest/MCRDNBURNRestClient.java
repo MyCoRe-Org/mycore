@@ -30,9 +30,11 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -158,6 +160,31 @@ public class MCRDNBURNRestClient {
                 break;
         }
 
+        return Optional.empty();
+    }
+
+    public Optional<JsonObject> getRegistrationInfo(MCRPIRegistrationInfo urn) {
+        String identifier = urn.getIdentifier();
+        return getRegistrationInfo(identifier);
+    }
+
+    public Optional<JsonObject> getRegistrationInfo(String identifier) {
+        String url = getBaseServiceURL() + "/urn/" + identifier;
+        CloseableHttpResponse response = MCRHttpsClient.get(url, Optional.empty());
+
+        int statusCode = response.getStatusLine().getStatusCode();
+        switch (statusCode) {
+            case HttpStatus.SC_OK:
+                HttpEntity entity = response.getEntity();
+                try {
+                    Reader reader = new InputStreamReader(entity.getContent());
+                    JsonElement jsonElement = JsonParser.parseReader(reader);
+                    return Optional.of(jsonElement.getAsJsonObject());
+                } catch (Exception e) {
+                    LOGGER.error("Could not read Response from " + url);
+                }
+                break;
+        }
         return Optional.empty();
     }
 
