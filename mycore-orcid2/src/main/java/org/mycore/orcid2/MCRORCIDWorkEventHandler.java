@@ -18,23 +18,17 @@
 
 package org.mycore.orcid2;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.orcid2.user.MCRORCIDUser;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserManager;
+import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserUtils;
 
 /**
  * When a publication is created or updated locally in this application,
- * collects all name identifiers from the MODS metadata,
- * looks up login users that have one of these identifiers, e.g. ORCID iD,
- * stored in their user attributes,
+ * collects all orcid name identifiers from the MODS metadata,
+ * looks up login users that have one of these identifiers stored in their user attributes,
  * checks if these users have an ORCID profile we know of
  * and have authorized us to update their profile as trusted party,
  * and then creates/updates the publication in the works section of that profile.
@@ -55,27 +49,17 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
-        final Set<String> nameIdentifierKeys = MCRORCIDUtils.getNameIdentifierKeys(new MCRMODSWrapper(object));
-        getUsersForGivenNameIdentifiers(nameIdentifierKeys).stream().map(user -> new MCRORCIDUser(user))
-            .forEach(user -> publishToORCID(object, user));
-    }
-
-    private Set<MCRUser> getUsersForGivenNameIdentifiers(Set<String> nameIdentifierKeys) {
-        final Set<MCRUser> users = new HashSet<>();
-        for (String key : nameIdentifierKeys) {
-            final String name = MCRORCIDUser.ATTR_ID_PREFIX + key.split(":")[0];
-            final String value = key.split(":")[1];
-            users.addAll(MCRUserManager.getUsers(name, value).collect(Collectors.toSet()));
-        }
-        return users;
+        MCRORCIDUtils.getORCIDs(object).stream().map(orcid -> MCRORCIDUserUtils.getCredentials(orcid))
+            .forEach(credentials -> publishToORCID(object, credentials));
     }
 
     /**
      * Publishes MCRObject in user's orcid profile.
-     * Requires orcid credentals.
+     * Creates a new record if no corresponding publication can be found in the profile.
+     * Otherwise, the publication in the profile will be updated.
      * 
      * @param object the object
-     * @param user the user
+     * @param credentials the credentials
      */
-    abstract protected void publishToORCID(MCRObject object, MCRORCIDUser user);
+    abstract protected void publishToORCID(MCRObject object, MCRORCIDCredentials credentials);
 }

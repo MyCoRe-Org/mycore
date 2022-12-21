@@ -19,6 +19,7 @@
 package org.mycore.orcid2.v3.resources;
 
 import java.util.List;
+import java.util.Set;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -31,23 +32,20 @@ import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.content.MCRContent;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
-import org.mycore.orcid2.client.MCRORCIDClient;
+import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.v3.MCRORCIDAPIClientFactoryImpl;
 import org.mycore.orcid2.v3.MCRORCIDSectionImpl;
 import org.mycore.orcid2.v3.MCRORCIDWorkHelper;
-import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformer;
-import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 
@@ -75,12 +73,23 @@ public class MCRORCIDResource {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
         final MCRObjectID objectID = MCRJerseyUtil.getID(objectIDString);
+        MCRObject object = null;
+        try {
+            object = MCRMetadataManager.retrieveMCRObject(objectID);
+        } catch(MCRPersistenceException e) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        final Set<String> orcids = MCRORCIDUtils.getORCIDs(object);
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        // assumption that a publication cannot be in the profile, it is if not users.
-        if (orcidUser.isMyPublication(objectID)) {
+        orcids.retainAll(orcidUser.getORCIDs());
+        if (orcids.isEmpty()) {
+            // assumption that a publication cannot be in the profile, it is if not users.
             return new MCRORCIDPublicationStatus(false, false);
         }
-        final MCRORCIDCredentials credentials = orcidUser.getCredentials();
+        if (orcids.size() > 1) { // should not happen
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        final MCRORCIDCredentials credentials = orcidUser.getCredentials(orcids.iterator().next());
         if (credentials == null) {
             return new MCRORCIDPublicationStatus(true, false);
         }
@@ -89,7 +98,6 @@ public class MCRORCIDResource {
                 .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-            final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
             final boolean result = MCRORCIDWorkHelper.findMatchingSummaries(object, summaries).findAny().isPresent();
             return new MCRORCIDPublicationStatus(true, result);
         } catch (Exception e) {
@@ -119,30 +127,24 @@ public class MCRORCIDResource {
         if (!MCRMetadataManager.exists(objectID)) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        if (!orcidUser.isMyPublication(objectID)) {
+        MCRObject object = null;
+        try {
+            object = MCRMetadataManager.retrieveMCRObject(objectID);
+        } catch(MCRPersistenceException e) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final MCRORCIDCredentials credentials = orcidUser.getCredentials();
+        final Set<String> orcids = MCRORCIDUtils.getORCIDs(object);
+        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+        orcids.retainAll(orcidUser.getORCIDs());
+        if (orcids.isEmpty() || orcids.size() > 1) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        final MCRORCIDCredentials credentials = orcidUser.getCredentials(orcids.iterator().next());
         if (credentials == null || credentials.getAccessToken() == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
         try {
-            final MCRORCIDClient memberClient = MCRORCIDAPIClientFactoryImpl.getInstance()
-                .createMemberClient(credentials);
-            final Works works = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class);
-            final List<WorkSummary> summaries
-                = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-            final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
-            final WorkSummary summary
-                = MCRORCIDWorkHelper.findMatchingSummaries(object, summaries).findFirst().orElse(null);
-            final MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(object.getId());
-            final Work transformedWork = MCRORCIDWorkTransformer.getInstance().transformToWork(content);
-            if (summary == null) {
-                memberClient.create(MCRORCIDSectionImpl.WORK, transformedWork);
-            } else {
-                memberClient.update(MCRORCIDSectionImpl.WORK, summary.getPutCode(), transformedWork);
-            }
+            MCRORCIDWorkHelper.publishToORCID(object, credentials);
             return Response.ok().build();
         } catch (Exception e) {
             LOGGER.error("Error while publishing: ", e);

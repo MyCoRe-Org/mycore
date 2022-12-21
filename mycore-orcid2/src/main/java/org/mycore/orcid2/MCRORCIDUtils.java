@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
 
@@ -57,6 +58,18 @@ public class MCRORCIDUtils {
         final Element modsCollection = new Element("modsCollection", MCRConstants.MODS_NAMESPACE);
         elements.forEach(w -> modsCollection.addContent(w));
         return modsCollection;
+    }
+
+    /**
+     * Extract all orcid name identifiers in mods.
+     * 
+     * @param object the object
+     * @return orcid name identifiers as set
+     */
+    public static Set<String> getORCIDs(MCRObject object) {
+        final MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
+        return wrapper.getElements("mods:name/mods:nameIdentifier[@type='orcid']").stream().map(Element::getTextTrim)
+            .collect(Collectors.toSet());
     }
 
     /**

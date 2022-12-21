@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.user;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -54,11 +55,9 @@ public class MCRORCIDUser {
      */
     public static final String ATTR_ORCID_CREDENTIALS = "orcid_credentials_";
 
-    private static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + "orcid";
+    public static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + "orcid";
 
     private final MCRUser user;
-
-    private MCRORCIDCredentials credentials;
 
     /**
      * Wraps MCRUser to MCRORCIDUser.
@@ -114,7 +113,6 @@ public class MCRORCIDUser {
         final String credentialsString = serializeCredentials(credentials);
         user.setUserAttribute(ATTR_ORCID_CREDENTIALS + orcid, credentialsString);
         MCRUserManager.updateUser(user);
-        this.credentials = credentials; // cache credentials
     }
 
     /**
@@ -130,30 +128,69 @@ public class MCRORCIDUser {
         }
         user.setAttributes(toKeep); // because of hibernate issues
         MCRUserManager.updateUser(user);
-        this.credentials = null;
+    }
+
+    /**
+     * Removes MCROCIDCredentials by orcid if exists.
+     * 
+     * @param orcid the orcid
+     */
+    public void removeCredentials(String orcid) {
+        final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
+        final SortedSet<MCRUserAttribute> toKeep = new TreeSet<MCRUserAttribute>();
+        for (MCRUserAttribute attribute : attributes) {
+            if (!attribute.getName().equals(ATTR_ORCID_CREDENTIALS + orcid)) {
+                toKeep.add(attribute);
+            }
+        }
+        user.setAttributes(toKeep); // because of hibernate issues
+        MCRUserManager.updateUser(user);
+    }
+
+    /**
+     * Checks if user has MCRORCIDCredentials.
+     * 
+     * @return true if user has credentials
+     */
+    public boolean hasCredentials() {
+        return user.getAttributes().stream()
+            .filter(attribute -> attribute.getName().startsWith(ATTR_ORCID_CREDENTIALS)).findAny().isPresent();
     }
 
     /** 
      * Gets user's MCRORCIDCredentials from user attributes.
      * 
-     * @return credentials or null
-     * @throws MCRORCIDException if serialization fails or there are more than one credentials
+     * @return List of credentials
+     * @throws MCRORCIDException if serialization fails
      */
-    public MCRORCIDCredentials getCredentials() throws MCRORCIDException {
-        if (credentials != null) { // use cached credentials
-            return credentials;
-        }
+    public List<MCRORCIDCredentials> listCredentials() throws MCRORCIDException {
         final List<MCRUserAttribute> attributes = user.getAttributes().stream()
             .filter(attribute -> attribute.getName().startsWith(ATTR_ORCID_CREDENTIALS)).toList();
-        if (attributes.size() > 1) { // assumption that there is only one credential
-            throw new MCRORCIDException("There are more than one credentials.");
-        }
         if (attributes.isEmpty()) {
+            return List.of();
+        }
+        final List<MCRORCIDCredentials> credentials = new ArrayList<MCRORCIDCredentials>();
+        for (MCRUserAttribute attribute : attributes) {
+            final MCRORCIDCredentials tmp = deserializeCredentials(attribute.getValue());
+            final String orcid = attribute.getName().substring(ATTR_ORCID_CREDENTIALS.length());
+            tmp.setORCID(orcid);
+        }
+        return credentials;
+    }
+
+    /**
+     * Gets user's MCRORCIDCredentials by orcid.
+     * 
+     * @param orcid the orcid
+     * @return credentials or null
+     * @throws MCRORCIDException if serialization fails
+     */
+    public MCRORCIDCredentials getCredentials(String orcid) throws MCRORCIDException {
+        final String credentialsString = user.getUserAttribute(ATTR_ORCID_CREDENTIALS + orcid);
+        if (credentialsString == null) {
             return null;
         }
-        final String credentialsString = attributes.get(0).getValue();
         final MCRORCIDCredentials credentials = deserializeCredentials(credentialsString);
-        final String orcid = attributes.get(0).getName().substring(ATTR_ORCID_CREDENTIALS.length());
         credentials.setORCID(orcid);
         return credentials;
     }

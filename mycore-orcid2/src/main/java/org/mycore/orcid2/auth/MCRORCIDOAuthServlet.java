@@ -108,7 +108,7 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
             if ("auth".equalsIgnoreCase(action)) {
                 handleAuth(req, res);
             } else if ("revoke".equalsIgnoreCase(action)) {
-                handleRevoke(res);
+                handleRevoke(req, res);
             } else {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown action");
             }
@@ -148,14 +148,18 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         credentials.setExpiration(cal.getTime());
     }
 
-    private void handleRevoke(HttpServletResponse res) throws Exception {
+    private void handleRevoke(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        final String orcid = req.getParameter("orcid");
+        if (orcid == null) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "ORCID is required");
+        }
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        final MCRORCIDCredentials credentials = orcidUser.getCredentials();
+        final MCRORCIDCredentials credentials = orcidUser.getCredentials(orcid);
         if (credentials != null) {
             try {
                 final String token = credentials.getAccessToken();
                 MCRORCIDOAuthClient.getInstance().revokeToken(token);
-                orcidUser.removeAllCredentials();
+                orcidUser.removeCredentials(orcid);
                 res.sendRedirect(userProfileURL);
             } catch (Exception e) {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST);

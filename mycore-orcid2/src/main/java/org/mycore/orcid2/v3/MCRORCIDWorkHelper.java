@@ -29,14 +29,21 @@ import jakarta.xml.bind.JAXBException;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.MCRException;
+import org.mycore.common.content.MCRContent;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid2.MCRORCIDUtils;
+import org.mycore.orcid2.client.MCRORCIDClient;
+import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
+import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkSummaryTransformer;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformer;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
+import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.xml.sax.SAXException;
 
 /**
@@ -118,6 +125,29 @@ public class MCRORCIDWorkHelper {
             modslist.add(MCRORCIDWorkTransformer.getInstance().transformToMODS(work).detach());
         }
         return modslist;
+    }
+
+    public static long publishToORCID(MCRObject object, MCRORCIDCredentials credentials)
+        throws MCRException, MCRORCIDRequestException {
+        final MCRORCIDClient memberClient = MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials);
+        try {
+            final Works works = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class);
+            final List<WorkSummary> summaries
+                = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
+            final MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(object.getId());
+            final Work transformedWork = MCRORCIDWorkTransformer.getInstance().transformToWork(content);
+            final WorkSummary work = findMatchingSummaries(object, summaries).findFirst()
+                .orElse(null);
+            if (work != null) {
+                // TODO check if need to set put code in model...
+                // TODO check if update is required
+                memberClient.update(MCRORCIDSectionImpl.WORK, work.getPutCode(), transformedWork);
+                return work.getPutCode();
+            }
+            return memberClient.create(MCRORCIDSectionImpl.WORK, transformedWork);
+        } catch (IOException | JAXBException e) {
+            throw new MCRException(e);
+        }
     }
 
     /**

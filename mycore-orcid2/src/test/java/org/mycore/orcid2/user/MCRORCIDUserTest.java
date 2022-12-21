@@ -28,9 +28,7 @@ import org.junit.Test;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRJPATestCase;
-import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserAttribute;
 import org.mycore.user2.MCRUserManager;
 
 public class MCRORCIDUserTest extends MCRJPATestCase {
@@ -42,17 +40,17 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         MCRUser user = new MCRUser("junit");
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-        assertNull(orcidUser.getCredentials());
+        assertEquals(0, orcidUser.listCredentials().size());
         final MCRORCIDCredentials credentials = new MCRORCIDCredentials("orcid", "accessToken");
         orcidUser.storeCredentials(credentials);
         assertEquals(2, user.getAttributes().size()); // id_orcid + orcid_credentials_orcid
         assertNotNull(user.getUserAttribute("orcid_credentials_orcid"));
-        assertEquals("orcid", user.getUserAttribute("id_orcid"));
-        assertEquals(credentials, orcidUser.getCredentials());
+        assertEquals(credentials.getORCID(), user.getUserAttribute("id_orcid"));
+        assertEquals(credentials, orcidUser.getCredentials(credentials.getORCID()));
     }
 
     @Test
-    public void testRemoveCredentials() {
+    public void testRemoveAllCredentials() {
         MCRUser user = new MCRUser("junit");
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
@@ -63,16 +61,6 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         assertEquals(2, user.getAttributes().size()); // id_orcid + test
         assertEquals("orcid", user.getUserAttribute("id_orcid"));
         assertEquals("test", user.getUserAttribute("test"));
-    }
-
-    @Test(expected = MCRORCIDException.class)
-    public void testMoreThanOneCredentials() {
-        final MCRUser user = new MCRUser("junit");
-        MCRUserManager.createUser(user);
-        user.getAttributes().add(new MCRUserAttribute("orcid_credentials_foo", "foo"));
-        user.getAttributes().add(new MCRUserAttribute("orcid_credentials_bar", "bar"));
-        new MCRORCIDUser(user).getCredentials(); // exception
-        MCRUserManager.deleteUser(user);
     }
 
     @Test

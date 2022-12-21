@@ -42,24 +42,22 @@ public class MCRORCIDResource {
      *
      * {
      *   orcids: ['0000-0001-5484-889X'],
-     *   trustedOrcid: null,
+     *   trustedOrcid: [],
      * }
      * @return the user status
      */
     @GET
     @Path("userStatus")
     @Produces(MediaType.APPLICATION_JSON)
-    public MCRORCIDUserStatus getUserStatusSummary() throws WebApplicationException {
+    public MCRORCIDUserStatus getUserStatus() throws WebApplicationException {
         if (isCurrentUserGuest()) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
         final MCRORCIDUser user = MCRORCIDSessionUtils.getCurrentUser();
         final String[] orcids = user.getORCIDs().toArray(String[]::new);
-        final MCRORCIDCredentials credentials = user.getCredentials();
-        if (credentials == null) {
-            return new MCRORCIDUserStatus(orcids, null);
-        }
-        return new MCRORCIDUserStatus(orcids, credentials.getORCID());
+        final String[] credentials =
+            user.listCredentials().stream().map(MCRORCIDCredentials::getORCID).toArray(String[]::new);
+        return new MCRORCIDUserStatus(orcids, credentials);
     }
 
     private boolean isCurrentUserGuest() {
@@ -71,19 +69,19 @@ public class MCRORCIDResource {
 
         private String[] orcids;
 
-        private String trustedOrcid;
+        private String[] trustedOrcids;
 
-        MCRORCIDUserStatus(String[] orcids, String trustedOrcid) {
+        MCRORCIDUserStatus(String[] orcids, String[] trustedOrcids) {
             this.orcids = orcids;
-            this.trustedOrcid = trustedOrcid;
+            this.trustedOrcids = trustedOrcids;
         }
 
         public String[] getOrcids() {
             return orcids;
         }
 
-        public String getTrustedOrcid() {
-            return trustedOrcid;
+        public String[] getTrustedOrcids() {
+            return trustedOrcids;
         }
     }
 }
