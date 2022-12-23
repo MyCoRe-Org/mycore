@@ -18,11 +18,15 @@
 
 package org.mycore.orcid2.resources;
 
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 import org.mycore.common.MCRSessionMgr;
@@ -42,7 +46,7 @@ public class MCRORCIDResource {
      *
      * {
      *   orcids: ['0000-0001-5484-889X'],
-     *   trustedOrcid: [],
+     *   trustedOrcids: ['0000-0001-5484-889X'],
      * }
      * @return the user status
      */
@@ -58,6 +62,40 @@ public class MCRORCIDResource {
         final String[] credentials =
             user.listCredentials().stream().map(MCRORCIDCredentials::getORCID).toArray(String[]::new);
         return new MCRORCIDUserStatus(orcids, credentials);
+    }
+
+    @GET
+    @Path("revoke")
+    public Response revoke(@PathParam("orcid") String orcid) throws WebApplicationException {
+        if (orcid == null) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        if (isCurrentUserGuest()) {
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        }
+        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+        try {
+            orcidUser.revokeCredentials(orcid);
+            return Response.ok().build();
+        } catch (Exception e) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+    }
+
+    @POST
+    @Path("storeCredentials")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response storeCredentials(MCRORCIDCredentials credentials) {
+        if (credentials == null) {
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+        if (isCurrentUserGuest()) {
+            throw new WebApplicationException(Status.UNAUTHORIZED);
+        }
+        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
+        // validate credentials
+        orcidUser.storeCredentials(credentials);
+        return Response.ok().build();
     }
 
     private boolean isCurrentUserGuest() {

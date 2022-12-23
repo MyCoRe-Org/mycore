@@ -34,6 +34,7 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.user2.MCRUser;
@@ -193,6 +194,21 @@ public class MCRORCIDUser {
         final MCRORCIDCredentials credentials = deserializeCredentials(credentialsString);
         credentials.setORCID(orcid);
         return credentials;
+    }
+
+    /**
+     * Revokes orcid access token by orcid.
+     * 
+     * @param orcid the orcid
+     * @throws MCRORCIDException if revoke request fails
+     */
+    public void revokeCredentials(String orcid) throws MCRORCIDException {
+        final MCRORCIDCredentials credentials = getCredentials(orcid);
+        if (credentials == null) {
+            throw new MCRORCIDException("Credentials do not exist.");
+        }
+        MCRORCIDOAuthClient.getInstance().revokeToken(credentials.getAccessToken());
+        removeCredentials(orcid);
     }
 
     /**

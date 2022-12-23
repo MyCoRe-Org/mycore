@@ -45,7 +45,6 @@ import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
-import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -107,8 +106,6 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         } else if (action != null) {
             if ("auth".equalsIgnoreCase(action)) {
                 handleAuth(req, res);
-            } else if ("revoke".equalsIgnoreCase(action)) {
-                handleRevoke(req, res);
             } else {
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown action");
             }
@@ -146,27 +143,6 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         cal.add(Calendar.SECOND, Integer.parseInt(credentials.getExpiresIn()));
         cal.add(Calendar.MINUTE, -1); // subtract request time
         credentials.setExpiration(cal.getTime());
-    }
-
-    private void handleRevoke(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        final String orcid = req.getParameter("orcid");
-        if (orcid == null) {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "ORCID is required");
-        }
-        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        final MCRORCIDCredentials credentials = orcidUser.getCredentials(orcid);
-        if (credentials != null) {
-            try {
-                final String token = credentials.getAccessToken();
-                MCRORCIDOAuthClient.getInstance().revokeToken(token);
-                orcidUser.removeCredentials(orcid);
-                res.sendRedirect(userProfileURL);
-            } catch (Exception e) {
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            }
-        } else {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-        }
     }
 
     private void handleAuth(HttpServletRequest req, HttpServletResponse res) throws Exception {
