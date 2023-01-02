@@ -34,6 +34,8 @@
   -->
   <xsl:param name="MCR.MODS.Utils.ccTextLink" />
 
+  <xsl:variable name="nbsp" select="'&#xa0;'"/>
+
   <xsl:import href="resource:xsl/functions/stringutils.xsl" />
   <xsl:import href="resource:xsl/functions/i18n.xsl" />
 
@@ -136,7 +138,8 @@
         <xsl:if test="$withSubtitle and $alternateContent/subTitle">
           <span class="subtitle">
             <span class="delimiter">
-              <xsl:text> : </xsl:text>
+              <xsl:value-of select="$nbsp" />
+              <xsl:text>: </xsl:text>
             </span>
             <xsl:apply-templates select="$alternateContent/subTitle/node()" mode="unescapeHtml" />
           </span>
@@ -150,7 +153,8 @@
         <xsl:if test="$withSubtitle and mods:subTitle">
           <span class="subtitle">
             <span class="delimiter">
-              <xsl:text> : </xsl:text>
+              <xsl:value-of select="$nbsp" />
+              <xsl:text>: </xsl:text>
             </span>
             <xsl:value-of select="mods:subTitle" />
           </span>
