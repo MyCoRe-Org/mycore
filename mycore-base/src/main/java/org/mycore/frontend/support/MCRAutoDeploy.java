@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import jakarta.servlet.ServletRegistration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -237,15 +238,23 @@ public class MCRAutoDeploy implements MCRStartupHandler.AutoExecutable {
                                     .findFirst()
                                     .ifPresent(mapping -> {
                                         LOGGER.info("Register Servlet {} ({})...", name, className);
-                                        Optional.ofNullable(servletContext.addServlet(name, className))
-                                            .<Runnable>map(sr -> () -> mapping.getChildren("url-pattern", ns).stream()
-                                                .forEach(url -> {
-                                                    LOGGER.info("...add url mapping: {}",
-                                                        url.getTextTrim());
-                                                    sr.addMapping(url.getTextTrim());
-                                                }))
-                                            .orElse(() -> LOGGER.error("Servlet{} already registered!", name))
-                                            .run();
+                                        ServletRegistration.Dynamic sr = servletContext.addServlet(name, className);
+
+                                        if(sr != null) {
+                                            mapping.getChildren("url-pattern", ns).forEach(url -> {
+                                                LOGGER.info("...add url mapping: {}", url.getTextTrim());
+                                                sr.addMapping(url.getTextTrim());
+                                            });
+
+                                            servlet.getChildren("init-param", ns).forEach(param -> {
+                                                LOGGER.info("...add init-param: {}", param.getTextTrim());
+                                                String paramName = param.getChildText("param-name", ns);
+                                                String paramValue = param.getChildText("param-value", ns);
+                                                sr.setInitParameter(paramName, paramValue);
+                                            });
+                                        } else {
+                                            LOGGER.warn("Servlet {} already registered!", name);
+                                        }
                                     });
                             });
                         } catch (IOException | JDOMException e) {
