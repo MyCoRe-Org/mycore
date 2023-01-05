@@ -46,11 +46,9 @@ public class MCRPIServiceManager {
             .collect(Collectors.toList());
     }
 
-    public List<MCRPIJobService<MCRPersistentIdentifier>> getAutoCreationList() {
+    public List<MCRPIService<MCRPersistentIdentifier>> getAutoCreationList() {
         return getServiceList()
             .stream()
-            .filter(service -> service instanceof MCRPIJobService)
-            .map(s -> (MCRPIJobService<MCRPersistentIdentifier>) s)
             .filter(service -> MCRConfiguration2
                 .getString(REGISTRATION_SERVICE_CONFIG_PREFIX + service.getServiceID() + "." +
                     CREATION_PREDICATE)
