@@ -8,8 +8,9 @@ jobs:
     uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v3
     with:
       ff-os: 'ubuntu-20.04'
+      ff-jdk-distribution: 'adopt'
       ff-site-goal: ''
-      ff-goal: '-X -Plocal-testing,!standard-with-extra-repos -Dlog4j.configurationFile=$PWD/ci/log4j2.xml verify'
+      ff-goal: '-Plocal-testing,!standard-with-extra-repos -Dlog4j.configurationFile=$PWD/ci/log4j2.xml verify'
       verify-goal: '-P !standard-with-extra-repos -Dlog4j.configurationFile=$PWD/ci/log4j2.xml verify'
       failure-upload-path: |
         ./**/surefire-reports
