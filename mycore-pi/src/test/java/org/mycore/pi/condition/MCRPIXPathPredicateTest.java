@@ -36,6 +36,10 @@ public class MCRPIXPathPredicateTest extends MCRTestCase {
 
     private static final String MOCK_SERVICE_3 = "MOCK3";
 
+    private static final String MOCK_SERVICE_4 = "MOCK4";
+
+    private static final String MOCK_SERVICE_5 = "MOCK5";
+
     @Test
     public void test1() {
         MCRObjectID testID = MCRObjectID.getInstance("my_test_00000001");
@@ -57,10 +61,16 @@ public class MCRPIXPathPredicateTest extends MCRTestCase {
             .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_2 + ".CreationPredicate").test(mcrObject);
         final boolean mock3Result = MCRPIJobService
             .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate").test(mcrObject);
+        final boolean mock4Result = MCRPIJobService
+            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate").test(mcrObject);
+        final boolean mock5Result = MCRPIJobService
+            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_5 + ".CreationPredicate").test(mcrObject);
 
         Assert.assertTrue(mock1Result);
         Assert.assertFalse(mock2Result);
         Assert.assertTrue(mock3Result);
+        Assert.assertFalse(mock4Result);
+        Assert.assertTrue(mock5Result);
     }
 
     @Override
@@ -81,6 +91,16 @@ public class MCRPIXPathPredicateTest extends MCRTestCase {
             .put("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate", MCRPIXPathPredicate.class.getName());
         testProperties
             .put("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate.XPath", "/mycoreobject/metadata/test1/test2");
+
+        testProperties
+            .put("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate", MCRPIXPathPredicate.class.getName());
+        testProperties
+            .put("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate.XPath", "false()");
+
+        testProperties
+            .put("MCR.PI.Service." + MOCK_SERVICE_5 + ".CreationPredicate", MCRPIXPathPredicate.class.getName());
+        testProperties
+            .put("MCR.PI.Service." + MOCK_SERVICE_5 + ".CreationPredicate.XPath", "true()");
 
         testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
 
