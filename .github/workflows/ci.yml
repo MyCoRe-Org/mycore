@@ -7,6 +7,7 @@ jobs:
     name: Verify
     uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v3
     with:
+      ff-os: 'ubuntu-20.04'
       ff-site-goal: ''
       ff-goal: '-X -Plocal-testing,!standard-with-extra-repos -Dlog4j.configurationFile=$PWD/ci/log4j2.xml verify'
       verify-goal: '-P !standard-with-extra-repos -Dlog4j.configurationFile=$PWD/ci/log4j2.xml verify'
@@ -19,6 +20,6 @@ jobs:
       matrix-exclude: >
         [
           {"os": "macOS-latest"},
-          {"jdk": ["8", "11"]}
+          {"jdk": ["8"]}
         ]
 
