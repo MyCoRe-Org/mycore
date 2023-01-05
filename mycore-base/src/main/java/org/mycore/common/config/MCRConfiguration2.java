@@ -18,10 +18,6 @@
 
 package org.mycore.common.config;
 
-import org.apache.logging.log4j.LogManager;
-import org.mycore.common.MCRClassTools;
-import org.mycore.common.function.MCRTriConsumer;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -33,6 +29,10 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.mycore.common.MCRClassTools;
+import org.mycore.common.function.MCRTriConsumer;
 
 /**
  * Provides methods to manage and read all configuration properties from the MyCoRe configuration files.
@@ -84,7 +84,7 @@ public class MCRConfiguration2 {
 
     private static ConcurrentHashMap<UUID, EventListener> LISTENERS = new ConcurrentHashMap<>();
 
-    static ConcurrentHashMap<SingletonKey, Object> instanceHolder = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<SingletonKey, Object> instanceHolder = new MCRConcurrentHashMap<>();
 
     public static Map<String, String> getPropertiesMap() {
         return Collections.unmodifiableMap(MCRConfigurationBase.getResolvedProperties().getAsMap());
