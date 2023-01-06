@@ -70,26 +70,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         MCR_document_00000001 = new XMLInfo("MCR_document_00000001",
             "<object id=\"MCR_document_00000001\"/>".getBytes(StandardCharsets.UTF_8), new Date());
     }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        for (File projectDir : getStoreBaseDir().toFile().listFiles()) {
-            for (File typeDir : projectDir.listFiles()) {
-                Files.walkFileTree(typeDir.toPath(), MCRRecursiveDeleter.instance());
-                typeDir.mkdir();
-            }
-        }
-        for (File projectDir : getSvnBaseDir().toFile().listFiles()) {
-            for (File typeDir : projectDir.listFiles()) {
-                Files.walkFileTree(typeDir.toPath(), MCRRecursiveDeleter.instance());
-                typeDir.mkdir();
-                SVNRepositoryFactory.createLocalRepository(typeDir, true, false);
-            }
-        }
-        super.tearDown();
-    }
-
+    
     static Document getDocument(InputStream in) throws JDOMException, IOException {
         try {
             return SAX_BUILDER.build(in);
