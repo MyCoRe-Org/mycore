@@ -81,25 +81,6 @@ Applications based on MyCoRe use a common core, which provides the functionality
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-toolchains-plugin</artifactId>
-          <version>${maven-toolchains-plugin.version}</version>
-          <configuration>
-            <toolchains>
-              <jdk>
-                <version>[${java.target.version},)</version>
-              </jdk>
-            </toolchains>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>toolchain</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <configuration>
             <archive>
