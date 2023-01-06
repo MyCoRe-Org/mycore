@@ -7,6 +7,7 @@ jobs:
     name: Verify
     uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v3
     with:
+      jdk-matrix: '["11", "17"]'
       ff-os: 'ubuntu-20.04'
       ff-jdk-distribution: 'adopt'
       ff-site-run: false
@@ -20,7 +21,6 @@ jobs:
         ./**/*test.log
       matrix-exclude: >
         [
-          {"os": "macOS-latest"},
-          {"jdk": ["8"]}
+          {"os": "macOS-latest"}
         ]
 
