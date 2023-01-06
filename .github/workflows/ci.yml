@@ -11,8 +11,8 @@ jobs:
       ff-os: 'ubuntu-20.04'
       ff-jdk-distribution: 'adopt'
       ff-site-run: false
-      ff-goal: '-Plocal-testing,!standard-with-extra-repos -Dlog4j.configurationFile=$PWD/ci/log4j2.xml verify'
-      verify-goal: '-P !standard-with-extra-repos -Dlog4j.configurationFile=$PWD/ci/log4j2.xml verify'
+      ff-goal: '-Plocal-testing,!standard-with-extra-repos -D"log4j.configurationFile"="$GITHUB_WORKSPACE/ci/log4j2.xml" verify'
+      verify-goal: '-P !standard-with-extra-repos verify'
       failure-upload-path: |
         ./**/surefire-reports
         ./**/failsafe-reports
