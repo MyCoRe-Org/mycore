@@ -97,9 +97,12 @@ public class MCRIFSCopyTest extends MCRIFSTest {
 
     @Override
     public void tearDown() throws Exception {
-        MCRMetadataManager.delete(derivate);
-        MCRMetadataManager.delete(root);
-        super.tearDown();
+        try {
+            MCRMetadataManager.delete(derivate);
+            MCRMetadataManager.delete(root);
+        } finally {
+            super.tearDown();
+        }
     }
 
     public static void copy(String from, String to, MCRDerivate derivate) throws IOException {

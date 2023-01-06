@@ -70,7 +70,7 @@ public class MCRXMLMetadataManagerTest extends MCRStoreTestCase {
         MCR_document_00000001 = new XMLInfo("MCR_document_00000001",
             "<object id=\"MCR_document_00000001\"/>".getBytes(StandardCharsets.UTF_8), new Date());
     }
-    
+
     static Document getDocument(InputStream in) throws JDOMException, IOException {
         try {
             return SAX_BUILDER.build(in);
