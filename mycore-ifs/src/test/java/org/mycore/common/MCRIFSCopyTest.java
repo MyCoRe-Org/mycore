@@ -32,6 +32,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
 import org.junit.Test;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -100,6 +101,8 @@ public class MCRIFSCopyTest extends MCRIFSTest {
         try {
             MCRMetadataManager.delete(derivate);
             MCRMetadataManager.delete(root);
+        } catch (Exception e) {
+            LogManager.getLogger().warn("Error while removing test data.", e);
         } finally {
             super.tearDown();
         }
