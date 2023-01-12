@@ -5,4 +5,11 @@
 
   <!-- Rest-API is handled by jersey-servlet-container -->
 
+  <name>mycore_restapi</name>
+  <ordering>
+    <after>
+      <name>mycore_base</name>
+    </after>
+  </ordering>
+
 </web-fragment>

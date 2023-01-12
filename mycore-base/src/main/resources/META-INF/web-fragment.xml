@@ -3,10 +3,12 @@
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
   metadata-complete="true">
 
-  <name>mycore</name>
-  <!-- **************************************************************** -->
-  <!-- Servlets and mapping from MyCoRe kernel -->
-  <!-- **************************************************************** -->
+  <name>mycore_base</name>
+  <ordering>
+    <before>
+      <others />
+    </before>
+  </ordering>
 
   <listener>
     <listener-class>org.mycore.common.events.MCRServletContextListener</listener-class>

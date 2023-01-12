@@ -3,6 +3,13 @@
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
   metadata-complete="true">
 
+  <name>mycore_classbrowser</name>
+  <ordering>
+    <after>
+      <name>mycore_base</name>
+    </after>
+  </ordering>
+
   <servlet id="ClassificationBrowser2">
     <servlet-name>ClassificationBrowser2</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRClassificationBrowser2</servlet-class>

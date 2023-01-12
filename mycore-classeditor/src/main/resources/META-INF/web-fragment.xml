@@ -3,6 +3,13 @@
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
   metadata-complete="true">
 
+  <name>mycore_classeditor</name>
+  <ordering>
+    <after>
+      <name>mycore_base</name>
+    </after>
+  </ordering>
+
   <listener>
     <listener-class>org.mycore.frontend.classeditor.listener.MCRClassificationListener</listener-class>
   </listener>

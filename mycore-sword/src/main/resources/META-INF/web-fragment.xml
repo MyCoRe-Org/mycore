@@ -2,11 +2,16 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
   metadata-complete="true">
-  
-<!-- **************************************************************** -->
-<!-- Servlets and mappings of mycore-sword -->
-<!-- Multi-Part servlets are configured via org.mycore.sword.MCRSwordMultiPartServletDeployer -->
-<!-- **************************************************************** -->
+
+  <name>mycore_sword</name>
+  <ordering>
+    <after>
+      <name>mycore_base</name>
+    </after>
+  </ordering>
+
+
+  <!-- Multi-Part servlets are configured via org.mycore.sword.MCRSwordMultiPartServletDeployer -->
   <servlet>
     <servlet-name>MCRSword2ServiceDocumentServlet</servlet-name>
     <servlet-class>org.mycore.sword.servlets.MCRSwordServiceDocumentServlet</servlet-class>
