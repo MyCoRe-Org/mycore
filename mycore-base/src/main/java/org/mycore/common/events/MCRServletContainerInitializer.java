@@ -24,6 +24,7 @@ import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -71,6 +72,15 @@ public class MCRServletContainerInitializer implements ServletContainerInitializ
                 e.printStackTrace();
             }
             logger.debug("This class is here: {}", getSource(this.getClass()));
+        }
+
+        //see  https://jakarta.ee/specifications/platform/9/apidocs/jakarta/servlet/servletcontext#ORDERED_LIBS
+        @SuppressWarnings("unchecked")
+        List<String> loadOrderWebFragments = (List<String>) ctx.getAttribute(ServletContext.ORDERED_LIBS);
+        if (loadOrderWebFragments == null) {
+            logger.info("Loading Order by web-fragment.xml: NOT SPECIFIED");
+        } else {
+            logger.info("Loading Order by web-fragment.xml: " + String.join(", ", loadOrderWebFragments));
         }
     }
 
