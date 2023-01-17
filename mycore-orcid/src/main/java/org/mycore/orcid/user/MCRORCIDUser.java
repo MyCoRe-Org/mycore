@@ -145,9 +145,13 @@ public class MCRORCIDUser {
 
         List<Element> nameIdentifiers = wrapper.getElements(xPath);
         for (Element nameIdentifier : nameIdentifiers) {
-            String key = buildNameIdentifierKey(nameIdentifier.getAttributeValue("type"), nameIdentifier.getText());
-            LOGGER.info("found name identifier in publication: " + key);
-            identifierKeys.add(key);
+            if (!"".equals(nameIdentifier.getAttributeValue("type"))) {
+                String key = buildNameIdentifierKey(nameIdentifier.getAttributeValue("type"), nameIdentifier.getText());
+                LOGGER.info("found name identifier in publication: " + key);
+                identifierKeys.add(key);
+            } else {
+                LOGGER.info("found name identifier without type, skipping");
+            }
         }
         return identifierKeys;
     }
