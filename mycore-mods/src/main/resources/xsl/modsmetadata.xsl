@@ -20,12 +20,13 @@
     <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name($nodes[1])))" />
     <xsl:param name="sep" select="''" />
     <xsl:param name="property" select="''" />
+    <xsl:param name="filter" select="'true'" />
     <xsl:variable name="selectPresentLang">
       <xsl:call-template name="selectPresentLang">
         <xsl:with-param name="nodes" select="$nodes" />
       </xsl:call-template>
     </xsl:variable>
-    <xsl:variable name="filteredNodes" select="$nodes[not(@xml:lang) or @xml:lang=$selectPresentLang]"/>
+    <xsl:variable name="filteredNodes" select="$nodes[not($filter='true') or (not(@xml:lang) or @xml:lang=$selectPresentLang)]"/>
     <xsl:call-template name="printMetaDate.mods.filtered">
       <xsl:with-param name="nodes" select="$filteredNodes"/>
       <xsl:with-param name="label" select="$label"/>
