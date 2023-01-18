@@ -82,7 +82,7 @@ public class MCRUploadResource {
 
     private static final String FILE_PROCESSOR_PROPERTY = "MCR.MCRUploadHandlerIFS.FileProcessors";
 
-    private static final String IGNORE_MAINFILE_PROPERTY = "MCR.Upload.IgnoreFiletypeForMainfile";
+    private static final String IGNORE_MAINFILE_PROPERTY = "MCR.Upload.NotPreferredFiletypeForMainfile";
 
     private static final List<MCRPostUploadFileProcessor> FILE_PROCESSORS = initProcessorList();
 
