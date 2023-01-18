@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaEnrichedLinkID;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
@@ -66,14 +67,32 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
                         .anyMatch(type::equals)) {
                         final String maindoc = derLink.getMainDoc();
                         if (maindoc != null) {
-                            final MCRTileInfo mcrTileInfo = new MCRTileInfo(derLink.getXLinkHref(), maindoc, null);
-                            final Optional<Path> tileFile = this.tileFileProvider.getTileFile(mcrTileInfo);
-                            if (tileFile.isPresent() && Files.exists(tileFile.get())) {
-                                return mcrTileInfo;
+                            Optional<MCRTileInfo> tileInfoForFile = createTileInfoForFile(derLink.getXLinkHref(),
+                                maindoc);
+                            if (tileInfoForFile.isPresent()) {
+                                return tileInfoForFile.get();
                             }
                         }
                     }
                 }
+            }
+            Optional<String> linkedImage = MCRLinkTableManager.instance()
+                .getDestinationOf(mcrID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK).stream().findFirst();
+            if (linkedImage.isPresent()) {
+                MCRObjectID deriID = MCRObjectID.getInstance(
+                    linkedImage.get().substring(0, linkedImage.get().indexOf("/")));
+                MCRDerivate deri = MCRMetadataManager.retrieveMCRDerivate(deriID);
+                if (deri.getDerivate().getClassifications().stream()
+                    .map(classi -> classi.getClassId() + ":" + classi.getCategId())
+                    .anyMatch(derivateTypes::contains)) {
+                    Optional<MCRTileInfo> tileInfoForFile = createTileInfoForFile(
+                        deriID.toString(),
+                        linkedImage.get().substring(linkedImage.get().indexOf("/") + 1));
+                    if (tileInfoForFile.isPresent()) {
+                        return tileInfoForFile.get();
+                    }
+                }
+
             }
         }
         throw new MCRIIIFImageNotFoundException(id);
@@ -84,5 +103,14 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
         return MCRAccessManager.checkPermission(identifier, MCRAccessManager.PERMISSION_PREVIEW) ||
             MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_VIEW) ||
             MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ);
+    }
+
+    private Optional<MCRTileInfo> createTileInfoForFile(String derID, String file) {
+        final MCRTileInfo mcrTileInfo = new MCRTileInfo(derID, file, null);
+        final Optional<Path> tileFile = this.tileFileProvider.getTileFile(mcrTileInfo);
+        if (tileFile.isPresent() && Files.exists(tileFile.get())) {
+            return Optional.of(mcrTileInfo);
+        }
+        return Optional.empty();
     }
 }
