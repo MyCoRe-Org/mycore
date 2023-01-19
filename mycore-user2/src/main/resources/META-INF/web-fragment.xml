@@ -3,6 +3,13 @@
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
   metadata-complete="true">
 
+  <name>mycore_user2</name>
+  <ordering>
+    <after>
+      <name>mycore</name>
+    </after>
+  </ordering>
+
   <servlet id="MCRUserServlet">
     <servlet-name>MCRUserServlet</servlet-name>
     <servlet-class>org.mycore.user2.MCRUserServlet</servlet-class>
