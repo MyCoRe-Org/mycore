@@ -6,7 +6,7 @@
   <name>mycore_xeditor</name>
   <ordering>
     <after>
-      <name>mycore_base</name>
+      <name>mycore</name>
     </after>
   </ordering>
 

@@ -8,7 +8,7 @@
   <name>mycore_restapi</name>
   <ordering>
     <after>
-      <name>mycore_base</name>
+      <name>mycore</name>
     </after>
   </ordering>
 
