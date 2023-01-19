@@ -59,40 +59,13 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
             MCRDerivate mcrDer = MCRMetadataManager.retrieveMCRDerivate(mcrID);
             return new MCRTileInfo(mcrID.toString(), mcrDer.getDerivate().getInternals().getMainDoc(), null);
         } else {
-            MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrID);
-            for (String type : derivateTypes) {
-                for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
-                    if (derLink.getClassifications().stream()
-                        .map(MCRCategoryID::toString)
-                        .anyMatch(type::equals)) {
-                        final String maindoc = derLink.getMainDoc();
-                        if (maindoc != null) {
-                            Optional<MCRTileInfo> tileInfoForFile = createTileInfoForFile(derLink.getXLinkHref(),
-                                maindoc);
-                            if (tileInfoForFile.isPresent()) {
-                                return tileInfoForFile.get();
-                            }
-                        }
-                    }
-                }
+            Optional<MCRTileInfo> tileInfoForMCRObject = createTileInfoForMCRObject(mcrID);
+            if (tileInfoForMCRObject.isPresent()) {
+                return tileInfoForMCRObject.get();
             }
-            Optional<String> linkedImage = MCRLinkTableManager.instance()
-                .getDestinationOf(mcrID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK).stream().findFirst();
-            if (linkedImage.isPresent()) {
-                MCRObjectID deriID = MCRObjectID.getInstance(
-                    linkedImage.get().substring(0, linkedImage.get().indexOf("/")));
-                MCRDerivate deri = MCRMetadataManager.retrieveMCRDerivate(deriID);
-                if (deri.getDerivate().getClassifications().stream()
-                    .map(classi -> classi.getClassId() + ":" + classi.getCategId())
-                    .anyMatch(derivateTypes::contains)) {
-                    Optional<MCRTileInfo> tileInfoForFile = createTileInfoForFile(
-                        deriID.toString(),
-                        linkedImage.get().substring(linkedImage.get().indexOf("/") + 1));
-                    if (tileInfoForFile.isPresent()) {
-                        return tileInfoForFile.get();
-                    }
-                }
-
+            Optional<MCRTileInfo> tileInfoForDerivateLink = createTileInfoForDerivateLink(mcrID);
+            if (tileInfoForDerivateLink.isPresent()){
+                return tileInfoForDerivateLink.get();
             }
         }
         throw new MCRIIIFImageNotFoundException(id);
@@ -103,6 +76,43 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
         return MCRAccessManager.checkPermission(identifier, MCRAccessManager.PERMISSION_PREVIEW) ||
             MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_VIEW) ||
             MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ);
+    }
+
+    private Optional<MCRTileInfo> createTileInfoForMCRObject(MCRObjectID mcrID) {
+        MCRObject mcrObj = MCRMetadataManager.retrieveMCRObject(mcrID);
+        for (String type : derivateTypes) {
+            for (MCRMetaEnrichedLinkID derLink : mcrObj.getStructure().getDerivates()) {
+                if (derLink.getClassifications().stream()
+                    .map(MCRCategoryID::toString)
+                    .anyMatch(type::equals)) {
+                    final String maindoc = derLink.getMainDoc();
+                    if (maindoc != null) {
+                        Optional<MCRTileInfo> tileInfoForFile = createTileInfoForFile(derLink.getXLinkHref(), maindoc);
+                        if (tileInfoForFile.isPresent()) {
+                            return tileInfoForFile;
+                        }
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<MCRTileInfo> createTileInfoForDerivateLink(MCRObjectID mcrID) {
+        Optional<String> linkedImage = MCRLinkTableManager.instance()
+            .getDestinationOf(mcrID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE_LINK).stream().findFirst();
+        if (linkedImage.isPresent()) {
+            MCRObjectID deriID = MCRObjectID.getInstance(
+                linkedImage.get().substring(0, linkedImage.get().indexOf("/")));
+            MCRDerivate deri = MCRMetadataManager.retrieveMCRDerivate(deriID);
+            if (deri.getDerivate().getClassifications().stream()
+                .map(classi -> classi.getClassId() + ":" + classi.getCategId())
+                .anyMatch(derivateTypes::contains)) {
+                return createTileInfoForFile(deriID.toString(),
+                    linkedImage.get().substring(linkedImage.get().indexOf("/") + 1));
+            }
+        }
+        return Optional.empty();
     }
 
     private Optional<MCRTileInfo> createTileInfoForFile(String derID, String file) {
