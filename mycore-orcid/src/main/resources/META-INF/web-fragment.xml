@@ -3,10 +3,6 @@
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
   metadata-complete="true">
 
-  <!-- **************************************************************** -->
-  <!-- MyCoRe ORCID integration -->
-  <!-- **************************************************************** -->
-
   <name>mycore_orcid</name>
   <ordering>
     <after>
