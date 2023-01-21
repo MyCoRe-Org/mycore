@@ -51,11 +51,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     @Override
     protected MCRTileInfo createTileInfo(String id) throws MCRIIIFImageNotFoundException {
-        if (!MCRObjectID.isValid(id)) {
-            throw new MCRIIIFImageNotFoundException(id);
-        }
-
-        MCRObjectID mcrID = MCRObjectID.getInstance(id);
+        MCRObjectID mcrID = calculateMCRObjectID(id).orElseThrow(() -> new MCRIIIFImageNotFoundException(id));
         if (mcrID.getTypeId().equals("derivate")) {
             MCRDerivate mcrDer = MCRMetadataManager.retrieveMCRDerivate(mcrID);
             return new MCRTileInfo(mcrID.toString(), mcrDer.getDerivate().getInternals().getMainDoc(), null);
@@ -65,7 +61,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
                 return tileInfoForMCRObject.get();
             }
             Optional<MCRTileInfo> tileInfoForDerivateLink = createTileInfoForDerivateLink(mcrID);
-            if (tileInfoForDerivateLink.isPresent()){
+            if (tileInfoForDerivateLink.isPresent()) {
                 return tileInfoForDerivateLink.get();
             }
         }
@@ -74,9 +70,25 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     @Override
     protected boolean checkPermission(String identifier, MCRTileInfo tileInfo) {
-        return MCRAccessManager.checkPermission(identifier, MCRAccessManager.PERMISSION_PREVIEW) ||
-            MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_VIEW) ||
-            MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ);
+        Optional<MCRObjectID> mcrObjId = calculateMCRObjectID(identifier);
+        if (mcrObjId.isPresent()) {
+            return MCRAccessManager.checkPermission(mcrObjId.get(), MCRAccessManager.PERMISSION_PREVIEW) ||
+                MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_VIEW) ||
+                MCRAccessManager.checkPermission(tileInfo.getDerivate(), MCRAccessManager.PERMISSION_READ);
+        }
+        return false;
+    }
+
+    /**
+     * Builds a MyCoRe Object ID from the given IIIF image id parameter.
+     * 
+     * Subclasses may override it.
+     *
+     * @param id the IIIF image id parameter
+     * @return an Optional containing the MyCoRe ID
+     */
+    protected Optional<MCRObjectID> calculateMCRObjectID(String id) {
+        return MCRObjectID.isValid(id) ? Optional.of(MCRObjectID.getInstance(id)) : Optional.empty();
     }
 
     private Optional<MCRTileInfo> createTileInfoForMCRObject(MCRObjectID mcrID) {
