@@ -25,6 +25,7 @@ import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -115,7 +116,7 @@ public class MCRFileSystemEventTest extends MCRTestCase {
     }
 
     @Test
-    public void testFiles() throws IOException {
+    public void testFiles() throws IOException, InterruptedException {
         Path file = derivateRoot.resolve("File.txt");
         Assert.assertTrue(register.getEntries().isEmpty());
         Files.createFile(file);
@@ -126,7 +127,17 @@ public class MCRFileSystemEventTest extends MCRTestCase {
         Assert.assertEquals(1, register.getEntries().size());
         Assert.assertEquals(1, countEvents(MCREvent.EventType.UPDATE));
         register.clear();
-        Files.delete(file);
+        //Windows fails to delete file here
+        try {
+            Files.delete(file);
+        } catch (AccessDeniedException ade) {
+            LogManager.getLogger().warn("Error while deleting " + file, ade);
+            for (int i = 0; i < 5; i++) {
+                LogManager.getLogger().info("Try #" + (i + 1));
+                Thread.sleep(5000);
+                Files.deleteIfExists(file);
+            }
+        }
         Assert.assertEquals(1, register.getEntries().size());
         Assert.assertEquals(1, countEvents(MCREvent.EventType.DELETE));
         register.clear();
