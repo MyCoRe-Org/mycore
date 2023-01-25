@@ -182,37 +182,42 @@ public class MCRDerivateServlet extends MCRServlet {
         }
 
         boolean updateMainFile = false;
-        MCRDerivate derivate;
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdStr);
-        if (MCRMetadataManager.exists(derivateId)) {
-            derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
-            internals = derivate.getDerivate().getInternals();
-            String mainDoc = internals.getMainDoc();
-            // check if the main file is moved, need to be done before the move,
-            // because the main file gets lost after the move.
-            if (mainDoc != null) {
-                // the getOwnerRelativePath() method returns with a leading slash, but the mainDoc not.
-                String substring = pathFrom.getOwnerRelativePath().substring(1);
-                if (mainDoc.equals(substring)) {
-                    updateMainFile = true;
-                }
-            }
-        }
+
+        // check if the main file is moved, need to be done before the move,
+        // because the main file gets lost after the move.
+        updateMainFile = isMainFileUpdateRequired(pathFrom, derivateId);
 
         // this should always be a MCRPath, if not then ClassCastException is okay
         MCRPath resultingFile = (MCRPath) Files.move(pathFrom, pathTo);
 
         if (updateMainFile) {
-            // read derivate again, because it was changed by Files.move
-            // (The maindoc gets removed, because the file does not exist anymore)
-            derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
-            internals = derivate.getDerivate().getInternals();
-            internals.setMainDoc(resultingFile.getOwnerRelativePath());
-            try {
-                MCRMetadataManager.update(derivate);
-            } catch (MCRAccessException e) {
-                throw new MCRException("Error while updating main file", e);
-            }
+            setMainFile(derivateId, resultingFile);
         }
+    }
+
+    private void setMainFile(MCRObjectID derivateId, MCRPath resultingFile) {
+        // read derivate again, because it was changed by Files.move
+        // (The maindoc gets removed, because the file does not exist anymore)
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
+        internals = derivate.getDerivate().getInternals();
+        internals.setMainDoc(resultingFile.getOwnerRelativePath());
+        try {
+            MCRMetadataManager.update(derivate);
+        } catch (MCRAccessException e) {
+            throw new MCRException("Error while updating main file", e);
+        }
+    }
+
+    private boolean isMainFileUpdateRequired(MCRPath pathFrom, MCRObjectID derivateId) {
+        if (MCRMetadataManager.exists(derivateId)) {
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
+            internals = derivate.getDerivate().getInternals();
+            String mainDoc = internals.getMainDoc();
+
+            // the getOwnerRelativePath() method returns with a leading slash, but the mainDoc not.
+            return mainDoc!=null &&  mainDoc.equals(pathFrom.getOwnerRelativePath().substring(1));
+        }
+        return false;
     }
 }
