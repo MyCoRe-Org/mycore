@@ -1184,6 +1184,7 @@ Applications based on MyCoRe use a common core, which provides the functionality
     <module>mycore-mods</module>
     <module>mycore-orcid</module>
     <module>mycore-oai</module>
+    <module>mycore-pandoc</module>
     <module>mycore-pi</module>
     <module>mycore-restapi</module>
     <module>mycore-sass</module>
