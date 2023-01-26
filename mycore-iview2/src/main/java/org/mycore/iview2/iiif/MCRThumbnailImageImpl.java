@@ -19,7 +19,6 @@
 package org.mycore.iview2.iiif;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -131,10 +130,7 @@ public class MCRThumbnailImageImpl extends MCRIVIEWIIIFImageImpl {
 
     private Optional<MCRTileInfo> createTileInfoForFile(String derID, String file) {
         final MCRTileInfo mcrTileInfo = new MCRTileInfo(derID, file, null);
-        final Optional<Path> tileFile = this.tileFileProvider.getTileFile(mcrTileInfo);
-        if (tileFile.isPresent() && Files.exists(tileFile.get())) {
-            return Optional.of(mcrTileInfo);
-        }
-        return Optional.empty();
+        return Optional.of(mcrTileInfo)
+            .filter(t -> this.tileFileProvider.getTileFile(t).filter(Files::exists).isPresent());
     }
 }
