@@ -42,6 +42,9 @@ class MCRBibTeXEntryTransformer {
             .add(new MCRField2XPathTransformer("document_type", "mods:genre" + MCRFieldTransformer.AS_NEW_ELEMENT));
         fieldTransformers.add(new MCRField2XPathTransformer("title",
             "mods:titleInfo" + MCRFieldTransformer.AS_NEW_ELEMENT + "/mods:title"));
+        fieldTransformers
+            .add(new MCRMoveToRelatedItemIfExists("mods:titleInfo", new MCRField2XPathTransformer("subtitle",
+                "mods:subTitle")));
         fieldTransformers.add(new MCRPersonListTransformer("author", "aut"));
         fieldTransformers.add(new MCRField2XPathTransformer("journal",
             XPATH_HOST + "[mods:genre='journal']/mods:titleInfo/mods:title"));
