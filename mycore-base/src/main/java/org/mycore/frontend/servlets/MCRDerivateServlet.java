@@ -47,7 +47,6 @@ public class MCRDerivateServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     public static final String TODO_SMOVFILE = "smovfile";
-    private MCRMetaIFS internals;
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
@@ -200,7 +199,7 @@ public class MCRDerivateServlet extends MCRServlet {
         // read derivate again, because it was changed by Files.move
         // (The maindoc gets removed, because the file does not exist anymore)
         MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
-        internals = derivate.getDerivate().getInternals();
+        MCRMetaIFS internals = derivate.getDerivate().getInternals();
         internals.setMainDoc(resultingFile.getOwnerRelativePath());
         try {
             MCRMetadataManager.update(derivate);
@@ -212,7 +211,7 @@ public class MCRDerivateServlet extends MCRServlet {
     private boolean isMainFileUpdateRequired(MCRPath pathFrom, MCRObjectID derivateId) {
         if (MCRMetadataManager.exists(derivateId)) {
             MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
-            internals = derivate.getDerivate().getInternals();
+            MCRMetaIFS internals = derivate.getDerivate().getInternals();
             String mainDoc = internals.getMainDoc();
 
             // the getOwnerRelativePath() method returns with a leading slash, but the mainDoc not.
