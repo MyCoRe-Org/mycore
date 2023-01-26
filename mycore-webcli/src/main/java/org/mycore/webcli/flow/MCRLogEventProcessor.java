@@ -75,7 +75,10 @@ public class MCRLogEventProcessor extends SubmissionPublisher<JsonObject>
 
     @Override
     public void close() {
-        this.upstreamSubscrition.cancel();
+        //MCR-2823 upstreamSubscription may not yet be initialized: prevent NPE
+        if (this.upstreamSubscrition != null) {
+            this.upstreamSubscrition.cancel();
+        }
         super.close();
     }
 }
