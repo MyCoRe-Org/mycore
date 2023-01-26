@@ -79,14 +79,14 @@ public class MCRAESCipher extends MCRCipher {
         } catch (NoSuchFileException e) {
             throw new MCRCryptKeyFileNotFoundException(
                 "Keyfile " + keyFile
-                    + " not found. Generate new one with cli command or copy file to path.");
+                    + " not found. Generate new one with CLI command or copy file to path.");
         } catch (IllegalArgumentException e) {
             throw new InvalidKeyException("Error while decoding key from keyFile " + keyFile + "!", e);
         } catch (IOException e) {
             throw new MCRException("Can't read keyFile " + keyFile + ".", e);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new MCRCryptCipherConfigurationException(
-                "The algorithm AES/ECB/PKCS5PADDING ist not provided by this javaversion."
+                "The algorithm AES/ECB/PKCS5PADDING ist not provided by this Java version."
                     + "Update Java or configure an other chipher in mycore.properties.",
                 e);
         }
@@ -115,7 +115,7 @@ public class MCRAESCipher extends MCRCipher {
         } catch (FileAlreadyExistsException e) {
             throw new FileAlreadyExistsException(keyFile, null,
                 "A crypt key shouldn't be generated if it allready exists. "
-                    + " If you aware of the consequences use overwriteKeyFile().");
+                    + " If you are aware of the consequences use overwriteKeyFile().");
         } catch (IOException e) {
             throw new MCRException("Error while write key to file.", e);
         }
