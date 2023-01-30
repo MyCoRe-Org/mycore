@@ -2,10 +2,13 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
   metadata-complete="true">
-  
-  <!-- **************************************************************** -->
-  <!--                     MyCoRe ORCID integration                     -->
-  <!-- **************************************************************** -->
+
+  <name>mycore_orcid</name>
+  <ordering>
+    <after>
+      <name>mycore</name>
+    </after>
+  </ordering>
 
   <servlet id="OAuthServlet">
     <servlet-name>OAuthServlet</servlet-name>

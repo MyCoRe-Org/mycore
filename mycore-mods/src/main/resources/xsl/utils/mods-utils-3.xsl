@@ -16,6 +16,26 @@
   <xsl:param name="MCR.MODS.Utils.shortenTitleLength" />
   <xsl:param name="MCR.MODS.Utils.addTermsOfAddressToDisplayForm" />
 
+  <!--
+    Static lists of translatable content and languages (supported by all translatable deed and legal codes) from
+    https://creativecommons.org/publicdomain/ and https://creativecommons.org/licenses/.
+    For cc_mark, there is no legal code. This is handled explicitly in the template.
+  -->
+  <xsl:param name="MCR.MODS.Utils.ccSupportedTranslations" select="'deed-1.0,deed-2.0,deed-2.1,deed-2.5,deed-3.0,deed-4.0,legalcode-4.0'" />
+  <xsl:param name="MCR.MODS.Utils.ccSupportedLanguages" select="'ar,cs,de,el,en,es,eu,fi,fr,hr,id,it,ja,ko,lt,lv,nl,no,pl,pt,ro,ru,sl,sv,tr,uk'" />
+
+  <!--
+    What to link to from Creative Commons licenses; either: default, deed, legalcode
+  -->
+  <xsl:param name="MCR.MODS.Utils.ccLinkDestination" />
+
+  <!--
+    What text link to create additionally for Creative Commons licenses; either: none, text, description
+  -->
+  <xsl:param name="MCR.MODS.Utils.ccTextLink" />
+
+  <xsl:variable name="nbsp" select="'&#xa0;'"/>
+
   <xsl:import href="resource:xsl/functions/stringutils.xsl" />
   <xsl:import href="resource:xsl/functions/i18n.xsl" />
 
@@ -118,7 +138,8 @@
         <xsl:if test="$withSubtitle and $alternateContent/subTitle">
           <span class="subtitle">
             <span class="delimiter">
-              <xsl:text> : </xsl:text>
+              <xsl:value-of select="$nbsp" />
+              <xsl:text>: </xsl:text>
             </span>
             <xsl:apply-templates select="$alternateContent/subTitle/node()" mode="unescapeHtml" />
           </span>
@@ -132,7 +153,8 @@
         <xsl:if test="$withSubtitle and mods:subTitle">
           <span class="subtitle">
             <span class="delimiter">
-              <xsl:text> : </xsl:text>
+              <xsl:value-of select="$nbsp" />
+              <xsl:text>: </xsl:text>
             </span>
             <xsl:value-of select="mods:subTitle" />
           </span>
@@ -289,22 +311,99 @@
 
   <!--Template for access conditions -->
   <xsl:template match="mods:accessCondition" mode="cc-logo">
-    <!-- split category ID e.g "cc_by_4.0" -->
-    <xsl:variable name="licenseVersion" select="substring-after(substring-after(@xlink:href, '#cc_'), '_')" />
-    <xsl:variable name="licenseString" select="substring-before(substring-after(@xlink:href, '#cc_'), '_')" />
-    <xsl:choose>
-      <!-- public domain -->
-      <xsl:when test="$licenseString='zero' or $licenseString='mark'">
-        <a rel="license" href="http://creativecommons.org/publicdomain/{$licenseString}/{$licenseVersion}/">
-          <img src="//licensebuttons.net/p/{$licenseString}/{$licenseVersion}/88x31.png" />
-        </a>
-      </xsl:when>
-      <xsl:otherwise>
-        <a rel="license" href="http://creativecommons.org/licenses/{$licenseString}/{$licenseVersion}/">
-          <img src="//licensebuttons.net/l/{$licenseString}/{$licenseVersion}/88x31.png" />
-        </a>
-      </xsl:otherwise>
-    </xsl:choose>
+    <!-- split category ID e.g "cc_zero_1.0", "cc_mark_1.0", "cc_by-nc-nd_3.0_de", "cc_by_4.0" -->
+    <xsl:variable name="licenseId" select="substring-after(@xlink:href,'#')" />
+    <xsl:variable name="license" select="document(concat('classification:metadata:0:children:mir_licenses:',$licenseId))//category[@ID=$licenseId]" />
+    <xsl:variable name="ccDetails" select="substring-after($licenseId, 'cc_')" />
+    <xsl:variable name="ccComponents" select="substring-before($ccDetails, '_')" />
+    <xsl:variable name="ccVersionAndCountry" select="substring-after($ccDetails, '_')" />
+    <xsl:variable name="ccVersion">
+      <xsl:choose>
+        <xsl:when test="contains($ccVersionAndCountry,'_')">
+          <xsl:value-of select="substring-before($ccVersionAndCountry,'_')" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$ccVersionAndCountry" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="ccCountry">
+      <xsl:choose>
+        <xsl:when test="contains($ccVersionAndCountry,'_')">
+          <xsl:value-of select="substring-after($ccVersionAndCountry,'_')" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="''" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="publicDomain" select="$ccComponents='zero' or $ccComponents='mark'" />
+    <xsl:variable name="ccUrl">
+      <xsl:value-of select="'//creativecommons.org/'" />
+      <xsl:choose>
+        <xsl:when test="$publicDomain">
+          <xsl:value-of select="concat('publicdomain/',$ccComponents,'/',$ccVersion,'/')" />
+        </xsl:when>
+        <xsl:when test="string-length($ccCountry)&gt;0">
+          <xsl:value-of select="concat('licenses/',$ccComponents,'/',$ccVersion,'/',$ccCountry,'/')" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat('licenses/',$ccComponents,'/',$ccVersion,'/')" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="aHref">
+      <xsl:value-of select="$ccUrl" />
+      <xsl:variable name="ccLinkDestination" select="$MCR.MODS.Utils.ccLinkDestination" />
+      <xsl:if test="$ccLinkDestination='deed' or $ccLinkDestination='legalcode'">
+        <xsl:value-of select="$ccLinkDestination" />
+        <xsl:variable name="translation" select="concat($ccLinkDestination,'-',$ccVersion)" />
+        <xsl:variable name="ccSupportedTranslations" select="$MCR.MODS.Utils.ccSupportedTranslations" />
+        <xsl:variable name="ccSupportedLanguages" select="$MCR.MODS.Utils.ccSupportedLanguages" />
+        <xsl:if test="contains($ccSupportedTranslations,$translation) and contains($ccSupportedLanguages,$CurrentLang)">
+          <xsl:if test="not($ccComponents='mark' and $ccLinkDestination='legalcode')">
+            <xsl:value-of select="concat('.',$CurrentLang)" />
+          </xsl:if>
+        </xsl:if>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:variable name="licenseLogoUrl" select="$license/label[lang('x-logo')]/@text" />
+    <xsl:variable name="imgSrc">
+      <xsl:choose>
+        <xsl:when test="string-length($licenseLogoUrl)&gt;0">
+          <xsl:value-of select="$licenseLogoUrl" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'//licensebuttons.net/'" />
+          <xsl:choose>
+            <xsl:when test="$publicDomain">
+              <xsl:value-of select="concat('p/',$ccComponents,'/',$ccVersion)" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="concat('l/',$ccComponents,'/',$ccVersion)" />
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:value-of select="'/88x31.png'" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <a class="cc-logo" rel="license" href="{$aHref}">
+      <img src="{$imgSrc}" />
+    </a>
+    <xsl:variable name="ccTextLink" select="$MCR.MODS.Utils.ccTextLink" />
+    <xsl:if test="$ccTextLink='text' or $ccTextLink='description'">
+      <br />
+      <a class="cc-text" rel="license" href="{$aHref}">
+        <xsl:choose>
+          <xsl:when test="$license/label[lang($CurrentLang)]">
+            <xsl:value-of select="$license/label[lang($CurrentLang)]/@*[name()=$ccTextLink]" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$license/label[lang($DefaultLang)]/@*[name()=$ccTextLink]" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </a>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="mods:accessCondition" mode="oa-logo">

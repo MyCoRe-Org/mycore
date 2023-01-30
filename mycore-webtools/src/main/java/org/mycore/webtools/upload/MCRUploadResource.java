@@ -26,11 +26,14 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,6 +82,8 @@ public class MCRUploadResource {
 
     private static final String FILE_PROCESSOR_PROPERTY = "MCR.MCRUploadHandlerIFS.FileProcessors";
 
+    private static final String IGNORE_MAINFILE_PROPERTY = "MCR.Upload.NotPreferredFiletypeForMainfile";
+
     private static final List<MCRPostUploadFileProcessor> FILE_PROCESSORS = initProcessorList();
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -126,14 +131,27 @@ public class MCRUploadResource {
 
     private static void setDefaultMainFile(MCRDerivate derivate) {
         MCRPath path = MCRPath.getPath(derivate.getId().toString(), "/");
+        List<String> ignoreMainfileList = MCRConfiguration2.getString(IGNORE_MAINFILE_PROPERTY)
+            .map(MCRConfiguration2::splitValue)
+            .map(s -> s.collect(Collectors.toList()))
+            .orElseGet(Collections::emptyList);
         try {
             MCRFileCollectingFileVisitor<java.nio.file.Path> visitor = new MCRFileCollectingFileVisitor<>();
             Files.walkFileTree(path, visitor);
 
-            visitor.getPaths().stream()
+            //sort files by name
+            ArrayList<java.nio.file.Path> paths = visitor.getPaths();
+            paths.sort(Comparator.comparing(java.nio.file.Path::getNameCount)
+                .thenComparing(java.nio.file.Path::getFileName));
+            //extract first file, before filtering
+            MCRPath firstPath = MCRPath.toMCRPath(paths.get(0));
+
+            //filter files, remove files that should be ignored for mainfile
+            paths.stream()
                 .map(MCRPath.class::cast)
-                .filter(p -> !p.getOwnerRelativePath().endsWith(".xml"))
+                .filter(p -> ignoreMainfileList.stream().noneMatch(p.getOwnerRelativePath()::endsWith))
                 .findFirst()
+                .or(() -> Optional.of(firstPath))
                 .ifPresent(file -> {
                     derivate.getDerivate().getInternals().setMainDoc(file.getOwnerRelativePath());
                     try {

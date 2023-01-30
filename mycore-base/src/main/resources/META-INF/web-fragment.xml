@@ -4,9 +4,11 @@
   metadata-complete="true">
 
   <name>mycore</name>
-  <!-- **************************************************************** -->
-  <!-- Servlets and mapping from MyCoRe kernel -->
-  <!-- **************************************************************** -->
+  <ordering>
+    <before>
+      <others />
+    </before>
+  </ordering>
 
   <listener>
     <listener-class>org.mycore.common.events.MCRServletContextListener</listener-class>

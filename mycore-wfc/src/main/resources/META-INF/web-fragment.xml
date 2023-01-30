@@ -2,10 +2,14 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-fragment_5_0.xsd"
   metadata-complete="true">
-  
-<!-- **************************************************************** -->
-<!-- Servlets and mappings of mycore-wfc                              -->
-<!-- **************************************************************** -->
+
+  <name>mycore_wfc</name>
+  <ordering>
+    <after>
+      <name>mycore</name>
+    </after>
+  </ordering>
+
   <servlet>
     <servlet-name>MCRActionMappingServlet</servlet-name>
     <servlet-class>org.mycore.wfc.actionmapping.MCRActionMappingServlet</servlet-class>

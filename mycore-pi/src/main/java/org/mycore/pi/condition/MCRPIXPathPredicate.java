@@ -26,17 +26,17 @@ import org.mycore.datamodel.metadata.MCRBase;
 
 public class MCRPIXPathPredicate extends MCRPIPredicateBase
     implements MCRPICreationPredicate, MCRPIObjectRegistrationPredicate {
-    final private XPathExpression<Object> expr;
+    final private XPathExpression<Boolean> expr;
 
     public MCRPIXPathPredicate(String propertyPrefix) {
         super(propertyPrefix);
-        final String xPath = requireProperty("XPath");
+        final String xPath = "boolean(" + requireProperty("XPath") + ")";
         XPathFactory factory = XPathFactory.instance();
-        expr = factory.compile(xPath, Filters.fpassthrough(), null, MCRConstants.getStandardNamespaces());
+        expr = factory.compile(xPath, Filters.fboolean(), null, MCRConstants.getStandardNamespaces());
     }
 
     @Override
     public boolean test(MCRBase mcrBase) {
-        return expr.evaluate(mcrBase.createXML()).size() > 0;
+        return expr.evaluateFirst(mcrBase.createXML()) == Boolean.TRUE;
     }
 }
