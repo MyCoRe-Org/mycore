@@ -80,6 +80,7 @@ import org.mycore.common.xml.MCRLayoutTransformerFactory;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -622,7 +623,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 100)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
         Transformer transformer = getTransformer(style != null ? style + "-object" : null);
-        exportWith(fromID, toID, dirname, "xml", (content, out) -> {
+        String extension = MCRXSLTransformerUtils.getFileExtension(transformer, "xml");
+        exportWith(fromID, toID, dirname, extension, (content, out) -> {
             StreamResult sr = new StreamResult(out);
             JDOMSource doc = new JDOMSource(MCRXMLParserFactory.getNonValidatingParser().parseXML(content));
             transformer.transform(doc, sr);
