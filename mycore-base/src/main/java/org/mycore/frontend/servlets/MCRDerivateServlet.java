@@ -38,6 +38,7 @@ import org.mycore.frontend.fileupload.MCRUploadHelper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * @author Sebastian Hofmann; Silvio Hermann; Thomas Scheffler (yagee); Sebastian Röher
@@ -168,6 +169,14 @@ public class MCRDerivateServlet extends MCRServlet {
         if (Files.isDirectory(pathFrom)) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format(Locale.ENGLISH,
                 "Renaming directory %s is not supported!", pathFrom));
+            return;
+        }
+
+        try {
+            MCRUploadHelper.checkPathName(pathTo.getOwnerRelativePath(), true);
+        } catch (MCRException ex){
+            String translatedMessage = MCRTranslation.translate("IFS.invalid.fileName", pathTo.getOwnerRelativePath());
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, translatedMessage);
             return;
         }
 
