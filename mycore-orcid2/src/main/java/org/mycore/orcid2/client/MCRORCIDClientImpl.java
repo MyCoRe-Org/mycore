@@ -31,7 +31,7 @@ import org.mycore.orcid2.user.MCRORCIDCredentials;
 /**
  * ORCID client which is bounded to MCRORCIDCredentials.
  */
-public class MCRORCIDClientImpl extends MCRORCIDAPIClientImpl implements MCRORCIDClient {
+public class MCRORCIDClientImpl extends MCRORCIDAPIClient implements MCRORCIDClient {
 
     private final WebTarget baseTarget;
 

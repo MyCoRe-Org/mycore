@@ -18,13 +18,20 @@
 
 package org.mycore.orcid2.client;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import jakarta.ws.rs.core.Response;
+
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 
 /**
  * Provides an ORCID Client with read methods.
  * Can be used to talk to Public or Member API.
  */
-public class MCRORCIDReadClientImpl extends MCRORCIDAPIClientImpl implements MCRORCIDReadClient {
+public class MCRORCIDReadClientImpl extends MCRORCIDAPIClient implements MCRORCIDReadClient {
+
+    private static final int DEFAULT_SEARCH_LIMIT = 1000;
 
     /**
      * Creates a new Client with given API url.
@@ -53,5 +60,38 @@ public class MCRORCIDReadClientImpl extends MCRORCIDAPIClientImpl implements MCR
     public <T> T fetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes)
         throws MCRORCIDRequestException {
         return doFetch(orcid, section, valueType, putCodes);
+    }
+
+    private <T> T doSearch(String path, String query, int offset, int limit, Class<T> valueType)
+        throws MCRORCIDRequestException {
+        if (offset < 0 || limit < 0) {
+            throw new IllegalArgumentException("Offset or limit must be positive.");
+        }
+        final Map<String, Object> queryMap = new HashMap<String, Object>();
+        queryMap.put("q", query);
+        queryMap.put("start", offset);
+        queryMap.put("rows", limit);
+        final Response response = fetch(path + "/", queryMap);
+        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+            throw new MCRORCIDRequestException(response);
+        }
+        return response.readEntity(valueType);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T search(MCRORCIDSearch type, String query, int offset, int limit, Class<T> valueType)
+        throws MCRORCIDRequestException {
+        return doSearch(type.getPath(), query, offset, limit, valueType);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T search(MCRORCIDSearch type, String query, Class<T> valueType) throws MCRORCIDRequestException {
+        return search(type, query, 0, DEFAULT_SEARCH_LIMIT, valueType);
     }
 }
