@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.mycore</groupId>
     <artifactId>mycore</artifactId>
-    <version>2022.08</version>
+    <version>2023.02-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>mycore-mets</artifactId>
