@@ -24,17 +24,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
 import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
-import org.mycore.pi.urn.rest.MCRDerivateURNUtils;
-import org.mycore.pi.urn.rest.MCRURNJsonBundle;
 
 import com.google.gson.JsonElement;
 
@@ -57,9 +49,7 @@ public class MCRURNUtils {
     public static Date getDNBRegisterDate(String identifier) throws MCRIdentifierUnresolvableException,
             ParseException {
 
-        MCRDNBURNRestClient mcrurnClient = new MCRDNBURNRestClient(
-                u -> MCRURNJsonBundle.instance(u, MCRDerivateURNUtils.getURL(u)));
-        String date = mcrurnClient.getRegistrationInfo(identifier)
+        String date = MCRDNBURNRestClient.getRegistrationInfo(identifier)
                 .map(info -> info.get("created"))
                 .map(JsonElement::getAsString)
                 .orElse(null);

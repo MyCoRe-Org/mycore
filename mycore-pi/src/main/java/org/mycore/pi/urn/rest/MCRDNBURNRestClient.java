@@ -18,6 +18,8 @@
 
 package org.mycore.pi.urn.rest;
 
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -29,10 +31,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.function.Function;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -44,7 +42,10 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.pi.MCRPIRegistrationInfo;
 
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 /**
  * <p>Class for registering and updating urn managed by the DNB.</p>
@@ -168,8 +169,10 @@ public class MCRDNBURNRestClient {
         return getRegistrationInfo(identifier);
     }
 
-    public Optional<JsonObject> getRegistrationInfo(String identifier) {
-        String url = getBaseServiceURL() + "/urn/" + identifier;
+    public static Optional<JsonObject> getRegistrationInfo(String identifier) {
+        MCRDNBURNRestClient mcrurnClient = new MCRDNBURNRestClient(
+                u -> MCRURNJsonBundle.instance(u, MCRDerivateURNUtils.getURL(u)));
+        String url = mcrurnClient.getBaseServiceURL() + "/urn/" + identifier;
         CloseableHttpResponse response = MCRHttpsClient.get(url, Optional.empty());
 
         int statusCode = response.getStatusLine().getStatusCode();
@@ -183,6 +186,9 @@ public class MCRDNBURNRestClient {
                 } catch (Exception e) {
                     LOGGER.error("Could not read Response from " + url);
                 }
+                break;
+            default:
+                mcrurnClient.logFailure("", response, statusCode, identifier, url);
                 break;
         }
         return Optional.empty();
@@ -274,6 +280,10 @@ public class MCRDNBURNRestClient {
     }
 
     private void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier, URL url) {
+        logFailure(json, response, postStatus, identifier, url.toString());
+    }
+
+    private void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier, String url) {
         try (Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)) {
             JsonElement jsonElement = JsonParser.parseReader(reader);
             LOGGER.error("{}: {} ({})", postStatus,
