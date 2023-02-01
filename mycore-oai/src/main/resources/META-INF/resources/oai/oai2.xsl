@@ -59,7 +59,7 @@ td.value {
 	padding-left: 1em;
 	padding: 3px;
 }
-td.key {
+td.key, td.subkey {
 	background-color: #e0e0ff;
 	padding: 3px;
 	text-align: right;
@@ -67,11 +67,21 @@ td.key {
 	white-space: nowrap;
 	font-weight: bold;
 	vertical-align: top;
+  min-width: 12px;
 }
-.dcdata td.key {
-	background-color: #ffffe0;
+td.subkey .empty {
+  display: inline-block;
 }
-body { 
+.dcdata td.key, .marcdata td.key {
+  background-color: #ffffe0;
+}
+.marcsubdata {
+  margin: -5px;
+}
+.leader .value, .controlfield .value {
+  white-space: pre;
+}
+body {
 	margin: 1em 2em 1em 2em;
 }
 h1, h2, h3 {
@@ -660,6 +670,80 @@ p.intro {
 
 <xsl:template match="dc:rights" xmlns:dc="http://purl.org/dc/elements/1.1/">
 <tr><td class="key">Rights Management</td><td class="value"><xsl:value-of select="."/></td></tr></xsl:template>
+
+<!-- marc record -->
+
+<xsl:template match="marc:record" xmlns:marc="http://www.loc.gov/MARC21/slim" >
+  <div class="marcdata">
+    <h3>MARC21-XML (marcxml)</h3>
+    <table class="marcdata">
+      <xsl:apply-templates select="*" />
+    </table>
+  </div>
+  <h3>XML-Source</h3>
+  <div class="xmlSource">
+    <xsl:apply-templates select="." mode='xmlMarkup' />
+  </div>
+</xsl:template>
+
+<xsl:template match="marc:leader" xmlns:marc="http://www.loc.gov/MARC21/slim">
+<tr class="leader">
+  <td class="key">Leader</td>
+  <td class="key"/>
+  <td class="key"/>
+  <td class="key"/>
+  <td class="value">
+    <table class="marcsubdata">
+      <tbody>
+        <tr>
+          <td class="subkey"><span class="empty"/></td>
+          <td class="value"><xsl:value-of select="."/></td>
+        </tr>
+       </tbody>
+    </table>
+  </td>
+</tr>
+</xsl:template>
+
+<xsl:template match="marc:controlfield" xmlns:marc="http://www.loc.gov/MARC21/slim">
+<tr class="controlfield">
+  <td class="key">Controlfield</td>
+  <td class="key"><xsl:value-of select="@tag"/></td>
+  <td class="key"/>
+  <td class="key"/>
+  <td class="value">
+    <table class="marcsubdata">
+      <tbody>
+        <tr>
+          <td class="subkey"><span class="empty"/></td>
+          <td class="value"><xsl:value-of select="."/></td>
+        </tr>
+      </tbody>
+    </table>
+  </td>
+</tr>
+</xsl:template>
+
+<xsl:template match="marc:datafield" xmlns:marc="http://www.loc.gov/MARC21/slim">
+<tr class="datafield">
+  <td class="key">Datafield</td>
+  <td class="key"><xsl:value-of select="@tag"/></td>
+  <td class="key"><xsl:value-of select="@ind1"/></td>
+  <td class="key"><xsl:value-of select="@ind2"/></td>
+  <td class="value">
+    <table class="marcsubdata">
+      <xsl:apply-templates select="*" />
+    </table>
+  </td>
+</tr>
+</xsl:template>
+
+<xsl:template match="marc:subfield" xmlns:marc="http://www.loc.gov/MARC21/slim">
+<tr>
+  <td class="subkey"><xsl:value-of select="@code"/></td>
+  <td class="value"><xsl:value-of select="."/></td>
+</tr>
+</xsl:template>
 
 <!-- XML Pretty Maker -->
 
