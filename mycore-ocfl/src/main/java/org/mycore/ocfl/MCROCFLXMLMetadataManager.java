@@ -40,7 +40,7 @@ import edu.wisc.library.ocfl.api.OcflRepository;
  * @deprecated use {@link org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager MCROCFLXMLMetadataManager}
  */
 @Deprecated(forRemoval = true)
-public class MCROCFLXMLMetadataManager extends metadata.MCROCFLXMLMetadataManager {
+public class MCROCFLXMLMetadataManager extends org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
