@@ -30,7 +30,7 @@ import edu.wisc.library.ocfl.api.OcflRepository;
  * @deprecated use {@link org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider MCROCFLHashRepositoryProvider}
  */
 @Deprecated(forRemoval = true)
-public class MCROCFLHashRepositoryProvider extends org.mycore.ocfl.repository.MCROCFLHashRepositoryProvider {
+public class MCROCFLHashRepositoryProvider extends repository.MCROCFLHashRepositoryProvider {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

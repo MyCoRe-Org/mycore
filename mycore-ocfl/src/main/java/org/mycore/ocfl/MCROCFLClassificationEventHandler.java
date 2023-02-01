@@ -29,7 +29,7 @@ import org.mycore.common.events.MCREvent;
  */
 @Deprecated(forRemoval = true)
 public class MCROCFLClassificationEventHandler
-    extends org.mycore.ocfl.classification.MCROCFLClassificationEventHandler {
+    extends classification.MCROCFLClassificationEventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

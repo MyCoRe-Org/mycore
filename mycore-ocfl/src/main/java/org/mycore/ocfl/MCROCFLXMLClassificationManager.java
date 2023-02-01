@@ -31,7 +31,7 @@ import edu.wisc.library.ocfl.api.OcflRepository;
  *@deprecated use {@link org.mycore.ocfl.classification.MCROCFLXMLClassificationManager MCROCFLXMLClassificationManager}
  */
 @Deprecated(forRemoval = true)
-public class MCROCFLXMLClassificationManager extends org.mycore.ocfl.classification.MCROCFLXMLClassificationManager {
+public class MCROCFLXMLClassificationManager extends classification.MCROCFLXMLClassificationManager {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
