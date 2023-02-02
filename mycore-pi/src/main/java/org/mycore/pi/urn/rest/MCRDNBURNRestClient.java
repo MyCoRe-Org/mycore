@@ -98,7 +98,7 @@ public class MCRDNBURNRestClient {
      *
      * @return the base url as set in mycore property MCR.PI.URNGranular.API.BaseURL
      * */
-    protected String getBaseServiceURL() {
+    public static String getBaseServiceURL() {
         return MCRConfiguration2.getString("MCR.PI.URNGranular.API.BaseURL")
             .orElse("https://api.nbn-resolving.org/sandbox/v2/") + "urns/";
     }
@@ -170,9 +170,7 @@ public class MCRDNBURNRestClient {
     }
 
     public static Optional<JsonObject> getRegistrationInfo(String identifier) {
-        MCRDNBURNRestClient mcrurnClient = new MCRDNBURNRestClient(
-                u -> MCRURNJsonBundle.instance(u, MCRDerivateURNUtils.getURL(u)));
-        String url = mcrurnClient.getBaseServiceURL() + "/urn/" + identifier;
+        String url = MCRDNBURNRestClient.getBaseServiceURL() + "/urn/" + identifier;
         CloseableHttpResponse response = MCRHttpsClient.get(url, Optional.empty());
 
         int statusCode = response.getStatusLine().getStatusCode();
@@ -188,7 +186,7 @@ public class MCRDNBURNRestClient {
                 }
                 break;
             default:
-                mcrurnClient.logFailure("", response, statusCode, identifier, url);
+                MCRDNBURNRestClient.logFailure("", response, statusCode, identifier, url);
                 break;
         }
         return Optional.empty();
@@ -279,11 +277,11 @@ public class MCRDNBURNRestClient {
         return Optional.empty();
     }
 
-    private void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier, URL url) {
+    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier, URL url) {
         logFailure(json, response, postStatus, identifier, url.toString());
     }
 
-    private void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier, String url) {
+    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier, String url) {
         try (Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)) {
             JsonElement jsonElement = JsonParser.parseReader(reader);
             LOGGER.error("{}: {} ({})", postStatus,
