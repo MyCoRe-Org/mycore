@@ -163,14 +163,21 @@ public class MCREditorSession {
 
     public String replaceParameters(String uri) {
         Matcher m = PATTERN_URI.matcher(uri);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (m.find()) {
-            String token = m.group(1);
-            Object value = variables.get(token);
-            m.appendReplacement(sb, value == null ? m.group().replace("$", "\\$") : value.toString());
+            m.appendReplacement(sb, getReplacement(m.group(1)));
         }
         m.appendTail(sb);
         return sb.toString();
+    }
+
+    private String getReplacement(String token) {
+        Object value = variables.get(token);
+        if (value == null) {
+            return "{\\$" + token + "}";
+        } else {
+            return Matcher.quoteReplacement(value.toString());
+        }
     }
 
     public Document getEditedXML() {

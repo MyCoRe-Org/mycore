@@ -33,6 +33,8 @@ import org.mycore.common.xml.MCRNodeBuilder;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
 
+import java.util.Map;
+
 /**
  * @author Frank L\u00FCtzenkirchen
  */
@@ -374,6 +376,74 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
         assertFalse(session.getValidator().isValid());
         checkResult(session, "/document/title", MCRValidationResults.MARKER_ERROR);
 
+    }
+
+    @Test
+    public void testEnableReplacementsRule() throws JDOMException, JaxenException {
+
+        MCREditorSession session;
+
+        session = buildSession("document[test='abc']");
+        addRule(session, "/document/test", "matches", "[a-z]+");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/test", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[test='abc']");
+        addRule(session, "/document/test", "enable-replacements", "false", "matches", "[a-z]+");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/test", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[test='abc']");
+        addRule(session, "/document/test", "enable-replacements", "true", "matches", "{$MCR.Pattern.Alphabetic}");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/test", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[test='123']");
+        addRule(session, "/document/test", "enable-replacements", "true", "matches", "{$MCR.Pattern.Alphabetic}");
+        assertFalse(session.getValidator().isValid());
+        checkResult(session, "/document/test", MCRValidationResults.MARKER_ERROR);
+
+        session = buildSession("document[test='123']");
+        addRule(session, "/document/test", "matches", "[1-9]+");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/test", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[test='123']");
+        addRule(session, "/document/test", "enable-replacements", "false", "matches", "[1-9]+");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/test", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[test='123']");
+        addRule(session, "/document/test", "enable-replacements", "true", "matches", "{$MCR.Pattern.Numeric}");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/test", MCRValidationResults.MARKER_SUCCESS);
+
+        session = buildSession("document[test='abc']");
+        addRule(session, "/document/test", "enable-replacements", "true", "matches", "{$MCR.Pattern.Numeric}");
+        assertFalse(session.getValidator().isValid());
+        checkResult(session, "/document/test", MCRValidationResults.MARKER_ERROR);
+
+    }
+
+    @Test
+    public void testReplacementProcessor() throws JDOMException, JaxenException {
+
+        MCREditorSession session;
+
+        session = buildSession("document[test='$']");
+        addRule(session, "/document/test", "enable-replacements", "true", "matches", "{$MCR.Pattern.Dollar}");
+        assertTrue(session.getValidator().isValid());
+        checkResult(session, "/document/test", MCRValidationResults.MARKER_SUCCESS);
+
+    }
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.Pattern.Alphabetic", "[a-z]+");
+        testProperties.put("MCR.Pattern.Numeric", "[0-9]+");
+        testProperties.put("MCR.Pattern.Dollar", "\\$");
+        return testProperties;
     }
 
     public static boolean nameStartsWithJ(String name) {
