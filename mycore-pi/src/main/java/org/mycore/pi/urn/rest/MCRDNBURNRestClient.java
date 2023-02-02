@@ -277,11 +277,13 @@ public class MCRDNBURNRestClient {
         return Optional.empty();
     }
 
-    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier, URL url) {
+    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier,
+        URL url) {
         logFailure(json, response, postStatus, identifier, url.toString());
     }
 
-    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier, String url) {
+    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier,
+        String url) {
         try (Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)) {
             JsonElement jsonElement = JsonParser.parseReader(reader);
             LOGGER.error("{}: {} ({})", postStatus,
@@ -289,7 +291,8 @@ public class MCRDNBURNRestClient {
         } catch (IOException | JsonParseException e) {
             LOGGER.error(
                 "Could not handle urn post request: status={}, " +
-                    "urn={}, url={} json={}", postStatus, identifier, url, json);
+                    "urn={}, url={} json={}",
+                postStatus, identifier, url, json);
         }
     }
 }
