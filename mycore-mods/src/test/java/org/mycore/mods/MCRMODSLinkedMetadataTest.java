@@ -134,8 +134,12 @@ public class MCRMODSLinkedMetadataTest extends MCRJPATestCase {
         MCRMetadataManager.update(series);
     }
 
-    @Test()
-    public void testHierarchyNoInheritance() throws URISyntaxException, SAXParseException, IOException, MCRAccessException {
+    /**
+     * The tests check if the relatedItems with no inherited data are ignored by the hierarchy check of the ShareAgent
+     */
+    @Test(expected = Test.None.class)
+    public void testHierarchyNoInheritance() throws URISyntaxException, SAXParseException, IOException,
+            MCRAccessException {
         MCRObjectID book4ID = MCRObjectID.getInstance("junit_mods_00000004");
         MCRObject book2 = new MCRObject(getResourceAsURL(book4ID + ".xml").toURI());
         MCRMetadataManager.create(book2);
