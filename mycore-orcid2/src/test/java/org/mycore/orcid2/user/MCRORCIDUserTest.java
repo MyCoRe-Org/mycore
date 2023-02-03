@@ -35,9 +35,9 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String testORCID = "0000-0001-2345-6789";
+    private static final String ORCID = "0000-0001-2345-6789";
 
-    private static final String testAccessToken = "accessToken";
+    private static final String ACCESS_TOKEN = "accessToken";
 
     @Test
     public void testStoreGetCredentials() {
@@ -45,10 +45,10 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         assertEquals(0, orcidUser.listCredentials().size());
-        final MCRORCIDCredentials credentials = new MCRORCIDCredentials(testORCID, testAccessToken);
+        final MCRORCIDCredentials credentials = new MCRORCIDCredentials(ORCID, ACCESS_TOKEN);
         orcidUser.storeCredentials(credentials);
         assertEquals(2, user.getAttributes().size()); // id_orcid + orcid_credentials_orcid
-        assertNotNull(user.getUserAttribute("orcid_credentials_" + testORCID));
+        assertNotNull(user.getUserAttribute("orcid_credentials_" + ORCID));
         assertEquals(credentials.getORCID(), user.getUserAttribute("id_orcid"));
         assertEquals(credentials, orcidUser.getCredentials(credentials.getORCID()));
     }
@@ -58,18 +58,18 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         MCRUser user = new MCRUser("junit");
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-        final MCRORCIDCredentials credentials = new MCRORCIDCredentials(testORCID, testAccessToken);
+        final MCRORCIDCredentials credentials = new MCRORCIDCredentials(ORCID, ACCESS_TOKEN);
         orcidUser.storeCredentials(credentials);
         user.setUserAttribute("test", "test");
         orcidUser.removeAllCredentials();
         assertEquals(2, user.getAttributes().size()); // id_orcid + test
-        assertEquals(testORCID, user.getUserAttribute("id_orcid"));
+        assertEquals(ORCID, user.getUserAttribute("id_orcid"));
         assertEquals("test", user.getUserAttribute("test"));
     }
 
     @Test
     public void testSerialization() {
-        final MCRORCIDCredentials credentials = new MCRORCIDCredentials(testORCID, testAccessToken);
+        final MCRORCIDCredentials credentials = new MCRORCIDCredentials(ORCID, ACCESS_TOKEN);
         credentials.setTokenType("bearer");
         credentials.setRefreshToken("refreshToken");
         credentials.setExpiresIn("631138518");

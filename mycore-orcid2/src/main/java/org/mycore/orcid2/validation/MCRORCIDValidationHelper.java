@@ -37,10 +37,7 @@ public class MCRORCIDValidationHelper {
             return false;
         }
         final String accessToken = credentials.getAccessToken();
-        if (accessToken == null || accessToken.isEmpty()) {
-            return false;
-        }
-        return true;
+        return accessToken != null && !accessToken.isEmpty();
     }
 
 
