@@ -133,4 +133,13 @@ public class MCRMODSLinkedMetadataTest extends MCRJPATestCase {
         MCRObject series = new MCRObject(getResourceAsURL(seriesID + "-updated2.xml").toURI());
         MCRMetadataManager.update(series);
     }
+
+    @Test()
+    public void testHierarchyNoInheritance() throws URISyntaxException, SAXParseException, IOException, MCRAccessException {
+        MCRObjectID book4ID = MCRObjectID.getInstance("junit_mods_00000004");
+        MCRObject book2 = new MCRObject(getResourceAsURL(book4ID + ".xml").toURI());
+        MCRMetadataManager.create(book2);
+        book2 = new MCRObject(getResourceAsURL(book4ID + "-updated.xml").toURI());
+        MCRMetadataManager.update(book2);
+    }
 }

@@ -43,6 +43,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectMetadata;
 import org.mycore.datamodel.metadata.share.MCRMetadataShareAgent;
 
+import static org.mycore.mods.MCRMODSWrapper.LINKED_RELATED_ITEMS;
+
 /**
  * @author Thomas Scheffler (yagee)
  */
@@ -173,7 +175,8 @@ public class MCRMODSMetadataShareAgent implements MCRMetadataShareAgent {
     private void checkHierarchy(MCRMODSWrapper mods) throws MCRPersistenceException {
         final MCRObjectID modsId = Objects.requireNonNull(mods.getMCRObject().getId());
         LOGGER.info("Checking relatedItem hierarchy of {}.", modsId);
-        final List<Element> relatedItemLeaves = mods.getElements(".//mods:relatedItem[not(mods:relatedItem)]");
+        final List<Element> relatedItemLeaves
+            = mods.getElements(".//" + LINKED_RELATED_ITEMS + "[not(mods:relatedItem)]");
         try {
             relatedItemLeaves.forEach(e -> checkHierarchy(e, new HashSet<>(Set.of(modsId))));
         } catch (MCRPersistenceException e) {

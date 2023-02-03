@@ -53,7 +53,7 @@ import org.mycore.mods.classification.MCRClassMapper;
 public class MCRMODSWrapper {
 
     //ancestor::mycoreobject required for MCR-927
-    private static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host'"
+    static final String LINKED_RELATED_ITEMS = "mods:relatedItem[@type='host'"
         + " and ancestor::mycoreobject/structure/parents/parent or"
         + " string-length(substring-after(@xlink:href,'_')) > 0 and"
         + " string-length(substring-after(substring-after(@xlink:href,'_'), '_')) > 0 and"
