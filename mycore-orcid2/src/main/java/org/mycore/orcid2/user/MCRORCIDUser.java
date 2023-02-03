@@ -34,9 +34,10 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.MCRORCIDUtils;
+import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.exception.MCRORCIDException;
+import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserAttribute;
 import org.mycore.user2.MCRUserManager;
@@ -82,8 +83,12 @@ public class MCRORCIDUser {
      * Adds ORCID id to user's user attributes.
      * 
      * @param orcid the orcid id
+     * @throws MCRORCIDException if ORCID iD is invalid
      */
-    public void addORCID(String orcid) {
+    public void addORCID(String orcid) throws MCRORCIDException {
+        if (!MCRORCIDValidationHelper.validateORCID(orcid)) {
+            throw new MCRORCIDException("Invalid ORCID iD");
+        }
         final MCRUserAttribute attribute = new MCRUserAttribute(ATTR_ORCID_ID, orcid);
         if (!user.getAttributes().contains(attribute)) { // allow more than one orcid id per user
             user.getAttributes().add(new MCRUserAttribute(ATTR_ORCID_ID, orcid));
@@ -105,13 +110,21 @@ public class MCRORCIDUser {
      * Also, adds ORCID id to user attributes.
      * 
      * @param credentials the credentials
-     * @throws MCRORCIDException if serialization fails
+     * @throws MCRORCIDException if crededentials are invalid
      * @see MCRORCIDUser#addORCID
      */
     public void storeCredentials(MCRORCIDCredentials credentials) throws MCRORCIDException {
         final String orcid = credentials.getORCID();
         addORCID(orcid);
-        final String credentialsString = serializeCredentials(credentials);
+        if (!MCRORCIDValidationHelper.validateCredentials(credentials)) {
+            throw new MCRORCIDException("Credentials are invalid");
+        }
+        String credentialsString = null;
+        try {
+            credentialsString = serializeCredentials(credentials);
+        } catch (IllegalArgumentException e) {
+            throw new MCRORCIDException("Credentials are invalid");
+        }
         user.setUserAttribute(ATTR_ORCID_CREDENTIALS + orcid, credentialsString);
         MCRUserManager.updateUser(user);
     }
@@ -246,9 +259,9 @@ public class MCRORCIDUser {
      * 
      * @param credentials credentials
      * @return MCRORCIDCredentials as String
-     * @throws MCRORCIDException if serialization fails
+     * @throws IllegalArgumentException if serialization fails
      */
-    protected static String serializeCredentials(MCRORCIDCredentials credentials) throws MCRORCIDException {
+    protected static String serializeCredentials(MCRORCIDCredentials credentials) throws IllegalArgumentException {
         try {
             final MCRORCIDCredentials cloned = (MCRORCIDCredentials) credentials.clone();
             cloned.setExpiresIn(null);
@@ -258,7 +271,7 @@ public class MCRORCIDUser {
             mapper.setSerializationInclusion(Include.NON_NULL);
             return mapper.writeValueAsString(cloned);
         } catch (JsonProcessingException | CloneNotSupportedException e) {
-            throw new MCRORCIDException("Credentials serialization failed.");
+            throw new IllegalArgumentException(e);
         }
     }
 

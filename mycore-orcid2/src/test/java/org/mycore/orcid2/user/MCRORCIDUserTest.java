@@ -35,16 +35,20 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final String testORCID = "0000-0001-2345-6789";
+
+    private static final String testAccessToken = "accessToken";
+
     @Test
     public void testStoreGetCredentials() {
         MCRUser user = new MCRUser("junit");
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
         assertEquals(0, orcidUser.listCredentials().size());
-        final MCRORCIDCredentials credentials = new MCRORCIDCredentials("orcid", "accessToken");
+        final MCRORCIDCredentials credentials = new MCRORCIDCredentials(testORCID, testAccessToken);
         orcidUser.storeCredentials(credentials);
         assertEquals(2, user.getAttributes().size()); // id_orcid + orcid_credentials_orcid
-        assertNotNull(user.getUserAttribute("orcid_credentials_orcid"));
+        assertNotNull(user.getUserAttribute("orcid_credentials_" + testORCID));
         assertEquals(credentials.getORCID(), user.getUserAttribute("id_orcid"));
         assertEquals(credentials, orcidUser.getCredentials(credentials.getORCID()));
     }
@@ -54,24 +58,23 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         MCRUser user = new MCRUser("junit");
         MCRUserManager.createUser(user);
         MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-        final MCRORCIDCredentials credentials = new MCRORCIDCredentials("orcid", "accessToken");
+        final MCRORCIDCredentials credentials = new MCRORCIDCredentials(testORCID, testAccessToken);
         orcidUser.storeCredentials(credentials);
         user.setUserAttribute("test", "test");
         orcidUser.removeAllCredentials();
         assertEquals(2, user.getAttributes().size()); // id_orcid + test
-        assertEquals("orcid", user.getUserAttribute("id_orcid"));
+        assertEquals(testORCID, user.getUserAttribute("id_orcid"));
         assertEquals("test", user.getUserAttribute("test"));
     }
 
     @Test
     public void testSerialization() {
-        final MCRORCIDCredentials credentials
-            = new MCRORCIDCredentials("0000-0001-2345-6789", "f5af9f51-07e6-4332-8f1a-c0c11c1e3728");
+        final MCRORCIDCredentials credentials = new MCRORCIDCredentials(testORCID, testAccessToken);
         credentials.setTokenType("bearer");
-        credentials.setRefreshToken("f725f747-3a65-49f6-a231-3e8944ce464d");
+        credentials.setRefreshToken("refreshToken");
         credentials.setExpiresIn("631138518");
         credentials.setScope("/read-limited");
-        credentials.setName("Sofia Garcia");
+        credentials.setName("MyCoRe");
         credentials.setExpiration(new Date());
         final String credentialsString = MCRORCIDUser.serializeCredentials(credentials);
         LOGGER.info(credentialsString);
