@@ -18,7 +18,7 @@
 
 package org.mycore.ocfl.layout;
 
-import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
+import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 
 import edu.wisc.library.ocfl.api.exception.OcflExtensionException;
 import edu.wisc.library.ocfl.core.extension.OcflExtensionConfig;

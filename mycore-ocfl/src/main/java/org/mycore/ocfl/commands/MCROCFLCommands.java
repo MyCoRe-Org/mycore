@@ -33,12 +33,12 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
-import org.mycore.ocfl.MCROCFLMigration;
-import org.mycore.ocfl.MCROCFLObjectIDPrefixHelper;
 import org.mycore.ocfl.MCROCFLPersistenceTransaction;
-import org.mycore.ocfl.MCROCFLRepositoryProvider;
-import org.mycore.ocfl.MCROCFLXMLClassificationManager;
+import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
+import org.mycore.ocfl.metadata.MCROCFLMigration;
+import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.user.MCROCFLXMLUserManager;
+import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 

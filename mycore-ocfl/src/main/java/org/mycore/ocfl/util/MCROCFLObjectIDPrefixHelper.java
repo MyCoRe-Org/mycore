@@ -16,7 +16,7 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl;
+package org.mycore.ocfl.util;
 
 /**
  * Prefixes to map MyCoRe IDs to OCFL object IDs.
