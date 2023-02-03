@@ -64,6 +64,12 @@ public class MCRORCIDResource {
         return new MCRORCIDUserStatus(orcids, credentials);
     }
 
+    /**
+     * Revokes ORCID iD for current user.
+     * 
+     * @param orcid the ORCID iD
+     * @return Response
+     */
     @GET
     @Path("revoke")
     public Response revoke(@PathParam("orcid") String orcid) throws WebApplicationException {
@@ -82,6 +88,12 @@ public class MCRORCIDResource {
         }
     }
 
+    /**
+     * Stores MCRORCIDCredentials to current user.
+     * 
+     * @param credentials MCRORCIDCredentials
+     * @return Response
+     */
     @POST
     @Path("storeCredentials")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -93,7 +105,6 @@ public class MCRORCIDResource {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        // validate credentials
         orcidUser.storeCredentials(credentials);
         return Response.ok().build();
     }

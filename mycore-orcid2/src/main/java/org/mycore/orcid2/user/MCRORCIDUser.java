@@ -57,6 +57,9 @@ public class MCRORCIDUser {
      */
     public static final String ATTR_ORCID_CREDENTIALS = "orcid_credentials_";
 
+    /**
+     * ORCID iD user attribute name.
+     */
     public static final String ATTR_ORCID_ID = ATTR_ID_PREFIX + "orcid";
 
     private final MCRUser user;
@@ -64,7 +67,7 @@ public class MCRORCIDUser {
     /**
      * Wraps MCRUser to MCRORCIDUser.
      * 
-     * @param user the user
+     * @param user the MCRUser
      */
     public MCRORCIDUser(MCRUser user) {
         this.user = user;
@@ -73,16 +76,16 @@ public class MCRORCIDUser {
     /**
      * Returns MCRUser.
      *
-     * @return user
+     * @return MCRUser
      */
     public MCRUser getUser() {
         return user;
     }
 
     /**
-     * Adds ORCID id to user's user attributes.
+     * Adds ORCID iD to user's user attributes.
      * 
-     * @param orcid the orcid id
+     * @param orcid the ORCID iD
      * @throws MCRORCIDException if ORCID iD is invalid
      */
     public void addORCID(String orcid) throws MCRORCIDException {
@@ -96,9 +99,9 @@ public class MCRORCIDUser {
         }
     }
 
-    /** Returns user's orcid ids.
+    /** Returns user's ORCID iDs.
      * 
-     * @return ids as set
+     * @return ORCID iDs as set
      */
     public Set<String> getORCIDs() {
         return user.getAttributes().stream().filter(a -> a.getName().startsWith(ATTR_ORCID_ID))
@@ -106,7 +109,7 @@ public class MCRORCIDUser {
     }
 
     /** 
-     * Sets MCRORCIDCredentials to user's user attributes.
+     * Sets MCRORCIDCredentials to user's MCRUserAttribute.
      * Also, adds ORCID id to user attributes.
      * 
      * @param credentials the credentials
@@ -130,7 +133,7 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Removes all MCRORCIDCredentials attributes if exists.
+     * Removes all MCRORCIDCredentials attributes.
      */
     public void removeAllCredentials() {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
@@ -145,9 +148,9 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Removes MCROCIDCredentials by orcid if exists.
+     * Removes MCROCIDCredentials by ORCID id if exists.
      * 
-     * @param orcid the orcid
+     * @param orcid the ORCID iD
      */
     public void removeCredentials(String orcid) {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
@@ -164,7 +167,7 @@ public class MCRORCIDUser {
     /**
      * Checks if user has MCRORCIDCredentials.
      * 
-     * @return true if user has credentials
+     * @return true if user has MCRCredentials
      */
     public boolean hasCredentials() {
         return user.getAttributes().stream()
@@ -172,10 +175,10 @@ public class MCRORCIDUser {
     }
 
     /** 
-     * Gets user's MCRORCIDCredentials from user attributes.
+     * Lists user's MCRORCIDCredentials from user attributes.
      * 
-     * @return List of credentials
-     * @throws MCRORCIDException if the are corrupt credentials
+     * @return List of MCRCredentials
+     * @throws MCRORCIDException if the are corrupt MCRCredentials
      */
     public List<MCRORCIDCredentials> listCredentials() throws MCRORCIDException {
         final List<MCRUserAttribute> attributes = user.getAttributes().stream()
@@ -193,11 +196,11 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Gets user's MCRORCIDCredentials by orcid.
+     * Gets user's MCRORCIDCredentials by ORCID iD.
      * 
-     * @param orcid the orcid
-     * @return credentials or null
-     * @throws MCRORCIDException if the credentials are corrupt
+     * @param orcid the ORCID iD
+     * @return MCRCredentials or null
+     * @throws MCRORCIDException if the MCRCredentials are corrupt
      */
     public MCRORCIDCredentials getCredentials(String orcid) throws MCRORCIDException {
         final String credentialsString = user.getUserAttribute(ATTR_ORCID_CREDENTIALS + orcid);
@@ -215,9 +218,9 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Revokes orcid access token by orcid.
+     * Revokes orcid access token by ORCID iD.
      * 
-     * @param orcid the orcid
+     * @param orcid the ORCID iD
      * @throws MCRORCIDException if revoke request fails
      */
     public void revokeCredentials(String orcid) throws MCRORCIDException {
@@ -257,7 +260,7 @@ public class MCRORCIDUser {
     /**
      * Serializes MCRORCIDCredentials to String.
      * 
-     * @param credentials credentials
+     * @param credentials MCRCredentials
      * @return MCRORCIDCredentials as String
      * @throws IllegalArgumentException if serialization fails
      */
@@ -278,7 +281,7 @@ public class MCRORCIDUser {
     /**
      * Deserializes Stirng to MCRORCIDCredentials.
      * 
-     * @param credentialsString credentials as String
+     * @param credentialsString MCRCredentials as String
      * @return MCRORCIDCredentials
      * @throws IllegalArgumentException if deserialisation fails
      */

@@ -57,6 +57,13 @@ abstract class MCRORCIDAPIClient {
         this.baseTarget = client.target(restURL.endsWith("/") ? restURL : restURL + "/");
     }
 
+    /**
+     * Fetches ORCID with given query params.
+     * 
+     * @param path the path
+     * @param queryMap the query params
+     * @return the Response
+     */
     protected Response fetch(String path, Map<String, Object> queryMap) {
         WebTarget target = baseTarget.path(path);
         for (Map.Entry<String, Object> entry : queryMap.entrySet()) {

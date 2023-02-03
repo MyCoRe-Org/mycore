@@ -26,7 +26,7 @@ import org.mycore.orcid2.user.MCRORCIDCredentials;
 public class MCRORCIDValidationHelper {
 
     /**
-     * Validates MCRORCIDCredentials
+     * Validates MCRORCIDCredentials.
      * 
      * @param credentials MCRORCIDCredentials
      * @return true if credentials are valid
@@ -45,7 +45,7 @@ public class MCRORCIDValidationHelper {
 
 
     /**
-     * Validates an ORCID iD
+     * Validates an ORCID iD.
      * 
      * @param orcid ORCID iD
      * @return true if ORCID iD is valid

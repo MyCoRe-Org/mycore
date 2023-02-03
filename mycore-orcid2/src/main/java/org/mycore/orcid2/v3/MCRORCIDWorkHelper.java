@@ -127,6 +127,15 @@ public class MCRORCIDWorkHelper {
         return modslist;
     }
 
+    /**
+     * Publishes MCRObject with given MCRORCIDCredentials to ORCID.
+     * 
+     * @param object the MCRObject
+     * @param credentials the MCRORCIDCredentials
+     * @return ORCID put code of published MCRObject
+     * @throws MCRORCIDRequestException if publishing fails
+     * @throws MCRException if transformation to orcid model fails
+     */
     public static long publishToORCID(MCRObject object, MCRORCIDCredentials credentials)
         throws MCRException, MCRORCIDRequestException {
         final MCRORCIDClient memberClient = MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials);
@@ -151,11 +160,11 @@ public class MCRORCIDWorkHelper {
     }
 
     /**
-     * Returns a stream of WorkSummaries matching the identifiers of the MCRObject.
+     * Returns a Stream of WorkSummaries matching the identifiers of the MCRObject.
      *
      * @param object the MCRObject
      * @param workSummaries List of WorkSummaries
-     * @return List of matching WorkSummaries
+     * @return Stream of matching WorkSummaries
      */
     public static Stream<WorkSummary> findMatchingSummaries(MCRObject object, List<WorkSummary> workSummaries) {
         final Set<String> identifiersKeys = MCRORCIDUtils.getIdentifierKeys(new MCRMODSWrapper(object));
