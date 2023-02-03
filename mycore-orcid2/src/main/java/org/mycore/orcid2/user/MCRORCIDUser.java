@@ -162,7 +162,7 @@ public class MCRORCIDUser {
      * Gets user's MCRORCIDCredentials from user attributes.
      * 
      * @return List of credentials
-     * @throws MCRORCIDException if serialization fails
+     * @throws MCRORCIDException if the are corrupt credentials
      */
     public List<MCRORCIDCredentials> listCredentials() throws MCRORCIDException {
         final List<MCRUserAttribute> attributes = user.getAttributes().stream()
@@ -184,14 +184,19 @@ public class MCRORCIDUser {
      * 
      * @param orcid the orcid
      * @return credentials or null
-     * @throws MCRORCIDException if serialization fails
+     * @throws MCRORCIDException if the credentials are corrupt
      */
     public MCRORCIDCredentials getCredentials(String orcid) throws MCRORCIDException {
         final String credentialsString = user.getUserAttribute(ATTR_ORCID_CREDENTIALS + orcid);
         if (credentialsString == null) {
             return null;
         }
-        final MCRORCIDCredentials credentials = deserializeCredentials(credentialsString);
+        MCRORCIDCredentials credentials = null;
+        try {
+            credentials = deserializeCredentials(credentialsString);
+        } catch (IllegalArgumentException e) {
+            throw new MCRORCIDException("Credentials are corrupt");
+        }
         credentials.setORCID(orcid);
         return credentials;
     }
@@ -262,13 +267,14 @@ public class MCRORCIDUser {
      * 
      * @param credentialsString credentials as String
      * @return MCRORCIDCredentials
-     * @throws MCRORCIDException if serialization fails
+     * @throws IllegalArgumentException if deserialisation fails
      */
-    protected static MCRORCIDCredentials deserializeCredentials(String credentialsString) throws MCRORCIDException {
+    protected static MCRORCIDCredentials deserializeCredentials(String credentialsString)
+        throws IllegalArgumentException {
         try {
             return new ObjectMapper().readValue(credentialsString, MCRORCIDCredentials.class);
         } catch (JsonProcessingException e) {
-            throw new MCRORCIDException("Credentials deserialization failed.");
+            throw new IllegalArgumentException(e);
         }
     }
 }

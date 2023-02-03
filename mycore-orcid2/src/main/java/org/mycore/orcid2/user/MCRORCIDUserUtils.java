@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.user;
 
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.user2.MCRUserManager;
 
 /**
@@ -41,8 +42,9 @@ public class MCRORCIDUserUtils {
      * 
      * @param orcid the orcid
      * @return MCRORCIDCredentials or null
+     * @throws MCRORCIDException if the credentials are corrupt
      */
-    public static MCRORCIDCredentials getCredentials(String orcid) {
+    public static MCRORCIDCredentials getCredentials(String orcid) throws MCRORCIDException {
         final MCRORCIDUser user = getORCIDUser(orcid);
         if (user != null) {
             return user.getCredentials(orcid);
