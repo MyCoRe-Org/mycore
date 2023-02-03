@@ -178,7 +178,7 @@ public class MCRDNBURNRestClient {
             case HttpStatus.SC_OK:
                 HttpEntity entity = response.getEntity();
                 try {
-                    Reader reader = new InputStreamReader(entity.getContent());
+                    Reader reader = new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8);
                     JsonElement jsonElement = JsonParser.parseReader(reader);
                     return Optional.of(jsonElement.getAsJsonObject());
                 } catch (Exception e) {
