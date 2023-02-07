@@ -53,6 +53,10 @@ public class MCRServletContextResourceImporter implements Importer {
 
     private final ServletContext context;
 
+    /**
+     * Initialize MCRServletContextResourceImporter
+     * @param context - the servlet context
+     */
     public MCRServletContextResourceImporter(ServletContext context) {
         this.context = context;
     }

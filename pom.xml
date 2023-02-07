@@ -191,15 +191,15 @@ Applications based on MyCoRe use a common core, which provides the functionality
               </group>
             </groups>
             <links>
-              <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
-              <link>https://javaee.github.io/javaee-spec/javadocs/</link>
+              <link>https://docs.oracle.com/en/java/javase/17/docs/api/</link>
+              <link>https://jakarta.ee/specifications/platform/9/apidocs/</link>
               <link>http://www.jdom.org/docs/apidocs/</link>
               <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-              <link>http://docs.jboss.org/hibernate/orm/5.5/javadocs/</link>
-              <link>https://jakarta.ee/specifications/persistence/3.0/apidocs/</link>
+              <link>http://docs.jboss.org/hibernate/orm/5.6/javadocs/</link>
+              <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
               <!--
-              <link>http://lucene.apache.org/solr/8_6_0/solr-solrj/</link>
--->
+              <link>https://solr.apache.org/docs/8_11_2/solr-solrj/</link>
+			  -->
             </links>
           </configuration>
         </plugin>
@@ -700,15 +700,15 @@ Applications based on MyCoRe use a common core, which provides the functionality
                 </group>
               </groups>
               <links>
-                <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
-                <link>https://javaee.github.io/javaee-spec/javadocs/</link>
+                <link>https://docs.oracle.com/en/java/javase/17/docs/api/</link>
+                <link>https://jakarta.ee/specifications/platform/9/apidocs/</link>
                 <link>http://www.jdom.org/docs/apidocs/</link>
                 <link>https://logging.apache.org/log4j/2.x/log4j-api/apidocs/</link>
-                <link>http://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
-                <link>https://jakarta.ee/specifications/persistence/3.0/apidocs/</link>
+                <link>http://docs.jboss.org/hibernate/orm/5.6/javadocs/</link>
+                <link>https://jakarta.ee/specifications/persistence/3.1/apidocs/</link>
                 <!--
-                <link>http://lucene.apache.org/solr/8_6_0/solr-solrj/</link>
--->
+                <link>https://solr.apache.org/docs/8_11_2/solr-solrj/</link>
+                -->
               </links>
             </configuration>
             <reportSets>

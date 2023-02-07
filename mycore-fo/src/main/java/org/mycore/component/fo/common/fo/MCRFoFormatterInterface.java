@@ -31,8 +31,15 @@ import org.mycore.common.content.MCRContent;
  * @author Jens Kupferschmidt
  * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
  */
-
 public interface MCRFoFormatterInterface {
 
+    /**
+     * transform the given MCRContent to the given OutputStream
+     * 
+     * @param input the MCRContent
+     * @param out the target output stream
+     * @throws TransformerException if the transformation goes wrong
+     * @throws IOException if an I/O error occurs
+     */
     void transform(MCRContent input, OutputStream out) throws TransformerException, IOException;
 }

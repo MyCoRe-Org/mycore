@@ -43,6 +43,9 @@ import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
+/**
+ * Resource to deliver CSS files compiled by SASS
+ */
 @Path("/sass/")
 @MCRStaticContent
 public class MCRSassResource {
@@ -52,6 +55,12 @@ public class MCRSassResource {
     @Context
     ServletContext context;
 
+    /**
+     * return the compiled CSS 
+     * @param name - the name of file
+     * @param request - the Http request
+     * @return the response object
+     */
     @GET
     @Path("{fileName:.+}")
     @Produces("text/css")

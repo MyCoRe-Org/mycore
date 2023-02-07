@@ -39,7 +39,7 @@ public class MCRFoFormatterHelper {
     /** The singleton */
     private static MCRFoFormatterInterface formatter;
 
-    /** Returns the XSL-FO formatter instance configured */
+    /** @return the XSL-FO formatter instance configured */
     public static synchronized MCRFoFormatterInterface getFoFormatter() {
         if (formatter == null) {
             formatter = MCRConfiguration2.<MCRFoFormatterInterface>getInstanceOf(PROPERTY)

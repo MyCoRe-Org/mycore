@@ -33,27 +33,46 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+/**
+ * SAX Error handler for validating TEI XML
+ */
 public class MCRTEIValidator implements ErrorHandler {
 
+    /**
+     * XML Schema file for transcriptions
+     */
     public static final String MCR_TRANSCRIPTION_SCHEMA = "xsd/mcrtranscr.xsd";
 
+    /** 
+     * Exception map key: fatalError 
+     */
     public static final String FATAL_ERROR = "fatalError";
 
+    /** 
+     * Exception map key: error 
+     */
     public static final String ERROR = "error";
 
+    /** 
+     * Exception map key: warning 
+     */
     public static final String WARNING = "warning";
 
     private Hashtable<String, List<SAXParseException>> exceptionMap;
 
     private Source teiSource;
 
+    /**
+     * initialize TEI validator
+     * @param teiSource - the TEI XML source
+     */
     public MCRTEIValidator(Source teiSource) {
         this.teiSource = teiSource;
 
         this.exceptionMap = new Hashtable<>();
-        this.exceptionMap.put("warning", new ArrayList<>());
-        this.exceptionMap.put("error", new ArrayList<>());
-        this.exceptionMap.put("fatalError", new ArrayList<>());
+        this.exceptionMap.put(WARNING, new ArrayList<>());
+        this.exceptionMap.put(ERROR, new ArrayList<>());
+        this.exceptionMap.put(FATAL_ERROR, new ArrayList<>());
     }
 
     private Schema getSchema(String path) throws SAXException {
@@ -64,6 +83,11 @@ public class MCRTEIValidator implements ErrorHandler {
             path));
     }
 
+    /**
+     * run the TEI validator
+     * @throws IOException - if the input cannot be read
+     * @throws SAXException - if the XML parsing fails
+     */
     public void validate() throws IOException, SAXException {
         Validator validator = this.getSchema(MCR_TRANSCRIPTION_SCHEMA).newValidator();
         validator.setErrorHandler(this);
@@ -85,14 +109,23 @@ public class MCRTEIValidator implements ErrorHandler {
         this.exceptionMap.get(FATAL_ERROR).add(exception);
     }
 
+    /**
+     * @return the list of warnings
+     */
     public List<SAXParseException> getWarnings() {
         return this.exceptionMap.get(WARNING);
     }
 
+    /**
+     * @return the list of errors
+     */
     public List<SAXParseException> getErrors() {
         return this.exceptionMap.get(ERROR);
     }
 
+    /**
+     * @return the list of fatal errors
+     */
     public List<SAXParseException> getFatals() {
         return this.exceptionMap.get(FATAL_ERROR);
     }
