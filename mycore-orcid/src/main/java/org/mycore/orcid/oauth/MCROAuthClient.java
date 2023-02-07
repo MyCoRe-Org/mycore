@@ -111,7 +111,14 @@ public class MCROAuthClient {
         builder.addParameter("scope", scopes.trim());
         builder.addParameter("state", buildStateParam());
         builder.addParameter("prompt", "login");
-        builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+        
+        // check if current lang is supported
+        String supportedLanguages = MCRConfiguration2.getStringOrThrow("MCR.ORCID.SupportedLanguages");
+        if (supportedLanguages.contains(MCRSessionMgr.getCurrentSession().getCurrentLanguage())) {
+            builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+        } else {
+            builder.addParameter("lang", "en");
+        }
 
         if (MCRConfiguration2.getOrThrow("MCR.ORCID.PreFillRegistrationForm", Boolean::parseBoolean)) {
             preFillRegistrationForm(builder);
