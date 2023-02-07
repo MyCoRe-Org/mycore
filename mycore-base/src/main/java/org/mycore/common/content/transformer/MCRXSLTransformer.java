@@ -28,7 +28,6 @@ import java.util.Optional;
 import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -57,6 +56,7 @@ import org.mycore.common.content.streams.MCRByteArrayOutputStream;
 import org.mycore.common.xml.MCREntityResolver;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.common.xsl.MCRParameterCollector;
 import org.mycore.common.xsl.MCRTemplatesSource;
@@ -331,16 +331,7 @@ public class MCRXSLTransformer extends MCRParameterizedTransformer {
         if (fileExtension != null && !getDefaultExtension().equals(fileExtension)) {
             return fileExtension;
         }
-        Properties outputProperties = getOutputProperties();
-        //until we have a better solution
-        String definedMimeType = getMimeType();
-        if ("text/html".equals(definedMimeType) || "html".equals(outputProperties.getProperty(OutputKeys.METHOD))) {
-            return "html";
-        }
-        if ("text/xml".equals(definedMimeType)) {
-            return "xml";
-        }
-        return getDefaultExtension();
+       return MCRXSLTransformerUtils.getFileExtension(getOutputProperties(), getDefaultExtension());
     }
 
     static class MCRTransformedContent extends MCRWrappedContent {

@@ -80,6 +80,7 @@ import org.mycore.common.xml.MCRLayoutTransformerFactory;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXMLParserFactory;
+import org.mycore.common.xml.MCRXSLTransformerUtils;
 import org.mycore.common.xsl.MCRErrorListener;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -622,7 +623,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 100)
     public static void exportWithStylesheet(String fromID, String toID, String dirname, String style) {
         Transformer transformer = getTransformer(style != null ? style + "-object" : null);
-        exportWith(fromID, toID, dirname, (content, out) -> {
+        String extension = MCRXSLTransformerUtils.getFileExtension(transformer, "xml");
+        exportWith(fromID, toID, dirname, extension, (content, out) -> {
             StreamResult sr = new StreamResult(out);
             JDOMSource doc = new JDOMSource(MCRXMLParserFactory.getNonValidatingParser().parseXML(content));
             transformer.transform(doc, sr);
@@ -650,10 +652,18 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         order = 100)
     public static void exportWithTransformer(String fromID, String toID, String dirname, String transname) {
         MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer(transname);
-        exportWith(fromID, toID, dirname, transformer::transform);
+        exportWith(fromID, toID, dirname, getExtension(transformer), transformer::transform);
     }
 
-    private static void exportWith(String fromID, String toID, String dirname,
+    private static String getExtension(MCRContentTransformer transformer) {
+        try {
+            return transformer.getFileExtension();
+        } catch (Exception e) {
+            throw new MCRException(e);
+        }
+    }
+
+    private static void exportWith(String fromID, String toID, String dirname, String extension,
         FailableBiConsumer<MCRContent, OutputStream, Exception> trans) {
         MCRObjectID fid, tid;
 
@@ -679,7 +689,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 if (!MCRMetadataManager.exists(MCRObjectID.getInstance(id))) {
                     continue;
                 }
-                if (!exportMCRObject(dir, trans, id)) {
+                if (!exportMCRObject(dir, extension, trans, id)) {
                     continue;
                 }
                 k++;
@@ -776,6 +786,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *
      * @param dir
      *            the file instance to store
+     * @param extension
+     *            the file extension to use
      * @param trans
      *            the transformation
      * @param nid
@@ -784,7 +796,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws IOException
      * @throws MCRException
      */
-    private static boolean exportMCRObject(File dir, FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
+    private static boolean exportMCRObject(File dir, String extension,
+        FailableBiConsumer<MCRContent, OutputStream, Exception> trans,
         String nid) throws IOException, MCRException {
         MCRContent content;
         try {
@@ -794,7 +807,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return false;
         }
 
-        File xmlOutput = new File(dir, nid + ".xml");
+        File xmlOutput = new File(dir, nid + "." + extension);
 
         if (trans != null) {
             FileOutputStream out = new FileOutputStream(xmlOutput);
