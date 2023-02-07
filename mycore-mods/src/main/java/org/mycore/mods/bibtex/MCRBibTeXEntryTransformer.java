@@ -94,6 +94,7 @@ class MCRBibTeXEntryTransformer {
         fieldTransformers.add(new MCRField2XPathTransformer("type", "mods:note" + MCRFieldTransformer.AS_NEW_ELEMENT));
         fieldTransformers.add(new MCRField2XPathTransformer("source", "mods:recordInfo/mods:recordOrigin"));
         fieldTransformers.add(new MCRField2XPathTransformer("annote", "mods:note"));
+        fieldTransformers.add(new MCRField2XPathTransformer("pagetotal", "mods:physicalDescription/mods:extent"));
         fieldTransformers.add(new MCRUnsupportedFieldTransformer(fieldTransformers));
     }
 
