@@ -30,22 +30,23 @@ import org.jdom2.Element;
 import org.jdom2.output.XMLOutputter;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.content.MCRJDOMContent;
 import org.orcid.jaxb.model.v3.release.record.Work;
 
-public class MCRORCIDWorkTransformerTest extends MCRTestCase {
+public class MCRORCIDWorkTransformerHelperTest extends MCRTestCase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Test
     public void testTransformContent() throws Exception {
         final JAXBContext jaxbContext = JAXBContext.newInstance(Work.class);
-        final URL inputUrl = MCRORCIDWorkTransformerTest.class.getResource("/work_example.xml");
+        final URL inputUrl = MCRORCIDWorkTransformerHelperTest.class.getResource("/work_example.xml");
         final Work work = (Work) jaxbContext.createUnmarshaller().unmarshal(inputUrl);
         LOGGER.info(work);
-        final MCRORCIDWorkTransformer transformer = MCRORCIDWorkTransformer.getInstance();
-        final Element mods = transformer.transformToMODS(work);
+
+        final Element mods = MCRORCIDWorkTransformerHelper.transformWork(work).asXML().detachRootElement();
         LOGGER.info(new XMLOutputter().outputString(mods));
-        final Work result = transformer.transformToWork(mods);
+        final Work result = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(mods));
         LOGGER.info(result);
         assertEquals(work.getWorkType(), result.getWorkType());
         LOGGER.warn("Skipping contributors...");

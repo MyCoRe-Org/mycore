@@ -31,6 +31,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
+
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -39,8 +40,7 @@ import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
-import org.mycore.orcid2.v3.transformer.MCRORCIDWorkSummaryTransformer;
-import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformer;
+import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
@@ -50,25 +50,6 @@ import org.xml.sax.SAXException;
  * Provides utility methods for Work and WorkSummaries.
  */
 public class MCRORCIDWorkHelper {
-
-    /**
-     * Transforms and merges List of work summaries to Element.
-     * 
-     * @param works List of work summaries
-     * @return merged Element
-     * @throws JAXBException
-     * @throws JDOMException
-     * @throws SAXException
-     * @throws IOException
-     */
-    public static Element buildMergedMODSFromWorkSummaries(List<WorkSummary> workSummaries)
-        throws IOException, JAXBException, JDOMException, SAXException {
-        final List<Element> modsElements = new ArrayList<Element>();
-        for (WorkSummary workSummary : workSummaries) {
-            modsElements.add(MCRORCIDWorkSummaryTransformer.getInstance().transformToMODS(workSummary));
-        }
-        return mergeElements(modsElements);
-    }
 
     /**
      * Transforms and merges List of works to Element.
@@ -84,28 +65,9 @@ public class MCRORCIDWorkHelper {
         throws JAXBException, JDOMException, SAXException, IOException {
         final List<Element> modsElements = new ArrayList<Element>();
         for (Work work : works) {
-            modsElements.add(MCRORCIDWorkTransformer.getInstance().transformToMODS(work));
+            modsElements.add(MCRORCIDWorkTransformerHelper.transformWork(work).asXML().detachRootElement());
         }
         return mergeElements(modsElements);
-    }
-
-    /**
-     * Transforms List of work summaries to List of elements.
-     * 
-     * @param works List of work summaries
-     * @return List of elements
-     * @throws JAXBException
-     * @throws JDOMException
-     * @throws SAXException
-     * @throws IOException
-     */
-    public static List<Element> buildUnmergedMODSFromWorkSummaries(List<WorkSummary> workSummaries)
-        throws JAXBException, JDOMException, SAXException, IOException {
-        final List<Element> modslist = new ArrayList<>();
-        for (WorkSummary workSummary : workSummaries) {
-            modslist.add(MCRORCIDWorkSummaryTransformer.getInstance().transformToMODS(workSummary).detach());
-        }
-        return modslist;
     }
 
     /**
@@ -120,11 +82,11 @@ public class MCRORCIDWorkHelper {
      */
     public static List<Element> buildUnmergedMODSFromWorks(List<Work> works)
         throws JAXBException, JDOMException, SAXException, IOException {
-        final List<Element> modslist = new ArrayList<>();
+        final List<Element> modsElements = new ArrayList<>();
         for (Work work : works) {
-            modslist.add(MCRORCIDWorkTransformer.getInstance().transformToMODS(work).detach());
+            modsElements.add(MCRORCIDWorkTransformerHelper.transformWork(work).asXML().detachRootElement());
         }
-        return modslist;
+        return modsElements;
     }
 
     /**
@@ -144,7 +106,7 @@ public class MCRORCIDWorkHelper {
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
             final MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(object.getId());
-            final Work transformedWork = MCRORCIDWorkTransformer.getInstance().transformToWork(content);
+            final Work transformedWork = MCRORCIDWorkTransformerHelper.transformContent(content);
             final WorkSummary work = findMatchingSummaries(object, summaries).findFirst()
                 .orElse(null);
             if (work != null) {
@@ -190,4 +152,5 @@ public class MCRORCIDWorkHelper {
         a.retainAll(b);
         return !a.isEmpty();
     }
+
 }
