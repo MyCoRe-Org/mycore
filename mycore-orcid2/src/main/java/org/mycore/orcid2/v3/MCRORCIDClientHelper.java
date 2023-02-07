@@ -45,13 +45,14 @@ public class MCRORCIDClientHelper {
      * @return the result as specified type
      * @throws MCRORCIDRequestException if the request fails
      */
-    public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType)
+    public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
+            long... putCodes)
         throws MCRORCIDRequestException {
         final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentials(orcid);
         if (credentials != null) {
             try {
                 return MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials).fetch(section,
-                    valueType);
+                    valueType, putCodes);
             } catch (MCRORCIDRequestException e) {
                 final Response response = e.getErrorResponse();
                 if (Response.Status.Family.CLIENT_ERROR.equals(response.getStatusInfo().getFamily())) {
@@ -60,13 +61,14 @@ public class MCRORCIDClientHelper {
                             + " Token has probably expired.",
                         orcid, response.getStatus());
                     return MCRORCIDAPIClientFactoryImpl.getInstance().createPublicClient().fetch(orcid, section,
-                        valueType);
+                        valueType, putCodes);
                 } else {
                     throw e;
                 }
             }
         } else {
-            return MCRORCIDAPIClientFactoryImpl.getInstance().createPublicClient().fetch(orcid, section, valueType);
+            return MCRORCIDAPIClientFactoryImpl.getInstance().createPublicClient().fetch(orcid, section, valueType,
+                putCodes);
         }
     }
 }
