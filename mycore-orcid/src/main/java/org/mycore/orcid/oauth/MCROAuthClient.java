@@ -114,7 +114,8 @@ public class MCROAuthClient {
         
         // check if current lang is supported
         String supportedLanguages = MCRConfiguration2.getStringOrThrow("MCR.ORCID.SupportedLanguages");
-        if (supportedLanguages.contains(MCRSessionMgr.getCurrentSession().getCurrentLanguage())) {
+        List<String> langList  = Arrays.asList(supportedLanguages.split(",", -1));
+        if(langList.contains(MCRSessionMgr.getCurrentSession().getCurrentLanguage())) {
             builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
         } else {
             builder.addParameter("lang", "en");
