@@ -42,12 +42,12 @@ public class MCRORCIDClientHelper {
      * @param orcid the ORCID iD
      * @param section the section
      * @param valueType type of the response
+     * @param putCodes optional put codes 
      * @return the result as specified type
      * @throws MCRORCIDRequestException if the request fails
      */
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
-            long... putCodes)
-        throws MCRORCIDRequestException {
+            long... putCodes) throws MCRORCIDRequestException {
         final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentials(orcid);
         if (credentials != null) {
             try {

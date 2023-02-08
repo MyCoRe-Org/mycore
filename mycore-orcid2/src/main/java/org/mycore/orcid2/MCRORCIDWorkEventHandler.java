@@ -88,14 +88,14 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
                     if (tmp.size() == 1) {
                         credentials = tmp.get(0);
                     } else {
-                        LOGGER.info("Found more than one ORCID credentials for user: {}", user.getUserID());
+                        LOGGER.info("Found multiple ORCID credentials for user: {}", user.getUserID());
                         continue;
                     }
                 }
                 if (credentials != null) {
                     final String scope = credentials.getScope();
                     if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
-                        LOGGER.info("The scope is invalid. Skipping");
+                        LOGGER.info("The scope is invalid. Skipping...");
                     } else {
                         publishToORCID(object, credentials);
                     }
