@@ -22,6 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.mycore.common.MCRSessionMgr;
@@ -111,11 +113,11 @@ public class MCROAuthClient {
         builder.addParameter("scope", scopes.trim());
         builder.addParameter("state", buildStateParam());
         builder.addParameter("prompt", "login");
-        
+
         // check if current lang is supported
-        String supportedLanguages = MCRConfiguration2.getStringOrThrow("MCR.ORCID.SupportedLanguages");
-        List<String> langList  = Arrays.asList(supportedLanguages.split(",", -1));
-        if(langList.contains(MCRSessionMgr.getCurrentSession().getCurrentLanguage())) {
+        List<String> supportedLanguages
+            = Arrays.asList(MCRConfiguration2.getStringOrThrow("MCR.ORCID.SupportedLanguages").split(",", 0));
+        if (supportedLanguages.contains(MCRSessionMgr.getCurrentSession().getCurrentLanguage())) {
             builder.addParameter("lang", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
         } else {
             builder.addParameter("lang", "en");
