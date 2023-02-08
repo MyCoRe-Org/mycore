@@ -19,24 +19,20 @@
 package org.mycore.orcid2;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
+import org.mycore.orcid2.user.MCRIdentifier;
 
 /**
  * Provides utility methods.
  */
 public class MCRORCIDUtils {
-
-    private static final String MATCH_ONLY_NAME_IDENTIFIER
-        = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "User.NameIdentifier").orElse("");
 
     /**
      * Compares String with auth client's client id.
@@ -61,66 +57,61 @@ public class MCRORCIDUtils {
     }
 
     /**
-     * Extract all orcid name identifiers in mods.
+     * Extracts all orcid name identifiers in mods.
      * 
-     * @param object the object
-     * @return orcid name identifiers as set
+     * @param object the MCRObject
+     * @return Set of ORCID MCRIdentifier
      */
     public static Set<String> getORCIDs(MCRObject object) {
-        final MCRMODSWrapper wrapper = new MCRMODSWrapper(object);
-        return wrapper.getElements("mods:name/mods:nameIdentifier[@type='orcid']").stream().map(Element::getTextTrim)
+        return new MCRMODSWrapper(object).getElements("mods:name/mods:nameIdentifier[@type='orcid']").stream()
+            .map(Element::getTextTrim).collect(Collectors.toSet());
+    }
+
+    /**
+     * Lists mods:name Elements.
+     * 
+     * @param wrapper the MCRMODSWrapper
+     * @return List of name elements
+     */
+    public static List<Element> listNameElements(MCRMODSWrapper wrapper) {
+        return wrapper.getElements("mods:name");
+    }
+
+    /**
+     * Returns mods:nameIdentifer.
+     * 
+     * @param nameElement the mods:name Element
+     * @return Set of MCRIdentifier
+     */
+    public static Set<MCRIdentifier> getNameIdentifiers(Element nameElement) {
+        return nameElement.getChildren("nameIdentifier", MCRConstants.MODS_NAMESPACE).stream()
+            .map(e -> getIdentfierFromElement(e))
             .collect(Collectors.toSet());
     }
 
     /**
-     * Extracts all name identfiers from mods. Name identiers are represented as key
-     * value strings.
+     * Returns mods:nameIdentifer.
      * 
-     * MCR.ORCID2.User.NameIdentifier=
-     * 
-     * Optionally specifies the type of names identifiers.
-     * 
-     * @param wrapper wrapper of mods object
-     * @return set of name identifer keys
-     * @see MCRORCIDUtils#buildIdentifierKey
+     * @param wrapper the MCRMODSWrapper
+     * @return Set of MCRIdentifier
      */
-    public static Set<String> getNameIdentifierKeys(MCRMODSWrapper wrapper) {
-        return getIdentifierKeys(wrapper, !MATCH_ONLY_NAME_IDENTIFIER.isEmpty()
-            ? "[@type = '" + MATCH_ONLY_NAME_IDENTIFIER + "']" : "mods:name/mods:nameIdentifier");
+    public static Set<MCRIdentifier> getNameIdentifiers(MCRMODSWrapper wrapper) {
+        return wrapper.getElements("mods:nameIdentifier").stream().map(e -> getIdentfierFromElement(e))
+            .collect(Collectors.toSet());
     }
 
     /**
-     * Extracts all identfiers from mods. Name identiers are represented as key
-     * value strings.
+     * Returns mods:identifer.
      * 
-     * @param wrapper wrapper of mods object
-     * @return set of identifer keys
-     * @see MCRORCIDUtils#buildIdentifierKey
+     * @param wrapper the MCRMODSWrapper
+     * @return Set of MCRIdentifier
      */
-    public static Set<String> getIdentifierKeys(MCRMODSWrapper wrapper) {
-        return getIdentifierKeys(wrapper, "mods:identifier");
+    public static Set<MCRIdentifier> getIdentifiers(MCRMODSWrapper wrapper) {
+        return wrapper.getElements("mods:identifier").stream().map(e -> getIdentfierFromElement(e))
+            .collect(Collectors.toSet());
     }
 
-    /**
-     * Builds identifier key.
-     * 
-     * @param type identifier type
-     * @param value identifier value
-     * @return name identifier as key value string
-     */
-    public static String buildIdentifierKey(String type, String value) {
-        return String.format(Locale.ROOT, "%s:%s", type, value);
-    }
-
-    private static Set<String> getIdentifierKeys(MCRMODSWrapper wrapper, String xPath) {
-        return getIdentifierKeys(wrapper.getElements(xPath));
-    }
-
-    private static Set<String> getIdentifierKeys(List<Element> elements) {
-        return elements.stream().map(i -> buildIdentifierKey(i)).collect(Collectors.toSet());
-    }
-
-    private static String buildIdentifierKey(Element modsIdentifier) {
-        return buildIdentifierKey(modsIdentifier.getAttributeValue("type"), modsIdentifier.getTextTrim());
+    private static MCRIdentifier getIdentfierFromElement(Element element) {
+        return new MCRIdentifier(element.getAttributeValue("type"), element.getTextTrim());
     }
 }

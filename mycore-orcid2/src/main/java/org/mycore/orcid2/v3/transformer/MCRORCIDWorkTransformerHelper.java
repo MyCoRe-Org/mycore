@@ -27,6 +27,7 @@ import jakarta.xml.bind.Unmarshaller;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -47,7 +48,7 @@ public class MCRORCIDWorkTransformerHelper {
         try {
             context = JAXBContext.newInstance(Work.class);
         } catch (JAXBException e) {
-            //
+            throw new IllegalArgumentException("Could not init jaxb context");
         }
     }
 
@@ -57,12 +58,15 @@ public class MCRORCIDWorkTransformerHelper {
         return unmarshalWork(transformedContent);
     }
 
-    private static Work unmarshalWork(MCRContent content) throws IOException, JAXBException {
+    private static Work unmarshalWork(MCRContent content) throws IOException, JAXBException, MCRException {
+        checkContext();
         final Unmarshaller unmarshaller = context.createUnmarshaller();
         return (Work) unmarshaller.unmarshal(content.getInputSource());
     }
 
-    public static MCRContent transformWork(Work work) throws JAXBException, IOException, JDOMException, SAXException {
+    public static MCRContent transformWork(Work work)
+        throws JAXBException, IOException, JDOMException, SAXException, MCRException {
+        checkContext();
         final MCRJAXBContent<Work> workContent = new MCRJAXBContent(context, work);
         final MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("BaseORCIDv3Work2MODS");
         final MCRContent transformed = transformer.transform(workContent);
@@ -74,5 +78,11 @@ public class MCRORCIDWorkTransformerHelper {
             MCRMergeTool.merge(mods, modsBibTeX);
         }
         return new MCRJDOMContent(mods);
+    }
+
+    private static void checkContext() throws MCRException {
+        if (context == null) {
+            throw new MCRException("Jaxb context is not inited");
+        }
     }
 }

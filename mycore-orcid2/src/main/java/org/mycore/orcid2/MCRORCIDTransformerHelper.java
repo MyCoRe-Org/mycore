@@ -42,6 +42,9 @@ public class MCRORCIDTransformerHelper {
      *
      * @param bibTeX BibTex String
      * @return MODS Element
+     * @throws IOException
+     * @throws JDOMException
+     * @throws SAXException
      */
     public static Element transformBibTeXToMODS(String bibTeX) throws IOException, JDOMException, SAXException {
         final MCRContent result = T_BIBTEX2MODS.transform(new MCRStringContent(bibTeX));

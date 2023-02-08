@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -30,10 +31,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
+import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.exception.MCRORCIDException;
@@ -46,6 +49,15 @@ import org.mycore.user2.MCRUserManager;
  * Provides functionality to interact with MCRUser that is also an ORCID user.
  */
 public class MCRORCIDUser {
+
+    /**
+     * List of trusted name identifier types.
+     */
+    public static final List<String> TRUSTED_NAME_IDENTIFIER_TYPES
+        = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "User.TrustedNameIdentifierTypes")
+            .map(MCRConfiguration2::splitValue)
+            .orElseGet(() -> Stream.of("orcid"))
+            .collect(Collectors.toList());
 
     /**
      * Id prefix for user attributes.
@@ -240,20 +252,32 @@ public class MCRORCIDUser {
      */
     public boolean isMyPublication(MCRObjectID objectID) throws MCRPersistenceException {
         final MCRObject object = MCRMetadataManager.retrieveMCRObject(objectID);
-        final Set<String> nameIdentifierKeys = MCRORCIDUtils.getNameIdentifierKeys(new MCRMODSWrapper(object));
-        nameIdentifierKeys.retainAll(getIdentifierKeys());
-        return !nameIdentifierKeys.isEmpty();
+        final Set<MCRIdentifier> nameIdentifiers
+            = MCRORCIDUtils.getNameIdentifiers(new MCRMODSWrapper(object)); // TODO uniqueness of ids
+        nameIdentifiers.retainAll(getTrustedIdentifiers());
+        return !nameIdentifiers.isEmpty();
     }
 
     /**
-     * Returns users identifier keys.
+     * Returns users identifiers.
      * 
-     * @return identifer keys as set
-     * @see MCRORCIDUtils#buildIdentifierKey
+     * @return Set of MCRIdentifier
      */
-    public Set<String> getIdentifierKeys() {
+    public Set<MCRIdentifier> getIdentifiers() {
         return user.getAttributes().stream().filter(a -> a.getName().startsWith(ATTR_ID_PREFIX))
-            .map(a -> MCRORCIDUtils.buildIdentifierKey(a.getName().substring(ATTR_ID_PREFIX.length()), a.getValue()))
+            .map(a -> new MCRIdentifier(a.getName().substring(ATTR_ID_PREFIX.length()), a.getValue()))
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * Returns all trusted identifiers.
+     * MCR.ORCID2.User.TrustedNameIdentifierTypes=
+     * Optionally specifies the type of names identifiers.
+     * 
+     * @return Set of trusted MCRIdentifier
+     */
+    public Set<MCRIdentifier> getTrustedIdentifiers() {
+        return getIdentifiers().stream().filter(i -> TRUSTED_NAME_IDENTIFIER_TYPES.contains(i))
             .collect(Collectors.toSet());
     }
 

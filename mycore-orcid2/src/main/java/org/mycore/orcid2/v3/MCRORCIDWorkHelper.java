@@ -40,6 +40,7 @@ import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
@@ -129,15 +130,15 @@ public class MCRORCIDWorkHelper {
      * @return Stream of matching WorkSummaries
      */
     public static Stream<WorkSummary> findMatchingSummaries(MCRObject object, List<WorkSummary> workSummaries) {
-        final Set<String> identifiersKeys = MCRORCIDUtils.getIdentifierKeys(new MCRMODSWrapper(object));
-        if (identifiersKeys.isEmpty()) {
+        final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object));
+        if (identifiers.isEmpty()) {
             return Stream.empty();
         }
         return workSummaries.stream()
             .filter(w -> hasMatch(
                 w.getExternalIdentifiers().getExternalIdentifier().stream()
-                    .map(i -> MCRORCIDUtils.buildIdentifierKey(i.getType(), i.getValue())).collect(Collectors.toSet()),
-                identifiersKeys));
+                    .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet()),
+                identifiers));
     }
 
     private static Element mergeElements(List<Element> elements) {
@@ -148,7 +149,7 @@ public class MCRORCIDWorkHelper {
         return result;
     }
 
-    private static boolean hasMatch(Set<String> a, Set<String> b) {
+    private static boolean hasMatch(Set<MCRIdentifier> a, Set<MCRIdentifier> b) {
         a.retainAll(b);
         return !a.isEmpty();
     }

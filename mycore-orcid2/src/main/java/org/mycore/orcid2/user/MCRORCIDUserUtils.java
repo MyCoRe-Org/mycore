@@ -18,7 +18,11 @@
 
 package org.mycore.orcid2.user;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.mycore.orcid2.exception.MCRORCIDException;
+import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
 /**
@@ -31,10 +35,17 @@ public class MCRORCIDUserUtils {
      * 
      * @param orcid the orcid
      * @return MCRORCIDUser or null
+     * @throws MCRORCIDException if there is more than one matching user for orcid
      */
-    public static MCRORCIDUser getORCIDUser(String orcid) {
-        return MCRUserManager.getUsers(MCRORCIDUser.ATTR_ORCID_ID, orcid).findFirst()
-            .map(user -> new MCRORCIDUser(user)).orElse(null);
+    public static MCRORCIDUser getORCIDUser(String orcid) throws MCRORCIDException {
+        final Set<MCRUser> users
+            = MCRUserManager.getUsers(MCRORCIDUser.ATTR_ORCID_ID, orcid).collect(Collectors.toSet());
+        if (users.isEmpty()) {
+            return null;
+        } else if (users.size() == 1) {
+            return new MCRORCIDUser(users.iterator().next());
+        }
+        throw new MCRORCIDException("Found more than one user for given orcid");
     }
 
     /**
@@ -42,7 +53,7 @@ public class MCRORCIDUserUtils {
      * 
      * @param orcid the orcid
      * @return MCRORCIDCredentials or null
-     * @throws MCRORCIDException if the credentials are corrupt
+     * @throws MCRORCIDException if the credentials are corrupt or there is more than one user
      */
     public static MCRORCIDCredentials getCredentials(String orcid) throws MCRORCIDException {
         final MCRORCIDUser user = getORCIDUser(orcid);
@@ -50,5 +61,16 @@ public class MCRORCIDUserUtils {
             return user.getCredentials(orcid);
         }
         return null;
+    }
+
+    /**
+     * Return Set of MCRUser for given MCRIdentifier
+     * 
+     * @param id the MCRIdentifier
+     * @return Set of MCRUser
+     */
+    public static Set<MCRUser> getUserByID(MCRIdentifier id) {
+        return MCRUserManager.getUsers(MCRORCIDUser.ATTR_ID_PREFIX + id.getType(), id.getValue())
+            .collect(Collectors.toSet());
     }
 }
