@@ -32,6 +32,7 @@ import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.user.MCRIdentifier;
+import org.orcid.jaxb.model.message.ScopeConstants;
 
 /**
  * When a publication is created or updated locally in this application,
@@ -92,7 +93,12 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
                     }
                 }
                 if (credentials != null) {
-                    publishToORCID(object, credentials);
+                    final String scope = credentials.getScope();
+                    if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
+                        LOGGER.info("The scope is invalid. Skipping");
+                    } else {
+                        publishToORCID(object, credentials);
+                    }
                 } 
             }
         }

@@ -28,7 +28,7 @@ public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEven
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    protected void publishToORCID(MCRObject object, MCRORCIDCredentials credentials) {
+    protected void publishToORCID(MCRObject object, MCRORCIDCredentials credentials) { // TODO maybe rethrow exc
         try {
             MCRORCIDWorkHelper.publishToORCID(object, credentials);
         } catch (Exception ex) {

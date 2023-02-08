@@ -39,9 +39,11 @@ import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
+import org.orcid.jaxb.model.message.ScopeConstants;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
@@ -97,10 +99,15 @@ public class MCRORCIDWorkHelper {
      * @param credentials the MCRORCIDCredentials
      * @return ORCID put code of published MCRObject
      * @throws MCRORCIDRequestException if publishing fails
+     * @throws MCRORCIDException if scope is invalid
      * @throws MCRException if transformation to orcid model fails
      */
     public static long publishToORCID(MCRObject object, MCRORCIDCredentials credentials)
-        throws MCRException, MCRORCIDRequestException {
+        throws MCRException, MCRORCIDException, MCRORCIDRequestException {
+        final String scope = credentials.getScope();
+        if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
+            throw new MCRORCIDException("The scope is invalid"); // TODO own exception
+        }
         final MCRORCIDClient memberClient = MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials);
         try {
             final Works works = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class);
