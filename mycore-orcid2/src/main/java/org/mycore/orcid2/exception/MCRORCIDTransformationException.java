@@ -18,31 +18,38 @@
 
 package org.mycore.orcid2.exception;
 
-import org.mycore.common.MCRException;
-
 /**
- * General mycore-orcid exception.
+ * This exception concerns errors when transforming.
  */
-public class MCRORCIDException extends MCRException {
+public class MCRORCIDTransformationException extends MCRORCIDException {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a new MCRORCIDException with message.
+     * Creates a new MCRORCIDTransformationException with message.
      * 
      * @param message the message
      */
-    public MCRORCIDException(String message) {
+    public MCRORCIDTransformationException(String message) {
         super(message);
     }
 
     /**
-     * Creates a new MCRORCIDException with message and cause.
+     * Creates a new MCRORCIDTransformationException with default message and cause.
+     * 
+     * @param cause the cause
+     */
+    public MCRORCIDTransformationException(Throwable cause) {
+        super("Transformation failed", cause);
+    }
+
+    /**
+     * Creates a new MCRORCIDTransformationException with message and cause.
      * 
      * @param message the message
      * @param cause the cause
      */
-    public MCRORCIDException(String message, Throwable cause) {
+    public MCRORCIDTransformationException(String message, Throwable cause) {
         super(message, cause);
     }
 }

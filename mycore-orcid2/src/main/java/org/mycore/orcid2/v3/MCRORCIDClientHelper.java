@@ -41,6 +41,7 @@ public class MCRORCIDClientHelper {
      * 
      * @param orcid the ORCID iD
      * @param section the section
+     * @param <T> the result class
      * @param valueType type of the response
      * @param putCodes optional put codes 
      * @return the result as specified type

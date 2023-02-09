@@ -30,6 +30,9 @@ import org.mycore.orcid2.client.MCRORCIDReadClientImpl;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 
+/**
+ * Provides a factory that creates a specific api client.
+ */
 public class MCRORCIDAPIClientFactoryImpl implements MCRORCIDAPIClientFactory {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -57,6 +60,11 @@ public class MCRORCIDAPIClientFactoryImpl implements MCRORCIDAPIClientFactory {
     private MCRORCIDAPIClientFactoryImpl() {
     }
 
+    /**
+     * Returns a MCRORCIDAPIClientFactoryImpl instance.
+     *
+     * @return MCRORCIDAPIClientFactoryImpl instance
+     */
     public static MCRORCIDAPIClientFactoryImpl getInstance() {
         if (instance == null) {
             instance = new MCRORCIDAPIClientFactoryImpl();

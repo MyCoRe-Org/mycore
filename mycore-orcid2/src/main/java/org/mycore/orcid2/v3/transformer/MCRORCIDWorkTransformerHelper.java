@@ -27,7 +27,6 @@ import jakarta.xml.bind.Unmarshaller;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
@@ -35,11 +34,15 @@ import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
 import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid2.MCRORCIDTransformerHelper;
+import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.orcid.jaxb.model.common.CitationType;
 import org.orcid.jaxb.model.v3.release.record.Citation;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.xml.sax.SAXException;
 
+/**
+ * Provides helper functions to transform between Work and mods MCRContent.
+ */
 public class MCRORCIDWorkTransformerHelper {
 
     private static JAXBContext context = null;
@@ -52,26 +55,40 @@ public class MCRORCIDWorkTransformerHelper {
         }
     }
 
-    public static Work transformContent(MCRContent content) throws JAXBException, IOException {
+    /**
+     * Transforms mods MCRContent to Work.
+     * 
+     * @param content the mods MCRContent
+     * @return the Work
+     * @throws MCRORCIDTransformationException if transformation failed
+     */
+    public static Work transformContent(MCRContent content) throws MCRORCIDTransformationException {
         final MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("MODS2ORCIDv3Work");
-        final MCRContent transformedContent = transformer.transform(content);
-        return unmarshalWork(transformedContent);
+        try {
+            return unmarshalWork(transformer.transform(content));
+        } catch (IOException e) {
+            throw new MCRORCIDTransformationException(e);
+        }
     }
 
-    private static Work unmarshalWork(MCRContent content) throws IOException, JAXBException, MCRException {
-        checkContext();
-        final Unmarshaller unmarshaller = context.createUnmarshaller();
-        return (Work) unmarshaller.unmarshal(content.getInputSource());
-    }
-
-    public static MCRContent transformWork(Work work)
-        throws JAXBException, IOException, JDOMException, SAXException, MCRException {
+    /**
+     * Transforms Work to mods MCRContent.
+     * 
+     * @param work the Work
+     * @return the mods MCRContent
+     * @throws MCRORCIDTransformationException if transformation fails
+     */
+    public static MCRContent transformWork(Work work) throws MCRORCIDTransformationException {
         checkContext();
         final MCRJAXBContent<Work> workContent = new MCRJAXBContent(context, work);
         final MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("BaseORCIDv3Work2MODS");
-        final MCRContent transformed = transformer.transform(workContent);
-        final Element mods
-            = transformed.asXML().detachRootElement().getChild("mods", MCRConstants.MODS_NAMESPACE).detach();
+        Element mods = null;
+        try {
+            mods = transformer.transform(workContent).asXML().detachRootElement()
+                .getChild("mods", MCRConstants.MODS_NAMESPACE).detach();
+        } catch (IOException | JDOMException | SAXException e) {
+            throw new MCRORCIDTransformationException(e);
+        }
         final Citation citation = work.getWorkCitation();
         if (citation != null && CitationType.BIBTEX.equals(citation.getWorkCitationType())) {
             final Element modsBibTeX = MCRORCIDTransformerHelper.transformBibTeXToMODS(citation.getCitation());
@@ -80,9 +97,19 @@ public class MCRORCIDWorkTransformerHelper {
         return new MCRJDOMContent(mods);
     }
 
-    private static void checkContext() throws MCRException {
+    private static Work unmarshalWork(MCRContent content) throws MCRORCIDTransformationException {
+        checkContext();
+        try {
+            final Unmarshaller unmarshaller = context.createUnmarshaller();
+            return (Work) unmarshaller.unmarshal(content.getInputSource());
+        } catch(IOException | JAXBException e) {
+            throw new MCRORCIDTransformationException(e);
+        }
+    }
+
+    private static void checkContext() throws MCRORCIDTransformationException {
         if (context == null) {
-            throw new MCRException("Jaxb context is not inited");
+            throw new MCRORCIDTransformationException("Jaxb context is not inited");
         }
     }
 }

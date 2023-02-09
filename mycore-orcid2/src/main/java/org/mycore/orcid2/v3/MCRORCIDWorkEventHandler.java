@@ -23,6 +23,9 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 
+/**
+ * Work handler which publishes object to ORCID.
+ */
 public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEventHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();

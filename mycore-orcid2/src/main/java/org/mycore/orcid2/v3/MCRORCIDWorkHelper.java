@@ -25,13 +25,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.xml.bind.JAXBException;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.mycore.common.MCRException;
 import org.mycore.common.content.MCRContent;
-
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -39,6 +36,7 @@ import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
+import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRIdentifier;
@@ -59,18 +57,11 @@ public class MCRORCIDWorkHelper {
      * 
      * @param works List of works
      * @return merged Element
-     * @throws JAXBException
-     * @throws JDOMException
-     * @throws SAXException
-     * @throws IOException
+     * @throws MCRORCIDTransformationException if transformation fails
+     * @see MCRORCIDWorkHelper#buildUnmergedMODSFromWorks
      */
-    public static Element buildMergedMODSFromWorks(List<Work> works)
-        throws JAXBException, JDOMException, SAXException, IOException {
-        final List<Element> modsElements = new ArrayList<Element>();
-        for (Work work : works) {
-            modsElements.add(MCRORCIDWorkTransformerHelper.transformWork(work).asXML().detachRootElement());
-        }
-        return mergeElements(modsElements);
+    public static Element buildMergedMODSFromWorks(List<Work> works) throws MCRORCIDTransformationException {
+        return mergeElements(buildUnmergedMODSFromWorks(works));
     }
 
     /**
@@ -78,16 +69,16 @@ public class MCRORCIDWorkHelper {
      * 
      * @param works List of works
      * @return List of elements
-     * @throws JAXBException
-     * @throws JDOMException
-     * @throws SAXException
-     * @throws IOException
+     * @throws MCRORCIDTransformationException if transformation fails
      */
-    public static List<Element> buildUnmergedMODSFromWorks(List<Work> works)
-        throws JAXBException, JDOMException, SAXException, IOException {
+    public static List<Element> buildUnmergedMODSFromWorks(List<Work> works) throws MCRORCIDTransformationException {
         final List<Element> modsElements = new ArrayList<>();
         for (Work work : works) {
-            modsElements.add(MCRORCIDWorkTransformerHelper.transformWork(work).asXML().detachRootElement());
+            try {
+                modsElements.add(MCRORCIDWorkTransformerHelper.transformWork(work).asXML().detachRootElement());
+            } catch (IOException | JDOMException | SAXException e) {
+                throw new MCRORCIDTransformationException(e);
+            }
         }
         return modsElements;
     }
@@ -98,12 +89,12 @@ public class MCRORCIDWorkHelper {
      * @param object the MCRObject
      * @param credentials the MCRORCIDCredentials
      * @return ORCID put code of published MCRObject
-     * @throws MCRORCIDRequestException if publishing fails
      * @throws MCRORCIDException if scope is invalid
-     * @throws MCRException if transformation to orcid model fails
+     * @throws MCRORCIDTransformationException if transformation to orcid model fails
+     * @throws MCRORCIDRequestException if publishing fails
      */
     public static long publishToORCID(MCRObject object, MCRORCIDCredentials credentials)
-        throws MCRException, MCRORCIDException, MCRORCIDRequestException {
+        throws MCRORCIDException, MCRORCIDTransformationException, MCRORCIDRequestException {
         final String scope = credentials.getScope();
         if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
             throw new MCRORCIDException("The scope is invalid"); // TODO own exception
@@ -124,8 +115,8 @@ public class MCRORCIDWorkHelper {
                 return work.getPutCode();
             }
             return memberClient.create(MCRORCIDSectionImpl.WORK, transformedWork);
-        } catch (IOException | JAXBException e) {
-            throw new MCRException(e);
+        } catch (IOException e) {
+            throw new MCRORCIDTransformationException(e);
         }
     }
 

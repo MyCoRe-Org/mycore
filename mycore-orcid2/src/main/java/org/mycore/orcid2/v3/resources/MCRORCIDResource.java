@@ -49,6 +49,9 @@ import org.mycore.orcid2.v3.MCRORCIDWorkHelper;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 
+/**
+ * Basic resource for general methods.
+ */
 @Path("orcid")
 public class MCRORCIDResource {
 
@@ -62,7 +65,8 @@ public class MCRORCIDResource {
      *   "isInORCIDProfile": true,
      * }
      *
-     * @see org.mycore.orcid2.user.MCRPublicationStatus
+     * @param objectIDString the MCRObjectID as String
+     * @return the publication status
      */
     @GET
     @Path("objectStatus/{objectID}")
@@ -114,7 +118,8 @@ public class MCRORCIDResource {
      * The current user must have an ORCID profile and must have authorized this application
      * to add or updated works.
      *
-     * Returns the new publication status as by {@link #getPublicationStatus(String)}
+     * @param objectIDString the MCRObjectID as String
+     * @return the new publication status
      */
     @GET
     @Path("publish/{objectID}")

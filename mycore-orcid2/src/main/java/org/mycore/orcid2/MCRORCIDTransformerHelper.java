@@ -23,10 +23,10 @@ import java.io.IOException;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.MCRConstants;
-import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRStringContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.xml.sax.SAXException;
 
 /**
@@ -42,13 +42,15 @@ public class MCRORCIDTransformerHelper {
      *
      * @param bibTeX BibTex String
      * @return MODS Element
-     * @throws IOException
-     * @throws JDOMException
-     * @throws SAXException
+     * @throws MCRORCIDTransformationException if transformation fails
      */
-    public static Element transformBibTeXToMODS(String bibTeX) throws IOException, JDOMException, SAXException {
-        final MCRContent result = T_BIBTEX2MODS.transform(new MCRStringContent(bibTeX));
-        final Element modsCollection = result.asXML().getRootElement();
+    public static Element transformBibTeXToMODS(String bibTeX) throws MCRORCIDTransformationException {
+        Element modsCollection = null;
+        try {
+            modsCollection = T_BIBTEX2MODS.transform(new MCRStringContent(bibTeX)).asXML().getRootElement();
+        } catch (IOException | JDOMException | SAXException e) {
+            throw new MCRORCIDTransformationException("BibTeXT to mods transformation failed", e);
+        }
         final Element mods = modsCollection.getChild("mods", MCRConstants.MODS_NAMESPACE);
         // Remove mods:extension containing the original BibTeX:
         mods.removeChildren("extension", MCRConstants.MODS_NAMESPACE);
