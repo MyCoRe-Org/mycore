@@ -63,9 +63,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
         for (Element nameElement : MCRORCIDUtils.listNameElements(new MCRMODSWrapper(object))) {
             MCRUser user = null;
             String orcid = null;
-            final List<MCRIdentifier> ids = MCRORCIDUtils.getNameIdentifiers(nameElement).stream()
-                .filter(i -> MCRORCIDUser.TRUSTED_NAME_IDENTIFIER_TYPES.contains(i.getType())).toList();
-            for (MCRIdentifier id : ids) {
+            for (MCRIdentifier id : listTrustedNameIdentifiers(nameElement)) {
                 final List<MCRUser> tmp = MCRORCIDUserUtils.getUserByID(id).stream().toList();
                 if (tmp.size() == 1) {
                     user = tmp.get(0);
@@ -102,6 +100,11 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
                 } 
             }
         }
+    }
+
+    private List<MCRIdentifier> listTrustedNameIdentifiers(Element nameElement) {
+        return MCRORCIDUtils.getNameIdentifiers(nameElement).stream()
+            .filter(i -> MCRORCIDUser.TRUSTED_NAME_IDENTIFIER_TYPES.contains(i.getType())).toList();
     }
 
     /**
