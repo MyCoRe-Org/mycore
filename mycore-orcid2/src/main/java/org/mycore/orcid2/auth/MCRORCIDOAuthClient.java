@@ -18,6 +18,8 @@
 
 package org.mycore.orcid2.auth;
 
+import java.util.Objects;
+
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
@@ -78,7 +80,7 @@ public class MCRORCIDOAuthClient {
         form.param("client_secret", CLIENT_SECRET);
         form.param("token", token);
         final Response response = webTarget.path("revoke").request().post(Entity.form(form));
-        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }
     }

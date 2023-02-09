@@ -18,10 +18,8 @@
 
 package org.mycore.orcid2.auth;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -138,11 +136,10 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
     }
 
     private void setExpiration(MCRORCIDCredentials credentials) {
-        final Calendar cal = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
-        cal.setTime(new Date());
-        cal.add(Calendar.SECOND, Integer.parseInt(credentials.getExpiresIn()));
-        cal.add(Calendar.MINUTE, -1); // subtract request time
-        credentials.setExpiration(cal.getTime());
+        final LocalDate now = LocalDate.now();
+        now.plus(Integer.parseInt(credentials.getExpiresIn()), ChronoUnit.SECONDS);
+        now.minus(1, ChronoUnit.MINUTES);
+        credentials.setExpiration(now);
     }
 
     private void handleAuth(HttpServletRequest req, HttpServletResponse res) throws Exception {

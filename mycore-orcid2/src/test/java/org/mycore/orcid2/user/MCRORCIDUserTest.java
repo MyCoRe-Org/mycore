@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.junit.Test;
 import org.apache.logging.log4j.LogManager;
@@ -75,7 +75,7 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         credentials.setExpiresIn("631138518");
         credentials.setScope("/read-limited");
         credentials.setName("MyCoRe");
-        credentials.setExpiration(new Date());
+        credentials.setExpiration(LocalDate.now());
         final String credentialsString = MCRORCIDUser.serializeCredentials(credentials);
         LOGGER.info(credentialsString);
         final MCRORCIDCredentials result = MCRORCIDUser.deserializeCredentials(credentialsString);

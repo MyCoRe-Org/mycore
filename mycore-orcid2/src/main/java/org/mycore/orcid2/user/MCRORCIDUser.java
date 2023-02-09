@@ -295,6 +295,7 @@ public class MCRORCIDUser {
             cloned.setName(null);
             cloned.setORCID(null);
             final ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules();
             mapper.setSerializationInclusion(Include.NON_NULL);
             return mapper.writeValueAsString(cloned);
         } catch (JsonProcessingException | CloneNotSupportedException e) {
@@ -312,7 +313,9 @@ public class MCRORCIDUser {
     protected static MCRORCIDCredentials deserializeCredentials(String credentialsString)
         throws IllegalArgumentException {
         try {
-            return new ObjectMapper().readValue(credentialsString, MCRORCIDCredentials.class);
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules();
+            return mapper.readValue(credentialsString, MCRORCIDCredentials.class);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }

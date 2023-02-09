@@ -18,7 +18,7 @@
 
 package org.mycore.orcid2.user;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -46,7 +46,7 @@ public class MCRORCIDCredentials implements Cloneable {
 
     private String scope;
 
-    private Date expiration;
+    private LocalDate expiration;
 
     /**
      * Creates MCRORCIDCredentials object with orcid and access token.
@@ -182,14 +182,14 @@ public class MCRORCIDCredentials implements Cloneable {
     /**
      * @return expiration
      */
-    public Date getExpiration() {
+    public LocalDate getExpiration() {
         return expiration;
     }
 
     /**
      * @param expiration expiration to set
      */
-    public void setExpiration(Date expiration) {
+    public void setExpiration(LocalDate expiration) {
         this.expiration = expiration;
     }
 
