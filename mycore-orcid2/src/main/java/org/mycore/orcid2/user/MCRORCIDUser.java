@@ -277,7 +277,7 @@ public class MCRORCIDUser {
      * @return Set of trusted MCRIdentifier
      */
     public Set<MCRIdentifier> getTrustedIdentifiers() {
-        return getIdentifiers().stream().filter(i -> TRUSTED_NAME_IDENTIFIER_TYPES.contains(i))
+        return getIdentifiers().stream().filter(i -> TRUSTED_NAME_IDENTIFIER_TYPES.contains(i.getType()))
             .collect(Collectors.toSet());
     }
 
