@@ -169,8 +169,8 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
      * 
      * @param scope not encoded scope string
      * @return url to request authorization code
-     * @throws URISyntaxException
-     * @throws MalformedURLException
+     * @throws URISyntaxException if BaseURL is malformed
+     * @throws MalformedURLException if BaseURL is malformed
      */
     private URL buildRequestCodeURL(String scope) throws URISyntaxException, MalformedURLException {
         UriBuilder builder = UriBuilder.fromPath(ORCID_BASE_URL);

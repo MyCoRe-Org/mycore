@@ -26,7 +26,7 @@ import org.mycore.orcid2.client.MCRORCIDSearch;
 public enum MCRORCIDSearchImpl implements MCRORCIDSearch {
     DEFAULT("search"), EXPANDED("expanded-search");
 
-    private String path;
+    private final String path;
 
     MCRORCIDSearchImpl(String path) {
         this.path = path;
