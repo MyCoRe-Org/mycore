@@ -38,18 +38,28 @@ import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.orcid.jaxb.model.common.CitationType;
 import org.orcid.jaxb.model.v3.release.record.Citation;
 import org.orcid.jaxb.model.v3.release.record.Work;
+import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.xml.sax.SAXException;
 
 /**
- * Provides helper functions to transform between Work and mods MCRContent.
+ * Provides helper functions to transform between Work or WorkSummary and mods MCRContent.
  */
 public class MCRORCIDWorkTransformerHelper {
+
+    private static final MCRContentTransformer T_MODS_WORK
+        = MCRContentTransformerFactory.getTransformer("MODS2ORCIDv3Work");
+
+    private static final MCRContentTransformer T_WORK_MODS
+        = MCRContentTransformerFactory.getTransformer("BaseORCIDv3Work2MODS");
+
+    private static final MCRContentTransformer T_SUMMARY_MODS
+        = MCRContentTransformerFactory.getTransformer("BaseORCIDv3WorkSummary2MODS");
 
     private static JAXBContext context = null;
 
     static {
         try {
-            context = JAXBContext.newInstance(Work.class);
+            context = JAXBContext.newInstance(new Class[] { Work.class, WorkSummary.class });
         } catch (JAXBException e) {
             throw new IllegalArgumentException("Could not init jaxb context");
         }
@@ -63,9 +73,8 @@ public class MCRORCIDWorkTransformerHelper {
      * @throws MCRORCIDTransformationException if transformation failed
      */
     public static Work transformContent(MCRContent content) throws MCRORCIDTransformationException {
-        final MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("MODS2ORCIDv3Work");
         try {
-            return unmarshalWork(transformer.transform(content));
+            return unmarshalWork(T_MODS_WORK.transform(content));
         } catch (IOException e) {
             throw new MCRORCIDTransformationException(e);
         }
@@ -73,6 +82,7 @@ public class MCRORCIDWorkTransformerHelper {
 
     /**
      * Transforms Work to mods MCRContent.
+     * Merges BibLaTeX using transformer
      * 
      * @param work the Work
      * @return the mods MCRContent
@@ -81,10 +91,9 @@ public class MCRORCIDWorkTransformerHelper {
     public static MCRContent transformWork(Work work) throws MCRORCIDTransformationException {
         checkContext();
         final MCRJAXBContent<Work> workContent = new MCRJAXBContent(context, work);
-        final MCRContentTransformer transformer = MCRContentTransformerFactory.getTransformer("BaseORCIDv3Work2MODS");
         Element mods = null;
         try {
-            mods = transformer.transform(workContent).asXML().detachRootElement()
+            mods = T_WORK_MODS.transform(workContent).asXML().detachRootElement()
                 .getChild("mods", MCRConstants.MODS_NAMESPACE).detach();
         } catch (IOException | JDOMException | SAXException e) {
             throw new MCRORCIDTransformationException(e);
@@ -93,6 +102,26 @@ public class MCRORCIDWorkTransformerHelper {
         if (citation != null && CitationType.BIBTEX.equals(citation.getWorkCitationType())) {
             final Element modsBibTeX = MCRORCIDTransformerHelper.transformBibTeXToMODS(citation.getCitation());
             MCRMergeTool.merge(mods, modsBibTeX);
+        }
+        return new MCRJDOMContent(mods);
+    }
+
+    /**
+     * Transforms WorkSummary to mods MCRContent.
+     * 
+     * @param work the WorkSummary
+     * @return the mods MCRContent
+     * @throws MCRORCIDTransformationException if transformation fails
+     */
+    public static MCRContent transformWorkSummary(WorkSummary work) throws MCRORCIDTransformationException {
+        checkContext();
+        final MCRJAXBContent<WorkSummary> workContent = new MCRJAXBContent(context, work);
+        Element mods = null;
+        try {
+            mods = T_SUMMARY_MODS.transform(workContent).asXML().detachRootElement()
+                .getChild("mods", MCRConstants.MODS_NAMESPACE).detach();
+        } catch (IOException | JDOMException | SAXException e) {
+            throw new MCRORCIDTransformationException(e);
         }
         return new MCRJDOMContent(mods);
     }

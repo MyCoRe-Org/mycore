@@ -73,13 +73,33 @@ public class MCRORCIDWorkHelper {
      */
     public static List<Element> buildUnmergedMODSFromWorks(List<Work> works) throws MCRORCIDTransformationException {
         final List<Element> modsElements = new ArrayList<>();
-        for (Work work : works) {
+        works.forEach(w -> {
             try {
-                modsElements.add(MCRORCIDWorkTransformerHelper.transformWork(work).asXML().detachRootElement());
+                modsElements.add(MCRORCIDWorkTransformerHelper.transformWork(w).asXML().detachRootElement());
             } catch (IOException | JDOMException | SAXException e) {
                 throw new MCRORCIDTransformationException(e);
             }
-        }
+        });
+        return modsElements;
+    }
+
+    /**
+     * Transforms List of work summaries to List of elements.
+     * 
+     * @param works List of work summaries
+     * @return List of elements
+     * @throws MCRORCIDTransformationException if transformation fails
+     */
+    public static List<Element> buildUnmergedMODSFromWorkSummaries(List<WorkSummary> works)
+        throws MCRORCIDTransformationException {
+        final List<Element> modsElements = new ArrayList<>();
+        works.forEach(w -> {
+            try {
+                modsElements.add(MCRORCIDWorkTransformerHelper.transformWorkSummary(w).asXML().detachRootElement());
+            } catch (IOException | JDOMException | SAXException e) {
+                throw new MCRORCIDTransformationException(e);
+            }
+        });
         return modsElements;
     }
 
