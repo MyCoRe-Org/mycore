@@ -38,9 +38,9 @@ public class MCRORCIDClientImpl extends MCRORCIDAPIClient implements MCRORCIDCli
     private final MCRORCIDCredentials credentials;
 
     /**
-     * Creates an ORCID client with given API url and credentials.
+     * Creates an ORCID client with given api url and MCRORCIDCredentials.
      * 
-     * @param restURL rest url of ORCID API
+     * @param restURL rest url of ORCID api url
      * @param credentials the MCRORCIDCredentials
      */
     public MCRORCIDClientImpl(String restURL, MCRORCIDCredentials credentials) {

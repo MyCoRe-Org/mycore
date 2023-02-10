@@ -59,6 +59,17 @@ public class MCRORCIDReadClientImpl extends MCRORCIDAPIClient implements MCRORCI
         return doFetch(orcid, section, valueType, putCodes);
     }
 
+    @Override
+    public <T> T search(MCRORCIDSearch type, String query, int offset, int limit, Class<T> valueType)
+        throws MCRORCIDRequestException {
+        return doSearch(type.getPath(), query, offset, limit, valueType);
+    }
+
+    @Override
+    public <T> T search(MCRORCIDSearch type, String query, Class<T> valueType) throws MCRORCIDRequestException {
+        return search(type, query, 0, DEFAULT_SEARCH_LIMIT, valueType);
+    }
+
     private <T> T doSearch(String path, String query, int offset, int limit, Class<T> valueType)
         throws MCRORCIDRequestException {
         if (offset < 0 || limit < 0) {
@@ -73,16 +84,5 @@ public class MCRORCIDReadClientImpl extends MCRORCIDAPIClient implements MCRORCI
             throw new MCRORCIDRequestException(response);
         }
         return response.readEntity(valueType);
-    }
-
-    @Override
-    public <T> T search(MCRORCIDSearch type, String query, int offset, int limit, Class<T> valueType)
-        throws MCRORCIDRequestException {
-        return doSearch(type.getPath(), query, offset, limit, valueType);
-    }
-
-    @Override
-    public <T> T search(MCRORCIDSearch type, String query, Class<T> valueType) throws MCRORCIDRequestException {
-        return search(type, query, 0, DEFAULT_SEARCH_LIMIT, valueType);
     }
 }

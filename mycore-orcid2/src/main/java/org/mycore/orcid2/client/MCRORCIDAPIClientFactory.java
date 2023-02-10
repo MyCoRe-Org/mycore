@@ -25,25 +25,27 @@ import org.mycore.orcid2.user.MCRORCIDCredentials;
  * Interface for ORCID client factory which contains which all relevant options.
  */
 public interface MCRORCIDAPIClientFactory {
+
     /**
-     * Creates an ORCID Public API client.
+     * Creates MCRORCIDReadClient.
      *
-     * @return the client
+     * @return MCRORCIDReadClient
      */
     MCRORCIDReadClient createPublicClient();
 
     /**
-     * Creates an ORCID Member API client.
-     *
-     * @return the client
+     * Creates MCRORCIDReadClient.
+     * 
+     * @return MCRORCIDReadClient
+     * @throws MCRORCIDException if there is no token
      */
     MCRORCIDReadClient createMemberClient() throws MCRORCIDException;
 
     /**
-     * Creates an ORCID Member API client with MCRORCIDCredentials.
+     * Creates an MCRORCIDClient with MCRORCIDCredentials.
      *
-     * @param credentials the credentials
-     * @return the client
+     * @param credentials the MCRORCIDCredentials
+     * @return MCRORCIDClient
      */
     MCRORCIDClient createMemberClient(MCRORCIDCredentials credentials);
 }

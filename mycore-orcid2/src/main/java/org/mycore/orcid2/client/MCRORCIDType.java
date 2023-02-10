@@ -22,8 +22,10 @@ package org.mycore.orcid2.client;
  * Base interface for ORCID sections.
  */
 public interface MCRORCIDType {
+
     /**
      * Returns path of section.
+     * 
      * @return the path
      */
     String getPath();

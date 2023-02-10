@@ -45,6 +45,8 @@ public class MCRORCIDRequestException extends MCRORCIDException {
     }
 
     /**
+     * Returns the error response.
+     * 
      * @return the error response
      */
     public Response getErrorResponse() {

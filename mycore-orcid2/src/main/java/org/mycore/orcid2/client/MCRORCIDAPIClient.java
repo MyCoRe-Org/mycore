@@ -40,13 +40,19 @@ import org.mycore.orcid2.client.filter.MCRORCIDXMLWriter;
 abstract class MCRORCIDAPIClient {
 
     /**
-     * Orcid xml media type.
+     * ORCID xml media type.
      */
     protected static final MediaType ORCID_XML_MEDIA_TYPE
         = MediaType.valueOf(MCRORCIDClientConstants.ORCID_XML_MEDIA_TYPE);
 
     private final WebTarget baseTarget;
 
+    /**
+     * Creates MCRORCIDAPIClient with rest url and token.
+     * 
+     * @param restURL rest url
+     * @param token the token
+     */
     protected MCRORCIDAPIClient(String restURL, String token) {
         final Client client = ClientBuilder.newClient();
         client.register(new MCRORCIDXMLReader<Object>());
@@ -103,7 +109,9 @@ abstract class MCRORCIDAPIClient {
     }
 
     /**
-     * @return the base target of client.
+     * Returns the base WebTarget of client.
+     * 
+     * @return base WebTarget
      */
     protected WebTarget getBaseTarget() {
         return baseTarget;

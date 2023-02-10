@@ -24,7 +24,7 @@ package org.mycore.orcid2.client;
 public class MCRORCIDClientConstants {
 
     /**
-     * Default ORCID xml media type
+     * Default ORCID xml media type.
      */
     public static final String ORCID_XML_MEDIA_TYPE = "application/vnd.orcid+xml";
 }
