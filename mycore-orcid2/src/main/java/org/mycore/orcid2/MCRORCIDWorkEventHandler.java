@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -60,6 +61,17 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
+        final List<MCRORCIDCredentials> credentials = listOrcidCredentials(object, ScopeConstants.ACTIVITIES_UPDATE);
+        publishToORCID(object, credentials);
+    }
+
+    private List<MCRIdentifier> listTrustedNameIdentifiers(Element nameElement) {
+        return MCRORCIDUtils.getNameIdentifiers(nameElement).stream()
+            .filter(i -> MCRORCIDUser.TRUSTED_NAME_IDENTIFIER_TYPES.contains(i.getType())).toList();
+    }
+
+    private List<MCRORCIDCredentials> listOrcidCredentials(MCRObject object, String... scopes) {
+        List<MCRORCIDCredentials> orcidCredentials = new ArrayList<MCRORCIDCredentials>();
         for (Element nameElement : MCRORCIDUtils.listNameElements(new MCRMODSWrapper(object))) {
             MCRUser user = null;
             String orcid = null;
@@ -92,28 +104,31 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
                 }
                 if (credentials != null) {
                     final String scope = credentials.getScope();
-                    if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
-                        LOGGER.info("The scope is invalid. Skipping...");
-                    } else {
-                        publishToORCID(object, credentials);
+                    if (scope != null) {
+                        boolean allScopesPresent = true;
+                        for(String s : scopes) {
+                            if (!scope.contains(s)) {
+                                allScopesPresent = false;
+                                break;
+                            }
+                        }
+                        if(allScopesPresent) {
+                            orcidCredentials.add(credentials);
+                        }
                     }
                 } 
             }
         }
-    }
-
-    private List<MCRIdentifier> listTrustedNameIdentifiers(Element nameElement) {
-        return MCRORCIDUtils.getNameIdentifiers(nameElement).stream()
-            .filter(i -> MCRORCIDUser.TRUSTED_NAME_IDENTIFIER_TYPES.contains(i.getType())).toList();
+        return orcidCredentials;
     }
 
     /**
-     * Publishes MCRObject in user's orcid profile.
+     * Publishes MCRObject in all orcid profiles specified by list of credentials.
      * Creates a new record if no corresponding publication can be found in the profile.
      * Otherwise, the publication in the profile will be updated.
      * 
      * @param object the object
-     * @param credentials the credentials
+     * @param credentialsList list of credentials
      */
-    abstract protected void publishToORCID(MCRObject object, MCRORCIDCredentials credentials);
+    abstract protected void publishToORCID(MCRObject object, List<MCRORCIDCredentials> credentialsList);
 }

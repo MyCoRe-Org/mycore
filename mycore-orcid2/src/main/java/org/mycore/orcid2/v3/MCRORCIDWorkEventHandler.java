@@ -18,8 +18,11 @@
 
 package org.mycore.orcid2.v3;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 
@@ -31,11 +34,12 @@ public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEven
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
-    protected void publishToORCID(MCRObject object, MCRORCIDCredentials credentials) { // TODO maybe rethrow exc
+    protected void publishToORCID(MCRObject object, List<MCRORCIDCredentials> credentialsList) {
+        // TODO maybe rethrow exc
         try {
-            MCRORCIDWorkHelper.publishToORCID(object, credentials);
+            MCRORCIDWorkHelper.publishToORCID(object, credentialsList);
         } catch (Exception ex) {
-            LOGGER.warn("Could not publish {} to ORCID profile {}.", object.getId(), credentials.getORCID(), ex);
+            LOGGER.warn("Could not publish {} to ORCID profile.", object.getId(), ex);
         }
     }
 }

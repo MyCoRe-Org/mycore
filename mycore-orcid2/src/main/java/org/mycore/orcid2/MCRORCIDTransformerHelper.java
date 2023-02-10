@@ -49,7 +49,7 @@ public class MCRORCIDTransformerHelper {
         try {
             modsCollection = T_BIBTEX2MODS.transform(new MCRStringContent(bibTeX)).asXML().getRootElement();
         } catch (IOException | JDOMException | SAXException e) {
-            throw new MCRORCIDTransformationException("BibTeXT to mods transformation failed", e);
+            throw new MCRORCIDTransformationException("BibTeX to mods transformation failed", e);
         }
         final Element mods = modsCollection.getChild("mods", MCRConstants.MODS_NAMESPACE);
         // Remove mods:extension containing the original BibTeX:
