@@ -87,7 +87,7 @@ public class MCRORCIDUser {
 
     /**
      * Returns MCRUser.
-     *
+     * 
      * @return MCRUser
      */
     public MCRUser getUser() {
@@ -164,7 +164,7 @@ public class MCRORCIDUser {
      * 
      * @param orcid the ORCID iD
      */
-    public void removeCredentials(String orcid) {
+    public void removeCredentialsByORCID(String orcid) {
         final SortedSet<MCRUserAttribute> attributes = user.getAttributes();
         final SortedSet<MCRUserAttribute> toKeep = new TreeSet<MCRUserAttribute>();
         for (MCRUserAttribute attribute : attributes) {
@@ -214,7 +214,7 @@ public class MCRORCIDUser {
      * @return MCRCredentials or null
      * @throws MCRORCIDException if the MCRCredentials are corrupt
      */
-    public MCRORCIDCredentials getCredentials(String orcid) throws MCRORCIDException {
+    public MCRORCIDCredentials getCredentialsByORCID(String orcid) throws MCRORCIDException {
         final String credentialsString = user.getUserAttribute(ATTR_ORCID_CREDENTIALS + orcid);
         if (credentialsString == null) {
             return null;
@@ -229,19 +229,20 @@ public class MCRORCIDUser {
         return credentials;
     }
 
+    // TODO check place
     /**
      * Revokes orcid access token by ORCID iD.
      * 
      * @param orcid the ORCID iD
      * @throws MCRORCIDException if revoke request fails
      */
-    public void revokeCredentials(String orcid) throws MCRORCIDException {
-        final MCRORCIDCredentials credentials = getCredentials(orcid);
+    public void revokeCredentialsByORCID(String orcid) throws MCRORCIDException {
+        final MCRORCIDCredentials credentials = getCredentialsByORCID(orcid);
         if (credentials == null) {
-            throw new MCRORCIDException("Credentials do not exist.");
+            throw new MCRORCIDException("Credentials do not exist");
         }
         MCRORCIDOAuthClient.getInstance().revokeToken(credentials.getAccessToken());
-        removeCredentials(orcid);
+        removeCredentialsByORCID(orcid);
     }
 
     /**
@@ -304,7 +305,7 @@ public class MCRORCIDUser {
     }
 
     /**
-     * Deserializes Stirng to MCRORCIDCredentials.
+     * Deserializes String to MCRORCIDCredentials.
      * 
      * @param credentialsString MCRCredentials as String
      * @return MCRORCIDCredentials

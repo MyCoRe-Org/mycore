@@ -93,7 +93,7 @@ public class MCRORCIDResource {
         if (orcids.size() > 1) { // should not happen
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final MCRORCIDCredentials credentials = orcidUser.getCredentials(orcids.iterator().next());
+        final MCRORCIDCredentials credentials = orcidUser.getCredentialsByORCID(orcids.iterator().next());
         if (credentials == null) {
             return new MCRORCIDPublicationStatus(true, false);
         }
@@ -144,7 +144,7 @@ public class MCRORCIDResource {
         if (orcids.isEmpty() || orcids.size() > 1) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final MCRORCIDCredentials credentials = orcidUser.getCredentials(orcids.iterator().next());
+        final MCRORCIDCredentials credentials = orcidUser.getCredentialsByORCID(orcids.iterator().next());
         if (credentials == null || credentials.getAccessToken() == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }

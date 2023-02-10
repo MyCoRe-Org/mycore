@@ -53,9 +53,6 @@ public class MCRORCIDReadClientImpl extends MCRORCIDAPIClient implements MCRORCI
         super(restURL, token);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T fetch(String orcid, MCRORCIDSection section, Class<T> valueType, long... putCodes)
         throws MCRORCIDRequestException {
@@ -78,18 +75,12 @@ public class MCRORCIDReadClientImpl extends MCRORCIDAPIClient implements MCRORCI
         return response.readEntity(valueType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T search(MCRORCIDSearch type, String query, int offset, int limit, Class<T> valueType)
         throws MCRORCIDRequestException {
         return doSearch(type.getPath(), query, offset, limit, valueType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T search(MCRORCIDSearch type, String query, Class<T> valueType) throws MCRORCIDRequestException {
         return search(type, query, 0, DEFAULT_SEARCH_LIMIT, valueType);

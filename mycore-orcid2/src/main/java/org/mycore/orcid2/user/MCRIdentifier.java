@@ -42,14 +42,18 @@ public class MCRIdentifier {
     }
 
     /**
-     * @return the id type
+     * Returns the id type.
+     *
+     * @return id type
      */
     public String getType() {
         return type;
     }
 
     /**
-     * @return the identifier value
+     * Returns the id value.
+     *
+     * @return id value
      */
     public String getValue() {
         return value;

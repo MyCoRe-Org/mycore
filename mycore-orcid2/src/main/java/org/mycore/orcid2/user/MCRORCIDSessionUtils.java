@@ -33,7 +33,7 @@ public class MCRORCIDSessionUtils {
     /**
      * Initializes current user's MCRORCIDUser.
      *
-     * @return MCRORCIDUser
+     * @return current MCRUser as MCRORCIDUser
      */
     public static MCRORCIDUser getCurrentUser() {
         final MCRSession session = MCRSessionMgr.getCurrentSession();

@@ -25,7 +25,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents the orcid credentials with all important properties.
+ * Represents the ORCID credentials with all important properties.
  * Maps the access token json response.
  * 
  * See <a href="https://members.orcid.org/api/oauth/3legged-oauth">ORCID documentation</a>
@@ -49,9 +49,9 @@ public class MCRORCIDCredentials implements Cloneable {
     private LocalDate expiration;
 
     /**
-     * Creates MCRORCIDCredentials object with orcid and access token.
+     * Creates MCRORCIDCredentials object with ORCID iD and access token.
      * 
-     * @param orcid the orcid
+     * @param orcid the ORCID iD
      * @param accessToken the access token
      */
     public MCRORCIDCredentials(String orcid, String accessToken) {
@@ -60,9 +60,9 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
-     * Creates MCRORCIDCredentials object with orcid.
+     * Creates MCRORCIDCredentials object with ORCID iD.
      * 
-     * @param orcid the orcid
+     * @param orcid the ORCID iD
      */
     public MCRORCIDCredentials(String orcid) {
         this.orcid = orcid;
@@ -75,7 +75,9 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
-     * @return orcid
+     * Returns the ORCID iD.
+     * 
+     * @return ORCID iD
      */
     @JsonProperty("orcid")
     public String getORCID() {
@@ -83,13 +85,17 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
-     * @param orcid orcid to set
+     * Sets the ORCID iD.
+     * 
+     * @param orcid the ORCID iD
      */
     public void setORCID(String orcid) {
         this.orcid = orcid;
     }
 
     /**
+     * Returns the access token.
+     * 
      * @return access token
      */
     @JsonProperty("access_token")
@@ -98,13 +104,17 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
-     * @param accessToken access token to set
+     * Sets the access token.
+     * 
+     * @param accessToken the access token
      */
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
 
     /**
+     * Returns the refresh token.
+     * 
      * @return refresh token
      */
     @JsonProperty("refresh_token")
@@ -113,13 +123,17 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
-     * @param refreshToken refresh token to set
+     * Sets the refresh token.
+     * 
+     * @param refreshToken the refresh token
      */
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
     /**
+     * Returns the token type.
+     * 
      * @return token type
      */
     @JsonProperty("token_type")
@@ -128,14 +142,18 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
-     * @param tokenType token type to set
+     * Sets the token type.
+     * 
+     * @param tokenType the token type
      */
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
     }
 
     /**
-     * @return expires in
+     * Returns the token life time in seconds.
+     * 
+     * @return token life time
      */
     @JsonProperty("expires_in")
     public String getExpiresIn() {
@@ -143,13 +161,17 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
-     * @param expiresIn expires in to set
+     * Sets the life time in seconds.
+     * 
+     * @param expiresIn life time in seconds
      */
     public void setExpiresIn(String expiresIn) {
         this.expiresIn = expiresIn;
     }
 
     /**
+     * Returns the name.
+     * 
      * @return name
      */
     @JsonProperty("name")
@@ -158,13 +180,17 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
-     * @param name name to set
+     * Sets the name.
+     * 
+     * @param name the name
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
+     * Returns the scope.
+     * 
      * @return scope
      */
     @JsonProperty("scope")
@@ -173,6 +199,8 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
+     * Sets the scope.
+     * 
      * @param scope scope to set
      */
     public void setScope(String scope) {
@@ -180,6 +208,8 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
+     * Returns the expire date.
+     * 
      * @return expiration
      */
     public LocalDate getExpiration() {
@@ -187,6 +217,8 @@ public class MCRORCIDCredentials implements Cloneable {
     }
 
     /**
+     * Sets the expire date.
+     * 
      * @param expiration expiration to set
      */
     public void setExpiration(LocalDate expiration) {

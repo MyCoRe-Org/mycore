@@ -81,7 +81,7 @@ public class MCRORCIDResource {
         }
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         try {
-            orcidUser.revokeCredentials(orcid);
+            orcidUser.revokeCredentialsByORCID(orcid);
             return Response.ok().build();
         } catch (Exception e) {
             throw new WebApplicationException(Status.BAD_REQUEST);

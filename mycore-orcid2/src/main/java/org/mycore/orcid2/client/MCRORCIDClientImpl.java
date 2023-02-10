@@ -49,21 +49,11 @@ public class MCRORCIDClientImpl extends MCRORCIDAPIClient implements MCRORCIDCli
         this.baseTarget = getBaseTarget().path(credentials.getORCID());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T fetch(MCRORCIDSection section, Class<T> valueType, long... putCodes) throws MCRORCIDRequestException {
         return doFetch(credentials.getORCID(), section, valueType, putCodes);
     }
 
-    private Response write(String path, String method, Object object) {
-        return this.baseTarget.path(path).request().build(method, Entity.entity(object, ORCID_XML_MEDIA_TYPE)).invoke();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public long create(MCRORCIDSection section, Object object) throws MCRORCIDRequestException {
         final Response response = write(section.getPath(), "post", object);
@@ -73,12 +63,17 @@ public class MCRORCIDClientImpl extends MCRORCIDAPIClient implements MCRORCIDCli
         return Long.parseLong(getLastPathSegment(response.getLocation()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(MCRORCIDSection section, long putCode, Object object) throws MCRORCIDRequestException {
         final Response response = write(String.format(Locale.ROOT, "%s/%d", section.getPath(), putCode), "put", object);
+        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+            handleError(response);
+        }
+    }
+
+    @Override
+    public void delete(MCRORCIDSection section, long putCode) throws MCRORCIDRequestException {
+        final Response response = delete(String.format(Locale.ROOT, "%s/%d", section.getPath(), putCode));
         if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
             handleError(response);
         }
@@ -88,15 +83,8 @@ public class MCRORCIDClientImpl extends MCRORCIDAPIClient implements MCRORCIDCli
         return this.baseTarget.path(path).request().delete();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void delete(MCRORCIDSection section, long putCode) throws MCRORCIDRequestException {
-        final Response response = delete(String.format(Locale.ROOT, "%s/%d", section.getPath(), putCode));
-        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
-            handleError(response);
-        }
+    private Response write(String path, String method, Object object) {
+        return this.baseTarget.path(path).request().build(method, Entity.entity(object, ORCID_XML_MEDIA_TYPE)).invoke();
     }
 
     private String getLastPathSegment(URI uri) {

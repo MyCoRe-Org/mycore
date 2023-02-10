@@ -45,9 +45,6 @@ public enum MCRORCIDSectionImpl implements MCRORCIDSection {
         this.path = path;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getPath() {
         return path;

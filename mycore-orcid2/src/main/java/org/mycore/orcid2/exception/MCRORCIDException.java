@@ -21,7 +21,7 @@ package org.mycore.orcid2.exception;
 import org.mycore.common.MCRException;
 
 /**
- * General mycore-orcid exception.
+ * General mycore-orcid2 exception.
  */
 public class MCRORCIDException extends MCRException {
 

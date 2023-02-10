@@ -49,7 +49,7 @@ public class MCRORCIDClientHelper {
      */
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
             long... putCodes) throws MCRORCIDRequestException {
-        final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentials(orcid);
+        final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
         if (credentials != null) {
             try {
                 return MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials).fetch(section,

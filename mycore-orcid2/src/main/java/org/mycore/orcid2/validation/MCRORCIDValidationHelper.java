@@ -28,7 +28,7 @@ public class MCRORCIDValidationHelper {
     /**
      * Validates MCRORCIDCredentials.
      * 
-     * @param credentials MCRORCIDCredentials
+     * @param credentials the MCRORCIDCredentials
      * @return true if credentials are valid
      */
     public static boolean validateCredentials(MCRORCIDCredentials credentials) {

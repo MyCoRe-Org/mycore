@@ -50,7 +50,7 @@ public class MCRORCIDUserTest extends MCRJPATestCase {
         assertEquals(2, user.getAttributes().size()); // id_orcid + orcid_credentials_orcid
         assertNotNull(user.getUserAttribute("orcid_credentials_" + ORCID));
         assertEquals(credentials.getORCID(), user.getUserAttribute("id_orcid"));
-        assertEquals(credentials, orcidUser.getCredentials(credentials.getORCID()));
+        assertEquals(credentials, orcidUser.getCredentialsByORCID(credentials.getORCID()));
     }
 
     @Test

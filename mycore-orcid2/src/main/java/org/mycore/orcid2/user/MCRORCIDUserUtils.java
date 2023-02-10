@@ -31,13 +31,28 @@ import org.mycore.user2.MCRUserManager;
 public class MCRORCIDUserUtils {
 
     /**
-     * Returns MCRORCIDUser for given orcid.
+     * Returns MCRORCIDCredentials by ORCID iD.
      * 
-     * @param orcid the orcid
-     * @return MCRORCIDUser or null
-     * @throws MCRORCIDException if there is more than one matching user for orcid
+     * @param orcid the ORCID iD
+     * @return MCRORCIDCredentials or null
+     * @throws MCRORCIDException if the credentials are corrupt or there is more than one user
      */
-    public static MCRORCIDUser getORCIDUser(String orcid) throws MCRORCIDException {
+    public static MCRORCIDCredentials getCredentialsByORCID(String orcid) throws MCRORCIDException {
+        final MCRORCIDUser user = getORCIDUserByORCID(orcid);
+        if (user != null) {
+            return user.getCredentialsByORCID(orcid);
+        }
+        return null;
+    }
+
+    /**
+     * Returns MCRORCIDUser by ORCID iD.
+     * 
+     * @param orcid the ORCID iD
+     * @return MCRORCIDUser or null
+     * @throws MCRORCIDException if there is more than one matching user
+     */
+    public static MCRORCIDUser getORCIDUserByORCID(String orcid) throws MCRORCIDException {
         final Set<MCRUser> users
             = MCRUserManager.getUsers(MCRORCIDUser.ATTR_ORCID_ID, orcid).collect(Collectors.toSet());
         if (users.isEmpty()) {
@@ -49,22 +64,7 @@ public class MCRORCIDUserUtils {
     }
 
     /**
-     * Returns MCRORCIDCredentials for given orcid.
-     * 
-     * @param orcid the orcid
-     * @return MCRORCIDCredentials or null
-     * @throws MCRORCIDException if the credentials are corrupt or there is more than one user
-     */
-    public static MCRORCIDCredentials getCredentials(String orcid) throws MCRORCIDException {
-        final MCRORCIDUser user = getORCIDUser(orcid);
-        if (user != null) {
-            return user.getCredentials(orcid);
-        }
-        return null;
-    }
-
-    /**
-     * Return Set of MCRUser for given MCRIdentifier
+     * Returns Set of MCRUser for given MCRIdentifier.
      * 
      * @param id the MCRIdentifier
      * @return Set of MCRUser

@@ -74,9 +74,6 @@ public class MCRORCIDAPIClientFactoryImpl implements MCRORCIDAPIClientFactory {
 
     // Public API is limited to 10,000 results
     // 24 requests per second; 40 burst
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public MCRORCIDReadClient createPublicClient() {
         if (publicClient == null) {
@@ -94,9 +91,6 @@ public class MCRORCIDAPIClientFactoryImpl implements MCRORCIDAPIClientFactory {
 
     // Member API does not limit the number of results
     // 24 requests per second; 60 burst
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public MCRORCIDReadClient createMemberClient() throws MCRORCIDException {
         if (memberClient == null) {
@@ -112,9 +106,6 @@ public class MCRORCIDAPIClientFactoryImpl implements MCRORCIDAPIClientFactory {
         return memberClient;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public MCRORCIDClient createMemberClient(MCRORCIDCredentials credentials) {
         if (IS_SANDBOX) {

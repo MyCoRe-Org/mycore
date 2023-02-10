@@ -32,9 +32,6 @@ public enum MCRORCIDSearchImpl implements MCRORCIDSearch {
         this.path = path;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getPath() {
         return path;
