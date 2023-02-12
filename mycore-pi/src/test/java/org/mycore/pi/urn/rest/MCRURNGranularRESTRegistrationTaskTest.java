@@ -19,10 +19,8 @@
 package org.mycore.pi.urn.rest;
 
 import static org.mycore.pi.MCRPITestUtils.generateMCRPI;
-import static org.mycore.pi.MCRPITestUtils.randomFilename;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -35,7 +33,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.MCRPITestUtils;
