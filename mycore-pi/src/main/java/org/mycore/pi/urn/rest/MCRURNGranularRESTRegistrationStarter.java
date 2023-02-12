@@ -45,24 +45,24 @@ public class MCRURNGranularRESTRegistrationStarter
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private final long period;
+    private long period;
 
-    private final TimeUnit timeUnit;
+    private TimeUnit timeUnit;
 
     private ScheduledExecutorService scheduler;
 
     public MCRURNGranularRESTRegistrationStarter() {
-        this(1, TimeUnit.MINUTES);
+        long taskPeriod = MCRConfiguration2.getLong("MCR.PI.GranularRESTRegistrationStarter.taskPeriod").orElse(5L);
+        init(taskPeriod, TimeUnit.MINUTES);
     }
 
     public MCRURNGranularRESTRegistrationStarter(long taskPeriod, TimeUnit timeUnit) {
-        this.period = taskPeriod;
-        this.timeUnit = timeUnit;
+        init(taskPeriod, timeUnit);
     }
 
     @Override
     public String getName() {
-        return "URN Registration Service";
+        return "URN Registration Service refactoring 20230212_10:13";
     }
 
     @Override
@@ -74,11 +74,16 @@ public class MCRURNGranularRESTRegistrationStarter
     public void startUp(ServletContext servletContext) {
         MCRShutdownHandler.getInstance().addCloseable(this);
 
-        MCRDNBURNRestClient client = new MCRDNBURNRestClient(getBundleProvider(), getUsernamePasswordCredentials());
+        MCRDNBURNRestClient client = new MCRDNBURNRestClient();
         MCRURNGranularRESTRegistrationTask task = new MCRURNGranularRESTRegistrationTask(client);
         Optional.of(startTimerTask(task))
             .orElseGet(this::couldNotStartTask)
             .accept(LOGGER);
+    }
+
+    private void init(long taskPeriod, TimeUnit timeUnit) {
+        this.period = taskPeriod;
+        this.timeUnit = timeUnit;
     }
 
     private Consumer<Logger> couldNotStartTask() {
