@@ -49,7 +49,7 @@ import org.mycore.datamodel.niofs.MCRContentTypes;
 import org.mycore.datamodel.niofs.MCRPath;
 import org.mycore.frontend.MCRFrontendUtil;
 import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.MCRPIUtils;
+import org.mycore.pi.MCRPITestUtils;
 import org.mycore.pi.MockMetadataManager;
 import org.mycore.pi.urn.MCRDNBURN;
 import org.mycore.pi.urn.MCRUUIDURNGenerator;
@@ -80,7 +80,7 @@ public class MCRURNGranularRESTServiceTest extends MCRStoreTestCase {
         MockMetadataManager mockMetadataManager = new MockMetadataManager();
 
         MCRDerivate derivate = new MCRDerivate();
-        MCRObjectID mcrObjectID = MCRPIUtils.getNextFreeID();
+        MCRObjectID mcrObjectID = MCRPITestUtils.getNextFreeID();
         derivate.setId(mcrObjectID);
 
         mockMetadataManager.put(mcrObjectID, derivate);
