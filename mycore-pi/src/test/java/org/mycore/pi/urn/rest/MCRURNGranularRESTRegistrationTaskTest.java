@@ -18,11 +18,10 @@
 
 package org.mycore.pi.urn.rest;
 
-import static org.mycore.pi.MCRPITestUtils.generateMCRPI;
-import static org.mycore.pi.MCRPITestUtils.randomFilename;
+import static org.mycore.pi.MCRPIUtils.generateMCRPI;
+import static org.mycore.pi.MCRPIUtils.randomFilename;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -35,10 +34,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRStoreTestCase;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIManager;
 import org.mycore.pi.MCRPIRegistrationInfo;
-import org.mycore.pi.MCRPITestUtils;
+import org.mycore.pi.MCRPIUtils;
 import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
 
@@ -64,8 +62,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
     @Ignore
     @Test
     public void run() throws Exception {
-        MCRObjectID mcrDerId = MCRPITestUtils.getNextFreeID();
-        MCRPI urn1 = generateMCRPI(mcrDerId, "TestService");
+        MCRPI urn1 = generateMCRPI(randomFilename(), countRegistered);
         MCREntityManagerProvider.getCurrentEntityManager()
             .persist(urn1);
 
@@ -79,7 +76,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
             .forEach(LOGGER::info);
 
         Integer progressedIdentifiersFromDatabase;
-        Function<MCRPIRegistrationInfo, Optional<Date>> registerFn = MCRPITestUtils.getMCRURNClient()::register;
+        Function<MCRPIRegistrationInfo, Optional<Date>> registerFn = MCRPIUtils.getMCRURNClient()::register;
         do {
             progressedIdentifiersFromDatabase = MCRPIManager.getInstance()
                 .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, registerFn, BATCH_SIZE);

@@ -83,7 +83,7 @@ public class MCRDerivateURNUtils {
                     String filePath = "/" + file.getOwner() + "/" + file.getFileName();
                     return new URL(
                         MCRFrontendUtil.getBaseURL() + "servlets/" + MCRFileNodeServlet.class.getSimpleName()
-                            + filePath.replaceAll(" ", "%20"));
+                            + filePath);
                 }
 
                 return new URL(getViewerURL(file));

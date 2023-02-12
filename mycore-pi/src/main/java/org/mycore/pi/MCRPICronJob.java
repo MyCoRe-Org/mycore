@@ -39,7 +39,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRStartupHandler;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -173,9 +172,8 @@ public class MCRPICronJob implements Runnable, MCRStartupHandler.AutoExecutable 
 
     @Override
     public void startUp(ServletContext servletContext) {
-        Boolean disableCronJob = MCRConfiguration2.getBoolean("MCR.PI.CronJob.disable").orElse(false);
-        if (servletContext == null || disableCronJob) {
-            return; //do not run in CLI or is disabled
+        if (servletContext == null) {
+            return; //do not run in CLI
         }
         updateExecutorService = Executors
             .newSingleThreadExecutor(r -> new Thread(r, MCRPICronJob.class.getSimpleName() + ".update"));

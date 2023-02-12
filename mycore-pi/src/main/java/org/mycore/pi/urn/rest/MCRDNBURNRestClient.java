@@ -34,11 +34,9 @@ import java.util.function.Function;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.ParseException;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -46,6 +44,7 @@ import org.mycore.pi.MCRPIRegistrationInfo;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 /**
@@ -61,38 +60,27 @@ public class MCRDNBURNRestClient {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final Function<MCRPIRegistrationInfo, MCRURNJsonBundle> jsonProvider;
+
     private final Optional<UsernamePasswordCredentials> credentials;
-    private final Function<MCRPIRegistrationInfo,URL> urlOfUrn;
-
-    public MCRDNBURNRestClient() {
-        this(urn -> MCRDerivateURNUtils.getURL(urn));
-    }
-
-    public MCRDNBURNRestClient(Function<MCRPIRegistrationInfo,URL> urlOfUrn) {
-        this.credentials = getUsernamePasswordCredentials();
-        this.urlOfUrn = urlOfUrn;
-    }
 
     /**
      * Creates a new operator with the given configuration.
      *
      * @param bundleProvider
-     * @deprecated see {@link MCRDNBURNRestClient#MCRDNBURNRestClient()}
      */
-    /* @Deprecated
     public MCRDNBURNRestClient(Function<MCRPIRegistrationInfo, MCRURNJsonBundle> bundleProvider) {
-        this();
-    } */
-    
+        this(bundleProvider, Optional.empty());
+    }
+
     /**
      * @param bundleProvider the provider creating the required json
      * @param credentials the credentials needed for authentication
-     * @deprecated see {@link MCRDNBURNRestClient#MCRDNBURNRestClient()}
      * */
-    @Deprecated
     public MCRDNBURNRestClient(Function<MCRPIRegistrationInfo, MCRURNJsonBundle> bundleProvider,
         Optional<UsernamePasswordCredentials> credentials) {
-        this();
+        this.jsonProvider = bundleProvider;
+        this.credentials = credentials;
     }
 
     /**
@@ -102,7 +90,7 @@ public class MCRDNBURNRestClient {
      * */
     @Deprecated
     protected String getBaseServiceURL(MCRPIRegistrationInfo urn) {
-        return getBaseServiceURL();
+        return this.getBaseServiceURL();
     }
 
     /**
@@ -147,7 +135,7 @@ public class MCRDNBURNRestClient {
      * @return the registration/update date
      */
     public Optional<Date> register(MCRPIRegistrationInfo urn) {
-        MCRURNJsonBundle bundle = getUrnJsonBundle(urn);
+        MCRURNJsonBundle bundle = this.jsonProvider.apply(urn);
         String url = getBaseServiceCheckExistsURL(urn);
         CloseableHttpResponse response = MCRHttpsClient.get(url, credentials);
         StatusLine statusLine = response.getStatusLine();
@@ -169,7 +157,7 @@ public class MCRDNBURNRestClient {
                 LOGGER.info("URN {} is not registered", identifier);
                 return registerNew(urn);
             default:
-                logFailure("Could not register " + bundle.toJSON(MCRURNJsonBundle.Format.register), response);
+                logFailure("", response, status, urn.getIdentifier(), bundle.getUrl());
                 break;
         }
 
@@ -198,8 +186,7 @@ public class MCRDNBURNRestClient {
                 }
                 break;
             default:
-                LOGGER.error("Error while get registration info of URN {} using url {}", identifier, url);
-                logFailure(identifier, response);
+                MCRDNBURNRestClient.logFailure("", response, statusCode, identifier, url);
                 break;
         }
         return Optional.empty();
@@ -216,10 +203,10 @@ public class MCRDNBURNRestClient {
      * @return the registration date
      */
     private Optional<Date> registerNew(MCRPIRegistrationInfo urn) {
-        MCRURNJsonBundle bundle = getUrnJsonBundle(urn);
-        String urnJSONBundle = bundle.toJSON(MCRURNJsonBundle.Format.register);
+        MCRURNJsonBundle bundle = jsonProvider.apply(urn);
+        String json = bundle.toJSON(MCRURNJsonBundle.Format.register);
         String baseServiceURL = getBaseServiceURL();
-        CloseableHttpResponse response = MCRHttpsClient.post(baseServiceURL, APPLICATION_JSON.toString(), urnJSONBundle,
+        CloseableHttpResponse response = MCRHttpsClient.post(baseServiceURL, APPLICATION_JSON.toString(), json,
             credentials);
 
         StatusLine statusLine = response.getStatusLine();
@@ -242,8 +229,7 @@ public class MCRDNBURNRestClient {
                     .map(Instant::from)
                     .map(Date::from);
             default:
-                String errMsg = "Failed register new URN " + identifier + " using url " + baseServiceURL;
-                logFailure(errMsg, response);
+                logFailure(json, response, postStatus, identifier, url);
                 break;
         }
         return Optional.empty();
@@ -260,10 +246,10 @@ public class MCRDNBURNRestClient {
      */
 
     private Optional<Date> update(MCRPIRegistrationInfo urn) {
-        MCRURNJsonBundle bundle = getUrnJsonBundle(urn);
-        String urnJSONBundle = bundle.toJSON(MCRURNJsonBundle.Format.update);
+        MCRURNJsonBundle bundle = jsonProvider.apply(urn);
+        String json = bundle.toJSON(MCRURNJsonBundle.Format.update);
         String updateURL = getUpdateURL(urn);
-        CloseableHttpResponse response = MCRHttpsClient.patch(updateURL, APPLICATION_JSON.toString(), urnJSONBundle,
+        CloseableHttpResponse response = MCRHttpsClient.patch(updateURL, APPLICATION_JSON.toString(), json,
             credentials);
         StatusLine statusLine = response.getStatusLine();
 
@@ -277,46 +263,36 @@ public class MCRDNBURNRestClient {
         String identifier = urn.getIdentifier();
         switch (patchStatus) {
             case HttpStatus.SC_NO_CONTENT:
-            LOGGER.info("URN {} updated to {}", identifier, bundle.getUrl());
-            return Optional.ofNullable(response.getFirstHeader("date"))
-            .map(Header::getValue)
-            .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
-            .map(Instant::from)
-            .map(Date::from);
+                LOGGER.info("URN {} updated to {}", identifier, bundle.getUrl());
+                return Optional.ofNullable(response.getFirstHeader("date"))
+                    .map(Header::getValue)
+                    .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
+                    .map(Instant::from)
+                    .map(Date::from);
             default:
-                String errMsg = "Failed uppdating URN " + urnJSONBundle + " using url " + updateURL;
-                logFailure(errMsg, response);
+                logFailure(json, response, patchStatus, identifier, bundle.getUrl());
                 break;
         }
 
         return Optional.empty();
     }
 
-    public static void logFailure(String msg, CloseableHttpResponse response) {
-            LOGGER.error(msg);
-            HttpEntity entity = response.getEntity();
-            try {
-                String body = EntityUtils.toString(entity, "UTF-8");
-                LOGGER.error("API Response: " + body);
-            } catch (ParseException|IOException e) {
-                LOGGER.error("Error while parsing response body", e);
-		}
+    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier,
+        URL url) {
+        logFailure(json, response, postStatus, identifier, url.toString());
     }
 
-    public Optional<UsernamePasswordCredentials> getUsernamePasswordCredentials() {
-        String username = MCRConfiguration2.getString("MCR.PI.DNB.Credentials.Login").orElse(null);
-        String password = MCRConfiguration2.getString("MCR.PI.DNB.Credentials.Password").orElse(null);
-
-        if (username == null || password == null || username.length() == 0 || password.length() == 0) {
-            LOGGER.warn("Could not instantiate {} as required credentials are unset", this.getClass().getName());
-            LOGGER.warn("Please set MCR.PI.DNB.Credentials.Login and MCR.PI.DNB.Credentials.Password");
-            return Optional.empty();
+    public static void logFailure(String json, CloseableHttpResponse response, int postStatus, String identifier,
+        String url) {
+        try (Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)) {
+            JsonElement jsonElement = JsonParser.parseReader(reader);
+            LOGGER.error("{}: {} ({})", postStatus,
+                jsonElement.getAsJsonObject().get("developerMessage"), identifier);
+        } catch (IOException | JsonParseException e) {
+            LOGGER.error(
+                "Could not handle urn post request: status={}, " +
+                    "urn={}, url={} json={}",
+                postStatus, identifier, url, json);
         }
-
-        return Optional.of(new UsernamePasswordCredentials(username, password));
-    }
-
-    private MCRURNJsonBundle getUrnJsonBundle(MCRPIRegistrationInfo urn) {
-        return MCRURNJsonBundle.instance(urn, urlOfUrn.apply(urn));
     }
 }
