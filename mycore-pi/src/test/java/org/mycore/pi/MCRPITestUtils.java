@@ -71,7 +71,7 @@
          try {
              return new URL(url);
          } catch (MalformedURLException e) {
-             LOGGER.error("Malformed URL: " + url.toString(), e);
+             LOGGER.error("Malformed URL: " + url, e);
          }
  
          return null;
@@ -85,4 +85,3 @@
          return MCRURNJsonBundle.instance(urnInfo, MCRPITestUtils.getUrl(urnInfo));
      }
  }
- 
