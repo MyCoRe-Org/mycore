@@ -20,19 +20,18 @@ package org.mycore.pi.urn.rest;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import java.util.TimerTask;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+
+import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.backend.jpa.MCREntityManagerProvider;
-import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.pi.MCRPIManager;
-import org.mycore.pi.backend.MCRPI;
 import org.mycore.pi.urn.MCRDNBURN;
-import org.mycore.util.concurrent.MCRFixedUserCallable;
 
 /**
  * Created by chi on 26.01.17.
@@ -43,49 +42,72 @@ import org.mycore.util.concurrent.MCRFixedUserCallable;
  */
 public final class MCRURNGranularRESTRegistrationTask extends TimerTask implements Closeable {
 
-    public final int batchSize;
+    public static final int BATCH_SIZE = 20;
 
     protected static final Logger LOGGER = LogManager.getLogger(MCRURNGranularRESTRegistrationTask.class);
 
     private final MCRDNBURNRestClient dnburnClient;
 
-    public MCRURNGranularRESTRegistrationTask() {
-        this(new MCRDNBURNRestClient());
-    }
-
     public MCRURNGranularRESTRegistrationTask(MCRDNBURNRestClient client) {
         this.dnburnClient = client;
-        this.batchSize = MCRConfiguration2.getInt("MCR.PI.GranularRESTRegistrationTask.batchSize").orElse(10);
     }
 
     @Override
     public void run() {
-        LOGGER.info("Check for unregistered URNs .. ");
-        try {
-            List<MCRPI> unregisteredURNs = MCRPIManager.getInstance()
-                .getUnregisteredIdentifiers(MCRDNBURN.TYPE, batchSize);
-    
-            for (MCRPI urn : unregisteredURNs) {
-                dnburnClient.register(urn).ifPresent(date -> setRegisterDate(urn, date));
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error occured while registering URNs!", e);
-        }
-    }
+        UnaryOperator<Integer> register = b -> MCRPIManager
+            .getInstance()
+            .setRegisteredDateForUnregisteredIdenifiers(MCRDNBURN.TYPE, dnburnClient::register, b);
 
-    private void setRegisterDate(MCRPI mcrpi, Date registerDate) {
-        try {
-			new MCRFixedUserCallable<>(() -> {
-			    mcrpi.setRegistered(registerDate);
-			    return MCREntityManagerProvider.getCurrentEntityManager().merge(mcrpi);
-			}, MCRSystemUserInformation.getJanitorInstance()).call();
-		} catch (Exception e) {
-			LOGGER.error("Error while set registered date!", e);
-		}
+        Integer numOfRegisteredObj = MCRTransactionExec.cute(register).apply(BATCH_SIZE);
+
+        while (numOfRegisteredObj > 0) {
+            numOfRegisteredObj = MCRTransactionExec.cute(register).apply(BATCH_SIZE);
+        }
+
     }
 
     @Override
     public void close() throws IOException {
         LOGGER.info("Stopping {}", getClass().getSimpleName());
+    }
+
+    public static class MCRTransactionExec {
+        public static <T, R> Function<T, R> cute(Function<T, R> function) {
+            return t -> {
+                EntityTransaction tx = beginTransaction();
+
+                try {
+                    return function.apply(t);
+                } finally {
+                    endTransaction(tx);
+                }
+            };
+        }
+
+        private static EntityTransaction beginTransaction() {
+            EntityTransaction tx = MCREntityManagerProvider
+                .getCurrentEntityManager()
+                .getTransaction();
+
+            tx.begin();
+            return tx;
+        }
+
+        private static void endTransaction(EntityTransaction tx) {
+            if (tx != null && tx.isActive()) {
+                if (tx.getRollbackOnly()) {
+                    tx.rollback();
+                } else {
+                    try {
+                        tx.commit();
+                    } catch (RollbackException e) {
+                        if (tx.isActive()) {
+                            tx.rollback();
+                        }
+                        throw e;
+                    }
+                }
+            }
+        }
     }
 }
