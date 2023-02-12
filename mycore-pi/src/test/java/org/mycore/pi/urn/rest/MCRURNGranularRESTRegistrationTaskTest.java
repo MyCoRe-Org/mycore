@@ -64,8 +64,8 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
     @Ignore
     @Test
     public void run() throws Exception {
-        MCRObjectID mcrDerId = MCRPITestUtils.getNextFreeID();
-        MCRPI urn1 = generateMCRPI(mcrDerId, "TestService");
+        String fileName = MCRPITestUtils.randomFilename();
+        MCRPI urn1 = generateMCRPI(fileName, "TestService");
         MCREntityManagerProvider.getCurrentEntityManager()
             .persist(urn1);
 
