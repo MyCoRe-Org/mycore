@@ -214,7 +214,7 @@ public class MCRORCIDWorkHelper {
 
     private static boolean updateRequired(Work localWork, Work remoteWork) {
 
-        if(!Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle()) ||
+        if (!Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle()) ||
                 !Objects.equals(localWork.getShortDescription(), remoteWork.getShortDescription()) ||
                 !Objects.equals(localWork.getWorkCitation(), remoteWork.getWorkCitation()) ||
                 !Objects.equals(localWork.getWorkType(), remoteWork.getWorkType()) ||
@@ -226,21 +226,21 @@ public class MCRORCIDWorkHelper {
                 !Objects.equals(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers())) {
             return true;
         }
-        if(!Objects.equals(localWork.getWorkContributors(), remoteWork.getWorkContributors())) {
-            if(localWork.getWorkContributors() == null ^ remoteWork.getWorkContributors() == null) {
+        if (!Objects.equals(localWork.getWorkContributors(), remoteWork.getWorkContributors())) {
+            if (localWork.getWorkContributors() == null ^ remoteWork.getWorkContributors() == null) {
                 return true;
             } else {
                 List<Contributor> localContributor = localWork.getWorkContributors().getContributor();
                 List<Contributor> remoteContributor = remoteWork.getWorkContributors().getContributor();
-                if(localContributor.size() != remoteContributor.size()) {
+                if (localContributor.size() != remoteContributor.size()) {
                     return true;
                 }
                 Iterator<Contributor> itl = localContributor.iterator();
                 Iterator<Contributor> itr = remoteContributor.iterator();
-                while(itl.hasNext()) {
+                while (itl.hasNext()) {
                     Contributor cl = itl.next();
                     Contributor cr = itr.next();
-                    if(!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
+                    if (!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
                             cl.getContributorOrcid() == null &&
                             !Objects.equals(cl.getCreditName(), cr.getCreditName())) {
                         return true;
