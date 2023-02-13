@@ -227,7 +227,7 @@ public class MCRORCIDWorkHelper {
             return true;
         }
         if (!Objects.equals(localWork.getWorkContributors(), remoteWork.getWorkContributors())) {
-            if (localWork.getWorkContributors() == null ^ remoteWork.getWorkContributors() == null) {
+            if (localWork.getWorkContributors() == null || remoteWork.getWorkContributors() == null) {
                 return true;
             } else {
                 List<Contributor> localContributor = localWork.getWorkContributors().getContributor();
@@ -242,7 +242,9 @@ public class MCRORCIDWorkHelper {
                     Contributor cr = itr.next();
                     if (!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
                             cl.getContributorOrcid() == null &&
-                            !Objects.equals(cl.getCreditName(), cr.getCreditName())) {
+                            !Objects.equals(cl.getCreditName(), cr.getCreditName()) ||
+                            !Objects.equals(cl.getContributorEmail(), cr.getContributorEmail()) ||
+                            !Objects.equals(cl.getContributorAttributes(), cr.getContributorAttributes())) {
                         return true;
                     }
                 }
