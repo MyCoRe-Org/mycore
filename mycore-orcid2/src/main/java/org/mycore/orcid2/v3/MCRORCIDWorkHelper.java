@@ -214,34 +214,16 @@ public class MCRORCIDWorkHelper {
 
     private static boolean updateRequired(Work localWork, Work remoteWork) {
 
-        if(!Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle())) {
-            return true;
-        }
-        if(!Objects.equals(localWork.getShortDescription(), remoteWork.getShortDescription())) {
-            return true;
-        }
-        if(!Objects.equals(localWork.getWorkCitation(), remoteWork.getWorkCitation())) {
-            return true;
-        }
-        if(!Objects.equals(localWork.getWorkType(), remoteWork.getWorkType())) {
-            return true;
-        }
-        if(!Objects.equals(localWork.getPublicationDate(), remoteWork.getPublicationDate())) {
-            return true;
-        }
-        if(!Objects.equals(localWork.getUrl(), remoteWork.getUrl())) {
-            return true;
-        }
-        if(!Objects.equals(localWork.getJournalTitle(), remoteWork.getJournalTitle())) {
-            return true;
-        }
-        if(!Objects.equals(localWork.getLanguageCode(), remoteWork.getLanguageCode())) {
-            return true;
-        }
-        if(!Objects.equals(localWork.getCountry(), remoteWork.getCountry())) {
-            return true;
-        }
-        if(!Objects.equals(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers())) {
+        if(!Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle()) ||
+                !Objects.equals(localWork.getShortDescription(), remoteWork.getShortDescription()) ||
+                !Objects.equals(localWork.getWorkCitation(), remoteWork.getWorkCitation()) ||
+                !Objects.equals(localWork.getWorkType(), remoteWork.getWorkType()) ||
+                !Objects.equals(localWork.getPublicationDate(), remoteWork.getPublicationDate()) ||
+                !Objects.equals(localWork.getUrl(), remoteWork.getUrl()) ||
+                !Objects.equals(localWork.getJournalTitle(), remoteWork.getJournalTitle()) ||
+                !Objects.equals(localWork.getLanguageCode(), remoteWork.getLanguageCode()) ||
+                !Objects.equals(localWork.getCountry(), remoteWork.getCountry()) ||
+                !Objects.equals(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers())) {
             return true;
         }
         if(!Objects.equals(localWork.getWorkContributors(), remoteWork.getWorkContributors())) {
@@ -258,10 +240,9 @@ public class MCRORCIDWorkHelper {
                 while(itl.hasNext()) {
                     Contributor cl = itl.next();
                     Contributor cr = itr.next();
-                    if(!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid())) {
-                        return true;
-                    }
-                    if(cl.getContributorOrcid() == null && !Objects.equals(cl.getCreditName(), cr.getCreditName())) {
+                    if(!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
+                            cl.getContributorOrcid() == null &&
+                            !Objects.equals(cl.getCreditName(), cr.getCreditName())) {
                         return true;
                     }
                 }
