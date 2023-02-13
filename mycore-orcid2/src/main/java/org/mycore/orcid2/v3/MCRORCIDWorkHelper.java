@@ -30,11 +30,13 @@ import java.util.stream.Stream;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.merger.MCRMergeTool;
+import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
@@ -54,6 +56,14 @@ import org.xml.sax.SAXException;
  * Provides utility methods for Work and WorkSummaries.
  */
 public class MCRORCIDWorkHelper {
+
+    private static final String CONFIG_WORK_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "Work.";
+
+    private static final boolean ALWAYS_UPDATE_OWN_WORK
+        = MCRConfiguration2.getOrThrow(CONFIG_WORK_PREFIX + "AlwaysUpdateOwn", Boolean::parseBoolean);
+
+    private static final boolean ALWAYS_CREATE_OWN_WORK
+        = MCRConfiguration2.getOrThrow(CONFIG_WORK_PREFIX + "AlwaysCreateOwn", Boolean::parseBoolean);
 
     /**
      * Transforms and merges List of works to Element.
@@ -115,6 +125,7 @@ public class MCRORCIDWorkHelper {
      * @throws MCRORCIDException if scope is invalid
      * @throws MCRORCIDTransformationException if transformation to orcid model fails
      * @throws MCRORCIDRequestException if publishing fails
+     * @see #publishWork
      */
     public static long publishToORCID(MCRObject object, MCRORCIDCredentials credentials)
         throws MCRORCIDException, MCRORCIDTransformationException, MCRORCIDRequestException {
@@ -123,23 +134,24 @@ public class MCRORCIDWorkHelper {
 
     /**
      * Publishes MCRObject with given list of MCRORCIDCredentials to ORCID.
-     *
+     * 
      * @param object the MCRObject
      * @param credentialsList the list of MCRORCIDCredentials
-     * @return ORCID put code of published MCRObject
+     * @return List of ORCID put codes
      * @throws MCRORCIDException if scope is invalid
      * @throws MCRORCIDTransformationException if transformation to orcid model fails
      * @throws MCRORCIDRequestException if publishing fails
+     * @see #publishWork
      */
     public static List<Long> publishToORCID(MCRObject object, List<MCRORCIDCredentials> credentialsList)
         throws MCRORCIDException, MCRORCIDTransformationException, MCRORCIDRequestException {
-        ArrayList<Long> putCodes = new ArrayList<Long>();
+        final ArrayList<Long> putCodes = new ArrayList<Long>();
         try {
             final MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(object.getId());
             final Work work = MCRORCIDWorkTransformerHelper.transformContent(content);
             final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object));
             for (MCRORCIDCredentials credentials : credentialsList) {
-                putCodes.add(publishWork(work, identifiers, credentials));
+                putCodes.add(publishWork(work, identifiers, credentials)); // TODO Exception
             }
         } catch (IOException e) {
             throw new MCRORCIDTransformationException(e);
@@ -147,24 +159,47 @@ public class MCRORCIDWorkHelper {
         return putCodes;
     }
 
+    /**
+     * Creates/Updates Work to ORCID profile by credentials.
+     * 
+     * Update and create strategies can be set via:
+     * 
+     * MCR.ORCID2.Work.AlwaysUpdateOwn=
+     * MCR.ORCID2.Work.AlwaysCreateOwn=
+     * 
+     * @param work the Work
+     * @param identifiers List of MCRIdentifier to to determine a possible matching work
+     * @param credentials the MCRORCIDCredentials
+     * @return ORCID put code of created/updated work
+     * @throws MCRORCIDException if scope is invalid
+     * @throws MCRORCIDRequestException if publishing fails
+     */
     private static long publishWork(Work work, Set<MCRIdentifier> identifiers, MCRORCIDCredentials credentials)
         throws MCRORCIDException, MCRORCIDRequestException {
         final String scope = credentials.getScope();
         if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
-            throw new MCRORCIDException("The scope is invalid"); // TODO own exception
+            throw new MCRORCIDException("The scope is invalid"); // TODO maybe own exception
         }
         final MCRORCIDClient memberClient = MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials);
         final Works works = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class);
         final List<WorkSummary> summaries
             = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-        final WorkSummary matchingWork = findMatchingSummaries(identifiers, summaries).findFirst()
-            .orElse(null); // TODO filter works from this application
-        if (matchingWork != null) {
-            Work remoteWork = memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, matchingWork.getPutCode());
-            if (updateRequired(work, remoteWork)) {
-                memberClient.update(MCRORCIDSectionImpl.WORK, matchingWork.getPutCode(), work);
-                return matchingWork.getPutCode();
+        final Stream<WorkSummary> matchingWorks = findMatchingSummaries(identifiers, summaries);
+        if (matchingWorks.count() != 0) {
+            final WorkSummary matchingOwnWork = matchingWorks
+                .filter(w -> MCRORCIDUtils.isCreatedByThisApplication(w.retrieveSourcePath())).findFirst()
+                .orElse(null);
+            if (matchingOwnWork != null) {
+                if (ALWAYS_UPDATE_OWN_WORK) {
+                    final Work remoteWork =
+                        memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, matchingOwnWork.getPutCode());
+                    if (updateRequired(work, remoteWork)) {
+                        memberClient.update(MCRORCIDSectionImpl.WORK, matchingOwnWork.getPutCode(), work);
+                    }
+                }
+                return matchingOwnWork.getPutCode();
             }
+            return ALWAYS_CREATE_OWN_WORK ? memberClient.create(MCRORCIDSectionImpl.WORK, work) : 0;
         }
         return memberClient.create(MCRORCIDSectionImpl.WORK, work);
     }
@@ -212,8 +247,8 @@ public class MCRORCIDWorkHelper {
         return !a.isEmpty();
     }
 
+    // TODO method name
     private static boolean updateRequired(Work localWork, Work remoteWork) {
-
         if (!Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle()) ||
                 !Objects.equals(localWork.getShortDescription(), remoteWork.getShortDescription()) ||
                 !Objects.equals(localWork.getWorkCitation(), remoteWork.getWorkCitation()) ||
@@ -230,16 +265,16 @@ public class MCRORCIDWorkHelper {
             if (localWork.getWorkContributors() == null || remoteWork.getWorkContributors() == null) {
                 return true;
             } else {
-                List<Contributor> localContributor = localWork.getWorkContributors().getContributor();
-                List<Contributor> remoteContributor = remoteWork.getWorkContributors().getContributor();
+                final List<Contributor> localContributor = localWork.getWorkContributors().getContributor();
+                final List<Contributor> remoteContributor = remoteWork.getWorkContributors().getContributor();
                 if (localContributor.size() != remoteContributor.size()) {
                     return true;
                 }
-                Iterator<Contributor> itl = localContributor.iterator();
-                Iterator<Contributor> itr = remoteContributor.iterator();
+                final Iterator<Contributor> itl = localContributor.iterator();
+                final Iterator<Contributor> itr = remoteContributor.iterator();
                 while (itl.hasNext()) {
-                    Contributor cl = itl.next();
-                    Contributor cr = itr.next();
+                    final Contributor cl = itl.next();
+                    final Contributor cr = itr.next();
                     if (!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
                             cl.getContributorOrcid() == null &&
                             !Objects.equals(cl.getCreditName(), cr.getCreditName()) ||
