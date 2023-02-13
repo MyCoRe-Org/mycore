@@ -61,7 +61,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
-        final List<MCRORCIDCredentials> credentials = listOrcidCredentials(object, ScopeConstants.ACTIVITIES_UPDATE);
+        final List<MCRORCIDCredentials> credentials = listOrcidCredentials(object);
         publishToORCID(object, credentials);
     }
 
@@ -70,7 +70,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
             .filter(i -> MCRORCIDUser.TRUSTED_NAME_IDENTIFIER_TYPES.contains(i.getType())).toList();
     }
 
-    private List<MCRORCIDCredentials> listOrcidCredentials(MCRObject object, String... scopes) {
+    private List<MCRORCIDCredentials> listOrcidCredentials(MCRObject object) {
         List<MCRORCIDCredentials> orcidCredentials = new ArrayList<MCRORCIDCredentials>();
         for (Element nameElement : MCRORCIDUtils.listNameElements(new MCRMODSWrapper(object))) {
             MCRUser user = null;
@@ -104,17 +104,10 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
                 }
                 if (credentials != null) {
                     final String scope = credentials.getScope();
-                    if (scope != null) {
-                        boolean allScopesPresent = true;
-                        for(String s : scopes) {
-                            if (!scope.contains(s)) {
-                                allScopesPresent = false;
-                                break;
-                            }
-                        }
-                        if(allScopesPresent) {
-                            orcidCredentials.add(credentials);
-                        }
+                    if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
+                        LOGGER.info("The scope is invalid. Skipping...");
+                    } else {
+                        orcidCredentials.add(credentials);
                     }
                 } 
             }
