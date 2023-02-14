@@ -64,7 +64,7 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
         try {
             List<MCRPI> unregisteredURNs = MCRPIManager.getInstance()
                 .getUnregisteredIdentifiers(MCRDNBURN.TYPE, batchSize);
-    
+
             for (MCRPI urn : unregisteredURNs) {
                 dnburnClient.register(urn).ifPresent(date -> setRegisterDate(urn, date));
             }
@@ -75,13 +75,13 @@ public final class MCRURNGranularRESTRegistrationTask extends TimerTask implemen
 
     private void setRegisterDate(MCRPI mcrpi, Date registerDate) {
         try {
-			new MCRFixedUserCallable<>(() -> {
-			    mcrpi.setRegistered(registerDate);
-			    return MCREntityManagerProvider.getCurrentEntityManager().merge(mcrpi);
-			}, MCRSystemUserInformation.getJanitorInstance()).call();
-		} catch (Exception e) {
-			LOGGER.error("Error while set registered date!", e);
-		}
+            new MCRFixedUserCallable<>(() -> {
+                mcrpi.setRegistered(registerDate);
+                return MCREntityManagerProvider.getCurrentEntityManager().merge(mcrpi);
+            }, MCRSystemUserInformation.getJanitorInstance()).call();
+        } catch (Exception e) {
+            LOGGER.error("Error while set registered date!", e);
+        }
     }
 
     @Override

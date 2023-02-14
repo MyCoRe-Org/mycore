@@ -62,28 +62,17 @@ public class MCRDNBURNRestClient {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final Optional<UsernamePasswordCredentials> credentials;
-    private final Function<MCRPIRegistrationInfo,URL> urlOfUrn;
+    private final Function<MCRPIRegistrationInfo, URL> urlOfUrn;
 
     public MCRDNBURNRestClient() {
         this(urn -> MCRDerivateURNUtils.getURL(urn));
     }
 
-    public MCRDNBURNRestClient(Function<MCRPIRegistrationInfo,URL> urlOfUrn) {
+    public MCRDNBURNRestClient(Function<MCRPIRegistrationInfo, URL> urlOfUrn) {
         this.credentials = getUsernamePasswordCredentials();
         this.urlOfUrn = urlOfUrn;
     }
 
-    /**
-     * Creates a new operator with the given configuration.
-     *
-     * @param bundleProvider
-     * @deprecated see {@link MCRDNBURNRestClient#MCRDNBURNRestClient()}
-     */
-    /* @Deprecated
-    public MCRDNBURNRestClient(Function<MCRPIRegistrationInfo, MCRURNJsonBundle> bundleProvider) {
-        this();
-    } */
-    
     /**
      * @param bundleProvider the provider creating the required json
      * @param credentials the credentials needed for authentication
@@ -161,16 +150,16 @@ public class MCRDNBURNRestClient {
 
         String identifier = urn.getIdentifier();
         switch (status) {
-            case HttpStatus.SC_OK:
-                LOGGER.info("URN {} is in database. No further information asked", identifier);
-                LOGGER.info("Performing update of url");
-                return update(urn);
-            case HttpStatus.SC_NOT_FOUND:
-                LOGGER.info("URN {} is not registered", identifier);
-                return registerNew(urn);
-            default:
-                logFailure("Could not register " + bundle.toJSON(MCRURNJsonBundle.Format.register), response);
-                break;
+        case HttpStatus.SC_OK:
+            LOGGER.info("URN {} is in database. No further information asked", identifier);
+            LOGGER.info("Performing update of url");
+            return update(urn);
+        case HttpStatus.SC_NOT_FOUND:
+            LOGGER.info("URN {} is not registered", identifier);
+            return registerNew(urn);
+        default:
+            logFailure("Could not register " + bundle.toJSON(MCRURNJsonBundle.Format.register), response);
+            break;
         }
 
         return Optional.empty();
@@ -187,20 +176,20 @@ public class MCRDNBURNRestClient {
 
         int statusCode = response.getStatusLine().getStatusCode();
         switch (statusCode) {
-            case HttpStatus.SC_OK:
-                HttpEntity entity = response.getEntity();
-                try {
-                    Reader reader = new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8);
-                    JsonElement jsonElement = JsonParser.parseReader(reader);
-                    return Optional.of(jsonElement.getAsJsonObject());
-                } catch (Exception e) {
-                    LOGGER.error("Could not read Response from " + url);
-                }
-                break;
-            default:
-                LOGGER.error("Error while get registration info of URN {} using url {}", identifier, url);
-                logFailure(identifier, response);
-                break;
+        case HttpStatus.SC_OK:
+            HttpEntity entity = response.getEntity();
+            try {
+                Reader reader = new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8);
+                JsonElement jsonElement = JsonParser.parseReader(reader);
+                return Optional.of(jsonElement.getAsJsonObject());
+            } catch (Exception e) {
+                LOGGER.error("Could not read Response from " + url);
+            }
+            break;
+        default:
+            LOGGER.error("Error while get registration info of URN {} using url {}", identifier, url);
+            logFailure(identifier, response);
+            break;
         }
         return Optional.empty();
     }
@@ -234,17 +223,17 @@ public class MCRDNBURNRestClient {
         String identifier = urn.getIdentifier();
         URL url = bundle.getUrl();
         switch (postStatus) {
-            case HttpStatus.SC_CREATED:
-                LOGGER.info("URN {} registered to {}", identifier, url);
-                return Optional.ofNullable(response.getFirstHeader("date"))
-                    .map(Header::getValue)
-                    .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
-                    .map(Instant::from)
-                    .map(Date::from);
-            default:
-                String errMsg = "Failed register new URN " + identifier + " using url " + baseServiceURL;
-                logFailure(errMsg, response);
-                break;
+        case HttpStatus.SC_CREATED:
+            LOGGER.info("URN {} registered to {}", identifier, url);
+            return Optional.ofNullable(response.getFirstHeader("date"))
+                .map(Header::getValue)
+                .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
+                .map(Instant::from)
+                .map(Date::from);
+        default:
+            String errMsg = "Failed register new URN " + identifier + " using url " + baseServiceURL;
+            logFailure(errMsg, response);
+            break;
         }
         return Optional.empty();
     }
@@ -276,31 +265,31 @@ public class MCRDNBURNRestClient {
 
         String identifier = urn.getIdentifier();
         switch (patchStatus) {
-            case HttpStatus.SC_NO_CONTENT:
+        case HttpStatus.SC_NO_CONTENT:
             LOGGER.info("URN {} updated to {}", identifier, bundle.getUrl());
             return Optional.ofNullable(response.getFirstHeader("date"))
-            .map(Header::getValue)
-            .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
-            .map(Instant::from)
-            .map(Date::from);
-            default:
-                String errMsg = "Failed uppdating URN " + urnJSONBundle + " using url " + updateURL;
-                logFailure(errMsg, response);
-                break;
+                .map(Header::getValue)
+                .map(DateTimeFormatter.RFC_1123_DATE_TIME::parse)
+                .map(Instant::from)
+                .map(Date::from);
+        default:
+            String errMsg = "Failed uppdating URN " + urnJSONBundle + " using url " + updateURL;
+            logFailure(errMsg, response);
+            break;
         }
 
         return Optional.empty();
     }
 
     public static void logFailure(String msg, CloseableHttpResponse response) {
-            LOGGER.error(msg);
-            HttpEntity entity = response.getEntity();
-            try {
-                String body = EntityUtils.toString(entity, "UTF-8");
-                LOGGER.error("API Response: " + body);
-            } catch (ParseException|IOException e) {
-                LOGGER.error("Error while parsing response body", e);
-		}
+        LOGGER.error(msg);
+        HttpEntity entity = response.getEntity();
+        try {
+            String body = EntityUtils.toString(entity, "UTF-8");
+            LOGGER.error("API Response: " + body);
+        } catch (ParseException | IOException e) {
+            LOGGER.error("Error while parsing response body", e);
+        }
     }
 
     public Optional<UsernamePasswordCredentials> getUsernamePasswordCredentials() {

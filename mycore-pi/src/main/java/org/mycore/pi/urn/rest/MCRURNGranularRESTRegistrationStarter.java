@@ -62,7 +62,7 @@ public class MCRURNGranularRESTRegistrationStarter
 
     @Override
     public String getName() {
-        return "URN Registration Service refactoring 20230212_10:13";
+        return "URN Registration Service via REST";
     }
 
     @Override

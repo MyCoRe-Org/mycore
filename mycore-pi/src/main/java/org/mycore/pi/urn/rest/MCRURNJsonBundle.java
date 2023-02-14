@@ -21,14 +21,14 @@ public class MCRURNJsonBundle {
     }
 
     private final MCRPIRegistrationInfo urn;
-    
-	private final URL url;
-    
+
+    private final URL url;
+
     private MCRURNJsonBundle(MCRPIRegistrationInfo urn, URL url) {
         this.urn = urn;
         this.url = url;
     }
-    
+
     public static MCRURNJsonBundle instance(MCRPIRegistrationInfo urn, URL url) {
         return new MCRURNJsonBundle(urn, url);
     }
