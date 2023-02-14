@@ -19,7 +19,6 @@
 package org.mycore.orcid2.v3;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,8 +30,7 @@ import java.util.stream.Stream;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.common.content.MCRContent;
-import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.merger.MCRMergeTool;
@@ -129,79 +127,9 @@ public class MCRORCIDWorkHelper {
      */
     public static long publishToORCID(MCRObject object, MCRORCIDCredentials credentials)
         throws MCRORCIDException, MCRORCIDTransformationException, MCRORCIDRequestException {
-        return publishToORCID(object, Arrays.asList(credentials)).get(0);
-    }
-
-    /**
-     * Publishes MCRObject with given list of MCRORCIDCredentials to ORCID.
-     * 
-     * @param object the MCRObject
-     * @param credentialsList the list of MCRORCIDCredentials
-     * @return List of ORCID put codes
-     * @throws MCRORCIDException if scope is invalid
-     * @throws MCRORCIDTransformationException if transformation to orcid model fails
-     * @throws MCRORCIDRequestException if publishing fails
-     * @see #publishWork
-     */
-    public static List<Long> publishToORCID(MCRObject object, List<MCRORCIDCredentials> credentialsList)
-        throws MCRORCIDException, MCRORCIDTransformationException, MCRORCIDRequestException {
-        final ArrayList<Long> putCodes = new ArrayList<Long>();
-        try {
-            final MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(object.getId());
-            final Work work = MCRORCIDWorkTransformerHelper.transformContent(content);
-            final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object));
-            for (MCRORCIDCredentials credentials : credentialsList) {
-                putCodes.add(publishWork(work, identifiers, credentials)); // TODO Exception
-            }
-        } catch (IOException e) {
-            throw new MCRORCIDTransformationException(e);
-        }
-        return putCodes;
-    }
-
-    /**
-     * Creates/Updates Work to ORCID profile by credentials.
-     * 
-     * Update and create strategies can be set via:
-     * 
-     * MCR.ORCID2.Work.AlwaysUpdateOwn=
-     * MCR.ORCID2.Work.AlwaysCreateOwn=
-     * 
-     * @param work the Work
-     * @param identifiers List of MCRIdentifier to to determine a possible matching work
-     * @param credentials the MCRORCIDCredentials
-     * @return ORCID put code of created/updated work
-     * @throws MCRORCIDException if scope is invalid
-     * @throws MCRORCIDRequestException if publishing fails
-     */
-    private static long publishWork(Work work, Set<MCRIdentifier> identifiers, MCRORCIDCredentials credentials)
-        throws MCRORCIDException, MCRORCIDRequestException {
-        final String scope = credentials.getScope();
-        if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
-            throw new MCRORCIDException("The scope is invalid"); // TODO maybe own exception
-        }
-        final MCRORCIDClient memberClient = MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials);
-        final Works works = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class);
-        final List<WorkSummary> summaries
-            = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-        final Stream<WorkSummary> matchingWorks = findMatchingSummaries(identifiers, summaries);
-        if (matchingWorks.count() != 0) {
-            final WorkSummary matchingOwnWork = matchingWorks
-                .filter(w -> MCRORCIDUtils.isCreatedByThisApplication(w.retrieveSourcePath())).findFirst()
-                .orElse(null);
-            if (matchingOwnWork != null) {
-                if (ALWAYS_UPDATE_OWN_WORK) {
-                    final Work remoteWork =
-                        memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, matchingOwnWork.getPutCode());
-                    if (updateRequired(work, remoteWork)) {
-                        memberClient.update(MCRORCIDSectionImpl.WORK, matchingOwnWork.getPutCode(), work);
-                    }
-                }
-                return matchingOwnWork.getPutCode();
-            }
-            return ALWAYS_CREATE_OWN_WORK ? memberClient.create(MCRORCIDSectionImpl.WORK, work) : 0;
-        }
-        return memberClient.create(MCRORCIDSectionImpl.WORK, work);
+        final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object));
+        final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
+        return publishWork(work, identifiers, credentials);
     }
 
     /**
@@ -234,6 +162,99 @@ public class MCRORCIDWorkHelper {
                 identifiers));
     }
 
+
+    /**
+     * Creates/Updates Work to ORCID profile by credentials.
+     * 
+     * Update and create strategies can be set via:
+     * 
+     * MCR.ORCID2.Work.AlwaysUpdateOwn=
+     * MCR.ORCID2.Work.AlwaysCreateOwn=
+     * 
+     * @param work the Work
+     * @param identifiers List of MCRIdentifier to to determine a possible matching work
+     * @param credentials the MCRORCIDCredentials
+     * @return ORCID put code of created/updated work
+     * @throws MCRORCIDException if scope is invalid
+     * @throws MCRORCIDRequestException if publishing fails
+     */
+    protected static long publishWork(Work work, Set<MCRIdentifier> identifiers, MCRORCIDCredentials credentials)
+        throws MCRORCIDException, MCRORCIDRequestException {
+        final String scope = credentials.getScope();
+        if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
+            throw new MCRORCIDException("The scope is invalid"); // TODO maybe own exception
+        }
+        final MCRORCIDClient memberClient = MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials);
+        final Works works = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class);
+        final List<WorkSummary> summaries
+            = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
+        final Stream<WorkSummary> matchingWorks = findMatchingSummaries(identifiers, summaries);
+        if (matchingWorks.count() != 0) {
+            final WorkSummary matchingOwnWork = matchingWorks
+                .filter(w -> MCRORCIDUtils.isCreatedByThisApplication(w.retrieveSourcePath())).findFirst()
+                .orElse(null);
+            if (matchingOwnWork != null) {
+                if (ALWAYS_UPDATE_OWN_WORK) {
+                    final Work remoteWork =
+                        memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, matchingOwnWork.getPutCode());
+                    if (!checkWorkEquality(work, remoteWork)) {
+                        memberClient.update(MCRORCIDSectionImpl.WORK, matchingOwnWork.getPutCode(), work);
+                    }
+                }
+                return matchingOwnWork.getPutCode();
+            }
+            return ALWAYS_CREATE_OWN_WORK ? memberClient.create(MCRORCIDSectionImpl.WORK, work) : 0;
+        }
+        return memberClient.create(MCRORCIDSectionImpl.WORK, work);
+    }
+
+    /**
+     * Compares works and possibly ignores the credit name of the contributors.
+     * 
+     * @param localWork the local Work
+     * @param remoteWork the remote work
+     * @return true if localWork equals remoteWork
+     */
+    private static boolean checkWorkEquality(Work localWork, Work remoteWork) {
+        if (!Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle()) ||
+                !Objects.equals(localWork.getShortDescription(), remoteWork.getShortDescription()) ||
+                !Objects.equals(localWork.getWorkCitation(), remoteWork.getWorkCitation()) ||
+                !Objects.equals(localWork.getWorkType(), remoteWork.getWorkType()) ||
+                !Objects.equals(localWork.getPublicationDate(), remoteWork.getPublicationDate()) ||
+                !Objects.equals(localWork.getUrl(), remoteWork.getUrl()) ||
+                !Objects.equals(localWork.getJournalTitle(), remoteWork.getJournalTitle()) ||
+                !Objects.equals(localWork.getLanguageCode(), remoteWork.getLanguageCode()) ||
+                !Objects.equals(localWork.getCountry(), remoteWork.getCountry()) ||
+                !Objects.equals(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers())) {
+            return false;
+        }
+        if (!Objects.equals(localWork.getWorkContributors(), remoteWork.getWorkContributors())) {
+            if (localWork.getWorkContributors() == null || remoteWork.getWorkContributors() == null) {
+                return false;
+            } else {
+                final List<Contributor> localContributor = localWork.getWorkContributors().getContributor();
+                final List<Contributor> remoteContributor = remoteWork.getWorkContributors().getContributor();
+                if (localContributor.size() != remoteContributor.size()) {
+                    return false;
+                }
+                final Iterator<Contributor> itl = localContributor.iterator();
+                final Iterator<Contributor> itr = remoteContributor.iterator();
+                while (itl.hasNext()) {
+                    final Contributor cl = itl.next();
+                    final Contributor cr = itr.next();
+                    if (!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
+                            cl.getContributorOrcid() == null &&
+                            !Objects.equals(cl.getCreditName(), cr.getCreditName()) ||
+                            !Objects.equals(cl.getContributorEmail(), cr.getContributorEmail()) ||
+                            !Objects.equals(cl.getContributorAttributes(), cr.getContributorAttributes())) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     private static Element mergeElements(List<Element> elements) {
         final Element result = elements.get(0);
         for (int i = 1; i < elements.size(); i++) {
@@ -246,46 +267,4 @@ public class MCRORCIDWorkHelper {
         a.retainAll(b);
         return !a.isEmpty();
     }
-
-    // TODO method name
-    private static boolean updateRequired(Work localWork, Work remoteWork) {
-        if (!Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle()) ||
-                !Objects.equals(localWork.getShortDescription(), remoteWork.getShortDescription()) ||
-                !Objects.equals(localWork.getWorkCitation(), remoteWork.getWorkCitation()) ||
-                !Objects.equals(localWork.getWorkType(), remoteWork.getWorkType()) ||
-                !Objects.equals(localWork.getPublicationDate(), remoteWork.getPublicationDate()) ||
-                !Objects.equals(localWork.getUrl(), remoteWork.getUrl()) ||
-                !Objects.equals(localWork.getJournalTitle(), remoteWork.getJournalTitle()) ||
-                !Objects.equals(localWork.getLanguageCode(), remoteWork.getLanguageCode()) ||
-                !Objects.equals(localWork.getCountry(), remoteWork.getCountry()) ||
-                !Objects.equals(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers())) {
-            return true;
-        }
-        if (!Objects.equals(localWork.getWorkContributors(), remoteWork.getWorkContributors())) {
-            if (localWork.getWorkContributors() == null || remoteWork.getWorkContributors() == null) {
-                return true;
-            } else {
-                final List<Contributor> localContributor = localWork.getWorkContributors().getContributor();
-                final List<Contributor> remoteContributor = remoteWork.getWorkContributors().getContributor();
-                if (localContributor.size() != remoteContributor.size()) {
-                    return true;
-                }
-                final Iterator<Contributor> itl = localContributor.iterator();
-                final Iterator<Contributor> itr = remoteContributor.iterator();
-                while (itl.hasNext()) {
-                    final Contributor cl = itl.next();
-                    final Contributor cr = itr.next();
-                    if (!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
-                            cl.getContributorOrcid() == null &&
-                            !Objects.equals(cl.getCreditName(), cr.getCreditName()) ||
-                            !Objects.equals(cl.getContributorEmail(), cr.getContributorEmail()) ||
-                            !Objects.equals(cl.getContributorAttributes(), cr.getContributorAttributes())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
 }
