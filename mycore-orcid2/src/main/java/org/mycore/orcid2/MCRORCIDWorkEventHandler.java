@@ -20,6 +20,7 @@ package org.mycore.orcid2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,7 +80,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
                 final List<MCRUser> tmp = MCRORCIDUserUtils.getUserByID(id).stream().toList();
                 if (tmp.size() == 1) {
                     user = tmp.get(0);
-                    if ("orcid".equals(id.getType())) {
+                    if (Objects.equals(id.getType(), "orcid")) {
                         orcid = id.getValue();
                     }
                 } else if (tmp.size() > 1) {
