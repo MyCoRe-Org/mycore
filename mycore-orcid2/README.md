@@ -16,16 +16,14 @@ Steps:
     *   MCR.ORCID2.OAuth.ClientID
     *   MCR.ORCID2.OAuth.ClientSecret
     *   MCR.ORCID2.OAuth.Scope
-    *   MCR.ORCID2.v3.ReadPublicToken
-
-*   The Client talks default to the Production APIs. The developer API can be activated with`MCR.ORCID2.v3.IsSandbox=true`. Therefore, developer Credentials are required
+    *   MCR.ORCID2.Client.ReadPublicToken
 
 ## Examples
 
-### Fetching Works from Public API
+### Fetching works from Public API v3
 
     String orcid = "0000-0001-5065-6970";
-    MCRORCIDReadClient client = MCRORCIDAPIClientFactoryImpl.getInstance().createPublicClient();
+    MCRORCIDReadClient client = MCRORCIDClientFactory.getInstance("v3").createPublicClient();
 
     // fetch work summary
     List<WorkSummary> summaries = client.fetch(orcid, MCRORCIDSectionImpl.WORKS, Works.class).getWorkGroup()
@@ -37,18 +35,18 @@ Steps:
             .fetch(orcid, MCRORCIDSectionImpl.WORKS, WorkBulk.class, putCodes).getBulk();
 
     // transform work to mods
-    Element mods = MCRORCIDWorkTransformer.getInstance().convertToMODS(work.get(0));
+    MCRContent mods = MCRORCIDWorkTransformerHelper.transformWork(works.get(0));
 
 ### Publishing work into current user's ORCID profile
 
     // transform object to work
     MCRObjectID objectID = null // TODO
     MCRContent object = MCRXMLMetadataManager.instance().retrieveContent(objectID);
-    Work work = MCRORCIDWorkTransformer.getInstance().convertObject(object);
+    Work work = MCRORCIDWorkTransformerHelper.transformContent(object);
 
     // initialize member client for current user
-    MCRORCIDCredentials credentials = MCRORCIDSessionUtils.getCurrentUser().getCredentials();
-    MCRORCIDClient client = MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials);
+    MCRORCIDCredentials credentials = MCRORCIDSessionUtils.getCurrentUser().getCredentials("ORCID");
+    MCRORCIDClient client = MCRORCIDClientFactory.getInstance("v3").createMemberClient(credentials);
 
     // publish work to orcid
     long putCode = client.create(MCRORCIDSectionImpl.WORKS, work);

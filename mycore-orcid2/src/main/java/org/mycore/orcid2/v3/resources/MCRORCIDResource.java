@@ -43,7 +43,7 @@ import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
-import org.mycore.orcid2.v3.MCRORCIDAPIClientFactoryImpl;
+import org.mycore.orcid2.v3.MCRORCIDClientHelper;
 import org.mycore.orcid2.v3.MCRORCIDSectionImpl;
 import org.mycore.orcid2.v3.MCRORCIDWorkHelper;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
@@ -98,7 +98,7 @@ public class MCRORCIDResource {
             return new MCRORCIDPublicationStatus(true, false);
         }
         try {
-            final Works works = MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials)
+            final Works works = MCRORCIDClientHelper.getClientFactory().createMemberClient(credentials)
                 .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();

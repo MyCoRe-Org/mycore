@@ -18,11 +18,14 @@
 
 package org.mycore.orcid2.v3;
 
+import java.util.Objects;
+
 import jakarta.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
+import org.mycore.orcid2.client.MCRORCIDClientFactory;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 
@@ -52,24 +55,30 @@ public class MCRORCIDClientHelper {
         final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
         if (credentials != null) {
             try {
-                return MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials).fetch(section,
-                    valueType, putCodes);
+                return getClientFactory().createMemberClient(credentials).fetch(section, valueType, putCodes);
             } catch (MCRORCIDRequestException e) {
                 final Response response = e.getErrorResponse();
-                if (Response.Status.Family.CLIENT_ERROR.equals(response.getStatusInfo().getFamily())) {
+                if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
                     LOGGER.info(
                         "Request with credentials for orcid {} has failed with status code {}."
                             + " Token has probably expired.",
                         orcid, response.getStatus());
-                    return MCRORCIDAPIClientFactoryImpl.getInstance().createPublicClient().fetch(orcid, section,
-                        valueType, putCodes);
+                    return getClientFactory().createPublicClient().fetch(orcid, section, valueType, putCodes);
                 } else {
                     throw e;
                 }
             }
         } else {
-            return MCRORCIDAPIClientFactoryImpl.getInstance().createPublicClient().fetch(orcid, section, valueType,
-                putCodes);
+            return getClientFactory().createPublicClient().fetch(orcid, section, valueType, putCodes);
         }
+    }
+
+    /**
+     * Returns v3 MCRORCIDClientFactory.
+     *
+     * @return MCRORCIDClientFactory
+     */
+    public static MCRORCIDClientFactory getClientFactory() {
+        return MCRORCIDClientFactory.getInstance("v3");
     }
 }

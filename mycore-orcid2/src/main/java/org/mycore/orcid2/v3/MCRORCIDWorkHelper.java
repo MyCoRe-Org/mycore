@@ -38,8 +38,8 @@ import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.exception.MCRORCIDException;
+import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
@@ -162,7 +162,7 @@ public class MCRORCIDWorkHelper {
                 identifiers));
     }
 
-
+    // TODO handle if no identifiers exist
     /**
      * Creates/Updates Work to ORCID profile by credentials.
      * 
@@ -184,7 +184,7 @@ public class MCRORCIDWorkHelper {
         if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
             throw new MCRORCIDException("The scope is invalid"); // TODO maybe own exception
         }
-        final MCRORCIDClient memberClient = MCRORCIDAPIClientFactoryImpl.getInstance().createMemberClient(credentials);
+        final MCRORCIDClient memberClient = MCRORCIDClientHelper.getClientFactory().createMemberClient(credentials);
         final Works works = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class);
         final List<WorkSummary> summaries
             = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
