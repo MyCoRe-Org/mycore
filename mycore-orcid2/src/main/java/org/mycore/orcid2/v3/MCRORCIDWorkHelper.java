@@ -27,6 +27,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.ws.rs.core.Response;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration2;
@@ -35,11 +39,14 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid2.MCRORCIDConstants;
+import org.mycore.orcid2.MCRORCIDMetadataService;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
+import org.mycore.orcid2.flag.MCRORCIDPutCodeInfo;
+import org.mycore.orcid2.flag.MCRORCIDUserInfo;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
@@ -55,6 +62,8 @@ import org.xml.sax.SAXException;
  */
 public class MCRORCIDWorkHelper {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static final String CONFIG_WORK_PREFIX = MCRORCIDConstants.CONFIG_PREFIX + "Work.";
 
     private static final boolean ALWAYS_UPDATE_OWN_WORK
@@ -62,6 +71,9 @@ public class MCRORCIDWorkHelper {
 
     private static final boolean ALWAYS_CREATE_OWN_WORK
         = MCRConfiguration2.getOrThrow(CONFIG_WORK_PREFIX + "AlwaysCreateOwn", Boolean::parseBoolean);
+
+    private static final boolean ALWAYS_UPDATE_PUT_CODES
+        = MCRConfiguration2.getOrThrow(CONFIG_WORK_PREFIX + "AlwaysUpdatePutCodes", Boolean::parseBoolean);
 
     /**
      * Transforms and merges List of works to Element.
@@ -115,24 +127,6 @@ public class MCRORCIDWorkHelper {
     }
 
     /**
-     * Publishes MCRObject with given MCRORCIDCredentials to ORCID.
-     * 
-     * @param object the MCRObject
-     * @param credentials the MCRORCIDCredentials
-     * @return ORCID put code of published MCRObject
-     * @throws MCRORCIDException if scope is invalid
-     * @throws MCRORCIDTransformationException if transformation to orcid model fails
-     * @throws MCRORCIDRequestException if publishing fails
-     * @see #publishWork
-     */
-    public static long publishToORCID(MCRObject object, MCRORCIDCredentials credentials)
-        throws MCRORCIDException, MCRORCIDTransformationException, MCRORCIDRequestException {
-        final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object));
-        final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
-        return publishWork(work, identifiers, credentials);
-    }
-
-    /**
      * Returns a Stream of WorkSummaries matching the identifiers of the MCRObject.
      *
      * @param object the MCRObject
@@ -162,9 +156,81 @@ public class MCRORCIDWorkHelper {
                 identifiers));
     }
 
-    // TODO handle if no identifiers exist
     /**
-     * Creates/Updates Work to ORCID profile by credentials.
+     * Publishes MCRObject with given MCRORCIDCredentials to ORCID.
+     * 
+     * @param object the MCRObject
+     * @param credentials the MCRORCIDCredentials
+     * @return ORCID put code of published MCRObject
+     * @throws MCRORCIDException if publishing fails
+     * @see #retrieveWorkInfo
+     * @see #publishWork
+     */
+    public static long publishObjectToORCID(MCRObject object, MCRORCIDCredentials credentials)
+        throws MCRORCIDException {
+        try {
+            MCRORCIDUserInfo userInfo = MCRORCIDMetadataService.getUserInfoByORCID(object, credentials.getORCID());
+            if (userInfo == null) {
+                userInfo = new MCRORCIDUserInfo(credentials.getORCID());
+            }
+            retrieveWorkInfo(object, credentials, userInfo);
+            final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
+            final long putCode = publishWork(work, credentials, userInfo.getWorkInfo());
+            final long ownPutCode = userInfo.getWorkInfo().getOwnPutCode();
+            if (!Objects.equals(ownPutCode, putCode)) {
+                userInfo.getWorkInfo().setOwnPutCode(putCode);
+                MCRORCIDMetadataService.updateUserInfoByORCID(object, credentials.getORCID(), userInfo);
+            }
+            return putCode;
+        } catch (Exception e) {
+            throw new MCRORCIDException("Publishing to ORCID failed", e);
+        }
+    }
+
+    /**
+     * Retrieves work info for MCRORCIDUserInfo of MCRObject with MCRORCIDCredentials.
+     * 
+     * Strategie can be set via:
+     * 
+     * MCR.ORCID2.Work.AlwaysUpdatePutCodes=
+     * 
+     * @param object the MCRObject
+     * @param credentials the MCRORCIDCredentials
+     * @param userInfo the userInfo
+     * @throws MCRORCIDException if retrieving fails
+     */
+    public static void retrieveWorkInfo(MCRObject object, MCRORCIDCredentials credentials, MCRORCIDUserInfo userInfo)
+        throws MCRORCIDException {
+        if (ALWAYS_UPDATE_PUT_CODES || userInfo.getWorkInfo() == null) {
+            userInfo.setWorkInfo(createWorkInfo(object, credentials));
+        }
+    }
+
+    /**
+     * Creates work info for MCRORCIDCredentials with MCRObject as reference.
+     * 
+     * @param object the MCRObject
+     * @param credentials the MCRORCIDCredentials
+     * @return a work info as MCRORCIDPutCodeInfo
+     * @throws MCRORCIDRequestException look up request fails
+     */
+    protected static MCRORCIDPutCodeInfo createWorkInfo(MCRObject object, MCRORCIDCredentials credentials) {
+        final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object));
+        final MCRORCIDClient memberClient = MCRORCIDClientHelper.getClientFactory().createMemberClient(credentials);
+        final List<WorkSummary> summaries = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class).getWorkGroup()
+            .stream().flatMap(g -> g.getWorkSummary().stream()).toList();
+        final Stream<WorkSummary> matchingWorks = findMatchingSummaries(identifiers, summaries);
+        final long ownPutCode = matchingWorks
+            .filter(w -> MCRORCIDUtils.isCreatedByThisApplication(w.retrieveSourcePath())) // TODO improve filters
+            .findFirst().map(WorkSummary::getPutCode).orElse(0l);
+        final long[] otherPutCodes = matchingWorks
+            .filter(w -> !MCRORCIDUtils.isCreatedByThisApplication(w.retrieveSourcePath()))
+            .map(WorkSummary::getPutCode).mapToLong(l -> (long) l).toArray();
+        return new MCRORCIDPutCodeInfo(ownPutCode, otherPutCodes); 
+    }
+
+    /**
+     * Creates/Updates Work to ORCID profile by MCRORCIDCredentials and MCRORCIDUserInfo.
      * 
      * Update and create strategies can be set via:
      * 
@@ -172,36 +238,41 @@ public class MCRORCIDWorkHelper {
      * MCR.ORCID2.Work.AlwaysCreateOwn=
      * 
      * @param work the Work
-     * @param identifiers List of MCRIdentifier to to determine a possible matching work
      * @param credentials the MCRORCIDCredentials
-     * @return ORCID put code of created/updated work
+     * @param workInfo the MCRORCIDUserInfo
+     * @return ORCID put code of created/updated work or 0
      * @throws MCRORCIDException if scope is invalid
      * @throws MCRORCIDRequestException if publishing fails
      */
-    protected static long publishWork(Work work, Set<MCRIdentifier> identifiers, MCRORCIDCredentials credentials)
-        throws MCRORCIDException, MCRORCIDRequestException {
+    protected static long publishWork(Work work, MCRORCIDCredentials credentials, MCRORCIDPutCodeInfo workInfo) 
+        throws IllegalArgumentException, MCRORCIDRequestException, MCRORCIDException {
         final String scope = credentials.getScope();
         if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
             throw new MCRORCIDException("The scope is invalid"); // TODO maybe own exception
         }
         final MCRORCIDClient memberClient = MCRORCIDClientHelper.getClientFactory().createMemberClient(credentials);
-        final Works works = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class);
-        final List<WorkSummary> summaries
-            = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-        final Stream<WorkSummary> matchingWorks = findMatchingSummaries(identifiers, summaries);
-        if (matchingWorks.count() != 0) {
-            final WorkSummary matchingOwnWork = matchingWorks
-                .filter(w -> MCRORCIDUtils.isCreatedByThisApplication(w.retrieveSourcePath())).findFirst()
-                .orElse(null);
-            if (matchingOwnWork != null) {
-                if (ALWAYS_UPDATE_OWN_WORK) {
-                    final Work remoteWork =
-                        memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, matchingOwnWork.getPutCode());
-                    if (!checkWorkEquality(work, remoteWork)) {
-                        memberClient.update(MCRORCIDSectionImpl.WORK, matchingOwnWork.getPutCode(), work);
+        final long ownPutCode = workInfo.getOwnPutCode();
+        final long[] otherPutCodes = workInfo.getOtherPutCodes();
+        if (ownPutCode > 0 || otherPutCodes.length > 0) { // matching work should exists in profile
+            if (ownPutCode > 0) {
+                try {
+                    if (ALWAYS_UPDATE_OWN_WORK) {
+                        final Work remoteWork =
+                            memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, ownPutCode);
+                        if (!checkWorkEquality(work, remoteWork)) {
+                            memberClient.update(MCRORCIDSectionImpl.WORK, ownPutCode, work);
+                        }
+                    }
+                    return ownPutCode;
+                } catch (MCRORCIDRequestException e) { // skip 404
+                    final Response response = e.getErrorResponse();
+                    if (Objects.equals(response.getStatus(), Response.Status.NOT_FOUND)) {
+                        LOGGER.info(
+                            "Work of user {} with put code {} not found.", credentials.getORCID(), ownPutCode);
+                    } else {
+                        throw e;
                     }
                 }
-                return matchingOwnWork.getPutCode();
             }
             return ALWAYS_CREATE_OWN_WORK ? memberClient.create(MCRORCIDSectionImpl.WORK, work) : 0;
         }
