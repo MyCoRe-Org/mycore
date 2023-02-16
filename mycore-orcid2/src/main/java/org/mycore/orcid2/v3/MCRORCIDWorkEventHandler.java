@@ -26,9 +26,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.orcid2.MCRORCIDMetadataService;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
-import org.mycore.orcid2.flag.MCRORCIDUserInfo;
+import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
+import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
 import org.mycore.orcid2.user.MCRIdentifier;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
@@ -52,7 +52,7 @@ public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEven
         credentials.forEach(c -> {
             final String orcid = c.getORCID();
             try {
-                MCRORCIDUserInfo userInfo = MCRORCIDMetadataService.getUserInfoByORCID(object, orcid);
+                MCRORCIDUserInfo userInfo = MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid);
                 if (userInfo == null) {
                     userInfo = new MCRORCIDUserInfo(orcid);
                 }
@@ -61,7 +61,7 @@ public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEven
                 final long ownPutCode = userInfo.getWorkInfo().getOwnPutCode();
                 if (!Objects.equals(ownPutCode, putCode)) {
                     userInfo.getWorkInfo().setOwnPutCode(putCode);
-                    MCRORCIDMetadataService.updateUserInfoByORCID(object, orcid, userInfo);
+                    MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
                 }
             } catch (Exception ex) {
                 LOGGER.warn("Could not publish {} to ORCID profile: {}.", object.getId(), c.getORCID(), ex);

@@ -39,14 +39,14 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid2.MCRORCIDConstants;
-import org.mycore.orcid2.MCRORCIDMetadataService;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
-import org.mycore.orcid2.flag.MCRORCIDPutCodeInfo;
-import org.mycore.orcid2.flag.MCRORCIDUserInfo;
+import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
+import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
+import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
@@ -169,7 +169,7 @@ public class MCRORCIDWorkHelper {
     public static long publishObjectToORCID(MCRObject object, MCRORCIDCredentials credentials)
         throws MCRORCIDException {
         try {
-            MCRORCIDUserInfo userInfo = MCRORCIDMetadataService.getUserInfoByORCID(object, credentials.getORCID());
+            MCRORCIDUserInfo userInfo = MCRORCIDMetadataUtils.getUserInfoByORCID(object, credentials.getORCID());
             if (userInfo == null) {
                 userInfo = new MCRORCIDUserInfo(credentials.getORCID());
             }
@@ -179,7 +179,7 @@ public class MCRORCIDWorkHelper {
             final long ownPutCode = userInfo.getWorkInfo().getOwnPutCode();
             if (!Objects.equals(ownPutCode, putCode)) {
                 userInfo.getWorkInfo().setOwnPutCode(putCode);
-                MCRORCIDMetadataService.updateUserInfoByORCID(object, credentials.getORCID(), userInfo);
+                MCRORCIDMetadataUtils.updateUserInfoByORCID(object, credentials.getORCID(), userInfo);
             }
             return putCode;
         } catch (Exception e) {

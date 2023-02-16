@@ -16,8 +16,12 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.flag;
+package org.mycore.orcid2.metadata;
 
+import java.util.Arrays;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -60,6 +64,7 @@ public class MCRORCIDPutCodeInfo {
      * 
      * @return own put code
      */
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonProperty("own")
     public long getOwnPutCode() {
         return ownPutCode;
@@ -80,6 +85,7 @@ public class MCRORCIDPutCodeInfo {
      * @return other put codes
      */
     @JsonProperty("other")
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public long[] getOtherPutCodes() {
         return otherPutCodes;
     }
@@ -91,5 +97,25 @@ public class MCRORCIDPutCodeInfo {
      */
     public void setOtherPutCodes(long[] putCodes) {
         this.otherPutCodes = putCodes;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ownPutCode, otherPutCodes);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MCRORCIDPutCodeInfo other = (MCRORCIDPutCodeInfo) obj;
+        return Objects.equals(ownPutCode, other.ownPutCode) && Arrays.equals(otherPutCodes, other.otherPutCodes);
     }
 }

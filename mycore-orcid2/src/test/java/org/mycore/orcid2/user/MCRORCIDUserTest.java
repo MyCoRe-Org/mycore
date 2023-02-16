@@ -24,9 +24,9 @@ import static org.junit.Assert.assertNull;
 
 import java.time.LocalDate;
 
-import org.junit.Test;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;

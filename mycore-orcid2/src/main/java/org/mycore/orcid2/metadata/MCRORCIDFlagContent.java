@@ -16,10 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.flag;
+package org.mycore.orcid2.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents model for ORCID flag content.
@@ -89,5 +90,25 @@ public class MCRORCIDFlagContent {
      */
     public void removeUserInfoByORCID(String orcid) {
         userInfos = userInfos.stream().filter(c -> !c.getORCID().equals(orcid)).toList();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userInfos);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        MCRORCIDFlagContent other = (MCRORCIDFlagContent) obj;
+        return Objects.equals(userInfos, other.userInfos);
     }
 }

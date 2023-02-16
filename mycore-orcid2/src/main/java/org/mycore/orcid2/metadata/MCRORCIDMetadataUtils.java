@@ -16,10 +16,10 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2;
+package org.mycore.orcid2.metadata;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
@@ -27,13 +27,11 @@ import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
-import org.mycore.orcid2.flag.MCRORCIDFlagContent;
-import org.mycore.orcid2.flag.MCRORCIDUserInfo;
 
 /**
  * Handles metadata for ORCID stuff.
  */
-public class MCRORCIDMetadataService {
+public class MCRORCIDMetadataUtils {
 
     /**
      * Name of ORCID flag.
@@ -60,7 +58,7 @@ public class MCRORCIDMetadataService {
     }
 
     /**
-     * Sets ORCID flag of MCRObject.
+     * Sets ORCID flag of MCRObject and updates MCRObject.
      * 
      * @param object the MCRObject
      * @param flagContent the MCRORCIDFlagContent
@@ -68,23 +66,21 @@ public class MCRORCIDMetadataService {
      */
     public static void setORCIDFlagContent(MCRObject object, MCRORCIDFlagContent flagContent) throws MCRORCIDException {
         try {
-            object.getService().removeFlags(ORCID_FLAG);
-            final String flagContentString = transformFlagContent(flagContent);
-            object.getService().addFlag(ORCID_FLAG, flagContentString);
+            doSetORCIDFlagContent(object, flagContent);
             MCRMetadataManager.update(object);
-        } catch (MCRAccessException | MCRPersistenceException | MCRORCIDTransformationException e) {
+        } catch (MCRAccessException | MCRPersistenceException e) {
             throw new MCRORCIDException("Could not update list of object " + object.getId(), e);
         }
     }
 
     /**
-     * Removes ORCID flag from MCRObject.
+     * Removes ORCID flag from MCRObject and updates MCRObject.
      * 
      * @param object the MCRObject
      * @throws MCRORCIDException if cannot remove flag
      */
     public static void removeORCIDFlag(MCRObject object) throws MCRORCIDException {
-        object.getService().removeFlags(ORCID_FLAG);
+        doRemoveORCIDFlag(object);
         try {
             MCRMetadataManager.update(object);
         } catch (Exception e) {
@@ -109,7 +105,7 @@ public class MCRORCIDMetadataService {
     }
 
     /**
-     * Updates MCRORCIDUserInfo by ORCID iD for MCROject.
+     * Updates MCRORCIDUserInfo by ORCID iD for MCROject and updates MCRObject.
      * 
      * @param object the MCRObject
      * @param orcid the ORCID iD
@@ -124,6 +120,34 @@ public class MCRORCIDMetadataService {
         }
         flagContent.updateUserInfoByORCID(orcid, userInfo);
         setORCIDFlagContent(object, flagContent);
+    }
+
+    /**
+     * Removes ORCID flag from MCRObject.
+     * 
+     * @param object the MCRObject
+     */
+    protected static void doRemoveORCIDFlag(MCRObject object) throws MCRORCIDException {
+        object.getService().removeFlags(ORCID_FLAG);
+    }
+
+    /**
+     * Sets ORCID flag of MCRObject.
+     * 
+     * @param object the MCRObject
+     * @param flagContent the MCRORCIDFlagContent
+     * @throws MCRORCIDException if update fails
+     */
+    protected static void doSetORCIDFlagContent(MCRObject object, MCRORCIDFlagContent flagContent)
+        throws MCRORCIDException {
+        object.getService().removeFlags(ORCID_FLAG);
+        String flagContentString = null;
+        try {
+            flagContentString = transformFlagContent(flagContent);
+        } catch (MCRORCIDTransformationException e) {
+            throw new MCRORCIDException("Could not update list of object " + object.getId(), e);
+        }
+        object.getService().addFlag(ORCID_FLAG, flagContentString);
     }
 
     /**
