@@ -20,16 +20,23 @@ package org.mycore.datamodel.niofs.ifs2;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.ProviderMismatchException;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -307,6 +314,32 @@ abstract class MCRFileSystemUtils {
         return doResolveParent(parent.getParent())
             .map(p -> p.getChild(dirName))
             .map(MCRDirectory.class::cast);
+    }
+
+    static Collection<String> getObjectBaseIds() throws IOException {
+        final Path baseDir = Paths.get(getBaseDir());
+        if (!Files.isDirectory(baseDir)) {
+            return List.of();
+        }
+        try {
+            return Files.list(baseDir)
+                .filter(Files::isDirectory)
+                .sorted(Comparator.comparing(Path::getFileName))
+                .flatMap(dir -> {
+                    try {
+                        return Files.list(dir);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                })
+                .filter(path -> MCRObjectID.isValidType(path.getFileName().toString()))
+                .filter(Files::isDirectory)
+                .sorted(Comparator.comparing(Path::getFileName))
+                .map(p -> p.getParent().getFileName().toString() + "_" + p.getFileName().toString())
+                .collect(Collectors.toList());
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
 }
