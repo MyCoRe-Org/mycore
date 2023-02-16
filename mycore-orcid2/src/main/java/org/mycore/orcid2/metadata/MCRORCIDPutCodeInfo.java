@@ -60,7 +60,7 @@ public class MCRORCIDPutCodeInfo {
     }
 
     /**
-     * Return own put code.
+     * Returns own put code.
      * 
      * @return own put code
      */
@@ -68,6 +68,15 @@ public class MCRORCIDPutCodeInfo {
     @JsonProperty("own")
     public long getOwnPutCode() {
         return ownPutCode;
+    }
+
+    /**
+     * Checks if object has own put code.
+     * 
+     * @return true if there is an own put code
+     */
+    public boolean hasOwnPutCode() {
+        return ownPutCode > 0;
     }
 
     /**

@@ -102,7 +102,8 @@ public class MCRORCIDResource {
                 .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-            final boolean result = MCRORCIDWorkHelper.findMatchingSummaries(object, summaries).findAny().isPresent();
+            final boolean result = MCRORCIDWorkHelper.findMatchingSummariesByIdentifiers(object, summaries).findAny()
+                .isPresent();
             return new MCRORCIDPublicationStatus(true, result);
         } catch (Exception e) {
             LOGGER.error("Error while retrieving status: ", e);
