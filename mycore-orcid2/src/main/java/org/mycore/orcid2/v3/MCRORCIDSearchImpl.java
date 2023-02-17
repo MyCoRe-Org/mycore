@@ -21,7 +21,7 @@ package org.mycore.orcid2.v3;
 import org.mycore.orcid2.client.MCRORCIDSearch;
 
 /**
- * @see org.mycore.orcid2.client.MCRORCIDSearch
+ * See {@link org.mycore.orcid2.client.MCRORCIDSearch}.
  */
 public enum MCRORCIDSearchImpl implements MCRORCIDSearch {
     DEFAULT("search"), EXPANDED("expanded-search");

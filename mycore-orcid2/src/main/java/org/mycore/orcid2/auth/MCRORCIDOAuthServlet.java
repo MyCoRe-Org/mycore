@@ -137,10 +137,10 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
     }
 
     private void setExpiration(MCRORCIDCredentials credentials) {
-        final LocalDate now = LocalDate.now(ZoneId.systemDefault());
-        now.plus(Integer.parseInt(credentials.getExpiresIn()), ChronoUnit.SECONDS);
-        now.minusDays(1);
-        credentials.setExpiration(now);
+        final LocalDate expireDate = LocalDate.now(ZoneId.systemDefault())
+            .plus(Integer.parseInt(credentials.getExpiresIn()), ChronoUnit.SECONDS)
+            .minusDays(1);
+        credentials.setExpiration(expireDate);
     }
 
     private void handleAuth(HttpServletRequest req, HttpServletResponse res) throws Exception {

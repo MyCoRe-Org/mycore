@@ -21,7 +21,7 @@ package org.mycore.orcid2.v3;
 import org.mycore.orcid2.client.MCRORCIDSection;
 
 /**
- * @see org.mycore.orcid2.client.MCRORCIDSection
+ * See {@link org.mycore.orcid2.client.MCRORCIDSection}.
  */
 public enum MCRORCIDSectionImpl implements MCRORCIDSection {
     ALL(""), ACTIVITIES("activities"), ADDRESS("address"), BIOGRAPHY("biography"), DISTINCTION("distinction"),
