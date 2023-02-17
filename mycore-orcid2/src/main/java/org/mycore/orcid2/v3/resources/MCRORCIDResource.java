@@ -163,7 +163,7 @@ public class MCRORCIDResource {
             .equals(MCRSessionMgr.getCurrentSession().getUserInformation().getUserID());
     }
 
-    class MCRORCIDPublicationStatus {
+    static class MCRORCIDPublicationStatus {
 
         private boolean isUsersPublication;
 

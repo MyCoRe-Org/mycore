@@ -18,9 +18,11 @@
 
 package org.mycore.orcid2.user;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
@@ -38,11 +40,7 @@ public class MCRORCIDUserUtils {
      * @throws MCRORCIDException if the credentials are corrupt or there is more than one user
      */
     public static MCRORCIDCredentials getCredentialsByORCID(String orcid) throws MCRORCIDException {
-        final MCRORCIDUser user = getORCIDUserByORCID(orcid);
-        if (user != null) {
-            return user.getCredentialsByORCID(orcid);
-        }
-        return null;
+        return Optional.ofNullable(getORCIDUserByORCID(orcid)).map(u -> u.getCredentialsByORCID(orcid)).orElse(null);
     }
 
     /**
@@ -72,5 +70,19 @@ public class MCRORCIDUserUtils {
     public static Set<MCRUser> getUserByID(MCRIdentifier id) {
         return MCRUserManager.getUsers(MCRORCIDUser.ATTR_ID_PREFIX + id.getType(), id.getValue())
             .collect(Collectors.toSet());
+    }
+
+    /**
+     * Revokes orcid access token of MCRORCIDUser by ORCID iD.
+     * 
+     * @param orcidUser the MCRORCIDUser
+     * @param orcid the ORCID iD
+     * @throws MCRORCIDException if revoke request fails
+     */
+    public static void revokeCredentialsByORCID(MCRORCIDUser orcidUser, String orcid) throws MCRORCIDException {
+        final MCRORCIDCredentials credentials = Optional.ofNullable(getCredentialsByORCID(orcid))
+            .orElseThrow(() -> new MCRORCIDException("Credentials do not exist"));
+        MCRORCIDOAuthClient.getInstance().revokeToken(credentials.getAccessToken());
+        orcidUser.removeCredentialsByORCID(orcid);
     }
 }

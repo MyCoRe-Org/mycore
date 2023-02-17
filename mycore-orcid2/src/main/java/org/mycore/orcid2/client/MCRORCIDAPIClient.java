@@ -21,6 +21,7 @@ package org.mycore.orcid2.client;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -57,9 +58,7 @@ abstract class MCRORCIDAPIClient {
         final Client client = ClientBuilder.newClient();
         client.register(new MCRORCIDXMLReader<Object>());
         client.register(new MCRORCIDXMLWriter());
-        if (token != null) {
-            client.register(new MCRORCIDAuthenticationFilter(token));
-        }
+        Optional.of(token).ifPresent(t -> client.register(new MCRORCIDAuthenticationFilter(t)));
         this.baseTarget = client.target(restURL.endsWith("/") ? restURL : restURL + "/");
     }
 
@@ -97,7 +96,7 @@ abstract class MCRORCIDAPIClient {
         if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
             handleError(response);
         }
-        return response.readEntity(valueType);
+        return response.readEntity(valueType); // may ProcessingException
     }
     /**
      * Handles error response.

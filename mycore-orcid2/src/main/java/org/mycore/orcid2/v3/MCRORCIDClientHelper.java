@@ -51,7 +51,7 @@ public class MCRORCIDClientHelper {
      * @throws MCRORCIDRequestException if the request fails
      */
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
-            long... putCodes) throws MCRORCIDRequestException {
+        long... putCodes) throws MCRORCIDRequestException {
         final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
         if (credentials != null) {
             try {

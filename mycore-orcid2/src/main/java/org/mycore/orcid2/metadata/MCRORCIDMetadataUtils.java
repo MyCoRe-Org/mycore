@@ -18,6 +18,8 @@
 
 package org.mycore.orcid2.metadata;
 
+import java.util.Optional;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -46,14 +48,10 @@ public class MCRORCIDMetadataUtils {
      * @throws MCRORCIDException if orcid flag is broken
      */
     public static MCRORCIDFlagContent getORCIDFlagContent(MCRObject object) throws MCRORCIDException {
-        final String flagContentString = object.getService().getFlags(ORCID_FLAG).stream().findFirst().orElse(null);
-        if (flagContentString == null) {
-            return null;
-        } 
         try {
-            return transformFlagContentString(flagContentString);
+            return getORCIDFlagContentString(object).map(s -> transformFlagContentString(s)).orElse(null);
         } catch (MCRORCIDTransformationException e) {
-            throw new MCRORCIDException("ORCID flag of object " + object.getId() + "is broken" , e);
+            throw new MCRORCIDException("ORCID flag of object " + object.getId() + "is broken", e);
         }
     }
 
@@ -97,11 +95,7 @@ public class MCRORCIDMetadataUtils {
      * @throws MCRORCIDException if MCRORCIDUserInfo is broken
      */
     public static MCRORCIDUserInfo getUserInfoByORCID(MCRObject object, String orcid) throws MCRORCIDException {
-        final MCRORCIDFlagContent flagContent = getORCIDFlagContent(object);
-        if (flagContent == null) {
-            return null;
-        }
-        return flagContent.getUserInfoByORCID(orcid);
+        return Optional.ofNullable(getORCIDFlagContent(object)).map(f -> f.getUserInfoByORCID(orcid)).orElse(null);
     }
 
     /**
@@ -114,10 +108,8 @@ public class MCRORCIDMetadataUtils {
      */
     public static void updateUserInfoByORCID(MCRObject object, String orcid, MCRORCIDUserInfo userInfo)
         throws MCRORCIDException {
-        final MCRORCIDFlagContent flagContent = getORCIDFlagContent(object);
-        if (flagContent == null) {
-            throw new MCRORCIDException("Flag does not exist");
-        }
+        final MCRORCIDFlagContent flagContent = Optional.ofNullable(getORCIDFlagContent(object))
+            .orElseThrow(() -> new MCRORCIDException("Flag does not exist"));
         flagContent.updateUserInfoByORCID(orcid, userInfo);
         setORCIDFlagContent(object, flagContent);
     }
@@ -140,14 +132,14 @@ public class MCRORCIDMetadataUtils {
      */
     protected static void doSetORCIDFlagContent(MCRObject object, MCRORCIDFlagContent flagContent)
         throws MCRORCIDException {
-        object.getService().removeFlags(ORCID_FLAG);
+        removeORCIDFlags(object);
         String flagContentString = null;
         try {
             flagContentString = transformFlagContent(flagContent);
         } catch (MCRORCIDTransformationException e) {
             throw new MCRORCIDException("Could not update list of object " + object.getId(), e);
         }
-        object.getService().addFlag(ORCID_FLAG, flagContentString);
+        addORCIDFlag(object, flagContentString);
     }
 
     /**
@@ -159,9 +151,8 @@ public class MCRORCIDMetadataUtils {
      */
     protected static String transformFlagContent(MCRORCIDFlagContent flagContent)
         throws MCRORCIDTransformationException {
-        final ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.writeValueAsString(flagContent);
+            return new ObjectMapper().writeValueAsString(flagContent);
         } catch (JsonProcessingException e) {
             throw new MCRORCIDTransformationException(e);
         }
@@ -176,11 +167,22 @@ public class MCRORCIDMetadataUtils {
      */
     protected static MCRORCIDFlagContent transformFlagContentString(String flagContentString)
         throws MCRORCIDTransformationException {
-        final ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(flagContentString, MCRORCIDFlagContent.class);
+            return new ObjectMapper().readValue(flagContentString, MCRORCIDFlagContent.class);
         } catch (JsonProcessingException e) {
             throw new MCRORCIDTransformationException(e);
         }
+    }
+
+    private static Optional<String> getORCIDFlagContentString(MCRObject object) {
+        return object.getService().getFlags(ORCID_FLAG).stream().findFirst();
+    }
+
+    private static void addORCIDFlag(MCRObject object, String content) {
+        object.getService().addFlag(ORCID_FLAG, content);
+    }
+
+    private static void removeORCIDFlags(MCRObject object) {
+        object.getService().removeFlags(ORCID_FLAG);
     }
 }

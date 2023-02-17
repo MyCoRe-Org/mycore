@@ -34,6 +34,7 @@ import org.mycore.common.MCRSystemUserInformation;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
+import org.mycore.orcid2.user.MCRORCIDUserUtils;
 
 /**
  * Base resource for orcid methods.
@@ -81,7 +82,7 @@ public class MCRORCIDResource {
         }
         final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
         try {
-            orcidUser.revokeCredentialsByORCID(orcid);
+            MCRORCIDUserUtils.revokeCredentialsByORCID(orcidUser, orcid);
             return Response.ok().build();
         } catch (Exception e) {
             throw new WebApplicationException(Status.BAD_REQUEST);

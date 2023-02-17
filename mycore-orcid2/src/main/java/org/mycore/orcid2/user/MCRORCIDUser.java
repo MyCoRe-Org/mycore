@@ -20,6 +20,7 @@ package org.mycore.orcid2.user;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -38,7 +39,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.MCRORCIDUtils;
-import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.validation.MCRORCIDValidationHelper;
 import org.mycore.user2.MCRUser;
@@ -215,34 +215,15 @@ public class MCRORCIDUser {
      * @throws MCRORCIDException if the MCRCredentials are corrupt
      */
     public MCRORCIDCredentials getCredentialsByORCID(String orcid) throws MCRORCIDException {
-        final String credentialsString = user.getUserAttribute(ATTR_ORCID_CREDENTIALS + orcid);
-        if (credentialsString == null) {
-            return null;
-        }
-        MCRORCIDCredentials credentials = null;
+        Optional<MCRORCIDCredentials> credentials = null;
         try {
-            credentials = deserializeCredentials(credentialsString);
+            credentials = Optional.ofNullable(getCredentialsAttributeValueByORCID(orcid))
+                .map(s -> deserializeCredentials(s));
         } catch (IllegalArgumentException e) {
             throw new MCRORCIDException("Credentials are corrupt");
         }
-        credentials.setORCID(orcid);
-        return credentials;
-    }
-
-    // TODO check place
-    /**
-     * Revokes orcid access token by ORCID iD.
-     * 
-     * @param orcid the ORCID iD
-     * @throws MCRORCIDException if revoke request fails
-     */
-    public void revokeCredentialsByORCID(String orcid) throws MCRORCIDException {
-        final MCRORCIDCredentials credentials = getCredentialsByORCID(orcid);
-        if (credentials == null) {
-            throw new MCRORCIDException("Credentials do not exist");
-        }
-        MCRORCIDOAuthClient.getInstance().revokeToken(credentials.getAccessToken());
-        removeCredentialsByORCID(orcid);
+        credentials.ifPresent(c -> c.setORCID(orcid));
+        return credentials.orElse(null);
     }
 
     /**
@@ -320,5 +301,9 @@ public class MCRORCIDUser {
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    private String getCredentialsAttributeValueByORCID(String orcid) {
+        return user.getUserAttribute(ATTR_ORCID_CREDENTIALS + orcid);
     }
 }

@@ -53,7 +53,7 @@ public class MCRORCIDXMLReader<T> implements MessageBodyReader<T> {
             JAXBContext jaxbContext = JAXBContext.newInstance(type);
             return type.cast(jaxbContext.createUnmarshaller().unmarshal(entityStream));
         } catch (JAXBException e) {
-            throw new ProcessingException("Error while deserializing object.", e);
+            throw new ProcessingException("Error while serializing object.", e);
         }
     }
 }
