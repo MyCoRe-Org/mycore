@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.metadata;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,8 +26,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 
@@ -34,6 +37,12 @@ import org.mycore.orcid2.exception.MCRORCIDTransformationException;
  * Handles metadata for ORCID stuff.
  */
 public class MCRORCIDMetadataUtils {
+
+    /**
+     * Controls the saving of other put codes.
+     */
+    public static boolean SAVE_OTHER_PUT_CODES = MCRConfiguration2.getOrThrow(MCRORCIDConstants.CONFIG_PREFIX
+        + "Metadata.SaveOtherPutCodes", Boolean::parseBoolean);
 
     /**
      * Name of ORCID flag.
@@ -133,6 +142,11 @@ public class MCRORCIDMetadataUtils {
     protected static void doSetORCIDFlagContent(MCRObject object, MCRORCIDFlagContent flagContent)
         throws MCRORCIDException {
         removeORCIDFlags(object);
+        if (!SAVE_OTHER_PUT_CODES) {
+            // may rudimentary approach
+            flagContent.getUserInfos().stream().map(MCRORCIDUserInfo::getWorkInfo).filter(Objects::nonNull)
+                .forEach(w -> w.setOtherPutCodes(null));
+        }
         String flagContentString = null;
         try {
             flagContentString = transformFlagContent(flagContent);

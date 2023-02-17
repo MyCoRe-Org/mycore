@@ -33,6 +33,7 @@ import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
+import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.user.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
@@ -89,6 +90,9 @@ public class MCRORCIDWorkSummaryUtils {
             workSummaries);
     }
 
+    // TODO may use trusted identifiers
+    // TODO ingnore case for identifiers/values
+    // TODO identifiers may be case sensitive?
     /**
      * Returns a Stream of WorkSummaries matching a set of MCRIdentifiers.
      *
@@ -121,17 +125,15 @@ public class MCRORCIDWorkSummaryUtils {
         final Stream<WorkSummary> matchingWorks = findMatchingSummariesByIdentifiers(object, summaries);
         long ownPutCode = workInfo.getOwnPutCode();
         // validate current own put code
-        if (ownPutCode > 0) {
+        if (ownPutCode == 0 || !checkPutCodeExistsInSummaries(summaries, ownPutCode)) {
             // try to find own work via identifiers as fallback
-            if (!checkPutCodeExistsInSummaries(summaries, ownPutCode)) {
-                ownPutCode = getPutCodeCreatedByThisAppFromSummaries(matchingWorks);
-            }
-        } else {
-            ownPutCode = getPutCodeCreatedByThisAppFromSummaries(matchingWorks);
+            workInfo.setOwnPutCode(getPutCodeCreatedByThisAppFromSummaries(matchingWorks));
         }
-        workInfo.setOwnPutCode(ownPutCode);
-        final long[] otherPutCodes = getPutCodesNotCreatedByThisAppFromSummaries(matchingWorks);
-        workInfo.setOtherPutCodes(otherPutCodes);
+        if (MCRORCIDMetadataUtils.SAVE_OTHER_PUT_CODES) { // optimization
+            workInfo.setOtherPutCodes(getPutCodesNotCreatedByThisAppFromSummaries(matchingWorks));
+        } else {
+            workInfo.setOtherPutCodes(null);
+        }
     }
 
     /**

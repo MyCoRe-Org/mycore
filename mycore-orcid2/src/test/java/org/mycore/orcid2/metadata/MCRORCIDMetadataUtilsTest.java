@@ -19,6 +19,7 @@
 package org.mycore.orcid2.metadata;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -29,6 +30,13 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 
 public class MCRORCIDMetadataUtilsTest extends MCRTestCase {
+
+    @Override
+    protected Map<String, String> getTestProperties() {
+        Map<String, String> testProperties = super.getTestProperties();
+        testProperties.put("MCR.ORCID2.Metadata.SaveOtherPutCodes", Boolean.TRUE.toString());
+        return testProperties;
+    }
 
     @Test
     public void testGetORCIDFlagContentNull() {
