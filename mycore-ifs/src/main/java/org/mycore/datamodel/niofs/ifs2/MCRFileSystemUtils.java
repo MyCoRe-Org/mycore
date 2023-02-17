@@ -322,12 +322,12 @@ abstract class MCRFileSystemUtils {
         if (!Files.isDirectory(baseDir)) {
             return List.of();
         }
-        try (Stream<Path> dirEntries = Files.list(baseDir)) {
-            return dirEntries
+        try (Stream<Path> baseDirEntries = Files.list(baseDir)) {
+            return baseDirEntries
                 .filter(Files::isDirectory)
                 .sorted(Comparator.comparing(Path::getFileName))
                 .flatMap(dir -> {
-                    try (Stream<Path> subDirEntries = Files.list(baseDir)) {
+                    try (Stream<Path> subDirEntries = Files.list(dir)) {
                         return subDirEntries.toList().stream(); //copy required to close the stream
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
