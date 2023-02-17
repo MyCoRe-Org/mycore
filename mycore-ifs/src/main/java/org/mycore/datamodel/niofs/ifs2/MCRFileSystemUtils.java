@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -321,13 +322,13 @@ abstract class MCRFileSystemUtils {
         if (!Files.isDirectory(baseDir)) {
             return List.of();
         }
-        try {
-            return Files.list(baseDir)
+        try (Stream<Path> dirEntries = Files.list(baseDir)) {
+            return dirEntries
                 .filter(Files::isDirectory)
                 .sorted(Comparator.comparing(Path::getFileName))
                 .flatMap(dir -> {
-                    try {
-                        return Files.list(dir);
+                    try (Stream<Path> subDirEntries = Files.list(baseDir)) {
+                        return subDirEntries.toList().stream(); //copy required to close the stream
                     } catch (IOException e) {
                         throw new UncheckedIOException(e);
                     }
