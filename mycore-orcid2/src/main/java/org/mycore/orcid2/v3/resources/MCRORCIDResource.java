@@ -99,7 +99,7 @@ public class MCRORCIDResource {
             return new MCRORCIDPublicationStatus(true, false);
         }
         try {
-            final Works works = MCRORCIDClientHelper.getClientFactory().createMemberClient(credentials)
+            final Works works = MCRORCIDClientHelper.getClientFactory().createUserClient(credentials)
                 .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();

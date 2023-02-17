@@ -40,7 +40,7 @@ public class MCRORCIDClientHelper {
      * Fetches API with best credentials.
      * If credentials exist for an ORCID iD, the Member API is requested with the token. 
      * If a problem occurs during the request or no credentials exist, 
-     * the Public API is requested as a fallback.
+     * the general Member/Public API is requested as a fallback.
      * 
      * @param orcid the ORCID iD
      * @param section the section
@@ -55,7 +55,7 @@ public class MCRORCIDClientHelper {
         final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
         if (credentials != null) {
             try {
-                return getClientFactory().createMemberClient(credentials).fetch(section, valueType, putCodes);
+                return getClientFactory().createUserClient(credentials).fetch(section, valueType, putCodes);
             } catch (MCRORCIDRequestException e) {
                 final Response response = e.getErrorResponse();
                 if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
@@ -63,13 +63,13 @@ public class MCRORCIDClientHelper {
                         "Request with credentials for orcid {} has failed with status code {}."
                             + " Token has probably expired.",
                         orcid, response.getStatus());
-                    return getClientFactory().createPublicClient().fetch(orcid, section, valueType, putCodes);
+                    return getClientFactory().createReadClient().fetch(orcid, section, valueType, putCodes);
                 } else {
                     throw e;
                 }
             }
         } else {
-            return getClientFactory().createPublicClient().fetch(orcid, section, valueType, putCodes);
+            return getClientFactory().createReadClient().fetch(orcid, section, valueType, putCodes);
         }
     }
 

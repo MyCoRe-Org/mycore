@@ -29,7 +29,7 @@ import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
  * Provides an ORCID Client with read methods.
  * Can be used to talk to Public or Member API.
  */
-public class MCRORCIDReadClientImpl extends MCRORCIDAPIClient implements MCRORCIDReadClient {
+public class MCRORCIDReadClientImpl extends MCRORCIDBaseClient implements MCRORCIDReadClient {
 
     private static final int DEFAULT_SEARCH_LIMIT = 1000;
 

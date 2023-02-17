@@ -30,7 +30,7 @@ import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.orcid2.MCRORCIDConstants;
-import org.mycore.orcid2.client.MCRORCIDClient;
+import org.mycore.orcid2.client.MCRORCIDUserClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
@@ -133,7 +133,7 @@ public class MCRORCIDWorkHelper {
      */
     private static void updateWorkInfo(MCRObject object, MCRORCIDCredentials credentials,
         MCRORCIDPutCodeInfo workInfo) throws MCRORCIDException {
-        final MCRORCIDClient memberClient = MCRORCIDClientHelper.getClientFactory().createMemberClient(credentials);
+        final MCRORCIDUserClient memberClient = MCRORCIDClientHelper.getClientFactory().createUserClient(credentials);
         Stream<WorkSummary> summaries = null;
         try {
             summaries = memberClient.fetch(MCRORCIDSectionImpl.WORKS, Works.class).getWorkGroup().stream()
@@ -165,7 +165,7 @@ public class MCRORCIDWorkHelper {
         if (scope.isPresent() && !scope.get().contains(ScopeConstants.ACTIVITIES_UPDATE)) {
             throw new MCRORCIDException("The scope is invalid"); // TODO maybe own exception
         }
-        final MCRORCIDClient memberClient = MCRORCIDClientHelper.getClientFactory().createMemberClient(credentials);
+        final MCRORCIDUserClient memberClient = MCRORCIDClientHelper.getClientFactory().createUserClient(credentials);
         final long ownPutCode = workInfo.getOwnPutCode();
         final long[] otherPutCodes = workInfo.getOtherPutCodes();
         // matching work should exists in profile

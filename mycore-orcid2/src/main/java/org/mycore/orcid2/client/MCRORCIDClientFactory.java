@@ -20,6 +20,7 @@ package org.mycore.orcid2.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,17 +44,21 @@ public class MCRORCIDClientFactory {
 
     private static Map<String, MCRORCIDClientFactory> factories = new HashMap<>();
 
-    private final String memberAPI;
+    private String mode;
 
-    private final String publicAPI;
+    private String version;
 
-    private MCRORCIDReadClient publicClient = null;
+    private MCRORCIDAPIDefinition definition;
 
-    private MCRORCIDReadClient memberClient = null;
+    private MCRORCIDReadClient readClient = null;
 
     private MCRORCIDClientFactory(String version) throws MCRConfigurationException {
-        this.publicAPI = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + version + ".PublicAPI");
-        this.memberAPI = MCRConfiguration2.getStringOrThrow(CONFIG_PREFIX + version + ".MemberAPI");
+        final String prefix = CONFIG_PREFIX + version;
+        this.definition = MCRConfiguration2.<MCRORCIDAPIDefinition>getInstanceOf(prefix + ".Config.class")
+            .orElseThrow();
+        this.mode = MCRConfiguration2.getStringOrThrow(prefix + ".Mode");
+        this.version = MCRConfiguration2.getStringOrThrow(prefix + ".Version");
+        // TODO validate mode and version
     }
 
     /**
@@ -75,47 +80,59 @@ public class MCRORCIDClientFactory {
     }
 
     /**
-     * Creates a MCRORCIDReadClient for ORCID Public API.
-     * Public API is limited to 10,000 results
-     * 24 requests per second; 40 burst
-     * 
-     * @return MCRORCIDReadClient
-     */
-    public MCRORCIDReadClient createPublicClient() {
-        if (publicClient == null) {
-            if (READ_PUBLIC_TOKEN == null) {
-                LOGGER.info("MCR.ORCID2.ReadPublicToken is not set.");
-            }
-            publicClient = new MCRORCIDReadClientImpl(publicAPI);
-        }
-        return publicClient;
-    }
-
-    /**
      * Creates a MCRORCIDReadClient for ORCID Member API.
      * Member API does not limit the number of results
      * 24 requests per second; 60 burst
+     * Public API is limited to 10,000 results
+     * 24 requests per second; 40 burst
      *
-     * @throws MCRORCIDException if MCR.ORCID2.Client.ReadPublicToken is not set
+     * @throws MCRORCIDException if MCR.ORCID2.Client.ReadPublicToken is required but not set
      * @return MCRORCIDReadClient
      */
-    public MCRORCIDReadClient createMemberClient() throws MCRORCIDException {
-        if (memberClient == null) {
-            if (READ_PUBLIC_TOKEN == null) {
-                throw new MCRORCIDException("MCR.ORCID2.ReadPublicToken is not set.");
-            }
-            memberClient = new MCRORCIDReadClientImpl(memberAPI, READ_PUBLIC_TOKEN);
+    public MCRORCIDReadClient createReadClient() throws MCRORCIDException {
+        if (readClient == null) {
+            readClient = initReadClient();
         }
-        return memberClient;
+        return readClient;
     }
 
     /**
-     * Creates a MCRORCIDClient for ORCID Member API with MCRORCIDCredentials.
+     * Creates a MCRORCIDUserClient for user with MCRORCIDCredentials.
      *
      * @param credentials the MCRORCIDCredentials
      * @return MCRORCIDClient
+     * @throws MCRORCIDException if client is not in member mode
      */
-    public MCRORCIDClient createMemberClient(MCRORCIDCredentials credentials) {
-        return new MCRORCIDClientImpl(memberAPI, credentials);
+    public MCRORCIDUserClient createUserClient(MCRORCIDCredentials credentials) throws MCRORCIDException {
+        if (Objects.equals(version, "member")) {
+            if (Objects.equals(mode, "sandbox")) {
+                return new MCRORCIDUserClientImpl(definition.getMemberSandboxURL(), credentials);
+            } else {
+                return new MCRORCIDUserClientImpl(definition.getMemberURL(), credentials);
+            }
+        }
+        throw new MCRORCIDException("Client is not in member mode");
+    }
+
+    private MCRORCIDReadClient initReadClient() throws MCRORCIDException {
+        if (Objects.equals(version, "member")) {
+            if (READ_PUBLIC_TOKEN == null) {
+                throw new MCRORCIDException("MCR.ORCID2.ReadPublicToken is not set");
+            }
+            if (Objects.equals(mode, "sandbox")) {
+                return new MCRORCIDReadClientImpl(definition.getMemberSandboxURL(), READ_PUBLIC_TOKEN);
+            } else {
+                return new MCRORCIDReadClientImpl(definition.getMemberURL(), READ_PUBLIC_TOKEN);
+            }
+        } else {
+            if (READ_PUBLIC_TOKEN == null) {
+                LOGGER.info("MCR.ORCID2.ReadPublicToken is not set.");
+            }
+            if (Objects.equals(mode, "sandbox")) {
+                return new MCRORCIDReadClientImpl(definition.getPublicSandboxURL(), READ_PUBLIC_TOKEN);
+            } else {
+                return new MCRORCIDReadClientImpl(definition.getPublicURL(), READ_PUBLIC_TOKEN);
+            }
+        }
     }
 }

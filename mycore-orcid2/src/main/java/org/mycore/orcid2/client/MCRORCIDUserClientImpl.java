@@ -29,21 +29,22 @@ import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 
 /**
- * ORCID client which is bounded to MCRORCIDCredentials.
+ * See {@link MCRORCIDUserClient}.
+ * Write actions require the member API and a corresponding scope.
  */
-public class MCRORCIDClientImpl extends MCRORCIDAPIClient implements MCRORCIDClient {
+public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORCIDUserClient {
 
     private final WebTarget baseTarget;
 
     private final MCRORCIDCredentials credentials;
 
     /**
-     * Creates an ORCID client with given api url and MCRORCIDCredentials.
+     * Creates an MCRORCIDUserClient with given api url and MCRORCIDCredentials.
      * 
      * @param restURL rest url of ORCID api url
      * @param credentials the MCRORCIDCredentials
      */
-    public MCRORCIDClientImpl(String restURL, MCRORCIDCredentials credentials) {
+    public MCRORCIDUserClientImpl(String restURL, MCRORCIDCredentials credentials) {
         super(restURL, credentials.getAccessToken());
         this.credentials = credentials;
         this.baseTarget = getBaseTarget().path(credentials.getORCID());

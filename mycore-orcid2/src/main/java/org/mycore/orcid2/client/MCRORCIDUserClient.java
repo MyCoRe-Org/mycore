@@ -21,9 +21,9 @@ package org.mycore.orcid2.client;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 
 /**
- * Interface for client that is at least compatible with ORCID MemberAPI.
+ * Interface for ORCID client which bound to specific MCRCredentials.
  */
-public interface MCRORCIDClient {
+public interface MCRORCIDUserClient {
 
     /**
      * Fetches section/object and wraps response into type.
