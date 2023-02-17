@@ -27,6 +27,7 @@ import java.util.Objects;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.mods.merger.MCRMergeTool;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
@@ -43,7 +44,7 @@ public class MCRORCIDWorkUtils {
      * 
      * @param works List of works
      * @return merged Element
-     * @throws MCRORCIDTransformationException if transformation fails
+     * @throws MCRORCIDException if build fails
      * @see #buildUnmergedMODSFromWorks
      */
     public static Element buildMergedMODSFromWorks(List<Work> works) throws MCRORCIDTransformationException {
@@ -55,15 +56,15 @@ public class MCRORCIDWorkUtils {
      * 
      * @param works List of works
      * @return List of elements
-     * @throws MCRORCIDTransformationException if transformation fails
+     * @throws MCRORCIDException if build fails
      */
     public static List<Element> buildUnmergedMODSFromWorks(List<Work> works) throws MCRORCIDTransformationException {
         final List<Element> modsElements = new ArrayList<>();
         works.forEach(w -> {
             try {
                 modsElements.add(MCRORCIDWorkTransformerHelper.transformWork(w).asXML().detachRootElement());
-            } catch (IOException | JDOMException | SAXException e) {
-                throw new MCRORCIDTransformationException(e);
+            } catch (IOException | JDOMException | SAXException | MCRORCIDTransformationException e) {
+                throw new MCRORCIDException("Build failed", e);
             }
         });
         return modsElements;

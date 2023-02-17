@@ -31,6 +31,7 @@ import org.jdom2.JDOMException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.MCRORCIDUtils;
+import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.user.MCRIdentifier;
@@ -48,7 +49,7 @@ public class MCRORCIDWorkSummaryUtils {
      * 
      * @param works List of work summaries
      * @return List of elements
-     * @throws MCRORCIDTransformationException if transformation fails
+     * @throws MCRORCIDException if build fails
      */
     public static List<Element> buildUnmergedMODSFromWorkSummaries(List<WorkSummary> works)
         throws MCRORCIDTransformationException {
@@ -56,8 +57,8 @@ public class MCRORCIDWorkSummaryUtils {
         works.forEach(w -> {
             try {
                 modsElements.add(MCRORCIDWorkTransformerHelper.transformWorkSummary(w).asXML().detachRootElement());
-            } catch (IOException | JDOMException | SAXException e) {
-                throw new MCRORCIDTransformationException(e);
+            } catch (IOException | JDOMException | SAXException | MCRORCIDTransformationException e) {
+                throw new MCRORCIDException("Build failed", e);
             }
         });
         return modsElements;
