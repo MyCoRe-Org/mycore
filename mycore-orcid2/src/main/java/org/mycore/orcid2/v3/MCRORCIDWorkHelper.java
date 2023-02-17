@@ -18,48 +18,33 @@
 
 package org.mycore.orcid2.v3;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.mods.MCRMODSWrapper;
-import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid2.MCRORCIDConstants;
-import org.mycore.orcid2.MCRORCIDUtils;
 import org.mycore.orcid2.client.MCRORCIDClient;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.exception.MCRORCIDException;
-import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.metadata.MCRORCIDMetadataUtils;
 import org.mycore.orcid2.metadata.MCRORCIDPutCodeInfo;
 import org.mycore.orcid2.metadata.MCRORCIDUserInfo;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
-import org.mycore.orcid2.user.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.orcid.jaxb.model.message.ScopeConstants;
-import org.orcid.jaxb.model.v3.release.common.Contributor;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
-import org.xml.sax.SAXException;
 
 /**
- * Provides utility methods for Work and WorkSummaries.
+ * Provides utility methods for ORCID Work.
  */
 public class MCRORCIDWorkHelper {
 
@@ -75,102 +60,6 @@ public class MCRORCIDWorkHelper {
 
     private static final boolean ALWAYS_UPDATE_PUT_CODES
         = MCRConfiguration2.getOrThrow(CONFIG_WORK_PREFIX + "AlwaysUpdatePutCodes", Boolean::parseBoolean);
-
-    /**
-     * Transforms and merges List of works to Element.
-     * 
-     * @param works List of works
-     * @return merged Element
-     * @throws MCRORCIDTransformationException if transformation fails
-     * @see MCRORCIDWorkHelper#buildUnmergedMODSFromWorks
-     */
-    public static Element buildMergedMODSFromWorks(List<Work> works) throws MCRORCIDTransformationException {
-        return mergeElements(buildUnmergedMODSFromWorks(works));
-    }
-
-    /**
-     * Transforms List of works to List of elements.
-     * 
-     * @param works List of works
-     * @return List of elements
-     * @throws MCRORCIDTransformationException if transformation fails
-     */
-    public static List<Element> buildUnmergedMODSFromWorks(List<Work> works) throws MCRORCIDTransformationException {
-        final List<Element> modsElements = new ArrayList<>();
-        works.forEach(w -> {
-            try {
-                modsElements.add(MCRORCIDWorkTransformerHelper.transformWork(w).asXML().detachRootElement());
-            } catch (IOException | JDOMException | SAXException e) {
-                throw new MCRORCIDTransformationException(e);
-            }
-        });
-        return modsElements;
-    }
-
-    /**
-     * Transforms List of work summaries to List of elements.
-     * 
-     * @param works List of work summaries
-     * @return List of elements
-     * @throws MCRORCIDTransformationException if transformation fails
-     */
-    public static List<Element> buildUnmergedMODSFromWorkSummaries(List<WorkSummary> works)
-        throws MCRORCIDTransformationException {
-        final List<Element> modsElements = new ArrayList<>();
-        works.forEach(w -> {
-            try {
-                modsElements.add(MCRORCIDWorkTransformerHelper.transformWorkSummary(w).asXML().detachRootElement());
-            } catch (IOException | JDOMException | SAXException e) {
-                throw new MCRORCIDTransformationException(e);
-            }
-        });
-        return modsElements;
-    }
-
-    /**
-     * Returns a Stream of WorkSummaries matching the identifiers of the MCRObject.
-     *
-     * @param object the MCRObject
-     * @param workSummaries List of WorkSummaries
-     * @return Stream of matching WorkSummaries
-     */
-    public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(MCRObject object,
-        List<WorkSummary> workSummaries) {
-        return findMatchingSummariesByIdentifiers(object, workSummaries.stream());
-    }
-
-    /**
-     * Returns a Stream of WorkSummaries matching the identifiers of the MCRObject.
-     *
-     * @param object the MCRObject
-     * @param workSummaries Stream of WorkSummaries
-     * @return Stream of matching WorkSummaries
-     */
-    public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(MCRObject object,
-        Stream<WorkSummary> workSummaries) {
-        return findMatchingSummariesByIdentifiers(MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object)),
-            workSummaries);
-    }
-
-    /**
-     * Returns a Stream of WorkSummaries matching a set of MCRIdentifiers.
-     *
-     * @param identifiers the set of MCRIdentifiers
-     * @param workSummaries List of WorkSummaries
-     * @return Stream of matching WorkSummaries
-     */
-    public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(Set<MCRIdentifier> identifiers,
-        Stream<WorkSummary> workSummaries) {
-        if (identifiers.isEmpty()) {
-            return Stream.empty();
-        }
-        return workSummaries
-            .filter(
-                w -> hasMatch(
-                    w.getExternalIdentifiers().getExternalIdentifier().stream()
-                        .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet()),
-                    identifiers));
-    }
 
     /**
      * Publishes MCRObject with given MCRORCIDCredentials to ORCID.
@@ -235,7 +124,7 @@ public class MCRORCIDWorkHelper {
     }
 
     /**
-     * Creates work info for MCRORCIDCredentials with MCRObject as reference.
+     * Updates work info for MCRORCIDCredentials with MCRObject as reference.
      * 
      * @param object the MCRObject
      * @param credentials the MCRORCIDCredentials
@@ -252,22 +141,7 @@ public class MCRORCIDWorkHelper {
         } catch (MCRORCIDRequestException e) {
             throw new MCRORCIDException("Error during update", e);
         }
-        final Stream<WorkSummary> matchingWorks = findMatchingSummariesByIdentifiers(object, summaries);
-        long ownPutCode = 0;
-        // validate current own put code
-        if (workInfo.hasOwnPutCode()) {
-            // try to find own work via identifiers as fallback
-            ownPutCode = summaries.filter(w -> w.getPutCode().equals(workInfo.getOwnPutCode())).findFirst()
-                .map(WorkSummary::getPutCode).orElseGet(
-                    () -> findSummaryCreateByThisApplication(matchingWorks).map(WorkSummary::getPutCode).orElse(0l));
-        } else {
-            ownPutCode = findSummaryCreateByThisApplication(matchingWorks).map(WorkSummary::getPutCode).orElse(0l);
-        }
-        workInfo.setOwnPutCode(ownPutCode);
-        final long[] otherPutCodes
-            = matchingWorks.filter(w -> !MCRORCIDUtils.isCreatedByThisApplication(w.retrieveSourcePath()))
-                .map(WorkSummary::getPutCode).mapToLong(l -> (long) l).toArray();
-        workInfo.setOtherPutCodes(otherPutCodes);
+        MCRORCIDWorkSummaryUtils.updateWorkInfoFromSummaries(object, summaries, workInfo);
     }
 
     /**
@@ -302,7 +176,7 @@ public class MCRORCIDWorkHelper {
                         final Work remoteWork =
                             memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, ownPutCode);
                         // check if update is required
-                        if (!checkWorkEquality(work, remoteWork)) {
+                        if (!MCRORCIDWorkUtils.checkWorkEquality(work, remoteWork)) {
                             memberClient.update(MCRORCIDSectionImpl.WORK, ownPutCode, work);
                         }
                     }
@@ -319,68 +193,5 @@ public class MCRORCIDWorkHelper {
             return ALWAYS_CREATE_OWN_WORK ? memberClient.create(MCRORCIDSectionImpl.WORK, work) : 0;
         }
         return memberClient.create(MCRORCIDSectionImpl.WORK, work);
-    }
-
-    /**
-     * Compares works and possibly ignores the credit name of the contributors.
-     * 
-     * @param localWork the local Work
-     * @param remoteWork the remote work
-     * @return true if localWork equals remoteWork
-     */
-    private static boolean checkWorkEquality(Work localWork, Work remoteWork) {
-        if (!Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle()) ||
-            !Objects.equals(localWork.getShortDescription(), remoteWork.getShortDescription()) ||
-            !Objects.equals(localWork.getWorkCitation(), remoteWork.getWorkCitation()) ||
-            !Objects.equals(localWork.getWorkType(), remoteWork.getWorkType()) ||
-            !Objects.equals(localWork.getPublicationDate(), remoteWork.getPublicationDate()) ||
-            !Objects.equals(localWork.getUrl(), remoteWork.getUrl()) ||
-            !Objects.equals(localWork.getJournalTitle(), remoteWork.getJournalTitle()) ||
-            !Objects.equals(localWork.getLanguageCode(), remoteWork.getLanguageCode()) ||
-            !Objects.equals(localWork.getCountry(), remoteWork.getCountry()) ||
-            !Objects.equals(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers())) {
-            return false;
-        }
-        if (!Objects.equals(localWork.getWorkContributors(), remoteWork.getWorkContributors())) {
-            if (localWork.getWorkContributors() == null || remoteWork.getWorkContributors() == null) {
-                return false;
-            } else {
-                final List<Contributor> localContributor = localWork.getWorkContributors().getContributor();
-                final List<Contributor> remoteContributor = remoteWork.getWorkContributors().getContributor();
-                if (localContributor.size() != remoteContributor.size()) {
-                    return false;
-                }
-                final Iterator<Contributor> itl = localContributor.iterator();
-                final Iterator<Contributor> itr = remoteContributor.iterator();
-                while (itl.hasNext()) {
-                    final Contributor cl = itl.next();
-                    final Contributor cr = itr.next();
-                    if (!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
-                        cl.getContributorOrcid() == null &&
-                            !Objects.equals(cl.getCreditName(), cr.getCreditName())
-                        ||
-                        !Objects.equals(cl.getContributorEmail(), cr.getContributorEmail()) ||
-                        !Objects.equals(cl.getContributorAttributes(), cr.getContributorAttributes())) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-    private static Optional<WorkSummary> findSummaryCreateByThisApplication(Stream<WorkSummary> summaries) {
-        return summaries.filter(s -> MCRORCIDUtils.isCreatedByThisApplication(s.retrieveSourcePath())).findFirst();
-    }
-
-    private static Element mergeElements(List<Element> elements) {
-        final Element result = elements.get(0);
-        elements.stream().skip(1).forEach(e -> MCRMergeTool.merge(result, e));
-        return result;
-    }
-
-    private static boolean hasMatch(Set<MCRIdentifier> a, Set<MCRIdentifier> b) {
-        a.retainAll(b);
-        return !a.isEmpty();
     }
 }

@@ -46,6 +46,7 @@ import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.v3.MCRORCIDClientHelper;
 import org.mycore.orcid2.v3.MCRORCIDSectionImpl;
 import org.mycore.orcid2.v3.MCRORCIDWorkHelper;
+import org.mycore.orcid2.v3.MCRORCIDWorkSummaryUtils;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 
@@ -102,8 +103,8 @@ public class MCRORCIDResource {
                 .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
-            final boolean result = MCRORCIDWorkHelper.findMatchingSummariesByIdentifiers(object, summaries).findAny()
-                .isPresent();
+            final boolean result = MCRORCIDWorkSummaryUtils.findMatchingSummariesByIdentifiers(object, summaries)
+                .findAny().isPresent();
             return new MCRORCIDPublicationStatus(true, result);
         } catch (Exception e) {
             LOGGER.error("Error while retrieving status: ", e);
