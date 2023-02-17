@@ -21,7 +21,6 @@ package org.mycore.orcid2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,9 +72,8 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
             return;
         }
         final T work = transformContent(new MCRJDOMContent(object.createXML()));
-        final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object));
         final List<MCRORCIDCredentials> credentials = listOrcidCredentials(object);
-        publishWork(object, work, identifiers, credentials);
+        publishWork(object, work, credentials);
     }
 
     private List<MCRORCIDCredentials> listOrcidCredentials(MCRObject object) {
@@ -144,9 +142,7 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
      * 
      * @param object the MCRObject
      * @param work the work
-     * @param identifiers List of MCRIdentifier
      * @param credentials list of credentials
      */
-    abstract protected void publishWork(MCRObject object, T work, Set<MCRIdentifier> identifiers,
-        List<MCRORCIDCredentials> credentials);
+    abstract protected void publishWork(MCRObject object, T work, List<MCRORCIDCredentials> credentials);
 }
