@@ -80,7 +80,7 @@ public class MCRORCIDReadClientImpl extends MCRORCIDBaseClient implements MCRORC
         queryMap.put("start", offset);
         queryMap.put("rows", limit);
         final Response response = fetch(path + "/", queryMap);
-        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             throw new MCRORCIDRequestException(response);
         }
         return response.readEntity(valueType);
