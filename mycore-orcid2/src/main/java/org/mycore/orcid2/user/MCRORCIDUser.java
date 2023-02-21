@@ -55,10 +55,8 @@ public class MCRORCIDUser {
      * List of trusted name identifier types.
      */
     public static final List<String> TRUSTED_NAME_IDENTIFIER_TYPES
-        = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "User.TrustedNameIdentifierTypes")
-            .map(MCRConfiguration2::splitValue)
-            .orElseGet(() -> Stream.of("orcid"))
-            .collect(Collectors.toList());
+        = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "User.TrustedNameIdentifierTypes").stream()
+            .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toList());
 
     /**
      * Id prefix for user attributes.
@@ -254,8 +252,9 @@ public class MCRORCIDUser {
 
     /**
      * Returns all trusted identifiers.
+     * Trusted name identifier type  can be defined as follows:
+     *
      * MCR.ORCID2.User.TrustedNameIdentifierTypes=
-     * Optionally specifies the type of names identifiers.
      * 
      * @return Set of trusted MCRIdentifier
      */

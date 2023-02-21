@@ -227,7 +227,6 @@ public class MCRORCIDWorkHelper {
      * @param work the Work
      * @param credentials the MCRORCIDCredentials
      * @param workInfo the MCRORCIDUserInfo
-     * @return ORCID put code of created/updated work or 0
      * @throws MCRORCIDException if scope is invalid
      * @throws MCRORCIDRequestException if publishing fails
      */
@@ -268,7 +267,7 @@ public class MCRORCIDWorkHelper {
     }
 
     private static List<String> getMatchingORCIDs(MCRObject object) throws MCRORCIDException {
-        final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object)); // TODO trusted
+        final Set<MCRIdentifier> identifiers = MCRORCIDUtils.getTrustedIdentifiers(new MCRMODSWrapper(object));
         final String query = buildORCIDIdentifierSearchQuery(identifiers);
         try {
             return MCRORCIDClientHelper.getClientFactory().createReadClient()

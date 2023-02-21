@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.jdom2.Element;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
@@ -33,6 +34,10 @@ import org.mycore.orcid2.util.MCRIdentifier;
  * Provides utility methods.
  */
 public class MCRORCIDUtils {
+
+    private static final List<String> TRUSTED_IDENTIFIER_TYPES
+        = MCRConfiguration2.getString(MCRORCIDConstants.CONFIG_PREFIX + "Object.TrustedIdentifierTyps").stream()
+          .flatMap(MCRConfiguration2::splitValue).collect(Collectors.toList());
 
     /**
      * Compares String with auth client's client id.
@@ -101,7 +106,27 @@ public class MCRORCIDUtils {
     }
 
     /**
-     * Returns mods:identifer.
+     * Returns Set of MCRIdentifier based on mods:identifier for MCRMODSWrapper.
+     * Trusted identifier types can be defined as follows:
+     *
+     * MCR.ORCID2.Object.TrustedIdentifierTypes=
+     *
+     * If empty, all identifiers will be returned.
+     * 
+     * @param wrapper the MCRMODSWrapper
+     * @return Set of MCRIdentifier
+     */
+    public static Set<MCRIdentifier> getTrustedIdentifiers(MCRMODSWrapper wrapper) {
+        Set<MCRIdentifier> identifiers = getIdentifiers(wrapper);
+        if (TRUSTED_IDENTIFIER_TYPES.size() > 0) {
+            identifiers = identifiers.stream().filter(i -> TRUSTED_IDENTIFIER_TYPES.contains(i.getType()))
+                .collect(Collectors.toSet());
+        }
+        return identifiers;
+    }
+
+    /**
+     * Returns List of MCRIdentifier based on mods:identifier.
      * 
      * @param wrapper the MCRMODSWrapper
      * @return Set of MCRIdentifier

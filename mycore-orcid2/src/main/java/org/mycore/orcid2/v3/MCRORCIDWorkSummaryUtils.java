@@ -86,7 +86,7 @@ public class MCRORCIDWorkSummaryUtils {
      */
     public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(MCRObject object,
         Stream<WorkSummary> workSummaries) {
-        return findMatchingSummariesByIdentifiers(MCRORCIDUtils.getIdentifiers(new MCRMODSWrapper(object)),
+        return findMatchingSummariesByIdentifiers(MCRORCIDUtils.getTrustedIdentifiers(new MCRMODSWrapper(object)),
             workSummaries);
     }
 
