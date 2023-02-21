@@ -20,6 +20,7 @@ package org.mycore.orcid2.v3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -73,6 +74,19 @@ public class MCRORCIDWorkHelper {
         = MCRConfiguration2.getOrThrow(CONFIG_WORK_PREFIX + "CollectExternalPutCodes", Boolean::parseBoolean);
 
     /**
+     * Publishes MCRObject to ORCID for MCRCredentials.
+     * 
+     * @param object the MCRObject
+     * @param credentials the MCRORCIDCredentials
+     * @throws MCRORCIDException if there is a general error
+     * @see #publishObjectToORCID(MCRObject, List<MCRORCIDCredentials>)
+     *
+     */
+    public static void publishObjectToORCID(MCRObject object, MCRORCIDCredentials credentials) {
+        publishObjectToORCID(object, List.of(credentials));
+    }
+
+    /**
      * Publishes MCRObject to ORCID for given List of MCRCredentials.
      * In the process, put codes may be collected and stored in the flags.
      *
@@ -86,6 +100,7 @@ public class MCRORCIDWorkHelper {
      * @param object the MCRObject
      * @param credentialsList List of MCRORCIDCredentials
      * @throws MCRORCIDException if there is a general error
+     * @see MCRORCIDUtils#getTrustedIdentifiers
      */
     public static void publishObjectToORCID(MCRObject object, List<MCRORCIDCredentials> credentialsList)
         throws MCRORCIDException {
@@ -110,7 +125,7 @@ public class MCRORCIDWorkHelper {
                 }
                 if (!userInfo.getWorkInfo().hasOwnPutCode() && !ALWAYS_CREATE_OWN_WORK) {
                     // optimization
-                    continue;
+                    return;
                 }
                 final long putCode = publishWork(work, credentials, userInfo.getWorkInfo());
                 userInfo.getWorkInfo().setOwnPutCode(putCode);
@@ -131,23 +146,6 @@ public class MCRORCIDWorkHelper {
         }
     }
 
-    private static void collectAndSaveOtherPutCodes(List<String> orcids, MCRObject object) throws MCRORCIDException {
-        for (String orcid : orcids) {
-            try {
-                final MCRORCIDUserInfo userInfo
-                    = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
-                        .orElseGet(() -> new MCRORCIDUserInfo(orcid));
-                final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo(); // no clone necessary
-                retrieveWorkInfo(object, orcid, userInfo);
-                if (!Objects.equals(currentWorkInfo, userInfo.getWorkInfo())) {
-                    MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
-                }
-            } catch (MCRORCIDException e) {
-                LOGGER.warn("Could not collect put codes for {} and {}.", object.getId(), orcid);
-            }
-        }
-    }
-
     /**
      * Retrieves work info for MCRORCIDUserInfo for ORCID iD of MCRObject.
      * 
@@ -159,6 +157,7 @@ public class MCRORCIDWorkHelper {
      * @param orcid the ORCID iD
      * @param userInfo the userInfo
      * @throws MCRORCIDException if retrieving fails
+     * @see MCRORCIDUtils#getTrustedIdentifiers
      */
     public static void retrieveWorkInfo(MCRObject object, String orcid, MCRORCIDUserInfo userInfo)
         throws MCRORCIDException {
@@ -177,6 +176,7 @@ public class MCRORCIDWorkHelper {
      * @param credentials the MCRORCIDCredentials
      * @param userInfo the userInfo
      * @throws MCRORCIDException if retrieving fails
+     * @see MCRORCIDUtils#getTrustedIdentifiers
      */
     public static void retrieveWorkInfo(MCRObject object, MCRORCIDCredentials credentials, MCRORCIDUserInfo userInfo)
         throws MCRORCIDException {
@@ -195,6 +195,7 @@ public class MCRORCIDWorkHelper {
      * @param credentials the MCRORCIDCredentials
      * @param workInfo the initial work info
      * @throws MCRORCIDException look up request fails
+     * @see MCRORCIDUtils#getTrustedIdentifiers
      */
     private static void updateWorkInfo(MCRObject object, MCRORCIDCredentials credentials,
         MCRORCIDPutCodeInfo workInfo) throws MCRORCIDException {
@@ -234,7 +235,7 @@ public class MCRORCIDWorkHelper {
         throws IllegalArgumentException, MCRORCIDRequestException, MCRORCIDException {
         final Optional<String> scope = Optional.ofNullable(credentials.getScope());
         if (scope.isPresent() && !scope.get().contains(ScopeConstants.ACTIVITIES_UPDATE)) {
-            throw new MCRORCIDException("The scope is invalid"); // TODO maybe own exception
+            throw new MCRORCIDException("The scope is invalid");
         }
         final MCRORCIDUserClient memberClient = MCRORCIDClientHelper.getClientFactory().createUserClient(credentials);
         final long ownPutCode = workInfo.getOwnPutCode();
@@ -278,9 +279,34 @@ public class MCRORCIDWorkHelper {
         }
     }
 
-    // TODO
+    // TODO test if escaping is necessary
     private static String buildORCIDIdentifierSearchQuery(Set<MCRIdentifier> identifiers) {
-        // https://pub.orcid.org/v3.0/search?q=doi-self%3A%2210.1002%2Fchem.201802506%22
-        return null;
+        String query = "";
+        for (MCRIdentifier i : List.copyOf(identifiers)) {
+            if (!query.isEmpty()) {
+                query += " OR ";
+            }
+            final String value = i.getValue();
+            query += String.format(Locale.ROOT, "%s-self:(%s OR %s OR %s)", i.getType(), value, value.toUpperCase(),
+                value.toLowerCase());
+        }
+        return query;
+    }
+
+    private static void collectAndSaveOtherPutCodes(List<String> orcids, MCRObject object) throws MCRORCIDException {
+        orcids.forEach(orcid -> {
+            try {
+                final MCRORCIDUserInfo userInfo
+                    = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
+                        .orElseGet(() -> new MCRORCIDUserInfo(orcid));
+                final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo(); // no clone necessary
+                retrieveWorkInfo(object, orcid, userInfo);
+                if (!Objects.equals(currentWorkInfo, userInfo.getWorkInfo())) {
+                    MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
+                }
+            } catch (MCRORCIDException e) {
+                LOGGER.warn("Could not collect put codes for {} and {}.", object.getId(), orcid);
+            }
+        });
     }
 }
