@@ -20,6 +20,7 @@ package org.mycore.orcid2.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import jakarta.ws.rs.core.Response;
 
