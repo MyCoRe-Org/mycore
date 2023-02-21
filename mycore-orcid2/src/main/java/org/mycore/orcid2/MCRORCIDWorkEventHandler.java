@@ -25,8 +25,6 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
-import org.mycore.common.content.MCRContent;
-import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -36,7 +34,7 @@ import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
-import org.mycore.orcid2.user.MCRIdentifier;
+import org.mycore.orcid2.util.MCRIdentifier;
 import org.orcid.jaxb.model.message.ScopeConstants;
 
 /**
@@ -47,7 +45,7 @@ import org.orcid.jaxb.model.message.ScopeConstants;
  * and have authorized us to update their profile as trusted party,
  * and then creates/updates the publication in the works section of that profile.
  */
-public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
+public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -67,13 +65,16 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
      * @param object the MCRObject
      * @throws MCRORCIDTransformationException if transformation to orcid model fails
      */
-    private void handlePublication(MCRObject object) throws MCRORCIDTransformationException {
+    private void handlePublication(MCRObject object) {
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
-        final T work = transformContent(new MCRJDOMContent(object.createXML()));
         final List<MCRORCIDCredentials> credentials = listOrcidCredentials(object);
-        publishWork(object, work, credentials);
+        try {
+            publishObject(object, credentials);
+        } catch (Exception e) {
+            LOGGER.warn(e);
+        }
     }
 
     private List<MCRORCIDCredentials> listOrcidCredentials(MCRObject object) {
@@ -127,22 +128,13 @@ public abstract class MCRORCIDWorkEventHandler<T> extends MCREventHandlerBase {
     }
 
     /**
-     * Transforms MCRContent to work.
-     * 
-     * @param content the MCRContent
-     * @return the work
-     * @throws MCRORCIDTransformationException if transformation fails
-     */
-    abstract protected T transformContent(MCRContent content) throws MCRORCIDTransformationException;
-
-    /**
-     * Publishes MCRObject in all orcid profiles specified by list of credentials.
+     * Publishes MCRObject in all orcid profiles specified by List of MCRCredentials.
      * Creates a new record if no corresponding publication can be found in the profile.
      * Otherwise, the publication in the profile will be updated.
      * 
      * @param object the MCRObject
-     * @param work the work
-     * @param credentials list of credentials
+     * @param credentials List of MCRORCIDCredentials
+     * @throws Exception if Publish fails in general
      */
-    abstract protected void publishWork(MCRObject object, T work, List<MCRORCIDCredentials> credentials);
+    abstract protected void publishObject(MCRObject object, List<MCRORCIDCredentials> credentials) throws Exception;
 }

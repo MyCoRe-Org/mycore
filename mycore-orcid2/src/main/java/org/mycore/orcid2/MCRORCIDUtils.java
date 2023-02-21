@@ -27,7 +27,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.orcid2.auth.MCRORCIDOAuthClient;
-import org.mycore.orcid2.user.MCRIdentifier;
+import org.mycore.orcid2.util.MCRIdentifier;
 
 /**
  * Provides utility methods.

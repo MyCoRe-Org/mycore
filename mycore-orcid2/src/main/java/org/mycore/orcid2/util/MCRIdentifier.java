@@ -16,14 +16,14 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.orcid2.user;
+package org.mycore.orcid2.util;
 
 import java.util.Locale;
 import java.util.Objects;
 
 /**
-  Class to store ids.
-*/
+ * Class to store ids.
+ */
 public class MCRIdentifier {
 
     private final String type;

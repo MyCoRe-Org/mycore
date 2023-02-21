@@ -20,36 +20,16 @@ package org.mycore.orcid2.v3;
 
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.common.content.MCRContent;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
-import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
-import org.orcid.jaxb.model.v3.release.record.Work;
 
 /**
  * Work handler which publishes object to ORCID.
  */
-public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEventHandler<Work> {
-
-    private static final Logger LOGGER = LogManager.getLogger();
+public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEventHandler {
 
     @Override
-    protected Work transformContent(MCRContent content) throws MCRORCIDTransformationException {
-        return MCRORCIDWorkTransformerHelper.transformContent(content);
-    }
-
-    @Override
-    protected void publishWork(MCRObject object, Work work, List<MCRORCIDCredentials> credentials) {
-        credentials.forEach(c -> {
-            final String orcid = c.getORCID();
-            try {
-                MCRORCIDWorkHelper.publishObjectToORCID(object, c);
-            } catch (Exception ex) {
-                LOGGER.warn("Could not publish {} to ORCID profile: {}.", object.getId(), c.getORCID(), ex);
-            }
-        });
+    protected void publishObject(MCRObject object, List<MCRORCIDCredentials> credentials) throws Exception {
+        MCRORCIDWorkHelper.publishObjectToORCID(object, credentials);
     }
 }
