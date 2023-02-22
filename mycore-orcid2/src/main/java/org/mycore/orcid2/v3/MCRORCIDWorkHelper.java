@@ -287,8 +287,8 @@ public class MCRORCIDWorkHelper {
                 query += " OR ";
             }
             final String value = i.getValue();
-            query += String.format(Locale.ROOT, "%s-self:(%s OR %s OR %s)", i.getType(), value, value.toUpperCase(),
-                value.toLowerCase());
+            query += String.format(Locale.ROOT, "%s-self:(%s OR %s OR %s)", i.getType(), value,
+                value.toUpperCase(Locale.ROOT), value.toLowerCase(Locale.ROOT));
         }
         return query;
     }

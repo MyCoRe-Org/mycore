@@ -71,7 +71,7 @@ public class MCRORCIDWorkSummaryUtils {
      * @param object the MCRObject
      * @param workSummaries List of WorkSummaries
      * @return Stream of matching WorkSummaries
-     * @see MCRORCIDUtils.getTrustedIdentifiers
+     * @see MCRORCIDUtils#getTrustedIdentifiers
      */
     public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(MCRObject object,
         List<WorkSummary> workSummaries) {
@@ -84,7 +84,7 @@ public class MCRORCIDWorkSummaryUtils {
      * @param object the MCRObject
      * @param workSummaries Stream of WorkSummaries
      * @return Stream of matching WorkSummaries
-     * @see MCRORCIDUtils.getTrustedIdentifiers
+     * @see MCRORCIDUtils#getTrustedIdentifiers
      */
     public static Stream<WorkSummary> findMatchingSummariesByIdentifiers(MCRObject object,
         Stream<WorkSummary> workSummaries) {
