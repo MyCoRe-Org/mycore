@@ -111,7 +111,7 @@ public class MCRDNBURNRestClient {
      * @return the request url
      * */
     protected String getBaseServiceCheckExistsURL(MCRPIRegistrationInfo urn) {
-        return getUpdateURL(urn);
+        return getBaseServiceURL() + "urn/" + urn.getIdentifier();
     }
 
     /**
@@ -121,7 +121,7 @@ public class MCRDNBURNRestClient {
      * @return the url for updating the urls
      * */
     protected String getUpdateURL(MCRPIRegistrationInfo urn) {
-        return getBaseServiceURL() + "urn/" + urn.getIdentifier() + "/my-urls/";
+        return getBaseServiceCheckExistsURL(urn) + "/my-urls/";
     }
 
     /**
@@ -138,7 +138,7 @@ public class MCRDNBURNRestClient {
     public Optional<Date> register(MCRPIRegistrationInfo urn) {
         MCRURNJsonBundle bundle = getUrnJsonBundle(urn);
         String url = getBaseServiceCheckExistsURL(urn);
-        CloseableHttpResponse response = MCRHttpsClient.get(url, credentials);
+        CloseableHttpResponse response = MCRHttpsClient.head(url, credentials);
         StatusLine statusLine = response.getStatusLine();
 
         if (statusLine == null) {

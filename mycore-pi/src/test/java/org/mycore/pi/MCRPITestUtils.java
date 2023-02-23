@@ -16,72 +16,79 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- package org.mycore.pi;
+package org.mycore.pi;
 
- import java.net.MalformedURLException;
- import java.net.URL;
- import java.util.UUID;
- 
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
- import org.mycore.datamodel.metadata.MCRObject;
- import org.mycore.datamodel.metadata.MCRObjectID;
- import org.mycore.pi.backend.MCRPI;
- import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
- import org.mycore.pi.urn.MCRDNBURN;
- import org.mycore.pi.urn.MCRUUIDURNGenerator;
- import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
- import org.mycore.pi.urn.rest.MCRURNJsonBundle;
- 
- /**
-  * Created by chi on 23.02.17.
-  *
-  * @author Huu Chi Vu
-  */
- public class MCRPITestUtils {
-     final private static Logger LOGGER = LogManager.getLogger();
- 
-     public static MCRPI generateMCRPI(String fileName, String serviceID) throws MCRPersistentIdentifierException {
-         MCRObjectID mycoreID = getNextFreeID();
-         return new MCRPI(generateURNFor(mycoreID).asString(), MCRDNBURN.TYPE,
-             mycoreID.toString(), fileName, serviceID, null);
-     }
- 
-     public static MCRObjectID getNextFreeID() {
-         return MCRObjectID.getNextFreeId("MyCoRe_test");
-     }
- 
-     private static MCRDNBURN generateURNFor(MCRObjectID mycoreID) throws MCRPersistentIdentifierException {
-         String testGenerator = "testGenerator";
-         MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator();
-         mcruuidurnGenerator.init(MCRPIService.GENERATOR_CONFIG_PREFIX + testGenerator);
-         MCRObject mcrObject1 = new MCRObject();
-         mcrObject1.setId(mycoreID);
-         return mcruuidurnGenerator.generate(mcrObject1, "");
-     }
- 
-     public static String randomFilename() {
-         return UUID.randomUUID()
-             .toString()
-             .concat(".tif");
-     }
- 
-     public static URL getUrl(MCRPIRegistrationInfo info) {
-         String url = "http://localhost:8291/deriv_0001/" + info.getAdditional();
-         try {
-             return new URL(url);
-         } catch (MalformedURLException e) {
-             LOGGER.error("Malformed URL: " + url, e);
-         }
- 
-         return null;
-     }
- 
-     public static MCRDNBURNRestClient getMCRURNClient() {
-         return new MCRDNBURNRestClient(MCRPITestUtils::getUrl);
-     }
- 
-     public static MCRURNJsonBundle getBundle(MCRPIRegistrationInfo urnInfo) {
-         return MCRURNJsonBundle.instance(urnInfo, MCRPITestUtils.getUrl(urnInfo));
-     }
- }
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.pi.backend.MCRPI;
+import org.mycore.pi.exceptions.MCRPersistentIdentifierException;
+import org.mycore.pi.urn.MCRDNBURN;
+import org.mycore.pi.urn.MCRUUIDURNGenerator;
+import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
+import org.mycore.pi.urn.rest.MCRURNJsonBundle;
+
+/**
+ * Created by chi on 23.02.17.
+ *
+ * @author Huu Chi Vu
+ */
+public class MCRPITestUtils {
+    final private static Logger LOGGER = LogManager.getLogger();
+
+    public static MCRPI generateMCRPI(String fileName, String serviceID, String namespace)
+        throws MCRPersistentIdentifierException {
+        MCRObjectID mycoreID = getNextFreeID();
+        return new MCRPI(generateURNFor(mycoreID, namespace).asString(), MCRDNBURN.TYPE,
+            mycoreID.toString(), fileName, serviceID, null);
+    }
+
+    public static MCRObjectID getNextFreeID() {
+        return MCRObjectID.getNextFreeId("MyCoRe_test");
+    }
+
+    private static MCRDNBURN generateURNFor(MCRObjectID mycoreID, String namespace)
+        throws MCRPersistentIdentifierException {
+        String testGenerator = "testGenerator";
+        MCRUUIDURNGenerator mcruuidurnGenerator = new MCRUUIDURNGenerator();
+        mcruuidurnGenerator.init(MCRPIService.GENERATOR_CONFIG_PREFIX + testGenerator);
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Namespace", namespace);
+        mcruuidurnGenerator.setProperties(properties);
+        MCRObject mcrObject1 = new MCRObject();
+        mcrObject1.setId(mycoreID);
+        return mcruuidurnGenerator.generate(mcrObject1, "");
+    }
+
+    public static String randomFilename() {
+        return UUID.randomUUID()
+            .toString()
+            .concat(".tif");
+    }
+
+    public static URL getUrl(MCRPIRegistrationInfo info) {
+        String url = "http://localhost:8291/deriv_0001/" + info.getAdditional();
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            LOGGER.error("Malformed URL: " + url, e);
+        }
+
+        return null;
+    }
+
+    public static MCRDNBURNRestClient getMCRURNClient() {
+        return new MCRDNBURNRestClient(MCRPITestUtils::getUrl);
+    }
+
+    public static MCRURNJsonBundle getBundle(MCRPIRegistrationInfo urnInfo) {
+        return MCRURNJsonBundle.instance(urnInfo, MCRPITestUtils.getUrl(urnInfo));
+    }
+}

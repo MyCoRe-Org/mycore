@@ -62,7 +62,7 @@ public class MCRURNGranularRESTRegistrationTaskTest extends MCRStoreTestCase {
     @Test
     public void run() throws Exception {
         String fileName = MCRPITestUtils.randomFilename();
-        MCRPI urn1 = generateMCRPI(fileName, "TestService");
+        MCRPI urn1 = generateMCRPI(fileName, "TestService", "namespace");
         MCREntityManagerProvider.getCurrentEntityManager()
             .persist(urn1);
 
