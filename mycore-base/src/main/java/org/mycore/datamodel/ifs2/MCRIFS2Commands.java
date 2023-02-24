@@ -168,7 +168,7 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
                 .sorted(Comparator.comparing(getName))
                 .flatMap(n -> {
                     final String fileName = getName.apply(n);
-                    if (n.getName().equals("dir")) {
+                    if ("dir".equals(n.getName())) {
                         try {
                             return getAllFiles(nodePath.resolve(fileName), n);
                         } catch (IOException e) {
@@ -187,6 +187,10 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
     public static void verifyVersioningMetadataStore(String storeId) {
         initMetadataStores();
         MCRVersioningMetadataStore store = MCRStoreCenter.instance().getStore(storeId);
+        if (storeId == null) {
+            LOGGER.error("MCRVersioningMetadataStore with id " + storeId + " was not found.");
+            return;
+        }
         store.verify();
     }
 
