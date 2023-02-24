@@ -46,6 +46,16 @@ public class MCRIFSFileSystem extends MCRAbstractFileSystem {
     MCRIFSFileSystem(MCRFileSystemProvider provider) {
         super();
         this.provider = provider;
+        try {
+            initStores();
+        } catch (IOException e) {
+            LogManager.getLogger().error("Could not initialize stores. This file system may be degraded.", e);
+        }
+    }
+
+    private void initStores() throws IOException {
+        MCRFileSystemUtils.getObjectBaseIds()
+            .forEach(MCRFileSystemUtils::getStore);
     }
 
     /* (non-Javadoc)
