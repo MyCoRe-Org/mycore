@@ -180,15 +180,6 @@ public class MCRDerivateServlet extends MCRServlet {
             return;
         }
 
-        String newName = pathTo.getFileName().toString();
-        try {
-            MCRUploadHelper.checkPathName(newName);
-        } catch (MCRException ex) {
-            String message = ex.getMessage();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-            return;
-        }
-
         boolean updateMainFile = false;
         MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdStr);
 
