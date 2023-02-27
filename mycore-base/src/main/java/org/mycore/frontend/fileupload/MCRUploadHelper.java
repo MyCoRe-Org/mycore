@@ -20,6 +20,8 @@ package org.mycore.frontend.fileupload;
 
 import java.io.File;
 import java.nio.CharBuffer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
@@ -27,6 +29,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -113,7 +116,9 @@ public abstract class MCRUploadHelper {
     }
 
     private static Stream<String> splitPath(String path) {
-        return PATH_SEPERATOR.splitAsStream(path);
+        return StreamSupport.stream(((Iterable<Path>) () -> Paths.get(path).iterator()).spliterator(), false)
+            .map(Path::getFileName)
+            .map(Path::toString);
     }
 
     private static void checkNotEmpty(String path, String pathElement) {
