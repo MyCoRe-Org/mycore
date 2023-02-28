@@ -19,9 +19,13 @@
 package org.mycore.mcr.cronjob;
 
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRPostConstruction;
@@ -40,7 +44,7 @@ import com.cronutils.parser.CronParser;
 /**
  * {@link MCRCronjobManager#JOBS_CONFIG_PREFIX} and automatic executed. If you want to create your own
  * {@link MCRCronjob} you should maybe look if {@link MCRCommandCronJob} is good enough.
- *
+ * <p>
  * The Default properties for this Configurable are:
  * {@link #cronType} and {@link #setCron(String)}
  */
@@ -48,12 +52,11 @@ public abstract class MCRCronjob implements Runnable {
 
     private MCRAbstractProcessable processable;
 
-    /**
-     * The format type of the {@link #cron} property. Default is Unix, other possible values are:
-     * CRON4J, QUARTZ, UNIX, SPRING
-     */
-    @MCRProperty(name = "CronType", required = false)
-    public String cronType;
+    private boolean enabled;
+
+    private Set<Context> contexts;
+
+    private CronType cronType;
 
     private Cron cron;
 
@@ -76,27 +79,69 @@ public abstract class MCRCronjob implements Runnable {
         this.processable.setProgressText("Wait for " + getCronDescription() + "..");
     }
 
-    public Cron getCron() {
-        return cron;
+
+    /**
+     * Whether this Cronjob is enabled as all.  Possible values are: true, false.
+     *
+     * @param enabled Whether this Cronjob is enabled.
+     */
+    @MCRProperty(name = "Enabled", defaultName = "MCR.Cronjob.Default.Enabled")
+    public void setEnabled(String enabled) {
+        this.enabled = Boolean.parseBoolean(enabled);
     }
 
     /**
-     * @param cron The description when the Cronjob should be executed.
+     * Comma separated list of contexts in which this Cronjob is executed. Possible values are: WEBAPP, CLI.
+     *
+     * @param contexts List of contexts in which this Cronjob is executed.
      */
-    @MCRProperty(name = "Cron")
-    public void setCron(String cron) {
-        CronType cronType = Optional.ofNullable(this.cronType)
-            .map(CronType::valueOf)
-            .orElse(CronType.UNIX);
+    @MCRProperty(name = "Contexts", defaultName = "MCR.Cronjob.Default.Contexts")
+    public void setContexts(String contexts) {
+        this.contexts = Arrays.stream(contexts.split(",")).map(Context::valueOf).collect(Collectors.toSet());
+    }
 
+    /**
+     * Whether this Cronjob is active, i.e. whether it is enabled at all and
+     * whether it is executed in the given context.
+     *
+     * @param context The context
+     * @return Whether this Cronjob is active.
+     */
+    public boolean isActive(Context context) {
+        return enabled && contexts.contains(context);
+    }
+
+    /**
+     * The format type of the cron description property. Possible values are: CRON4J, QUARTZ, UNIX, SPRING
+     *
+     * @param cronType The format type of the {@link #setCron(String)} property.
+     */
+    @MCRProperty(name = "CronType", defaultName = "MCR.Cronjob.Default.CronType", order = 1)
+    public void setCronType(String cronType) {
+        this.cronType = CronType.valueOf(cronType);
+    }
+
+    /**
+     * Set the cron description (i.e. a string like like "42 23 * * *") that describes
+     * when this Cronjob is executed. The interpretation of this string is dependent on the
+     * set cron type.
+     *
+     * @param cron The description of when this Cronjob is executed.
+     */
+    @MCRProperty(name = "Cron", order = 2)
+    public void setCron(String cron) {
         CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(cronType);
         CronParser parser = new CronParser(cronDefinition);
         this.cron = parser.parse(cron);
     }
 
+    public Cron getCron() {
+        return cron;
+    }
+
     public Optional<Long> getNextExecution() {
-        ZonedDateTime now = ZonedDateTime.now();
         Cron cron = getCron();
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
         Optional<Duration> duration = ExecutionTime.forCron(cron).timeToNextExecution(now);
         return duration.map(Duration::toMillis);
     }
@@ -133,5 +178,13 @@ public abstract class MCRCronjob implements Runnable {
      * @return A Description what this Cronjob does.
      */
     public abstract String getDescription();
+
+    public enum Context {
+
+        WEBAPP,
+
+        CLI;
+
+    }
 
 }

@@ -31,7 +31,7 @@ public class MCRCronjobManagerTest extends MCRTestCase {
     @Test
     public void startUp() {
         Assert.assertEquals("Count should be 0", MCRTestCronJob.count, 0);
-        MCRCronjobManager.getInstance().startUp();
+        MCRCronjobManager.getInstance().startUp(null);
         try {
             Thread.sleep(2500);
         } catch (InterruptedException e) {
@@ -46,6 +46,7 @@ public class MCRCronjobManagerTest extends MCRTestCase {
 
         testProperties.put("MCR.Processable.Registry.Class", MCRCentralProcessableRegistry.class.getName());
         testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2", MCRTestCronJob.class.getName());
+        testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.Contexts", "CLI");
         testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.CronType", "QUARTZ");
         testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.Cron", "* * * * * ? *");
         testProperties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Test2.N", "1");
