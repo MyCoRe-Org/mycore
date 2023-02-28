@@ -44,7 +44,7 @@ public class MCRCommandCronJobTest extends MCRJPATestCase {
                 .of(new MCRCommand("test command {0}",
                     "org.mycore.mcr.cronjob.MCRCommandCronJobTest.testCommand String", "just a test command."))
                 .collect(Collectors.toList()));
-        MCRCronjobManager.getInstance().startUp();
+        MCRCronjobManager.getInstance().startUp(null);
         Thread.sleep(2000);
         Assert.assertTrue("The command should have been executed!", commandRun);
         Assert.assertNotNull("The message should be set", message);
@@ -69,9 +69,10 @@ public class MCRCommandCronJobTest extends MCRJPATestCase {
 
         properties.put("MCR.Processable.Registry.Class", MCRCentralProcessableRegistry.class.getName());
         properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command", MCRCommandCronJob.class.getName());
-        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Command", "test command Hallo");
-        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Cron", "* * * * * ? *");
+        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Contexts", "CLI");
         properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.CronType", "QUARTZ");
+        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Cron", "* * * * * ? *");
+        properties.put(MCRCronjobManager.JOBS_CONFIG_PREFIX + "Command.Command", "test command Hallo");
 
         return properties;
     }

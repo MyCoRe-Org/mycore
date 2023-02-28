@@ -21,8 +21,8 @@ package org.mycore.mcr.cronjob;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
+import jakarta.servlet.ServletContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
@@ -80,16 +80,23 @@ public class MCRCronjobManager implements MCRShutdownHandler.Closeable {
         }
     }
 
-    void startUp() {
+    void startUp(ServletContext servletContext) {
         MCRShutdownHandler.getInstance().addCloseable(this);
         LOGGER.info("Cron schedule:");
-        List<String> properties = MCRConfiguration2.getInstantiatablePropertyKeys(JOBS_CONFIG_PREFIX)
-            .collect(Collectors.toList());
+        List<String> properties = MCRConfiguration2.getInstantiatablePropertyKeys(JOBS_CONFIG_PREFIX).toList();
         for (String id : properties) {
             MCRCronjob job = (MCRCronjob) MCRConfiguration2.getInstanceOf(id).orElseThrow();
-            LOGGER.info(job.getDescription() + " " + job.getCronDescription());
-            scheduleNext(job.getID());
+            if (job.isActive(getContext(servletContext))) {
+                LOGGER.info("Active - " + job.getDescription() + " " + job.getCronDescription());
+                scheduleNext(job.getID());
+            } else {
+                LOGGER.info("Inactive - " + job.getDescription() + " " + job.getCronDescription());
+            }
         }
+    }
+
+    private MCRCronjob.Context getContext(ServletContext servletContext) {
+        return servletContext != null ? MCRCronjob.Context.WEBAPP : MCRCronjob.Context.CLI;
     }
 
     private void scheduleNext(String jobID) {
