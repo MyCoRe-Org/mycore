@@ -19,8 +19,8 @@
 package org.mycore.orcid2.auth;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -137,9 +137,9 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
     }
 
     private void setExpiration(MCRORCIDCredentials credentials) {
-        final LocalDate expireDate = LocalDate.now(ZoneId.systemDefault())
-            .plus(Integer.parseInt(credentials.getExpiresIn()), ChronoUnit.SECONDS)
-            .minusDays(1);
+        final LocalDate expireDate = LocalDateTime.now(ZoneId.systemDefault())
+            .plusSeconds(Integer.parseInt(credentials.getExpiresIn()))
+            .toLocalDate();
         credentials.setExpiration(expireDate);
     }
 
