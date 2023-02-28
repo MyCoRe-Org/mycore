@@ -29,6 +29,7 @@ import org.jdom2.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
@@ -210,6 +211,15 @@ public class MCRIFS2Commands extends MCRAbstractCommands {
         MCRFileStore store = MCRStoreCenter.instance().getStore(storeId);
         final MCRFileCollection fc = store.retrieve(fileCollection);
         fc.repairMetadata();
+    }
+
+    @MCRCommand(syntax = "repair ifs2 metadata for derivate {0}",
+        help = "repairs checksums for derivate {0}")
+    public static List<String> repairMetaXML(String mcrId) {
+        final MCRObjectID derivateId = MCRObjectID.getInstance(mcrId);
+        //works for derivate that use ifs2:// URIs
+        return List.of("repair metadata for file collection " + derivateId.getNumberAsInteger()
+            + " in ifs2 file store IFS2_" + derivateId.getBase());
     }
 
     private record FileInfo(Path localPath, String md5) {
