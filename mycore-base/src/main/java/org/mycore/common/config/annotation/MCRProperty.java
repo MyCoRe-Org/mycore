@@ -45,13 +45,27 @@ public @interface MCRProperty {
     String name();
 
     /**
-     * @return true if the property has to be present in the properties. {@link MCRConfigurationException} is thrown
-     * if the property is required but not present.
+     * @return true if the property specified by {@link MCRProperty#name()} has to be present in the properties.
+     * {@link MCRConfigurationException} is thrown if the property is required but not present.
      */
     boolean required() default true;
 
     /**
-     * @return true if the property is absolute and not specific for this instance e.G. MCR.NameOfProject
+     * @return true if the property is absolute and not specific for this instance e.g. MCR.NameOfProject.
      */
     boolean absolute() default false;
+
+    /**
+     * @return The name for a default property that should be used as a default value if the property
+     * specified by {@link MCRProperty#name()} is not present in the properties. {@link MCRConfigurationException} is
+     * thrown if the default property is not present. The default property must be absolute, e.g. MCR.NameOfProject.
+     */
+    String defaultName() default "";
+
+    /**
+     * @return the order in which the annotated fields or methods are processed. The higher the value, the later the
+     * field or method is processed. All fields are processed first, then all methods are processed.
+     */
+    int order() default 0;
+
 }
