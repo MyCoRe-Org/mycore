@@ -20,6 +20,7 @@ package org.mycore.frontend.fileupload;
 
 import java.io.File;
 import java.nio.CharBuffer;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -116,7 +117,13 @@ public abstract class MCRUploadHelper {
     }
 
     private static Stream<String> splitPath(String path) {
-        return StreamSupport.stream(((Iterable<Path>) () -> Paths.get(path).iterator()).spliterator(), false)
+        return StreamSupport.stream(((Iterable<Path>) () -> {
+                    try {
+                        return Paths.get(path).iterator();
+                    } catch (InvalidPathException e) {
+                        throw new MCRException("Path " + path + " is invalid.", e);
+                    }
+                }).spliterator(), false)
             .map(Path::getFileName)
             .map(Path::toString);
     }
