@@ -34,4 +34,11 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 @Inherited
 public @interface MCRPostConstruction {
+
+    /**
+     * @return the order in which the annotated methods are processed. The higher the value, the later the
+     * method is processed.
+     */
+    int order() default 0;
+
 }
