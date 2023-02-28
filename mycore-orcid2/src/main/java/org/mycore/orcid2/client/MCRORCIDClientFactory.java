@@ -19,6 +19,7 @@
 package org.mycore.orcid2.client;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -44,21 +45,24 @@ public class MCRORCIDClientFactory {
 
     private static Map<String, MCRORCIDClientFactory> factories = new HashMap<>();
 
-    private String mode;
+    private final String publicAPI;
 
-    private String version;
+    private final String memberAPI;
 
-    private MCRORCIDAPIDefinition definition;
+    private final ReadClientMode mode;
 
     private MCRORCIDReadClient readClient = null;
 
     private MCRORCIDClientFactory(String version) throws MCRConfigurationException {
         final String prefix = CONFIG_PREFIX + version;
-        this.definition = MCRConfiguration2.<MCRORCIDAPIDefinition>getInstanceOf(prefix + ".Config.class")
-            .orElseThrow();
-        this.mode = MCRConfiguration2.getStringOrThrow(prefix + ".Mode");
-        this.version = MCRConfiguration2.getStringOrThrow(prefix + ".Version");
-        // TODO validate mode and version
+        publicAPI = MCRConfiguration2.getStringOrThrow(prefix + ".PublicAPI");
+        memberAPI = MCRConfiguration2.getStringOrThrow(prefix + ".MemberAPI");
+        final String modeString = MCRConfiguration2.getStringOrThrow(prefix + ".ReadClientMode");
+        try {
+            mode = ReadClientMode.valueOf(modeString.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new MCRConfigurationException("Unknown .ReadClientMode: " + modeString);
+        }
     }
 
     /**
@@ -104,35 +108,27 @@ public class MCRORCIDClientFactory {
      * @throws MCRORCIDException if client is not in member mode
      */
     public MCRORCIDUserClient createUserClient(MCRORCIDCredentials credentials) throws MCRORCIDException {
-        if (Objects.equals(version, "member")) {
-            if (Objects.equals(mode, "sandbox")) {
-                return new MCRORCIDUserClientImpl(definition.getMemberSandboxURL(), credentials);
-            } else {
-                return new MCRORCIDUserClientImpl(definition.getMemberURL(), credentials);
-            }
+        if (Objects.equals(mode, ReadClientMode.MEMBER)) {
+            return new MCRORCIDUserClientImpl(memberAPI, credentials);
         }
         throw new MCRORCIDException("Client is not in member mode");
     }
 
     private MCRORCIDReadClient initReadClient() throws MCRORCIDException {
-        if (Objects.equals(version, "member")) {
+        if (Objects.equals(mode, ReadClientMode.MEMBER)) {
             if (READ_PUBLIC_TOKEN == null) {
                 throw new MCRORCIDException("MCR.ORCID2.ReadPublicToken is not set");
             }
-            if (Objects.equals(mode, "sandbox")) {
-                return new MCRORCIDReadClientImpl(definition.getMemberSandboxURL(), READ_PUBLIC_TOKEN);
-            } else {
-                return new MCRORCIDReadClientImpl(definition.getMemberURL(), READ_PUBLIC_TOKEN);
-            }
+            return new MCRORCIDReadClientImpl(memberAPI, READ_PUBLIC_TOKEN);
         } else {
             if (READ_PUBLIC_TOKEN == null) {
                 LOGGER.info("MCR.ORCID2.ReadPublicToken is not set.");
             }
-            if (Objects.equals(mode, "sandbox")) {
-                return new MCRORCIDReadClientImpl(definition.getPublicSandboxURL(), READ_PUBLIC_TOKEN);
-            } else {
-                return new MCRORCIDReadClientImpl(definition.getPublicURL(), READ_PUBLIC_TOKEN);
-            }
+            return new MCRORCIDReadClientImpl(publicAPI, READ_PUBLIC_TOKEN);
         }
     }
+
+    enum ReadClientMode {
+        PUBLIC, MEMBER
+    } 
 }
