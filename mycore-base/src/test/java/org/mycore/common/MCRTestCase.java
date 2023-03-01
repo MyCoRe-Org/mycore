@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -31,12 +32,18 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
+import org.mycore.common.config.MCRConfigurationException;
 
 public class MCRTestCase {
 
     @ClassRule
     public static TemporaryFolder junitFolder = new TemporaryFolder();
+
+    @Rule
+    public MCRTestAnnotationWatcher<MCRTestConfiguration> configurationTestWatcher =
+        new MCRTestAnnotationWatcher<>(MCRTestConfiguration.class);
 
     @BeforeClass
     public static void initBaseDir() throws IOException {
@@ -44,16 +51,15 @@ public class MCRTestCase {
     }
 
     /**
-     * initializes MCRConfiguration with an empty property file. This can be used to test MyCoRe classes without any
-     * propties set, using default. You may want to set Properties per TestCase with the set() method of
-     * <code>MCRConfiguration2</code>
-     *
-     * @see org.mycore.common.config.MCRConfiguration2#set(String, String)
+     * Initializes {@link org.mycore.common.config.MCRConfiguration2} with an empty property file.
+     * This can be used to test MyCoRe classes without any properties set, using default. You may set specific
+     * properties for a test case by calling {@link org.mycore.common.config.MCRConfiguration2#set(String, String)}
+     * inside of the test case or by annotating the test case with {{@link MCRTestConfiguration}}.
      */
     @Before
     public void setUp() throws Exception {
         initProperties();
-        MCRTestCaseHelper.before(getTestProperties());
+        MCRTestCaseHelper.before(extendTestProperties(getTestProperties()));
     }
 
     @After
@@ -63,6 +69,35 @@ public class MCRTestCase {
 
     protected Map<String, String> getTestProperties() {
         return new HashMap<>();
+    }
+
+    private Map<String, String> extendTestProperties(Map<String, String> testProperties) {
+        configurationTestWatcher.getAnnotation().ifPresent(testConfiguration ->
+            Arrays.stream(testConfiguration.properties()).forEach(testProperty ->
+                extendTestProperties(testProperties, testProperty)
+            )
+        );
+        return testProperties;
+    }
+
+    private static void extendTestProperties(Map<String, String> testProperties, MCRTestProperty testProperty) {
+
+        String string = testProperty.string();
+        boolean nonDefaultString = !"".equals(string);
+
+        Class<?> classNameOfClass = testProperty.classNameOf();
+        boolean nonDefaultClassNameOfClass = Void.class != classNameOfClass;
+
+        if (nonDefaultString && nonDefaultClassNameOfClass) {
+            throw new MCRConfigurationException("MCRTestProperty can have either a string- or a classNameOf-value");
+        } else if (nonDefaultString) {
+            testProperties.put(testProperty.key(), string);
+        } else if (nonDefaultClassNameOfClass) {
+            testProperties.put(testProperty.key(), classNameOfClass.getName());
+        } else {
+            throw new MCRConfigurationException("MCRTestProperty must have either a string- or a classNameOf-value");
+        }
+
     }
 
     /**
