@@ -173,7 +173,7 @@ public class MCRDerivateServlet extends MCRServlet {
         }
 
         try {
-            MCRUploadHelper.checkPathName(pathTo.getOwnerRelativePath(), true);
+            MCRUploadHelper.checkPathName(pathTo.getRoot().relativize(pathTo).toString(), true);
         } catch (MCRException ex){
             String translatedMessage = MCRTranslation.translate("IFS.invalid.fileName", pathTo.getOwnerRelativePath());
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, translatedMessage);
