@@ -455,4 +455,5 @@ public class MCRXEditorValidatorTest extends MCRTestCase {
             return "John".equals(author.getChildText("first")) && "Doe".equals(author.getChildText("last"));
         }
     }
+
 }

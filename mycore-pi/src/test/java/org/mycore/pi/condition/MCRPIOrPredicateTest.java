@@ -27,8 +27,9 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
 
-import java.util.Map;
-
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
 public class MCRPIOrPredicateTest extends MCRTestCase {
 
     private static final String KEY_CREATION_PREDICATE = "MCR.PI.Service.Mock.CreationPredicate";
@@ -93,13 +94,6 @@ public class MCRPIOrPredicateTest extends MCRTestCase {
 
         return mcrObject;
 
-    }
-
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> testProperties = super.getTestProperties();
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-        return testProperties;
     }
 
 }
