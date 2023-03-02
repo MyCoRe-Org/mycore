@@ -32,7 +32,7 @@
   <name>MyCoRe Bill of Materials (BOM)</name>
 
   <properties>
-    <grizzly.version>3.0.1</grizzly.version>
+    <grizzly.version>4.0.0</grizzly.version>
     <hibernate.core.version>${hibernate.version}</hibernate.core.version>
     <hibernate.version>5.6.7.Final</hibernate.version>
     <hk2.version>3.0.2</hk2.version>
@@ -42,7 +42,7 @@
     <jakarta.mail.version>2.0.1</jakarta.mail.version>
     <java.target.version>17</java.target.version>
     <jaxb.version>3.0.2</jaxb.version>
-    <jersey.version>3.0.8</jersey.version>
+    <jersey.version>3.1.0</jersey.version>
     <!-- defined in parent POM: -->
     <!-- <log4j.version>2.19.0</log4j.version> -->
     <oaipmh.version>3.0</oaipmh.version>
@@ -804,7 +804,7 @@
       <dependency>
         <groupId>jakarta.servlet</groupId>
         <artifactId>jakarta.servlet-api</artifactId>
-        <version>5.0.0</version>
+        <version>6.0.0</version>
         <scope>provided</scope>
       </dependency>
       <dependency>

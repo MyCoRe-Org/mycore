@@ -57,11 +57,11 @@ public abstract class MCRUploadHelper {
 
     /**
      * reserved URI characters should not be in uploaded filenames. See RFC3986,
-     * Section 2.2
+     * Section 2.2 and 7.3
      */
     private static final String RESERVERD_CHARACTERS = new String(
         new char[] { ':', '?', '%', '#', '[', ']', '@', '!', '$', '&', '\'', '(',
-            ')', '*', ',', ';', '=', '\'', '+' });
+                ')', '*', ',', ';', '=', '\'', '+', '\\' });
 
     private static final String WINDOWS_RESERVED_CHARS = "<>:\"|?*";
 
@@ -84,9 +84,6 @@ public abstract class MCRUploadHelper {
      *             if path contains reserved character
      */
     public static void checkPathName(String path, boolean checkFilePattern) throws MCRException {
-        if (path.contains("../") || path.contains("..\\")) {
-            throw new MCRException("File path " + path + " may not contain \"../\".");
-        }
         List<String> pathParts = splitPath(path).collect(Collectors.toList());
         pathParts.forEach(pathElement -> {
             checkNotEmpty(path, pathElement);

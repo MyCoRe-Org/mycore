@@ -46,9 +46,9 @@ public class MyCoReWebPageProviderTest extends MCRTestCase {
         assertEquals("text test", section2.getChild("p").getText());
         // only text
         Element section3 = wp.addSection("title3", "simple text", "uk");
-        assertEquals("simple text", section3.getText());
+        assertEquals("simple text", section3.getChild("p").getText());
         // multi tags
-        Element section4 = wp.addSection("title4", "<b>bold</b> <i>italic</i>", "at");
+        Element section4 = wp.addSection("title4", "<b>bold</b><i>italic</i>", "at");
         assertEquals(2, section4.getChildren().size());
         // check section count
         assertEquals(4, wp.getXML().getRootElement().getContentSize());

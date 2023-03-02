@@ -74,19 +74,33 @@ import org.mycore.frontend.fileupload.MCRUploadHelper;
 import com.google.common.collect.Sets;
 
 /**
+ * MyCoRe IFS2 FileSystemProvider implementation
+ * 
  * @author Thomas Scheffler (yagee)
  */
 public class MCRFileSystemProvider extends FileSystemProvider {
 
+    /**
+     * scheme part of the IFS file system URI
+     */
     public static final String SCHEME = "ifs2";
 
+    /**
+     * base URI of the IFS fiel system
+     */
     public static final URI FS_URI = URI.create(SCHEME + ":///");
 
     private static MCRAbstractFileSystem FILE_SYSTEM_INSTANCE;
 
+    /**
+     * set of supported copy options
+     */
     private static final Set<? extends CopyOption> SUPPORTED_COPY_OPTIONS = Collections.unmodifiableSet(EnumSet.of(
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING));
 
+    /**
+     * set of supported open options
+     */
     private static final Set<? extends OpenOption> SUPPORTED_OPEN_OPTIONS = EnumSet.of(StandardOpenOption.APPEND,
         StandardOpenOption.DSYNC, StandardOpenOption.READ, StandardOpenOption.SPARSE, StandardOpenOption.SYNC,
         StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
@@ -558,6 +572,9 @@ public class MCRFileSystemProvider extends FileSystemProvider {
         throw new UnsupportedOperationException("setAttributes is not implemented yet.");
     }
 
+    /**
+     * @return the MCRIFSFileSystem instance
+     */
     public static MCRIFSFileSystem getMCRIFSFileSystem() {
         return (MCRIFSFileSystem) (FILE_SYSTEM_INSTANCE == null ? MCRAbstractFileSystem.getInstance(SCHEME)
             : FILE_SYSTEM_INSTANCE);

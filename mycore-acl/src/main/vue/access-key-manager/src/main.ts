@@ -51,8 +51,8 @@ import {
   faAngleLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import MCRLocalePlugin from '@/plugins/MCRLocalePlugin';
-import AccessKeyManager from './App.vue';
 import { fetchDict, locale, webApplicationBaseURL } from '@/common/MCRUtils';
+import AccessKeyManager from './App.vue';
 
 Vue.config.productionTip = false;
 

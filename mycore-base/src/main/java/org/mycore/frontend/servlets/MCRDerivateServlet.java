@@ -29,6 +29,7 @@ import org.mycore.access.MCRAccessException;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.niofs.MCRPath;
@@ -37,6 +38,7 @@ import org.mycore.frontend.fileupload.MCRUploadHelper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.mycore.services.i18n.MCRTranslation;
 
 /**
  * @author Sebastian Hofmann; Silvio Hermann; Thomas Scheffler (yagee); Sebastian Röher
@@ -142,21 +144,21 @@ public class MCRDerivateServlet extends MCRServlet {
         }
     }
 
-    private void moveFile(String derivateId, String file, String target, HttpServletResponse response)
+    private void moveFile(String derivateIdStr, String file, String target, HttpServletResponse response)
         throws IOException {
-        if (!MCRAccessManager.checkPermission(derivateId, PERMISSION_DELETE)) {
+        if (!MCRAccessManager.checkPermission(derivateIdStr, PERMISSION_DELETE)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, String.format(Locale.ENGLISH,
-                "User has not the \"%s\" permission on object %s.", PERMISSION_DELETE, derivateId));
+                "User has not the \"%s\" permission on object %s.", PERMISSION_DELETE, derivateIdStr));
             return;
         }
 
-        if (!MCRAccessManager.checkPermission(derivateId, PERMISSION_WRITE)) {
+        if (!MCRAccessManager.checkPermission(derivateIdStr, PERMISSION_WRITE)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, String.format(Locale.ENGLISH,
-                "User has not the \"%s\" permission on object %s.", PERMISSION_WRITE, derivateId));
+                "User has not the \"%s\" permission on object %s.", PERMISSION_WRITE, derivateIdStr));
             return;
         }
-        MCRPath pathFrom = MCRPath.getPath(derivateId, file);
-        MCRPath pathTo = MCRPath.getPath(derivateId, target);
+        MCRPath pathFrom = MCRPath.getPath(derivateIdStr, file);
+        MCRPath pathTo = MCRPath.getPath(derivateIdStr, target);
 
         if (Files.exists(pathTo)) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format(Locale.ENGLISH,
@@ -170,16 +172,51 @@ public class MCRDerivateServlet extends MCRServlet {
             return;
         }
 
-        String newName = pathTo.getFileName().toString();
         try {
-            MCRUploadHelper.checkPathName(newName);
-        } catch (MCRException ex) {
-            String message = ex.getMessage();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            MCRUploadHelper.checkPathName(pathTo.getRoot().relativize(pathTo).toString(), true);
+        } catch (MCRException ex){
+            String translatedMessage = MCRTranslation.translate("IFS.invalid.fileName", pathTo.getOwnerRelativePath());
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, translatedMessage);
             return;
         }
 
-        Files.move(pathFrom, pathTo);
+        boolean updateMainFile = false;
+        MCRObjectID derivateId = MCRObjectID.getInstance(derivateIdStr);
+
+        // check if the main file is moved, need to be done before the move,
+        // because the main file gets lost after the move.
+        updateMainFile = isMainFileUpdateRequired(pathFrom, derivateId);
+
+        // this should always be a MCRPath, if not then ClassCastException is okay
+        MCRPath resultingFile = (MCRPath) Files.move(pathFrom, pathTo);
+
+        if (updateMainFile) {
+            setMainFile(derivateId, resultingFile);
+        }
     }
 
+    private void setMainFile(MCRObjectID derivateId, MCRPath resultingFile) {
+        // read derivate again, because it was changed by Files.move
+        // (The maindoc gets removed, because the file does not exist anymore)
+        MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
+        MCRMetaIFS internals = derivate.getDerivate().getInternals();
+        internals.setMainDoc(resultingFile.getOwnerRelativePath());
+        try {
+            MCRMetadataManager.update(derivate);
+        } catch (MCRAccessException e) {
+            throw new MCRException("Error while updating main file", e);
+        }
+    }
+
+    private boolean isMainFileUpdateRequired(MCRPath pathFrom, MCRObjectID derivateId) {
+        if (MCRMetadataManager.exists(derivateId)) {
+            MCRDerivate derivate = MCRMetadataManager.retrieveMCRDerivate(derivateId);
+            MCRMetaIFS internals = derivate.getDerivate().getInternals();
+            String mainDoc = internals.getMainDoc();
+
+            // the getOwnerRelativePath() method returns with a leading slash, but the mainDoc not.
+            return mainDoc!=null &&  mainDoc.equals(pathFrom.getOwnerRelativePath().substring(1));
+        }
+        return false;
+    }
 }

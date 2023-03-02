@@ -39,6 +39,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+/**
+ * IFS2 MyCoRe FileStore implementation
+ */
 public class MCRFileStore extends MCRAbstractFileStore {
 
     private MCRStore contentStore;
@@ -89,6 +92,12 @@ public class MCRFileStore extends MCRAbstractFileStore {
         }
     }
 
+    /**
+     * creates a new MCRFileStore instance
+     * @param node - the MyCoRe store node
+     * @return the MCRFileStore instance
+     * @throws IOException if the MCRFileStore could not be created
+     */
     public static MCRFileStore getInstance(MCRStoredNode node) throws IOException {
         return getInstance(node.getRoot().getStore().getID());
     }

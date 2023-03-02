@@ -26,6 +26,8 @@ import org.jaxen.JaxenException;
 import org.jdom2.JDOMException;
 import org.mycore.frontend.xeditor.MCRBinding;
 import org.mycore.frontend.xeditor.MCREditorSession;
+import org.w3c.dom.Attr;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
@@ -48,10 +50,23 @@ public class MCRXEditorValidator {
     }
 
     public void addRule(String baseXPath, Node ruleElement) {
+
+        NamedNodeMap attributes = ruleElement.getAttributes();
+        Attr enableReplacementNode = (Attr) attributes.getNamedItem("enable-replacements");
+        if (enableReplacementNode != null && enableReplacementNode.getValue().equals("true")) {
+            for (int i = 0, n = attributes.getLength(); i < n; i++) {
+                Attr attribute = (Attr) attributes.item(i);
+                String oldValue = attribute.getNodeValue();
+                String newValue = session.replaceParameters(oldValue);
+                attribute.setValue(newValue);
+            }
+        }
+
         addIfConfigured(new MCRRequiredValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMinLengthValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMaxLengthValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMatchesValidator(), baseXPath, ruleElement);
+        addIfConfigured(new MCRMatchesNotValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRXPathTestValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRDateValidator(), baseXPath, ruleElement);
         addIfConfigured(new MCRMinDateValidator(), baseXPath, ruleElement);

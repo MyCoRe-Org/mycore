@@ -52,6 +52,17 @@ public class MCRFileChannel extends FileChannel {
 
     private boolean create;
 
+    /**
+     * MyCoRe implementation of a Java NIO FileChannel
+     * 
+     * @param path - the MyCoRe path object
+     * @param file - the MyCoRe file object
+     * @param baseChannel - the base channel
+     * @param write - true, if the FileChannel is writeable
+     * @param create - true, if the FileChannel can create new files 
+     * 
+     * @see FileChannel
+     */
     public MCRFileChannel(MCRPath path, MCRFile file, FileChannel baseChannel, boolean write, boolean create) {
         this.path = path;
         this.file = file;

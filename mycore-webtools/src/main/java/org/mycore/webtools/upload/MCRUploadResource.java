@@ -38,6 +38,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.access.MCRAccessException;
@@ -290,21 +292,26 @@ public class MCRUploadResource {
 
     @GET
     @Path("{objectID}/{path:.+}")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response validateFile(@PathParam("path") String path,
         @PathParam("objectID") String objectID,
         @QueryParam("size") String size) {
         String actualStringFileName = Paths.get(path).getFileName().toString();
+        String translation;
+        translation = MCRTranslation.translate("IFS.invalid.fileName", actualStringFileName);
         try {
             MCRUploadHelper.checkPathName(actualStringFileName);
         } catch (MCRException e) {
-            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage()).build();
+            LOGGER.warn("Invalid file name: {} -> {}", actualStringFileName, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), translation)
+                    .entity(translation).build();
         }
 
         long sizeL = Long.parseLong(size);
         long maxSize = MCRConfiguration2.getOrThrow("MCR.FileUpload.MaxSize", Long::parseLong);
 
         if (sizeL > maxSize) {
-            String translation = MCRTranslation.translate("component.webtools.upload.invalid.fileSize",
+            translation = MCRTranslation.translate("component.webtools.upload.invalid.fileSize",
                 actualStringFileName, MCRUtils.getSizeFormatted(sizeL), MCRUtils.getSizeFormatted(maxSize));
             return Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
                 translation).entity(translation).build();

@@ -24,14 +24,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
-import org.mycore.common.MCRConstants;
 import org.mycore.pi.MCRPIRegistrationInfo;
 import org.mycore.pi.exceptions.MCRIdentifierUnresolvableException;
+import org.mycore.pi.urn.rest.MCRDNBURNRestClient;
+
+import com.google.gson.JsonElement;
 
 public class MCRURNUtils {
 
@@ -50,18 +47,18 @@ public class MCRURNUtils {
     }
 
     public static Date getDNBRegisterDate(String identifier) throws MCRIdentifierUnresolvableException,
-        ParseException {
-        Document document = MCRDNBPIDefProvider.get(identifier);
-        XPathExpression<Element> xp = XPathFactory.instance().compile(
-            ".//pidef:created[contains(../pidef:identifier, '" + identifier
-                + "')]",
-            Filters.element(), null, MCRConstants.PIDEF_NAMESPACE);
-        Element element = xp.evaluateFirst(document);
-        if (element == null) {
+            ParseException {
+
+        String date = MCRDNBURNRestClient.getRegistrationInfo(identifier)
+                .map(info -> info.get("created"))
+                .map(JsonElement::getAsString)
+                .orElse(null);
+
+        if (date == null) {
             return null;
         }
-
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.GERMAN).parse(element.getText());
+        
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.GERMAN).parse(date);
     }
 
 }

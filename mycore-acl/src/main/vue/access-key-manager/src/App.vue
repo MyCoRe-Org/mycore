@@ -168,7 +168,6 @@ import { Component, Vue } from 'vue-property-decorator';
 import MCRAccessKey from '@/common/MCRAccessKey';
 import MCRAccessKeyServicePlugin, { MCRAccessKeyInformation } from '@/plugins/MCRAccessKeyServicePlugin';
 import MCRException from '@/common/MCRException';
-import MCRAccessKeyEditModal from './components/MCRAccessKeyEditModal.vue';
 import {
   webApplicationBaseURL,
   objectID,
@@ -177,6 +176,7 @@ import {
   fetchJWT,
   isSessionEnabled,
 } from '@/common/MCRUtils';
+import MCRAccessKeyEditModal from './components/MCRAccessKeyEditModal.vue';
 
 @Component({
   components: {

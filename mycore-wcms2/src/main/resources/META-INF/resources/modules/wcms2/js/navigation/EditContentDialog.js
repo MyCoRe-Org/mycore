@@ -36,7 +36,6 @@ wcms.navigation.EditContentDialog = function() {
 	// ck editor
 	this.editorDiv = null;
 	this.editor = null;
-	this.canNotEdit = null;
 
 	// section
 	this.sectionSelect = null;
@@ -55,6 +54,7 @@ wcms.navigation.EditContentDialog = function() {
 	// internal dialogs
 	this.removeSectionDialog = null;
 	this.editSectionDialog = null;
+	this.shouldNotEditDialog = null;
 };
 
 ( function() {
@@ -90,6 +90,9 @@ wcms.navigation.EditContentDialog = function() {
 				"component.wcms.navigation.itemEditor.editContent.deleteSectionTitle",
 				"component.wcms.navigation.itemEditor.editContent.deleteSection");
 		this.editSectionDialog = new wcms.navigation.EditContentSectionDialog();
+		this.shouldNotEditDialog = new wcms.gui.SimpleDialog("Ok",
+			"component.wcms.general.warning",
+			"component.wcms.navigation.itemEditor.shouldNotEdit");
 
 		// change ok button text
 		this.okButton.i18n = "component.wcms.navigation.itemEditor.editContent.markChanges";
@@ -103,13 +106,11 @@ wcms.navigation.EditContentDialog = function() {
         	splitter: true,
         	gutters: false
         });
-        this.canNotEdit = new dijit.layout.ContentPane({region:"center",style: "border:none;padding:0px; display:none", content: ""});
-        
+
         leftBC.addChild(this.sectionSelect);
         leftBC.addChild(this.sectionToolbar);
 		bc.addChild(leftBC);
 		bc.addChild(this.editorDiv);
-		bc.addChild(this.canNotEdit);
 
 		// add toolbar items
         this.sectionToolbar.addChild(this.addSection);
@@ -192,56 +193,56 @@ wcms.navigation.EditContentDialog = function() {
 		wcms.gui.AbstractDialog.prototype.show.call(this);
 		// load content
 		this.href = href;
-		var loadContentFunc = dojo.hitch(this, loadContent);
+		let loadContentFunc = dojo.hitch(this, loadContent);
 		loadContentFunc(content);
-		
-		dojo.removeClass(this.editorDiv.id,"hidden");
-		dojo.removeClass(this.canNotEdit.id, "visible");
-		if(this.selectedSection == null || this.selectedSection.hidden == "true") {
-			dojo.addClass(this.editorDiv.id, "hidden");
-      var invalidText = I18nManager.getInstance().getI18nTextAsString("component.wcms.navigation.itemEditor.canNotEdit");
-      var canNotEditLabel = "<p>" + invalidText + " '" + this.selectedSection.invalidElement + "'</p>";
-      this.canNotEdit.set("content", canNotEditLabel);
-			dojo.addClass(this.canNotEdit.id, "visible");
+
+		if (this.selectedSection !== null && this.selectedSection.unknownHTMLTags !== null && this.selectedSection.unknownHTMLTags.length > 0) {
+			console.log(this.selectedSection.unknownHTMLTags);
+			this.shouldNotEditDialog.show();
 		}
 	}
 
 	function loadContent(/*JSON*/ webpageContent) {
 		this.webpageContent = dojo.clone(webpageContent);
 
-		var addOptionFunc = dojo.hitch(this, addOption);
+		let addOptionFunc = dojo.hitch(this, addOption);
 		// update section
 		this.sectionCount = 0;
-		for(var i = 0; i < this.webpageContent.length; i++) {
+		for(let i = 0; i < this.webpageContent.length; i++) {
 			this.webpageContent[i].id = this.sectionCount++;
 			addOptionFunc(this.webpageContent[i]);
 		}
 		// select option
-		if(this.sectionSelect.domNode.hasChildNodes())
-			dojo.attr(this.sectionSelect.domNode.firstChild,"selected", "selected");
+		if(this.sectionSelect.domNode.hasChildNodes()) {
+			dojo.attr(this.sectionSelect.domNode.firstChild, "selected", "selected");
+		}
 
 		// set current content
 		this.selectedSection = null;
-		if(this.webpageContent.length > 0)
+		if(this.webpageContent.length > 0) {
 			this.selectedSection = this.webpageContent[0];
+		}
 
 		// set ck editor content
-		var contentData = "";
-		if(this.selectedSection != null && this.selectedSection.data)
+		let contentData = "";
+		if(this.selectedSection != null && this.selectedSection.data) {
 			contentData = this.selectedSection.data;
+		}
 		// ck editor settings
-		var lang=I18nManager.getInstance().getLang();
-		var folderHref = this.href.substring(0, this.href.lastIndexOf("/"));
-		var context = window.location.pathname.substring(0, window.location.pathname.indexOf("/modules"));
+		let lang = I18nManager.getInstance().getLang();
+		let folderHref = this.href.substring(0, this.href.lastIndexOf("/"));
+		let context = window.location.pathname.substring(0, window.location.pathname.indexOf("/modules"));
 		this.editor = CKEDITOR.appendTo(this.editorDiv.domNode, {
 			toolbar : contentToolbar,
 			uiColor : '#9AB8F3',
 			language: lang,
 			height:"495px", width:"98%",
 			entities: false,
-			basicEntities: true,
 			allowedContent: true,
 			autoParagraph: false,
+			protectedSource: [
+				/<head[\s\S]*?head>/gi
+			],
 			filebrowserBrowseUrl: context + '/rsc/wcms2/filebrowser?href=' + folderHref + "&type=files" + "&basehref=" + context + folderHref + "/",
 			filebrowserUploadUrl: context + '/rsc/wcms2/filebrowser/upload?href=' + folderHref + "&type=files" + "&basehref=" + context + folderHref + "/",
 			filebrowserImageBrowseUrl: context + '/rsc/wcms2/filebrowser?href=' + folderHref + "&type=images",
@@ -268,25 +269,18 @@ wcms.navigation.EditContentDialog = function() {
 
 	function changeSection() {
 		// save old content data
-		if(this.selectedSection != null && this.selectedSection.hidden != "true")
+		if(this.selectedSection != null) {
 			this.selectedSection.data = this.editor.getData();
-		
+		}
 		// switch to new content
 		dojo.removeClass(this.editorDiv.id,"hidden");
-		dojo.removeClass(this.canNotEdit.id, "visible");
-		var id = this.sectionSelect.get("value")[0];
-		var content = this.getSectionById(id);
-		if(!content.data)
+		let id = this.sectionSelect.get("value")[0];
+		let content = this.getSectionById(id);
+		if(!content.data) {
 			content.data = "";
+		}
 		this.selectedSection = content;
-		
-		if(content.hidden != "true"){
-			this.editor.setData(content.data);
-		}
-		else{
-			dojo.addClass(this.editorDiv.id,"hidden");
-			dojo.addClass(this.canNotEdit.id, "visible");
-		}
+		this.editor.setData(content.data);
 	}
 
 	function getSectionById(/*int*/ id) {
@@ -404,14 +398,12 @@ wcms.navigation.EditContentDialog = function() {
 	 */
 	function onBeforeOk() {
 		// sort content array
-		var orderSectionsFunc = dojo.hitch(this, orderSections);
+		let orderSectionsFunc = dojo.hitch(this, orderSections);
 		orderSectionsFunc();
 		// save content data
-		if (this.selectedSection.hidden != "true"){
-			this.selectedSection.data = this.editor.getData();
-		}
+		this.selectedSection.data = this.editor.getData();
 		// remove internal id from content
-		for(var i = 0; i < this.webpageContent.length; i++) {
+		for(let i = 0; i < this.webpageContent.length; i++) {
 			delete(this.webpageContent[i].id);
 		}
 	}

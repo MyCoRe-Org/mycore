@@ -20,6 +20,27 @@
     <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name($nodes[1])))" />
     <xsl:param name="sep" select="''" />
     <xsl:param name="property" select="''" />
+    <xsl:param name="filter" select="'true'" />
+    <xsl:variable name="selectPresentLang">
+      <xsl:call-template name="selectPresentLang">
+        <xsl:with-param name="nodes" select="$nodes" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="filteredNodes" select="$nodes[not($filter='true') or (not(@xml:lang) or @xml:lang=$selectPresentLang)]"/>
+    <xsl:call-template name="printMetaDate.mods.filtered">
+      <xsl:with-param name="nodes" select="$filteredNodes"/>
+      <xsl:with-param name="label" select="$label"/>
+      <xsl:with-param name="sep" select="$sep"/>
+      <xsl:with-param name="property" select="$property"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="printMetaDate.mods.filtered">
+    <!-- prints a table row for a given nodeset -->
+    <xsl:param name="nodes" />
+    <xsl:param name="label" select="i18n:translate(concat('component.mods.metaData.dictionary.',local-name($nodes[1])))" />
+    <xsl:param name="sep" select="''" />
+    <xsl:param name="property" select="''" />
     <xsl:if test="$nodes">
       <tr>
         <td valign="top" class="metaname">
@@ -31,11 +52,6 @@
               <xsl:value-of select="$property" />
             </xsl:attribute>
           </xsl:if>
-          <xsl:variable name="selectPresentLang">
-            <xsl:call-template name="selectPresentLang">
-              <xsl:with-param name="nodes" select="$nodes" />
-            </xsl:call-template>
-          </xsl:variable>
           <xsl:for-each select="$nodes">
             <xsl:if test="position()!=1">
               <xsl:choose>
@@ -47,13 +63,11 @@
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:if>
-            <xsl:if test="not(@xml:lang) or @xml:lang=$selectPresentLang">
-              <xsl:call-template name="lf2br">
-                <xsl:with-param name="string" select="normalize-space(.)" />
-              </xsl:call-template>
-              <xsl:if test="@authority='gnd' and @valueURI">
-                <xsl:apply-templates select="." mode="gnd"/>
-              </xsl:if>
+            <xsl:call-template name="lf2br">
+              <xsl:with-param name="string" select="normalize-space(.)" />
+            </xsl:call-template>
+            <xsl:if test="@authority='gnd' and @valueURI">
+              <xsl:apply-templates select="." mode="gnd"/>
             </xsl:if>
           </xsl:for-each>
         </td>

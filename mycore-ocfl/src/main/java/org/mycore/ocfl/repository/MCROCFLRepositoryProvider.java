@@ -16,10 +16,11 @@
  * along with MyCoRe.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.mycore.ocfl;
+package org.mycore.ocfl.repository;
+
+import org.mycore.common.config.MCRConfiguration2;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
-import org.mycore.common.config.MCRConfiguration2;
 
 /**
  * Base Class to provide a {@link OcflRepository}. A {@link MCROCFLRepositoryProvider} will be loaded from the property

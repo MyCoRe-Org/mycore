@@ -68,7 +68,6 @@ import org.mycore.common.xsl.MCRErrorListener;
  * @author Ren\u00E9 Adler (eagle)
  * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
  */
-
 public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -94,6 +93,9 @@ public class MCRFoFormatterFOP implements MCRFoFormatterInterface {
         }
     };
 
+    /**
+     * instantiate MCRFoFormatterFOP
+     */
     public MCRFoFormatterFOP() {
         FopFactoryBuilder fopFactoryBuilder;
         // use restricted io to prevent issues with font caching on some systems
