@@ -173,19 +173,10 @@ public class MCRDerivateServlet extends MCRServlet {
         }
 
         try {
-            MCRUploadHelper.checkPathName(pathTo.getOwnerRelativePath(), true);
+            MCRUploadHelper.checkPathName(pathTo.getRoot().relativize(pathTo).toString(), true);
         } catch (MCRException ex){
             String translatedMessage = MCRTranslation.translate("IFS.invalid.fileName", pathTo.getOwnerRelativePath());
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, translatedMessage);
-            return;
-        }
-
-        String newName = pathTo.getFileName().toString();
-        try {
-            MCRUploadHelper.checkPathName(newName);
-        } catch (MCRException ex) {
-            String message = ex.getMessage();
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
 
