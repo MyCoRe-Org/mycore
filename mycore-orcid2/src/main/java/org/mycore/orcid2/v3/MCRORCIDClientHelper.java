@@ -79,6 +79,6 @@ public class MCRORCIDClientHelper {
      * @return MCRORCIDClientFactory
      */
     public static MCRORCIDClientFactory getClientFactory() {
-        return MCRORCIDClientFactory.getInstance("v3");
+        return MCRORCIDClientFactory.getInstance("V3");
     }
 }
