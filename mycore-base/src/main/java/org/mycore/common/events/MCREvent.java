@@ -35,12 +35,33 @@ public class MCREvent {
 
     /** Pre-defined event types * */
     public enum EventType {
-        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE
+        CREATE,
+        UPDATE,
+        DELETE,
+        REPAIR,
+        INDEX,
+        MOVE,
+        /** required for ThULB/dbt, do not use **/
+        INACTIVATE,
+        /** required for ThULB/dbt, do not use **/
+        REACTIVATE,
+        /** required for ThULB/dbt, do not use **/
+        OWNER_TRANSFER
     }
 
     /** Pre-defined event objects * */
     public enum ObjectType {
-        OBJECT("MCRObject"), DERIVATE("MCRDerivate"), CLASS("MCRClassification"), PATH("MCRPath"), USER("MCRUser");
+        OBJECT("MCRObject"),
+        DERIVATE("MCRDerivate"),
+        CLASS("MCRClassification"),
+        PATH("MCRPath"),
+        USER("MCRUser"),
+
+        /** required for ThULB/dbt, do not use **/
+        SLOT("slot"),
+
+        /** required for ThULB/dbt, do not use **/
+        ENTRY("entry");
 
         private String className;
 
