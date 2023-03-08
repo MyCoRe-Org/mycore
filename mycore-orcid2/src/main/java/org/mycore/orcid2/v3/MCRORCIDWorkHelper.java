@@ -24,7 +24,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import jakarta.ws.rs.core.Response;
 
@@ -210,7 +209,7 @@ public class MCRORCIDWorkHelper {
      */
     private static void updateWorkInfo(MCRObject object, MCRORCIDCredentials credentials,
         MCRORCIDPutCodeInfo workInfo) throws MCRORCIDException {
-        Stream<WorkSummary> summaries = null;
+        List<WorkSummary> summaries = null;
         try {
             Works works = null;
             if (credentials.getAccessToken() != null) {
@@ -221,7 +220,7 @@ public class MCRORCIDWorkHelper {
                 works = MCRORCIDClientHelper.getClientFactory().createReadClient()
                     .fetch(credentials.getORCID(), MCRORCIDSectionImpl.WORKS, Works.class);
             }
-            summaries = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream());
+            summaries = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
         } catch (MCRORCIDRequestException e) {
             throw new MCRORCIDException("Error during update", e);
         }

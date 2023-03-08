@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.v3;
 
+import java.util.function.Supplier;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,23 +116,24 @@ public class MCRORCIDWorkSummaryUtils {
     }
 
     /**
-     * Updates work info for MCRObject with Stream of matching WorkSummary as reference.
+     * Updates work info for MCRObject with List of matching WorkSummary as reference.
      * 
      * @param object the MCRObject
-     * @param summaries Stream of WorkSummary
+     * @param summaries List of WorkSummary
      * @param workInfo the initial work info
      */
-    protected static void updateWorkInfoFromSummaries(MCRObject object, Stream<WorkSummary> summaries,
+    protected static void updateWorkInfoFromSummaries(MCRObject object, List<WorkSummary> summaries,
         MCRORCIDPutCodeInfo workInfo) {
-        final Stream<WorkSummary> matchingWorks = findMatchingSummariesByIdentifiers(object, summaries);
+        final Supplier<Stream<WorkSummary>> matchingWorksSupplier
+            = () -> findMatchingSummariesByIdentifiers(object, summaries);
         long ownPutCode = workInfo.getOwnPutCode();
         // validate current own put code
         if (ownPutCode == 0 || !checkPutCodeExistsInSummaries(summaries, ownPutCode)) {
             // try to find own work via identifiers as fallback
-            workInfo.setOwnPutCode(getPutCodeCreatedByThisAppFromSummaries(matchingWorks));
+            workInfo.setOwnPutCode(getPutCodeCreatedByThisAppFromSummaries(matchingWorksSupplier.get()));
         }
         if (MCRORCIDMetadataUtils.SAVE_OTHER_PUT_CODES) { // optimization
-            workInfo.setOtherPutCodes(getPutCodesNotCreatedByThisAppFromSummaries(matchingWorks));
+            workInfo.setOtherPutCodes(getPutCodesNotCreatedByThisAppFromSummaries(matchingWorksSupplier.get()));
         } else {
             workInfo.setOtherPutCodes(null);
         }
@@ -148,8 +150,8 @@ public class MCRORCIDWorkSummaryUtils {
         return summaries.filter(s -> MCRORCIDUtils.isCreatedByThisApplication(s.retrieveSourcePath())).findFirst();
     }
 
-    private static boolean checkPutCodeExistsInSummaries(Stream<WorkSummary> works, long putCode) {
-        return works.filter(w -> w.getPutCode().equals(putCode)).findAny().isPresent();
+    private static boolean checkPutCodeExistsInSummaries(List<WorkSummary> works, long putCode) {
+        return works.stream().filter(w -> w.getPutCode().equals(putCode)).findAny().isPresent();
     }
 
     private static long[] getPutCodesNotCreatedByThisAppFromSummaries(Stream<WorkSummary> works) {
