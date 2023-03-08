@@ -20,6 +20,7 @@ package org.mycore.common.events;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -35,18 +36,7 @@ public class MCREvent {
 
     /** Pre-defined event types * */
     public enum EventType {
-        CREATE,
-        UPDATE,
-        DELETE,
-        REPAIR,
-        INDEX,
-        MOVE,
-        /** required for ThULB/dbt, do not use **/
-        INACTIVATE,
-        /** required for ThULB/dbt, do not use **/
-        REACTIVATE,
-        /** required for ThULB/dbt, do not use **/
-        OWNER_TRANSFER
+        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE, OTHER
     }
 
     /** Pre-defined event objects * */
@@ -56,12 +46,7 @@ public class MCREvent {
         CLASS("MCRClassification"),
         PATH("MCRPath"),
         USER("MCRUser"),
-
-        /** required for ThULB/dbt, do not use **/
-        SLOT("slot"),
-
-        /** required for ThULB/dbt, do not use **/
-        ENTRY("entry");
+        OTHER("other");
 
         private String className;
 
@@ -106,8 +91,12 @@ public class MCREvent {
     /** The object type like object or file * */
     private ObjectType objType;
 
+    private String otherObjectType;
+
     /** The event type like create, update or delete * */
     private EventType evtType;
+
+    private String otherEventType;
 
     /** A hashtable to store event related, additional data */
     private Hashtable<String, Object> data = new Hashtable<>();
@@ -117,8 +106,35 @@ public class MCREvent {
      * event type (create, update, delete)
      */
     public MCREvent(ObjectType objType, EventType evtType) {
+        this(true, objType, evtType);
+    }
+
+    private MCREvent(boolean check, ObjectType objType, EventType evtType) {
+        if (check && (objType == ObjectType.OTHER || evtType == EventType.OTHER)) {
+            throw new IllegalArgumentException("'OTHER' is not supported with this constructor");
+        }
         this.objType = objType;
         this.evtType = evtType;
+    }
+
+    private MCREvent(String otherObjectType, String otherEventType) {
+        this(false, ObjectType.OTHER, EventType.OTHER);
+        this.otherObjectType = Objects.requireNonNull(otherObjectType);
+        this.otherEventType = Objects.requireNonNull(otherEventType);
+    }
+
+    public static MCREvent customEvent(String otherObjectType, String otherEventType) {
+        return new MCREvent(otherObjectType, otherEventType);
+    }
+
+    public MCREvent(ObjectType objType, String otherEventType) {
+        this(false, objType, EventType.OTHER);
+        this.otherEventType = Objects.requireNonNull(otherEventType);
+    }
+
+    public MCREvent(String otherObjectType, EventType evtType) {
+        this(false, ObjectType.OTHER, evtType);
+        this.otherObjectType = Objects.requireNonNull(otherObjectType);
     }
 
     /**
@@ -131,12 +147,30 @@ public class MCREvent {
     }
 
     /**
+     * Returns the custom object type.
+     *
+     * @return null, if {@link #getObjectType()} != {@link ObjectType#OTHER}
+     */
+    public String getOtherObjectType() {
+        return otherObjectType;
+    }
+
+    /**
      * Returns the event type of this event
      * 
      * @return the event type of this event
      */
     public EventType getEventType() {
         return evtType;
+    }
+
+    /**
+     * Returns the custom event type.
+     *
+     * @return null, if {@link #getEventType()} != {@link EventType#OTHER}
+     */
+    public String getOtherEventType() {
+        return otherEventType;
     }
 
     /**
