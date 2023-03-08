@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.metadata;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -120,6 +121,23 @@ public class MCRORCIDMetadataUtils {
         final MCRORCIDFlagContent flagContent = Optional.ofNullable(getORCIDFlagContent(object))
             .orElseThrow(() -> new MCRORCIDException("Flag does not exist"));
         flagContent.updateUserInfoByORCID(orcid, userInfo);
+        setORCIDFlagContent(object, flagContent);
+    }
+
+    /**
+     * Removes all work infos excluding orcids
+     * 
+     * @param object the MCRObject
+     * @param orcids List of ORCID iDs
+     * @throws MCRORCIDException if clean up fails
+     */
+    public static void cleanUpWorkInfosExcludingORCIDs(MCRObject object, List<String> orcids) throws MCRORCIDException {
+        final MCRORCIDFlagContent flagContent = MCRORCIDMetadataUtils.getORCIDFlagContent(object);
+        flagContent.getUserInfos().forEach(i -> {
+            if (!orcids.contains(i.getORCID())) {
+                i.setWorkInfo(null);
+            }
+        });
         setORCIDFlagContent(object, flagContent);
     }
 

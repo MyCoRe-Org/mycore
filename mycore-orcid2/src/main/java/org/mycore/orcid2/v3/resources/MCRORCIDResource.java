@@ -151,7 +151,7 @@ public class MCRORCIDResource {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
         try {
-            MCRORCIDWorkHelper.publishObjectToORCID(object, credentials);
+            MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, credentials);
             return Response.ok().build();
         } catch (Exception e) {
             LOGGER.error("Error while publishing: ", e);

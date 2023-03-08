@@ -82,7 +82,7 @@ public class MCRORCIDWorkHelper {
      * @see #publishObjectToORCID(MCRObject, List<MCRORCIDCredentials>)
      *
      */
-    public static void publishObjectToORCID(MCRObject object, MCRORCIDCredentials credentials) {
+    public static void publishToORCIDAndUpdateWorkInfo(MCRObject object, MCRORCIDCredentials credentials) {
         publishObjectToORCID(object, List.of(credentials));
     }
 
@@ -99,17 +99,31 @@ public class MCRORCIDWorkHelper {
      * 
      * @param object the MCRObject
      * @param credentialsList List of MCRORCIDCredentials
-     * @throws MCRORCIDException if there is a general error
+     * @throws MCRORCIDException if work transformation fails or cannot update flags
      * @see MCRORCIDUtils#getTrustedIdentifiers
      */
-    public static void publishObjectToORCID(MCRObject object, List<MCRORCIDCredentials> credentialsList)
+    public static void publishToORCIDAndUpdateWorkInfo(MCRObject object, List<MCRORCIDCredentials> credentialsList)
         throws MCRORCIDException {
-        Work work = null;
-        try {
-            work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
-        } catch (MCRORCIDTransformationException e) {
-            throw new MCRORCIDException("Cannot publish object", e);
+        final List<String> orcids = credentialsList.stream().map(MCRORCIDCredentials::getORCID).toList();
+        MCRORCIDMetadataUtils.cleanUpWorkInfosExcludingORCIDs(object, orcids);
+        if (!credentialsList.isEmpty()) {
+            try {
+                publishObjectToORCID(object, credentialsList);
+            } catch (MCRORCIDTransformationException e) {
+                throw new MCRORCIDException("Cannot publish object", e);
+            }
         }
+        // collect put codes for work without credentials
+        if (MCRORCIDMetadataUtils.SAVE_OTHER_PUT_CODES && COLLECT_EXTERNAL_PUT_CODES) {
+            final Set<String> matchingORCIDs = Set.copyOf(getMatchingORCIDs(object));
+            matchingORCIDs.removeAll(credentialsList.stream().map(MCRORCIDCredentials::getORCID).toList());
+            collectAndSaveOtherPutCodes(List.copyOf(matchingORCIDs), object);
+        }
+    }
+
+    private static void publishObjectToORCID(MCRObject object, List<MCRORCIDCredentials> credentialsList)
+        throws MCRORCIDTransformationException {
+        final Work work = MCRORCIDWorkTransformerHelper.transformContent(new MCRJDOMContent(object.createXML()));
         final List<String> failedORCIDs = new ArrayList<>();
         for (MCRORCIDCredentials credentials : credentialsList) {
             final String orcid = credentials.getORCID();
@@ -135,14 +149,11 @@ public class MCRORCIDWorkHelper {
                 LOGGER.warn("Could not publish {} to ORCID profile: {}.", object.getId(), orcid, e);
             }
         }
-        // collect put codes for work without credentials
+        final List<String> successfullORCIDs = credentialsList.stream().map(MCRORCIDCredentials::getORCID)
+            .filter(o -> !failedORCIDs.contains(o)).toList();
+        MCRORCIDMetadataUtils.cleanUpWorkInfosExcludingORCIDs(object, successfullORCIDs);
         if (MCRORCIDMetadataUtils.SAVE_OTHER_PUT_CODES) {
             collectAndSaveOtherPutCodes(failedORCIDs, object);
-            if (COLLECT_EXTERNAL_PUT_CODES) {
-                final Set<String> matchingORCIDs = Set.copyOf(getMatchingORCIDs(object));
-                matchingORCIDs.removeAll(credentialsList.stream().map(MCRORCIDCredentials::getORCID).toList());
-                collectAndSaveOtherPutCodes(List.copyOf(matchingORCIDs), object);
-            }
         }
     }
 
@@ -293,7 +304,7 @@ public class MCRORCIDWorkHelper {
         return query;
     }
 
-    private static void collectAndSaveOtherPutCodes(List<String> orcids, MCRObject object) throws MCRORCIDException {
+    private static void collectAndSaveOtherPutCodes(List<String> orcids, MCRObject object) {
         orcids.forEach(orcid -> {
             try {
                 final MCRORCIDUserInfo userInfo

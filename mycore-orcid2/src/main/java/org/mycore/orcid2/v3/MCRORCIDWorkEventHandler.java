@@ -30,6 +30,6 @@ public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEven
 
     @Override
     protected void publishObject(MCRObject object, List<MCRORCIDCredentials> credentials) throws Exception {
-        MCRORCIDWorkHelper.publishObjectToORCID(object, credentials);
+        MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, credentials);
     }
 }
