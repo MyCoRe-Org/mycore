@@ -312,6 +312,11 @@ public class MCRORCIDWorkHelper {
                         .orElseGet(() -> new MCRORCIDUserInfo(orcid));
                 final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo(); // no clone necessary
                 retrieveWorkInfo(object, orcid, userInfo);
+                if (userInfo.getWorkInfo().getOwnPutCode() != 0) {
+                    final long ownPutCode = userInfo.getWorkInfo().getOwnPutCode();
+                    userInfo.getWorkInfo().addOtherPutCode(ownPutCode);
+                    userInfo.getWorkInfo().setOwnPutCode(0);
+                }
                 if (!Objects.equals(currentWorkInfo, userInfo.getWorkInfo())) {
                     MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
                 }

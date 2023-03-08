@@ -108,6 +108,21 @@ public class MCRORCIDPutCodeInfo {
         this.otherPutCodes = putCodes;
     }
 
+    /**
+     * Adds put code to other put codes.
+     * 
+     * @param putCode put code
+     */
+    public void addOtherPutCode(long putCode) {
+        if (otherPutCodes == null) {
+            otherPutCodes = new long[1];
+            otherPutCodes[0] = putCode;
+        } else {
+            otherPutCodes = Arrays.copyOf(otherPutCodes, otherPutCodes.length + 1);
+            otherPutCodes[otherPutCodes.length - 1] = putCode;
+        }
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(ownPutCode, otherPutCodes);
