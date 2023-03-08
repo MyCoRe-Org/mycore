@@ -106,36 +106,57 @@ public class MCREvent {
      * event type (create, update, delete)
      */
     public MCREvent(ObjectType objType, EventType evtType) {
-        this(true, objType, evtType);
+        checkNonCustomObjectType(objType);
+        checkNonCustomEventType(evtType);
+        initTypes(objType, evtType);
     }
 
-    private MCREvent(boolean check, ObjectType objType, EventType evtType) {
-        if (check && (objType == ObjectType.CUSTOM || evtType == EventType.CUSTOM)) {
-            throw new IllegalArgumentException("'CUSTOM' is not supported with this constructor");
-        }
+    private void initTypes(ObjectType objType, EventType evtType) {
         this.objType = objType;
         this.evtType = evtType;
     }
 
+    private static void checkNonCustomObjectType(ObjectType objType) {
+        if (objType == ObjectType.CUSTOM) {
+            throw new IllegalArgumentException("'CUSTOM' is not a supported object type here.");
+        }
+    }
+
+    private static void checkNonCustomEventType(EventType evtType) {
+        if (evtType == EventType.CUSTOM) {
+            throw new IllegalArgumentException("'CUSTOM' is not a supported event type here.");
+        }
+    }
+
     private MCREvent(String customObjectType, String customEventType) {
-        this(false, ObjectType.CUSTOM, EventType.CUSTOM);
+        initTypes(ObjectType.CUSTOM, EventType.CUSTOM);
         this.customObjectType = Objects.requireNonNull(customObjectType);
         this.customEventType = Objects.requireNonNull(customEventType);
+    }
+    private MCREvent(ObjectType objType, String customEventType) {
+        checkNonCustomObjectType(objType);
+        initTypes(objType, EventType.CUSTOM);
+        this.customEventType = Objects.requireNonNull(customEventType);
+    }
+
+    private MCREvent(String customObjectType, EventType evtType) {
+        checkNonCustomEventType(evtType);
+        initTypes(ObjectType.CUSTOM, evtType);
+        this.customObjectType = Objects.requireNonNull(customObjectType);
     }
 
     public static MCREvent customEvent(String otherObjectType, String otherEventType) {
         return new MCREvent(otherObjectType, otherEventType);
     }
 
-    public MCREvent(ObjectType objType, String customEventType) {
-        this(false, objType, EventType.CUSTOM);
-        this.customEventType = Objects.requireNonNull(customEventType);
+    public static MCREvent customEvent(ObjectType objType, String otherEventType) {
+        return new MCREvent(objType, otherEventType);
     }
 
-    public MCREvent(String customObjectType, EventType evtType) {
-        this(false, ObjectType.CUSTOM, evtType);
-        this.customObjectType = Objects.requireNonNull(customObjectType);
+    public static MCREvent customEvent(String otherObjectType, EventType evtType) {
+        return new MCREvent(otherObjectType, evtType);
     }
+
 
     /**
      * Returns the object type of this event
