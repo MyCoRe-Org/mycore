@@ -119,7 +119,7 @@ public class MCRORCIDMetadataUtils {
     public static void updateUserInfoByORCID(MCRObject object, String orcid, MCRORCIDUserInfo userInfo)
         throws MCRORCIDException {
         final MCRORCIDFlagContent flagContent = Optional.ofNullable(getORCIDFlagContent(object))
-            .orElseThrow(() -> new MCRORCIDException("Flag does not exist"));
+            .orElse(new MCRORCIDFlagContent());
         flagContent.updateUserInfoByORCID(orcid, userInfo);
         setORCIDFlagContent(object, flagContent);
     }
