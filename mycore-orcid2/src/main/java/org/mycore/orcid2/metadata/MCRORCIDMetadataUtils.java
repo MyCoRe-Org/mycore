@@ -132,7 +132,11 @@ public class MCRORCIDMetadataUtils {
      * @throws MCRORCIDException if clean up fails
      */
     public static void cleanUpWorkInfosExcludingORCIDs(MCRObject object, List<String> orcids) throws MCRORCIDException {
-        final MCRORCIDFlagContent flagContent = MCRORCIDMetadataUtils.getORCIDFlagContent(object);
+        final MCRORCIDFlagContent flagContent = getORCIDFlagContent(object);
+        // nothing to clean up
+        if (flagContent == null) {
+            return;
+        }
         flagContent.getUserInfos().forEach(i -> {
             if (!orcids.contains(i.getORCID())) {
                 i.setWorkInfo(null);
