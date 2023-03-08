@@ -36,7 +36,7 @@ public class MCREvent {
 
     /** Pre-defined event types * */
     public enum EventType {
-        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE, OTHER
+        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE, CUSTOM
     }
 
     /** Pre-defined event objects * */
@@ -46,7 +46,7 @@ public class MCREvent {
         CLASS("MCRClassification"),
         PATH("MCRPath"),
         USER("MCRUser"),
-        OTHER("other");
+        CUSTOM("MCREvent");
 
         private String className;
 
@@ -91,12 +91,12 @@ public class MCREvent {
     /** The object type like object or file * */
     private ObjectType objType;
 
-    private String otherObjectType;
+    private String customObjectType;
 
     /** The event type like create, update or delete * */
     private EventType evtType;
 
-    private String otherEventType;
+    private String customEventType;
 
     /** A hashtable to store event related, additional data */
     private Hashtable<String, Object> data = new Hashtable<>();
@@ -110,31 +110,31 @@ public class MCREvent {
     }
 
     private MCREvent(boolean check, ObjectType objType, EventType evtType) {
-        if (check && (objType == ObjectType.OTHER || evtType == EventType.OTHER)) {
-            throw new IllegalArgumentException("'OTHER' is not supported with this constructor");
+        if (check && (objType == ObjectType.CUSTOM || evtType == EventType.CUSTOM)) {
+            throw new IllegalArgumentException("'CUSTOM' is not supported with this constructor");
         }
         this.objType = objType;
         this.evtType = evtType;
     }
 
-    private MCREvent(String otherObjectType, String otherEventType) {
-        this(false, ObjectType.OTHER, EventType.OTHER);
-        this.otherObjectType = Objects.requireNonNull(otherObjectType);
-        this.otherEventType = Objects.requireNonNull(otherEventType);
+    private MCREvent(String customObjectType, String customEventType) {
+        this(false, ObjectType.CUSTOM, EventType.CUSTOM);
+        this.customObjectType = Objects.requireNonNull(customObjectType);
+        this.customEventType = Objects.requireNonNull(customEventType);
     }
 
     public static MCREvent customEvent(String otherObjectType, String otherEventType) {
         return new MCREvent(otherObjectType, otherEventType);
     }
 
-    public MCREvent(ObjectType objType, String otherEventType) {
-        this(false, objType, EventType.OTHER);
-        this.otherEventType = Objects.requireNonNull(otherEventType);
+    public MCREvent(ObjectType objType, String customEventType) {
+        this(false, objType, EventType.CUSTOM);
+        this.customEventType = Objects.requireNonNull(customEventType);
     }
 
-    public MCREvent(String otherObjectType, EventType evtType) {
-        this(false, ObjectType.OTHER, evtType);
-        this.otherObjectType = Objects.requireNonNull(otherObjectType);
+    public MCREvent(String customObjectType, EventType evtType) {
+        this(false, ObjectType.CUSTOM, evtType);
+        this.customObjectType = Objects.requireNonNull(customObjectType);
     }
 
     /**
@@ -149,10 +149,10 @@ public class MCREvent {
     /**
      * Returns the custom object type.
      *
-     * @return null, if {@link #getObjectType()} != {@link ObjectType#OTHER}
+     * @return null, if {@link #getObjectType()} != {@link ObjectType#CUSTOM}
      */
-    public String getOtherObjectType() {
-        return otherObjectType;
+    public String getCustomObjectType() {
+        return customObjectType;
     }
 
     /**
@@ -167,10 +167,10 @@ public class MCREvent {
     /**
      * Returns the custom event type.
      *
-     * @return null, if {@link #getEventType()} != {@link EventType#OTHER}
+     * @return null, if {@link #getEventType()} != {@link EventType#CUSTOM}
      */
-    public String getOtherEventType() {
-        return otherEventType;
+    public String getCustomEventType() {
+        return customEventType;
     }
 
     /**
