@@ -96,7 +96,7 @@ public class MCRORCIDClientHelper {
         builder.append(String.format(Locale.ROOT, "response code: %d\n", error.getResponseCode()));
         builder.append(String.format(Locale.ROOT, "developer message: %s\n", error.getDeveloperMessage()));
         builder.append(String.format(Locale.ROOT, "user message: %s\n", error.getUserMessage()));
-        builder.append(String.format(Locale.ROOT, "error code: %s\n", error.getErrorCode()));
+        builder.append(String.format(Locale.ROOT, "error code: %s", error.getErrorCode()));
         return builder.toString();
     }
 

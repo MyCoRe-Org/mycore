@@ -258,6 +258,7 @@ public class MCRORCIDWorkHelper {
                             memberClient.fetch(MCRORCIDSectionImpl.WORK, Work.class, ownPutCode);
                         // check if update is required
                         if (!MCRORCIDWorkUtils.checkWorkEquality(work, remoteWork)) {
+                            work.setPutCode(ownPutCode);
                             memberClient.update(MCRORCIDSectionImpl.WORK, ownPutCode, work);
                         }
                     }
