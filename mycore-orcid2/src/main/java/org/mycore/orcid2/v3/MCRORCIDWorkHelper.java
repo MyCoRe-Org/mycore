@@ -140,8 +140,7 @@ public class MCRORCIDWorkHelper {
                     // optimization
                     return;
                 }
-                final long putCode = publishWork(work, credentials, userInfo.getWorkInfo());
-                userInfo.getWorkInfo().setOwnPutCode(putCode);
+                publishWork(work, credentials, userInfo.getWorkInfo());
                 MCRORCIDMetadataUtils.updateUserInfoByORCID(object, orcid, userInfo);
             } catch (Exception e) {
                 failedORCIDs.add(orcid);
@@ -241,14 +240,14 @@ public class MCRORCIDWorkHelper {
      * @throws MCRORCIDException if scope is invalid
      * @throws MCRORCIDRequestException if publishing fails
      */
-    private static long publishWork(Work work, MCRORCIDCredentials credentials, MCRORCIDPutCodeInfo workInfo)
+    private static void publishWork(Work work, MCRORCIDCredentials credentials, MCRORCIDPutCodeInfo workInfo)
         throws IllegalArgumentException, MCRORCIDRequestException, MCRORCIDException {
         final Optional<String> scope = Optional.ofNullable(credentials.getScope());
         if (scope.isPresent() && !scope.get().contains(ScopeConstants.ACTIVITIES_UPDATE)) {
             throw new MCRORCIDException("The scope is invalid");
         }
         final MCRORCIDUserClient memberClient = MCRORCIDClientHelper.getClientFactory().createUserClient(credentials);
-        final long ownPutCode = workInfo.getOwnPutCode();
+        long ownPutCode = workInfo.getOwnPutCode();
         final long[] otherPutCodes = workInfo.getOtherPutCodes();
         // matching work should exists in profile
         if (ownPutCode > 0 || (otherPutCodes != null && otherPutCodes.length > 0)) {
@@ -262,7 +261,7 @@ public class MCRORCIDWorkHelper {
                             memberClient.update(MCRORCIDSectionImpl.WORK, ownPutCode, work);
                         }
                     }
-                    return ownPutCode;
+                    return;
                 } catch (MCRORCIDRequestException e) {
                     // skip 404
                     if (Objects.equals(e.getErrorResponse().getStatus(), Response.Status.NOT_FOUND)) {
@@ -272,9 +271,14 @@ public class MCRORCIDWorkHelper {
                     }
                 }
             }
-            return ALWAYS_CREATE_OWN_WORK ? memberClient.create(MCRORCIDSectionImpl.WORK, work) : 0;
+            if (ALWAYS_CREATE_OWN_WORK) {
+                ownPutCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
+                workInfo.setOwnPutCode(ownPutCode);
+            }
+            return;
         }
-        return memberClient.create(MCRORCIDSectionImpl.WORK, work);
+        ownPutCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
+        workInfo.setOwnPutCode(ownPutCode);
     }
 
     private static List<String> getMatchingORCIDs(MCRObject object) throws MCRORCIDException {
