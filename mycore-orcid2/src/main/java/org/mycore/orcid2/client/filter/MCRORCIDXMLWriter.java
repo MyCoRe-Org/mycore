@@ -49,7 +49,7 @@ public class MCRORCIDXMLWriter implements MessageBodyWriter<Object> {
     public void writeTo(Object object, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
         MultivaluedMap<String, Object> httpHeaders, OutputStream out) throws IOException, WebApplicationException {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(type);
+            final JAXBContext jaxbContext = JAXBContext.newInstance(type);
             jaxbContext.createMarshaller().marshal(object, out);
         } catch (JAXBException e) {
             throw new ProcessingException("Error while deserializing object.", e);

@@ -21,6 +21,7 @@ package org.mycore.orcid2.client;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.ws.rs.client.Client;
@@ -59,7 +60,7 @@ abstract class MCRORCIDBaseClient {
         final Client client = ClientBuilder.newClient();
         client.register(new MCRORCIDXMLReader<Object>());
         client.register(new MCRORCIDXMLWriter());
-        Optional.of(token).ifPresent(t -> client.register(new MCRORCIDAuthenticationFilter(t)));
+        Optional.ofNullable(token).ifPresent(t -> client.register(new MCRORCIDAuthenticationFilter(t)));
         this.baseTarget = client.target(restURL.endsWith("/") ? restURL : restURL + "/");
     }
 
@@ -94,7 +95,7 @@ abstract class MCRORCIDBaseClient {
         final String putCodeString = (putCodes == null || putCodes.length == 0) ? "" : StringUtils.join(putCodes, ',');
         final Response response
             = fetch(String.format(Locale.ROOT, "%s/%s/%s", orcid, section.getPath(), putCodeString));
-        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }
         return response.readEntity(valueType); // may ProcessingException

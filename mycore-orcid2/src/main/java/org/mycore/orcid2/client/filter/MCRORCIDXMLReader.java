@@ -50,7 +50,7 @@ public class MCRORCIDXMLReader<T> implements MessageBodyReader<T> {
         MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
         throws IOException, WebApplicationException {
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(type);
+            final JAXBContext jaxbContext = JAXBContext.newInstance(type);
             return type.cast(jaxbContext.createUnmarshaller().unmarshal(entityStream));
         } catch (JAXBException e) {
             throw new ProcessingException("Error while serializing object.", e);

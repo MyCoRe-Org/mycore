@@ -102,7 +102,7 @@ public class MCRORCIDOAuthClient {
         form.param("code", code);
         form.param("redirect_uri", redirectURI);
         final Response response = webTarget.path("token").request().post(Entity.form(form));
-        if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
+        if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }
         return response.readEntity(MCRORCIDCredentials.class);
