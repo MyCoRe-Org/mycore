@@ -66,14 +66,16 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
      * @throws MCRORCIDTransformationException if transformation to orcid model fails
      */
     private void handlePublication(MCRObject object) {
+        LOGGER.info("Start publishing {} to ORCID.", object.getId());
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
         final List<MCRORCIDCredentials> credentials = listOrcidCredentials(object);
         try {
             publishObject(object, credentials);
+            LOGGER.info("Finished publishing {} to ORCID.", object.getId());
         } catch (Exception e) {
-            LOGGER.warn(e);
+            LOGGER.warn("Error while publishing {} to ORCID:", object.getId(), e);
         }
     }
 

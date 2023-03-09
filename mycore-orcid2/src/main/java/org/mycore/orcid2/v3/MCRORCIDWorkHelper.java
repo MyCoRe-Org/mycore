@@ -130,7 +130,7 @@ public class MCRORCIDWorkHelper {
                 final MCRORCIDUserInfo userInfo
                     = Optional.ofNullable(MCRORCIDMetadataUtils.getUserInfoByORCID(object, orcid))
                         .orElseGet(() -> new MCRORCIDUserInfo(orcid));
-                final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo(); // no clone necessary
+                final MCRORCIDPutCodeInfo currentWorkInfo = userInfo.getWorkInfo();
                 retrieveWorkInfo(object, credentials, userInfo);
                 if (!Objects.equals(currentWorkInfo, userInfo.getWorkInfo())) {
                     // save is safe ;)
@@ -260,6 +260,11 @@ public class MCRORCIDWorkHelper {
                         if (!MCRORCIDWorkUtils.checkWorkEquality(work, remoteWork)) {
                             work.setPutCode(ownPutCode);
                             memberClient.update(MCRORCIDSectionImpl.WORK, ownPutCode, work);
+                            LOGGER.info("Updated work of user {} with put code {}.",
+                                credentials.getORCID(), ownPutCode);
+                        } else {
+                          LOGGER.info("Update of work of user {} with put code {} not required.",
+                              credentials.getORCID(), ownPutCode);
                         }
                     }
                     return;
@@ -276,12 +281,14 @@ public class MCRORCIDWorkHelper {
             ownPutCode = 0;
             if (ALWAYS_CREATE_OWN_WORK) {
                 ownPutCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
+                LOGGER.info("Created work of user {} with put code {}.", credentials.getORCID(), ownPutCode);
             }
             workInfo.setOwnPutCode(ownPutCode);
-            return;
+        } else {
+            ownPutCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
+            LOGGER.info("Created work of user {} with put code {}.", credentials.getORCID(), ownPutCode);
+            workInfo.setOwnPutCode(ownPutCode);
         }
-        ownPutCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
-        workInfo.setOwnPutCode(ownPutCode);
     }
 
     private static List<String> getMatchingORCIDs(MCRObject object) throws MCRORCIDException {
