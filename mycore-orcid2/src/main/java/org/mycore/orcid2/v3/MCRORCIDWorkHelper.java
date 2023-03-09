@@ -271,10 +271,12 @@ public class MCRORCIDWorkHelper {
                     }
                 }
             }
+            // clean up own put code
+            ownPutCode = 0;
             if (ALWAYS_CREATE_OWN_WORK) {
                 ownPutCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
-                workInfo.setOwnPutCode(ownPutCode);
             }
+            workInfo.setOwnPutCode(ownPutCode);
             return;
         }
         ownPutCode = memberClient.create(MCRORCIDSectionImpl.WORK, work);
