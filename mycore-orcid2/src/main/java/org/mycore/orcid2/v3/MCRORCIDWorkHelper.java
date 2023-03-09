@@ -19,6 +19,7 @@
 package org.mycore.orcid2.v3;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -114,7 +115,7 @@ public class MCRORCIDWorkHelper {
         }
         // collect put codes for work without credentials
         if (MCRORCIDMetadataUtils.SAVE_OTHER_PUT_CODES && COLLECT_EXTERNAL_PUT_CODES) {
-            final Set<String> matchingORCIDs = Set.copyOf(getMatchingORCIDs(object));
+            final Set<String> matchingORCIDs = new HashSet<>(getMatchingORCIDs(object));
             matchingORCIDs.removeAll(credentialsList.stream().map(MCRORCIDCredentials::getORCID).toList());
             collectAndSaveOtherPutCodes(List.copyOf(matchingORCIDs), object);
         }
