@@ -21,6 +21,7 @@ package org.mycore.orcid2.client;
 import java.net.URI;
 import java.util.Locale;
 
+import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
@@ -57,7 +58,7 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
 
     @Override
     public long create(MCRORCIDSection section, Object object) throws MCRORCIDRequestException {
-        final Response response = write(section.getPath(), "post", object);
+        final Response response = write(section.getPath(), HttpMethod.POST, object);
         if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
             handleError(response);
         }
@@ -66,7 +67,8 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
 
     @Override
     public void update(MCRORCIDSection section, long putCode, Object object) throws MCRORCIDRequestException {
-        final Response response = write(String.format(Locale.ROOT, "%s/%d", section.getPath(), putCode), "put", object);
+        final Response response = write(String.format(Locale.ROOT, "%s/%d", section.getPath(), putCode),
+            HttpMethod.PUT, object);
         if (!Response.Status.Family.SUCCESSFUL.equals(response.getStatusInfo().getFamily())) {
             handleError(response);
         }
