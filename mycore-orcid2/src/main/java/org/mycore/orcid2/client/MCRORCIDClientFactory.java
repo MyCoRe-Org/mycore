@@ -108,14 +108,23 @@ public class MCRORCIDClientFactory {
      * @throws MCRORCIDException if client is not in member mode
      */
     public MCRORCIDUserClient createUserClient(MCRORCIDCredentials credentials) throws MCRORCIDException {
-        if (Objects.equals(mode, ReadClientMode.MEMBER)) {
+        if (checkMemberMode()) {
             return new MCRORCIDUserClientImpl(memberAPI, credentials);
         }
         throw new MCRORCIDException("Client is not in member mode");
     }
 
+    /**
+     * Checks if api is in member mode.
+     * 
+     * @return true if member mode is enabled
+     */
+    public boolean checkMemberMode() {
+        return Objects.equals(mode, ReadClientMode.MEMBER);
+    }
+
     private MCRORCIDReadClient initReadClient() throws MCRORCIDException {
-        if (Objects.equals(mode, ReadClientMode.MEMBER)) {
+        if (checkMemberMode()) {
             if (READ_PUBLIC_TOKEN == null) {
                 throw new MCRORCIDException("MCR.ORCID2.ReadPublicToken is not set");
             }

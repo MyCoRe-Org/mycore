@@ -54,25 +54,25 @@ public class MCRORCIDClientHelper {
      */
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
         long... putCodes) throws MCRORCIDRequestException {
-        final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
-        if (credentials != null) {
-            try {
-                return getClientFactory().createUserClient(credentials).fetch(section, valueType, putCodes);
-            } catch (MCRORCIDRequestException e) {
-                final Response response = e.getErrorResponse();
-                if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
-                    LOGGER.info(
-                        "Request with credentials for orcid {} has failed with status code {}."
-                            + " Token has probably expired.",
-                        orcid, response.getStatus());
-                    return getClientFactory().createReadClient().fetch(orcid, section, valueType, putCodes);
-                } else {
-                    throw e;
+        if (getClientFactory().checkMemberMode()) {
+            final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
+            if (credentials != null) {
+                try {
+                    return getClientFactory().createUserClient(credentials).fetch(section, valueType, putCodes);
+                } catch (MCRORCIDRequestException e) {
+                    final Response response = e.getErrorResponse();
+                    if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
+                        LOGGER.info(
+                            "Request with credentials for orcid {} has failed with status code {}."
+                                + " Token has probably expired. Trying to use read client as fallback...",
+                            orcid, response.getStatus());
+                    } else {
+                        throw e;
+                    }
                 }
             }
-        } else {
-            return getClientFactory().createReadClient().fetch(orcid, section, valueType, putCodes);
         }
+        return getClientFactory().createReadClient().fetch(orcid, section, valueType, putCodes);
     }
 
     /**
