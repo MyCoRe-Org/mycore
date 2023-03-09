@@ -21,6 +21,7 @@ package org.mycore.orcid2.metadata;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Represents model for ORCID flag content.
@@ -89,7 +90,7 @@ public class MCRORCIDFlagContent {
      * @param orcid the ORCID iD
      */
     public void removeUserInfoByORCID(String orcid) {
-        userInfos = userInfos.stream().filter(c -> !c.getORCID().equals(orcid)).toList();
+        userInfos = userInfos.stream().filter(c -> !c.getORCID().equals(orcid)).collect(Collectors.toList());
     }
 
     @Override
