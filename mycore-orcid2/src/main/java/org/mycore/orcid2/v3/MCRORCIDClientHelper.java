@@ -18,6 +18,7 @@
 
 package org.mycore.orcid2.v3;
 
+import java.util.Locale;
 import java.util.Objects;
 
 import jakarta.ws.rs.core.Response;
@@ -28,6 +29,7 @@ import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.client.MCRORCIDClientFactory;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
 import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.orcid.jaxb.model.v3.release.error.OrcidError;
 
 /**
  * Provides utilty methods for v3 client.
@@ -71,6 +73,31 @@ public class MCRORCIDClientHelper {
         } else {
             return getClientFactory().createReadClient().fetch(orcid, section, valueType, putCodes);
         }
+    }
+
+    /**
+     * Returns OrcidError from MCRORCIDRequestException.
+     * 
+     * @param exception the MCRORICDException
+     * @return OrcidError
+     */
+    public static OrcidError getORCIDErrorFromException(MCRORCIDRequestException exception) {
+        return exception.getErrorResponse().readEntity(OrcidError.class);
+    }
+
+    /**
+     * Returns debug string for OrcidError.
+     * 
+     * @param error the OrcidError
+     * @return the debug message
+     */
+    public static String createDebugMessageFromORCIDError(OrcidError error) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(String.format(Locale.ROOT, "response code: %d\n", error.getResponseCode()));
+        builder.append(String.format(Locale.ROOT, "developer message: %s\n", error.getDeveloperMessage()));
+        builder.append(String.format(Locale.ROOT, "user message: %s\n", error.getUserMessage()));
+        builder.append(String.format(Locale.ROOT, "error code: %s\n", error.getErrorCode()));
+        return builder.toString();
     }
 
     /**
