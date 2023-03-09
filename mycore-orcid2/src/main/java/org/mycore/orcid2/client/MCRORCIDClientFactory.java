@@ -57,11 +57,11 @@ public class MCRORCIDClientFactory {
         final String prefix = CONFIG_PREFIX + version;
         publicAPI = MCRConfiguration2.getStringOrThrow(prefix + ".PublicAPI");
         memberAPI = MCRConfiguration2.getStringOrThrow(prefix + ".MemberAPI");
-        final String modeString = MCRConfiguration2.getStringOrThrow(prefix + ".ReadClientMode");
+        final String modeString = MCRConfiguration2.getStringOrThrow(prefix + ".APIMode");
         try {
             mode = ReadClientMode.valueOf(modeString.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            throw new MCRConfigurationException("Unknown .ReadClientMode: " + modeString);
+            throw new MCRConfigurationException("Unknown APIMode: " + modeString);
         }
     }
 
