@@ -23,12 +23,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
+import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
 import org.orcid.jaxb.model.v3.release.record.Work;
@@ -86,9 +89,22 @@ public class MCRORCIDWorkUtils {
             !Objects.equals(localWork.getUrl(), remoteWork.getUrl()) ||
             !Objects.equals(localWork.getJournalTitle(), remoteWork.getJournalTitle()) ||
             !Objects.equals(localWork.getLanguageCode(), remoteWork.getLanguageCode()) ||
-            !Objects.equals(localWork.getCountry(), remoteWork.getCountry()) ||
-            !Objects.equals(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers())) {
+            !Objects.equals(localWork.getCountry(), remoteWork.getCountry())) {
             return false;
+        }
+        if (!Objects.equals(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers())) {
+            if (localWork.getExternalIdentifiers() == null || remoteWork.getExternalIdentifiers() == null) {
+                return false;
+            } else {
+                Set<MCRIdentifier> localIds = localWork.getExternalIdentifiers().getExternalIdentifier().stream()
+                    .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
+                Set<MCRIdentifier> remoteIds = remoteWork.getExternalIdentifiers().getExternalIdentifier().stream()
+                    .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
+                if(!localIds.containsAll(remoteIds) || !remoteIds.containsAll(localIds)
+                        || localIds.size() != remoteIds.size()) {
+                    return false;
+                }
+            }
         }
         if (!Objects.equals(localWork.getWorkContributors(), remoteWork.getWorkContributors())) {
             if (localWork.getWorkContributors() == null || remoteWork.getWorkContributors() == null) {
@@ -105,12 +121,25 @@ public class MCRORCIDWorkUtils {
                     final Contributor cl = itl.next();
                     final Contributor cr = itr.next();
                     if (!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
-                        cl.getContributorOrcid() == null &&
-                            !Objects.equals(cl.getCreditName(), cr.getCreditName())
-                        ||
-                        !Objects.equals(cl.getContributorEmail(), cr.getContributorEmail()) ||
-                        !Objects.equals(cl.getContributorAttributes(), cr.getContributorAttributes())) {
+                        cl.getContributorOrcid() == null && !Objects.equals(cl.getCreditName(), cr.getCreditName()) ||
+                        !Objects.equals(cl.getContributorEmail(), cr.getContributorEmail()) /*||
+                            The comparision of ContributorAttributes is currently broken in the ORCID model and the
+                            following test will currently always be true.
+                        !Objects.equals(cl.getContributorAttributes(), cr.getContributorAttributes())*/) {
                         return false;
+                    }
+                    /* Workaround for above mentioned issue in ORCID model */
+                    if (!Objects.equals(cl.getContributorAttributes(), cr.getContributorAttributes())) {
+                        if (cl.getContributorAttributes() == null || cr.getContributorAttributes() == null) {
+                            return false;
+                        } else {
+                            if (!Objects.equals(cl.getContributorAttributes().getContributorSequence(),
+                                    cr.getContributorAttributes().getContributorSequence()) ||
+                                !Objects.equals(cl.getContributorAttributes().getContributorRole(),
+                                    cr.getContributorAttributes().getContributorRole())) {
+                                return false;
+                            }
+                        }
                     }
                 }
             }
