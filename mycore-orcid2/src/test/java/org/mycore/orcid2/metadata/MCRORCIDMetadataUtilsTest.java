@@ -95,7 +95,7 @@ public class MCRORCIDMetadataUtilsTest extends MCRTestCase {
         final MCRObject object = new MCRObject();
         final MCRORCIDFlagContent flagContent = new MCRORCIDFlagContent();
         MCRORCIDMetadataUtils.doSetORCIDFlagContent(object, flagContent);
-        MCRORCIDMetadataUtils.doRemoveORCIDFlag(object);
+        MCRORCIDMetadataUtils.removeORCIDFlag(object);
         assertEquals(object.getService().getFlags("MyCoRe-ORCID").size(), 0);
     }
 }

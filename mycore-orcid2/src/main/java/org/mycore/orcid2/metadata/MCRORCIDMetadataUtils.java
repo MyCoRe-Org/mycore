@@ -25,10 +25,8 @@ import java.util.Optional;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.datamodel.metadata.MCRMetadataManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.exception.MCRORCIDException;
@@ -75,8 +73,7 @@ public class MCRORCIDMetadataUtils {
     public static void setORCIDFlagContent(MCRObject object, MCRORCIDFlagContent flagContent) throws MCRORCIDException {
         try {
             doSetORCIDFlagContent(object, flagContent);
-            MCRMetadataManager.update(object);
-        } catch (MCRAccessException | MCRPersistenceException e) {
+        } catch (MCRPersistenceException e) {
             throw new MCRORCIDException("Could not update list of object " + object.getId(), e);
         }
     }
@@ -88,12 +85,7 @@ public class MCRORCIDMetadataUtils {
      * @throws MCRORCIDException if cannot remove flag
      */
     public static void removeORCIDFlag(MCRObject object) throws MCRORCIDException {
-        doRemoveORCIDFlag(object);
-        try {
-            MCRMetadataManager.update(object);
-        } catch (Exception e) {
-            throw new MCRORCIDException("Could remove list of object " + object.getId(), e);
-        }
+        object.getService().removeFlags(ORCID_FLAG);
     }
 
     /**
@@ -143,15 +135,6 @@ public class MCRORCIDMetadataUtils {
             }
         });
         setORCIDFlagContent(object, flagContent);
-    }
-
-    /**
-     * Removes ORCID flag from MCRObject.
-     * 
-     * @param object the MCRObject
-     */
-    protected static void doRemoveORCIDFlag(MCRObject object) throws MCRORCIDException {
-        object.getService().removeFlags(ORCID_FLAG);
     }
 
     /**
