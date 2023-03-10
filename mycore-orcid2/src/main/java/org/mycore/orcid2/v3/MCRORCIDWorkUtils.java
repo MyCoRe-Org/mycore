@@ -34,7 +34,10 @@ import org.mycore.orcid2.exception.MCRORCIDTransformationException;
 import org.mycore.orcid2.util.MCRIdentifier;
 import org.mycore.orcid2.v3.transformer.MCRORCIDWorkTransformerHelper;
 import org.orcid.jaxb.model.v3.release.common.Contributor;
+import org.orcid.jaxb.model.v3.release.common.ContributorAttributes;
+import org.orcid.jaxb.model.v3.release.record.ExternalIDs;
 import org.orcid.jaxb.model.v3.release.record.Work;
+import org.orcid.jaxb.model.v3.release.record.WorkContributors;
 import org.xml.sax.SAXException;
 
 /**
@@ -81,66 +84,91 @@ public class MCRORCIDWorkUtils {
      * @return true if localWork equals remoteWork
      */
     public static boolean checkWorkEquality(Work localWork, Work remoteWork) {
-        if (!Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle()) ||
-            !Objects.equals(localWork.getShortDescription(), remoteWork.getShortDescription()) ||
-            !Objects.equals(localWork.getWorkCitation(), remoteWork.getWorkCitation()) ||
-            !Objects.equals(localWork.getWorkType(), remoteWork.getWorkType()) ||
-            !Objects.equals(localWork.getPublicationDate(), remoteWork.getPublicationDate()) ||
-            !Objects.equals(localWork.getUrl(), remoteWork.getUrl()) ||
-            !Objects.equals(localWork.getJournalTitle(), remoteWork.getJournalTitle()) ||
-            !Objects.equals(localWork.getLanguageCode(), remoteWork.getLanguageCode()) ||
-            !Objects.equals(localWork.getCountry(), remoteWork.getCountry())) {
-            return false;
-        }
-        if (!Objects.equals(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers())) {
-            if (localWork.getExternalIdentifiers() == null || remoteWork.getExternalIdentifiers() == null) {
+        return Objects.equals(localWork.getWorkTitle(), remoteWork.getWorkTitle()) &&
+            Objects.equals(localWork.getShortDescription(), remoteWork.getShortDescription()) &&
+            Objects.equals(localWork.getWorkCitation(), remoteWork.getWorkCitation()) &&
+            Objects.equals(localWork.getWorkType(), remoteWork.getWorkType()) &&
+            Objects.equals(localWork.getPublicationDate(), remoteWork.getPublicationDate()) &&
+            Objects.equals(localWork.getUrl(), remoteWork.getUrl()) &&
+            Objects.equals(localWork.getJournalTitle(), remoteWork.getJournalTitle()) &&
+            Objects.equals(localWork.getLanguageCode(), remoteWork.getLanguageCode()) &&
+            Objects.equals(localWork.getCountry(), remoteWork.getCountry()) &&
+            equalExternalIdentifiers(localWork.getExternalIdentifiers(), remoteWork.getExternalIdentifiers()) &&
+            equalWorkContributors(localWork.getWorkContributors(), remoteWork.getWorkContributors());
+    }
+
+    /**
+     * Compares two ExternalIDs.
+     *
+     * @param a First ExternalIDs
+     * @param b Second ExternalIDs
+     * @return true if both are regarded equal
+     */
+    private static boolean equalExternalIdentifiers(ExternalIDs a, ExternalIDs b) {
+        if (!Objects.equals(a, b)) {
+            if (a == null || b == null) {
                 return false;
             } else {
-                Set<MCRIdentifier> localIds = localWork.getExternalIdentifiers().getExternalIdentifier().stream()
+                Set<MCRIdentifier> aIds = a.getExternalIdentifier().stream()
                     .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
-                Set<MCRIdentifier> remoteIds = remoteWork.getExternalIdentifiers().getExternalIdentifier().stream()
+                Set<MCRIdentifier> bIds = b.getExternalIdentifier().stream()
                     .map(i -> new MCRIdentifier(i.getType(), i.getValue())).collect(Collectors.toSet());
-                if(!localIds.containsAll(remoteIds) || !remoteIds.containsAll(localIds)
-                        || localIds.size() != remoteIds.size()) {
+                if(!Objects.equals(aIds, bIds)) {
                     return false;
                 }
             }
         }
-        if (!Objects.equals(localWork.getWorkContributors(), remoteWork.getWorkContributors())) {
-            if (localWork.getWorkContributors() == null || remoteWork.getWorkContributors() == null) {
+        return true;
+    }
+
+    /**
+     * Compares two WorkContributors.
+     *
+     * @param a First WorkContributors
+     * @param b Second WorkContributors
+     * @return true if both are regarded equal
+     */
+    private static boolean equalWorkContributors(WorkContributors a, WorkContributors b) {
+        if (!Objects.equals(a, b)) {
+            if (a == null || b == null) {
                 return false;
             } else {
-                final List<Contributor> localContributor = localWork.getWorkContributors().getContributor();
-                final List<Contributor> remoteContributor = remoteWork.getWorkContributors().getContributor();
-                if (localContributor.size() != remoteContributor.size()) {
+                final List<Contributor> aContributor = a.getContributor();
+                final List<Contributor> bContributor = b.getContributor();
+                if (aContributor.size() != bContributor.size()) {
                     return false;
                 }
-                final Iterator<Contributor> itl = localContributor.iterator();
-                final Iterator<Contributor> itr = remoteContributor.iterator();
+                final Iterator<Contributor> itl = aContributor.iterator();
+                final Iterator<Contributor> itr = bContributor.iterator();
                 while (itl.hasNext()) {
-                    final Contributor cl = itl.next();
-                    final Contributor cr = itr.next();
-                    if (!Objects.equals(cl.getContributorOrcid(), cr.getContributorOrcid()) ||
-                        cl.getContributorOrcid() == null && !Objects.equals(cl.getCreditName(), cr.getCreditName()) ||
-                        !Objects.equals(cl.getContributorEmail(), cr.getContributorEmail()) /*||
-                            The comparision of ContributorAttributes is currently broken in the ORCID model and the
-                            following test will currently always be true.
-                        !Objects.equals(cl.getContributorAttributes(), cr.getContributorAttributes())*/) {
+                    final Contributor ca = itl.next();
+                    final Contributor cb = itr.next();
+                    /* The comparision of ContributorAttributes is currently broken in the ORCID model
+                     * (https://github.com/ORCID/orcid-model/issues/46) and the Object.equals() test will currently
+                     * always be true. Once the issue has been fixed equalContributorAttributes() can be replaced
+                     * by Object.equals() */
+                    if (!Objects.equals(ca.getContributorOrcid(), cb.getContributorOrcid()) ||
+                        ca.getContributorOrcid() == null && cb.getContributorOrcid() == null &&
+                        !Objects.equals(ca.getCreditName(), cb.getCreditName()) ||
+                        !Objects.equals(ca.getContributorEmail(), cb.getContributorEmail()) ||
+                        !equalContributorAttributes(ca.getContributorAttributes(), cb.getContributorAttributes())) {
                         return false;
                     }
-                    /* Workaround for above mentioned issue in ORCID model */
-                    if (!Objects.equals(cl.getContributorAttributes(), cr.getContributorAttributes())) {
-                        if (cl.getContributorAttributes() == null || cr.getContributorAttributes() == null) {
-                            return false;
-                        } else {
-                            if (!Objects.equals(cl.getContributorAttributes().getContributorSequence(),
-                                    cr.getContributorAttributes().getContributorSequence()) ||
-                                !Objects.equals(cl.getContributorAttributes().getContributorRole(),
-                                    cr.getContributorAttributes().getContributorRole())) {
-                                return false;
-                            }
-                        }
-                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /* Temporary Workaround for issue in ORCID model (https://github.com/ORCID/orcid-model/issues/46) */
+    private static boolean equalContributorAttributes(ContributorAttributes a, ContributorAttributes b) {
+        if (!Objects.equals(a, b)) {
+            if (a == null || b == null) {
+                return false;
+            } else {
+                if (!Objects.equals(a.getContributorSequence(), b.getContributorSequence()) ||
+                    !Objects.equals(a.getContributorRole(), b.getContributorRole())) {
+                    return false;
                 }
             }
         }
