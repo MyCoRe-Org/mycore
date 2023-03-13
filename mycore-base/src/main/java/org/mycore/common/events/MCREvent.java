@@ -20,6 +20,7 @@ package org.mycore.common.events;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -35,12 +36,17 @@ public class MCREvent {
 
     /** Pre-defined event types * */
     public enum EventType {
-        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE
+        CREATE, UPDATE, DELETE, REPAIR, INDEX, MOVE, CUSTOM
     }
 
     /** Pre-defined event objects * */
     public enum ObjectType {
-        OBJECT("MCRObject"), DERIVATE("MCRDerivate"), CLASS("MCRClassification"), PATH("MCRPath"), USER("MCRUser");
+        OBJECT("MCRObject"),
+        DERIVATE("MCRDerivate"),
+        CLASS("MCRClassification"),
+        PATH("MCRPath"),
+        USER("MCRUser"),
+        CUSTOM("MCREvent");
 
         private String className;
 
@@ -85,8 +91,12 @@ public class MCREvent {
     /** The object type like object or file * */
     private ObjectType objType;
 
+    private String customObjectType;
+
     /** The event type like create, update or delete * */
     private EventType evtType;
+
+    private String customEventType;
 
     /** A hashtable to store event related, additional data */
     private Hashtable<String, Object> data = new Hashtable<>();
@@ -96,9 +106,57 @@ public class MCREvent {
      * event type (create, update, delete)
      */
     public MCREvent(ObjectType objType, EventType evtType) {
+        checkNonCustomObjectType(objType);
+        checkNonCustomEventType(evtType);
+        initTypes(objType, evtType);
+    }
+
+    private void initTypes(ObjectType objType, EventType evtType) {
         this.objType = objType;
         this.evtType = evtType;
     }
+
+    private static void checkNonCustomObjectType(ObjectType objType) {
+        if (objType == ObjectType.CUSTOM) {
+            throw new IllegalArgumentException("'CUSTOM' is not a supported object type here.");
+        }
+    }
+
+    private static void checkNonCustomEventType(EventType evtType) {
+        if (evtType == EventType.CUSTOM) {
+            throw new IllegalArgumentException("'CUSTOM' is not a supported event type here.");
+        }
+    }
+
+    private MCREvent(String customObjectType, String customEventType) {
+        initTypes(ObjectType.CUSTOM, EventType.CUSTOM);
+        this.customObjectType = Objects.requireNonNull(customObjectType);
+        this.customEventType = Objects.requireNonNull(customEventType);
+    }
+    private MCREvent(ObjectType objType, String customEventType) {
+        checkNonCustomObjectType(objType);
+        initTypes(objType, EventType.CUSTOM);
+        this.customEventType = Objects.requireNonNull(customEventType);
+    }
+
+    private MCREvent(String customObjectType, EventType evtType) {
+        checkNonCustomEventType(evtType);
+        initTypes(ObjectType.CUSTOM, evtType);
+        this.customObjectType = Objects.requireNonNull(customObjectType);
+    }
+
+    public static MCREvent customEvent(String otherObjectType, String otherEventType) {
+        return new MCREvent(otherObjectType, otherEventType);
+    }
+
+    public static MCREvent customEvent(ObjectType objType, String otherEventType) {
+        return new MCREvent(objType, otherEventType);
+    }
+
+    public static MCREvent customEvent(String otherObjectType, EventType evtType) {
+        return new MCREvent(otherObjectType, evtType);
+    }
+
 
     /**
      * Returns the object type of this event
@@ -110,12 +168,30 @@ public class MCREvent {
     }
 
     /**
+     * Returns the custom object type.
+     *
+     * @return null, if {@link #getObjectType()} != {@link ObjectType#CUSTOM}
+     */
+    public String getCustomObjectType() {
+        return customObjectType;
+    }
+
+    /**
      * Returns the event type of this event
      * 
      * @return the event type of this event
      */
     public EventType getEventType() {
         return evtType;
+    }
+
+    /**
+     * Returns the custom event type.
+     *
+     * @return null, if {@link #getEventType()} != {@link EventType#CUSTOM}
+     */
+    public String getCustomEventType() {
+        return customEventType;
     }
 
     /**
