@@ -32,6 +32,7 @@ import org.mycore.common.content.MCRJAXBContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.content.transformer.MCRContentTransformerFactory;
+import org.mycore.common.xml.MCRXMLParserFactory;
 import org.mycore.mods.merger.MCRMergeTool;
 import org.mycore.orcid2.MCRORCIDTransformerHelper;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
@@ -74,8 +75,9 @@ public class MCRORCIDWorkTransformerHelper {
      */
     public static Work transformContent(MCRContent content) throws MCRORCIDTransformationException {
         try {
-            return unmarshalWork(T_MODS_WORK.transform(content));
-        } catch (IOException e) {
+            return unmarshalWork(new MCRJDOMContent(MCRXMLParserFactory.getValidatingParser()
+				    .parseXML(T_MODS_WORK.transform(content))));
+        } catch (IOException | SAXException e) {
             throw new MCRORCIDTransformationException(e);
         }
     }
