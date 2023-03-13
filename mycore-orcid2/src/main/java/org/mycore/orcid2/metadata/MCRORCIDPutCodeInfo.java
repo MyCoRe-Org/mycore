@@ -125,7 +125,7 @@ public class MCRORCIDPutCodeInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(ownPutCode, otherPutCodes);
+        return Objects.hash(ownPutCode, Arrays.hashCode(otherPutCodes));
     }
 
     @Override
@@ -140,6 +140,6 @@ public class MCRORCIDPutCodeInfo {
             return false;
         }
         MCRORCIDPutCodeInfo other = (MCRORCIDPutCodeInfo) obj;
-        return Objects.equals(ownPutCode, other.ownPutCode) && Arrays.equals(otherPutCodes, other.otherPutCodes);
+        return (ownPutCode == other.ownPutCode) && Arrays.equals(otherPutCodes, other.otherPutCodes);
     }
 }
