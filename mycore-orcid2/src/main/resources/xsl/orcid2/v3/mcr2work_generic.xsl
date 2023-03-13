@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xsl:stylesheet version="1.0" xmlns="http://www.w3.org/TR/REC-html40" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0"
+  xmlns="http://www.w3.org/TR/REC-html40"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:work="http://www.orcid.org/ns/work"
+  xmlns:common="http://www.orcid.org/ns/common">
 
   <xsl:param name="MCR.ORCID2.Works.SourceURL" />
 
@@ -217,7 +222,7 @@
   </xsl:template>
 
   <xsl:template name="contributorAttributes">
-    <xsl:if test="mods:role/mods:roleTerm[@type='code']" />
+    <xsl:if test="mods:role/mods:roleTerm[@type='code']">
       <work:contributor-attributes>
         <xsl:apply-templates select="mods:role/mods:roleTerm" />
       </work:contributor-attributes>

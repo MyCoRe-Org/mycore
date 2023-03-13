@@ -9,7 +9,7 @@
   xmlns:common="http://www.orcid.org/ns/common"
   exclude-result-prefixes="xsl mods">
 
-  <xsl:import href="xsl/orcid2/v3/mcr2work_generic.xsl" />
+  <xsl:import href="resource:xsl/orcid2/v3/mcr2work_generic.xsl" />
 
   <xsl:template name="workType">
     <work:type>journal-article</work:type> <!-- TODO -->
