@@ -36,6 +36,7 @@ import org.mycore.common.content.MCRStreamContent;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.common.MCRXMLClassificationManager;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
+import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 import org.xml.sax.SAXException;
@@ -104,6 +105,10 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
     }
 
     public void delete(MCRCategoryID mcrid) throws IOException {
+        if (MCROCFLDeleteUtils.checkPurgeClass(mcrid)) {
+            purge(mcrid);
+            return;
+        }
         String ocflObjectID = getOCFLObjectID(mcrid);
         VersionInfo versionInfo = buildVersionInfo(MESSAGE_DELETED, new Date());
         try {
@@ -112,6 +117,10 @@ public class MCROCFLXMLClassificationManager implements MCRXMLClassificationMana
         } catch (NotFoundException | ObjectOutOfSyncException e) {
             throw new IOException(e);
         }
+    }
+
+    public void purge(MCRCategoryID mcrid) {
+        getRepository().purgeObject(getOCFLObjectID(mcrid));
     }
 
     /**

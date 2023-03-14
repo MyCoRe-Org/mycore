@@ -49,6 +49,7 @@ import org.mycore.datamodel.common.MCRXMLMetadataManagerAdapter;
 import org.mycore.datamodel.ifs2.MCRObjectIDDateImpl;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
+import org.mycore.ocfl.util.MCROCFLDeleteUtils;
 import org.mycore.ocfl.util.MCROCFLMetadataVersion;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 import org.xml.sax.SAXException;
@@ -136,6 +137,14 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
     }
 
     public void delete(MCRObjectID mcrid, Date date, String user) throws MCRPersistenceException {
+        String prefix = "derivate".equals(mcrid.getTypeId()) ? MCROCFLObjectIDPrefixHelper.MCRDERIVATE
+            : MCROCFLObjectIDPrefixHelper.MCROBJECT;
+
+        if (MCROCFLDeleteUtils.checkPurgeObject(mcrid, prefix)) {
+            purge(mcrid, date, user);
+            return;
+        }
+
         String ocflObjectID = getOCFLObjectID(mcrid);
         if (!exists(mcrid)) {
             throw new MCRUsageException("Cannot delete nonexistent object '" + ocflObjectID + "'");
@@ -149,6 +158,16 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
         repo.updateObject(ObjectVersionId.head(ocflObjectID), buildVersionInfo(MESSAGE_DELETED, date, null), init -> {
             init.removeFile(buildFilePath(mcrid));
         });
+    }
+
+    public void purge(MCRObjectID mcrid, Date date, String user) {
+        String ocflObjectID = getOCFLObjectID(mcrid);
+        if (!getRepository().containsObject(ocflObjectID)) {
+            throw new MCRUsageException("Cannot delete nonexistent object '" + ocflObjectID + "'");
+        }
+
+        OcflRepository repo = getRepository();
+        repo.purgeObject(ocflObjectID);
     }
 
     @Override
@@ -231,7 +250,7 @@ public class MCROCFLXMLMetadataManager implements MCRXMLMetadataManagerAdapter {
 
         try (InputStream storedContentStream = storeObject.getFile(buildFilePath(mcrid)).getStream()) {
             Document xml = new MCRStreamContent(storedContentStream).asXML();
-            xml.getRootElement().setAttribute("rev", revision);
+            xml.getRootElement().setAttribute("rev", revision); // bugfix: MCR-2510, PR #1373
             return new MCRJDOMContent(xml);
         } catch (JDOMException | SAXException e) {
             throw new IOException("Can not parse XML from OCFL-Store", e);

@@ -19,28 +19,40 @@
 package org.mycore.ocfl.commands;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jdom2.JDOMException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.content.MCRContent;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
+import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRAbstractMetadataVersion;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.ocfl.MCROCFLPersistenceTransaction;
 import org.mycore.ocfl.classification.MCROCFLXMLClassificationManager;
 import org.mycore.ocfl.metadata.MCROCFLMigration;
+import org.mycore.ocfl.metadata.MCROCFLXMLMetadataManager;
 import org.mycore.ocfl.repository.MCROCFLRepositoryProvider;
 import org.mycore.ocfl.user.MCROCFLXMLUserManager;
 import org.mycore.ocfl.util.MCROCFLObjectIDPrefixHelper;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
+import org.xml.sax.SAXException;
 
 import edu.wisc.library.ocfl.api.OcflRepository;
 
@@ -57,6 +69,8 @@ public class MCROCFLCommands {
 
     public static final String FAILED_AND_NOW_INVALID_STATE = FAILED + " and now invalid state";
 
+    private static boolean confirmPurgeMarked = false;
+
     @MCRCommand(syntax = "migrate metadata to repository {0}",
         help = "migrates all the metadata to the ocfl " +
             "repository with the id {0}")
@@ -71,7 +85,7 @@ public class MCROCFLCommands {
         ArrayList<String> withoutHistory = migration.getWithoutHistory();
 
         LOGGER.info("The migration resulted in \n" +
-            SUCCESS + ": {}, \n" +
+            SUCCESS + ": {} \n" +
             FAILED + ": {} \n" +
             FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
             SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n",
@@ -81,7 +95,7 @@ public class MCROCFLCommands {
             String.join(", ", withoutHistory));
 
         LOGGER.info("The migration resulted in \n" +
-            SUCCESS + ": {}, \n" +
+            SUCCESS + ": {} \n" +
             FAILED + ": {} \n" +
             FAILED_AND_NOW_INVALID_STATE + ": {} \n" +
             SUCCESS_BUT_WITHOUT_HISTORY + ": {} \n",
@@ -175,6 +189,172 @@ public class MCROCFLCommands {
     public static void writeUserToDb(String userId) throws IOException {
         MCRUser user = new MCROCFLXMLUserManager().retrieveContent(userId, null);
         MCRUserManager.updateUser(user);
+    }
+
+    @MCRCommand(syntax = "restore classification {0} from ocfl with version {1}",
+        help = "restore a specified revision of a ocfl classification backup to the primary classification store")
+    public static void writeClassToDbVersioned(String classId, String revision)
+        throws URISyntaxException, JDOMException, IOException, SAXException {
+        MCROCFLXMLClassificationManager manager = MCRConfiguration2
+            .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager").orElseThrow();
+        MCRCategoryID cId = MCRCategoryID.fromString(classId);
+        MCRContent content = manager.retrieveContent(cId, revision);
+        MCRCategory category = MCRXMLTransformer.getCategory(content.asXML());
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        if (dao.exist(category.getId())) {
+            dao.replaceCategory(category);
+        } else {
+            // add if classification does not exist
+            dao.addCategory(null, category);
+        }
+    }
+
+    @MCRCommand(syntax = "restore classification {0} from ocfl",
+        help = "restore the latest revision of a ocfl classification backup to the primary classification store")
+    public static void writeClassToDb(String classId)
+        throws URISyntaxException, JDOMException, IOException, SAXException {
+        writeClassToDbVersioned(classId, null);
+    }
+
+    @MCRCommand(syntax = "restore object {0} from ocfl with version {1}",
+    help = "restore mcrobject {0} with version {1} to current store from ocfl history")
+    public static void restoreObjFromOCFLVersioned(String mcridString, String revision) throws IOException {
+        MCRObjectID mcrid = MCRObjectID.getInstance(mcridString);
+        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
+        manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
+        MCRContent content = manager.retrieveContent(mcrid, revision);
+        try {
+            MCRXMLMetadataManager.instance().update(mcrid, content, new Date(content.lastModified()));
+        } catch (MCRUsageException e) {
+            MCRXMLMetadataManager.instance().create(mcrid, content, new Date(content.lastModified()));
+        }
+    }
+
+    @MCRCommand(syntax = "restore object {0} from ocfl",
+        help = "restore latest mcrobject {0} to current store from ocfl history")
+    public static void restoreObjFromOCFL(String mcridString) throws IOException {
+        restoreObjFromOCFLVersioned(mcridString, null);
+    }
+    
+    @MCRCommand(syntax = "purge object {0} from ocfl",
+        help = "Permanently delete object {0} and its history from ocfl")
+    public static void purgeObject(String mcridString) throws IOException {
+        MCRObjectID mcrid = MCRObjectID.getInstance(mcridString);
+        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
+        manager.setRepositoryKey(MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository"));
+        manager.purge(mcrid, new Date(), MCRUserManager.getCurrentUser().getUserName());
+    }
+
+    @MCRCommand(syntax = "purge classification {0} from ocfl",
+        help = "Permanently delete classification {0} and its history from ocfl")
+    public static void purgeClass(String mcrCgIdString) throws IOException {
+        MCRCategoryID mcrCgId = MCRCategoryID.fromString(mcrCgIdString);
+        if (!mcrCgId.isRootID()) {
+            throw new MCRUsageException("You can only purge root classifications!");
+        }
+        MCRConfiguration2.<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager")
+            .orElseThrow().purge(mcrCgId);
+
+    }
+
+    @MCRCommand(syntax = "purge user {0} from ocfl",
+        help = "Permanently delete user {0} and its history from ocfl")
+    public static void purgeUser(String userId) throws IOException {
+        new MCROCFLXMLUserManager().purgeUser(userId);
+    }
+
+    @MCRCommand(syntax = "purge all marked from ocfl",
+        help = "Permanently delete all hidden/archived ocfl entries")
+    public static void purgeMarked() throws IOException {
+        if (!confirmPurgeMarked) {
+            LOGGER.info("\n"
+                + "\u001B[93m" + "Enter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL"
+                + " hidden/archived OCFL entries." + "\u001B[0m" + "\n"
+                + "\u001B[41m" + "THIS ACTION CANNOT BE UNDONE!" + "\u001B[0m");
+            confirmPurgeMarked = true;
+            return;
+        }
+        purgeMarkedObjects();
+        confirmPurgeMarked = true;
+        purgeMarkedClasses();
+        confirmPurgeMarked = true;
+        purgeMarkedUsers();
+        confirmPurgeMarked = false;
+    }
+
+    @MCRCommand(syntax = "purge marked metadata from ocfl",
+        help = "Permanently delete all hidden/archived ocfl objects")
+    public static void purgeMarkedObjects() throws IOException {
+        if (!confirmPurgeMarked) {
+            LOGGER.info("\n"
+                + "\u001B[93m" + "Enter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL"
+                + " hidden/archived OCFL objects." + "\u001B[0m" + "\n"
+                + "\u001B[41m" + "THIS ACTION CANNOT BE UNDONE!" + "\u001B[0m");
+            confirmPurgeMarked = true;
+            return;
+        }
+        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Metadata.Manager.Repository");
+        MCROCFLXMLMetadataManager manager = new MCROCFLXMLMetadataManager();
+        manager.setRepositoryKey(repositoryKey);
+        OcflRepository repository = manager.getRepository();
+        repository.listObjectIds()
+            .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.MCROBJECT)
+                || obj.startsWith(MCROCFLObjectIDPrefixHelper.MCRDERIVATE))
+            .filter(obj -> "Deleted".equals(repository.describeObject(obj)
+                .getHeadVersion().getVersionInfo().getMessage()))
+            .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.MCROBJECT, ""))
+            .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.MCRDERIVATE, ""))
+            .forEach(oId -> manager.purge(MCRObjectID.getInstance(oId), new Date(),
+                MCRUserManager.getCurrentUser().getUserName()));
+        confirmPurgeMarked = false;
+    }
+
+    @MCRCommand(syntax = "purge marked classifications from ocfl",
+        help = "Permanently delete all hidden/archived ocfl classes")
+    public static void purgeMarkedClasses() throws IOException {
+        if (!confirmPurgeMarked) {
+            LOGGER.info("\n"
+                + "\u001B[93m" + "Enter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL"
+                + " hidden/archived OCFL classes." + "\u001B[0m" + "\n"
+                + "\u001B[41m" + "THIS ACTION CANNOT BE UNDONE!" + "\u001B[0m");
+            confirmPurgeMarked = true;
+            return;
+        }
+
+        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Classification.Manager.Repository");
+        OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        MCROCFLXMLClassificationManager manager = MCRConfiguration2
+                    .<MCROCFLXMLClassificationManager>getSingleInstanceOf("MCR.Classification.Manager").orElseThrow();
+        repository.listObjectIds()
+            .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.CLASSIFICATION))
+            .filter(obj -> MCROCFLXMLClassificationManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
+                .getHeadVersion().getVersionInfo().getMessage()))
+            .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.CLASSIFICATION, ""))
+            .forEach(cId -> manager.purge(MCRCategoryID.fromString(cId)));
+        confirmPurgeMarked = false;
+    }
+
+    @MCRCommand(syntax = "purge marked users from ocfl",
+        help = "Permanently delete all hidden/archived ocfl users")
+    public static void purgeMarkedUsers() throws IOException {
+        if (!confirmPurgeMarked) {
+            LOGGER.info("\n"
+                + "\u001B[93m" + "Enter the command again to confirm \u001B[4mPERMANENTLY\u001B[24m deleting ALL"
+                + " hidden/archived OCFL users." + "\u001B[0m" + "\n"
+                + "\u001B[41m" + "THIS ACTION CANNOT BE UNDONE!" + "\u001B[0m");
+            confirmPurgeMarked = true;
+            return;
+        }
+
+        String repositoryKey = MCRConfiguration2.getStringOrThrow("MCR.Users.Manager.Repository");
+        OcflRepository repository = MCROCFLRepositoryProvider.getRepository(repositoryKey);
+        repository.listObjectIds()
+            .filter(obj -> obj.startsWith(MCROCFLObjectIDPrefixHelper.USER))
+            .filter(obj -> MCROCFLXMLUserManager.MESSAGE_DELETED.equals(repository.describeObject(obj)
+                .getHeadVersion().getVersionInfo().getMessage()))
+            .map(obj -> obj.replace(MCROCFLObjectIDPrefixHelper.USER, ""))
+            .forEach(u -> new MCROCFLXMLUserManager().purgeUser(u));
+        confirmPurgeMarked = false;
     }
 
     private static List<String> getStaleOCFLClassificationIDs() {
