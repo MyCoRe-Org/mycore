@@ -18,11 +18,9 @@
 
 package org.mycore.orcid2.resources;
 
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
@@ -87,27 +85,6 @@ public class MCRORCIDResource {
         } catch (Exception e) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-    }
-
-    /**
-     * Stores MCRORCIDCredentials to current user.
-     * 
-     * @param credentials MCRORCIDCredentials
-     * @return Response
-     */
-    @POST
-    @Path("storeCredentials")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response storeCredentials(MCRORCIDCredentials credentials) {
-        if (credentials == null) {
-            throw new WebApplicationException(Status.BAD_REQUEST);
-        }
-        if (isCurrentUserGuest()) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
-        }
-        final MCRORCIDUser orcidUser = MCRORCIDSessionUtils.getCurrentUser();
-        orcidUser.storeCredentials(credentials);
-        return Response.ok().build();
     }
 
     private boolean isCurrentUserGuest() {
