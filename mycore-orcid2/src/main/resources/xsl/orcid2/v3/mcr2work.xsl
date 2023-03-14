@@ -6,7 +6,6 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
   xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:work="http://www.orcid.org/ns/work"
-  xmlns:common="http://www.orcid.org/ns/common"
   exclude-result-prefixes="xsl mods">
 
   <xsl:import href="resource:xsl/orcid2/v3/mcr2work_generic.xsl" />

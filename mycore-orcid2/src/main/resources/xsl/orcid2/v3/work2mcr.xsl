@@ -5,8 +5,6 @@
   xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:work="http://www.orcid.org/ns/work"
   xmlns:common="http://www.orcid.org/ns/common"
-  xmlns:bulk="http://www.orcid.org/ns/bulk"
-  xmlns:activities="http://www.orcid.org/ns/activities"
   exclude-result-prefixes="xsl">
 
   <xsl:import href="resource:xsl/orcid2/v3/work2mcr_generic.xsl" />
