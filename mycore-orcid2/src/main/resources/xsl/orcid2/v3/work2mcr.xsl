@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Transforms the response of a HTTP GET request to the ORCID.org works API into MODS -->
-
-<xsl:stylesheet version="1.0" 
+<xsl:stylesheet version="3.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
   xmlns:mods="http://www.loc.gov/mods/v3"
-  xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:work="http://www.orcid.org/ns/work"
   xmlns:common="http://www.orcid.org/ns/common"
   xmlns:bulk="http://www.orcid.org/ns/bulk"
   xmlns:activities="http://www.orcid.org/ns/activities"
-  exclude-result-prefixes="xsl xalan">
+  exclude-result-prefixes="xsl">
 
   <xsl:template match="activities:works|activities:group|bulk:bulk">
     <xsl:copy>
@@ -18,18 +15,12 @@
     </xsl:copy>
   </xsl:template>
 
-  <!-- Transforms the work to MODS and adds a mods:mods node to the work, which is copied 1:1 -->
   <xsl:template match="work:work|work:work-summary">
     <xsl:copy>
-      <!-- TODO <xsl:copy-of select="@put-code" /> -->
-      <!-- TODO <xsl:apply-templates select="common:source/common:*/common:path" /> -->
-      <!-- TODO <xsl:apply-templates select="common:external-ids/common:external-id[common:external-id-type='source-work-id']" /> -->
       <mods:mods>
         <xsl:apply-templates select="work:type" />
         <xsl:apply-templates select="work:title" />
-        <xsl:apply-templates select="work:title/common:translated-title" />
-        <xsl:apply-templates select="work:journal-title" />
-        <xsl:apply-templates select="work:contributors/work:contributor" />
+        <xsl:apply-templates select="work:contributors" />
         <xsl:apply-templates select="common:publication-date" />
         <xsl:apply-templates select="work:short-description" />
         <xsl:apply-templates select="common:url" />
@@ -40,55 +31,107 @@
     </xsl:copy>
   </xsl:template>
 
-  <!-- MyCoRe Object ID -->  
-  <xsl:template match="common:external-ids/common:external-id[common:external-id-type='source-work-id']">
-    <xsl:attribute name="oid">
-      <xsl:value-of select="substring-before(common:external-id-value,':')" />
-      <xsl:text>_mods_</xsl:text>
-      <xsl:value-of select="substring-after(common:external-id-value,':')" />
-    </xsl:attribute>
-  </xsl:template>
-  
-  <!-- BibTeX -->
   <xsl:template match="work:citation[work:citation-type='bibtex']">
     <bibTeX>
       <xsl:value-of select="work:citation-value" />
     </bibTeX>
   </xsl:template>
-  
-  <!-- Source -->
-  <xsl:template match="common:source/common:*/common:path">
-    <xsl:attribute name="source">
-      <xsl:value-of select="." />
-    </xsl:attribute>
+
+  <xsl:template match="work:type">
+    <xsl:variable name="genre">
+      <xsl:choose>
+        <!--xsl:when test="text()='book'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='book-chapter'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='book-review'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='dictionary-entry'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='dissertation'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='dissertation-thesis'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='encyclopedia-entry'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='edited-book'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='journal-article'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='journal-issue'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='magazine-article'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='manual'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='online-resource'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='newsletter-article'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='newspaper-article'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='preprint'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='report'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='research-tool'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='supervised-student-publication'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='test'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='translation'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='website'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='working-paper'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='conference-abstract'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='conference-paper'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='conference-poster'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='disclosure'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='license'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='patent'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='registered-copyright'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='trademark'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='annotation'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='artistic-performance'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='data-management-plan'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='data-set'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='invention'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='lecture-speech'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='physical-object'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='research-technique'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='software'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='spin-off-company'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='standards-and-policy'"><xsl:value-of select="text()" /></xsl:when-->
+        <!--xsl:when test="text()='technical-standard'"><xsl:value-of select="text()" /></xsl:when-->
+        <xsl:otherwise><xsl:value-of select="text()" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="host">
+      <xsl:choose>
+        <xsl:when test="text()='book-chapter'"><xsl:value-of select="text()" /></xsl:when>
+        <xsl:when test="text()='dictionary-entry'"><xsl:value-of select="text()" /></xsl:when>
+        <xsl:when test="text()='encyclopedia-entry'"><xsl:value-of select="text()" /></xsl:when>
+        <xsl:when test="text()='journal-article'"><xsl:value-of select="text()" /></xsl:when>
+        <xsl:when test="text()='journal-issue'"><xsl:value-of select="text()" /></xsl:when>
+        <xsl:when test="text()='newspaper-article'"><xsl:value-of select="text()" /></xsl:when>
+        <xsl:when test="text()='conference-abstract'"><xsl:value-of select="text()" /></xsl:when>
+        <xsl:when test="text()='conference-paper'"><xsl:value-of select="text()" /></xsl:when>
+        <xsl:when test="text()='magazine-article'"><xsl:value-of select="text()" /></xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:if test="string-length($genre) &gt; 0">
+      <mods:genre type="intern"><xsl:value-of select="$genre" /></mods:genre>
+    </xsl:if>
+    <xsl:if test="string-length($host) &gt; 0">
+      <mods:relatedItem type="host">
+        <mods:genre type="intern"><xsl:value-of select="$host" /></mods:genre>
+        <xsl:apply-templates select="../work:journal-title" />
+        <xsl:apply-templates select="../common:external-ids/common:external-id[common:external-id-relationship='part-of']" />
+      </mods:relatedItem>
+    </xsl:if>
   </xsl:template>
-  
-  <xsl:template match="work:type"> <!-- TODO -->
-    <mods:genre>
-      <xsl:value-of select="text()" />
-    </mods:genre>
-  </xsl:template>
-  
+
   <xsl:template match="work:title">
     <mods:titleInfo>
       <xsl:apply-templates select="common:title" />
       <xsl:apply-templates select="common:subtitle" />
     </mods:titleInfo>
+    <xsl:apply-templates select="common:translated-title" />
   </xsl:template>
-  
+
   <xsl:template match="common:title">
     <mods:title>
       <xsl:value-of select="text()" />
     </mods:title>
   </xsl:template>
-  
+
   <xsl:template match="common:subtitle">
     <mods:subTitle>
       <xsl:value-of select="text()" />
     </mods:subTitle>
   </xsl:template>
 
-  <xsl:template match="work:title/common:translated-title">
+  <xsl:template match="common:translated-title">
     <mods:titleInfo type="translated">
       <xsl:for-each select="@language-code">
         <xsl:attribute name="xml:lang">
@@ -102,20 +145,22 @@
   </xsl:template>
 
   <xsl:template match="work:journal-title">
-    <mods:relatedItem type="host">
-      <mods:titleInfo>
-        <mods:title>
-          <xsl:value-of select="text()" />
-        </mods:title>
-      </mods:titleInfo>
-      <xsl:apply-templates select="../common:external-ids/common:external-id[common:external-id-relationship='part-of']" />
-    </mods:relatedItem>  
+    <mods:titleInfo>
+      <mods:title>
+        <xsl:value-of select="text()"/>
+      </mods:title>
+    </mods:titleInfo>
   </xsl:template>
 
-  <xsl:template match="work:contributors/work:contributor">
+
+  <xsl:template match="work:contributors">
+    <xsl:apply-templates select="work:contributor" />
+  </xsl:template>
+
+  <xsl:template match="work:contributor">
     <mods:name type="personal">
       <xsl:apply-templates select="work:credit-name" />
-      <xsl:call-template name="contributor-role" /> 
+      <xsl:apply-templates select="work:contributor-attributes" />
       <xsl:apply-templates select="common:contributor-orcid" />
     </mods:name>
   </xsl:template>
@@ -133,14 +178,10 @@
   <!-- Split "John F. Doe" into mods:namePart -->
   <xsl:template match="work:credit-name[not(contains(.,','))]">
     <mods:namePart type="family">
-      <xsl:for-each select="xalan:tokenize(.,' ')">
-        <xsl:if test="position() = last()">
-          <xsl:value-of select="." />
-        </xsl:if>
-      </xsl:for-each>
+      <xsl:value-of select="tokenize(.,' ')[last()]" />
     </mods:namePart>
     <mods:namePart type="given">
-      <xsl:for-each select="xalan:tokenize(.,' ')">
+      <xsl:for-each select="tokenize(.,' ')">
         <xsl:if test="position() != last()">
           <xsl:if test="position() &gt; 1">
             <xsl:text> </xsl:text>
@@ -150,29 +191,33 @@
       </xsl:for-each>
     </mods:namePart>
   </xsl:template>
-  
+
+  <xsl:template match="work:contributor-attributes">
+    <xsl:apply-templates select="work:contributor-role" />
+  </xsl:template>
+
   <!-- ORCID.org contributor roles to MARC relator codes mapping -->
-  <xsl:template name="contributor-role">
+  <xsl:template match="work:contributor-role">
     <mods:role>
       <mods:roleTerm type="code" authority="marcrelator">
         <xsl:choose>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='author'">aut</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='assignee'">asg</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='editor'">edt</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='chair-or-translator'">trl</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='co-investigator'">ctb</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='co-inventor'">ctb</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='graduate-student'">ctb</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='other-inventor'">ctb</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='principal-investigator'">rth</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='postdoctoral-researcher'">res</xsl:when>
-          <xsl:when test="work:contributor-attributes/work:contributor-role='support-staff'">ctb</xsl:when>
-          <xsl:otherwise>aut</xsl:otherwise> <!-- TODO -->
+          <xsl:when test=".='author'">aut</xsl:when>
+          <xsl:when test=".='assignee'">asg</xsl:when>
+          <xsl:when test=".='editor'">edt</xsl:when>
+          <xsl:when test=".='chair-or-translator'">trl</xsl:when>
+          <xsl:when test=".='co-investigator'">ctb</xsl:when>
+          <xsl:when test=".='co-inventor'">ctb</xsl:when>
+          <xsl:when test=".='graduate-student'">ctb</xsl:when>
+          <xsl:when test=".='other-inventor'">ctb</xsl:when>
+          <xsl:when test=".='principal-investigator'">rth</xsl:when>
+          <xsl:when test=".='postdoctoral-researcher'">res</xsl:when>
+          <xsl:when test=".='support-staff'">ctb</xsl:when>
+          <xsl:otherwise>aut</xsl:otherwise>
         </xsl:choose>
       </mods:roleTerm>
     </mods:role>
   </xsl:template>
-  
+
   <xsl:template match="common:contributor-orcid">
     <mods:nameIdentifier type="orcid">
       <xsl:value-of select="common:path" />
@@ -183,20 +228,24 @@
     <mods:originInfo>
       <mods:dateIssued encoding="w3cdtf">
         <xsl:value-of select="common:year/text()" />
-        <xsl:text>-</xsl:text>
-        <xsl:value-of select="common:month/text()" />
-        <xsl:text>-</xsl:text>
-        <xsl:value-of select="common:day/text()" />
+        <xsl:if test="common:month/text()">
+          <xsl:text>-</xsl:text>
+          <xsl:value-of select='format-number(common:month/text(),"00"' />
+          <xsl:if test="common:day/text()">
+            <xsl:text>-</xsl:text>
+            <xsl:value-of select='format-number(common:day/text(),"00' />
+          </xsl:if>
+        </xsl:if>
       </mods:dateIssued>
     </mods:originInfo>
   </xsl:template>
-  
+
   <xsl:template match="work:short-description">
     <mods:abstract>
       <xsl:value-of select="text()" />
     </mods:abstract>
   </xsl:template>
-  
+
   <xsl:template match="common:url">
     <mods:location>
       <mods:url>
@@ -204,10 +253,17 @@
       </mods:url>
     </mods:location>
   </xsl:template>
-  
+
   <!-- DOI to mods:identifier -->
-  <xsl:template match="common:external-id[common:external-id-type='doi']">
-    <mods:identifier type="doi">
+  <xsl:template match="common:external-id[contains('doi',common:external-id-type)]">
+    <mods:identifier type="{common:external-id-type}">
+      <xsl:value-of select="common:external-id-value/text()" />
+    </mods:identifier>
+  </xsl:template>
+
+  <!-- OCLC, PubMed, PubMedCentral, URN to mods:identifier -->
+  <xsl:template match="common:external-id[contains('oclc pmid pmc urn',common:external-id-type)]">
+    <mods:identifier type="{common:external-id-type}">
       <xsl:value-of select="common:external-id-value" />
     </mods:identifier>
   </xsl:template>
@@ -218,13 +274,20 @@
       <xsl:value-of select="substring-after(common:external-id-value,'2-s2.0-')" />
     </mods:identifier>
   </xsl:template>
-  
-  <!-- ISBN, ISSN, URN to mods:identifier -->
-  <xsl:template match="common:external-id[contains('isbn issn urn',common:external-id-type)]">
+
+  <!-- ISBN, ISSN to mods:identifier -->
+  <xsl:template match="common:external-id[contains('isbn issn',common:external-id-type)]">
     <mods:identifier type="{common:external-id-type}">
-      <xsl:value-of select="common:external-id-value" />
+      <xsl:value-of select="upper-case(common:external-id-value/text())" />
     </mods:identifier>
   </xsl:template>
+
+  <!-- Ignore remaining IDs -->
+  <xsl:template match="common:external-id" />
+  <xsl:template match="common:external-ids" />
+
+  <!-- Ignore last modification date -->
+  <xsl:template match="common:last-modified-date" />
 
   <xsl:template match="common:language-code">
     <mods:language>
@@ -234,6 +297,6 @@
     </mods:language>
   </xsl:template>
   
-  <xsl:template match="*|text()" />
+  <xsl:template match="@*|text()" />
 
 </xsl:stylesheet>
