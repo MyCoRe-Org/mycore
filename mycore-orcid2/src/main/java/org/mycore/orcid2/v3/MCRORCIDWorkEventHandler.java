@@ -21,7 +21,7 @@ package org.mycore.orcid2.v3;
 import java.util.List;
 
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 
 /**
  * Work handler which publishes object to ORCID.
@@ -29,7 +29,7 @@ import org.mycore.orcid2.user.MCRORCIDCredentials;
 public class MCRORCIDWorkEventHandler extends org.mycore.orcid2.MCRORCIDWorkEventHandler {
 
     @Override
-    protected void publishObject(MCRObject object, List<MCRORCIDCredentials> credentials) throws Exception {
+    protected void publishObject(MCRObject object, List<MCRORCIDUserCredential> credentials) throws Exception {
         MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, credentials);
     }
 }

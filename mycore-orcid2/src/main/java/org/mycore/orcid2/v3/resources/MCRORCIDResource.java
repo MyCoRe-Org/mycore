@@ -40,7 +40,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.jersey.MCRJerseyUtil;
 import org.mycore.orcid2.MCRORCIDUtils;
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.v3.MCRORCIDClientHelper;
@@ -94,12 +94,12 @@ public class MCRORCIDResource {
         if (orcids.size() > 1) { // should not happen
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final MCRORCIDCredentials credentials = orcidUser.getCredentialsByORCID(orcids.iterator().next());
-        if (credentials == null) {
+        final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(orcids.iterator().next());
+        if (credential == null) {
             return new MCRORCIDPublicationStatus(true, false);
         }
         try {
-            final Works works = MCRORCIDClientHelper.getClientFactory().createUserClient(credentials)
+            final Works works = MCRORCIDClientHelper.getClientFactory().createUserClient(credential)
                 .fetch(MCRORCIDSectionImpl.WORKS, Works.class);
             final List<WorkSummary> summaries
                 = works.getWorkGroup().stream().flatMap(g -> g.getWorkSummary().stream()).toList();
@@ -146,12 +146,12 @@ public class MCRORCIDResource {
         if (orcids.isEmpty() || orcids.size() > 1) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-        final MCRORCIDCredentials credentials = orcidUser.getCredentialsByORCID(orcids.iterator().next());
-        if (credentials == null || credentials.getAccessToken() == null) {
+        final MCRORCIDUserCredential credential = orcidUser.getCredentialByORCID(orcids.iterator().next());
+        if (credential == null || credential.getAccessToken() == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
         try {
-            MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, credentials);
+            MCRORCIDWorkHelper.publishToORCIDAndUpdateWorkInfo(object, credential);
             return Response.ok().build();
         } catch (Exception e) {
             LOGGER.error("Error while publishing: ", e);

@@ -25,12 +25,12 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents the ORCID credentials with all important properties.
+ * Represents the ORCID OAuth acces token response.
  * Maps the access token json response.
  * 
  * See <a href="https://members.orcid.org/api/oauth/3legged-oauth">ORCID documentation</a>
  */
-public class MCRORCIDCredentials implements Cloneable {
+public class MCRORCIDUserCredential implements Cloneable {
 
     private String orcid;
 
@@ -49,29 +49,20 @@ public class MCRORCIDCredentials implements Cloneable {
     private LocalDate expiration;
 
     /**
-     * Creates MCRORCIDCredentials object with ORCID iD and access token.
+     * Creates MCRORCIDUserCredential object with ORCID iD and access token.
      * 
      * @param orcid the ORCID iD
      * @param accessToken the access token
      */
-    public MCRORCIDCredentials(String orcid, String accessToken) {
+    public MCRORCIDUserCredential(String orcid, String accessToken) {
         this.orcid = orcid;
         this.accessToken = accessToken;
     }
 
     /**
-     * Creates MCRORCIDCredentials object with ORCID iD.
-     * 
-     * @param orcid the ORCID iD
+     * Creates empty MCRORCIDUserCredential object.
      */
-    public MCRORCIDCredentials(String orcid) {
-        this.orcid = orcid;
-    }
-
-    /**
-     * Creates empty MCRORCIDCredentials object.
-     */
-    public MCRORCIDCredentials() {
+    public MCRORCIDUserCredential() {
     }
 
     /**
@@ -241,7 +232,7 @@ public class MCRORCIDCredentials implements Cloneable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        MCRORCIDCredentials other = (MCRORCIDCredentials) obj;
+        MCRORCIDUserCredential other = (MCRORCIDUserCredential) obj;
         return Objects.equals(accessToken, other.accessToken) && Objects.equals(expiresIn, other.expiresIn)
             && Objects.equals(name, other.name) && Objects.equals(orcid, other.orcid)
             && Objects.equals(refreshToken, other.refreshToken) && Objects.equals(scope, other.scope)

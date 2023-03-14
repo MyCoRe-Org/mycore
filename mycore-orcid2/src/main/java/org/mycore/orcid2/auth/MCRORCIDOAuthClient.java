@@ -29,7 +29,7 @@ import jakarta.ws.rs.core.Response;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 
 /**
  * Client for the OAuth2 API of orcid.org. Used to
@@ -90,11 +90,11 @@ public class MCRORCIDOAuthClient {
      * 
      * @param code the orcid auth code
      * @param redirectURI the redirect uri
-     * @return response serialized as MCRORCIDCredentials
+     * @return response serialized as MCRORCIDUserCredential
      * @throws MCRORCIDRequestException if request fails
-     * @see MCRORCIDCredentials
+     * @see MCRORCIDUserCredential
      */
-    public MCRORCIDCredentials exchangeCode(String code, String redirectURI) throws MCRORCIDRequestException {
+    public MCRORCIDUserCredential exchangeCode(String code, String redirectURI) throws MCRORCIDRequestException {
         Form form = new Form();
         form.param("client_id", CLIENT_ID);
         form.param("client_secret", CLIENT_SECRET);
@@ -105,7 +105,7 @@ public class MCRORCIDOAuthClient {
         if (!Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.SUCCESSFUL)) {
             handleError(response);
         }
-        return response.readEntity(MCRORCIDCredentials.class);
+        return response.readEntity(MCRORCIDUserCredential.class);
     }
 
     private void handleError(Response response) throws MCRORCIDRequestException {

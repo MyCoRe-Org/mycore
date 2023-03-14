@@ -18,7 +18,7 @@
 
 package org.mycore.orcid2.validation;
 
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 
 /**
  * Provides validation methods.
@@ -26,17 +26,17 @@ import org.mycore.orcid2.user.MCRORCIDCredentials;
 public class MCRORCIDValidationHelper {
 
     /**
-     * Validates MCRORCIDCredentials.
+     * Validates MCRORCIDUserCredential.
      * 
-     * @param credentials the MCRORCIDCredentials
-     * @return true if credentials are valid
+     * @param credential the MCRORCIDUserCredential
+     * @return true if credential is valid
      */
-    public static boolean validateCredentials(MCRORCIDCredentials credentials) {
-        final String orcid = credentials.getORCID();
+    public static boolean validateCredential(MCRORCIDUserCredential credential) {
+        final String orcid = credential.getORCID();
         if (orcid == null || !validateORCID(orcid)) {
             return false;
         }
-        final String accessToken = credentials.getAccessToken();
+        final String accessToken = credential.getAccessToken();
         return accessToken != null && !accessToken.isEmpty();
     }
 

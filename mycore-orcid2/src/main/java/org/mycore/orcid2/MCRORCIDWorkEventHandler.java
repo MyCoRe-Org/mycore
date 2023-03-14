@@ -31,7 +31,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
 import org.mycore.user2.MCRUser;
 import org.mycore.orcid2.exception.MCRORCIDTransformationException;
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.util.MCRIdentifier;
@@ -70,7 +70,7 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
         if (!MCRMODSWrapper.isSupported(object)) {
             return;
         }
-        final List<MCRORCIDCredentials> credentials = listOrcidCredentials(object);
+        final List<MCRORCIDUserCredential> credentials = listOrcidCredentials(object);
         try {
             publishObject(object, credentials);
             LOGGER.info("Finished publishing {} to ORCID.", object.getId());
@@ -79,8 +79,8 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
         }
     }
 
-    private List<MCRORCIDCredentials> listOrcidCredentials(MCRObject object) {
-        List<MCRORCIDCredentials> orcidCredentials = new ArrayList<MCRORCIDCredentials>();
+    private List<MCRORCIDUserCredential> listOrcidCredentials(MCRObject object) {
+        List<MCRORCIDUserCredential> orcidCredentials = new ArrayList<MCRORCIDUserCredential>();
         for (Element nameElement : MCRORCIDUtils.listNameElements(new MCRMODSWrapper(object))) {
             MCRUser user = null;
             String orcid = null;
@@ -98,25 +98,25 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
                 }
             }
             if (user != null) {
-                MCRORCIDCredentials credentials = null;
+                MCRORCIDUserCredential credential = null;
                 if (orcid != null) {
-                    credentials = MCRORCIDUserUtils.getCredentialsByORCID(orcid); // save because of uniqueness check
+                    credential = MCRORCIDUserUtils.getCredentialsByORCID(orcid); // save because of uniqueness check
                 } else { // try to fetch orcid user
                     final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-                    final List<MCRORCIDCredentials> tmp = orcidUser.listCredentials();
+                    final List<MCRORCIDUserCredential> tmp = orcidUser.listCredentials();
                     if (tmp.size() == 1) {
-                        credentials = tmp.get(0);
+                        credential = tmp.get(0);
                     } else {
                         LOGGER.info("Found multiple ORCID credentials for user: {}", user.getUserID());
                         continue;
                     }
                 }
-                if (credentials != null) {
-                    final String scope = credentials.getScope();
+                if (credential != null) {
+                    final String scope = credential.getScope();
                     if (scope != null && !scope.contains(ScopeConstants.ACTIVITIES_UPDATE)) {
                         LOGGER.info("The scope is invalid. Skipping...");
                     } else {
-                        orcidCredentials.add(credentials);
+                        orcidCredentials.add(credential);
                     }
                 } 
             }
@@ -135,8 +135,8 @@ public abstract class MCRORCIDWorkEventHandler extends MCREventHandlerBase {
      * Otherwise, the publication in the profile will be updated.
      * 
      * @param object the MCRObject
-     * @param credentials List of MCRORCIDCredentials
+     * @param credentials List of MCRORCIDUserCredential
      * @throws Exception if Publish fails in general
      */
-    abstract protected void publishObject(MCRObject object, List<MCRORCIDCredentials> credentials) throws Exception;
+    abstract protected void publishObject(MCRObject object, List<MCRORCIDUserCredential> credentials) throws Exception;
 }

@@ -28,7 +28,7 @@ import org.mycore.frontend.cli.annotation.MCRCommand;
 import org.mycore.frontend.cli.annotation.MCRCommandGroup;
 import org.mycore.orcid2.exception.MCRORCIDException;
 import org.mycore.orcid2.user.MCRORCIDUser;
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
@@ -47,13 +47,13 @@ public class MCRORCIDCommands {
     protected static final String ORCID_TOKEN_ATTRIBUTE_NAME = "token_orcid";
 
     /**
-     * Migrates all orcid token user attributes to MCRORCIDCredentials.
+     * Migrates all orcid token user attributes to MCRORCIDUserCredential.
      * 
      * @throws MCRORCIDException if migration fails
      * @throws MCRException if there is more than ORCiD attribute for one user
      */
     @MCRCommand(syntax = "migrate all orcid access token attributes",
-        help = "Migrates orcid user access token attributes to orcid2 credentials")
+        help = "Migrates orcid user access token attributes to orcid2 oauth credential")
     public static void migrateORCIDTokenAttributes() throws MCRORCIDException, MCRException {
         final List<MCRUser> users
             = MCRUserManager.listUsers(null, null, null, null, ORCID_TOKEN_ATTRIBUTE_NAME, 0, Integer.MAX_VALUE);
@@ -65,10 +65,10 @@ public class MCRORCIDCommands {
                 LOGGER.info("Ignored {}, ORCiD attribute is missing.", user.getUserName());
                 continue;
             }
-            final MCRORCIDCredentials credentials = new MCRORCIDCredentials(orcid, token);
-            credentials.setTokenType("bearer");
+            final MCRORCIDUserCredential credential = new MCRORCIDUserCredential(orcid, token);
+            credential.setTokenType("bearer");
             final MCRORCIDUser orcidUser = new MCRORCIDUser(user);
-            orcidUser.storeCredentials(credentials);
+            orcidUser.storeCredential(credential);
             user.getAttributes().removeIf(a -> Objects.equals(a.getName(), ORCID_TOKEN_ATTRIBUTE_NAME));
             MCRUserManager.updateUser(user);
         }

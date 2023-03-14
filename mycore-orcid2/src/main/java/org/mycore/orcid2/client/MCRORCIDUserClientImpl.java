@@ -27,7 +27,7 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
 
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 
 /**
  * See {@link MCRORCIDUserClient}.
@@ -37,23 +37,23 @@ public class MCRORCIDUserClientImpl extends MCRORCIDBaseClient implements MCRORC
 
     private final WebTarget baseTarget;
 
-    private final MCRORCIDCredentials credentials;
+    private final MCRORCIDUserCredential credential;
 
     /**
-     * Creates an MCRORCIDUserClient with given api url and MCRORCIDCredentials.
+     * Creates an MCRORCIDUserClient with given api url and MCRORCIDUserCredential.
      * 
      * @param restURL rest url of ORCID api url
-     * @param credentials the MCRORCIDCredentials
+     * @param credential the MCRORCIDUserCredential
      */
-    public MCRORCIDUserClientImpl(String restURL, MCRORCIDCredentials credentials) {
-        super(restURL, credentials.getAccessToken());
-        this.credentials = credentials;
-        this.baseTarget = getBaseTarget().path(credentials.getORCID());
+    public MCRORCIDUserClientImpl(String restURL, MCRORCIDUserCredential credential) {
+        super(restURL, credential.getAccessToken());
+        this.credential = credential;
+        this.baseTarget = getBaseTarget().path(credential.getORCID());
     }
 
     @Override
     public <T> T fetch(MCRORCIDSection section, Class<T> valueType, long... putCodes) throws MCRORCIDRequestException {
-        return doFetch(credentials.getORCID(), section, valueType, putCodes);
+        return doFetch(credential.getORCID(), section, valueType, putCodes);
     }
 
     @Override

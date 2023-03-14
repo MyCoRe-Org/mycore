@@ -29,7 +29,7 @@ import jakarta.ws.rs.core.Response.Status;
 
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRSystemUserInformation;
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.orcid2.user.MCRORCIDUser;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
@@ -59,7 +59,7 @@ public class MCRORCIDResource {
         final MCRORCIDUser user = MCRORCIDSessionUtils.getCurrentUser();
         final String[] orcids = user.getORCIDs().toArray(String[]::new);
         final String[] credentials =
-            user.listCredentials().stream().map(MCRORCIDCredentials::getORCID).toArray(String[]::new);
+            user.listCredentials().stream().map(MCRORCIDUserCredential::getORCID).toArray(String[]::new);
         return new MCRORCIDUserStatus(orcids, credentials);
     }
 

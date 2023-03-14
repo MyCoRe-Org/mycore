@@ -45,8 +45,8 @@ Steps:
     Work work = MCRORCIDWorkTransformerHelper.transformContent(object);
 
     // initialize member client for current user
-    MCRORCIDCredentials credentials = MCRORCIDSessionUtils.getCurrentUser().getCredentials("ORCID");
-    MCRORCIDClient client = MCRORCIDClientFactory.getInstance("v3").createMemberClient(credentials);
+    MCRORCIDUserCredentials credential = MCRORCIDSessionUtils.getCurrentUser().getCredential("ORCID");
+    MCRORCIDClient client = MCRORCIDClientFactory.getInstance("v3").createMemberClient(credential);
 
     // publish work to orcid
     long putCode = client.create(MCRORCIDSectionImpl.WORKS, work);

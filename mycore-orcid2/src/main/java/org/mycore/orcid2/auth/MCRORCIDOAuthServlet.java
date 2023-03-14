@@ -42,7 +42,7 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.orcid2.MCRORCIDConstants;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.mycore.orcid2.user.MCRORCIDSessionUtils;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
@@ -125,10 +125,10 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
                 res.sendError(HttpServletResponse.SC_UNAUTHORIZED, msg);
             }
             try {
-                final MCRORCIDCredentials credentials
+                final MCRORCIDUserCredential credential
                     = MCRORCIDOAuthClient.getInstance().exchangeCode(code, redirectURI);
-                setExpiration(credentials);
-                MCRORCIDSessionUtils.getCurrentUser().storeCredentials(credentials);
+                setExpiration(credential);
+                MCRORCIDSessionUtils.getCurrentUser().storeCredential(credential);
                 res.sendRedirect(userProfileURL);
             } catch (MCRORCIDRequestException e) {
                 LOGGER.error("Cannot exchange token.", e);
@@ -136,11 +136,11 @@ public class MCRORCIDOAuthServlet extends MCRServlet {
         }
     }
 
-    private void setExpiration(MCRORCIDCredentials credentials) {
+    private void setExpiration(MCRORCIDUserCredential credential) {
         final LocalDate expireDate = LocalDateTime.now(ZoneId.systemDefault())
-            .plusSeconds(Integer.parseInt(credentials.getExpiresIn()))
+            .plusSeconds(Integer.parseInt(credential.getExpiresIn()))
             .toLocalDate();
-        credentials.setExpiration(expireDate);
+        credential.setExpiration(expireDate);
     }
 
     private void handleAuth(HttpServletRequest req, HttpServletResponse res) throws Exception {

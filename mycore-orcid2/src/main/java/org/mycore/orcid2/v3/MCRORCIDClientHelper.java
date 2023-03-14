@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.orcid2.user.MCRORCIDUserUtils;
 import org.mycore.orcid2.client.MCRORCIDClientFactory;
 import org.mycore.orcid2.client.exception.MCRORCIDRequestException;
-import org.mycore.orcid2.user.MCRORCIDCredentials;
+import org.mycore.orcid2.user.MCRORCIDUserCredential;
 import org.orcid.jaxb.model.v3.release.error.OrcidError;
 
 /**
@@ -39,9 +39,9 @@ public class MCRORCIDClientHelper {
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
-     * Fetches API with best credentials.
-     * If credentials exist for an ORCID iD, the Member API is requested with the token. 
-     * If a problem occurs during the request or no credentials exist, 
+     * Fetches API with best credential.
+     * If credential exist for an ORCID iD, the Member API is requested with the token. 
+     * If a problem occurs during the request or no credential exist, 
      * the general Member/Public API is requested as a fallback.
      * 
      * @param orcid the ORCID iD
@@ -55,15 +55,15 @@ public class MCRORCIDClientHelper {
     public static <T> T fetchWithBestCredentials(String orcid, MCRORCIDSectionImpl section, Class<T> valueType,
         long... putCodes) throws MCRORCIDRequestException {
         if (getClientFactory().checkMemberMode()) {
-            final MCRORCIDCredentials credentials = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
-            if (credentials != null) {
+            final MCRORCIDUserCredential credential = MCRORCIDUserUtils.getCredentialsByORCID(orcid);
+            if (credential != null) {
                 try {
-                    return getClientFactory().createUserClient(credentials).fetch(section, valueType, putCodes);
+                    return getClientFactory().createUserClient(credential).fetch(section, valueType, putCodes);
                 } catch (MCRORCIDRequestException e) {
                     final Response response = e.getErrorResponse();
                     if (Objects.equals(response.getStatusInfo().getFamily(), Response.Status.Family.CLIENT_ERROR)) {
                         LOGGER.info(
-                            "Request with credentials for orcid {} has failed with status code {}."
+                            "Request with credential for orcid {} has failed with status code {}."
                                 + " Token has probably expired. Trying to use read client as fallback...",
                             orcid, response.getStatus());
                     } else {
