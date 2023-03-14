@@ -18,92 +18,87 @@
 
 package org.mycore.pi.condition;
 
-import java.util.Map;
-
 import org.jdom2.Element;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.pi.MCRPIJobService;
 
+@MCRTestConfiguration(properties = {
+    @MCRTestProperty(key = "MCR.Metadata.Type.test", string = "true")
+})
 public class MCRPIXPathPredicateTest extends MCRTestCase {
 
-    private static final String MOCK_SERVICE_1 = "MOCK1";
+    private static final String KEY_CREATION_PREDICATE = "MCR.PI.Service.Mock.CreationPredicate";
 
-    private static final String MOCK_SERVICE_2 = "MOCK2";
-
-    private static final String MOCK_SERVICE_3 = "MOCK3";
-
-    private static final String MOCK_SERVICE_4 = "MOCK4";
-
-    private static final String MOCK_SERVICE_5 = "MOCK5";
+    private static final String KEY_CREATION_PREDICATE_XPATH = KEY_CREATION_PREDICATE + ".XPath";
 
     @Test
-    public void test1() {
-        MCRObjectID testID = MCRObjectID.getInstance("my_test_00000001");
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "/mycoreobject/metadata/test")
+    })
+    public void testMetadataRootElement() {
+        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "/mycoreobject/metadata/foo")
+    })
+    public void testMetadataWrongRootElement() {
+        Assert.assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "/mycoreobject/metadata/test/foo")
+    })
+    public void testMetadataNestedElement() {
+        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "false()")
+    })
+    public void testFasle() {
+        Assert.assertFalse(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    }
+
+    @Test
+    @MCRTestConfiguration(properties = {
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE, classNameOf = MCRPIXPathPredicate.class),
+        @MCRTestProperty(key = KEY_CREATION_PREDICATE_XPATH, string = "true()")
+    })
+    public void testTrue() {
+        Assert.assertTrue(MCRPIJobService.getPredicateInstance(KEY_CREATION_PREDICATE).test(getTestObject()));
+    }
+
+    private static MCRObject getTestObject() {
+
+        Element testElement = new Element("test");
+        testElement.setAttribute("class", "MCRMetaXML");
+        testElement.addContent(new Element("foo").setText("result1"));
+        testElement.addContent(new Element("bar").setText("result2"));
+
+        Element metadataElement = new Element("metadata");
+        metadataElement.addContent(testElement);
+
         MCRObject mcrObject = new MCRObject();
         mcrObject.setSchema("test");
-        mcrObject.setId(testID);
-        mcrObject.setId(testID);
-        final Element metadata = new Element("metadata");
-        final Element testElement = new Element("test1");
-        metadata.addContent(testElement);
-        testElement.setAttribute("class", "MCRMetaXML");
-        testElement.addContent(new Element("test2").setText("result1"));
-        testElement.addContent(new Element("test3").setText("result2"));
-        mcrObject.getMetadata().setFromDOM(metadata);
+        mcrObject.setId(MCRObjectID.getInstance("mcr_test_00000001"));
+        mcrObject.getMetadata().setFromDOM(metadataElement);
 
-        final boolean mock1Result = MCRPIJobService
-            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_1 + ".CreationPredicate").test(mcrObject);
-        final boolean mock2Result = MCRPIJobService
-            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_2 + ".CreationPredicate").test(mcrObject);
-        final boolean mock3Result = MCRPIJobService
-            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate").test(mcrObject);
-        final boolean mock4Result = MCRPIJobService
-            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate").test(mcrObject);
-        final boolean mock5Result = MCRPIJobService
-            .getPredicateInstance("MCR.PI.Service." + MOCK_SERVICE_5 + ".CreationPredicate").test(mcrObject);
+        return mcrObject;
 
-        Assert.assertTrue(mock1Result);
-        Assert.assertFalse(mock2Result);
-        Assert.assertTrue(mock3Result);
-        Assert.assertFalse(mock4Result);
-        Assert.assertTrue(mock5Result);
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> testProperties = super.getTestProperties();
-
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_1 + ".CreationPredicate", MCRPIXPathPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_1 + ".CreationPredicate.XPath", "/mycoreobject/metadata/test1");
-
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_2 + ".CreationPredicate", MCRPIXPathPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_2 + ".CreationPredicate.XPath", "/mycoreobject/metadata/test2");
-
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate", MCRPIXPathPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_3 + ".CreationPredicate.XPath", "/mycoreobject/metadata/test1/test2");
-
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate", MCRPIXPathPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_4 + ".CreationPredicate.XPath", "false()");
-
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_5 + ".CreationPredicate", MCRPIXPathPredicate.class.getName());
-        testProperties
-            .put("MCR.PI.Service." + MOCK_SERVICE_5 + ".CreationPredicate.XPath", "true()");
-
-        testProperties.put("MCR.Metadata.Type.test", Boolean.TRUE.toString());
-
-        return testProperties;
-    }
 }
