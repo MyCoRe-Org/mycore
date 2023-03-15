@@ -48,6 +48,7 @@ import org.mycore.user2.MCRUserManager;
 
 /**
  * Provides functionality to interact with MCRUser that is also an ORCID user.
+ * Handles the updating of user.
  */
 public class MCRORCIDUser {
 
@@ -125,19 +126,19 @@ public class MCRORCIDUser {
      * 
      * @param orcid the ORCID iD
      * @param credential the MCRORCIDCredential
-     * @throws MCRORCIDException if crededentials are invalid
+     * @throws MCRORCIDException if crededential is invalid
      * @see MCRORCIDUser#addORCID
      */
     public void storeCredential(String orcid, MCRORCIDCredential credential) throws MCRORCIDException {
         addORCID(orcid);
         if (!MCRORCIDValidationHelper.validateCredential(credential)) {
-            throw new MCRORCIDException("Credentials are invalid");
+            throw new MCRORCIDException("Credential is invalid");
         }
         String credentialString = null;
         try {
             credentialString = serializeCredential(credential);
         } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("Credentials are invalid");
+            throw new MCRORCIDException("Credential is invalid");
         }
         user.setUserAttribute(getCredentialAttributeNameByORCID(orcid), credentialString);
         MCRUserManager.updateUser(user);
@@ -155,7 +156,8 @@ public class MCRORCIDUser {
                 toKeep.add(attribute);
             }
         }
-        user.setAttributes(toKeep); // because of hibernate issues
+        // because of Hibernate issues
+        user.setAttributes(toKeep);
         MCRUserManager.updateUser(user);
     }
 
@@ -172,7 +174,8 @@ public class MCRORCIDUser {
                 toKeep.add(attribute);
             }
         }
-        user.setAttributes(toKeep); // because of hibernate issues
+        // because of Hibernate issues
+        user.setAttributes(toKeep);
         MCRUserManager.updateUser(user);
     }
 
@@ -190,7 +193,7 @@ public class MCRORCIDUser {
      * Returns user's MCRORCIDCredential from user attributes.
      * 
      * @return Map of MCRORCIDCredentials
-     * @throws MCRORCIDException if the are corrupt MCRCredentials
+     * @throws MCRORCIDException if at least one MCRORCIDCredential is corrupt
      */
     public Map<String, MCRORCIDCredential> getCredentials() throws MCRORCIDException {
         try {
@@ -198,7 +201,7 @@ public class MCRORCIDUser {
                 .collect(Collectors.toMap(a -> a.getName().substring(ATTR_ORCID_CREDENTIAL.length()),
                     a -> deserializeCredential(a.getValue())));
         } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("Credentials are corrupt");
+            throw new MCRORCIDException("Found corrupt credential");
         }
     }
 
@@ -207,14 +210,14 @@ public class MCRORCIDUser {
      * 
      * @param orcid the ORCID iD
      * @return MCRCredentials or null
-     * @throws MCRORCIDException if the MCRCredentials are corrupt
+     * @throws MCRORCIDException if the MCRORCIDCredential is corrupt
      */
     public MCRORCIDCredential getCredentialByORCID(String orcid) throws MCRORCIDException {
         try {
             return Optional.ofNullable(getCredentialAttributeValueByORCID(orcid))
                 .map(s -> deserializeCredential(s)).orElse(null);
         } catch (IllegalArgumentException e) {
-            throw new MCRORCIDException("Credentials are corrupt");
+            throw new MCRORCIDException("Credential is corrupt");
         }
     }
 
@@ -259,7 +262,7 @@ public class MCRORCIDUser {
     /**
      * Serializes MCRORCIDCredential to String.
      * 
-     * @param credential MCRORCIDCredentials
+     * @param credential MCRORCIDCredential
      * @return MCRORCIDCredential as String
      * @throws IllegalArgumentException if serialization fails
      */
@@ -277,7 +280,7 @@ public class MCRORCIDUser {
     /**
      * Deserializes String to MCRORCIDCredential.
      * 
-     * @param credentialString MCRORCIDCredentials as String
+     * @param credentialString MCRORCIDCredential as String
      * @return MCRORCIDCredential
      * @throws IllegalArgumentException if deserialisation fails
      */
